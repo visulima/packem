@@ -1,0 +1,5 @@
+packages:
+    - "!**/__test__/**"
+    - "!**/__tests__/**"
+    - "!**/__fixtures__/**"
+    - "packages/**"
