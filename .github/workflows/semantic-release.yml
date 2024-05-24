@@ -18,7 +18,7 @@ permissions:
 jobs:
     semantic-release:
         name: "Semantic Release"
-        if: "github.repository == '{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}'"
+        if: "github.repository == 'visulima/packem'"
         runs-on: "ubuntu-latest"
         permissions:
             contents: "write" # to be able to publish a GitHub release

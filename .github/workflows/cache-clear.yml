@@ -10,4 +10,4 @@ jobs:
     cleanup-branch-cache:
         uses: "anolilab/workflows/.github/workflows/cleanup-branch-cache.yml@main"
         with:
-            target-repo: "{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}"
+            target-repo: "visulima/packem"

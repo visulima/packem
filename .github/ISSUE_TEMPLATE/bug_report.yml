@@ -9,7 +9,7 @@ body:
 
               If you are unsure whether your problem is a bug or not, you can check the following:
 
-              - open a new [discussion](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/discussions) and ask your question there
+              - open a new [discussion](https://github.com/visulima/packem/discussions) and ask your question there
 
     - type: "checkboxes"
       id: "checkboxes"
@@ -17,15 +17,15 @@ body:
           label: "Pre-Checks"
           description: "Before submitting the issue, please make sure you do the following"
           options:
-              - label: "Follow our [Code of Conduct](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/blob/main/.github/CODE_OF_CONDUCT.md)."
+              - label: "Follow our [Code of Conduct](https://github.com/visulima/packem/blob/main/.github/CODE_OF_CONDUCT.md)."
                 required: true
-              - label: "Read the [Contributing Guidelines](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/blob/main/.github/CONTRIBUTING.md)."
+              - label: "Read the [Contributing Guidelines](https://github.com/visulima/packem/blob/main/.github/CONTRIBUTING.md)."
                 required: true
-              - label: "Check that there isn't [already an issue](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/issues) that reports the same bug to avoid creating a duplicate."
+              - label: "Check that there isn't [already an issue](https://github.com/visulima/packem/issues) that reports the same bug to avoid creating a duplicate."
                 required: true
-              - label: "Make sure this is a {{ REPOSITORY_NAME }} issue and not related to a combination with another package."
+              - label: "Make sure this is a packem issue and not related to a combination with another package."
                 required: true
-              - label: "Check that this is a concrete bug. For Q&A open a [GitHub Discussion](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/discussions)."
+              - label: "Check that this is a concrete bug. For Q&A open a [GitHub Discussion](https://github.com/visulima/packem/discussions)."
                 required: true
               - label: "The provided reproduction is a [minimal reproducible example](https://stackoverflow.com/help/minimal-reproducible-example) of the bug."
                 required: true
@@ -62,7 +62,7 @@ body:
       id: "environment-info"
       attributes:
           label: "Environment Info"
-          description: "Output of `npx envinfo --system --npmPackages '@{{ SCOPED_PACKAGE_NAME }}/*' --binaries --browsers`"
+          description: "Output of `npx envinfo --system --npmPackages '@visulima/*' --binaries --browsers`"
           render: "shell"
           placeholder: |
               System:
@@ -76,7 +76,7 @@ body:
                 npm: _ - /usr/bin/npm
                 pnpm: _ - /usr/bin/pnpm
               npmPackages:
-                @{{ SCOPED_PACKAGE_NAME }}/*: _ => _
+                @visulima/*: _ => _
       validations:
           required: true
 

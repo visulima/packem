@@ -8,4 +8,4 @@ jobs:
     stale-issues:
         uses: "anolilab/workflows/.github/workflows/stale-issues.yml@main"
         with:
-            target-repo: "{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}"
+            target-repo: "visulima/packem"

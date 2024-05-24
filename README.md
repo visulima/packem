@@ -16,27 +16,6 @@
 
 ---
 
-## Getting Started
-
-Use the following steps when first using this template.
-
--   Find and replace
-    - `{{ ORGANIZATIONS }}` with your `organization` name
-    - {{ REPOSITORY_NAME }} with your `repository name`
-    - {{ SCOPED_PACKAGE_NAME }} with your npm `scope name` (don't use the @ at the beginning)
-    - {{ ORGANIZATIONS_capitalize }} with your capitalized `organization` name
-    across the whole project.
--   Replace the template package in the package's folder with a package of your choosing.
--   For automatic publishing add your npm token to your [GitHub repo secrets](https://docs.github.com/en/actions/reference/encrypted-secrets) with the name `NPM_AUTH_TOKEN`.
--   For automatic publishing add your GitHub token to your [GitHub repo secrets](https://docs.github.com/en/actions/reference/encrypted-secrets) with the name `SEMANTIC_RELEASE_GITHUB_TOKEN`.
-
-<br />
-
-## Why
-
-Created this template primarily for my work, to prevent from constantly reinventing the wheel when starting a new project.
-Often had ideas and then delayed because the pain of starting from scratch is too high. This toolkit hopefully helps to reduce the friction.
-
 ## Versioning
 
 This project uses [SemVer](https://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/anolilab/node-mono-library-template/tags).

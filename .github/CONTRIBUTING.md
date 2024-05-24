@@ -29,10 +29,10 @@ Here are a few guidelines that will help you along the way.
     -   [Release process](#release process)
     -   [Join the Project Team](#join-the-project-team)
 
-## [Code of Conduct](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/blob/main/.github/CODE_OF_CONDUCT.md)
+## [Code of Conduct](https://github.com/visulima/packem/blob/main/.github/CODE_OF_CONDUCT.md)
 
 <\**ORGANIZATIONS*uppercase\*> has adopted the [Contributor Covenant](https://www.contributor-covenant.org/) as its Code of Conduct, and we expect project participants to adhere to it.
-Please read [the full text](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/blob/main/.github/CODE_OF_CONDUCT.md) so that you can understand what actions will and will not be tolerated.
+Please read [the full text](https://github.com/visulima/packem/blob/main/.github/CODE_OF_CONDUCT.md) so that you can understand what actions will and will not be tolerated.
 
 ## Introduction
 
@@ -47,9 +47,9 @@ The [Project Team](#join-the-project-team) looks forward to your contributions. 
 If you have a question about this project, how to use it, or just need clarification about something:
 
 -   First, search the issues to see if someone else already had the same problem as you.
--   If not, open an GitHub Discussion at [Q&A](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/discussions/categories/q-a)
+-   If not, open an GitHub Discussion at [Q&A](https://github.com/visulima/packem/discussions/categories/q-a)
 -   Provide as much context as you can about what you're running into.
--   Provide project and platform versions (nodejs, npm, etc) you can use `npx envinfo --system --npmPackages '@{{ SCOPED_PACKAGE_NAME }}/*' --binaries --browsers`, depending on what seems relevant. If not, please be ready to provide that information if maintainers ask for it.
+-   Provide project and platform versions (nodejs, npm, etc) you can use `npx envinfo --system --npmPackages '@visulima/*' --binaries --browsers`, depending on what seems relevant. If not, please be ready to provide that information if maintainers ask for it.
 
 Once it's filed:
 
@@ -63,7 +63,7 @@ If you run into an error or bug with the project:
 
 -   First, search the open issues to see if someone else already reported this error or bug.
 -   If it's the case, add a +1 (thumb up reaction) to the issue and reply to the thread if you have something useful to add.
--   If nobody submitted this error or bug, open an issue as [Bug report](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/issues/new?assignees=&labels=s%3A+pending+triage%2Cc%3A+bug&projects=&template=bug_report.yml) and follow the steps to create the report.
+-   If nobody submitted this error or bug, open an issue as [Bug report](https://github.com/visulima/packem/issues/new?assignees=&labels=s%3A+pending+triage%2Cc%3A+bug&projects=&template=bug_report.yml) and follow the steps to create the report.
     > Include _reproduction steps_ that someone else can follow to recreate the bug or error on their own.
 
 Once it's filed:
@@ -82,7 +82,7 @@ If the project doesn't do something you need or want it to do:
 
 -   First, search the open issues to see if someone else already requested that feature.
 -   If it's the case, add a +1 (thumb up reaction) to the initial request and reply to the thread if you have something meaningful to add.
--   If nobody submitted this request, open an issue as [New feature proposal](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/issues/new?assignees=&labels=s%3A+pending+triage%2Cc%3A+feature%2Cs%3A+waiting+for+user+interest&projects=&template=feature_request.yml) and follow the steps to create the proposal.
+-   If nobody submitted this request, open an issue as [New feature proposal](https://github.com/visulima/packem/issues/new?assignees=&labels=s%3A+pending+triage%2Cc%3A+feature%2Cs%3A+waiting+for+user+interest&projects=&template=feature_request.yml) and follow the steps to create the proposal.
 
 Once it's filed:
 
@@ -99,7 +99,7 @@ Working on your first Pull Request? You can learn how from this free video serie
 
 [How to Contribute to an Open Source Project on GitHub](https://egghead.io/courses/how-to-contribute-to-an-open-source-project-on-github)
 
-To help you get your feet wet and get you familiar with our contribution process, we have a list of [good first issues](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/issues?q=is:open+is:issue+label:%22good+first+issue%22) that contain bugs that have a relatively limited scope.
+To help you get your feet wet and get you familiar with our contribution process, we have a list of [good first issues](https://github.com/visulima/packem/issues?q=is:open+is:issue+label:%22good+first+issue%22) that contain bugs that have a relatively limited scope.
 This is a great place to get started.
 
 If you decide to fix an issue, please be sure to check the comment thread in case somebody is already working on a fix.
@@ -118,7 +118,7 @@ If you want to go the usual route and run the project locally, though:
 
 -   [Install Node.js](https://nodejs.org/en/download/)
 -   [Install nvm](https://github.com/nvm-sh/nvm#installing-and-updating) (optional)
-    > {{ ORGANIZATIONS_capitalize }} use nvm to manage the different node version, if you don't want to install `nvm`, check the package.json -> engines -> node value for the min support node version.
+    > Visulima use nvm to manage the different node version, if you don't want to install `nvm`, check the package.json -> engines -> node value for the min support node version.
 -   [Install pnpm](https://pnpm.io/installation)
 -   [Fork the project](https://guides.github.com/activities/forking/#fork)
 
@@ -131,7 +131,7 @@ Then in your terminal:
 
 And you should be ready to go!
 
-> If you run into any issue with the setup, check first the [TROUBLESHOOT.md](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/blob/main/.github/TROUBLESHOOT.md)
+> If you run into any issue with the setup, check first the [TROUBLESHOOT.md](https://github.com/visulima/packem/blob/main/.github/TROUBLESHOOT.md)
 
 ## Contribute Documentation
 
@@ -517,7 +517,7 @@ Allowed scopes are:
 
 > The scope is not checkable via `Semantic Pull Request` action as this would limit the scopes to only existing modules,
 > but if we add a new package like `fs`, then the PR author couldn't use the new package name as scope.
-> As such, we (the {{ ORGANIZATIONS_capitalize }} team) must be mindful of valid scopes, and we reserve the right to edit titles as we see fit.
+> As such, we (the Visulima team) must be mindful of valid scopes, and we reserve the right to edit titles as we see fit.
 
 Some examples of valid pull request titles:
 
@@ -621,7 +621,7 @@ If you can't do this yourself, @mention a maintainer so they can do it.
 
 In order to help other folks out with their questions:
 
--   Go to the GitHub discussions and [open the Q&A category](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/discussions/categories/q-a).
+-   Go to the GitHub discussions and [open the Q&A category](https://github.com/visulima/packem/discussions/categories/q-a).
 -   Read through the list until you find something that you're familiar enough with to give an answer to.
 -   Respond to the discussion with whatever details are needed to clarify the question, or get more details about what's going on.
 -   Once the discussion wraps up and things are clarified, either close the issue, or ask the original issue filer (or a maintainer) to close it for you.
@@ -632,7 +632,7 @@ Some notes on picking up support discussion:
 -   As much as possible, try to refer to past issues or discussion with accepted answers. Link to them from your replies with the `#123` format.
 -   Be kind and patient with users -- often, folks who have run into confusing things might be upset or impatient.
     This is ok.
-    Try to understand where they're coming from, and if you're too uncomfortable with the tone, feel free to stay away or withdraw from the issue. (note: if the user is outright hostile or is violating the CoC, [refer to the Code of Conduct](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/blob/main/.github/CODE_OF_CONDUCT.md) to resolve the conflict).
+    Try to understand where they're coming from, and if you're too uncomfortable with the tone, feel free to stay away or withdraw from the issue. (note: if the user is outright hostile or is violating the CoC, [refer to the Code of Conduct](https://github.com/visulima/packem/blob/main/.github/CODE_OF_CONDUCT.md) to resolve the conflict).
 
 ## Label Issues
 
@@ -640,7 +640,7 @@ Some notes on picking up support discussion:
 
 One of the most important tasks in handling issues is labeling them usefully and accurately. All other tasks involving issues ultimately rely on the issue being classified in such a way that relevant parties looking to do their own tasks can find them quickly and easily.
 
-In order to label issues, [open up the list of unlabeled issues](https://github.com/{{ ORGANIZATIONS }}/{{ REPOSITORY_NAME }}/issues?q=is%3Aopen+is%3Aissue+no%3Alabel) and, **from newest to oldest**, read through each one and apply issue labels according to the table below. If you're unsure about what label to apply, skip the issue and try the next one: don't feel obligated to label each and every issue yourself!
+In order to label issues, [open up the list of unlabeled issues](https://github.com/visulima/packem/issues?q=is%3Aopen+is%3Aissue+no%3Alabel) and, **from newest to oldest**, read through each one and apply issue labels according to the table below. If you're unsure about what label to apply, skip the issue and try the next one: don't feel obligated to label each and every issue yourself!
 
 | Label                          | Apply When                                                                       | Notes                                                                                                                                                                                                                                                                  |
 | ------------------------------ | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
