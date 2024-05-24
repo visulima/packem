@@ -84,5 +84,10 @@
     "packageManager": "pnpm@9.1.2",
     "engines": {
         "node": ">=18.* <=21.*"
+    },
+    "pnpm": {
+        "overrides": {
+            "chrono-node@<2.2.4": ">=2.2.4"
+        }
     }
 }
