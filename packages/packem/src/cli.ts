@@ -14,7 +14,7 @@ createBuildCommand(cli);
 
 cli.setDefaultCommand("build");
 
-// eslint-disable-next-line unicorn/prefer-top-level-await,@typescript-eslint/no-explicit-any
+// eslint-disable-next-line unicorn/prefer-top-level-await,@typescript-eslint/no-explicit-any,etc/no-implicit-any-catch,@typescript-eslint/use-unknown-in-catch-callback-variable
 cli.run().catch((error: any) => {
     // eslint-disable-next-line no-console
     console.error(error.message);

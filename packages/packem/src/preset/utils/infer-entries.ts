@@ -121,8 +121,6 @@ const inferEntries = (packageJson: PackageJson, sourceFiles: string[], rootDirec
             entry.outDir = outputSlug;
         }
 
-        entry.format = output.type;
-
         if (output.isExecutable) {
             entry.isExecutable = true;
         }

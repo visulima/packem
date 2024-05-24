@@ -28,8 +28,7 @@ import tryRequire from "./utils/try-require";
 import validateDependencies from "./validator/validate-dependencies";
 import validatePackage from "./validator/validate-package";
 
-// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-type PackEmPackageJson = PackageJson & { packem?: BuildConfig };
+type PackEmPackageJson = { packem?: BuildConfig } & PackageJson;
 
 const logErrors = (context: BuildContext, hasOtherLogs: boolean): void => {
     if (context.warnings.size > 0) {
@@ -77,11 +76,11 @@ const build = async (
     cleanedDirectories: string[],
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
-    const preset = resolvePreset(buildConfig.preset ?? package_?.packem?.preset ?? inputConfig.preset ?? "auto", rootDirectory);
+    const preset = resolvePreset(buildConfig.preset ?? package_.packem?.preset ?? inputConfig.preset ?? "auto", rootDirectory);
 
     let nodeTarget = `node${versions.node.split(".")[0]}`;
 
-    if (package_?.engines?.node) {
+    if (package_.engines?.node) {
         const minNodeVersion = minVersion(package_.engines.node);
 
         if (minNodeVersion) {
@@ -89,9 +88,9 @@ const build = async (
         }
     }
 
-    const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config?.compilerOptions?.jsx);
+    const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
 
-    const options = defu(buildConfig, package_?.packem, inputConfig, preset, <BuildOptions>{
+    const options = defu(buildConfig, package_.packem, inputConfig, preset, <BuildOptions>{
         alias: {},
         clean: true,
         declaration: false,
@@ -100,7 +99,7 @@ const build = async (
         entries: [],
         externals: [...Module.builtinModules, ...Module.builtinModules.map((m) => `node:${m}`)],
         failOnWarn: true,
-        name: (package_?.name || "").split("/").pop() || "default",
+        name: (package_.name ?? "").split("/").pop() ?? "default",
         optionalDependencies: [],
         outDir: "dist",
         peerDependencies: [],
@@ -116,7 +115,7 @@ const build = async (
             },
             dts: {
                 compilerOptions: {
-                    baseUrl: tsconfig?.config?.compilerOptions?.baseUrl || ".",
+                    baseUrl: tsconfig?.config.compilerOptions?.baseUrl ?? ".",
                     // Avoid extra work
                     checkJs: false,
                     /**
@@ -166,10 +165,10 @@ const build = async (
                 charset: "utf8",
                 include: /\.[jt]sx?$/,
                 jsx: jsxRuntime,
-                jsxDev: tsconfig?.config?.compilerOptions?.jsx === "react-jsxdev",
-                jsxFactory: tsconfig?.config?.compilerOptions?.jsxFactory,
-                jsxFragment: tsconfig?.config?.compilerOptions?.jsxFragmentFactory,
-                jsxImportSource: tsconfig?.config?.compilerOptions?.jsxImportSource,
+                jsxDev: tsconfig?.config.compilerOptions?.jsx === "react-jsxdev",
+                jsxFactory: tsconfig?.config.compilerOptions?.jsxFactory,
+                jsxFragment: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
+                jsxImportSource: tsconfig?.config.compilerOptions?.jsxImportSource,
                 jsxSideEffects: true,
                 // eslint-disable-next-line no-secrets/no-secrets
                 /**
@@ -198,7 +197,7 @@ const build = async (
                  * https://esbuild.github.io/api/#sources-content
                  */
                 sourcesContent: false,
-                target: tsconfig?.config?.compilerOptions?.target,
+                target: tsconfig?.config.compilerOptions?.target,
                 // Optionally preserve symbol names during minification
                 tsconfigRaw: tsconfig?.config,
             },
@@ -206,13 +205,13 @@ const build = async (
                 preferConst: true,
             },
             license: {
-                dtsTemplate: (licenses, dependencyLicenseTexts, pName) =>
+                dtsTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
                     `\n# Licenses of bundled types\n` +
                     `The published ${pName} artifact additionally contains code with the following licenses:\n` +
                     `${licenses.join(", ")}\n\n` +
                     `# Bundled types:\n` +
                     dependencyLicenseTexts,
-                template: (licenses, dependencyLicenseTexts, pName) =>
+                template: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
                     `\n# Licenses of bundled dependencies\n` +
                     `The published ${pName} artifact additionally contains code with the following licenses:\n` +
                     `${licenses.join(", ")}\n\n` +
@@ -244,21 +243,21 @@ const build = async (
             sucrase: {
                 disableESTransforms: true,
                 enableLegacyBabel5ModuleInterop: false,
-                enableLegacyTypeScriptModuleInterop: tsconfig?.config?.compilerOptions?.esModuleInterop === false,
+                enableLegacyTypeScriptModuleInterop: tsconfig?.config.compilerOptions?.esModuleInterop === false,
                 include: /\.[jt]sx?$/,
                 injectCreateRequireForImportRequire: false,
                 preserveDynamicImport: true,
                 production: env.NODE_ENV === "production",
-                ...(tsconfig?.config?.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig?.config?.compilerOptions?.jsx)
+                ...(tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
                     ? {
-                          jsxFragmentPragma: tsconfig?.config?.compilerOptions?.jsxFragmentFactory,
-                          jsxImportSource: tsconfig?.config?.compilerOptions?.jsxImportSource,
-                          jsxPragma: tsconfig?.config?.compilerOptions?.jsxFactory,
+                          jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
+                          jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
+                          jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
                           jsxRuntime,
-                          transforms: ["typescript", "jsx", ...(tsconfig?.config?.compilerOptions?.esModuleInterop ? ["imports"] : [])],
+                          transforms: ["typescript", "jsx", ...(tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : [])],
                       }
                     : {
-                          transforms: ["typescript", ...(tsconfig?.config?.compilerOptions?.esModuleInterop ? ["imports"] : [])],
+                          transforms: ["typescript", ...(tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : [])],
                       }),
             },
             swc: {
@@ -274,19 +273,19 @@ const build = async (
                     keepClassNames: true,
                     loose: true, // Use loose mode
                     parser: {
-                        decorators: tsconfig?.config?.compilerOptions?.experimentalDecorators,
+                        decorators: tsconfig?.config.compilerOptions?.experimentalDecorators,
                         dynamicImport: true,
                         syntax: tsconfig ? "typescript" : "ecmascript",
                         [tsconfig ? "tsx" : "jsx"]: true,
                     },
-                    target: tsconfig?.config?.compilerOptions?.target?.toLowerCase(),
+                    target: tsconfig?.config.compilerOptions?.target?.toLowerCase(),
                     transform: {
-                        decoratorMetadata: tsconfig?.config?.compilerOptions?.emitDecoratorMetadata,
+                        decoratorMetadata: tsconfig?.config.compilerOptions?.emitDecoratorMetadata,
                         legacyDecorator: true,
                         react: {
                             development: env.NODE_ENV !== "production",
-                            pragma: tsconfig?.config?.compilerOptions?.jsxFactory,
-                            pragmaFrag: tsconfig?.config?.compilerOptions?.jsxFragmentFactory,
+                            pragma: tsconfig?.config.compilerOptions?.jsxFactory,
+                            pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
                             runtime: jsxRuntime,
                             throwIfNamespace: true,
                             useBuiltins: true,
@@ -325,16 +324,31 @@ const build = async (
             },
         },
         target: nodeTarget,
-        transformer: "esbuild",
+        transformer: undefined,
     }) as BuildOptions;
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (options.transformer !== "esbuild" && options.transformer !== "swc" && options.transformer !== "sucrase") {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        throw new Error(options.transformer ? `Unknown transformer ${JSON.stringify(options.transformer)}` : "Missing transformer name in options.");
+        const dependencies = new Set([...Object.keys(package_.dependencies ?? {}), ...Object.keys(package_.devDependencies ?? {})]);
+
+        if (dependencies.has("esbuild")) {
+            logger.info("Found " + cyan("esbuild") + " in your package.json.");
+
+            options.transformer = "esbuild";
+        } else if (dependencies.has("@swc/core")) {
+            logger.info("Found " + cyan("@swc/core") + " in your package.json.");
+
+            options.transformer = "swc";
+        } else if (dependencies.has("sucrase")) {
+            logger.info("Found " + cyan("sucrase") + " in your package.json.");
+
+            options.transformer = "sucrase";
+        } else {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            throw new Error(options.transformer ? `Unknown transformer ${JSON.stringify(options.transformer)}` : "Missing transformer name in options.");
+        }
     }
 
-    if (options.rollup.emitESM === false && options.rollup.emitCJS === false) {
+    if (options.emitESM === false && options.emitCJS === false) {
         throw new Error("Both emitESM and emitCJS are disabled. At least one of them must be enabled.");
     }
 
@@ -344,7 +358,7 @@ const build = async (
     ensureDirSync(options.outDir);
 
     if (options.transformer === "esbuild" && options.rollup.esbuild) {
-        if (tsconfig?.config?.compilerOptions?.target?.toLowerCase() === "es3") {
+        if (tsconfig?.config.compilerOptions?.target?.toLowerCase() === "es3") {
             logger.warn(
                 [
                     "ES3 target is not supported by esbuild, so ES5 will be used instead..",
@@ -360,7 +374,7 @@ const build = async (
         if (options.rollup.esbuild.jsx === "preserve") {
             let message = "Packem does not support 'preserve' jsx option. Please use 'transform' or 'automatic' instead.";
 
-            if (tsconfig?.config?.compilerOptions?.jsx) {
+            if (tsconfig?.config.compilerOptions?.jsx) {
                 message =
                     "Packem does not support '" +
                     tsconfig.config.compilerOptions.jsx +
@@ -381,7 +395,7 @@ const build = async (
             options.rollup.esbuild.target = [options.target];
         }
 
-        if (tsconfig?.config?.compilerOptions?.target === "es5") {
+        if (tsconfig?.config.compilerOptions?.target === "es5") {
             options.rollup.esbuild.keepNames = false;
 
             logger.debug("Disabling keepNames because target is set to es5");
@@ -396,7 +410,7 @@ const build = async (
         logger.debug("Disabling polyfillNode because preferBuiltins is set to true");
     }
 
-    if (!tsconfig?.config?.compilerOptions?.isolatedModules) {
+    if (!tsconfig?.config.compilerOptions?.isolatedModules) {
         logger.warn(
             `'compilerOptions.isolatedModules' is not enabled in tsconfig.\nBecause none of the third-party transpilers, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.\nTo mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.`,
         );
@@ -433,15 +447,12 @@ const build = async (
     // Allow prepare and extending context
     await context.hooks.callHook("build:prepare", context);
 
-    // Normalize entries
-    options.entries = options.entries.map((entry) => (typeof entry === "string" ? { input: entry } : entry));
-
     if (options.declaration && tsconfig === undefined) {
         throw new Error("Cannot build declaration files without a tsconfig.json");
     }
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-    for (const entry of options.entries) {
+    for (const entry of context.options.entries) {
         if (typeof entry.name !== "string") {
             let relativeInput = isAbsolute(entry.input) ? relative(rootDirectory, entry.input) : normalize(entry.input);
 
@@ -465,10 +476,10 @@ const build = async (
     }
 
     // Infer dependencies from pkg
-    options.dependencies = Object.keys(package_.dependencies || {});
-    options.peerDependencies = Object.keys(package_.peerDependencies || {});
-    options.devDependencies = Object.keys(package_.devDependencies || {});
-    options.optionalDependencies = Object.keys(package_.optionalDependencies || {});
+    options.dependencies = Object.keys(package_.dependencies ?? {});
+    options.peerDependencies = Object.keys(package_.peerDependencies ?? {});
+    options.devDependencies = Object.keys(package_.devDependencies ?? {});
+    options.optionalDependencies = Object.keys(package_.optionalDependencies ?? {});
 
     // Add all dependencies as externals
     options.externals.push(...options.dependencies, ...options.peerDependencies, ...options.optionalDependencies);
@@ -486,21 +497,24 @@ const build = async (
 
     logger.info(cyan(`${modeName} ${options.name}`));
 
-    logger.debug(`${bold("Root dir:")} ${options.rootDir}\n  ${bold("Entries:")}\n  ${options.entries.map((entry) => `  ${dumpObject(entry)}`).join("\n  ")}`);
+    logger.debug(
+        `${bold("Root dir:")} ${options.rootDir}\n  ${bold("Entries:")}\n  ${context.options.entries.map((entry) => `  ${dumpObject(entry)}`).join("\n  ")}`,
+    );
 
     // Clean dist dirs
     if (options.clean) {
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const directory of new Set(
             // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-            options.entries
+            context.options.entries
                 .map((entry) => entry.outDir)
                 .filter(Boolean)
                 .sort() as unknown as Set<string>,
         )) {
             if (
-                directory === options.rootDir ||
-                options.rootDir.startsWith(directory.endsWith("/") ? directory : `${directory}/`) ||
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                directory === options.rootDir ??
+                options.rootDir.startsWith(directory.endsWith("/") ? directory : `${directory}/`) ??
                 cleanedDirectories.some((c) => directory.startsWith(c))
             ) {
                 // eslint-disable-next-line no-continue
@@ -558,7 +572,6 @@ const build = async (
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     const rPath = (p: string) => relative(context.rootDir, resolve(options.outDir, p));
 
     let loggedEntries = false;
@@ -587,7 +600,6 @@ const build = async (
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const chunk = context.buildEntries.find((buildEntry) => buildEntry.path === p) ?? ({} as any);
 
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                     return gray("  └─ " + rPath(p) + bold(chunk.bytes ? " (" + formatBytes(chunk?.bytes) + ")" : ""));
                 })
                 .join("\n")}`;
@@ -597,7 +609,7 @@ const build = async (
             const moduleList = entry.modules
                 .filter((m) => m.id.includes("node_modules"))
                 .sort((a, b) => (b.bytes || 0) - (a.bytes || 0))
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
                 .map((m) => gray("  📦 " + rPath(m.id) + bold(m.bytes ? " (" + formatBytes(m.bytes) + ")" : "")))
                 .join("\n");
 
@@ -664,11 +676,11 @@ const build = async (
 const createBundler = async (
     rootDirectory: string,
     mode: Mode,
-    inputConfig: BuildConfig & {
+    inputConfig: {
         configPath?: string;
         debug?: boolean;
         tsconfigPath?: string;
-    } = {},
+    } & BuildConfig = {},
 ): Promise<void> => {
     const { configPath, debug, tsconfigPath, ...otherInputConfig } = inputConfig;
     const loggerProcessors: Processor<string>[] = [new MessageFormatterProcessor<string>(), new ErrorProcessor<string>()];
@@ -699,7 +711,7 @@ const createBundler = async (
         }
 
         tsconfig = {
-            config: await readTsConfig(tsconfigPath),
+            config: readTsConfig(tsconfigPath),
             path: tsconfigPath,
         };
 

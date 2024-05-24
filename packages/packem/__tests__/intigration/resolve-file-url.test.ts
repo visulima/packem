@@ -49,7 +49,7 @@ export default log`,
 }
 
 export { log as effect };
-`)
+`);
 
         const cjsContent = readFileSync(`${distribution}/dist/importer.cjs`);
 
@@ -60,6 +60,6 @@ function log() {
 }
 
 exports.effect = log;
-`)
+`);
     });
 });

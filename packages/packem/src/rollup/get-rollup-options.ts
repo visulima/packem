@@ -19,7 +19,6 @@ import arrayIncludes from "../utils/array-includes";
 import getPackageName from "../utils/get-package-name";
 import { cjsInterop as cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
-import esbuildPlugin from "./plugins/esbuild";
 import JSONPlugin from "./plugins/json";
 import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
 import { license as licensePlugin } from "./plugins/license";
@@ -29,8 +28,7 @@ import { rawPlugin } from "./plugins/raw";
 import resolveFileUrlPlugin from "./plugins/resolve-file-url";
 import { removeShebangPlugin, shebangPlugin } from "./plugins/shebang";
 import shimCjsPlugin from "./plugins/shim-cjs";
-import { sucrasePlugin } from "./plugins/sucrase";
-import { swcPlugin } from "./plugins/swc";
+import type { SwcPluginConfig } from "./plugins/swc/types";
 import { patchTypescriptTypes as patchTypescriptTypesPlugin } from "./plugins/typescript/patch-typescript-types";
 import { getConfigAlias, resolveTsconfigPaths as resolveTsconfigPathsPlugin } from "./plugins/typescript/resolve-tsconfig-paths";
 import resolveTsconfigRootDirectoriesPlugin from "./plugins/typescript/resolve-tsconfig-root-dirs";
@@ -39,7 +37,29 @@ import createSplitChunks from "./utils/chunks/create-split-chunks";
 import getChunkFilename from "./utils/get-chunk-filename";
 import getEntryFileNames from "./utils/get-entry-file-names";
 import resolveAliases from "./utils/resolve-aliases";
+
 // import nativeNodeModule from "./plugins/native-node-module";
+
+const lazyImportSwc = async (options: SwcPluginConfig): Promise<Plugin> => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    const plugin = await import("./plugins/swc").then((module) => module.default);
+
+    return plugin(options) as Plugin;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const lazyImportEsbuild = async (options: any): Promise<Plugin> => {
+    const plugin = await import("./plugins/esbuild").then((module) => module.default);
+
+    return plugin(options);
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const lazyImportSucrase = async (options: any): Promise<Plugin> => {
+    const plugin = await import("./plugins/sucrase").then((module) => module.sucrasePlugin);
+
+    return plugin(options);
+};
 
 const sharedOnWarn = (warning: RollupLog, context: BuildContext): boolean => {
     // If the circular dependency warning is from node_modules, ignore it
@@ -51,7 +71,7 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext): boolean => {
     // @see https:// github.com/rollup/rollup/blob/5abe71bd5bae3423b4e2ee80207c871efde20253/cli/run/batchWarnings.ts#L236
     if (warning.code === "UNRESOLVED_IMPORT") {
         context.logger.error(
-            `Failed to resolve the module "${warning.exporter}" imported by "${cyan(relative(resolve(), warning.id as string))}"` +
+            `Failed to resolve the module "${warning.exporter as string}" imported by "${cyan(relative(resolve(), warning.id as string))}"` +
                 `\nIs the module installed? Note:` +
                 `\n ↳ to inline a module into your bundle, install it to "devDependencies".` +
                 `\n ↳ to depend on a module via import/require, install it to "dependencies".`,
@@ -99,7 +119,7 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
                 return true;
             }
 
-            if (id[0] === "." || isAbsolute(id) || /src[/\\]/.test(id) || (context.pkg.name && id.startsWith(context.pkg.name))) {
+            if (id.startsWith(".") || isAbsolute(id) || /src[/\\]/.test(id) || (context.pkg.name && id.startsWith(context.pkg.name))) {
                 return false;
             }
 
@@ -116,7 +136,7 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
 
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (!isExplicitExternal && calledImplicitExternals.has(id)) {
-                context.logger.info(`Inlined implicit external ${id}. If this is incorrect, add it to the "externals" option.`);
+                context.logger.info('Inlined implicit external "' + cyan(id) + '". If this is incorrect, add it to the "externals" option.');
             }
 
             calledImplicitExternals.set(id, true);
@@ -141,14 +161,14 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export const getRollupOptions = (context: BuildContext): RollupOptions => {
+export const getRollupOptions = async (context: BuildContext): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context, "build");
 
     return (<RollupOptions>{
         ...baseRollupOptions(context, resolvedAliases),
 
         output: [
-            context.options.rollup.emitCJS &&
+            context.options.emitCJS &&
                 <OutputOptions>{
                     chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(context, chunk, "cjs"),
                     dir: resolve(context.options.rootDir, context.options.outDir),
@@ -167,11 +187,11 @@ export const getRollupOptions = (context: BuildContext): RollupOptions => {
                     ...(context.options.rollup.output?.preserveModules
                         ? {
                               preserveModules: true,
-                              preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot || "src",
+                              preserveModulesRoot: context.options.rollup.output.preserveModulesRoot ?? "src",
                           }
                         : { manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries), preserveModules: false }),
                 },
-            context.options.rollup.emitESM &&
+            context.options.emitESM &&
                 <OutputOptions>{
                     chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(context, chunk, "mjs"),
                     dir: resolve(context.options.rootDir, context.options.outDir),
@@ -189,7 +209,7 @@ export const getRollupOptions = (context: BuildContext): RollupOptions => {
                     ...(context.options.rollup.output?.preserveModules
                         ? {
                               preserveModules: true,
-                              preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot || "src",
+                              preserveModulesRoot: context.options.rollup.output.preserveModulesRoot ?? "src",
                           }
                         : { manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries), preserveModules: false }),
                 },
@@ -254,16 +274,16 @@ export const getRollupOptions = (context: BuildContext): RollupOptions => {
 
             context.options.rollup.esbuild &&
                 context.options.transformer === "esbuild" &&
-                esbuildPlugin({
+                (await lazyImportEsbuild({
                     sourceMap: context.options.sourcemap,
                     ...context.options.rollup.esbuild,
                     logger: context.logger,
-                }),
+                })),
 
-            context.options.rollup.sucrase && context.options.transformer === "sucrase" && sucrasePlugin(context.options.rollup.sucrase),
+            context.options.rollup.sucrase && context.options.transformer === "sucrase" && await lazyImportSucrase(context.options.rollup.sucrase),
             context.options.rollup.swc &&
                 context.options.transformer === "swc" &&
-                swcPlugin({
+                (await lazyImportSwc({
                     ...context.options.rollup.swc,
                     jsc: {
                         ...(env.NODE_ENV === "production"
@@ -285,10 +305,10 @@ export const getRollupOptions = (context: BuildContext): RollupOptions => {
                         ...context.options.rollup.swc.jsc,
                     },
                     sourceMaps: context.options.sourcemap,
-                }),
+                })),
 
             context.options.cjsInterop &&
-                context.options.rollup.emitCJS &&
+                context.options.emitCJS &&
                 cjsInteropPlugin({
                     ...context.options.rollup.cjsInterop,
                     logger: context.logger,
@@ -367,7 +387,7 @@ export const getRollupDtsOptions = (context: BuildContext): RollupOptions => {
         name: "packem:ignore-files",
     };
 
-    const compilerOptions = context.tsconfig?.config?.compilerOptions;
+    const compilerOptions = context.tsconfig?.config.compilerOptions;
 
     delete compilerOptions?.lib;
 
@@ -387,7 +407,7 @@ export const getRollupDtsOptions = (context: BuildContext): RollupOptions => {
         },
 
         output: [
-            context.options.rollup.emitCJS &&
+            context.options.emitCJS &&
                 <OutputOptions>{
                     chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(context, chunk, "d.cts"),
                     dir: resolve(context.options.rootDir, context.options.outDir),
@@ -456,21 +476,20 @@ export const getRollupDtsOptions = (context: BuildContext): RollupOptions => {
                     ...context.options.rollup.resolve,
                 }),
 
-            context.options.rollup.dts &&
-                dtsPlugin({
-                    compilerOptions: {
-                        ...context.options.rollup.dts.compilerOptions,
-                        incremental: undefined,
-                        inlineSources: undefined,
-                        sourceMap: undefined,
-                        tsBuildInfoFile: undefined,
-                    },
-                    respectExternal: context.options.rollup.dts.respectExternal,
-                    tsconfig: context.tsconfig?.path,
-                }),
+            dtsPlugin({
+                compilerOptions: {
+                    ...context.options.rollup.dts.compilerOptions,
+                    incremental: undefined,
+                    inlineSources: undefined,
+                    sourceMap: undefined,
+                    tsBuildInfoFile: undefined,
+                },
+                respectExternal: context.options.rollup.dts.respectExternal,
+                tsconfig: context.tsconfig?.path,
+            }),
 
             context.options.cjsInterop &&
-                context.options.rollup.emitCJS &&
+                context.options.emitCJS &&
                 cjsInteropPlugin({
                     ...context.options.rollup.cjsInterop,
                     logger: context.logger,

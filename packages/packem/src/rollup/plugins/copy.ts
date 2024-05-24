@@ -68,15 +68,15 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail<never, strin
                               })
                             : target),
                     )
-                    .map((target) =>
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-                        glob(target.src, { ignore: target.exclude }).then((result) => {
-                            return {
-                                dest: target.dest ?? "",
-                                parent: globParent(target.src as string),
-                                src: result,
-                            };
-                        }),
+                    .map(
+                        async (target) =>
+                            await glob(target.src, { ignore: target.exclude }).then((result) => {
+                                return {
+                                    dest: target.dest ?? "",
+                                    parent: globParent(target.src as string),
+                                    src: result,
+                                };
+                            }),
                     ),
             );
 

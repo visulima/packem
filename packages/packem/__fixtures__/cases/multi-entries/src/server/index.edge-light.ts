@@ -1,1 +1,1 @@
-export const name = 'server.edge-light'
+export const name = "server.edge-light";

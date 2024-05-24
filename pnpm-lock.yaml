@@ -105,6 +105,166 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@18.18.14)(@vitest/ui@1.6.0)
 
+  examples/cjs-interop:
+    dependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+
+  examples/copy:
+    dependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+
+  examples/minifed-class:
+    dependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+
+  examples/native-node-module:
+    dependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+    devDependencies:
+      nodehun:
+        specifier: ^3.0.2
+        version: 3.0.2
+
+  examples/react-tsx:
+    dependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.79
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.2.25
+        version: 18.3.0
+      typescript:
+        specifier: ^4.9.5
+        version: 4.9.5
+
+  examples/react-tsx-css:
+    dependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.79
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.2.25
+        version: 18.3.0
+      typescript:
+        specifier: ^4.9.5
+        version: 4.9.5
+
+  examples/transformer-esbuild:
+    dependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.21.3
+        version: 0.21.3
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.79
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.2.25
+        version: 18.3.0
+      typescript:
+        specifier: ^4.9.5
+        version: 4.9.5
+
+  examples/transformer-sucrase:
+    dependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
+      sucrase:
+        specifier: ^3.35.0
+        version: 3.35.0
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.79
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.2.25
+        version: 18.3.0
+      typescript:
+        specifier: ^4.9.5
+        version: 4.9.5
+
+  examples/transformer-swc:
+    dependencies:
+      '@swc/core':
+        specifier: ^1.5.7
+        version: 1.5.7
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.79
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.2.25
+        version: 18.3.0
+      typescript:
+        specifier: ^4.9.5
+        version: 4.9.5
+
+  examples/vue-tsx:
+    dependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      vue:
+        specifier: ^3.4.25
+        version: 3.4.27(typescript@4.9.5)
+    devDependencies:
+      typescript:
+        specifier: ^4.9.5
+        version: 4.9.5
+
   packages/packem:
     dependencies:
       '@babel/parser':
@@ -5587,6 +5747,10 @@ packages:
     resolution: {integrity: sha512-3yZ1vfGKOcv0dyyhUeqA0Qa6RsQ4SfUnL6o2IWR4sVg8kdnJo48XTWbMLdtnfiZTbCUdsMttNwyJcihEdGCZBw==}
     engines: {node: '>=16', npm: '>=8'}
 
+  node-addon-api@8.0.0:
+    resolution: {integrity: sha512-ipO7rsHEBqa9STO5C5T10fj732ml+5kLN1cAG8/jdHd56ldQeGj3Q7+scUS+VHK/qy1zLEwC4wMK5+yM0btPvw==}
+    engines: {node: ^18 || ^20 || >= 21}
+
   node-emoji@2.1.3:
     resolution: {integrity: sha512-E2WEOVsgs7O16zsURJ/eH8BqhF029wGpEOnv7Urwdo2wmQanOACwJQh0devF9D9RhoZru0+9JXIS0dBXIAz+lA==}
     engines: {node: '>=18'}
@@ -5613,6 +5777,9 @@ packages:
   node-version-alias@5.0.0:
     resolution: {integrity: sha512-mFI5Yo8ApCP9NsKJ1sFa/GU3RoNqqWlwOsFwibZiuFgNivM6kCk5FrCVZajDm+MSFS/FNODROZws+52JutIdUA==}
     engines: {node: '>=18.18.0'}
+
+  nodehun@3.0.2:
+    resolution: {integrity: sha512-Zo0JrFhNqI4l/sq/3d0Ugxb+NKDIgYrGB5SWtYbpJm5N/lyoN9hP3tFmLNDsOJ6v7dXKn6tpzF+vgVar6C8JiQ==}
 
   nopt@7.2.1:
     resolution: {integrity: sha512-taM24ViiimT/XntxbPyJQzCG+p4EKOpgD3mxFwW38mGjVUrfERQOeY4EDHjdnptttfHuHQXFx+lTP08Q+mLa/w==}
@@ -7331,6 +7498,11 @@ packages:
 
   typedarray@0.0.6:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
+
+  typescript@4.9.5:
+    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
+    engines: {node: '>=4.2.0'}
+    hasBin: true
 
   typescript@5.4.5:
     resolution: {integrity: sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==}
@@ -10166,6 +10338,12 @@ snapshots:
       '@vue/runtime-core': 3.4.27
       '@vue/shared': 3.4.27
       csstype: 3.1.3
+
+  '@vue/server-renderer@3.4.27(vue@3.4.27(typescript@4.9.5))':
+    dependencies:
+      '@vue/compiler-ssr': 3.4.27
+      '@vue/shared': 3.4.27
+      vue: 3.4.27(typescript@4.9.5)
 
   '@vue/server-renderer@3.4.27(vue@3.4.27(typescript@5.4.5))':
     dependencies:
@@ -14283,6 +14461,8 @@ snapshots:
 
   no-cliches@0.3.6: {}
 
+  node-addon-api@8.0.0: {}
+
   node-emoji@2.1.3:
     dependencies:
       '@sindresorhus/is': 4.6.0
@@ -14322,6 +14502,10 @@ snapshots:
       normalize-node-version: 14.0.0
       path-exists: 5.0.0
       semver: 7.6.2
+
+  nodehun@3.0.2:
+    dependencies:
+      node-addon-api: 8.0.0
 
   nopt@7.2.1:
     dependencies:
@@ -16327,6 +16511,8 @@ snapshots:
 
   typedarray@0.0.6: {}
 
+  typescript@4.9.5: {}
+
   typescript@5.4.5: {}
 
   typical@4.0.0: {}
@@ -16797,6 +16983,16 @@ snapshots:
       - sugarss
       - supports-color
       - terser
+
+  vue@3.4.27(typescript@4.9.5):
+    dependencies:
+      '@vue/compiler-dom': 3.4.27
+      '@vue/compiler-sfc': 3.4.27
+      '@vue/runtime-dom': 3.4.27
+      '@vue/server-renderer': 3.4.27(vue@3.4.27(typescript@4.9.5))
+      '@vue/shared': 3.4.27
+    optionalDependencies:
+      typescript: 4.9.5
 
   vue@3.4.27(typescript@5.4.5):
     dependencies:

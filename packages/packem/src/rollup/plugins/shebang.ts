@@ -36,7 +36,7 @@ export const shebangPlugin = (executablePaths: string[], shebang = "#!/usr/bin/e
                  * - babel: https://github.com/babel/babel/blob/86fee43f499c76388cab495c8dcc4e821174d4e0/packages/babel-parser/src/tokenizer/index.ts#L574
                  * - swc: https://github.com/swc-project/swc/blob/7bf4ab39b0e49759d9f5c8d7f989b3ed010d81a7/crates/swc_ecma_parser/src/lexer/mod.rs#L204
                  */
-                if (code[0] === "#" && code[1] === "!") {
+                if (code.startsWith("#") && code[1] === "!") {
                     return null;
                 }
 
@@ -64,7 +64,7 @@ export const shebangPlugin = (executablePaths: string[], shebang = "#!/usr/bin/e
                     continue;
                 }
 
-                if (output.code?.match(SHEBANG_RE) && options.dir) {
+                if (SHEBANG_RE.test(output.code) && options.dir) {
                     const outFile = resolve(options.dir as string, fileName);
 
                     // eslint-disable-next-line no-await-in-loop
@@ -79,7 +79,6 @@ export const removeShebangPlugin = (): Plugin => {
     return {
         name: "packem:remove-shebang",
         renderChunk(code) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return code.replace(SHEBANG_RE, "");
         },
     };

@@ -11,7 +11,6 @@ import type { InternalModuleFormat, Plugin } from "rollup";
 
 import warn from "./warn";
 
-// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 const getEsbuildFormat = (rollupFormat: InternalModuleFormat): Format | undefined => {
     if (rollupFormat === "es") {
         return "esm";
@@ -24,11 +23,12 @@ const getEsbuildFormat = (rollupFormat: InternalModuleFormat): Format | undefine
     return undefined;
 };
 
-type Options = Omit<TransformOptions, "sourcemap"> & {
+type Options = {
     sourceMap?: boolean;
-};
+} & Omit<TransformOptions, "sourcemap">;
 
 const getRenderChunk = ({ sourceMap = true, ...options }: Options): Plugin["renderChunk"] =>
+    // eslint-disable-next-line func-names
     async function (code, _, rollupOptions) {
         if (options.minify || options.minifyWhitespace || options.minifyIdentifiers || options.minifySyntax) {
             const format = getEsbuildFormat(rollupOptions.format);

@@ -23,7 +23,7 @@ export type JSXRemoveAttributesPlugin = {
     attributes: string[];
 };
 
-export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesPlugin & { logger: Pail<never, string> }): Plugin => {
+export const jsxRemoveAttributes = ({ attributes, logger }: { logger: Pail<never, string> } & JSXRemoveAttributesPlugin): Plugin => {
     const filter = createFilter([/\.[tj]sx$/], /node_modules/);
 
     if (!Array.isArray(attributes) || attributes.length === 0) {
@@ -63,9 +63,9 @@ export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesP
 
             walk(ast, {
                 enter(node) {
-                    if (node?.type === "CallExpression" && node?.callee?.type === "Identifier" && node?.callee?.name === "jsx") {
+                    if (node.type === "CallExpression" && node.callee.type === "Identifier" && node.callee.name === "jsx") {
                         const filteredArguments = node.arguments.filter(
-                            (argument) => argument?.type === "ObjectExpression" && Array.isArray(argument?.properties),
+                            (argument) => argument.type === "ObjectExpression" && Array.isArray(argument.properties),
                         ) as ObjectExpression[];
 
                         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax

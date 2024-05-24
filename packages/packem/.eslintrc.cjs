@@ -33,6 +33,8 @@ module.exports = {
 
                 "compat/compat": "off",
                 "prefer-template": "off",
+
+                "@typescript-eslint/sort-type-constituents": "off",
             },
         },
         {
@@ -74,5 +76,5 @@ module.exports = {
     },
     // Report unused `eslint-disable` comments.
     reportUnusedDisableDirectives: true,
-    root: true
+    root: true,
 };

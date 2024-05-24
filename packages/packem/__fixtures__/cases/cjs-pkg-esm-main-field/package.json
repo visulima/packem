@@ -1,4 +1,4 @@
 {
-  "type": "commonjs",
-  "main": "./dist/index.mjs"
+    "type": "commonjs",
+    "main": "./dist/index.mjs"
 }

@@ -1,3 +1,3 @@
 export function shared() {
-  return 'shared-export'
+    return "shared-export";
 }

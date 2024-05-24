@@ -31,7 +31,7 @@ console.log("Hello, world!");`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, { "compilerOptions": { "rootDir": "./src" } });
+        writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = execPackemSync(["--env NODE_ENV=development"], {
             cwd: distribution,
@@ -65,7 +65,7 @@ console.log("Hello, world!");
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, { "compilerOptions": { "rootDir": "./src" } });
+        writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = execPackemSync(["--env NODE_ENV=development"], {
             cwd: distribution,
@@ -200,7 +200,7 @@ console.log("Hello, cli!");`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, { "compilerOptions": { "rootDir": "./src" } });
+        writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = execPackemSync(["--env NODE_ENV=development"], {
             cwd: distribution,
@@ -268,7 +268,7 @@ export const baz = 'baz';`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, { "compilerOptions": { "rootDir": "./src" } });
+        writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = execPackemSync(["--env NODE_ENV=development"], {
             cwd: distribution,

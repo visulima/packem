@@ -729,12 +729,14 @@ export class Child extends Parent {
 
         const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`var c=Object.defineProperty;var e=(t,s)=>c(t,"name",{value:s,configurable:!0});var o=Object.defineProperty,r=e((t,s)=>o(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{r(this,"Parent")}constructor(){}}class l{static{e(this,"c")}static{r(this,"Feature")}constructor(){}}class n extends a{static{e(this,"Child")}static{r(this,"Child")}feature=new l;constructor(){console.log("before"),super(),console.log("after")}}export{n as Child};
+        expect(mjsContent)
+            .toBe(`var c=Object.defineProperty;var e=(t,s)=>c(t,"name",{value:s,configurable:!0});var o=Object.defineProperty,r=e((t,s)=>o(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{r(this,"Parent")}constructor(){}}class l{static{e(this,"c")}static{r(this,"Feature")}constructor(){}}class n extends a{static{e(this,"Child")}static{r(this,"Child")}feature=new l;constructor(){console.log("before"),super(),console.log("after")}}export{n as Child};
 `);
 
         const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`"use strict";var r=Object.defineProperty;var e=(t,s)=>r(t,"name",{value:s,configurable:!0});var o=Object.defineProperty,c=e((t,s)=>o(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{c(this,"Parent")}constructor(){}}class i{static{e(this,"c")}static{c(this,"Feature")}constructor(){}}class l extends a{static{e(this,"Child")}static{c(this,"Child")}feature=new i;constructor(){console.log("before"),super(),console.log("after")}}exports.Child=l;
+        expect(cjsContent)
+            .toBe(`"use strict";var r=Object.defineProperty;var e=(t,s)=>r(t,"name",{value:s,configurable:!0});var o=Object.defineProperty,c=e((t,s)=>o(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{c(this,"Parent")}constructor(){}}class i{static{e(this,"c")}static{c(this,"Feature")}constructor(){}}class l extends a{static{e(this,"Child")}static{c(this,"Child")}feature=new i;constructor(){console.log("before"),super(),console.log("after")}}exports.Child=l;
 `);
 
         const dCtsContent = readFileSync(`${distribution}/dist/index.d.cts`);

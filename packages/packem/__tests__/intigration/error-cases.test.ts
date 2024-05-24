@@ -114,8 +114,10 @@ describe.each(await getNodePathList())("node %s - jsx", (_, nodePath) => {
             nodePath,
         });
 
-        await expect(streamToString(binProcess.stdout)).resolves.toBe("")
-        await expect(streamToString(binProcess.stderr)).resolves.toMatch(`Conflicting field "module" with entry "dist/index.js" detected. Conflicts with "main" field. Please change one of the entries inside your package.json.`);
+        await expect(streamToString(binProcess.stdout)).resolves.toBe("");
+        await expect(streamToString(binProcess.stderr)).resolves.toMatch(
+            `Conflicting field "module" with entry "dist/index.js" detected. Conflicts with "main" field. Please change one of the entries inside your package.json.`,
+        );
         expect(binProcess.exitCode).toBe(1);
     });
 });

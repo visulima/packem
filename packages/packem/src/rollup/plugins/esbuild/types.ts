@@ -9,18 +9,18 @@ import type { FilterPattern } from "@rollup/pluginutils";
 import type { BuildOptions as EsbuildOptions, Loader, TransformOptions } from "esbuild";
 import type { MarkOptional } from "ts-essentials";
 
-export type Options = Omit<TransformOptions, "loader" | "sourcemap"> & {
+export type Options = {
     exclude?: FilterPattern;
     include?: FilterPattern;
     /**
      * Map extension to esbuild loader
      * Note that each entry (the extension) needs to start with a dot
      */
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+     
     loaders?: Record<string, Loader | false>;
     optimizeDeps?: MarkOptional<OptimizeDepsOptions, "cwd" | "sourceMap">;
     sourceMap?: boolean;
-};
+} & Omit<TransformOptions, "loader" | "sourcemap">;
 
 export type OptimizeDepsOptions = {
     cwd: string;

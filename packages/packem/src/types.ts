@@ -21,7 +21,7 @@ import type { JSXRemoveAttributesPlugin } from "./rollup/plugins/jsx-remove-attr
 import type { LicenseOptions } from "./rollup/plugins/license";
 import type { RawLoaderOptions } from "./rollup/plugins/raw";
 import type { SucrasePluginConfig } from "./rollup/plugins/sucrase";
-import type { SwcPluginConfig } from "./rollup/plugins/swc";
+import type { SwcPluginConfig } from "./rollup/plugins/swc/types";
 import type { PatchTypesOptions } from "./rollup/plugins/typescript/patch-typescript-types";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
@@ -36,13 +36,13 @@ interface RollupDynamicImportVariablesOptions {
     /**
      * A picomatch pattern, or array of patterns, which specifies the files in the build the plugin
      * should _ignore_.
-     * By default no files are ignored.
+     * By default, no files are ignored.
      */
     exclude?: FilterPattern;
     /**
      * A picomatch pattern, or array of patterns, which specifies the files in the build the plugin
      * should operate on.
-     * By default all files are targeted.
+     * By default, all files are targeted.
      */
     include?: FilterPattern;
     /**
@@ -54,46 +54,35 @@ interface RollupDynamicImportVariablesOptions {
 }
 
 export interface RollupBuildOptions {
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     alias: RollupAliasOptions | false;
     cjsInterop?: CJSInteropOptions;
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     commonjs: RollupCommonJSOptions | false;
     copy?: CopyPluginOptions | false;
     dts: RollupDtsOptions;
     dynamicVars?: RollupDynamicImportVariablesOptions | false;
-    emitCJS?: boolean;
-    emitESM?: boolean;
     esbuild: EsbuildOptions | false;
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     json: RollupJsonOptions | false;
     jsxRemoveAttributes?: JSXRemoveAttributesPlugin | false;
     license?: LicenseOptions | false;
     metafile?: boolean;
     output?: OutputOptions;
     patchTypes: PatchTypesOptions | false;
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     polyfillNode?: NodePolyfillsOptions | false;
     preserveDynamicImports?: boolean;
     raw?: RawLoaderOptions | false;
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     replace: RollupReplaceOptions | false;
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     resolve: RollupNodeResolveOptions | false;
     shim?: boolean;
     sucrase?: SucrasePluginConfig | false;
     swc?: SwcPluginConfig | false;
     treeshake?: RollupOptions["treeshake"];
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     visualizer?: PluginVisualizerOptions | false;
     watch?: RollupOptions["watch"];
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     wsam?: RollupWasmOptions | false;
 }
 
 export type BuildEntry = {
     declaration?: boolean | "compatible" | "node16";
-    format?: string;
     input: string;
     isExecutable?: boolean;
     name?: string;
@@ -109,11 +98,13 @@ export interface BuildOptions {
      * * `node16` means "src/index.ts" will generate "dist/index.d.mts" and "dist/index.d.cts".
      * * `true` is equivalent to `compatible`.
      * * `false` will disable declaration generation.
-     * * `undefined` will auto detect based on "package.json". If "package.json" has "types" field, it will be `"compatible"`, otherwise `false`.
+     * * `undefined` will auto-detect based on "package.json". If "package.json" has "types" field, it will be `"compatible"`, otherwise `false`.
      */
     declaration?: boolean | "compatible" | "node16";
     dependencies: string[];
     devDependencies: string[];
+    emitCJS?: boolean;
+    emitESM?: boolean;
     entries: BuildEntry[];
     externals: (RegExp | string)[];
     failOnWarn?: boolean;
@@ -129,7 +120,7 @@ export interface BuildOptions {
     stub: boolean;
     stubOptions: { jiti: Omit<JITIOptions, "onError" | "transform"> };
     target: string;
-    transformer: "esbuild" | "sucrase" | "swc";
+    transformer: "esbuild" | "sucrase" | "swc" | undefined;
 }
 
 export interface BuildHooks {

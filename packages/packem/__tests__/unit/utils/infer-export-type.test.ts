@@ -39,5 +39,5 @@ describe("inferExportType", () => {
         expect.assertions(1);
 
         expect(inferExportType("unknown", [], undefined, "commonjs")).toBe("cjs");
-    })
+    });
 });

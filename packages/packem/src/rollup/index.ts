@@ -44,7 +44,7 @@ const watchHandler = (watcher: RollupWatcher, mode: "bundle" | "types", logger: 
 };
 
 export const watch = async (context: BuildContext): Promise<void> => {
-    const rollupOptions = getRollupOptions(context);
+    const rollupOptions = await getRollupOptions(context);
 
     await context.hooks.callHook("rollup:options", context, rollupOptions);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -61,7 +61,7 @@ export const watch = async (context: BuildContext): Promise<void> => {
             ? rollupOptions.input
             : typeof rollupOptions.input === "string"
               ? [rollupOptions.input]
-              : Object.keys(rollupOptions.input || {})),
+              : Object.keys(rollupOptions.input ?? {})),
     ];
 
     let infoMessage = `Starting watchers for entries:`;
@@ -90,7 +90,7 @@ export const watch = async (context: BuildContext): Promise<void> => {
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export const build = async (context: BuildContext): Promise<void> => {
-    const rollupOptions = getRollupOptions(context);
+    const rollupOptions = await getRollupOptions(context);
 
     await context.hooks.callHook("rollup:options", context, rollupOptions);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -125,7 +125,7 @@ export const build = async (context: BuildContext): Promise<void> => {
             if (entry.isEntry) {
                 context.buildEntries.push({
                     bytes: Buffer.byteLength(entry.code, "utf8"),
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
                     chunks: entry.imports.filter((index) => outputChunks.find((c) => c.fileName === index)),
                     exports: entry.exports,
                     modules: Object.entries(entry.modules).map(([id, module_]) => {
@@ -142,8 +142,10 @@ export const build = async (context: BuildContext): Promise<void> => {
 
         const outputAssets = output.filter((fOutput) => fOutput.type === "asset") as OutputAsset[];
 
+        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const entry of outputAssets) {
             if (assets.has(entry.fileName)) {
+                // eslint-disable-next-line no-continue
                 continue;
             }
 
@@ -182,7 +184,7 @@ export const build = async (context: BuildContext): Promise<void> => {
             prefix: "dts",
         });
 
-        if (context.options.rollup.emitCJS) {
+        if (context.options.emitCJS) {
             await typesBuild.write({
                 chunkFileNames: (chunk) => getChunkFilename(context, chunk, "d.cts"),
                 dir: resolve(context.options.rootDir, context.options.outDir),
@@ -190,7 +192,7 @@ export const build = async (context: BuildContext): Promise<void> => {
             });
         }
 
-        if (context.options.rollup.emitESM) {
+        if (context.options.emitESM) {
             await typesBuild.write({
                 chunkFileNames: (chunk) => getChunkFilename(context, chunk, "d.mts"),
                 dir: resolve(context.options.rootDir, context.options.outDir),
@@ -199,7 +201,8 @@ export const build = async (context: BuildContext): Promise<void> => {
         }
 
         // .d.ts for node10 compatibility (TypeScript version < 4.7)
-        if (context.options.declaration === true || context.options.declaration === "compatible") {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (context.options.declaration === true ?? context.options.declaration === "compatible") {
             await typesBuild.write({
                 chunkFileNames: (chunk) => getChunkFilename(context, chunk, "d.ts"),
                 dir: resolve(context.options.rootDir, context.options.outDir),

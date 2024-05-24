@@ -50,7 +50,7 @@ const cjsPlugin = (packageJson: PackageJson): Plugin =>
             if (options.format === "es") {
                 let shim = CJSShim;
 
-                if (packageJson?.engines?.node) {
+                if (packageJson.engines?.node) {
                     const minNodeVersion = minVersion(packageJson.engines.node);
 
                     if (minNodeVersion && minNodeVersion.major >= 20 && minNodeVersion.minor >= 11) {

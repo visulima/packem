@@ -1,1 +1,1 @@
-export default 'shared.edge-light'
+export default "shared.edge-light";

@@ -1,1 +1,1 @@
-export const variable = typeof EdgeRuntime
+export const variable = typeof EdgeRuntime;

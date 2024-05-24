@@ -1,3 +1,3 @@
-'use client'
+"use client";
 
-export const asset = 'asset-module'
+export const asset = "asset-module";

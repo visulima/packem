@@ -1,4 +1,4 @@
-import type { PackageJson } from "read-pkg";
+import type { PackageJson } from "@visulima/package";
 
 import { inferExportType, inferExportTypeFromFileName } from "./infer-export-type";
 

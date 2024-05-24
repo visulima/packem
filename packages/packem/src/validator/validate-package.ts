@@ -24,7 +24,6 @@ const validatePackage = (package_: PackageJson, context: BuildContext): void => 
             ...extractExportFilenames(package_.exports, package_.type ?? "commonjs").map((index) => index.file),
         ].map(
             (index) =>
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 index &&
                 // eslint-disable-next-line security/detect-unsafe-regex
                 resolve(context.rootDir, index.replace(/\/[^*/]*\*[^\n\r/\u2028\u2029]*(?:[\n\r\u2028\u2029][^*/]*\*[^\n\r/\u2028\u2029]*)*(?:\/.*)?$/, "")),
@@ -42,9 +41,8 @@ const validatePackage = (package_: PackageJson, context: BuildContext): void => 
     }
 
     if (missingOutputs.length > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         const rPath = (p: string) => relative(context.rootDir, resolve(context.options.outDir, p));
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
         const listOfGeneratedFiles = context.buildEntries.filter((bEntry) => !bEntry.chunk).map((bEntry) => rPath(bEntry.path));
 
         let message = "Potential missing or wrong package.json files:";

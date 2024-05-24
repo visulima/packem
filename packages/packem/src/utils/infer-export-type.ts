@@ -1,4 +1,4 @@
-import type { PackageJson } from "read-pkg";
+import type { PackageJson } from "@visulima/package";
 
 export const inferExportTypeFromFileName = (filename: string): "cjs" | "esm" | undefined => {
     if (filename.endsWith(".d.ts")) {

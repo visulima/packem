@@ -36,7 +36,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
         const shebang = getShebang(code);
 
         // CJS Stub
-        if (context.options.rollup.emitCJS) {
+        if (context.options.emitCJS) {
             // eslint-disable-next-line no-await-in-loop
             await writeFile(
                 `${output}.cjs`,

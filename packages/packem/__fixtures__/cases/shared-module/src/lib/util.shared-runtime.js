@@ -1,3 +1,3 @@
 export function sharedApi() {
-  return 'common:shared'
+    return "common:shared";
 }

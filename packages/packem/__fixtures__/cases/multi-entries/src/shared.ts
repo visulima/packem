@@ -1,3 +1,3 @@
-export default 'shared'
+export default "shared";
 
-export type Shared = string
+export type Shared = string;

@@ -17,7 +17,7 @@ export interface SucrasePluginConfig extends Options {
 }
 
 export const sucrasePlugin = ({ exclude, extensions = DEFAULT_EXTENSIONS, include, ...transformOptions }: SucrasePluginConfig): Plugin => {
-    const filter = createFilter(include, exclude || EXCLUDE_REGEXP);
+    const filter = createFilter(include, exclude ?? EXCLUDE_REGEXP);
 
     // Initialize own resolution cache.
     const resolveIdCache = new Map();
@@ -37,7 +37,7 @@ export const sucrasePlugin = ({ exclude, extensions = DEFAULT_EXTENSIONS, includ
                 return resolvedId as string | null;
             }
 
-            if (importer && id[0] === ".") {
+            if (importer && id.startsWith(".")) {
                 const resolved = resolve(importer ? dirname(importer) : process.cwd(), id);
 
                 let file = resolveFile(extensions, resolved);

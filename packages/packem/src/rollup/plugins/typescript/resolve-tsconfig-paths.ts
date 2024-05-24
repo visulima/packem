@@ -47,7 +47,7 @@ export const getConfigAlias = (tsconfig?: TsConfigResult, addBaseUrl = true): Al
             for (const value of values) {
                 /** String used to replace a matched path. */
                 const replacement = [...normalizePath(resolve(resolvedBaseUrl, value))]
-                    // eslint-disable-next-line @typescript-eslint/no-loop-func,@typescript-eslint/no-unsafe-return,no-plusplus
+                    // eslint-disable-next-line @typescript-eslint/no-loop-func,no-plusplus
                     .map((segment) => (segment === "*" ? `$${++matchId}` : segment === "$" ? "$$" : segment))
                     .join("");
 
@@ -62,7 +62,7 @@ export const getConfigAlias = (tsconfig?: TsConfigResult, addBaseUrl = true): Al
         // - if `baseUrl` exists then all non-relative specifiers are resolved relative to it
         aliases.push({
             find: /^(?!\.*\/|\.*$|\w:)(.+)$/,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
             replacement: `${[...normalizePath(resolvedBaseUrl)].map((segment) => (segment === "$" ? "$$" : segment)).join("")}/$1`,
         });
     }
@@ -119,7 +119,7 @@ export const resolveTsconfigPaths = (tsconfig: TsConfigResult, logger: Pail<neve
                             message: `Resolved ${id} to ${resolved.id} using paths from tsconfig.json.`,
                             prefix: "resolve-tsconfig-paths",
                         });
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
                         return resolved.id;
                     }
                 }

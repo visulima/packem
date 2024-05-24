@@ -5,6 +5,6 @@ export default defineConfig({
     rollup: {
         license: {
             path: "./LICENSE.md",
-        }
-    }
+        },
+    },
 });

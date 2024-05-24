@@ -11,7 +11,6 @@ const resolveFileUrl = (): Plugin => {
             if (id.startsWith(resolverPrefix)) {
                 const path = fileURLToPath(id.slice(resolverPrefix.length));
 
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 return await readFile(path);
             }
 

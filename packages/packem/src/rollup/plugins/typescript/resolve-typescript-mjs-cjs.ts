@@ -12,10 +12,9 @@ const resolveTypescriptMjsCts = (): Plugin => {
 
     return {
         name: "packem:resolve-typescript-mjs-cjs",
-        resolveId(id, importer, options) {
+        async resolveId(id, importer, options) {
             if (isJs.test(id) && importer) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-                return this.resolve(id.replace(/js(x?)$/, "ts$1"), importer, options);
+                return await this.resolve(id.replace(/js(x?)$/, "ts$1"), importer, options);
             }
 
             return null;

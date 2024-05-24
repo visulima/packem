@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import getEntrypointPaths from "../../../../src/preset/utils/get-entrypoint-paths";
 

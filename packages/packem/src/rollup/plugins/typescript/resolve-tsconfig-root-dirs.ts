@@ -84,7 +84,6 @@ const resolveTsconfigRootDirectories = (cwd: string, logger: Pail<never, string>
                             prefix: "resolve-tsconfig-root-dirs",
                         });
 
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                         return resolved.id;
                     }
                 }

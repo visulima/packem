@@ -10,10 +10,10 @@ export const cjsInterop = ({
     addDefaultProperty = false,
     logger,
     type,
-}: CJSInteropOptions & {
+}: {
     logger: Pail<never, string>;
     type: "commonjs" | "module";
-}): Plugin => {
+} & CJSInteropOptions): Plugin => {
     return {
         name: "packem:cjs-interop",
         // eslint-disable-next-line sonarjs/cognitive-complexity

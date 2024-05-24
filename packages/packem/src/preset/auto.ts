@@ -2,8 +2,8 @@ import { existsSync } from "node:fs";
 
 import { bold, cyan, gray } from "@visulima/colorize";
 import { collectSync } from "@visulima/fs";
+import type { NormalizedPackageJson } from "@visulima/package";
 import { join } from "@visulima/path";
-import type { NormalizedPackageJson } from "read-pkg";
 
 import type { BuildPreset } from "../types";
 import warn from "../utils/warn";
@@ -48,11 +48,11 @@ const autoPreset: BuildPreset = {
             context.options.entries.push(...result.entries);
 
             if (result.cjs) {
-                context.options.rollup.emitCJS = true;
+                context.options.emitCJS = true;
             }
 
             if (result.esm) {
-                context.options.rollup.emitESM = true;
+                context.options.emitESM = true;
             }
 
             if (result.dts) {
@@ -66,7 +66,7 @@ const autoPreset: BuildPreset = {
                     "Automatically detected entries:",
                     cyan(
                         context.options.entries
-                            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
                             .map((buildEntry) => bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*")))
                             .join(", "),
                     ),

@@ -31,7 +31,7 @@ export default log();`,
             main: "./dist/index.cjs",
             type: "commonjs",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, { "compilerOptions": { "rootDir": "./src" } });
+        writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
         writeFileSync(
             `${distribution}/packem.config.ts`,
             `import { resolve } from "path";

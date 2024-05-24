@@ -21,9 +21,9 @@ import doOptimizeDeps from "./optmize-deps";
 import type { OptimizeDepsResult, Options } from "./types";
 import warn from "./warn";
 
-type PluginConfig = Options & {
+type PluginConfig = {
     logger: Pail<never, string>;
-};
+} & Options;
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sourceMap = true, ...esbuildOptions }: PluginConfig): RollupPlugin => {
@@ -37,7 +37,7 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
             if (typeof value === "string") {
                 // eslint-disable-next-line security/detect-object-injection
                 loaders[key] = value;
-            } else if (value === false) {
+            } else if (!value) {
                 // eslint-disable-next-line @typescript-eslint/no-dynamic-delete,security/detect-object-injection
                 delete loaders[key];
             }
@@ -110,7 +110,7 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
                 return resolvedId as string | null;
             }
 
-            if (importer && id[0] === ".") {
+            if (importer && id.startsWith(".")) {
                 const resolved = resolve(importer ? dirname(importer) : process.cwd(), id);
 
                 let file = resolveFile(extensions, resolved);

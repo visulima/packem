@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-console.log('b')
+console.log("b");

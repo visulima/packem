@@ -1,1 +1,1 @@
-export const name = 'server.react-server'
+export const name = "server.react-server";

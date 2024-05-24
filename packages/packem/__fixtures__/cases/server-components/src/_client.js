@@ -1,5 +1,5 @@
-'use client'
+"use client";
 
 export function Client() {
-  return 'client-module'
+    return "client-module";
 }

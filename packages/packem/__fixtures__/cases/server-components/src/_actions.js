@@ -1,5 +1,5 @@
-'use server'
+"use server";
 
 export async function action() {
-  return 'server-action'
+    return "server-action";
 }

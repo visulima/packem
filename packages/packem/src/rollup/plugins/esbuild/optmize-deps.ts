@@ -45,7 +45,6 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
             {
                 name: "optimize-deps",
                 async setup(build) {
-                    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
                     build.onResolve({ filter: /.*/ }, async (arguments_: OnResolveArgs): Promise<OnResolveResult | null | undefined> => {
                         if (options.exclude?.includes(arguments_.path)) {
                             return {
@@ -65,7 +64,6 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
                             });
 
                             if (resolved.errors.length > 0 || resolved.warnings.length > 0) {
-                                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                                 return resolved;
                             }
 
