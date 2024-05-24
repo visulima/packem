@@ -19,7 +19,7 @@
     "homepage": "https://www.visulima.com/docs/package/packem",
     "repository": {
         "type": "git",
-        "url": "https://github.com/visulima/visulima.git",
+        "url": "https://github.com/visulima/packem.git",
         "directory": "packages/packem"
     },
     "funding": [
