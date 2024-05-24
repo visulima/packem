@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.1...@visulima/packem@1.0.0-alpha.2) (2024-05-24)
+
+
+### Bug Fixes
+
+* added check for transformer based on package.jso, changed type for packem.config.ts, and some other fixes ([85213bf](https://github.com/visulima/packem/commit/85213bfb3ce6d766009dfbcf624a3e08fe48d4da))
+
 ## @visulima/packem 1.0.0-alpha.1 (2024-05-24)
 
 
