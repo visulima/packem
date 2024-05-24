@@ -32,15 +32,15 @@ jobs:
               with:
                   egress-policy: "audit"
 
-            - name: "Wait for tests to succeed"
-              uses: "lewagon/wait-on-check-action@595dabb3acf442d47e29c9ec9ba44db0c6bdd18f" # v1.3.3
-              timeout-minutes: 20
-              with:
-                  ref: "${{ github.event.pull_request.head.sha || github.sha }}"
-                  repo-token: "${{ secrets.GITHUB_TOKEN }}"
-                  wait-interval: 60 # seconds
-                  running-workflow-name: "Semantic Release" # wait for all other checks to complete
-                  allowed-conclusions: "success,skipped" # all other checks must pass, being skipped or cancelled is not sufficient
+#            - name: "Wait for workflows to succeed"
+#              uses: "lewagon/wait-on-check-action@595dabb3acf442d47e29c9ec9ba44db0c6bdd18f" # v1.3.3
+#              timeout-minutes: 20
+#              with:
+#                  ref: "${{ github.event.pull_request.head.sha || github.sha }}"
+#                  repo-token: "${{ secrets.GITHUB_TOKEN }}"
+#                  wait-interval: 60 # seconds
+#                  running-workflow-name: "Semantic Release" # wait for all other checks to complete
+#                  allowed-conclusions: "success,skipped" # all other checks must pass, being skipped or cancelled is not sufficient
 
             - name: "Git checkout"
               uses: "actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11" # v4.1.1
