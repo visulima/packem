@@ -106,7 +106,7 @@ importers:
         version: 1.6.0(@types/node@18.18.14)(@vitest/ui@1.6.0)
 
   examples/cjs-interop:
-    dependencies:
+    devDependencies:
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
@@ -115,7 +115,7 @@ importers:
         version: 0.21.3
 
   examples/copy:
-    dependencies:
+    devDependencies:
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
@@ -124,7 +124,7 @@ importers:
         version: 0.21.3
 
   examples/minifed-class:
-    dependencies:
+    devDependencies:
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
@@ -133,26 +133,19 @@ importers:
         version: 0.21.3
 
   examples/native-node-module:
-    dependencies:
+    devDependencies:
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
       esbuild:
         specifier: ^0.21.3
         version: 0.21.3
-    devDependencies:
       nodehun:
         specifier: ^3.0.2
         version: 3.0.2
 
   examples/react-tsx:
     dependencies:
-      '@visulima/packem':
-        specifier: workspace:*
-        version: link:../../packages/packem
-      esbuild:
-        specifier: ^0.21.3
-        version: 0.21.3
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -166,18 +159,18 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.25
         version: 18.3.0
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.21.3
+        version: 0.21.3
       typescript:
         specifier: ^4.9.5
         version: 4.9.5
 
   examples/react-tsx-css:
     dependencies:
-      '@visulima/packem':
-        specifier: workspace:*
-        version: link:../../packages/packem
-      esbuild:
-        specifier: ^0.21.3
-        version: 0.21.3
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -191,49 +184,49 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.25
         version: 18.3.0
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.21.3
+        version: 0.21.3
       typescript:
         specifier: ^4.9.5
         version: 4.9.5
 
   examples/transformer-esbuild:
     dependencies:
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.79
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.2.25
+        version: 18.3.0
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
       esbuild:
         specifier: ^0.21.3
         version: 0.21.3
-      react:
-        specifier: ^18.2.0
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.3.1(react@18.3.1)
-    devDependencies:
-      '@types/react':
-        specifier: ^18.2.79
-        version: 18.3.3
-      '@types/react-dom':
-        specifier: ^18.2.25
-        version: 18.3.0
       typescript:
         specifier: ^4.9.5
         version: 4.9.5
 
   examples/transformer-sucrase:
     dependencies:
-      '@visulima/packem':
-        specifier: workspace:*
-        version: link:../../packages/packem
       react:
         specifier: ^18.2.0
         version: 18.3.1
       react-dom:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
-      sucrase:
-        specifier: ^3.35.0
-        version: 3.35.0
     devDependencies:
       '@types/react':
         specifier: ^18.2.79
@@ -241,18 +234,18 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.25
         version: 18.3.0
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      sucrase:
+        specifier: ^3.35.0
+        version: 3.35.0
       typescript:
         specifier: ^4.9.5
         version: 4.9.5
 
   examples/transformer-swc:
     dependencies:
-      '@swc/core':
-        specifier: ^1.5.7
-        version: 1.5.7
-      '@visulima/packem':
-        specifier: workspace:*
-        version: link:../../packages/packem
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -260,12 +253,37 @@ importers:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
     devDependencies:
+      '@swc/core':
+        specifier: ^1.5.7
+        version: 1.5.7
       '@types/react':
         specifier: ^18.2.79
         version: 18.3.3
       '@types/react-dom':
         specifier: ^18.2.25
         version: 18.3.0
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      typescript:
+        specifier: ^4.9.5
+        version: 4.9.5
+
+  examples/vue:
+    dependencies:
+      '@vueuse/core':
+        specifier: ^8.5.0
+        version: 8.9.4(vue@3.4.27(typescript@4.9.5))
+      vue:
+        specifier: ^3.4.25
+        version: 3.4.27(typescript@4.9.5)
+    devDependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.21.3
+        version: 0.21.3
       typescript:
         specifier: ^4.9.5
         version: 4.9.5
@@ -287,7 +305,7 @@ importers:
         version: 4.9.5
 
   examples/without-typescript:
-    dependencies:
+    devDependencies:
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
@@ -2206,6 +2224,9 @@ packages:
   '@types/unist@3.0.2':
     resolution: {integrity: sha512-dqId9J8K/vGi5Zr7oo212BGii5m3q5Hxlkwy3WpYuKPklmBEvsbMYYyLxAQpSffdLl/gdW0XUpKWFvYmyoWCoQ==}
 
+  '@types/web-bluetooth@0.0.14':
+    resolution: {integrity: sha512-5d2RhCard1nQUC3aHcq/gHzWYO6K0WJmAbjO7mQJgCQKtZpgXxv1rOM6O/dBDhDYYVutk1sciOgNSe+5YyfM8A==}
+
   '@types/yargs-parser@21.0.3':
     resolution: {integrity: sha512-I4q9QU9MQv4oEOz4tAHJtNz1cwuLxn2F3xcc2iV5WdqLPpUnj30aUuxt1mAxYTG+oe8CZMV/+6rU4S4gRDzqtQ==}
 
@@ -2519,6 +2540,31 @@ packages:
 
   '@vue/shared@3.4.27':
     resolution: {integrity: sha512-DL3NmY2OFlqmYYrzp39yi3LDkKxa5vZVwxWdQ3rG0ekuWscHraeIbnI8t+aZK7qhYqEqWKTUdijadunb9pnrgA==}
+
+  '@vueuse/core@8.9.4':
+    resolution: {integrity: sha512-B/Mdj9TK1peFyWaPof+Zf/mP9XuGAngaJZBwPaXBvU3aCTZlx3ltlrFFFyMV4iGBwsjSCeUCgZrtkEj9dS2Y3Q==}
+    peerDependencies:
+      '@vue/composition-api': ^1.1.0
+      vue: ^2.6.0 || ^3.2.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+      vue:
+        optional: true
+
+  '@vueuse/metadata@8.9.4':
+    resolution: {integrity: sha512-IwSfzH80bnJMzqhaapqJl9JRIiyQU0zsRGEgnxN6jhq7992cPUJIRfV+JHRIZXjYqbwt07E1gTEp0R0zPJ1aqw==}
+
+  '@vueuse/shared@8.9.4':
+    resolution: {integrity: sha512-wt+T30c4K6dGRMVqPddexEVLa28YwxW5OFIPmzUHICjphfAuBFTTdDoyqREZNDOFJZ44ARH1WWQNCUK8koJ+Ag==}
+    peerDependencies:
+      '@vue/composition-api': ^1.1.0
+      vue: ^2.6.0 || ^3.2.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+      vue:
+        optional: true
 
   '@yarnpkg/lockfile@1.1.0':
     resolution: {integrity: sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==}
@@ -7842,6 +7888,17 @@ packages:
       jsdom:
         optional: true
 
+  vue-demi@0.14.7:
+    resolution: {integrity: sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==}
+    engines: {node: '>=12'}
+    hasBin: true
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^3.0.0-0 || ^2.6.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+
   vue@3.4.27:
     resolution: {integrity: sha512-8s/56uK6r01r1icG/aEOHqyMVxd1bkYcSe9j8HcKtr/xTOFWvnzIVTehNW+5Yt89f+DLBe4A569pnZLS5HzAMA==}
     peerDependencies:
@@ -9929,6 +9986,8 @@ snapshots:
 
   '@types/unist@3.0.2': {}
 
+  '@types/web-bluetooth@0.0.14': {}
+
   '@types/yargs-parser@21.0.3': {}
 
   '@types/yargs@17.0.32':
@@ -10382,6 +10441,23 @@ snapshots:
       vue: 3.4.27(typescript@5.4.5)
 
   '@vue/shared@3.4.27': {}
+
+  '@vueuse/core@8.9.4(vue@3.4.27(typescript@4.9.5))':
+    dependencies:
+      '@types/web-bluetooth': 0.0.14
+      '@vueuse/metadata': 8.9.4
+      '@vueuse/shared': 8.9.4(vue@3.4.27(typescript@4.9.5))
+      vue-demi: 0.14.7(vue@3.4.27(typescript@4.9.5))
+    optionalDependencies:
+      vue: 3.4.27(typescript@4.9.5)
+
+  '@vueuse/metadata@8.9.4': {}
+
+  '@vueuse/shared@8.9.4(vue@3.4.27(typescript@4.9.5))':
+    dependencies:
+      vue-demi: 0.14.7(vue@3.4.27(typescript@4.9.5))
+    optionalDependencies:
+      vue: 3.4.27(typescript@4.9.5)
 
   '@yarnpkg/lockfile@1.1.0': {}
 
@@ -17013,6 +17089,10 @@ snapshots:
       - sugarss
       - supports-color
       - terser
+
+  vue-demi@0.14.7(vue@3.4.27(typescript@4.9.5)):
+    dependencies:
+      vue: 3.4.27(typescript@4.9.5)
 
   vue@3.4.27(typescript@4.9.5):
     dependencies:

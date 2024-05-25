@@ -45,6 +45,9 @@ pnpm add @visulima/packem
 
 ```
 
+Links:
+- https://github.com/frehner/modern-guide-to-packaging-js-library#set-the-main-field
+
 ## Related
 
 -   [bunchee](https://github.com/huozhi/bunchee) - Zero config bundler for ECMAScript and TypeScript packages

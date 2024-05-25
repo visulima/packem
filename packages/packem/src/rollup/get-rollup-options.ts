@@ -65,19 +65,6 @@ const getTransformerConfig = (
             context.options.rollup.esbuild.target = "es5";
         }
 
-        if (context.options.rollup.esbuild.jsx === "preserve") {
-            let message = "Packem does not support 'preserve' jsx option. Please use 'transform' or 'automatic' instead.";
-
-            if (context.tsconfig?.config.compilerOptions?.jsx) {
-                message =
-                    "Packem does not support '" +
-                    context.tsconfig.config.compilerOptions.jsx +
-                    "' jsx option. Please change it to 'react' or 'react-jsx' or 'react-jsxdev' instead.";
-            }
-
-            throw new Error(message);
-        }
-
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
         let nodeTarget = 'node' + (versions.node.split(".")[0]);
 
@@ -377,7 +364,7 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
                     type: context.pkg.type ?? "commonjs",
                 }),
 
-            context.options.rollup.dynamicVars && dynamicImportVarsPlugin(),
+            context.options.rollup.dynamicVars && dynamicImportVarsPlugin(context.options.rollup.dynamicVars),
 
             context.options.rollup.commonjs &&
                 commonjsPlugin({

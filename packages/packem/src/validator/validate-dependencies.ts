@@ -7,7 +7,7 @@ import warn from "../utils/warn";
 
 const validateDependencies = (context: BuildContext): void => {
     const usedDependencies = new Set<string>();
-    const unusedDependencies = new Set<string>(Object.keys(context.pkg.dependencies || {}));
+    const unusedDependencies = new Set<string>(Object.keys(context.pkg.dependencies ?? {}));
     const implicitDependencies = new Set<string>();
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax

@@ -9,11 +9,9 @@
     "scripts": {
         "build": "packem --cjsInterop"
     },
-    "dependencies": {
-        "@visulima/packem": "workspace:*",
-        "esbuild": "^0.21.3"
-    },
     "devDependencies": {
+        "@visulima/packem": "workspace:*",
+        "esbuild": "^0.21.3",
         "nodehun": "^3.0.2"
     }
 }

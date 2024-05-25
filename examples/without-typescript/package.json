@@ -8,7 +8,7 @@
     "scripts": {
         "build": "packem --cjsInterop"
     },
-    "dependencies": {
+    "devDependencies": {
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.21.3"
     }

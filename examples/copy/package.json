@@ -9,7 +9,7 @@
     "scripts": {
         "build": "packem"
     },
-    "dependencies": {
+    "devDependencies": {
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.21.3"
     },

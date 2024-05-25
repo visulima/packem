@@ -10,12 +10,12 @@
         "build": "packem"
     },
     "dependencies": {
-        "@swc/core": "^1.5.7",
-        "@visulima/packem": "workspace:*",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
     },
     "devDependencies": {
+        "@swc/core": "^1.5.7",
+        "@visulima/packem": "workspace:*",
         "@types/react": "^18.2.79",
         "@types/react-dom": "^18.2.25",
         "typescript": "^4.9.5"

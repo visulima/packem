@@ -24,7 +24,7 @@ import warn from "./warn";
 export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sourceMap = true, ...esbuildOptions }: EsbuildPluginConfig): RollupPlugin => {
     const loaders = DEFAULT_LOADERS;
 
-    if (_loaders) {
+    if (_loaders !== undefined) {
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax,prefer-const
         for (let [key, value] of Object.entries(_loaders)) {
             key = key.startsWith(".") ? key : `.${key}`;
@@ -32,6 +32,7 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
             if (typeof value === "string") {
                 // eslint-disable-next-line security/detect-object-injection
                 loaders[key] = value;
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             } else if (!value) {
                 // eslint-disable-next-line @typescript-eslint/no-dynamic-delete,security/detect-object-injection
                 delete loaders[key];
@@ -43,7 +44,7 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
     // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
     const INCLUDE_REGEXP = new RegExp(`\\.(${extensions.map((extension) => extension.slice(1)).join("|")})$`);
 
-    const filter = createFilter(include || INCLUDE_REGEXP, exclude || EXCLUDE_REGEXP);
+    const filter = createFilter(include ?? INCLUDE_REGEXP, exclude ?? EXCLUDE_REGEXP);
 
     let optimizeDepsResult: OptimizeDepsResult | undefined;
     let cwd = process.cwd();
@@ -141,6 +142,8 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
             const extension = extname(id);
             // eslint-disable-next-line security/detect-object-injection
             const loader = loaders[extension];
+
+            logger.debug("transforming %s with %s loader", id, loader);
 
             if (!loader) {
                 return null;
