@@ -1,3 +1,15 @@
+## @visulima/packem [1.0.0-alpha.9](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.8...@visulima/packem@1.0.0-alpha.9) (2024-05-25)
+
+
+### Features
+
+* added build time ([5ad7b27](https://github.com/visulima/packem/commit/5ad7b27eedd056dc1ce127ad76bcc03a52fe5d31))
+
+
+### Miscellaneous Chores
+
+* clean up of started node native plugin ([6b67ca9](https://github.com/visulima/packem/commit/6b67ca93299d876893028d80816defa5da27c5f0))
+
 ## @visulima/packem [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.7...@visulima/packem@1.0.0-alpha.8) (2024-05-25)
 
 
