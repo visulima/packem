@@ -14,6 +14,7 @@ import { visualizer as visualizerPlugin } from "rollup-plugin-visualizer";
 import { DEFAULT_EXTENSIONS } from "../constants";
 import type { BuildContext, InternalBuildOptions } from "../types";
 import arrayIncludes from "../utils/array-includes";
+import arrayify from "../utils/arrayify";
 import getPackageName from "../utils/get-package-name";
 import { cjsInterop as cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
@@ -49,6 +50,48 @@ const getTransformerConfig = (
             throw new Error("No esbuild options found in your configuration.");
         }
 
+        if (context.tsconfig?.config.compilerOptions?.target?.toLowerCase() === "es3") {
+            context.logger.warn(
+                [
+                    "ES3 target is not supported by esbuild, so ES5 will be used instead..",
+                    "Please set 'target' option in tsconfig to at least ES5 to disable this error",
+                ].join(" "),
+            );
+
+            context.tsconfig.config.compilerOptions.target = "es5";
+            context.options.rollup.esbuild.target = "es5";
+        }
+
+        if (context.options.rollup.esbuild.jsx === "preserve") {
+            let message = "Packem does not support 'preserve' jsx option. Please use 'transform' or 'automatic' instead.";
+
+            if (context.tsconfig?.config.compilerOptions?.jsx) {
+                message =
+                    "Packem does not support '" +
+                    context.tsconfig.config.compilerOptions.jsx +
+                    "' jsx option. Please change it to 'react' or 'react-jsx' or 'react-jsxdev' instead.";
+            }
+
+            throw new Error(message);
+        }
+
+        // Add node target to esbuild target
+        if (context.options.rollup.esbuild.target) {
+            const targets = arrayify(context.options.rollup.esbuild.target);
+
+            if (!targets.some((t) => t.startsWith("node"))) {
+                context.options.rollup.esbuild.target = [...new Set([...arrayify(context.options.target), ...targets])];
+            }
+        } else {
+            context.options.rollup.esbuild.target = arrayify(context.options.target);
+        }
+
+        if (context.tsconfig?.config.compilerOptions?.target === "es5") {
+            context.options.rollup.esbuild.keepNames = false;
+
+            context.logger.debug("Disabling keepNames because target is set to es5");
+        }
+
         return {
             minify: context.options.minify,
             sourceMap: context.options.sourcemap,
@@ -60,6 +103,21 @@ const getTransformerConfig = (
     if (name === "swc") {
         if (!context.options.rollup.swc) {
             throw new Error("No swc options found in your configuration.");
+        }
+
+        if (typeof context.options.rollup.swc.env !== "object") {
+            context.options.rollup.swc.env = {};
+        }
+
+        // Add node target to esbuild target
+        if (context.options.rollup.swc.env.targets) {
+            const targets = arrayify(context.options.rollup.swc.env.targets);
+
+            if (!targets.some((t) => t.startsWith("node"))) {
+                context.options.rollup.swc.env.targets = [...new Set([...arrayify(context.options.target), ...targets])];
+            }
+        } else {
+            context.options.rollup.swc.env.targets = arrayify(context.options.target);
         }
 
         return {
@@ -283,6 +341,7 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
             context.options.rollup.resolve &&
                 nodeResolvePlugin({
                     extensions: DEFAULT_EXTENSIONS,
+                    rootDir: context.rootDir,
                     ...context.options.rollup.resolve,
                 }),
 

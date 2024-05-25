@@ -97,6 +97,8 @@ const build = async (
         declaration: false,
         dependencies: [],
         devDependencies: [],
+        emitCJS: false,
+        emitESM: true,
         entries: [],
         externals: [...Module.builtinModules, ...Module.builtinModules.map((m) => `node:${m}`)],
         failOnWarn: true,
@@ -161,8 +163,6 @@ const build = async (
                 // the `import` and the `(`.
                 include: /\bimport\s*[(/]/,
             },
-            emitCJS: false,
-            emitESM: true,
             esbuild: {
                 charset: "utf8",
                 include: /\.[jt]sx?$/,
@@ -352,51 +352,6 @@ const build = async (
     options.outDir = resolve(options.rootDir, options.outDir);
 
     ensureDirSync(options.outDir);
-
-    if (options.transformerName === "esbuild" && options.rollup.esbuild) {
-        if (tsconfig?.config.compilerOptions?.target?.toLowerCase() === "es3") {
-            logger.warn(
-                [
-                    "ES3 target is not supported by esbuild, so ES5 will be used instead..",
-                    "Please set 'target' option in tsconfig to at least ES5 to disable this error",
-                ].join(" "),
-            );
-
-            // eslint-disable-next-line no-param-reassign
-            tsconfig.config.compilerOptions.target = "es5";
-            options.rollup.esbuild.target = "es5";
-        }
-
-        if (options.rollup.esbuild.jsx === "preserve") {
-            let message = "Packem does not support 'preserve' jsx option. Please use 'transform' or 'automatic' instead.";
-
-            if (tsconfig?.config.compilerOptions?.jsx) {
-                message =
-                    "Packem does not support '" +
-                    tsconfig.config.compilerOptions.jsx +
-                    "' jsx option. Please change it to 'react' or 'react-jsx' or 'react-jsxdev' instead.";
-            }
-
-            throw new Error(message);
-        }
-
-        // Add node target to esbuild target
-        if (options.rollup.esbuild.target) {
-            const targets = arrayify(options.rollup.esbuild.target);
-
-            if (!targets.some((t) => t.startsWith("node"))) {
-                options.rollup.esbuild.target = [options.target, ...targets];
-            }
-        } else {
-            options.rollup.esbuild.target = [options.target];
-        }
-
-        if (tsconfig?.config.compilerOptions?.target === "es5") {
-            options.rollup.esbuild.keepNames = false;
-
-            logger.debug("Disabling keepNames because target is set to es5");
-        }
-    }
 
     if (options.rollup.resolve && options.rollup.resolve.preferBuiltins === true) {
         options.rollup.polyfillNode = false;
