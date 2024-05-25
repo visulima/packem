@@ -20,7 +20,6 @@ import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP } from "./constants";
 import createStub from "./jit/create-stub";
 import { build as rollupBuild, watch as rollupWatch } from "./rollup";
 import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildOptions, InternalBuildOptions, Mode } from "./types";
-import arrayify from "./utils/arrayify";
 import dumpObject from "./utils/dump-object";
 import getPackageSideEffect from "./utils/get-package-side-effect";
 import removeExtension from "./utils/remove-extension";
