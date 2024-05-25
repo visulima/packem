@@ -45,6 +45,7 @@ import resolveAliases from "./utils/resolve-aliases";
 const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],
     context: BuildContext,
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig => {
     if (name === "esbuild") {
         if (!context.options.rollup.esbuild) {

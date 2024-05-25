@@ -654,7 +654,7 @@ const createBundler = async (
         scope: "packem",
     });
 
-    // logger.wrapAll();
+    logger.wrapAll();
 
     // Determine rootDirectory
     // eslint-disable-next-line no-param-reassign
@@ -674,12 +674,12 @@ const createBundler = async (
             path: tsconfigPath,
         };
 
-        logger.debug("Using tsconfig.json found at", tsconfigPath);
+        logger.info("Using tsconfig settings found at", tsconfigPath);
     } else {
         try {
             tsconfig = await findTSConfig(rootDirectory);
 
-            logger.debug("Using " + basename(tsconfig.path) + " found at", tsconfig.path);
+            logger.info("Using tsconfig settings found at", tsconfig.path.replace(rootDirectory, "."));
         } catch {
             logger.info("No tsconfig.json or jsconfig.json found.");
         }
@@ -688,12 +688,17 @@ const createBundler = async (
     try {
         const { packageJson, path: packageJsonPath } = await findPackageJson(rootDirectory);
 
-        logger.debug("Using package.json found at", packageJsonPath);
+        logger.info("Using package.json found at", packageJsonPath.replace(rootDirectory, "."));
 
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const _buildConfig: BuildConfig | BuildConfig[] = tryRequire(configPath ?? "./packem.config", rootDirectory, []);
 
         const buildConfigs = (Array.isArray(_buildConfig) ? _buildConfig : [_buildConfig]).filter(Boolean);
+        const start = Date.now();
+
+        const getDuration = () => {
+            return `${Math.floor(Date.now() - start)}ms`;
+        };
 
         if (buildConfigs.length === 0) {
             await build(logger, rootDirectory, mode, otherInputConfig, {}, packageJson as PackEmPackageJson, tsconfig, []);
@@ -707,6 +712,8 @@ const createBundler = async (
                 await build(logger, rootDirectory, mode, otherInputConfig, buildConfig, packageJson as PackEmPackageJson, tsconfig, cleanedDirectories);
             }
         }
+
+        logger.raw(`\n⚡️ Build success in ${getDuration()}`);
 
         // Restore all wrapped console methods
         logger.restoreAll();
