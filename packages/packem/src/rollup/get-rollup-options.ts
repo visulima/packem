@@ -42,8 +42,6 @@ import getChunkFilename from "./utils/get-chunk-filename";
 import getEntryFileNames from "./utils/get-entry-file-names";
 import resolveAliases from "./utils/resolve-aliases";
 
-// import nativeNodeModule from "./plugins/native-node-module";
-
 const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],
     context: BuildContext,
@@ -322,8 +320,6 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
                     ...context.options.rollup.alias,
                     entries: resolvedAliases,
                 }),
-
-            // nativeNodeModule(),
 
             context.options.rollup.resolve &&
                 nodeResolvePlugin({
