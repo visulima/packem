@@ -9,7 +9,7 @@ import type { PackageJson, TsConfigResult } from "@visulima/package";
 import type { Pail } from "@visulima/pail";
 import type { Hookable } from "hookable";
 import type { JITIOptions } from "jiti";
-import type { OutputOptions, Plugin,RollupBuild, RollupOptions, RollupWatcher } from "rollup";
+import type { OutputOptions, Plugin, RollupBuild, RollupOptions, RollupWatcher } from "rollup";
 import type { Options as RollupDtsOptions } from "rollup-plugin-dts";
 import type { NodePolyfillsOptions } from "rollup-plugin-polyfill-node";
 import type { PluginVisualizerOptions } from "rollup-plugin-visualizer";

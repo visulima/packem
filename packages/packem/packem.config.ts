@@ -9,5 +9,5 @@ export default defineConfig({
         },
         shim: true,
     },
-    transformer
+    transformer,
 });

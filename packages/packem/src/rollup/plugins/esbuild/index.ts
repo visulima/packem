@@ -17,7 +17,7 @@ import { DEFAULT_LOADERS, EXCLUDE_REGEXP } from "../../../constants";
 import resolveFile from "../../utils/resolve-file";
 import getRenderChunk from "./get-render-chunk";
 import doOptimizeDeps from "./optmize-deps";
-import type { OptimizeDepsResult, EsbuildPluginConfig } from "./types";
+import type { EsbuildPluginConfig, OptimizeDepsResult } from "./types";
 import warn from "./warn";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity

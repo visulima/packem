@@ -1,21 +1,22 @@
-import { stat } from "node:fs/promises";
+import { readdir, stat } from "node:fs/promises";
 import Module from "node:module";
 import { cwd, env, exit, versions } from "node:process";
 
 import { bold, cyan, gray, green } from "@visulima/colorize";
-import { emptyDir, ensureDirSync, isAccessible, walk } from "@visulima/fs";
+import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync, walk } from "@visulima/fs";
+import { NotFoundError } from "@visulima/fs/error";
 import { formatBytes } from "@visulima/humanizer";
 import type { PackageJson, TsConfigJson, TsConfigResult } from "@visulima/package";
 import { findPackageJson, findTSConfig, readTsConfig } from "@visulima/package";
 import type { Pail, Processor } from "@visulima/pail";
 import { createPail } from "@visulima/pail";
 import { CallerProcessor, ErrorProcessor, MessageFormatterProcessor } from "@visulima/pail/processor";
-import { basename, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
+import { basename, dirname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import { defu } from "defu";
 import { createHooks } from "hookable";
 import { minVersion } from "semver";
 
-import { EXCLUDE_REGEXP } from "./constants";
+import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP } from "./constants";
 import createStub from "./jit/create-stub";
 import { build as rollupBuild, watch as rollupWatch } from "./rollup";
 import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildOptions, InternalBuildOptions, Mode } from "./types";
@@ -448,7 +449,7 @@ const build = async (
     }
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-    for (const entry of context.options.entries) {
+    for await (const entry of context.options.entries) {
         if (typeof entry.name !== "string") {
             let relativeInput = isAbsolute(entry.input) ? relative(rootDirectory, entry.input) : normalize(entry.input);
 
@@ -469,9 +470,24 @@ const build = async (
 
         entry.input = resolve(options.rootDir, entry.input);
 
-        // if (!isAccessibleSync(entry.input)) {
-        //     throw new NotFoundError("Your configured entry: " + cyan(entry.input) + " does not exist.");
-        // }
+        if (!isAccessibleSync(entry.input)) {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename
+            const filesInWorkingDirectory = new Set(await readdir(dirname(entry.input)));
+
+            let hasFile = false;
+
+            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+            for (const extension of DEFAULT_EXTENSIONS) {
+                if (filesInWorkingDirectory.has(basename(entry.input) + extension)) {
+                    hasFile = true;
+                    break;
+                }
+            }
+
+            if (!hasFile) {
+                throw new NotFoundError("Your configured entry: " + cyan(entry.input) + " does not exist.");
+            }
+        }
 
         entry.outDir = resolve(options.rootDir, entry.outDir ?? options.outDir);
     }
