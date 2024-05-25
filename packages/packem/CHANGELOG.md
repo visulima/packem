@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.6...@visulima/packem@1.0.0-alpha.7) (2024-05-25)
+
+
+### Bug Fixes
+
+* adjusted target on swc and esbuild ([5ee4937](https://github.com/visulima/packem/commit/5ee493757e5fc51945228df0ff97db77c35eac3e))
+
 ## @visulima/packem [1.0.0-alpha.6](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.5...@visulima/packem@1.0.0-alpha.6) (2024-05-25)
 
 
