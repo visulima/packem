@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.7...@visulima/packem@1.0.0-alpha.8) (2024-05-25)
+
+
+### Bug Fixes
+
+* removed vue examples, removed jsx preserve error ([55f5571](https://github.com/visulima/packem/commit/55f55712e021a3a4a1aa24c2026a508597a28d14))
+
 ## @visulima/packem [1.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.6...@visulima/packem@1.0.0-alpha.7) (2024-05-25)
 
 
