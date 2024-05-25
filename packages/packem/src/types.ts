@@ -89,31 +89,6 @@ export type BuildEntry = {
     outDir?: string;
 };
 
-type Target =
-    | "chrome"
-    | "deno"
-    | "edge"
-    | "firefox"
-    | "hermes"
-    | "ie"
-    | "ios"
-    | "node"
-    | "opera"
-    | "rhino"
-    | "safari"
-    | "esnext"
-    | "es5"
-    | "es6"
-    | "es2015"
-    | "es2016"
-    | "es2017"
-    | "es2018"
-    | "es2019"
-    | "es2020"
-    | "es2021"
-    | "es2022"
-    | "es2023";
-
 export interface BuildOptions {
     alias: Record<string, string>;
     cjsInterop?: boolean;
@@ -145,7 +120,6 @@ export interface BuildOptions {
     sourcemap: boolean;
     stub: boolean;
     stubOptions: { jiti: Omit<JITIOptions, "onError" | "transform"> };
-    target: Target | Target[];
     transformer?: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
 }
 

@@ -1,6 +1,6 @@
 import { readdir, stat } from "node:fs/promises";
 import Module from "node:module";
-import { cwd, env, exit, versions } from "node:process";
+import { cwd, env, exit } from "node:process";
 
 import { bold, cyan, gray, green } from "@visulima/colorize";
 import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync, walk } from "@visulima/fs";
@@ -14,7 +14,6 @@ import { CallerProcessor, ErrorProcessor, MessageFormatterProcessor } from "@vis
 import { basename, dirname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import { defu } from "defu";
 import { createHooks } from "hookable";
-import { minVersion } from "semver";
 
 import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP } from "./constants";
 import createStub from "./jit/create-stub";
@@ -77,16 +76,6 @@ const build = async (
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
     const preset = resolvePreset(buildConfig.preset ?? package_.packem?.preset ?? inputConfig.preset ?? "auto", rootDirectory);
-
-    let nodeTarget = `node${versions.node.split(".")[0]}`;
-
-    if (package_.engines?.node) {
-        const minNodeVersion = minVersion(package_.engines.node);
-
-        if (minNodeVersion) {
-            nodeTarget = `node${minNodeVersion.major}`;
-        }
-    }
 
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
 
@@ -323,7 +312,6 @@ const build = async (
                 interopDefault: true,
             },
         },
-        target: nodeTarget,
         transformerName: undefined,
     }) as InternalBuildOptions;
 

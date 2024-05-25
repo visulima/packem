@@ -1,3 +1,5 @@
+import { versions } from "node:process";
+
 import aliasPlugin from "@rollup/plugin-alias";
 import commonjsPlugin from "@rollup/plugin-commonjs";
 import dynamicImportVarsPlugin from "@rollup/plugin-dynamic-import-vars";
@@ -10,6 +12,7 @@ import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupL
 import { dts as dtsPlugin } from "rollup-plugin-dts";
 import polifillPlugin from "rollup-plugin-polyfill-node";
 import { visualizer as visualizerPlugin } from "rollup-plugin-visualizer";
+import { minVersion } from "semver";
 
 import { DEFAULT_EXTENSIONS } from "../constants";
 import type { BuildContext, InternalBuildOptions } from "../types";
@@ -75,15 +78,27 @@ const getTransformerConfig = (
             throw new Error(message);
         }
 
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        let nodeTarget = 'node' + (versions.node.split(".")[0]);
+
+        if (context.pkg.engines?.node) {
+            const minNodeVersion = minVersion(context.pkg.engines.node);
+
+            if (minNodeVersion) {
+                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                nodeTarget = 'node' + minNodeVersion.major;
+            }
+        }
+
         // Add node target to esbuild target
         if (context.options.rollup.esbuild.target) {
             const targets = arrayify(context.options.rollup.esbuild.target);
 
             if (!targets.some((t) => t.startsWith("node"))) {
-                context.options.rollup.esbuild.target = [...new Set([...arrayify(context.options.target), ...targets])];
+                context.options.rollup.esbuild.target = [...new Set([...arrayify(nodeTarget), ...targets])];
             }
         } else {
-            context.options.rollup.esbuild.target = arrayify(context.options.target);
+            context.options.rollup.esbuild.target = arrayify(nodeTarget);
         }
 
         if (context.tsconfig?.config.compilerOptions?.target === "es5") {
@@ -103,21 +118,6 @@ const getTransformerConfig = (
     if (name === "swc") {
         if (!context.options.rollup.swc) {
             throw new Error("No swc options found in your configuration.");
-        }
-
-        if (typeof context.options.rollup.swc.env !== "object") {
-            context.options.rollup.swc.env = {};
-        }
-
-        // Add node target to esbuild target
-        if (context.options.rollup.swc.env.targets) {
-            const targets = arrayify(context.options.rollup.swc.env.targets);
-
-            if (!targets.some((t) => t.startsWith("node"))) {
-                context.options.rollup.swc.env.targets = [...new Set([...arrayify(context.options.target), ...targets])];
-            }
-        } else {
-            context.options.rollup.swc.env.targets = arrayify(context.options.target);
         }
 
         return {
@@ -272,7 +272,7 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
                     format: "cjs",
                     freeze: false,
                     generatedCode: { constBindings: true },
-                    // By default in rollup, when creating multiple chunks, transitive imports of entry chunks
+                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
                     // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
                     hoistTransitiveImports: false,
                     interop: "compat",
@@ -295,7 +295,7 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
                     format: "esm",
                     freeze: false,
                     generatedCode: { constBindings: true },
-                    // By default in rollup, when creating multiple chunks, transitive imports of entry chunks
+                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
                     // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
                     hoistTransitiveImports: false,
                     sourcemap: context.options.sourcemap,
