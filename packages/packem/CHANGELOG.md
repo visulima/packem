@@ -1,3 +1,15 @@
+## @visulima/packem [1.0.0-alpha.6](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.5...@visulima/packem@1.0.0-alpha.6) (2024-05-25)
+
+
+### Bug Fixes
+
+* added target options to esbuild and swc ([5d3100b](https://github.com/visulima/packem/commit/5d3100b6bce15819a90b97f537b5626498bb6b18))
+
+
+### Styles
+
+* cs fix ([78752e4](https://github.com/visulima/packem/commit/78752e434e62c20c5efb800015d321899770030f))
+
 ## @visulima/packem [1.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.4...@visulima/packem@1.0.0-alpha.5) (2024-05-25)
 
 
