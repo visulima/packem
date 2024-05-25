@@ -10,7 +10,8 @@
         "build": "packem"
     },
     "dependencies": {
-        "@visulima/packem": "workspace:*"
+        "@visulima/packem": "workspace:*",
+        "esbuild": "^0.21.3"
     },
     "packem": {
         "rollup": {

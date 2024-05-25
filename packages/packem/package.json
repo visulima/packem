@@ -6,6 +6,8 @@
         "anolilab",
         "visulima",
         "esbuild",
+        "swc",
+        "sucrase",
         "rollup",
         "zero config",
         "package.json",
@@ -58,6 +60,36 @@
             "import": {
                 "types": "./dist/config.d.mts",
                 "default": "./dist/config.mjs"
+            }
+        },
+        "./transformer/esbuild": {
+            "require": {
+                "types": "./dist/rollup/plugins/esbuild/index.d.cts",
+                "default": "./dist/rollup/plugins/esbuild/index.cjs"
+            },
+            "import": {
+                "types": "./dist/rollup/plugins/esbuild/index.d.mts",
+                "default": "./dist/rollup/plugins/esbuild/index.mjs"
+            }
+        },
+        "./transformer/swc": {
+            "require": {
+                "types": "./dist/rollup/plugins/swc/index.d.cts",
+                "default": "./dist/rollup/plugins/swc/index.cjs"
+            },
+            "import": {
+                "types": "./dist/rollup/plugins/swc/index.d.mts",
+                "default": "./dist/rollup/plugins/swc/index.mjs"
+            }
+        },
+        "./transformer/sucrase": {
+            "require": {
+                "types": "./dist/rollup/plugins/sucrase/index.d.cts",
+                "default": "./dist/rollup/plugins/sucrase/index.cjs"
+            },
+            "import": {
+                "types": "./dist/rollup/plugins/sucrase/index.d.mts",
+                "default": "./dist/rollup/plugins/sucrase/index.mjs"
             }
         },
         "./package.json": "./package.json"

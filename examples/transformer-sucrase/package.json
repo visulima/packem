@@ -11,9 +11,9 @@
     },
     "dependencies": {
         "@visulima/packem": "workspace:*",
-        "sucrase": "^3.35.0",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-dom": "^18.2.0",
+        "sucrase": "^3.35.0"
     },
     "devDependencies": {
         "@types/react": "^18.2.79",

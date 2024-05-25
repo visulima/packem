@@ -1,19 +1,15 @@
 {
-    "name": "example_packem_vue_tsx",
+    "name": "example_packem_cjs_interop",
     "version": "1.0.0",
     "private": true,
     "type": "module",
     "main": "./dist/index.cjs",
     "module": "./dist/index.mjs",
     "scripts": {
-        "build": "packem"
+        "build": "packem --cjsInterop"
     },
     "dependencies": {
         "@visulima/packem": "workspace:*",
-        "esbuild": "^0.21.3",
-        "vue": "^3.4.25"
-    },
-    "devDependencies": {
-        "typescript": "^4.9.5"
+        "esbuild": "^0.21.3"
     }
 }

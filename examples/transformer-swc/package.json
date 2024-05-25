@@ -10,8 +10,8 @@
         "build": "packem"
     },
     "dependencies": {
-        "@visulima/packem": "workspace:*",
         "@swc/core": "^1.5.7",
+        "@visulima/packem": "workspace:*",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
     },

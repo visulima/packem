@@ -8,7 +8,6 @@
 import { existsSync, statSync } from "node:fs";
 
 import { createFilter } from "@rollup/pluginutils";
-import type { Pail } from "@visulima/pail";
 import { dirname, extname, resolve } from "@visulima/path";
 import type { Loader } from "esbuild";
 import { transform } from "esbuild";
@@ -18,15 +17,11 @@ import { DEFAULT_LOADERS, EXCLUDE_REGEXP } from "../../../constants";
 import resolveFile from "../../utils/resolve-file";
 import getRenderChunk from "./get-render-chunk";
 import doOptimizeDeps from "./optmize-deps";
-import type { OptimizeDepsResult, Options } from "./types";
+import type { OptimizeDepsResult, EsbuildPluginConfig } from "./types";
 import warn from "./warn";
 
-type PluginConfig = {
-    logger: Pail<never, string>;
-} & Options;
-
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sourceMap = true, ...esbuildOptions }: PluginConfig): RollupPlugin => {
+export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sourceMap = true, ...esbuildOptions }: EsbuildPluginConfig): RollupPlugin => {
     const loaders = DEFAULT_LOADERS;
 
     if (_loaders) {

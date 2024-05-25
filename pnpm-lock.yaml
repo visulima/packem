@@ -110,24 +110,36 @@ importers:
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.21.3
+        version: 0.21.3
 
   examples/copy:
     dependencies:
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.21.3
+        version: 0.21.3
 
   examples/minifed-class:
     dependencies:
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.21.3
+        version: 0.21.3
 
   examples/native-node-module:
     dependencies:
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.21.3
+        version: 0.21.3
     devDependencies:
       nodehun:
         specifier: ^3.0.2
@@ -138,6 +150,9 @@ importers:
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.21.3
+        version: 0.21.3
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -160,6 +175,9 @@ importers:
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.21.3
+        version: 0.21.3
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -257,6 +275,9 @@ importers:
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.21.3
+        version: 0.21.3
       vue:
         specifier: ^3.4.25
         version: 3.4.27(typescript@4.9.5)
@@ -264,6 +285,15 @@ importers:
       typescript:
         specifier: ^4.9.5
         version: 4.9.5
+
+  examples/without-typescript:
+    dependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.21.3
+        version: 0.21.3
 
   packages/packem:
     dependencies:

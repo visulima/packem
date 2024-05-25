@@ -1,22 +1,15 @@
 import { existsSync, statSync } from "node:fs";
 
-import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { dirname, resolve } from "@visulima/path";
 import type { Plugin } from "rollup";
-import type { Options } from "sucrase";
 import { transform as sucraseTransform } from "sucrase";
 
-import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP } from "../../constants";
-import resolveFile from "../utils/resolve-file";
+import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP } from "../../../constants";
+import resolveFile from "../../utils/resolve-file";
+import type { SucrasePluginConfig } from "./types";
 
-export interface SucrasePluginConfig extends Options {
-    exclude?: FilterPattern;
-    extensions?: string[];
-    include?: FilterPattern;
-}
-
-export const sucrasePlugin = ({ exclude, extensions = DEFAULT_EXTENSIONS, include, ...transformOptions }: SucrasePluginConfig): Plugin => {
+const sucrasePlugin = ({ exclude, extensions = DEFAULT_EXTENSIONS, include, ...transformOptions }: SucrasePluginConfig): Plugin => {
     const filter = createFilter(include, exclude ?? EXCLUDE_REGEXP);
 
     // Initialize own resolution cache.
@@ -82,3 +75,5 @@ export const sucrasePlugin = ({ exclude, extensions = DEFAULT_EXTENSIONS, includ
         },
     };
 };
+
+export default sucrasePlugin;

@@ -14,11 +14,12 @@ import polifillPlugin from "rollup-plugin-polyfill-node";
 import { visualizer as visualizerPlugin } from "rollup-plugin-visualizer";
 
 import { DEFAULT_EXTENSIONS } from "../constants";
-import type { BuildContext } from "../types";
+import type { BuildContext, InternalBuildOptions } from "../types";
 import arrayIncludes from "../utils/array-includes";
 import getPackageName from "../utils/get-package-name";
 import { cjsInterop as cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
+import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
 import JSONPlugin from "./plugins/json";
 import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
 import { license as licensePlugin } from "./plugins/license";
@@ -28,6 +29,7 @@ import { rawPlugin } from "./plugins/raw";
 import resolveFileUrlPlugin from "./plugins/resolve-file-url";
 import { removeShebangPlugin, shebangPlugin } from "./plugins/shebang";
 import shimCjsPlugin from "./plugins/shim-cjs";
+import type { SucrasePluginConfig } from "./plugins/sucrase/types";
 import type { SwcPluginConfig } from "./plugins/swc/types";
 import { patchTypescriptTypes as patchTypescriptTypesPlugin } from "./plugins/typescript/patch-typescript-types";
 import { getConfigAlias, resolveTsconfigPaths as resolveTsconfigPathsPlugin } from "./plugins/typescript/resolve-tsconfig-paths";
@@ -40,25 +42,61 @@ import resolveAliases from "./utils/resolve-aliases";
 
 // import nativeNodeModule from "./plugins/native-node-module";
 
-const lazyImportSwc = async (options: SwcPluginConfig): Promise<Plugin> => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    const plugin = await import("./plugins/swc").then((module) => module.default);
+const getTransformerConfig = (
+    name: InternalBuildOptions["transformerName"],
+    context: BuildContext,
+): SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig => {
+    if (name === "esbuild") {
+        if (!context.options.rollup.esbuild) {
+            throw new Error("No esbuild options found in your configuration.");
+        }
 
-    return plugin(options) as Plugin;
-};
+        return {
+            sourceMap: context.options.sourcemap,
+            ...context.options.rollup.esbuild,
+            logger: context.logger,
+        };
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const lazyImportEsbuild = async (options: any): Promise<Plugin> => {
-    const plugin = await import("./plugins/esbuild").then((module) => module.default);
+    if (name === "swc") {
+        if (!context.options.rollup.swc) {
+            throw new Error("No swc options found in your configuration.");
+        }
 
-    return plugin(options);
-};
+        return {
+            ...context.options.rollup.swc,
+            jsc: {
+                ...(env.NODE_ENV === "production"
+                    ? {
+                          minify: {
+                              compress: {
+                                  directives: false,
+                              },
+                              format: {
+                                  comments: "some",
+                              },
+                              mangle: {
+                                  toplevel: true,
+                              },
+                              sourceMap: context.options.sourcemap,
+                          },
+                      }
+                    : {}),
+                ...context.options.rollup.swc.jsc,
+            },
+            sourceMaps: context.options.sourcemap,
+        };
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const lazyImportSucrase = async (options: any): Promise<Plugin> => {
-    const plugin = await import("./plugins/sucrase").then((module) => module.sucrasePlugin);
+    if (name === "sucrase") {
+        if (!context.options.rollup.sucrase) {
+            throw new Error("No sucrase options found in your configuration.");
+        }
 
-    return plugin(options);
+        return context.options.rollup.sucrase;
+    }
+
+    throw new Error(`A Unknown transformer was provided`);
 };
 
 const sharedOnWarn = (warning: RollupLog, context: BuildContext): boolean => {
@@ -272,40 +310,7 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
 
             context.options.rollup.wsam && wasmPlugin(context.options.rollup.wsam),
 
-            context.options.rollup.esbuild &&
-                context.options.transformer === "esbuild" &&
-                (await lazyImportEsbuild({
-                    sourceMap: context.options.sourcemap,
-                    ...context.options.rollup.esbuild,
-                    logger: context.logger,
-                })),
-
-            context.options.rollup.sucrase && context.options.transformer === "sucrase" && await lazyImportSucrase(context.options.rollup.sucrase),
-            context.options.rollup.swc &&
-                context.options.transformer === "swc" &&
-                (await lazyImportSwc({
-                    ...context.options.rollup.swc,
-                    jsc: {
-                        ...(env.NODE_ENV === "production"
-                            ? {
-                                  minify: {
-                                      compress: {
-                                          directives: false,
-                                      },
-                                      format: {
-                                          comments: "some",
-                                      },
-                                      mangle: {
-                                          toplevel: true,
-                                      },
-                                      sourceMap: context.options.sourcemap,
-                                  },
-                              }
-                            : {}),
-                        ...context.options.rollup.swc.jsc,
-                    },
-                    sourceMaps: context.options.sourcemap,
-                })),
+            context.options.transformer?.(getTransformerConfig(context.options.transformerName, context)),
 
             context.options.cjsInterop &&
                 context.options.emitCJS &&

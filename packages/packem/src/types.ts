@@ -9,18 +9,18 @@ import type { PackageJson, TsConfigResult } from "@visulima/package";
 import type { Pail } from "@visulima/pail";
 import type { Hookable } from "hookable";
 import type { JITIOptions } from "jiti";
-import type { OutputOptions, RollupBuild, RollupOptions, RollupWatcher } from "rollup";
+import type { OutputOptions, Plugin,RollupBuild, RollupOptions, RollupWatcher } from "rollup";
 import type { Options as RollupDtsOptions } from "rollup-plugin-dts";
 import type { NodePolyfillsOptions } from "rollup-plugin-polyfill-node";
 import type { PluginVisualizerOptions } from "rollup-plugin-visualizer";
 
 import type { CJSInteropOptions } from "./rollup/plugins/cjs-interop";
 import type { CopyPluginOptions } from "./rollup/plugins/copy";
-import type { Options as EsbuildOptions } from "./rollup/plugins/esbuild/types";
+import type { EsbuildPluginConfig, Options as EsbuildOptions } from "./rollup/plugins/esbuild/types";
 import type { JSXRemoveAttributesPlugin } from "./rollup/plugins/jsx-remove-attributes";
 import type { LicenseOptions } from "./rollup/plugins/license";
 import type { RawLoaderOptions } from "./rollup/plugins/raw";
-import type { SucrasePluginConfig } from "./rollup/plugins/sucrase";
+import type { SucrasePluginConfig } from "./rollup/plugins/sucrase/types";
 import type { SwcPluginConfig } from "./rollup/plugins/swc/types";
 import type { PatchTypesOptions } from "./rollup/plugins/typescript/patch-typescript-types";
 
@@ -120,7 +120,7 @@ export interface BuildOptions {
     stub: boolean;
     stubOptions: { jiti: Omit<JITIOptions, "onError" | "transform"> };
     target: string;
-    transformer: "esbuild" | "sucrase" | "swc" | undefined;
+    transformer?: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
 }
 
 export interface BuildHooks {
@@ -149,13 +149,17 @@ export type BuildContextBuildEntry = {
     type?: "asset" | "chunk" | "entry";
 };
 
+export interface InternalBuildOptions extends BuildOptions {
+    transformerName: "esbuild" | "sucrase" | "swc" | undefined;
+}
+
 export interface BuildContext {
     buildEntries: BuildContextBuildEntry[];
     dependencyGraphMap: Map<string, Set<[string, string]>>;
     hooks: Hookable<BuildHooks>;
     logger: Pail<never, string>;
     mode: Mode;
-    options: BuildOptions;
+    options: InternalBuildOptions;
     pkg: PackageJson;
     rootDir: string;
     tsconfig?: TsConfigResult;

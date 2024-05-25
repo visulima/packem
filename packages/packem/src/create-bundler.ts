@@ -18,7 +18,7 @@ import { minVersion } from "semver";
 import { EXCLUDE_REGEXP } from "./constants";
 import createStub from "./jit/create-stub";
 import { build as rollupBuild, watch as rollupWatch } from "./rollup";
-import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildOptions, Mode } from "./types";
+import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildOptions, InternalBuildOptions, Mode } from "./types";
 import arrayify from "./utils/arrayify";
 import dumpObject from "./utils/dump-object";
 import getPackageSideEffect from "./utils/get-package-side-effect";
@@ -324,28 +324,23 @@ const build = async (
             },
         },
         target: nodeTarget,
-        transformer: undefined,
-    }) as BuildOptions;
+        transformerName: undefined,
+    }) as InternalBuildOptions;
 
-    if (options.transformer !== "esbuild" && options.transformer !== "swc" && options.transformer !== "sucrase") {
+    if (!options.transformerName) {
         const dependencies = new Set([...Object.keys(package_.dependencies ?? {}), ...Object.keys(package_.devDependencies ?? {})]);
 
         if (dependencies.has("esbuild")) {
-            logger.info("Found " + cyan("esbuild") + " in your package.json.");
-
-            options.transformer = "esbuild";
+            options.transformerName = "esbuild";
         } else if (dependencies.has("@swc/core")) {
-            logger.info("Found " + cyan("@swc/core") + " in your package.json.");
-
-            options.transformer = "swc";
+            options.transformerName = "swc";
         } else if (dependencies.has("sucrase")) {
-            logger.info("Found " + cyan("sucrase") + " in your package.json.");
-
-            options.transformer = "sucrase";
+            options.transformerName = "sucrase";
         } else {
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            throw new Error(options.transformer ? `Unknown transformer ${JSON.stringify(options.transformer)}` : "Missing transformer name in options.");
+            throw new Error("Unknown transformer, check your transformer options or install one of the supported transformers: esbuild, swc, sucrase");
         }
+
+        logger.info('Using "' + cyan(options.transformerName) + '" as transformer.');
     }
 
     if (options.emitESM === false && options.emitCJS === false) {
@@ -357,7 +352,7 @@ const build = async (
 
     ensureDirSync(options.outDir);
 
-    if (options.transformer === "esbuild" && options.rollup.esbuild) {
+    if (options.transformerName === "esbuild" && options.rollup.esbuild) {
         if (tsconfig?.config.compilerOptions?.target?.toLowerCase() === "es3") {
             logger.warn(
                 [
@@ -402,8 +397,6 @@ const build = async (
         }
     }
 
-    logger.info('Using "' + cyan(options.transformer) + '" as transformer.');
-
     if (options.rollup.resolve && options.rollup.resolve.preferBuiltins === true) {
         options.rollup.polyfillNode = false;
 
@@ -447,6 +440,9 @@ const build = async (
     // Allow prepare and extending context
     await context.hooks.callHook("build:prepare", context);
 
+    // Normalize entries
+    context.options.entries = context.options.entries.map((entry) => (typeof entry === "string" ? { input: entry } : entry));
+
     if (options.declaration && tsconfig === undefined) {
         throw new Error("Cannot build declaration files without a tsconfig.json");
     }
@@ -472,6 +468,11 @@ const build = async (
         }
 
         entry.input = resolve(options.rootDir, entry.input);
+
+        // if (!isAccessibleSync(entry.input)) {
+        //     throw new NotFoundError("Your configured entry: " + cyan(entry.input) + " does not exist.");
+        // }
+
         entry.outDir = resolve(options.rootDir, entry.outDir ?? options.outDir);
     }
 
@@ -695,7 +696,7 @@ const createBundler = async (
         scope: "packem",
     });
 
-    logger.wrapAll();
+    // logger.wrapAll();
 
     // Determine rootDirectory
     // eslint-disable-next-line no-param-reassign
