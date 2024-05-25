@@ -108,6 +108,7 @@ export interface BuildOptions {
     entries: BuildEntry[];
     externals: (RegExp | string)[];
     failOnWarn?: boolean;
+    minify: boolean;
     name: string;
     optionalDependencies: string[];
     outDir: string;

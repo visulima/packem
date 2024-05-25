@@ -99,6 +99,7 @@ const build = async (
         entries: [],
         externals: [...Module.builtinModules, ...Module.builtinModules.map((m) => `node:${m}`)],
         failOnWarn: true,
+        minify: env.NODE_ENV === "production",
         name: (package_.name ?? "").split("/").pop() ?? "default",
         optionalDependencies: [],
         outDir: "dist",
@@ -176,7 +177,6 @@ const build = async (
                  * https://esbuild.github.io/try/#dAAwLjE5LjUAAGNvbnN0IGEgPSAxOwooZnVuY3Rpb24gYSgpIHt9KTs
                  */
                 keepNames: true,
-                minify: env.NODE_ENV === "production",
                 // eslint-disable-next-line no-secrets/no-secrets
                 /**
                  * Smaller output for cache and marginal performance improvement:

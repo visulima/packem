@@ -52,10 +52,11 @@ const getTransformerConfig = (
         }
 
         return {
+            minify: context.options.minify,
             sourceMap: context.options.sourcemap,
             ...context.options.rollup.esbuild,
             logger: context.logger,
-        };
+        } satisfies EsbuildPluginConfig;
     }
 
     if (name === "swc") {
@@ -64,28 +65,25 @@ const getTransformerConfig = (
         }
 
         return {
+            minify: context.options.minify,
             ...context.options.rollup.swc,
             jsc: {
-                ...(env.NODE_ENV === "production"
-                    ? {
-                          minify: {
-                              compress: {
-                                  directives: false,
-                              },
-                              format: {
-                                  comments: "some",
-                              },
-                              mangle: {
-                                  toplevel: true,
-                              },
-                              sourceMap: context.options.sourcemap,
-                          },
-                      }
-                    : {}),
+                minify: {
+                    compress: {
+                        directives: false,
+                    },
+                    format: {
+                        comments: "some",
+                    },
+                    mangle: {
+                        toplevel: true,
+                    },
+                    sourceMap: context.options.sourcemap,
+                },
                 ...context.options.rollup.swc.jsc,
             },
             sourceMaps: context.options.sourcemap,
-        };
+        } satisfies SwcPluginConfig;
     }
 
     if (name === "sucrase") {
@@ -93,7 +91,9 @@ const getTransformerConfig = (
             throw new Error("No sucrase options found in your configuration.");
         }
 
-        return context.options.rollup.sucrase;
+        return {
+            ...context.options.rollup.sucrase,
+        } satisfies SucrasePluginConfig;
     }
 
     throw new Error(`A Unknown transformer was provided`);

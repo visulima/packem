@@ -28,12 +28,12 @@ const createBuildCommand = (cli: Cli): void => {
                 cjsInterop: options.cjsInterop,
                 configPath: options.config ?? undefined,
                 debug: options.debug,
+                minify: options.minify,
                 replace: {
                     ...environments,
                 },
                 rollup: {
                     esbuild: {
-                        minify: options.minify,
                         target: options.target,
                     },
                     license: {
