@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.3](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.2...@visulima/packem@1.0.0-alpha.3) (2024-05-25)
+
+
+### Bug Fixes
+
+* fixed lazy loading of transformers ([81e8f65](https://github.com/visulima/packem/commit/81e8f6548431deb720fe2c68ccff5c19aa70af2c))
+
 ## @visulima/packem [1.0.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.1...@visulima/packem@1.0.0-alpha.2) (2024-05-24)
 
 
