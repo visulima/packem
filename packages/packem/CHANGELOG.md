@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.4](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.3...@visulima/packem@1.0.0-alpha.4) (2024-05-25)
+
+
+### Features
+
+* moved minify to the core config ([219782f](https://github.com/visulima/packem/commit/219782f2e5ea2275fd63fbac07b180bf05497bf1))
+
 ## @visulima/packem [1.0.0-alpha.3](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.2...@visulima/packem@1.0.0-alpha.3) (2024-05-25)
 
 
