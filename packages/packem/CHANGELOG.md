@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.4...@visulima/packem@1.0.0-alpha.5) (2024-05-25)
+
+
+### Bug Fixes
+
+* added better dx for invalid entries ([55fc8ed](https://github.com/visulima/packem/commit/55fc8ed9040dc40d751028e2143a85962aa6b54e))
+
 ## @visulima/packem [1.0.0-alpha.4](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.3...@visulima/packem@1.0.0-alpha.4) (2024-05-25)
 
 
