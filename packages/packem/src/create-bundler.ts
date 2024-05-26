@@ -696,9 +696,8 @@ const createBundler = async (
         const buildConfigs = (Array.isArray(_buildConfig) ? _buildConfig : [_buildConfig]).filter(Boolean);
         const start = Date.now();
 
-        const getDuration = () => {
-            return `${Math.floor(Date.now() - start)}ms`;
-        };
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        const getDuration = () => Math.floor(Date.now() - start) + "ms";
 
         if (buildConfigs.length === 0) {
             await build(logger, rootDirectory, mode, otherInputConfig, {}, packageJson as PackEmPackageJson, tsconfig, []);
