@@ -64,19 +64,17 @@ const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX):
     }
 };
 
-const build = async (
+const generateOptions = (
     logger: Pail<never, string>,
     rootDirectory: string,
     mode: Mode,
     inputConfig: BuildConfig,
     buildConfig: BuildConfig,
+    preset: BuildConfig,
     package_: PackEmPackageJson,
     tsconfig: TsConfigResult | undefined,
-    cleanedDirectories: string[],
     // eslint-disable-next-line sonarjs/cognitive-complexity
-): Promise<void> => {
-    const preset = resolvePreset(buildConfig.preset ?? package_.packem?.preset ?? inputConfig.preset ?? "auto", rootDirectory);
-
+): InternalBuildOptions => {
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
 
     const options = defu(buildConfig, package_.packem, inputConfig, preset, <BuildOptions>{
@@ -338,8 +336,6 @@ const build = async (
     // Resolve dirs relative to rootDir
     options.outDir = resolve(options.rootDir, options.outDir);
 
-    ensureDirSync(options.outDir);
-
     if (options.rollup.resolve && options.rollup.resolve.preferBuiltins === true) {
         options.rollup.polyfillNode = false;
 
@@ -352,43 +348,26 @@ const build = async (
         );
     }
 
-    // Build context
-    const context: BuildContext = {
-        buildEntries: [],
-        dependencyGraphMap: new Map(),
-        hooks: createHooks(),
-        logger,
-        mode,
-        options,
-        pkg: package_,
-        rootDir: rootDirectory,
-        tsconfig,
-        usedImports: new Set(),
-        warnings: new Set(),
-    };
-
-    // Register hooks
-    if (preset.hooks) {
-        context.hooks.addHooks(preset.hooks);
-    }
-
-    if (inputConfig.hooks) {
-        context.hooks.addHooks(inputConfig.hooks);
-    }
-
-    if (buildConfig.hooks) {
-        context.hooks.addHooks(buildConfig.hooks);
-    }
-
-    // Allow prepare and extending context
-    await context.hooks.callHook("build:prepare", context);
-
-    // Normalize entries
-    context.options.entries = context.options.entries.map((entry) => (typeof entry === "string" ? { input: entry } : entry));
-
     if (options.declaration && tsconfig === undefined) {
         throw new Error("Cannot build declaration files without a tsconfig.json");
     }
+
+    // Infer dependencies from pkg
+    options.dependencies = Object.keys(package_.dependencies ?? {});
+    options.peerDependencies = Object.keys(package_.peerDependencies ?? {});
+    options.devDependencies = Object.keys(package_.devDependencies ?? {});
+    options.optionalDependencies = Object.keys(package_.optionalDependencies ?? {});
+
+    // Add all dependencies as externals
+    options.externals.push(...options.dependencies, ...options.peerDependencies, ...options.optionalDependencies);
+
+    return options;
+};
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+const prepareEntries = async (context: BuildContext, rootDirectory: string): Promise<void> => {
+    // Normalize entries
+    context.options.entries = context.options.entries.map((entry) => (typeof entry === "string" ? { input: entry } : entry));
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for await (const entry of context.options.entries) {
@@ -406,11 +385,11 @@ const build = async (
             throw new Error(`Missing entry input: ${dumpObject(entry)}`);
         }
 
-        if (options.declaration !== undefined && entry.declaration === undefined) {
-            entry.declaration = options.declaration;
+        if (context.options.declaration !== undefined && entry.declaration === undefined) {
+            entry.declaration = context.options.declaration;
         }
 
-        entry.input = resolve(options.rootDir, entry.input);
+        entry.input = resolve(context.options.rootDir, entry.input);
 
         if (!isAccessibleSync(entry.input)) {
             // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -431,107 +410,13 @@ const build = async (
             }
         }
 
-        entry.outDir = resolve(options.rootDir, entry.outDir ?? options.outDir);
+        entry.outDir = resolve(context.options.rootDir, entry.outDir ?? context.options.outDir);
     }
+};
 
-    // Infer dependencies from pkg
-    options.dependencies = Object.keys(package_.dependencies ?? {});
-    options.peerDependencies = Object.keys(package_.peerDependencies ?? {});
-    options.devDependencies = Object.keys(package_.devDependencies ?? {});
-    options.optionalDependencies = Object.keys(package_.optionalDependencies ?? {});
-
-    // Add all dependencies as externals
-    options.externals.push(...options.dependencies, ...options.peerDependencies, ...options.optionalDependencies);
-
-    // Call build:before
-    await context.hooks.callHook("build:before", context);
-
-    let modeName = "Building";
-
-    if (mode === "watch") {
-        modeName = "Watching";
-    } else if (mode === "jit") {
-        modeName = "Stubbing";
-    }
-
-    logger.info(cyan(`${modeName} ${options.name}`));
-
-    logger.debug(
-        `${bold("Root dir:")} ${options.rootDir}\n  ${bold("Entries:")}\n  ${context.options.entries.map((entry) => `  ${dumpObject(entry)}`).join("\n  ")}`,
-    );
-
-    // Clean dist dirs
-    if (options.clean) {
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-        for (const directory of new Set(
-            // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-            context.options.entries
-                .map((entry) => entry.outDir)
-                .filter(Boolean)
-                .sort() as unknown as Set<string>,
-        )) {
-            if (
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                directory === options.rootDir ??
-                options.rootDir.startsWith(directory.endsWith("/") ? directory : `${directory}/`) ??
-                cleanedDirectories.some((c) => directory.startsWith(c))
-            ) {
-                // eslint-disable-next-line no-continue
-                continue;
-            }
-
-            cleanedDirectories.push(directory);
-
-            logger.info(`Cleaning dist directory: \`./${relative(options.rootDir, directory)}\``);
-
-            // eslint-disable-next-line no-await-in-loop
-            await emptyDir(directory);
-        }
-    }
-
-    // Skip rest for stub
-    if (options.stub) {
-        await createStub(context);
-
-        await context.hooks.callHook("build:done", context);
-
-        return;
-    }
-
-    if (mode === "watch") {
-        await rollupWatch(context);
-
-        logErrors(context, false);
-
-        return;
-    }
-
-    await rollupBuild(context);
-
-    logger.success(green(`Build succeeded for ${options.name}`));
-
-    // Find all dist files and add missing entries as chunks
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-    for await (const file of walk(options.outDir)) {
-        let entry = context.buildEntries.find((bEntry) => join(context.options.outDir, bEntry.path) === file.path);
-
-        if (!entry) {
-            entry = {
-                chunk: true,
-                path: file.path,
-            };
-
-            context.buildEntries.push(entry);
-        }
-
-        if (!entry.bytes) {
-            const awaitedStat = await stat(resolve(options.outDir, file.path));
-
-            entry.bytes = awaitedStat.size;
-        }
-    }
-
-    const rPath = (p: string) => relative(context.rootDir, resolve(options.outDir, p));
+// eslint-disable-next-line sonarjs/cognitive-complexity
+const showSizeInformation = (logger: Pail<never, string>, context: BuildContext, packageJson: PackEmPackageJson): boolean => {
+    const rPath = (p: string) => relative(context.rootDir, resolve(context.options.outDir, p));
 
     let loggedEntries = false;
 
@@ -599,7 +484,7 @@ const build = async (
                 }
 
                 line +=
-                    foundCompatibleDts && type === package_.type
+                    foundCompatibleDts && type === packageJson.type
                         ? "\n  types:\n" +
                           [foundDts, foundCompatibleDts]
                               .map(
@@ -622,14 +507,158 @@ const build = async (
         logger.raw("Σ Total dist size (byte size):", cyan(formatBytes(context.buildEntries.reduce((index, entry) => index + (entry.bytes ?? 0), 0))), "\n");
     }
 
+    return loggedEntries;
+}
+
+const build = async (
+    logger: Pail<never, string>,
+    rootDirectory: string,
+    mode: Mode,
+    presetName: string,
+    inputConfig: BuildConfig,
+    buildConfig: BuildConfig,
+    packageJson: PackEmPackageJson,
+    tsconfig: TsConfigResult | undefined,
+    cleanedDirectories: string[],
+    // eslint-disable-next-line sonarjs/cognitive-complexity
+): Promise<void> => {
+    const preset = resolvePreset(presetName, rootDirectory);
+    const options = generateOptions(logger, rootDirectory, mode, inputConfig, buildConfig, preset, packageJson, tsconfig);
+
+    ensureDirSync(options.outDir);
+
+    // Build context
+    const context: BuildContext = {
+        buildEntries: [],
+        dependencyGraphMap: new Map(),
+        hooks: createHooks(),
+        logger,
+        mode,
+        options,
+        pkg: packageJson,
+        rootDir: rootDirectory,
+        tsconfig,
+        usedImports: new Set(),
+        warnings: new Set(),
+    };
+
+    // Register hooks
+    if (preset.hooks) {
+        context.hooks.addHooks(preset.hooks);
+    }
+
+    if (inputConfig.hooks) {
+        context.hooks.addHooks(inputConfig.hooks);
+    }
+
+    if (buildConfig.hooks) {
+        context.hooks.addHooks(buildConfig.hooks);
+    }
+
+    // Allow to prepare and extending context
+    await context.hooks.callHook("build:prepare", context);
+
+    await prepareEntries(context, rootDirectory);
+
+    // Call build:before
+    await context.hooks.callHook("build:before", context);
+
+    let modeName = "Building";
+
+    if (mode === "watch") {
+        modeName = "Watching";
+    } else if (mode === "jit") {
+        modeName = "Stubbing";
+    }
+
+    logger.info(cyan(`${modeName} ${context.options.name}`));
+
+    logger.debug(
+        `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}\n  ${context.options.entries.map((entry) => `  ${dumpObject(entry)}`).join("\n  ")}`,
+    );
+
+    // Clean dist dirs
+    if (context.options.clean) {
+        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+        for (const directory of new Set(
+            // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
+            context.options.entries
+                .map((entry) => entry.outDir)
+                .filter(Boolean)
+                .sort() as unknown as Set<string>,
+        )) {
+            if (
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                directory === context.options.rootDir ??
+                context.options.rootDir.startsWith(directory.endsWith("/") ? directory : `${directory}/`) ??
+                cleanedDirectories.some((c) => directory.startsWith(c))
+            ) {
+                // eslint-disable-next-line no-continue
+                continue;
+            }
+
+            cleanedDirectories.push(directory);
+
+            logger.info(`Cleaning dist directory: \`./${relative(context.options.rootDir, directory)}\``);
+
+            // eslint-disable-next-line no-await-in-loop
+            await emptyDir(directory);
+        }
+    }
+
+    // Skip rest for stub
+    if (context.options.stub) {
+        await createStub(context);
+
+        await context.hooks.callHook("build:done", context);
+
+        return;
+    }
+
+    if (mode === "watch") {
+        await rollupWatch(context);
+
+        logErrors(context, false);
+
+        return;
+    }
+
+    await rollupBuild(context);
+
+    logger.success(green(`Build succeeded for ${context.options.name}`));
+
+    // Find all dist files and add missing entries as chunks
+    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+    for await (const file of walk(context.options.outDir)) {
+        let entry = context.buildEntries.find((bEntry) => join(context.options.outDir, bEntry.path) === file.path);
+
+        if (!entry) {
+            entry = {
+                chunk: true,
+                path: file.path,
+            };
+
+            context.buildEntries.push(entry);
+        }
+
+        if (!entry.bytes) {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename
+            const awaitedStat = await stat(resolve(context.options.outDir, file.path));
+
+            entry.bytes = awaitedStat.size;
+        }
+    }
+
+    const logged = showSizeInformation(logger, context, packageJson);
+
     // Validate
     validateDependencies(context);
-    validatePackage(package_, context);
+    validatePackage(packageJson, context);
 
     // Call build:done
     await context.hooks.callHook("build:done", context);
 
-    logErrors(context, loggedEntries);
+    logErrors(context, logged);
 };
 
 const createBundler = async (
@@ -640,8 +669,9 @@ const createBundler = async (
         debug?: boolean;
         tsconfigPath?: string;
     } & BuildConfig = {},
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
-    const { configPath, debug, tsconfigPath, ...otherInputConfig } = inputConfig;
+    const { configPath, debug, tsconfigPath, ...restInputConfig } = inputConfig;
     const loggerProcessors: Processor<string>[] = [new MessageFormatterProcessor<string>(), new ErrorProcessor<string>()];
 
     if (debug) {
@@ -699,20 +729,36 @@ const createBundler = async (
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
         const getDuration = () => Math.floor(Date.now() - start) + "ms";
 
+        let presetName = packageJson.packem?.preset ?? inputConfig.preset ?? "auto";
+
         if (buildConfigs.length === 0) {
-            await build(logger, rootDirectory, mode, otherInputConfig, {}, packageJson as PackEmPackageJson, tsconfig, []);
+            await build(logger, rootDirectory, mode, presetName, restInputConfig, {}, packageJson as PackEmPackageJson, tsconfig, []);
         } else {
             // Invoke build for every build config defined in packem.config.ts
             const cleanedDirectories: string[] = [];
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const buildConfig of buildConfigs) {
+                if (buildConfig.preset) {
+                    presetName = buildConfig.preset;
+                }
+
                 // eslint-disable-next-line no-await-in-loop
-                await build(logger, rootDirectory, mode, otherInputConfig, buildConfig, packageJson as PackEmPackageJson, tsconfig, cleanedDirectories);
+                await build(
+                    logger,
+                    rootDirectory,
+                    mode,
+                    presetName,
+                    restInputConfig,
+                    buildConfig,
+                    packageJson as PackEmPackageJson,
+                    tsconfig,
+                    cleanedDirectories,
+                );
             }
         }
 
-        logger.raw(`\n⚡️ Build success in ${getDuration()}`);
+        logger.raw(`\n⚡️ Build run in ${getDuration()}`);
 
         // Restore all wrapped console methods
         logger.restoreAll();
