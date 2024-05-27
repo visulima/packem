@@ -17,7 +17,9 @@ import { createHooks } from "hookable";
 
 import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP } from "./constants";
 import createStub from "./jit/create-stub";
-import { build as rollupBuild, watch as rollupWatch } from "./rollup";
+import rollupBuild from "./rollup/build";
+import rollupBuildTypes from "./rollup/build-types";
+import rollupWatch from "./rollup/watch";
 import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildOptions, InternalBuildOptions, Mode } from "./types";
 import dumpObject from "./utils/dump-object";
 import getPackageSideEffect from "./utils/get-package-side-effect";
@@ -624,6 +626,10 @@ const build = async (
     }
 
     await rollupBuild(context);
+
+    if (context.options.declaration) {
+        await rollupBuildTypes(context);
+    }
 
     logger.success(green(`Build succeeded for ${context.options.name}`));
 

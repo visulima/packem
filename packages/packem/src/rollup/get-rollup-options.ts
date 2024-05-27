@@ -65,14 +65,14 @@ const getTransformerConfig = (
         }
 
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        let nodeTarget = 'node' + (versions.node.split(".")[0]);
+        let nodeTarget = "node" + versions.node.split(".")[0];
 
         if (context.pkg.engines?.node) {
             const minNodeVersion = minVersion(context.pkg.engines.node);
 
             if (minNodeVersion) {
                 // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                nodeTarget = 'node' + minNodeVersion.major;
+                nodeTarget = "node" + minNodeVersion.major;
             }
         }
 
@@ -244,6 +244,15 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
 export const getRollupOptions = async (context: BuildContext): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context, "build");
 
+    let nodeResolver;
+
+    if (context.options.rollup.resolve) {
+        nodeResolver = nodeResolvePlugin({
+            extensions: DEFAULT_EXTENSIONS,
+            ...context.options.rollup.resolve,
+        });
+    }
+
     return (<RollupOptions>{
         ...baseRollupOptions(context, resolvedAliases),
 
@@ -314,20 +323,12 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
             context.options.rollup.alias &&
                 aliasPlugin({
                     // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                    customResolver: nodeResolvePlugin({
-                        extensions: DEFAULT_EXTENSIONS,
-                        ...context.options.rollup.resolve,
-                    }),
+                    customResolver: nodeResolver,
                     ...context.options.rollup.alias,
                     entries: resolvedAliases,
                 }),
 
-            context.options.rollup.resolve &&
-                nodeResolvePlugin({
-                    extensions: DEFAULT_EXTENSIONS,
-                    rootDir: context.rootDir,
-                    ...context.options.rollup.resolve,
-                }),
+            nodeResolver,
 
             context.options.rollup.polyfillNode &&
                 polifillPlugin({
@@ -437,6 +438,15 @@ export const getRollupDtsOptions = (context: BuildContext): RollupOptions => {
 
     delete compilerOptions?.lib;
 
+    let nodeResolver;
+
+    if (context.options.rollup.resolve) {
+        nodeResolver = nodeResolvePlugin({
+            extensions: DEFAULT_EXTENSIONS,
+            ...context.options.rollup.resolve,
+        });
+    }
+
     return <RollupOptions>{
         ...baseRollupOptions(context, resolvedAliases),
 
@@ -508,19 +518,12 @@ export const getRollupDtsOptions = (context: BuildContext): RollupOptions => {
             context.options.rollup.alias &&
                 aliasPlugin({
                     // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                    customResolver: nodeResolvePlugin({
-                        extensions: DEFAULT_EXTENSIONS,
-                        ...context.options.rollup.resolve,
-                    }),
+                    customResolver: nodeResolver,
                     ...context.options.rollup.alias,
                     entries: resolvedAliases,
                 }),
 
-            context.options.rollup.resolve &&
-                nodeResolvePlugin({
-                    extensions: DEFAULT_EXTENSIONS,
-                    ...context.options.rollup.resolve,
-                }),
+            nodeResolver,
 
             dtsPlugin({
                 compilerOptions: {
