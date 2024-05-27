@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.14](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.13...@visulima/packem@1.0.0-alpha.14) (2024-05-27)
+
+
+### Bug Fixes
+
+* optimized the code a bit ([c644e8a](https://github.com/visulima/packem/commit/c644e8a3b1926b55c3c4038943100260bb9de811))
+
 ## @visulima/packem [1.0.0-alpha.13](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.12...@visulima/packem@1.0.0-alpha.13) (2024-05-27)
 
 
