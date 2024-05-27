@@ -7,7 +7,8 @@ import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync, walk } from "@
 import { NotFoundError } from "@visulima/fs/error";
 import { formatBytes } from "@visulima/humanizer";
 import type { PackageJson, TsConfigJson, TsConfigResult } from "@visulima/package";
-import { findPackageJson, findTSConfig, readTsConfig } from "@visulima/package";
+import { findTSConfig, readTsConfig } from "@visulima/package";
+import { parsePackageJson } from "@visulima/package/package-json";
 import type { Pail, Processor } from "@visulima/pail";
 import { createPail } from "@visulima/pail";
 import { CallerProcessor, ErrorProcessor, MessageFormatterProcessor } from "@visulima/pail/processor";
@@ -731,7 +732,8 @@ const createBundler = async (
     }
 
     try {
-        const { packageJson, path: packageJsonPath } = await findPackageJson(rootDirectory);
+        const packageJsonPath = join(rootDirectory, "package.json");
+        const packageJson = parsePackageJson(packageJsonPath);
 
         logger.info("Using package.json found at", packageJsonPath.replace(rootDirectory, "."));
 

@@ -114,8 +114,8 @@
         "LICENSE.md"
     ],
     "scripts": {
-        "build": "cross-env JITI_ESM_RESOLVE=1 INTERNAL_PACKEM_BUILD=1 jiti ./src/cli",
-        "build:prod": "cross-env JITI_ESM_RESOLVE=1 INTERNAL_PACKEM_BUILD=1 jiti ./src/cli --minify",
+        "build": "cross-env JITI_ESM_RESOLVE=1 INTERNAL_PACKEM_BUILD=1 jiti ./src/cli build",
+        "build:prod": "cross-env JITI_ESM_RESOLVE=1 INTERNAL_PACKEM_BUILD=1 jiti ./src/cli build --minify",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build",
         "lint:eslint": "eslint . --ext js,cjs,mjs,jsx,ts,tsx,json,yaml,yml,md,mdx --max-warnings=0 --config .eslintrc.cjs",
@@ -130,6 +130,7 @@
         "test:watch": "vitest"
     },
     "dependencies": {
+        "@antfu/install-pkg": "^0.3.3",
         "@babel/parser": "^7.24.6",
         "@rollup/plugin-alias": "^5.1.0",
         "@rollup/plugin-commonjs": "^25.0.8",
@@ -147,6 +148,7 @@
         "@visulima/package": "^1.8.2",
         "@visulima/pail": "^1.1.11",
         "@visulima/path": "^1.0.1",
+        "@clack/prompts": "^0.7.0",
         "defu": "6.1.4",
         "es-module-lexer": "^1.5.3",
         "fastest-levenshtein": "^1.0.16",

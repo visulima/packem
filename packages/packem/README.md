@@ -39,6 +39,12 @@ yarn add @visulima/packem
 pnpm add @visulima/packem
 ```
 
+### Choose between you transformer
+
+- [esbuild](https://github.com/evanw/esbuild)
+- [@swc/core](https://github.com/swc-project/swc)
+- [sucrase]()
+
 ## Usage
 
 ```typescript
@@ -78,7 +84,8 @@ The visulima pack is open-sourced software licensed under the [MIT][license-url]
 
 [typescript-image]: https://img.shields.io/badge/Typescript-294E80.svg?style=for-the-badge&logo=typescript
 [typescript-url]: "typescript"
-[license-image]: https://img.shields.io/npm/l/@visulima/pack?color=blueviolet&style=for-the-badge
+[license-image]: https://img.shields.io/npm/l/@visulima/packem?color=blueviolet&style=for-the-badge
 [license-url]: LICENSE.md "license"
-[npm-image]: https://img.shields.io/npm/v/@visulima/pack/latest.svg?style=for-the-badge&logo=npm
-[npm-url]: https://www.npmjs.com/package/@visulima/pack/v/latest "npm"
+[npm-image]: https://img.shields.io/npm/v/@visulima/packem/latest.svg?style=for-the-badge&logo=npm
+[npm-url]: https://www.npmjs.com/package/@visulima/packem/v/latest "npm"
+
