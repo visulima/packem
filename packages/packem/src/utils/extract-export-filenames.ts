@@ -31,7 +31,7 @@ const extractExportFilenames = (
             // Filter out .json subpaths such as package.json
             .filter(([subpath]) => !subpath.endsWith(".json"))
             .flatMap(([condition, packageExport]) => {
-                if (condition === "types" && declaration === undefined) {
+                if (condition === "types" && !declaration) {
                     return [];
                 }
 
