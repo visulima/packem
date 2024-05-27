@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.15](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.14...@visulima/packem@1.0.0-alpha.15) (2024-05-27)
+
+
+### Features
+
+* added a first version of the init command ([ab3b009](https://github.com/visulima/packem/commit/ab3b0091cb30d7632be3e6818cb76a03ecd13a4f))
+
 ## @visulima/packem [1.0.0-alpha.14](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.13...@visulima/packem@1.0.0-alpha.14) (2024-05-27)
 
 
