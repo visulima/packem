@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.12](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.11...@visulima/packem@1.0.0-alpha.12) (2024-05-27)
+
+
+### Bug Fixes
+
+* fixed types validation ([f0f572e](https://github.com/visulima/packem/commit/f0f572ea04a001bd566371d67f3f0df2da35d09d))
+
 ## @visulima/packem [1.0.0-alpha.11](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.10...@visulima/packem@1.0.0-alpha.11) (2024-05-27)
 
 
