@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.11](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.10...@visulima/packem@1.0.0-alpha.11) (2024-05-27)
+
+
+### Bug Fixes
+
+* optimize config loading of types, cjs and esm ([ed4368f](https://github.com/visulima/packem/commit/ed4368f833c2e577ae78bb7a89f18075d8fde6d9))
+
 ## @visulima/packem [1.0.0-alpha.10](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.9...@visulima/packem@1.0.0-alpha.10) (2024-05-27)
 
 
