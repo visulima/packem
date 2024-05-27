@@ -1,4 +1,5 @@
 import type { NormalizedPackageJson } from "@visulima/package";
+
 import type { BuildConfig } from "../../types";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity

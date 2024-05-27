@@ -46,7 +46,8 @@ pnpm add @visulima/packem
 ```
 
 Links:
-- https://github.com/frehner/modern-guide-to-packaging-js-library#set-the-main-field
+
+-   https://github.com/frehner/modern-guide-to-packaging-js-library#set-the-main-field
 
 ## Related
 

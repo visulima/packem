@@ -502,7 +502,7 @@ const showSizeInformation = (logger: Pail<never, string>, context: BuildContext,
     }
 
     return loggedEntries;
-}
+};
 
 const build = async (
     logger: Pail<never, string>,

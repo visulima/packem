@@ -1,14 +1,10 @@
 {
-    "tasksRunnerOptions": {
-        "default": {
-            "runner": "nx/tasks-runners/default"
-        }
-    },
     "targetDefaults": {
         "build": {
             "dependsOn": ["^build", "default"],
             "inputs": ["default", "^default"],
-            "cache": true
+            "cache": true,
+            "outputs": ["{projectRoot}/dist"]
         },
         "build:prod": {
             "dependsOn": ["^build:prod", "default"],
@@ -50,6 +46,11 @@
             "cache": true
         }
     },
+    "tasksRunnerOptions": {
+        "default": {
+            "runner": "nx/tasks-runners/default"
+        }
+    },
     "namedInputs": {
         "default": ["sharedGlobals", "{projectRoot}/**/*", "!{projectRoot}/**/*.md"],
         "public": [
@@ -69,10 +70,15 @@
             "{workspaceRoot}/tsconfig.base.json",
             "{workspaceRoot}/tsconfig.eslint.json"
         ],
-        "production": ["default"]
+        "production": [
+            "default",
+            "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+            "!{projectRoot}/tsconfig.spec.json",
+            "!{projectRoot}/.eslintrc.json",
+            "!{projectRoot}/eslint.config.js"
+        ]
     },
     "parallel": 5,
-    "extends": "@nrwl/workspace/presets/npm.json",
     "affected": {
         "defaultBase": "main"
     },

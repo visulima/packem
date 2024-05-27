@@ -2,10 +2,14 @@
 .env*
 *.ico
 *.lock
+
 dist
-CHANGELOG.md
 coverage
 node_modules
+
 .eslintcache
 tsconfig.json
 tsconfig.eslint.json
+
+CHANGELOG.md
+LICENSE.md
