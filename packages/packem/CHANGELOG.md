@@ -1,3 +1,15 @@
+## @visulima/packem [1.0.0-alpha.13](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.12...@visulima/packem@1.0.0-alpha.13) (2024-05-27)
+
+
+### Bug Fixes
+
+* optimized the code with memo calls ([fe27249](https://github.com/visulima/packem/commit/fe27249d25fabcf5f2f9a8717a0fe750667475d8))
+
+
+### Styles
+
+* cs fixes ([44f813e](https://github.com/visulima/packem/commit/44f813e6a0f3bc787490c480eeb338530cd37ede))
+
 ## @visulima/packem [1.0.0-alpha.12](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.11...@visulima/packem@1.0.0-alpha.12) (2024-05-27)
 
 
