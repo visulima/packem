@@ -1,15 +1,11 @@
 import type { PackageJson } from "@visulima/package";
 
 export const inferExportTypeFromFileName = (filename: string): "cjs" | "esm" | undefined => {
-    if (filename.endsWith(".d.ts")) {
+    if (filename.endsWith(".mjs") || filename.endsWith(".d.mts")) {
         return "esm";
     }
 
-    if (filename.endsWith(".mjs")) {
-        return "esm";
-    }
-
-    if (filename.endsWith(".cjs")) {
+    if (filename.endsWith(".cjs") || filename.endsWith(".d.cts")) {
         return "cjs";
     }
 

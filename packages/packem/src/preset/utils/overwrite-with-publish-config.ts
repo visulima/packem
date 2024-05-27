@@ -1,7 +1,8 @@
 import type { NormalizedPackageJson } from "@visulima/package";
+import type { BuildConfig } from "../../types";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const overwriteWithPublishConfig = (package_: NormalizedPackageJson): NormalizedPackageJson => {
+const overwriteWithPublishConfig = (package_: NormalizedPackageJson, declaration: BuildConfig["declaration"]): NormalizedPackageJson => {
     const { publishConfig } = package_;
 
     if (publishConfig) {
@@ -25,10 +26,10 @@ const overwriteWithPublishConfig = (package_: NormalizedPackageJson): Normalized
             package_.module = publishConfig.module as NormalizedPackageJson["module"];
         }
 
-        if (publishConfig.types && typeof publishConfig.types === "string" && publishConfig.types !== "") {
+        if (declaration === undefined && publishConfig.types && typeof publishConfig.types === "string" && publishConfig.types !== "") {
             // eslint-disable-next-line no-param-reassign
             package_.types = publishConfig.types as NormalizedPackageJson["types"];
-        } else if (publishConfig.typings && typeof publishConfig.typings === "string" && publishConfig.typings !== "") {
+        } else if (declaration === undefined && publishConfig.typings && typeof publishConfig.typings === "string" && publishConfig.typings !== "") {
             // eslint-disable-next-line no-param-reassign
             package_.typings = publishConfig.typings as NormalizedPackageJson["typings"];
         }

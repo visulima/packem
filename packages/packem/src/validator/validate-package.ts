@@ -9,19 +9,16 @@ import extractExportFilenames from "../utils/extract-export-filenames";
 import levenstein from "../utils/levenstein";
 import warn from "../utils/warn";
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const validatePackage = (package_: PackageJson, context: BuildContext): void => {
-    if (!package_) {
-        return;
-    }
-
     const filenames = new Set(
         [
-            ...(typeof package_.bin === "string" ? [package_.bin] : Object.values(package_.bin || {})),
+            ...(typeof package_.bin === "string" ? [package_.bin] : Object.values(package_.bin ?? {})),
             package_.main,
             package_.module,
-            package_.types,
-            package_.typings,
-            ...extractExportFilenames(package_.exports, package_.type ?? "commonjs").map((index) => index.file),
+            context.options.declaration ? package_.types : "",
+            context.options.declaration ? package_.typings : "",
+            ...extractExportFilenames(package_.exports, package_.type ?? "commonjs", context.options.declaration).map((index) => index.file),
         ].map(
             (index) =>
                 index &&

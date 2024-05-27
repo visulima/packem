@@ -1,10 +1,16 @@
 import type { PackageJson } from "@visulima/package";
 
+import type { BuildOptions } from "../types";
 import { inferExportType, inferExportTypeFromFileName } from "./infer-export-type";
 
 type OutputDescriptor = { fieldName?: string; file: string; isExecutable?: true; type?: "cjs" | "esm" };
 
-const extractExportFilenames = (packageExports: PackageJson["exports"], type: PackageJson["type"], conditions: string[] = []): OutputDescriptor[] => {
+const extractExportFilenames = (
+    packageExports: PackageJson["exports"],
+    type: PackageJson["type"],
+    declaration: BuildOptions["declaration"],
+    conditions: string[] = [],
+): OutputDescriptor[] => {
     if (!packageExports) {
         return [];
     }
@@ -14,7 +20,7 @@ const extractExportFilenames = (packageExports: PackageJson["exports"], type: Pa
         const fileType = type === "module" ? "esm" : "cjs";
 
         if (inferredType && inferredType !== fileType) {
-            throw new Error(`Exported file "${packageExports}" has an extension that does not match the package.json type "${type}".`);
+            throw new Error(`Exported file "${packageExports}" has an extension that does not match the package.json type "${type as string}".`);
         }
 
         return [{ file: packageExports, type: inferredType ?? fileType }];
@@ -24,14 +30,18 @@ const extractExportFilenames = (packageExports: PackageJson["exports"], type: Pa
         Object.entries(packageExports)
             // Filter out .json subpaths such as package.json
             .filter(([subpath]) => !subpath.endsWith(".json"))
-            .flatMap(([condition, packageExport]) =>
-                (typeof packageExport === "string"
+            .flatMap(([condition, packageExport]) => {
+                if (condition === "types" && declaration === undefined) {
+                    return [];
+                }
+
+                return typeof packageExport === "string"
                     ? {
                           file: packageExport,
                           type: inferExportType(condition, conditions, packageExport, type),
                       }
-                    : extractExportFilenames(packageExport, type, [...conditions, condition])),
-            )
+                    : extractExportFilenames(packageExport, type, declaration, [...conditions, condition]);
+            })
     );
 };
 

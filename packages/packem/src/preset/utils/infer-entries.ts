@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import type { PackageJson } from "@visulima/package";
 import { resolve } from "@visulima/path";
 
-import type { BuildEntry, InferEntriesResult } from "../../types";
+import type { BuildConfig, BuildEntry, InferEntriesResult } from "../../types";
 import extractExportFilenames from "../../utils/extract-export-filenames";
 import { inferExportTypeFromFileName } from "../../utils/infer-export-type";
 import getEntrypointPaths from "./get-entrypoint-paths";
@@ -11,17 +11,18 @@ import getEntrypointPaths from "./get-entrypoint-paths";
 /**
  * @param {PackageJson} packageJson The contents of a package.json file to serve as the source for inferred entries.
  * @param {string[]} sourceFiles A list of source files to use for inferring entries.
+ * @param {BuildConfig["declaration"]} declaration Whether to emit declaration files.
  * @param {string | undefined} rootDirectory The root directory of the project.
  */
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const inferEntries = (packageJson: PackageJson, sourceFiles: string[], rootDirectory = "."): InferEntriesResult => {
+const inferEntries = (packageJson: PackageJson, sourceFiles: string[], declaration: BuildConfig["declaration"], rootDirectory = "."): InferEntriesResult => {
     const warnings = [];
 
     // Sort files so least-nested files are first
     sourceFiles.sort((a, b) => a.split("/").length - b.split("/").length);
 
     // Come up with a list of all output files & their formats
-    const outputs = extractExportFilenames(packageJson.exports, packageJson.type || "commonjs");
+    const outputs = extractExportFilenames(packageJson.exports, packageJson.type ?? "commonjs", declaration);
 
     if (packageJson.bin) {
         const binaries = typeof packageJson.bin === "string" ? [packageJson.bin] : Object.values(packageJson.bin);
@@ -43,8 +44,8 @@ const inferEntries = (packageJson: PackageJson, sourceFiles: string[], rootDirec
     }
 
     // Entry point for TypeScript
-    if (packageJson.types || packageJson.typings) {
-        outputs.push({ file: (packageJson.types || packageJson.typings) as string });
+    if (declaration === undefined && (packageJson.types || packageJson.typings)) {
+        outputs.push({ file: (packageJson.types ?? packageJson.typings) as string });
     }
 
     // Try to detect output types
@@ -88,6 +89,7 @@ const inferEntries = (packageJson: PackageJson, sourceFiles: string[], rootDirec
                 return source;
             }
 
+            // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
             const SOURCE_RE = new RegExp(`(?<=/|$)${d}${isDirectory ? "" : "\\.\\w+"}$`);
 
             return sourceFiles.find((index) => SOURCE_RE.test(index))?.replace(/(?:\.d\.(?:m|c)?ts|\.\w+)$/, "");

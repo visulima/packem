@@ -12,9 +12,10 @@ import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";
 
 const autoPreset: BuildPreset = {
     hooks: {
+        // eslint-disable-next-line sonarjs/cognitive-complexity
         "build:prepare": function (context) {
             // Disable auto if entries already provided of pkg not available
-            if (!context.pkg || context.options.entries.length > 0) {
+            if (context.options.entries.length > 0) {
                 return;
             }
 
@@ -35,10 +36,10 @@ const autoPreset: BuildPreset = {
             let package_ = { ...context.pkg } as NormalizedPackageJson;
 
             if (package_.publishConfig) {
-                package_ = overwriteWithPublishConfig(package_);
+                package_ = overwriteWithPublishConfig(package_, context.options.declaration);
             }
 
-            const result = inferEntries(package_, sourceFiles, context.options.rootDir);
+            const result = inferEntries(package_, sourceFiles, context.options.declaration, context.options.rootDir);
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const message of result.warnings) {
@@ -47,15 +48,15 @@ const autoPreset: BuildPreset = {
 
             context.options.entries.push(...result.entries);
 
-            if (result.cjs) {
+            if (context.options.emitCJS === undefined && result.cjs) {
                 context.options.emitCJS = true;
             }
 
-            if (result.esm) {
+            if (context.options.emitESM === undefined && result.esm) {
                 context.options.emitESM = true;
             }
 
-            if (result.dts) {
+            if (context.options.declaration === undefined && result.dts) {
                 context.options.declaration = result.dts;
             }
 

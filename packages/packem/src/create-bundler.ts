@@ -82,11 +82,11 @@ const generateOptions = (
     const options = defu(buildConfig, package_.packem, inputConfig, preset, <BuildOptions>{
         alias: {},
         clean: true,
-        declaration: false,
+        declaration: undefined,
         dependencies: [],
         devDependencies: [],
-        emitCJS: false,
-        emitESM: true,
+        emitCJS: undefined,
+        emitESM: undefined,
         entries: [],
         externals: [...Module.builtinModules, ...Module.builtinModules.map((m) => `node:${m}`)],
         failOnWarn: true,
@@ -331,10 +331,6 @@ const generateOptions = (
         logger.info('Using "' + cyan(options.transformerName) + '" as transformer.');
     }
 
-    if (options.emitESM === false && options.emitCJS === false) {
-        throw new Error("Both emitESM and emitCJS are disabled. At least one of them must be enabled.");
-    }
-
     // Resolve dirs relative to rootDir
     options.outDir = resolve(options.rootDir, options.outDir);
 
@@ -348,10 +344,6 @@ const generateOptions = (
         logger.warn(
             `'compilerOptions.isolatedModules' is not enabled in tsconfig.\nBecause none of the third-party transpilers, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.\nTo mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.`,
         );
-    }
-
-    if (options.declaration && tsconfig === undefined) {
-        throw new Error("Cannot build declaration files without a tsconfig.json");
     }
 
     // Infer dependencies from pkg
@@ -387,7 +379,7 @@ const prepareEntries = async (context: BuildContext, rootDirectory: string): Pro
             throw new Error(`Missing entry input: ${dumpObject(entry)}`);
         }
 
-        if (context.options.declaration !== undefined && entry.declaration === undefined) {
+        if (!context.options.declaration && entry.declaration === undefined) {
             entry.declaration = context.options.declaration;
         }
 
@@ -559,6 +551,26 @@ const build = async (
 
     // Allow to prepare and extending context
     await context.hooks.callHook("build:prepare", context);
+
+    if (context.options.emitESM === false && context.options.emitCJS === false) {
+        throw new Error("Both emitESM and emitCJS are disabled. At least one of them must be enabled.");
+    }
+
+    if (context.options.declaration && tsconfig === undefined) {
+        throw new Error("Cannot build declaration files without a tsconfig.json");
+    }
+
+    if (context.options.emitESM === undefined) {
+        logger.info("Emitting ESM bundles, is disabled.");
+    }
+
+    if (context.options.emitCJS === undefined) {
+        logger.info("Emitting CJS bundles, is disabled.");
+    }
+
+    if (!context.options.declaration) {
+        logger.info("Declaration files, are disabled.");
+    }
 
     await prepareEntries(context, rootDirectory);
 
