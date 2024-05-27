@@ -39,11 +39,13 @@ yarn add @visulima/packem
 pnpm add @visulima/packem
 ```
 
-### Choose between you transformer
+### Choose you transformer
+
+You choose which one of the three supported transformer to use.
 
 - [esbuild](https://github.com/evanw/esbuild)
 - [@swc/core](https://github.com/swc-project/swc)
-- [sucrase]()
+- [sucrase](https://github.com/alangpierce/sucrase)
 
 ## Usage
 
