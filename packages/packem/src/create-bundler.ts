@@ -187,6 +187,7 @@ const generateOptions = (
                  */
                 sourcesContent: false,
                 target: tsconfig?.config.compilerOptions?.target,
+                treeShaking: true,
                 // Optionally preserve symbol names during minification
                 tsconfigRaw: tsconfig?.config,
             },

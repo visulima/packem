@@ -1,5 +1,6 @@
 import { versions } from "node:process";
 
+import type { ResolverFunction } from "@rollup/plugin-alias";
 import aliasPlugin from "@rollup/plugin-alias";
 import commonjsPlugin from "@rollup/plugin-commonjs";
 import dynamicImportVarsPlugin from "@rollup/plugin-dynamic-import-vars";
@@ -122,6 +123,7 @@ const getTransformerConfig = (
                         toplevel: true,
                     },
                     sourceMap: context.options.sourcemap,
+                    toplevel: context.options.emitCJS ?? context.options.emitESM,
                 },
                 ...context.options.rollup.swc.jsc,
             },
@@ -241,7 +243,7 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
     };
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
+// eslint-disable-next-line sonarjs/cognitive-complexity,import/exports-last
 export const getRollupOptions = async (context: BuildContext): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context, "build");
 
@@ -324,7 +326,7 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
             context.options.rollup.alias &&
                 aliasPlugin({
                     // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                    customResolver: nodeResolver,
+                    customResolver: nodeResolver?.resolveId as ResolverFunction,
                     ...context.options.rollup.alias,
                     entries: resolvedAliases,
                 }),
@@ -441,8 +443,9 @@ const createDtsPlugin = async (context: BuildContext) => {
 
 // Avoid create multiple dts plugins instance and parsing the same tsconfig multi times,
 // This will avoid memory leak and performance issue.
-const memoizeDtsPluginByKey = memoizeByKey(createDtsPlugin)
+const memoizeDtsPluginByKey = memoizeByKey(createDtsPlugin);
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export const getRollupDtsOptions = async (context: BuildContext): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context, "types");
     const ignoreFiles: Plugin = {
@@ -473,7 +476,7 @@ export const getRollupDtsOptions = async (context: BuildContext): Promise<Rollup
     // Each package build should be unique
     // Composing above factors into a unique cache key to retrieve the memoized dts plugin with tsconfigs
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    const uniqueProcessId = 'dts-plugin:' + process.pid + (context.tsconfig as TsConfigResult).path as string;
+    const uniqueProcessId = ("dts-plugin:" + process.pid + (context.tsconfig as TsConfigResult).path) as string;
 
     return <RollupOptions>{
         ...baseRollupOptions(context, resolvedAliases),
@@ -546,7 +549,7 @@ export const getRollupDtsOptions = async (context: BuildContext): Promise<Rollup
             context.options.rollup.alias &&
                 aliasPlugin({
                     // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                    customResolver: nodeResolver,
+                    customResolver: nodeResolver?.resolveId as ResolverFunction,
                     ...context.options.rollup.alias,
                     entries: resolvedAliases,
                 }),
