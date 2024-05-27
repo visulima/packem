@@ -75,7 +75,7 @@ const watch = async (context: BuildContext): Promise<void> => {
     watchHandler(watcher, "bundle", context.logger);
 
     if (context.options.declaration) {
-        const rollupDtsOptions = getRollupDtsOptions(context);
+        const rollupDtsOptions = await getRollupDtsOptions(context);
 
         await context.hooks.callHook("rollup:dts:options", context, rollupDtsOptions);
 

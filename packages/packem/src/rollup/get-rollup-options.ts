@@ -7,9 +7,9 @@ import { nodeResolve as nodeResolvePlugin } from "@rollup/plugin-node-resolve";
 import replacePlugin from "@rollup/plugin-replace";
 import { wasm as wasmPlugin } from "@rollup/plugin-wasm";
 import { cyan } from "@visulima/colorize";
+import type { TsConfigResult } from "@visulima/package";
 import { isAbsolute, relative, resolve } from "@visulima/path";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
-import { dts as dtsPlugin } from "rollup-plugin-dts";
 import polifillPlugin from "rollup-plugin-polyfill-node";
 import { visualizer as visualizerPlugin } from "rollup-plugin-visualizer";
 import { minVersion } from "semver";
@@ -19,6 +19,7 @@ import type { BuildContext, InternalBuildOptions } from "../types";
 import arrayIncludes from "../utils/array-includes";
 import arrayify from "../utils/arrayify";
 import getPackageName from "../utils/get-package-name";
+import memoizeByKey from "../utils/memoize";
 import { cjsInterop as cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
@@ -421,7 +422,28 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
     }) as RollupOptions;
 };
 
-export const getRollupDtsOptions = (context: BuildContext): RollupOptions => {
+const createDtsPlugin = async (context: BuildContext) => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports,@typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires,global-require,unicorn/prefer-module
+    const { dts } = require("rollup-plugin-dts") as typeof import("rollup-plugin-dts");
+
+    return dts({
+        compilerOptions: {
+            ...context.options.rollup.dts.compilerOptions,
+            incremental: undefined,
+            inlineSources: undefined,
+            sourceMap: undefined,
+            tsBuildInfoFile: undefined,
+        },
+        respectExternal: context.options.rollup.dts.respectExternal,
+        tsconfig: context.tsconfig?.path,
+    });
+};
+
+// Avoid create multiple dts plugins instance and parsing the same tsconfig multi times,
+// This will avoid memory leak and performance issue.
+const memoizeDtsPluginByKey = memoizeByKey(createDtsPlugin)
+
+export const getRollupDtsOptions = async (context: BuildContext): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context, "types");
     const ignoreFiles: Plugin = {
         load(id) {
@@ -446,6 +468,12 @@ export const getRollupDtsOptions = (context: BuildContext): RollupOptions => {
             ...context.options.rollup.resolve,
         });
     }
+
+    // Each process should be unique
+    // Each package build should be unique
+    // Composing above factors into a unique cache key to retrieve the memoized dts plugin with tsconfigs
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    const uniqueProcessId = 'dts-plugin:' + process.pid + (context.tsconfig as TsConfigResult).path as string;
 
     return <RollupOptions>{
         ...baseRollupOptions(context, resolvedAliases),
@@ -525,17 +553,7 @@ export const getRollupDtsOptions = (context: BuildContext): RollupOptions => {
 
             nodeResolver,
 
-            dtsPlugin({
-                compilerOptions: {
-                    ...context.options.rollup.dts.compilerOptions,
-                    incremental: undefined,
-                    inlineSources: undefined,
-                    sourceMap: undefined,
-                    tsBuildInfoFile: undefined,
-                },
-                respectExternal: context.options.rollup.dts.respectExternal,
-                tsconfig: context.tsconfig?.path,
-            }),
+            await memoizeDtsPluginByKey(uniqueProcessId)(context),
 
             context.options.cjsInterop &&
                 context.options.emitCJS &&

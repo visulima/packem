@@ -637,11 +637,7 @@ const build = async (
         return;
     }
 
-    await rollupBuild(context);
-
-    if (context.options.declaration) {
-        await rollupBuildTypes(context);
-    }
+    await Promise.allSettled([rollupBuild(context), context.options.declaration && rollupBuildTypes(context)]);
 
     logger.success(green(`Build succeeded for ${context.options.name}`));
 
@@ -755,25 +751,25 @@ const createBundler = async (
             // Invoke build for every build config defined in packem.config.ts
             const cleanedDirectories: string[] = [];
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-            for (const buildConfig of buildConfigs) {
-                if (buildConfig.preset) {
-                    presetName = buildConfig.preset;
-                }
+            await Promise.allSettled(
+                buildConfigs.map(async (buildConfig) => {
+                    if (buildConfig.preset) {
+                        presetName = buildConfig.preset;
+                    }
 
-                // eslint-disable-next-line no-await-in-loop
-                await build(
-                    logger,
-                    rootDirectory,
-                    mode,
-                    presetName,
-                    restInputConfig,
-                    buildConfig,
-                    packageJson as PackEmPackageJson,
-                    tsconfig,
-                    cleanedDirectories,
-                );
-            }
+                    await build(
+                        logger,
+                        rootDirectory,
+                        mode,
+                        presetName,
+                        restInputConfig,
+                        buildConfig,
+                        packageJson as PackEmPackageJson,
+                        tsconfig,
+                        cleanedDirectories,
+                    );
+                }),
+            );
         }
 
         logger.raw(`\n⚡️ Build run in ${getDuration()}`);

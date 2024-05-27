@@ -6,7 +6,7 @@ import { getRollupDtsOptions } from "./get-rollup-options";
 import getChunkFilename from "./utils/get-chunk-filename";
 
 const buildTypes = async (context: BuildContext): Promise<void> => {
-    const rollupTypeOptions = getRollupDtsOptions(context);
+    const rollupTypeOptions = await getRollupDtsOptions(context);
 
     await context.hooks.callHook("rollup:dts:options", context, rollupTypeOptions);
 

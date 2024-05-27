@@ -1,3 +1,5 @@
+import { env } from "node:process";
+
 import type { PackageJson } from "@visulima/package";
 import MagicString from "magic-string";
 import { findStaticImports } from "mlly";
@@ -27,7 +29,8 @@ const require = __cjs_mod__.createRequire(import.meta.url);
 
 // Shim __dirname, __filename and require
 const CJSToESM = (code: string, shim: string) => {
-    if (code.includes(CJSShim) || code.includes(CJSShimNode20_11) || !CJSyntaxRe.test(code)) {
+    // INTERNAL_PACKEM_BUILD is set to "1" when building packem itself
+    if (env.INTERNAL_PACKEM_BUILD !== "1" && (code.includes(CJSShim) || code.includes(CJSShimNode20_11) || !CJSyntaxRe.test(code))) {
         return null;
     }
 
