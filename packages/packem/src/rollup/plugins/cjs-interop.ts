@@ -48,7 +48,7 @@ export const cjsInterop = ({
 
                 logger.debug({
                     message: "Applied CommonJS interop to entry chunk " + chunk.fileName + ".",
-                    prefix: "cjs-interop",
+                    prefix: "plugin:cjs-interop",
                 });
 
                 return {
@@ -73,7 +73,7 @@ export const cjsInterop = ({
 
                 const buildObjectEntries: string[] = [];
 
-                let defaultKey: string | undefined;
+                let defaultKey = "";
 
                 // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const match of splitMatches) {
@@ -86,7 +86,7 @@ export const cjsInterop = ({
                         const [original, alias] = match.split(" as ");
 
                         if (alias === "default") {
-                            defaultKey = original;
+                            defaultKey = original as string;
 
                             if (!addDefaultProperty) {
                                 // eslint-disable-next-line no-continue
@@ -94,7 +94,7 @@ export const cjsInterop = ({
                             }
                         }
 
-                        buildObjectEntries.push(alias + ": typeof " + original + ";");
+                        buildObjectEntries.push((alias as string) + ": typeof " + (original as string) + ";");
                     } else {
                         buildObjectEntries.push(match + ": typeof " + match + ";");
                     }
@@ -115,7 +115,7 @@ export const cjsInterop = ({
 
                 logger.debug({
                     message: "Applied CommonJS interop to entry chunk " + chunk.fileName + ".",
-                    prefix: "cjs-interop",
+                    prefix: "plugin:cjs-interop",
                 });
 
                 return {

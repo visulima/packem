@@ -106,7 +106,7 @@ export const resolveTsconfigPaths = (tsconfig: TsConfigResult, logger: Pail<neve
             }
 
             // Handle aliases found from `compilerOptions.paths`. Unlike @rollup/plugin-alias, tsconfig aliases
-            // are best effort only, so we have to manually replace them here, instead of using `alias` or `rollup.alias`
+            // are the best effort only, so we have to manually replace them here, instead of using `alias` or `rollup.alias`
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const { find, replacement } of configAlias) {
                 if (find.test(id)) {
@@ -117,7 +117,7 @@ export const resolveTsconfigPaths = (tsconfig: TsConfigResult, logger: Pail<neve
                     if (resolved) {
                         logger.debug({
                             message: `Resolved ${id} to ${resolved.id} using paths from tsconfig.json.`,
-                            prefix: "resolve-tsconfig-paths",
+                            prefix: "plugin:resolve-tsconfig-paths",
                         });
 
                         return resolved.id;

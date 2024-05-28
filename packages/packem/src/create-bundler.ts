@@ -196,17 +196,17 @@ const generateOptions = (
                 preferConst: true,
             },
             license: {
-                dtsTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
-                    `\n# Licenses of bundled types\n` +
-                    `The published ${pName} artifact additionally contains code with the following licenses:\n` +
-                    `${licenses.join(", ")}\n\n` +
-                    `# Bundled types:\n` +
-                    dependencyLicenseTexts,
                 dependenciesTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
                     `\n# Licenses of bundled dependencies\n` +
                     `The published ${pName} artifact additionally contains code with the following licenses:\n` +
                     `${licenses.join(", ")}\n\n` +
                     `# Bundled dependencies:\n` +
+                    dependencyLicenseTexts,
+                dtsTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
+                    `\n# Licenses of bundled types\n` +
+                    `The published ${pName} artifact additionally contains code with the following licenses:\n` +
+                    `${licenses.join(", ")}\n\n` +
+                    `# Bundled types:\n` +
                     dependencyLicenseTexts,
             },
             patchTypes: {},
@@ -272,15 +272,16 @@ const generateOptions = (
                     target: tsconfig?.config.compilerOptions?.target?.toLowerCase(),
                     transform: {
                         decoratorMetadata: tsconfig?.config.compilerOptions?.emitDecoratorMetadata,
-                        legacyDecorator: true,
+                        legacyDecorator: tsconfig?.config.compilerOptions?.experimentalDecorators,
                         react: {
                             development: env.NODE_ENV !== "production",
                             pragma: tsconfig?.config.compilerOptions?.jsxFactory,
                             pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
                             runtime: jsxRuntime,
                             throwIfNamespace: true,
-                            useBuiltins: true,
                         },
+                        treatConstEnumAsEnum: tsconfig?.config.compilerOptions?.preserveConstEnums,
+                        useDefineForClassFields: tsconfig?.config.compilerOptions?.useDefineForClassFields,
                     },
                 },
                 module: {
@@ -605,9 +606,8 @@ const build = async (
                 .sort() as unknown as Set<string>,
         )) {
             if (
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                directory === context.options.rootDir ??
-                context.options.rootDir.startsWith(directory.endsWith("/") ? directory : `${directory}/`) ??
+                directory === context.options.rootDir ||
+                context.options.rootDir.startsWith(directory.endsWith("/") ? directory : `${directory}/`) ||
                 cleanedDirectories.some((c) => directory.startsWith(c))
             ) {
                 // eslint-disable-next-line no-continue
@@ -756,25 +756,20 @@ const createBundler = async (
         // Invoke build for every build config defined in packem.config.ts
         const cleanedDirectories: string[] = [];
 
-        await Promise.all(
-            buildConfigs.map(async (buildConfig: BuildConfig): Promise<void> => {
-                if (buildConfig.preset) {
-                    buildPreset = buildConfig.preset;
-                }
+        const builds: Promise<void>[] = [];
 
-                await build(
-                    logger,
-                    rootDirectory,
-                    mode,
-                    buildPreset,
-                    restInputConfig,
-                    buildConfig,
-                    packageJson as PackEmPackageJson,
-                    tsconfig,
-                    cleanedDirectories,
-                );
-            }),
-        );
+        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+        for (const buildConfig of buildConfigs) {
+            if (buildConfig.preset) {
+                buildPreset = buildConfig.preset;
+            }
+
+            builds.push(
+                build(logger, rootDirectory, mode, buildPreset, restInputConfig, buildConfig, packageJson as PackEmPackageJson, tsconfig, cleanedDirectories),
+            );
+        }
+
+        await Promise.all(builds);
 
         logger.raw(`\n⚡️ Build run in ${getDuration()}`);
 

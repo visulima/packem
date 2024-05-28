@@ -81,7 +81,7 @@ const resolveTsconfigRootDirectories = (cwd: string, logger: Pail<never, string>
                     if (resolved) {
                         logger.debug({
                             message: `Resolved ${id} to ${resolved.id} using rootDirs from tsconfig.json.`,
-                            prefix: "resolve-tsconfig-root-dirs",
+                            prefix: "plugin:resolve-tsconfig-root-dirs",
                         });
 
                         return resolved.id;

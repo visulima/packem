@@ -41,8 +41,7 @@ const buildTypes = async (context: BuildContext): Promise<void> => {
     }
 
     // .d.ts for node10 compatibility (TypeScript version < 4.7)
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (context.options.declaration === true ?? context.options.declaration === "compatible") {
+    if (context.options.declaration === true || context.options.declaration === "compatible") {
         await typesBuild.write({
             chunkFileNames: (chunk) => getChunkFilename(context, chunk, "d.ts"),
             dir: resolve(context.options.rootDir, context.options.outDir),

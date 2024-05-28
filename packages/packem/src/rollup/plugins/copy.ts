@@ -109,7 +109,7 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail<never, strin
 
             logger.info({
                 message: "Copying files...",
-                prefix: "copy",
+                prefix: "plugin:copy",
             });
 
             await Promise.all(
@@ -140,7 +140,7 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail<never, strin
                         logger.error({
                             context: [error],
                             message: `error reading file ${fileName}`,
-                            prefix: "copy",
+                            prefix: "plugin:copy",
                         });
 
                         return;
@@ -167,7 +167,7 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail<never, strin
 
                             logger.debug({
                                 message: `copied ${fileName} → ${destinationFileName}`,
-                                prefix: "copy",
+                                prefix: "plugin:copy",
                             });
 
                             fileDesc.copied.push(destination);
@@ -176,7 +176,7 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail<never, strin
                             logger.error({
                                 context: [error],
                                 message: `error copying file ${fileName} → ${destinationFileName}`,
-                                prefix: "copy",
+                                prefix: "plugin:copy",
                             });
                         }
                     }

@@ -50,7 +50,7 @@ const preserveDirectives = (logger: Pail<never, string>): Plugin => {
                 if (outputDirectives.size > 0) {
                     logger.debug({
                         message: `directives for chunk "${chunk.fileName}" are preserved.`,
-                        prefix: "preserve-directives",
+                        prefix: "plugin:preserve-directives",
                     });
 
                     magicString.prepend(`${[...outputDirectives].map((directive) => `'${directive}';`).join("\n")}\n`);
@@ -65,7 +65,7 @@ const preserveDirectives = (logger: Pail<never, string>): Plugin => {
                 if (shebang) {
                     logger.debug({
                         message: `shebang for chunk "${chunk.fileName}" is preserved.`,
-                        prefix: "preserve-directives",
+                        prefix: "plugin:preserve-directives",
                     });
 
                     magicString.prepend(`${shebang}\n`);
@@ -133,7 +133,7 @@ const preserveDirectives = (logger: Pail<never, string>): Plugin => {
 
                         logger.debug({
                             message: `shebang for module "${id}" is preserved.`,
-                            prefix: "preserve-directives",
+                            prefix: "plugin:preserve-directives",
                         });
                     }
                 }
@@ -209,7 +209,7 @@ const preserveDirectives = (logger: Pail<never, string>): Plugin => {
 
                         logger.debug({
                             message: `directive "${directive}" for module "${id}" is preserved.`,
-                            prefix: "preserve-directives",
+                            prefix: "plugin:preserve-directives",
                         });
                     }
                 }

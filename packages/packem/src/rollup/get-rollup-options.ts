@@ -171,7 +171,7 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext): boolean => {
 const calledImplicitExternals = new Map<string, boolean>();
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string, string>): RollupOptions => {
+const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string, string>, type: "dependencies" | "dts"): RollupOptions => {
     const findAlias = (id: string): string | undefined => {
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [key, replacement] of Object.entries(resolvedAliases)) {
@@ -210,7 +210,10 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
                 // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const { find } of configAlias) {
                     if (find.test(id)) {
-                        context.logger.debug(`Resolved alias ${id} to ${find.source}`);
+                        context.logger.debug({
+                            message: `Resolved alias ${id} to ${find.source}`,
+                            prefix: type,
+                        });
 
                         return false;
                     }
@@ -218,8 +221,11 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            if (!isExplicitExternal && calledImplicitExternals.has(id)) {
-                context.logger.info('Inlined implicit external "' + cyan(id) + '". If this is incorrect, add it to the "externals" option.');
+            if (!isExplicitExternal && !calledImplicitExternals.has(id)) {
+                context.logger.info({
+                    message: 'Inlined implicit external "' + cyan(id) + '". If this is incorrect, add it to the "externals" option.',
+                    prefix: type,
+                });
             }
 
             calledImplicitExternals.set(id, true);
@@ -228,6 +234,38 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
         },
 
         input: Object.fromEntries(context.options.entries.map((entry) => [entry.name, resolve(context.options.rootDir, entry.input)])),
+
+        onLog: (level, log) => {
+            let format = log.message;
+
+            if (log.stack) {
+                format = `${format}\n${log.stack}`;
+            }
+
+            // eslint-disable-next-line default-case
+            switch (level) {
+                case "info": {
+                    context.logger.info({
+                        message: format,
+                        prefix: type + (log.plugin ? ":plugin:" + log.plugin : ""),
+                    });
+                    return;
+                }
+                case "warn": {
+                    context.logger.warn({
+                        message: format,
+                        prefix: type + (log.plugin ? ":plugin:" + log.plugin : ""),
+                    });
+                    return;
+                }
+                case "debug": {
+                    context.logger.debug({
+                        message: format,
+                        prefix: type + (log.plugin ? ":plugin:" + log.plugin : ""),
+                    });
+                }
+            }
+        },
 
         onwarn(warning: RollupLog, rollupWarn) {
             if (sharedOnWarn(warning, context)) {
@@ -257,7 +295,7 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
     }
 
     return (<RollupOptions>{
-        ...baseRollupOptions(context, resolvedAliases),
+        ...baseRollupOptions(context, resolvedAliases, "dependencies"),
 
         output: [
             context.options.emitCJS &&
@@ -269,7 +307,14 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
                     externalLiveBindings: false,
                     format: "cjs",
                     freeze: false,
-                    generatedCode: { constBindings: true },
+                    generatedCode: {
+                        arrowFunctions: true,
+                        constBindings: true,
+                        objectShorthand: true,
+                        preset: "es2015",
+                        reservedNamesAsProps: true,
+                        symbols: true,
+                    },
                     // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
                     // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
                     hoistTransitiveImports: false,
@@ -292,7 +337,14 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
                     externalLiveBindings: false,
                     format: "esm",
                     freeze: false,
-                    generatedCode: { constBindings: true },
+                    generatedCode: {
+                        arrowFunctions: true,
+                        constBindings: true,
+                        objectShorthand: true,
+                        preset: "es2015",
+                        reservedNamesAsProps: true,
+                        symbols: true,
+                    },
                     // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
                     // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
                     hoistTransitiveImports: false,
@@ -402,10 +454,10 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
                 context.options.rollup.license.path &&
                 typeof context.options.rollup.license.dependenciesTemplate === "function" &&
                 licensePlugin({
-                    marker: context.options.rollup.license.dependenciesMarker ?? "DEPENDENCIES",
                     licenseFilePath: context.options.rollup.license.path,
                     licenseTemplate: context.options.rollup.license.dependenciesTemplate,
                     logger: context.logger,
+                    marker: context.options.rollup.license.dependenciesMarker ?? "DEPENDENCIES",
                     mode: "dependencies",
                     packageName: context.pkg.name,
                 }),
@@ -479,7 +531,7 @@ export const getRollupDtsOptions = async (context: BuildContext): Promise<Rollup
     const uniqueProcessId = ("dts-plugin:" + process.pid + (context.tsconfig as TsConfigResult).path) as string;
 
     return <RollupOptions>{
-        ...baseRollupOptions(context, resolvedAliases),
+        ...baseRollupOptions(context, resolvedAliases, "dts"),
 
         onwarn(warning, rollupWarn) {
             if (sharedOnWarn(warning, context)) {
@@ -574,10 +626,10 @@ export const getRollupDtsOptions = async (context: BuildContext): Promise<Rollup
                 context.options.rollup.license.path &&
                 typeof context.options.rollup.license.dtsTemplate === "function" &&
                 licensePlugin({
-                    marker: context.options.rollup.license.dependenciesMarker ?? "TYPE_DEPENDENCIES",
                     licenseFilePath: context.options.rollup.license.path,
                     licenseTemplate: context.options.rollup.license.dtsTemplate,
                     logger: context.logger,
+                    marker: context.options.rollup.license.dependenciesMarker ?? "TYPE_DEPENDENCIES",
                     mode: "types",
                     packageName: context.pkg.name,
                 }),
