@@ -400,12 +400,12 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
 
             context.options.rollup.license &&
                 context.options.rollup.license.path &&
-                typeof context.options.rollup.license.template === "function" &&
+                typeof context.options.rollup.license.dependenciesTemplate === "function" &&
                 licensePlugin({
+                    marker: context.options.rollup.license.dependenciesMarker ?? "DEPENDENCIES",
                     licenseFilePath: context.options.rollup.license.path,
-                    licenseTemplate: context.options.rollup.license.template,
+                    licenseTemplate: context.options.rollup.license.dependenciesTemplate,
                     logger: context.logger,
-                    marker: context.options.rollup.license.marker ?? "DEPENDENCIES",
                     mode: "dependencies",
                     packageName: context.pkg.name,
                 }),
@@ -574,10 +574,10 @@ export const getRollupDtsOptions = async (context: BuildContext): Promise<Rollup
                 context.options.rollup.license.path &&
                 typeof context.options.rollup.license.dtsTemplate === "function" &&
                 licensePlugin({
+                    marker: context.options.rollup.license.dependenciesMarker ?? "TYPE_DEPENDENCIES",
                     licenseFilePath: context.options.rollup.license.path,
                     licenseTemplate: context.options.rollup.license.dtsTemplate,
                     logger: context.logger,
-                    marker: context.options.rollup.license.marker ?? "TYPE_DEPENDENCIES",
                     mode: "types",
                     packageName: context.pkg.name,
                 }),

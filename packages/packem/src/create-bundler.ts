@@ -202,7 +202,7 @@ const generateOptions = (
                     `${licenses.join(", ")}\n\n` +
                     `# Bundled types:\n` +
                     dependencyLicenseTexts,
-                template: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
+                dependenciesTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
                     `\n# Licenses of bundled dependencies\n` +
                     `The published ${pName} artifact additionally contains code with the following licenses:\n` +
                     `${licenses.join(", ")}\n\n` +
@@ -510,7 +510,7 @@ const build = async (
     logger: Pail<never, string>,
     rootDirectory: string,
     mode: Mode,
-    presetName: string,
+    buildPreset: string,
     inputConfig: BuildConfig,
     buildConfig: BuildConfig,
     packageJson: PackEmPackageJson,
@@ -518,7 +518,8 @@ const build = async (
     cleanedDirectories: string[],
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
-    const preset = resolvePreset(presetName, rootDirectory);
+    const preset = resolvePreset(buildPreset, rootDirectory);
+
     const options = generateOptions(logger, rootDirectory, mode, inputConfig, buildConfig, preset, packageJson, tsconfig);
 
     ensureDirSync(options.outDir);
@@ -639,7 +640,7 @@ const build = async (
         return;
     }
 
-    await Promise.allSettled([rollupBuild(context), context.options.declaration && rollupBuildTypes(context)]);
+    await Promise.all([rollupBuild(context), context.options.declaration && rollupBuildTypes(context)]);
 
     logger.success(green(`Build succeeded for ${context.options.name}`));
 
@@ -750,22 +751,22 @@ const createBundler = async (
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
         const getDuration = () => Math.floor(Date.now() - start) + "ms";
 
-        let presetName = packageJson.packem?.preset ?? inputConfig.preset ?? "auto";
+        let buildPreset = packageJson.packem?.preset ?? inputConfig.preset ?? "auto";
 
         // Invoke build for every build config defined in packem.config.ts
         const cleanedDirectories: string[] = [];
 
-        await Promise.allSettled(
-            buildConfigs.map(async (buildConfig) => {
+        await Promise.all(
+            buildConfigs.map(async (buildConfig: BuildConfig): Promise<void> => {
                 if (buildConfig.preset) {
-                    presetName = buildConfig.preset;
+                    buildPreset = buildConfig.preset;
                 }
 
                 await build(
                     logger,
                     rootDirectory,
                     mode,
-                    presetName,
+                    buildPreset,
                     restInputConfig,
                     buildConfig,
                     packageJson as PackEmPackageJson,
@@ -781,7 +782,8 @@ const createBundler = async (
         logger.restoreAll();
 
         exit(0);
-    } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
         logger.error("An error occurred while building", error);
 
         exit(1);

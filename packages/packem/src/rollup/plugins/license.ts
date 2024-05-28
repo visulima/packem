@@ -38,11 +38,11 @@ const replaceContentWithin = (content: string, marker: string, replacement: stri
 };
 
 export interface LicenseOptions {
+    dependenciesMarker?: string;
+    dependenciesTemplate?: (licenses: string[], dependencyLicenseTexts: string, packageName: string | undefined) => string;
     dtsMarker?: string;
     dtsTemplate?: (licenses: string[], dependencyLicenseTexts: string, packageName: string | undefined) => string;
-    marker?: string;
     path?: string;
-    template?: (licenses: string[], dependencyLicenseTexts: string, packageName: string | undefined) => string;
 }
 
 export const license = ({
@@ -66,9 +66,11 @@ export const license = ({
             const licenses = new Set<string>();
 
             const dependencyLicenseTexts = dependencies
+                // eslint-disable-next-line etc/no-assign-mutated-array
                 .sort(({ name: nameA }, { name: nameB }) => (nameA! > nameB! ? 1 : nameB! > nameA! ? -1 : 0))
                 .map(({ author, contributors, license: dependencylicense, licenseText, maintainers, name, repository }) => {
-                    let text = `## ${name}\n`;
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                    let text = "## " + name + "\n";
 
                     if (dependencylicense) {
                         text += `License: ${dependencylicense}\n`;
@@ -112,6 +114,12 @@ export const license = ({
                     return text;
                 })
                 .join("\n---------------------------------------\n\n");
+
+            if (dependencyLicenseTexts === "") {
+                logger.info("No dependencies license information found.");
+
+                return;
+            }
 
             const licenseText = licenseTemplate(sortLicenses(licenses), dependencyLicenseTexts, packageName);
 
