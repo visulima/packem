@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.17](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.16...@visulima/packem@1.0.0-alpha.17) (2024-05-28)
+
+
+### Bug Fixes
+
+* working on better tests ([a6a569e](https://github.com/visulima/packem/commit/a6a569e88496ac30bfebebc05c0b0f967d8810b8))
+
 ## @visulima/packem [1.0.0-alpha.16](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.15...@visulima/packem@1.0.0-alpha.16) (2024-05-28)
 
 
