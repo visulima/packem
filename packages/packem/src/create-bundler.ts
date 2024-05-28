@@ -685,7 +685,6 @@ const createBundler = async (
         debug?: boolean;
         tsconfigPath?: string;
     } & BuildConfig = {},
-    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
     const { configPath, debug, tsconfigPath, ...restInputConfig } = inputConfig;
     const loggerProcessors: Processor<string>[] = [new MessageFormatterProcessor<string>(), new ErrorProcessor<string>()];
@@ -739,8 +738,11 @@ const createBundler = async (
 
         logger.debug("Using package.json found at", packageJsonPath);
 
+        const packemConfigFileName = configPath ?? "./packem.config";
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const _buildConfig: BuildConfig | BuildConfig[] = tryRequire(configPath ?? "./packem.config", rootDirectory, []);
+        const _buildConfig: BuildConfig | BuildConfig[] = tryRequire(packemConfigFileName, rootDirectory, []);
+
+        logger.debug("Using packem.config.ts found at", join(rootDirectory, packemConfigFileName));
 
         const buildConfigs = (Array.isArray(_buildConfig) ? _buildConfig : [_buildConfig]).filter(Boolean);
         const start = Date.now();
@@ -750,32 +752,28 @@ const createBundler = async (
 
         let presetName = packageJson.packem?.preset ?? inputConfig.preset ?? "auto";
 
-        if (buildConfigs.length === 0) {
-            await build(logger, rootDirectory, mode, presetName, restInputConfig, {}, packageJson as PackEmPackageJson, tsconfig, []);
-        } else {
-            // Invoke build for every build config defined in packem.config.ts
-            const cleanedDirectories: string[] = [];
+        // Invoke build for every build config defined in packem.config.ts
+        const cleanedDirectories: string[] = [];
 
-            await Promise.allSettled(
-                buildConfigs.map(async (buildConfig) => {
-                    if (buildConfig.preset) {
-                        presetName = buildConfig.preset;
-                    }
+        await Promise.allSettled(
+            buildConfigs.map(async (buildConfig) => {
+                if (buildConfig.preset) {
+                    presetName = buildConfig.preset;
+                }
 
-                    await build(
-                        logger,
-                        rootDirectory,
-                        mode,
-                        presetName,
-                        restInputConfig,
-                        buildConfig,
-                        packageJson as PackEmPackageJson,
-                        tsconfig,
-                        cleanedDirectories,
-                    );
-                }),
-            );
-        }
+                await build(
+                    logger,
+                    rootDirectory,
+                    mode,
+                    presetName,
+                    restInputConfig,
+                    buildConfig,
+                    packageJson as PackEmPackageJson,
+                    tsconfig,
+                    cleanedDirectories,
+                );
+            }),
+        );
 
         logger.raw(`\n⚡️ Build run in ${getDuration()}`);
 
