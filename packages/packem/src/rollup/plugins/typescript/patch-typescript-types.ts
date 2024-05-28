@@ -96,7 +96,7 @@ function replaceConfusingTypeNames(
         // Display the warning only once per file
         if (!calledDtsFiles.has(fileWithoutExtension)) {
             logger.warn({
-                message: `${chunk.fileName} contains confusing identifier names${unreplacedString}\n\nTo replace these, add them to the "patchTypes -> identifierReplacements" option in your packem config.`,
+                message: `${chunk.fileName} contains confusing identifier names${unreplacedString}\n\nTo replace these, add them to the "rollup -> patchTypes -> identifierReplacements" option in your packem config.`,
                 prefix: "patch-types",
             });
         }
