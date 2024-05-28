@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { execPackemSync, getNodePathList, streamToString } from "../helpers";
 
-describe.each(await getNodePathList())("node %s - package.json exports", (_, nodePath) => {
+describe("packem package.json exports", () => {
     let distribution: string;
 
     beforeEach(async () => {
@@ -33,7 +33,7 @@ export function method() {
 }
 `,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {
                 "my-mod": "*",
             },
@@ -43,9 +43,8 @@ export function method() {
             },
         });
 
-        const binProcess = execPackemSync([], {
+        const binProcess = execPackemSync("build", [], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -95,7 +94,7 @@ exports.method = method;
         expect.assertions(4);
 
         writeFileSync(`${distribution}/src/index.js`, `export default 'exports-sugar'`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {
                 "my-mod": "*",
             },
@@ -106,9 +105,8 @@ exports.method = method;
             },
         });
 
-        const binProcess = execPackemSync([], {
+        const binProcess = execPackemSync("build", [], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -125,7 +123,7 @@ exports.method = method;
         expect.assertions(6);
 
         writeFileSync(`${distribution}/src/index.ts`, `export const value = process.env.NODE_ENV;`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: {
                 ".": {
                     default: "./dist/index.js",
@@ -143,9 +141,8 @@ exports.method = method;
             },
         });
 
-        const binProcess = execPackemSync([], {
+        const binProcess = execPackemSync("build", [], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -176,7 +173,7 @@ exports.method = method;
         writeFileSync(`${distribution}/src/core.ts`, `export const value = 'core';`);
         writeFileSync(`${distribution}/src/core.production.ts`, `export const value = 'core' + process.env.NODE_ENV;`);
         writeFileSync(`${distribution}/src/core.development.ts`, `export const value = 'core' + process.env.NODE_ENV;`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: {
                 ".": {
                     import: {
@@ -205,9 +202,8 @@ exports.method = method;
             },
         });
 
-        const binProcess = execPackemSync([], {
+        const binProcess = execPackemSync("build", [], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -256,7 +252,7 @@ export type IString = string;`,
 export default 'api:' + index;
 export { IString };`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: {
                 ".": {
                     import: "./dist/index.mjs",
@@ -272,9 +268,8 @@ export { IString };`,
             },
         });
 
-        const binProcess = execPackemSync([], {
+        const binProcess = execPackemSync("build", [], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -298,15 +293,14 @@ export { IString };`,
         expect.assertions(6);
 
         writeFileSync(`${distribution}/src/foo/bar.js`, `export const value = 'foo.bar';`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: {
                 "./foo/bar": "./dist/foo/bar.js",
             },
         });
 
-        const binProcess = execPackemSync([], {
+        const binProcess = execPackemSync("build", [], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -321,7 +315,7 @@ export { IString };`,
         expect.assertions(4);
 
         writeFileSync(`${distribution}/src/index.js`, `export const value = 'cjs';`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: {
                 ".": {
                     import: "./dist/index.mjs",
@@ -332,9 +326,8 @@ export { IString };`,
             type: "module",
         });
 
-        const binProcess = execPackemSync([], {
+        const binProcess = execPackemSync("build", [], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -361,7 +354,7 @@ exports.value = value;
         expect.assertions(3);
 
         writeFileSync(`${distribution}/src/index.ts`, `export const value = 'cjs';`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: {
                 import: {
                     default: "./dist/index.mjs",
@@ -378,9 +371,8 @@ exports.value = value;
         });
         writeJsonSync(`${distribution}/tsconfig.json`, {});
 
-        const binProcess = execPackemSync([], {
+        const binProcess = execPackemSync("build", [], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -397,16 +389,15 @@ exports.value = value;
 
         writeFileSync(`${distribution}/src/index/index.js`, `export const index = 'index';`);
         writeFileSync(`${distribution}/src/index/index.react-server.js`, `export const index = 'react-server';`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: {
                 default: "./dist/index.js",
                 "react-server": "./dist/react-server.js",
             },
         });
 
-        const binProcess = execPackemSync([], {
+        const binProcess = execPackemSync("build", [], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -432,7 +423,7 @@ exports.value = value;
                 allowJs: true,
             },
         });
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: {
                 import: "./dist/index.mjs",
                 require: "./dist/index.cjs",
@@ -441,9 +432,8 @@ exports.value = value;
             type: "module",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -479,7 +469,7 @@ export { index as default };
                 allowJs: true,
             },
         });
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: {
                 import: "./dist/index.mjs",
                 require: "./dist/index.cjs",
@@ -488,9 +478,8 @@ export { index as default };
             type: "commonjs",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");

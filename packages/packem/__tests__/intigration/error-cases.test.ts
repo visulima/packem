@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { execPackemSync, getNodePathList, streamToString } from "../helpers";
 
-describe.each(await getNodePathList())("node %s - jsx", (_, nodePath) => {
+describe("packem jsx", () => {
     let distribution: string;
 
     beforeEach(async () => {
@@ -21,9 +21,8 @@ describe.each(await getNodePathList())("node %s - jsx", (_, nodePath) => {
     it("should throw a error if no package.json was found", async () => {
         expect.assertions(2);
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toMatch("No such file or directory, for package.json found.");
@@ -35,9 +34,8 @@ describe.each(await getNodePathList())("node %s - jsx", (_, nodePath) => {
 
         writeFileSync(`${distribution}/package.json`, "{");
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toMatch("Unexpected end of JSON input in");
@@ -47,14 +45,13 @@ describe.each(await getNodePathList())("node %s - jsx", (_, nodePath) => {
     it("should throw a error if no src directory was found", async () => {
         expect.assertions(2);
 
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {},
             name: "pkg",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toMatch("No 'src' directory found. Please provide entries manually.");
@@ -64,16 +61,15 @@ describe.each(await getNodePathList())("node %s - jsx", (_, nodePath) => {
     it("should throw a error if src dir has no entries", async () => {
         expect.assertions(2);
 
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {},
             name: "pkg",
         });
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         mkdirSync(`${distribution}/src`);
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toMatch("No source files found in 'src' directory. Please provide entries manually.");
@@ -83,15 +79,14 @@ describe.each(await getNodePathList())("node %s - jsx", (_, nodePath) => {
     it("should throw a error if package.json has no entry", async () => {
         expect.assertions(2);
 
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {},
             name: "pkg",
         });
         writeFileSync(`${distribution}/src/index.ts`, "");
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toMatch("No entries detected. Please provide entries manually.");
@@ -101,7 +96,7 @@ describe.each(await getNodePathList())("node %s - jsx", (_, nodePath) => {
     it.todo("should throw a error if conflicting entry in package.json", async () => {
         expect.assertions(2);
 
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {},
             main: "dist/index.js",
             module: "dist/index.js",
@@ -109,9 +104,8 @@ describe.each(await getNodePathList())("node %s - jsx", (_, nodePath) => {
         });
         writeFileSync(`${distribution}/src/index.ts`, "");
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stdout)).resolves.toBe("");

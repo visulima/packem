@@ -1,5 +1,14 @@
+/**
+ * Modified copy of https://github.com/huozhi/bunchee/blob/main/src/lib/memoize.ts
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2018 these people -> https://github.com/huozhi/bunchee/graphs/contributors
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CacheKeyResolver = string | ((...arguments_: any[]) => string);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const memoize = <T extends (...arguments_: any[]) => any>(
     function_: T,
     cacheKey?: CacheKeyResolver, // if you need specify a cache key
@@ -19,10 +28,12 @@ const memoize = <T extends (...arguments_: any[]) => any>(
 
         cache.set(key, result);
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return result;
     }) as T;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const memoizeByKey = <T extends (...arguments_: any[]) => any>(function_: T) => {
     const cache = new Map<string, ReturnType<T>>();
 

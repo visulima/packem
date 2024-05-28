@@ -706,6 +706,8 @@ const createBundler = async (
     // eslint-disable-next-line no-param-reassign
     rootDirectory = resolve(cwd(), rootDirectory);
 
+    logger.debug("Root directory:", rootDirectory);
+
     let tsconfig: TsConfigResult | undefined;
 
     if (tsconfigPath) {

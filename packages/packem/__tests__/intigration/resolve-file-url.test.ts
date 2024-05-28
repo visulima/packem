@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { execPackemSync, getNodePathList, streamToString } from "../helpers";
 
-describe.each(await getNodePathList())("node %s - resolve-file-url", (_, nodePath) => {
+describe("packem resolve-file-url", () => {
     let distribution: string;
 
     beforeEach(async () => {
@@ -29,14 +29,13 @@ describe.each(await getNodePathList())("node %s - resolve-file-url", (_, nodePat
 export default log`,
         );
         writeFileSync(`${distribution}/src/importer.mjs`, `export { default as effect } from "file://${distribution}/src/importee.mjs"`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             main: "./dist/importer.cjs",
             type: "commonjs",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");

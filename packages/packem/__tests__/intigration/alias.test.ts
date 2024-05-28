@@ -1,12 +1,13 @@
 import { rm } from "node:fs/promises";
+import { resolve } from "node:path";
 
-import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
+import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { execPackemSync, getNodePathList, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, streamToString } from "../helpers";
 
-describe.each(await getNodePathList())("node %s - alias", (_, nodePath) => {
+describe("packem alias", () => {
     let distribution: string;
 
     beforeEach(async () => {
@@ -27,25 +28,19 @@ describe.each(await getNodePathList())("node %s - alias", (_, nodePath) => {
 export default log();`,
         );
         writeFileSync(`${distribution}/src/test/logger.ts`, `export const log = () => console.log("test");`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             main: "./dist/index.cjs",
             type: "commonjs",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
-        writeFileSync(
-            `${distribution}/packem.config.ts`,
-            `import { resolve } from "path";
+        createTsConfig(distribution, { compilerOptions: { rootDir: "./src" } });
+        createPackemConfig(distribution, {
+            alias: {
+                "@/test/*": resolve(distribution, "src/test"),
+            },
+        });
 
-export default [{
-    alias: {
-        '@/test/*': resolve('${distribution}', 'src/test'),
-    },
-}];`,
-        );
-
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stdout)).resolves.toBe("");

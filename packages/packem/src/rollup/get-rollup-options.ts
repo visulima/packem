@@ -424,7 +424,7 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
     }) as RollupOptions;
 };
 
-const createDtsPlugin = async (context: BuildContext) => {
+const createDtsPlugin = async (context: BuildContext): Promise<Plugin> => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports,@typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires,global-require,unicorn/prefer-module
     const { dts } = require("rollup-plugin-dts") as typeof import("rollup-plugin-dts");
 
@@ -443,7 +443,7 @@ const createDtsPlugin = async (context: BuildContext) => {
 
 // Avoid create multiple dts plugins instance and parsing the same tsconfig multi times,
 // This will avoid memory leak and performance issue.
-const memoizeDtsPluginByKey = memoizeByKey(createDtsPlugin);
+const memoizeDtsPluginByKey = memoizeByKey<typeof createDtsPlugin>(createDtsPlugin);
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export const getRollupDtsOptions = async (context: BuildContext): Promise<RollupOptions> => {

@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { execPackemSync, getNodePathList, streamToString } from "../helpers";
 
-describe.each(await getNodePathList())("node %s - typescript", (_, nodePath) => {
+describe("packem typescript", () => {
     let distribution: string;
 
     beforeEach(async () => {
@@ -25,13 +25,13 @@ describe.each(await getNodePathList())("node %s - typescript", (_, nodePath) => 
 
             writeFileSync(`${distribution}/src/index.ts`, 'import "./file.jsx";');
             writeFileSync(`${distribution}/src/file.tsx`, "console.log(1);");
-            writeJsonSync(`${distribution}/package.json`, {
+            createPackageJson(distribution, {
                 main: "./dist/index.cjs",
                 type: "module",
             });
             writeJsonSync(`${distribution}/tsconfig.json`, {});
 
-            const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: distribution,
                 nodePath,
             });
@@ -49,12 +49,12 @@ describe.each(await getNodePathList())("node %s - typescript", (_, nodePath) => 
 
             writeFileSync(`${distribution}/src/index.js`, 'import "./file.jsx";');
             writeFileSync(`${distribution}/src/file.jsx`, "console.log(1);");
-            writeJsonSync(`${distribution}/package.json`, {
+            createPackageJson(distribution, {
                 main: "./dist/index.cjs",
                 type: "module",
             });
 
-            const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: distribution,
                 nodePath,
             });
@@ -72,13 +72,13 @@ describe.each(await getNodePathList())("node %s - typescript", (_, nodePath) => 
 
             writeFileSync(`${distribution}/src/index.ts`, 'import "./file.mjs";');
             writeFileSync(`${distribution}/src/file.mjs`, "console.log(1);");
-            writeJsonSync(`${distribution}/package.json`, {
+            createPackageJson(distribution, {
                 main: "./dist/index.cjs",
                 type: "module",
             });
             writeJsonSync(`${distribution}/tsconfig.json`, {});
 
-            const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: distribution,
                 nodePath,
             });
@@ -96,13 +96,13 @@ describe.each(await getNodePathList())("node %s - typescript", (_, nodePath) => 
 
             writeFileSync(`${distribution}/src/index.ts`, 'import "./file.cjs";');
             writeFileSync(`${distribution}/src/file.cjs`, "console.log(1);");
-            writeJsonSync(`${distribution}/package.json`, {
+            createPackageJson(distribution, {
                 main: "./dist/index.cjs",
                 type: "module",
             });
             writeJsonSync(`${distribution}/tsconfig.json`, {});
 
-            const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: distribution,
                 nodePath,
             });
@@ -130,9 +130,9 @@ describe.each(await getNodePathList())("node %s - typescript", (_, nodePath) => 
                     },
                 },
             });
-            writeJsonSync(`${distribution}/package.json`, { main: "./dist/index.cjs" });
+            createPackageJson(distribution, { main: "./dist/index.cjs" });
 
-            const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: distribution,
                 nodePath,
             });
@@ -166,9 +166,9 @@ console.log(1);
                     },
                 },
             });
-            writeJsonSync(`${distribution}/package.json`, { main: "./dist/index.cjs" });
+            createPackageJson(distribution, { main: "./dist/index.cjs" });
 
-            const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: distribution,
                 nodePath,
             });
@@ -203,9 +203,9 @@ console.log(1);
                     rootDirs: ["src", "tt/b", "tt/a"],
                 },
             });
-            writeJsonSync(`${distribution}/package.json`, { main: "./dist/index.cjs" });
+            createPackageJson(distribution, { main: "./dist/index.cjs" });
 
-            const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: distribution,
                 nodePath,
             });
@@ -255,7 +255,7 @@ export class ExampleClass {
   public readonly value!: string;
 }`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "module",
@@ -266,9 +266,8 @@ export class ExampleClass {
             },
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -354,14 +353,13 @@ exports.ExampleClass = ExampleClass;
                 allowJs: true,
             },
         });
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: "./dist/index.js",
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -400,7 +398,7 @@ export const version = pkgJson.version;
                 moduleResolution: "bundler",
             },
         });
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: {
                 ".": {
                     default: "./dist/index.mjs",
@@ -411,9 +409,8 @@ export const version = pkgJson.version;
             version: "0.0.1",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -464,14 +461,13 @@ export { version };
                 incremental: true,
             },
         });
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: "./dist/index.cjs",
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -514,14 +510,13 @@ export { index as default };
                 tsBuildInfoFile: ".tsbuildinfo",
             },
         });
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: "./dist/index.cjs",
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -563,14 +558,13 @@ export { index as default };
                 noEmit: true,
             },
         });
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: "./dist/index.cjs",
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");

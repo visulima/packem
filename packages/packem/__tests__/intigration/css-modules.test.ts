@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { execPackemSync, getNodePathList, streamToString } from "../helpers";
 
-describe.each(await getNodePathList())("node %s - css modules", (_, nodePath) => {
+describe("packem css modules", () => {
     let distribution: string;
 
     beforeEach(async () => {
@@ -33,15 +33,14 @@ describe.each(await getNodePathList())("node %s - css modules", (_, nodePath) =>
 console.log(styles.Button);
 `,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             main: "./dist/button.cjs",
             module: "./dist/button.msj",
             type: "commonjs",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");

@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { execPackemSync, getNodePathList, streamToString } from "../helpers";
 
-describe.each(await getNodePathList())("node %s - output", (_, nodePath) => {
+describe("packem output", () => {
     let distribution: string;
 
     beforeEach(async () => {
@@ -24,7 +24,7 @@ describe.each(await getNodePathList())("node %s - output", (_, nodePath) => {
         writeFileSync(`${distribution}/src/foo.js`, `export const foo = 'foo'`);
         writeFileSync(`${distribution}/src/index.js`, `export const index = 'index'`);
         writeFileSync(`${distribution}/src/index.react-server.js`, `export const index = 'index.react-server'`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             bin: {
                 cli: "./dist/bin/cli.cjs",
             },
@@ -38,9 +38,8 @@ describe.each(await getNodePathList())("node %s - output", (_, nodePath) => {
             name: "@scope/output-app",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development", "--no-color"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development", "--no-color"], {
             cwd: distribution,
-            nodePath,
         });
 
         const stdout = await streamToString(binProcess.stdout);

@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { execPackemSync, getNodePathList, streamToString } from "../helpers";
 
-describe.each(await getNodePathList())("node %s - shims", (_, nodePath) => {
+describe("packem shims", () => {
     let distribution: string;
 
     beforeEach(async () => {
@@ -42,7 +42,7 @@ export function esmImport() {
   return import.meta.url
 }`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: {
                 "./dirname": {
                     import: "./dist/dirname.mjs",
@@ -59,9 +59,8 @@ export function esmImport() {
             },
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -205,7 +204,7 @@ export function esmImport() {
   return import.meta.url
 }`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             engines: {
                 node: "20.11",
             },
@@ -225,9 +224,8 @@ export function esmImport() {
             },
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -344,14 +342,13 @@ exports.getRequireModule = getRequireModule;
         expect.assertions(3);
 
         writeFileSync(`${distribution}/src/index.js`, `const test = "this should be in final bundle";\nexport default test;`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             module: "./dist/index.mjs",
             type: "module",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -382,14 +379,13 @@ export { test as default };
 
 export { getFilename } from "./filename.js";`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             module: "./dist/index.mjs",
             type: "module",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");

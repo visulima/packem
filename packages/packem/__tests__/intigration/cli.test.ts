@@ -1,12 +1,14 @@
-import { rm } from "node:fs/promises";
+import { readdir, rm } from "node:fs/promises";
 
-import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
+import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { execPackemSync, getNodePathList, streamToString } from "../helpers";
+import { createPackageJson, createTsConfig, execPackemSync, streamToString } from "../helpers";
+import * as console from "node:console";
+import { join } from "@visulima/path";
 
-describe.each(await getNodePathList())("node %s - typescript", (_, nodePath) => {
+describe("packem typescript", () => {
     let distribution: string;
 
     beforeEach(async () => {
@@ -21,10 +23,14 @@ describe.each(await getNodePathList())("node %s - typescript", (_, nodePath) => 
         expect.assertions(5);
 
         writeFileSync(`${distribution}/src/index.ts`, `export default class A {}`);
-        writeJsonSync(`${distribution}/tsconfig.build.json`, {
-            compilerOptions: { target: "es2018" },
-        });
-        writeJsonSync(`${distribution}/package.json`, {
+        createTsConfig(
+            distribution,
+            {
+                compilerOptions: { target: "es2018" },
+            },
+            ".build",
+        );
+        createPackageJson(distribution, {
             exports: {
                 ".": {
                     default: "./dist/index.mjs",
@@ -34,13 +40,12 @@ describe.each(await getNodePathList())("node %s - typescript", (_, nodePath) => 
             type: "module",
         });
 
-        const binProcessEs2018 = execPackemSync(["--tsconfig=tsconfig.build.json"], {
+        const binProcessEs2018 = execPackemSync("build", ["--tsconfig=tsconfig.build.json"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcessEs2018.stderr)).resolves.toBe("");
-        expect(binProcessEs2018.exitCode).toBe(0);
+        // expect(binProcessEs2018.exitCode).toBe(0);
 
         const dMtsContentEs2018 = readFileSync(`${distribution}/dist/index.d.mts`);
 

@@ -1,13 +1,13 @@
 import { existsSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
-import { writeFileSync, writeJsonSync } from "@visulima/fs";
+import { writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { execPackemSync, getNodePathList, streamToString } from "../helpers";
+import { createPackageJson, execPackemSync, getNodePathList, streamToString } from "../helpers";
 
-describe.each(await getNodePathList())("node %s - copy", (_, nodePath) => {
+describe("packem copy", () => {
     let distribution: string;
 
     beforeEach(async () => {
@@ -24,7 +24,7 @@ describe.each(await getNodePathList())("node %s - copy", (_, nodePath) => {
         writeFileSync(`${distribution}/src/index.ts`, `console.log("Hello, world!");`);
         writeFileSync(`${distribution}/assets/style.css`, `body { background-color: red; }`);
         writeFileSync(`${distribution}/assets/data.csv`, `name,age`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             main: "./dist/index.cjs",
             packem: {
                 rollup: {
@@ -36,9 +36,8 @@ describe.each(await getNodePathList())("node %s - copy", (_, nodePath) => {
             type: "commonjs",
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");

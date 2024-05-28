@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { esc, execPackemSync, getNodePathList, installPackage, streamToString } from "../helpers";
 
-describe.each(await getNodePathList())("node %s - jsx", (_, nodePath) => {
+describe("packem jsx", () => {
     let distribution: string;
 
     beforeEach(async () => {
@@ -26,7 +26,7 @@ describe.each(await getNodePathList())("node %s - jsx", (_, nodePath) => {
 
 export default Tr;`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {
                 react: "^18.2.0",
                 "react-dom": "^18.2.0",
@@ -51,9 +51,8 @@ export default Tr;`,
         await installPackage(distribution, "react");
         await installPackage(distribution, "react-dom");
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -113,7 +112,7 @@ export { Tr as default };
 
 export default Tr;`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {
                 react: "^18.2.0",
                 "react-dom": "^18.2.0",
@@ -142,9 +141,8 @@ export default Tr;`,
         await installPackage(distribution, "react");
         await installPackage(distribution, "react-dom");
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toMatch(
@@ -162,7 +160,7 @@ export default Tr;`,
 
 export default Tr;`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {
                 react: "^18.2.0",
                 "react-dom": "^18.2.0",
@@ -187,9 +185,8 @@ export default Tr;`,
         await installPackage(distribution, "react");
         await installPackage(distribution, "react-dom");
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toMatch(
@@ -207,7 +204,7 @@ export default Tr;`,
 
 export default Tr;`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {
                 react: "^18.2.0",
                 "react-dom": "^18.2.0",
@@ -232,9 +229,8 @@ export default Tr;`,
         await installPackage(distribution, "react");
         await installPackage(distribution, "react-dom");
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -294,7 +290,7 @@ export { Tr as default };
 
 export default Tr;`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {
                 react: "^18.2.0",
                 "react-dom": "^18.2.0",
@@ -326,9 +322,8 @@ export default Tr;`,
         await installPackage(distribution, "react");
         await installPackage(distribution, "react-dom");
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -388,7 +383,7 @@ export { Tr as default };
 
 export default Tr;`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {
                 react: "^18.2.0",
                 "react-dom": "^18.2.0",
@@ -420,9 +415,8 @@ export default Tr;`,
         await installPackage(distribution, "react");
         await installPackage(distribution, "react-dom");
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -484,7 +478,7 @@ export const Spinner = Vue.defineComponent(() => () => {
   return <div>loading</div>
 })`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {
                 vue: "^3.4.25",
             },
@@ -509,9 +503,8 @@ export const Spinner = Vue.defineComponent(() => () => {
         await installPackage(distribution, "typescript");
         await installPackage(distribution, "vue");
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");

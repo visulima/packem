@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { execPackemSync, getNodePathList, streamToString } from "../helpers";
 
-describe.each(await getNodePathList())("node %s - node exports", (_, nodePath) => {
+describe("packem node exports", () => {
     let distribution: string;
 
     beforeEach(async () => {
@@ -21,7 +21,7 @@ describe.each(await getNodePathList())("node %s - node exports", (_, nodePath) =
         expect.assertions(7);
 
         writeFileSync(`${distribution}/src/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",
@@ -29,9 +29,8 @@ describe.each(await getNodePathList())("node %s - node exports", (_, nodePath) =
         });
         writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -80,7 +79,7 @@ export { test as default };
             expect.assertions(7);
 
             writeFileSync(`${distribution}/src/index.ts`, `const test = () => "this should be in final bundle";\nexport default test;`);
-            writeJsonSync(`${distribution}/package.json`, {
+            createPackageJson(distribution, {
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
                 type: "commonjs",
@@ -88,7 +87,7 @@ export { test as default };
             });
             writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
-            const binProcess = execPackemSync(["--env NODE_ENV=development", "--cjsInterop"], {
+            const binProcess = execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
                 cwd: distribution,
                 nodePath,
             });
@@ -162,7 +161,7 @@ const test2 = "this should be in final bundle";
 
 export { test2, test as default };`,
             );
-            writeJsonSync(`${distribution}/package.json`, {
+            createPackageJson(distribution, {
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
                 type: "commonjs",
@@ -170,7 +169,7 @@ export { test2, test as default };`,
             });
             writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
-            const binProcess = execPackemSync(["--env NODE_ENV=development", "--cjsInterop"], {
+            const binProcess = execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
                 cwd: distribution,
                 nodePath,
             });
@@ -259,7 +258,7 @@ const test5 = "this should be in final bundle";
 
 export { test2, test3, test4, test5, test as default };`,
             );
-            writeJsonSync(`${distribution}/package.json`, {
+            createPackageJson(distribution, {
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
                 type: "commonjs",
@@ -267,7 +266,7 @@ export { test2, test3, test4, test5, test as default };`,
             });
             writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
-            const binProcess = execPackemSync(["--env NODE_ENV=development", "--cjsInterop"], {
+            const binProcess = execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
                 cwd: distribution,
                 nodePath,
             });
@@ -368,7 +367,7 @@ export default defaultExport;
         expect.assertions(7);
 
         writeFileSync(`${distribution}/src/test/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             main: "./dist/test/index.cjs",
             module: "./dist/test/index.mjs",
             type: "commonjs",
@@ -376,9 +375,8 @@ export default defaultExport;
         });
         writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -432,7 +430,7 @@ import b from 'peer-dep-meta'
 export default a + b
 `,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: "./dist/index.js",
             peerDependencies: {
                 "peer-dep": "*",
@@ -444,9 +442,8 @@ export default a + b
             },
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -501,16 +498,15 @@ export const value = dep
 `,
         );
         writeFileSync(`${distribution}/src/lib/polyfill.js`, `export const dep = 'polyfill-dep'`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             exports: "./dist/index.js",
             imports: {
                 "#dep": "./src/lib/polyfill.js",
             },
         });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -553,7 +549,7 @@ export class Child extends Parent {
   }
 }`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",
@@ -561,9 +557,8 @@ export class Child extends Parent {
         });
         writeJsonSync(`${distribution}/tsconfig.json`, {});
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -711,7 +706,7 @@ export class Child extends Parent {
   }
 }`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",
@@ -719,9 +714,8 @@ export class Child extends Parent {
         });
         writeJsonSync(`${distribution}/tsconfig.json`, {});
 
-        const binProcess = execPackemSync(["--env NODE_ENV=production", "--minify"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=production", "--minify"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");

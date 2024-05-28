@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { execPackemSync, getNodePathList, installPackage, streamToString } from "../helpers";
 
-describe.each(await getNodePathList())("node %s - preserve-directives", (_, nodePath) => {
+describe("packem preserve-directives", () => {
     let distribution: string;
 
     beforeEach(async () => {
@@ -25,7 +25,7 @@ describe.each(await getNodePathList())("node %s - preserve-directives", (_, node
             `#!/usr/bin/env node
 console.log("Hello, world!");`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",
@@ -33,9 +33,8 @@ console.log("Hello, world!");`,
         });
         writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -60,16 +59,15 @@ console.log("Hello, world!");
         expect.assertions(4);
 
         writeFileSync(`${distribution}/src/index.ts`, `console.log("Hello, world!");`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             bin: "./dist/index.cjs",
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
         writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -101,7 +99,7 @@ const Tr = () => (<tr className={"m-0 border-t border-gray-300 p-0 dark:border-g
 
 export default Tr;`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             dependencies: {
                 react: "^18.2.0",
                 "react-dom": "^18.2.0",
@@ -127,9 +125,8 @@ export default Tr;`,
         await installPackage(distribution, "react");
         await installPackage(distribution, "react-dom");
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -191,7 +188,7 @@ export { Tr as default };
 console.log("Hello, cli!");`,
         );
         writeFileSync(`${distribution}/src/index.ts`, `export const foo = 'foo';`);
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             bin: {
                 packem: "./dist/cli.cjs",
             },
@@ -202,9 +199,8 @@ console.log("Hello, cli!");`,
         });
         writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -255,7 +251,7 @@ export const foo = 'foo';`,
 export { bar } from './bar';
 export const baz = 'baz';`,
         );
-        writeJsonSync(`${distribution}/package.json`, {
+        createPackageJson(distribution, {
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             packem: {
@@ -270,9 +266,8 @@ export const baz = 'baz';`,
         });
         writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = execPackemSync(["--env NODE_ENV=development"], {
+        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: distribution,
-            nodePath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
