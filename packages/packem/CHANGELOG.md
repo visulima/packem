@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.19](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.18...@visulima/packem@1.0.0-alpha.19) (2024-05-28)
+
+
+### Bug Fixes
+
+* fixed error handling of promises ([be3b055](https://github.com/visulima/packem/commit/be3b055d68f2544c4271d1da9899e6ea40ebdb04))
+
 ## @visulima/packem [1.0.0-alpha.18](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.17...@visulima/packem@1.0.0-alpha.18) (2024-05-28)
 
 
