@@ -727,7 +727,7 @@ const createBundler = async (
         try {
             tsconfig = await findTSConfig(rootDirectory);
 
-            logger.info("Using tsconfig settings found at", tsconfig.path.replace(rootDirectory, "."));
+            logger.debug("Using tsconfig settings found at", tsconfig.path);
         } catch {
             logger.info("No tsconfig.json or jsconfig.json found.");
         }
@@ -737,7 +737,7 @@ const createBundler = async (
         const packageJsonPath = join(rootDirectory, "package.json");
         const packageJson = parsePackageJson(packageJsonPath);
 
-        logger.info("Using package.json found at", packageJsonPath.replace(rootDirectory, "."));
+        logger.debug("Using package.json found at", packageJsonPath);
 
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const _buildConfig: BuildConfig | BuildConfig[] = tryRequire(configPath ?? "./packem.config", rootDirectory, []);

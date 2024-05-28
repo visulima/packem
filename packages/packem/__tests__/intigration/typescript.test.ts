@@ -6,7 +6,7 @@ import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { execPackemSync, getNodePathList, streamToString } from "../helpers";
+import { execPackemSync, streamToString } from "../helpers";
 
 describe("packem typescript", () => {
     let distribution: string;

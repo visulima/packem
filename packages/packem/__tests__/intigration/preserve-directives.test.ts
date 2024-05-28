@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { execPackemSync, getNodePathList, installPackage, streamToString } from "../helpers";
+import { execPackemSync, installPackage, streamToString } from "../helpers";
 
 describe("packem preserve-directives", () => {
     let distribution: string;
