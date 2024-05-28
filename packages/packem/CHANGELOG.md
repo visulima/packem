@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.20](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.19...@visulima/packem@1.0.0-alpha.20) (2024-05-28)
+
+
+### Bug Fixes
+
+* extended logs ([984a1ea](https://github.com/visulima/packem/commit/984a1eac339f12b6683b5284325bf97d0b606334))
+
 ## @visulima/packem [1.0.0-alpha.19](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.18...@visulima/packem@1.0.0-alpha.19) (2024-05-28)
 
 
