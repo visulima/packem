@@ -1,30 +1,30 @@
 import { rm } from "node:fs/promises";
 
-import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
+import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { execPackemSync, streamToString } from "../helpers";
+import { createPackageJson, execPackemSync, streamToString } from "../helpers";
 
 describe("packem output", () => {
-    let distribution: string;
+    let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
-        distribution = temporaryDirectory();
+        temporaryDirectoryPath = temporaryDirectory();
     });
 
     afterEach(async () => {
-        await rm(distribution, { recursive: true });
+        await rm(temporaryDirectoryPath, { recursive: true });
     });
 
     it("should generate output with all exports", async () => {
         expect.assertions(19);
 
-        writeFileSync(`${distribution}/src/bin/cli.js`, `export const cli = 'cli';`);
-        writeFileSync(`${distribution}/src/foo.js`, `export const foo = 'foo'`);
-        writeFileSync(`${distribution}/src/index.js`, `export const index = 'index'`);
-        writeFileSync(`${distribution}/src/index.react-server.js`, `export const index = 'index.react-server'`);
-        createPackageJson(distribution, {
+        writeFileSync(`${temporaryDirectoryPath}/src/bin/cli.js`, `export const cli = 'cli';`);
+        writeFileSync(`${temporaryDirectoryPath}/src/foo.js`, `export const foo = 'foo'`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const index = 'index'`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.react-server.js`, `export const index = 'index.react-server'`);
+        createPackageJson(temporaryDirectoryPath, {
             bin: {
                 cli: "./dist/bin/cli.cjs",
             },
@@ -39,7 +39,7 @@ describe("packem output", () => {
         });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development", "--no-color"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         const stdout = await streamToString(binProcess.stdout);
@@ -63,14 +63,14 @@ describe("packem output", () => {
         expect(stdout).toContain("exports: cli");
         expect(stdout).toContain("Σ Total dist size (byte size): 714 Bytes");
 
-        const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`const index = "index";
 
 export { index };
 `);
 
-        const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 

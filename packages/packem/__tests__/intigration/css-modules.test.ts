@@ -7,53 +7,53 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { execPackemSync, streamToString } from "../helpers";
 
 describe("packem css modules", () => {
-    let distribution: string;
+    let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
-        distribution = temporaryDirectory();
+        temporaryDirectoryPath = temporaryDirectory();
     });
 
     afterEach(async () => {
-        await rm(distribution, { recursive: true });
+        await rm(temporaryDirectoryPath, { recursive: true });
     });
 
     it("should support css modules", async () => {
         expect.assertions(3);
 
         writeFileSync(
-            `${distribution}/src/button.module.css`,
+            `${temporaryDirectoryPath}/src/button.module.css`,
             `.Button {
   border: 1px solid transparent;
   border-radius: 4px;
 }`,
         );
         writeFileSync(
-            `${distribution}/src/button.tsx`,
+            `${temporaryDirectoryPath}/src/button.tsx`,
             `import styles from "./button.module.css";
 console.log(styles.Button);
 `,
         );
-        createPackageJson(distribution, {
+        createPackageJson(temporaryDirectoryPath, {
             main: "./dist/button.cjs",
             module: "./dist/button.msj",
             type: "commonjs",
         });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const buttonCss = readFileSync(`${distribution}/dist/button.module.css`);
+        const buttonCss = readFileSync(`${temporaryDirectoryPath}/dist/button.module.css`);
 
         expect(buttonCss).toBe(`.Button {
   border: 1px solid transparent;
   border-radius: 4px;
 }`);
 
-        const mjsContent = readFileSync(`${distribution}/dist/button.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/button.mjs`);
 
         expect(mjsContent).toBe(`function log() {
   return 'this should be in final bundle'
@@ -62,7 +62,7 @@ console.log(styles.Button);
 export { log as effect };
 `);
 
-        const cjsContent = readFileSync(`${distribution}/dist/button.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/button.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 

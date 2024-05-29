@@ -7,46 +7,46 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { execPackemSync, streamToString } from "../helpers";
 
 describe("packem raw data", () => {
-    let distribution: string;
+    let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
-        distribution = temporaryDirectory();
+        temporaryDirectoryPath = temporaryDirectory();
     });
 
     afterEach(async () => {
-        await rm(distribution, { recursive: true });
+        await rm(temporaryDirectoryPath, { recursive: true });
     });
 
     it("should generate js files with included raw content", async () => {
         expect.assertions(6);
 
         writeFileSync(
-            `${distribution}/src/index.ts`,
+            `${temporaryDirectoryPath}/src/index.ts`,
             `import content from './content.txt'
 
 export const data = content;`,
         );
-        writeFileSync(`${distribution}/src/content.txt`, `thisismydata`);
-        createPackageJson(distribution, {
+        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `thisismydata`);
+        createPackageJson(temporaryDirectoryPath, {
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
         });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsTextContent = readFileSync(`${distribution}/dist/content.txt.mjs`);
+        const mjsTextContent = readFileSync(`${temporaryDirectoryPath}/dist/content.txt.mjs`);
 
         expect(mjsTextContent).toBe(`const content = "thisismydata";
 
 export { content as default };
 `);
 
-        const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`import content from './content.txt.mjs';
 
@@ -55,7 +55,7 @@ const data = content;
 export { data };
 `);
 
-        const cjsTextContent = readFileSync(`${distribution}/dist/content.txt.cjs`);
+        const cjsTextContent = readFileSync(`${temporaryDirectoryPath}/dist/content.txt.cjs`);
 
         expect(cjsTextContent).toBe(`'use strict';
 
@@ -64,7 +64,7 @@ const content = "thisismydata";
 module.exports = content;
 `);
 
-        const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 

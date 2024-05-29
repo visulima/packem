@@ -5,7 +5,7 @@ import { cwd, env, exit } from "node:process";
 import { bold, cyan, gray, green } from "@visulima/colorize";
 import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync, walk } from "@visulima/fs";
 import { NotFoundError } from "@visulima/fs/error";
-import { formatBytes } from "@visulima/humanizer";
+import { duration, formatBytes } from "@visulima/humanizer";
 import type { PackageJson, TsConfigJson, TsConfigResult } from "@visulima/package";
 import { findTSConfig, readTsConfig } from "@visulima/package";
 import { parsePackageJson } from "@visulima/package/package-json";
@@ -686,6 +686,7 @@ const createBundler = async (
         debug?: boolean;
         tsconfigPath?: string;
     } & BuildConfig = {},
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
     const { configPath, debug, tsconfigPath, ...restInputConfig } = inputConfig;
     const loggerProcessors: Processor<string>[] = [new MessageFormatterProcessor<string>(), new ErrorProcessor<string>()];
@@ -711,18 +712,20 @@ const createBundler = async (
     let tsconfig: TsConfigResult | undefined;
 
     if (tsconfigPath) {
-        if (!(await isAccessible(tsconfigPath))) {
-            logger.error("tsconfig.json not found at", tsconfigPath);
+        const rootTsconfigPath = join(rootDirectory, tsconfigPath);
+
+        if (!(await isAccessible(rootTsconfigPath))) {
+            logger.error("tsconfig.json not found at", rootTsconfigPath);
 
             exit(1);
         }
 
         tsconfig = {
-            config: readTsConfig(tsconfigPath),
-            path: tsconfigPath,
+            config: readTsConfig(rootTsconfigPath),
+            path: rootTsconfigPath,
         };
 
-        logger.info("Using tsconfig settings found at", tsconfigPath);
+        logger.info("Using tsconfig settings at", rootTsconfigPath);
     } else {
         try {
             tsconfig = await findTSConfig(rootDirectory);
@@ -739,17 +742,23 @@ const createBundler = async (
 
         logger.debug("Using package.json found at", packageJsonPath);
 
-        const packemConfigFileName = configPath ?? "./packem.config";
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        const _buildConfig: BuildConfig | BuildConfig[] = tryRequire(packemConfigFileName, rootDirectory, []);
+        const packemConfigFileName = configPath ?? "./packem.config.ts";
 
-        logger.debug("Using packem.config.ts found at", join(rootDirectory, packemConfigFileName));
+        if (!/\.(?:js|mjs|cjs|ts)$/.test(packemConfigFileName)) {
+            logger.error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts extensions are allowed.");
+
+            exit(1);
+        }
+
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        const _buildConfig = tryRequire<BuildConfig | BuildConfig[]>(packemConfigFileName, rootDirectory);
+
+        logger.debug("Using packem config found at", join(rootDirectory, packemConfigFileName));
 
         const buildConfigs = (Array.isArray(_buildConfig) ? _buildConfig : [_buildConfig]).filter(Boolean);
         const start = Date.now();
 
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        const getDuration = () => Math.floor(Date.now() - start) + "ms";
+        const getDuration = () => duration(Math.floor(Date.now() - start));
 
         let buildPreset = packageJson.packem?.preset ?? inputConfig.preset ?? "auto";
 
@@ -771,7 +780,7 @@ const createBundler = async (
 
         await Promise.all(builds);
 
-        logger.raw(`\n⚡️ Build run in ${getDuration()}`);
+        logger.raw("\n⚡️ Build" + (builds.length > 1 ? "s" : "") + " run in " + getDuration());
 
         // Restore all wrapped console methods
         logger.restoreAll();

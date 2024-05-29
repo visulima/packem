@@ -8,50 +8,49 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, streamToString } from "../helpers";
 
 describe("packem alias", () => {
-    let distribution: string;
+    let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
-        distribution = temporaryDirectory();
+        temporaryDirectoryPath = temporaryDirectory();
     });
 
     afterEach(async () => {
-        await rm(distribution, { recursive: true });
+        await rm(temporaryDirectoryPath, { recursive: true });
     });
 
     it("should not trigger a warning if alias option is used", async () => {
         expect.assertions(4);
 
         writeFileSync(
-            `${distribution}/src/index.ts`,
+            `${temporaryDirectoryPath}/src/index.ts`,
             `import { log } from "@/test/logger";
 
 export default log();`,
         );
-        writeFileSync(`${distribution}/src/test/logger.ts`, `export const log = () => console.log("test");`);
-        createPackageJson(distribution, {
+        writeFileSync(`${temporaryDirectoryPath}/src/test/logger.ts`, `export const log = () => console.log("test");`);
+        createPackageJson(temporaryDirectoryPath, {
             main: "./dist/index.cjs",
             type: "commonjs",
         });
-        createTsConfig(distribution, { compilerOptions: { rootDir: "./src" } });
-        createPackemConfig(distribution, {
+        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        createPackemConfig(temporaryDirectoryPath, {
             alias: {
-                "@/test/*": resolve(distribution, "src/test"),
+                "@/test/*": resolve(temporaryDirectoryPath, "src/test"),
             },
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+            cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stdout)).resolves.toBe("");
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${distribution}/dist/importer.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.mjs`);
 
         expect(mjsContent).toMatchSnapshot("mjs content");
 
-        const cjsContent = readFileSync(`${distribution}/dist/importer.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.cjs`);
 
         expect(cjsContent).toMatchSnapshot("cjs content");
     });

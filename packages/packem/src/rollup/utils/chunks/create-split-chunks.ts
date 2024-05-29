@@ -77,7 +77,6 @@ const createSplitChunks = (dependencyGraphMap: Map<string, Set<[string, string]>
         ) {
             const parentModuleIds = [...dependencyGraphMap.get(id)!];
             const isImportFromOtherEntry = parentModuleIds.some(([id]) => {
-                console.log(id);
                 // If other entry is dependency of this entry
                 if (entryFiles.some((entry) => entry.path === id)) {
                     const entryModuleInfo = context.getModuleInfo(id);

@@ -7,46 +7,46 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { execPackemSync, installPackage, streamToString } from "../helpers";
 
 describe("packem preserve-directives", () => {
-    let distribution: string;
+    let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
-        distribution = temporaryDirectory();
+        temporaryDirectoryPath = temporaryDirectory();
     });
 
     afterEach(async () => {
-        await rm(distribution, { recursive: true });
+        await rm(temporaryDirectoryPath, { recursive: true });
     });
 
     it("should preserve user added shebang", async () => {
         expect.assertions(4);
 
         writeFileSync(
-            `${distribution}/src/index.ts`,
+            `${temporaryDirectoryPath}/src/index.ts`,
             `#!/usr/bin/env node
 console.log("Hello, world!");`,
         );
-        createPackageJson(distribution, {
+        createPackageJson(temporaryDirectoryPath, {
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
+        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`#!/usr/bin/env node
 console.log("Hello, world!");
 `);
 
-        const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`#!/usr/bin/env node
 'use strict';
@@ -58,28 +58,28 @@ console.log("Hello, world!");
     it("should preserve package.json bin added shebang", async () => {
         expect.assertions(4);
 
-        writeFileSync(`${distribution}/src/index.ts`, `console.log("Hello, world!");`);
-        createPackageJson(distribution, {
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `console.log("Hello, world!");`);
+        createPackageJson(temporaryDirectoryPath, {
             bin: "./dist/index.cjs",
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
+        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`#!/usr/bin/env node
 console.log("Hello, world!");
 `);
 
-        const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`#!/usr/bin/env node
 'use strict';
@@ -92,14 +92,14 @@ console.log("Hello, world!");
         expect.assertions(7);
 
         writeFileSync(
-            `${distribution}/src/index.tsx`,
+            `${temporaryDirectoryPath}/src/index.tsx`,
             `"use client";
 
 const Tr = () => (<tr className={"m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20"} />);
 
 export default Tr;`,
         );
-        createPackageJson(distribution, {
+        createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 react: "^18.2.0",
                 "react-dom": "^18.2.0",
@@ -114,25 +114,25 @@ export default Tr;`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, {
+        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
             compilerOptions: {
                 jsx: "react-jsx",
                 moduleResolution: "bundler",
             },
         });
 
-        await installPackage(distribution, "typescript");
-        await installPackage(distribution, "react");
-        await installPackage(distribution, "react-dom");
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await installPackage(temporaryDirectoryPath, "react");
+        await installPackage(temporaryDirectoryPath, "react-dom");
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`'use client';
 import { jsx } from 'react/jsx-runtime';
@@ -144,7 +144,7 @@ const Tr = /* @__PURE__ */ __name(() => jsx("tr", { className: "m-0 border-t bor
 export { Tr as default };
 `);
 
-        const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use client';
 'use strict';
@@ -157,21 +157,21 @@ const Tr = /* @__PURE__ */ __name(() => jsxRuntime.jsx("tr", { className: "m-0 b
 
 module.exports = Tr;
 `);
-        const dCtsContent = readFileSync(`${distribution}/dist/index.d.cts`);
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare const Tr: () => any;
 
 export { Tr as default };
 `);
 
-        const dMtsContent = readFileSync(`${distribution}/dist/index.d.mts`);
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare const Tr: () => any;
 
 export { Tr as default };
 `);
 
-        const dContent = readFileSync(`${distribution}/dist/index.d.ts`);
+        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dContent).toBe(`declare const Tr: () => any;
 
@@ -183,12 +183,12 @@ export { Tr as default };
         expect.assertions(6);
 
         writeFileSync(
-            `${distribution}/src/cli.ts`,
+            `${temporaryDirectoryPath}/src/cli.ts`,
             `#!/usr/bin/env node
 console.log("Hello, cli!");`,
         );
-        writeFileSync(`${distribution}/src/index.ts`, `export const foo = 'foo';`);
-        createPackageJson(distribution, {
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const foo = 'foo';`);
+        createPackageJson(temporaryDirectoryPath, {
             bin: {
                 packem: "./dist/cli.cjs",
             },
@@ -197,23 +197,23 @@ console.log("Hello, cli!");`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
+        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`const foo = "foo";
 
 export { foo };
 `);
 
-        const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -222,14 +222,14 @@ const foo = "foo";
 exports.foo = foo;
 `);
 
-        const cjsCliContent = readFileSync(`${distribution}/dist/cli.cjs`);
+        const cjsCliContent = readFileSync(`${temporaryDirectoryPath}/dist/cli.cjs`);
 
         expect(cjsCliContent).toBe(`#!/usr/bin/env node
 'use strict';
 
 console.log("Hello, cli!");
 `);
-        const dtsContent = readFileSync(`${distribution}/dist/cli.d.ts`);
+        const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/cli.d.ts`);
 
         expect(dtsContent).toBe(`\n`);
     });
@@ -237,21 +237,21 @@ console.log("Hello, cli!");
     it("should merge duplicated directives from many files", async () => {
         expect.assertions(4);
 
-        writeFileSync(`${distribution}/src/bar.ts`, `'use client';export const bar = 'bar';`);
+        writeFileSync(`${temporaryDirectoryPath}/src/bar.ts`, `'use client';export const bar = 'bar';`);
         writeFileSync(
-            `${distribution}/src/foo.ts`,
+            `${temporaryDirectoryPath}/src/foo.ts`,
             `"use client";
 'use sukka';
 
 export const foo = 'foo';`,
         );
         writeFileSync(
-            `${distribution}/src/index.ts`,
+            `${temporaryDirectoryPath}/src/index.ts`,
             `export { foo } from './foo';
 export { bar } from './bar';
 export const baz = 'baz';`,
         );
-        createPackageJson(distribution, {
+        createPackageJson(temporaryDirectoryPath, {
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             packem: {
@@ -264,16 +264,16 @@ export const baz = 'baz';`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
+        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`'use client';
 'use sukka';
@@ -286,7 +286,7 @@ const baz = "baz";
 export { bar, baz, foo };
 `);
 
-        const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use client';
 'use sukka';

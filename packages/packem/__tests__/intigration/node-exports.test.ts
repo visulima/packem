@@ -7,43 +7,43 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { execPackemSync, streamToString } from "../helpers";
 
 describe("packem node exports", () => {
-    let distribution: string;
+    let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
-        distribution = temporaryDirectory();
+        temporaryDirectoryPath = temporaryDirectory();
     });
 
     afterEach(async () => {
-        await rm(distribution, { recursive: true });
+        await rm(temporaryDirectoryPath, { recursive: true });
     });
 
     it("should output 'default export' correctly", async () => {
         expect.assertions(7);
 
-        writeFileSync(`${distribution}/src/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
-        createPackageJson(distribution, {
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
+        createPackageJson(temporaryDirectoryPath, {
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
+        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`const test = "this should be in final bundle";
 
 export { test as default };
 `);
 
-        const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -52,21 +52,21 @@ const test = "this should be in final bundle";
 module.exports = test;
 `);
 
-        const dCtsContent = readFileSync(`${distribution}/dist/index.d.cts`);
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare const test = "this should be in final bundle";
 
 export { test as default };
 `);
 
-        const dMtsContent = readFileSync(`${distribution}/dist/index.d.mts`);
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare const test = "this should be in final bundle";
 
 export { test as default };
 `);
 
-        const dContent = readFileSync(`${distribution}/dist/index.d.ts`);
+        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dContent).toBe(`declare const test = "this should be in final bundle";
 
@@ -78,24 +78,24 @@ export { test as default };
         it("should output 'default export' correctly and dont transform dts when cjsInterop", async () => {
             expect.assertions(7);
 
-            writeFileSync(`${distribution}/src/index.ts`, `const test = () => "this should be in final bundle";\nexport default test;`);
-            createPackageJson(distribution, {
+            writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `const test = () => "this should be in final bundle";\nexport default test;`);
+            createPackageJson(temporaryDirectoryPath, {
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
                 type: "commonjs",
                 types: "./dist/index.d.ts",
             });
-            writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
+            writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
             const binProcess = execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
-                cwd: distribution,
+                cwd: temporaryDirectoryPath,
                 nodePath,
             });
 
             await expect(streamToString(binProcess.stderr)).resolves.toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+            const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
             expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -104,7 +104,7 @@ const test = /* @__PURE__ */ __name(() => "this should be in final bundle", "tes
 export { test as default };
 `);
 
-            const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+            const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
             expect(cjsContent).toBe(`'use strict';
 
@@ -114,7 +114,7 @@ const test = /* @__PURE__ */ __name(() => "this should be in final bundle", "tes
 
 module.exports = test;
 `);
-            const dCtsContent = readFileSync(`${distribution}/dist/index.d.cts`);
+            const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
             expect(dCtsContent).toBe(`declare const test: () => string;
 
@@ -127,14 +127,14 @@ declare const defaultExport: {
 export default defaultExport;
 `);
 
-            const dMtsContent = readFileSync(`${distribution}/dist/index.d.mts`);
+            const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
             expect(dMtsContent).toBe(`declare const test: () => string;
 
 export { test as default };
 `);
 
-            const dContent = readFileSync(`${distribution}/dist/index.d.ts`);
+            const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
             expect(dContent).toBe(`declare const test: () => string;
 
@@ -152,7 +152,7 @@ export default defaultExport;
             expect.assertions(7);
 
             writeFileSync(
-                `${distribution}/src/index.ts`,
+                `${temporaryDirectoryPath}/src/index.ts`,
                 `const test = () => {
     return "this should be in final bundle";
 };
@@ -161,23 +161,23 @@ const test2 = "this should be in final bundle";
 
 export { test2, test as default };`,
             );
-            createPackageJson(distribution, {
+            createPackageJson(temporaryDirectoryPath, {
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
                 type: "commonjs",
                 types: "./dist/index.d.ts",
             });
-            writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
+            writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
             const binProcess = execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
-                cwd: distribution,
+                cwd: temporaryDirectoryPath,
                 nodePath,
             });
 
             await expect(streamToString(binProcess.stderr)).resolves.toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+            const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
             expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -189,7 +189,7 @@ const test2 = "this should be in final bundle";
 export { test as default, test2 };
 `);
 
-            const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+            const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
             expect(cjsContent).toBe(`'use strict';
 
@@ -206,7 +206,7 @@ module.exports = test;
 module.exports.test2 = test2;
 `);
 
-            const dCtsContent = readFileSync(`${distribution}/dist/index.d.cts`);
+            const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
             expect(dCtsContent).toBe(`declare const test: () => string;
 declare const test2 = "this should be in final bundle";
@@ -220,14 +220,14 @@ declare const defaultExport: {
 export default defaultExport;
 `);
 
-            const dMtsContent = readFileSync(`${distribution}/dist/index.d.mts`);
+            const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
             expect(dMtsContent).toBe(`declare const test: () => string;
 declare const test2 = "this should be in final bundle";
 
 export { test as default, test2 };
 `);
-            const dContent = readFileSync(`${distribution}/dist/index.d.ts`);
+            const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
             expect(dContent).toBe(`declare const test: () => string;
 declare const test2 = "this should be in final bundle";
@@ -246,7 +246,7 @@ export default defaultExport;
             expect.assertions(7);
 
             writeFileSync(
-                `${distribution}/src/index.ts`,
+                `${temporaryDirectoryPath}/src/index.ts`,
                 `const test = () => {
     return "this should be in final bundle";
 };
@@ -258,23 +258,23 @@ const test5 = "this should be in final bundle";
 
 export { test2, test3, test4, test5, test as default };`,
             );
-            createPackageJson(distribution, {
+            createPackageJson(temporaryDirectoryPath, {
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
                 type: "commonjs",
                 types: "./dist/index.d.ts",
             });
-            writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
+            writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
             const binProcess = execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
-                cwd: distribution,
+                cwd: temporaryDirectoryPath,
                 nodePath,
             });
 
             await expect(streamToString(binProcess.stderr)).resolves.toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+            const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
             expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -289,7 +289,7 @@ const test5 = "this should be in final bundle";
 export { test as default, test2, test3, test4, test5 };
 `);
 
-            const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+            const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
             expect(cjsContent).toBe(`'use strict';
 
@@ -312,7 +312,7 @@ module.exports.test4 = test4;
 module.exports.test5 = test5;
 `);
 
-            const dCtsContent = readFileSync(`${distribution}/dist/index.d.cts`);
+            const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
             expect(dCtsContent).toBe(`declare const test: () => string;
 declare const test2 = "this should be in final bundle";
@@ -331,7 +331,7 @@ declare const defaultExport: {
 
 export default defaultExport;
 `);
-            const dMtsContent = readFileSync(`${distribution}/dist/index.d.mts`);
+            const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
             expect(dMtsContent).toBe(`declare const test: () => string;
 declare const test2 = "this should be in final bundle";
@@ -341,7 +341,7 @@ declare const test5 = "this should be in final bundle";
 
 export { test as default, test2, test3, test4, test5 };
 `);
-            const dContent = readFileSync(`${distribution}/dist/index.d.ts`);
+            const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
             expect(dContent).toBe(`declare const test: () => string;
 declare const test2 = "this should be in final bundle";
@@ -366,30 +366,30 @@ export default defaultExport;
     it("should output 'default export' for nested folder correctly", async () => {
         expect.assertions(7);
 
-        writeFileSync(`${distribution}/src/test/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
-        createPackageJson(distribution, {
+        writeFileSync(`${temporaryDirectoryPath}/src/test/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
+        createPackageJson(temporaryDirectoryPath, {
             main: "./dist/test/index.cjs",
             module: "./dist/test/index.mjs",
             type: "commonjs",
             types: "./dist/test/index.d.ts",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
+        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${distribution}/dist/test/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.mjs`);
 
         expect(mjsContent).toBe(`const test = "this should be in final bundle";
 
 export { test as default };
 `);
 
-        const cjsContent = readFileSync(`${distribution}/dist/test/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -397,21 +397,21 @@ const test = "this should be in final bundle";
 
 module.exports = test;
 `);
-        const dCtsContent = readFileSync(`${distribution}/dist/test/index.d.cts`);
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare const test = "this should be in final bundle";
 
 export { test as default };
 `);
 
-        const dMtsContent = readFileSync(`${distribution}/dist/test/index.d.mts`);
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare const test = "this should be in final bundle";
 
 export { test as default };
 `);
 
-        const dContent = readFileSync(`${distribution}/dist/test/index.d.ts`);
+        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.d.ts`);
 
         expect(dContent).toBe(`declare const test = "this should be in final bundle";
 
@@ -423,14 +423,14 @@ export { test as default };
         expect.assertions(7);
 
         writeFileSync(
-            `${distribution}/src/index.ts`,
+            `${temporaryDirectoryPath}/src/index.ts`,
             `import a from 'peer-dep'
 import b from 'peer-dep-meta'
 
 export default a + b
 `,
         );
-        createPackageJson(distribution, {
+        createPackageJson(temporaryDirectoryPath, {
             exports: "./dist/index.js",
             peerDependencies: {
                 "peer-dep": "*",
@@ -443,20 +443,20 @@ export default a + b
         });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`const test = "this should be in final bundle";
 
 export { test as default };
 `);
 
-        const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -465,21 +465,21 @@ const test = "this should be in final bundle";
 module.exports = test;
 `);
 
-        const dCtsContent = readFileSync(`${distribution}/dist/index.d.cts`);
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare const test = "this should be in final bundle";
 
 export { test as default };
 `);
 
-        const dMtsContent = readFileSync(`${distribution}/dist/index.d.mts`);
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare const test = "this should be in final bundle";
 
 export { test as default };
 `);
 
-        const dContent = readFileSync(`${distribution}/dist/index.d.ts`);
+        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dContent).toBe(`declare const test = "this should be in final bundle";
 
@@ -491,14 +491,14 @@ export { test as default };
         expect.assertions(3);
 
         writeFileSync(
-            `${distribution}/src/index.js`,
+            `${temporaryDirectoryPath}/src/index.js`,
             `import { dep } from '#dep'
 
 export const value = dep
 `,
         );
-        writeFileSync(`${distribution}/src/lib/polyfill.js`, `export const dep = 'polyfill-dep'`);
-        createPackageJson(distribution, {
+        writeFileSync(`${temporaryDirectoryPath}/src/lib/polyfill.js`, `export const dep = 'polyfill-dep'`);
+        createPackageJson(temporaryDirectoryPath, {
             exports: "./dist/index.js",
             imports: {
                 "#dep": "./src/lib/polyfill.js",
@@ -506,13 +506,13 @@ export const value = dep
         });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(`${distribution}/dist/index.js`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -528,7 +528,7 @@ exports.value = value;
         expect.assertions(7);
 
         writeFileSync(
-            `${distribution}/src/index.ts`,
+            `${temporaryDirectoryPath}/src/index.ts`,
             `class Parent {
   constructor() {}
 }
@@ -549,22 +549,22 @@ export class Child extends Parent {
   }
 }`,
         );
-        createPackageJson(distribution, {
+        createPackageJson(temporaryDirectoryPath, {
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, {});
+        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -597,7 +597,7 @@ class Child extends Parent {
 export { Child };
 `);
 
-        const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -632,7 +632,7 @@ class Child extends Parent {
 exports.Child = Child;
 `);
 
-        const dCtsContent = readFileSync(`${distribution}/dist/index.d.cts`);
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare class Parent {
     constructor();
@@ -648,7 +648,7 @@ declare class Child extends Parent {
 export { Child };
 `);
 
-        const dMtsContent = readFileSync(`${distribution}/dist/index.d.mts`);
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare class Parent {
     constructor();
@@ -664,7 +664,7 @@ declare class Child extends Parent {
 export { Child };
 `);
 
-        const dContent = readFileSync(`${distribution}/dist/index.d.ts`);
+        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dContent).toBe(`declare class Parent {
     constructor();
@@ -685,7 +685,7 @@ export { Child };
         expect.assertions(7);
 
         writeFileSync(
-            `${distribution}/src/index.ts`,
+            `${temporaryDirectoryPath}/src/index.ts`,
             `class Parent {
   constructor() {}
 }
@@ -706,34 +706,34 @@ export class Child extends Parent {
   }
 }`,
         );
-        createPackageJson(distribution, {
+        createPackageJson(temporaryDirectoryPath, {
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${distribution}/tsconfig.json`, {});
+        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=production", "--minify"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent)
             .toBe(`var c=Object.defineProperty;var e=(t,s)=>c(t,"name",{value:s,configurable:!0});var o=Object.defineProperty,r=e((t,s)=>o(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{r(this,"Parent")}constructor(){}}class l{static{e(this,"c")}static{r(this,"Feature")}constructor(){}}class n extends a{static{e(this,"Child")}static{r(this,"Child")}feature=new l;constructor(){console.log("before"),super(),console.log("after")}}export{n as Child};
 `);
 
-        const cjsContent = readFileSync(`${distribution}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent)
             .toBe(`"use strict";var r=Object.defineProperty;var e=(t,s)=>r(t,"name",{value:s,configurable:!0});var o=Object.defineProperty,c=e((t,s)=>o(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{c(this,"Parent")}constructor(){}}class i{static{e(this,"c")}static{c(this,"Feature")}constructor(){}}class l extends a{static{e(this,"Child")}static{c(this,"Child")}feature=new i;constructor(){console.log("before"),super(),console.log("after")}}exports.Child=l;
 `);
 
-        const dCtsContent = readFileSync(`${distribution}/dist/index.d.cts`);
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare class Parent {
     constructor();
@@ -749,7 +749,7 @@ declare class Child extends Parent {
 export { Child };
 `);
 
-        const dMtsContent = readFileSync(`${distribution}/dist/index.d.mts`);
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare class Parent {
     constructor();
@@ -765,7 +765,7 @@ declare class Child extends Parent {
 export { Child };
 `);
 
-        const dContent = readFileSync(`${distribution}/dist/index.d.ts`);
+        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dContent).toBe(`declare class Parent {
     constructor();

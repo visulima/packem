@@ -7,33 +7,33 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { execPackemSync, streamToString } from "../helpers";
 
 describe("packem shims", () => {
-    let distribution: string;
+    let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
-        distribution = temporaryDirectory();
+        temporaryDirectoryPath = temporaryDirectory();
     });
 
     afterEach(async () => {
-        await rm(distribution, { recursive: true });
+        await rm(temporaryDirectoryPath, { recursive: true });
     });
 
     it("should include esm shim, if dirname, filename or require are found", async () => {
         expect.assertions(8);
 
         writeFileSync(
-            `${distribution}/src/dirname.js`,
+            `${temporaryDirectoryPath}/src/dirname.js`,
             `export function getDirname() {
   return __dirname
 }`,
         );
         writeFileSync(
-            `${distribution}/src/filename.js`,
+            `${temporaryDirectoryPath}/src/filename.js`,
             `export function getFilename() {
   return __filename
 }`,
         );
         writeFileSync(
-            `${distribution}/src/require.js`,
+            `${temporaryDirectoryPath}/src/require.js`,
             `export function getRequireModule() {
   return require('node:fs')
 }
@@ -42,7 +42,7 @@ export function esmImport() {
   return import.meta.url
 }`,
         );
-        createPackageJson(distribution, {
+        createPackageJson(temporaryDirectoryPath, {
             exports: {
                 "./dirname": {
                     import: "./dist/dirname.mjs",
@@ -60,13 +60,13 @@ export function esmImport() {
         });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsDirnameContent = readFileSync(`${distribution}/dist/dirname.mjs`);
+        const mjsDirnameContent = readFileSync(`${temporaryDirectoryPath}/dist/dirname.mjs`);
 
         expect(mjsDirnameContent).toBe(`
 // -- pack CommonJS Shims --
@@ -86,7 +86,7 @@ __name(getDirname, "getDirname");
 export { getDirname };
 `);
 
-        const cjsDirnameContent = readFileSync(`${distribution}/dist/dirname.cjs`);
+        const cjsDirnameContent = readFileSync(`${temporaryDirectoryPath}/dist/dirname.cjs`);
 
         expect(cjsDirnameContent).toBe(`'use strict';
 
@@ -100,7 +100,7 @@ __name(getDirname, "getDirname");
 exports.getDirname = getDirname;
 `);
 
-        const mjsFilenameContent = readFileSync(`${distribution}/dist/filename.mjs`);
+        const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.mjs`);
 
         expect(mjsFilenameContent).toBe(`
 // -- pack CommonJS Shims --
@@ -120,7 +120,7 @@ __name(getFilename, "getFilename");
 export { getFilename };
 `);
 
-        const cjsFilenameContent = readFileSync(`${distribution}/dist/filename.cjs`);
+        const cjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.cjs`);
 
         expect(cjsFilenameContent).toBe(`'use strict';
 
@@ -134,7 +134,7 @@ __name(getFilename, "getFilename");
 exports.getFilename = getFilename;
 `);
 
-        const mjsRequireContent = readFileSync(`${distribution}/dist/require.mjs`);
+        const mjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.mjs`);
 
         expect(mjsRequireContent).toBe(`
 // -- pack CommonJS Shims --
@@ -158,7 +158,7 @@ __name(esmImport, "esmImport");
 export { esmImport, getRequireModule };
 `);
 
-        const cjsRequireContent = readFileSync(`${distribution}/dist/require.cjs`);
+        const cjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.cjs`);
 
         expect(cjsRequireContent).toBe(`'use strict';
 
@@ -183,19 +183,19 @@ exports.getRequireModule = getRequireModule;
         expect.assertions(8);
 
         writeFileSync(
-            `${distribution}/src/dirname.js`,
+            `${temporaryDirectoryPath}/src/dirname.js`,
             `export function getDirname() {
   return __dirname
 }`,
         );
         writeFileSync(
-            `${distribution}/src/filename.js`,
+            `${temporaryDirectoryPath}/src/filename.js`,
             `export function getFilename() {
   return __filename
 }`,
         );
         writeFileSync(
-            `${distribution}/src/require.js`,
+            `${temporaryDirectoryPath}/src/require.js`,
             `export function getRequireModule() {
   return require('node:fs')
 }
@@ -204,7 +204,7 @@ export function esmImport() {
   return import.meta.url
 }`,
         );
-        createPackageJson(distribution, {
+        createPackageJson(temporaryDirectoryPath, {
             engines: {
                 node: "20.11",
             },
@@ -225,13 +225,13 @@ export function esmImport() {
         });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsDirnameContent = readFileSync(`${distribution}/dist/dirname.mjs`);
+        const mjsDirnameContent = readFileSync(`${temporaryDirectoryPath}/dist/dirname.mjs`);
 
         expect(mjsDirnameContent).toBe(`
 // -- pack CommonJS Shims Node 20.11 --
@@ -249,7 +249,7 @@ __name(getDirname, "getDirname");
 export { getDirname };
 `);
 
-        const cjsDirnameContent = readFileSync(`${distribution}/dist/dirname.cjs`);
+        const cjsDirnameContent = readFileSync(`${temporaryDirectoryPath}/dist/dirname.cjs`);
 
         expect(cjsDirnameContent).toBe(`'use strict';
 
@@ -263,7 +263,7 @@ __name(getDirname, "getDirname");
 exports.getDirname = getDirname;
 `);
 
-        const mjsFilenameContent = readFileSync(`${distribution}/dist/filename.mjs`);
+        const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.mjs`);
 
         expect(mjsFilenameContent).toBe(`
 // -- pack CommonJS Shims Node 20.11 --
@@ -281,7 +281,7 @@ __name(getFilename, "getFilename");
 export { getFilename };
 `);
 
-        const cjsFilenameContent = readFileSync(`${distribution}/dist/filename.cjs`);
+        const cjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.cjs`);
 
         expect(cjsFilenameContent).toBe(`'use strict';
 
@@ -295,7 +295,7 @@ __name(getFilename, "getFilename");
 exports.getFilename = getFilename;
 `);
 
-        const mjsRequireContent = readFileSync(`${distribution}/dist/require.mjs`);
+        const mjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.mjs`);
 
         expect(mjsRequireContent).toBe(`
 // -- pack CommonJS Shims Node 20.11 --
@@ -317,7 +317,7 @@ __name(esmImport, "esmImport");
 export { esmImport, getRequireModule };
 `);
 
-        const cjsRequireContent = readFileSync(`${distribution}/dist/require.cjs`);
+        const cjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.cjs`);
 
         expect(cjsRequireContent).toBe(`'use strict';
 
@@ -341,20 +341,20 @@ exports.getRequireModule = getRequireModule;
     it("should not include esm shim, if dirname, filename or require are not found", async () => {
         expect.assertions(3);
 
-        writeFileSync(`${distribution}/src/index.js`, `const test = "this should be in final bundle";\nexport default test;`);
-        createPackageJson(distribution, {
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `const test = "this should be in final bundle";\nexport default test;`);
+        createPackageJson(temporaryDirectoryPath, {
             module: "./dist/index.mjs",
             type: "module",
         });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`const test = "this should be in final bundle";
 
@@ -366,32 +366,32 @@ export { test as default };
         expect.assertions(4);
 
         writeFileSync(
-            `${distribution}/src/filename.js`,
+            `${temporaryDirectoryPath}/src/filename.js`,
             `export function getFilename() {
   return __filename
 }`,
         );
         writeFileSync(
-            `${distribution}/src/index.js`,
+            `${temporaryDirectoryPath}/src/index.js`,
             `export function getDirname() {
   return __dirname
 }
 
 export { getFilename } from "./filename.js";`,
         );
-        createPackageJson(distribution, {
+        createPackageJson(temporaryDirectoryPath, {
             module: "./dist/index.mjs",
             type: "module",
         });
 
         const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: distribution,
+            cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${distribution}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`
 // -- pack CommonJS Shims --
@@ -413,7 +413,7 @@ __name(getDirname, "getDirname");
 export { getDirname };
 `);
 
-        const mjsFilenameContent = readFileSync(`${distribution}/dist/filename.mjs`);
+        const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.mjs`);
 
         expect(mjsFilenameContent).toBe(`
 // -- pack CommonJS Shims --

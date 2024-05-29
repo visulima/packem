@@ -4,10 +4,9 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { writeFileSync, writeJsonSync } from "@visulima/fs";
-import { type PackageJson, TsConfigJson } from "@visulima/package";
+import type { PackageJson, TsConfigJson } from "@visulima/package";
 import type { Options } from "execa";
 import { execaNode } from "execa";
-import getNode from "get-node";
 
 import type { BuildConfig } from "../src/types";
 
@@ -35,22 +34,8 @@ export const execScriptSync = (file: string, flags: string[] = [], environment: 
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const execPackemSync = (command: "build" | "init", flags: string[] = [], options: Options = {}) =>
-    execaNode(join(distributionPath, "cli.mjs"), [command, ...flags], options);
-
-export const getNodePathList = async (): Promise<string[][]> => {
-    const supportedNode = ["18", "20"];
-    const outputNodes = [];
-
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-    for await (const node of supportedNode) {
-        const nodeBinary = await getNode(node);
-
-        outputNodes.push([nodeBinary.version, nodeBinary.path]);
-    }
-
-    return outputNodes;
-};
+export const execPackemSync = async (command: "build" | "init", flags: string[] = [], options: Options = {}) =>
+    await execaNode(join(distributionPath, "cli.mjs"), [command, ...flags], options);
 
 // @TODO: Fix type
 export const streamToString = async (stream: any): Promise<string> => {
@@ -74,18 +59,20 @@ export const installPackage = async (fixturePath: string, packageName: string): 
     await symlink(resolve("node_modules/" + packageName), join(nodeModulesDirectory, packageName), "dir");
 };
 
-export const createPackemConfig = (fixturePath: string, config: BuildConfig | BuildConfig[], transformer: "esbuild" | "swc" | "sucrase" = "esbuild"): void => {
-    const packemConfigPath = join(fixturePath, "packem.config.ts");
-
+export const createPackemConfig = (
+    fixturePath: string,
+    config: BuildConfig | BuildConfig[] = {},
+    transformer: "esbuild" | "swc" | "sucrase" = "esbuild",
+): void => {
     writeFileSync(
-        packemConfigPath,
-        `import { defineConfig } from "${distributionPath}/dist/config";
-import transformer from "${distributionPath}/dist/rollup/plugins/${transformer}";
+        join(fixturePath, "packem.config.ts"),
+        `import { defineConfig } from "${distributionPath}/config";
+import transformer from "${distributionPath}/rollup/plugins/${transformer}/index";
 
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
-    ${JSON.stringify(config, null, 4).slice(1, -1)},
     transformer,
+    ${JSON.stringify(config, null, 4).slice(1, -1)}
 });
 `,
     );
@@ -93,10 +80,11 @@ export default defineConfig({
 
 export const createPackageJson = (fixturePAth: string, data: PackageJson): void => {
     writeJsonSync(`${fixturePAth}/package.json`, {
+        ...data,
         devDependencies: {
             esbuild: "0.20",
+            ...data.devDependencies,
         },
-        ...data,
     });
 };
 
