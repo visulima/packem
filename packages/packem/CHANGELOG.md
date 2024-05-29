@@ -1,3 +1,11 @@
+## @visulima/packem [1.0.0-alpha.24](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.23...@visulima/packem@1.0.0-alpha.24) (2024-05-29)
+
+
+### Features
+
+* added file cache to rollup, added support of es5 ([c6734ac](https://github.com/visulima/packem/commit/c6734ac079db193d1c88e473cf01361a728c9bdd))
+* added option to disable cache ([9ee5cac](https://github.com/visulima/packem/commit/9ee5cacb3db1f1e59419f5a00f0f245a5be43d3a))
+
 ## @visulima/packem [1.0.0-alpha.23](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.22...@visulima/packem@1.0.0-alpha.23) (2024-05-29)
 
 
