@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.22](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.21...@visulima/packem@1.0.0-alpha.22) (2024-05-29)
+
+
+### Bug Fixes
+
+* fixing tests for check all functions ([786fb37](https://github.com/visulima/packem/commit/786fb378b7cbab3dbb48cdf43561485cdf5436a0))
+
 ## @visulima/packem [1.0.0-alpha.21](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.20...@visulima/packem@1.0.0-alpha.21) (2024-05-28)
 
 
