@@ -16,6 +16,7 @@ import { basename, dirname, isAbsolute, join, normalize, relative, resolve } fro
 import { defu } from "defu";
 import { createHooks } from "hookable";
 
+import packemPackageJson from "../package.json";
 import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP } from "./constants";
 import createStub from "./jit/create-stub";
 import rollupBuild from "./rollup/build";
@@ -23,14 +24,13 @@ import rollupBuildTypes from "./rollup/build-types";
 import rollupWatch from "./rollup/watch";
 import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildOptions, InternalBuildOptions, Mode } from "./types";
 import dumpObject from "./utils/dump-object";
+import FileCache from "./utils/file-cache";
 import getPackageSideEffect from "./utils/get-package-side-effect";
 import removeExtension from "./utils/remove-extension";
 import resolvePreset from "./utils/resolve-preset";
 import tryRequire from "./utils/try-require";
 import validateDependencies from "./validator/validate-dependencies";
 import validatePackage from "./validator/validate-package";
-import FileCache from "./utils/file-cache";
-import packemPackageJson from "../package.json";
 
 type PackEmPackageJson = { packem?: BuildConfig } & PackageJson;
 
@@ -84,6 +84,7 @@ const generateOptions = (
 
     const options = defu(buildConfig, inputConfig, preset, <BuildOptions>{
         alias: {},
+        cache: true,
         clean: true,
         declaration: undefined,
         dependencies: [],
@@ -524,6 +525,9 @@ const build = async (
 
     const options = generateOptions(logger, rootDirectory, mode, inputConfig, buildConfig, preset, packageJson, tsconfig);
 
+    // eslint-disable-next-line no-param-reassign
+    fileCache.isEnabled = options.cache as boolean;
+
     ensureDirSync(options.outDir);
 
     // Build context
@@ -634,7 +638,7 @@ const build = async (
     }
 
     if (mode === "watch") {
-        await rollupWatch(context);
+        await rollupWatch(context, fileCache);
 
         logErrors(context, false);
 

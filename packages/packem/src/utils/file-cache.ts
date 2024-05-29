@@ -10,6 +10,8 @@ class FileCache {
 
     readonly #packemVersion: string;
 
+    #isEnabled = true;
+
     public constructor(cwd: string, packemVersion: string, logger: Pail<never, string>) {
         this.#cachePath = findCacheDirectorySync("visulima-packem", {
             create: true,
@@ -29,7 +31,15 @@ class FileCache {
         }
     }
 
+    public set isEnabled(value: boolean) {
+        this.#isEnabled = value;
+    }
+
     public get(name: string): RollupCache | undefined {
+        if (!this.#isEnabled) {
+            return undefined;
+        }
+
         if (this.#cachePath === undefined) {
             return undefined;
         }
@@ -44,6 +54,10 @@ class FileCache {
     }
 
     public set(name: string, data: RollupCache | undefined): void {
+        if (!this.#isEnabled) {
+            return;
+        }
+
         if (this.#cachePath === undefined || data === undefined) {
             return;
         }

@@ -91,6 +91,7 @@ export type BuildEntry = {
 
 export interface BuildOptions {
     alias: Record<string, string>;
+    cache?: boolean;
     cjsInterop?: boolean;
     clean: boolean;
     /**
