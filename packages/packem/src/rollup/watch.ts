@@ -5,6 +5,7 @@ import type { RollupWatcher, RollupWatcherEvent } from "rollup";
 import { watch as rollupWatch } from "rollup";
 
 import type { BuildContext } from "../types";
+import type FileCache from "../utils/file-cache";
 import { getRollupDtsOptions, getRollupOptions } from "./get-rollup-options";
 
 const watchHandler = (watcher: RollupWatcher, mode: "bundle" | "types", logger: Pail<never, string>) => {
@@ -42,7 +43,7 @@ const watchHandler = (watcher: RollupWatcher, mode: "bundle" | "types", logger: 
     });
 };
 
-const watch = async (context: BuildContext): Promise<void> => {
+const watch = async (context: BuildContext, fileCache: FileCache): Promise<void> => {
     const rollupOptions = await getRollupOptions(context);
 
     await context.hooks.callHook("rollup:options", context, rollupOptions);
@@ -50,6 +51,8 @@ const watch = async (context: BuildContext): Promise<void> => {
     if (Object.keys(rollupOptions.input as any).length === 0) {
         return;
     }
+
+    rollupOptions.cache = fileCache.get("rollup-watch");
 
     const watcher = rollupWatch(rollupOptions);
 

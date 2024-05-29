@@ -29,6 +29,8 @@ import resolvePreset from "./utils/resolve-preset";
 import tryRequire from "./utils/try-require";
 import validateDependencies from "./validator/validate-dependencies";
 import validatePackage from "./validator/validate-package";
+import FileCache from "./utils/file-cache";
+import packemPackageJson from "../package.json";
 
 type PackEmPackageJson = { packem?: BuildConfig } & PackageJson;
 
@@ -514,6 +516,7 @@ const build = async (
     buildConfig: BuildConfig,
     packageJson: PackEmPackageJson,
     tsconfig: TsConfigResult | undefined,
+    fileCache: FileCache,
     cleanedDirectories: string[],
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
@@ -638,7 +641,7 @@ const build = async (
         return;
     }
 
-    await Promise.all([rollupBuild(context), context.options.declaration && rollupBuildTypes(context)]);
+    await Promise.all([rollupBuild(context, fileCache), context.options.declaration && rollupBuildTypes(context, fileCache)]);
 
     logger.success(green(`Build succeeded for ${context.options.name}`));
 
@@ -698,7 +701,7 @@ const createBundler = async (
         scope: "packem",
     });
 
-    logger.wrapAll();
+    // logger.wrapAll();
 
     // Determine rootDirectory
     // eslint-disable-next-line no-param-reassign
@@ -762,9 +765,11 @@ const createBundler = async (
 
         const builds: Promise<void>[] = [];
 
+        const fileCache = new FileCache(rootDirectory, packemPackageJson.version, logger);
+
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const buildConfig of buildConfigs) {
-            builds.push(build(logger, rootDirectory, mode, restInputConfig, buildConfig, packageJson as PackEmPackageJson, tsconfig, cleanedDirectories));
+            builds.push(build(logger, rootDirectory, mode, restInputConfig, buildConfig, packageJson as PackEmPackageJson, tsconfig, fileCache, cleanedDirectories));
         }
 
         await Promise.all(builds);

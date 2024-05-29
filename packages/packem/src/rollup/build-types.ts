@@ -2,10 +2,11 @@ import { resolve } from "@visulima/path";
 import { rollup } from "rollup";
 
 import type { BuildContext } from "../types";
+import type FileCache from "../utils/file-cache";
 import { getRollupDtsOptions } from "./get-rollup-options";
 import getChunkFilename from "./utils/get-chunk-filename";
 
-const buildTypes = async (context: BuildContext): Promise<void> => {
+const buildTypes = async (context: BuildContext, fileCache: FileCache): Promise<void> => {
     const rollupTypeOptions = await getRollupDtsOptions(context);
 
     await context.hooks.callHook("rollup:dts:options", context, rollupTypeOptions);
@@ -15,7 +16,11 @@ const buildTypes = async (context: BuildContext): Promise<void> => {
         return;
     }
 
+    rollupTypeOptions.cache = fileCache.get("rollup-dts");
+
     const typesBuild = await rollup(rollupTypeOptions);
+
+    fileCache.set("rollup-dts", typesBuild.cache);
 
     await context.hooks.callHook("rollup:dts:build", context, typesBuild);
 
