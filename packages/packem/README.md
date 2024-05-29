@@ -43,9 +43,9 @@ pnpm add @visulima/packem
 
 You choose which one of the three supported transformer to use.
 
-- [esbuild](https://github.com/evanw/esbuild)
-- [@swc/core](https://github.com/swc-project/swc)
-- [sucrase](https://github.com/alangpierce/sucrase)
+-   [esbuild](https://github.com/evanw/esbuild)
+-   [@swc/core](https://github.com/swc-project/swc)
+-   [sucrase](https://github.com/alangpierce/sucrase)
 
 ## Usage
 
@@ -90,4 +90,3 @@ The visulima pack is open-sourced software licensed under the [MIT][license-url]
 [license-url]: LICENSE.md "license"
 [npm-image]: https://img.shields.io/npm/v/@visulima/packem/latest.svg?style=for-the-badge&logo=npm
 [npm-url]: https://www.npmjs.com/package/@visulima/packem/v/latest "npm"
-

@@ -773,7 +773,9 @@ const createBundler = async (
 
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const buildConfig of buildConfigs) {
-            builds.push(build(logger, rootDirectory, mode, restInputConfig, buildConfig, packageJson as PackEmPackageJson, tsconfig, fileCache, cleanedDirectories));
+            builds.push(
+                build(logger, rootDirectory, mode, restInputConfig, buildConfig, packageJson as PackEmPackageJson, tsconfig, fileCache, cleanedDirectories),
+            );
         }
 
         await Promise.all(builds);

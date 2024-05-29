@@ -30,11 +30,11 @@ describe("packem typescript", () => {
         );
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
-                "typescript": "5"
+                typescript: "5",
             },
             module: "dist/index.mjs",
             type: "module",
-            types: "dist/index.d.ts"
+            types: "dist/index.d.ts",
         });
         createPackemConfig(temporaryDirectoryPath);
 

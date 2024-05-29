@@ -118,7 +118,7 @@ export const license = ({
             if (dependencyLicenseTexts === "") {
                 logger.info({
                     message: "No dependencies license information found.",
-                    prefix: 'plugin:license:' + mode,
+                    prefix: "plugin:license:" + mode,
                 });
 
                 return;
@@ -134,7 +134,7 @@ export const license = ({
                 if (!content) {
                     logger.error({
                         message: `Could not find the license marker: <!-- ${marker} --> in ${licenseFilePath}`,
-                        prefix: 'plugin:license:' + mode,
+                        prefix: "plugin:license:" + mode,
                     });
 
                     return;
@@ -145,7 +145,7 @@ export const license = ({
 
                     logger.info({
                         message: `${licenseFilePath} updated.`,
-                        prefix: 'plugin:license:' + mode,
+                        prefix: "plugin:license:" + mode,
                     });
                 }
             } catch (error) {

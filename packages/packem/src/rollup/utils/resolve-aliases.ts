@@ -40,7 +40,7 @@ const resolveAliases = (context: BuildContext, mode: "build" | "jit" | "types"):
         if (Array.isArray(context.options.rollup.alias.entries)) {
             Object.assign(aliases, Object.fromEntries(context.options.rollup.alias.entries.map((entry) => [entry.find, entry.replacement])));
         } else {
-            Object.assign(aliases, context.options.rollup.alias.entries || context.options.rollup.alias);
+            Object.assign(aliases, context.options.rollup.alias.entries ?? context.options.rollup.alias);
         }
     }
 

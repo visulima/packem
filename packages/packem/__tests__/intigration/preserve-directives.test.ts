@@ -4,14 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import {
-    createPackageJson,
-    createPackemConfig,
-    createTsConfig,
-    execPackemSync,
-    installPackage,
-    streamToString
-} from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage, streamToString } from "../helpers";
 
 describe("packem preserve-directives", () => {
     let temporaryDirectoryPath: string;
@@ -19,7 +12,7 @@ describe("packem preserve-directives", () => {
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
 
-        createPackemConfig(temporaryDirectoryPath, {})
+        createPackemConfig(temporaryDirectoryPath, {});
     });
 
     afterEach(async () => {
