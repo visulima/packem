@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.23](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.22...@visulima/packem@1.0.0-alpha.23) (2024-05-29)
+
+
+### Bug Fixes
+
+* removed packem from package.json. fixed test runs ([05b346a](https://github.com/visulima/packem/commit/05b346a57749147fb7f5cbd810112eaf01ec2a56))
+
 ## @visulima/packem [1.0.0-alpha.22](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.21...@visulima/packem@1.0.0-alpha.22) (2024-05-29)
 
 
