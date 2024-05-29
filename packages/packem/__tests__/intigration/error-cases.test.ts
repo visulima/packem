@@ -1,17 +1,19 @@
 import { mkdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
-import { writeFileSync, writeJsonSync } from "@visulima/fs";
+import { writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { execPackemSync, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackemSync, streamToString } from "../helpers";
 
-describe("packem jsx", () => {
+describe("packem error cases", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
+
+        createPackemConfig(temporaryDirectoryPath, {});
     });
 
     afterEach(async () => {
@@ -21,7 +23,7 @@ describe("packem jsx", () => {
     it("should throw a error if no package.json was found", async () => {
         expect.assertions(2);
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -34,7 +36,7 @@ describe("packem jsx", () => {
 
         writeFileSync(`${temporaryDirectoryPath}/package.json`, "{");
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -50,7 +52,7 @@ describe("packem jsx", () => {
             name: "pkg",
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -68,7 +70,7 @@ describe("packem jsx", () => {
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         mkdirSync(`${temporaryDirectoryPath}/src`);
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -85,7 +87,7 @@ describe("packem jsx", () => {
         });
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "");
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -104,7 +106,7 @@ describe("packem jsx", () => {
         });
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "");
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 

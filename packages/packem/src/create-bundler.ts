@@ -74,13 +74,13 @@ const generateOptions = (
     inputConfig: BuildConfig,
     buildConfig: BuildConfig,
     preset: BuildConfig,
-    package_: PackEmPackageJson,
+    packageJson: PackEmPackageJson,
     tsconfig: TsConfigResult | undefined,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): InternalBuildOptions => {
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
 
-    const options = defu(buildConfig, package_.packem, inputConfig, preset, <BuildOptions>{
+    const options = defu(buildConfig, inputConfig, preset, <BuildOptions>{
         alias: {},
         clean: true,
         declaration: undefined,
@@ -92,7 +92,7 @@ const generateOptions = (
         externals: [...Module.builtinModules, ...Module.builtinModules.map((m) => `node:${m}`)],
         failOnWarn: true,
         minify: env.NODE_ENV === "production",
-        name: (package_.name ?? "").split("/").pop() ?? "default",
+        name: (packageJson.name ?? "").split("/").pop() ?? "default",
         optionalDependencies: [],
         outDir: "dist",
         peerDependencies: [],
@@ -265,7 +265,6 @@ const generateOptions = (
                     loose: true, // Use loose mode
                     parser: {
                         decorators: tsconfig?.config.compilerOptions?.experimentalDecorators,
-                        dynamicImport: true,
                         syntax: tsconfig ? "typescript" : "ecmascript",
                         [tsconfig ? "tsx" : "jsx"]: true,
                     },
@@ -294,7 +293,7 @@ const generateOptions = (
                 },
             },
             treeshake: {
-                moduleSideEffects: getPackageSideEffect(rootDirectory, package_),
+                moduleSideEffects: getPackageSideEffect(rootDirectory, packageJson),
                 preset: "recommended",
             },
             watch: {
@@ -319,7 +318,7 @@ const generateOptions = (
     }) as InternalBuildOptions;
 
     if (!options.transformerName) {
-        const dependencies = new Set([...Object.keys(package_.dependencies ?? {}), ...Object.keys(package_.devDependencies ?? {})]);
+        const dependencies = new Set([...Object.keys(packageJson.dependencies ?? {}), ...Object.keys(packageJson.devDependencies ?? {})]);
 
         if (dependencies.has("esbuild")) {
             options.transformerName = "esbuild";
@@ -350,10 +349,10 @@ const generateOptions = (
     }
 
     // Infer dependencies from pkg
-    options.dependencies = Object.keys(package_.dependencies ?? {});
-    options.peerDependencies = Object.keys(package_.peerDependencies ?? {});
-    options.devDependencies = Object.keys(package_.devDependencies ?? {});
-    options.optionalDependencies = Object.keys(package_.optionalDependencies ?? {});
+    options.dependencies = Object.keys(packageJson.dependencies ?? {});
+    options.peerDependencies = Object.keys(packageJson.peerDependencies ?? {});
+    options.devDependencies = Object.keys(packageJson.devDependencies ?? {});
+    options.optionalDependencies = Object.keys(packageJson.optionalDependencies ?? {});
 
     // Add all dependencies as externals
     options.externals.push(...options.dependencies, ...options.peerDependencies, ...options.optionalDependencies);
@@ -511,7 +510,6 @@ const build = async (
     logger: Pail<never, string>,
     rootDirectory: string,
     mode: Mode,
-    buildPreset: string,
     inputConfig: BuildConfig,
     buildConfig: BuildConfig,
     packageJson: PackEmPackageJson,
@@ -519,7 +517,7 @@ const build = async (
     cleanedDirectories: string[],
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
-    const preset = resolvePreset(buildPreset, rootDirectory);
+    const preset = resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", rootDirectory);
 
     const options = generateOptions(logger, rootDirectory, mode, inputConfig, buildConfig, preset, packageJson, tsconfig);
 
@@ -686,7 +684,6 @@ const createBundler = async (
         debug?: boolean;
         tsconfigPath?: string;
     } & BuildConfig = {},
-    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
     const { configPath, debug, tsconfigPath, ...restInputConfig } = inputConfig;
     const loggerProcessors: Processor<string>[] = [new MessageFormatterProcessor<string>(), new ErrorProcessor<string>()];
@@ -708,6 +705,11 @@ const createBundler = async (
     rootDirectory = resolve(cwd(), rootDirectory);
 
     logger.debug("Root directory:", rootDirectory);
+
+    const packageJsonPath = join(rootDirectory, "package.json");
+    const packageJson = parsePackageJson(packageJsonPath);
+
+    logger.debug("Using package.json found at", packageJsonPath);
 
     let tsconfig: TsConfigResult | undefined;
 
@@ -737,11 +739,6 @@ const createBundler = async (
     }
 
     try {
-        const packageJsonPath = join(rootDirectory, "package.json");
-        const packageJson = parsePackageJson(packageJsonPath);
-
-        logger.debug("Using package.json found at", packageJsonPath);
-
         const packemConfigFileName = configPath ?? "./packem.config.ts";
 
         if (!/\.(?:js|mjs|cjs|ts)$/.test(packemConfigFileName)) {
@@ -760,8 +757,6 @@ const createBundler = async (
 
         const getDuration = () => duration(Math.floor(Date.now() - start));
 
-        let buildPreset = packageJson.packem?.preset ?? inputConfig.preset ?? "auto";
-
         // Invoke build for every build config defined in packem.config.ts
         const cleanedDirectories: string[] = [];
 
@@ -769,13 +764,7 @@ const createBundler = async (
 
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const buildConfig of buildConfigs) {
-            if (buildConfig.preset) {
-                buildPreset = buildConfig.preset;
-            }
-
-            builds.push(
-                build(logger, rootDirectory, mode, buildPreset, restInputConfig, buildConfig, packageJson as PackEmPackageJson, tsconfig, cleanedDirectories),
-            );
+            builds.push(build(logger, rootDirectory, mode, restInputConfig, buildConfig, packageJson as PackEmPackageJson, tsconfig, cleanedDirectories));
         }
 
         await Promise.all(builds);

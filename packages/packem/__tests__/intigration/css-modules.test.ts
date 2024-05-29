@@ -1,10 +1,10 @@
 import { rm } from "node:fs/promises";
 
-import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
+import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { execPackemSync, streamToString } from "../helpers";
+import { createPackageJson, execPackemSync, streamToString } from "../helpers";
 
 describe("packem css modules", () => {
     let temporaryDirectoryPath: string;
@@ -39,7 +39,7 @@ console.log(styles.Button);
             type: "commonjs",
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 

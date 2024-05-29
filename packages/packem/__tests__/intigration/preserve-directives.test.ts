@@ -1,16 +1,25 @@
 import { rm } from "node:fs/promises";
 
-import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
+import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { execPackemSync, installPackage, streamToString } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackemSync,
+    installPackage,
+    streamToString
+} from "../helpers";
 
 describe("packem preserve-directives", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
+
+        createPackemConfig(temporaryDirectoryPath, {})
     });
 
     afterEach(async () => {
@@ -31,9 +40,9 @@ console.log("Hello, world!");`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
+        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -64,9 +73,9 @@ console.log("Hello, world!");
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
+        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -114,7 +123,7 @@ export default Tr;`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
+        createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 jsx: "react-jsx",
                 moduleResolution: "bundler",
@@ -125,7 +134,7 @@ export default Tr;`,
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -197,9 +206,9 @@ console.log("Hello, cli!");`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
+        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -264,9 +273,9 @@ export const baz = 'baz';`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, { compilerOptions: { rootDir: "./src" } });
+        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 

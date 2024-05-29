@@ -1,16 +1,18 @@
 import { rm } from "node:fs/promises";
 
-import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
+import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { execPackemSync, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackemSync, streamToString } from "../helpers";
 
 describe("packem raw data", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
+
+        createPackemConfig(temporaryDirectoryPath, {});
     });
 
     afterEach(async () => {
@@ -32,7 +34,7 @@ export const data = content;`,
             module: "./dist/index.mjs",
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 

@@ -1,16 +1,18 @@
 import { rm } from "node:fs/promises";
 
-import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
+import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { execPackemSync, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackemSync, streamToString } from "../helpers";
 
 describe("packem shims", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
+
+        createPackemConfig(temporaryDirectoryPath, {});
     });
 
     afterEach(async () => {
@@ -59,7 +61,7 @@ export function esmImport() {
             },
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -224,7 +226,7 @@ export function esmImport() {
             },
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -347,7 +349,7 @@ exports.getRequireModule = getRequireModule;
             type: "module",
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -384,7 +386,7 @@ export { getFilename } from "./filename.js";`,
             type: "module",
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 

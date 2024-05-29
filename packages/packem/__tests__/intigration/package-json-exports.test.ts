@@ -6,13 +6,15 @@ import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { execPackemSync, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackemSync, streamToString } from "../helpers";
 
 describe("packem package.json exports", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
+
+        createPackemConfig(temporaryDirectoryPath, {});
     });
 
     afterEach(async () => {
@@ -43,7 +45,7 @@ export function method() {
             },
         });
 
-        const binProcess = execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -105,7 +107,7 @@ exports.method = method;
             },
         });
 
-        const binProcess = execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -141,7 +143,7 @@ exports.method = method;
             },
         });
 
-        const binProcess = execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -202,7 +204,7 @@ exports.method = method;
             },
         });
 
-        const binProcess = execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -268,7 +270,7 @@ export { IString };`,
             },
         });
 
-        const binProcess = execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -299,7 +301,7 @@ export { IString };`,
             },
         });
 
-        const binProcess = execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -326,7 +328,7 @@ export { IString };`,
             type: "module",
         });
 
-        const binProcess = execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -371,7 +373,7 @@ exports.value = value;
         });
         writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
 
-        const binProcess = execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -396,7 +398,7 @@ exports.value = value;
             },
         });
 
-        const binProcess = execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -432,7 +434,7 @@ exports.value = value;
             type: "module",
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -478,7 +480,7 @@ export { index as default };
             type: "commonjs",
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 

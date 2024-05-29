@@ -6,13 +6,15 @@ import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { execPackemSync, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackemSync, streamToString } from "../helpers";
 
 describe("packem typescript", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
+
+        createPackemConfig(temporaryDirectoryPath, {});
     });
 
     afterEach(async () => {
@@ -31,9 +33,8 @@ describe("packem typescript", () => {
             });
             writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
 
-            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: temporaryDirectoryPath,
-                nodePath,
             });
 
             await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -54,9 +55,8 @@ describe("packem typescript", () => {
                 type: "module",
             });
 
-            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: temporaryDirectoryPath,
-                nodePath,
             });
 
             await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -78,9 +78,8 @@ describe("packem typescript", () => {
             });
             writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
 
-            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: temporaryDirectoryPath,
-                nodePath,
             });
 
             await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -102,9 +101,8 @@ describe("packem typescript", () => {
             });
             writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
 
-            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: temporaryDirectoryPath,
-                nodePath,
             });
 
             await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -132,9 +130,8 @@ describe("packem typescript", () => {
             });
             createPackageJson(temporaryDirectoryPath, { main: "./dist/index.cjs" });
 
-            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: temporaryDirectoryPath,
-                nodePath,
             });
 
             await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -168,9 +165,8 @@ console.log(1);
             });
             createPackageJson(temporaryDirectoryPath, { main: "./dist/index.cjs" });
 
-            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: temporaryDirectoryPath,
-                nodePath,
             });
 
             await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -205,9 +201,8 @@ console.log(1);
             });
             createPackageJson(temporaryDirectoryPath, { main: "./dist/index.cjs" });
 
-            const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
                 cwd: temporaryDirectoryPath,
-                nodePath,
             });
 
             await expect(streamToString(binProcess.stderr)).resolves.toBe("");
@@ -266,7 +261,7 @@ export class ExampleClass {
             },
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -358,7 +353,7 @@ exports.ExampleClass = ExampleClass;
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -409,7 +404,7 @@ export const version = pkgJson.version;
             version: "0.0.1",
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -466,7 +461,7 @@ export { version };
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -515,7 +510,7 @@ export { index as default };
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -563,7 +558,7 @@ export { index as default };
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 

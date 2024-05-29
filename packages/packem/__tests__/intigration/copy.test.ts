@@ -5,7 +5,7 @@ import { writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, execPackemSync, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackemSync, streamToString } from "../helpers";
 
 describe("packem copy", () => {
     let temporaryDirectoryPath: string;
@@ -26,14 +26,14 @@ describe("packem copy", () => {
         writeFileSync(`${temporaryDirectoryPath}/assets/data.csv`, `name,age`);
         createPackageJson(temporaryDirectoryPath, {
             main: "./dist/index.cjs",
-            packem: {
-                rollup: {
-                    copy: {
-                        targets: "assets/*",
-                    },
+            type: "commonjs",
+        });
+        createPackemConfig(temporaryDirectoryPath, {
+            rollup: {
+                copy: {
+                    targets: "assets/*",
                 },
             },
-            type: "commonjs",
         });
 
         const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {

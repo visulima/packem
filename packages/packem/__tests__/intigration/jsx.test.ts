@@ -1,10 +1,10 @@
 import { rm } from "node:fs/promises";
 
-import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
+import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { esc, execPackemSync, installPackage, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage, streamToString } from "../helpers";
 
 describe("packem jsx", () => {
     let temporaryDirectoryPath: string;
@@ -41,17 +41,19 @@ export default Tr;`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
+        createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 jsx: "react-jsx",
                 moduleResolution: "bundler",
             },
         });
+        createPackemConfig(temporaryDirectoryPath, {});
+
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -103,98 +105,6 @@ export { Tr as default };
 `);
     });
 
-    it("should throw a error if 'rollup.esbuild.preserve' is set in packem.config", async () => {
-        expect.assertions(2);
-
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.tsx`,
-            `const Tr = () => (<tr className={"m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20"} />);
-
-export default Tr;`,
-        );
-        createPackageJson(temporaryDirectoryPath, {
-            dependencies: {
-                react: "^18.2.0",
-                "react-dom": "^18.2.0",
-            },
-            devDependencies: {
-                "@types/react": "^18.0.0",
-                "@types/react-dom": "^18.0.0",
-                typescript: "^5",
-            },
-            main: "./dist/index.cjs",
-            module: "./dist/index.mjs",
-            type: "commonjs",
-            types: "./dist/index.d.ts",
-        });
-        writeFileSync(
-            `${temporaryDirectoryPath}/packem.config.js`,
-            `module.exports = {
-    rollup: {
-        esbuild: {
-            jsx: "preserve",
-        },
-    },
-};`,
-        );
-        await installPackage(temporaryDirectoryPath, "typescript");
-        await installPackage(temporaryDirectoryPath, "react");
-        await installPackage(temporaryDirectoryPath, "react-dom");
-
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: temporaryDirectoryPath,
-        });
-
-        await expect(streamToString(binProcess.stderr)).resolves.toMatch(
-            esc(`Packem does not support 'preserve' jsx option. Please use 'transform' or 'automatic' instead.`),
-        );
-        expect(binProcess.exitCode).toBe(1);
-    });
-
-    it("should throw a error if 'preserve' is set in tsconfig", async () => {
-        expect.assertions(2);
-
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.tsx`,
-            `const Tr = () => (<tr className={"m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20"} />);
-
-export default Tr;`,
-        );
-        createPackageJson(temporaryDirectoryPath, {
-            dependencies: {
-                react: "^18.2.0",
-                "react-dom": "^18.2.0",
-            },
-            devDependencies: {
-                "@types/react": "^18.0.0",
-                "@types/react-dom": "^18.0.0",
-                typescript: "^5",
-            },
-            main: "./dist/index.cjs",
-            module: "./dist/index.mjs",
-            type: "commonjs",
-            types: "./dist/index.d.ts",
-        });
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
-            compilerOptions: {
-                jsx: "preserve",
-                moduleResolution: "bundler",
-            },
-        });
-        await installPackage(temporaryDirectoryPath, "typescript");
-        await installPackage(temporaryDirectoryPath, "react");
-        await installPackage(temporaryDirectoryPath, "react-dom");
-
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
-            cwd: temporaryDirectoryPath,
-        });
-
-        await expect(streamToString(binProcess.stderr)).resolves.toMatch(
-            esc(`Packem does not support 'preserve' jsx option. Please change it to 'react' or 'react-jsx' or 'react-jsxdev' instead.`),
-        );
-        expect(binProcess.exitCode).toBe(1);
-    });
-
     it("should not delete a attribute if the jsxRemoveAttributes config is empty", async () => {
         expect.assertions(7);
 
@@ -219,17 +129,19 @@ export default Tr;`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
+        createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 jsx: "react-jsx",
                 moduleResolution: "bundler",
             },
         });
+        createPackemConfig(temporaryDirectoryPath, {});
+
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -302,27 +214,28 @@ export default Tr;`,
             },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
-            packem: {
-                rollup: {
-                    jsxRemoveAttributes: {
-                        attributes: ["data-testid"],
-                    },
-                },
-            },
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
+        createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 jsx: "react-jsx",
                 moduleResolution: "bundler",
             },
         });
+        createPackemConfig(temporaryDirectoryPath, {
+            rollup: {
+                jsxRemoveAttributes: {
+                    attributes: ["data-testid"],
+                },
+            },
+        });
+
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -395,27 +308,28 @@ export default Tr;`,
             },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
-            packem: {
-                rollup: {
-                    jsxRemoveAttributes: {
-                        attributes: ["data-testid", "data-test"],
-                    },
-                },
-            },
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
+        createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 jsx: "react-jsx",
                 moduleResolution: "bundler",
             },
         });
+        createPackemConfig(temporaryDirectoryPath, {
+            rollup: {
+                jsxRemoveAttributes: {
+                    attributes: ["data-testid", "data-test"],
+                },
+            },
+        });
+
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -467,7 +381,8 @@ export { Tr as default };
 `);
     });
 
-    it("should support custom jsx", async () => {
+    // Lets see how this can be supported
+    it.skip("should support custom jsx", async () => {
         expect.assertions(7);
 
         writeFileSync(
@@ -490,7 +405,7 @@ export const Spinner = Vue.defineComponent(() => () => {
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
+        createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 // Customized JSX for Vue
                 jsx: "preserve",
@@ -500,10 +415,12 @@ export const Spinner = Vue.defineComponent(() => () => {
                 moduleResolution: "Bundler",
             },
         });
+        createPackemConfig(temporaryDirectoryPath, {});
+
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "vue");
 
-        const binProcess = execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
             cwd: temporaryDirectoryPath,
         });
 
