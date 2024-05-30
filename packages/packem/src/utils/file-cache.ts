@@ -102,7 +102,11 @@ class FileCache {
     }
 
     private getFilePath(name: string, subDirectory?: string): string {
-        return join(this.#cachePath as string, this.#packemVersion, subDirectory ?? "", toNamespacedPath(name.replace(this.#cwd, "")));
+        let optimizedName = name.replaceAll(toNamespacedPath(this.#cwd), "");
+
+        optimizedName = optimizedName.replaceAll(":", "-")
+
+        return join(this.#cachePath as string, this.#packemVersion, subDirectory?.replaceAll(":", "-") ?? "", toNamespacedPath(optimizedName));
     }
 }
 

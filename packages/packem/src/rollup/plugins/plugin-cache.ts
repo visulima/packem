@@ -8,6 +8,18 @@ import type FileCache from "../../utils/file-cache";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-redundant-type-constituents
 const getHandler = (plugin: ObjectHook<any> | ((...arguments_: any[]) => any)): ((...arguments_: any[]) => any) => plugin.handler || plugin;
 
+const optimizeFileName = (filePath: string) => {
+    if (!filePath.includes(".pnpm")) {
+        return filePath;
+    }
+
+    const split = filePath.split(".pnpm");
+
+    split.splice(0, 1);
+
+    return join(".pnpm", split.join("") as string);
+};
+
 /**
  * Wrap a Rollup plugin to add caching to various hooks.
  *
@@ -44,8 +56,7 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin => {
                 return null;
             }
 
-            const cacheKey = join("load", id);
-
+            const cacheKey = join("load", optimizeFileName(id));
 
             if (cache.has(cacheKey, plugin.name)) {
                 return await cache.get(cacheKey, plugin.name);
@@ -66,7 +77,7 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin => {
                 return null;
             }
 
-            const cacheKey = join("resolveId", getCacheVersion(JSON.stringify(options)), importer ?? "", id);
+            const cacheKey = join("resolveId", getCacheVersion(JSON.stringify(options)), importer ? optimizeFileName(importer) : "", optimizeFileName(id));
 
             if (cache.has(cacheKey, plugin.name)) {
                 return await cache.get(cacheKey, plugin.name);
@@ -85,7 +96,7 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin => {
                 return null;
             }
 
-            const cacheKey = join("transform", getCacheVersion(code), id);
+            const cacheKey = join("transform", getCacheVersion(code), optimizeFileName(id));
 
             if (cache.has(cacheKey, plugin.name)) {
                 return await cache.get(cacheKey, plugin.name);
