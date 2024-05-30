@@ -114,8 +114,8 @@
         "LICENSE.md"
     ],
     "scripts": {
-        "build": "cross-env JITI_ESM_RESOLVE=1 INTERNAL_PACKEM_BUILD=1 jiti ./src/cli build",
-        "build:prod": "cross-env JITI_ESM_RESOLVE=1 INTERNAL_PACKEM_BUILD=1 jiti ./src/cli build --minify",
+        "build": "cross-env JITI_ESM_RESOLVE=1 INTERNAL_PACKEM_BUILD=1 NODE_ENV=development jiti ./src/cli build",
+        "build:prod": "cross-env JITI_ESM_RESOLVE=1 INTERNAL_PACKEM_BUILD=1 NODE_ENV=production jiti ./src/cli build --minify",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build",
         "lint:eslint": "eslint . --ext js,cjs,mjs,jsx,ts,tsx,json,yaml,yml,md,mdx --max-warnings=0 --config .eslintrc.cjs",

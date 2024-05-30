@@ -315,11 +315,10 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
                         reservedNamesAsProps: true,
                         symbols: true,
                     },
-                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
-                    // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
                     hoistTransitiveImports: false,
                     interop: "compat",
                     sourcemap: context.options.sourcemap,
+                    validate: true,
                     ...context.options.rollup.output,
                     ...(context.options.rollup.output?.preserveModules
                         ? {
@@ -345,10 +344,9 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
                         reservedNamesAsProps: true,
                         symbols: true,
                     },
-                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
-                    // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
                     hoistTransitiveImports: false,
                     sourcemap: context.options.sourcemap,
+                    validate: true,
                     ...context.options.rollup.output,
                     ...(context.options.rollup.output?.preserveModules
                         ? {

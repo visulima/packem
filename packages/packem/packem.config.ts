@@ -1,3 +1,5 @@
+import { env } from "node:process";
+
 import { defineConfig } from "./src/config";
 import transformer from "./src/rollup/plugins/esbuild";
 
@@ -9,5 +11,6 @@ export default defineConfig({
         },
         shim: true,
     },
+    sourcemap: env.NODE_ENV === "development",
     transformer,
 });
