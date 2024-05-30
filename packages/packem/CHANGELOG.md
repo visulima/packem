@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.26](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.25...@visulima/packem@1.0.0-alpha.26) (2024-05-30)
+
+
+### Features
+
+* added NODE_ENV ([9c04a6f](https://github.com/visulima/packem/commit/9c04a6f0a27427d25141e03cc27679cd42b2a847))
+
 ## @visulima/packem [1.0.0-alpha.25](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.24...@visulima/packem@1.0.0-alpha.25) (2024-05-29)
 
 
