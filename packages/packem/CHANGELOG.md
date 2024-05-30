@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.27](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.26...@visulima/packem@1.0.0-alpha.27) (2024-05-30)
+
+
+### Features
+
+* added plugin cache ([e77052f](https://github.com/visulima/packem/commit/e77052fe960470f55a4a5ee33efa11eed5ecd191))
+
 ## @visulima/packem [1.0.0-alpha.26](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.25...@visulima/packem@1.0.0-alpha.26) (2024-05-30)
 
 
