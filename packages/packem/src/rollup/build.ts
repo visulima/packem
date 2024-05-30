@@ -1,4 +1,4 @@
-import type { OutputAsset, OutputChunk, OutputOptions } from "rollup";
+import type { OutputAsset, OutputChunk, OutputOptions, RollupCache } from "rollup";
 import { rollup } from "rollup";
 
 import type { BuildContext, BuildContextBuildEntry } from "../types";
@@ -7,7 +7,7 @@ import { getRollupOptions } from "./get-rollup-options";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const build = async (context: BuildContext, fileCache: FileCache): Promise<void> => {
-    const rollupOptions = await getRollupOptions(context);
+    const rollupOptions = await getRollupOptions(context, fileCache);
 
     await context.hooks.callHook("rollup:options", context, rollupOptions);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -15,11 +15,13 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<void>
         return;
     }
 
-    rollupOptions.cache = fileCache.get("rollup-build");
+    const cacheKey = "rollup-build.json";
+
+    rollupOptions.cache = fileCache.get<RollupCache>(cacheKey);
 
     const buildResult = await rollup(rollupOptions);
 
-    fileCache.set("rollup-build", buildResult.cache);
+    fileCache.set<RollupCache>(cacheKey, buildResult.cache);
 
     await context.hooks.callHook("rollup:build", context, buildResult);
 

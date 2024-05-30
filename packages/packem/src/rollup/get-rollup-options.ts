@@ -19,6 +19,7 @@ import { DEFAULT_EXTENSIONS } from "../constants";
 import type { BuildContext, InternalBuildOptions } from "../types";
 import arrayIncludes from "../utils/array-includes";
 import arrayify from "../utils/arrayify";
+import type FileCache from "../utils/file-cache";
 import getPackageName from "../utils/get-package-name";
 import memoizeByKey from "../utils/memoize";
 import { cjsInterop as cjsInteropPlugin } from "./plugins/cjs-interop";
@@ -28,6 +29,7 @@ import JSONPlugin from "./plugins/json";
 import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
 import { license as licensePlugin } from "./plugins/license";
 import metafilePlugin from "./plugins/metafile";
+import cachingPlugin from "./plugins/plugin-cache";
 import preserveDirectivesPlugin from "./plugins/preserve-directives";
 import { rawPlugin } from "./plugins/raw";
 import resolveFileUrlPlugin from "./plugins/resolve-file-url";
@@ -282,16 +284,19 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity,import/exports-last
-export const getRollupOptions = async (context: BuildContext): Promise<RollupOptions> => {
+export const getRollupOptions = async (context: BuildContext, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context, "build");
 
     let nodeResolver;
 
     if (context.options.rollup.resolve) {
-        nodeResolver = nodeResolvePlugin({
-            extensions: DEFAULT_EXTENSIONS,
-            ...context.options.rollup.resolve,
-        });
+        nodeResolver = cachingPlugin(
+            nodeResolvePlugin({
+                extensions: DEFAULT_EXTENSIONS,
+                ...context.options.rollup.resolve,
+            }),
+            fileCache,
+        );
     }
 
     return (<RollupOptions>{
@@ -358,11 +363,11 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
         ].filter(Boolean),
 
         plugins: [
-            resolveFileUrlPlugin(),
-            resolveTypescriptMjsCtsPlugin(),
+            cachingPlugin(resolveFileUrlPlugin(), fileCache),
+            cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
-            context.tsconfig && resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig),
-            context.tsconfig && resolveTsconfigPathsPlugin(context.tsconfig, context.logger),
+            context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
+            context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.tsconfig, context.logger), fileCache),
 
             context.options.rollup.replace &&
                 replacePlugin({
@@ -418,11 +423,14 @@ export const getRollupOptions = async (context: BuildContext): Promise<RollupOpt
             context.options.rollup.dynamicVars && dynamicImportVarsPlugin(context.options.rollup.dynamicVars),
 
             context.options.rollup.commonjs &&
-                commonjsPlugin({
-                    extensions: DEFAULT_EXTENSIONS,
-                    sourceMap: context.options.sourcemap,
-                    ...context.options.rollup.commonjs,
-                }),
+                cachingPlugin(
+                    commonjsPlugin({
+                        extensions: DEFAULT_EXTENSIONS,
+                        sourceMap: context.options.sourcemap,
+                        ...context.options.rollup.commonjs,
+                    }),
+                    fileCache,
+                ),
 
             context.options.rollup.preserveDynamicImports && {
                 renderDynamicImport() {
@@ -496,7 +504,7 @@ const createDtsPlugin = async (context: BuildContext): Promise<Plugin> => {
 const memoizeDtsPluginByKey = memoizeByKey<typeof createDtsPlugin>(createDtsPlugin);
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export const getRollupDtsOptions = async (context: BuildContext): Promise<RollupOptions> => {
+export const getRollupDtsOptions = async (context: BuildContext, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context, "types");
     const ignoreFiles: Plugin = {
         load(id) {
@@ -516,10 +524,13 @@ export const getRollupDtsOptions = async (context: BuildContext): Promise<Rollup
     let nodeResolver;
 
     if (context.options.rollup.resolve) {
-        nodeResolver = nodeResolvePlugin({
-            extensions: DEFAULT_EXTENSIONS,
-            ...context.options.rollup.resolve,
-        });
+        nodeResolver = cachingPlugin(
+            nodeResolvePlugin({
+                extensions: DEFAULT_EXTENSIONS,
+                ...context.options.rollup.resolve,
+            }),
+            fileCache,
+        );
     }
 
     // Each process should be unique
@@ -574,8 +585,8 @@ export const getRollupDtsOptions = async (context: BuildContext): Promise<Rollup
         ].filter(Boolean),
 
         plugins: [
-            resolveFileUrlPlugin(),
-            resolveTypescriptMjsCtsPlugin(),
+            cachingPlugin(resolveFileUrlPlugin(), fileCache),
+            cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
             context.options.rollup.json &&
                 JSONPlugin({
@@ -584,8 +595,8 @@ export const getRollupDtsOptions = async (context: BuildContext): Promise<Rollup
 
             ignoreFiles,
 
-            context.tsconfig && resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig),
-            context.tsconfig && resolveTsconfigPathsPlugin(context.tsconfig, context.logger),
+            context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
+            context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.tsconfig, context.logger), fileCache),
 
             context.options.rollup.replace &&
                 replacePlugin({
