@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.28](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.27...@visulima/packem@1.0.0-alpha.28) (2024-05-30)
+
+
+### Features
+
+* optimized file names for the cache ([e8abc95](https://github.com/visulima/packem/commit/e8abc9569a7ed6cfca2d531a6dfb4a3e26999af8))
+
 ## @visulima/packem [1.0.0-alpha.27](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.26...@visulima/packem@1.0.0-alpha.27) (2024-05-30)
 
 
