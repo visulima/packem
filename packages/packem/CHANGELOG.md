@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.30](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.29...@visulima/packem@1.0.0-alpha.30) (2024-05-31)
+
+
+### Bug Fixes
+
+* fixed issue with cache dir, added auto update of lock file ([a49df8a](https://github.com/visulima/packem/commit/a49df8a093578b3c781e466b2e3d4478a9a8d01a))
+
 ## @visulima/packem [1.0.0-alpha.29](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.28...@visulima/packem@1.0.0-alpha.29) (2024-05-31)
 
 
