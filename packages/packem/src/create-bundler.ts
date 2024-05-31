@@ -705,7 +705,7 @@ const createBundler = async (
         scope: "packem",
     });
 
-    // logger.wrapAll();
+    logger.wrapAll();
 
     // Determine rootDirectory
     // eslint-disable-next-line no-param-reassign

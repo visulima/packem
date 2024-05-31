@@ -116,7 +116,7 @@ const createBuildCommand = (cli: Cli): void => {
                 type: String,
             },
             {
-                conflicts: "watch",
+                // conflicts: "watch",
                 description: "Visualize and analyze the bundle",
                 name: "analyze",
                 type: Boolean,
