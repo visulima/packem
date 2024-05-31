@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.31](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.30...@visulima/packem@1.0.0-alpha.31) (2024-05-31)
+
+
+### Bug Fixes
+
+* improved hashing of plugins ([2ca9377](https://github.com/visulima/packem/commit/2ca9377c82e726707881e8b06b2a56ab51ed8d06))
+
 ## @visulima/packem [1.0.0-alpha.30](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.29...@visulima/packem@1.0.0-alpha.30) (2024-05-31)
 
 
