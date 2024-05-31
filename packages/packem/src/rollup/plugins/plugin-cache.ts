@@ -1,24 +1,11 @@
-import { createHash } from "node:crypto";
-
 import { join } from "@visulima/path";
 import type { ObjectHook, Plugin } from "rollup";
 
 import type FileCache from "../../utils/file-cache";
+import getHash from "../utils/get-hash";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-redundant-type-constituents
 const getHandler = (plugin: ObjectHook<any> | ((...arguments_: any[]) => any)): ((...arguments_: any[]) => any) => plugin.handler || plugin;
-
-const optimizeFileName = (filePath: string) => {
-    if (!filePath.includes(".pnpm")) {
-        return filePath;
-    }
-
-    const split = filePath.split(".pnpm");
-
-    split.splice(0, 1);
-
-    return join(".pnpm", split.join("") as string);
-};
 
 /**
  * Wrap a Rollup plugin to add caching to various hooks.
@@ -27,16 +14,8 @@ const optimizeFileName = (filePath: string) => {
  * @param {FileCache} cache
  * @returns {Plugin}
  */
-const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin => {
-    const getCacheVersion = (data: Buffer | string) => {
-        const hash = createHash("md5");
-
-        hash.update(data);
-
-        return hash.digest("hex");
-    };
-
-    return <Plugin>{
+const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin =>
+    <Plugin>{
         ...plugin,
 
         async buildEnd(error) {
@@ -56,7 +35,7 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin => {
                 return null;
             }
 
-            const cacheKey = join("load", optimizeFileName(id));
+            const cacheKey = join("load", getHash(id));
 
             if (cache.has(cacheKey, plugin.name)) {
                 return await cache.get(cacheKey, plugin.name);
@@ -77,7 +56,12 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin => {
                 return null;
             }
 
-            const cacheKey = join("resolveId", getCacheVersion(JSON.stringify(options)), importer ? optimizeFileName(importer) : "", optimizeFileName(id));
+            const cacheKey = join(
+                "resolveId",
+                getHash(id),
+                importer ? getHash(importer) : "",
+                getHash(JSON.stringify(options)),
+            );
 
             if (cache.has(cacheKey, plugin.name)) {
                 return await cache.get(cacheKey, plugin.name);
@@ -96,7 +80,7 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin => {
                 return null;
             }
 
-            const cacheKey = join("transform", getCacheVersion(code), optimizeFileName(id));
+            const cacheKey = join("transform", getHash(id), getHash(code));
 
             if (cache.has(cacheKey, plugin.name)) {
                 return await cache.get(cacheKey, plugin.name);
@@ -110,6 +94,5 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin => {
             return result;
         },
     };
-};
 
 export default cachingPlugin;
