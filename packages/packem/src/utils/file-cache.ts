@@ -1,5 +1,3 @@
-import { createHash } from "node:crypto";
-
 import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import { findCacheDirectorySync } from "@visulima/package";
 import type { Pail } from "@visulima/pail";
@@ -10,24 +8,19 @@ class FileCache {
 
     readonly #cachePath: undefined | string;
 
-    readonly #packemVersion: string;
+    readonly #packageJsonHash: string;
 
     #isEnabled = true;
 
     readonly #memoryCache = new Map<string, unknown>();
 
-    public constructor(cwd: string, packemVersion: string, logger: Pail<never, string>) {
+    public constructor(cwd: string, packageJsonHash: string, logger: Pail<never, string>) {
         this.#cwd = cwd;
         this.#cachePath = findCacheDirectorySync("visulima-packem", {
-            create: true,
             cwd,
         });
 
-        const hash = createHash("md5");
-
-        hash.update(packemVersion);
-
-        this.#packemVersion = hash.digest("hex");
+        this.#packageJsonHash = packageJsonHash;
 
         if (this.#cachePath === undefined) {
             logger.debug("Could not create cache directory.");
@@ -38,6 +31,10 @@ class FileCache {
 
     public set isEnabled(value: boolean) {
         this.#isEnabled = value;
+    }
+
+    public get cachePath(): string | undefined {
+        return this.#cachePath;
     }
 
     public has(name: string, subDirectory?: string): boolean {
@@ -104,9 +101,9 @@ class FileCache {
     private getFilePath(name: string, subDirectory?: string): string {
         let optimizedName = name.replaceAll(toNamespacedPath(this.#cwd), "");
 
-        optimizedName = optimizedName.replaceAll(":", "-")
+        optimizedName = optimizedName.replaceAll(":", "-");
 
-        return join(this.#cachePath as string, this.#packemVersion, subDirectory?.replaceAll(":", "-") ?? "", toNamespacedPath(optimizedName));
+        return join(this.#cachePath as string, this.#packageJsonHash, subDirectory?.replaceAll(":", "-") ?? "", toNamespacedPath(optimizedName));
     }
 }
 

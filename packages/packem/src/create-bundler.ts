@@ -16,11 +16,11 @@ import { basename, dirname, isAbsolute, join, normalize, relative, resolve } fro
 import { defu } from "defu";
 import { createHooks } from "hookable";
 
-import packemPackageJson from "../package.json";
 import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP } from "./constants";
 import createStub from "./jit/create-stub";
 import rollupBuild from "./rollup/build";
 import rollupBuildTypes from "./rollup/build-types";
+import getHash from "./rollup/utils/get-hash";
 import rollupWatch from "./rollup/watch";
 import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildOptions, InternalBuildOptions, Mode } from "./types";
 import dumpObject from "./utils/dump-object";
@@ -84,7 +84,7 @@ const generateOptions = (
 
     const options = defu(buildConfig, inputConfig, preset, <BuildOptions>{
         alias: {},
-        cache: true,
+        fileCache: true,
         clean: true,
         declaration: undefined,
         dependencies: [],
@@ -526,7 +526,7 @@ const build = async (
     const options = generateOptions(logger, rootDirectory, mode, inputConfig, buildConfig, preset, packageJson, tsconfig);
 
     // eslint-disable-next-line no-param-reassign
-    fileCache.isEnabled = options.cache as boolean;
+    fileCache.isEnabled = options.fileCache as boolean;
 
     ensureDirSync(options.outDir);
 
@@ -769,7 +769,17 @@ const createBundler = async (
 
         const builds: Promise<void>[] = [];
 
-        const fileCache = new FileCache(rootDirectory, packemPackageJson.version, logger);
+        const cachekey = getHash(
+            packageJson.version + JSON.stringify({ ...packageJson.dependencies, ...packageJson.devDependencies, eNode: packageJson.engines?.node }),
+        );
+        const fileCache = new FileCache(rootDirectory, cachekey, logger);
+
+        // clear cache if the cache key has changed
+        if (fileCache.cachePath && !isAccessibleSync(join(fileCache.cachePath, cachekey)) && isAccessibleSync(fileCache.cachePath)) {
+            logger.info("Clearing file cache because the cache key has changed.");
+
+            await emptyDir(fileCache.cachePath);
+        }
 
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const buildConfig of buildConfigs) {

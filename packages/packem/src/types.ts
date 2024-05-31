@@ -91,17 +91,16 @@ export type BuildEntry = {
 
 export interface BuildOptions {
     alias: Record<string, string>;
-    cache?: boolean;
     cjsInterop?: boolean;
     clean: boolean;
     /**
-     * * `compatible` means "src/index.ts" will generate "dist/index.d.mts", "dist/index.d.cts" and "dist/index.d.ts".
-     * * `node16` means "src/index.ts" will generate "dist/index.d.mts" and "dist/index.d.cts".
-     * * `true` is equivalent to `compatible`.
-     * * `false` will disable declaration generation.
-     * * `undefined` will auto-detect based on "package.json". If "package.json" has "types" field, it will be `"compatible"`, otherwise `false`.
+     * `compatible` means "src/index.ts" will generate "dist/index.d.mts", "dist/index.d.cts" and "dist/index.d.ts".
+     * `node16` means "src/index.ts" will generate "dist/index.d.mts" and "dist/index.d.cts".
+     * `true` is equivalent to `compatible`.
+     * `false` will disable declaration generation.
+     * `undefined` will auto-detect based on "package.json". If "package.json" has "types" field, it will be `"compatible"`, otherwise `false`.
      */
-    declaration?: boolean | "compatible" | "node16";
+    declaration?: boolean | "compatible" | "node16" | undefined;
     dependencies: string[];
     devDependencies: string[];
     emitCJS?: boolean;
@@ -109,6 +108,7 @@ export interface BuildOptions {
     entries: BuildEntry[];
     externals: (RegExp | string)[];
     failOnWarn?: boolean;
+    fileCache?: boolean;
     minify: boolean;
     name: string;
     optionalDependencies: string[];
