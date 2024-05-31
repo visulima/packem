@@ -44,7 +44,7 @@ const watchHandler = (watcher: RollupWatcher, mode: "bundle" | "types", logger: 
 };
 
 const watch = async (context: BuildContext, fileCache: FileCache): Promise<void> => {
-    const rollupOptions = await getRollupOptions(context);
+    const rollupOptions = await getRollupOptions(context, fileCache);
 
     await context.hooks.callHook("rollup:options", context, rollupOptions);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,7 +78,7 @@ const watch = async (context: BuildContext, fileCache: FileCache): Promise<void>
     watchHandler(watcher, "bundle", context.logger);
 
     if (context.options.declaration) {
-        const rollupDtsOptions = await getRollupDtsOptions(context);
+        const rollupDtsOptions = await getRollupDtsOptions(context, fileCache);
 
         await context.hooks.callHook("rollup:dts:options", context, rollupDtsOptions);
 
