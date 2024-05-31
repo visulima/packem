@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.29](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.28...@visulima/packem@1.0.0-alpha.29) (2024-05-31)
+
+
+### Bug Fixes
+
+* added missing variable to watch ([174124b](https://github.com/visulima/packem/commit/174124b68063da42afb51ca008c542480f32c436))
+
 ## @visulima/packem [1.0.0-alpha.28](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.27...@visulima/packem@1.0.0-alpha.28) (2024-05-30)
 
 
