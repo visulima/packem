@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.32](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.31...@visulima/packem@1.0.0-alpha.32) (2024-05-31)
+
+
+### Features
+
+* delete the cache if the cacheKey did changed based on the packagejson data ([820a564](https://github.com/visulima/packem/commit/820a5642be00ac7b1a08f05c10a924af802a8d53))
+
 ## @visulima/packem [1.0.0-alpha.31](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.30...@visulima/packem@1.0.0-alpha.31) (2024-05-31)
 
 
