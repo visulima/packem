@@ -18,6 +18,7 @@ import { createHooks } from "hookable";
 
 import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP } from "./constants";
 import createStub from "./jit/create-stub";
+import resolvePreset from "./preset/utils/resolve-preset";
 import rollupBuild from "./rollup/build";
 import rollupBuildTypes from "./rollup/build-types";
 import getHash from "./rollup/utils/get-hash";
@@ -26,8 +27,6 @@ import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildOptions, I
 import dumpObject from "./utils/dump-object";
 import FileCache from "./utils/file-cache";
 import getPackageSideEffect from "./utils/get-package-side-effect";
-import removeExtension from "./utils/remove-extension";
-import resolvePreset from "./utils/resolve-preset";
 import tryRequire from "./utils/try-require";
 import validateDependencies from "./validator/validate-dependencies";
 import validatePackage from "./validator/validate-package";
@@ -84,16 +83,16 @@ const generateOptions = (
 
     const options = defu(buildConfig, inputConfig, preset, <BuildOptions>{
         alias: {},
-        fileCache: true,
         clean: true,
-        declaration: undefined,
+        declaration: true,
         dependencies: [],
         devDependencies: [],
-        emitCJS: undefined,
-        emitESM: undefined,
+        emitCJS: true,
+        emitESM: true,
         entries: [],
         externals: [...Module.builtinModules, ...Module.builtinModules.map((m) => `node:${m}`)],
         failOnWarn: true,
+        fileCache: true,
         minify: env.NODE_ENV === "production",
         name: (packageJson.name ?? "").split("/").pop() ?? "default",
         optionalDependencies: [],
@@ -363,6 +362,8 @@ const generateOptions = (
     return options;
 };
 
+const removeExtension = (filename: string): string => filename.replace(/\.(?:js|mjs|cjs|ts|mts|cts|json|jsx|tsx)$/, "");
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const prepareEntries = async (context: BuildContext, rootDirectory: string): Promise<void> => {
     // Normalize entries
@@ -382,10 +383,6 @@ const prepareEntries = async (context: BuildContext, rootDirectory: string): Pro
 
         if (!entry.input) {
             throw new Error(`Missing entry input: ${dumpObject(entry)}`);
-        }
-
-        if (!context.options.declaration && entry.declaration === undefined) {
-            entry.declaration = context.options.declaration;
         }
 
         entry.input = resolve(context.options.rootDir, entry.input);
@@ -525,9 +522,6 @@ const build = async (
 
     const options = generateOptions(logger, rootDirectory, mode, inputConfig, buildConfig, preset, packageJson, tsconfig);
 
-    // eslint-disable-next-line no-param-reassign
-    fileCache.isEnabled = options.fileCache as boolean;
-
     ensureDirSync(options.outDir);
 
     // Build context
@@ -558,10 +552,13 @@ const build = async (
         context.hooks.addHooks(buildConfig.hooks);
     }
 
+    // eslint-disable-next-line no-param-reassign
+    fileCache.isEnabled = context.options.fileCache as boolean;
+
     // Allow to prepare and extending context
     await context.hooks.callHook("build:prepare", context);
 
-    if (context.options.emitESM === false && context.options.emitCJS === false) {
+    if (!context.options.emitESM && !context.options.emitCJS) {
         throw new Error("Both emitESM and emitCJS are disabled. At least one of them must be enabled.");
     }
 
@@ -570,15 +567,15 @@ const build = async (
     }
 
     if (context.options.emitESM === undefined) {
-        logger.info("Emitting ESM bundles, is disabled.");
+        context.logger.info("Emitting ESM bundles, is disabled.");
     }
 
     if (context.options.emitCJS === undefined) {
-        logger.info("Emitting CJS bundles, is disabled.");
+        context.logger.info("Emitting CJS bundles, is disabled.");
     }
 
     if (!context.options.declaration) {
-        logger.info("Declaration files, are disabled.");
+        context.logger.info("Declaration files, are disabled.");
     }
 
     await prepareEntries(context, rootDirectory);
@@ -594,9 +591,9 @@ const build = async (
         modeName = "Stubbing";
     }
 
-    logger.info(cyan(`${modeName} ${context.options.name}`));
+    context.logger.info(cyan(`${modeName} ${context.options.name}`));
 
-    logger.debug(
+    context.logger.debug(
         `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}\n  ${context.options.entries.map((entry) => `  ${dumpObject(entry)}`).join("\n  ")}`,
     );
 
@@ -621,7 +618,7 @@ const build = async (
 
             cleanedDirectories.push(directory);
 
-            logger.info(`Cleaning dist directory: \`./${relative(context.options.rootDir, directory)}\``);
+            context.logger.info(`Cleaning dist directory: \`./${relative(context.options.rootDir, directory)}\``);
 
             // eslint-disable-next-line no-await-in-loop
             await emptyDir(directory);
@@ -647,7 +644,7 @@ const build = async (
 
     await Promise.all([rollupBuild(context, fileCache), context.options.declaration && rollupBuildTypes(context, fileCache)]);
 
-    logger.success(green(`Build succeeded for ${context.options.name}`));
+    context.logger.success(green(`Build succeeded for ${context.options.name}`));
 
     // Find all dist files and add missing entries as chunks
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
@@ -671,7 +668,7 @@ const build = async (
         }
     }
 
-    const logged = showSizeInformation(logger, context, packageJson);
+    const logged = showSizeInformation(context.logger, context, packageJson);
 
     // Validate
     validateDependencies(context);
@@ -691,6 +688,7 @@ const createBundler = async (
         debug?: boolean;
         tsconfigPath?: string;
     } & BuildConfig = {},
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
     const { configPath, debug, tsconfigPath, ...restInputConfig } = inputConfig;
     const loggerProcessors: Processor<string>[] = [new MessageFormatterProcessor<string>(), new ErrorProcessor<string>()];

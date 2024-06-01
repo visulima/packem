@@ -21,7 +21,7 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<void>
 
     const buildResult = await rollup(rollupOptions);
 
-    fileCache.set<RollupCache>(cacheKey, buildResult.cache);
+    fileCache.set(cacheKey, buildResult.cache);
 
     await context.hooks.callHook("rollup:build", context, buildResult);
 

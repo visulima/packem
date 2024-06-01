@@ -50,60 +50,27 @@
     "type": "module",
     "exports": {
         ".": {
-            "require": {
-                "types": "./dist/create-bundler.d.cts",
-                "default": "./dist/create-bundler.cjs"
-            },
-            "import": {
-                "types": "./dist/create-bundler.d.mts",
-                "default": "./dist/create-bundler.mjs"
-            }
+            "types": "./dist/create-bundler.d.mts",
+            "import": "./dist/create-bundler.mjs"
         },
         "./config": {
-            "require": {
-                "types": "./dist/config.d.cts",
-                "default": "./dist/config.cjs"
-            },
-            "import": {
-                "types": "./dist/config.d.mts",
-                "default": "./dist/config.mjs"
-            }
+            "types": "./dist/config.d.mts",
+            "import": "./dist/config.mjs"
         },
         "./transformer/esbuild": {
-            "require": {
-                "types": "./dist/rollup/plugins/esbuild/index.d.cts",
-                "default": "./dist/rollup/plugins/esbuild/index.cjs"
-            },
-            "import": {
-                "types": "./dist/rollup/plugins/esbuild/index.d.mts",
-                "default": "./dist/rollup/plugins/esbuild/index.mjs"
-            }
+            "types": "./dist/rollup/plugins/esbuild/index.d.mts",
+            "import": "./dist/rollup/plugins/esbuild/index.mjs"
         },
         "./transformer/swc": {
-            "require": {
-                "types": "./dist/rollup/plugins/swc/index.d.cts",
-                "default": "./dist/rollup/plugins/swc/index.cjs"
-            },
-            "import": {
-                "types": "./dist/rollup/plugins/swc/index.d.mts",
-                "default": "./dist/rollup/plugins/swc/index.mjs"
-            }
+            "types": "./dist/rollup/plugins/swc/index.d.mts",
+            "import": "./dist/rollup/plugins/swc/index.mjs"
         },
         "./transformer/sucrase": {
-            "require": {
-                "types": "./dist/rollup/plugins/sucrase/index.d.cts",
-                "default": "./dist/rollup/plugins/sucrase/index.cjs"
-            },
-            "import": {
-                "types": "./dist/rollup/plugins/sucrase/index.d.mts",
-                "default": "./dist/rollup/plugins/sucrase/index.mjs"
-            }
+            "types": "./dist/rollup/plugins/sucrase/index.d.mts",
+            "import": "./dist/rollup/plugins/sucrase/index.mjs"
         },
         "./package.json": "./package.json"
     },
-    "main": "./dist/create-bundler.cjs",
-    "module": "./dist/create-bundler.mjs",
-    "types": "./dist/create-bundler.d.ts",
     "bin": {
         "packem": "./dist/cli.cjs"
     },
@@ -132,6 +99,7 @@
     "dependencies": {
         "@antfu/install-pkg": "^0.3.3",
         "@babel/parser": "^7.24.6",
+        "@clack/prompts": "^0.7.0",
         "@rollup/plugin-alias": "^5.1.0",
         "@rollup/plugin-commonjs": "^25.0.8",
         "@rollup/plugin-dynamic-import-vars": "^2.1.2",
@@ -148,7 +116,6 @@
         "@visulima/package": "^1.8.4",
         "@visulima/pail": "^1.1.11",
         "@visulima/path": "^1.0.1",
-        "@clack/prompts": "^0.7.0",
         "defu": "6.1.4",
         "es-module-lexer": "^1.5.3",
         "fastest-levenshtein": "^1.0.16",

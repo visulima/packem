@@ -403,7 +403,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             shebangPlugin(
                 context.options.entries
-                    .filter((entry) => entry.isExecutable)
+                    .filter((entry) => entry.executable)
                     .map((entry) => entry.name)
                     .filter(Boolean) as string[],
             ),

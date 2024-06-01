@@ -3,7 +3,8 @@ import { existsSync } from "node:fs";
 import type { PackageJson } from "@visulima/package";
 import { resolve } from "@visulima/path";
 
-import type { BuildConfig, BuildEntry, InferEntriesResult } from "../../types";
+import { RUNTIME_EXPORT_CONVENTIONS } from "../../constants";
+import type { BuildConfig, BuildEntry, InferEntriesResult, Runtime } from "../../types";
 import extractExportFilenames from "../../utils/extract-export-filenames";
 import { inferExportTypeFromFileName } from "../../utils/infer-export-type";
 import getEntrypointPaths from "./get-entrypoint-paths";
@@ -44,7 +45,7 @@ const inferEntries = (packageJson: PackageJson, sourceFiles: string[], declarati
     }
 
     // Entry point for TypeScript
-    if (declaration === undefined && (packageJson.types || packageJson.typings)) {
+    if (declaration !== false && (packageJson.types || packageJson.typings)) {
         outputs.push({ file: (packageJson.types ?? packageJson.typings) as string });
     }
 
@@ -62,10 +63,6 @@ const inferEntries = (packageJson: PackageJson, sourceFiles: string[], declarati
         }
     }
 
-    let cjs = false;
-    let esm = false;
-    let dts = false;
-
     // Infer entries from package files
     const entries: BuildEntry[] = [];
 
@@ -73,7 +70,7 @@ const inferEntries = (packageJson: PackageJson, sourceFiles: string[], declarati
     for (const output of outputs) {
         // Supported output file extensions are `.d.ts`, `.cjs` and `.mjs`
         // But we support any file extension here in case user has extended rollup options
-        const outputSlug = output.file.replace(/(?:\*[^/\\]*|\.d\.(?:m|c)?ts|\.\w+)$/, "");
+        const outputSlug = output.file.replace(/(?:\*[^/\\]*|\.d\.[mc]?ts|\.\w+)$/, "");
         const isDirectory = outputSlug.endsWith("/");
 
         // Skip top level directory
@@ -92,7 +89,7 @@ const inferEntries = (packageJson: PackageJson, sourceFiles: string[], declarati
             // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
             const SOURCE_RE = new RegExp(`(?<=/|$)${d}${isDirectory ? "" : "\\.\\w+"}$`);
 
-            return sourceFiles.find((index) => SOURCE_RE.test(index))?.replace(/(?:\.d\.(?:m|c)?ts|\.\w+)$/, "");
+            return sourceFiles.find((index) => SOURCE_RE.test(index))?.replace(/(?:\.d\.[mc]?ts|\.\w+)$/, "");
         }, undefined);
 
         if (!input) {
@@ -105,30 +102,47 @@ const inferEntries = (packageJson: PackageJson, sourceFiles: string[], declarati
             continue;
         }
 
-        if (output.type === "cjs") {
-            cjs = true;
-        }
-
-        if (output.type === "esm") {
-            esm = true;
-        }
-
         const entry = entries.find((index) => index.input === input) ?? (entries[entries.push({ input }) - 1] as BuildEntry);
-
-        if (/\.d\.(?:m|c)?ts$/.test(output.file)) {
-            dts = true;
-        }
 
         if (isDirectory) {
             entry.outDir = outputSlug;
         }
 
+        if (output.file.includes(".min.")) {
+            entry.minify = true;
+        }
+
         if (output.isExecutable) {
-            entry.isExecutable = true;
+            entry.executable = true;
+
+            entry.declaration = false;
+            entry.cjs = packageJson.type === "commonjs";
+            entry.esm = packageJson.type === "module";
+        } else {
+            if (/\.d\.[mc]?ts$/.test(output.file) && !declaration) {
+                entry.declaration = declaration;
+            }
+
+            if (output.type === "cjs") {
+                entry.cjs = true;
+            }
+
+            if (output.type === "esm") {
+                entry.esm = true;
+            }
+
+            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+            for (const runtime of RUNTIME_EXPORT_CONVENTIONS) {
+                if (output.file.includes(runtime)) {
+                    entry.runtime = runtime as Runtime;
+
+                    break;
+                }
+            }
         }
     }
 
-    return { cjs, dts, entries, esm, warnings };
+    return { entries, warnings };
 };
 
 export default inferEntries;

@@ -22,22 +22,6 @@ module.exports = {
             rules: {},
         },
         {
-            files: ["*.ts", "*.tsx", "*.mts", "*.cts"],
-            // Set parserOptions.project for the project to allow TypeScript to create the type-checker behind the scenes when we run linting
-            parserOptions: {},
-            rules: {
-                "@typescript-eslint/no-unsafe-argument": "off",
-                "@typescript-eslint/no-unsafe-assignment": "off",
-                "@typescript-eslint/no-unsafe-call": "off",
-                "@typescript-eslint/no-unsafe-member-access": "off",
-
-                "compat/compat": "off",
-                "prefer-template": "off",
-
-                "@typescript-eslint/sort-type-constituents": "off",
-            },
-        },
-        {
             files: ["*.test.ts"],
             // Set parserOptions.project for the project to allow TypeScript to create the type-checker behind the scenes when we run linting
             parserOptions: {},
@@ -58,6 +42,15 @@ module.exports = {
             files: ["*.ts"],
             rules: {
                 "no-underscore-dangle": "off",
+                "@typescript-eslint/no-unsafe-argument": "off",
+                "@typescript-eslint/no-unsafe-assignment": "off",
+                "@typescript-eslint/no-unsafe-call": "off",
+                "@typescript-eslint/no-unsafe-member-access": "off",
+
+                "compat/compat": "off",
+                "prefer-template": "off",
+
+                "@typescript-eslint/sort-type-constituents": "off",
             },
         },
         {

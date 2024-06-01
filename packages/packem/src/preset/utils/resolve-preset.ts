@@ -1,6 +1,6 @@
-import autoPreset from "../preset/auto";
-import type { BuildConfig, BuildPreset } from "../types";
-import tryRequire from "./try-require";
+import type { BuildConfig, BuildPreset } from "../../types";
+import tryRequire from "../../utils/try-require";
+import autoPreset from "../auto";
 
 const resolvePreset = (preset: BuildPreset | string, rootDirectory: string): BuildConfig => {
     if (preset === "auto") {

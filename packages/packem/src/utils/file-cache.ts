@@ -77,7 +77,7 @@ class FileCache {
         return value as unknown as R;
     }
 
-    public set(name: string, data: ArrayBuffer | ArrayBufferView | string | undefined, subDirectory?: string): void {
+    public set(name: string, data: object | ArrayBuffer | ArrayBufferView | string | undefined, subDirectory?: string): void {
         if (!this.#isEnabled) {
             return;
         }

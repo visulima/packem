@@ -81,12 +81,20 @@ export interface RollupBuildOptions {
     wsam?: RollupWasmOptions | false;
 }
 
+export type Runtime = "react-server" | "react-native" | "edge-light";
+
 export type BuildEntry = {
+    cjs?: boolean;
     declaration?: boolean | "compatible" | "node16";
+    dts?: boolean;
+    environment?: "production" | "development";
+    esm?: boolean;
+    executable?: boolean;
     input: string;
-    isExecutable?: boolean;
+    minify?: boolean;
     name?: string;
     outDir?: string;
+    runtime?: Runtime;
 };
 
 export interface BuildOptions {
@@ -181,10 +189,7 @@ export interface BuildConfig extends DeepPartial<Omit<BuildOptions, "entries">> 
 }
 
 export type InferEntriesResult = {
-    cjs?: boolean;
-    dts?: boolean;
     entries: BuildEntry[];
-    esm?: boolean;
     warnings: string[];
 };
 
