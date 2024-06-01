@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.33](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.32...@visulima/packem@1.0.0-alpha.33) (2024-06-01)
+
+
+### Features
+
+* working on a better auto preset, changed package to esm ([1697cd2](https://github.com/visulima/packem/commit/1697cd23ae35155795c4d727a7ac3004b1eec450))
+
 ## @visulima/packem [1.0.0-alpha.32](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.31...@visulima/packem@1.0.0-alpha.32) (2024-05-31)
 
 
