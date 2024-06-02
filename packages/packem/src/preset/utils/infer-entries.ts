@@ -147,7 +147,7 @@ const inferEntries = (
             continue;
         }
 
-        const sourceSlug = outputSlug.replace("./" + context.options.outDir, context.options.sourceDir);
+        const sourceSlug = outputSlug.replace(new RegExp("(./)?" + context.options.outDir), context.options.sourceDir);
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if (output.file.includes("/*") && output.key === "exports") {
