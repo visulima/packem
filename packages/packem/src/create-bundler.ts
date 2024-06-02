@@ -504,7 +504,7 @@ const showSizeInformation = (logger: Pail<never, string>, context: BuildContext,
     return loggedEntries;
 };
 
-const build = async (
+const createContext = async (
     logger: Pail<never, string>,
     rootDirectory: string,
     mode: Mode,
@@ -512,10 +512,7 @@ const build = async (
     buildConfig: BuildConfig,
     packageJson: PackEmPackageJson,
     tsconfig: TsConfigResult | undefined,
-    fileCache: FileCache,
-    cleanedDirectories: string[],
-    // eslint-disable-next-line sonarjs/cognitive-complexity
-): Promise<void> => {
+): Promise<BuildContext> => {
     const preset = resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", rootDirectory);
 
     const options = generateOptions(logger, rootDirectory, mode, inputConfig, buildConfig, preset, packageJson, tsconfig);
@@ -550,9 +547,6 @@ const build = async (
         context.hooks.addHooks(buildConfig.hooks);
     }
 
-    // eslint-disable-next-line no-param-reassign
-    fileCache.isEnabled = context.options.fileCache as boolean;
-
     // Allow to prepare and extending context
     await context.hooks.callHook("build:prepare", context);
 
@@ -576,26 +570,12 @@ const build = async (
         context.logger.info("Declaration files, are disabled.");
     }
 
-    await prepareEntries(context, rootDirectory);
+    return context;
+};
 
-    // Call build:before
-    await context.hooks.callHook("build:before", context);
+const cleanDistributionDirectories = async (context: BuildContext): Promise<void> => {
+    const cleanedDirectories: string[] = [];
 
-    let modeName = "Building";
-
-    if (mode === "watch") {
-        modeName = "Watching";
-    } else if (mode === "jit") {
-        modeName = "Stubbing";
-    }
-
-    context.logger.info(cyan(`${modeName} ${context.options.name}`));
-
-    context.logger.debug(
-        `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}\n  ${context.options.entries.map((entry) => `  ${dumpObject(entry)}`).join("\n  ")}`,
-    );
-
-    // Clean dist dirs
     if (context.options.clean) {
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const directory of new Set(
@@ -615,30 +595,17 @@ const build = async (
             }
 
             cleanedDirectories.push(directory);
-
             context.logger.info(`Cleaning dist directory: \`./${relative(context.options.rootDir, directory)}\``);
 
             // eslint-disable-next-line no-await-in-loop
             await emptyDir(directory);
         }
     }
+};
 
-    // Skip rest for stub
-    if (context.options.stub) {
-        await createStub(context);
-
-        await context.hooks.callHook("build:done", context);
-
-        return;
-    }
-
-    if (mode === "watch") {
-        await rollupWatch(context, fileCache);
-
-        logErrors(context, false);
-
-        return;
-    }
+const build = async (context: BuildContext, packageJson: PackEmPackageJson, fileCache: FileCache): Promise<void> => {
+    // Call build:before
+    await context.hooks.callHook("build:before", context);
 
     await Promise.all([rollupBuild(context, fileCache), context.options.declaration && rollupBuildTypes(context, fileCache)]);
 
@@ -750,20 +717,13 @@ const createBundler = async (
             exit(1);
         }
 
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        const _buildConfig = tryRequire<BuildConfig | BuildConfig[]>(packemConfigFileName, rootDirectory);
+        const buildConfig = tryRequire<BuildConfig>(packemConfigFileName, rootDirectory);
 
         logger.debug("Using packem config found at", join(rootDirectory, packemConfigFileName));
 
-        const buildConfigs = (Array.isArray(_buildConfig) ? _buildConfig : [_buildConfig]).filter(Boolean);
         const start = Date.now();
 
         const getDuration = () => duration(Math.floor(Date.now() - start));
-
-        // Invoke build for every build config defined in packem.config.ts
-        const cleanedDirectories: string[] = [];
-
-        const builds: Promise<void>[] = [];
 
         const cachekey = getHash(
             packageJson.version + JSON.stringify({ ...packageJson.dependencies, ...packageJson.devDependencies, eNode: packageJson.engines?.node }),
@@ -777,16 +737,41 @@ const createBundler = async (
             await emptyDir(fileCache.cachePath);
         }
 
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-        for (const buildConfig of buildConfigs) {
-            builds.push(
-                build(logger, rootDirectory, mode, restInputConfig, buildConfig, packageJson as PackEmPackageJson, tsconfig, fileCache, cleanedDirectories),
-            );
+        const context = await createContext(logger, rootDirectory, mode, restInputConfig, buildConfig, packageJson, tsconfig);
+
+        fileCache.isEnabled = context.options.fileCache as boolean;
+
+        await prepareEntries(context, rootDirectory);
+
+        context.logger.info(cyan((mode === "watch" ? "Watching" : mode === "jit" ? "Stubbing" : "Building") + " " + context.options.name));
+
+        context.logger.debug(
+            `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}\n  ${context.options.entries.map((entry) => `  ${dumpObject(entry)}`).join("\n  ")}`,
+        );
+
+        // Clean dist dirs
+        await cleanDistributionDirectories(context);
+
+        // Skip rest for stub
+        if (context.options.stub) {
+            await createStub(context);
+
+            await context.hooks.callHook("build:done", context);
+
+            return;
         }
 
-        await Promise.all(builds);
+        if (mode === "watch") {
+            await rollupWatch(context, fileCache);
 
-        logger.raw("\n⚡️ Build" + (builds.length > 1 ? "s" : "") + " run in " + getDuration());
+            logErrors(context, false);
+
+            return;
+        }
+
+        await build(context, packageJson as PackEmPackageJson, fileCache);
+
+        logger.raw("\n⚡️ Build run in " + getDuration());
 
         // Restore all wrapped console methods
         logger.restoreAll();

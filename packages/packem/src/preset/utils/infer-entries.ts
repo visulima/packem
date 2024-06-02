@@ -151,7 +151,7 @@ const inferEntries = (
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if (output.file.includes("/*") && output.key === "exports") {
-            context.logger.debug("Private subfolders are not supported, if you need this feature please open an issue on GitHub.");
+            context.logger.warn("Private subfolders are not supported, if you need this feature please open an issue on GitHub.");
 
             const inputs: string[] = [];
 
