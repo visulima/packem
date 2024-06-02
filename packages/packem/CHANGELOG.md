@@ -1,3 +1,12 @@
+## @visulima/packem [1.0.0-alpha.34](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.33...@visulima/packem@1.0.0-alpha.34) (2024-06-02)
+
+
+### Features
+
+* optimized package.json auto resolver ([89bda92](https://github.com/visulima/packem/commit/89bda9259044a02ec629283a6152a8381ec2d4d1))
+* optimized package.json auto resolver ([1348ada](https://github.com/visulima/packem/commit/1348ada13f778db685ddfcede9a11caca3af1a0c))
+* optimized package.json auto resolver ([87be4ea](https://github.com/visulima/packem/commit/87be4ea19acc2dbd9c90b4b783df372aeb6cee23))
+
 ## @visulima/packem [1.0.0-alpha.33](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.32...@visulima/packem@1.0.0-alpha.33) (2024-06-01)
 
 
