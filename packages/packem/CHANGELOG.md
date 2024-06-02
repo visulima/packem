@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.36](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.35...@visulima/packem@1.0.0-alpha.36) (2024-06-02)
+
+
+### Features
+
+* reduced complexity scope of builder ([958049a](https://github.com/visulima/packem/commit/958049a8d5fb1bc81b59a85f6373ba26b1ba0edc))
+
 ## @visulima/packem [1.0.0-alpha.35](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.34...@visulima/packem@1.0.0-alpha.35) (2024-06-02)
 
 
