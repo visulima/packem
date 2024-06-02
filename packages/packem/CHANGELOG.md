@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.35](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.34...@visulima/packem@1.0.0-alpha.35) (2024-06-02)
+
+
+### Bug Fixes
+
+* fixed path handling without ./ ([e717627](https://github.com/visulima/packem/commit/e717627a8a8bc332a54126c79653cccee1aeea3d))
+
 ## @visulima/packem [1.0.0-alpha.34](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.33...@visulima/packem@1.0.0-alpha.34) (2024-06-02)
 
 
