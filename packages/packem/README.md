@@ -62,6 +62,7 @@ Links:
 -   [bunchee](https://github.com/huozhi/bunchee) - Zero config bundler for ECMAScript and TypeScript packages
 -   [unbuild](https://github.com/unjs/unbuild) - 📦 An unified javascript build system
 -   [pkgroll](https://github.com/privatenumber/pkgroll) - 📦 Zero-config package bundler for Node.js + TypeScript
+-   [siroc](https://github.com/danielroe/siroc) - Zero-config build tooling for Node
 -   [tsup](https://github.com/egoist/tsup) - The simplest and fastest way to bundle your TypeScript libraries
 
 ## Supported Node.js Versions
