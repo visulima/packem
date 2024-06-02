@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.37](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.36...@visulima/packem@1.0.0-alpha.37) (2024-06-02)
+
+
+### Bug Fixes
+
+* disabled cjs ([8c714e6](https://github.com/visulima/packem/commit/8c714e653669efa07250122b84fe200c103d81a0))
+
 ## @visulima/packem [1.0.0-alpha.36](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.35...@visulima/packem@1.0.0-alpha.36) (2024-06-02)
 
 
