@@ -72,7 +72,7 @@
         "./package.json": "./package.json"
     },
     "bin": {
-        "packem": "./dist/cli.cjs"
+        "packem": "./dist/cli.mjs"
     },
     "files": [
         "dist/**",
