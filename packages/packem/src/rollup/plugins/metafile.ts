@@ -36,7 +36,7 @@ const metafilePlugin = (options: MetafileOptions): Plugin =>
                 return;
             }
 
-            const outPath = resolve(options.outDir, `graph.json`);
+            const outPath = resolve(options.rootDir, options.outDir, `graph.json`);
 
             writeJsonSync(outPath, deps);
         },

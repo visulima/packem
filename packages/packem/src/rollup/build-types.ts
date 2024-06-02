@@ -23,7 +23,7 @@ const buildTypes = async (context: BuildContext, fileCache: FileCache): Promise<
 
     const typesBuild = await rollup(rollupTypeOptions);
 
-    fileCache.set<RollupCache>(cacheKey, typesBuild.cache);
+    fileCache.set(cacheKey, typesBuild.cache);
 
     await context.hooks.callHook("rollup:dts:build", context, typesBuild);
 

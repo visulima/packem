@@ -125,6 +125,7 @@ export interface BuildOptions {
     replace: Record<string, string>;
     rollup: RollupBuildOptions;
     rootDir: string;
+    sourceDir: string;
     /** @experimental */
     sourcemap: boolean;
     stub: boolean;

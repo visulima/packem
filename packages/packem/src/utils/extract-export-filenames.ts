@@ -3,9 +3,16 @@ import type { PackageJson } from "@visulima/package";
 import type { BuildOptions } from "../types";
 import { inferExportType, inferExportTypeFromFileName } from "./infer-export-type";
 
-type OutputDescriptor = { fieldName?: string; file: string; isExecutable?: true; type?: "cjs" | "esm" };
+export type OutputDescriptor = {
+    fieldName?: string;
+    file: string;
+    isExecutable?: true;
+    key: "exports" | "main" | "types" | "module" | "bin";
+    subKey?: "import" | "require" | "node" | "node-addons" | "default" | "production" | "types" | "deno" | "browser" | "development";
+    type?: "cjs" | "esm";
+};
 
-const extractExportFilenames = (
+export const extractExportFilenames = (
     packageExports: PackageJson["exports"],
     type: PackageJson["type"],
     declaration: BuildOptions["declaration"],
@@ -23,7 +30,7 @@ const extractExportFilenames = (
             throw new Error(`Exported file "${packageExports}" has an extension that does not match the package.json type "${type as string}".`);
         }
 
-        return [{ file: packageExports, type: inferredType ?? fileType }];
+        return [{ file: packageExports, key: "exports", type: inferredType ?? fileType }];
     }
 
     return (
@@ -38,11 +45,11 @@ const extractExportFilenames = (
                 return typeof packageExport === "string"
                     ? {
                           file: packageExport,
+                          key: "exports",
+                          subKey: condition as OutputDescriptor["subKey"],
                           type: inferExportType(condition, conditions, packageExport, type),
                       }
                     : extractExportFilenames(packageExport, type, declaration, [...conditions, condition]);
             })
     );
 };
-
-export default extractExportFilenames;

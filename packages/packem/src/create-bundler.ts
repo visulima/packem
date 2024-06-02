@@ -304,6 +304,7 @@ const generateOptions = (
             },
         },
         rootDir: rootDirectory,
+        sourceDir: "src",
         sourcemap: false,
         stub: mode === "jit",
         stubOptions: {
@@ -334,9 +335,6 @@ const generateOptions = (
 
         logger.info('Using "' + cyan(options.transformerName) + '" as transformer.');
     }
-
-    // Resolve dirs relative to rootDir
-    options.outDir = resolve(options.rootDir, options.outDir);
 
     if (options.rollup.resolve && options.rollup.resolve.preferBuiltins === true) {
         options.rollup.polyfillNode = false;
@@ -522,7 +520,7 @@ const build = async (
 
     const options = generateOptions(logger, rootDirectory, mode, inputConfig, buildConfig, preset, packageJson, tsconfig);
 
-    ensureDirSync(options.outDir);
+    ensureDirSync(join(options.rootDir, options.outDir));
 
     // Build context
     const context: BuildContext = {
@@ -648,8 +646,8 @@ const build = async (
 
     // Find all dist files and add missing entries as chunks
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-    for await (const file of walk(context.options.outDir)) {
-        let entry = context.buildEntries.find((bEntry) => join(context.options.outDir, bEntry.path) === file.path);
+    for await (const file of walk(join(context.options.rootDir, context.options.outDir))) {
+        let entry = context.buildEntries.find((bEntry) => join(context.options.rootDir, context.options.outDir, bEntry.path) === file.path);
 
         if (!entry) {
             entry = {
@@ -662,7 +660,7 @@ const build = async (
 
         if (!entry.bytes) {
             // eslint-disable-next-line security/detect-non-literal-fs-filename
-            const awaitedStat = await stat(resolve(context.options.outDir, file.path));
+            const awaitedStat = await stat(resolve(context.options.rootDir, context.options.outDir, file.path));
 
             entry.bytes = awaitedStat.size;
         }
@@ -703,7 +701,7 @@ const createBundler = async (
         scope: "packem",
     });
 
-    logger.wrapAll();
+    // logger.wrapAll();
 
     // Determine rootDirectory
     // eslint-disable-next-line no-param-reassign

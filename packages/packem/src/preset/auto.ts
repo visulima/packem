@@ -5,14 +5,14 @@ import { collectSync } from "@visulima/fs";
 import type { NormalizedPackageJson } from "@visulima/package";
 import { join } from "@visulima/path";
 
-import type { BuildPreset } from "../types";
+import type { BuildContext, BuildPreset } from "../types";
 import warn from "../utils/warn";
 import inferEntries from "./utils/infer-entries";
 import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";
 
 const autoPreset: BuildPreset = {
     hooks: {
-        "build:prepare": function (context) {
+        "build:prepare": function (context: BuildContext) {
             // Disable auto if entries already provided of pkg not available
             if (context.options.entries.length > 0) {
                 return;
@@ -38,7 +38,11 @@ const autoPreset: BuildPreset = {
                 package_ = overwriteWithPublishConfig(package_, context.options.declaration);
             }
 
-            const result = inferEntries(package_, sourceFiles, context.options.declaration, context.options.rootDir);
+            const result = inferEntries(
+                package_,
+                sourceFiles,
+                context
+            );
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const message of result.warnings) {

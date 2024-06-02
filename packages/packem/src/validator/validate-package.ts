@@ -5,7 +5,7 @@ import type { PackageJson } from "@visulima/package";
 import { relative, resolve } from "@visulima/path";
 
 import type { BuildContext } from "../types";
-import extractExportFilenames from "../utils/extract-export-filenames";
+import { extractExportFilenames } from "../utils/extract-export-filenames";
 import levenstein from "../utils/levenstein";
 import warn from "../utils/warn";
 
