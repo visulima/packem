@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.38](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.37...@visulima/packem@1.0.0-alpha.38) (2024-06-03)
+
+
+### Features
+
+* improved auto preset handling, split the builder based on evn and runtime ([6d92a3b](https://github.com/visulima/packem/commit/6d92a3bebd3916bb008aa862164740f520017f8f))
+
 ## @visulima/packem [1.0.0-alpha.37](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.36...@visulima/packem@1.0.0-alpha.37) (2024-06-02)
 
 
