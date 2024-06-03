@@ -23,10 +23,11 @@ import rollupBuild from "./rollup/build";
 import rollupBuildTypes from "./rollup/build-types";
 import getHash from "./rollup/utils/get-hash";
 import rollupWatch from "./rollup/watch";
-import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildOptions, InternalBuildOptions, Mode } from "./types";
+import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildEntry, BuildOptions, InternalBuildOptions, Mode } from "./types";
 import dumpObject from "./utils/dump-object";
 import FileCache from "./utils/file-cache";
 import getPackageSideEffect from "./utils/get-package-side-effect";
+import groupByKeys from "./utils/group-by-keys";
 import tryRequire from "./utils/try-require";
 import validateDependencies from "./validator/validate-dependencies";
 import validatePackage from "./validator/validate-package";
@@ -603,11 +604,57 @@ const cleanDistributionDirectories = async (context: BuildContext): Promise<void
     }
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const build = async (context: BuildContext, packageJson: PackEmPackageJson, fileCache: FileCache): Promise<void> => {
     // Call build:before
     await context.hooks.callHook("build:before", context);
 
-    await Promise.all([rollupBuild(context, fileCache), context.options.declaration && rollupBuildTypes(context, fileCache)]);
+    const groupedEntries = groupByKeys(context.options.entries, "environment", "runtime");
+
+    const rollups: Promise<void>[] = [];
+    const typescriptEntries: BuildEntry[] = [];
+
+    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+    for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
+        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+        for (const [runtime, entries] of Object.entries(environmentEntries)) {
+            typescriptEntries.push(...entries.filter((entry) => entry.declaration));
+
+            const adjustedContext = { ...context };
+
+            // dont minify in development files
+            if (environment === "development") {
+                adjustedContext.options.minify = false;
+            }
+
+            if (context.options.rollup.replace) {
+                context.options.rollup.replace.values = {
+                    ...context.options.rollup.replace.values,
+                    "process.env.NODE_ENV": environment,
+                };
+
+                if (runtime === "edge-light") {
+                    context.options.rollup.replace.values.EdgeRuntime = "edge-runtime";
+                }
+            } else {
+                context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
+            }
+
+            adjustedContext.options.entries = entries
+
+            rollups.push(rollupBuild(adjustedContext, fileCache));
+        }
+    }
+
+    if (context.options.declaration) {
+        const adjustedContext = { ...context };
+
+        adjustedContext.options.entries = typescriptEntries;
+
+        rollups.push(rollupBuildTypes(adjustedContext, fileCache));
+    }
+
+    await Promise.all(rollups);
 
     context.logger.success(green(`Build succeeded for ${context.options.name}`));
 

@@ -7,6 +7,7 @@ const createFilter = _createFilter as (
     include?: FilterPattern,
     exclude?: FilterPattern,
     options?: { resolve?: string | false | null },
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 ) => (id: string | unknown) => boolean;
 
 const getPackageSideEffect = (cwd: string, packageJson: PackageJson): ((id: string) => boolean | null) => {

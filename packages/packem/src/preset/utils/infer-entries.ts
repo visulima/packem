@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs";
+import { env } from "node:process";
 
 import type { PackageJson } from "@visulima/package";
 import { resolve } from "@visulima/path";
@@ -8,6 +9,26 @@ import type { BuildContext, BuildEntry, InferEntriesResult, Runtime } from "../.
 import type { OutputDescriptor } from "../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
 import { inferExportTypeFromFileName } from "../../utils/infer-export-type";
+
+const getEnvironment = (output: OutputDescriptor): "production" | "development" => {
+    if (output.key === "exports" && output.subKey === "production") {
+        return "production";
+    }
+
+    if (output.key === "exports" && output.subKey === "development") {
+        return "development";
+    }
+
+    if (env.NODE_ENV) {
+        if (!env.NODE_ENV.includes("production") && !env.NODE_ENV.includes("development")) {
+            throw new Error(`Invalid NODE_ENV value: ${env.NODE_ENV}, must be either "production" or "development".`);
+        }
+
+        return env.NODE_ENV as "production" | "development";
+    }
+
+    return "production";
+};
 
 const createOrUpdateEntry = (
     entries: BuildEntry[],
@@ -25,10 +46,6 @@ const createOrUpdateEntry = (
         entry.outDir = outputSlug;
     }
 
-    if (output.file.includes(".min.")) {
-        entry.minify = true;
-    }
-
     if (output.isExecutable) {
         entry.executable = true;
 
@@ -36,7 +53,7 @@ const createOrUpdateEntry = (
         entry.cjs = packageJson.type === "commonjs";
         entry.esm = packageJson.type === "module";
     } else {
-        if (/\.d\.[mc]?ts$/.test(output.file) && !declaration) {
+        if (/\.d\.[mc]?ts$/.test(output.file) && declaration !== false) {
             entry.declaration = declaration;
         }
 
@@ -50,19 +67,19 @@ const createOrUpdateEntry = (
 
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const runtime of RUNTIME_EXPORT_CONVENTIONS) {
-            if (output.file.includes(runtime)) {
+            if (output.file.includes(runtime + ".")) {
                 entry.runtime = runtime as Runtime;
 
                 break;
             }
         }
-
-        if (output.key === "exports" && output.subKey === "production") {
-            entry.environment = "production";
-        } else if (output.key === "exports" && output.subKey === "development") {
-            entry.environment = "development";
-        }
     }
+
+    if (entry.runtime === undefined) {
+        entry.runtime = "node";
+    }
+
+    entry.environment = getEnvironment(output);
 };
 
 const ENDING_RE = /(?:\.d\.[mc]?ts|\.\w+)$/;
@@ -139,6 +156,7 @@ const inferEntries = (
         // Supported output file extensions are `.d.ts`, `.cjs` and `.mjs`
         // But we support any file extension here in case user has extended rollup options
         const outputSlug = output.file.replace(/(?:\*[^/\\]|\.d\.[mc]?ts|\.\w+)$/, "");
+
         const isDirectory = outputSlug.endsWith("/");
 
         // Skip top level directory
@@ -147,6 +165,7 @@ const inferEntries = (
             continue;
         }
 
+        // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
         const sourceSlug = outputSlug.replace(new RegExp("(./)?" + context.options.outDir), context.options.sourceDir);
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns

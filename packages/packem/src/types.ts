@@ -81,17 +81,15 @@ export interface RollupBuildOptions {
     wsam?: RollupWasmOptions | false;
 }
 
-export type Runtime = "react-server" | "react-native" | "edge-light";
+export type Runtime = "react-server" | "react-native" | "edge-light" | "node";
 
 export type BuildEntry = {
     cjs?: boolean;
     declaration?: boolean | "compatible" | "node16";
-    dts?: boolean;
     environment?: "production" | "development";
     esm?: boolean;
     executable?: boolean;
     input: string;
-    minify?: boolean;
     name?: string;
     outDir?: string;
     runtime?: Runtime;
