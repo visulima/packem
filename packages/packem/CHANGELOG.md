@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.40](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.39...@visulima/packem@1.0.0-alpha.40) (2024-06-04)
+
+
+### Bug Fixes
+
+* text changes ([cc0005e](https://github.com/visulima/packem/commit/cc0005e7f45211a54ca9363dab1f3e83a5e4709c))
+
 ## @visulima/packem [1.0.0-alpha.39](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.38...@visulima/packem@1.0.0-alpha.39) (2024-06-04)
 
 
