@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.39](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.38...@visulima/packem@1.0.0-alpha.39) (2024-06-04)
+
+
+### Features
+
+* more improvements ([b1a1013](https://github.com/visulima/packem/commit/b1a10136d2b7b275b78910b0d6c5e11c1b262b1b))
+
 ## @visulima/packem [1.0.0-alpha.38](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.37...@visulima/packem@1.0.0-alpha.38) (2024-06-03)
 
 
