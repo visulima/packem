@@ -15,6 +15,7 @@ import { CallerProcessor, ErrorProcessor, MessageFormatterProcessor } from "@vis
 import { basename, dirname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import { defu } from "defu";
 import { createHooks } from "hookable";
+import { VERSION } from "rollup";
 
 import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP } from "./constants";
 import createStub from "./jit/create-stub";
@@ -25,6 +26,7 @@ import getHash from "./rollup/utils/get-hash";
 import rollupWatch from "./rollup/watch";
 import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildEntry, BuildOptions, InternalBuildOptions, Mode } from "./types";
 import dumpObject from "./utils/dump-object";
+import enhanceRollupError from "./utils/enhance-rollup-error";
 import FileCache from "./utils/file-cache";
 import getPackageSideEffect from "./utils/get-package-side-effect";
 import groupByKeys from "./utils/group-by-keys";
@@ -73,6 +75,7 @@ const generateOptions = (
     logger: Pail<never, string>,
     rootDirectory: string,
     mode: Mode,
+    debug: boolean,
     inputConfig: BuildConfig,
     buildConfig: BuildConfig,
     preset: BuildConfig,
@@ -85,6 +88,7 @@ const generateOptions = (
     const options = defu(buildConfig, inputConfig, preset, <BuildOptions>{
         alias: {},
         clean: true,
+        debug,
         declaration: true,
         dependencies: [],
         devDependencies: [],
@@ -300,6 +304,10 @@ const generateOptions = (
                 preset: "recommended",
             },
             watch: {
+                chokidar: {
+                    ignoreInitial: true,
+                    ignorePermissionErrors: true,
+                },
                 clearScreen: true,
                 exclude: EXCLUDE_REGEXP,
             },
@@ -322,19 +330,27 @@ const generateOptions = (
     }) as InternalBuildOptions;
 
     if (!options.transformerName) {
-        const dependencies = new Set([...Object.keys(packageJson.dependencies ?? {}), ...Object.keys(packageJson.devDependencies ?? {})]);
+        const dependencies = new Map([...Object.entries(packageJson.dependencies ?? {}), ...Object.entries(packageJson.devDependencies ?? {})]);
+
+        let version = "0.0.0";
 
         if (dependencies.has("esbuild")) {
             options.transformerName = "esbuild";
+
+            version = dependencies.get("esbuild") as string;
         } else if (dependencies.has("@swc/core")) {
             options.transformerName = "swc";
+
+            version = dependencies.get("@swc/core") as string;
         } else if (dependencies.has("sucrase")) {
             options.transformerName = "sucrase";
+
+            version = dependencies.get("sucrase") as string;
         } else {
             throw new Error("Unknown transformer, check your transformer options or install one of the supported transformers: esbuild, swc, sucrase");
         }
 
-        logger.info('Using "' + cyan(options.transformerName) + '" as transformer.');
+        logger.info(["Using " + cyan("rollup ") + VERSION, "Using " + cyan(options.transformerName) + " " + version + " as transformer"].join("\n"));
     }
 
     if (options.rollup.resolve && options.rollup.resolve.preferBuiltins === true) {
@@ -345,7 +361,7 @@ const generateOptions = (
 
     if (!tsconfig?.config.compilerOptions?.isolatedModules) {
         logger.warn(
-            `'compilerOptions.isolatedModules' is not enabled in tsconfig.\nBecause none of the third-party transpilers, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.\nTo mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.`,
+            `'compilerOptions.isolatedModules' is not enabled in tsconfig.\nBecause none of the third-party transpiler, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.\nTo mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.`,
         );
     }
 
@@ -509,6 +525,7 @@ const createContext = async (
     logger: Pail<never, string>,
     rootDirectory: string,
     mode: Mode,
+    debug: boolean,
     inputConfig: BuildConfig,
     buildConfig: BuildConfig,
     packageJson: PackEmPackageJson,
@@ -516,7 +533,7 @@ const createContext = async (
 ): Promise<BuildContext> => {
     const preset = resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", rootDirectory);
 
-    const options = generateOptions(logger, rootDirectory, mode, inputConfig, buildConfig, preset, packageJson, tsconfig);
+    const options = generateOptions(logger, rootDirectory, mode, debug, inputConfig, buildConfig, preset, packageJson, tsconfig);
 
     ensureDirSync(join(options.rootDir, options.outDir));
 
@@ -640,7 +657,7 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
                 context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
             }
 
-            adjustedContext.options.entries = entries
+            adjustedContext.options.entries = entries;
 
             rollups.push(rollupBuild(adjustedContext, fileCache));
         }
@@ -784,7 +801,7 @@ const createBundler = async (
             await emptyDir(fileCache.cachePath);
         }
 
-        const context = await createContext(logger, rootDirectory, mode, restInputConfig, buildConfig, packageJson, tsconfig);
+        const context = await createContext(logger, rootDirectory, mode, debug ?? false, restInputConfig, buildConfig, packageJson, tsconfig);
 
         fileCache.isEnabled = context.options.fileCache as boolean;
 
@@ -809,6 +826,10 @@ const createBundler = async (
         }
 
         if (mode === "watch") {
+            if (context.options.rollup.watch === false) {
+                throw new Error("Rollup watch is disabled. You should check your packem.config file.");
+            }
+
             await rollupWatch(context, fileCache);
 
             logErrors(context, false);
@@ -826,6 +847,8 @@ const createBundler = async (
         exit(0);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
+        enhanceRollupError(error);
+
         logger.error("An error occurred while building", error);
 
         exit(1);

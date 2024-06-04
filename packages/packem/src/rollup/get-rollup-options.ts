@@ -234,8 +234,9 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
 
             return isExplicitExternal;
         },
-
         input: Object.fromEntries(context.options.entries.map((entry) => [entry.name, resolve(context.options.rootDir, entry.input)])),
+
+        logLevel: context.options.debug ? "debug" : "info",
 
         onLog: (level, log) => {
             let format = log.message;

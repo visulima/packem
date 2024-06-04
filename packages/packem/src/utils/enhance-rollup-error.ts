@@ -1,4 +1,4 @@
-import { cyan, red, yellow } from "@visulima/colorize";
+import { cyan, yellow } from "@visulima/colorize";
 import type { RollupError } from "rollup";
 
 /**
@@ -34,7 +34,7 @@ const normalizeCodeFrame = (frame: string): string => {
 const enhanceRollupError = (error: RollupError): void => {
     const stackOnly = extractStack(error);
 
-    let message = red((error.plugin ? `[${error.plugin}] ` : "") + error.message);
+    let message = (error.plugin ? `[${error.plugin}] ` : "") + error.message;
 
     if (error.id) {
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands

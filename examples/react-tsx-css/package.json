@@ -6,7 +6,7 @@
     "main": "./dist/index.cjs",
     "module": "./dist/index.mjs",
     "scripts": {
-        "build": "packem"
+        "build": "packem build"
     },
     "dependencies": {
         "react": "^18.3.1",

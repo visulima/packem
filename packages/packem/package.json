@@ -50,24 +50,54 @@
     "type": "module",
     "exports": {
         ".": {
-            "types": "./dist/create-bundler.d.mts",
-            "import": "./dist/create-bundler.mjs"
+            "import": {
+                "types": "./dist/create-bundler.d.mts",
+                "default": "./dist/create-bundler.mjs"
+            },
+            "require": {
+                "types": "./dist/create-bundler.d.cts",
+                "default": "./dist/create-bundler.cjs"
+            }
         },
         "./config": {
-            "types": "./dist/config.d.mts",
-            "import": "./dist/config.mjs"
+            "import": {
+                "types": "./dist/config.d.mts",
+                "default": "./dist/config.mjs"
+            },
+            "require": {
+                "types": "./dist/config.d.cts",
+                "default": "./dist/config.cjs"
+            }
         },
         "./transformer/esbuild": {
-            "types": "./dist/rollup/plugins/esbuild/index.d.mts",
-            "import": "./dist/rollup/plugins/esbuild/index.mjs"
+            "import": {
+                "types": "./dist/rollup/plugins/esbuild/index.d.mts",
+                "default": "./dist/rollup/plugins/esbuild/index.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/esbuild/index.d.cts",
+                "default": "./dist/rollup/plugins/esbuild/index.cjs"
+            }
         },
         "./transformer/swc": {
-            "types": "./dist/rollup/plugins/swc/index.d.mts",
-            "import": "./dist/rollup/plugins/swc/index.mjs"
+            "import": {
+                "types": "./dist/rollup/plugins/swc/index.d.mts",
+                "default": "./dist/rollup/plugins/swc/index.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/swc/index.d.cts",
+                "default": "./dist/rollup/plugins/swc/index.cjs"
+            }
         },
         "./transformer/sucrase": {
-            "types": "./dist/rollup/plugins/sucrase/index.d.mts",
-            "import": "./dist/rollup/plugins/sucrase/index.mjs"
+            "import": {
+                "types": "./dist/rollup/plugins/sucrase/index.d.mts",
+                "default": "./dist/rollup/plugins/sucrase/index.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/sucrase/index.d.cts",
+                "default": "./dist/rollup/plugins/sucrase/index.cjs"
+            }
         },
         "./package.json": "./package.json"
     },
@@ -109,11 +139,11 @@
         "@rollup/plugin-replace": "^5.0.5",
         "@rollup/plugin-wasm": "^6.2.2",
         "@rollup/pluginutils": "^5.1.0",
-        "@visulima/cerebro": "^1.0.30",
+        "@visulima/cerebro": "^1.0.31",
         "@visulima/colorize": "^1.4.1",
         "@visulima/fs": "^2.1.2",
         "@visulima/humanizer": "^1.0.3",
-        "@visulima/package": "^1.8.4",
+        "@visulima/package": "^1.9.0",
         "@visulima/pail": "^1.1.11",
         "@visulima/path": "^1.0.1",
         "defu": "6.1.4",
@@ -154,22 +184,22 @@
         "@vitest/ui": "^1.6.0",
         "cross-env": "^7.0.3",
         "esbuild": "^0.21.4",
-        "eslint": "^8.56.0",
-        "eslint-plugin-deprecation": "^2.0.0",
+        "eslint": "^9.4.0",
+        "eslint-plugin-deprecation": "^3.0.0",
         "eslint-plugin-etc": "^2.0.3",
         "eslint-plugin-import": "npm:eslint-plugin-i@^2.29.1",
         "eslint-plugin-mdx": "^3.1.5",
-        "eslint-plugin-vitest": "^0.4.1",
+        "eslint-plugin-vitest": "^0.5.4",
         "eslint-plugin-vitest-globals": "^1.5.0",
         "estree-walker": "^3.0.3",
         "execa": "^9.1.0",
         "jiti": "^1.21.0",
-        "prettier": "^3.2.5",
+        "prettier": "^3.3.0",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "rimraf": "^5.0.7",
         "secretlint": "8.2.4",
-        "semantic-release": "^23.1.1",
+        "semantic-release": "^24.0.0",
         "sort-package-json": "^2.10.0",
         "sucrase": "^3.35.0",
         "tempy": "^3.1.0",

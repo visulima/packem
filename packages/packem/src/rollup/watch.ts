@@ -1,10 +1,11 @@
 import { cyan, gray } from "@visulima/colorize";
 import type { Pail } from "@visulima/pail";
-import { relative } from "@visulima/path";
+import { join, relative } from "@visulima/path";
 import type { RollupWatcher, RollupWatcherEvent } from "rollup";
 import { watch as rollupWatch } from "rollup";
 
 import type { BuildContext } from "../types";
+import enhanceRollupError from "../utils/enhance-rollup-error";
 import type FileCache from "../utils/file-cache";
 import { getRollupDtsOptions, getRollupOptions } from "./get-rollup-options";
 
@@ -26,19 +27,46 @@ const watchHandler = (watcher: RollupWatcher, mode: "bundle" | "types", logger: 
     });
 
     watcher.on("event", (event: RollupWatcherEvent) => {
-        if (event.code === "END") {
-            logger.success({
-                message: "Rebuild " + mode + " finished",
-                prefix,
-            });
-        }
+        // eslint-disable-next-line default-case
+        switch (event.code) {
+            case "END": {
+                logger.success({
+                    message: "Rebuild " + mode + " finished",
+                    prefix,
+                });
 
-        if (event.code === "ERROR") {
-            logger.error({
-                context: [event.error],
-                message: "Rebuild " + mode + " failed: " + event.error.message,
-                prefix,
-            });
+                break;
+            }
+            case "BUNDLE_START": {
+                logger.info({
+                    message: cyan(`\nbuild started...`),
+                    prefix,
+                });
+
+                break;
+            }
+            case "BUNDLE_END": {
+                event.result.close();
+
+                logger.info({
+                    message: cyan(`built in ${event.duration}ms.`),
+                    prefix,
+                });
+
+                break;
+            }
+            case "ERROR": {
+                enhanceRollupError(event.error);
+
+                logger.error({
+                    context: [event.error],
+                    message: "Rebuild " + mode + " failed: " + event.error.message,
+                    prefix,
+                });
+
+                break;
+            }
+            // No default
         }
     });
 };
@@ -54,7 +82,16 @@ const watch = async (context: BuildContext, fileCache: FileCache): Promise<void>
 
     rollupOptions.cache = fileCache.get("rollup-watch");
 
-    const watcher = rollupWatch(rollupOptions);
+    if (typeof rollupOptions.watch === "object" && rollupOptions.watch.include === undefined) {
+        rollupOptions.watch.include = [join(context.options.sourceDir, "**")];
+
+        rollupOptions.watch.chokidar = {
+            cwd: context.options.rootDir,
+            ...rollupOptions.watch.chokidar,
+        }
+    }
+
+    const watcher = await rollupWatch(rollupOptions);
 
     await context.hooks.callHook("rollup:watch", context, watcher);
 
