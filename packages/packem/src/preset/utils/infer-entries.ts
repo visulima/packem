@@ -84,6 +84,8 @@ const createOrUpdateEntry = (
 
 const ENDING_RE = /(?:\.d\.[mc]?ts|\.\w+)$/;
 
+let privateSubfolderWarningShown = false;
+
 /**
  * Infer entries from package files.
  *
@@ -170,7 +172,11 @@ const inferEntries = (
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if (output.file.includes("/*") && output.key === "exports") {
-            context.logger.warn("Private subfolders are not supported, if you need this feature please open an issue on GitHub.");
+            if (!privateSubfolderWarningShown) {
+                context.logger.debug("Private subfolders are not supported, if you need this feature please open an issue on GitHub.");
+
+                privateSubfolderWarningShown = true;
+            }
 
             const inputs: string[] = [];
 

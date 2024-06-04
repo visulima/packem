@@ -39,7 +39,7 @@ const watchHandler = (watcher: RollupWatcher, mode: "bundle" | "types", logger: 
             }
             case "BUNDLE_START": {
                 logger.info({
-                    message: cyan(`\nbuild started...`),
+                    message: cyan(`build started...`),
                     prefix,
                 });
 
