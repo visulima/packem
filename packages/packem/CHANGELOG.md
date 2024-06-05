@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.41](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.40...@visulima/packem@1.0.0-alpha.41) (2024-06-05)
+
+
+### Bug Fixes
+
+* improved caching ([a56b5cb](https://github.com/visulima/packem/commit/a56b5cb1a1ebcb5ed4afffef73dea273f8c8c73a))
+
 ## @visulima/packem [1.0.0-alpha.40](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.39...@visulima/packem@1.0.0-alpha.40) (2024-06-04)
 
 
