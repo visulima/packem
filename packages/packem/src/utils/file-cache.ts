@@ -1,3 +1,5 @@
+import { rmSync } from "node:fs";
+
 import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import { findCacheDirectorySync } from "@visulima/package";
 import type { Pail } from "@visulima/pail";
@@ -14,6 +16,8 @@ class FileCache {
 
     readonly #memoryCache = new Map<string, unknown>();
 
+    readonly #logger: Pail<never, string>;
+
     public constructor(cwd: string, packageJsonHash: string, logger: Pail<never, string>) {
         this.#cwd = cwd;
         this.#cachePath = findCacheDirectorySync("visulima-packem", {
@@ -21,6 +25,7 @@ class FileCache {
         });
 
         this.#packageJsonHash = packageJsonHash;
+        this.#logger = logger;
 
         if (this.#cachePath === undefined) {
             logger.debug("Could not create cache directory.");
@@ -70,11 +75,24 @@ class FileCache {
 
         const fileData = readFileSync(filePath);
 
-        const value = JSON.parse(fileData);
+        try {
+            const value = JSON.parse(fileData);
 
-        this.#memoryCache.set(filePath, value);
+            this.#memoryCache.set(filePath, value);
 
-        return value as unknown as R;
+            return value as unknown as R;
+             
+        } catch {
+            this.#logger.warn(`Could not parse cache file: ${filePath}, deleting the broken cache file.`);
+
+            this.#memoryCache.delete(filePath);
+
+            rmSync(filePath, {
+                force: true,
+            });
+
+            return undefined;
+        }
     }
 
     public set(name: string, data: object | ArrayBuffer | ArrayBufferView | string | undefined, subDirectory?: string): void {

@@ -790,7 +790,18 @@ const createBundler = async (
         const getDuration = () => duration(Math.floor(Date.now() - start));
 
         const cachekey = getHash(
-            packageJson.version + JSON.stringify({ ...packageJson.dependencies, ...packageJson.devDependencies, eNode: packageJson.engines?.node }),
+                JSON.stringify({
+                    version: packageJson.version,
+                    ...packageJson.dependencies,
+                    ...packageJson.devDependencies,
+                    browser: packageJson.browser,
+                    eNode: packageJson.engines?.node,
+                    exports: packageJson.exports,
+                    main: packageJson.main,
+                    module: packageJson.module,
+                    type: packageJson.type,
+                    types: packageJson.types,
+                }),
         );
         const fileCache = new FileCache(rootDirectory, cachekey, logger);
 

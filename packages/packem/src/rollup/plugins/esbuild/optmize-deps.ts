@@ -92,7 +92,7 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
                     });
                 },
             },
-            ...(options.esbuildOptions?.plugins || []),
+            ...(options.esbuildOptions?.plugins ?? []),
         ],
     });
 

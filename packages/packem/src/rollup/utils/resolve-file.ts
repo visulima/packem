@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 
 import { join } from "@visulima/path";
 
-const resolveFile = (extensions: string[], resolved: string, index = false) => {
+const resolveFile = (extensions: string[], resolved: string, index = false): string | null => {
     const fileWithoutExtension = resolved.replace(/\.[jt]sx?$/, "");
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax

@@ -27,7 +27,7 @@ const watchHandler = (watcher: RollupWatcher, mode: "bundle" | "types", logger: 
     });
 
     watcher.on("event", (event: RollupWatcherEvent) => {
-        // eslint-disable-next-line default-case
+        // eslint-disable-next-line default-case,@typescript-eslint/switch-exhaustiveness-check
         switch (event.code) {
             case "END": {
                 logger.success({

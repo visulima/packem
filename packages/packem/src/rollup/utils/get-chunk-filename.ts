@@ -2,7 +2,7 @@ import type { PreRenderedChunk } from "rollup";
 
 import type { BuildContext } from "../../types";
 
-const getChunkFilename = (context: BuildContext, chunk: PreRenderedChunk, extension: string) => {
+const getChunkFilename = (context: BuildContext, chunk: PreRenderedChunk, extension: string): string => {
     if (chunk.isDynamicEntry) {
         return `chunks/[name].${extension}`;
     }
