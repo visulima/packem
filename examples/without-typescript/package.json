@@ -1,5 +1,5 @@
 {
-    "name": "example_packem_cjs_interop",
+    "name": "example_packem_without_typescript",
     "version": "1.0.0",
     "private": true,
     "type": "module",
@@ -10,6 +10,6 @@
     },
     "devDependencies": {
         "@visulima/packem": "workspace:*",
-        "esbuild": "^0.21.4"
+        "esbuild": "^0.21.5"
     }
 }

@@ -12,6 +12,7 @@ import { parsePackageJson } from "@visulima/package/package-json";
 import type { Pail, Processor } from "@visulima/pail";
 import { createPail } from "@visulima/pail";
 import { CallerProcessor, ErrorProcessor, MessageFormatterProcessor } from "@visulima/pail/processor";
+import { SimpleReporter } from "@visulima/pail/reporter";
 import { basename, dirname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import { defu } from "defu";
 import { createHooks } from "hookable";
@@ -350,7 +351,11 @@ const generateOptions = (
             throw new Error("Unknown transformer, check your transformer options or install one of the supported transformers: esbuild, swc, sucrase");
         }
 
-        logger.info(["Using " + cyan("rollup ") + VERSION, "Using " + cyan(options.transformerName) + " " + version + " as transformer"].join("\n"));
+        logger.info("Using " + cyan("rollup ") + VERSION);
+        logger.info({
+            message: "Using " + cyan(options.transformerName) + " " + version,
+            prefix: "transformer"
+        });
     }
 
     if (options.rollup.resolve && options.rollup.resolve.preferBuiltins === true) {
@@ -729,6 +734,7 @@ const createBundler = async (
     const logger = createPail({
         logLevel: debug ? "debug" : "informational",
         processors: loggerProcessors,
+        reporters: [new SimpleReporter()],
         scope: "packem",
     });
 
