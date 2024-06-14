@@ -1,3 +1,13 @@
+## @visulima/packem [1.0.0-alpha.42](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.41...@visulima/packem@1.0.0-alpha.42) (2024-06-14)
+
+### Bug Fixes
+
+* updated [@visulima](https://github.com/visulima) packages inside packem ([2225974](https://github.com/visulima/packem/commit/2225974a1f186c54669971269c8dafe331d03a8c))
+
+### Miscellaneous Chores
+
+* added conventional-changelog-conventionalcommits as dev dep ([9e462a2](https://github.com/visulima/packem/commit/9e462a24766313e49ed25ecde8eb64ddc978b60b))
+
 ## @visulima/packem [1.0.0-alpha.41](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.40...@visulima/packem@1.0.0-alpha.41) (2024-06-05)
 
 
