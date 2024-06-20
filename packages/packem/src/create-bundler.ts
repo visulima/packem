@@ -6,8 +6,9 @@ import { bold, cyan, gray, green } from "@visulima/colorize";
 import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync, walk } from "@visulima/fs";
 import { NotFoundError } from "@visulima/fs/error";
 import { duration, formatBytes } from "@visulima/humanizer";
-import type { PackageJson, TsConfigJson, TsConfigResult } from "@visulima/package";
-import { findTSConfig, readTsConfig } from "@visulima/package";
+import type { PackageJson } from "@visulima/package";
+import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
+import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
 import { parsePackageJson } from "@visulima/package/package-json";
 import type { Pail, Processor } from "@visulima/pail";
 import { createPail } from "@visulima/pail";
@@ -770,7 +771,7 @@ const createBundler = async (
         logger.info("Using tsconfig settings at", rootTsconfigPath);
     } else {
         try {
-            tsconfig = await findTSConfig(rootDirectory);
+            tsconfig = await findTsConfig(rootDirectory);
 
             logger.debug("Using tsconfig settings found at", tsconfig.path);
         } catch {

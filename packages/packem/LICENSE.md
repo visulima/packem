@@ -261,7 +261,7 @@ Repository: git+https://github.com/swc-project/swc.git
 ## ts-essentials
 License: MIT
 By: Krzysztof Kaczor
-Repository: git@github.com:krzkaczor/ts-essentials.git
+Repository: git@github.com:ts-essentials/ts-essentials.git
 
 > The MIT License
 > 

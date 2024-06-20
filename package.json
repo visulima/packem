@@ -58,7 +58,7 @@
         "@commitlint/cli": "^19.3.0",
         "@commitlint/config-conventional": "^19.2.2",
         "@secretlint/secretlint-rule-preset-recommend": "^8.2.4",
-        "@types/node": "18.18.14",
+        "@types/node": "20.14.6",
         "audit-ci": "^7.0.1",
         "browserslist-config-anolilab": "^5.0.14",
         "commitizen": "^4.3.0",

@@ -1,5 +1,5 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
-import type { TsConfigResult } from "@visulima/package/tsconfig";
+import type { TsConfigResult } from "@visulima/tsconfig";
 import type { Pail } from "@visulima/pail";
 import { join, resolve } from "@visulima/path";
 import type { Plugin } from "rollup";

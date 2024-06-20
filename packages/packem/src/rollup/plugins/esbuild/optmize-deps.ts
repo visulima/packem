@@ -7,7 +7,7 @@
  */
 import { readFile } from "node:fs/promises";
 
-import { findCacheDirectory } from "@visulima/package";
+import { findCacheDir } from "@visulima/find-cache-dir";
 import { join } from "@visulima/path";
 import { init, parse } from "es-module-lexer";
 import type { OnResolveArgs, OnResolveResult } from "esbuild";
@@ -20,7 +20,7 @@ const slash = (p: string) => p.replaceAll("\\", "/");
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsResult> => {
     // eslint-disable-next-line unicorn/prevent-abbreviations
-    const cacheDir = await findCacheDirectory("packem/optimize_deps", {
+    const cacheDir = await findCacheDir("@visulima/packem/optimize-deps", {
         create: true,
         cwd: options.cwd,
     });

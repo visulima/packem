@@ -8,7 +8,7 @@ import { nodeResolve as nodeResolvePlugin } from "@rollup/plugin-node-resolve";
 import replacePlugin from "@rollup/plugin-replace";
 import { wasm as wasmPlugin } from "@rollup/plugin-wasm";
 import { cyan } from "@visulima/colorize";
-import type { TsConfigResult } from "@visulima/package";
+import type { TsConfigResult } from "@visulima/tsconfig";
 import { isAbsolute, relative, resolve } from "@visulima/path";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
 import polifillPlugin from "rollup-plugin-polyfill-node";
