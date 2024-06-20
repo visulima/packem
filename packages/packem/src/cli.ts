@@ -13,4 +13,6 @@ createInitCommand(cli);
 createBuildCommand(cli);
 
 // eslint-disable-next-line no-void
-void cli.run();
+void cli.run({
+    shouldExitProcess: false,
+});
