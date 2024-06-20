@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.44](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.43...@visulima/packem@1.0.0-alpha.44) (2024-06-20)
+
+### Bug Fixes
+
+* fixed watch run ([5237cd5](https://github.com/visulima/packem/commit/5237cd5bdfb3c3719ecb19a281e28265411c8fad))
+
 ## @visulima/packem [1.0.0-alpha.43](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.42...@visulima/packem@1.0.0-alpha.43) (2024-06-20)
 
 ### Bug Fixes
