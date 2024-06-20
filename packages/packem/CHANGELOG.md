@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.43](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.42...@visulima/packem@1.0.0-alpha.43) (2024-06-20)
+
+### Bug Fixes
+
+* updated the packages and fixed breaking changes ([019d53a](https://github.com/visulima/packem/commit/019d53a9b2e0a26e232af92474622fa5a1052218))
+
 ## @visulima/packem [1.0.0-alpha.42](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.41...@visulima/packem@1.0.0-alpha.42) (2024-06-14)
 
 ### Bug Fixes
