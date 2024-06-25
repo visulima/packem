@@ -9,7 +9,7 @@ import enhanceRollupError from "../utils/enhance-rollup-error";
 import type FileCache from "../utils/file-cache";
 import { getRollupDtsOptions, getRollupOptions } from "./get-rollup-options";
 
-const watchHandler = (watcher: RollupWatcher, mode: "bundle" | "types", logger: Pail<never, string>) => {
+const watchHandler = (watcher: RollupWatcher, mode: "bundle" | "types", logger: Pail) => {
     const prefix = "watcher:" + mode;
 
     watcher.on("change", (id, { event }) => {
@@ -26,7 +26,7 @@ const watchHandler = (watcher: RollupWatcher, mode: "bundle" | "types", logger: 
         });
     });
 
-    watcher.on("event", (event: RollupWatcherEvent) => {
+    watcher.on("event", async (event: RollupWatcherEvent) => {
         // eslint-disable-next-line default-case,@typescript-eslint/switch-exhaustiveness-check
         switch (event.code) {
             case "END": {
@@ -46,10 +46,11 @@ const watchHandler = (watcher: RollupWatcher, mode: "bundle" | "types", logger: 
                 break;
             }
             case "BUNDLE_END": {
-                event.result.close();
+                await event.result.close();
 
                 logger.info({
-                    message: cyan(`built in ${event.duration}ms.`),
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                    message: cyan(`built in ${event.duration + ""}ms.`),
                     prefix,
                 });
 
@@ -88,10 +89,10 @@ const watch = async (context: BuildContext, fileCache: FileCache): Promise<void>
         rollupOptions.watch.chokidar = {
             cwd: context.options.rootDir,
             ...rollupOptions.watch.chokidar,
-        }
+        };
     }
 
-    const watcher = await rollupWatch(rollupOptions);
+    const watcher = rollupWatch(rollupOptions);
 
     await context.hooks.callHook("rollup:watch", context, watcher);
 

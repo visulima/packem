@@ -25,7 +25,7 @@ export type CopyPluginOptions = {
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export const copyPlugin = (options: CopyPluginOptions, logger: Pail<never, string>): Plugin => {
+export const copyPlugin = (options: CopyPluginOptions, logger: Pail): Plugin => {
     const files = new Map<string, FileDesc>();
     const config = {
         copyOnce: true,

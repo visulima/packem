@@ -8,8 +8,8 @@ import { nodeResolve as nodeResolvePlugin } from "@rollup/plugin-node-resolve";
 import replacePlugin from "@rollup/plugin-replace";
 import { wasm as wasmPlugin } from "@rollup/plugin-wasm";
 import { cyan } from "@visulima/colorize";
-import type { TsConfigResult } from "@visulima/tsconfig";
 import { isAbsolute, relative, resolve } from "@visulima/path";
+import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
 import polifillPlugin from "rollup-plugin-polyfill-node";
 import { visualizer as visualizerPlugin } from "rollup-plugin-visualizer";
@@ -155,16 +155,12 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext): boolean => {
     // eslint-disable-next-line no-secrets/no-secrets
     // @see https:// github.com/rollup/rollup/blob/5abe71bd5bae3423b4e2ee80207c871efde20253/cli/run/batchWarnings.ts#L236
     if (warning.code === "UNRESOLVED_IMPORT") {
-        context.logger.error(
+        throw new Error(
             `Failed to resolve the module "${warning.exporter as string}" imported by "${cyan(relative(resolve(), warning.id as string))}"` +
                 `\nIs the module installed? Note:` +
                 `\n ↳ to inline a module into your bundle, install it to "devDependencies".` +
                 `\n ↳ to depend on a module via import/require, install it to "dependencies".`,
         );
-
-        process.exitCode = 1;
-
-        return true;
     }
 
     return warning.code === "MIXED_EXPORTS" && context.options.cjsInterop === true;

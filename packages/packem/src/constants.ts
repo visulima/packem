@@ -40,11 +40,11 @@ export const RUNTIME_EXPORT_CONVENTIONS = ["react-server", "react-native", "edge
 export const SPECIAL_EXPORT_CONVENTIONS = [...OPTIMIZE_CONVENTIONS, ...RUNTIME_EXPORT_CONVENTIONS];
 
 export const DTS_EXTENSIONS_MAP = {
-  cjs: 'd.cts',
-  js: 'd.ts',
-  mjs: 'd.mts',
-}
+    cjs: "d.cts",
+    js: "d.ts",
+    mjs: "d.mts",
+};
 
-export const BINARY_TAG = '$binary'
+export const BINARY_TAG = "$binary";
 
 export const EXCLUDE_REGEXP = /node_modules/;

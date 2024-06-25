@@ -2,7 +2,7 @@ import type { Message } from "esbuild";
 import { formatMessages } from "esbuild";
 import type { PluginContext } from "rollup";
 
-const warn = async (pluginContext: PluginContext, messages: Message[]) => {
+const warn = async (pluginContext: PluginContext, messages: Message[]): Promise<void> => {
     if (messages.length > 0) {
         const warnings = await formatMessages(messages, {
             color: true,

@@ -6,6 +6,6 @@ const getHash = (data: string | Buffer): string => {
     hash.update(data);
 
     return hash.digest("hex");
-}
+};
 
 export default getHash;

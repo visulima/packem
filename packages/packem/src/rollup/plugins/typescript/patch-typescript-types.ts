@@ -1,8 +1,6 @@
 /**
  * Modified copy of https://github.com/vitejs/vite/blob/main/packages/vite/rollup.dts.config.ts#L64
  */
-import { exit } from "node:process";
-
 import { parse } from "@babel/parser";
 import type { Pail } from "@visulima/pail";
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -33,13 +31,7 @@ const calledDtsFiles = new Map<string, boolean>();
  * confusing when showed in autocompletions. Try to replace with a better name
  */
 // eslint-disable-next-line func-style
-function replaceConfusingTypeNames(
-    this: PluginContext,
-    code: string,
-    chunk: RenderedChunk,
-    { identifierReplacements }: PatchTypesOptions,
-    logger: Pail<never, string>,
-) {
+function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: RenderedChunk, { identifierReplacements }: PatchTypesOptions, logger: Pail) {
     const imports = findStaticImports(code);
 
     // eslint-disable-next-line guard-for-in,no-loops/no-loops,no-restricted-syntax
@@ -64,9 +56,7 @@ function replaceConfusingTypeNames(
         for (const id in replacements) {
             // Validate that `identifierReplacements` is not outdated if there's no match
             if (!imp.imports.includes(id)) {
-                this.warn(`${chunk.fileName} does not import "${id}" from "${moduleName}" for replacement`);
-
-                exit(1);
+                throw new Error(`${chunk.fileName} does not import "${id}" from "${moduleName}" for replacement`);
             }
 
             // eslint-disable-next-line security/detect-object-injection
@@ -119,7 +109,7 @@ function removeInternal(s: MagicString, node: any): boolean {
         // function a(foo: string, /* @internal */ bar: number)
         //                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
         // strip trailing comma
-        const end = s.original[node.end] === "," ? node.end + 1 : node.end;
+        const end = s.original[node.end] === "," ? (node.end as number) + 1 : node.end;
 
         s.remove(node.leadingComments[0].start, end);
 
@@ -157,9 +147,7 @@ function stripInternalTypes(this: PluginContext, code: string, chunk: RenderedCh
         code = s.toString();
 
         if (code.includes("@internal")) {
-            this.warn(`${chunk.fileName} has unhandled @internal declarations`);
-
-            exit(1);
+            throw new Error(`${chunk.fileName} has unhandled @internal declarations`);
         }
     }
 
@@ -178,7 +166,7 @@ export interface PatchTypesOptions {
  * 4. Strip leftover internal types
  * 5. Clean unnecessary comments
  */
-export const patchTypescriptTypes = (options: PatchTypesOptions, logger: Pail<never, string>): Plugin => {
+export const patchTypescriptTypes = (options: PatchTypesOptions, logger: Pail): Plugin => {
     return {
         name: "packem:patch-types",
         renderChunk(code, chunk) {

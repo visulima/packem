@@ -1,122 +1,234 @@
-import { describe, expect, it } from "vitest";
+import { rm } from "node:fs/promises";
+
+import { writeFileSync } from "@visulima/fs";
+import { join } from "@visulima/path";
+import { temporaryDirectory } from "tempy";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import inferEntries from "../../../../src/preset/utils/infer-entries";
-import type { InferEntriesResult } from "../../../../src/types";
+import type { BuildContext, InferEntriesResult } from "../../../../src/types";
+
+const createFiles = (files: string[], directory: string) => {
+    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+    for (const file of files) {
+        writeFileSync(`${directory}/${file}`, "", {
+            overwrite: true,
+            recursive: true,
+        });
+    }
+};
 
 describe("inferEntries", () => {
-    it("recognises main and module outputs", () => {
+    let temporaryDirectoryPath: string;
+    let defaultContext: BuildContext;
+
+    beforeEach(async () => {
+        temporaryDirectoryPath = temporaryDirectory();
+
+        vi.stubEnv("NODE_ENV", "development");
+
+        defaultContext = {
+            logger: {
+                debug: vi.fn(),
+            },
+            options: {
+                declaration: false,
+                outDir: "dist",
+                rootDir: temporaryDirectoryPath,
+                sourceDir: "src",
+            },
+        } as unknown as BuildContext;
+    });
+
+    afterEach(async () => {
+        await rm(temporaryDirectoryPath, { recursive: true });
+
+        vi.unstubAllEnvs();
+    });
+
+    it("should recognise main and module outputs", () => {
         expect.assertions(1);
 
-        const result = inferEntries({ main: "dist/test.cjs", module: "dist/test.mjs" }, ["src/", "src/test.ts"], false);
+        createFiles(["src/test.ts"], temporaryDirectoryPath);
+
+        const result = inferEntries(
+            { main: "dist/test.cjs", module: "dist/test.mjs" },
+            ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            defaultContext,
+        );
 
         expect(result).toStrictEqual({
             entries: [
                 {
                     cjs: true,
+                    environment: "development",
                     esm: true,
-                    input: "src/test",
+                    input: join(temporaryDirectoryPath, "/src/test"),
+                    runtime: "node",
                 },
             ],
             warnings: [],
         } satisfies InferEntriesResult);
     });
 
-    it("handles nested indexes", () => {
+    it("should handle nested indexes", () => {
         expect.assertions(1);
 
-        const result = inferEntries({ module: "dist/index.mjs" }, ["src/", "src/event/index.ts", "src/index.ts"], false);
+        createFiles(["src/event/index.ts", "src/index.ts"], temporaryDirectoryPath);
+
+        const result = inferEntries(
+            { module: "dist/index.mjs" },
+            ["src/", "src/event/index.ts", "src/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            defaultContext,
+        );
 
         expect(result).toStrictEqual({
             entries: [
                 {
+                    environment: "development",
                     esm: true,
-                    input: "src/index",
+                    input: join(temporaryDirectoryPath, "/src/index"),
+                    runtime: "node",
                 },
             ],
             warnings: [],
         } satisfies InferEntriesResult);
     });
 
-    it("handles binary outputs", () => {
+    it("should handle binary outputs", () => {
         expect.assertions(3);
 
-        expect(inferEntries({ bin: "dist/cli.cjs" }, ["src/", "src/cli.ts"], false)).toStrictEqual({
+        createFiles(["src/cli.ts"], temporaryDirectoryPath);
+
+        expect(
+            inferEntries(
+                { bin: "dist/cli.cjs" },
+                ["src/", "src/cli.ts"].map((file) => join(temporaryDirectoryPath, file)),
+                defaultContext,
+            ),
+        ).toStrictEqual({
             entries: [
                 {
                     cjs: true,
-
+                    declaration: false,
+                    environment: "development",
                     executable: true,
-                    input: "src/cli",
+                    input: join(temporaryDirectoryPath, "src/cli"),
+                    runtime: "node",
                 },
             ],
             warnings: [],
         } satisfies InferEntriesResult);
 
-        expect(inferEntries({ bin: { nuxt: "dist/cli.js" } }, ["src/", "src/cli.ts"], false)).toStrictEqual({
+        expect(
+            inferEntries(
+                { bin: { nuxt: "dist/cli.js" } },
+                ["src/", "src/cli.ts"].map((file) => join(temporaryDirectoryPath, file)),
+                defaultContext,
+            ),
+        ).toStrictEqual({
             entries: [
                 {
                     cjs: true,
-
+                    declaration: false,
+                    environment: "development",
                     executable: true,
-                    input: "src/cli",
+                    input: join(temporaryDirectoryPath, "src/cli"),
+                    runtime: "node",
                 },
             ],
             warnings: [],
         } satisfies InferEntriesResult);
 
-        expect(inferEntries({ bin: { nuxt: "dist/cli.js" }, type: "module" }, ["src/", "src/cli.ts"], false)).toStrictEqual({
+        expect(
+            inferEntries(
+                { bin: { nuxt: "dist/cli.js" }, type: "module" },
+                ["src/", "src/cli.ts"].map((file) => join(temporaryDirectoryPath, file)),
+                defaultContext,
+            ),
+        ).toStrictEqual({
             entries: [
                 {
+                    declaration: false,
+                    environment: "development",
                     esm: true,
                     executable: true,
-                    input: "src/cli",
+                    input: join(temporaryDirectoryPath, "src/cli"),
+                    runtime: "node",
                 },
             ],
             warnings: [],
         } satisfies InferEntriesResult);
     });
 
-    it("recognises `type: module` projects", () => {
+    it("should recognise `type: module` projects", () => {
         expect.assertions(1);
 
-        const result = inferEntries({ main: "dist/test.js", type: "module" }, ["src/", "src/test.ts"], false);
+        createFiles(["src/test.ts"], temporaryDirectoryPath);
+
+        const result = inferEntries(
+            { main: "dist/test.js", type: "module" },
+            ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            defaultContext,
+        );
 
         expect(result).toStrictEqual({
             entries: [
                 {
+                    environment: "development",
                     esm: true,
-                    input: "src/test",
+                    input: join(temporaryDirectoryPath, "src/test"),
+                    runtime: "node",
                 },
             ],
             warnings: [],
         } satisfies InferEntriesResult);
     });
 
-    it("matches nested entrypoint paths", () => {
+    it("should match nested entrypoint paths", () => {
         expect.assertions(1);
 
-        const result = inferEntries({ exports: "dist/runtime/index.js" }, ["src/", "src/other/runtime/index.ts"], false);
+        createFiles(["src/other/runtime/index.ts"], temporaryDirectoryPath);
+
+        const result = inferEntries(
+            { exports: "dist/runtime/index.js" },
+            ["src/", "src/other", "src/other/runtime", "src/other/runtime/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            defaultContext,
+        );
 
         expect(result).toStrictEqual({
             entries: [
                 {
                     cjs: true,
-                    input: "src/other/runtime/index",
+                    environment: "development",
+                    input: join(temporaryDirectoryPath, "src/other/runtime/index"),
+                    runtime: "node",
                 },
             ],
             warnings: [],
         } satisfies InferEntriesResult);
     });
 
-    it("handles declarations from `types`", () => {
+    it("should handle declarations from `types`", () => {
         expect.assertions(3);
 
-        expect(inferEntries({ main: "dist/test.cjs", types: "custom/handwritten.d.ts" }, ["src/", "src/test.ts"], true)).toStrictEqual({
+        createFiles(["src/test.ts"], temporaryDirectoryPath);
+
+        expect(
+            inferEntries(
+                { main: "dist/test.cjs", types: "custom/handwritten.d.ts" },
+                ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
+                {
+                    options: { ...defaultContext.options, declaration: true },
+                } as unknown as BuildContext,
+            ),
+        ).toStrictEqual({
             entries: [
                 {
                     cjs: true,
-                    declaration: true,
-                    input: "src/test",
+                    environment: "development",
+                    input: join(temporaryDirectoryPath, "src/test"),
+                    runtime: "node",
                 },
             ],
             warnings: ["Could not find entrypoint for `custom/handwritten.d.ts`"],
@@ -129,20 +241,23 @@ describe("inferEntries", () => {
                     module: "dist/test.mjs",
                     types: "dist/test.d.ts",
                 },
-                ["src/", "src/test.ts"],
-                true,
+                ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
+                { options: { ...defaultContext.options, declaration: true } } as unknown as BuildContext,
             ),
         ).toStrictEqual({
             entries: [
                 {
                     cjs: true,
                     declaration: true,
+                    environment: "development",
                     esm: true,
-                    input: "src/test",
+                    input: join(temporaryDirectoryPath, "src/test"),
+                    runtime: "node",
                 },
             ],
             warnings: [],
         } satisfies InferEntriesResult);
+
         expect(
             inferEntries(
                 {
@@ -150,24 +265,28 @@ describe("inferEntries", () => {
                     module: "dist/test.mjs",
                     typings: "dist/test.d.ts",
                 },
-                ["src/", "src/test.ts"],
-                true,
+                ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
+                { options: { ...defaultContext.options, declaration: true } } as unknown as BuildContext,
             ),
         ).toStrictEqual({
             entries: [
                 {
                     cjs: true,
                     declaration: true,
+                    environment: "development",
                     esm: true,
-                    input: "src/test",
+                    input: join(temporaryDirectoryPath, "src/test"),
+                    runtime: "node",
                 },
             ],
             warnings: [],
         } satisfies InferEntriesResult);
     });
 
-    it("handles types within exports`", () => {
+    it("should handle types within exports`", () => {
         expect.assertions(1);
+
+        createFiles(["src/test.ts"], temporaryDirectoryPath);
 
         const result = inferEntries(
             {
@@ -182,41 +301,69 @@ describe("inferEntries", () => {
                     },
                 },
             },
-            ["src/", "src/test.ts"],
-            true,
+            ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            { options: { ...defaultContext.options, declaration: true } } as unknown as BuildContext,
         );
         expect(result).toStrictEqual({
             entries: [
                 {
                     cjs: true,
-                    dts: true,
-                    input: "src/test",
+                    declaration: true,
+                    environment: "development",
+                    esm: true,
+                    input: join(temporaryDirectoryPath, "src/test"),
+                    runtime: "node",
                 },
             ],
             warnings: [],
         } satisfies InferEntriesResult);
     });
 
-    it("gracefully handles unknown entries", () => {
+    it("should gracefully handles unknown entries", () => {
         expect.assertions(1);
 
-        expect(inferEntries({ exports: "dist/test.js" }, ["src/", "src/index.ts"], false)).toStrictEqual({
+        createFiles(["src/test.ts"], temporaryDirectoryPath);
+
+        expect(
+            inferEntries(
+                { exports: "dist/test.js" },
+                ["src/", "src/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
+                defaultContext,
+            ),
+        ).toStrictEqual({
             entries: [],
             warnings: ["Could not find entrypoint for `dist/test.js`"],
         } satisfies InferEntriesResult);
     });
 
-    it("ignores top-level exports", () => {
-        expect.assertions(1);
+    it("should support top-level '*' exports", () => {
+        expect.assertions(2);
 
-        expect(inferEntries({ exports: { "./*": "./*" } }, ["src/", "src/", "src/index.ts"], false)).toStrictEqual({
-            entries: [],
+        createFiles(["src/index.ts"], temporaryDirectoryPath);
+
+        expect(
+            inferEntries(
+                { exports: { "./*": "./*" } },
+                ["src/", "src/", "src/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
+                defaultContext,
+            ),
+        ).toStrictEqual({
+            entries: [
+                {
+                    cjs: true,
+                    environment: "development",
+                    input: join(temporaryDirectoryPath, "src/index"),
+                    runtime: "node",
+                },
+            ],
             warnings: [],
         } satisfies InferEntriesResult);
+        expect(defaultContext.logger.debug).toHaveBeenCalledTimes(1);
     });
-
-    it("handles multiple entries", () => {
+    it("should handle multiple entries", () => {
         expect.assertions(1);
+
+        createFiles(["src/index.ts", "src/first-test.ts", "src/test.mjs"], temporaryDirectoryPath);
 
         expect(
             inferEntries(
@@ -227,70 +374,180 @@ describe("inferEntries", () => {
                         "first-test": "./dist/first-test.cjs",
                     },
                 },
-                ["src/", "src/", "src/index.ts", "src/first-test.ts", "src/test.mjs"],
-                false,
+                ["src/", "src/", "src/index.ts", "src/first-test.ts", "src/test.mjs"].map((file) => join(temporaryDirectoryPath, file)),
+                defaultContext,
             ),
         ).toStrictEqual({
             entries: [
                 {
                     cjs: true,
-                    input: "src/index",
+                    environment: "development",
+                    input: join(temporaryDirectoryPath, "src/index"),
+                    runtime: "node",
                 },
                 {
                     cjs: true,
-                    input: "src/test",
+                    environment: "development",
+                    input: join(temporaryDirectoryPath, "src/test"),
+                    runtime: "node",
                 },
                 {
                     cjs: true,
-                    input: "src/first-test",
+                    environment: "development",
+                    input: join(temporaryDirectoryPath, "src/first-test"),
+                    runtime: "node",
                 },
             ],
             warnings: [],
         } satisfies InferEntriesResult);
     });
 
-    it("recognises directory mappings", () => {
+    it("should recognise directory mappings", () => {
         expect.assertions(4);
 
-        expect(inferEntries({ exports: "./dist/runtime/*" }, ["src/", "src/runtime/", "src/runtime/test.js"], false)).toStrictEqual({
-            entries: [
-                {
-                    esm: true,
-                    input: "src/runtime/",
-                    outDir: "./dist/runtime/",
-                },
-            ],
-            warnings: [],
-        } satisfies InferEntriesResult);
+        createFiles(["src/runtime/test.js", "src/runtime/test2.js"], temporaryDirectoryPath);
 
-        expect(inferEntries({ exports: { "./runtime/*": "./dist/runtime/*.mjs," } }, ["src/", "src/runtime/"], false)).toStrictEqual({
+        expect(
+            inferEntries(
+                { exports: "./dist/runtime/*" },
+                ["src/", "src/runtime/", "src/runtime/test.js"].map((file) => join(temporaryDirectoryPath, file)),
+                defaultContext,
+            ),
+        ).toStrictEqual({
             entries: [
                 {
                     cjs: true,
-                    input: "src/runtime/",
-                    outDir: "./dist/runtime/",
+                    environment: "development",
+                    input: join(temporaryDirectoryPath, "src/runtime/test"),
+                    runtime: "node",
                 },
             ],
             warnings: [],
         } satisfies InferEntriesResult);
 
-        expect(inferEntries({ exports: { "./runtime/*": "./dist/runtime/*.mjs," }, type: "module" }, ["src/", "src/runtime/"], false)).toStrictEqual({
+        expect(
+            inferEntries(
+                { exports: { "./runtime/*": "./dist/runtime/*.mjs" }, type: "module" },
+                ["src/", "src/runtime/", "src/runtime/test.js"].map((file) => join(temporaryDirectoryPath, file)),
+                defaultContext,
+            ),
+        ).toStrictEqual({
             entries: [
                 {
+                    environment: "development",
                     esm: true,
-                    input: "src/runtime/",
-                    outDir: "./dist/runtime/",
+                    input: join(temporaryDirectoryPath, "src/runtime/test"),
+                    runtime: "node",
                 },
             ],
             warnings: [],
         } satisfies InferEntriesResult);
 
-        expect(inferEntries({ exports: { "./runtime/*": { require: "./dist/runtime/*" } } }, ["src/", "src/runtime/"], false)).toStrictEqual({
+        expect(
+            inferEntries(
+                { exports: { "./runtime/*": { require: "./dist/runtime/*" } } },
+                ["src/", "src/runtime/", "src/runtime/test.js"].map((file) => join(temporaryDirectoryPath, file)),
+                defaultContext,
+            ),
+        ).toStrictEqual({
             entries: [
                 {
                     cjs: true,
-                    input: "src/runtime/",
-                    outDir: "./dist/runtime/",
+                    environment: "development",
+                    input: join(temporaryDirectoryPath, "src/runtime/test"),
+                    runtime: "node",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+
+        createFiles(["src/test/index.ts", "src/test/test2/index.ts", "src/test/index2.ts", "src/index.ts"], temporaryDirectoryPath);
+
+        expect(
+            inferEntries(
+                { exports: { "./test/*": "./test/*.js" } },
+                ["src/", "src/test/", "src/test/index.ts", "src/test/test2/", "src/test/test2/index.ts", "src/test/index2.ts", "src/index.ts"].map((file) =>
+                    join(temporaryDirectoryPath, file),
+                ),
+                defaultContext,
+            ),
+        ).toStrictEqual({
+            entries: [
+                {
+                    cjs: true,
+                    environment: "development",
+                    input: join(temporaryDirectoryPath, "src/test/index"),
+                    runtime: "node",
+                },
+                {
+                    cjs: true,
+                    environment: "development",
+                    input: join(temporaryDirectoryPath, "src/test/index2"),
+                    runtime: "node",
+                },
+                {
+                    cjs: true,
+                    environment: "development",
+                    input: join(temporaryDirectoryPath, "src/test/test2/index"),
+                    runtime: "node",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+    });
+
+    it("should return a warning if the directory mappings map to a empty directory", () => {
+        expect.assertions(1);
+
+        expect(
+            inferEntries(
+                { exports: { "./runtime/*": "./dist/runtime/*.mjs" } },
+                ["src/", "src/runtime/"].map((file) => join(temporaryDirectoryPath, file)),
+                defaultContext,
+            ),
+        ).toStrictEqual({
+            entries: [],
+            warnings: ["Could not find entrypoint for `./dist/runtime/*.mjs`"],
+        } satisfies InferEntriesResult);
+    });
+
+    it("should map cjs and mjs to mts and cts, if they exists", () => {
+        expect.assertions(1);
+
+        createFiles(["src/test.cts", "src/test.mts", "src/test.ts"], temporaryDirectoryPath);
+
+        const result = inferEntries(
+            {
+                exports: {
+                    import: {
+                        default: "dist/test.mjs",
+                        types: "dist/test.d.mts",
+                    },
+                    require: {
+                        default: "dist/test.cjs",
+                        types: "dist/test.d.cts",
+                    },
+                },
+            },
+            ["src/", "src/test.ts", "src/test.cts", "src/test.mts"].map((file) => join(temporaryDirectoryPath, file)),
+            { options: { ...defaultContext.options, declaration: true } } as unknown as BuildContext,
+        );
+        expect(result).toStrictEqual({
+            entries: [
+                {
+                    cjs: true,
+                    declaration: true,
+                    environment: "development",
+                    input: join(temporaryDirectoryPath, "src/test.cts"),
+                    runtime: "node",
+                },
+
+                {
+                    declaration: true,
+                    environment: "development",
+                    esm: true,
+                    input: join(temporaryDirectoryPath, "src/test.mts"),
+                    runtime: "node",
                 },
             ],
             warnings: [],

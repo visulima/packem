@@ -17,6 +17,7 @@ export const extractExportFilenames = (
     type: PackageJson["type"],
     declaration: BuildOptions["declaration"],
     conditions: string[] = [],
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): OutputDescriptor[] => {
     if (!packageExports) {
         return [];
@@ -46,7 +47,11 @@ export const extractExportFilenames = (
                     ? {
                           file: packageExport,
                           key: "exports",
-                          subKey: condition as OutputDescriptor["subKey"],
+                          ...(["browser", "default", "deno", "development", "import", "node", "node-addons", "production", "require", "types"].includes(
+                              condition,
+                          )
+                              ? { subKey: condition as OutputDescriptor["subKey"] }
+                              : {}),
                           type: inferExportType(condition, conditions, packageExport, type),
                       }
                     : extractExportFilenames(packageExport, type, declaration, [...conditions, condition]);

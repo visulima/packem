@@ -1,7 +1,7 @@
 import { normalizePath } from "@rollup/pluginutils";
-import type { TsConfigResult } from "@visulima/tsconfig";
 import type { Pail } from "@visulima/pail";
 import { dirname, resolve } from "@visulima/path";
+import type { TsConfigResult } from "@visulima/tsconfig";
 import type { Plugin } from "rollup";
 
 type Alias = {
@@ -38,6 +38,7 @@ export const getConfigAlias = (tsconfig?: TsConfigResult, addBaseUrl = true): Al
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [alias, values] of Object.entries(paths)) {
             /** Regular Expression used to match a given path. */
+            // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
             const find = new RegExp(`^${[...alias].map((segment) => (segment === "*" ? "(.+)" : segment.replace(/[\\^$*+?.()|[\]{}]/, "\\$&"))).join("")}$`);
 
             /** Internal index used to calculate the matching id in a replacement. */
@@ -47,8 +48,8 @@ export const getConfigAlias = (tsconfig?: TsConfigResult, addBaseUrl = true): Al
             for (const value of values) {
                 /** String used to replace a matched path. */
                 const replacement = [...normalizePath(resolve(resolvedBaseUrl, value))]
-                    // eslint-disable-next-line @typescript-eslint/no-loop-func,no-plusplus
-                    .map((segment) => (segment === "*" ? `$${++matchId}` : segment === "$" ? "$$" : segment))
+                    // eslint-disable-next-line @typescript-eslint/no-loop-func,no-plusplus,@typescript-eslint/restrict-plus-operands
+                    .map((segment) => (segment === "*" ? "$" + (++matchId + "") : segment === "$" ? "$$" : segment))
                     .join("");
 
                 aliases.push({ find, replacement });
@@ -95,7 +96,7 @@ export const getConfigAlias = (tsconfig?: TsConfigResult, addBaseUrl = true): Al
  *
  * import Test from 'components:Test';
  */
-export const resolveTsconfigPaths = (tsconfig: TsConfigResult, logger: Pail<never, string>): Plugin => {
+export const resolveTsconfigPaths = (tsconfig: TsConfigResult, logger: Pail): Plugin => {
     const configAlias = getConfigAlias(tsconfig);
 
     return {

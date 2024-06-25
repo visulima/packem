@@ -1,6 +1,7 @@
 import { createFilter } from "@rollup/pluginutils";
 import type { Pail } from "@visulima/pail";
 import type { Node, ObjectExpression, Property } from "estree";
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { walk } from "estree-walker";
 import MagicString from "magic-string";
 import type { Plugin } from "rollup";
@@ -23,7 +24,8 @@ export type JSXRemoveAttributesPlugin = {
     attributes: string[];
 };
 
-export const jsxRemoveAttributes = ({ attributes, logger }: { logger: Pail<never, string> } & JSXRemoveAttributesPlugin): Plugin => {
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export const jsxRemoveAttributes = ({ attributes, logger }: { logger: Pail } & JSXRemoveAttributesPlugin): Plugin => {
     const filter = createFilter([/\.[tj]sx$/], /node_modules/);
 
     if (!Array.isArray(attributes) || attributes.length === 0) {

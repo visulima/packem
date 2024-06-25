@@ -1,5 +1,3 @@
-import { exit } from "node:process";
-
 import { installPackage } from "@antfu/install-pkg";
 import { cancel, confirm, intro, isCancel, outro, select, spinner } from "@clack/prompts";
 import type { Cli } from "@visulima/cerebro";
@@ -17,22 +15,20 @@ const createInitCommand = (cli: Cli): void => {
             if (isAccessibleSync(join(options.dir, "packem.config.ts"))) {
                 logger.info("Packem project already initialized, you can use `packem build` to build your project");
 
-                return exit(0);
+                return;
             }
 
             if (isCancel(options.transformer)) {
                 cancel("Operation cancelled");
 
-                return exit(0);
+                return;
             }
 
             if (options.transformer === undefined) {
                 const packageJsonPath = join(options.dir, "package.json");
 
                 if (!isAccessibleSync(packageJsonPath)) {
-                    logger.error("No package.json found in the directory");
-
-                    return exit(1);
+                    throw new Error("No package.json found in the directory");
                 }
 
                 const packageJson = parsePackageJson(packageJsonPath);
@@ -81,8 +77,6 @@ export default defineConfig({
             s.stop("Created packem.config.ts");
 
             outro("Now you can run `packem build` to build your project");
-
-            return exit(0);
         },
         name: "init",
         options: [

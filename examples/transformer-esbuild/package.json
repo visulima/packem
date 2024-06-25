@@ -18,6 +18,6 @@
         "@types/react-dom": "^18.3.0",
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.21.5",
-        "typescript": "^5.4.5"
+        "typescript": "^5.5.2"
     }
 }

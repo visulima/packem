@@ -160,7 +160,7 @@ exports.method = method;
             ["index.js", /= "test"/],
             ["index.mjs", /= "test"/],
         ]) {
-            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file}`);
+            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
 
             expect(content).toMatch(regex as RegExp);
         }
@@ -229,7 +229,7 @@ exports.method = method;
             ["core.js", /= 'core'/],
             ["core.mjs", /= 'core'/],
         ]) {
-            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file}`);
+            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
 
             expect(content).toMatch(regex as RegExp);
         }
@@ -285,7 +285,7 @@ export { IString };`,
             ["./index.d.ts", /declare const shared = true/],
             ["./api.mjs", /'pkg-export-ts-rsc'/],
         ]) {
-            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file}`);
+            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
 
             expect(content).toMatch(regex as RegExp);
         }
@@ -410,7 +410,7 @@ exports.value = value;
             ["index.js", /'index'/],
             ["react-server.js", /'react-server'/],
         ]) {
-            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file}`);
+            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
 
             expect(content).toMatch(regex as RegExp);
         }

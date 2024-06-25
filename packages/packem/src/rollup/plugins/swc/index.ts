@@ -78,4 +78,5 @@ const swcPlugin = ({ exclude, extensions = DEFAULT_EXTENSIONS, include, ...trans
     };
 };
 
+// eslint-disable-next-line import/no-unused-modules
 export default swcPlugin;

@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { env } from "node:process";
 
+import { isAccessibleSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { resolve } from "@visulima/path";
 
@@ -36,7 +37,6 @@ const createOrUpdateEntry = (
     isDirectory: boolean,
     outputSlug: string,
     output: OutputDescriptor,
-    packageJson: PackageJson,
     declaration: undefined | false | true | "compatible" | "node16",
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): void => {
@@ -50,8 +50,14 @@ const createOrUpdateEntry = (
         entry.executable = true;
 
         entry.declaration = false;
-        entry.cjs = packageJson.type === "commonjs";
-        entry.esm = packageJson.type === "module";
+
+        if (output.type === "cjs") {
+            entry.cjs = true;
+        }
+
+        if (output.type === "esm") {
+            entry.esm = true;
+        }
     } else {
         if (/\.d\.[mc]?ts$/.test(output.file) && declaration !== false) {
             entry.declaration = declaration;
@@ -67,7 +73,7 @@ const createOrUpdateEntry = (
 
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const runtime of RUNTIME_EXPORT_CONVENTIONS) {
-            if (output.file.includes(runtime + ".")) {
+            if (output.file.includes("." + runtime + ".")) {
                 entry.runtime = runtime as Runtime;
 
                 break;
@@ -105,15 +111,23 @@ const inferEntries = (
     // Sort files so least-nested files are first
     sourceFiles.sort((a, b) => a.split("/").length - b.split("/").length);
 
+    const fileType = packageJson.type === "module" ? "esm" : "cjs";
+
     // Come up with a list of all output files & their formats
     const outputs = extractExportFilenames(packageJson.exports, packageJson.type ?? "commonjs", context.options.declaration);
 
     if (packageJson.bin) {
-        const binaries = typeof packageJson.bin === "string" ? [packageJson.bin] : Object.values(packageJson.bin);
+        const binaries = (typeof packageJson.bin === "string" ? [packageJson.bin] : Object.values(packageJson.bin)).filter(Boolean);
 
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const file of binaries) {
-            outputs.push({ file: file as string, isExecutable: true, key: "bin" });
+            const inferredType = inferExportTypeFromFileName(file);
+
+            if (inferredType && inferredType !== fileType) {
+                throw new Error(`Exported file "${file}" has an extension that does not match the package.json type "${packageJson.type as string}".`);
+            }
+
+            outputs.push({ file: file as string, isExecutable: true, key: "bin", type: inferredType ?? fileType });
         }
     }
 
@@ -121,7 +135,7 @@ const inferEntries = (
         outputs.push({
             file: packageJson.main,
             key: "main",
-            type: inferExportTypeFromFileName(packageJson.main) ?? (packageJson.type === "module" ? "esm" : "cjs"),
+            type: inferExportTypeFromFileName(packageJson.main) ?? fileType,
         });
     }
 
@@ -134,20 +148,6 @@ const inferEntries = (
     // Entry point for TypeScript
     if (context.options.declaration !== false && (packageJson.types || packageJson.typings)) {
         outputs.push({ file: (packageJson.types ?? packageJson.typings) as string, key: "types" });
-    }
-
-    // Try to detect output types
-    const isESMPackage = packageJson.type === "module";
-
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-    for (const output of outputs.filter((o) => !o.type)) {
-        const isJS = output.file.endsWith(".js");
-
-        if ((isESMPackage && isJS) || output.file.endsWith(".mjs")) {
-            output.type = "esm";
-        } else if ((!isESMPackage && isJS) || output.file.endsWith(".cjs")) {
-            output.type = "cjs";
-        }
     }
 
     // Infer entries from package files
@@ -168,7 +168,7 @@ const inferEntries = (
         }
 
         // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-        const sourceSlug = outputSlug.replace(new RegExp("(./)?" + context.options.outDir), context.options.sourceDir);
+        const sourceSlug = outputSlug.replace(new RegExp("(./)?" + context.options.outDir), context.options.sourceDir).replace("./", "");
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if (output.file.includes("/*") && output.key === "exports") {
@@ -190,7 +190,7 @@ const inferEntries = (
             }
 
             if (inputs.length === 0) {
-                warnings.push(`Could not find entrypoints for \`${output.file}\``);
+                warnings.push(`Could not find entrypoint for \`${output.file}\``);
 
                 // eslint-disable-next-line no-continue
                 continue;
@@ -198,7 +198,7 @@ const inferEntries = (
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const input of inputs) {
-                createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, packageJson, context.options.declaration);
+                createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context.options.declaration);
             }
 
             // eslint-disable-next-line no-continue
@@ -220,7 +220,12 @@ const inferEntries = (
             continue;
         }
 
-        createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, packageJson, context.options.declaration);
+        if (isAccessibleSync(input + ".cts") && isAccessibleSync(input + ".mts")) {
+            createOrUpdateEntry(entries, input + ".cts", isDirectory, outputSlug, { ...output, type: "cjs" }, context.options.declaration);
+            createOrUpdateEntry(entries, input + ".mts", isDirectory, outputSlug, { ...output, type: "esm" }, context.options.declaration);
+        } else {
+            createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context.options.declaration);
+        }
     }
 
     return { entries, warnings };

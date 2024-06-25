@@ -38,11 +38,7 @@ const autoPreset: BuildPreset = {
                 package_ = overwriteWithPublishConfig(package_, context.options.declaration);
             }
 
-            const result = inferEntries(
-                package_,
-                sourceFiles,
-                context
-            );
+            const result = inferEntries(package_, sourceFiles, context);
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const message of result.warnings) {

@@ -76,4 +76,5 @@ const sucrasePlugin = ({ exclude, extensions = DEFAULT_EXTENSIONS, include, ...t
     };
 };
 
+// eslint-disable-next-line import/no-unused-modules
 export default sucrasePlugin;

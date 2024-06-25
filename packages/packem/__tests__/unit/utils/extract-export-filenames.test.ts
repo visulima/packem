@@ -23,7 +23,7 @@ describe("extractExportFilenames", () => {
 
         const result = extractExportFilenames(packageExports, type, false);
 
-        expect(result).toStrictEqual([{ file: "index.js", type: "esm" }]);
+        expect(result).toStrictEqual([{ file: "index.js", key: "exports", type: "esm" }]);
     });
 
     it("should return an array of objects when packageExports is an object", () => {
@@ -38,8 +38,8 @@ describe("extractExportFilenames", () => {
         const result = extractExportFilenames(packageExports, type, false);
 
         expect(result).toStrictEqual([
-            { file: "./lib/index.js", type: "esm" },
-            { file: "./src/index.js", type: "esm" },
+            { file: "./lib/index.js", key: "exports", type: "esm" },
+            { file: "./src/index.js", key: "exports", type: "esm" },
         ]);
     });
 
@@ -55,8 +55,8 @@ describe("extractExportFilenames", () => {
         const result = extractExportFilenames(packageExports, type, false);
 
         expect(result).toStrictEqual([
-            { file: "./lib/index.js", type: "cjs" },
-            { file: "./src/index.mjs", type: "esm" },
+            { file: "./lib/index.js", key: "exports", type: "cjs" },
+            { file: "./src/index.mjs", key: "exports", type: "esm" },
         ]);
     });
 
@@ -76,8 +76,8 @@ describe("extractExportFilenames", () => {
         const result = extractExportFilenames(packageExports, type, false);
 
         expect(result).toStrictEqual([
-            { file: "./lib/index.js", type: "esm" },
-            { file: "./src/index.js", type: "esm" },
+            { file: "./lib/index.js", key: "exports", subKey: "import", type: "esm" },
+            { file: "./src/index.js", key: "exports", subKey: "import", type: "esm" },
         ]);
     });
 
@@ -101,18 +101,26 @@ describe("extractExportFilenames", () => {
         expect(result).toStrictEqual([
             {
                 file: "./lib/index.mjs",
+                key: "exports",
+                subKey: "import",
                 type: "esm",
             },
             {
                 file: "./src/index.cjs",
+                key: "exports",
+                subKey: "require",
                 type: "cjs",
             },
             {
                 file: "./src/index.mjs",
+                key: "exports",
+                subKey: "import",
                 type: "esm",
             },
             {
                 file: "./src/index.cjs",
+                key: "exports",
+                subKey: "require",
                 type: "cjs",
             },
         ]);
@@ -162,34 +170,49 @@ describe("extractExportFilenames", () => {
         expect(result).toStrictEqual([
             {
                 file: "./dist/create-bundler.d.ts",
-                type: "esm",
+                key: "exports",
+                subKey: "types",
+                type: "cjs",
             },
             {
                 file: "./dist/create-bundler.js",
+                key: "exports",
+                subKey: "default",
                 type: "cjs",
             },
             {
                 file: "./dist/create-bundler.d.mts",
+                key: "exports",
+                subKey: "types",
                 type: "esm",
             },
             {
                 file: "./dist/create-bundler.mjs",
+                key: "exports",
+                subKey: "default",
                 type: "esm",
             },
             {
                 file: "./dist/create-bundler.js",
+                key: "exports",
                 type: "esm",
             },
             {
                 file: "./dist/create-bundler.cjs",
+                key: "exports",
+                subKey: "require",
                 type: "cjs",
             },
             {
                 file: "./dist/create-bundler.d.cts",
+                key: "exports",
+                subKey: "types",
                 type: "cjs",
             },
             {
                 file: "./dist/create-bundler.cjs",
+                key: "exports",
+                subKey: "default",
                 type: "cjs",
             },
         ]);

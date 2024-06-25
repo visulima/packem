@@ -1,20 +1,20 @@
 import { readdir, stat } from "node:fs/promises";
 import Module from "node:module";
-import { cwd, env, exit } from "node:process";
+import { cwd, env } from "node:process";
 
 import { bold, cyan, gray, green } from "@visulima/colorize";
 import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync, walk } from "@visulima/fs";
 import { NotFoundError } from "@visulima/fs/error";
 import { duration, formatBytes } from "@visulima/humanizer";
 import type { PackageJson } from "@visulima/package";
-import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
-import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
 import { parsePackageJson } from "@visulima/package/package-json";
 import type { Pail, Processor } from "@visulima/pail";
 import { createPail } from "@visulima/pail";
 import { CallerProcessor, ErrorProcessor, MessageFormatterProcessor } from "@visulima/pail/processor";
 import { SimpleReporter } from "@visulima/pail/reporter";
 import { basename, dirname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
+import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
+import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
 import { defu } from "defu";
 import { createHooks } from "hookable";
 import { VERSION } from "rollup";
@@ -47,9 +47,7 @@ const logErrors = (context: BuildContext, hasOtherLogs: boolean): void => {
         context.logger.warn(`Build is done with some warnings:\n\n${[...context.warnings].map((message) => `- ${message}`).join("\n")}`);
 
         if (context.options.failOnWarn) {
-            context.logger.error("Exiting with code (1). You can change this behavior by setting `failOnWarn: false`.");
-
-            exit(1);
+            throw new Error("Exiting with code (1). You can change this behavior by setting `failOnWarn: false`.");
         }
     }
 };
@@ -74,7 +72,7 @@ const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX):
 };
 
 const generateOptions = (
-    logger: Pail<never, string>,
+    logger: Pail,
     rootDirectory: string,
     mode: Mode,
     debug: boolean,
@@ -355,7 +353,7 @@ const generateOptions = (
         logger.info("Using " + cyan("rollup ") + VERSION);
         logger.info({
             message: "Using " + cyan(options.transformerName) + " " + version,
-            prefix: "transformer"
+            prefix: "transformer",
         });
     }
 
@@ -432,7 +430,7 @@ const prepareEntries = async (context: BuildContext, rootDirectory: string): Pro
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const showSizeInformation = (logger: Pail<never, string>, context: BuildContext, packageJson: PackEmPackageJson): boolean => {
+const showSizeInformation = (logger: Pail, context: BuildContext, packageJson: PackEmPackageJson): boolean => {
     const rPath = (p: string) => relative(context.rootDir, resolve(context.options.outDir, p));
 
     let loggedEntries = false;
@@ -528,7 +526,7 @@ const showSizeInformation = (logger: Pail<never, string>, context: BuildContext,
 };
 
 const createContext = async (
-    logger: Pail<never, string>,
+    logger: Pail,
     rootDirectory: string,
     mode: Mode,
     debug: boolean,
@@ -758,9 +756,7 @@ const createBundler = async (
         const rootTsconfigPath = join(rootDirectory, tsconfigPath);
 
         if (!(await isAccessible(rootTsconfigPath))) {
-            logger.error("tsconfig.json not found at", rootTsconfigPath);
-
-            exit(1);
+            throw new Error("tsconfig.json not found at " + rootTsconfigPath);
         }
 
         tsconfig = {
@@ -783,9 +779,7 @@ const createBundler = async (
         const packemConfigFileName = configPath ?? "./packem.config.ts";
 
         if (!/\.(?:js|mjs|cjs|ts)$/.test(packemConfigFileName)) {
-            logger.error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts extensions are allowed.");
-
-            exit(1);
+            throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts extensions are allowed.");
         }
 
         const buildConfig = tryRequire<BuildConfig>(packemConfigFileName, rootDirectory);
@@ -797,18 +791,18 @@ const createBundler = async (
         const getDuration = () => duration(Math.floor(Date.now() - start));
 
         const cachekey = getHash(
-                JSON.stringify({
-                    version: packageJson.version,
-                    ...packageJson.dependencies,
-                    ...packageJson.devDependencies,
-                    browser: packageJson.browser,
-                    eNode: packageJson.engines?.node,
-                    exports: packageJson.exports,
-                    main: packageJson.main,
-                    module: packageJson.module,
-                    type: packageJson.type,
-                    types: packageJson.types,
-                }),
+            JSON.stringify({
+                version: packageJson.version,
+                ...packageJson.dependencies,
+                ...packageJson.devDependencies,
+                browser: packageJson.browser,
+                eNode: packageJson.engines?.node,
+                exports: packageJson.exports,
+                main: packageJson.main,
+                module: packageJson.module,
+                type: packageJson.type,
+                types: packageJson.types,
+            }),
         );
         const fileCache = new FileCache(rootDirectory, cachekey, logger);
 
@@ -861,15 +855,13 @@ const createBundler = async (
 
         // Restore all wrapped console methods
         logger.restoreAll();
-
-        exit(0);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         enhanceRollupError(error);
 
-        logger.error("An error occurred while building", error);
-
-        exit(1);
+        throw new Error("An error occurred while building", {
+            cause: error,
+        });
     }
 };
 

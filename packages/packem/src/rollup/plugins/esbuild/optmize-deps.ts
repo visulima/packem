@@ -5,9 +5,8 @@
  *
  * Copyright (c) 2020 EGOIST
  */
-import { readFile } from "node:fs/promises";
-
 import { findCacheDir } from "@visulima/find-cache-dir";
+import { readFile } from "@visulima/fs";
 import { join } from "@visulima/path";
 import { init, parse } from "es-module-lexer";
 import type { OnResolveArgs, OnResolveResult } from "esbuild";
@@ -82,7 +81,7 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
 
                     build.onLoad({ filter: /.*/, namespace: "optimize-deps" }, async (arguments_) => {
                         const { absolute, resolveDir } = arguments_.pluginData;
-                        const contents = await readFile(absolute, "utf8");
+                        const contents = await readFile(absolute);
                         const [, exported] = parse(contents);
 
                         return {

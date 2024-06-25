@@ -1,7 +1,7 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
-import type { TsConfigResult } from "@visulima/tsconfig";
 import type { Pail } from "@visulima/pail";
 import { join, resolve } from "@visulima/path";
+import type { TsConfigResult } from "@visulima/tsconfig";
 import type { Plugin } from "rollup";
 
 const getRootDirectories = (cwd: string, tsconfig?: TsConfigResult): string[] | null => {
@@ -60,7 +60,7 @@ const getRootDirectories = (cwd: string, tsconfig?: TsConfigResult): string[] | 
  * import { bar } from "./bar"; // -> ./lib/bar
  * ```
  */
-const resolveTsconfigRootDirectories = (cwd: string, logger: Pail<never, string>, tsconfig: TsConfigResult): Plugin => {
+const resolveTsconfigRootDirectories = (cwd: string, logger: Pail, tsconfig: TsConfigResult): Plugin => {
     const rootDirectories = getRootDirectories(cwd, tsconfig);
 
     return {

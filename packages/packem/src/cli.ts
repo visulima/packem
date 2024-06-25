@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unused-modules,import/no-named-as-default
 import Cli from "@visulima/cerebro";
 
 import { name, version } from "../package.json";

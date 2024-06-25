@@ -39,5 +39,5 @@ export type OptimizeDepsResult = {
 };
 
 export type EsbuildPluginConfig = {
-    logger: Pail<never, string>;
+    logger: Pail;
 } & Options;

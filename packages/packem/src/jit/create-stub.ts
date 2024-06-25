@@ -63,7 +63,8 @@ const createStub = async (context: BuildContext): Promise<void> => {
             });
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-            warn(context, `Cannot analyze ${resolvedEntry} for exports:${error}`);
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            warn(context, `Cannot analyze ${resolvedEntry} for exports: ${error.toString()}`);
 
             return;
         }

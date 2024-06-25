@@ -34,7 +34,7 @@ const memoize = <T extends (...arguments_: any[]) => any>(
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const memoizeByKey = <T extends (...arguments_: any[]) => any>(function_: T) => {
+const memoizeByKey = <T extends (...arguments_: any[]) => any>(function_: T): ((cacheKey?: CacheKeyResolver) => T) => {
     const cache = new Map<string, ReturnType<T>>();
 
     return (cacheKey?: CacheKeyResolver) => memoize(function_, cacheKey, cache);

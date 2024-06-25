@@ -56,12 +56,7 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin =>
                 return null;
             }
 
-            const cacheKey = join(
-                "resolveId",
-                getHash(id),
-                importer ? getHash(importer) : "",
-                getHash(JSON.stringify(options)),
-            );
+            const cacheKey = join("resolveId", getHash(id), importer ? getHash(importer) : "", getHash(JSON.stringify(options)));
 
             if (cache.has(cacheKey, plugin.name)) {
                 return await cache.get(cacheKey, plugin.name);

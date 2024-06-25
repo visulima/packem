@@ -11,13 +11,14 @@ export const cjsInterop = ({
     logger,
     type,
 }: {
-    logger: Pail<never, string>;
+    logger: Pail;
     type: "commonjs" | "module";
 } & CJSInteropOptions): Plugin => {
     return {
         name: "packem:cjs-interop",
         // eslint-disable-next-line sonarjs/cognitive-complexity
         renderChunk(code: string, chunk: RenderedChunk, options: NormalizedOutputOptions): { code: string; map: SourceMapInput } | null {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (chunk.type !== "chunk" || !chunk.isEntry) {
                 return null;
             }
@@ -38,7 +39,7 @@ export const cjsInterop = ({
 
                 if (addDefaultProperty) {
                     // add `module.exports.default = module.exports;`
-                    transformed.append("\nmodule.exports.default = " + matches[2] + ";");
+                    transformed.append("\nmodule.exports.default = " + (matches[2] as string) + ";");
                 }
 
                 let newCode = transformed.toString();

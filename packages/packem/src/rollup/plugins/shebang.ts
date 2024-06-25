@@ -8,6 +8,7 @@ import type { Plugin, SourceMapInput } from "rollup";
 const SHEBANG_RE = /^#![^\n]*/;
 
 export const makeExecutable = async (filePath: string): Promise<void> => {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await chmod(filePath, 0o755 /* rwx r-x r-x */).catch(() => {});
 };
 
@@ -84,8 +85,9 @@ export const removeShebangPlugin = (): Plugin => {
     };
 };
 
-export const getShebang = (code: string, append = "\n") => {
+export const getShebang = (code: string, append = "\n"): string => {
     const m = SHEBANG_RE.exec(code);
 
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     return m ? m + append : "";
 };
