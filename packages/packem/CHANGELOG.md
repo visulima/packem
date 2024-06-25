@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.45](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.44...@visulima/packem@1.0.0-alpha.45) (2024-06-25)
+
+### Features
+
+* fixed some tests, add mapping of cjs and mjs to cts and mts, no exit is used inside the functions ([a7169c0](https://github.com/visulima/packem/commit/a7169c03b4f235b16206cca68ea2bb9ecbaa463f))
+
 ## @visulima/packem [1.0.0-alpha.44](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.43...@visulima/packem@1.0.0-alpha.44) (2024-06-20)
 
 ### Bug Fixes
