@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.46](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.45...@visulima/packem@1.0.0-alpha.46) (2024-06-26)
+
+### Features
+
+* improved logger, moved code from function into cli ([a2fc9a8](https://github.com/visulima/packem/commit/a2fc9a84e4215613b65e97bd89c862ed528c859a))
+
 ## @visulima/packem [1.0.0-alpha.45](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.44...@visulima/packem@1.0.0-alpha.45) (2024-06-25)
 
 ### Features
