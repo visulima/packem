@@ -8,10 +8,7 @@ import { NotFoundError } from "@visulima/fs/error";
 import { duration, formatBytes } from "@visulima/humanizer";
 import type { PackageJson } from "@visulima/package";
 import { parsePackageJson } from "@visulima/package/package-json";
-import type { Pail, Processor } from "@visulima/pail";
-import { createPail } from "@visulima/pail";
-import { CallerProcessor, ErrorProcessor, MessageFormatterProcessor } from "@visulima/pail/processor";
-import { SimpleReporter } from "@visulima/pail/reporter";
+import type { Pail } from "@visulima/pail";
 import { basename, dirname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
 import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
@@ -26,7 +23,16 @@ import rollupBuild from "./rollup/build";
 import rollupBuildTypes from "./rollup/build-types";
 import getHash from "./rollup/utils/get-hash";
 import rollupWatch from "./rollup/watch";
-import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildEntry, BuildOptions, InternalBuildOptions, Mode } from "./types";
+import type {
+    BuildConfig,
+    BuildContext,
+    BuildContextBuildEntry,
+    BuildEntry,
+    BuildOptions,
+    BuildPreset,
+    InternalBuildOptions,
+    Mode
+} from "./types";
 import dumpObject from "./utils/dump-object";
 import enhanceRollupError from "./utils/enhance-rollup-error";
 import FileCache from "./utils/file-cache";
@@ -78,7 +84,7 @@ const generateOptions = (
     debug: boolean,
     inputConfig: BuildConfig,
     buildConfig: BuildConfig,
-    preset: BuildConfig,
+    preset: BuildPreset,
     packageJson: PackEmPackageJson,
     tsconfig: TsConfigResult | undefined,
     // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -716,6 +722,7 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
 const createBundler = async (
     rootDirectory: string,
     mode: Mode,
+    logger: Pail,
     inputConfig: {
         configPath?: string;
         debug?: boolean;
@@ -724,20 +731,8 @@ const createBundler = async (
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
     const { configPath, debug, tsconfigPath, ...restInputConfig } = inputConfig;
-    const loggerProcessors: Processor<string>[] = [new MessageFormatterProcessor<string>(), new ErrorProcessor<string>()];
 
-    if (debug) {
-        loggerProcessors.push(new CallerProcessor());
-    }
-
-    const logger = createPail({
-        logLevel: debug ? "debug" : "informational",
-        processors: loggerProcessors,
-        reporters: [new SimpleReporter()],
-        scope: "packem",
-    });
-
-    // logger.wrapAll();
+    logger.wrapAll();
 
     // Determine rootDirectory
     // eslint-disable-next-line no-param-reassign

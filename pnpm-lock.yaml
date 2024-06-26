@@ -315,8 +315,8 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0(rollup@4.18.0)
       '@visulima/cerebro':
-        specifier: ^1.0.51
-        version: 1.0.51(yaml@2.4.2)
+        specifier: ^1.1.1
+        version: 1.1.1(yaml@2.4.2)
       '@visulima/colorize':
         specifier: ^1.4.3
         version: 1.4.3
@@ -2251,8 +2251,8 @@ packages:
     engines: {node: '>=18.* <=22.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/cerebro@1.0.51':
-    resolution: {integrity: sha512-MzvEara8GG1YIDyyLXsyG5oP6c8Q/hrKhjInecaDVCh67HG+UE/wv+J8o5W6c626ME63Wg+rnqdkLKYxkY7OiQ==}
+  '@visulima/cerebro@1.1.1':
+    resolution: {integrity: sha512-MDWRs1FEUPFmSzhwFMDLQS06ePFWMI8l2YwmARfvPLy5Bl6f6yNlm06l2yOZqpmx3FFTguY2t6GXZmm7QIf6PQ==}
     engines: {node: '>=18.* <=22.*'}
     os: [darwin, linux, win32]
 
@@ -9836,7 +9836,7 @@ snapshots:
 
   '@visulima/boxen@1.0.10': {}
 
-  '@visulima/cerebro@1.0.51(yaml@2.4.2)':
+  '@visulima/cerebro@1.1.1(yaml@2.4.2)':
     dependencies:
       '@visulima/boxen': 1.0.10
       '@visulima/colorize': 1.4.3

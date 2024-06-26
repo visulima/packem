@@ -1,3 +1,4 @@
+import type { Alias } from "@rollup/plugin-alias";
 import type { PackageJson } from "@visulima/package";
 import { join } from "@visulima/path";
 
@@ -39,7 +40,7 @@ const resolveAliases = (context: BuildContext, mode: "build" | "jit" | "types"):
 
     if (context.options.rollup.alias) {
         if (Array.isArray(context.options.rollup.alias.entries)) {
-            Object.assign(aliases, Object.fromEntries(context.options.rollup.alias.entries.map((entry) => [entry.find, entry.replacement])));
+            Object.assign(aliases, Object.fromEntries((context.options.rollup.alias.entries as Alias[]).map((entry: Alias) => [entry.find, entry.replacement])));
         } else {
             Object.assign(aliases, context.options.rollup.alias.entries ?? context.options.rollup.alias);
         }

@@ -139,7 +139,7 @@
         "@rollup/plugin-replace": "^5.0.7",
         "@rollup/plugin-wasm": "^6.2.2",
         "@rollup/pluginutils": "^5.1.0",
-        "@visulima/cerebro": "^1.0.51",
+        "@visulima/cerebro": "^1.1.1",
         "@visulima/colorize": "^1.4.3",
         "@visulima/fs": "^2.1.7",
         "@visulima/humanizer": "^1.0.5",

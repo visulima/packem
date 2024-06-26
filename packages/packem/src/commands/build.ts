@@ -6,7 +6,7 @@ import type { Mode } from "../types";
 const createBuildCommand = (cli: Cli): void => {
     cli.addCommand({
         description: "Demonstrate options required",
-        execute: async ({ options }): Promise<void> => {
+        execute: async ({ logger, options }): Promise<void> => {
             let mode: Mode = "build";
 
             if (options.watch) {
@@ -24,7 +24,7 @@ const createBuildCommand = (cli: Cli): void => {
                 }
             }
 
-            await createBundler(options.dir, mode, {
+            await createBundler(options.dir, mode, logger, {
                 cjsInterop: options.cjsInterop,
                 configPath: options.config ?? undefined,
                 debug: options.debug,
@@ -80,13 +80,13 @@ const createBuildCommand = (cli: Cli): void => {
                 type: Boolean,
             },
             {
-                // conflicts: "jit",
+                conflicts: "jit",
                 description: "Watch for changes",
                 name: "watch",
                 type: Boolean,
             },
             {
-                // conflicts: "watch",
+                conflicts: "watch",
                 description: "Stub the package for JIT compilation",
                 name: "jit",
                 type: Boolean,
@@ -116,7 +116,7 @@ const createBuildCommand = (cli: Cli): void => {
                 type: String,
             },
             {
-                // conflicts: "watch",
+                conflicts: "watch",
                 description: "Visualize and analyze the bundle",
                 name: "analyze",
                 type: Boolean,
