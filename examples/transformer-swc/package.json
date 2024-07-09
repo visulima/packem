@@ -14,10 +14,10 @@
         "react-dom": "^18.3.1"
     },
     "devDependencies": {
-        "@swc/core": "^1.6.5",
+        "@swc/core": "^1.6.13",
         "@types/react": "^18.3.3",
         "@types/react-dom": "^18.3.0",
         "@visulima/packem": "workspace:*",
-        "typescript": "^5.5.2"
+        "typescript": "^5.5.3"
     }
 }
