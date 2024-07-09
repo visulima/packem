@@ -852,6 +852,8 @@ const createBundler = async (
         logger.restoreAll();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
+        logger.raw("\n");
+
         enhanceRollupError(error);
 
         throw new Error("An error occurred while building", {

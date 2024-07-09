@@ -1,3 +1,5 @@
+import { exit } from "node:process";
+
 import type { Cli } from "@visulima/cerebro";
 
 import createBundler from "../create-bundler";
@@ -24,27 +26,33 @@ const createBuildCommand = (cli: Cli): void => {
                 }
             }
 
-            await createBundler(options.dir, mode, logger, {
-                cjsInterop: options.cjsInterop,
-                configPath: options.config ?? undefined,
-                debug: options.debug,
-                minify: options.minify,
-                replace: {
-                    ...environments,
-                },
-                rollup: {
-                    esbuild: {
-                        target: options.target,
+            try {
+                await createBundler(options.dir, mode, logger, {
+                    cjsInterop: options.cjsInterop,
+                    configPath: options.config ?? undefined,
+                    debug: options.debug,
+                    minify: options.minify,
+                    replace: {
+                        ...environments,
                     },
-                    license: {
-                        path: options.license,
+                    rollup: {
+                        esbuild: {
+                            target: options.target,
+                        },
+                        license: {
+                            path: options.license,
+                        },
+                        metafile: options.metafile,
+                        ...(options.analyze ? { visualizer: {} } : { visualizer: false }),
                     },
-                    metafile: options.metafile,
-                    ...(options.analyze ? { visualizer: {} } : { visualizer: false }),
-                },
-                sourcemap: options.sourcemap,
-                tsconfigPath: options.tsconfig ?? undefined,
-            });
+                    sourcemap: options.sourcemap,
+                    tsconfigPath: options.tsconfig ?? undefined,
+                });
+            } catch (error) {
+                logger.error(error);
+
+                exit(1);
+            }
         },
         name: "build",
         options: [
