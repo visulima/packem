@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.48](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.47...@visulima/packem@1.0.0-alpha.48) (2024-07-09)
+
+### Bug Fixes
+
+* improved error display ([c5815be](https://github.com/visulima/packem/commit/c5815be6af64b8be517e43fed498c0d1c7d8a79d))
+
 ## @visulima/packem [1.0.0-alpha.47](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.46...@visulima/packem@1.0.0-alpha.47) (2024-07-09)
 
 ### Bug Fixes
