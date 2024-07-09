@@ -315,8 +315,8 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0(rollup@4.18.0)
       '@visulima/cerebro':
-        specifier: ^1.1.8
-        version: 1.1.8(yaml@2.4.2)
+        specifier: ^1.1.9
+        version: 1.1.9(yaml@2.4.2)
       '@visulima/colorize':
         specifier: ^1.4.3
         version: 1.4.3
@@ -333,8 +333,8 @@ importers:
         specifier: ^3.0.4
         version: 3.0.4(yaml@2.4.2)
       '@visulima/pail':
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: ^2.0.1
+        version: 2.0.1
       '@visulima/path':
         specifier: ^1.0.2
         version: 1.0.2
@@ -2516,8 +2516,8 @@ packages:
     engines: {node: '>=18.* <=22.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/cerebro@1.1.8':
-    resolution: {integrity: sha512-lUE/x5Gox5cI582Iy+1s/bTB8UKfxFeguMelZ5ijSZOSU7lWp244y4ijICig5cXC1my07vWEwE3bpHKnyTf6Ng==}
+  '@visulima/cerebro@1.1.9':
+    resolution: {integrity: sha512-F8YHM87s90A9t2tvr5BXWZqbOaQry39Fv588PQgTQ9dXMoUfY9+0I/XA+TuczA71nM25KcZSfTNm2TOo8lnLYQ==}
     engines: {node: '>=18.* <=22.*'}
     os: [darwin, linux, win32]
 
@@ -2583,8 +2583,8 @@ packages:
     engines: {node: '>=18.* <=22.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/pail@2.0.0':
-    resolution: {integrity: sha512-9sYEXh3PzjRZpHNW7zlIwna8YiFovm+pGr4T+iasFE137HadEzJr3FdtWIQ0YGwxbtU4EnwZ2kphibw0ceaB2g==}
+  '@visulima/pail@2.0.1':
+    resolution: {integrity: sha512-wJwdRzp+fEtU8BcY5iEYklYJVeWIm4Iff0gEO8oqnuEVZ4uZ4jC7WvDBYlwsdrz2nfyk3DPCyGb+FdQ9tUGj2A==}
     engines: {node: '>=18.* <=22.*'}
     os: [darwin, linux, win32]
     peerDependencies:
@@ -10259,12 +10259,12 @@ snapshots:
 
   '@visulima/boxen@1.0.11': {}
 
-  '@visulima/cerebro@1.1.8(yaml@2.4.2)':
+  '@visulima/cerebro@1.1.9(yaml@2.4.2)':
     dependencies:
       '@visulima/boxen': 1.0.11
       '@visulima/colorize': 1.4.3
       '@visulima/find-cache-dir': 1.0.3(yaml@2.4.2)
-      '@visulima/pail': 2.0.0
+      '@visulima/pail': 2.0.1
       cli-table3: 0.6.5
       command-line-args: 5.2.1
       fastest-levenshtein: 1.0.16
@@ -10325,7 +10325,7 @@ snapshots:
     transitivePeerDependencies:
       - yaml
 
-  '@visulima/pail@2.0.0':
+  '@visulima/pail@2.0.1':
     dependencies:
       '@visulima/colorize': 1.4.3
       '@visulima/error': 4.3.0

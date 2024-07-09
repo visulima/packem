@@ -8,7 +8,13 @@ import createInitCommand from "./commands/init";
 
 const cli = new Cli("packem", {
     logger: {
-        reporters: [new SimpleReporter()],
+        reporters: [new SimpleReporter({
+            error: {
+                hideErrorCauseCodeView: true,
+                hideErrorCodeView: true,
+                hideErrorErrorsCodeView: true,
+            }
+        })],
         scope: "packem",
     },
     packageName: name,
