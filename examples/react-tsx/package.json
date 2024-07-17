@@ -19,6 +19,6 @@
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.23.0",
         "typescript": "^5.5.3",
-        "vite": "5.3.3"
+        "vite": "5.3.4"
     }
 }

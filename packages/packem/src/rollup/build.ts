@@ -48,7 +48,6 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<void>
             if (entry.isEntry) {
                 context.buildEntries.push({
                     bytes: Buffer.byteLength(entry.code, "utf8"),
-
                     chunks: entry.imports.filter((index) => outputChunks.find((c) => c.fileName === index)),
                     exports: entry.exports,
                     modules: Object.entries(entry.modules).map(([id, module_]) => {

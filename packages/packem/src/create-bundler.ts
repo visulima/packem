@@ -23,16 +23,7 @@ import rollupBuild from "./rollup/build";
 import rollupBuildTypes from "./rollup/build-types";
 import getHash from "./rollup/utils/get-hash";
 import rollupWatch from "./rollup/watch";
-import type {
-    BuildConfig,
-    BuildContext,
-    BuildContextBuildEntry,
-    BuildEntry,
-    BuildOptions,
-    BuildPreset,
-    InternalBuildOptions,
-    Mode
-} from "./types";
+import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildOptions, BuildPreset, InternalBuildOptions, Mode } from "./types";
 import dumpObject from "./utils/dump-object";
 import enhanceRollupError from "./utils/enhance-rollup-error";
 import FileCache from "./utils/file-cache";
@@ -639,20 +630,12 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
     const groupedEntries = groupByKeys(context.options.entries, "environment", "runtime");
 
     const rollups: Promise<void>[] = [];
-    const typescriptEntries: BuildEntry[] = [];
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [runtime, entries] of Object.entries(environmentEntries)) {
-            typescriptEntries.push(...entries.filter((entry) => entry.declaration));
-
-            const adjustedContext = { ...context };
-
-            // dont minify in development files
-            if (environment === "development") {
-                adjustedContext.options.minify = false;
-            }
+            context.logger.info("Preparing build for " + cyan(environment) + " environment with " + cyan(runtime) + " runtime");
 
             if (context.options.rollup.replace) {
                 context.options.rollup.replace.values = {
@@ -667,18 +650,100 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
                 context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
             }
 
-            adjustedContext.options.entries = entries;
+            const esmAndCjsEntries = [];
+            const esmEntries = [];
+            const cjsEntries = [];
 
-            rollups.push(rollupBuild(adjustedContext, fileCache));
+            for (const entry of entries) {
+                if (entry.cjs && entry.esm) {
+                    esmAndCjsEntries.push(entry);
+                } else if (entry.cjs) {
+                    cjsEntries.push(entry);
+                } else if (entry.esm) {
+                    esmEntries.push(entry);
+                }
+            }
+
+            const minify = environment !== "development" && context.options.minify;
+
+            if (esmAndCjsEntries.length > 0) {
+                const adjustedEsmAndCjsContext = {
+                    ...context,
+                    options: { ...context.options, emitCJS: true, emitESM: true, entries: esmAndCjsEntries, minify },
+                };
+
+                rollups.push(rollupBuild(adjustedEsmAndCjsContext, fileCache));
+
+                const typedEntries = adjustedEsmAndCjsContext.options.entries.filter((entry) => entry.declaration);
+
+                if (context.options.declaration && typedEntries.length > 0) {
+                    rollups.push(
+                        rollupBuildTypes(
+                            {
+                                ...adjustedEsmAndCjsContext,
+                                options: {
+                                    ...adjustedEsmAndCjsContext.options,
+                                    entries: typedEntries,
+                                },
+                            },
+                            fileCache,
+                        ),
+                    );
+                }
+            }
+
+            if (esmEntries.length > 0) {
+                const adjustedEsmContext = {
+                    ...context,
+                    options: { ...context.options, emitCJS: false, emitESM: true, entries: esmEntries, minify },
+                };
+
+                rollups.push(rollupBuild(adjustedEsmContext, fileCache));
+
+                const typedEntries = adjustedEsmContext.options.entries.filter((entry) => entry.declaration);
+
+                if (context.options.declaration && typedEntries.length > 0) {
+                    rollups.push(
+                        rollupBuildTypes(
+                            {
+                                ...adjustedEsmContext,
+                                options: {
+                                    ...adjustedEsmContext.options,
+                                    entries: typedEntries,
+                                },
+                            },
+                            fileCache,
+                        ),
+                    );
+                }
+            }
+
+            if (cjsEntries.length > 0) {
+                const adjustedCjsContext = {
+                    ...context,
+                    options: { ...context.options, emitCJS: false, emitESM: false, entries: cjsEntries, minify },
+                };
+
+                rollups.push(rollupBuild(adjustedCjsContext, fileCache));
+
+                const typedEntries = adjustedCjsContext.options.entries.filter((entry) => entry.declaration);
+
+                if (context.options.declaration && typedEntries.length > 0) {
+                    rollups.push(
+                        rollupBuildTypes(
+                            {
+                                ...adjustedCjsContext,
+                                options: {
+                                    ...adjustedCjsContext.options,
+                                    entries: typedEntries,
+                                },
+                            },
+                            fileCache,
+                        ),
+                    );
+                }
+            }
         }
-    }
-
-    if (context.options.declaration) {
-        const adjustedContext = { ...context };
-
-        adjustedContext.options.entries = typescriptEntries;
-
-        rollups.push(rollupBuildTypes(adjustedContext, fileCache));
     }
 
     await Promise.all(rollups);

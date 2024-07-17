@@ -561,14 +561,15 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                     sourcemap: context.options.sourcemap,
                     ...context.options.rollup.output,
                 },
-            <OutputOptions>{
-                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(context, chunk, "d.mts"),
-                dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: "[name].d.mts",
-                format: "esm",
-                sourcemap: context.options.sourcemap,
-                ...context.options.rollup.output,
-            },
+            context.options.emitESM &&
+                <OutputOptions>{
+                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(context, chunk, "d.mts"),
+                    dir: resolve(context.options.rootDir, context.options.outDir),
+                    entryFileNames: "[name].d.mts",
+                    format: "esm",
+                    sourcemap: context.options.sourcemap,
+                    ...context.options.rollup.output,
+                },
             // .d.ts for node10 compatibility (TypeScript version < 4.7)
             (context.options.declaration === true || context.options.declaration === "compatible") &&
                 <OutputOptions>{
