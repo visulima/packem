@@ -295,6 +295,9 @@ const generateOptions = (
                     strictMode: false, // no 'use strict';
                     type: "es6",
                 },
+                transform: {
+                    decoratorVersion: "2022-03",
+                },
             },
             treeshake: {
                 moduleSideEffects: getPackageSideEffect(rootDirectory, packageJson),
@@ -606,6 +609,7 @@ const cleanDistributionDirectories = async (context: BuildContext): Promise<void
         )) {
             if (
                 directory === context.options.rootDir ||
+                directory === context.options.sourceDir ||
                 context.options.rootDir.startsWith(directory.endsWith("/") ? directory : `${directory}/`) ||
                 cleanedDirectories.some((c) => directory.startsWith(c))
             ) {
@@ -921,9 +925,7 @@ const createBundler = async (
 
         enhanceRollupError(error);
 
-        throw new Error("An error occurred while building", {
-            cause: error,
-        });
+        throw error;
     }
 };
 
