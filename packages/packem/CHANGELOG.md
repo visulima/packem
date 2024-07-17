@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.51](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.50...@visulima/packem@1.0.0-alpha.51) (2024-07-17)
+
+### Bug Fixes
+
+* stop delete on source folder, added decorator to swc, removed custom error ([449f93c](https://github.com/visulima/packem/commit/449f93ccd2e3174a7161dc96976bfe537817586b))
+
 ## @visulima/packem [1.0.0-alpha.50](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.49...@visulima/packem@1.0.0-alpha.50) (2024-07-17)
 
 ### Bug Fixes
