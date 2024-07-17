@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.50](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.49...@visulima/packem@1.0.0-alpha.50) (2024-07-17)
+
+### Bug Fixes
+
+* improved splitting of esm and cjs files based on input ([1a87180](https://github.com/visulima/packem/commit/1a87180a48be21fdf66b9dcb020623eb1684a669))
+
 ## @visulima/packem [1.0.0-alpha.49](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.48...@visulima/packem@1.0.0-alpha.49) (2024-07-09)
 
 ### Bug Fixes
