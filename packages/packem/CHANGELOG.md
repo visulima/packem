@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.52](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.51...@visulima/packem@1.0.0-alpha.52) (2024-07-18)
+
+### Features
+
+* added isolated declarations transformer, added check for peerDependenciesMeta ([8f7ba0d](https://github.com/visulima/packem/commit/8f7ba0d8a52afa6dad9a67ee5cee82096748600c))
+
 ## @visulima/packem [1.0.0-alpha.51](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.50...@visulima/packem@1.0.0-alpha.51) (2024-07-17)
 
 ### Bug Fixes
