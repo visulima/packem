@@ -21,6 +21,7 @@
         "rollup",
         "sucrase",
         "swc",
+        "declarations",
         "isolated declarations",
         "isolated-declarations",
         "transformer",
