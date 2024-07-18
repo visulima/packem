@@ -1,8 +1,9 @@
+import { createJiti } from "jiti";
+
 import type { BuildConfig, BuildPreset } from "../../../types";
-import tryRequire from "../../../utils/try-require";
 import autoPreset from "../auto";
 
-const resolvePreset = (preset: BuildPreset | "auto" | "none" | (NonNullable<unknown> & string), rootDirectory: string): BuildConfig => {
+const resolvePreset = async (preset: BuildPreset | string, rootDirectory: string): Promise<BuildConfig> => {
     if (preset === "auto") {
         // eslint-disable-next-line no-param-reassign
         preset = autoPreset;
@@ -10,7 +11,7 @@ const resolvePreset = (preset: BuildPreset | "auto" | "none" | (NonNullable<unkn
         return {};
     } else if (typeof preset === "string") {
         // eslint-disable-next-line no-param-reassign
-        preset = tryRequire(preset, rootDirectory);
+        preset = (await createJiti(rootDirectory).import(preset)) || {};
     }
 
     if (typeof preset === "function") {

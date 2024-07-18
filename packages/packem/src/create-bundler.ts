@@ -11,6 +11,7 @@ import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
 import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
 import { defu } from "defu";
 import { createHooks } from "hookable";
+import { createJiti } from "jiti";
 import { VERSION } from "rollup";
 
 import build from "./build";
@@ -28,7 +29,6 @@ import getPackageSideEffect from "./utils/get-package-side-effect";
 import loadPackageJson from "./utils/load-package-json";
 import logBuildErrors from "./utils/log-build-errors";
 import prepareEntries from "./utils/prepare-entries";
-import tryRequire from "./utils/try-require";
 import packageJsonValidator from "./validator/package-json";
 import validateAliasEntries from "./validator/validate-alias-entries";
 
@@ -309,12 +309,10 @@ const generateOptions = (
         stub: mode === "jit",
         stubOptions: {
             /**
-             * See https://github.com/unjs/jiti#options
+             * See https://github.com/unjs/jiti#%EF%B8%8F-options
              */
             jiti: {
                 alias: {},
-                esmResolve: true,
-                interopDefault: true,
             },
         },
         transformerName: undefined,
@@ -388,11 +386,14 @@ const createContext = async (
     tsconfig: TsConfigResult | undefined,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<BuildContext> => {
-    const preset = resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", rootDirectory);
+    const preset = await resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", rootDirectory);
 
     const options = generateOptions(logger, rootDirectory, mode, environment, debug, inputConfig, buildConfig, preset, packageJson, tsconfig);
 
     ensureDirSync(join(options.rootDir, options.outDir));
+
+    // Create shared jiti instance for context
+    const jiti = createJiti(options.rootDir, options.stubOptions.jiti);
 
     // Build context
     const context: BuildContext = {
@@ -400,6 +401,7 @@ const createContext = async (
         dependencyGraphMap: new Map<string, Set<[string, string]>>(),
         environment,
         hooks: createHooks(),
+        jiti,
         logger,
         mode,
         options,
@@ -577,11 +579,13 @@ const createBundler = async (
             }
         }
 
+        const jiti = await createJiti(rootDirectory);
+
         if (!/\.(?:js|mjs|cjs|ts|cts|mts)$/.test(packemConfigFilePath)) {
             throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.");
         }
 
-        let buildConfig: BuildConfig | BuildConfig[] | BuildConfigFunction = tryRequire(packemConfigFilePath, rootDirectory);
+        let buildConfig: BuildConfig | BuildConfig[] | BuildConfigFunction = (jiti.import(packemConfigFilePath, { try: true }) || {});
 
         if (typeof buildConfig === "function") {
             buildConfig = await buildConfig(environment, mode);
