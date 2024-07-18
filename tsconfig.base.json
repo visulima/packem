@@ -5,7 +5,7 @@
         "downlevelIteration": true,
         "isolatedModules": true,
         "lib": ["ES2023"],
-        "module": "preserve",
+        "module": "Preserve",
         "target": "ESNext",
         "moduleResolution": "Bundler",
         "tsBuildInfoFile": ".tsbuildinfo",

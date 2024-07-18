@@ -18,6 +18,7 @@ import type { PluginVisualizerOptions } from "rollup-plugin-visualizer";
 import type { CJSInteropOptions } from "./rollup/plugins/cjs-interop";
 import type { CopyPluginOptions } from "./rollup/plugins/copy";
 import type { EsbuildPluginConfig, Options as EsbuildOptions } from "./rollup/plugins/esbuild/types";
+import type { IsolatedDeclarationsOptions } from "./rollup/plugins/isolated-declarations-plugin";
 import type { JSXRemoveAttributesPlugin } from "./rollup/plugins/jsx-remove-attributes";
 import type { LicenseOptions } from "./rollup/plugins/license";
 import type { RawLoaderOptions } from "./rollup/plugins/raw";
@@ -62,6 +63,7 @@ export interface RollupBuildOptions {
     dts: RollupDtsOptions;
     dynamicVars?: RollupDynamicImportVariablesOptions | false;
     esbuild: EsbuildOptions | false;
+    isolatedDeclarations?: IsolatedDeclarationsOptions;
     json: RollupJsonOptions | false;
     jsxRemoveAttributes?: JSXRemoveAttributesPlugin | false;
     license?: LicenseOptions | false;
@@ -117,6 +119,7 @@ export interface BuildOptions {
     externals: (RegExp | string)[];
     failOnWarn?: boolean;
     fileCache?: boolean;
+    isolatedDeclarationTransformer?: (code: string, id: string) => Promise<IsolatedDeclarationsResult>;
     minify: boolean;
     name: string;
     optionalDependencies: string[];
@@ -195,3 +198,8 @@ export type InferEntriesResult = {
 };
 
 export type Mode = "build" | "jit" | "watch";
+
+export interface IsolatedDeclarationsResult {
+    errors: string[];
+    sourceText: string;
+}

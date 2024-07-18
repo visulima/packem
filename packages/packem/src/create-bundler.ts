@@ -196,6 +196,7 @@ const generateOptions = (
                 // Optionally preserve symbol names during minification
                 tsconfigRaw: tsconfig?.config,
             },
+            isolatedDeclarations: {},
             json: {
                 preferConst: true,
             },
@@ -658,6 +659,7 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
             const esmEntries = [];
             const cjsEntries = [];
 
+            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const entry of entries) {
                 if (entry.cjs && entry.esm) {
                     esmAndCjsEntries.push(entry);

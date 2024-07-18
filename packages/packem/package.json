@@ -81,12 +81,32 @@
         },
         "./transformer/swc": {
             "import": {
-                "types": "./dist/rollup/plugins/swc/index.d.mts",
-                "default": "./dist/rollup/plugins/swc/index.mjs"
+                "types": "./dist/rollup/plugins/swc/swc-plugin.d.mts",
+                "default": "./dist/rollup/plugins/swc/swc-plugin.mjs"
             },
             "require": {
-                "types": "./dist/rollup/plugins/swc/index.d.cts",
-                "default": "./dist/rollup/plugins/swc/index.cjs"
+                "types": "./dist/rollup/plugins/swc/swc-plugin.d.cts",
+                "default": "./dist/rollup/plugins/swc/swc-plugin.cjs"
+            }
+        },
+        "./transformer/dts/swc": {
+            "import": {
+                "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-plugin.d.mts",
+                "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-plugin.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-plugin.d.cts",
+                "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-plugin.cjs"
+            }
+        },
+        "./transformer/dts/oxc": {
+            "import": {
+                "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-plugin.d.mts",
+                "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-plugin.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-plugin.d.cts",
+                "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-plugin.cjs"
             }
         },
         "./transformer/sucrase": {
@@ -196,6 +216,7 @@
         "estree-walker": "^3.0.3",
         "execa": "^9.3.0",
         "jiti": "^1.21.6",
+        "oxc-transform": "^0.20.0",
         "prettier": "^3.3.3",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
@@ -213,6 +234,7 @@
         "@swc/core": "^1.5.7",
         "esbuild": "^0.20.2 || ^0.21.3",
         "jiti": "^1.21.0",
+        "oxc-transform": "^0.20.0",
         "sucrase": "^3.35.0",
         "typescript": "^4.5 || ^5.0"
     },
@@ -221,6 +243,9 @@
             "optional": true
         },
         "esbuild": {
+            "optional": true
+        },
+        "oxc-transform": {
             "optional": true
         },
         "sucrase": {

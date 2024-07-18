@@ -25,6 +25,7 @@ import memoizeByKey from "../utils/memoize";
 import { cjsInterop as cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
+import { isolatedDeclarationsPlugin } from "./plugins/isolated-declarations-plugin";
 import JSONPlugin from "./plugins/json";
 import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
 import { license as licensePlugin } from "./plugins/license";
@@ -200,7 +201,24 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
                 return true;
             }
 
-            if (id.startsWith(".") || isAbsolute(id) || /src[/\\]/.test(id) || (context.pkg.name && id.startsWith(context.pkg.name))) {
+            const { pkg } = context;
+
+            const depPeerDeps = pkg.peerDependencies;
+
+            if (
+                depPeerDeps &&
+                id in depPeerDeps &&
+                // eslint-disable-next-line security/detect-object-injection
+                !pkg.dependencies?.[id] &&
+                // eslint-disable-next-line security/detect-object-injection
+                !pkg.peerDependencies?.[id] && // Check if it's optional
+                // eslint-disable-next-line security/detect-object-injection
+                !pkg.peerDependenciesMeta?.[id]?.optional
+            ) {
+                return true;
+            }
+
+            if (id.startsWith(".") || isAbsolute(id) || /src[/\\]/.test(id) || (pkg.name && id.startsWith(pkg.name))) {
                 return false;
             }
 
@@ -615,7 +633,9 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
 
             nodeResolver,
 
-            await memoizeDtsPluginByKey(uniqueProcessId)(context),
+            context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer
+                ? isolatedDeclarationsPlugin(context.options.isolatedDeclarationTransformer, context.options.rollup.isolatedDeclarations)
+                : await memoizeDtsPluginByKey(uniqueProcessId)(context),
 
             context.options.cjsInterop &&
                 context.options.emitCJS &&
