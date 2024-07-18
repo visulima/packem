@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.53](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.52...@visulima/packem@1.0.0-alpha.53) (2024-07-18)
+
+### Features
+
+* added isolated declarations transformer based on typescript, and fixed the plugin ([6bec80b](https://github.com/visulima/packem/commit/6bec80b5555beaa8812a78b5ab6f1a16010dd4fd))
+
 ## @visulima/packem [1.0.0-alpha.52](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.51...@visulima/packem@1.0.0-alpha.52) (2024-07-18)
 
 ### Features
