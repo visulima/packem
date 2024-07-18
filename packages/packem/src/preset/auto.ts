@@ -18,7 +18,7 @@ const autoPreset: BuildPreset = {
                 return;
             }
 
-            const sourceDirectory = join(context.options.rootDir, "src");
+            const sourceDirectory = join(context.options.rootDir, context.options.sourceDir);
 
             // eslint-disable-next-line security/detect-non-literal-fs-filename
             if (!existsSync(sourceDirectory)) {

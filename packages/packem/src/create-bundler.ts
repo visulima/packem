@@ -196,7 +196,11 @@ const generateOptions = (
                 // Optionally preserve symbol names during minification
                 tsconfigRaw: tsconfig?.config,
             },
-            isolatedDeclarations: {},
+            isolatedDeclarations: {
+                exclude: EXCLUDE_REGEXP,
+                ignoreErrors: false,
+                include: [/\.[cm]?ts$/],
+            },
             json: {
                 preferConst: true,
             },
@@ -432,7 +436,7 @@ const prepareEntries = async (context: BuildContext, rootDirectory: string): Pro
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const showSizeInformation = (logger: Pail, context: BuildContext, packageJson: PackEmPackageJson): boolean => {
-    const rPath = (p: string) => relative(context.rootDir, resolve(context.options.outDir, p));
+    const rPath = (p: string) => relative(context.options.rootDir, resolve(context.options.outDir, p));
 
     let loggedEntries = false;
 
@@ -551,7 +555,6 @@ const createContext = async (
         mode,
         options,
         pkg: packageJson,
-        rootDir: rootDirectory,
         tsconfig,
         usedImports: new Set(),
         warnings: new Set(),

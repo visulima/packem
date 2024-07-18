@@ -29,7 +29,7 @@ const resolveAliases = (context: BuildContext, mode: "build" | "jit" | "types"):
             }
 
             // eslint-disable-next-line security/detect-object-injection
-            aliases[alias] = join(context.rootDir, subpath);
+            aliases[alias] = join(context.options.rootDir, subpath);
         }
     }
 

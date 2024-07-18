@@ -8,7 +8,7 @@ import { nodeResolve as nodeResolvePlugin } from "@rollup/plugin-node-resolve";
 import replacePlugin from "@rollup/plugin-replace";
 import { wasm as wasmPlugin } from "@rollup/plugin-wasm";
 import { cyan } from "@visulima/colorize";
-import { isAbsolute, relative, resolve } from "@visulima/path";
+import { isAbsolute, join, relative, resolve } from "@visulima/path";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
 import polifillPlugin from "rollup-plugin-polyfill-node";
@@ -425,6 +425,14 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             context.options.rollup.wsam && wasmPlugin(context.options.rollup.wsam),
 
+            context.options.declaration &&
+                context.options.rollup.isolatedDeclarations &&
+                context.options.isolatedDeclarationTransformer &&
+                isolatedDeclarationsPlugin(join(context.options.rootDir, context.options.sourceDir))(
+                    context.options.isolatedDeclarationTransformer,
+                    context.options.rollup.isolatedDeclarations,
+                ),
+
             context.options.transformer?.(getTransformerConfig(context.options.transformerName, context)),
 
             context.options.cjsInterop &&
@@ -633,9 +641,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
 
             nodeResolver,
 
-            context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer
-                ? isolatedDeclarationsPlugin(context.options.isolatedDeclarationTransformer, context.options.rollup.isolatedDeclarations)
-                : await memoizeDtsPluginByKey(uniqueProcessId)(context),
+            await memoizeDtsPluginByKey(uniqueProcessId)(context),
 
             context.options.cjsInterop &&
                 context.options.emitCJS &&

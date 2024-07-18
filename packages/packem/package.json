@@ -21,6 +21,10 @@
         "rollup",
         "sucrase",
         "swc",
+        "isolated declarations",
+        "isolated-declarations",
+        "transformer",
+        "oxc",
         "typescript",
         "visulima",
         "zero config"
@@ -91,22 +95,32 @@
         },
         "./transformer/dts/swc": {
             "import": {
-                "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-plugin.d.mts",
-                "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-plugin.mjs"
+                "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.mts",
+                "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.mjs"
             },
             "require": {
-                "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-plugin.d.cts",
-                "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-plugin.cjs"
+                "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.cts",
+                "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.cjs"
             }
         },
         "./transformer/dts/oxc": {
             "import": {
-                "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-plugin.d.mts",
-                "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-plugin.mjs"
+                "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.mts",
+                "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.mjs"
             },
             "require": {
-                "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-plugin.d.cts",
-                "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-plugin.cjs"
+                "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.cts",
+                "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.cjs"
+            }
+        },
+        "./transformer/dts/ts": {
+            "import": {
+                "types": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.mts",
+                "default": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.cts",
+                "default": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.cjs"
             }
         },
         "./transformer/sucrase": {

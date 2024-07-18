@@ -8,6 +8,15 @@ import { getRollupDtsOptions } from "./get-rollup-options";
 import getChunkFilename from "./utils/get-chunk-filename";
 
 const buildTypes = async (context: BuildContext, fileCache: FileCache): Promise<void> => {
+    if (context.options.declaration && context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer) {
+        context.logger.debug({
+            message: "Skipping declaration file generation as isolated declaration transformer is enabled.",
+            prefix: "dts",
+        });
+
+        return;
+    }
+
     const rollupTypeOptions = await getRollupDtsOptions(context, fileCache);
 
     await context.hooks.callHook("rollup:dts:options", context, rollupTypeOptions);

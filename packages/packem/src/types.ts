@@ -174,7 +174,6 @@ export interface BuildContext {
     mode: Mode;
     options: InternalBuildOptions;
     pkg: PackageJson;
-    rootDir: string;
     tsconfig?: TsConfigResult;
     usedImports: Set<string>;
     warnings: Set<string>;

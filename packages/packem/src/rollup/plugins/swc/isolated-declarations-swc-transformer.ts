@@ -2,7 +2,7 @@ import { transform as swcTransform } from "@swc/core";
 
 import type { IsolatedDeclarationsResult } from "../../../types";
 
-const isolatedDeclarationsSwcPlugin = async (id: string, code: string): Promise<IsolatedDeclarationsResult> => {
+const isolatedDeclarationsSwcTransformer = async (id: string, code: string): Promise<IsolatedDeclarationsResult> => {
     try {
         const result = await swcTransform(code, {
             filename: id,
@@ -33,4 +33,4 @@ const isolatedDeclarationsSwcPlugin = async (id: string, code: string): Promise<
     }
 };
 
-export default isolatedDeclarationsSwcPlugin;
+export default isolatedDeclarationsSwcTransformer;

@@ -22,8 +22,11 @@ const validatePackage = (package_: PackageJson, context: BuildContext): void => 
         ].map(
             (index) =>
                 index &&
-                // eslint-disable-next-line security/detect-unsafe-regex
-                resolve(context.rootDir, index.replace(/\/[^*/]*\*[^\n\r/\u2028\u2029]*(?:[\n\r\u2028\u2029][^*/]*\*[^\n\r/\u2028\u2029]*)*(?:\/.*)?$/, "")),
+                 
+                resolve(
+                    context.options.rootDir,
+                    index.replace(/\/[^*/]*\*[^\n\r/\u2028\u2029]*(?:[\n\r\u2028\u2029][^*/]*\*[^\n\r/\u2028\u2029]*)*(?:\/.*)?$/, ""),
+                ),
         ),
     );
 
@@ -33,12 +36,12 @@ const validatePackage = (package_: PackageJson, context: BuildContext): void => 
     for (const filename of filenames) {
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         if (filename && !filename.includes("*") && !existsSync(filename)) {
-            missingOutputs.push(filename.replace(`${context.rootDir}/`, ""));
+            missingOutputs.push(filename.replace(`${context.options.rootDir}/`, ""));
         }
     }
 
     if (missingOutputs.length > 0) {
-        const rPath = (p: string) => relative(context.rootDir, resolve(context.options.outDir, p));
+        const rPath = (p: string) => relative(context.options.rootDir, resolve(context.options.outDir, p));
 
         const listOfGeneratedFiles = context.buildEntries.filter((bEntry) => !bEntry.chunk).map((bEntry) => rPath(bEntry.path));
 
