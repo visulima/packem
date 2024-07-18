@@ -148,11 +148,11 @@ export interface BuildOptions {
     sourceDir: string;
     /** @experimental */
     sourcemap: boolean;
-    stub: boolean
+    stub: boolean;
     /**
      * Stub options, where [jiti](https://github.com/unjs/jiti)
      * is an object of type `Omit<JitiOptions, "transform" | "onError">`.
-     */;
+     */
     stubOptions: { jiti: Omit<JitiOptions, "onError" | "transform"> };
     transformer?: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
     validation?: {

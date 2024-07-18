@@ -11,6 +11,7 @@ import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
 import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
 import { defu } from "defu";
 import { createHooks } from "hookable";
+import type { Jiti } from "jiti";
 import { createJiti } from "jiti";
 import { VERSION } from "rollup";
 
@@ -384,16 +385,14 @@ const createContext = async (
     buildConfig: BuildConfig,
     packageJson: PackageJson,
     tsconfig: TsConfigResult | undefined,
+    jiti: Jiti,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<BuildContext> => {
-    const preset = await resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", rootDirectory);
+    const preset = await resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", jiti);
 
     const options = generateOptions(logger, rootDirectory, mode, environment, debug, inputConfig, buildConfig, preset, packageJson, tsconfig);
 
     ensureDirSync(join(options.rootDir, options.outDir));
-
-    // Create shared jiti instance for context
-    const jiti = createJiti(options.rootDir, options.stubOptions.jiti);
 
     // Build context
     const context: BuildContext = {
@@ -401,7 +400,8 @@ const createContext = async (
         dependencyGraphMap: new Map<string, Set<[string, string]>>(),
         environment,
         hooks: createHooks(),
-        jiti,
+        // Create shared jiti instance for context
+        jiti: createJiti(options.rootDir, options.stubOptions.jiti),
         logger,
         mode,
         options,
@@ -579,7 +579,7 @@ const createBundler = async (
             }
         }
 
-        const jiti = await createJiti(rootDirectory);
+        const jiti = createJiti(rootDirectory);
 
         if (!/\.(?:js|mjs|cjs|ts|cts|mts)$/.test(packemConfigFilePath)) {
             throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.");
@@ -626,7 +626,7 @@ const createBundler = async (
                 await emptyDir(fileCache.cachePath);
             }
 
-            const context = await createContext(logger, rootDirectory, mode, environment, debug ?? false, restInputConfig, buildOptions, packageJson, tsconfig);
+            const context = await createContext(logger, rootDirectory, mode, debug ?? false, restInputConfig, buildConfig, packageJson, tsconfig, jiti);
 
             fileCache.isEnabled = context.options.fileCache as boolean;
 
