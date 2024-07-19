@@ -39,7 +39,7 @@ describe("packem output", () => {
         });
         createPackemConfig(temporaryDirectoryPath, {});
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development", "--no-color"], {
+        const binProcess = await execPackemSync("build", ["--no-color"], {
             cwd: temporaryDirectoryPath,
         });
 

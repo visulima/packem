@@ -21,12 +21,12 @@ describe("packem copy", () => {
     it("should not trigger a warning if alias option is used", async () => {
         expect.assertions(4);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `console.log("Hello, world!");`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `console.log("Hello, world!");`);
         writeFileSync(`${temporaryDirectoryPath}/assets/style.css`, `body { background-color: red; }`);
         writeFileSync(`${temporaryDirectoryPath}/assets/data.csv`, `name,age`);
         createPackageJson(temporaryDirectoryPath, {
-            main: "./dist/index.cjs",
-            type: "commonjs",
+            main: "./dist/index.mjs",
+            type: "module",
         });
         createPackemConfig(temporaryDirectoryPath, {
             rollup: {
@@ -36,7 +36,7 @@ describe("packem copy", () => {
             },
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

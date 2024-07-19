@@ -102,7 +102,7 @@ exports.method = method;
             },
             exports: {
                 import: "./dist/index.mjs",
-                module: "./dist/index.esm.js",
+                module: "./dist/index.mjs",
                 require: "./dist/index.cjs",
             },
         });
@@ -434,7 +434,7 @@ exports.value = value;
             type: "module",
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -480,7 +480,7 @@ export { index as default };
             type: "commonjs",
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

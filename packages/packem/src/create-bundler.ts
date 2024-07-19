@@ -368,7 +368,7 @@ const generateOptions = (
         logger.debug("Disabling polyfillNode because preferBuiltins is set to true");
     }
 
-    if (!tsconfig?.config.compilerOptions?.isolatedModules) {
+    if (packageJson.devDependencies?.typescript && !tsconfig?.config.compilerOptions?.isolatedModules) {
         logger.warn(
             `'compilerOptions.isolatedModules' is not enabled in tsconfig.\nBecause none of the third-party transpiler, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.\nTo mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.`,
         );
@@ -580,8 +580,8 @@ const createContext = async (
         throw new Error("Both emitESM and emitCJS are disabled. At least one of them must be enabled.");
     }
 
-    if (context.options.declaration && tsconfig === undefined) {
-        throw new Error("Cannot build declaration files without a tsconfig.json");
+    if (context.options.declaration && tsconfig === undefined && packageJson.devDependencies?.typescript) {
+        throw new Error("               Cannot build declaration files without a tsconfig.json");
     }
 
     if (context.options.emitESM === undefined) {
@@ -592,7 +592,7 @@ const createContext = async (
         context.logger.info("Emitting CJS bundles, is disabled.");
     }
 
-    if (!context.options.declaration) {
+    if (!context.options.declaration || !packageJson.devDependencies?.typescript) {
         context.logger.info("Declaration files, are disabled.");
     }
 
@@ -834,7 +834,7 @@ const createBundler = async (
         };
 
         logger.info("Using tsconfig settings at", rootTsconfigPath);
-    } else {
+    } else if (packageJson.devDependencies?.typescript) {
         try {
             tsconfig = await findTsConfig(rootDirectory);
 

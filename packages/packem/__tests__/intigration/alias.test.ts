@@ -39,7 +39,7 @@ export default log();`,
             },
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

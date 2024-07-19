@@ -61,7 +61,7 @@ export function esmImport() {
             },
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -226,7 +226,7 @@ export function esmImport() {
             },
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -349,7 +349,7 @@ exports.getRequireModule = getRequireModule;
             type: "module",
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -386,7 +386,7 @@ export { getFilename } from "./filename.js";`,
             type: "module",
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

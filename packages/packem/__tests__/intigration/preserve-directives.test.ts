@@ -35,7 +35,7 @@ console.log("Hello, world!");`,
         });
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -68,7 +68,7 @@ console.log("Hello, world!");
         });
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -127,7 +127,7 @@ export default Tr;`,
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -201,7 +201,7 @@ console.log("Hello, cli!");`,
         });
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -268,7 +268,7 @@ export const baz = 'baz';`,
         });
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

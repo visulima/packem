@@ -34,7 +34,7 @@ export const data = content;`,
             module: "./dist/index.mjs",
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

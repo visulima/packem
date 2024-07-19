@@ -23,11 +23,11 @@ describe("packem error cases", () => {
     it("should throw a error if no package.json was found", async () => {
         expect.assertions(2);
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toMatch("No such file or directory, for package.json found.");
+        await expect(streamToString(binProcess.stderr)).resolves.toContain("No such file or directory, for package.json found.");
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -36,11 +36,11 @@ describe("packem error cases", () => {
 
         writeFileSync(`${temporaryDirectoryPath}/package.json`, "{");
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toMatch("Unexpected end of JSON input in");
+        await expect(streamToString(binProcess.stderr)).resolves.toContain("Unexpected end of JSON input in");
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -52,11 +52,11 @@ describe("packem error cases", () => {
             name: "pkg",
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toMatch("No 'src' directory found. Please provide entries manually.");
+        await expect(streamToString(binProcess.stderr)).resolves.toContain("No 'src' directory found. Please provide entries manually.");
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -70,11 +70,11 @@ describe("packem error cases", () => {
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         mkdirSync(`${temporaryDirectoryPath}/src`);
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toMatch("No source files found in 'src' directory. Please provide entries manually.");
+        await expect(streamToString(binProcess.stderr)).resolves.toContain("No source files found in 'src' directory. Please provide entries manually.");
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -87,11 +87,11 @@ describe("packem error cases", () => {
         });
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "");
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toMatch("No entries detected. Please provide entries manually.");
+        await expect(streamToString(binProcess.stderr)).resolves.toContain("No entries detected. Please provide entries manually.");
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -106,12 +106,12 @@ describe("packem error cases", () => {
         });
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "");
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
         await expect(streamToString(binProcess.stdout)).resolves.toBe("");
-        await expect(streamToString(binProcess.stderr)).resolves.toMatch(
+        await expect(streamToString(binProcess.stderr)).resolves.toContain(
             `Conflicting field "module" with entry "dist/index.js" detected. Conflicts with "main" field. Please change one of the entries inside your package.json.`,
         );
         expect(binProcess.exitCode).toBe(1);

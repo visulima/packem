@@ -1,10 +1,10 @@
-import { execSync } from "node:child_process";
 import { mkdir, symlink } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { writeFileSync, writeJsonSync } from "@visulima/fs";
-import type { PackageJson, TsConfigJson } from "@visulima/package";
+import type { PackageJson } from "@visulima/package";
+import type { TsConfigJson } from "@visulima/tsconfig";
 import type { Options } from "execa";
 import { execaNode } from "execa";
 
@@ -18,24 +18,14 @@ const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../dist"
  */
 export const esc = (string_: string): string => string_.replaceAll("", "\\x1b");
 
-export const execScriptSync = (file: string, flags: string[] = [], environment: string[] = []): string => {
-    const environmentVariables = environment.length > 0 ? `${environment.join(" ")} ` : "";
-
-    let cmd = `node "${file}" ${flags.join(" ")}`;
-
-    if (environmentVariables) {
-        cmd = `${environmentVariables}${cmd}`;
-    }
-
-    const result = execSync(cmd);
-
-    // replace last newline in result
-    return result.toString().replace(/\n$/, "");
-};
-
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const execPackemSync = async (command: "build" | "init", flags: string[] = [], options: Options = {}) =>
-    await execaNode(join(distributionPath, "cli.mjs"), [command, ...flags], options);
+    await execaNode(join(distributionPath, "cli.mjs"), [command, ...flags], {
+        env: {
+            NODE_ENV: "development",
+        },
+        ...options,
+    });
 
 // @TODO: Fix type
 export const streamToString = async (stream: any): Promise<string> => {

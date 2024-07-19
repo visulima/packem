@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage, streamToString } from "../helpers";
 
 describe("packem node exports", () => {
     let temporaryDirectoryPath: string;
@@ -21,7 +21,12 @@ describe("packem node exports", () => {
         expect.assertions(7);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "^4.4.3",
+            },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",
@@ -30,7 +35,7 @@ describe("packem node exports", () => {
         createPackemConfig(temporaryDirectoryPath, {});
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -80,7 +85,12 @@ export { test as default };
             expect.assertions(7);
 
             writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `const test = () => "this should be in final bundle";\nexport default test;`);
+
+            await installPackage(temporaryDirectoryPath, "typescript");
             createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "^4.4.3",
+                },
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
                 type: "commonjs",
@@ -152,6 +162,7 @@ export default defaultExport;
         it("should output 'default export with named export' correctly when cjsInterop", async () => {
             expect.assertions(7);
 
+            await installPackage(temporaryDirectoryPath, "typescript");
             writeFileSync(
                 `${temporaryDirectoryPath}/src/index.ts`,
                 `const test = () => {
@@ -163,6 +174,9 @@ const test2 = "this should be in final bundle";
 export { test2, test as default };`,
             );
             createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "^4.4.3",
+                },
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
                 type: "commonjs",
@@ -246,6 +260,7 @@ export default defaultExport;
         it("should output 'default export with multi named export' correctly when cjsInterop", async () => {
             expect.assertions(7);
 
+            await installPackage(temporaryDirectoryPath, "typescript");
             writeFileSync(
                 `${temporaryDirectoryPath}/src/index.ts`,
                 `const test = () => {
@@ -260,6 +275,9 @@ const test5 = "this should be in final bundle";
 export { test2, test3, test4, test5, test as default };`,
             );
             createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "^4.4.3",
+                },
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
                 type: "commonjs",
@@ -367,8 +385,12 @@ export default defaultExport;
     it("should output 'default export' for nested folder correctly", async () => {
         expect.assertions(7);
 
+        await installPackage(temporaryDirectoryPath, "typescript");
         writeFileSync(`${temporaryDirectoryPath}/src/test/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "^4.4.3",
+            },
             main: "./dist/test/index.cjs",
             module: "./dist/test/index.mjs",
             type: "commonjs",
@@ -377,7 +399,7 @@ export default defaultExport;
         createPackemConfig(temporaryDirectoryPath, {});
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -424,6 +446,7 @@ export { test as default };
     it("should handle externals", async () => {
         expect.assertions(7);
 
+        await installPackage(temporaryDirectoryPath, "typescript");
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
             `import a from 'peer-dep'
@@ -433,6 +456,9 @@ export default a + b
 `,
         );
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "^4.4.3",
+            },
             exports: "./dist/index.js",
             peerDependencies: {
                 "peer-dep": "*",
@@ -444,8 +470,9 @@ export default a + b
             },
         });
         createPackemConfig(temporaryDirectoryPath, {});
+        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -509,7 +536,7 @@ export const value = dep
         });
         createPackemConfig(temporaryDirectoryPath, {});
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -531,6 +558,7 @@ exports.value = value;
     it("should output 'class' with 'extends correctly", async () => {
         expect.assertions(7);
 
+        await installPackage(temporaryDirectoryPath, "typescript");
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
             `class Parent {
@@ -554,6 +582,9 @@ export class Child extends Parent {
 }`,
         );
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "^4.4.3",
+            },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",
@@ -562,7 +593,7 @@ export class Child extends Parent {
         createPackemConfig(temporaryDirectoryPath, {});
         createTsConfig(temporaryDirectoryPath, {});
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -711,7 +742,12 @@ export class Child extends Parent {
   }
 }`,
         );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "^4.4.3",
+            },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",

@@ -53,7 +53,7 @@ export default Tr;`,
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -141,7 +141,7 @@ export default Tr;`,
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -235,7 +235,7 @@ export default Tr;`,
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -329,7 +329,7 @@ export default Tr;`,
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -420,7 +420,7 @@ export const Spinner = Vue.defineComponent(() => () => {
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "vue");
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

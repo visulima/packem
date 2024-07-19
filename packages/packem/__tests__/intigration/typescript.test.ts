@@ -33,7 +33,7 @@ describe("packem typescript", () => {
             });
             writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
 
-            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", [], {
                 cwd: temporaryDirectoryPath,
             });
 
@@ -55,7 +55,7 @@ describe("packem typescript", () => {
                 type: "module",
             });
 
-            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", [], {
                 cwd: temporaryDirectoryPath,
             });
 
@@ -78,7 +78,7 @@ describe("packem typescript", () => {
             });
             writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
 
-            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", [], {
                 cwd: temporaryDirectoryPath,
             });
 
@@ -101,7 +101,7 @@ describe("packem typescript", () => {
             });
             writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
 
-            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", [], {
                 cwd: temporaryDirectoryPath,
             });
 
@@ -130,7 +130,7 @@ describe("packem typescript", () => {
             });
             createPackageJson(temporaryDirectoryPath, { main: "./dist/index.cjs" });
 
-            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", [], {
                 cwd: temporaryDirectoryPath,
             });
 
@@ -165,7 +165,7 @@ console.log(1);
             });
             createPackageJson(temporaryDirectoryPath, { main: "./dist/index.cjs" });
 
-            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", [], {
                 cwd: temporaryDirectoryPath,
             });
 
@@ -201,7 +201,7 @@ console.log(1);
             });
             createPackageJson(temporaryDirectoryPath, { main: "./dist/index.cjs" });
 
-            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+            const binProcess = await execPackemSync("build", [], {
                 cwd: temporaryDirectoryPath,
             });
 
@@ -261,7 +261,7 @@ export class ExampleClass {
             },
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -353,7 +353,7 @@ exports.ExampleClass = ExampleClass;
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -404,7 +404,7 @@ export const version = pkgJson.version;
             version: "0.0.1",
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -461,7 +461,7 @@ export { version };
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -510,7 +510,7 @@ export { index as default };
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -558,7 +558,7 @@ export { index as default };
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=development"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
