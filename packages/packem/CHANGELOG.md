@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.54](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.53...@visulima/packem@1.0.0-alpha.54) (2024-07-19)
+
+### Bug Fixes
+
+* fixed some tests, allowed to have typescript optional ([0b72a91](https://github.com/visulima/packem/commit/0b72a91809e1a0a2082cf79675c413db5c65be1b))
+
 ## @visulima/packem [1.0.0-alpha.53](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.52...@visulima/packem@1.0.0-alpha.53) (2024-07-18)
 
 ### Features
