@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.55](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.54...@visulima/packem@1.0.0-alpha.55) (2024-07-20)
+
+### Bug Fixes
+
+* fixed cjs bundling, fixed broken state if typescript is not installed, fixed some tests ([7771424](https://github.com/visulima/packem/commit/777142446de68d81108d8d4154a0ab66c0725a60))
+
 ## @visulima/packem [1.0.0-alpha.54](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.53...@visulima/packem@1.0.0-alpha.54) (2024-07-19)
 
 ### Bug Fixes
