@@ -38,7 +38,7 @@ console.log(styles.Button);
             module: "./dist/button.msj",
             type: "commonjs",
         });
-        createPackemConfig(temporaryDirectoryPath, {
+        await createPackemConfig(temporaryDirectoryPath, {
             rollup: {
                 copy: {
                     targets: "assets/*",

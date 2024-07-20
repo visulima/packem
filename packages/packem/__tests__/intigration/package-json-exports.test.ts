@@ -14,7 +14,7 @@ describe("packem package.json exports", () => {
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
 
-        createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath, {});
     });
 
     afterEach(async () => {

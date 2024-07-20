@@ -36,7 +36,7 @@ describe("packem typescript", () => {
             type: "module",
             types: "dist/index.d.ts",
         });
-        createPackemConfig(temporaryDirectoryPath);
+        await createPackemConfig(temporaryDirectoryPath);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 

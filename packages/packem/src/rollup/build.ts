@@ -25,12 +25,10 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<void>
 
     await context.hooks.callHook("rollup:build", context, buildResult);
 
-    const allOutputOptions = rollupOptions.output as OutputOptions[];
-
     const assets = new Map<string, BuildContextBuildEntry>();
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-    for (const outputOptions of allOutputOptions) {
+    for (const outputOptions of rollupOptions.output as OutputOptions[]) {
         // eslint-disable-next-line no-await-in-loop
         const { output } = await buildResult.write(outputOptions);
         const chunkFileNames = new Set<string>();

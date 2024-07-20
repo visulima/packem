@@ -12,7 +12,7 @@ describe("packem resolve-file-url", () => {
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
 
-        createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath, {});
     });
 
     afterEach(async () => {

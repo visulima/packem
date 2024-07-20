@@ -47,7 +47,7 @@ export default Tr;`,
                 moduleResolution: "bundler",
             },
         });
-        createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath, {});
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "react");
@@ -135,7 +135,7 @@ export default Tr;`,
                 moduleResolution: "bundler",
             },
         });
-        createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath, {});
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "react");
@@ -223,7 +223,7 @@ export default Tr;`,
                 moduleResolution: "bundler",
             },
         });
-        createPackemConfig(temporaryDirectoryPath, {
+        await createPackemConfig(temporaryDirectoryPath, {
             rollup: {
                 jsxRemoveAttributes: {
                     attributes: ["data-testid"],
@@ -317,7 +317,7 @@ export default Tr;`,
                 moduleResolution: "bundler",
             },
         });
-        createPackemConfig(temporaryDirectoryPath, {
+        await createPackemConfig(temporaryDirectoryPath, {
             rollup: {
                 jsxRemoveAttributes: {
                     attributes: ["data-testid", "data-test"],
@@ -415,7 +415,7 @@ export const Spinner = Vue.defineComponent(() => () => {
                 moduleResolution: "Bundler",
             },
         });
-        createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath, {});
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "vue");

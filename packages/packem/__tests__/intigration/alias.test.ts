@@ -33,7 +33,7 @@ export default log();`,
             type: "commonjs",
         });
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
-        createPackemConfig(temporaryDirectoryPath, {
+        await createPackemConfig(temporaryDirectoryPath, {
             alias: {
                 "@/test/*": resolve(temporaryDirectoryPath, "src/test"),
             },

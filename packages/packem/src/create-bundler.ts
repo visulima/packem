@@ -592,7 +592,11 @@ const createContext = async (
         context.logger.info("Emitting CJS bundles, is disabled.");
     }
 
-    if (!context.options.declaration || !packageJson.devDependencies?.typescript) {
+    if (!packageJson.devDependencies?.typescript) {
+        context.options.declaration = false;
+    }
+
+    if (!context.options.declaration) {
         context.logger.info("Declaration files, are disabled.");
     }
 
@@ -730,7 +734,7 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
             if (cjsEntries.length > 0) {
                 const adjustedCjsContext = {
                     ...context,
-                    options: { ...context.options, emitCJS: false, emitESM: false, entries: cjsEntries, minify },
+                    options: { ...context.options, emitCJS: true, emitESM: false, entries: cjsEntries, minify },
                 };
 
                 rollups.push(rollupBuild(adjustedCjsContext, fileCache));
@@ -757,7 +761,7 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
 
     await Promise.all(rollups);
 
-    context.logger.success(green(`Build succeeded for ${context.options.name}`));
+    context.logger.success(green(context.options.name ? "Build succeeded for " + context.options.name : "Build succeeded"));
 
     // Find all dist files and add missing entries as chunks
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax

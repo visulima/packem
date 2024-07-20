@@ -49,11 +49,19 @@ export const installPackage = async (fixturePath: string, packageName: string): 
     await symlink(resolve("node_modules/" + packageName), join(nodeModulesDirectory, packageName), "dir");
 };
 
-export const createPackemConfig = (
+export const createPackemConfig = async (
     fixturePath: string,
     config: BuildConfig | BuildConfig[] = {},
     transformer: "esbuild" | "swc" | "sucrase" = "esbuild",
-): void => {
+): Promise<void> => {
+    const transformerPackageNames = {
+        esbuild: "esbuild",
+        sucrase: "sucrase",
+        swc: "@swc/core",
+    };
+
+    await installPackage(fixturePath, transformerPackageNames[transformer]);
+
     writeFileSync(
         join(fixturePath, "packem.config.ts"),
         `import { defineConfig } from "${distributionPath}/config";
@@ -72,14 +80,14 @@ export const createPackageJson = (fixturePAth: string, data: PackageJson): void 
     writeJsonSync(`${fixturePAth}/package.json`, {
         ...data,
         devDependencies: {
-            esbuild: "0.20",
+            esbuild: "^0.23.0",
             ...data.devDependencies,
         },
     });
 };
 
 export const createTsConfig = (fixturePath: string, config: TsConfigJson, name = ""): void => {
-    writeJsonSync(`${fixturePath}/tsconfig${name}.json`, {
+    writeJsonSync(fixturePath + "/tsconfig" + name + ".json", {
         ...config,
         compilerOptions: {
             isolatedModules: true,

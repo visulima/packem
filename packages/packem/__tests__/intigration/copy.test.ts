@@ -28,7 +28,7 @@ describe("packem copy", () => {
             main: "./dist/index.mjs",
             type: "module",
         });
-        createPackemConfig(temporaryDirectoryPath, {
+        await createPackemConfig(temporaryDirectoryPath, {
             rollup: {
                 copy: {
                     targets: "assets/*",

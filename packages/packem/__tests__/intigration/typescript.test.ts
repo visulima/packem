@@ -1,12 +1,12 @@
 import { existsSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
-import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
+import { readFileSync, writeFileSync } from "@visulima/fs";
 import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, execPackemSync, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage, streamToString } from "../helpers";
 
 describe("packem typescript", () => {
     let temporaryDirectoryPath: string;
@@ -14,7 +14,7 @@ describe("packem typescript", () => {
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
 
-        createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath, {});
     });
 
     afterEach(async () => {
@@ -28,10 +28,10 @@ describe("packem typescript", () => {
             writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.jsx";');
             writeFileSync(`${temporaryDirectoryPath}/src/file.tsx`, "console.log(1);");
             createPackageJson(temporaryDirectoryPath, {
-                main: "./dist/index.cjs",
+                main: "./dist/index.mjs",
                 type: "module",
             });
-            writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
+            createTsConfig(temporaryDirectoryPath, {});
 
             const binProcess = await execPackemSync("build", [], {
                 cwd: temporaryDirectoryPath,
@@ -51,7 +51,7 @@ describe("packem typescript", () => {
             writeFileSync(`${temporaryDirectoryPath}/src/index.js`, 'import "./file.jsx";');
             writeFileSync(`${temporaryDirectoryPath}/src/file.jsx`, "console.log(1);");
             createPackageJson(temporaryDirectoryPath, {
-                main: "./dist/index.cjs",
+                main: "./dist/index.mjs",
                 type: "module",
             });
 
@@ -73,10 +73,10 @@ describe("packem typescript", () => {
             writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.mjs";');
             writeFileSync(`${temporaryDirectoryPath}/src/file.mjs`, "console.log(1);");
             createPackageJson(temporaryDirectoryPath, {
-                main: "./dist/index.cjs",
+                main: "./dist/index.mjs",
                 type: "module",
             });
-            writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
+            createTsConfig(temporaryDirectoryPath, {});
 
             const binProcess = await execPackemSync("build", [], {
                 cwd: temporaryDirectoryPath,
@@ -96,10 +96,10 @@ describe("packem typescript", () => {
             writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.cjs";');
             writeFileSync(`${temporaryDirectoryPath}/src/file.cjs`, "console.log(1);");
             createPackageJson(temporaryDirectoryPath, {
-                main: "./dist/index.cjs",
+                main: "./dist/index.mjs",
                 type: "module",
             });
-            writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
+            createTsConfig(temporaryDirectoryPath, {});
 
             const binProcess = await execPackemSync("build", [], {
                 cwd: temporaryDirectoryPath,
@@ -118,9 +118,11 @@ describe("packem typescript", () => {
         it("should resolve tsconfig paths", async () => {
             expect.assertions(4);
 
+            await installPackage(temporaryDirectoryPath, "typescript");
+
             writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'import "components:Test";');
             writeFileSync(`${temporaryDirectoryPath}/src/components/Test.ts`, "console.log(1);");
-            writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
+            createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: {
                     baseUrl: "src",
                     paths: {
@@ -128,7 +130,13 @@ describe("packem typescript", () => {
                     },
                 },
             });
-            createPackageJson(temporaryDirectoryPath, { main: "./dist/index.cjs" });
+            createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "^4.4.3",
+                },
+                main: "./dist/index.cjs",
+                module: "./dist/index.mjs",
+            });
 
             const binProcess = await execPackemSync("build", [], {
                 cwd: temporaryDirectoryPath,
@@ -138,16 +146,10 @@ describe("packem typescript", () => {
             expect(binProcess.exitCode).toBe(0);
 
             const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
-
-            expect(cjs).toBe(`'use strict';
-
-console.log(1);
-`);
+            expect(cjs).toMatchSnapshot("cjs code output");
 
             const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
-
-            expect(mjs).toBe(`console.log(1);
-`);
+            expect(mjs).toMatchSnapshot("mjs code output");
         });
 
         it("should resolve tsconfig paths with a '@'", async () => {
@@ -155,7 +157,7 @@ console.log(1);
 
             writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'import "@/Test";');
             writeFileSync(`${temporaryDirectoryPath}/src/components/Test.ts`, "console.log(1);");
-            writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
+            createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: {
                     baseUrl: "src",
                     paths: {
@@ -190,10 +192,12 @@ console.log(1);
         it("should resolve tsconfig rootDirs", async () => {
             expect.assertions(4);
 
+            await installPackage(temporaryDirectoryPath, "typescript");
+
             writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'import { b } from "./bb";\n\nconsole.log(b);');
             writeFileSync(`${temporaryDirectoryPath}/tt/a/aa.ts`, "export const a = 1;");
             writeFileSync(`${temporaryDirectoryPath}/tt/b/bb.ts`, 'import { a } from "./aa";\nnconsole.log(a);\n\nexport const b = 2;');
-            writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
+            createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: {
                     rootDir: ".",
                     rootDirs: ["src", "tt/b", "tt/a"],
@@ -255,7 +259,7 @@ export class ExampleClass {
             module: "./dist/index.mjs",
             type: "module",
         });
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
+        createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 experimentalDecorators: true,
             },
@@ -269,87 +273,23 @@ export class ExampleClass {
         expect(binProcess.exitCode).toBe(0);
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
-
-        expect(mjs).toBe(`var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __decorateClass = (decorators, target, key, kind) => {
-  var result = kind > 1 ? void 0 : kind ? __getOwnPropDesc(target, key) : target;
-  for (var i = decorators.length - 1, decorator; i >= 0; i--)
-    if (decorator = decorators[i])
-      result = (kind ? decorator(target, key, result) : decorator(result)) || result;
-  if (kind && result)
-    __defProp(target, key, result);
-  return result;
-};
-function first() {
-  console.log("first(): factory evaluated");
-  return function(target, propertyKey, descriptor) {
-    console.log("first(): called");
-  };
-}
-__name(first, "first");
-class ExampleClass {
-  static {
-    __name(this, "ExampleClass");
-  }
-  value;
-}
-__decorateClass([
-  first()
-], ExampleClass.prototype, "value", 2);
-
-export { ExampleClass };
-`);
+        expect(mjs).toMatchSnapshot("mjs code output");
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
-
-        expect(cjs).toBe(`'use strict';
-
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __decorateClass = (decorators, target, key, kind) => {
-  var result = kind > 1 ? void 0 : kind ? __getOwnPropDesc(target, key) : target;
-  for (var i = decorators.length - 1, decorator; i >= 0; i--)
-    if (decorator = decorators[i])
-      result = (kind ? decorator(target, key, result) : decorator(result)) || result;
-  if (kind && result)
-    __defProp(target, key, result);
-  return result;
-};
-function first() {
-  console.log("first(): factory evaluated");
-  return function(target, propertyKey, descriptor) {
-    console.log("first(): called");
-  };
-}
-__name(first, "first");
-class ExampleClass {
-  static {
-    __name(this, "ExampleClass");
-  }
-  value;
-}
-__decorateClass([
-  first()
-], ExampleClass.prototype, "value", 2);
-
-exports.ExampleClass = ExampleClass;
-`);
+        expect(cjs).toMatchSnapshot("cjs code output");
     });
 
     it('should allow support for "allowJs" and generate proper assets', async () => {
         expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export default () => 'index';`);
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
+        createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 allowJs: true,
             },
         });
         createPackageJson(temporaryDirectoryPath, {
-            exports: "./dist/index.js",
+            exports: "./dist/index.cjs",
             types: "./dist/index.d.ts",
         });
 
@@ -362,24 +302,21 @@ exports.ExampleClass = ExampleClass;
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-console.log(1);
-`);
+        expect(cjsContent).toMatchSnapshot("cjs code output");
 
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(dCtsContent).toBe(`declare function _default(): string;
-`);
+        expect(dCtsContent).toMatchSnapshot("cts type code output");
 
-        const dTsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.s`);
+        const dTsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dTsContent).toBe(`declare function _default(): string;
-`);
+        expect(dTsContent).toMatchSnapshot("ts type code output");
     });
 
     it("should output correct bundles and types import json with export condition", async () => {
         expect.assertions(5);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
@@ -388,7 +325,7 @@ console.log(1);
 export const version = pkgJson.version;
 `,
         );
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
+        createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 moduleResolution: "bundler",
             },
@@ -450,11 +387,11 @@ export { version };
     it("should work with tsconfig 'incremental' option", async () => {
         expect.assertions(6);
 
+        await installPackage(temporaryDirectoryPath, "typescript");
+
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index'`);
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
-            compilerOptions: {
-                incremental: true,
-            },
+        createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { incremental: true },
         });
         createPackageJson(temporaryDirectoryPath, {
             exports: "./dist/index.cjs",
@@ -498,12 +435,11 @@ export { index as default };
     it("should work with tsconfig 'incremental' and 'tsBuildInfoFile' option", async () => {
         expect.assertions(6);
 
+        await installPackage(temporaryDirectoryPath, "typescript");
+
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index'`);
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
-            compilerOptions: {
-                incremental: true,
-                tsBuildInfoFile: ".tsbuildinfo",
-            },
+        createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { incremental: true, tsBuildInfoFile: ".tsbuildinfo" },
         });
         createPackageJson(temporaryDirectoryPath, {
             exports: "./dist/index.cjs",
@@ -547,15 +483,17 @@ export { index as default };
     it("should work with tsconfig 'noEmit' option", async () => {
         expect.assertions(5);
 
+        await installPackage(temporaryDirectoryPath, "typescript");
+
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index'`);
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
-            compilerOptions: {
-                noEmit: true,
-            },
-        });
         createPackageJson(temporaryDirectoryPath, {
             exports: "./dist/index.cjs",
             types: "./dist/index.d.ts",
+        });
+        createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                noEmit: true,
+            },
         });
 
         const binProcess = await execPackemSync("build", [], {
