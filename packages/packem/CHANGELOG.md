@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.56](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.55...@visulima/packem@1.0.0-alpha.56) (2024-07-25)
+
+### Features
+
+* added alias validation for better dx ([d5321e6](https://github.com/visulima/packem/commit/d5321e6a9629ae0780ad9df3ab999ca73e7c7804))
+
 ## @visulima/packem [1.0.0-alpha.55](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.54...@visulima/packem@1.0.0-alpha.55) (2024-07-20)
 
 ### Bug Fixes
