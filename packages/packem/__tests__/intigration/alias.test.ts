@@ -24,18 +24,24 @@ describe("packem alias", () => {
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
             `import { log } from "@/test/logger";
+import { bar } from "@test2/abc/bar";
+
+const a = bar();
 
 export default log();`,
         );
         writeFileSync(`${temporaryDirectoryPath}/src/test/logger.ts`, `export const log = () => console.log("test");`);
+        writeFileSync(`${temporaryDirectoryPath}/src/test2/foo/bar.ts`, `export const bar = () => console.log("bar");`);
         createPackageJson(temporaryDirectoryPath, {
             main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
             type: "commonjs",
         });
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
         await createPackemConfig(temporaryDirectoryPath, {
             alias: {
-                "@/test/*": resolve(temporaryDirectoryPath, "src/test"),
+                "@": resolve(temporaryDirectoryPath, "src"),
+                "@test2/abc": resolve(temporaryDirectoryPath, "src", "test2", "foo"),
             },
         });
 
@@ -46,11 +52,11 @@ export default log();`,
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toMatchSnapshot("mjs content");
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("cjs content");
     });

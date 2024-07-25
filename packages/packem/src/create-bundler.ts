@@ -32,6 +32,7 @@ import groupByKeys from "./utils/group-by-keys";
 import tryRequire from "./utils/try-require";
 import validateDependencies from "./validator/validate-dependencies";
 import validatePackage from "./validator/validate-package";
+import validateAliasEntries from "./validator/validate-alias-entries";
 
 type PackEmPackageJson = { packem?: BuildConfig } & PackageJson;
 
@@ -82,7 +83,7 @@ const generateOptions = (
 ): InternalBuildOptions => {
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
 
-    const options = defu(buildConfig, inputConfig, preset, <BuildOptions>{
+    const options = defu(buildConfig, inputConfig, preset, <BuildOptions> {
         alias: {},
         clean: true,
         debug,
@@ -144,7 +145,6 @@ const generateOptions = (
                     preserveSymlinks: false,
                     skipLibCheck: true,
                     // Ensure we can parse the latest code
-
                     target: 99, // ESNext
                 },
                 respectExternal: true,
@@ -183,7 +183,6 @@ const generateOptions = (
                  * eg. unused try-catch error variable
                  */
                 minifyWhitespace: env.NODE_ENV === "production",
-
                 /**
                  * Improve performance by generating smaller source maps
                  * that doesn't include the original source code
@@ -250,15 +249,15 @@ const generateOptions = (
                 production: env.NODE_ENV === "production",
                 ...(tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
                     ? {
-                          jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
-                          jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
-                          jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
-                          jsxRuntime,
-                          transforms: ["typescript", "jsx", ...(tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : [])],
-                      }
+                        jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
+                        jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
+                        jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
+                        jsxRuntime,
+                        transforms: ["typescript", "jsx", ...(tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : [])],
+                    }
                     : {
-                          transforms: ["typescript", ...(tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : [])],
-                      }),
+                        transforms: ["typescript", ...(tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : [])],
+                    }),
             },
             swc: {
                 include: /\.[jt]sx?$/,
@@ -382,6 +381,12 @@ const generateOptions = (
 
     // Add all dependencies as externals
     options.externals.push(...options.dependencies, ...options.peerDependencies, ...options.optionalDependencies);
+
+    validateAliasEntries(options.alias);
+
+    if (options.rollup.alias && options.rollup.alias.entries) {
+        validateAliasEntries(options.rollup.alias.entries);
+    }
 
     return options;
 };
