@@ -459,7 +459,7 @@ export default a + b
             devDependencies: {
                 typescript: "^4.4.3",
             },
-            exports: "./dist/index.js",
+            exports: "./dist/index.cjs",
             peerDependencies: {
                 "peer-dep": "*",
             },
@@ -531,7 +531,7 @@ export const value = dep
         createPackageJson(temporaryDirectoryPath, {
             exports: "./dist/index.js",
             imports: {
-                "#dep": "./src/lib/polyfill.js",
+                "#dep": "./src/lib/polyfill.cjs",
             },
         });
         await createPackemConfig(temporaryDirectoryPath, {});

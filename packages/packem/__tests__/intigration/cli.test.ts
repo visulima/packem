@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage, streamToString } from "../helpers";
 
-describe("packem typescript", () => {
+describe("packem cli", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {

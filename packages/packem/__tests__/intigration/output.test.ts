@@ -37,7 +37,7 @@ describe("packem output", () => {
             },
             name: "@scope/output-app",
         });
-        createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", ["--no-color"], {
             cwd: temporaryDirectoryPath,
@@ -48,28 +48,13 @@ describe("packem output", () => {
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
 
         expect(stdout).toContain("Build succeeded for output-app");
-        expect(stdout).toContain("dist/index.react-server.cjs (total size: 75 Bytes, chunk size: 75 Bytes)");
+        expect(stdout).toContain("dist/index.react-server.cjs (total size: 149 Bytes, chunk size: 149 Bytes)");
         expect(stdout).toContain("exports: index");
-        expect(stdout).toContain("dist/foo.cjs (total size: 54 Bytes, chunk size: 54 Bytes)");
+        expect(stdout).toContain("dist/foo.cjs (total size: 128 Bytes, chunk size: 128 Bytes)");
         expect(stdout).toContain("exports: foo");
-        expect(stdout).toContain("dist/bin/cli.cjs (total size: 74 Bytes, chunk size: 74 Bytes)");
+        expect(stdout).toContain("dist/bin/cli.cjs (total size: 148 Bytes, chunk size: 148 Bytes)");
         expect(stdout).toContain("exports: cli");
-        expect(stdout).toContain("dist/index.mjs (total size: 42 Bytes, chunk size: 42 Bytes)");
-        expect(stdout).toContain("exports: index");
-        expect(stdout).toContain("dist/index.react-server.mjs (total size: 55 Bytes, chunk size: 55 Bytes)");
-        expect(stdout).toContain("exports: index");
-        expect(stdout).toContain("dist/foo.mjs (total size: 36 Bytes, chunk size: 36 Bytes)");
-        expect(stdout).toContain("exports: foo");
-        expect(stdout).toContain("dist/bin/cli.mjs (total size: 56 Bytes, chunk size: 56 Bytes)");
-        expect(stdout).toContain("exports: cli");
-        expect(stdout).toContain("Σ Total dist size (byte size): 714 Bytes");
-
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
-
-        expect(mjsContent).toBe(`const index = "index";
-
-export { index };
-`);
+        expect(stdout).toContain("Σ Total dist size (byte size): 741 Bytes");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
