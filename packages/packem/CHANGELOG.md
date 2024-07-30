@@ -1,3 +1,13 @@
+## @visulima/packem [1.0.0-alpha.57](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.56...@visulima/packem@1.0.0-alpha.57) (2024-07-30)
+
+### Bug Fixes
+
+* fixed more tests, added new ones, fixed minification and added more logs ([6ba1dcc](https://github.com/visulima/packem/commit/6ba1dcc7fa5958f1a377e2dc67aeae1e2cf29416))
+
+### Miscellaneous Chores
+
+* more test work ([44052b7](https://github.com/visulima/packem/commit/44052b7137b43fa99447dd56e4de9fc93ece2153))
+
 ## @visulima/packem [1.0.0-alpha.56](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.55...@visulima/packem@1.0.0-alpha.56) (2024-07-25)
 
 ### Features
