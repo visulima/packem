@@ -88,8 +88,6 @@ const generateOptions = (
         clean: true,
         debug,
         declaration: true,
-        dependencies: [],
-        devDependencies: [],
         emitCJS: true,
         emitESM: true,
         entries: [],
@@ -98,9 +96,7 @@ const generateOptions = (
         fileCache: true,
         minify: env.NODE_ENV === "production",
         name: (packageJson.name ?? "").split("/").pop() ?? "default",
-        optionalDependencies: [],
         outDir: "dist",
-        peerDependencies: [],
         replace: {},
         rollup: {
             alias: {},
@@ -171,18 +167,6 @@ const generateOptions = (
                  * https://esbuild.github.io/try/#dAAwLjE5LjUAAGNvbnN0IGEgPSAxOwooZnVuY3Rpb24gYSgpIHt9KTs
                  */
                 keepNames: true,
-                // eslint-disable-next-line no-secrets/no-secrets
-                /**
-                 * Smaller output for cache and marginal performance improvement:
-                 * https://twitter.com/evanwallace/status/1396336348366180359?s=20
-                 *
-                 * minifyIdentifiers is disabled because debuggers don't use the
-                 * `names` property from the source map
-                 *
-                 * minifySyntax is disabled because it does some tree-shaking
-                 * eg. unused try-catch error variable
-                 */
-                minifyWhitespace: env.NODE_ENV === "production",
                 /**
                  * Improve performance by generating smaller source maps
                  * that doesn't include the original source code
@@ -373,14 +357,8 @@ const generateOptions = (
         );
     }
 
-    // Infer dependencies from pkg
-    options.dependencies = Object.keys(packageJson.dependencies ?? {});
-    options.peerDependencies = Object.keys(packageJson.peerDependencies ?? {});
-    options.devDependencies = Object.keys(packageJson.devDependencies ?? {});
-    options.optionalDependencies = Object.keys(packageJson.optionalDependencies ?? {});
-
     // Add all dependencies as externals
-    options.externals.push(...options.dependencies, ...options.peerDependencies, ...options.optionalDependencies);
+    options.externals.push(...Object.keys(packageJson.dependencies ?? {}), ...Object.keys(packageJson.peerDependencies ?? {}), ...Object.keys(packageJson.devDependencies ?? {}));
 
     validateAliasEntries(options.alias);
 
@@ -644,6 +622,10 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
     // Call build:before
     await context.hooks.callHook("build:before", context);
 
+    if (context.options.minify) {
+        context.logger.info("Minification is enabled, the output will be minified");
+    }
+
     const groupedEntries = groupByKeys(context.options.entries, "environment", "runtime");
 
     const rollups: Promise<void>[] = [];
@@ -682,12 +664,10 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
                 }
             }
 
-            const minify = environment !== "development" && context.options.minify;
-
             if (esmAndCjsEntries.length > 0) {
                 const adjustedEsmAndCjsContext = {
                     ...context,
-                    options: { ...context.options, emitCJS: true, emitESM: true, entries: esmAndCjsEntries, minify },
+                    options: { ...context.options, emitCJS: true, emitESM: true, entries: esmAndCjsEntries },
                 };
 
                 rollups.push(rollupBuild(adjustedEsmAndCjsContext, fileCache));
@@ -713,7 +693,7 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
             if (esmEntries.length > 0) {
                 const adjustedEsmContext = {
                     ...context,
-                    options: { ...context.options, emitCJS: false, emitESM: true, entries: esmEntries, minify },
+                    options: { ...context.options, emitCJS: false, emitESM: true, entries: esmEntries },
                 };
 
                 rollups.push(rollupBuild(adjustedEsmContext, fileCache));
@@ -739,7 +719,7 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
             if (cjsEntries.length > 0) {
                 const adjustedCjsContext = {
                     ...context,
-                    options: { ...context.options, emitCJS: true, emitESM: false, entries: cjsEntries, minify },
+                    options: { ...context.options, emitCJS: true, emitESM: false, entries: cjsEntries },
                 };
 
                 rollups.push(rollupBuild(adjustedCjsContext, fileCache));
@@ -824,6 +804,11 @@ const createBundler = async (
     logger.debug("Root directory:", rootDirectory);
 
     const packageJsonPath = join(rootDirectory, "package.json");
+
+    if (!isAccessibleSync(packageJsonPath)) {
+        throw new Error("package.json not found at " + packageJsonPath);
+    }
+
     const packageJson = parsePackageJson(packageJsonPath);
 
     logger.debug("Using package.json found at", packageJsonPath);

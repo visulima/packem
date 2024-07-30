@@ -99,10 +99,22 @@ const getTransformerConfig = (
         }
 
         return {
+            logger: context.logger,
             minify: context.options.minify,
+            // eslint-disable-next-line no-secrets/no-secrets
+            /**
+             * Smaller output for cache and marginal performance improvement:
+             * https://twitter.com/evanwallace/status/1396336348366180359?s=20
+             *
+             * minifyIdentifiers is disabled because debuggers don't use the
+             * `names` property from the source map
+             *
+             * minifySyntax is disabled because it does some tree-shaking
+             * eg. unused try-catch error variable
+             */
+            minifyWhitespace: context.options.minify,
             sourceMap: context.options.sourcemap,
             ...context.options.rollup.esbuild,
-            logger: context.logger,
         } satisfies EsbuildPluginConfig;
     }
 
@@ -203,17 +215,11 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
 
             const { pkg } = context;
 
-            const depPeerDeps = pkg.peerDependencies;
-
             if (
-                depPeerDeps &&
-                id in depPeerDeps &&
                 // eslint-disable-next-line security/detect-object-injection
                 !pkg.dependencies?.[id] &&
                 // eslint-disable-next-line security/detect-object-injection
-                !pkg.peerDependencies?.[id] && // Check if it's optional
-                // eslint-disable-next-line security/detect-object-injection
-                !pkg.peerDependenciesMeta?.[id]?.optional
+                pkg.peerDependencies?.[id]
             ) {
                 return true;
             }

@@ -111,8 +111,6 @@ export interface BuildOptions {
      * `undefined` will auto-detect based on "package.json". If "package.json" has "types" field, it will be `"compatible"`, otherwise `false`.
      */
     declaration?: boolean | "compatible" | "node16" | undefined;
-    dependencies: string[];
-    devDependencies: string[];
     emitCJS?: boolean;
     emitESM?: boolean;
     entries: BuildEntry[];
@@ -122,9 +120,7 @@ export interface BuildOptions {
     isolatedDeclarationTransformer?: (code: string, id: string) => Promise<IsolatedDeclarationsResult>;
     minify: boolean;
     name: string;
-    optionalDependencies: string[];
     outDir: string;
-    peerDependencies: string[];
     replace: Record<string, string>;
     rollup: RollupBuildOptions;
     rootDir: string;

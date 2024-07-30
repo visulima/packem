@@ -16,20 +16,26 @@ const validateDependencies = (context: BuildContext): void => {
         usedDependencies.add(id);
     }
 
-    if (Array.isArray(context.options.dependencies)) {
+    if (context.pkg.dependencies) {
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-        for (const id of context.options.dependencies) {
+        for (const id of Object.keys(context.pkg.dependencies)) {
             unusedDependencies.delete(id);
         }
     }
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const id of usedDependencies) {
+        const packageId = getPackageName(id);
+
         if (
             !arrayIncludes(context.options.externals, id) &&
             !id.startsWith("chunks/") &&
-            !context.options.dependencies.includes(getPackageName(id)) &&
-            !context.options.peerDependencies.includes(getPackageName(id))
+            // eslint-disable-next-line security/detect-object-injection
+            !context.pkg.dependencies?.[packageId] &&
+            // eslint-disable-next-line security/detect-object-injection
+            !context.pkg.peerDependencies?.[packageId] && // Check if it's optional
+            // eslint-disable-next-line security/detect-object-injection
+            !context.pkg.peerDependenciesMeta?.[packageId]?.optional
         ) {
             implicitDependencies.add(id);
         }

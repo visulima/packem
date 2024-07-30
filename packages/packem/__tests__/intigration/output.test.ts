@@ -17,8 +17,8 @@ describe("packem output", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it("should generate output with all exports", async () => {
-        expect.assertions(19);
+    it("should generate output with all cjs exports", async () => {
+        expect.assertions(13);
 
         writeFileSync(`${temporaryDirectoryPath}/src/bin/cli.js`, `export const cli = 'cli';`);
         writeFileSync(`${temporaryDirectoryPath}/src/foo.js`, `export const foo = 'foo'`);
@@ -58,11 +58,18 @@ describe("packem output", () => {
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
+        expect(cjsContent).toMatchSnapshot("cjs output");
 
-const index = "index";
+        const cjsReactContent = readFileSync(`${temporaryDirectoryPath}/dist/index.react-server.cjs`);
 
-exports.index = index;
-`);
+        expect(cjsReactContent).toMatchSnapshot("cjs output");
+
+        const cjsFooContent = readFileSync(`${temporaryDirectoryPath}/dist/foo.cjs`);
+
+        expect(cjsFooContent).toMatchSnapshot("cjs output");
+
+        const cjsCliContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/cli.cjs`);
+
+        expect(cjsCliContent).toMatchSnapshot("cjs output");
     });
 });

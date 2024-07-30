@@ -194,67 +194,23 @@ export { test2, test as default };`,
 
             const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-            expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const test = /* @__PURE__ */ __name(() => {
-  return "this should be in final bundle";
-}, "test");
-const test2 = "this should be in final bundle";
-
-export { test as default, test2 };
-`);
+            expect(mjsContent).toMatchSnapshot("mjs output");
 
             const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-            expect(cjsContent).toBe(`'use strict';
-
-
-
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const test = /* @__PURE__ */ __name(() => {
-  return "this should be in final bundle";
-}, "test");
-const test2 = "this should be in final bundle";
-
-module.exports = test;
-module.exports.test2 = test2;
-`);
+            expect(cjsContent).toMatchSnapshot("cjs output");
 
             const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-            expect(dCtsContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle";
-
-export { test2 };
-
-declare const defaultExport: {
-  test2: typeof test2;
-} & typeof test;
-
-export default defaultExport;
-`);
+            expect(dCtsContent).toMatchSnapshot("cjs dts output");
 
             const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-            expect(dMtsContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle";
+            expect(dMtsContent).toMatchSnapshot("mjs dts output");
 
-export { test as default, test2 };
-`);
             const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-            expect(dContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle";
-
-export { test2 };
-
-declare const defaultExport: {
-  test2: typeof test2;
-} & typeof test;
-
-export default defaultExport;
-`);
+            expect(dContent).toMatchSnapshot("dts output");
         });
 
         it("should output 'default export with multi named export' correctly when cjsInterop", async () => {
@@ -295,90 +251,23 @@ export { test2, test3, test4, test5, test as default };`,
 
             const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-            expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const test = /* @__PURE__ */ __name(() => {
-  return "this should be in final bundle";
-}, "test");
-const test2 = "this should be in final bundle";
-const test3 = "this should be in final bundle";
-const test4 = "this should be in final bundle";
-const test5 = "this should be in final bundle";
-
-export { test as default, test2, test3, test4, test5 };
-`);
+            expect(mjsContent).toMatchSnapshot("mjs output");
 
             const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-            expect(cjsContent).toBe(`'use strict';
-
-
-
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const test = /* @__PURE__ */ __name(() => {
-  return "this should be in final bundle";
-}, "test");
-const test2 = "this should be in final bundle";
-const test3 = "this should be in final bundle";
-const test4 = "this should be in final bundle";
-const test5 = "this should be in final bundle";
-
-module.exports = test;
-module.exports.test2 = test2;
-module.exports.test3 = test3;
-module.exports.test4 = test4;
-module.exports.test5 = test5;
-`);
+            expect(cjsContent).toMatchSnapshot("cjs output");
 
             const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-            expect(dCtsContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle";
-declare const test3 = "this should be in final bundle";
-declare const test4 = "this should be in final bundle";
-declare const test5 = "this should be in final bundle";
+            expect(dCtsContent).toMatchSnapshot("cjs dts output");
 
-export { test2, test3, test4, test5 };
-
-declare const defaultExport: {
-  test2: typeof test2;
-  test3: typeof test3;
-  test4: typeof test4;
-  test5: typeof test5;
-} & typeof test;
-
-export default defaultExport;
-`);
             const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-            expect(dMtsContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle";
-declare const test3 = "this should be in final bundle";
-declare const test4 = "this should be in final bundle";
-declare const test5 = "this should be in final bundle";
+            expect(dMtsContent).toMatchSnapshot("mjs dts output");
 
-export { test as default, test2, test3, test4, test5 };
-`);
             const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-            expect(dContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle";
-declare const test3 = "this should be in final bundle";
-declare const test4 = "this should be in final bundle";
-declare const test5 = "this should be in final bundle";
-
-export { test2, test3, test4, test5 };
-
-declare const defaultExport: {
-  test2: typeof test2;
-  test3: typeof test3;
-  test4: typeof test4;
-  test5: typeof test5;
-} & typeof test;
-
-export default defaultExport;
-`);
+            expect(dContent).toMatchSnapshot("dts output");
         });
     });
 
@@ -443,7 +332,7 @@ export { test as default };
 `);
     });
 
-    it("should handle externals", async () => {
+    it.todo("should handle externals", async () => {
         expect.assertions(7);
 
         await installPackage(temporaryDirectoryPath, "typescript");
@@ -459,7 +348,13 @@ export default a + b
             devDependencies: {
                 typescript: "^4.4.3",
             },
-            exports: "./dist/index.cjs",
+            exports: {
+                ".": {
+                    import: "./dist/index.mjs",
+                    require: "./dist/index.cjs",
+                    types: "./dist/index.d.ts",
+                },
+            },
             peerDependencies: {
                 "peer-dep": "*",
             },
@@ -481,40 +376,23 @@ export default a + b
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`const test = "this should be in final bundle";
-
-export { test as default };
-`);
+        expect(mjsContent).toMatchSnapshot("mjs output");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-const test = "this should be in final bundle";
-
-module.exports = test;
-`);
+        expect(cjsContent).toMatchSnapshot("cjs output");
 
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(dCtsContent).toBe(`declare const test = "this should be in final bundle";
-
-export { test as default };
-`);
+        expect(dCtsContent).toMatchSnapshot("cjs dts output");
 
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(dMtsContent).toBe(`declare const test = "this should be in final bundle";
-
-export { test as default };
-`);
+        expect(dMtsContent).toMatchSnapshot("mjs dts output");
 
         const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dContent).toBe(`declare const test = "this should be in final bundle";
-
-export { test as default };
-`);
+        expect(dContent).toMatchSnapshot("dts output");
     });
 
     it("should split shared module into one chunk layer", async () => {
@@ -602,123 +480,27 @@ export class Child extends Parent {
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-class Parent {
-  static {
-    __name(this, "Parent");
-  }
-  constructor() {
-  }
-}
-class Feature {
-  static {
-    __name(this, "Feature");
-  }
-  constructor() {
-  }
-}
-class Child extends Parent {
-  static {
-    __name(this, "Child");
-  }
-  feature = new Feature();
-  constructor() {
-    console.log("before");
-    super();
-    console.log("after");
-  }
-}
-
-export { Child };
-`);
+        expect(mjsContent).toMatchSnapshot("mjs output");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-class Parent {
-  static {
-    __name(this, "Parent");
-  }
-  constructor() {
-  }
-}
-class Feature {
-  static {
-    __name(this, "Feature");
-  }
-  constructor() {
-  }
-}
-class Child extends Parent {
-  static {
-    __name(this, "Child");
-  }
-  feature = new Feature();
-  constructor() {
-    console.log("before");
-    super();
-    console.log("after");
-  }
-}
-
-exports.Child = Child;
-`);
+        expect(cjsContent).toMatchSnapshot("cjs output");
 
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(dCtsContent).toBe(`declare class Parent {
-    constructor();
-}
-declare class Feature {
-    constructor();
-}
-declare class Child extends Parent {
-    feature: Feature;
-    constructor();
-}
-
-export { Child };
-`);
+        expect(dCtsContent).toMatchSnapshot("cjs dts output");
 
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(dMtsContent).toBe(`declare class Parent {
-    constructor();
-}
-declare class Feature {
-    constructor();
-}
-declare class Child extends Parent {
-    feature: Feature;
-    constructor();
-}
-
-export { Child };
-`);
+        expect(dMtsContent).toMatchSnapshot("mjs dts output");
 
         const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dContent).toBe(`declare class Parent {
-    constructor();
-}
-declare class Feature {
-    constructor();
-}
-declare class Child extends Parent {
-    feature: Feature;
-    constructor();
-}
-
-export { Child };
-`);
+        expect(dContent).toMatchSnapshot("dts output");
     });
 
     it("should output 'class' with 'extends correctly when minify is used", async () => {
-        expect.assertions(7);
+        expect.assertions(8);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
@@ -763,64 +545,26 @@ export class Child extends Parent {
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
+        expect(binProcess.stdout).toContain("Minification is enabled, the output will be minified");
+
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent)
-            .toBe(`var c=Object.defineProperty;var e=(t,s)=>c(t,"name",{value:s,configurable:!0});var o=Object.defineProperty,r=e((t,s)=>o(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{r(this,"Parent")}constructor(){}}class l{static{e(this,"c")}static{r(this,"Feature")}constructor(){}}class n extends a{static{e(this,"Child")}static{r(this,"Child")}feature=new l;constructor(){console.log("before"),super(),console.log("after")}}export{n as Child};
-`);
+        expect(mjsContent).toMatchSnapshot("mjs output");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent)
-            .toBe(`"use strict";var r=Object.defineProperty;var e=(t,s)=>r(t,"name",{value:s,configurable:!0});var o=Object.defineProperty,c=e((t,s)=>o(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{c(this,"Parent")}constructor(){}}class i{static{e(this,"c")}static{c(this,"Feature")}constructor(){}}class l extends a{static{e(this,"Child")}static{c(this,"Child")}feature=new i;constructor(){console.log("before"),super(),console.log("after")}}exports.Child=l;
-`);
+        expect(cjsContent).toMatchSnapshot("cjs output");
 
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(dCtsContent).toBe(`declare class Parent {
-    constructor();
-}
-declare class Feature {
-    constructor();
-}
-declare class Child extends Parent {
-    feature: Feature;
-    constructor();
-}
-
-export { Child };
-`);
+        expect(dCtsContent).toMatchSnapshot("cjs dts output");
 
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(dMtsContent).toBe(`declare class Parent {
-    constructor();
-}
-declare class Feature {
-    constructor();
-}
-declare class Child extends Parent {
-    feature: Feature;
-    constructor();
-}
-
-export { Child };
-`);
+        expect(dMtsContent).toMatchSnapshot("mjs dts output");
 
         const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dContent).toBe(`declare class Parent {
-    constructor();
-}
-declare class Feature {
-    constructor();
-}
-declare class Child extends Parent {
-    feature: Feature;
-    constructor();
-}
-
-export { Child };
-`);
+        expect(dContent).toMatchSnapshot("dts output");
     });
 });

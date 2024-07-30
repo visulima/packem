@@ -25,9 +25,10 @@ describe("packem error cases", () => {
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
+            reject: false,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toContain("No such file or directory, for package.json found.");
+        await expect(streamToString(binProcess.stderr)).resolves.toContain("package.json not found at " + temporaryDirectoryPath);
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -38,6 +39,7 @@ describe("packem error cases", () => {
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
+            reject: false,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toContain("Unexpected end of JSON input in");
@@ -54,6 +56,7 @@ describe("packem error cases", () => {
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
+            reject: false,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toContain("No 'src' directory found. Please provide entries manually.");
@@ -72,6 +75,7 @@ describe("packem error cases", () => {
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
+            reject: false,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toContain("No source files found in 'src' directory. Please provide entries manually.");
@@ -89,6 +93,7 @@ describe("packem error cases", () => {
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
+            reject: false,
         });
 
         await expect(streamToString(binProcess.stderr)).resolves.toContain("No entries detected. Please provide entries manually.");

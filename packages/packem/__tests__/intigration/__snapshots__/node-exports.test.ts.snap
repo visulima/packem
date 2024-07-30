@@ -1,0 +1,358 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > cjs dts output 1`] = `
+"declare const test: () => string;
+declare const test2 = "this should be in final bundle";
+declare const test3 = "this should be in final bundle";
+declare const test4 = "this should be in final bundle";
+declare const test5 = "this should be in final bundle";
+
+export { test2, test3, test4, test5 };
+
+declare const defaultExport: {
+  test2: typeof test2;
+  test3: typeof test3;
+  test4: typeof test4;
+  test5: typeof test5;
+} & typeof test;
+
+export default defaultExport;
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const test = /* @__PURE__ */ __name(() => {
+  return "this should be in final bundle";
+}, "test");
+const test2 = "this should be in final bundle";
+const test3 = "this should be in final bundle";
+const test4 = "this should be in final bundle";
+const test5 = "this should be in final bundle";
+
+module.exports = test;
+module.exports.test2 = test2;
+module.exports.test3 = test3;
+module.exports.test4 = test4;
+module.exports.test5 = test5;
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > dts output 1`] = `
+"declare const test: () => string;
+declare const test2 = "this should be in final bundle";
+declare const test3 = "this should be in final bundle";
+declare const test4 = "this should be in final bundle";
+declare const test5 = "this should be in final bundle";
+
+export { test2, test3, test4, test5 };
+
+declare const defaultExport: {
+  test2: typeof test2;
+  test3: typeof test3;
+  test4: typeof test4;
+  test5: typeof test5;
+} & typeof test;
+
+export default defaultExport;
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > mjs dts output 1`] = `
+"declare const test: () => string;
+declare const test2 = "this should be in final bundle";
+declare const test3 = "this should be in final bundle";
+declare const test4 = "this should be in final bundle";
+declare const test5 = "this should be in final bundle";
+
+export { test as default, test2, test3, test4, test5 };
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > mjs output 1`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const test = /* @__PURE__ */ __name(() => {
+  return "this should be in final bundle";
+}, "test");
+const test2 = "this should be in final bundle";
+const test3 = "this should be in final bundle";
+const test4 = "this should be in final bundle";
+const test5 = "this should be in final bundle";
+
+export { test as default, test2, test3, test4, test5 };
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > cjs dts output 1`] = `
+"declare const test: () => string;
+declare const test2 = "this should be in final bundle";
+
+export { test2 };
+
+declare const defaultExport: {
+  test2: typeof test2;
+} & typeof test;
+
+export default defaultExport;
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const test = /* @__PURE__ */ __name(() => {
+  return "this should be in final bundle";
+}, "test");
+const test2 = "this should be in final bundle";
+
+module.exports = test;
+module.exports.test2 = test2;
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > dts output 1`] = `
+"declare const test: () => string;
+declare const test2 = "this should be in final bundle";
+
+export { test2 };
+
+declare const defaultExport: {
+  test2: typeof test2;
+} & typeof test;
+
+export default defaultExport;
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > mjs dts output 1`] = `
+"declare const test: () => string;
+declare const test2 = "this should be in final bundle";
+
+export { test as default, test2 };
+"
+`;
+
+exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > mjs output 1`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const test = /* @__PURE__ */ __name(() => {
+  return "this should be in final bundle";
+}, "test");
+const test2 = "this should be in final bundle";
+
+export { test as default, test2 };
+"
+`;
+
+exports[`packem node exports > should handle externals > cjs output 1`] = `
+"'use strict';
+
+const a = require('peer-dep');
+const b = require('peer-dep-meta');
+
+const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
+
+const a__default = /*#__PURE__*/_interopDefaultCompat(a);
+const b__default = /*#__PURE__*/_interopDefaultCompat(b);
+
+const index = a__default + b__default;
+
+module.exports = index;
+"
+`;
+
+exports[`packem node exports > should handle externals > mjs output 1`] = `
+"import a from 'peer-dep';
+import b from 'peer-dep-meta';
+
+const index = a + b;
+
+export { index as default };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly > cjs dts output 1`] = `
+"declare class Parent {
+    constructor();
+}
+declare class Feature {
+    constructor();
+}
+declare class Child extends Parent {
+    feature: Feature;
+    constructor();
+}
+
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+class Parent {
+  static {
+    __name(this, "Parent");
+  }
+  constructor() {
+  }
+}
+class Feature {
+  static {
+    __name(this, "Feature");
+  }
+  constructor() {
+  }
+}
+class Child extends Parent {
+  static {
+    __name(this, "Child");
+  }
+  feature = new Feature();
+  constructor() {
+    console.log("before");
+    super();
+    console.log("after");
+  }
+}
+
+exports.Child = Child;
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly > dts output 1`] = `
+"declare class Parent {
+    constructor();
+}
+declare class Feature {
+    constructor();
+}
+declare class Child extends Parent {
+    feature: Feature;
+    constructor();
+}
+
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly > mjs dts output 1`] = `
+"declare class Parent {
+    constructor();
+}
+declare class Feature {
+    constructor();
+}
+declare class Child extends Parent {
+    feature: Feature;
+    constructor();
+}
+
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly > mjs output 1`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+class Parent {
+  static {
+    __name(this, "Parent");
+  }
+  constructor() {
+  }
+}
+class Feature {
+  static {
+    __name(this, "Feature");
+  }
+  constructor() {
+  }
+}
+class Child extends Parent {
+  static {
+    __name(this, "Child");
+  }
+  feature = new Feature();
+  constructor() {
+    console.log("before");
+    super();
+    console.log("after");
+  }
+}
+
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > cjs dts output 1`] = `
+"declare class Parent {
+    constructor();
+}
+declare class Feature {
+    constructor();
+}
+declare class Child extends Parent {
+    feature: Feature;
+    constructor();
+}
+
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > cjs output 1`] = `
+""use strict";var o=Object.defineProperty;var e=(t,s)=>o(t,"name",{value:s,configurable:!0});Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});var c=Object.defineProperty,r=e((t,s)=>c(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{r(this,"Parent")}constructor(){}}class l{static{e(this,"c")}static{r(this,"Feature")}constructor(){}}class i extends a{static{e(this,"Child")}static{r(this,"Child")}feature=new l;constructor(){console.log("before"),super(),console.log("after")}}exports.Child=i;
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > dts output 1`] = `
+"declare class Parent {
+    constructor();
+}
+declare class Feature {
+    constructor();
+}
+declare class Child extends Parent {
+    feature: Feature;
+    constructor();
+}
+
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > mjs dts output 1`] = `
+"declare class Parent {
+    constructor();
+}
+declare class Feature {
+    constructor();
+}
+declare class Child extends Parent {
+    feature: Feature;
+    constructor();
+}
+
+export { Child };
+"
+`;
+
+exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > mjs output 1`] = `
+"var c=Object.defineProperty;var e=(t,s)=>c(t,"name",{value:s,configurable:!0});var o=Object.defineProperty,r=e((t,s)=>o(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{r(this,"Parent")}constructor(){}}class l{static{e(this,"c")}static{r(this,"Feature")}constructor(){}}class i extends a{static{e(this,"Child")}static{r(this,"Child")}feature=new l;constructor(){console.log("before"),super(),console.log("after")}}export{i as Child};
+"
+`;

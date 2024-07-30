@@ -60,4 +60,36 @@ export default log();`,
 
         expect(cjsContent).toMatchSnapshot("cjs content");
     });
+
+    it.each(["@", "#", "~"])("should trigger a error if a invalid alias (%s) was used", async (alias) => {
+        expect.assertions(2);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `import { log } from "${alias}/test/logger";
+
+export default log();`,
+        );
+        writeFileSync(`${temporaryDirectoryPath}/src/test/logger.ts`, `export const log = () => console.log("test");`);
+        createPackageJson(temporaryDirectoryPath, {
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            type: "commonjs",
+        });
+        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createPackemConfig(temporaryDirectoryPath, {
+            alias: {
+                [alias + "/"]: resolve(temporaryDirectoryPath, "src")
+            },
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+            // This is needed to get the error
+            reject: false,
+        });
+
+        expect(binProcess.exitCode).toBe(1);
+        await expect(streamToString(binProcess.stderr)).resolves.toContain(`Error: Alias name "${alias}/" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.`);
+    });
 });
