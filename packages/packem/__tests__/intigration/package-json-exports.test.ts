@@ -54,42 +54,11 @@ export function method() {
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`import myMod from 'my-mod';
-
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = "exports-sugar-default";
-function method() {
-  return myMod.test();
-}
-__name(method, "method");
-
-export { index as default, method };
-`);
+        expect(mjsContent).toMatchSnapshot("mjs output");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-const myMod = require('my-mod');
-
-function _interopDefaultCompat (e) { return e && typeof e === 'object' && 'default' in e ? e.default : e; }
-
-const myMod__default = /*#__PURE__*/_interopDefaultCompat(myMod);
-
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = "exports-sugar-default";
-function method() {
-  return myMod__default.test();
-}
-__name(method, "method");
-
-exports.default = index;
-exports.method = method;
-`);
+        expect(cjsContent).toMatchSnapshot("cjs output");
     });
 
     it("should generate proper assets with js based on the package.json exports", async () => {
@@ -115,7 +84,7 @@ exports.method = method;
         expect(binProcess.exitCode).toBe(0);
 
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-        for (const file of ["index.cjs", "index.esm.js", "index.mjs"]) {
+        for (const file of ["index.cjs", "index.mjs"]) {
             // eslint-disable-next-line security/detect-non-literal-fs-filename
             expect(existsSync(`${temporaryDirectoryPath}/dist/${file}`)).toBeTruthy();
         }
@@ -128,16 +97,16 @@ exports.method = method;
         createPackageJson(temporaryDirectoryPath, {
             exports: {
                 ".": {
-                    default: "./dist/index.js",
+                    default: "./dist/index.cjs",
                     import: {
                         default: "./dist/index.mjs",
                         development: "./dist/index.development.mjs",
                         production: "./dist/index.production.mjs",
                     },
                     require: {
-                        default: "./dist/index.js",
-                        development: "./dist/index.development.js",
-                        production: "./dist/index.production.js",
+                        default: "./dist/index.cjs",
+                        development: "./dist/index.development.cjs",
+                        production: "./dist/index.production.cjs",
                     },
                 },
             },
@@ -157,7 +126,7 @@ exports.method = method;
             ["index.production.cjs", /= "production"/],
             ["index.production.mjs", /= "production"/],
             // In vitest the NODE_ENV is set to test
-            ["index.js", /= "test"/],
+            ["index.cjs", /= "test"/],
             ["index.mjs", /= "test"/],
         ]) {
             const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
@@ -184,9 +153,9 @@ exports.method = method;
                         production: "./dist/index.production.mjs",
                     },
                     require: {
-                        default: "./dist/index.js",
-                        development: "./dist/index.development.js",
-                        production: "./dist/index.production.js",
+                        default: "./dist/index.cjs",
+                        development: "./dist/index.development.cjs",
+                        production: "./dist/index.production.cjs",
                     },
                 },
                 "./core": {
@@ -196,9 +165,9 @@ exports.method = method;
                         production: "./dist/core.production.mjs",
                     },
                     require: {
-                        default: "./dist/core.js",
-                        development: "./dist/core.development.js",
-                        production: "./dist/core.production.js",
+                        default: "./dist/core.cjs",
+                        development: "./dist/core.development.cjs",
+                        production: "./dist/core.production.cjs",
                     },
                 },
             },
@@ -218,15 +187,15 @@ exports.method = method;
             ["index.production.cjs", /= "production"/],
             ["index.production.mjs", /= "production"/],
             // In vitest the NODE_ENV is set to test
-            ["index.js", /= "test"/],
+            ["index.cjs", /= "test"/],
             ["index.mjs", /= "test"/],
 
             // core export
-            ["core.development.js", /= 'core' \+ "development"/],
+            ["core.development.cjs", /= 'core' \+ "development"/],
             ["core.development.mjs", /= 'core' \+ "development"/],
-            ["core.production.js", /= 'core' \+ "production"/],
+            ["core.production.cjs", /= 'core' \+ "production"/],
             ["core.production.mjs", /= 'core' \+ "production"/],
-            ["core.js", /= 'core'/],
+            ["core.cjs", /= 'core'/],
             ["core.mjs", /= 'core'/],
         ]) {
             const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
@@ -258,7 +227,7 @@ export { IString };`,
             exports: {
                 ".": {
                     import: "./dist/index.mjs",
-                    "react-native": "./dist/react-native.js",
+                    "react-native": "./dist/react-native.cjs",
                     "react-server": "./dist/react-server.mjs",
                     require: "./dist/index.cjs",
                     types: "./dist/index.d.ts",
@@ -281,7 +250,7 @@ export { IString };`,
         for (const [file, regex] of [
             ["./index.mjs", /const shared = true/],
             ["./react-server.mjs", /'react-server'/],
-            ["./react-native.js", /'react-native'/],
+            ["./react-native.cjs", /'react-native'/],
             ["./index.d.ts", /declare const shared = true/],
             ["./api.mjs", /'pkg-export-ts-rsc'/],
         ]) {
@@ -292,13 +261,14 @@ export { IString };`,
     });
 
     it("should work with nested path in exports", async () => {
-        expect.assertions(6);
+        expect.assertions(3);
 
         writeFileSync(`${temporaryDirectoryPath}/src/foo/bar.js`, `export const value = 'foo.bar';`);
         createPackageJson(temporaryDirectoryPath, {
             exports: {
-                "./foo/bar": "./dist/foo/bar.js",
+                "./foo/bar": "./dist/foo/bar.mjs",
             },
+            type: "module",
         });
 
         const binProcess = await execPackemSync("build", [], {
@@ -308,9 +278,12 @@ export { IString };`,
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const content = readFileSync(`${temporaryDirectoryPath}/dist/foo/bar.js`);
+        const content = readFileSync(`${temporaryDirectoryPath}/dist/foo/bar.mjs`);
 
-        expect(content).toMatch("export const value = 'foo.bar';");
+        expect(content).toMatch(`const value = "foo.bar";
+
+export { value };
+`);
     });
 
     it("should work with ESM package with CJS main field", async () => {
@@ -337,19 +310,11 @@ export { IString };`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`const value = "cjs";
-
-export { value };
-`);
+        expect(mjsContent).toMatchSnapshot("mjs output");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-const value = "cjs";
-
-exports.value = value;
-`);
+        expect(cjsContent).toMatchSnapshot("cjs output");
     });
 
     it("should deduplicate entries", async () => {
@@ -357,6 +322,9 @@ exports.value = value;
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = 'cjs';`);
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "typescript": "*",
+            },
             exports: {
                 import: {
                     default: "./dist/index.mjs",
@@ -369,7 +337,7 @@ exports.value = value;
             },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
-            types: "./dist/index.d.ts",
+            types: "./dist/index.d.ts"
         });
         writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
 

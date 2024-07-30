@@ -161,7 +161,7 @@ describe("packem typescript", () => {
                 compilerOptions: {
                     baseUrl: "src",
                     paths: {
-                        "@/*": ["components/*.ts"],
+                        "@": ["components/*.ts"],
                     },
                 },
             });
@@ -487,8 +487,16 @@ export { index as default };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index'`);
         createPackageJson(temporaryDirectoryPath, {
-            exports: "./dist/index.cjs",
-            types: "./dist/index.d.ts",
+            devDependencies: {
+                typescript: "^4.4.3",
+            },
+            exports: {
+                ".": {
+                    default: "./dist/index.mjs",
+                    types: "./dist/index.d.ts",
+                },
+            },
+            type: "module",
         });
         createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
@@ -503,6 +511,15 @@ export { index as default };
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const index = /* @__PURE__ */ __name(() => "index", "default");
+
+export { index as default };
+`);
+
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare const _default: () => string;
@@ -515,15 +532,6 @@ export { _default as default };
         expect(dTsContent).toBe(`declare const _default: () => string;
 
 export { _default as default };
-`);
-
-        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
-
-        expect(dCtsContent).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = /* @__PURE__ */ __name(() => "index", "default");
-
-export { index as default };
 `);
     });
 });
