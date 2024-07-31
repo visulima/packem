@@ -33,7 +33,15 @@ const createInitCommand = (cli: Cli): void => {
 
                 const packageJson = parsePackageJson(packageJsonPath);
 
-                const packages = [...Object.keys(packageJson.dependencies ?? {}), ...Object.keys(packageJson.devDependencies ?? {})];
+                const packages = [];
+
+                if (packageJson.dependencies) {
+                    packages.push(...Object.keys(packageJson.dependencies));
+                }
+
+                if (packageJson.devDependencies) {
+                    packages.push(...Object.keys(packageJson.devDependencies));
+                }
 
                 // eslint-disable-next-line no-param-reassign
                 options.transformer = await select({

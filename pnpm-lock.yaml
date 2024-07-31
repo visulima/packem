@@ -459,6 +459,9 @@ importers:
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
+      detect-indent:
+        specifier: ^7.0.1
+        version: 7.0.1
       esbuild:
         specifier: ^0.23.0
         version: 0.23.0

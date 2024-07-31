@@ -17,69 +17,6 @@ describe("packem node exports", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it("should output 'default export' correctly", async () => {
-        expect.assertions(7);
-
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
-
-        await installPackage(temporaryDirectoryPath, "typescript");
-        createPackageJson(temporaryDirectoryPath, {
-            devDependencies: {
-                typescript: "^4.4.3",
-            },
-            main: "./dist/index.cjs",
-            module: "./dist/index.mjs",
-            type: "commonjs",
-            types: "./dist/index.d.ts",
-        });
-        await createPackemConfig(temporaryDirectoryPath, {});
-        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
-
-        const binProcess = await execPackemSync("build", [], {
-            cwd: temporaryDirectoryPath,
-        });
-
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
-        expect(binProcess.exitCode).toBe(0);
-
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
-
-        expect(mjsContent).toBe(`const test = "this should be in final bundle";
-
-export { test as default };
-`);
-
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
-
-        expect(cjsContent).toBe(`'use strict';
-
-const test = "this should be in final bundle";
-
-module.exports = test;
-`);
-
-        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
-
-        expect(dCtsContent).toBe(`declare const test = "this should be in final bundle";
-
-export { test as default };
-`);
-
-        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
-
-        expect(dMtsContent).toBe(`declare const test = "this should be in final bundle";
-
-export { test as default };
-`);
-
-        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
-
-        expect(dContent).toBe(`declare const test = "this should be in final bundle";
-
-export { test as default };
-`);
-    });
-
     describe("cjs-interop", () => {
         it("should output 'default export' correctly and dont transform dts when cjsInterop", async () => {
             expect.assertions(7);
@@ -271,6 +208,69 @@ export { test2, test3, test4, test5, test as default };`,
         });
     });
 
+    it("should output 'default export' correctly", async () => {
+        expect.assertions(7);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "^4.4.3",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            type: "commonjs",
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {});
+        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toBe(`const test = "this should be in final bundle";
+
+export { test as default };
+`);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+const test = "this should be in final bundle";
+
+module.exports = test;
+`);
+
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(dCtsContent).toBe(`declare const test = "this should be in final bundle";
+
+export { test as default };
+`);
+
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(dMtsContent).toBe(`declare const test = "this should be in final bundle";
+
+export { test as default };
+`);
+
+        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dContent).toBe(`declare const test = "this should be in final bundle";
+
+export { test as default };
+`);
+    });
+
     it("should output 'default export' for nested folder correctly", async () => {
         expect.assertions(7);
 
@@ -366,6 +366,65 @@ export default a + b
         });
         await createPackemConfig(temporaryDirectoryPath, {});
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toMatchSnapshot("mjs output");
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toMatchSnapshot("cjs output");
+
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(dCtsContent).toMatchSnapshot("cjs dts output");
+
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(dMtsContent).toMatchSnapshot("mjs dts output");
+
+        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dContent).toMatchSnapshot("dts output");
+    });
+
+    it("should bundle 'devDependencies' that are used inside the code and are not marked as external", async () => {
+        expect.assertions(7);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await installPackage(temporaryDirectoryPath, "detect-indent");
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `import detectIndentFn from "detect-indent";
+
+const { indent: dIndent } = detectIndentFn("  file");
+
+export const indent = dIndent;
+`,
+        );
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "detect-indent": "^7.0.1",
+                typescript: "^4.4.3",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            type: "commonjs",
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {});
+        createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                moduleResolution: "bundler",
+            }
+        });
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,

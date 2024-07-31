@@ -207,22 +207,12 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
 
             // eslint-disable-next-line @typescript-eslint/naming-convention
             const package_ = getPackageName(id);
-            const isExplicitExternal: boolean = arrayIncludes(context.options.externals, package_) || arrayIncludes(context.options.externals, id);
 
-            if (isExplicitExternal) {
+            if (arrayIncludes(context.options.externals, package_) || arrayIncludes(context.options.externals, id)) {
                 return true;
             }
 
             const { pkg } = context;
-
-            if (
-                // eslint-disable-next-line security/detect-object-injection
-                !pkg.dependencies?.[id] &&
-                // eslint-disable-next-line security/detect-object-injection
-                pkg.peerDependencies?.[id]
-            ) {
-                return true;
-            }
 
             if (id.startsWith(".") || isAbsolute(id) || /src[/\\]/.test(id) || (pkg.name && id.startsWith(pkg.name))) {
                 return false;
@@ -242,8 +232,7 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
                 }
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            if (!isExplicitExternal && !calledImplicitExternals.has(id)) {
+            if (!calledImplicitExternals.has(id)) {
                 context.logger.info({
                     message: 'Inlined implicit external "' + cyan(id) + '". If this is incorrect, add it to the "externals" option.',
                     prefix: type,
@@ -252,7 +241,7 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
 
             calledImplicitExternals.set(id, true);
 
-            return isExplicitExternal;
+            return false;
         },
         input: Object.fromEntries(context.options.entries.map((entry) => [entry.name, resolve(context.options.rootDir, entry.input)])),
 

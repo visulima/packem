@@ -358,7 +358,17 @@ const generateOptions = (
     }
 
     // Add all dependencies as externals
-    options.externals.push(...Object.keys(packageJson.dependencies ?? {}), ...Object.keys(packageJson.peerDependencies ?? {}), ...Object.keys(packageJson.devDependencies ?? {}));
+    if (packageJson.dependencies) {
+        options.externals.push(...Object.keys(packageJson.dependencies));
+    }
+
+    if (packageJson.peerDependencies) {
+        options.externals.push(...Object.keys(packageJson.peerDependencies));
+    }
+
+    if (packageJson.optionalDependencies) {
+        options.externals.push(...Object.keys(packageJson.optionalDependencies));
+    }
 
     validateAliasEntries(options.alias);
 
@@ -858,6 +868,8 @@ const createBundler = async (
                 version: packageJson.version,
                 ...packageJson.dependencies,
                 ...packageJson.devDependencies,
+                ...packageJson.peerDependencies,
+                ...packageJson.peerDependenciesMeta,
                 browser: packageJson.browser,
                 eNode: packageJson.engines?.node,
                 exports: packageJson.exports,

@@ -31,11 +31,8 @@ const validateDependencies = (context: BuildContext): void => {
             !arrayIncludes(context.options.externals, id) &&
             !id.startsWith("chunks/") &&
             // eslint-disable-next-line security/detect-object-injection
-            !context.pkg.dependencies?.[packageId] &&
-            // eslint-disable-next-line security/detect-object-injection
-            !context.pkg.peerDependencies?.[packageId] && // Check if it's optional
-            // eslint-disable-next-line security/detect-object-injection
-            !context.pkg.peerDependenciesMeta?.[packageId]?.optional
+            context.pkg.dependencies?.[packageId] === undefined &&
+            context.pkg.peerDependencies?.[packageId] === undefined
         ) {
             implicitDependencies.add(id);
         }
