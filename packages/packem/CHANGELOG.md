@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.60](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.59...@visulima/packem@1.0.0-alpha.60) (2024-07-31)
+
+### Bug Fixes
+
+* fixed inlining of dev deps, added test for it ([82e5c8b](https://github.com/visulima/packem/commit/82e5c8ba42268a3652b6aa3de29ebbfe1fc0503a))
+
 ## @visulima/packem [1.0.0-alpha.59](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.58...@visulima/packem@1.0.0-alpha.59) (2024-07-31)
 
 ### Bug Fixes
