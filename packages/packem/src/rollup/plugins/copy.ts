@@ -18,8 +18,18 @@ type MultipleTargetsDesc = SingleTargetDesc | SingleTargetDesc[] | string[] | st
 type FileDesc = { copied: string[]; dest: string[]; timestamp: number; transform?: (content: Buffer, filename: string) => Buffer | string };
 
 export type CopyPluginOptions = {
+    /**
+     * Copy items once. Useful in watch mode.
+     *
+     * @default false
+     */
     copyOnce?: boolean;
     exactFileNames?: boolean;
+    /**
+     * Remove the directory structure of copied files.
+     *
+     * @default true
+     */
     flatten?: boolean;
     targets: MultipleTargetsDesc;
 };

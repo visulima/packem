@@ -1,5 +1,50 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`packem package.json exports > should generate output with all cjs exports > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const index = "index";
+
+exports.index = index;
+"
+`;
+
+exports[`packem package.json exports > should generate output with all cjs exports > cjs output 2`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const index = "index.react-server";
+
+exports.index = index;
+"
+`;
+
+exports[`packem package.json exports > should generate output with all cjs exports > cjs output 3`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const foo = "foo";
+
+exports.foo = foo;
+"
+`;
+
+exports[`packem package.json exports > should generate output with all cjs exports > cjs output 4`] = `
+"#!/usr/bin/env node
+'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const cli = "cli";
+
+exports.cli = cli;
+"
+`;
+
 exports[`packem package.json exports > should generate proper assets with js based on the package.json exports default > cjs output 1`] = `
 "'use strict';
 
