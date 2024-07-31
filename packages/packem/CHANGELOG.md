@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.61](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.60...@visulima/packem@1.0.0-alpha.61) (2024-07-31)
+
+### Bug Fixes
+
+* added test for inlined text message on output ([802185f](https://github.com/visulima/packem/commit/802185f8b661810e24b113b51ac869d6c1470128))
+
 ## @visulima/packem [1.0.0-alpha.60](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.59...@visulima/packem@1.0.0-alpha.60) (2024-07-31)
 
 ### Bug Fixes
