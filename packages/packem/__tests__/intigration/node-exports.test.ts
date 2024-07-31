@@ -396,7 +396,7 @@ export default a + b
     });
 
     it("should bundle 'devDependencies' that are used inside the code and are not marked as external", async () => {
-        expect.assertions(7);
+        expect.assertions(8);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "detect-indent");
@@ -432,6 +432,8 @@ export const indent = dIndent;
 
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
+
+        await expect(streamToString(binProcess.stdout)).resolves.toContain("Inlined implicit external");
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
