@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.62](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.61...@visulima/packem@1.0.0-alpha.62) (2024-08-04)
+
+### Bug Fixes
+
+* fixed init command to check for typescript and esm, changed moduleResolution to Bundler on dts plugin ([31c4d71](https://github.com/visulima/packem/commit/31c4d71f960d5dde8635cbdd1d30a5bd85a6ff56))
+
 ## @visulima/packem [1.0.0-alpha.61](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.60...@visulima/packem@1.0.0-alpha.61) (2024-07-31)
 
 ### Bug Fixes
