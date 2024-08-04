@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.65](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.64...@visulima/packem@1.0.0-alpha.65) (2024-08-04)
+
+### Bug Fixes
+
+* improved esm-shim ([e732c7e](https://github.com/visulima/packem/commit/e732c7e988ff1736f2293636a6cbedea48ecb452))
+
 ## @visulima/packem [1.0.0-alpha.64](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.63...@visulima/packem@1.0.0-alpha.64) (2024-08-04)
 
 ### Bug Fixes
