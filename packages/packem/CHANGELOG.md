@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.64](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.63...@visulima/packem@1.0.0-alpha.64) (2024-08-04)
+
+### Bug Fixes
+
+* fixed more tests, fixed package imports dont show external warning ([038f05d](https://github.com/visulima/packem/commit/038f05da499e90695eec4c25a475e7204bae1ed1))
+
 ## @visulima/packem [1.0.0-alpha.63](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.62...@visulima/packem@1.0.0-alpha.63) (2024-08-04)
 
 ### Bug Fixes
