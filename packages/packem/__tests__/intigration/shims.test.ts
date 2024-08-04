@@ -20,7 +20,7 @@ describe("packem shims", () => {
     });
 
     it("should include esm shim, if dirname, filename or require are found", async () => {
-        expect.assertions(8);
+        expect.assertions(10);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/dirname.js`,
@@ -44,8 +44,27 @@ export function esmImport() {
   return import.meta.url
 }`,
         );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/custom-require.js`,
+            `const __getOwnPropNames = Object.getOwnPropertyNames
+var __commonJS = (cb, mod) =>
+  function __require() {
+    return (
+      mod ||
+        (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod),
+      mod.exports
+    )
+  }
+
+export const a = 1`,
+        );
+
         createPackageJson(temporaryDirectoryPath, {
             exports: {
+                "./custom-require": {
+                    import: "./dist/custom-require.mjs",
+                    require: "./dist/custom-require.cjs",
+                },
                 "./dirname": {
                     import: "./dist/dirname.mjs",
                     require: "./dist/dirname.cjs",
@@ -70,14 +89,10 @@ export function esmImport() {
 
         const mjsDirnameContent = readFileSync(`${temporaryDirectoryPath}/dist/dirname.mjs`);
 
-        expect(mjsDirnameContent).toBe(`
-// -- pack CommonJS Shims --
-import __cjs_url__ from "node:url";
-import __cjs_path__ from "node:path";
-import __cjs_mod__ from "node:module";
+        expect(mjsDirnameContent).toBe(`import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
+import __cjs_path__ from "node:path"; // -- packem CommonJS __dirname shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
 const __dirname = __cjs_path__.dirname(__filename);
-const require = __cjs_mod__.createRequire(import.meta.url);
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getDirname() {
@@ -106,14 +121,8 @@ exports.getDirname = getDirname;
 
         const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.mjs`);
 
-        expect(mjsFilenameContent).toBe(`
-// -- pack CommonJS Shims --
-import __cjs_url__ from "node:url";
-import __cjs_path__ from "node:path";
-import __cjs_mod__ from "node:module";
+        expect(mjsFilenameContent).toBe(`import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
-const __dirname = __cjs_path__.dirname(__filename);
-const require = __cjs_mod__.createRequire(import.meta.url);
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getFilename() {
@@ -142,13 +151,7 @@ exports.getFilename = getFilename;
 
         const mjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.mjs`);
 
-        expect(mjsRequireContent).toBe(`
-// -- pack CommonJS Shims --
-import __cjs_url__ from "node:url";
-import __cjs_path__ from "node:path";
-import __cjs_mod__ from "node:module";
-const __filename = __cjs_url__.fileURLToPath(import.meta.url);
-const __dirname = __cjs_path__.dirname(__filename);
+        expect(mjsRequireContent).toBe(`import __cjs_mod__ from "node:module"; // -- packem CommonJS require shim --
 const require = __cjs_mod__.createRequire(import.meta.url);
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -184,6 +187,24 @@ __name(esmImport, "esmImport");
 
 exports.esmImport = esmImport;
 exports.getRequireModule = getRequireModule;
+`);
+
+        const mjsCustomRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/custom-require.mjs`);
+
+        expect(mjsCustomRequireContent).toBe(`const a = 1;
+
+export { a };
+`);
+
+        const cjsCustomRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/custom-require.cjs`);
+
+        expect(cjsCustomRequireContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const a = 1;
+
+exports.a = a;
 `);
     });
 
@@ -241,12 +262,7 @@ export function esmImport() {
 
         const mjsDirnameContent = readFileSync(`${temporaryDirectoryPath}/dist/dirname.mjs`);
 
-        expect(mjsDirnameContent).toBe(`
-// -- pack CommonJS Shims Node 20.11 --
-import __cjs_mod__ from "node:module";
-const __filename = import.meta.filename;
-const __dirname = import.meta.dirname;
-const require = __cjs_mod__.createRequire(import.meta.url);
+        expect(mjsDirnameContent).toBe(`const __dirname = import.meta.dirname; // -- packem CommonJS __dirname shim --
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getDirname() {
@@ -275,12 +291,7 @@ exports.getDirname = getDirname;
 
         const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.mjs`);
 
-        expect(mjsFilenameContent).toBe(`
-// -- pack CommonJS Shims Node 20.11 --
-import __cjs_mod__ from "node:module";
-const __filename = import.meta.filename;
-const __dirname = import.meta.dirname;
-const require = __cjs_mod__.createRequire(import.meta.url);
+        expect(mjsFilenameContent).toBe(`const __filename = import.meta.filename; // -- packem CommonJS __filename shim --
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getFilename() {
@@ -309,11 +320,7 @@ exports.getFilename = getFilename;
 
         const mjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.mjs`);
 
-        expect(mjsRequireContent).toBe(`
-// -- pack CommonJS Shims Node 20.11 --
-import __cjs_mod__ from "node:module";
-const __filename = import.meta.filename;
-const __dirname = import.meta.dirname;
+        expect(mjsRequireContent).toBe(`import __cjs_mod__ from "node:module"; // -- packem CommonJS require shim --
 const require = __cjs_mod__.createRequire(import.meta.url);
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -407,14 +414,10 @@ export { getFilename } from "./filename.js";`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`
-// -- pack CommonJS Shims --
-import __cjs_url__ from "node:url";
-import __cjs_path__ from "node:path";
-import __cjs_mod__ from "node:module";
+        expect(mjsContent).toBe(`import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
+import __cjs_path__ from "node:path"; // -- packem CommonJS __dirname shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
 const __dirname = __cjs_path__.dirname(__filename);
-const require = __cjs_mod__.createRequire(import.meta.url);
 var __defProp$1 = Object.defineProperty;
 var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function getFilename() {

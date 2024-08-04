@@ -22,7 +22,6 @@ const validatePackage = (package_: PackageJson, context: BuildContext): void => 
         ].map(
             (index) =>
                 index &&
-                 
                 resolve(
                     context.options.rootDir,
                     index.replace(/\/[^*/]*\*[^\n\r/\u2028\u2029]*(?:[\n\r\u2028\u2029][^*/]*\*[^\n\r/\u2028\u2029]*)*(?:\/.*)?$/, ""),

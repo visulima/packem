@@ -1,6 +1,6 @@
 import { versions } from "node:process";
 
-import type { ResolverFunction } from "@rollup/plugin-alias";
+import type { ResolverObject } from "@rollup/plugin-alias";
 import aliasPlugin from "@rollup/plugin-alias";
 import commonjsPlugin from "@rollup/plugin-commonjs";
 import dynamicImportVarsPlugin from "@rollup/plugin-dynamic-import-vars";
@@ -25,6 +25,7 @@ import memoizeByKey from "../utils/memoize";
 import { cjsInterop as cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
+import shimCjsPlugin from "./plugins/esm-shim-cjs-syntax";
 import { isolatedDeclarationsPlugin } from "./plugins/isolated-declarations-plugin";
 import JSONPlugin from "./plugins/json";
 import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
@@ -35,7 +36,6 @@ import preserveDirectivesPlugin from "./plugins/preserve-directives";
 import { rawPlugin } from "./plugins/raw";
 import resolveFileUrlPlugin from "./plugins/resolve-file-url";
 import { removeShebangPlugin, shebangPlugin } from "./plugins/shebang";
-import shimCjsPlugin from "./plugins/shim-cjs";
 import type { SucrasePluginConfig } from "./plugins/sucrase/types";
 import type { SwcPluginConfig } from "./plugins/swc/types";
 import { patchTypescriptTypes as patchTypescriptTypesPlugin } from "./plugins/typescript/patch-typescript-types";
@@ -397,7 +397,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             context.options.rollup.alias &&
                 aliasPlugin({
                     // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                    customResolver: nodeResolver?.resolveId as ResolverFunction,
+                    customResolver: nodeResolver as ResolverObject,
                     ...context.options.rollup.alias,
                     entries: resolvedAliases,
                 }),
@@ -636,7 +636,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             context.options.rollup.alias &&
                 aliasPlugin({
                     // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                    customResolver: nodeResolver?.resolveId as ResolverFunction,
+                    customResolver: nodeResolver as ResolverObject,
                     ...context.options.rollup.alias,
                     entries: resolvedAliases,
                 }),

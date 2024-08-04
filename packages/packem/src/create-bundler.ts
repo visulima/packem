@@ -83,7 +83,7 @@ const generateOptions = (
 ): InternalBuildOptions => {
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
 
-    const options = defu(buildConfig, inputConfig, preset, <BuildOptions> {
+    const options = defu(buildConfig, inputConfig, preset, <BuildOptions>{
         alias: {},
         clean: true,
         debug,
@@ -234,15 +234,15 @@ const generateOptions = (
                 production: env.NODE_ENV === "production",
                 ...(tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
                     ? {
-                        jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
-                        jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
-                        jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
-                        jsxRuntime,
-                        transforms: ["typescript", "jsx", ...(tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : [])],
-                    }
+                          jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
+                          jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
+                          jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
+                          jsxRuntime,
+                          transforms: ["typescript", "jsx", ...(tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : [])],
+                      }
                     : {
-                        transforms: ["typescript", ...(tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : [])],
-                    }),
+                          transforms: ["typescript", ...(tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : [])],
+                      }),
             },
             swc: {
                 include: /\.[jt]sx?$/,

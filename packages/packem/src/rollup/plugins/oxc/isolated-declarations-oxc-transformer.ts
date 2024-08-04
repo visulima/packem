@@ -1,4 +1,3 @@
- 
 import { isolatedDeclaration } from "oxc-transform";
 
 import type { IsolatedDeclarationsResult } from "../../../types";
