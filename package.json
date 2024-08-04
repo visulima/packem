@@ -65,8 +65,8 @@
         "cross-env": "^7.0.3",
         "husky": "^9.1.4",
         "is-ci": "^3.0.1",
-        "lint-staged": "^15.2.7",
-        "nx": "^19.5.4",
+        "lint-staged": "^15.2.8",
+        "nx": "^19.5.6",
         "plop": "^4.0.1",
         "prettier": "^3.3.3",
         "publint": "^0.2.9",
@@ -77,16 +77,16 @@
         "taze": "^0.16.3",
         "textlint": "^14.0.4",
         "typescript": "^5.5.4",
-        "vitest": "^2.0.4"
+        "vitest": "^2.0.5"
     },
-    "packageManager": "pnpm@9.5.0",
+    "packageManager": "pnpm@9.6.0",
     "engines": {
         "node": ">=18.* <=22.*"
     },
     "pnpm": {
         "overrides": {
-            "chrono-node@<2.2.4": ">=2.2.4",
-            "rollup": "^4.18.0"
+            "chrono-node@<2.2.4": ">=2.7.6",
+            "rollup": "^4.20.0"
         }
     }
 }
