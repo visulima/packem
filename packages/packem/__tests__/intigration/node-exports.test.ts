@@ -457,7 +457,7 @@ export const indent = dIndent;
     });
 
     it("should split shared module into one chunk layer", async () => {
-        expect.assertions(3);
+        expect.assertions(4);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.js`,
@@ -468,9 +468,9 @@ export const value = dep
         );
         writeFileSync(`${temporaryDirectoryPath}/src/lib/polyfill.js`, `export const dep = 'polyfill-dep'`);
         createPackageJson(temporaryDirectoryPath, {
-            exports: "./dist/index.js",
+            exports: "./dist/index.cjs",
             imports: {
-                "#dep": "./src/lib/polyfill.cjs",
+                "#dep": "./src/lib/polyfill.js",
             },
         });
         await createPackemConfig(temporaryDirectoryPath, {});
@@ -482,9 +482,13 @@ export const value = dep
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+        expect(binProcess.stdout).not.toContain("Inlined implicit external");
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 const dep = "polyfill-dep";
 

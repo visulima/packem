@@ -218,6 +218,12 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
                 return false;
             }
 
+            // package.json imports are not externals
+            // eslint-disable-next-line security/detect-object-injection,@typescript-eslint/no-unnecessary-condition
+            if ((pkg?.imports as Record<string, string>)?.[id] !== undefined) {
+                return false;
+            }
+
             if (configAlias) {
                 // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const { find } of configAlias) {

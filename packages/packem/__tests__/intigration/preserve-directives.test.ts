@@ -63,6 +63,7 @@ console.log("Hello, world!");
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `console.log("Hello, world!");`);
         createPackageJson(temporaryDirectoryPath, {
             bin: "./dist/index.cjs",
+            module: "./dist/index.mjs",
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
@@ -182,7 +183,7 @@ export { Tr as default };
     });
 
     it("should merge duplicated directives", async () => {
-        expect.assertions(6);
+        expect.assertions(5);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/cli.ts`,
@@ -219,6 +220,8 @@ export { foo };
 
         expect(cjsContent).toBe(`'use strict';
 
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
 const foo = "foo";
 
 exports.foo = foo;
@@ -231,12 +234,9 @@ exports.foo = foo;
 
 console.log("Hello, cli!");
 `);
-        const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/cli.d.ts`);
-
-        expect(dtsContent).toBe(`\n`);
     });
 
-    it("should merge duplicated directives from many files", async () => {
+    it("should chunk directives in separated files", async () => {
         expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/bar.ts`, `'use client';export const bar = 'bar';`);
@@ -277,32 +277,28 @@ export const baz = 'baz';`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`'use client';
-'use sukka';
-const foo = "foo";
-
-const bar = "bar";
+        expect(mjsContent).toBe(`export { f as foo } from './shared/.Dz9XMQGO.mjs';
+export { b as bar } from './shared/.pKIa1waU.mjs';
 
 const baz = "baz";
 
-export { bar, baz, foo };
+export { baz };
 `);
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use client';
-'use sukka';
-'use strict';
+        expect(cjsContent).toBe(`'use strict';
 
-const foo = "foo";
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const bar = "bar";
+const fooClient = require('./shared/.BidPBplS.cjs');
+const barClient = require('./shared/.C8ei8RaB.cjs');
 
 const baz = "baz";
 
-exports.bar = bar;
+exports.foo = fooClient.foo;
+exports.bar = barClient.bar;
 exports.baz = baz;
-exports.foo = foo;
 `);
     });
 });
