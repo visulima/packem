@@ -30,9 +30,9 @@ import FileCache from "./utils/file-cache";
 import getPackageSideEffect from "./utils/get-package-side-effect";
 import groupByKeys from "./utils/group-by-keys";
 import tryRequire from "./utils/try-require";
+import validateAliasEntries from "./validator/validate-alias-entries";
 import validateDependencies from "./validator/validate-dependencies";
 import validatePackage from "./validator/validate-package";
-import validateAliasEntries from "./validator/validate-alias-entries";
 
 type PackEmPackageJson = { packem?: BuildConfig } & PackageJson;
 
@@ -133,6 +133,7 @@ const generateOptions = (
                     // error TS5074: Option '--incremental' can only be specified using tsconfig, emitting to single
                     // file or when option '--tsBuildInfoFile' is specified.
                     incremental: false,
+                    moduleResolution: 100, // Bundler,
                     // Skip ".js" generation
                     noEmit: false,
                     // Skip code generation when error occurs

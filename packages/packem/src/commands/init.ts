@@ -24,25 +24,25 @@ const createInitCommand = (cli: Cli): void => {
                 return;
             }
 
+            const packageJsonPath = join(options.dir, "package.json");
+
+            if (!isAccessibleSync(packageJsonPath)) {
+                throw new Error("No package.json found in the directory");
+            }
+
+            const packageJson = parsePackageJson(packageJsonPath);
+
+            const packages = [];
+
+            if (packageJson.dependencies) {
+                packages.push(...Object.keys(packageJson.dependencies));
+            }
+
+            if (packageJson.devDependencies) {
+                packages.push(...Object.keys(packageJson.devDependencies));
+            }
+
             if (options.transformer === undefined) {
-                const packageJsonPath = join(options.dir, "package.json");
-
-                if (!isAccessibleSync(packageJsonPath)) {
-                    throw new Error("No package.json found in the directory");
-                }
-
-                const packageJson = parsePackageJson(packageJsonPath);
-
-                const packages = [];
-
-                if (packageJson.dependencies) {
-                    packages.push(...Object.keys(packageJson.dependencies));
-                }
-
-                if (packageJson.devDependencies) {
-                    packages.push(...Object.keys(packageJson.devDependencies));
-                }
-
                 // eslint-disable-next-line no-param-reassign
                 options.transformer = await select({
                     message: "Pick a transformer",
@@ -70,7 +70,8 @@ const createInitCommand = (cli: Cli): void => {
                 }
             }
 
-            const template = `import { defineConfig } from "@visulima/packem/config";
+            if (packages.includes("typescript") || packageJson.type === "module") {
+                const template = `import { defineConfig } from "@visulima/packem/config";
 import transformer from "@visulima/packem/transformer/${options.transformer as string}";
 
 export default defineConfig({
@@ -78,11 +79,28 @@ export default defineConfig({
 });
 `;
 
-            const s = spinner();
+                const s = spinner();
 
-            s.start("Creating packem.config.ts");
-            writeFileSync(join(options.dir, "packem.config.ts"), template);
-            s.stop("Created packem.config.ts");
+                const extension = packageJson.type === "module" ? "mjs" : "ts";
+
+                s.start("Creating packem.config." + extension);
+                writeFileSync(join(options.dir, "packem.config." + extension), template);
+                s.stop("Created packem.config." + extension);
+            } else {
+                const template = `const { defineConfig } = require("@visulima/packem/config");
+const transformer = require("@visulima/packem/transformer/${options.transformer as string}");
+
+module.exports = defineConfig({
+    transformer
+});
+`;
+
+                const s = spinner();
+
+                s.start("Creating packem.config.js");
+                writeFileSync(join(options.dir, "packem.config.js"), template);
+                s.stop("Created packem.config.js");
+            }
 
             outro("Now you can run `packem build` to build your project");
         },

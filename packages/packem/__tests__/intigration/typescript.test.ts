@@ -1,7 +1,7 @@
-import { existsSync } from "node:fs";
+import { existsSync, symlinkSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
-import { readFileSync, writeFileSync } from "@visulima/fs";
+import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -519,6 +519,78 @@ const index = /* @__PURE__ */ __name(() => "index", "default");
 
 export { index as default };
 `);
+
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(dMtsContent).toBe(`declare const _default: () => string;
+
+export { _default as default };
+`);
+
+        const dTsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dTsContent).toBe(`declare const _default: () => string;
+
+export { _default as default };
+`);
+    });
+
+    it("should work with symlink dependencies", async () => {
+        expect.assertions(5);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `import { fn } from 'dep-a';
+
+export default fn({ value: 1 });`,
+        );
+
+        const depAIndexDtsPath = `${temporaryDirectoryPath}/store/dep-a/index.d.ts`;
+
+        writeFileSync(depAIndexDtsPath, `export * from 'dep-b';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/store/dep-a/node_modules/dep-b/index.d.ts`,
+            `type data = {
+    value: number;
+};
+
+export declare function fn(a: data): data;
+    `,
+        );
+
+        writeJsonSync(join(temporaryDirectoryPath, "node_modules", "dep-a", "package.json"), { main: "index.js", name: "dep-a" });
+        writeFileSync(join(temporaryDirectoryPath, "node_modules", "dep-a", "index.js"), "console.log('dep-a');");
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        symlinkSync(depAIndexDtsPath, join(temporaryDirectoryPath, "node_modules", "dep-a", "index.d.ts"));
+
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "^4.4.3",
+            },
+            main: "./dist/index.mjs",
+            peerDependencies: {
+                "dep-a": "*",
+            },
+            type: "module",
+            types: "./dist/index.d.ts",
+        });
+        createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                noEmit: true,
+            },
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        console.log(binProcess.stdout);
 
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 

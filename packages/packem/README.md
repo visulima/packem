@@ -1,7 +1,7 @@
 <div align="center">
   <h3>Visulima packem</h3>
   <p>
-  A fast and modern bundler for Node.js and TypeScript.
+  A fast and modern bundler for Node.js and TypeScript. <br /> Bundles anything that's supported by Node.js natively, namely .js, .json, .mjs, .cjs and TypeScript .ts, .cts, .mts, .tsx.
   </p>
 </div>
 
@@ -49,9 +49,19 @@ You choose which one of the three supported transformer to use.
 
 ## Usage
 
-```typescript
+### Initialize the packem configuration
 
+```bash
+packem init [options]
 ```
+
+### Bundle files
+
+```bash
+packem build [options]
+```
+
+> This will write the files into the `./dist` folder.
 
 Links:
 
