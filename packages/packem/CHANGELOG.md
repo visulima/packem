@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.63](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.62...@visulima/packem@1.0.0-alpha.63) (2024-08-04)
+
+### Bug Fixes
+
+* fixed more tests, fixed license handling if dep was bundled with packem, improved lixense generator ([f3fdef6](https://github.com/visulima/packem/commit/f3fdef6c678182a85cd2c35edabfeb007e2a12a5))
+
 ## @visulima/packem [1.0.0-alpha.62](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.61...@visulima/packem@1.0.0-alpha.62) (2024-08-04)
 
 ### Bug Fixes
