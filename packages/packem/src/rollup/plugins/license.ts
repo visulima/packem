@@ -47,6 +47,7 @@ export interface LicenseOptions {
 }
 
 export const license = ({
+    dtsMarker,
     licenseFilePath,
     licenseTemplate,
     logger,
@@ -54,6 +55,7 @@ export const license = ({
     mode,
     packageName,
 }: {
+    dtsMarker?: string; // this is needed to replace license marker that are bundled with packem
     licenseFilePath: string;
     licenseTemplate: (licenses: string[], dependencyLicenseTexts: string, packageName: string | undefined) => string;
     logger: Pail;
@@ -69,12 +71,12 @@ export const license = ({
             const dependencyLicenseTexts = dependencies
                 // eslint-disable-next-line etc/no-assign-mutated-array
                 .sort(({ name: nameA }, { name: nameB }) => ((nameA || 0) > (nameB || 0) ? 1 : (nameB || 0) > (nameA || 0) ? -1 : 0))
-                .map(({ author, contributors, license: dependencylicense, licenseText, maintainers, name, repository }) => {
+                .map(({ author, contributors, license: dependencyLicense, licenseText, maintainers, name, repository }) => {
                     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
                     let text = "## " + name + "\n";
 
-                    if (dependencylicense) {
-                        text += `License: ${dependencylicense}\n`;
+                    if (dependencyLicense) {
+                        text += `License: ${dependencyLicense}\n`;
                     }
 
                     const names = new Set();
@@ -102,14 +104,23 @@ export const license = ({
                             licenseText
                                 .trim()
                                 .replaceAll(/\r\n|\r/g, "\n")
+                                .replaceAll(`<!-- ${marker} -->`, "")
+                                .replaceAll(dtsMarker ? `<!-- ${dtsMarker} -->` : "", "")
+                                .trim()
                                 .split("\n")
-                                .map((line) => `> ${line}`)
+                                .map((line) => {
+                                    if (!line) {
+                                        return ">";
+                                    }
+
+                                    return `> ${line}`;
+                                })
                                 .join("\n") +
                             "\n";
                     }
 
-                    if (dependencylicense) {
-                        licenses.add(dependencylicense);
+                    if (dependencyLicense) {
+                        licenses.add(dependencyLicense);
                     }
 
                     return text;

@@ -49,9 +49,11 @@ const createSplitChunks = (dependencyGraphMap: Map<string, Set<[string, string]>
         if (isEntry) {
             const subModuleIds = context.getModuleIds();
 
+            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const subId of subModuleIds) {
                 const subModuleInfo = context.getModuleInfo(subId);
                 if (!subModuleInfo) {
+                    // eslint-disable-next-line no-continue
                     continue;
                 }
 
@@ -86,11 +88,13 @@ const createSplitChunks = (dependencyGraphMap: Map<string, Set<[string, string]>
                 }
                 return false;
             });
+
             if (isImportFromOtherEntry) {
                 return undefined;
             }
 
             const isPartOfCurrentEntry = parentModuleIds.every(([, layer]) => layer === moduleLayer);
+
             if (isPartOfCurrentEntry) {
                 if (splitChunksGroupMap.has(id)) {
                     return splitChunksGroupMap.get(id);

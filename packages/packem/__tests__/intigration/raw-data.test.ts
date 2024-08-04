@@ -20,7 +20,7 @@ describe("packem raw data", () => {
     });
 
     it("should generate js files with included raw content", async () => {
-        expect.assertions(6);
+        expect.assertions(4);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
@@ -41,36 +41,22 @@ export const data = content;`,
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsTextContent = readFileSync(`${temporaryDirectoryPath}/dist/content.txt.mjs`);
-
-        expect(mjsTextContent).toBe(`const content = "thisismydata";
-
-export { content as default };
-`);
-
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`import content from './content.txt.mjs';
+        expect(mjsContent).toBe(`const content = "thisismydata";
 
 const data = content;
 
 export { data };
 `);
 
-        const cjsTextContent = readFileSync(`${temporaryDirectoryPath}/dist/content.txt.cjs`);
-
-        expect(cjsTextContent).toBe(`'use strict';
-
-const content = "thisismydata";
-
-module.exports = content;
-`);
-
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 
-const content = require('./content.txt.cjs');
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const content = "thisismydata";
 
 const data = content;
 

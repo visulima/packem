@@ -20,7 +20,7 @@ describe("packem resolve-file-url", () => {
     });
 
     it("should resolve import with file:// annotation", async () => {
-        expect.assertions(3);
+        expect.assertions(4);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/importee.mjs`,
@@ -56,6 +56,8 @@ export { log as effect };
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 function log() {
   return 'this should be in final bundle'

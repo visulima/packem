@@ -92,6 +92,8 @@ export { getDirname };
 
         expect(cjsDirnameContent).toBe(`'use strict';
 
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getDirname() {
@@ -125,6 +127,8 @@ export { getFilename };
         const cjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.cjs`);
 
         expect(cjsFilenameContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -163,6 +167,8 @@ export { esmImport, getRequireModule };
         const cjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.cjs`);
 
         expect(cjsRequireContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
 var __defProp = Object.defineProperty;
@@ -255,6 +261,8 @@ export { getDirname };
 
         expect(cjsDirnameContent).toBe(`'use strict';
 
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getDirname() {
@@ -286,6 +294,8 @@ export { getFilename };
         const cjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.cjs`);
 
         expect(cjsFilenameContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -322,6 +332,8 @@ export { esmImport, getRequireModule };
         const cjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.cjs`);
 
         expect(cjsRequireContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
 var __defProp = Object.defineProperty;
@@ -365,7 +377,7 @@ export { test as default };
     });
 
     it("should include esm shim only once per file, if dirname, filename or require are found", async () => {
-        expect.assertions(4);
+        expect.assertions(3);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/filename.js`,
@@ -380,6 +392,63 @@ export { test as default };
 }
 
 export { getFilename } from "./filename.js";`,
+        );
+        createPackageJson(temporaryDirectoryPath, {
+            module: "./dist/index.mjs",
+            type: "module",
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toBe(`
+// -- pack CommonJS Shims --
+import __cjs_url__ from "node:url";
+import __cjs_path__ from "node:path";
+import __cjs_mod__ from "node:module";
+const __filename = __cjs_url__.fileURLToPath(import.meta.url);
+const __dirname = __cjs_path__.dirname(__filename);
+const require = __cjs_mod__.createRequire(import.meta.url);
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function getFilename() {
+  return __filename;
+}
+__name$1(getFilename, "getFilename");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function getDirname() {
+  return __dirname;
+}
+__name(getDirname, "getDirname");
+
+export { getDirname, getFilename };
+`);
+    });
+
+    it("should include esm shim only once per file on the same dir level, if dirname, filename or require are found", async () => {
+        expect.assertions(3);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/level2/filename.js`,
+            `export function getFilename() {
+  return __filename
+}`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.js`,
+            `export function getDirname() {
+  return __dirname
+}
+
+export { getFilename } from "./level2/filename.js";`,
         );
         createPackageJson(temporaryDirectoryPath, {
             module: "./dist/index.mjs",

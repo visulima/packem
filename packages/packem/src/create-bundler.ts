@@ -192,13 +192,13 @@ const generateOptions = (
                 dependenciesTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
                     `\n# Licenses of bundled dependencies\n` +
                     `The published ${pName} artifact additionally contains code with the following licenses:\n` +
-                    `${licenses.join(", ")}\n\n` +
+                    (licenses.length > 0 ? `${licenses.join(", ")}\n\n` : "\n") +
                     `# Bundled dependencies:\n` +
                     dependencyLicenseTexts,
                 dtsTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
                     `\n# Licenses of bundled types\n` +
                     `The published ${pName} artifact additionally contains code with the following licenses:\n` +
-                    `${licenses.join(", ")}\n\n` +
+                    (licenses.length > 0 ? `${licenses.join(", ")}\n\n` : "\n") +
                     `# Bundled types:\n` +
                     dependencyLicenseTexts,
             },

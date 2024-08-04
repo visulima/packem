@@ -478,6 +478,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 context.options.rollup.license.path &&
                 typeof context.options.rollup.license.dependenciesTemplate === "function" &&
                 licensePlugin({
+                    dtsMarker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
                     licenseFilePath: context.options.rollup.license.path,
                     licenseTemplate: context.options.rollup.license.dependenciesTemplate,
                     logger: context.logger,
@@ -657,7 +658,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                     licenseFilePath: context.options.rollup.license.path,
                     licenseTemplate: context.options.rollup.license.dtsTemplate,
                     logger: context.logger,
-                    marker: context.options.rollup.license.dependenciesMarker ?? "TYPE_DEPENDENCIES",
+                    marker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
                     mode: "types",
                     packageName: context.pkg.name,
                 }),
