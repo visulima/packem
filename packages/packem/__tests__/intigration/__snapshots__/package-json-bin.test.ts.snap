@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem package.json bin > should patch binary directive > cjs output 1`] = `
+"#!/usr/bin/env node
+'use strict';
+
+console.log("Hello, world!");
+"
+`;
+
+exports[`packem package.json bin > should work with bin as .mts extension > mjs output 1`] = `
+"#!/usr/bin/env node
+console.log("Hello, world!");
+"
+`;
+
+exports[`packem package.json bin > should work with bin as multi path > cjs output 1`] = `
+"#!/usr/bin/env node
+'use strict';
+
+console.log("a");
+"
+`;
+
+exports[`packem package.json bin > should work with bin as multi path > cjs output 2`] = `
+"#!/usr/bin/env node
+'use strict';
+
+console.log("b");
+"
+`;

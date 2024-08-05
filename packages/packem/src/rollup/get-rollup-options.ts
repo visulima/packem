@@ -11,7 +11,7 @@ import { cyan } from "@visulima/colorize";
 import { isAbsolute, join, relative, resolve } from "@visulima/path";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
-import polifillPlugin from "rollup-plugin-polyfill-node";
+import polyfillPlugin from "rollup-plugin-polyfill-node";
 import { visualizer as visualizerPlugin } from "rollup-plugin-visualizer";
 import { minVersion } from "semver";
 
@@ -405,7 +405,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             nodeResolver,
 
             context.options.rollup.polyfillNode &&
-                polifillPlugin({
+                polyfillPlugin({
                     sourceMap: context.options.sourcemap,
                     ...context.options.rollup.polyfillNode,
                 }),

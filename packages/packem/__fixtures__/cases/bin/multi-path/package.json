@@ -1,6 +1,0 @@
-{
-    "bin": {
-        "a": "./dist/bin/a.js",
-        "b": "./dist/bin/b.js"
-    }
-}

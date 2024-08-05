@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage, streamToString } from "../helpers";
 
-describe("packem package.json bin", () => {
+describe("packem package.json legacy", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
@@ -19,24 +19,22 @@ describe("packem package.json bin", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it("should work with bin as .cts extension", async () => {
+    it("should work with the main field", async () => {
         expect.assertions(3);
 
         writeFileSync(
-            `${temporaryDirectoryPath}/src/bin/index.cts`,
-            `#!/usr/bin/env node
-const path = require("path");
-console.log(path.basename(__filename));
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `console.log("Hello, world!");
 `,
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
         createPackageJson(temporaryDirectoryPath, {
-            bin: "./dist/bin/index.cjs",
             devDependencies: {
                 typescript: "*",
             },
+            main: "./dist/index.cjs",
         });
         createTsConfig(temporaryDirectoryPath, {});
 
@@ -47,28 +45,27 @@ console.log(path.basename(__filename));
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
     });
 
-    it("should work with bin as .mts extension", async () => {
+    it("should work with the main field and type module", async () => {
         expect.assertions(3);
 
         writeFileSync(
-            `${temporaryDirectoryPath}/src/bin/index.mts`,
-            `#!/usr/bin/env node
-console.log("Hello, world!");
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `console.log("Hello, world!");
 `,
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
         createPackageJson(temporaryDirectoryPath, {
-            bin: "./dist/bin/index.mjs",
             devDependencies: {
                 typescript: "*",
             },
+            main: "./dist/index.cjs",
             type: "module",
         });
         createTsConfig(temporaryDirectoryPath, {});
@@ -80,61 +77,16 @@ console.log("Hello, world!");
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/index.mjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(mjsContent).toMatchSnapshot("mjs output");
+        expect(cjsContent).toMatchSnapshot("cjs output");
     });
 
-    it("should work with bin as multi path", async () => {
-        expect.assertions(4);
-
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/bin/a.ts`,
-            `#!/usr/bin/env node
-console.log("a");
-`,
-        );
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/bin/b.ts`,
-            `#!/usr/bin/env node
-console.log("b");
-`,
-        );
-
-        await installPackage(temporaryDirectoryPath, "typescript");
-
-        createPackageJson(temporaryDirectoryPath, {
-            bin: {
-                a: "./dist/bin/a.cjs",
-                b: "./dist/bin/b.cjs",
-            },
-            devDependencies: {
-                typescript: "*",
-            },
-        });
-        createTsConfig(temporaryDirectoryPath, {});
-
-        const binProcess = await execPackemSync("build", [], {
-            cwd: temporaryDirectoryPath,
-        });
-
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
-        expect(binProcess.exitCode).toBe(0);
-
-        const cjsAContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/a.cjs`);
-
-        expect(cjsAContent).toMatchSnapshot("cjs output");
-
-        const cjsBContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/b.cjs`);
-
-        expect(cjsBContent).toMatchSnapshot("cjs output");
-    });
-
-    it("should patch binary directive", async () => {
+    it("should work with the module field", async () => {
         expect.assertions(3);
 
         writeFileSync(
-            `${temporaryDirectoryPath}/src/bin/index.ts`,
+            `${temporaryDirectoryPath}/src/index.ts`,
             `console.log("Hello, world!");
 `,
         );
@@ -142,10 +94,10 @@ console.log("b");
         await installPackage(temporaryDirectoryPath, "typescript");
 
         createPackageJson(temporaryDirectoryPath, {
-            bin: "./dist/bin/index.cjs",
             devDependencies: {
                 typescript: "*",
             },
+            module: "./dist/index.mjs"
         });
         createTsConfig(temporaryDirectoryPath, {});
 
@@ -156,8 +108,40 @@ console.log("b");
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/index.cjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(cjsContent).toMatchSnapshot("cjs output");
+        expect(mjsContent).toMatchSnapshot("mjs output");
+    });
+
+    it("should work with the module field and type module", async () => {
+        expect.assertions(3);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `console.log("Hello, world!");
+`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "./dist/index.mjs",
+            type: "module",
+        });
+        createTsConfig(temporaryDirectoryPath, {});
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toMatchSnapshot("mjs output");
     });
 });
