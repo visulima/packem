@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.69](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.68...@visulima/packem@1.0.0-alpha.69) (2024-08-08)
+
+### Features
+
+* removed unsupported node resolutions, added fix for dynamic imports, added new env for cli ([b76595c](https://github.com/visulima/packem/commit/b76595c4751496282778923b85b4b9b6f23b5419))
+
 ## @visulima/packem [1.0.0-alpha.68](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.67...@visulima/packem@1.0.0-alpha.68) (2024-08-08)
 
 ### Features
