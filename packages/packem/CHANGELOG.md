@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.68](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.67...@visulima/packem@1.0.0-alpha.68) (2024-08-08)
+
+### Features
+
+* added error on unsupported node resolutions, fixed cjs types interop ([809c698](https://github.com/visulima/packem/commit/809c698bed742d939372ae5c5b6b3b4596e4fa48))
+
 ## @visulima/packem [1.0.0-alpha.67](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.66...@visulima/packem@1.0.0-alpha.67) (2024-08-05)
 
 ### Bug Fixes
