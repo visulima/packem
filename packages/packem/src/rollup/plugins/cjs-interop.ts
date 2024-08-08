@@ -109,8 +109,8 @@ export const cjsInterop = ({
                         "declare const defaultExport: {\n" +
                         (buildObjectEntries.length > 0 ? "  " : "") +
                         buildObjectEntries.join("\n  ") +
-                        "\n} & typeof " +
-                        defaultKey +
+                        "\n}" +
+                        (defaultKey ? " & typeof " + defaultKey : "") +
                         ";\n\nexport default defaultExport;",
                 );
 

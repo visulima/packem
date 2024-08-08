@@ -12,6 +12,12 @@ import type { BuildConfig } from "../src/types";
 
 const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../dist");
 
+const transformerPackageNames = {
+    esbuild: "esbuild",
+    sucrase: "sucrase",
+    swc: "@swc/core",
+};
+
 /**
  * Escape the slash `\` in ESC-symbol.
  * Use it to show by an error the received ESC sequence string in console output.
@@ -54,12 +60,6 @@ export const createPackemConfig = async (
     config: BuildConfig | BuildConfig[] = {},
     transformer: "esbuild" | "swc" | "sucrase" = "esbuild",
 ): Promise<void> => {
-    const transformerPackageNames = {
-        esbuild: "esbuild",
-        sucrase: "sucrase",
-        swc: "@swc/core",
-    };
-
     await installPackage(fixturePath, transformerPackageNames[transformer]);
 
     writeFileSync(
@@ -76,11 +76,12 @@ export default defineConfig({
     );
 };
 
-export const createPackageJson = (fixturePAth: string, data: PackageJson): void => {
+export const createPackageJson = (fixturePAth: string, data: PackageJson, transformer: "esbuild" | "swc" | "sucrase" = "esbuild"): void => {
     writeJsonSync(`${fixturePAth}/package.json`, {
         ...data,
         devDependencies: {
-            esbuild: "^0.23.0",
+            // eslint-disable-next-line security/detect-object-injection
+            [transformerPackageNames[transformer]]: "*",
             ...data.devDependencies,
         },
     });

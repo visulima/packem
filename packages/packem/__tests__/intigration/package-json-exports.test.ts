@@ -323,7 +323,7 @@ export { value };
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = 'cjs';`);
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
-                "typescript": "*",
+                typescript: "*",
             },
             exports: {
                 import: {
@@ -337,7 +337,7 @@ export { value };
             },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
-            types: "./dist/index.d.ts"
+            types: "./dist/index.d.ts",
         });
         writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
 
@@ -529,5 +529,47 @@ export { index as default };
         const cjsCliContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/cli.cjs`);
 
         expect(cjsCliContent).toMatchSnapshot("cjs output");
+    });
+
+    it("should work with single entry", async () => {
+        expect.assertions(4);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
+            compilerOptions: {
+                allowJs: true,
+            },
+        });
+        createPackageJson(temporaryDirectoryPath, {
+            exports: "./dist/index.js",
+            types: "./dist/index.d.ts",
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjs).toBe(`'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const index = /* @__PURE__ */ __name(() => "index", "default");
+
+module.exports = index;
+`);
+
+        const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjs).toBe(`var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const index = /* @__PURE__ */ __name(() => "index", "default");
+
+export { index as default };
+`);
     });
 });

@@ -574,10 +574,6 @@ const createContext = async (
         throw new Error("Both emitESM and emitCJS are disabled. At least one of them must be enabled.");
     }
 
-    if (context.options.declaration && tsconfig === undefined && packageJson.devDependencies?.typescript) {
-        throw new Error("               Cannot build declaration files without a tsconfig.json");
-    }
-
     if (context.options.emitESM === undefined) {
         context.logger.info("Emitting ESM bundles, is disabled.");
     }
@@ -586,12 +582,25 @@ const createContext = async (
         context.logger.info("Emitting CJS bundles, is disabled.");
     }
 
+    if (context.options.declaration && tsconfig === undefined && packageJson.devDependencies?.typescript) {
+        throw new Error("               Cannot build declaration files without a tsconfig.json");
+    }
+
     if (!packageJson.devDependencies?.typescript) {
         context.options.declaration = false;
     }
 
     if (!context.options.declaration) {
         context.logger.info("Declaration files, are disabled.");
+    }
+
+    if (
+        tsconfig &&
+        (tsconfig.config.compilerOptions?.moduleResolution === "node" ||
+            tsconfig.config.compilerOptions?.moduleResolution === "node10" ||
+            tsconfig.config.compilerOptions?.moduleResolution === "node16")
+    ) {
+        throw new Error("'node', 'node10' or 'node16' module resolution is not supported. Packem support only node18+ module resolution.");
     }
 
     return context;
