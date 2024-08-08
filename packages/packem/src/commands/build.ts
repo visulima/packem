@@ -26,6 +26,16 @@ const createBuildCommand = (cli: Cli): void => {
                 }
             }
 
+            if (!environments.NODE_ENV) {
+                if (options.production) {
+                    environments.NODE_ENV = "production";
+                } else if (options.development) {
+                    environments.NODE_ENV = "development";
+                } else {
+                    environments.NODE_ENV = "production";
+                }
+            }
+
             try {
                 await createBundler(options.dir, mode, logger, {
                     cjsInterop: options.cjsInterop,
@@ -134,6 +144,16 @@ const createBuildCommand = (cli: Cli): void => {
                 name: "cjsInterop",
                 type: Boolean,
             },
+            {
+                description: "Run code in production environment",
+                name: "production",
+                type: Boolean,
+            },
+            {
+                description: "Run code in development environment",
+                name: "development",
+                type: Boolean,
+            }
         ],
     });
 };

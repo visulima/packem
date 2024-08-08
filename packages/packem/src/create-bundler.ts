@@ -594,15 +594,6 @@ const createContext = async (
         context.logger.info("Declaration files, are disabled.");
     }
 
-    if (
-        tsconfig &&
-        (tsconfig.config.compilerOptions?.moduleResolution === "node" ||
-            tsconfig.config.compilerOptions?.moduleResolution === "node10" ||
-            tsconfig.config.compilerOptions?.moduleResolution === "node16")
-    ) {
-        throw new Error("'node', 'node10' or 'node16' module resolution is not supported. Packem support only node18+ module resolution.");
-    }
-
     return context;
 };
 
@@ -654,7 +645,7 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
     for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [runtime, entries] of Object.entries(environmentEntries)) {
-            context.logger.info("Preparing build for " + cyan(environment) + " environment with " + cyan(runtime) + " runtime");
+            context.logger.info("Preparing build for " + cyan(environment) + " environment" + (runtime ? " with " + cyan(runtime) + " runtime" : ""));
 
             if (context.options.rollup.replace) {
                 context.options.rollup.replace.values = {

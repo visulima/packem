@@ -46,6 +46,7 @@ import createSplitChunks from "./utils/chunks/create-split-chunks";
 import getChunkFilename from "./utils/get-chunk-filename";
 import getEntryFileNames from "./utils/get-entry-file-names";
 import resolveAliases from "./utils/resolve-aliases";
+import fixDynamicImportExtension from "./plugins/fix-dynamic-import-extension";
 
 const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],
@@ -444,6 +445,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     type: context.pkg.type ?? "commonjs",
                 }),
 
+            context.options.rollup.dynamicVars && fixDynamicImportExtension(),
             context.options.rollup.dynamicVars && dynamicImportVarsPlugin(context.options.rollup.dynamicVars),
 
             context.options.rollup.commonjs &&

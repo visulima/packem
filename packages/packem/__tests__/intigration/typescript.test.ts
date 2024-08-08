@@ -606,4 +606,195 @@ export { _default as default };
 export { _default as default };
 `);
     });
+
+    it("should automatically convert imports with .ts extension", async () => {
+        expect.assertions(7);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/utils/one.ts`, `export const one = 1`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export async function getOne() {
+  return await import('./utils/one.ts').then(m => m.one)
+}`,
+        );
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "^4.4.3",
+            },
+            exports: {
+                ".": {
+                    import: {
+                        default: "./dist/index.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/index.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                },
+            },
+            type: "module",
+        });
+        createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                allowImportingTsExtensions: true,
+                module: "esnext",
+            },
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+async function getOne() {
+  return await import('./chunks/one.mjs').then((m) => m.one);
+}
+__name(getOne, "getOne");
+
+export { getOne };
+`);
+
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(dMtsContent).toBe(`declare function getOne(): Promise<number>;
+
+export { getOne };
+`);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+async function getOne() {
+  return await import('./chunks/one.cjs').then((m) => m.one);
+}
+__name(getOne, "getOne");
+
+exports.getOne = getOne;
+`);
+
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(dCtsContent).toBe(`declare function getOne(): Promise<number>;
+
+export { getOne };
+`);
+
+        const dTsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dTsContent).toBe(`declare function getOne(): Promise<number>;
+
+export { getOne };
+`);
+    });
+
+    it("should automatically convert dynamic imports with .ts extension to cjs or mjs", async () => {
+        expect.assertions(7);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/utils/one.ts`, `export const one = 1`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export async function getOne() {
+  const path = 'one'
+  return await import(\`./utils/\${path}.ts\`).then(m => m.one)
+}`,
+        );
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "^4.4.3",
+            },
+            exports: {
+                ".": {
+                    import: {
+                        default: "./dist/index.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/index.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                },
+            },
+            type: "module",
+        });
+        createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                allowImportingTsExtensions: true,
+                module: "esnext",
+            },
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+async function getOne() {
+  const path = "one";
+  return await import(\`./utils/\${path}.mjs\`).then((m) => m.one);
+}
+__name(getOne, "getOne");
+
+export { getOne };
+`);
+
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(dMtsContent).toBe(`declare function getOne(): Promise<any>;
+
+export { getOne };
+`);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+async function getOne() {
+  const path = "one";
+  return await import(\`./utils/\${path}.cjs\`).then((m) => m.one);
+}
+__name(getOne, "getOne");
+
+exports.getOne = getOne;
+`);
+
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(dCtsContent).toBe(`declare function getOne(): Promise<any>;
+
+export { getOne };
+`);
+
+        const dTsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dTsContent).toBe(`declare function getOne(): Promise<any>;
+
+export { getOne };
+`);
+    });
 });
