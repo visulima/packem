@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.70](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.69...@visulima/packem@1.0.0-alpha.70) (2024-08-09)
+
+### Features
+
+* added new env options to cli, fixed dynamic import extensions ([e7a5d14](https://github.com/visulima/packem/commit/e7a5d14f41b46fff464d461a44799785847cad65))
+
 ## @visulima/packem [1.0.0-alpha.69](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.68...@visulima/packem@1.0.0-alpha.69) (2024-08-08)
 
 ### Features
