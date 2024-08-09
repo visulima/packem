@@ -531,6 +531,108 @@ export { index as default };
         expect(cjsCliContent).toMatchSnapshot("cjs output");
     });
 
+    it("should support wildcard subpath exports", async () => {
+        expect.assertions(7);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/pages/a.ts`,
+            `export function render() {
+    console.log('Page A');
+}`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/pages/b.ts`,
+            `export function render() {
+    console.log('Page B');
+}`,
+        );
+        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
+        createPackageJson(temporaryDirectoryPath, {
+            exports: {
+                ".": "./dist/index.cjs",
+                "./pages/*": {
+                    import: "./dist/pages/*.mjs",
+                    require: "./dist/pages/*.cjs",
+                    types: "./dist/pages/*.d.ts",
+                },
+            },
+            types: "./dist/index.d.ts",
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjs).toBe(`'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const index = /* @__PURE__ */ __name(() => "index", "default");
+
+module.exports = index;
+`);
+
+        const cjsPageA = readFileSync(`${temporaryDirectoryPath}/dist/pages/a.cjs`);
+
+        expect(cjsPageA).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function render() {
+  console.log("Page A");
+}
+__name(render, "render");
+
+exports.render = render;
+`);
+        const mjsPageA = readFileSync(`${temporaryDirectoryPath}/dist/pages/a.mjs`);
+
+        expect(mjsPageA).toBe(`var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function render() {
+  console.log("Page A");
+}
+__name(render, "render");
+
+export { render };
+`);
+
+        const cjsPageB = readFileSync(`${temporaryDirectoryPath}/dist/pages/b.cjs`);
+
+        expect(cjsPageB).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function render() {
+  console.log("Page B");
+}
+__name(render, "render");
+
+exports.render = render;
+`);
+        const mjsPageB = readFileSync(`${temporaryDirectoryPath}/dist/pages/b.mjs`);
+
+        expect(mjsPageB).toBe(`var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function render() {
+  console.log("Page B");
+}
+__name(render, "render");
+
+export { render };
+`);
+    });
+
     it("should work with single entry", async () => {
         expect.assertions(4);
 

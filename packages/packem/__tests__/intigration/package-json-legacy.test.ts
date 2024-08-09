@@ -97,7 +97,7 @@ describe("packem package.json legacy", () => {
             devDependencies: {
                 typescript: "*",
             },
-            module: "./dist/index.mjs"
+            module: "./dist/index.mjs",
         });
         createTsConfig(temporaryDirectoryPath, {});
 

@@ -16,7 +16,7 @@ import { defu } from "defu";
 import { createHooks } from "hookable";
 import { VERSION } from "rollup";
 
-import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP } from "./constants";
+import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "./constants";
 import createStub from "./jit/create-stub";
 import resolvePreset from "./preset/utils/resolve-preset";
 import rollupBuild from "./rollup/build";
@@ -231,7 +231,7 @@ const generateOptions = (
                 include: /\.[jt]sx?$/,
                 injectCreateRequireForImportRequire: false,
                 preserveDynamicImport: true,
-                production: env.NODE_ENV === "production",
+                production: env.NODE_ENV === PRODUCTION_ENV,
                 ...(tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
                     ? {
                           jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
@@ -266,7 +266,7 @@ const generateOptions = (
                         decoratorMetadata: tsconfig?.config.compilerOptions?.emitDecoratorMetadata,
                         legacyDecorator: tsconfig?.config.compilerOptions?.experimentalDecorators,
                         react: {
-                            development: env.NODE_ENV !== "production",
+                            development: env.NODE_ENV !== PRODUCTION_ENV,
                             pragma: tsconfig?.config.compilerOptions?.jsxFactory,
                             pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
                             runtime: jsxRuntime,

@@ -79,7 +79,7 @@ export default log();`,
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
         await createPackemConfig(temporaryDirectoryPath, {
             alias: {
-                [alias + "/"]: resolve(temporaryDirectoryPath, "src")
+                [alias + "/"]: resolve(temporaryDirectoryPath, "src"),
             },
         });
 
@@ -90,6 +90,8 @@ export default log();`,
         });
 
         expect(binProcess.exitCode).toBe(1);
-        await expect(streamToString(binProcess.stderr)).resolves.toContain(`Error: Alias name "${alias}/" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.`);
+        await expect(streamToString(binProcess.stderr)).resolves.toContain(
+            `Error: Alias name "${alias}/" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.`,
+        );
     });
 });

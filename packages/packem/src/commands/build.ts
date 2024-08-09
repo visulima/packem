@@ -1,7 +1,8 @@
-import { exit } from "node:process";
+import { env, exit } from "node:process";
 
 import type { Cli } from "@visulima/cerebro";
 
+import { DEVELOPMENT_ENV, PRODUCTION_ENV } from "../constants";
 import createBundler from "../create-bundler";
 import type { Mode } from "../types";
 
@@ -19,21 +20,32 @@ const createBuildCommand = (cli: Cli): void => {
 
             const environments: Record<string, string> = {};
 
+            // use the NODE_ENV environment variable if it exists
+            if (env.NODE_ENV && [DEVELOPMENT_ENV, PRODUCTION_ENV].includes(env.NODE_ENV)) {
+                environments.NODE_ENV = env.NODE_ENV;
+            }
+
             if (options.env) {
                 // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const environment of options.env) {
+                    if (environment.key === "NODE_ENV" && environments.NODE_ENV) {
+                        throw new Error("NODE_ENV was already set, this can't be overridden.");
+                    }
+
                     environments[environment.key] = environment.value;
                 }
             }
 
-            if (!environments.NODE_ENV) {
+            if (environments.NODE_ENV === undefined) {
                 if (options.production) {
-                    environments.NODE_ENV = "production";
+                    environments.NODE_ENV = PRODUCTION_ENV;
                 } else if (options.development) {
-                    environments.NODE_ENV = "development";
+                    environments.NODE_ENV = DEVELOPMENT_ENV;
                 } else {
-                    environments.NODE_ENV = "production";
+                    environments.NODE_ENV = PRODUCTION_ENV;
                 }
+
+                env.NODE_ENV = environments.NODE_ENV;
             }
 
             try {
@@ -41,7 +53,7 @@ const createBuildCommand = (cli: Cli): void => {
                     cjsInterop: options.cjsInterop,
                     configPath: options.config ?? undefined,
                     debug: options.debug,
-                    minify: options.minify,
+                    minify: options.minify === undefined ? env.NODE_ENV === PRODUCTION_ENV : options.minify,
                     replace: {
                         ...environments,
                     },
@@ -145,15 +157,17 @@ const createBuildCommand = (cli: Cli): void => {
                 type: Boolean,
             },
             {
+                conflicts: "development",
                 description: "Run code in production environment",
                 name: "production",
                 type: Boolean,
             },
             {
+                conflicts: "production",
                 description: "Run code in development environment",
                 name: "development",
                 type: Boolean,
-            }
+            },
         ],
     });
 };

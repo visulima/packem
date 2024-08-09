@@ -423,7 +423,7 @@ export const indent = dIndent;
         createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 moduleResolution: "bundler",
-            }
+            },
         });
 
         const binProcess = await execPackemSync("build", [], {

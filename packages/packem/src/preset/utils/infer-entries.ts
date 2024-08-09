@@ -5,7 +5,7 @@ import { isAccessibleSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { resolve } from "@visulima/path";
 
-import { RUNTIME_EXPORT_CONVENTIONS } from "../../constants";
+import { DEVELOPMENT_ENV, PRODUCTION_ENV, RUNTIME_EXPORT_CONVENTIONS } from "../../constants";
 import type { BuildContext, BuildEntry, InferEntriesResult, Runtime } from "../../types";
 import type { OutputDescriptor } from "../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
@@ -21,8 +21,8 @@ const getEnvironment = (output: OutputDescriptor): "production" | "development" 
     }
 
     if (env.NODE_ENV) {
-        if (!env.NODE_ENV.includes("production") && !env.NODE_ENV.includes("development")) {
-            throw new Error(`Invalid NODE_ENV value: ${env.NODE_ENV}, must be either "production" or "development".`);
+        if (!env.NODE_ENV.includes(PRODUCTION_ENV) && !env.NODE_ENV.includes(DEVELOPMENT_ENV)) {
+            throw new Error("Invalid NODE_ENV value: " + env.NODE_ENV + ', must be either "' + PRODUCTION_ENV + '" or "' + DEVELOPMENT_ENV + '".');
         }
 
         return env.NODE_ENV as "production" | "development";

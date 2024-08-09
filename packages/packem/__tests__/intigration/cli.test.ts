@@ -63,9 +63,9 @@ export { A as default };
 export { A as default };
 `);
 
-        const dCtsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mtsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(dCtsContentEs2018).toBe(`var __defProp = Object.defineProperty;
+        expect(mtsContentEs2018).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 const _A = class _A {
 };
@@ -73,6 +73,43 @@ __name(_A, "A");
 let A = _A;
 
 export { A as default };
+`);
+    });
+
+    it("should run in production mode if no NODE_ENV or 'production', 'development' options was given", async () => {
+        expect.assertions(5);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
+
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "dist/index.mjs",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
+
+        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).toContain("Preparing build for production");
+        expect(binProcess.stdout).toContain("Minification is enabled, the output will be minified");
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mtsContent).toBe(`const a = 1;
+
+export { a };
 `);
     });
 });

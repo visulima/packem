@@ -35,7 +35,10 @@ export const DEFAULT_LOADERS: Record<string, Loader> = {
     ".woff2": "file",
 };
 
-export const OPTIMIZE_CONVENTIONS = ["development", "production"];
+export const PRODUCTION_ENV = "production";
+export const DEVELOPMENT_ENV = "development";
+
+export const OPTIMIZE_CONVENTIONS = [DEVELOPMENT_ENV, PRODUCTION_ENV];
 export const RUNTIME_EXPORT_CONVENTIONS = ["react-server", "react-native", "edge-light"];
 export const SPECIAL_EXPORT_CONVENTIONS = [...OPTIMIZE_CONVENTIONS, ...RUNTIME_EXPORT_CONVENTIONS];
 

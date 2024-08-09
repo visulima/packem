@@ -197,7 +197,9 @@ The published  artifact additionally contains code with the following licenses:
 
         writeFileSync(`${temporaryDirectoryPath}/node_modules/dev-dep/index.js`, `export default "dev-dep"`);
         writeJsonSync(`${temporaryDirectoryPath}/node_modules/dev-dep/package.json`, { name: "dev-dep", version: "1.0.0" });
-        writeFileSync(`${temporaryDirectoryPath}/node_modules/dev-dep/LICENSE`, `The MIT License (MIT) dev-dep
+        writeFileSync(
+            `${temporaryDirectoryPath}/node_modules/dev-dep/LICENSE`,
+            `The MIT License (MIT) dev-dep
 <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
@@ -211,7 +213,8 @@ The published  artifact additionally contains code with the following licenses:
 <!-- DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
-<!-- TYPE_DEPENDENCIES -->`);
+<!-- TYPE_DEPENDENCIES -->`,
+        );
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,

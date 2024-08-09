@@ -26,6 +26,7 @@ import { cjsInterop as cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
 import shimCjsPlugin from "./plugins/esm-shim-cjs-syntax";
+import fixDynamicImportExtension from "./plugins/fix-dynamic-import-extension";
 import { isolatedDeclarationsPlugin } from "./plugins/isolated-declarations-plugin";
 import JSONPlugin from "./plugins/json";
 import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
@@ -46,7 +47,6 @@ import createSplitChunks from "./utils/chunks/create-split-chunks";
 import getChunkFilename from "./utils/get-chunk-filename";
 import getEntryFileNames from "./utils/get-entry-file-names";
 import resolveAliases from "./utils/resolve-aliases";
-import fixDynamicImportExtension from "./plugins/fix-dynamic-import-extension";
 
 const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],
