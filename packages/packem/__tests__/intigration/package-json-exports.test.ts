@@ -2,11 +2,18 @@ import { existsSync, readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
 
-import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
+import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, execPackemSync, streamToString } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackemSync,
+    installPackage,
+    streamToString,
+} from "../helpers";
 
 describe("packem package.json exports", () => {
     let temporaryDirectoryPath: string;
@@ -94,7 +101,13 @@ export function method() {
         expect.assertions(6);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = process.env.NODE_ENV;`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
             exports: {
                 ".": {
                     default: "./dist/index.cjs",
@@ -144,7 +157,13 @@ export function method() {
         writeFileSync(`${temporaryDirectoryPath}/src/core.ts`, `export const value = 'core';`);
         writeFileSync(`${temporaryDirectoryPath}/src/core.production.ts`, `export const value = 'core' + process.env.NODE_ENV;`);
         writeFileSync(`${temporaryDirectoryPath}/src/core.development.ts`, `export const value = 'core' + process.env.NODE_ENV;`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
             exports: {
                 ".": {
                     import: {
@@ -223,7 +242,13 @@ export type IString = string;`,
 export default 'api:' + index;
 export { IString };`,
         );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
             exports: {
                 ".": {
                     import: "./dist/index.mjs",
@@ -321,6 +346,9 @@ export { value };
         expect.assertions(3);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = 'cjs';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -339,7 +367,6 @@ export { value };
             module: "./dist/index.mjs",
             types: "./dist/index.d.ts",
         });
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -388,12 +415,13 @@ export { value };
         expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
-            compilerOptions: {
-                allowJs: true,
-            },
-        });
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
             exports: {
                 import: "./dist/index.mjs",
                 require: "./dist/index.cjs",
@@ -434,12 +462,13 @@ export { index as default };
         expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
-            compilerOptions: {
-                allowJs: true,
-            },
-        });
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
             exports: {
                 import: "./dist/index.mjs",
                 require: "./dist/index.cjs",
@@ -547,8 +576,13 @@ export { index as default };
     console.log('Page B');
 }`,
         );
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {});
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
             exports: {
                 ".": "./dist/index.cjs",
                 "./pages/*": {
@@ -633,17 +667,38 @@ export { render };
 `);
     });
 
-    it("should work with single entry", async () => {
-        expect.assertions(4);
+    it("should throw a error if exports is mjs file without type module in package.json", async () => {
+        expect.assertions(2);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
-        writeJsonSync(`${temporaryDirectoryPath}/tsconfig.json`, {
-            compilerOptions: {
-                allowJs: true,
-            },
-        });
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
-            exports: "./dist/index.js",
+            exports: "./dist/index.mjs"
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        await expect(streamToString(binProcess.stderr)).resolves.toContain(`Exported file "./dist/index.mjs" has an extension that does not match the package.json type "commonjs"`);
+        expect(binProcess.exitCode).toBe(1);
+    });
+
+    it("should work with single entry", async () => {
+        expect.assertions(3);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: "./dist/index.cjs",
             types: "./dist/index.d.ts",
         });
 
@@ -664,14 +719,167 @@ const index = /* @__PURE__ */ __name(() => "index", "default");
 
 module.exports = index;
 `);
+    });
 
-        const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+    it("should work with multi entries", async () => {
+        expect.assertions(3);
 
-        expect(mjs).toBe(`var __defProp = Object.defineProperty;
+        writeFileSync(`${temporaryDirectoryPath}/src/server/index.edge-light.ts`, `export const name = "server.edge-light";`);
+        writeFileSync(`${temporaryDirectoryPath}/src/server/index.react-server.ts`, `export const name = "server.react-server";`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/server/index.ts`,
+            `import { type Client } from "../client";
+import { type Shared } from "../shared";
+
+export const name = "server.index";
+export const main = true;
+
+export { Client, Shared };
+`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/client.ts`,
+            `import { type Shared } from "./shared";
+
+export default function client(c: string) {
+    return "client" + c;
+}
+
+export type Client = string;
+export { Shared };
+`,
+        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default "index";`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/lite.ts`,
+            `export default function lite(c: string) {
+    return "lite" + c;
+}
+`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/shared.edge-light.ts`,
+            `export default "shared.edge-light";
+`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/shared.ts`,
+            `export default "shared";
+
+export type Shared = string;
+`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": "./dist/index.cjs",
+                "./client": {
+                    import: "./dist/client/index.mjs",
+                    require: "./dist/client/index.cjs",
+                    types: "./dist/client/index.d.ts",
+                },
+                "./lite": "./dist/lite.cjs",
+                "./package.json": "./package.json",
+                "./server": {
+                    "edge-light": "./dist/server/edge.mjs",
+                    import: "./dist/server/index.mjs",
+                    "react-server": "./dist/server/react-server.mjs",
+                    types: "./dist/server/index.d.mts",
+                },
+                "./shared": {
+                    "edge-light": "./dist/shared/edge-light.mjs",
+                    import: "./dist/shared/index.mjs",
+                    require: "./dist/shared/index.cjs",
+                },
+            },
+            name: "multi-entries",
+            types: "./dist/index.d.ts",
+            version: "0.0.0",
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjs).toBe(`'use strict';
+
+var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 const index = /* @__PURE__ */ __name(() => "index", "default");
 
-export { index as default };
+module.exports = index;
+`);
+    });
+
+    it("should work with multi types", async () => {
+        expect.assertions(3);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const index = "index";`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    default: "./dist/index.cjs",
+                    import: {
+                        default: "./dist/index.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/index.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                },
+                "./package.json": "./package.json",
+            },
+            name: "multi-entries-multi-types",
+            types: "./dist/index.d.ts",
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjs).toBe(`const index = "index";
+
+export { index };
+`);
+
+        const cjsDts = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(cjsDts).toBe(`declare const index = "index";
+
+export { index };
+`);
+
+        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjs).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const index = "index";
+
+exports.index = index;
 `);
     });
 });

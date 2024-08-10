@@ -146,3 +146,14 @@ let ExampleClass = _ExampleClass;
 export { ExampleClass };
 "
 `;
+
+exports[`packem typescript > should throw if a declaration was found in the package.json and typescript is missing > cjs code output 1`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const index = /* @__PURE__ */ __name(() => "index", "default");
+
+module.exports = index;
+"
+`;

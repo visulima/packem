@@ -27,7 +27,12 @@ describe("packem preserve-directives", () => {
             `#!/usr/bin/env node
 console.log("Hello, world!");`,
         );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",
@@ -61,8 +66,13 @@ console.log("Hello, world!");
         expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `console.log("Hello, world!");`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
         createPackageJson(temporaryDirectoryPath, {
             bin: "./dist/index.cjs",
+            devDependencies: {
+                typescript: "*",
+            },
             module: "./dist/index.mjs",
             type: "commonjs",
             types: "./dist/index.d.ts",
@@ -191,9 +201,14 @@ export { Tr as default };
 console.log("Hello, cli!");`,
         );
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const foo = 'foo';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
         createPackageJson(temporaryDirectoryPath, {
             bin: {
                 packem: "./dist/cli.cjs",
+            },
+            devDependencies: {
+                typescript: "*",
             },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
@@ -253,7 +268,12 @@ export const foo = 'foo';`,
 export { bar } from './bar';
 export const baz = 'baz';`,
         );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             packem: {

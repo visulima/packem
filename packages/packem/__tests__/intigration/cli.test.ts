@@ -102,7 +102,9 @@ export { A as default };
         await expect(streamToString(binProcess.stderr)).resolves.toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        expect(binProcess.stdout).toContain("Preparing build for production");
+        expect(binProcess.stdout).toContain("Preparing build for");
+        expect(binProcess.stdout).toContain("production");
+        expect(binProcess.stdout).toContain("environment with");
         expect(binProcess.stdout).toContain("Minification is enabled, the output will be minified");
 
         const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);

@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage, streamToString } from "../helpers";
 
 describe("packem alias", () => {
     let temporaryDirectoryPath: string;
@@ -32,7 +32,12 @@ export default log();`,
         );
         writeFileSync(`${temporaryDirectoryPath}/src/test/logger.ts`, `export const log = () => console.log("test");`);
         writeFileSync(`${temporaryDirectoryPath}/src/test2/foo/bar.ts`, `export const bar = () => console.log("bar");`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",
@@ -71,7 +76,12 @@ export default log();`,
 export default log();`,
         );
         writeFileSync(`${temporaryDirectoryPath}/src/test/logger.ts`, `export const log = () => console.log("test");`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
         createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
+                },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",

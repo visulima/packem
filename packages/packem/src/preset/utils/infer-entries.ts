@@ -146,9 +146,9 @@ const inferEntries = (
     }
 
     // Entry point for TypeScript
-    if (context.options.declaration !== false && (packageJson.types || packageJson.typings)) {
-        outputs.push({ file: (packageJson.types ?? packageJson.typings) as string, key: "types" });
-    }
+    if ((packageJson.types || packageJson.typings) && context.options.declaration) {
+            outputs.push({ file: (packageJson.types ?? packageJson.typings) as string, key: "types" });
+        }
 
     // Infer entries from package files
     const entries: BuildEntry[] = [];
@@ -221,9 +221,22 @@ const inferEntries = (
         }
 
         if (isAccessibleSync(input + ".cts") && isAccessibleSync(input + ".mts")) {
+            if (context.pkg?.dependencies?.typescript === undefined && context.pkg?.devDependencies?.typescript === undefined) {
+                // @TODO Add command to install typescript
+                throw new Error("You tried to use a `.cts` or `.mts` file but `typescript` was not found in your package.json.");
+            }
+
             createOrUpdateEntry(entries, input + ".cts", isDirectory, outputSlug, { ...output, type: "cjs" }, context.options.declaration);
             createOrUpdateEntry(entries, input + ".mts", isDirectory, outputSlug, { ...output, type: "esm" }, context.options.declaration);
         } else {
+            if (
+                (isAccessibleSync(input + ".ts") || isAccessibleSync(input + ".cts") || isAccessibleSync(input + ".mts")) &&
+                (context.pkg?.dependencies?.typescript === undefined && context.pkg?.devDependencies?.typescript === undefined)
+            ) {
+                // @TODO Add command to install typescript
+                throw new Error("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");
+            }
+
             createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context.options.declaration);
         }
     }

@@ -7,7 +7,8 @@ import warn from "../utils/warn";
 
 const validateDependencies = (context: BuildContext): void => {
     const usedDependencies = new Set<string>();
-    const unusedDependencies = new Set<string>(Object.keys(context.pkg.dependencies ?? {}));
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    const unusedDependencies = new Set<string>(Object.keys(context.pkg?.dependencies ?? {}));
     const implicitDependencies = new Set<string>();
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
@@ -16,9 +17,10 @@ const validateDependencies = (context: BuildContext): void => {
         usedDependencies.add(id);
     }
 
-    if (context.pkg.dependencies) {
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-        for (const id of Object.keys(context.pkg.dependencies)) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (context.pkg?.dependencies) {
+        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax,@typescript-eslint/no-unnecessary-condition
+        for (const id of Object.keys(context.pkg?.dependencies)) {
             unusedDependencies.delete(id);
         }
     }
@@ -30,9 +32,10 @@ const validateDependencies = (context: BuildContext): void => {
         if (
             !arrayIncludes(context.options.externals, id) &&
             !id.startsWith("chunks/") &&
-            // eslint-disable-next-line security/detect-object-injection
-            context.pkg.dependencies?.[packageId] === undefined &&
-            context.pkg.peerDependencies?.[packageId] === undefined
+            // eslint-disable-next-line security/detect-object-injection,@typescript-eslint/no-unnecessary-condition
+            context.pkg?.dependencies?.[packageId] === undefined &&
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            context.pkg?.peerDependencies?.[packageId] === undefined
         ) {
             implicitDependencies.add(id);
         }

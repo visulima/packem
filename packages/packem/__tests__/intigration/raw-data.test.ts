@@ -4,7 +4,14 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, execPackemSync, streamToString } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackemSync,
+    installPackage,
+    streamToString,
+} from "../helpers";
 
 describe("packem raw data", () => {
     let temporaryDirectoryPath: string;
@@ -29,7 +36,13 @@ describe("packem raw data", () => {
 export const data = content;`,
         );
         writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `thisismydata`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
         });

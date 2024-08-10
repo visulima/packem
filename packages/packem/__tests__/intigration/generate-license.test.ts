@@ -4,7 +4,14 @@ import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, execPackemSync, streamToString } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackemSync,
+    installPackage,
+    streamToString,
+} from "../helpers";
 
 describe("packem generate-license", () => {
     let temporaryDirectoryPath: string;
@@ -45,12 +52,15 @@ export const data = { dep, devDep };`,
 <!-- TYPE_DEPENDENCIES -->`,
         );
 
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 dep: "*",
             },
             devDependencies: {
                 "dev-dep": "*",
+                typescript: "*",
             },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
@@ -118,12 +128,15 @@ export const data = { dep, devDep };`,
 <!-- TYPE_DEPENDENCIES -->`,
         );
 
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 dep: "*",
             },
             devDependencies: {
                 "dev-dep": "*",
+                typescript: "*",
             },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
@@ -233,12 +246,15 @@ export const data = { dep, devDep };`,
 <!-- TYPE_DEPENDENCIES -->`,
         );
 
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 dep: "*",
             },
             devDependencies: {
                 "dev-dep": "*",
+                typescript: "*",
             },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",

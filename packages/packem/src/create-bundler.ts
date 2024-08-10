@@ -352,7 +352,11 @@ const generateOptions = (
         logger.debug("Disabling polyfillNode because preferBuiltins is set to true");
     }
 
-    if (packageJson.devDependencies?.typescript && !tsconfig?.config.compilerOptions?.isolatedModules) {
+    if (
+        options.declaration &&
+        (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript) &&
+        !tsconfig?.config.compilerOptions?.isolatedModules
+    ) {
         logger.warn(
             `'compilerOptions.isolatedModules' is not enabled in tsconfig.\nBecause none of the third-party transpiler, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.\nTo mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.`,
         );
@@ -582,16 +586,20 @@ const createContext = async (
         context.logger.info("Emitting CJS bundles, is disabled.");
     }
 
-    if (context.options.declaration && tsconfig === undefined && packageJson.devDependencies?.typescript) {
+    const hasTypescript = packageJson.dependencies?.typescript !== undefined || packageJson.devDependencies?.typescript !== undefined
+
+    if (context.options.declaration && tsconfig === undefined && hasTypescript) {
         throw new Error("               Cannot build declaration files without a tsconfig.json");
     }
 
-    if (!packageJson.devDependencies?.typescript) {
+    if (!hasTypescript) {
         context.options.declaration = false;
     }
 
-    if (!context.options.declaration) {
-        context.logger.info("Declaration files, are disabled.");
+    if (context.options.declaration) {
+        context.logger.info("Using typescript version: " + cyan(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript ?? "unknown"));
+    } else {
+        context.logger.info("Generation of declaration files is disabled.");
     }
 
     return context;
@@ -839,7 +847,7 @@ const createBundler = async (
         };
 
         logger.info("Using tsconfig settings at", rootTsconfigPath);
-    } else if (packageJson.devDependencies?.typescript) {
+    } else if (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript) {
         try {
             tsconfig = await findTsConfig(rootDirectory);
 
