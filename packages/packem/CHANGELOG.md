@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.71](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.70...@visulima/packem@1.0.0-alpha.71) (2024-08-10)
+
+### Features
+
+* added check for compiling ts, without typescript, added more tests ([0232522](https://github.com/visulima/packem/commit/02325224a164813b5cfcf42088332810b3d7f392))
+
 ## @visulima/packem [1.0.0-alpha.70](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.69...@visulima/packem@1.0.0-alpha.70) (2024-08-09)
 
 ### Features
