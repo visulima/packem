@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.72](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.71...@visulima/packem@1.0.0-alpha.72) (2024-08-12)
+
+### Features
+
+* improved tests, added new one, improved raw and esm shim plugin ([d9ee7af](https://github.com/visulima/packem/commit/d9ee7afedc639c7d9118b2eb985b477a2c42971c))
+
 ## @visulima/packem [1.0.0-alpha.71](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.70...@visulima/packem@1.0.0-alpha.71) (2024-08-10)
 
 ### Features
