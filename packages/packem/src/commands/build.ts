@@ -9,6 +9,7 @@ import type { Mode } from "../types";
 const createBuildCommand = (cli: Cli): void => {
     cli.addCommand({
         description: "Demonstrate options required",
+        // eslint-disable-next-line sonarjs/cognitive-complexity
         execute: async ({ logger, options }): Promise<void> => {
             let mode: Mode = "build";
 

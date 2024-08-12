@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 
 describe("packem cli", () => {
     let temporaryDirectoryPath: string;
@@ -44,7 +44,7 @@ describe("packem cli", () => {
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcessEs2018.stderr)).resolves.toBe("");
+        expect(binProcessEs2018.stderr).toBe("");
         expect(binProcessEs2018.exitCode).toBe(0);
 
         const dMtsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
@@ -99,7 +99,7 @@ export { A as default };
             env: {},
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         expect(binProcess.stdout).toContain("Preparing build for");

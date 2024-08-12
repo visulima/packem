@@ -4,14 +4,7 @@ import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import {
-    createPackageJson,
-    createPackemConfig,
-    createTsConfig,
-    execPackemSync,
-    installPackage,
-    streamToString,
-} from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 
 describe("packem generate-license", () => {
     let temporaryDirectoryPath: string;
@@ -78,7 +71,7 @@ export const data = { dep, devDep };`,
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const licenseContent = readFileSync(`${temporaryDirectoryPath}/LICENSE.md`);
@@ -154,7 +147,7 @@ export const data = { dep, devDep };`,
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const licenseContent = readFileSync(`${temporaryDirectoryPath}/LICENSE.md`);
@@ -179,7 +172,7 @@ The published  artifact additionally contains code with the following licenses:
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess2.stderr)).resolves.toBe("");
+        expect(binProcess2.stderr).toBe("");
         expect(binProcess2.exitCode).toBe(0);
 
         const licenseContent2 = readFileSync(`${temporaryDirectoryPath}/LICENSE.md`);
@@ -272,7 +265,7 @@ export const data = { dep, devDep };`,
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const licenseContent = readFileSync(`${temporaryDirectoryPath}/LICENSE.md`);
@@ -306,7 +299,7 @@ The published  artifact additionally contains code with the following licenses:
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess2.stderr)).resolves.toBe("");
+        expect(binProcess2.stderr).toBe("");
         expect(binProcess2.exitCode).toBe(0);
 
         const licenseContent2 = readFileSync(`${temporaryDirectoryPath}/LICENSE.md`);

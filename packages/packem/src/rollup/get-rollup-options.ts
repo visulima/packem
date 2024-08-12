@@ -25,7 +25,7 @@ import memoizeByKey from "../utils/memoize";
 import { cjsInterop as cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
-import shimCjsPlugin from "./plugins/esm-shim-cjs-syntax";
+import { esmShimCjsSyntaxPlugin } from "./plugins/esm-shim-cjs-syntax";
 import fixDynamicImportExtension from "./plugins/fix-dynamic-import-extension";
 import { isolatedDeclarationsPlugin } from "./plugins/isolated-declarations-plugin";
 import JSONPlugin from "./plugins/json";
@@ -464,7 +464,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 },
             },
 
-            context.options.rollup.shim && shimCjsPlugin(context.pkg),
+            context.options.rollup.shim && esmShimCjsSyntaxPlugin(context.pkg, context.options.rollup.shim),
 
             context.options.rollup.raw && rawPlugin(context.options.rollup.raw),
 

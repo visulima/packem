@@ -18,12 +18,6 @@ const transformerPackageNames = {
     swc: "@swc/core",
 };
 
-/**
- * Escape the slash `\` in ESC-symbol.
- * Use it to show by an error the received ESC sequence string in console output.
- */
-export const esc = (string_: string): string => string_.replaceAll("", "\\x1b");
-
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const execPackemSync = async (command: "build" | "init", flags: string[] = [], options: Options = {}) =>
     await execaNode(join(distributionPath, "cli.mjs"), [command, ...flags], {
@@ -32,19 +26,6 @@ export const execPackemSync = async (command: "build" | "init", flags: string[] 
         },
         ...options,
     });
-
-// @TODO: Fix type
-export const streamToString = async (stream: any): Promise<string> => {
-    // lets have a ReadableStream as a stream variable
-    const chunks = [];
-
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-    for await (const chunk of stream) {
-        chunks.push(Buffer.from(chunk));
-    }
-
-    return esc(Buffer.concat(chunks).toString("utf8"));
-};
 
 export const installPackage = async (fixturePath: string, packageName: string): Promise<void> => {
     const nodeModulesDirectory = join(fixturePath, "node_modules");

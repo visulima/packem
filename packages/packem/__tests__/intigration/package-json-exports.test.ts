@@ -6,14 +6,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import {
-    createPackageJson,
-    createPackemConfig,
-    createTsConfig,
-    execPackemSync,
-    installPackage,
-    streamToString,
-} from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 
 describe("packem package.json exports", () => {
     let temporaryDirectoryPath: string;
@@ -56,7 +49,7 @@ export function method() {
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
@@ -87,7 +80,7 @@ export function method() {
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
@@ -129,7 +122,7 @@ export function method() {
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
@@ -196,7 +189,7 @@ export function method() {
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
@@ -268,7 +261,7 @@ export { IString };`,
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
@@ -300,7 +293,7 @@ export { IString };`,
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const content = readFileSync(`${temporaryDirectoryPath}/dist/foo/bar.mjs`);
@@ -330,7 +323,7 @@ export { value };
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
@@ -372,7 +365,7 @@ export { value };
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -397,7 +390,7 @@ export { value };
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
@@ -434,7 +427,7 @@ export { value };
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
@@ -481,7 +474,7 @@ export { index as default };
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
@@ -530,18 +523,16 @@ export { index as default };
             cwd: temporaryDirectoryPath,
         });
 
-        const stdout = await streamToString(binProcess.stdout);
+        expect(binProcess.stderr).toBe("");
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
-
-        expect(stdout).toContain("Build succeeded for output-app");
-        expect(stdout).toContain("dist/index.react-server.cjs (total size: 149 Bytes, chunk size: 149 Bytes)");
-        expect(stdout).toContain("exports: index");
-        expect(stdout).toContain("dist/foo.cjs (total size: 128 Bytes, chunk size: 128 Bytes)");
-        expect(stdout).toContain("exports: foo");
-        expect(stdout).toContain("dist/bin/cli.cjs (total size: 148 Bytes, chunk size: 148 Bytes)");
-        expect(stdout).toContain("exports: cli");
-        expect(stdout).toContain("Σ Total dist size (byte size): 741 Bytes");
+        expect(binProcess.stdout).toContain("Build succeeded for output-app");
+        expect(binProcess.stdout).toContain("dist/index.react-server.cjs (total size: 149 Bytes, chunk size: 149 Bytes)");
+        expect(binProcess.stdout).toContain("exports: index");
+        expect(binProcess.stdout).toContain("dist/foo.cjs (total size: 128 Bytes, chunk size: 128 Bytes)");
+        expect(binProcess.stdout).toContain("exports: foo");
+        expect(binProcess.stdout).toContain("dist/bin/cli.cjs (total size: 148 Bytes, chunk size: 148 Bytes)");
+        expect(binProcess.stdout).toContain("exports: cli");
+        expect(binProcess.stdout).toContain("Σ Total dist size (byte size): 741 Bytes");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
@@ -598,7 +589,7 @@ export { index as default };
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
@@ -675,7 +666,7 @@ export { render };
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
-            exports: "./dist/index.mjs"
+            exports: "./dist/index.mjs",
         });
 
         const binProcess = await execPackemSync("build", [], {
@@ -683,7 +674,7 @@ export { render };
             reject: false,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toContain(`Exported file "./dist/index.mjs" has an extension that does not match the package.json type "commonjs"`);
+        expect(binProcess.stderr).toContain(`Exported file "./dist/index.mjs" has an extension that does not match the package.json type "commonjs"`);
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -706,7 +697,7 @@ export { render };
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
@@ -806,7 +797,7 @@ export type Shared = string;
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
@@ -822,7 +813,7 @@ module.exports = index;
     });
 
     it("should work with multi types", async () => {
-        expect.assertions(3);
+        expect.assertions(5);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const index = "index";`);
 
@@ -854,7 +845,7 @@ module.exports = index;
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);

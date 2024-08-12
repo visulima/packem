@@ -4,14 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import {
-    createPackageJson,
-    createPackemConfig,
-    createTsConfig,
-    execPackemSync,
-    installPackage,
-    streamToString,
-} from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 
 describe("packem raw data", () => {
     let temporaryDirectoryPath: string;
@@ -51,7 +44,7 @@ export const data = content;`,
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);

@@ -5,7 +5,7 @@ import { writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, execPackemSync, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackemSync } from "../helpers";
 
 describe("packem error cases", () => {
     let temporaryDirectoryPath: string;
@@ -28,7 +28,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toContain("package.json not found at " + temporaryDirectoryPath);
+        expect(binProcess.stderr).toContain("package.json not found at " + temporaryDirectoryPath);
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -42,7 +42,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toContain("Unexpected end of JSON input in");
+        expect(binProcess.stderr).toContain("Unexpected end of JSON input in");
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -59,7 +59,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toContain("No 'src' directory found. Please provide entries manually.");
+        expect(binProcess.stderr).toContain("No 'src' directory found. Please provide entries manually.");
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -78,7 +78,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toContain("No source files found in 'src' directory. Please provide entries manually.");
+        expect(binProcess.stderr).toContain("No source files found in 'src' directory. Please provide entries manually.");
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -96,7 +96,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toContain("No entries detected. Please provide entries manually.");
+        expect(binProcess.stderr).toContain("No entries detected. Please provide entries manually.");
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -115,8 +115,8 @@ describe("packem error cases", () => {
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stdout)).resolves.toBe("");
-        await expect(streamToString(binProcess.stderr)).resolves.toContain(
+        expect(binProcess.stdout).toBe("");
+        expect(binProcess.stderr).toContain(
             `Conflicting field "module" with entry "dist/index.js" detected. Conflicts with "main" field. Please change one of the entries inside your package.json.`,
         );
         expect(binProcess.exitCode).toBe(1);

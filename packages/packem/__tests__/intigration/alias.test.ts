@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 
 describe("packem alias", () => {
     let temporaryDirectoryPath: string;
@@ -54,7 +54,7 @@ export default log();`,
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
@@ -79,9 +79,9 @@ export default log();`,
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createPackageJson(temporaryDirectoryPath, {
-                devDependencies: {
-                    typescript: "*",
-                },
+            devDependencies: {
+                typescript: "*",
+            },
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "commonjs",
@@ -100,7 +100,7 @@ export default log();`,
         });
 
         expect(binProcess.exitCode).toBe(1);
-        await expect(streamToString(binProcess.stderr)).resolves.toContain(
+        expect(binProcess.stderr).toContain(
             `Error: Alias name "${alias}/" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.`,
         );
     });

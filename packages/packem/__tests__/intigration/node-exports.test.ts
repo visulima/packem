@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage, streamToString } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 
 describe("packem node exports", () => {
     let temporaryDirectoryPath: string;
@@ -40,7 +40,7 @@ describe("packem node exports", () => {
                 cwd: temporaryDirectoryPath,
             });
 
-            await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+            expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
             const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
@@ -126,7 +126,7 @@ export { test2, test as default };`,
                 cwd: temporaryDirectoryPath,
             });
 
-            await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+            expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
             const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
@@ -183,7 +183,7 @@ export { test2, test3, test4, test5, test as default };`,
                 cwd: temporaryDirectoryPath,
             });
 
-            await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+            expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
             const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
@@ -230,7 +230,7 @@ export { test2, test3, test4, test5, test as default };`,
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
@@ -292,7 +292,7 @@ export { test as default };
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.mjs`);
@@ -371,7 +371,7 @@ export default a + b
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
@@ -430,10 +430,10 @@ export const indent = dIndent;
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        await expect(streamToString(binProcess.stdout)).resolves.toContain("Inlined implicit external");
+        expect(binProcess.stdout).toContain("Inlined implicit external");
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
@@ -479,7 +479,7 @@ export const value = dep
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         expect(binProcess.stdout).not.toContain("Inlined implicit external");
@@ -540,7 +540,7 @@ export class Child extends Parent {
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
@@ -607,7 +607,7 @@ export class Child extends Parent {
             cwd: temporaryDirectoryPath,
         });
 
-        await expect(streamToString(binProcess.stderr)).resolves.toBe("");
+        expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         expect(binProcess.stdout).toContain("Minification is enabled, the output will be minified");

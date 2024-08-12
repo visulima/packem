@@ -147,8 +147,8 @@ const inferEntries = (
 
     // Entry point for TypeScript
     if ((packageJson.types || packageJson.typings) && context.options.declaration) {
-            outputs.push({ file: (packageJson.types ?? packageJson.typings) as string, key: "types" });
-        }
+        outputs.push({ file: (packageJson.types ?? packageJson.typings) as string, key: "types" });
+    }
 
     // Infer entries from package files
     const entries: BuildEntry[] = [];
@@ -231,7 +231,8 @@ const inferEntries = (
         } else {
             if (
                 (isAccessibleSync(input + ".ts") || isAccessibleSync(input + ".cts") || isAccessibleSync(input + ".mts")) &&
-                (context.pkg?.dependencies?.typescript === undefined && context.pkg?.devDependencies?.typescript === undefined)
+                context.pkg?.dependencies?.typescript === undefined &&
+                context.pkg?.devDependencies?.typescript === undefined
             ) {
                 // @TODO Add command to install typescript
                 throw new Error("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");

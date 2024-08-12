@@ -207,7 +207,7 @@ const generateOptions = (
             preserveDynamicImports: true,
             raw: {
                 exclude: EXCLUDE_REGEXP,
-                include: ["**/*.data", "**/*.txt"],
+                include: ["**/*.data", "**/*.txt", /\.(md|txt|css|htm|html)$/],
             },
             replace: {
                 /**
@@ -223,7 +223,10 @@ const generateOptions = (
                 // Following option must be *false* for polyfill to work
                 preferBuiltins: false,
             },
-            shim: true,
+            shim: {
+                exclude: [/node_modules/],
+                include: [/\.(js|cjs|mjs|tsx|mts|cts)$/],
+            },
             sucrase: {
                 disableESTransforms: true,
                 enableLegacyBabel5ModuleInterop: false,
@@ -586,7 +589,7 @@ const createContext = async (
         context.logger.info("Emitting CJS bundles, is disabled.");
     }
 
-    const hasTypescript = packageJson.dependencies?.typescript !== undefined || packageJson.devDependencies?.typescript !== undefined
+    const hasTypescript = packageJson.dependencies?.typescript !== undefined || packageJson.devDependencies?.typescript !== undefined;
 
     if (context.options.declaration && tsconfig === undefined && hasTypescript) {
         throw new Error("               Cannot build declaration files without a tsconfig.json");

@@ -25,6 +25,7 @@ import type { RawLoaderOptions } from "./rollup/plugins/raw";
 import type { SucrasePluginConfig } from "./rollup/plugins/sucrase/types";
 import type { SwcPluginConfig } from "./rollup/plugins/swc/types";
 import type { PatchTypesOptions } from "./rollup/plugins/typescript/patch-typescript-types";
+import type { EsmShimCjsSyntaxOptions } from "./rollup/plugins/esm-shim-cjs-syntax";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -75,7 +76,7 @@ export interface RollupBuildOptions {
     raw?: RawLoaderOptions | false;
     replace: RollupReplaceOptions | false;
     resolve: RollupNodeResolveOptions | false;
-    shim?: boolean;
+    shim?: EsmShimCjsSyntaxOptions | false;
     sucrase?: SucrasePluginConfig | false;
     swc?: SwcPluginConfig | false;
     treeshake?: RollupOptions["treeshake"];

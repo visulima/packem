@@ -1,5 +1,7 @@
 import { env } from "node:process";
 
+import type { FilterPattern } from "@rollup/pluginutils";
+import { createFilter } from "@rollup/pluginutils";
 import type { PackageJson } from "@visulima/package";
 import MagicString from "magic-string";
 import { findStaticImports } from "mlly";
@@ -106,11 +108,18 @@ const generateCJSShimNode20_11 = (hasFilename: boolean, hasDirname: boolean, has
     return shim;
 };
 
-const cjsPlugin = (packageJson: PackageJson): Plugin =>
-    ({
+export interface EsmShimCjsSyntaxOptions {
+    exclude?: FilterPattern;
+    include?: FilterPattern;
+}
+
+export const esmShimCjsSyntaxPlugin = (packageJson: PackageJson, options: EsmShimCjsSyntaxOptions): Plugin => {
+    const filter = createFilter(options.include, options.exclude);
+
+    return {
         name: "packem:cjs",
-        renderChunk(code, _chunk, options) {
-            if (options.format === "es") {
+        renderChunk(code, chunk, nOptions) {
+            if (nOptions.format === "es" && filter(chunk.fileName)) {
                 let shim = generateCJSShim;
 
                 if (packageJson.engines?.node) {
@@ -126,6 +135,5 @@ const cjsPlugin = (packageJson: PackageJson): Plugin =>
 
             return null;
         },
-    }) as Plugin;
-
-export default cjsPlugin;
+    } as Plugin;
+};
