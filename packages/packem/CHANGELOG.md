@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.74](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.73...@visulima/packem@1.0.0-alpha.74) (2024-08-13)
+
+### Features
+
+* allow without prod or dev bundling, fixed lot of eslint errors, added func createConfig param ([08fac83](https://github.com/visulima/packem/commit/08fac836920fe81bb41240fd735cf2c8cbfef480))
+
 ## @visulima/packem [1.0.0-alpha.73](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.72...@visulima/packem@1.0.0-alpha.73) (2024-08-13)
 
 ### Features
