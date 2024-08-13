@@ -4,7 +4,7 @@ import type { Cli } from "@visulima/cerebro";
 
 import { DEVELOPMENT_ENV, PRODUCTION_ENV } from "../constants";
 import createBundler from "../create-bundler";
-import type { Mode } from "../types";
+import type { Environment, Mode } from "../types";
 
 const createBuildCommand = (cli: Cli): void => {
     cli.addCommand({
@@ -20,41 +20,46 @@ const createBuildCommand = (cli: Cli): void => {
             }
 
             const environments: Record<string, string> = {};
+            let nodeEnvironment;
 
             // use the NODE_ENV environment variable if it exists
             if (env.NODE_ENV && [DEVELOPMENT_ENV, PRODUCTION_ENV].includes(env.NODE_ENV)) {
-                environments.NODE_ENV = env.NODE_ENV;
+                nodeEnvironment = env.NODE_ENV;
             }
 
             if (options.env) {
                 // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const environment of options.env) {
-                    if (environment.key === "NODE_ENV" && environments.NODE_ENV) {
-                        throw new Error("NODE_ENV was already set, this can't be overridden.");
-                    }
+                    if (environment.key === "NODE_ENV") {
 
-                    environments[environment.key] = environment.value;
+                        if (nodeEnvironment) {
+                            throw new Error("NODE_ENV was already set, this can't be overridden.");
+                        } else {
+                            nodeEnvironment = environment.value;
+                        }
+                    } else {
+                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                        environments["process.env." + environment.key] = JSON.stringify(environment.value);
+                    }
                 }
             }
 
-            if (environments.NODE_ENV === undefined) {
+            if (nodeEnvironment === undefined) {
                 if (options.production) {
-                    environments.NODE_ENV = PRODUCTION_ENV;
+                    nodeEnvironment = PRODUCTION_ENV;
                 } else if (options.development) {
-                    environments.NODE_ENV = DEVELOPMENT_ENV;
+                    nodeEnvironment = DEVELOPMENT_ENV;
                 } else {
-                    environments.NODE_ENV = PRODUCTION_ENV;
+                    nodeEnvironment = PRODUCTION_ENV;
                 }
-
-                env.NODE_ENV = environments.NODE_ENV;
             }
 
             try {
-                await createBundler(options.dir, mode, logger, {
+                await createBundler(options.dir, mode, nodeEnvironment as Environment, logger, {
                     cjsInterop: options.cjsInterop,
                     configPath: options.config ?? undefined,
                     debug: options.debug,
-                    minify: options.minify === undefined ? env.NODE_ENV === PRODUCTION_ENV : options.minify,
+                    minify: options.minify === undefined ? nodeEnvironment === PRODUCTION_ENV : options.minify,
                     replace: {
                         ...environments,
                     },

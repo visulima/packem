@@ -127,6 +127,34 @@ importers:
         specifier: ^0.23.0
         version: 0.23.0
 
+  examples/multi-exports:
+    dependencies:
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.3
+        version: 18.3.3
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.0
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.23.0
+        version: 0.23.0
+      typescript:
+        specifier: ^5.5.4
+        version: 5.5.4
+      vite:
+        specifier: 5.3.5
+        version: 5.3.5(@types/node@20.14.11)
+
   examples/native-node-module:
     devDependencies:
       '@visulima/packem':

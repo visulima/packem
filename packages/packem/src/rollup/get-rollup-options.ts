@@ -177,6 +177,10 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext): boolean => {
         );
     }
 
+    if (warning.code === "MODULE_LEVEL_DIRECTIVE") {
+        return true;
+    }
+
     return warning.code === "MIXED_EXPORTS" && context.options.cjsInterop === true;
 };
 
@@ -337,6 +341,8 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         reservedNamesAsProps: true,
                         symbols: true,
                     },
+                    // By default in rollup, when creating multiple chunks, transitive imports of entry chunks
+                    // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
                     hoistTransitiveImports: false,
                     interop: "compat",
                     sourcemap: context.options.sourcemap,
@@ -366,6 +372,8 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         reservedNamesAsProps: true,
                         symbols: true,
                     },
+                    // By default in rollup, when creating multiple chunks, transitive imports of entry chunks
+                    // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
                     hoistTransitiveImports: false,
                     sourcemap: context.options.sourcemap,
                     validate: true,
@@ -388,6 +396,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             context.options.rollup.replace &&
                 replacePlugin({
+                    sourcemap: context.options.sourcemap,
                     ...context.options.rollup.replace,
                     values: {
                         ...context.options.replace,
@@ -628,6 +637,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
 
             context.options.rollup.replace &&
                 replacePlugin({
+                    sourcemap: context.options.sourcemap,
                     ...context.options.rollup.replace,
                     values: {
                         ...context.options.replace,

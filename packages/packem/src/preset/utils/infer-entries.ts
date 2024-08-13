@@ -1,34 +1,29 @@
 import { existsSync } from "node:fs";
-import { env } from "node:process";
 
 import { isAccessibleSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { resolve } from "@visulima/path";
 
 import { DEVELOPMENT_ENV, PRODUCTION_ENV, RUNTIME_EXPORT_CONVENTIONS } from "../../constants";
-import type { BuildContext, BuildEntry, InferEntriesResult, Runtime } from "../../types";
+import type { BuildContext, BuildEntry, Environment, InferEntriesResult, Runtime } from "../../types";
 import type { OutputDescriptor } from "../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
 import { inferExportTypeFromFileName } from "../../utils/infer-export-type";
 
-const getEnvironment = (output: OutputDescriptor): "production" | "development" => {
-    if (output.key === "exports" && output.subKey === "production") {
-        return "production";
+const getEnvironment = (output: OutputDescriptor, environment: Environment): "production" | "development" => {
+    if (output.key === "exports" && output.subKey === PRODUCTION_ENV) {
+        return PRODUCTION_ENV;
     }
 
-    if (output.key === "exports" && output.subKey === "development") {
-        return "development";
+    if (output.key === "exports" && output.subKey === DEVELOPMENT_ENV) {
+        return DEVELOPMENT_ENV;
     }
 
-    if (env.NODE_ENV) {
-        if (!env.NODE_ENV.includes(PRODUCTION_ENV) && !env.NODE_ENV.includes(DEVELOPMENT_ENV)) {
-            throw new Error("Invalid NODE_ENV value: " + env.NODE_ENV + ', must be either "' + PRODUCTION_ENV + '" or "' + DEVELOPMENT_ENV + '".');
-        }
-
-        return env.NODE_ENV as "production" | "development";
+    if (![DEVELOPMENT_ENV, PRODUCTION_ENV].includes(environment)) {
+        throw new Error("Invalid NODE_ENV value: " + environment + ', must be either "' + PRODUCTION_ENV + '" or "' + DEVELOPMENT_ENV + '".');
     }
 
-    return "production";
+    return environment as Environment;
 };
 
 const createOrUpdateEntry = (
@@ -38,9 +33,16 @@ const createOrUpdateEntry = (
     outputSlug: string,
     output: OutputDescriptor,
     declaration: undefined | false | true | "compatible" | "node16",
+    environment: Environment,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): void => {
-    const entry = entries.find((index) => index.input === input) ?? (entries[entries.push({ input }) - 1] as BuildEntry);
+    const entryEnvironment = getEnvironment(output, environment);
+
+    let entry: BuildEntry | undefined = entries.find((index) => index.input === input && index.environment === entryEnvironment);
+
+    if (entry === undefined) {
+        entry = entries[entries.push({ input }) - 1] as BuildEntry;
+    }
 
     if (isDirectory) {
         entry.outDir = outputSlug;
@@ -85,7 +87,12 @@ const createOrUpdateEntry = (
         entry.runtime = "node";
     }
 
-    entry.environment = getEnvironment(output);
+    entry.environment = entryEnvironment;
+
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    if ([DEVELOPMENT_ENV, PRODUCTION_ENV].includes(output.subKey as string) && output.file.includes("." + output.subKey + ".")) {
+        entry.fileAlias = true;
+    }
 };
 
 const ENDING_RE = /(?:\.d\.[mc]?ts|\.\w+)$/;
@@ -168,7 +175,12 @@ const inferEntries = (
         }
 
         // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-        const sourceSlug = outputSlug.replace(new RegExp("(./)?" + context.options.outDir), context.options.sourceDir).replace("./", "");
+        let sourceSlug = outputSlug.replace(new RegExp("(./)?" + context.options.outDir), context.options.sourceDir).replace("./", "");
+
+        // If entry is a development or production entry, remove the subKey from the sourceSlug to find the correct source file
+        if (output.subKey === DEVELOPMENT_ENV || output.subKey === PRODUCTION_ENV) {
+            sourceSlug = sourceSlug.replace("." + output.subKey, "");
+        }
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if (output.file.includes("/*") && output.key === "exports") {
@@ -198,7 +210,7 @@ const inferEntries = (
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const input of inputs) {
-                createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context.options.declaration);
+                createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context.options.declaration, context.environment);
             }
 
             // eslint-disable-next-line no-continue
@@ -221,24 +233,27 @@ const inferEntries = (
         }
 
         if (isAccessibleSync(input + ".cts") && isAccessibleSync(input + ".mts")) {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (context.pkg?.dependencies?.typescript === undefined && context.pkg?.devDependencies?.typescript === undefined) {
                 // @TODO Add command to install typescript
                 throw new Error("You tried to use a `.cts` or `.mts` file but `typescript` was not found in your package.json.");
             }
 
-            createOrUpdateEntry(entries, input + ".cts", isDirectory, outputSlug, { ...output, type: "cjs" }, context.options.declaration);
-            createOrUpdateEntry(entries, input + ".mts", isDirectory, outputSlug, { ...output, type: "esm" }, context.options.declaration);
+            createOrUpdateEntry(entries, input + ".cts", isDirectory, outputSlug, { ...output, type: "cjs" }, context.options.declaration, context.environment);
+            createOrUpdateEntry(entries, input + ".mts", isDirectory, outputSlug, { ...output, type: "esm" }, context.options.declaration, context.environment);
         } else {
             if (
                 (isAccessibleSync(input + ".ts") || isAccessibleSync(input + ".cts") || isAccessibleSync(input + ".mts")) &&
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                 context.pkg?.dependencies?.typescript === undefined &&
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                 context.pkg?.devDependencies?.typescript === undefined
             ) {
                 // @TODO Add command to install typescript
                 throw new Error("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");
             }
 
-            createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context.options.declaration);
+            createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context.options.declaration, context.environment);
         }
     }
 

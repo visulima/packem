@@ -28,6 +28,7 @@ describe("inferEntries", () => {
         vi.stubEnv("NODE_ENV", "development");
 
         defaultContext = {
+            environment: "development",
             logger: {
                 debug: vi.fn(),
             },
@@ -37,6 +38,11 @@ describe("inferEntries", () => {
                 rootDir: temporaryDirectoryPath,
                 sourceDir: "src",
             },
+            pkg: {
+                devDependencies: {
+                    typescript: "*",
+                },
+            },
         } as unknown as BuildContext;
     });
 
@@ -44,6 +50,20 @@ describe("inferEntries", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
 
         vi.unstubAllEnvs();
+    });
+
+    it("should throw a error if a ts file was found and no typescript was installed", () => {
+        expect.assertions(1);
+
+        createFiles(["src/test.ts"], temporaryDirectoryPath);
+
+        expect(() =>
+            inferEntries(
+                { main: "dist/test.cjs" },
+                ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
+                { ...defaultContext, pkg: {} } as unknown as BuildContext,
+            ),
+        ).toThrow("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");
     });
 
     it("should recognise main and module outputs", () => {
@@ -220,6 +240,7 @@ describe("inferEntries", () => {
                 ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
                 {
                     options: { ...defaultContext.options, declaration: true },
+                    pkg: defaultContext.pkg,
                 } as unknown as BuildContext,
             ),
         ).toStrictEqual({
@@ -242,7 +263,7 @@ describe("inferEntries", () => {
                     types: "dist/test.d.ts",
                 },
                 ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
-                { options: { ...defaultContext.options, declaration: true } } as unknown as BuildContext,
+                { environment: defaultContext.environment, options: { ...defaultContext.options, declaration: true }, pkg: defaultContext.pkg } as unknown as BuildContext,
             ),
         ).toStrictEqual({
             entries: [
@@ -266,7 +287,7 @@ describe("inferEntries", () => {
                     typings: "dist/test.d.ts",
                 },
                 ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
-                { options: { ...defaultContext.options, declaration: true } } as unknown as BuildContext,
+                { environment: defaultContext.environment, options: { ...defaultContext.options, declaration: true }, pkg: defaultContext.pkg } as unknown as BuildContext,
             ),
         ).toStrictEqual({
             entries: [
@@ -302,7 +323,7 @@ describe("inferEntries", () => {
                 },
             },
             ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
-            { options: { ...defaultContext.options, declaration: true } } as unknown as BuildContext,
+            { environment: defaultContext.environment, options: { ...defaultContext.options, declaration: true }, pkg: defaultContext.pkg } as unknown as BuildContext,
         );
         expect(result).toStrictEqual({
             entries: [
@@ -530,7 +551,7 @@ describe("inferEntries", () => {
                 },
             },
             ["src/", "src/test.ts", "src/test.cts", "src/test.mts"].map((file) => join(temporaryDirectoryPath, file)),
-            { options: { ...defaultContext.options, declaration: true } } as unknown as BuildContext,
+            { environment: defaultContext.environment, options: { ...defaultContext.options, declaration: true }, pkg: defaultContext.pkg } as unknown as BuildContext,
         );
         expect(result).toStrictEqual({
             entries: [
@@ -548,6 +569,61 @@ describe("inferEntries", () => {
                     esm: true,
                     input: join(temporaryDirectoryPath, "src/test.mts"),
                     runtime: "node",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+    });
+
+    it("should return sub-keys of exports", () => {
+        expect.assertions(1);
+
+        createFiles(["src/index.ts"], temporaryDirectoryPath);
+        createFiles(["src/index.react-server.ts"], temporaryDirectoryPath);
+
+        const result = inferEntries(
+            {
+                exports: {
+                    ".": {
+                        default: "./dist/index.cjs",
+                        import: {
+                            default: "./dist/index.mjs",
+                            development: "./dist/index.development.mjs",
+                            production: "./dist/index.production.mjs",
+                        },
+                        "react-server": "./dist/index.react-server.mjs",
+                        require: {
+                            default: "./dist/index.cjs",
+                            development: "./dist/index.development.cjs",
+                            production: "./dist/index.production.cjs",
+                        },
+                    },
+                },
+            },
+            ["src/", "src/index.ts", "src/index.react-server.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            { environment: defaultContext.environment, options: { ...defaultContext.options, declaration: true }, pkg: defaultContext.pkg } as unknown as BuildContext,
+        );
+        expect(result).toStrictEqual({
+            entries: [
+                {
+                    cjs: true,
+                    environment: "development",
+                    esm: true,
+                    input: join(temporaryDirectoryPath, "src/index"),
+                    runtime: "node",
+                },
+                {
+                    cjs: true,
+                    environment: "production",
+                    esm: true,
+                    input: join(temporaryDirectoryPath, "src/index"),
+                    runtime: "node",
+                },
+                {
+                    environment: "development",
+                    esm: true,
+                    input: join(temporaryDirectoryPath, "src/index.react-server"),
+                    runtime: "react-server",
                 },
             ],
             warnings: [],

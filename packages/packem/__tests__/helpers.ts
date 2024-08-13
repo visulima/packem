@@ -19,13 +19,18 @@ const transformerPackageNames = {
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const execPackemSync = async (command: "build" | "init", flags: string[] = [], options: Options = {}) =>
-    await execaNode(join(distributionPath, "cli.mjs"), [command, ...flags], {
-        env: {
-            NODE_ENV: "development",
-        },
+export const execPackemSync = async (command: "build" | "init", flags: string[] = [], options: Options = {}) => {
+    let environmentFlag: string | undefined = "--development";
+
+    if (flags.includes("--production") || flags.includes("--development")) {
+        environmentFlag = undefined;
+    }
+
+
+    return await execaNode(join(distributionPath, "cli.mjs"), ([command, environmentFlag, ...flags].filter(Boolean)) as string[], {
         ...options,
     });
+};
 
 export const installPackage = async (fixturePath: string, packageName: string): Promise<void> => {
     const nodeModulesDirectory = join(fixturePath, "node_modules");

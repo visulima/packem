@@ -9,6 +9,7 @@ import type { BuildContext, BuildPreset } from "../types";
 import warn from "../utils/warn";
 import inferEntries from "./utils/infer-entries";
 import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";
+import dumpObject from "../utils/dump-object";
 
 const autoPreset: BuildPreset = {
     hooks: {
@@ -31,14 +32,20 @@ const autoPreset: BuildPreset = {
                 throw new Error("No source files found in 'src' directory. Please provide entries manually.");
             }
 
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            let package_ = { ...context.pkg } as NormalizedPackageJson;
+            let packageJson = { ...context.pkg } as NormalizedPackageJson;
 
-            if (package_.publishConfig) {
-                package_ = overwriteWithPublishConfig(package_, context.options.declaration);
+            if (packageJson.publishConfig) {
+                context.logger.info(
+                    'Using publishConfig found in package.json, to override the default key-value pairs of "' +
+                        Object.keys(packageJson.publishConfig).join(", ") +
+                        '".',
+                );
+                context.logger.debug(dumpObject(packageJson.publishConfig));
+
+                packageJson = overwriteWithPublishConfig(packageJson, context.options.declaration);
             }
 
-            const result = inferEntries(package_, sourceFiles, context);
+            const result = inferEntries(packageJson, sourceFiles, context);
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const message of result.warnings) {

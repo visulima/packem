@@ -1,6 +1,6 @@
 import { readdir, stat } from "node:fs/promises";
 import Module from "node:module";
-import { cwd, env } from "node:process";
+import { cwd } from "node:process";
 
 import { bold, cyan, gray, green } from "@visulima/colorize";
 import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync, walk } from "@visulima/fs";
@@ -23,7 +23,17 @@ import rollupBuild from "./rollup/build";
 import rollupBuildTypes from "./rollup/build-types";
 import getHash from "./rollup/utils/get-hash";
 import rollupWatch from "./rollup/watch";
-import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildOptions, BuildPreset, InternalBuildOptions, Mode } from "./types";
+import type {
+    BuildConfig,
+    BuildContext,
+    BuildContextBuildEntry,
+    BuildEntry,
+    BuildOptions,
+    BuildPreset,
+    Environment,
+    InternalBuildOptions,
+    Mode,
+} from "./types";
 import dumpObject from "./utils/dump-object";
 import enhanceRollupError from "./utils/enhance-rollup-error";
 import FileCache from "./utils/file-cache";
@@ -73,6 +83,7 @@ const generateOptions = (
     logger: Pail,
     rootDirectory: string,
     mode: Mode,
+    environment: Environment,
     debug: boolean,
     inputConfig: BuildConfig,
     buildConfig: BuildConfig,
@@ -94,7 +105,7 @@ const generateOptions = (
         externals: [...Module.builtinModules, ...Module.builtinModules.map((m) => `node:${m}`)],
         failOnWarn: true,
         fileCache: true,
-        minify: env.NODE_ENV === "production",
+        minify: environment === PRODUCTION_ENV,
         name: (packageJson.name ?? "").split("/").pop() ?? "default",
         outDir: "dist",
         replace: {},
@@ -207,7 +218,7 @@ const generateOptions = (
             preserveDynamicImports: true,
             raw: {
                 exclude: EXCLUDE_REGEXP,
-                include: ["**/*.data", "**/*.txt", /\.(md|txt|css|htm|html)$/],
+                include: [/\.(md|txt|css|htm|html|data)$/],
             },
             replace: {
                 /**
@@ -234,7 +245,7 @@ const generateOptions = (
                 include: /\.[jt]sx?$/,
                 injectCreateRequireForImportRequire: false,
                 preserveDynamicImport: true,
-                production: env.NODE_ENV === PRODUCTION_ENV,
+                production: environment === PRODUCTION_ENV,
                 ...(tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
                     ? {
                           jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
@@ -269,7 +280,7 @@ const generateOptions = (
                         decoratorMetadata: tsconfig?.config.compilerOptions?.emitDecoratorMetadata,
                         legacyDecorator: tsconfig?.config.compilerOptions?.experimentalDecorators,
                         react: {
-                            development: env.NODE_ENV !== PRODUCTION_ENV,
+                            development: environment !== PRODUCTION_ENV,
                             pragma: tsconfig?.config.compilerOptions?.jsxFactory,
                             pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
                             runtime: jsxRuntime,
@@ -394,6 +405,8 @@ const prepareEntries = async (context: BuildContext, rootDirectory: string): Pro
     // Normalize entries
     context.options.entries = context.options.entries.map((entry) => (typeof entry === "string" ? { input: entry } : entry));
 
+    const fileAliasEntries: BuildEntry[] = [];
+
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for await (const entry of context.options.entries) {
         if (typeof entry.name !== "string") {
@@ -404,6 +417,14 @@ const prepareEntries = async (context: BuildContext, rootDirectory: string): Pro
             }
 
             entry.name = removeExtension(relativeInput.replace(/^src\//, ""));
+
+            if (entry.fileAlias) {
+                fileAliasEntries.push({
+                    ...entry,
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                    name: entry.name + "." + entry.environment,
+                });
+            }
         }
 
         if (!entry.input) {
@@ -433,6 +454,8 @@ const prepareEntries = async (context: BuildContext, rootDirectory: string): Pro
 
         entry.outDir = resolve(context.options.rootDir, entry.outDir ?? context.options.outDir);
     }
+
+    context.options.entries.push(...fileAliasEntries);
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -535,6 +558,7 @@ const createContext = async (
     logger: Pail,
     rootDirectory: string,
     mode: Mode,
+    environment: Environment,
     debug: boolean,
     inputConfig: BuildConfig,
     buildConfig: BuildConfig,
@@ -543,7 +567,7 @@ const createContext = async (
 ): Promise<BuildContext> => {
     const preset = resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", rootDirectory);
 
-    const options = generateOptions(logger, rootDirectory, mode, debug, inputConfig, buildConfig, preset, packageJson, tsconfig);
+    const options = generateOptions(logger, rootDirectory, mode, environment, debug, inputConfig, buildConfig, preset, packageJson, tsconfig);
 
     ensureDirSync(join(options.rootDir, options.outDir));
 
@@ -551,6 +575,7 @@ const createContext = async (
     const context: BuildContext = {
         buildEntries: [],
         dependencyGraphMap: new Map(),
+        environment,
         hooks: createHooks(),
         logger,
         mode,
@@ -640,14 +665,7 @@ const cleanDistributionDirectories = async (context: BuildContext): Promise<void
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const build = async (context: BuildContext, packageJson: PackEmPackageJson, fileCache: FileCache): Promise<void> => {
-    // Call build:before
-    await context.hooks.callHook("build:before", context);
-
-    if (context.options.minify) {
-        context.logger.info("Minification is enabled, the output will be minified");
-    }
-
+const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promise<void>[] => {
     const groupedEntries = groupByKeys(context.options.entries, "environment", "runtime");
 
     const rollups: Promise<void>[] = [];
@@ -661,11 +679,12 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
             if (context.options.rollup.replace) {
                 context.options.rollup.replace.values = {
                     ...context.options.rollup.replace.values,
-                    "process.env.NODE_ENV": environment,
+                    // hack to make sure, that the replace plugin dont replace the environment
+                    [["process", "env", "NODE_ENV"].join(".")]: JSON.stringify(environment),
                 };
 
                 if (runtime === "edge-light") {
-                    context.options.rollup.replace.values.EdgeRuntime = "edge-runtime";
+                    context.options.rollup.replace.values.EdgeRuntime = JSON.stringify("edge-runtime");
                 }
             } else {
                 context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
@@ -689,7 +708,13 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
             if (esmAndCjsEntries.length > 0) {
                 const adjustedEsmAndCjsContext = {
                     ...context,
-                    options: { ...context.options, emitCJS: true, emitESM: true, entries: esmAndCjsEntries },
+                    options: {
+                        ...context.options,
+                        emitCJS: true,
+                        emitESM: true,
+                        entries: esmAndCjsEntries,
+                        minify: environment !== "development" && context.options.minify,
+                    },
                 };
 
                 rollups.push(rollupBuild(adjustedEsmAndCjsContext, fileCache));
@@ -715,7 +740,13 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
             if (esmEntries.length > 0) {
                 const adjustedEsmContext = {
                     ...context,
-                    options: { ...context.options, emitCJS: false, emitESM: true, entries: esmEntries },
+                    options: {
+                        ...context.options,
+                        emitCJS: false,
+                        emitESM: true,
+                        entries: esmEntries,
+                        minify: environment !== "development" && context.options.minify,
+                    },
                 };
 
                 rollups.push(rollupBuild(adjustedEsmContext, fileCache));
@@ -741,7 +772,13 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
             if (cjsEntries.length > 0) {
                 const adjustedCjsContext = {
                     ...context,
-                    options: { ...context.options, emitCJS: true, emitESM: false, entries: cjsEntries },
+                    options: {
+                        ...context.options,
+                        emitCJS: true,
+                        emitESM: false,
+                        entries: cjsEntries,
+                        minify: environment !== "development" && context.options.minify,
+                    },
                 };
 
                 rollups.push(rollupBuild(adjustedCjsContext, fileCache));
@@ -766,7 +803,18 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
         }
     }
 
-    await Promise.all(rollups);
+    return rollups;
+};
+
+const build = async (context: BuildContext, packageJson: PackEmPackageJson, fileCache: FileCache): Promise<void> => {
+    // Call build:before
+    await context.hooks.callHook("build:before", context);
+
+    if (context.options.minify) {
+        context.logger.info("Minification is enabled, the output will be minified");
+    }
+
+    await Promise.all(prepareRollupConfig(context, fileCache));
 
     context.logger.success(green(context.options.name ? "Build succeeded for " + context.options.name : "Build succeeded"));
 
@@ -807,6 +855,7 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
 const createBundler = async (
     rootDirectory: string,
     mode: Mode,
+    environment: Environment,
     logger: Pail,
     inputConfig: {
         configPath?: string;
@@ -861,15 +910,35 @@ const createBundler = async (
     }
 
     try {
-        const packemConfigFileName = configPath ?? "./packem.config.ts";
+        let packemConfigFilePath = configPath ?? "";
 
-        if (!/\.(?:js|mjs|cjs|ts)$/.test(packemConfigFileName)) {
-            throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts extensions are allowed.");
+        // find packem config file
+        if (!packemConfigFilePath) {
+            const packemConfigFiles = [
+                "packem.config.js",
+                "packem.config.mjs",
+                "packem.config.cjs",
+                "packem.config.ts",
+                "packem.config.cts",
+                "packem.config.mts",
+            ];
+
+            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+            for (const file of packemConfigFiles) {
+                if (isAccessibleSync(join(rootDirectory, file))) {
+                    packemConfigFilePath = "./" + file;
+                    break;
+                }
+            }
         }
 
-        const buildConfig = tryRequire<BuildConfig>(packemConfigFileName, rootDirectory);
+        if (!/\.(?:js|mjs|cjs|ts|cts|mts)$/.test(packemConfigFilePath)) {
+            throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.");
+        }
 
-        logger.debug("Using packem config found at", join(rootDirectory, packemConfigFileName));
+        const buildConfig = tryRequire<BuildConfig>(packemConfigFilePath, rootDirectory);
+
+        logger.debug("Using packem config found at", join(rootDirectory, packemConfigFilePath));
 
         const start = Date.now();
 
@@ -900,7 +969,7 @@ const createBundler = async (
             await emptyDir(fileCache.cachePath);
         }
 
-        const context = await createContext(logger, rootDirectory, mode, debug ?? false, restInputConfig, buildConfig, packageJson, tsconfig);
+        const context = await createContext(logger, rootDirectory, mode, environment, debug ?? false, restInputConfig, buildConfig, packageJson, tsconfig);
 
         fileCache.isEnabled = context.options.fileCache as boolean;
 

@@ -3,12 +3,14 @@ import type { PackageJson } from "@visulima/package";
 import type { BuildOptions } from "../types";
 import { inferExportType, inferExportTypeFromFileName } from "./infer-export-type";
 
+const exportsKeys = ["import", "require", "node", "node-addons", "default", "production", "types", "deno", "browser", "development", "react-native", "react-server"] as const;
+
 export type OutputDescriptor = {
     fieldName?: string;
     file: string;
     isExecutable?: true;
     key: "exports" | "main" | "types" | "module" | "bin";
-    subKey?: "import" | "require" | "node" | "node-addons" | "default" | "production" | "types" | "deno" | "browser" | "development";
+    subKey?: typeof exportsKeys | (NonNullable<unknown> & string);
     type?: "cjs" | "esm";
 };
 
@@ -47,11 +49,7 @@ export const extractExportFilenames = (
                     ? {
                           file: packageExport,
                           key: "exports",
-                          ...(["browser", "default", "deno", "development", "import", "node", "node-addons", "production", "require", "types"].includes(
-                              condition,
-                          )
-                              ? { subKey: condition as OutputDescriptor["subKey"] }
-                              : {}),
+                          ...(exportsKeys.includes(condition) ? { subKey: condition as OutputDescriptor["subKey"] } : {}),
                           type: inferExportType(condition, conditions, packageExport, type),
                       }
                     : extractExportFilenames(packageExport, type, declaration, [...conditions, condition]);

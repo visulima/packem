@@ -18,6 +18,7 @@ import type { PluginVisualizerOptions } from "rollup-plugin-visualizer";
 import type { CJSInteropOptions } from "./rollup/plugins/cjs-interop";
 import type { CopyPluginOptions } from "./rollup/plugins/copy";
 import type { EsbuildPluginConfig, Options as EsbuildOptions } from "./rollup/plugins/esbuild/types";
+import type { EsmShimCjsSyntaxOptions } from "./rollup/plugins/esm-shim-cjs-syntax";
 import type { IsolatedDeclarationsOptions } from "./rollup/plugins/isolated-declarations-plugin";
 import type { JSXRemoveAttributesPlugin } from "./rollup/plugins/jsx-remove-attributes";
 import type { LicenseOptions } from "./rollup/plugins/license";
@@ -25,7 +26,6 @@ import type { RawLoaderOptions } from "./rollup/plugins/raw";
 import type { SucrasePluginConfig } from "./rollup/plugins/sucrase/types";
 import type { SwcPluginConfig } from "./rollup/plugins/swc/types";
 import type { PatchTypesOptions } from "./rollup/plugins/typescript/patch-typescript-types";
-import type { EsmShimCjsSyntaxOptions } from "./rollup/plugins/esm-shim-cjs-syntax";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -55,6 +55,8 @@ interface RollupDynamicImportVariablesOptions {
      */
     warnOnError?: boolean;
 }
+
+export type Environment = "production" | "development";
 
 export interface RollupBuildOptions {
     alias: RollupAliasOptions | false;
@@ -90,9 +92,10 @@ export type Runtime = "react-server" | "react-native" | "edge-light" | "node";
 export type BuildEntry = {
     cjs?: boolean;
     declaration?: boolean | "compatible" | "node16";
-    environment?: "production" | "development";
+    environment?: Environment;
     esm?: boolean;
     executable?: boolean;
+    fileAlias?: boolean;
     input: string;
     name?: string;
     outDir?: string;
@@ -166,6 +169,7 @@ export interface InternalBuildOptions extends BuildOptions {
 export interface BuildContext {
     buildEntries: BuildContextBuildEntry[];
     dependencyGraphMap: Map<string, Set<[string, string]>>;
+    environment: Environment;
     hooks: Hookable<BuildHooks>;
     logger: Pail;
     mode: Mode;
