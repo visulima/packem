@@ -68,6 +68,7 @@ const reservedKeywords = new Set([
     "yield",
 ]);
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const validateAliasEntries = (entries: ReadonlyArray<Alias> | Record<string, string>): void => {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!Array.isArray(entries) && entries !== null) {

@@ -1,6 +1,7 @@
 import jiti from "jiti";
 
 const tryResolve = (id: string, rootDirectory: string): string => {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const _require = jiti(rootDirectory, { esmResolve: true, interopDefault: true });
 
     try {

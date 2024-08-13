@@ -64,7 +64,7 @@ const createSplitChunks = (dependencyGraphMap: Map<string, Set<[string, string]>
                         dependencyGraphMap.set(subId, new Set());
                     }
 
-                    dependencyGraphMap.get(subId)!.add([id, moduleLayer]);
+                    (dependencyGraphMap.get(subId) as Set<[string, string]>).add([id, moduleLayer]);
                 }
             }
         }
@@ -77,11 +77,11 @@ const createSplitChunks = (dependencyGraphMap: Map<string, Set<[string, string]>
             // when the module layer is different from entry layer, split the module into a separate chunk as a separate boundary.
             dependencyGraphMap.has(id)
         ) {
-            const parentModuleIds = [...dependencyGraphMap.get(id)!];
-            const isImportFromOtherEntry = parentModuleIds.some(([id]) => {
+            const parentModuleIds = [...(dependencyGraphMap.get(id) as Set<[string, string]>)];
+            const isImportFromOtherEntry = parentModuleIds.some(([pid]) => {
                 // If other entry is dependency of this entry
-                if (entryFiles.some((entry) => entry.path === id)) {
-                    const entryModuleInfo = context.getModuleInfo(id);
+                if (entryFiles.some((entry) => entry.path === pid)) {
+                    const entryModuleInfo = context.getModuleInfo(pid);
                     const entryModuleLayer = getModuleLayer(entryModuleInfo ? entryModuleInfo.meta : {});
 
                     return entryModuleLayer === moduleLayer;
@@ -104,7 +104,8 @@ const createSplitChunks = (dependencyGraphMap: Map<string, Set<[string, string]>
             }
 
             const chunkName = basename(id, extname(id));
-            const chunkGroup = `${chunkName}-${moduleLayer}`;
+            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+            const chunkGroup = chunkName + "-" + moduleLayer;
 
             splitChunksGroupMap.set(id, chunkGroup);
 

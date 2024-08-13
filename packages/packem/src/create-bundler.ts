@@ -674,7 +674,11 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
     for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [runtime, entries] of Object.entries(environmentEntries)) {
-            context.logger.info("Preparing build for " + cyan(environment) + " environment" + (runtime ? " with " + cyan(runtime) + " runtime" : ""));
+            context.logger.info(
+                "Preparing build for " +
+                    (environment === "undefined" ? "" : cyan(environment) + " environment" + (runtime ? " with " : "")) +
+                    (runtime ? cyan(runtime) + " runtime" : ""),
+            );
 
             if (context.options.rollup.replace) {
                 context.options.rollup.replace.values = {
@@ -936,7 +940,11 @@ const createBundler = async (
             throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.");
         }
 
-        const buildConfig = tryRequire<BuildConfig>(packemConfigFilePath, rootDirectory);
+        let buildConfig = tryRequire(packemConfigFilePath, rootDirectory);
+
+        if (typeof buildConfig === "function") {
+            buildConfig = buildConfig(environment, mode);
+        }
 
         logger.debug("Using packem config found at", join(rootDirectory, packemConfigFilePath));
 
@@ -969,7 +977,17 @@ const createBundler = async (
             await emptyDir(fileCache.cachePath);
         }
 
-        const context = await createContext(logger, rootDirectory, mode, environment, debug ?? false, restInputConfig, buildConfig, packageJson, tsconfig);
+        const context = await createContext(
+            logger,
+            rootDirectory,
+            mode,
+            environment,
+            debug ?? false,
+            restInputConfig,
+            buildConfig as BuildConfig,
+            packageJson,
+            tsconfig,
+        );
 
         fileCache.isEnabled = context.options.fileCache as boolean;
 

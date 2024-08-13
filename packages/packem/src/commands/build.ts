@@ -31,7 +31,6 @@ const createBuildCommand = (cli: Cli): void => {
                 // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const environment of options.env) {
                     if (environment.key === "NODE_ENV") {
-
                         if (nodeEnvironment) {
                             throw new Error("NODE_ENV was already set, this can't be overridden.");
                         } else {
@@ -49,8 +48,6 @@ const createBuildCommand = (cli: Cli): void => {
                     nodeEnvironment = PRODUCTION_ENV;
                 } else if (options.development) {
                     nodeEnvironment = DEVELOPMENT_ENV;
-                } else {
-                    nodeEnvironment = PRODUCTION_ENV;
                 }
             }
 

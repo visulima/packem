@@ -46,6 +46,7 @@ export const createPackemConfig = async (
     config: BuildConfig | BuildConfig[] = {},
     transformer: "esbuild" | "swc" | "sucrase" = "esbuild",
 ): Promise<void> => {
+    // eslint-disable-next-line security/detect-object-injection
     await installPackage(fixturePath, transformerPackageNames[transformer]);
 
     writeFileSync(

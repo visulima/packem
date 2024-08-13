@@ -38,6 +38,13 @@ module.exports = {
             files: ["*.js", "*.jsx"],
             rules: {},
         },
+
+        {
+            files: ["*.test.ts"],
+            rules: {
+                "unicorn/prefer-module": "off",
+            }
+        },
         {
             files: ["*.ts"],
             rules: {

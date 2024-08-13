@@ -56,7 +56,7 @@ interface RollupDynamicImportVariablesOptions {
     warnOnError?: boolean;
 }
 
-export type Environment = "production" | "development";
+export type Environment = "production" | "development" | undefined;
 
 export interface RollupBuildOptions {
     alias: RollupAliasOptions | false;

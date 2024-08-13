@@ -7,7 +7,6 @@ export default defineConfig({
         license: {
             path: "./LICENSE.md",
         },
-        shim: true,
     },
     transformer,
 });

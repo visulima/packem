@@ -24,6 +24,7 @@ const validatePackage = (package_: PackageJson, context: BuildContext): void => 
                 index &&
                 resolve(
                     context.options.rootDir,
+                    // eslint-disable-next-line security/detect-unsafe-regex
                     index.replace(/\/[^*/]*\*[^\n\r/\u2028\u2029]*(?:[\n\r\u2028\u2029][^*/]*\*[^\n\r/\u2028\u2029]*)*(?:\/.*)?$/, ""),
                 ),
         ),

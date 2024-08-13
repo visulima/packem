@@ -127,6 +127,28 @@ importers:
         specifier: ^0.23.0
         version: 0.23.0
 
+  examples/mixed:
+    dependencies:
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.11.5
+        version: 20.14.11
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.23.0
+        version: 0.23.0
+      typescript:
+        specifier: ^5.5.4
+        version: 5.5.4
+
   examples/multi-exports:
     dependencies:
       react:
@@ -10064,11 +10086,11 @@ snapshots:
 
   '@types/concat-stream@2.0.3':
     dependencies:
-      '@types/node': 18.19.39
+      '@types/node': 20.14.11
 
   '@types/conventional-commits-parser@5.0.0':
     dependencies:
-      '@types/node': 18.19.39
+      '@types/node': 20.14.11
 
   '@types/debug@4.1.12':
     dependencies:
@@ -10087,7 +10109,7 @@ snapshots:
   '@types/glob@8.1.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 18.19.39
+      '@types/node': 20.14.11
 
   '@types/hast@2.3.10':
     dependencies:
@@ -10111,7 +10133,7 @@ snapshots:
   '@types/liftoff@4.0.3':
     dependencies:
       '@types/fined': 1.1.5
-      '@types/node': 18.19.39
+      '@types/node': 20.14.11
 
   '@types/mdast@3.0.15':
     dependencies:
@@ -10160,7 +10182,7 @@ snapshots:
 
   '@types/through@0.0.33':
     dependencies:
-      '@types/node': 18.19.39
+      '@types/node': 20.14.11
 
   '@types/unist@2.0.10': {}
 

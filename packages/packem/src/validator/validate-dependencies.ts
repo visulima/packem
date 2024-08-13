@@ -34,7 +34,7 @@ const validateDependencies = (context: BuildContext): void => {
             !id.startsWith("chunks/") &&
             // eslint-disable-next-line security/detect-object-injection,@typescript-eslint/no-unnecessary-condition
             context.pkg?.dependencies?.[packageId] === undefined &&
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition,security/detect-object-injection
             context.pkg?.peerDependencies?.[packageId] === undefined
         ) {
             implicitDependencies.add(id);

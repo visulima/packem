@@ -117,7 +117,7 @@ export const esmShimCjsSyntaxPlugin = (packageJson: PackageJson, options: EsmShi
     const filter = createFilter(options.include, options.exclude);
 
     return {
-        name: "packem:cjs",
+        name: "packem:esm-shim-cjs-syntax",
         renderChunk(code, chunk, nOptions) {
             if (nOptions.format === "es" && filter(chunk.fileName)) {
                 let shim = generateCJSShim;

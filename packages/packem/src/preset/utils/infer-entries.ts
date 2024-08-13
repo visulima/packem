@@ -10,7 +10,7 @@ import type { OutputDescriptor } from "../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
 import { inferExportTypeFromFileName } from "../../utils/infer-export-type";
 
-const getEnvironment = (output: OutputDescriptor, environment: Environment): "production" | "development" => {
+const getEnvironment = (output: OutputDescriptor, environment: Environment): Environment => {
     if (output.key === "exports" && output.subKey === PRODUCTION_ENV) {
         return PRODUCTION_ENV;
     }
@@ -19,11 +19,7 @@ const getEnvironment = (output: OutputDescriptor, environment: Environment): "pr
         return DEVELOPMENT_ENV;
     }
 
-    if (![DEVELOPMENT_ENV, PRODUCTION_ENV].includes(environment)) {
-        throw new Error("Invalid NODE_ENV value: " + environment + ', must be either "' + PRODUCTION_ENV + '" or "' + DEVELOPMENT_ENV + '".');
-    }
-
-    return environment as Environment;
+    return environment;
 };
 
 const createOrUpdateEntry = (

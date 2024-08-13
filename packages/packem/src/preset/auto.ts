@@ -6,13 +6,14 @@ import type { NormalizedPackageJson } from "@visulima/package";
 import { join } from "@visulima/path";
 
 import type { BuildContext, BuildPreset } from "../types";
+import dumpObject from "../utils/dump-object";
 import warn from "../utils/warn";
 import inferEntries from "./utils/infer-entries";
 import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";
-import dumpObject from "../utils/dump-object";
 
 const autoPreset: BuildPreset = {
     hooks: {
+         
         "build:prepare": function (context: BuildContext) {
             // Disable auto if entries already provided of pkg not available
             if (context.options.entries.length > 0) {
