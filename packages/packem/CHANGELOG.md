@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.73](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.72...@visulima/packem@1.0.0-alpha.73) (2024-08-13)
+
+### Features
+
+* improved tests, improved env replace, improved exports reading and build, dont minify dev export, improved publishConfig reading ([21e9943](https://github.com/visulima/packem/commit/21e9943b75084c5da75629ea569848de05f8d627))
+
 ## @visulima/packem [1.0.0-alpha.72](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.71...@visulima/packem@1.0.0-alpha.72) (2024-08-12)
 
 ### Features
