@@ -3,7 +3,20 @@ import type { PackageJson } from "@visulima/package";
 import type { BuildOptions } from "../types";
 import { inferExportType, inferExportTypeFromFileName } from "./infer-export-type";
 
-const exportsKeys = ["import", "require", "node", "node-addons", "default", "production", "types", "deno", "browser", "development", "react-native", "react-server"] as const;
+const exportsKeys = [
+    "import",
+    "require",
+    "node",
+    "node-addons",
+    "default",
+    "production",
+    "types",
+    "deno",
+    "browser",
+    "development",
+    "react-native",
+    "react-server",
+] as const;
 
 export type OutputDescriptor = {
     fieldName?: string;
@@ -16,10 +29,9 @@ export type OutputDescriptor = {
 
 export const extractExportFilenames = (
     packageExports: PackageJson["exports"],
-    type: PackageJson["type"],
+    packageType: "esm" | "cjs",
     declaration: BuildOptions["declaration"],
     conditions: string[] = [],
-    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): OutputDescriptor[] => {
     if (!packageExports) {
         return [];
@@ -27,32 +39,27 @@ export const extractExportFilenames = (
 
     if (typeof packageExports === "string") {
         const inferredType = inferExportTypeFromFileName(packageExports);
-        const fileType = type === "module" ? "esm" : "cjs";
 
-        if (inferredType && inferredType !== fileType) {
-            throw new Error(`Exported file "${packageExports}" has an extension that does not match the package.json type "${type as string}".`);
+        if (inferredType && inferredType !== packageType) {
+            throw new Error(`Exported file "${packageExports}" has an extension that does not match the package.json type "${packageType}".`);
         }
 
-        return [{ file: packageExports, key: "exports", type: inferredType ?? fileType }];
+        return [{ file: packageExports, key: "exports", type: inferredType ?? packageType }];
     }
 
     return (
         Object.entries(packageExports)
             // Filter out .json subpaths such as package.json
             .filter(([subpath]) => !subpath.endsWith(".json"))
-            .flatMap(([condition, packageExport]) => {
-                if (condition === "types" && declaration === false) {
-                    return [];
-                }
-
-                return typeof packageExport === "string"
+            .flatMap(([condition, packageExport]) =>
+                (typeof packageExport === "string"
                     ? {
                           file: packageExport,
                           key: "exports",
                           ...(exportsKeys.includes(condition) ? { subKey: condition as OutputDescriptor["subKey"] } : {}),
-                          type: inferExportType(condition, conditions, packageExport, type),
+                          type: inferExportType(condition, conditions, packageType, packageExport),
                       }
-                    : extractExportFilenames(packageExport, type, declaration, [...conditions, condition]);
-            })
+                    : extractExportFilenames(packageExport, packageType, declaration, [...conditions, condition])),
+            )
     );
 };

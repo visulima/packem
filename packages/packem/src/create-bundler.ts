@@ -1,44 +1,34 @@
-import { readdir, stat } from "node:fs/promises";
+import { stat } from "node:fs/promises";
 import Module from "node:module";
 import { cwd } from "node:process";
 
 import { bold, cyan, gray, green } from "@visulima/colorize";
 import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync, walk } from "@visulima/fs";
-import { NotFoundError } from "@visulima/fs/error";
 import { duration, formatBytes } from "@visulima/humanizer";
 import type { PackageJson } from "@visulima/package";
 import { parsePackageJson } from "@visulima/package/package-json";
 import type { Pail } from "@visulima/pail";
-import { basename, dirname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
+import { join, relative, resolve } from "@visulima/path";
 import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
 import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
 import { defu } from "defu";
 import { createHooks } from "hookable";
 import { VERSION } from "rollup";
 
-import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "./constants";
+import { EXCLUDE_REGEXP, PRODUCTION_ENV } from "./constants";
 import createStub from "./jit/create-stub";
 import resolvePreset from "./preset/utils/resolve-preset";
 import rollupBuild from "./rollup/build";
 import rollupBuildTypes from "./rollup/build-types";
 import getHash from "./rollup/utils/get-hash";
 import rollupWatch from "./rollup/watch";
-import type {
-    BuildConfig,
-    BuildContext,
-    BuildContextBuildEntry,
-    BuildEntry,
-    BuildOptions,
-    BuildPreset,
-    Environment,
-    InternalBuildOptions,
-    Mode,
-} from "./types";
+import type { BuildConfig, BuildContext, BuildContextBuildEntry, BuildOptions, BuildPreset, Environment, InternalBuildOptions, Mode } from "./types";
 import dumpObject from "./utils/dump-object";
 import enhanceRollupError from "./utils/enhance-rollup-error";
 import FileCache from "./utils/file-cache";
 import getPackageSideEffect from "./utils/get-package-side-effect";
 import groupByKeys from "./utils/group-by-keys";
+import prepareEntries from "./utils/prepare-entries";
 import tryRequire from "./utils/try-require";
 import validateAliasEntries from "./validator/validate-alias-entries";
 import validateDependencies from "./validator/validate-dependencies";
@@ -98,9 +88,9 @@ const generateOptions = (
         alias: {},
         clean: true,
         debug,
-        declaration: true,
-        emitCJS: true,
-        emitESM: true,
+        declaration: undefined,
+        emitCJS: undefined,
+        emitESM: undefined,
         entries: [],
         externals: [...Module.builtinModules, ...Module.builtinModules.map((m) => `node:${m}`)],
         failOnWarn: true,
@@ -398,66 +388,6 @@ const generateOptions = (
     return options;
 };
 
-const removeExtension = (filename: string): string => filename.replace(/\.(?:js|mjs|cjs|ts|mts|cts|json|jsx|tsx)$/, "");
-
-// eslint-disable-next-line sonarjs/cognitive-complexity
-const prepareEntries = async (context: BuildContext, rootDirectory: string): Promise<void> => {
-    // Normalize entries
-    context.options.entries = context.options.entries.map((entry) => (typeof entry === "string" ? { input: entry } : entry));
-
-    const fileAliasEntries: BuildEntry[] = [];
-
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-    for await (const entry of context.options.entries) {
-        if (typeof entry.name !== "string") {
-            let relativeInput = isAbsolute(entry.input) ? relative(rootDirectory, entry.input) : normalize(entry.input);
-
-            if (relativeInput.startsWith("./")) {
-                relativeInput = relativeInput.slice(2);
-            }
-
-            entry.name = removeExtension(relativeInput.replace(/^src\//, ""));
-
-            if (entry.fileAlias) {
-                fileAliasEntries.push({
-                    ...entry,
-                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                    name: entry.name + "." + entry.environment,
-                });
-            }
-        }
-
-        if (!entry.input) {
-            throw new Error(`Missing entry input: ${dumpObject(entry)}`);
-        }
-
-        entry.input = resolve(context.options.rootDir, entry.input);
-
-        if (!isAccessibleSync(entry.input)) {
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
-            const filesInWorkingDirectory = new Set(await readdir(dirname(entry.input)));
-
-            let hasFile = false;
-
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-            for (const extension of DEFAULT_EXTENSIONS) {
-                if (filesInWorkingDirectory.has(basename(entry.input) + extension)) {
-                    hasFile = true;
-                    break;
-                }
-            }
-
-            if (!hasFile) {
-                throw new NotFoundError("Your configured entry: " + cyan(entry.input) + " does not exist.");
-            }
-        }
-
-        entry.outDir = resolve(context.options.rootDir, entry.outDir ?? context.options.outDir);
-    }
-
-    context.options.entries.push(...fileAliasEntries);
-};
-
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const showSizeInformation = (logger: Pail, context: BuildContext, packageJson: PackEmPackageJson): boolean => {
     const rPath = (p: string) => relative(context.options.rootDir, resolve(context.options.outDir, p));
@@ -602,16 +532,12 @@ const createContext = async (
     // Allow to prepare and extending context
     await context.hooks.callHook("build:prepare", context);
 
-    if (!context.options.emitESM && !context.options.emitCJS) {
-        throw new Error("Both emitESM and emitCJS are disabled. At least one of them must be enabled.");
-    }
-
     if (context.options.emitESM === undefined) {
-        context.logger.info("Emitting ESM bundles, is disabled.");
+        context.logger.info("Emitting of ESM bundles, is disabled.");
     }
 
     if (context.options.emitCJS === undefined) {
-        context.logger.info("Emitting CJS bundles, is disabled.");
+        context.logger.info("Emitting of CJS bundles, is disabled.");
     }
 
     const hasTypescript = packageJson.dependencies?.typescript !== undefined || packageJson.devDependencies?.typescript !== undefined;
@@ -622,12 +548,12 @@ const createContext = async (
 
     if (!hasTypescript) {
         context.options.declaration = false;
+
+        context.logger.info("Typescript is not installed. Declaration files will not be generated.");
     }
 
     if (context.options.declaration) {
         context.logger.info("Using typescript version: " + cyan(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript ?? "unknown"));
-    } else {
-        context.logger.info("Generation of declaration files is disabled.");
     }
 
     return context;
@@ -674,11 +600,13 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
     for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [runtime, entries] of Object.entries(environmentEntries)) {
-            context.logger.info(
-                "Preparing build for " +
-                    (environment === "undefined" ? "" : cyan(environment) + " environment" + (runtime ? " with " : "")) +
-                    (runtime ? cyan(runtime) + " runtime" : ""),
-            );
+            if (environment !== "undefined" || runtime !== "undefined") {
+                context.logger.info(
+                    "Preparing build for " +
+                        (environment === "undefined" ? "" : cyan(environment) + " environment" + (runtime === "undefined" ? "" : " with ")) +
+                        (runtime === "undefined" ? "" : cyan(runtime) + " runtime"),
+                );
+            }
 
             if (context.options.rollup.replace) {
                 context.options.rollup.replace.values = {
@@ -697,6 +625,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
             const esmAndCjsEntries = [];
             const esmEntries = [];
             const cjsEntries = [];
+            const dtsEntries = [];
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const entry of entries) {
@@ -706,6 +635,8 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                     cjsEntries.push(entry);
                 } else if (entry.esm) {
                     esmEntries.push(entry);
+                } else if (entry.declaration) {
+                    dtsEntries.push(entry);
                 }
             }
 
@@ -804,6 +735,21 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                     );
                 }
             }
+
+            if (context.options.declaration && dtsEntries.length > 0) {
+                const adjustedCjsContext = {
+                    ...context,
+                    options: {
+                        ...context.options,
+                        emitCJS: false,
+                        emitESM: false,
+                        entries: dtsEntries,
+                        minify: environment !== "development" && context.options.minify,
+                    },
+                };
+
+                rollups.push(rollupBuildTypes(adjustedCjsContext, fileCache));
+            }
         }
     }
 
@@ -816,6 +762,10 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
 
     if (context.options.minify) {
         context.logger.info("Minification is enabled, the output will be minified");
+    }
+
+    if (context.options.declaration === false) {
+        context.logger.info("Generation of declaration files is disabled.");
     }
 
     await Promise.all(prepareRollupConfig(context, fileCache));

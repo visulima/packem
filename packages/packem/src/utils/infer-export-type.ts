@@ -1,5 +1,3 @@
-import type { PackageJson } from "@visulima/package";
-
 export const inferExportTypeFromFileName = (filename: string): "cjs" | "esm" | undefined => {
     if (filename.endsWith(".mjs") || filename.endsWith(".d.mts")) {
         return "esm";
@@ -12,7 +10,7 @@ export const inferExportTypeFromFileName = (filename: string): "cjs" | "esm" | u
     return undefined;
 };
 
-export const inferExportType = (condition: string, previousConditions: string[], filename?: string, type?: PackageJson["type"]): "cjs" | "esm" => {
+export const inferExportType = (condition: string, previousConditions: string[], packageType: "cjs" | "esm", filename?: string): "cjs" | "esm" => {
     if (filename) {
         const inferredType = inferExportTypeFromFileName(filename);
 
@@ -35,10 +33,10 @@ export const inferExportType = (condition: string, previousConditions: string[],
     }
 
     if (previousConditions.length === 0) {
-        return type === "commonjs" ? "cjs" : "esm";
+        return packageType;
     }
 
     const [newCondition, ...rest] = previousConditions;
 
-    return inferExportType(newCondition as string, rest, filename, type);
+    return inferExportType(newCondition as string, rest, packageType, filename);
 };

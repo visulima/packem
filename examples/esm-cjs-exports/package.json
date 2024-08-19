@@ -1,5 +1,5 @@
 {
-    "name": "example_packem_without_typescript",
+    "name": "example_packem_esm_cjs_exports",
     "version": "1.0.0",
     "private": true,
     "type": "module",

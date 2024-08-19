@@ -97,6 +97,7 @@ export type BuildEntry = {
     executable?: boolean;
     fileAlias?: boolean;
     input: string;
+    isGlob?: boolean;
     name?: string;
     outDir?: string;
     runtime?: Runtime;
@@ -189,7 +190,7 @@ export type BuildPreset = BuildConfig | (() => BuildConfig);
 export interface BuildConfig extends DeepPartial<Omit<BuildOptions, "entries">> {
     entries?: (BuildEntry | string)[];
     hooks?: Partial<BuildHooks>;
-    preset?: BuildPreset | string;
+    preset?: BuildPreset | "auto" | "none" | (NonNullable<unknown> & string);
 }
 
 export type InferEntriesResult = {

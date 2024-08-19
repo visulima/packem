@@ -95,6 +95,14 @@ const ENDING_RE = /(?:\.d\.[mc]?ts|\.\w+)$/;
 
 let privateSubfolderWarningShown = false;
 
+const validateIfTypescriptIsInstalled = (context: BuildContext): void => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (context.pkg?.dependencies?.typescript === undefined && context.pkg?.devDependencies?.typescript === undefined) {
+        // @TODO Add command to install typescript
+        throw new Error("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");
+    }
+};
+
 /**
  * Infer entries from package files.
  *
@@ -114,10 +122,18 @@ const inferEntries = (
     // Sort files so least-nested files are first
     sourceFiles.sort((a, b) => a.split("/").length - b.split("/").length);
 
-    const fileType = packageJson.type === "module" ? "esm" : "cjs";
+    const packageType = packageJson.type === "module" ? "esm" : "cjs";
+
+    if (packageType === "esm") {
+        context.options.emitESM = true;
+    }
+
+    if (packageType === "cjs") {
+        context.options.emitCJS = true;
+    }
 
     // Come up with a list of all output files & their formats
-    const outputs = extractExportFilenames(packageJson.exports, packageJson.type ?? "commonjs", context.options.declaration);
+    const outputs = extractExportFilenames(packageJson.exports, packageType, context.options.declaration);
 
     if (packageJson.bin) {
         const binaries = (typeof packageJson.bin === "string" ? [packageJson.bin] : Object.values(packageJson.bin)).filter(Boolean);
@@ -126,11 +142,11 @@ const inferEntries = (
         for (const file of binaries) {
             const inferredType = inferExportTypeFromFileName(file);
 
-            if (inferredType && inferredType !== fileType) {
+            if (inferredType && inferredType !== packageType) {
                 throw new Error(`Exported file "${file}" has an extension that does not match the package.json type "${packageJson.type as string}".`);
             }
 
-            outputs.push({ file: file as string, isExecutable: true, key: "bin", type: inferredType ?? fileType });
+            outputs.push({ file: file as string, isExecutable: true, key: "bin", type: inferredType });
         }
     }
 
@@ -138,7 +154,7 @@ const inferEntries = (
         outputs.push({
             file: packageJson.main,
             key: "main",
-            type: inferExportTypeFromFileName(packageJson.main) ?? fileType,
+            type: inferExportTypeFromFileName(packageJson.main) ?? packageType,
         });
     }
 
@@ -149,7 +165,11 @@ const inferEntries = (
     }
 
     // Entry point for TypeScript
-    if ((packageJson.types || packageJson.typings) && context.options.declaration) {
+    if (packageJson.types || packageJson.typings) {
+        validateIfTypescriptIsInstalled(context);
+
+        context.options.declaration = "compatible";
+
         outputs.push({ file: (packageJson.types ?? packageJson.typings) as string, key: "types" });
     }
 
@@ -158,6 +178,18 @@ const inferEntries = (
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const output of outputs) {
+        if (context.options.declaration === undefined) {
+            context.options.declaration = output.key === "types" || output.subKey === "types";
+        }
+
+        if (context.options.emitCJS === undefined) {
+            context.options.emitCJS = output.type === "cjs";
+        }
+
+        if (context.options.emitESM === undefined) {
+            context.options.emitESM = output.type === "esm";
+        }
+
         // Supported output file extensions are `.d.ts`, `.cjs` and `.mjs`
         // But we support any file extension here in case user has extended rollup options
         const outputSlug = output.file.replace(/(?:\*[^/\\]|\.d\.[mc]?ts|\.\w+)$/, "");
@@ -228,27 +260,14 @@ const inferEntries = (
             continue;
         }
 
-        if (isAccessibleSync(input + ".cts") && isAccessibleSync(input + ".mts")) {
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            if (context.pkg?.dependencies?.typescript === undefined && context.pkg?.devDependencies?.typescript === undefined) {
-                // @TODO Add command to install typescript
-                throw new Error("You tried to use a `.cts` or `.mts` file but `typescript` was not found in your package.json.");
-            }
+        if (isAccessibleSync(input + ".ts") || isAccessibleSync(input + ".cts") || isAccessibleSync(input + ".mts")) {
+            validateIfTypescriptIsInstalled(context);
+        }
 
+        if (isAccessibleSync(input + ".cts") && isAccessibleSync(input + ".mts")) {
             createOrUpdateEntry(entries, input + ".cts", isDirectory, outputSlug, { ...output, type: "cjs" }, context.options.declaration, context.environment);
             createOrUpdateEntry(entries, input + ".mts", isDirectory, outputSlug, { ...output, type: "esm" }, context.options.declaration, context.environment);
         } else {
-            if (
-                (isAccessibleSync(input + ".ts") || isAccessibleSync(input + ".cts") || isAccessibleSync(input + ".mts")) &&
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                context.pkg?.dependencies?.typescript === undefined &&
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                context.pkg?.devDependencies?.typescript === undefined
-            ) {
-                // @TODO Add command to install typescript
-                throw new Error("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");
-            }
-
             createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context.options.declaration, context.environment);
         }
     }

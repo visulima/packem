@@ -3,9 +3,11 @@ import { stat } from "node:fs/promises";
 import { readFile } from "@visulima/fs";
 import type { Pail } from "@visulima/pail";
 import { basename, dirname, join, normalize, relative } from "@visulima/path";
-import { glob } from "glob";
 import globParent from "glob-parent";
 import type { Plugin, PluginContext } from "rollup";
+import { glob } from "tinyglobby";
+
+import arrayify from "../../utils/arrayify";
 
 type SingleTargetDesc = {
     dest?: string;
@@ -80,7 +82,7 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail): Plugin => 
                     )
                     .map(
                         async (target) =>
-                            await glob(target.src, { ignore: target.exclude }).then((result) => {
+                            await glob(arrayify(target.src), { ignore: arrayify(target.exclude).filter(Boolean) }).then((result) => {
                                 return {
                                     dest: target.dest ?? "",
                                     parent: globParent(target.src as string),

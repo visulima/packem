@@ -13,7 +13,6 @@ import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";
 
 const autoPreset: BuildPreset = {
     hooks: {
-         
         "build:prepare": function (context: BuildContext) {
             // Disable auto if entries already provided of pkg not available
             if (context.options.entries.length > 0) {

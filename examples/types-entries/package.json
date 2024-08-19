@@ -1,0 +1,14 @@
+{
+    "name": "example_packem_type_entries",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "build": "packem build"
+    },
+    "types": "./types/index.types.ts",
+    "devDependencies": {
+        "@visulima/packem": "workspace:*",
+        "esbuild": "^0.23.0",
+        "typescript": "^5.5.4"
+    }
+}
