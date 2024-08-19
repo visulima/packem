@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.75](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.74...@visulima/packem@1.0.0-alpha.75) (2024-08-19)
+
+### Features
+
+* switched from glob to tinyglobby, added glob support for packem.config, added none preset ([70b1798](https://github.com/visulima/packem/commit/70b179850974b51f7ec81d35578adbbd33235180))
+
 ## @visulima/packem [1.0.0-alpha.74](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.73...@visulima/packem@1.0.0-alpha.74) (2024-08-13)
 
 ### Features
