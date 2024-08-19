@@ -610,7 +610,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                     ...context.options.rollup.output,
                 },
             // .d.ts for node10 compatibility (TypeScript version < 4.7)
-            (context.options.declaration === true || context.options.declaration === "compatible") &&
+            context.options.declaration === "compatible" &&
                 <OutputOptions>{
                     chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(context, chunk, "d.ts"),
                     dir: resolve(context.options.rootDir, context.options.outDir),
