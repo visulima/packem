@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.76](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.75...@visulima/packem@1.0.0-alpha.76) (2024-08-19)
+
+### Features
+
+* generate dts for ts 4.7 if only declaration = compatible is used ([ab3fd78](https://github.com/visulima/packem/commit/ab3fd78a4105798454545febb4b177525d4ba199))
+
 ## @visulima/packem [1.0.0-alpha.75](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.74...@visulima/packem@1.0.0-alpha.75) (2024-08-19)
 
 ### Features
