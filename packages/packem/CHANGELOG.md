@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.79](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.78...@visulima/packem@1.0.0-alpha.79) (2024-08-20)
+
+### Features
+
+* added no-clean option ([5837887](https://github.com/visulima/packem/commit/5837887e3f8955bd37ce809f8b4777a81ce0473b))
+* added no-clean option, more tests ([2cd3849](https://github.com/visulima/packem/commit/2cd3849a0cb4ae45fe9a102a57fe6963da9aa71d))
+
 ## @visulima/packem [1.0.0-alpha.78](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.77...@visulima/packem@1.0.0-alpha.78) (2024-08-20)
 
 ### Bug Fixes
