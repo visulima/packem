@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.78](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.77...@visulima/packem@1.0.0-alpha.78) (2024-08-20)
+
+### Bug Fixes
+
+* fixed handling of tsconfig paths @,#,~ aliases ([3e31cbf](https://github.com/visulima/packem/commit/3e31cbf5eb392db54d817a902624e77d29774b1d))
+
 ## @visulima/packem [1.0.0-alpha.77](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.76...@visulima/packem@1.0.0-alpha.77) (2024-08-20)
 
 ### Features
