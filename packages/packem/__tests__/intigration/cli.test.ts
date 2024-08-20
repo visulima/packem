@@ -191,4 +191,43 @@ export { a };
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         expect(existsSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`)).toBeTruthy();
     });
+
+    it("should clean the dist directory before building, when no --no-clean option was given", async () => {
+        expect.assertions(5);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
+        writeFileSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`, `dot do it`);
+
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "dist/index.mjs",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).toContain("Cleaning dist directory");
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mtsContent).toBe(`const a = 1;
+
+export { a };
+`);
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        expect(existsSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`)).toBeFalsy();
+    });
 });
