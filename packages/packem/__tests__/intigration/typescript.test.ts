@@ -253,10 +253,10 @@ describe("packem typescript", () => {
             expect(mjs).toMatchSnapshot("mjs code output");
         });
 
-        it("should resolve tsconfig paths with a '@'", async () => {
+        it.each(["@", "#", "~"])("should resolve tsconfig paths with a '%s'", async (namespace) => {
             expect.assertions(4);
 
-            writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'import "@/Test";');
+            writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `import "${namespace}/Test";`);
             writeFileSync(`${temporaryDirectoryPath}/src/components/Test.ts`, "console.log(1);");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -264,7 +264,7 @@ describe("packem typescript", () => {
                 compilerOptions: {
                     baseUrl: "src",
                     paths: {
-                        "@": ["components/*.ts"],
+                        [namespace]: ["components/*.ts"],
                     },
                 },
             });
@@ -273,6 +273,7 @@ describe("packem typescript", () => {
                     typescript: "*",
                 },
                 main: "./dist/index.cjs",
+                module: "./dist/index.mjs",
             });
             await createPackemConfig(temporaryDirectoryPath, {});
 
@@ -919,13 +920,6 @@ exports.getOne = getOne;
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare function getOne(): Promise<any>;
-
-export { getOne };
-`);
-
-        const dTsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
-
-        expect(dTsContent).toBe(`declare function getOne(): Promise<any>;
 
 export { getOne };
 `);

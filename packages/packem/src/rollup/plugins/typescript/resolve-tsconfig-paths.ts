@@ -37,9 +37,17 @@ export const getConfigAlias = (tsconfig?: TsConfigResult, addBaseUrl = true): Al
     if (paths) {
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [alias, values] of Object.entries(paths)) {
-            /** Regular Expression used to match a given path. */
-            // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-            const find = new RegExp(`^${[...alias].map((segment) => (segment === "*" ? "(.+)" : segment.replace(/[\\^$*+?.()|[\]{}]/, "\\$&"))).join("")}$`);
+            let find: RegExp;
+
+            // eslint-disable-next-line unicorn/prefer-ternary
+            if (alias === "@" || alias === "~" || alias === "#") {
+                // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+                find = new RegExp(`^${alias}/(.+)$`);
+            } else {
+                /** Regular Expression used to match a given path. */
+                // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+                find = new RegExp(`^${[...alias].map((segment) => (segment === "*" ? "(.+)" : segment.replace(/[\\^$*+?.()|[\]{}]/, "\\$&"))).join("")}$`);
+            }
 
             /** Internal index used to calculate the matching id in a replacement. */
             let matchId = 0;

@@ -674,7 +674,28 @@ export { render };
             reject: false,
         });
 
-        expect(binProcess.stderr).toContain(`Exported file "./dist/index.mjs" has an extension that does not match the package.json type "cjs"`);
+        expect(binProcess.stderr).toContain(`Exported file "./dist/index.mjs" has an extension that does not match the package.json type "commonjs"`);
+        expect(binProcess.exitCode).toBe(1);
+    });
+
+    it("should throw a error if exports is cjs file with type module in package.json", async () => {
+        expect.assertions(2);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            exports: "./dist/index.cjs",
+            type: "module",
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.stderr).toContain(`Exported file "./dist/index.cjs" has an extension that does not match the package.json type "module"`);
         expect(binProcess.exitCode).toBe(1);
     });
 

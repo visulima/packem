@@ -76,8 +76,8 @@ export { A as default };
 `);
     });
 
-    it("should run in production mode if no NODE_ENV or 'production', 'development' options was given", async () => {
-        expect.assertions(5);
+    it("should run in development mode if no NODE_ENV and development option was given", async () => {
+        expect.assertions(7);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -94,7 +94,46 @@ export { A as default };
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", ["--development"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).toContain("Preparing build for");
+        expect(binProcess.stdout).toContain("development");
+        expect(binProcess.stdout).toContain("environment with");
+        expect(binProcess.stdout).not.toContain("Minification is enabled, the output will be minified");
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mtsContent).toBe(`const a = 1;
+
+export { a };
+`);
+    });
+
+    it("should run in production mode if no NODE_ENV and production option was given", async () => {
+        expect.assertions(7);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
+
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "dist/index.mjs",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackemSync("build", ["--production"], {
             cwd: temporaryDirectoryPath,
             env: {},
         });
@@ -109,9 +148,7 @@ export { A as default };
 
         const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mtsContent).toBe(`const a = 1;
-
-export { a };
+        expect(mtsContent).toBe(`const o=1;export{o as a};
 `);
     });
 });

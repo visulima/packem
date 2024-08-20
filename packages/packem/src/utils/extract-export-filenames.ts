@@ -32,6 +32,7 @@ export const extractExportFilenames = (
     packageType: "esm" | "cjs",
     declaration: BuildOptions["declaration"],
     conditions: string[] = [],
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): OutputDescriptor[] => {
     if (!packageExports) {
         return [];
@@ -41,7 +42,7 @@ export const extractExportFilenames = (
         const inferredType = inferExportTypeFromFileName(packageExports);
 
         if (inferredType && inferredType !== packageType) {
-            throw new Error(`Exported file "${packageExports}" has an extension that does not match the package.json type "${packageType}".`);
+            throw new Error(`Exported file "${packageExports}" has an extension that does not match the package.json type "${packageType === "esm" ? "module" : "commonjs"}".`);
         }
 
         return [{ file: packageExports, key: "exports", type: inferredType ?? packageType }];
