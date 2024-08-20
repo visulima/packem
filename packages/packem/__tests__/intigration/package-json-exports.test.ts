@@ -894,4 +894,34 @@ const index = "index";
 exports.index = index;
 `);
     });
+
+    it("should work with edge export condition", async () => {
+        expect.assertions(3);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const variable = typeof EdgeRuntime;`);
+
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            exports: {
+                "edge-light": "./dist/index.edge.mjs",
+                import: "./dist/index.mjs",
+            },
+            type: "module",
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjs).toBe(`typeof EdgeRuntime`);
+
+        const mjsEdgeLight = readFileSync(`${temporaryDirectoryPath}/dist/index.edge.mjs`);
+
+        expect(mjsEdgeLight).toBe(`typeof "edge-runtime"`);
+    });
 });
