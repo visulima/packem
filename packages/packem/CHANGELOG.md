@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.80](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.79...@visulima/packem@1.0.0-alpha.80) (2024-08-20)
+
+### Features
+
+* fixed more tests, fixed overwrite of cli -> config file -> base config ([655b999](https://github.com/visulima/packem/commit/655b99937221defc50c28ba1eea511ccd6ce0c90))
+
 ## @visulima/packem [1.0.0-alpha.79](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.78...@visulima/packem@1.0.0-alpha.79) (2024-08-20)
 
 ### Features
