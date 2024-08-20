@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.77](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.76...@visulima/packem@1.0.0-alpha.77) (2024-08-20)
+
+### Features
+
+* fixed handling of types generation, based on auto preset ([bc584db](https://github.com/visulima/packem/commit/bc584dbb2ca58bf49abb0bb9a6f3dd9ad2d5750f))
+
 ## @visulima/packem [1.0.0-alpha.76](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.75...@visulima/packem@1.0.0-alpha.76) (2024-08-19)
 
 ### Features
