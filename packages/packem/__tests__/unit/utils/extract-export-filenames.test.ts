@@ -8,7 +8,7 @@ describe("extractExportFilenames", () => {
         expect.assertions(1);
 
         const packageExports = null;
-        const type = "module";
+        const type = "esm";
 
         const result = extractExportFilenames(packageExports, type, false);
 
@@ -19,7 +19,7 @@ describe("extractExportFilenames", () => {
         expect.assertions(1);
 
         const packageExports = "index.js";
-        const type = "module";
+        const type = "esm";
 
         const result = extractExportFilenames(packageExports, type, false);
 
@@ -33,7 +33,7 @@ describe("extractExportFilenames", () => {
             "./lib": "./lib/index.js",
             "./src": "./src/index.js",
         };
-        const type = "module";
+        const type = "esm";
 
         const result = extractExportFilenames(packageExports, type, false);
 
@@ -50,7 +50,7 @@ describe("extractExportFilenames", () => {
             "./lib": "./lib/index.js",
             "./src": "./src/index.mjs",
         };
-        const type = "commonjs";
+        const type = "cjs";
 
         const result = extractExportFilenames(packageExports, type, false);
 
@@ -71,7 +71,7 @@ describe("extractExportFilenames", () => {
                 import: "./src/index.js",
             },
         };
-        const type = "commonjs";
+        const type = "cjs";
 
         const result = extractExportFilenames(packageExports, type, false);
 
@@ -94,7 +94,7 @@ describe("extractExportFilenames", () => {
                 require: "./src/index.cjs",
             },
         };
-        const type = "commonjs";
+        const type = "cjs";
 
         const result = extractExportFilenames(packageExports, type, false);
 
@@ -130,7 +130,7 @@ describe("extractExportFilenames", () => {
         expect.assertions(1);
 
         const packageExports = "./src/index.cjs";
-        const type = "module";
+        const type = "esm";
 
         expect(() => {
             extractExportFilenames(packageExports, type, false);
@@ -163,7 +163,7 @@ describe("extractExportFilenames", () => {
                 },
             },
         };
-        const type = "commonjs";
+        const type = "cjs";
 
         const result = extractExportFilenames(packageExports, type, true);
 

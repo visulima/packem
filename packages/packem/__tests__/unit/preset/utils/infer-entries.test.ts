@@ -211,7 +211,7 @@ describe("inferEntries", () => {
         createFiles(["src/other/runtime/index.ts"], temporaryDirectoryPath);
 
         const result = inferEntries(
-            { exports: "dist/runtime/index.js" },
+            { exports: "dist/other/runtime/index.js" },
             ["src/", "src/other", "src/other/runtime", "src/other/runtime/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
             defaultContext,
         );
@@ -247,7 +247,7 @@ describe("inferEntries", () => {
             entries: [
                 {
                     cjs: true,
-                    environment: "development",
+                    environment: undefined,
                     input: join(temporaryDirectoryPath, "src/test"),
                     runtime: "node",
                 },
@@ -263,7 +263,11 @@ describe("inferEntries", () => {
                     types: "dist/test.d.ts",
                 },
                 ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
-                { environment: defaultContext.environment, options: { ...defaultContext.options, declaration: true }, pkg: defaultContext.pkg } as unknown as BuildContext,
+                {
+                    environment: defaultContext.environment,
+                    options: { ...defaultContext.options, declaration: true },
+                    pkg: defaultContext.pkg,
+                } as unknown as BuildContext,
             ),
         ).toStrictEqual({
             entries: [
@@ -287,7 +291,11 @@ describe("inferEntries", () => {
                     typings: "dist/test.d.ts",
                 },
                 ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
-                { environment: defaultContext.environment, options: { ...defaultContext.options, declaration: true }, pkg: defaultContext.pkg } as unknown as BuildContext,
+                {
+                    environment: defaultContext.environment,
+                    options: { ...defaultContext.options, declaration: true },
+                    pkg: defaultContext.pkg,
+                } as unknown as BuildContext,
             ),
         ).toStrictEqual({
             entries: [
@@ -323,7 +331,11 @@ describe("inferEntries", () => {
                 },
             },
             ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
-            { environment: defaultContext.environment, options: { ...defaultContext.options, declaration: true }, pkg: defaultContext.pkg } as unknown as BuildContext,
+            {
+                environment: defaultContext.environment,
+                options: { ...defaultContext.options, declaration: true },
+                pkg: defaultContext.pkg,
+            } as unknown as BuildContext,
         );
         expect(result).toStrictEqual({
             entries: [
@@ -551,7 +563,11 @@ describe("inferEntries", () => {
                 },
             },
             ["src/", "src/test.ts", "src/test.cts", "src/test.mts"].map((file) => join(temporaryDirectoryPath, file)),
-            { environment: defaultContext.environment, options: { ...defaultContext.options, declaration: true }, pkg: defaultContext.pkg } as unknown as BuildContext,
+            {
+                environment: defaultContext.environment,
+                options: { ...defaultContext.options, declaration: true },
+                pkg: defaultContext.pkg,
+            } as unknown as BuildContext,
         );
         expect(result).toStrictEqual({
             entries: [
@@ -601,7 +617,11 @@ describe("inferEntries", () => {
                 },
             },
             ["src/", "src/index.ts", "src/index.react-server.ts"].map((file) => join(temporaryDirectoryPath, file)),
-            { environment: defaultContext.environment, options: { ...defaultContext.options, declaration: true }, pkg: defaultContext.pkg } as unknown as BuildContext,
+            {
+                environment: defaultContext.environment,
+                options: { ...defaultContext.options, declaration: true },
+                pkg: defaultContext.pkg,
+            } as unknown as BuildContext,
         );
         expect(result).toStrictEqual({
             entries: [
@@ -609,6 +629,7 @@ describe("inferEntries", () => {
                     cjs: true,
                     environment: "development",
                     esm: true,
+                    fileAlias: true,
                     input: join(temporaryDirectoryPath, "src/index"),
                     runtime: "node",
                 },
@@ -616,6 +637,7 @@ describe("inferEntries", () => {
                     cjs: true,
                     environment: "production",
                     esm: true,
+                    fileAlias: true,
                     input: join(temporaryDirectoryPath, "src/index"),
                     runtime: "node",
                 },

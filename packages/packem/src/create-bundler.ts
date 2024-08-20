@@ -614,6 +614,13 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                 }
             }
 
+            let minify = environment !== "development" && context.options.minify;
+
+            // global minify overrides entry-specific minify
+            if (context.options.minify) {
+                minify = true;
+            }
+
             if (esmAndCjsEntries.length > 0) {
                 const adjustedEsmAndCjsContext = {
                     ...context,
@@ -622,7 +629,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                         emitCJS: true,
                         emitESM: true,
                         entries: esmAndCjsEntries,
-                        minify: environment !== "development" && context.options.minify,
+                        minify,
                     },
                 };
 
@@ -654,7 +661,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                         emitCJS: false,
                         emitESM: true,
                         entries: esmEntries,
-                        minify: environment !== "development" && context.options.minify,
+                        minify,
                     },
                 };
 
@@ -686,7 +693,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                         emitCJS: true,
                         emitESM: false,
                         entries: cjsEntries,
-                        minify: environment !== "development" && context.options.minify,
+                        minify,
                     },
                 };
 
@@ -718,7 +725,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                         emitCJS: false,
                         emitESM: false,
                         entries: dtsEntries,
-                        minify: environment !== "development" && context.options.minify,
+                        minify,
                     },
                 };
 

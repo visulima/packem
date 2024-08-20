@@ -146,7 +146,7 @@ const inferEntries = (
                 throw new Error(`Exported file "${file}" has an extension that does not match the package.json type "${packageJson.type ?? "commonjs"}".`);
             }
 
-            outputs.push({ file: file as string, isExecutable: true, key: "bin", type: inferredType });
+            outputs.push({ file: file as string, isExecutable: true, key: "bin", type: inferredType ?? packageType });
         }
     }
 
