@@ -51,15 +51,19 @@ export const extractExportFilenames = (
         Object.entries(packageExports)
             // Filter out .json subpaths such as package.json
             .filter(([subpath]) => !subpath.endsWith(".json"))
-            .flatMap(([condition, packageExport]) =>
-                (typeof packageExport === "string"
+            .flatMap(([condition, packageExport]) => {
+                if (declaration === false && condition === "types") {
+                    return [];
+                }
+
+                return typeof packageExport === "string"
                     ? {
                           file: packageExport,
                           key: "exports",
                           ...(exportsKeys.includes(condition) ? { subKey: condition as OutputDescriptor["subKey"] } : {}),
                           type: inferExportType(condition, conditions, packageType, packageExport),
                       }
-                    : extractExportFilenames(packageExport, packageType, declaration, [...conditions, condition])),
-            )
+                    : extractExportFilenames(packageExport, packageType, declaration, [...conditions, condition]);
+            })
     );
 };

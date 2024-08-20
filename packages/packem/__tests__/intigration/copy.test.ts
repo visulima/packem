@@ -18,7 +18,7 @@ describe("packem copy", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it("should not trigger a warning if alias option is used", async () => {
+    it("should copy files based on target glob pattern", async () => {
         expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `console.log("Hello, world!");`);

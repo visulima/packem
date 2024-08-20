@@ -10,15 +10,15 @@ import levenstein from "../utils/levenstein";
 import warn from "../utils/warn";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const validatePackage = (package_: PackageJson, context: BuildContext): void => {
+const validatePackage = (packageJson: PackageJson, context: BuildContext): void => {
     const filenames = new Set(
         [
-            ...(typeof package_.bin === "string" ? [package_.bin] : Object.values(package_.bin ?? {})),
-            package_.main,
-            package_.module,
-            context.options.declaration ? package_.types : "",
-            context.options.declaration ? package_.typings : "",
-            ...extractExportFilenames(package_.exports, package_.type === "module" ? "esm" : "cjs", context.options.declaration).map((index) => index.file),
+            ...(typeof packageJson.bin === "string" ? [packageJson.bin] : Object.values(packageJson.bin ?? {})),
+            packageJson.main,
+            packageJson.module,
+            context.options.declaration ? packageJson.types : "",
+            context.options.declaration ? packageJson.typings : "",
+            ...extractExportFilenames(packageJson.exports, packageJson.type === "module" ? "esm" : "cjs", context.options.declaration).map((index) => index.file),
         ].map(
             (index) =>
                 index &&

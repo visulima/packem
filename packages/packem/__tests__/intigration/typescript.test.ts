@@ -43,19 +43,50 @@ describe("packem typescript", () => {
         expect(binProcess.exitCode).toBe(1);
     });
 
-    it("should show a warning if declaration is disabled", async () => {
+    it("should show a info if declaration is disabled", async () => {
         expect.assertions(3);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
-        createTsConfig(temporaryDirectoryPath, {});
 
+        createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
             exports: "./dist/index.cjs",
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, { declaration: false });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+        expect(binProcess.stdout).toContain("Generation of declaration files is disabled.");
+    });
+
+    it("should not throw a error if declaration is disabled and a types fields are present", async () => {
+        expect.assertions(3);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    default: "./dist/index.cjs",
+                    types: "./dist/index.d.ts",
+                },
+            },
             types: "./dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath, { declaration: false });
@@ -380,6 +411,7 @@ export class ExampleClass {
         createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 allowJs: true,
+                baseUrl: "./",
             },
         });
         createPackageJson(temporaryDirectoryPath, {
@@ -412,7 +444,7 @@ export class ExampleClass {
     });
 
     it("should output correct bundles and types import json with export condition", async () => {
-        expect.assertions(5);
+        expect.assertions(4);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
@@ -453,13 +485,6 @@ export const version = pkgJson.version;
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare const version: string;
-
-export { version };
-`);
-
-        const dTsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
-
-        expect(dTsContent).toBe(`declare const version: string;
 
 export { version };
 `);
@@ -598,11 +623,12 @@ export { index as default };
     });
 
     it("should work with tsconfig 'noEmit' option", async () => {
-        expect.assertions(5);
+        expect.assertions(4);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index'`);
+
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -610,7 +636,7 @@ export { index as default };
             exports: {
                 ".": {
                     default: "./dist/index.mjs",
-                    types: "./dist/index.d.ts",
+                    types: "./dist/index.d.mts",
                 },
             },
             type: "module",
@@ -641,13 +667,6 @@ export { index as default };
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare const _default: () => string;
-
-export { _default as default };
-`);
-
-        const dTsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
-
-        expect(dTsContent).toBe(`declare const _default: () => string;
 
 export { _default as default };
 `);
@@ -809,13 +828,6 @@ exports.getOne = getOne;
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare function getOne(): Promise<number>;
-
-export { getOne };
-`);
-
-        const dTsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
-
-        expect(dTsContent).toBe(`declare function getOne(): Promise<number>;
 
 export { getOne };
 `);

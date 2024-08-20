@@ -674,7 +674,7 @@ export { render };
             reject: false,
         });
 
-        expect(binProcess.stderr).toContain(`Exported file "./dist/index.mjs" has an extension that does not match the package.json type "commonjs"`);
+        expect(binProcess.stderr).toContain(`Exported file "./dist/index.mjs" has an extension that does not match the package.json type "cjs"`);
         expect(binProcess.exitCode).toBe(1);
     });
 

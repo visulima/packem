@@ -168,7 +168,9 @@ const inferEntries = (
     if (packageJson.types || packageJson.typings) {
         validateIfTypescriptIsInstalled(context);
 
-        context.options.declaration = "compatible";
+        if (context.options.declaration === undefined) {
+            context.options.declaration = "compatible";
+        }
 
         outputs.push({ file: (packageJson.types ?? packageJson.typings) as string, key: "types" });
     }
@@ -178,16 +180,16 @@ const inferEntries = (
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const output of outputs) {
-        if (context.options.declaration === undefined) {
-            context.options.declaration = output.key === "types" || output.subKey === "types";
+        if (context.options.declaration === undefined && (output.key === "types" || output.subKey === "types")) {
+            context.options.declaration = output.file.includes(".d.ts") ? "compatible" : true;
         }
 
-        if (context.options.emitCJS === undefined) {
-            context.options.emitCJS = output.type === "cjs";
+        if (context.options.emitCJS === undefined && output.type === "cjs") {
+            context.options.emitCJS = true;
         }
 
-        if (context.options.emitESM === undefined) {
-            context.options.emitESM = output.type === "esm";
+        if (context.options.emitESM === undefined && output.type === "esm") {
+            context.options.emitESM = true;
         }
 
         // Supported output file extensions are `.d.ts`, `.cjs` and `.mjs`

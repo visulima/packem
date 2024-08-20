@@ -60,6 +60,9 @@ export default defineConfig({
     ${JSON.stringify(config, null, 4).slice(1, -1)}
 });
 `,
+        {
+            overwrite: true,
+        }
     );
 };
 

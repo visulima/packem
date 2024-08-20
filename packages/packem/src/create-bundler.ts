@@ -356,16 +356,6 @@ const generateOptions = (
         logger.debug("Disabling polyfillNode because preferBuiltins is set to true");
     }
 
-    if (
-        options.declaration &&
-        (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript) &&
-        !tsconfig?.config.compilerOptions?.isolatedModules
-    ) {
-        logger.warn(
-            `'compilerOptions.isolatedModules' is not enabled in tsconfig.\nBecause none of the third-party transpiler, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.\nTo mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.`,
-        );
-    }
-
     // Add all dependencies as externals
     if (packageJson.dependencies) {
         options.externals.push(...Object.keys(packageJson.dependencies));
@@ -538,22 +528,6 @@ const createContext = async (
 
     if (context.options.emitCJS === undefined) {
         context.logger.info("Emitting of CJS bundles, is disabled.");
-    }
-
-    const hasTypescript = packageJson.dependencies?.typescript !== undefined || packageJson.devDependencies?.typescript !== undefined;
-
-    if (context.options.declaration && tsconfig === undefined && hasTypescript) {
-        throw new Error("               Cannot build declaration files without a tsconfig.json");
-    }
-
-    if (!hasTypescript) {
-        context.options.declaration = false;
-
-        context.logger.info("Typescript is not installed. Declaration files will not be generated.");
-    }
-
-    if (context.options.declaration) {
-        context.logger.info("Using typescript version: " + cyan(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript ?? "unknown"));
     }
 
     return context;
@@ -756,6 +730,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
     return rollups;
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const build = async (context: BuildContext, packageJson: PackEmPackageJson, fileCache: FileCache): Promise<void> => {
     // Call build:before
     await context.hooks.callHook("build:before", context);
@@ -764,8 +739,38 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
         context.logger.info("Minification is enabled, the output will be minified");
     }
 
-    if (context.options.declaration === false) {
-        context.logger.info("Generation of declaration files is disabled.");
+    const hasTypescript = packageJson.dependencies?.typescript !== undefined || packageJson.devDependencies?.typescript !== undefined;
+
+    if (context.options.declaration && context.tsconfig === undefined && hasTypescript) {
+        throw new Error("Cannot build declaration files without a tsconfig.json");
+    }
+
+    if (!hasTypescript) {
+        context.options.declaration = false;
+
+        context.logger.info({
+            message: "Typescript is not installed. Generation of declaration files are disabled.",
+            prefix: "dts",
+        });
+    } else if (context.options.declaration === false) {
+        context.logger.info({
+            message: "Generation of declaration files are disabled.",
+            prefix: "dts",
+        });
+    }
+
+    if (context.options.declaration) {
+        context.logger.info("Using typescript version: " + cyan(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript ?? "unknown"));
+    }
+
+    if (
+        context.options.declaration &&
+        (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript) &&
+        !context.tsconfig?.config.compilerOptions?.isolatedModules
+    ) {
+        context.logger.warn(
+            `'compilerOptions.isolatedModules' is not enabled in tsconfig.\nBecause none of the third-party transpiler, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.\nTo mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.`,
+        );
     }
 
     await Promise.all(prepareRollupConfig(context, fileCache));
