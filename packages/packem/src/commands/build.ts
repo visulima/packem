@@ -54,6 +54,7 @@ const createBuildCommand = (cli: Cli): void => {
             try {
                 await createBundler(options.dir, mode, nodeEnvironment as Environment, logger, {
                     cjsInterop: options.cjsInterop,
+                    clean: options.clean,
                     configPath: options.config ?? undefined,
                     debug: options.debug,
                     minify: options.minify === undefined ? nodeEnvironment === PRODUCTION_ENV : options.minify,
@@ -171,6 +172,11 @@ const createBuildCommand = (cli: Cli): void => {
                 name: "development",
                 type: Boolean,
             },
+            {
+                description: "Do not clean the dist directory before building",
+                name: "no-clean",
+                type: Boolean,
+            }
         ],
     });
 };

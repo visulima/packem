@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
@@ -150,5 +151,44 @@ export { a };
 
         expect(mtsContent).toBe(`const o=1;export{o as a};
 `);
+    });
+
+    it("should not clean the dist directory before building, when --no-clean option was given", async () => {
+        expect.assertions(5);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
+        writeFileSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`, `dot do it`);
+
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "dist/index.mjs",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackemSync("build", ["--no-clean"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).not.toContain("Cleaning dist directory");
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mtsContent).toBe(`const a = 1;
+
+export { a };
+`);
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        expect(existsSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`)).toBeTruthy();
     });
 });
