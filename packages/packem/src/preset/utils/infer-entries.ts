@@ -87,12 +87,7 @@ const createOrUpdateEntry = (
     const aliasName = output.file.replace(extname(output.file), "").replace(new RegExp(`^./${context.options.outDir.replace(/^\.\//, "")}/`), "");
 
     if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && !input.includes(aliasName)) {
-        entry.fileAliases = [
-            ...new Set([
-                ...(entry.fileAliases ?? []),
-                aliasName,
-            ]),
-        ];
+        entry.fileAliases = [...new Set([...(entry.fileAliases ?? []), aliasName])];
     }
 };
 
@@ -210,11 +205,10 @@ const inferEntries = (
         }
 
         // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-        let sourceSlug = outputSlug.replace(new RegExp("(./)?" + context.options.outDir), context.options.sourceDir).replace("./", "");
+        const sourceSlug = outputSlug.replace(new RegExp("(./)?" + context.options.outDir), context.options.sourceDir).replace("./", "");
 
-        if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string)) {
-            sourceSlug = sourceSlug.replace(/(.*)\.[^.]*$/, '$1');
-        }
+        const beforeSourceRegex = "(?<=/|$)";
+        const fileExtensionRegex = (isDirectory ? "" : "\\.\\w+$")
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if (output.file.includes("/*") && output.key === "exports") {
@@ -227,10 +221,13 @@ const inferEntries = (
             const inputs: string[] = [];
 
             // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-            const SOURCE_RE = new RegExp("(?<=/|$)" + sourceSlug.replace("*", "(.*)") + (isDirectory ? "" : "\\.\\w+"));
+            const SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace("*", "(.*)") + fileExtensionRegex);
+            // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+            const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace(/(.*)\.[^.]*$/, "$1").replace("*", "(.*)") + fileExtensionRegex);
+
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const source of sourceFiles) {
-                if (SOURCE_RE.test(source)) {
+                if (SOURCE_RE.test(source) || (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && SPECIAL_SOURCE_RE.test(source))) {
                     inputs.push(source.replace(ENDING_RE, ""));
                 }
             }
@@ -252,11 +249,18 @@ const inferEntries = (
         }
 
         // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-        const SOURCE_RE = new RegExp("(?<=/|$)" + sourceSlug + (isDirectory ? "" : "\\.\\w+"));
+        const SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug + fileExtensionRegex);
 
-        const input = sourceFiles.find((index) => SOURCE_RE.test(index))?.replace(ENDING_RE, "");
+        let input = sourceFiles.find((index) => SOURCE_RE.test(index))?.replace(ENDING_RE, "");
 
-        if (!input) {
+        if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && input === undefined) {
+            // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+            const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace(/(.*)\.[^.]*$/, "$1") + fileExtensionRegex);
+
+            input = sourceFiles.find((index) => SPECIAL_SOURCE_RE.test(index))?.replace(ENDING_RE, "");
+        }
+
+        if (input === undefined) {
             // eslint-disable-next-line security/detect-non-literal-fs-filename
             if (!existsSync(resolve(context.options.rootDir, output.file))) {
                 warnings.push(`Could not find entrypoint for \`${output.file}\``);

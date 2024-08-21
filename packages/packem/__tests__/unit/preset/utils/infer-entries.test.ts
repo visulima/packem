@@ -595,6 +595,7 @@ describe("inferEntries", () => {
         expect.assertions(1);
 
         createFiles(["src/index.ts"], temporaryDirectoryPath);
+        createFiles(["src/index.production.ts"], temporaryDirectoryPath);
         createFiles(["src/index.react-server.ts"], temporaryDirectoryPath);
 
         const result = inferEntries(
@@ -616,7 +617,7 @@ describe("inferEntries", () => {
                     },
                 },
             },
-            ["src/", "src/index.ts", "src/index.react-server.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            ["src/", "src/index.ts", "src/index.react-server.ts", "src/index.production.ts"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 environment: defaultContext.environment,
                 options: { ...defaultContext.options, declaration: true, outDir: "dist" },
@@ -637,8 +638,7 @@ describe("inferEntries", () => {
                     cjs: true,
                     environment: "production",
                     esm: true,
-                    fileAliases: ["index.production"],
-                    input: join(temporaryDirectoryPath, "src/index"),
+                    input: join(temporaryDirectoryPath, "src/index.production"),
                     runtime: "node",
                 },
                 {

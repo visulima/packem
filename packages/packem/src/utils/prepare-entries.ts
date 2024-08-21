@@ -3,15 +3,16 @@ import { readdir } from "node:fs/promises";
 import { cyan } from "@visulima/colorize";
 import { isAccessibleSync } from "@visulima/fs";
 import { NotFoundError } from "@visulima/fs/error";
-import { basename, dirname, extname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
+import { basename, dirname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import isGlob from "is-glob";
 import { globSync } from "tinyglobby";
 
-import { DEFAULT_EXTENSIONS } from "../constants";
+import { DEFAULT_EXTENSIONS, DEFAULT_LOADERS } from "../constants";
 import type { BuildContext, BuildEntry } from "../types";
 import dumpObject from "./dump-object";
 
-const removeExtension = (filename: string): string => filename.replace(extname(filename), "");
+// eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+const removeExtension = (filename: string): string => filename.replace(new RegExp(`.(?:${Object.keys(DEFAULT_LOADERS).join("|")})$`), "");
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const prepareEntries = async (context: BuildContext, rootDirectory: string): Promise<void> => {

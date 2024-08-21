@@ -142,7 +142,7 @@ export function method() {
     });
 
     it("should work with dev and prod optimize conditions in nested-convention", async () => {
-        expect.assertions(6);
+        expect.assertions(14);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = 'index';`);
         writeFileSync(`${temporaryDirectoryPath}/src/index.production.ts`, `export const value = process.env.NODE_ENV;`);
@@ -198,17 +198,16 @@ export function method() {
             ["index.development.mjs", /= "development"/],
             ["index.production.cjs", /= "production"/],
             ["index.production.mjs", /= "production"/],
-            // In vitest the NODE_ENV is set to test
-            ["index.cjs", /= "test"/],
-            ["index.mjs", /= "test"/],
+            ["index.cjs", /= "index"/],
+            ["index.mjs", /= "index"/],
 
             // core export
-            ["core.development.cjs", /= 'core' \+ "development"/],
-            ["core.development.mjs", /= 'core' \+ "development"/],
-            ["core.production.cjs", /= 'core' \+ "production"/],
-            ["core.production.mjs", /= 'core' \+ "production"/],
-            ["core.cjs", /= 'core'/],
-            ["core.mjs", /= 'core'/],
+            ["core.development.cjs", /= "coredevelopment"/],
+            ["core.development.mjs", /= "coredevelopment"/],
+            ["core.production.cjs", /= "coreproduction"/],
+            ["core.production.mjs", /= "coreproduction"/],
+            ["core.cjs", /= "core"/],
+            ["core.mjs", /= "core"/],
         ]) {
             const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
 
