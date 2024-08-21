@@ -619,7 +619,7 @@ describe("inferEntries", () => {
             ["src/", "src/index.ts", "src/index.react-server.ts"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 environment: defaultContext.environment,
-                options: { ...defaultContext.options, declaration: true },
+                options: { ...defaultContext.options, declaration: true, outDir: "dist" },
                 pkg: defaultContext.pkg,
             } as unknown as BuildContext,
         );
@@ -629,7 +629,7 @@ describe("inferEntries", () => {
                     cjs: true,
                     environment: "development",
                     esm: true,
-                    fileAlias: true,
+                    fileAliases: ["index.development"],
                     input: join(temporaryDirectoryPath, "src/index"),
                     runtime: "node",
                 },
@@ -637,7 +637,7 @@ describe("inferEntries", () => {
                     cjs: true,
                     environment: "production",
                     esm: true,
-                    fileAlias: true,
+                    fileAliases: ["index.production"],
                     input: join(temporaryDirectoryPath, "src/index"),
                     runtime: "node",
                 },
@@ -646,6 +646,39 @@ describe("inferEntries", () => {
                     esm: true,
                     input: join(temporaryDirectoryPath, "src/index.react-server"),
                     runtime: "react-server",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+    });
+
+    it("should work with edge-light", () => {
+        expect.assertions(1);
+
+        createFiles(["src/index.ts"], temporaryDirectoryPath);
+
+        const result = inferEntries(
+            {
+                exports: {
+                    "edge-light": "./dist/index.edge.mjs",
+                    import: "./dist/index.mjs",
+                },
+                type: "module",
+            },
+            ["src/", "src/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            {
+                options: { ...defaultContext.options, declaration: true, outDir: "dist" },
+                pkg: defaultContext.pkg,
+            } as unknown as BuildContext,
+        );
+        expect(result).toStrictEqual({
+            entries: [
+                {
+                    environment: undefined,
+                    esm: true,
+                    fileAliases: ["index.edge"],
+                    input: join(temporaryDirectoryPath, "src/index"),
+                    runtime: "node",
                 },
             ],
             warnings: [],

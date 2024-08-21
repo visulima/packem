@@ -3,7 +3,7 @@ import { readdir } from "node:fs/promises";
 import { cyan } from "@visulima/colorize";
 import { isAccessibleSync } from "@visulima/fs";
 import { NotFoundError } from "@visulima/fs/error";
-import { basename, dirname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
+import { basename, dirname, extname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import isGlob from "is-glob";
 import { globSync } from "tinyglobby";
 
@@ -11,7 +11,7 @@ import { DEFAULT_EXTENSIONS } from "../constants";
 import type { BuildContext, BuildEntry } from "../types";
 import dumpObject from "./dump-object";
 
-const removeExtension = (filename: string): string => filename.replace(/\.(?:js|mjs|cjs|ts|mts|cts|json|jsx|tsx)$/, "");
+const removeExtension = (filename: string): string => filename.replace(extname(filename), "");
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const prepareEntries = async (context: BuildContext, rootDirectory: string): Promise<void> => {
@@ -60,11 +60,11 @@ const prepareEntries = async (context: BuildContext, rootDirectory: string): Pro
             // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
             entry.name = removeExtension(relativeInput.replace(new RegExp(`^${context.options.sourceDir}/`), ""));
 
-            if (entry.fileAlias) {
+            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+            for (const fileAlias of entry.fileAliases ?? []) {
                 fileAliasEntries.push({
                     ...entry,
-                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                    name: entry.name + "." + entry.environment,
+                    name: fileAlias,
                 });
             }
         }

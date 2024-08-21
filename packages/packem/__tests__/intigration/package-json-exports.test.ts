@@ -918,10 +918,15 @@ exports.index = index;
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`typeof EdgeRuntime`);
+        expect(mjs).toBe(`const variable = typeof EdgeRuntime;
+
+export { variable };
+`);
 
         const mjsEdgeLight = readFileSync(`${temporaryDirectoryPath}/dist/index.edge.mjs`);
 
-        expect(mjsEdgeLight).toBe(`typeof "edge-runtime"`);
+        expect(mjsEdgeLight).toBe(`const variable = typeof "edge-runtime";
+
+export { variable };`);
     });
 });

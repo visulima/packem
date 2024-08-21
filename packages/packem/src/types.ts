@@ -95,7 +95,7 @@ export type BuildEntry = {
     environment?: Environment;
     esm?: boolean;
     executable?: boolean;
-    fileAlias?: boolean;
+    fileAliases?: string[];
     input: string;
     isGlob?: boolean;
     name?: string;

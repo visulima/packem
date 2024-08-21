@@ -2,9 +2,9 @@ import { existsSync } from "node:fs";
 
 import { isAccessibleSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
-import { resolve } from "@visulima/path";
+import { extname, resolve } from "@visulima/path";
 
-import { DEVELOPMENT_ENV, PRODUCTION_ENV, RUNTIME_EXPORT_CONVENTIONS } from "../../constants";
+import { DEVELOPMENT_ENV, PRODUCTION_ENV, RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "../../constants";
 import type { BuildContext, BuildEntry, Environment, InferEntriesResult, Runtime } from "../../types";
 import type { OutputDescriptor } from "../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
@@ -28,11 +28,10 @@ const createOrUpdateEntry = (
     isDirectory: boolean,
     outputSlug: string,
     output: OutputDescriptor,
-    declaration: undefined | false | true | "compatible" | "node16",
-    environment: Environment,
+    context: BuildContext,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): void => {
-    const entryEnvironment = getEnvironment(output, environment);
+    const entryEnvironment = getEnvironment(output, context.environment);
 
     let entry: BuildEntry | undefined = entries.find((index) => index.input === input && index.environment === entryEnvironment);
 
@@ -57,8 +56,8 @@ const createOrUpdateEntry = (
             entry.esm = true;
         }
     } else {
-        if (/\.d\.[mc]?ts$/.test(output.file) && declaration !== false) {
-            entry.declaration = declaration;
+        if (/\.d\.[mc]?ts$/.test(output.file) && context.options.declaration !== false) {
+            entry.declaration = context.options.declaration;
         }
 
         if (output.type === "cjs") {
@@ -85,9 +84,15 @@ const createOrUpdateEntry = (
 
     entry.environment = entryEnvironment;
 
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    if ([DEVELOPMENT_ENV, PRODUCTION_ENV].includes(output.subKey as string) && output.file.includes("." + output.subKey + ".")) {
-        entry.fileAlias = true;
+    const aliasName = output.file.replace(extname(output.file), "").replace(new RegExp(`^./${context.options.outDir.replace(/^\.\//, "")}/`), "");
+
+    if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && !input.includes(aliasName)) {
+        entry.fileAliases = [
+            ...new Set([
+                ...(entry.fileAliases ?? []),
+                aliasName,
+            ]),
+        ];
     }
 };
 
@@ -207,9 +212,8 @@ const inferEntries = (
         // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
         let sourceSlug = outputSlug.replace(new RegExp("(./)?" + context.options.outDir), context.options.sourceDir).replace("./", "");
 
-        // If entry is a development or production entry, remove the subKey from the sourceSlug to find the correct source file
-        if (output.subKey === DEVELOPMENT_ENV || output.subKey === PRODUCTION_ENV) {
-            sourceSlug = sourceSlug.replace("." + output.subKey, "");
+        if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string)) {
+            sourceSlug = sourceSlug.replace(/(.*)\.[^.]*$/, '$1');
         }
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
@@ -240,7 +244,7 @@ const inferEntries = (
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const input of inputs) {
-                createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context.options.declaration, context.environment);
+                createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context);
             }
 
             // eslint-disable-next-line no-continue
@@ -267,10 +271,10 @@ const inferEntries = (
         }
 
         if (isAccessibleSync(input + ".cts") && isAccessibleSync(input + ".mts")) {
-            createOrUpdateEntry(entries, input + ".cts", isDirectory, outputSlug, { ...output, type: "cjs" }, context.options.declaration, context.environment);
-            createOrUpdateEntry(entries, input + ".mts", isDirectory, outputSlug, { ...output, type: "esm" }, context.options.declaration, context.environment);
+            createOrUpdateEntry(entries, input + ".cts", isDirectory, outputSlug, { ...output, type: "cjs" }, context);
+            createOrUpdateEntry(entries, input + ".mts", isDirectory, outputSlug, { ...output, type: "esm" }, context);
         } else {
-            createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context.options.declaration, context.environment);
+            createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context);
         }
     }
 

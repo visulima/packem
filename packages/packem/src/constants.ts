@@ -38,16 +38,13 @@ export const DEFAULT_LOADERS: Record<string, Loader> = {
 export const PRODUCTION_ENV = "production";
 export const DEVELOPMENT_ENV = "development";
 
-export const OPTIMIZE_CONVENTIONS = [DEVELOPMENT_ENV, PRODUCTION_ENV];
-export const RUNTIME_EXPORT_CONVENTIONS = ["react-server", "react-native", "edge-light"];
-export const SPECIAL_EXPORT_CONVENTIONS = [...OPTIMIZE_CONVENTIONS, ...RUNTIME_EXPORT_CONVENTIONS];
+export const RUNTIME_EXPORT_CONVENTIONS = new Set(["react-server", "react-native", "edge-light"]);
+export const SPECIAL_EXPORT_CONVENTIONS = new Set([DEVELOPMENT_ENV, PRODUCTION_ENV, ...RUNTIME_EXPORT_CONVENTIONS]);
 
 export const DTS_EXTENSIONS_MAP = {
     cjs: "d.cts",
     js: "d.ts",
     mjs: "d.mts",
 };
-
-export const BINARY_TAG = "$binary";
 
 export const EXCLUDE_REGEXP = /node_modules/;

@@ -1,22 +1,10 @@
 import type { PackageJson } from "@visulima/package";
 
+import { SPECIAL_EXPORT_CONVENTIONS } from "../constants";
 import type { BuildOptions } from "../types";
 import { inferExportType, inferExportTypeFromFileName } from "./infer-export-type";
 
-const exportsKeys = [
-    "import",
-    "require",
-    "node",
-    "node-addons",
-    "default",
-    "production",
-    "types",
-    "deno",
-    "browser",
-    "development",
-    "react-native",
-    "react-server",
-] as const;
+const exportsKeys = new Set(["import", "require", "node", "node-addons", "default", "types", "deno", "browser", ...SPECIAL_EXPORT_CONVENTIONS]);
 
 export type OutputDescriptor = {
     fieldName?: string;
@@ -42,7 +30,9 @@ export const extractExportFilenames = (
         const inferredType = inferExportTypeFromFileName(packageExports);
 
         if (inferredType && inferredType !== packageType) {
-            throw new Error(`Exported file "${packageExports}" has an extension that does not match the package.json type "${packageType === "esm" ? "module" : "commonjs"}".`);
+            throw new Error(
+                `Exported file "${packageExports}" has an extension that does not match the package.json type "${packageType === "esm" ? "module" : "commonjs"}".`,
+            );
         }
 
         return [{ file: packageExports, key: "exports", type: inferredType ?? packageType }];
@@ -61,7 +51,7 @@ export const extractExportFilenames = (
                     ? {
                           file: packageExport,
                           key: "exports",
-                          ...(exportsKeys.includes(condition) ? { subKey: condition as OutputDescriptor["subKey"] } : {}),
+                          ...(exportsKeys.has(condition) ? { subKey: condition as OutputDescriptor["subKey"] } : {}),
                           type: inferExportType(condition, conditions, packageType, packageExport),
                       }
                     : extractExportFilenames(packageExport, packageType, declaration, [...conditions, condition]);
