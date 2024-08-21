@@ -1,3 +1,14 @@
+## @visulima/packem [1.0.0-alpha.81](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.80...@visulima/packem@1.0.0-alpha.81) (2024-08-21)
+
+### Features
+
+* improved the file alias handling ([e94155a](https://github.com/visulima/packem/commit/e94155afd6f4d6422af773798f3e95d4edec9e8f))
+* more test for packem ([75139c1](https://github.com/visulima/packem/commit/75139c1ec27c09cce82e7f56f1371417c79c17e8))
+
+### Bug Fixes
+
+* fixed correct finding of source files ([6e25ff0](https://github.com/visulima/packem/commit/6e25ff0b6e6a39adc66a4f27671e01c3375aeb6f))
+
 ## @visulima/packem [1.0.0-alpha.80](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.79...@visulima/packem@1.0.0-alpha.80) (2024-08-20)
 
 ### Features
