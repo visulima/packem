@@ -17,7 +17,7 @@ const removeExtension = (filename: string): string => filename.replace(new RegEx
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const prepareEntries = async (context: BuildContext, rootDirectory: string): Promise<void> => {
     context.options.entries = context.options.entries.map((entry) =>
-        (typeof entry === "string" ? { input: entry, isGlob: isGlob(entry) } : { ...entry, isGlob: isGlob(entry.input) }),
+        typeof entry === "string" ? { input: entry, isGlob: isGlob(entry) } : { ...entry, isGlob: isGlob(entry.input) },
     );
 
     const fileAliasEntries: BuildEntry[] = [];
@@ -61,11 +61,10 @@ const prepareEntries = async (context: BuildContext, rootDirectory: string): Pro
             // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
             entry.name = removeExtension(relativeInput.replace(new RegExp(`^${context.options.sourceDir}/`), ""));
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-            for (const fileAlias of entry.fileAliases ?? []) {
+            if (entry.fileAlias !== undefined) {
                 fileAliasEntries.push({
                     ...entry,
-                    name: fileAlias,
+                    name: entry.fileAlias,
                 });
             }
         }

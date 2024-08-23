@@ -7,7 +7,7 @@ import type FileCache from "../utils/file-cache";
 import { getRollupDtsOptions } from "./get-rollup-options";
 import getChunkFilename from "./utils/get-chunk-filename";
 
-const buildTypes = async (context: BuildContext, fileCache: FileCache): Promise<void> => {
+const buildTypes = async (context: BuildContext, fileCache: FileCache, subDirectory: string): Promise<void> => {
     if (context.options.declaration && context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer) {
         context.logger.debug({
             message: "Skipping declaration file generation as isolated declaration transformer is enabled.",
@@ -28,11 +28,11 @@ const buildTypes = async (context: BuildContext, fileCache: FileCache): Promise<
 
     const cacheKey = "rollup-dts.json";
 
-    rollupTypeOptions.cache = fileCache.get<RollupCache>(cacheKey);
+    rollupTypeOptions.cache = fileCache.get<RollupCache>(cacheKey, subDirectory);
 
     const typesBuild = await rollup(rollupTypeOptions);
 
-    fileCache.set(cacheKey, typesBuild.cache);
+    fileCache.set(cacheKey, typesBuild.cache, subDirectory);
 
     await context.hooks.callHook("rollup:dts:build", context, typesBuild);
 

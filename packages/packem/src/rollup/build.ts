@@ -6,7 +6,7 @@ import type FileCache from "../utils/file-cache";
 import { getRollupOptions } from "./get-rollup-options";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const build = async (context: BuildContext, fileCache: FileCache): Promise<void> => {
+const build = async (context: BuildContext, fileCache: FileCache, subDirectory: string): Promise<void> => {
     const rollupOptions = await getRollupOptions(context, fileCache);
 
     await context.hooks.callHook("rollup:options", context, rollupOptions);
@@ -17,11 +17,11 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<void>
 
     const cacheKey = "rollup-build.json";
 
-    rollupOptions.cache = fileCache.get<RollupCache>(cacheKey);
+    rollupOptions.cache = fileCache.get<RollupCache>(cacheKey, subDirectory);
 
     const buildResult = await rollup(rollupOptions);
 
-    fileCache.set(cacheKey, buildResult.cache);
+    fileCache.set(cacheKey, buildResult.cache, subDirectory);
 
     await context.hooks.callHook("rollup:build", context, buildResult);
 

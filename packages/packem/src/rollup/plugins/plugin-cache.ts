@@ -12,9 +12,10 @@ const getHandler = (plugin: ObjectHook<any> | ((...arguments_: any[]) => any)): 
  *
  * @param {Plugin} plugin
  * @param {FileCache} cache
+ * @param {string} subDirectory
  * @returns {Plugin}
  */
-const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin =>
+const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugin =>
     <Plugin>{
         ...plugin,
 
@@ -35,15 +36,16 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin =>
                 return null;
             }
 
+            const pluginPath = join(subDirectory, plugin.name);
             const cacheKey = join("load", getHash(id));
 
-            if (cache.has(cacheKey, plugin.name)) {
-                return await cache.get(cacheKey, plugin.name);
+            if (cache.has(cacheKey, pluginPath)) {
+                return await cache.get(cacheKey, pluginPath);
             }
 
             const result = await getHandler(plugin.load).call(this, id);
 
-            cache.set(cacheKey, result, plugin.name);
+            cache.set(cacheKey, result, pluginPath);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return result;
@@ -56,15 +58,16 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin =>
                 return null;
             }
 
+            const pluginPath = join(subDirectory, plugin.name);
             const cacheKey = join("resolveId", getHash(id), importer ? getHash(importer) : "", getHash(JSON.stringify(options)));
 
-            if (cache.has(cacheKey, plugin.name)) {
-                return await cache.get(cacheKey, plugin.name);
+            if (cache.has(cacheKey, pluginPath)) {
+                return await cache.get(cacheKey, pluginPath);
             }
 
             const result = await getHandler(plugin.resolveId).call(this, id, importer, options);
 
-            cache.set(cacheKey, result, plugin.name);
+            cache.set(cacheKey, result, pluginPath);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return result;
@@ -75,15 +78,16 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache): Plugin =>
                 return null;
             }
 
+            const pluginPath = join(subDirectory, plugin.name);
             const cacheKey = join("transform", getHash(id), getHash(code));
 
-            if (cache.has(cacheKey, plugin.name)) {
-                return await cache.get(cacheKey, plugin.name);
+            if (cache.has(cacheKey, pluginPath)) {
+                return await cache.get(cacheKey, pluginPath);
             }
 
             const result = await getHandler(plugin.transform).call(this, code, id);
 
-            cache.set(cacheKey, result, plugin.name);
+            cache.set(cacheKey, result, pluginPath);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return result;

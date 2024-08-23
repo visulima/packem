@@ -630,7 +630,7 @@ describe("inferEntries", () => {
                     cjs: true,
                     environment: "development",
                     esm: true,
-                    fileAliases: ["index.development"],
+                    fileAlias: "index.development",
                     input: join(temporaryDirectoryPath, "src/index"),
                     runtime: "node",
                 },
@@ -676,7 +676,7 @@ describe("inferEntries", () => {
                 {
                     environment: undefined,
                     esm: true,
-                    fileAliases: ["index.edge"],
+                    fileAlias: "index.edge",
                     input: join(temporaryDirectoryPath, "src/index"),
                     runtime: "node",
                 },

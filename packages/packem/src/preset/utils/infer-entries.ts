@@ -4,7 +4,13 @@ import { isAccessibleSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { extname, resolve } from "@visulima/path";
 
-import { DEVELOPMENT_ENV, PRODUCTION_ENV, RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "../../constants";
+import {
+    DEVELOPMENT_ENV,
+    ENDING_RE,
+    PRODUCTION_ENV,
+    RUNTIME_EXPORT_CONVENTIONS,
+    SPECIAL_EXPORT_CONVENTIONS,
+} from "../../constants";
 import type { BuildContext, BuildEntry, Environment, InferEntriesResult, Runtime } from "../../types";
 import type { OutputDescriptor } from "../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
@@ -87,11 +93,9 @@ const createOrUpdateEntry = (
     const aliasName = output.file.replace(extname(output.file), "").replace(new RegExp(`^./${context.options.outDir.replace(/^\.\//, "")}/`), "");
 
     if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && !input.includes(aliasName)) {
-        entry.fileAliases = [...new Set([...(entry.fileAliases ?? []), aliasName])];
+        entry.fileAlias = aliasName;
     }
 };
-
-const ENDING_RE = /(?:\.d\.[mc]?ts|\.\w+)$/;
 
 let privateSubfolderWarningShown = false;
 

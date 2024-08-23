@@ -48,3 +48,5 @@ export const DTS_EXTENSIONS_MAP = {
 };
 
 export const EXCLUDE_REGEXP = /node_modules/;
+
+export const ENDING_RE = /(?:\.d\.[mc]?ts|\.\w+)$/;

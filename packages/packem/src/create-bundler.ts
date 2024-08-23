@@ -129,6 +129,7 @@ const generateOptions = (
                     composite: false,
                     // Ensure ".d.ts" modules are generated
                     declaration: true,
+                    // This plugin doesn't support declaration maps
                     declarationMap: false,
                     emitDeclarationOnly: true,
                     // error TS5074: Option '--incremental' can only be specified using tsconfig, emitting to single
@@ -596,6 +597,23 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                 context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
             }
 
+            let subDirectory = "";
+
+            if (environment !== "undefined") {
+                subDirectory += environment + "/";
+            }
+
+            if (runtime !== "undefined") {
+                subDirectory += runtime + "/";
+            }
+
+            let minify = environment !== "development" && context.options.minify;
+
+            // global minify overrides entry-specific minify
+            if (context.options.minify) {
+                minify = true;
+            }
+
             const esmAndCjsEntries = [];
             const esmEntries = [];
             const cjsEntries = [];
@@ -614,13 +632,6 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                 }
             }
 
-            let minify = environment !== "development" && context.options.minify;
-
-            // global minify overrides entry-specific minify
-            if (context.options.minify) {
-                minify = true;
-            }
-
             if (esmAndCjsEntries.length > 0) {
                 const adjustedEsmAndCjsContext = {
                     ...context,
@@ -633,7 +644,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                     },
                 };
 
-                rollups.push(rollupBuild(adjustedEsmAndCjsContext, fileCache));
+                rollups.push(rollupBuild(adjustedEsmAndCjsContext, fileCache, subDirectory));
 
                 const typedEntries = adjustedEsmAndCjsContext.options.entries.filter((entry) => entry.declaration);
 
@@ -648,6 +659,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                                 },
                             },
                             fileCache,
+                            subDirectory,
                         ),
                     );
                 }
@@ -665,7 +677,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                     },
                 };
 
-                rollups.push(rollupBuild(adjustedEsmContext, fileCache));
+                rollups.push(rollupBuild(adjustedEsmContext, fileCache, subDirectory));
 
                 const typedEntries = adjustedEsmContext.options.entries.filter((entry) => entry.declaration);
 
@@ -680,6 +692,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                                 },
                             },
                             fileCache,
+                            subDirectory,
                         ),
                     );
                 }
@@ -697,7 +710,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                     },
                 };
 
-                rollups.push(rollupBuild(adjustedCjsContext, fileCache));
+                rollups.push(rollupBuild(adjustedCjsContext, fileCache, subDirectory));
 
                 const typedEntries = adjustedCjsContext.options.entries.filter((entry) => entry.declaration);
 
@@ -712,6 +725,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                                 },
                             },
                             fileCache,
+                            subDirectory,
                         ),
                     );
                 }
@@ -729,7 +743,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                     },
                 };
 
-                rollups.push(rollupBuildTypes(adjustedCjsContext, fileCache));
+                rollups.push(rollupBuildTypes(adjustedCjsContext, fileCache, subDirectory));
             }
         }
     }
