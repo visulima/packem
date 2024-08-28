@@ -26,8 +26,7 @@ export const execPackemSync = async (command: "build" | "init", flags: string[] 
         environmentFlag = undefined;
     }
 
-
-    return await execaNode(join(distributionPath, "cli.mjs"), ([command, environmentFlag, ...flags].filter(Boolean)) as string[], {
+    return await execaNode(join(distributionPath, "cli.mjs"), [command, environmentFlag, ...flags].filter(Boolean) as string[], {
         ...options,
     });
 };
@@ -62,7 +61,7 @@ export default defineConfig({
 `,
         {
             overwrite: true,
-        }
+        },
     );
 };
 

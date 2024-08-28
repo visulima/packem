@@ -1,23 +1,22 @@
+import { copyFileSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 
 import { cyan } from "@visulima/colorize";
 import { isAccessibleSync } from "@visulima/fs";
 import { NotFoundError } from "@visulima/fs/error";
-import { basename, dirname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
+import { basename, dirname, extname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
+import { isRelative } from "@visulima/path/utils";
 import isGlob from "is-glob";
 import { globSync } from "tinyglobby";
 
-import { DEFAULT_EXTENSIONS, DEFAULT_LOADERS } from "../constants";
+import { DEFAULT_EXTENSIONS, ENDING_RE } from "../constants";
 import type { BuildContext, BuildEntry } from "../types";
 import dumpObject from "./dump-object";
-
-// eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-const removeExtension = (filename: string): string => filename.replace(new RegExp(`.(?:${Object.keys(DEFAULT_LOADERS).join("|")})$`), "");
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const prepareEntries = async (context: BuildContext, rootDirectory: string): Promise<void> => {
     context.options.entries = context.options.entries.map((entry) =>
-        typeof entry === "string" ? { input: entry, isGlob: isGlob(entry) } : { ...entry, isGlob: isGlob(entry.input) },
+        (typeof entry === "string" ? { input: entry, isGlob: isGlob(entry) } : { ...entry, isGlob: isGlob(entry.input) }),
     );
 
     const fileAliasEntries: BuildEntry[] = [];
@@ -59,7 +58,7 @@ const prepareEntries = async (context: BuildContext, rootDirectory: string): Pro
             }
 
             // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-            entry.name = removeExtension(relativeInput.replace(new RegExp(`^${context.options.sourceDir}/`), ""));
+            entry.name = relativeInput.replace(new RegExp(`^${context.options.sourceDir}/`), "").replace(ENDING_RE, "");
 
             if (entry.fileAlias !== undefined) {
                 fileAliasEntries.push({
@@ -73,7 +72,9 @@ const prepareEntries = async (context: BuildContext, rootDirectory: string): Pro
             throw new Error(`Missing entry input: ${dumpObject(entry)}`);
         }
 
-        entry.input = resolve(context.options.rootDir, entry.input);
+        if (isRelative(entry.input)) {
+            entry.input = resolve(context.options.rootDir, entry.input);
+        }
 
         if (context.options.declaration && entry.declaration === undefined) {
             entry.declaration = context.options.declaration;
@@ -95,7 +96,7 @@ const prepareEntries = async (context: BuildContext, rootDirectory: string): Pro
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const extension of DEFAULT_EXTENSIONS) {
-                if (filesInWorkingDirectory.has(basename(entry.input) + extension)) {
+                if (filesInWorkingDirectory.has(basename(entry.input.replace(ENDING_RE, "")) + extension)) {
                     hasFile = true;
                     break;
                 }
@@ -109,7 +110,23 @@ const prepareEntries = async (context: BuildContext, rootDirectory: string): Pro
         entry.outDir = resolve(context.options.rootDir, entry.outDir ?? context.options.outDir);
     }
 
-    context.options.entries.push(...fileAliasEntries);
+    if (fileAliasEntries.length > 0) {
+        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+        for (const entry of fileAliasEntries) {
+            // split file name and extension from the input file
+            const extension = extname(entry.input);
+
+            const destination = join(context.options.sourceDir, (entry.name as string) + extension);
+
+            // copy the file to the temporary directory
+            copyFileSync(entry.input, destination);
+
+            entry.input = destination;
+
+            context.options.entries.push(entry);
+            context.fileAliases.add(destination);
+        }
+    }
 };
 
 export default prepareEntries;

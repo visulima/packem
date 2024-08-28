@@ -171,6 +171,7 @@ export interface BuildContext {
     buildEntries: BuildContextBuildEntry[];
     dependencyGraphMap: Map<string, Set<[string, string]>>;
     environment: Environment;
+    fileAliases: Set<string>;
     hooks: Hookable<BuildHooks>;
     logger: Pail;
     mode: Mode;

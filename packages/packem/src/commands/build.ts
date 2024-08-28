@@ -176,7 +176,7 @@ const createBuildCommand = (cli: Cli): void => {
                 description: "Do not clean the dist directory before building",
                 name: "no-clean",
                 type: Boolean,
-            }
+            },
         ],
     });
 };

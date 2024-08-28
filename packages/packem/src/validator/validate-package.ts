@@ -18,7 +18,9 @@ const validatePackage = (packageJson: PackageJson, context: BuildContext): void 
             packageJson.module,
             context.options.declaration ? packageJson.types : "",
             context.options.declaration ? packageJson.typings : "",
-            ...extractExportFilenames(packageJson.exports, packageJson.type === "module" ? "esm" : "cjs", context.options.declaration).map((index) => index.file),
+            ...extractExportFilenames(packageJson.exports, packageJson.type === "module" ? "esm" : "cjs", context.options.declaration).map(
+                (index) => index.file,
+            ),
         ].map(
             (index) =>
                 index &&

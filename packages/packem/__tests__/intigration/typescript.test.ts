@@ -66,7 +66,7 @@ describe("packem typescript", () => {
 
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
-        expect(binProcess.stdout).toContain("Generation of declaration files is disabled.");
+        expect(binProcess.stdout).toContain("Generation of declaration files are disabled.");
     });
 
     it("should not throw a error if declaration is disabled and a types fields are present", async () => {
@@ -97,7 +97,7 @@ describe("packem typescript", () => {
 
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
-        expect(binProcess.stdout).toContain("Generation of declaration files is disabled.");
+        expect(binProcess.stdout).toContain("Generation of declaration files are disabled.");
     });
 
     describe("resolve-typescript-mjs-cjs plugin", () => {
@@ -404,7 +404,7 @@ export class ExampleClass {
     });
 
     it('should allow support for "allowJs" and generate proper assets', async () => {
-        expect.assertions(4);
+        expect.assertions(5);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export default () => 'index';`);
 
@@ -747,7 +747,7 @@ export { _default as default };
     });
 
     it("should automatically convert imports with .ts extension", async () => {
-        expect.assertions(7);
+        expect.assertions(6);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -835,7 +835,7 @@ export { getOne };
     });
 
     it("should automatically convert dynamic imports with .ts extension to cjs or mjs", async () => {
-        expect.assertions(7);
+        expect.assertions(6);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 

@@ -149,6 +149,7 @@
         "build:prod": "cross-env JITI_ESM_RESOLVE=1 INTERNAL_PACKEM_BUILD=1 jiti ./src/cli build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build",
+        "lint:fix": "pnpm run lint:prettier:fix && pnpm run lint:eslint:fix",
         "lint:eslint": "eslint . --ext js,cjs,mjs,jsx,ts,tsx,json,yaml,yml,md,mdx --max-warnings=0 --config .eslintrc.cjs",
         "lint:eslint:fix": "eslint . --ext js,cjs,mjs,jsx,ts,tsx,json,yaml,yml,md,mdx --max-warnings=0 --config .eslintrc.cjs --fix",
         "lint:packagejson": "publint --strict",

@@ -43,7 +43,7 @@ module.exports = {
             files: ["*.test.ts"],
             rules: {
                 "unicorn/prefer-module": "off",
-            }
+            },
         },
         {
             files: ["*.ts"],

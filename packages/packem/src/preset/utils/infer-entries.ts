@@ -1,16 +1,8 @@
-import { existsSync } from "node:fs";
-
 import { isAccessibleSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { extname, resolve } from "@visulima/path";
 
-import {
-    DEVELOPMENT_ENV,
-    ENDING_RE,
-    PRODUCTION_ENV,
-    RUNTIME_EXPORT_CONVENTIONS,
-    SPECIAL_EXPORT_CONVENTIONS,
-} from "../../constants";
+import { DEVELOPMENT_ENV, ENDING_RE, PRODUCTION_ENV, RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "../../constants";
 import type { BuildContext, BuildEntry, Environment, InferEntriesResult, Runtime } from "../../types";
 import type { OutputDescriptor } from "../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
@@ -90,6 +82,7 @@ const createOrUpdateEntry = (
 
     entry.environment = entryEnvironment;
 
+    // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
     const aliasName = output.file.replace(extname(output.file), "").replace(new RegExp(`^./${context.options.outDir.replace(/^\.\//, "")}/`), "");
 
     if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && !input.includes(aliasName)) {
@@ -212,7 +205,7 @@ const inferEntries = (
         const sourceSlug = outputSlug.replace(new RegExp("(./)?" + context.options.outDir), context.options.sourceDir).replace("./", "");
 
         const beforeSourceRegex = "(?<=/|$)";
-        const fileExtensionRegex = (isDirectory ? "" : "\\.\\w+$")
+        const fileExtensionRegex = isDirectory ? "" : "\\.\\w+$";
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if (output.file.includes("/*") && output.key === "exports") {
@@ -232,7 +225,7 @@ const inferEntries = (
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const source of sourceFiles) {
                 if (SOURCE_RE.test(source) || (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && SPECIAL_SOURCE_RE.test(source))) {
-                    inputs.push(source.replace(ENDING_RE, ""));
+                    inputs.push(source);
                 }
             }
 
@@ -255,32 +248,32 @@ const inferEntries = (
         // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
         const SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug + fileExtensionRegex);
 
-        let input = sourceFiles.find((index) => SOURCE_RE.test(index))?.replace(ENDING_RE, "");
+        let input = sourceFiles.find((index) => SOURCE_RE.test(index));
 
         if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && input === undefined) {
             // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
             const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace(/(.*)\.[^.]*$/, "$1") + fileExtensionRegex);
 
-            input = sourceFiles.find((index) => SPECIAL_SOURCE_RE.test(index))?.replace(ENDING_RE, "");
+            input = sourceFiles.find((index) => SPECIAL_SOURCE_RE.test(index));
         }
 
         if (input === undefined) {
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
-            if (!existsSync(resolve(context.options.rootDir, output.file))) {
+            if (!isAccessibleSync(resolve(context.options.rootDir, output.file))) {
                 warnings.push(`Could not find entrypoint for \`${output.file}\``);
             }
 
             // eslint-disable-next-line no-continue
             continue;
         }
-
-        if (isAccessibleSync(input + ".ts") || isAccessibleSync(input + ".cts") || isAccessibleSync(input + ".mts")) {
+        if ((input.endsWith(".ts") || input.endsWith(".cts") || input.endsWith(".mts")) && isAccessibleSync(input)) {
             validateIfTypescriptIsInstalled(context);
         }
 
-        if (isAccessibleSync(input + ".cts") && isAccessibleSync(input + ".mts")) {
-            createOrUpdateEntry(entries, input + ".cts", isDirectory, outputSlug, { ...output, type: "cjs" }, context);
-            createOrUpdateEntry(entries, input + ".mts", isDirectory, outputSlug, { ...output, type: "esm" }, context);
+        const inputWithoutExtension = input.replace(ENDING_RE, "");
+
+        if (isAccessibleSync(inputWithoutExtension + ".cts") && isAccessibleSync(inputWithoutExtension + ".mts")) {
+            createOrUpdateEntry(entries, inputWithoutExtension + ".cts", isDirectory, outputSlug, { ...output, type: "cjs" }, context);
+            createOrUpdateEntry(entries, inputWithoutExtension + ".mts", isDirectory, outputSlug, { ...output, type: "esm" }, context);
         } else {
             createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context);
         }
