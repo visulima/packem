@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.83](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.82...@visulima/packem@1.0.0-alpha.83) (2024-08-28)
+
+### Features
+
+* improved splitting of env files from package.json exports ([1bb4144](https://github.com/visulima/packem/commit/1bb41446c86424e8704f05e8611f594fcb095c5f))
+
 ## @visulima/packem [1.0.0-alpha.82](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.81...@visulima/packem@1.0.0-alpha.82) (2024-08-28)
 
 ### Features
