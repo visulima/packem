@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.82](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.81...@visulima/packem@1.0.0-alpha.82) (2024-08-28)
+
+### Features
+
+* improved rollup caching ([02e89e2](https://github.com/visulima/packem/commit/02e89e204257310a089bca22a983d597666074fb))
+* improved splitting based on package.json exports ([aba0a20](https://github.com/visulima/packem/commit/aba0a2058f15a4ceebdb30c8b0db31c646d0eb21))
+
 ## @visulima/packem [1.0.0-alpha.81](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.80...@visulima/packem@1.0.0-alpha.81) (2024-08-21)
 
 ### Features
