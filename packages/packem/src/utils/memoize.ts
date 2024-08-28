@@ -14,7 +14,7 @@ const memoize = <T extends (...arguments_: any[]) => any>(
     cacheKey?: CacheKeyResolver, // if you need specify a cache key
     cacheArgument?: Map<string, ReturnType<T>>,
 ) => {
-    const cache: Map<string, ReturnType<T>> = cacheArgument ?? new Map();
+    const cache: Map<string, ReturnType<T>> = cacheArgument ?? new Map<string, ReturnType<T>>();
 
     return ((...arguments_: Parameters<T>) => {
         const key = cacheKey ? (typeof cacheKey === "function" ? cacheKey(...arguments_) : cacheKey) : JSON.stringify({ args: arguments_ });

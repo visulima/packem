@@ -95,7 +95,7 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
         ],
     });
 
-    const optimized: Optimized = new Map();
+    const optimized: Optimized = new Map<string, { file: string }>();
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const id of options.include) {
