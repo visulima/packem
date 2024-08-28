@@ -1,8 +1,6 @@
-import { copyFileSync } from "node:fs";
-
 import { cyan } from "@visulima/colorize";
 import { NotFoundError } from "@visulima/fs/error";
-import { extname, isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
+import { isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 import isGlob from "is-glob";
 import { globSync } from "tinyglobby";
@@ -53,7 +51,7 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<vo
 
 const prepareEntries = async (context: BuildContext): Promise<void> => {
     context.options.entries = context.options.entries.map((entry) =>
-        typeof entry === "string" ? { input: entry, isGlob: isGlob(entry) } : { ...entry, isGlob: isGlob(entry.input) },
+        (typeof entry === "string" ? { input: entry, isGlob: isGlob(entry) } : { ...entry, isGlob: isGlob(entry.input) }),
     );
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax,@typescript-eslint/no-shadow
@@ -90,17 +88,10 @@ const prepareEntries = async (context: BuildContext): Promise<void> => {
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax,@typescript-eslint/no-shadow
     for await (const entry of context.options.entries.filter((entry) => entry.fileAlias !== undefined)) {
-        const extension = extname(entry.input);
-        const destination = join(context.options.rootDir, context.options.sourceDir, (entry.fileAlias as string) + extension);
-
-        copyFileSync(entry.input, destination);
-
-        entry.input = destination;
+        entry.name = entry.fileAlias;
         entry.fileAlias = undefined;
 
         await extendEntry(entry, context);
-
-        context.fileAliases.add(destination);
     }
 };
 

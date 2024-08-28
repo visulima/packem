@@ -1,4 +1,4 @@
-import { stat, unlink } from "node:fs/promises";
+import { stat } from "node:fs/promises";
 import Module from "node:module";
 import { cwd } from "node:process";
 
@@ -499,7 +499,6 @@ const createContext = async (
         buildEntries: [],
         dependencyGraphMap: new Map<string, Set<[string, string]>>(),
         environment,
-        fileAliases: new Set(),
         hooks: createHooks(),
         logger,
         mode,
@@ -1005,29 +1004,19 @@ const createBundler = async (
             return;
         }
 
-        try {
-            if (mode === "watch") {
-                if (context.options.rollup.watch === false) {
-                    throw new Error("Rollup watch is disabled. You should check your packem.config file.");
-                }
-
-                await rollupWatch(context, fileCache);
-
-                logErrors(context, false);
-
-                return;
+        if (mode === "watch") {
+            if (context.options.rollup.watch === false) {
+                throw new Error("Rollup watch is disabled. You should check your packem.config file.");
             }
 
-            await build(context, packageJson as PackEmPackageJson, fileCache);
-        } finally {
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-            for (const file of context.fileAliases) {
-                if (isAccessibleSync(file)) {
-                    // eslint-disable-next-line no-await-in-loop,security/detect-non-literal-fs-filename
-                    await unlink(file);
-                }
-            }
+            await rollupWatch(context, fileCache);
+
+            logErrors(context, false);
+
+            return;
         }
+
+        await build(context, packageJson as PackEmPackageJson, fileCache);
 
         logger.raw("\n⚡️ Build run in " + getDuration());
 
