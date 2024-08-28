@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.85](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.84...@visulima/packem@1.0.0-alpha.85) (2024-08-28)
+
+### Bug Fixes
+
+* fixed splitting of env based exports ([7ce88b2](https://github.com/visulima/packem/commit/7ce88b2531b05bdcc17e913fbccefe2734730a44))
+
 ## @visulima/packem [1.0.0-alpha.84](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.83...@visulima/packem@1.0.0-alpha.84) (2024-08-28)
 
 ### Bug Fixes
