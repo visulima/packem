@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.84](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.83...@visulima/packem@1.0.0-alpha.84) (2024-08-28)
+
+### Bug Fixes
+
+* fixed types errors ([3e34770](https://github.com/visulima/packem/commit/3e34770652ec94d7bb796fe942d45c537349c54e))
+
 ## @visulima/packem [1.0.0-alpha.83](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.82...@visulima/packem@1.0.0-alpha.83) (2024-08-28)
 
 ### Features
