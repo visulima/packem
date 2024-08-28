@@ -20,7 +20,7 @@ const createBuildCommand = (cli: Cli): void => {
             }
 
             const environments: Record<string, string> = {};
-            let nodeEnvironment;
+            let nodeEnvironment: string | undefined;
 
             // use the NODE_ENV environment variable if it exists
             if (env.NODE_ENV && [DEVELOPMENT_ENV, PRODUCTION_ENV].includes(env.NODE_ENV)) {

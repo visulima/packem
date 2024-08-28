@@ -123,7 +123,7 @@ export interface BuildOptions {
     failOnWarn?: boolean;
     fileCache?: boolean;
     isolatedDeclarationTransformer?: (code: string, id: string) => Promise<IsolatedDeclarationsResult>;
-    minify: boolean;
+    minify?: boolean | undefined;
     name: string;
     outDir: string;
     replace: Record<string, string>;

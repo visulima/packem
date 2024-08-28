@@ -86,6 +86,7 @@ const generateOptions = (
 
     const options = defu(buildConfig, inputConfig, preset, <BuildOptions>{
         alias: {},
+        cjsInterop: false,
         clean: true,
         debug,
         declaration: undefined,
@@ -296,6 +297,7 @@ const generateOptions = (
             treeshake: {
                 moduleSideEffects: getPackageSideEffect(rootDirectory, packageJson),
                 preset: "recommended",
+                propertyReadSideEffects: true,
             },
             watch: {
                 chokidar: {
@@ -495,7 +497,7 @@ const createContext = async (
     // Build context
     const context: BuildContext = {
         buildEntries: [],
-        dependencyGraphMap: new Map(),
+        dependencyGraphMap: new Map<string, Set<[string, string]>>(),
         environment,
         fileAliases: new Set(),
         hooks: createHooks(),
@@ -576,6 +578,10 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
     for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [runtime, entries] of Object.entries(environmentEntries)) {
+            const environmentRuntimeContext = {
+                ...context,
+            };
+
             if (environment !== "undefined" || runtime !== "undefined") {
                 context.logger.info(
                     "Preparing build for " +
@@ -584,15 +590,21 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                 );
             }
 
-            if (context.options.rollup.replace) {
-                context.options.rollup.replace.values = {
-                    ...context.options.rollup.replace.values,
-                    // hack to make sure, that the replace plugin dont replace the environment
-                    [["process", "env", "NODE_ENV"].join(".")]: JSON.stringify(environment),
-                };
+            if (environmentRuntimeContext.options.rollup.replace) {
+                if (environmentRuntimeContext.options.rollup.replace.values === undefined) {
+                    environmentRuntimeContext.options.rollup.replace.values = {};
+                }
+
+                if (environment !== "undefined") {
+                    environmentRuntimeContext.options.rollup.replace.values = {
+                        ...environmentRuntimeContext.options.rollup.replace.values,
+                        // hack to make sure, that the replace plugin don't replace the environment
+                        [["process", "env", "NODE_ENV"].join(".")]: JSON.stringify(environment),
+                    };
+                }
 
                 if (runtime === "edge-light") {
-                    context.options.rollup.replace.values.EdgeRuntime = JSON.stringify("edge-runtime");
+                    environmentRuntimeContext.options.rollup.replace.values.EdgeRuntime = JSON.stringify("edge-runtime");
                 }
             } else {
                 context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
@@ -608,10 +620,15 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                 subDirectory += runtime + "/";
             }
 
-            let minify = environment !== "development" && context.options.minify;
+            let minify = false;
 
-            // global minify overrides entry-specific minify
-            if (context.options.minify) {
+            if (environmentRuntimeContext.options.minify !== undefined) {
+                minify = environmentRuntimeContext.options.minify;
+            }
+
+            if (environment === "development") {
+                minify = false;
+            } else if (environment === "production") {
                 minify = true;
             }
 
@@ -635,9 +652,9 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
 
             if (esmAndCjsEntries.length > 0) {
                 const adjustedEsmAndCjsContext = {
-                    ...context,
+                    ...environmentRuntimeContext,
                     options: {
-                        ...context.options,
+                        ...environmentRuntimeContext.options,
                         emitCJS: true,
                         emitESM: true,
                         entries: esmAndCjsEntries,
@@ -668,9 +685,9 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
 
             if (esmEntries.length > 0) {
                 const adjustedEsmContext = {
-                    ...context,
+                    ...environmentRuntimeContext,
                     options: {
-                        ...context.options,
+                        ...environmentRuntimeContext.options,
                         emitCJS: false,
                         emitESM: true,
                         entries: esmEntries,
@@ -701,9 +718,9 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
 
             if (cjsEntries.length > 0) {
                 const adjustedCjsContext = {
-                    ...context,
+                    ...environmentRuntimeContext,
                     options: {
-                        ...context.options,
+                        ...environmentRuntimeContext.options,
                         emitCJS: true,
                         emitESM: false,
                         entries: cjsEntries,
@@ -732,11 +749,11 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                 }
             }
 
-            if (context.options.declaration && dtsEntries.length > 0) {
+            if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
                 const adjustedCjsContext = {
-                    ...context,
+                    ...environmentRuntimeContext,
                     options: {
-                        ...context.options,
+                        ...environmentRuntimeContext.options,
                         emitCJS: false,
                         emitESM: false,
                         entries: dtsEntries,
@@ -968,7 +985,7 @@ const createBundler = async (
 
         fileCache.isEnabled = context.options.fileCache as boolean;
 
-        await prepareEntries(context, rootDirectory);
+        await prepareEntries(context);
 
         context.logger.info(cyan((mode === "watch" ? "Watching" : mode === "jit" ? "Stubbing" : "Building") + " " + context.options.name));
 
