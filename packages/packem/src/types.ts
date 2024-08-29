@@ -109,8 +109,8 @@ export interface BuildOptions {
     clean: boolean;
     debug: boolean;
     /**
-     * `compatible` means "src/index.ts" will generate "dist/index.d.mts", "dist/index.d.cts" and "dist/index.d.ts".
-     * `node16` means "src/index.ts" will generate "dist/index.d.mts" and "dist/index.d.cts".
+     * `compatible` means "src/gather.ts" will generate "dist/index.d.mts", "dist/index.d.cts" and "dist/index.d.ts".
+     * `node16` means "src/gather.ts" will generate "dist/index.d.mts" and "dist/index.d.cts".
      * `true` is equivalent to `compatible`.
      * `false` will disable declaration generation.
      * `undefined` will auto-detect based on "package.json". If "package.json" has "types" field, it will be `"compatible"`, otherwise `false`.

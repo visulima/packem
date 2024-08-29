@@ -22,6 +22,7 @@ import arrayify from "../utils/arrayify";
 import type FileCache from "../utils/file-cache";
 import getPackageName from "../utils/get-package-name";
 import memoizeByKey from "../utils/memoize";
+import chunkSplitter from "./plugins/chunk-splitter";
 import { cjsInterop as cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
@@ -413,6 +414,8 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 }),
 
             nodeResolver,
+
+            chunkSplitter(/* { preserveChunkSignature: context.options.rollup.preserveChunkSignature } */),
 
             context.options.rollup.polyfillNode &&
                 polyfillPlugin({
