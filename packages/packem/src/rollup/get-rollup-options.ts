@@ -34,6 +34,7 @@ import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
 import { license as licensePlugin } from "./plugins/license";
 import metafilePlugin from "./plugins/metafile";
 import cachingPlugin from "./plugins/plugin-cache";
+import prependDirectivePlugin from "./plugins/prepend-directives";
 import preserveDirectivesPlugin from "./plugins/preserve-directives";
 import { rawPlugin } from "./plugins/raw";
 import resolveFileUrlPlugin from "./plugins/resolve-file-url";
@@ -321,13 +322,20 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
         );
     }
 
+    const chunking = context.options.rollup.output?.preserveModules
+        ? {
+              preserveModules: true,
+              preserveModulesRoot: context.options.rollup.output.preserveModulesRoot ?? "src",
+          }
+        : { manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries), preserveModules: false };
+
     return (<RollupOptions>{
         ...baseRollupOptions(context, resolvedAliases, "dependencies"),
 
         output: [
             context.options.emitCJS &&
                 <OutputOptions>{
-                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(context, chunk, "cjs"),
+                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "cjs"),
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "cjs"),
                     exports: "auto",
@@ -349,16 +357,11 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     sourcemap: context.options.sourcemap,
                     validate: true,
                     ...context.options.rollup.output,
-                    ...(context.options.rollup.output?.preserveModules
-                        ? {
-                              preserveModules: true,
-                              preserveModulesRoot: context.options.rollup.output.preserveModulesRoot ?? "src",
-                          }
-                        : { manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries), preserveModules: false }),
+                    ...chunking,
                 },
             context.options.emitESM &&
                 <OutputOptions>{
-                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(context, chunk, "mjs"),
+                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "mjs"),
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "mjs"),
                     exports: "auto",
@@ -379,12 +382,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     sourcemap: context.options.sourcemap,
                     validate: true,
                     ...context.options.rollup.output,
-                    ...(context.options.rollup.output?.preserveModules
-                        ? {
-                              preserveModules: true,
-                              preserveModulesRoot: context.options.rollup.output.preserveModulesRoot ?? "src",
-                          }
-                        : { manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries), preserveModules: false }),
+                    ...chunking,
                 },
         ].filter(Boolean),
 
@@ -415,8 +413,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             nodeResolver,
 
-            chunkSplitter(/* { preserveChunkSignature: context.options.rollup.preserveChunkSignature } */),
-
             context.options.rollup.polyfillNode &&
                 polyfillPlugin({
                     sourceMap: context.options.sourcemap,
@@ -428,7 +424,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     ...context.options.rollup.json,
                 }),
 
-            preserveDirectivesPlugin(context.logger),
+            chunkSplitter(/* { preserveChunkSignature: context.options.rollup.preserveChunkSignature } */),
 
             shebangPlugin(
                 context.options.entries
@@ -448,6 +444,12 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 ),
 
             context.options.transformer?.(getTransformerConfig(context.options.transformerName, context)),
+
+            preserveDirectivesPlugin({
+                directiveRegex: /^['|"](use (\w+))['|"]$/,
+                ...context.options.rollup.preserveDirectives,
+                logger: context.logger,
+            }),
 
             context.options.cjsInterop &&
                 context.options.emitCJS &&
@@ -506,6 +508,8 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     mode: "dependencies",
                     packageName: context.pkg.name,
                 }),
+
+            prependDirectivePlugin(),
 
             context.options.rollup.visualizer &&
                 visualizerPlugin({
@@ -596,7 +600,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
         output: [
             context.options.emitCJS &&
                 <OutputOptions>{
-                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(context, chunk, "d.cts"),
+                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "d.cts"),
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: "[name].d.cts",
                     format: "cjs",
@@ -605,7 +609,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                 },
             context.options.emitESM &&
                 <OutputOptions>{
-                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(context, chunk, "d.mts"),
+                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "d.mts"),
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: "[name].d.mts",
                     format: "esm",
@@ -615,7 +619,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             // .d.ts for node10 compatibility (TypeScript version < 4.7)
             context.options.declaration === "compatible" &&
                 <OutputOptions>{
-                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(context, chunk, "d.ts"),
+                    chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "d.ts"),
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: "[name].d.ts",
                     format: "cjs",

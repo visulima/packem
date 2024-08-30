@@ -5,7 +5,7 @@
 import { useActionState } from 'react';
 import { request } from './server-components/request';
 
-function UsernameForm() {
+export function UsernameForm() {
   const [state, action] = useActionState(request, null, 'n/a');
 
   return (

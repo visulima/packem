@@ -207,6 +207,10 @@ const generateOptions = (
             },
             patchTypes: {},
             polyfillNode: {},
+            preserveDirectives: {
+                exclude: EXCLUDE_REGEXP,
+                include: [/\.(?:m|c)?(?:j|t)sx?$/],
+            },
             preserveDynamicImports: true,
             raw: {
                 exclude: EXCLUDE_REGEXP,

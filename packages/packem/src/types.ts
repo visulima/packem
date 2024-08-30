@@ -74,6 +74,11 @@ export interface RollupBuildOptions {
     output?: OutputOptions;
     patchTypes: PatchTypesOptions | false;
     polyfillNode?: NodePolyfillsOptions | false;
+    preserveDirectives?: {
+        directiveRegex?: RegExp;
+        exclude?: FilterPattern;
+        include?: FilterPattern;
+    };
     preserveDynamicImports?: boolean;
     raw?: RawLoaderOptions | false;
     replace: RollupReplaceOptions | false;

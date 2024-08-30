@@ -994,11 +994,58 @@ export const AppContext = React.createContext(null)`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = /* @__PURE__ */ __name(() => "index", "default");
+        expect(mjsContent).toBe(`export { s as sharedApi } from './shared/shared-module.DwwxX0VF.mjs';
+export { A as AppContext } from './shared/shared-module.CA88-UyG.mjs';
 
-export { index as default };
+const index = "index";
+
+export { index };
+`);
+
+        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/shared-module.DwwxX0VF.mjs`);
+
+        expect(mjsChunk1Content).toBe(`'use client';
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function sharedApi() {
+  return "common:shared";
+}
+__name(sharedApi, "sharedApi");
+
+export { sharedApi as s };
+`);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const anotherSharedApi = require('./shared/shared-module.C_G2lNA6.cjs');
+const AppContext = require('./shared/shared-module.BcQ69C1t.cjs');
+
+const index = "index";
+
+exports.sharedApi = anotherSharedApi.sharedApi;
+exports.AppContext = AppContext.AppContext;
+exports.index = index;
+`);
+
+        const cjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/shared-module.C_G2lNA6.cjs`);
+
+        expect(cjsChunk1Content).toBe(`'use client';
+'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function sharedApi() {
+  return "common:shared";
+}
+__name(sharedApi, "sharedApi");
+
+exports.sharedApi = sharedApi;
 `);
 
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);

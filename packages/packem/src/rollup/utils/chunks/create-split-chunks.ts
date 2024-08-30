@@ -86,6 +86,7 @@ const createSplitChunks = (dependencyGraphMap: Map<string, Set<[string, string]>
 
                     return entryModuleLayer === moduleLayer;
                 }
+
                 return false;
             });
 

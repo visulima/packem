@@ -1,5 +1,5 @@
 const arrayify = <T>(x: T | T[]): T[] => {
-    if (x === undefined) {
+    if (x === undefined || x === null) {
         return [] as T[];
     }
 

@@ -43,7 +43,7 @@ const buildTypes = async (context: BuildContext, fileCache: FileCache, subDirect
 
     if (context.options.emitCJS) {
         await typesBuild.write({
-            chunkFileNames: (chunk) => getChunkFilename(context, chunk, "d.cts"),
+            chunkFileNames: (chunk) => getChunkFilename(chunk, "d.cts"),
             dir: resolve(context.options.rootDir, context.options.outDir),
             entryFileNames: "[name].d.cts",
         });
@@ -51,7 +51,7 @@ const buildTypes = async (context: BuildContext, fileCache: FileCache, subDirect
 
     if (context.options.emitESM) {
         await typesBuild.write({
-            chunkFileNames: (chunk) => getChunkFilename(context, chunk, "d.mts"),
+            chunkFileNames: (chunk) => getChunkFilename(chunk, "d.mts"),
             dir: resolve(context.options.rootDir, context.options.outDir),
             entryFileNames: "[name].d.mts",
         });
@@ -60,7 +60,7 @@ const buildTypes = async (context: BuildContext, fileCache: FileCache, subDirect
     // .d.ts for node10 compatibility (TypeScript version < 4.7)
     if (context.options.declaration === "compatible") {
         await typesBuild.write({
-            chunkFileNames: (chunk) => getChunkFilename(context, chunk, "d.ts"),
+            chunkFileNames: (chunk) => getChunkFilename(chunk, "d.ts"),
             dir: resolve(context.options.rootDir, context.options.outDir),
             entryFileNames: "[name].d.ts",
         });
