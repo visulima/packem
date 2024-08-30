@@ -252,7 +252,7 @@ console.log("Hello, cli!");
     });
 
     it("should chunk directives in separated files", async () => {
-        expect.assertions(4);
+        expect.assertions(8);
 
         writeFileSync(`${temporaryDirectoryPath}/src/bar.ts`, `'use client';export const bar = 'bar';`);
         writeFileSync(
@@ -297,12 +297,29 @@ export const baz = 'baz';`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`export { f as foo } from './shared/.Dz9XMQGO.mjs';
-export { b as bar } from './shared/.pKIa1waU.mjs';
+        expect(mjsContent).toBe(`export { f as foo } from './shared/foo-Dz9XMQGO.mjs';
+export { b as bar } from './shared/bar-pKIa1waU.mjs';
 
 const baz = "baz";
 
 export { baz };
+`);
+
+        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/foo-Dz9XMQGO.mjs`);
+
+        expect(mjsChunk1Content).toBe(`'use client';
+'use sukka';
+const foo = "foo";
+
+export { foo as f };
+`);
+
+        const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/bar-pKIa1waU.mjs`);
+
+        expect(mjsChunk2Content).toBe(`'use client';
+const bar = "bar";
+
+export { bar as b };
 `);
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
@@ -311,14 +328,39 @@ export { baz };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const fooClient = require('./shared/.BidPBplS.cjs');
-const barClient = require('./shared/.C8ei8RaB.cjs');
+const foo = require('./shared/foo-CPDxWGQe.cjs');
+const bar = require('./shared/bar-ChnaedqB.cjs');
 
 const baz = "baz";
 
-exports.foo = fooClient.foo;
-exports.bar = barClient.bar;
+exports.foo = foo.foo;
+exports.bar = bar.bar;
 exports.baz = baz;
+`);
+
+        const cjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/foo-CPDxWGQe.cjs`);
+
+        expect(cjsChunk1Content).toBe(`'use client';
+'use sukka';
+'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const foo = "foo";
+
+exports.foo = foo;
+`);
+
+        const cjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/bar-ChnaedqB.cjs`);
+
+        expect(cjsChunk2Content).toBe(`'use client';
+'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const bar = "bar";
+
+exports.bar = bar;
 `);
     });
 });

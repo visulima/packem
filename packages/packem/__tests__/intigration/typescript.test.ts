@@ -926,7 +926,7 @@ export { getOne };
     });
 
     it("should contain correct type file path of shared chunks", async () => {
-        expect.assertions(5);
+        expect.assertions(10);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "react");
@@ -994,18 +994,17 @@ export const AppContext = React.createContext(null)`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`export { s as sharedApi } from './shared/shared-module.DwwxX0VF.mjs';
-export { A as AppContext } from './shared/shared-module.CA88-UyG.mjs';
+        expect(mjsContent).toBe(`export { s as sharedApi } from './shared/anotherSharedApi-DwwxX0VF.mjs';
+export { A as AppContext } from './shared/AppContext-CA88-UyG.mjs';
 
 const index = "index";
 
 export { index };
 `);
 
-        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/shared-module.DwwxX0VF.mjs`);
+        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/anotherSharedApi-DwwxX0VF.mjs`);
 
-        expect(mjsChunk1Content).toBe(`'use client';
-var __defProp = Object.defineProperty;
+        expect(mjsChunk1Content).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function sharedApi() {
   return "common:shared";
@@ -1014,6 +1013,15 @@ __name(sharedApi, "sharedApi");
 
 export { sharedApi as s };
 `);
+        const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/AppContext-CA88-UyG.mjs`);
+
+        expect(mjsChunk2Content).toBe(`'use client';
+import React from 'react';
+
+const AppContext = React.createContext(null);
+
+export { AppContext as A };
+`);
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
@@ -1021,8 +1029,8 @@ export { sharedApi as s };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const anotherSharedApi = require('./shared/shared-module.C_G2lNA6.cjs');
-const AppContext = require('./shared/shared-module.BcQ69C1t.cjs');
+const anotherSharedApi = require('./shared/anotherSharedApi-C_G2lNA6.cjs');
+const AppContext = require('./shared/AppContext-BcQ69C1t.cjs');
 
 const index = "index";
 
@@ -1031,10 +1039,9 @@ exports.AppContext = AppContext.AppContext;
 exports.index = index;
 `);
 
-        const cjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/shared-module.C_G2lNA6.cjs`);
+        const cjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/anotherSharedApi-C_G2lNA6.cjs`);
 
-        expect(cjsChunk1Content).toBe(`'use client';
-'use strict';
+        expect(cjsChunk1Content).toBe(`'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
@@ -1048,18 +1055,44 @@ __name(sharedApi, "sharedApi");
 exports.sharedApi = sharedApi;
 `);
 
+        const cjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/AppContext-BcQ69C1t.cjs`);
+
+        expect(cjsChunk2Content).toBe(`'use client';
+'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const React = require('react');
+
+const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
+
+const React__default = /*#__PURE__*/_interopDefaultCompat(React);
+
+const AppContext = React__default.createContext(null);
+
+exports.AppContext = AppContext;
+`);
+
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(dMtsContent).toBe(`declare const _default: () => string;
+        expect(dMtsContent).toBe(`export { anotherSharedApi as sharedApi } from './another.mjs';
 
-export { _default as default };
+declare const AppContext: any;
+
+declare const index = "index";
+
+export { AppContext, index };
 `);
 
         const dTsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dTsContent).toBe(`declare const _default: () => string;
+        expect(dTsContent).toBe(`export { anotherSharedApi as sharedApi } from './another.js';
 
-export { _default as default };
+declare const AppContext: any;
+
+declare const index = "index";
+
+export { AppContext, index };
 `);
     });
 });

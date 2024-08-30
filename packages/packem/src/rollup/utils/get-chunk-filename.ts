@@ -5,7 +5,7 @@ const getChunkFilename = (chunk: PreRenderedChunk, extension: string): string =>
         return `chunks/[name].${extension}`;
     }
 
-    return `shared/[name]-[hash].${extension}`;
+    return `shared/${chunk.name}-[hash].${extension}`;
 };
 
 export default getChunkFilename;

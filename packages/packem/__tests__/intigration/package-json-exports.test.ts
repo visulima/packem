@@ -196,16 +196,16 @@ export function method() {
         for (const [file, regex] of [
             ["index.development.cjs", /= "development"/],
             ["index.development.mjs", /= "development"/],
-            ["index.production.cjs", /= "production"/],
-            ["index.production.mjs", /= "production"/],
+            ["index.production.cjs", /="production"/],
+            ["index.production.mjs", /="production"/],
             ["index.cjs", /= "index"/],
             ["index.mjs", /= "index"/],
 
             // core export
             ["core.development.cjs", /= "coredevelopment"/],
             ["core.development.mjs", /= "coredevelopment"/],
-            ["core.production.cjs", /= "coreproduction"/],
-            ["core.production.mjs", /= "coreproduction"/],
+            ["core.production.cjs", /="coreproduction"/],
+            ["core.production.mjs", /="coreproduction"/],
             ["core.cjs", /= "core"/],
             ["core.mjs", /= "core"/],
         ]) {
