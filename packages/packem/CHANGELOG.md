@@ -1,3 +1,15 @@
+## @visulima/packem [1.0.0-alpha.86](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.85...@visulima/packem@1.0.0-alpha.86) (2024-08-30)
+
+### Bug Fixes
+
+* added a better chunk splitter ([185ac52](https://github.com/visulima/packem/commit/185ac5287326feefc1bcc3f7acd6fef3c94b0c3b))
+* fixed preserve and prepend of directives ([9191381](https://github.com/visulima/packem/commit/9191381697a965e84a9cf4500eb84850bd251532))
+* updated tests ([56f6be1](https://github.com/visulima/packem/commit/56f6be1e7532924b0972ece2b56db415342f43a7))
+
+### Miscellaneous Chores
+
+* deps update ([ef94d5c](https://github.com/visulima/packem/commit/ef94d5c2e99c033f2ccdbe0f14b51ee390b1dc5c))
+
 ## @visulima/packem [1.0.0-alpha.85](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.84...@visulima/packem@1.0.0-alpha.85) (2024-08-28)
 
 ### Bug Fixes
