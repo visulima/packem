@@ -101,8 +101,8 @@ function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: Ren
  * Remove `@internal` comments not handled by `compilerOptions.stripInternal`
  * Reference: https://github.com/vuejs/core/blob/main/rollup.dts.config.js
  */
-// eslint-disable-next-line func-style,@typescript-eslint/no-explicit-any
-function removeInternal(s: MagicString, node: any): boolean {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const removeInternal = (s: MagicString, node: any): boolean => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-return
     if (node.leadingComments?.some((c: any) => c.type === "CommentBlock" && c.value.includes("@internal"))) {
         // Examples:

@@ -4,6 +4,7 @@ import transformer from "./src/rollup/plugins/esbuild";
 
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
+    fileCache: false,
     rollup: {
         license: {
             path: "./LICENSE.md",
@@ -15,6 +16,5 @@ export default defineConfig({
             include: [/\.(?:m|c)?(?:j|t)sx?$/],
         },
     },
-    fileCache: false,
     transformer,
 });

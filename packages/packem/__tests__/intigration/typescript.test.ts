@@ -1095,4 +1095,175 @@ declare const index = "index";
 export { AppContext, index };
 `);
     });
+
+    describe("isolated declarations", () => {
+        it.each(["typescript", "oxc", "swc"])("should work with '%s' isolated declarations transformer and commonjs package", async (isolatedDeclarationTransformer) => {
+            expect.assertions(7);
+
+            const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : "\"";
+
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                `import { type Num } from './types'
+export type Str = string
+
+export function hello(s: Str): Str {
+  return 'hello' + s
+}
+
+export let num: Num = 1`,
+            );
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/types.ts`,
+                `import type { Num2 } from './types2'
+export type Num = number`,
+            );
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/types2.ts`,
+                `import type { Num } from './types'
+export type Num2 = number`,
+            );
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+
+            createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
+                },
+                exports: {
+                    ".": {
+                        default: "./dist/index.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                },
+            });
+            await createPackemConfig(temporaryDirectoryPath, {}, "esbuild", isolatedDeclarationTransformer as "swc" | "typescript" | "oxc" | undefined);
+            createTsConfig(temporaryDirectoryPath, {
+                compilerOptions: {
+                    isolatedDeclarations: true,
+                    noErrorTruncation: true,
+                }
+            });
+
+            const binProcess = await execPackemSync("build", [], {
+                cwd: temporaryDirectoryPath,
+                reject: false,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+            expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
+console.log(binProcess.stdout);
+            const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+            expect(dCtsContent).toBe(`import { type Num } from ${quote}./types.cts${quote};
+export type Str = string;
+export declare function hello(s: Str): Str;
+export declare let num: Num;
+`);
+
+            const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+            expect(dtsContent).toBe(`import { type Num } from ${quote}./types${quote};
+export type Str = string;
+export declare function hello(s: Str): Str;
+export declare let num: Num;
+`);
+
+            const dCtsTypesContent = readFileSync(`${temporaryDirectoryPath}/dist/types.d.cts`);
+
+            expect(dCtsTypesContent).toBe(`export type Num = number;
+`);
+
+            const dtsTypesContent = readFileSync(`${temporaryDirectoryPath}/dist/types.d.ts`);
+
+            expect(dtsTypesContent).toBe(`export type Num = number;
+`);
+        });
+
+        it.each(["typescript", "oxc", "swc"])("should work with '%s' isolated declarations transformer and module package", async (isolatedDeclarationTransformer) => {
+            expect.assertions(7);
+
+            const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : "\"";
+
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                `import { type Num } from './types'
+export type Str = string
+
+export function hello(s: Str): Str {
+  return 'hello' + s
+}
+
+export let num: Num = 1`,
+            );
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/types.ts`,
+                `import type { Num2 } from './types2'
+export type Num = number`,
+            );
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/types2.ts`,
+                `import type { Num } from './types'
+export type Num2 = number`,
+            );
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+
+            createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
+                },
+                exports: {
+                    ".": {
+                        default: "./dist/index.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                },
+                type: "module",
+            });
+            await createPackemConfig(temporaryDirectoryPath, {}, "esbuild", isolatedDeclarationTransformer as "swc" | "typescript" | "oxc" | undefined);
+            createTsConfig(temporaryDirectoryPath, {
+                compilerOptions: {
+                    isolatedDeclarations: true,
+                    noErrorTruncation: true,
+                }
+            });
+
+            const binProcess = await execPackemSync("build", [], {
+                cwd: temporaryDirectoryPath,
+                reject: false,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+            expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
+
+            const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+            expect(dMtsContent).toBe(`import { type Num } from ${quote}./types.mts${quote};
+export type Str = string;
+export declare function hello(s: Str): Str;
+export declare let num: Num;
+`);
+
+            const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+            expect(dtsContent).toBe(`import { type Num } from ${quote}./types${quote};
+export type Str = string;
+export declare function hello(s: Str): Str;
+export declare let num: Num;
+`);
+
+            const dMtsTypesContent = readFileSync(`${temporaryDirectoryPath}/dist/types.d.mts`);
+
+            expect(dMtsTypesContent).toBe(`export type Num = number;
+`);
+
+            const dtsTypesContent = readFileSync(`${temporaryDirectoryPath}/dist/types.d.ts`);
+
+            expect(dtsTypesContent).toBe(`export type Num = number;
+`);
+        });
+    });
 });

@@ -10,7 +10,7 @@ import { createFilter } from "@rollup/pluginutils";
 import type { Pail } from "@visulima/pail";
 import type { Node } from "estree";
 import MagicString from "magic-string";
-import type { Plugin } from "rollup";
+import type { Plugin, SourceMap } from "rollup";
 
 const preserveDirectives = ({
     directiveRegex,
@@ -103,7 +103,7 @@ const preserveDirectives = ({
         },
 
         // eslint-disable-next-line sonarjs/cognitive-complexity
-        transform(code, id) {
+        transform(code, id): null | { code: string; map: SourceMap | null, meta: { preserveDirectives: { directives: string[]; shebang: string | null; }; }; } {
             if (!filter(id)) {
                 return null;
             }

@@ -15,7 +15,7 @@ import { defu } from "defu";
 import { createHooks } from "hookable";
 import { VERSION } from "rollup";
 
-import { EXCLUDE_REGEXP, PRODUCTION_ENV } from "./constants";
+import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "./constants";
 import createStub from "./jit/create-stub";
 import resolvePreset from "./preset/utils/resolve-preset";
 import rollupBuild from "./rollup/build";
@@ -104,6 +104,7 @@ const generateOptions = (
             alias: {},
             cjsInterop: { addDefaultProperty: false },
             commonjs: {
+                extensions: [".mjs", ".js", ".json", ".node", ".cjs"],
                 ignoreTryCatch: true,
                 preserveSymlinks: true,
                 // https://github.com/rollup/plugins/tree/master/packages/commonjs#transformmixedesmodules
@@ -183,6 +184,7 @@ const generateOptions = (
                 // Optionally preserve symbol names during minification
                 tsconfigRaw: tsconfig?.config,
             },
+            // https://github.com/microsoft/TypeScript/issues/58944
             isolatedDeclarations: {
                 exclude: EXCLUDE_REGEXP,
                 ignoreErrors: false,
@@ -227,6 +229,7 @@ const generateOptions = (
             resolve: {
                 // old behavior node 14 and removed in node 17
                 allowExportsFolderMapping: false,
+                extensions: DEFAULT_EXTENSIONS,
                 // Following option must be *false* for polyfill to work
                 preferBuiltins: false,
             },

@@ -9,8 +9,8 @@ import getChunkFilename from "./utils/get-chunk-filename";
 
 const buildTypes = async (context: BuildContext, fileCache: FileCache, subDirectory: string): Promise<void> => {
     if (context.options.declaration && context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer) {
-        context.logger.debug({
-            message: "Skipping declaration file generation as isolated declaration transformer is enabled.",
+        context.logger.info({
+            message: "Using isolated declaration transformer to generate declaration files...",
             prefix: "dts",
         });
 

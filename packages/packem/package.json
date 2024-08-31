@@ -184,6 +184,7 @@
         "@visulima/path": "^1.0.4",
         "@visulima/tsconfig": "^1.0.8",
         "defu": "6.1.4",
+        "oxc-parser": "^0.25.0",
         "es-module-lexer": "^1.5.4",
         "fastest-levenshtein": "^1.0.16",
         "glob-parent": "^6.0.2",

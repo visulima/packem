@@ -8,14 +8,13 @@ import { nodeResolve as nodeResolvePlugin } from "@rollup/plugin-node-resolve";
 import replacePlugin from "@rollup/plugin-replace";
 import { wasm as wasmPlugin } from "@rollup/plugin-wasm";
 import { cyan } from "@visulima/colorize";
-import { isAbsolute, join, relative, resolve } from "@visulima/path";
+import { isAbsolute, relative, resolve } from "@visulima/path";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
 import polyfillPlugin from "rollup-plugin-polyfill-node";
 import { visualizer as visualizerPlugin } from "rollup-plugin-visualizer";
 import { minVersion } from "semver";
 
-import { DEFAULT_EXTENSIONS } from "../constants";
 import type { BuildContext, InternalBuildOptions } from "../types";
 import arrayIncludes from "../utils/array-includes";
 import arrayify from "../utils/arrayify";
@@ -28,7 +27,7 @@ import { copyPlugin } from "./plugins/copy";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
 import { esmShimCjsSyntaxPlugin } from "./plugins/esm-shim-cjs-syntax";
 import fixDynamicImportExtension from "./plugins/fix-dynamic-import-extension";
-import { isolatedDeclarationsPlugin } from "./plugins/isolated-declarations-plugin";
+import { isolatedDeclarationsPlugin } from "./plugins/isolated-declarations";
 import JSONPlugin from "./plugins/json";
 import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
 import { license as licensePlugin } from "./plugins/license";
@@ -315,7 +314,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
     if (context.options.rollup.resolve) {
         nodeResolver = cachingPlugin(
             nodeResolvePlugin({
-                extensions: DEFAULT_EXTENSIONS,
                 ...context.options.rollup.resolve,
             }),
             fileCache,
@@ -438,10 +436,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             context.options.declaration &&
                 context.options.rollup.isolatedDeclarations &&
                 context.options.isolatedDeclarationTransformer &&
-                isolatedDeclarationsPlugin(join(context.options.rootDir, context.options.sourceDir))(
-                    context.options.isolatedDeclarationTransformer,
-                    context.options.rollup.isolatedDeclarations,
-                ),
+                isolatedDeclarationsPlugin(context.options.isolatedDeclarationTransformer, context.options.declaration, context.pkg.type, context.options.rollup.isolatedDeclarations),
 
             context.options.transformer?.(getTransformerConfig(context.options.transformerName, context)),
 
@@ -465,7 +460,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             context.options.rollup.commonjs &&
                 cachingPlugin(
                     commonjsPlugin({
-                        extensions: DEFAULT_EXTENSIONS,
                         sourceMap: context.options.sourcemap,
                         ...context.options.rollup.commonjs,
                     }),
@@ -569,7 +563,6 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
     if (context.options.rollup.resolve) {
         nodeResolver = cachingPlugin(
             nodeResolvePlugin({
-                extensions: DEFAULT_EXTENSIONS,
                 ...context.options.rollup.resolve,
             }),
             fileCache,

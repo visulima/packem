@@ -44,6 +44,7 @@ export const createPackemConfig = async (
     fixturePath: string,
     config: BuildConfig | BuildConfig[] = {},
     transformer: "esbuild" | "swc" | "sucrase" = "esbuild",
+    isolatedDeclarationTransformer: "swc" | "typescript" | "oxc" | undefined = undefined,
 ): Promise<void> => {
     // eslint-disable-next-line security/detect-object-injection
     await installPackage(fixturePath, transformerPackageNames[transformer]);
@@ -52,10 +53,12 @@ export const createPackemConfig = async (
         join(fixturePath, "packem.config.ts"),
         `import { defineConfig } from "${distributionPath}/config";
 import transformer from "${distributionPath}/rollup/plugins/${transformer}/index";
+${isolatedDeclarationTransformer ? `import isolatedDeclarationTransformer from "${distributionPath}/rollup/plugins/${isolatedDeclarationTransformer}/isolated-declarations-${isolatedDeclarationTransformer}-transformer";` : ""}
 
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
     transformer,
+    ${isolatedDeclarationTransformer ? `isolatedDeclarationTransformer,` : ""}
     ${JSON.stringify(config, null, 4).slice(1, -1)}
 });
 `,
