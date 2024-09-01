@@ -19,11 +19,11 @@ const metafilePlugin = (options: MetafileOptions): Plugin =>
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const id of this.getModuleIds()) {
-                const m = this.getModuleInfo(id);
+                const moduleInfo = this.getModuleInfo(id);
 
-                if (m != null && !m.isExternal) {
+                if (moduleInfo != null && !moduleInfo.isExternal) {
                     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-                    for (const target of m.importedIds) {
+                    for (const target of moduleInfo.importedIds) {
                         deps.push({
                             source: id,
                             target,

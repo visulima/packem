@@ -1,3 +1,6 @@
+/**
+ * Modified copy of https://github.com/cprecioso/rollup-plugin-chunk-per-export/blob/main/src/parse
+ */
 import assert from "node:assert/strict";
 
 import { extractAssignedNames } from "@rollup/pluginutils";

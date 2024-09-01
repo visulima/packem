@@ -1,3 +1,6 @@
+/**
+ * Modified copy of https://github.com/cprecioso/rollup-plugin-chunk-per-export/blob/main/src/gather
+ */
 import assert from "node:assert/strict";
 
 import type { ModuleInfo, PluginContext } from "rollup";

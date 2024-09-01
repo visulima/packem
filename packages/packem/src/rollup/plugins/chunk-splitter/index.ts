@@ -1,18 +1,21 @@
-import type { Plugin, PreserveEntrySignaturesOption } from "rollup";
+/**
+ * Modified copy of https://github.com/cprecioso/rollup-plugin-chunk-per-export/blob/main/src/index.ts
+ */
+import type { ModuleInfo, Plugin, PreserveEntrySignaturesOption } from "rollup";
 
 import gatherExports from "./gather";
 
 const chunkSplitter = ({ preserveChunkSignature = false }: { preserveChunkSignature?: PreserveEntrySignaturesOption | undefined } = {}): Plugin => {
     return {
         moduleParsed: {
-            async handler(module_) {
-                if (!module_.isEntry) {
+            async handler(info: ModuleInfo) {
+                if (!info.isEntry) {
                     return;
                 }
 
                 // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-                for await (const exported of gatherExports(this, module_)) {
-                    if (exported.id === module_.id) {
+                for await (const exported of gatherExports(this, info)) {
+                    if (exported.id === info.id) {
                         // eslint-disable-next-line no-continue
                         continue;
                     }

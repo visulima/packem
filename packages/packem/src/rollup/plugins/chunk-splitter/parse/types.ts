@@ -1,3 +1,6 @@
+/**
+ * Modified copy of https://github.com/cprecioso/rollup-plugin-chunk-per-export/blob/main/src/parse/types.ts
+ */
 export interface NamedSelfExport {
     exportedName: string;
     from: "self";

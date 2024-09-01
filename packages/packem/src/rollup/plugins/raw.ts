@@ -13,14 +13,14 @@ export const rawPlugin = (options: RawLoaderOptions): Plugin => {
     return {
         name: "packem:raw",
         transform(code, id) {
-            if (filter(id)) {
-                return {
-                    code: `export default ${JSON.stringify(code)}`,
-                    map: null,
-                };
+            if (!filter(id)) {
+                return null;
             }
 
-            return null;
+            return {
+                code: `export default ${JSON.stringify(code)}`,
+                map: null,
+            };
         },
     };
 };
