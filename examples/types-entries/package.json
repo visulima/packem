@@ -2,10 +2,10 @@
     "name": "example_packem_type_entries",
     "version": "1.0.0",
     "private": true,
+    "types": "./types/index.types.ts",
     "scripts": {
         "build": "packem build"
     },
-    "types": "./types/index.types.ts",
     "devDependencies": {
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.23.1",

@@ -2,13 +2,7 @@
     "name": "example_packem_mixed",
     "version": "1.0.0",
     "description": "",
-    "main": "./dist/index.cjs",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
     "type": "commonjs",
-    "scripts": {
-        "build": "packem build"
-    },
     "exports": {
         ".": {
             "react-server": "./dist/index.react-server.mjs",
@@ -56,6 +50,12 @@
             },
             "default": "./dist/react/index.cjs"
         }
+    },
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "packem build"
     },
     "dependencies": {
         "react": "^18.3.1",

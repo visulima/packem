@@ -1,3 +1,10 @@
+/**
+ * Modified copy of https://github.com/unplugin/unplugin-isolated-decl/blob/main/src/index.ts
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright © 2024-PRESENT 三咲智子 (https://github.com/sxzz)
+ */
 import { dirname, toNamespacedPath } from "@visulima/path";
 
 const lowestCommonAncestor = (...filepaths: string[]): string => {

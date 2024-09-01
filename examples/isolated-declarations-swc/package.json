@@ -19,8 +19,8 @@
         "build": "packem build"
     },
     "devDependencies": {
-        "@visulima/packem": "workspace:*",
         "@swc/core": "^1.7.22",
+        "@visulima/packem": "workspace:*",
         "esbuild": "^0.23.1",
         "typescript": "^5.0.4"
     }

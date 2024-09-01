@@ -27,7 +27,10 @@
         "oxc",
         "typescript",
         "visulima",
-        "zero config"
+        "zero config",
+        "tsup",
+        "unbuild",
+        "bunchee"
     ],
     "homepage": "https://www.visulima.com/docs/package/packem",
     "repository": {
@@ -93,7 +96,7 @@
                 "default": "./dist/rollup/plugins/swc/swc-plugin.cjs"
             }
         },
-        "./transformer/dts/swc": {
+        "./dts/isolated/transformer/swc": {
             "import": {
                 "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.mts",
                 "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.mjs"
@@ -103,7 +106,7 @@
                 "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.cjs"
             }
         },
-        "./transformer/dts/oxc": {
+        "./dts/isolated/transformer/oxc": {
             "import": {
                 "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.mts",
                 "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.mjs"
@@ -113,7 +116,7 @@
                 "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.cjs"
             }
         },
-        "./transformer/dts/ts": {
+        "./dts/isolated/transformer/typescript": {
             "import": {
                 "types": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.mts",
                 "default": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.mjs"
@@ -149,9 +152,9 @@
         "build:prod": "cross-env JITI_ESM_RESOLVE=1 INTERNAL_PACKEM_BUILD=1 jiti ./src/cli build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build",
-        "lint:fix": "pnpm run lint:prettier:fix && pnpm run lint:eslint:fix",
         "lint:eslint": "eslint . --ext js,cjs,mjs,jsx,ts,tsx,json,yaml,yml,md,mdx --max-warnings=0 --config .eslintrc.cjs",
         "lint:eslint:fix": "eslint . --ext js,cjs,mjs,jsx,ts,tsx,json,yaml,yml,md,mdx --max-warnings=0 --config .eslintrc.cjs --fix",
+        "lint:fix": "pnpm run lint:prettier:fix && pnpm run lint:eslint:fix",
         "lint:packagejson": "publint --strict",
         "lint:prettier": "prettier --config=.prettierrc.cjs --check .",
         "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
@@ -184,7 +187,6 @@
         "@visulima/path": "^1.0.4",
         "@visulima/tsconfig": "^1.0.8",
         "defu": "6.1.4",
-        "oxc-parser": "^0.25.0",
         "es-module-lexer": "^1.5.4",
         "fastest-levenshtein": "^1.0.16",
         "glob-parent": "^6.0.2",
@@ -192,6 +194,7 @@
         "is-glob": "^4.0.3",
         "magic-string": "^0.30.11",
         "mlly": "^1.7.1",
+        "oxc-parser": "^0.25.0",
         "rollup": "^4.21.2",
         "rollup-plugin-dts": "^6.1.1",
         "rollup-plugin-license": "^3.5.2",

@@ -70,12 +70,65 @@ const createInitCommand = (cli: Cli): void => {
                 }
             }
 
+            if (options.isolatedDeclarationTransformer === undefined) {
+                // eslint-disable-next-line no-param-reassign
+                options.isolatedDeclarationTransformer = await select({
+                    message: "Pick a isolated declaration transformer",
+                    options: [
+                        { label: "Typescript", value: "typescript" },
+                        { label: "swc", value: "swc" },
+                        { label: "OXC", value: "oxc" },
+                        { label: "None", value: null },
+                    ],
+                });
+
+                if (options.isolatedDeclarationTransformer !== null) {
+                    let packageName: string | undefined;
+
+                    switch (options.isolatedDeclarationTransformer) {
+                        case "typescript": {
+                            packageName = "typescript";
+
+                            break;
+                        }
+                        case "swc": {
+                            packageName = "@swc/core";
+
+                            break;
+                        }
+                        case "oxc": {
+                            packageName = "oxc-transform";
+
+                            break;
+                        }
+                        default: {
+                            cancel("Invalid isolated declaration transformer");
+                        }
+                    }
+
+                    if (packageName && !packages.includes(packageName)) {
+                        const shouldInstall = await confirm({
+                            message: "Do you want to install " + packageName + "?",
+                        });
+
+                        if (shouldInstall) {
+                            const s = spinner();
+
+                            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                            s.start("Installing " + options.isolatedDeclarationTransformer);
+                            await installPackage(packageName, { cwd: options.dir, dev: true, silent: true });
+                            s.stop("");
+                        }
+                    }
+                }
+            }
+
             if (packages.includes("typescript") || packageJson.type === "module") {
                 const template = `import { defineConfig } from "@visulima/packem/config";
 import transformer from "@visulima/packem/transformer/${options.transformer as string}";
-
+${options.isolatedDeclarationTransformer === null ? "" : `import isolatedDeclarationTransformer from "@visulima/packem/dts/isolated/transformer/${options.isolatedDeclarationTransformer as string}";\n`}
 export default defineConfig({
-    transformer
+    transformer${options.isolatedDeclarationTransformer === null ? "" : ",\n    isolatedDeclarationTransformer"}
 });
 `;
 
@@ -113,8 +166,13 @@ module.exports = defineConfig({
                 type: String,
             },
             {
-                description: "Choose a transformer to use for packem",
+                description: "Choose a transformer",
                 name: "transformer",
+                type: String,
+            },
+            {
+                description: "Choose a isolated declaration transformer",
+                name: "isolated-declaration-transformer",
                 type: String,
             },
         ],

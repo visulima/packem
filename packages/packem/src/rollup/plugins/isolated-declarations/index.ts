@@ -1,3 +1,10 @@
+/**
+ * Modified copy of https://github.com/unplugin/unplugin-isolated-decl/blob/main/src/index.ts
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright © 2024-PRESENT 三咲智子 (https://github.com/sxzz)
+ */
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { readFile } from "@visulima/fs";
@@ -104,9 +111,7 @@ export const isolatedDeclarationsPlugin = (
         name: "packem:isolated-declarations",
 
         renderStart(outputOptions: NormalizedOutputOptions, { input }: NormalizedInputOptions): void {
-            let outBase = "";
-
-            outBase = lowestCommonAncestor(...(Array.isArray(input) ? input : Object.values(input)));
+            const outBase = lowestCommonAncestor(...(Array.isArray(input) ? input : Object.values(input)));
 
             if (typeof outputOptions.entryFileNames === "function") {
                 // eslint-disable-next-line no-param-reassign
@@ -117,11 +122,6 @@ export const isolatedDeclarationsPlugin = (
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const [filename, source] of Object.entries(outputFiles)) {
-                // console.log({
-                //     entry: entryFileNames.replace("[name]", relative(outBase, filename)),
-                //     source,
-                // });
-
                 if ((declaration === true || declaration === "compatible") && outputOptions.format === format) {
                     this.emitFile({
                         fileName: entryFileNames.replace("[name]", relative(outBase, filename)).replace(format === "cjs" ? ".cts" : ".mts", ".ts"),
