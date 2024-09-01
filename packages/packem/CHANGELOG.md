@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.88](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.87...@visulima/packem@1.0.0-alpha.88) (2024-09-01)
+
+### Features
+
+* use outDir from tsconfig.json if present ([a58a111](https://github.com/visulima/packem/commit/a58a111b12294552aabe84ae9f7c62605463cdb8))
+
 ## @visulima/packem [1.0.0-alpha.87](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.86...@visulima/packem@1.0.0-alpha.87) (2024-09-01)
 
 ### Features
