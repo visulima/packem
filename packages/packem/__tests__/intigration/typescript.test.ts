@@ -1266,4 +1266,49 @@ export declare let num: Num;
 `);
         });
     });
+
+    it("should use the outDir option from tsconfig if present", async () => {
+        expect.assertions(3);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+
+        createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                outDir: "lib",
+            },
+        });
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    default: "./lib/index.cjs",
+                    types: "./lib/index.d.ts",
+                },
+            },
+            types: "./lib/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {});
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/lib/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const index = /* @__PURE__ */ __name(() => "index", "default");
+
+module.exports = index;
+`);
+    });
 });

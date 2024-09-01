@@ -98,7 +98,7 @@ const generateOptions = (
         fileCache: true,
         minify: environment === PRODUCTION_ENV,
         name: (packageJson.name ?? "").split("/").pop() ?? "default",
-        outDir: "dist",
+        outDir: tsconfig?.config.compilerOptions?.outDir ?? "dist",
         replace: {},
         rollup: {
             alias: {},
