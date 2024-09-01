@@ -1,3 +1,15 @@
+## @visulima/packem [1.0.0-alpha.87](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.86...@visulima/packem@1.0.0-alpha.87) (2024-09-01)
+
+### Features
+
+* added missing copyright header ([f4a8530](https://github.com/visulima/packem/commit/f4a8530d4b040ba7fb8986607344cd1018fc3ba9))
+* added missing copyright header, added isolated transformer to init command, renamed exports ([ecb0a4e](https://github.com/visulima/packem/commit/ecb0a4e3cabf3117c571e00b00305c033dc57ae8))
+* added working isolated declarations for swc, typescript and oxc ([30f9f38](https://github.com/visulima/packem/commit/30f9f38747256b433c4ef8b6d10aad6ad24bb479))
+
+### Bug Fixes
+
+* fixed shebang output ([a88654a](https://github.com/visulima/packem/commit/a88654a1f29c6cb0bafc4fd0d8f9575a828a54e4))
+
 ## @visulima/packem [1.0.0-alpha.86](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.85...@visulima/packem@1.0.0-alpha.86) (2024-08-30)
 
 ### Bug Fixes
