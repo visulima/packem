@@ -424,13 +424,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             chunkSplitter(/* { preserveChunkSignature: context.options.rollup.preserveChunkSignature } */),
 
-            shebangPlugin(
-                context.options.entries
-                    .filter((entry) => entry.executable)
-                    .map((entry) => entry.name)
-                    .filter(Boolean) as string[],
-            ),
-
             context.options.rollup.wsam && wasmPlugin(context.options.rollup.wsam),
 
             context.options.declaration &&
@@ -445,6 +438,13 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 ...context.options.rollup.preserveDirectives,
                 logger: context.logger,
             }),
+
+            shebangPlugin(
+                context.options.entries
+                    .filter((entry) => entry.executable)
+                    .map((entry) => entry.name)
+                    .filter(Boolean) as string[],
+            ),
 
             context.options.cjsInterop &&
                 context.options.emitCJS &&

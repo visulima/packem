@@ -12,27 +12,19 @@ exports[`packem package.json bin > should work with bin as .cts extension > cjs 
 "#!/usr/bin/env node
 'use strict';
 
-const require$$0 = require('path');
-
-const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
-
-const require$$0__default = /*#__PURE__*/_interopDefaultCompat(require$$0);
-
-const path = require$$0__default;
+const path = require("path");
 console.log(path.basename(__filename));
 "
 `;
 
 exports[`packem package.json bin > should work with bin as .mts extension > mjs output 1`] = `
 "#!/usr/bin/env node
-#!/usr/bin/env node
 console.log("Hello, world!");
 "
 `;
 
 exports[`packem package.json bin > should work with bin as multi path > cjs output 1`] = `
 "#!/usr/bin/env node
-#!/usr/bin/env node
 'use strict';
 
 console.log("a");
@@ -41,7 +33,6 @@ console.log("a");
 
 exports[`packem package.json bin > should work with bin as multi path > cjs output 2`] = `
 "#!/usr/bin/env node
-#!/usr/bin/env node
 'use strict';
 
 console.log("b");

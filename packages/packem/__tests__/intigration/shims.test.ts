@@ -384,7 +384,7 @@ export { test as default };
     });
 
     it("should include esm shim only once per file, if dirname, filename or require are found", async () => {
-        expect.assertions(3);
+        expect.assertions(4);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/filename.js`,
@@ -418,12 +418,7 @@ export { getFilename } from "./filename.js";`,
 import __cjs_path__ from "node:path"; // -- packem CommonJS __dirname shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
 const __dirname = __cjs_path__.dirname(__filename);
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
-function getFilename() {
-  return __filename;
-}
-__name$1(getFilename, "getFilename");
+export { g as getFilename } from './shared/getFilename-CAC-3KI_.mjs';
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -432,7 +427,21 @@ function getDirname() {
 }
 __name(getDirname, "getDirname");
 
-export { getDirname, getFilename };
+export { getDirname };
+`);
+
+        const mjsSharedContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/getFilename-CAC-3KI_.mjs`);
+
+        expect(mjsSharedContent).toBe(`import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
+const __filename = __cjs_url__.fileURLToPath(import.meta.url);
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function getFilename() {
+  return __filename;
+}
+__name(getFilename, "getFilename");
+
+export { getFilename as g };
 `);
     });
 
@@ -467,15 +476,11 @@ export { getFilename } from "./level2/filename.js";`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`
-// -- pack CommonJS Shims --
-import __cjs_url__ from "node:url";
-import __cjs_path__ from "node:path";
-import __cjs_mod__ from "node:module";
+        expect(mjsContent).toBe(`import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
+import __cjs_path__ from "node:path"; // -- packem CommonJS __dirname shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
 const __dirname = __cjs_path__.dirname(__filename);
-const require = __cjs_mod__.createRequire(import.meta.url);
-export { getFilename } from './filename.mjs';
+export { g as getFilename } from './shared/getFilename-CAC-3KI_.mjs';
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -487,7 +492,7 @@ __name(getDirname, "getDirname");
 export { getDirname };
 `);
 
-        const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.mjs`);
+        const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/getFilename-CAC-3KI_.mjs`);
 
         expect(mjsFilenameContent).toBe(`
 // -- pack CommonJS Shims --
