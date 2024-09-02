@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.89](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.88...@visulima/packem@1.0.0-alpha.89) (2024-09-02)
+
+### Bug Fixes
+
+* fixed some issues with auto config ([e0c9d4b](https://github.com/visulima/packem/commit/e0c9d4b45400ae3f73dc9cc962c081ff70e41709))
+
 ## @visulima/packem [1.0.0-alpha.88](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.87...@visulima/packem@1.0.0-alpha.88) (2024-09-01)
 
 ### Features
