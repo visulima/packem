@@ -62,7 +62,13 @@ const autoPreset: BuildPreset = {
                     cyan(
                         context.options.entries
 
-                            .map((buildEntry) => bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*")))
+                            .map((buildEntry) => {
+                                if (buildEntry.fileAlias) {
+                                    return bold(buildEntry.fileAlias) + " => " + bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*"))
+                                }
+
+                                return bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*"))
+                            })
                             .join(", "),
                     ),
                     gray(

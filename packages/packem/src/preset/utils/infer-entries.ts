@@ -31,10 +31,21 @@ const createOrUpdateEntry = (
 ): void => {
     const entryEnvironment = getEnvironment(output, context.environment);
 
-    let entry: BuildEntry | undefined = entries.find((index) => index.input === input && index.environment === entryEnvironment);
+    let runtime: Runtime = "node";
+
+    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+    for (const runtimeExportConvention of RUNTIME_EXPORT_CONVENTIONS) {
+        if (output.file.includes("." + runtimeExportConvention + ".") || output.subKey === runtimeExportConvention) {
+            runtime = runtimeExportConvention as Runtime;
+
+            break;
+        }
+    }
+
+    let entry: BuildEntry | undefined = entries.find((index) => index.input === input && index.environment === entryEnvironment && index.runtime === runtime);
 
     if (entry === undefined) {
-        entry = entries[entries.push({ input }) - 1] as BuildEntry;
+        entry = entries[entries.push({ environment: entryEnvironment, input, runtime }) - 1] as BuildEntry;
     }
 
     if (isDirectory) {
@@ -65,22 +76,7 @@ const createOrUpdateEntry = (
         if (output.type === "esm") {
             entry.esm = true;
         }
-
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-        for (const runtime of RUNTIME_EXPORT_CONVENTIONS) {
-            if (output.file.includes("." + runtime + ".")) {
-                entry.runtime = runtime as Runtime;
-
-                break;
-            }
-        }
     }
-
-    if (entry.runtime === undefined) {
-        entry.runtime = "node";
-    }
-
-    entry.environment = entryEnvironment;
 
     // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
     const aliasName = output.file.replace(extname(output.file), "").replace(new RegExp(`^./${context.options.outDir.replace(/^\.\//, "")}/`), "");

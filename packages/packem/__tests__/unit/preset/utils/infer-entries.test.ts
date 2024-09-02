@@ -94,11 +94,11 @@ describe("inferEntries", () => {
     it("should handle nested indexes", () => {
         expect.assertions(1);
 
-        createFiles(["src/event/gather.ts", "src/gather.ts"], temporaryDirectoryPath);
+        createFiles(["src/event/index.ts", "src/index.ts"], temporaryDirectoryPath);
 
         const result = inferEntries(
             { module: "dist/index.mjs" },
-            ["src/", "src/event/gather.ts", "src/gather.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            ["src/", "src/event/index.ts", "src/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
             defaultContext,
         );
 
@@ -107,7 +107,7 @@ describe("inferEntries", () => {
                 {
                     environment: "development",
                     esm: true,
-                    input: join(temporaryDirectoryPath, "/src/gather.ts"),
+                    input: join(temporaryDirectoryPath, "/src/index.ts"),
                     runtime: "node",
                 },
             ],
@@ -208,11 +208,11 @@ describe("inferEntries", () => {
     it("should match nested entrypoint paths", () => {
         expect.assertions(1);
 
-        createFiles(["src/other/runtime/gather.ts"], temporaryDirectoryPath);
+        createFiles(["src/other/runtime/index.ts"], temporaryDirectoryPath);
 
         const result = inferEntries(
             { exports: "dist/other/runtime/index.js" },
-            ["src/", "src/other", "src/other/runtime", "src/other/runtime/gather.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            ["src/", "src/other", "src/other/runtime", "src/other/runtime/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
             defaultContext,
         );
 
@@ -221,7 +221,7 @@ describe("inferEntries", () => {
                 {
                     cjs: true,
                     environment: "development",
-                    input: join(temporaryDirectoryPath, "src/other/runtime/gather.ts"),
+                    input: join(temporaryDirectoryPath, "src/other/runtime/index.ts"),
                     runtime: "node",
                 },
             ],
@@ -393,10 +393,11 @@ describe("inferEntries", () => {
         } satisfies InferEntriesResult);
         expect(defaultContext.logger.debug).toHaveBeenCalledTimes(1);
     });
+
     it("should handle multiple entries", () => {
         expect.assertions(1);
 
-        createFiles(["src/gather.ts", "src/first-test.ts", "src/test.mjs"], temporaryDirectoryPath);
+        createFiles(["src/index.ts", "src/first-test.ts", "src/test.mjs"], temporaryDirectoryPath);
 
         expect(
             inferEntries(
@@ -407,7 +408,7 @@ describe("inferEntries", () => {
                         "first-test": "./dist/first-test.cjs",
                     },
                 },
-                ["src/", "src/", "src/gather.ts", "src/first-test.ts", "src/test.mjs"].map((file) => join(temporaryDirectoryPath, file)),
+                ["src/", "src/", "src/index.ts", "src/first-test.ts", "src/test.mjs"].map((file) => join(temporaryDirectoryPath, file)),
                 defaultContext,
             ),
         ).toStrictEqual({
@@ -415,7 +416,7 @@ describe("inferEntries", () => {
                 {
                     cjs: true,
                     environment: "development",
-                    input: join(temporaryDirectoryPath, "src/gather.ts"),
+                    input: join(temporaryDirectoryPath, "src/index.ts"),
                     runtime: "node",
                 },
                 {
@@ -594,7 +595,7 @@ describe("inferEntries", () => {
     it("should return sub-keys of exports", () => {
         expect.assertions(1);
 
-        createFiles(["src/gather.ts"], temporaryDirectoryPath);
+        createFiles(["src/index.ts"], temporaryDirectoryPath);
         createFiles(["src/index.production.ts"], temporaryDirectoryPath);
         createFiles(["src/index.react-server.ts"], temporaryDirectoryPath);
 
@@ -617,7 +618,7 @@ describe("inferEntries", () => {
                     },
                 },
             },
-            ["src/", "src/gather.ts", "src/index.react-server.ts", "src/index.production.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            ["src/", "src/index.ts", "src/index.react-server.ts", "src/index.production.ts"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 environment: defaultContext.environment,
                 options: { ...defaultContext.options, declaration: true, outDir: "dist" },
@@ -631,7 +632,7 @@ describe("inferEntries", () => {
                     environment: "development",
                     esm: true,
                     fileAlias: "index.development",
-                    input: join(temporaryDirectoryPath, "src/gather.ts"),
+                    input: join(temporaryDirectoryPath, "src/index.ts"),
                     runtime: "node",
                 },
                 {
@@ -655,7 +656,7 @@ describe("inferEntries", () => {
     it("should work with edge-light", () => {
         expect.assertions(1);
 
-        createFiles(["src/gather.ts"], temporaryDirectoryPath);
+        createFiles(["src/index.ts"], temporaryDirectoryPath);
 
         const result = inferEntries(
             {
@@ -665,19 +666,83 @@ describe("inferEntries", () => {
                 },
                 type: "module",
             },
-            ["src/", "src/gather.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            ["src/", "src/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 options: { ...defaultContext.options, declaration: true, outDir: "dist" },
                 pkg: defaultContext.pkg,
             } as unknown as BuildContext,
         );
+
         expect(result).toStrictEqual({
             entries: [
                 {
                     environment: undefined,
                     esm: true,
                     fileAlias: "index.edge",
-                    input: join(temporaryDirectoryPath, "src/gather.ts"),
+                    input: join(temporaryDirectoryPath, "src/index.ts"),
+                    runtime: "edge-light",
+                },
+                {
+                    environment: undefined,
+                    esm: true,
+                    input: join(temporaryDirectoryPath, "src/index.ts"),
+                    runtime: "node",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+    });
+
+    it("should match default, development and production exports", () => {
+        expect.assertions(1);
+
+        createFiles(["src/index.ts"], temporaryDirectoryPath);
+
+        const result = inferEntries(
+            {
+                exports: {
+                    ".": {
+                        default: "./dist/index.cjs",
+                        import: {
+                            default: "./dist/index.mjs",
+                            development: "./dist/index.development.mjs",
+                            production: "./dist/index.production.mjs",
+                        },
+                        require: {
+                            default: "./dist/index.cjs",
+                            development: "./dist/index.development.cjs",
+                            production: "./dist/index.production.cjs",
+                        },
+                    },
+                },
+            },
+            ["src/", "src/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            defaultContext,
+        );
+
+        expect(result).toStrictEqual({
+            entries: [
+                {
+                    cjs: true,
+                    environment: undefined,
+                    esm: true,
+                    input: join(temporaryDirectoryPath, "src/index.ts"),
+                    runtime: "node",
+                },
+                {
+                    cjs: true,
+                    environment: "development",
+                    esm: true,
+                    fileAlias: "index.development",
+                    input: join(temporaryDirectoryPath, "src/index.ts"),
+                    runtime: "node",
+                },
+                {
+                    cjs: true,
+                    environment: "production",
+                    esm: true,
+                    fileAlias: "index.production",
+                    input: join(temporaryDirectoryPath, "src/index.ts"),
                     runtime: "node",
                 },
             ],
