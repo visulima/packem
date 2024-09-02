@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.90](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.89...@visulima/packem@1.0.0-alpha.90) (2024-09-02)
+
+### Bug Fixes
+
+* improved edge runtime, fixed some tests ([c0fc7a5](https://github.com/visulima/packem/commit/c0fc7a564081264d9d41eaf220ba619c00ba1608))
+
 ## @visulima/packem [1.0.0-alpha.89](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.88...@visulima/packem@1.0.0-alpha.89) (2024-09-02)
 
 ### Bug Fixes
