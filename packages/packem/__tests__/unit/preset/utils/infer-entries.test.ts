@@ -717,7 +717,10 @@ describe("inferEntries", () => {
                 },
             },
             ["src/", "src/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
-            defaultContext,
+            {
+                ...defaultContext,
+                environment: undefined,
+            },
         );
 
         expect(result).toStrictEqual({

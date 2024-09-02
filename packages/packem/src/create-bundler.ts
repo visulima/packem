@@ -609,9 +609,10 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                     };
                 }
 
-                if (runtime === "edge-light") {
-                    environmentRuntimeContext.options.rollup.replace.values.EdgeRuntime = JSON.stringify("edge-runtime");
-                }
+                environmentRuntimeContext.options.rollup.replace.values = {
+                    ...environmentRuntimeContext.options.rollup.replace.values,
+                    [["process", "env", "EdgeRuntime"].join(".")]: JSON.stringify(runtime === "edge-light"),
+                };
             } else {
                 context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
             }

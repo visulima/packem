@@ -80,28 +80,23 @@ export const isolatedDeclarationsPlugin = (
 
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for await (const typeImport of typeImports) {
-            this.resolve(typeImport.source.value, id)
-                .then(async (resolved) => {
-                    if (!resolved) {
-                        return;
-                    }
+            const resolved = await this.resolve(typeImport.source.value, id);
 
-                    const resolvedId = resolved.id;
+            if (!resolved) {
+                return;
+            }
 
-                    // eslint-disable-next-line promise/always-return
-                    if (filter(resolvedId) && !outputFiles[resolvedId.replace(ENDING_RE, "")]) {
-                        try {
-                            const source = await readFile(resolvedId);
+            const resolvedId = resolved.id;
 
-                            await transform.call(this, source, resolvedId);
-                        } catch {
-                            // empty
-                        }
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+            if (filter(resolvedId) && !outputFiles[resolvedId.replace(ENDING_RE, "")]) {
+                try {
+                    const source = await readFile(resolvedId);
+
+                    await transform.call(this, source, resolvedId);
+                } catch {
+                    // empty
+                }
+            }
         }
     }
 
@@ -137,7 +132,10 @@ export const isolatedDeclarationsPlugin = (
                 this.emitFile({
                     fileName: entryFileNames.replace("[name]", relative(outBase, filename)),
                     // imports need correct extension for the declarations .cts or .mts
-                    source: source.replaceAll(/from\s+['"]([^'"]+)['"]/g, (_, p1) => `from ${quote}${p1.replace(ENDING_RE, "")}${outputOptions.format === "cjs" ? ".cts" : ".mts"}${quote}`),
+                    source: source.replaceAll(
+                        /from\s+['"]([^'"]+)['"]/g,
+                        (_, p1) => `from ${quote}${p1.replace(ENDING_RE, "")}${outputOptions.format === "cjs" ? ".cts" : ".mts"}${quote}`,
+                    ),
                     type: "asset",
                 });
             }

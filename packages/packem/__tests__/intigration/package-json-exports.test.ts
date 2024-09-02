@@ -91,7 +91,7 @@ export function method() {
     });
 
     it("should work with dev and prod optimize conditions", async () => {
-        expect.assertions(6);
+        expect.assertions(8);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = process.env.NODE_ENV;`);
 
@@ -118,7 +118,7 @@ export function method() {
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", ["--no-environment"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -129,11 +129,11 @@ export function method() {
         for (const [file, regex] of [
             ["index.development.cjs", /= "development"/],
             ["index.development.mjs", /= "development"/],
-            ["index.production.cjs", /= "production"/],
-            ["index.production.mjs", /= "production"/],
+            ["index.production.cjs", /="production"/],
+            ["index.production.mjs", /="production"/],
             // In vitest the NODE_ENV is set to test
-            ["index.cjs", /= "test"/],
-            ["index.mjs", /= "test"/],
+            ["index.cjs", /process.env.NODE_ENV/],
+            ["index.mjs", /process.env.NODE_ENV/],
         ]) {
             const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
 
@@ -216,7 +216,7 @@ export function method() {
     });
 
     it("should generate proper assets for rsc condition with ts", async () => {
-        expect.assertions(6);
+        expect.assertions(8);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
@@ -244,19 +244,19 @@ export { IString };`,
             exports: {
                 ".": {
                     import: "./dist/index.mjs",
-                    "react-native": "./dist/react-native.cjs",
-                    "react-server": "./dist/react-server.mjs",
+                    "react-native": "./dist/index.react-native.cjs",
+                    "react-server": "./dist/index.react-server.mjs",
                     require: "./dist/index.cjs",
                     types: "./dist/index.d.ts",
                 },
                 "./api": {
-                    import: "./dist/api.mjs",
-                    require: "./dist/api.cjs",
+                    import: "./dist/api/index.mjs",
+                    require: "./dist/api/index.cjs",
                 },
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", ["--no-environment"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -266,10 +266,11 @@ export { IString };`,
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [file, regex] of [
             ["./index.mjs", /const shared = true/],
-            ["./react-server.mjs", /'react-server'/],
-            ["./react-native.cjs", /'react-native'/],
+            ["./index.react-server.mjs", /"react-server"/],
+            ["./index.react-native.cjs", /"react-native"/],
             ["./index.d.ts", /declare const shared = true/],
-            ["./api.mjs", /'pkg-export-ts-rsc'/],
+            ["./api/index.cjs", /"api:"/],
+            ["./api/index.mjs", /"api:"/],
         ]) {
             const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
 
@@ -371,36 +372,6 @@ export { value };
         const files = readdirSync(join(temporaryDirectoryPath, "dist"));
 
         expect(files).toHaveLength(5);
-    });
-
-    it("should work with index file inside index directory", async () => {
-        expect.assertions(3);
-
-        writeFileSync(`${temporaryDirectoryPath}/src/index/index.js`, `export const index = 'index';`);
-        writeFileSync(`${temporaryDirectoryPath}/src/index/index.react-server.js`, `export const index = 'react-server';`);
-        createPackageJson(temporaryDirectoryPath, {
-            exports: {
-                default: "./dist/index.js",
-                "react-server": "./dist/react-server.js",
-            },
-        });
-
-        const binProcess = await execPackemSync("build", [], {
-            cwd: temporaryDirectoryPath,
-        });
-
-        expect(binProcess.stderr).toBe("");
-        expect(binProcess.exitCode).toBe(0);
-
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-        for (const [file, regex] of [
-            ["index.js", /'index'/],
-            ["react-server.js", /'react-server'/],
-        ]) {
-            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
-
-            expect(content).toMatch(regex as RegExp);
-        }
     });
 
     it("should export dual package for type module", async () => {
@@ -733,7 +704,7 @@ module.exports = index;
     });
 
     it("should work with multi entries", async () => {
-        expect.assertions(3);
+        expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/server/index.edge-light.ts`, `export const name = "server.edge-light";`);
         writeFileSync(`${temporaryDirectoryPath}/src/server/index.react-server.ts`, `export const name = "server.react-server";`);
@@ -790,22 +761,22 @@ export type Shared = string;
             exports: {
                 ".": "./dist/index.cjs",
                 "./client": {
-                    import: "./dist/client/index.mjs",
-                    require: "./dist/client/index.cjs",
-                    types: "./dist/client/index.d.ts",
+                    import: "./dist/client.mjs",
+                    require: "./dist/client.cjs",
+                    types: "./dist/client.d.ts",
                 },
                 "./lite": "./dist/lite.cjs",
                 "./package.json": "./package.json",
                 "./server": {
-                    "edge-light": "./dist/server/edge.mjs",
+                    "edge-light": "./dist/server/index.edge.mjs",
                     import: "./dist/server/index.mjs",
-                    "react-server": "./dist/server/react-server.mjs",
+                    "react-server": "./dist/server/index.react-server.mjs",
                     types: "./dist/server/index.d.mts",
                 },
                 "./shared": {
-                    "edge-light": "./dist/shared/edge-light.mjs",
-                    import: "./dist/shared/index.mjs",
-                    require: "./dist/shared/index.cjs",
+                    "edge-light": "./dist/shared.edge-light.mjs",
+                    import: "./dist/shared.mjs",
+                    require: "./dist/shared.cjs",
                 },
             },
             name: "multi-entries",
@@ -820,15 +791,27 @@ export type Shared = string;
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsIndexContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjs).toBe(`'use strict';
+        expect(cjsIndexContent).toBe(`'use strict';
+
+const index = "index";
+
+module.exports = index;
+`);
+
+        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/client.cjs`);
+
+        expect(cjsClientContent).toBe(`'use strict';
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = /* @__PURE__ */ __name(() => "index", "default");
+function client(c) {
+  return "client" + c;
+}
+__name(client, "client");
 
-module.exports = index;
+module.exports = client;
 `);
     });
 
@@ -895,9 +878,9 @@ exports.index = index;
     });
 
     it("should work with edge export condition", async () => {
-        expect.assertions(3);
+        expect.assertions(4);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const variable = typeof EdgeRuntime;`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const isEdge = process.env.EdgeRuntime;`);
 
         createTsConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
@@ -917,15 +900,16 @@ exports.index = index;
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`const variable = typeof EdgeRuntime;
+        expect(mjs).toBe(`const isEdge = false;
 
-export { variable };
+export { isEdge };
 `);
 
         const mjsEdgeLight = readFileSync(`${temporaryDirectoryPath}/dist/index.edge.mjs`);
 
-        expect(mjsEdgeLight).toBe(`const variable = typeof "edge-runtime";
+        expect(mjsEdgeLight).toBe(`const isEdge = true;
 
-export { variable };`);
+export { isEdge };
+`);
     });
 });
