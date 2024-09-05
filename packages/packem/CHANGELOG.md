@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.92](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.91...@visulima/packem@1.0.0-alpha.92) (2024-09-05)
+
+### Bug Fixes
+
+* exported types, fixed lint errors ([f74f8b3](https://github.com/visulima/packem/commit/f74f8b3c5b6fd4c4037d4c8d9bd149ff639f05c6))
+
 ## @visulima/packem [1.0.0-alpha.91](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.90...@visulima/packem@1.0.0-alpha.91) (2024-09-05)
 
 ### Bug Fixes
