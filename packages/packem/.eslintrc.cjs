@@ -61,6 +61,12 @@ module.exports = {
             },
         },
         {
+            files: ["create-bundler.ts"],
+            rules: {
+                "import/no-unused-modules": "off",
+            },
+        },
+        {
             files: ["*.mdx"],
             rules: {
                 "jsx-a11y/anchor-has-content": "off",

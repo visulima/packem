@@ -1041,3 +1041,17 @@ const createBundler = async (
 };
 
 export default createBundler;
+
+export type {
+    BuildConfig,
+    BuildContext,
+    BuildContextBuildEntry,
+    BuildEntry,
+    BuildHooks,
+    BuildOptions,
+    BuildPreset,
+    Environment,
+    Mode,
+    RollupBuildOptions,
+    Runtime,
+} from "./types";

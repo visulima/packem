@@ -58,14 +58,19 @@ export const isolatedDeclarationsPlugin = (
 
         addOutput(id, sourceText);
 
-        let program: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let program: { body: any[] };
 
         try {
-            program = JSON.parse((await parseAsync(code, { sourceFilename: id })).program);
+            const result = await parseAsync(code, { sourceFilename: id });
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            program = JSON.parse(result.program) as { body: any[] };
         } catch {
             return;
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const typeImports = program.body.filter((node: any) => {
             if (node.type !== "ImportDeclaration") {
                 return false;
@@ -75,7 +80,7 @@ export const isolatedDeclarationsPlugin = (
                 return true;
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return (node.specifiers || []).every((spec: any) => spec.type === "ImportSpecifier" && spec.importKind === "type");
         });
 
@@ -114,6 +119,7 @@ export const isolatedDeclarationsPlugin = (
                 outputOptions.entryFileNames = outputOptions.entryFileNames({ name: outputOptions.name } as unknown as PreRenderedChunk);
             }
 
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             const entryFileNames = outputOptions.entryFileNames.replace(/\.(.)?[jt]s$/, (_, s) => `.d.${s || ""}ts`);
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
@@ -135,7 +141,7 @@ export const isolatedDeclarationsPlugin = (
                     // imports need correct extension for the declarations .cts or .mts
                     source: source.replaceAll(
                         /from\s+['"]([^'"]+)['"]/g,
-                        (_, p1) => `from ${quote}${p1.replace(ENDING_RE, "")}${outputOptions.format === "cjs" ? ".cts" : ".mts"}${quote}`,
+                        (_, p1) => `from ${quote}${(p1 as string).replace(ENDING_RE, "")}${outputOptions.format === "cjs" ? ".cts" : ".mts"}${quote}`,
                     ),
                     type: "asset",
                 });
