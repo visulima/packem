@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import lowestCommonAncestor from "../../../../../src/rollup/plugins/isolated-declarations/lowest-common-ancestor";
 

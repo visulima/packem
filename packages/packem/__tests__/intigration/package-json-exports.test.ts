@@ -912,4 +912,289 @@ export { isEdge };
 export { isEdge };
 `);
     });
+
+    it("should generate proper assets for each exports for server components with same layer", async () => {
+        expect.assertions(6);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.js`,
+            `"use client";
+
+import React, { useState } from "react";
+
+export function Button() {
+    const [count] = useState(0);
+    return React.createElement("button", \`count: \${count}\`);
+}
+
+export { Client } from "./_client";
+`,
+        );
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/_client.js`,
+            `"use client";
+
+export function Client() {
+    return "client-module";
+}
+`,
+        );
+
+        createPackageJson(temporaryDirectoryPath, {
+            exports: {
+                ".": {
+                    import: "./dist/index.mjs",
+                    require: "./dist/index.cjs",
+                },
+            },
+            peerDependencies: {
+                react: "*",
+            },
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toBe(`'use client';
+import React, { useState } from 'react';
+export { C as Client } from './shared/Client-DWTUoKrV.mjs';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Button() {
+  const [count] = useState(0);
+  return React.createElement("button", \`count: \${count}\`);
+}
+__name(Button, "Button");
+
+export { Button };
+`);
+
+        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/Client-DWTUoKrV.mjs`);
+
+        expect(mjsClientContent).toBe(`'use client';
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Client() {
+  return "client-module";
+}
+__name(Client, "Client");
+
+export { Client as C };
+`);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use client';
+'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const React = require('react');
+const Client = require('./shared/Client-CjMHur1x.cjs');
+
+const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
+
+const React__default = /*#__PURE__*/_interopDefaultCompat(React);
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Button() {
+  const [count] = React.useState(0);
+  return React__default.createElement("button", \`count: \${count}\`);
+}
+__name(Button, "Button");
+
+exports.Client = Client.Client;
+exports.Button = Button;
+`);
+
+        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/Client-CjMHur1x.cjs`);
+
+        expect(cjsClientContent).toBe(`'use client';
+'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Client() {
+  return "client-module";
+}
+__name(Client, "Client");
+
+exports.Client = Client;
+`);
+    });
+
+    it("should generate proper assets for each exports for server components", async () => {
+        expect.assertions(8);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.js`,
+            `export { Button, Client as UIClient } from "./ui";
+export { action } from "./_actions";
+export { Client } from "./_client";
+`,
+        );
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/ui.js`,
+            `"use client";
+
+import React, { useState } from "react";
+
+export function Button() {
+    const [count] = useState(0);
+    return React.createElement("button", \`count: \${count}\`);
+}
+
+export { Client } from "./_client";
+export { asset } from "./_asset";
+`,
+        );
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/_client.js`,
+            `"use client";
+
+export function Client() {
+    return "client-module";
+}
+`,
+        );
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/_actions.js`,
+            `"use server";
+
+export async function action() {
+    return "server-action";
+}`,
+        );
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/_asset.js`,
+            `"use client";
+
+export const asset = "asset-module";
+`,
+        );
+
+        createPackageJson(temporaryDirectoryPath, {
+            exports: {
+                ".": {
+                    import: "./dist/index.mjs",
+                    require: "./dist/index.cjs",
+                },
+                "./ui": {
+                    import: "./dist/ui.mjs",
+                    require: "./dist/ui.cjs",
+                },
+            },
+            peerDependencies: {
+                react: "*",
+            },
+            type: "module",
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toBe(`export { B as Button } from './ui.mjs';
+export { a as action } from './shared/action-CHfTqOfG.mjs';
+export { C as Client, C as UIClient } from './shared/Client-DWTUoKrV.mjs';
+`);
+
+        const mjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/action-CHfTqOfG.mjs`);
+
+        expect(mjsActionContent).toBe(`'use server';
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+async function action() {
+  return "server-action";
+}
+__name(action, "action");
+
+export { action as a };
+`);
+
+        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/Client-DWTUoKrV.mjs`);
+
+        expect(mjsClientContent).toBe(`'use client';
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Client() {
+  return "client-module";
+}
+__name(Client, "Client");
+
+export { Client as C };
+`);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const ui = require('./ui.cjs');
+const action = require('./shared/action-DdW0-Ipg.cjs');
+const Client = require('./shared/Client-CjMHur1x.cjs');
+
+
+
+exports.Button = ui.Button;
+exports.action = action.action;
+exports.Client = Client.Client;
+exports.UIClient = Client.Client;
+`);
+
+        const cjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/action-DdW0-Ipg.cjs`);
+
+        expect(cjsActionContent).toBe(`'use server';
+'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+async function action() {
+  return "server-action";
+}
+__name(action, "action");
+
+exports.action = action;
+`);
+
+        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/Client-CjMHur1x.cjs`);
+
+        expect(cjsClientContent).toBe(`'use client';
+'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Client() {
+  return "client-module";
+}
+__name(Client, "Client");
+
+exports.Client = Client;
+`);
+    });
 });

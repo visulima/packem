@@ -46,7 +46,7 @@ export const data = content;`,
 
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
-console.log(binProcess.stdout);
+
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`const content = "thisismydata";

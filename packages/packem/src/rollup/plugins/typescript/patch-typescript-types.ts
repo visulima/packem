@@ -117,7 +117,7 @@ const removeInternal = (s: MagicString, node: any): boolean => {
     }
 
     return false;
-}
+};
 
 /**
  * While we already enable `compilerOptions.stripInternal`, some internal comments

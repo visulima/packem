@@ -28,7 +28,7 @@ export const execPackemSync = async (command: "build" | "init", flags: string[] 
 
     if (flags.includes("--no-environment")) {
         // eslint-disable-next-line no-param-reassign
-        flags = flags.filter(flag => flag !== "--no-environment");
+        flags = flags.filter((flag) => flag !== "--no-environment");
     }
 
     return await execaNode(join(distributionPath, "cli.mjs"), [command, environmentFlag, ...flags].filter(Boolean) as string[], {

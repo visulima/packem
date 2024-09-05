@@ -64,10 +64,14 @@ const autoPreset: BuildPreset = {
 
                             .map((buildEntry) => {
                                 if (buildEntry.fileAlias) {
-                                    return bold(buildEntry.fileAlias) + " => " + bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*"))
+                                    return (
+                                        bold(buildEntry.fileAlias) +
+                                        " => " +
+                                        bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*"))
+                                    );
                                 }
 
-                                return bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*"))
+                                return bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*"));
                             })
                             .join(", "),
                     ),

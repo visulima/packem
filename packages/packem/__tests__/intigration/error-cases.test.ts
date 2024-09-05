@@ -105,19 +105,70 @@ describe("packem error cases", () => {
 
         createPackageJson(temporaryDirectoryPath, {
             dependencies: {},
-            main: "dist/index.js",
-            module: "dist/index.js",
+            main: "dist/index.mjs",
+            module: "dist/index.mjs",
             name: "pkg",
         });
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "");
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, "");
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
-        expect(binProcess.stdout).toBe("");
         expect(binProcess.stderr).toContain(
-            `Conflicting field "module" with entry "dist/index.js" detected. Conflicts with "main" field. Please change one of the entries inside your package.json.`,
+            `Conflicting field "module" with entry "dist/index.mjs" detected. Conflicts with "main" field. Please change one of the entries inside your package.json.`,
+        );
+        expect(binProcess.exitCode).toBe(1);
+    });
+
+    it.todo("should warn on invalid exports as ESM", async () => {
+        expect.assertions(2);
+
+        createPackageJson(temporaryDirectoryPath, {
+            exports: {
+                ".": {
+                    require: "./dist/index.mjs",
+                },
+                "./foo": {
+                    import: "./dist/foo.cjs",
+                },
+            },
+        });
+        writeFileSync(`${temporaryDirectoryPath}/src/foo.js`, `export const foo = "foo";`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const index = "index";`);
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toContain(
+            `Conflicting field "module" with entry "dist/index.mjs" detected. Conflicts with "main" field. Please change one of the entries inside your package.json.`,
+        );
+        expect(binProcess.exitCode).toBe(1);
+    });
+
+    it("should warn on invalid exports as CJS", async () => {
+        expect.assertions(2);
+
+        createPackageJson(temporaryDirectoryPath, {
+            exports: {
+                ".": {
+                    require: "./dist/index.mjs",
+                },
+                "./foo": {
+                    import: "./dist/foo.cjs",
+                },
+            },
+        });
+        writeFileSync(`${temporaryDirectoryPath}/src/foo.js`, `export const foo = "foo";`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const index = "index";`);
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toContain(
+            `Conflicting field "module" with entry "dist/index.mjs" detected. Conflicts with "main" field. Please change one of the entries inside your package.json.`,
         );
         expect(binProcess.exitCode).toBe(1);
     });

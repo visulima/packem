@@ -44,6 +44,6 @@ const lowestCommonAncestor = (...filepaths: string[]): string => {
     }
 
     return ancestor.length <= 1 && ancestor[0] === "" ? `/${ancestor[0]}` : ancestor.join("/");
-}
+};
 
 export default lowestCommonAncestor;

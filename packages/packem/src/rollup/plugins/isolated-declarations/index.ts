@@ -27,6 +27,7 @@ export const isolatedDeclarationsPlugin = (
     declaration: boolean | "compatible" | "node16" | undefined,
     packageType: "commonjs" | "module" | undefined,
     options: IsolatedDeclarationsOptions = {},
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Plugin => {
     const filter = createFilter(options.include, options.exclude);
 
@@ -36,7 +37,7 @@ export const isolatedDeclarationsPlugin = (
         outputFiles[filename.replace(/\..?[jt]s$/, "")] = source;
     };
 
-    // eslint-disable-next-line sonarjs/cognitive-complexity,func-style
+    // eslint-disable-next-line func-style
     async function transform(this: PluginContext, code: string, id: string): Promise<undefined> {
         if (!filter(id)) {
             return;

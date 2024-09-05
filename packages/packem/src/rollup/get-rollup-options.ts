@@ -429,7 +429,12 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             context.options.declaration &&
                 context.options.rollup.isolatedDeclarations &&
                 context.options.isolatedDeclarationTransformer &&
-                isolatedDeclarationsPlugin(context.options.isolatedDeclarationTransformer, context.options.declaration, context.pkg.type, context.options.rollup.isolatedDeclarations),
+                isolatedDeclarationsPlugin(
+                    context.options.isolatedDeclarationTransformer,
+                    context.options.declaration,
+                    context.pkg.type,
+                    context.options.rollup.isolatedDeclarations,
+                ),
 
             context.options.transformer?.(getTransformerConfig(context.options.transformerName, context)),
 

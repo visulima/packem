@@ -41,12 +41,6 @@ export const DEVELOPMENT_ENV = "development";
 export const RUNTIME_EXPORT_CONVENTIONS = new Set(["react-server", "react-native", "edge-light"]);
 export const SPECIAL_EXPORT_CONVENTIONS = new Set([DEVELOPMENT_ENV, PRODUCTION_ENV, ...RUNTIME_EXPORT_CONVENTIONS]);
 
-export const DTS_EXTENSIONS_MAP = {
-    cjs: "d.cts",
-    js: "d.ts",
-    mjs: "d.mts",
-};
-
 export const EXCLUDE_REGEXP = /node_modules/;
 
 export const ENDING_RE = /(?:\.d\.[mc]?ts|\.\w+)$/;

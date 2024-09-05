@@ -103,7 +103,7 @@ const preserveDirectives = ({
         },
 
         // eslint-disable-next-line sonarjs/cognitive-complexity
-        transform(code, id): null | { code: string; map: SourceMap | null, meta: { preserveDirectives: { directives: string[]; shebang: string | null; }; }; } {
+        transform(code, id): null | { code: string; map: SourceMap | null; meta: { preserveDirectives: { directives: string[]; shebang: string | null } } } {
             if (!filter(id)) {
                 return null;
             }

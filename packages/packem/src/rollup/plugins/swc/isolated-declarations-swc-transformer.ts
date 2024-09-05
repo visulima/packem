@@ -17,7 +17,7 @@ const isolatedDeclarationsSwcTransformer = async (id: string, code: string): Pro
             },
         });
 
-        // @ts-expect-error
+        // @ts-expect-error - we need to cast the output to a string
         const output = JSON.parse(result.output);
 
         return {
