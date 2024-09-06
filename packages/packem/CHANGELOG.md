@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.93](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.92...@visulima/packem@1.0.0-alpha.93) (2024-09-06)
+
+### Features
+
+* added node 10 compatibility, added attw to check the types, improved cjs interop ([0fed835](https://github.com/visulima/packem/commit/0fed835da63cb9007ee179a07504eb3636140679))
+
 ## @visulima/packem [1.0.0-alpha.92](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.91...@visulima/packem@1.0.0-alpha.92) (2024-09-05)
 
 ### Bug Fixes
