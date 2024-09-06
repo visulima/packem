@@ -140,6 +140,7 @@ export interface BuildOptions {
     stub: boolean;
     stubOptions: { jiti: Omit<JITIOptions, "onError" | "transform"> };
     transformer?: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
+    writeTypesVersionsToPackageJson?: boolean;
 }
 
 export interface BuildHooks {
@@ -156,6 +157,8 @@ export interface BuildHooks {
 
     "rollup:options": (context: BuildContext, options: RollupOptions) => Promise<void> | void;
     "rollup:watch": (context: BuildContext, watcher: RollupWatcher) => Promise<void> | void;
+
+    "validate:done": (context: BuildContext) => Promise<void> | void;
 }
 
 export type BuildContextBuildEntry = {

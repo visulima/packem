@@ -3,7 +3,7 @@ import Module from "node:module";
 import { cwd } from "node:process";
 
 import { bold, cyan, gray, green } from "@visulima/colorize";
-import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync, walk } from "@visulima/fs";
+import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync, walk, writeJsonSync } from "@visulima/fs";
 import { duration, formatBytes } from "@visulima/humanizer";
 import type { PackageJson } from "@visulima/package";
 import { parsePackageJson } from "@visulima/package/package-json";
@@ -16,8 +16,8 @@ import { createHooks } from "hookable";
 import { VERSION } from "rollup";
 
 import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "./constants";
+import resolvePreset from "./hooks/preset/utils/resolve-preset";
 import createStub from "./jit/create-stub";
-import resolvePreset from "./preset/utils/resolve-preset";
 import rollupBuild from "./rollup/build";
 import rollupBuildTypes from "./rollup/build-types";
 import getHash from "./rollup/utils/get-hash";
@@ -34,7 +34,7 @@ import validateAliasEntries from "./validator/validate-alias-entries";
 import validateDependencies from "./validator/validate-dependencies";
 import validatePackage from "./validator/validate-package";
 
-type PackEmPackageJson = { packem?: BuildConfig } & PackageJson;
+type PackemPackageJson = { packem?: BuildConfig } & PackageJson;
 
 const logErrors = (context: BuildContext, hasOtherLogs: boolean): void => {
     if (context.warnings.size > 0) {
@@ -78,7 +78,7 @@ const generateOptions = (
     inputConfig: BuildConfig,
     buildConfig: BuildConfig,
     preset: BuildPreset,
-    packageJson: PackEmPackageJson,
+    packageJson: PackemPackageJson,
     tsconfig: TsConfigResult | undefined,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): InternalBuildOptions => {
@@ -389,7 +389,7 @@ const generateOptions = (
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const showSizeInformation = (logger: Pail, context: BuildContext, packageJson: PackEmPackageJson): boolean => {
+const showSizeInformation = (logger: Pail, context: BuildContext, packageJson: PackemPackageJson): boolean => {
     const rPath = (p: string) => relative(context.options.rootDir, resolve(context.options.outDir, p));
 
     let loggedEntries = false;
@@ -427,7 +427,6 @@ const showSizeInformation = (logger: Pail, context: BuildContext, packageJson: P
             const moduleList = entry.modules
                 .filter((m) => m.id.includes("node_modules"))
                 .sort((a, b) => (b.bytes || 0) - (a.bytes || 0))
-
                 .map((m) => gray("  📦 " + rPath(m.id) + bold(m.bytes ? " (" + formatBytes(m.bytes) + ")" : "")))
                 .join("\n");
 
@@ -451,7 +450,7 @@ const showSizeInformation = (logger: Pail, context: BuildContext, packageJson: P
             if (foundDts) {
                 let foundCompatibleDts: BuildContextBuildEntry | undefined;
 
-                if ((context.options.declaration === true || context.options.declaration === "compatible") && !dtsPath.includes(".d.ts")) {
+                if (!dtsPath.includes(".d.ts")) {
                     dtsPath = (dtsPath as string).replace(type === "commonjs" ? ".d.c" : ".d.m", ".d.");
 
                     foundCompatibleDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
@@ -492,7 +491,7 @@ const createContext = async (
     debug: boolean,
     inputConfig: BuildConfig,
     buildConfig: BuildConfig,
-    packageJson: PackEmPackageJson,
+    packageJson: PackemPackageJson,
     tsconfig: TsConfigResult | undefined,
 ): Promise<BuildContext> => {
     const preset = resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", rootDirectory);
@@ -777,7 +776,53 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const build = async (context: BuildContext, packageJson: PackEmPackageJson, fileCache: FileCache): Promise<void> => {
+const generateNode10Compatibility = (context: BuildContext, packageJson: PackageJson): void => {
+    if (context.options.declaration === "compatible") {
+        context.logger.raw("\n");
+        context.logger.info(
+            `Compatibility mode enabled. This will generate a typesVersions field ${context.options.writeTypesVersionsToPackageJson ? "and write it to package.json" : " and display it in the console"}.`,
+        );
+        const typesVersions: string[] = [];
+
+        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+        for (const entry of context.buildEntries.filter((bEntry) => !bEntry.chunk)) {
+            if (entry.type === "entry" && entry.path.endsWith(".cjs")) {
+                const foundDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(entry.path.replace(".cjs", ".d.ts")));
+                if (foundDts) {
+                    typesVersions.push(foundDts.path.replace(context.options.rootDir, "."));
+                }
+            }
+        }
+
+        if (context.options.writeTypesVersionsToPackageJson) {
+            const clonedPackageJson = { ...packageJson };
+
+            delete clonedPackageJson._id;
+            delete clonedPackageJson.readme;
+
+            writeJsonSync(join(context.options.rootDir, "package.json"), {
+                ...clonedPackageJson,
+                typesVersions: {
+                    ...clonedPackageJson.typesVersions,
+                    "*": {
+                        // eslint-disable-next-line @typescript-eslint/require-array-sort-compare,etc/no-assign-mutated-array
+                        "*": typesVersions.sort(),
+                    },
+                },
+            }, {
+                detectIndent: true,
+            });
+        } else {
+            context.logger.info(
+                // eslint-disable-next-line etc/no-assign-mutated-array,@typescript-eslint/require-array-sort-compare
+                `Please add the following field into your package.json to enable node 10 compatibility:\n\n${JSON.stringify({ typesVersions: { "*": { "*": typesVersions.sort() } } }, null, 4)}`,
+            );
+        }
+    }
+};
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+const build = async (context: BuildContext, packageJson: PackemPackageJson, fileCache: FileCache): Promise<void> => {
     // Call build:before
     await context.hooks.callHook("build:before", context);
 
@@ -847,12 +892,17 @@ const build = async (context: BuildContext, packageJson: PackEmPackageJson, file
 
     const logged = showSizeInformation(context.logger, context, packageJson);
 
+    // Call build:done
+    await context.hooks.callHook("build:done", context);
+
+    generateNode10Compatibility(context, packageJson);
+
     // Validate
     validateDependencies(context);
     validatePackage(packageJson, context);
 
     // Call build:done
-    await context.hooks.callHook("build:done", context);
+    await context.hooks.callHook("validate:done", context);
 
     logErrors(context, logged);
 };
@@ -1024,7 +1074,7 @@ const createBundler = async (
             return;
         }
 
-        await build(context, packageJson as PackEmPackageJson, fileCache);
+        await build(context, packageJson as PackemPackageJson, fileCache);
 
         logger.raw("\n⚡️ Build run in " + getDuration());
 

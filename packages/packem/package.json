@@ -33,9 +33,12 @@
         "bunchee"
     ],
     "homepage": "https://www.visulima.com/docs/package/packem",
+    "bugs": {
+        "url": "https://github.com/visulima/packem/issues"
+    },
     "repository": {
         "type": "git",
-        "url": "https://github.com/visulima/packem.git",
+        "url": "git+https://github.com/visulima/packem.git",
         "directory": "packages/packem"
     },
     "funding": [
@@ -138,6 +141,23 @@
         },
         "./package.json": "./package.json"
     },
+    "main": "dist/create-bundler.cjs",
+    "module": "dist/create-bundler.mjs",
+    "types": "dist/create-bundler.d.ts",
+    "typesVersions": {
+        "*": {
+            "*": [
+                "./dist/config.d.ts",
+                "./dist/create-bundler.d.ts",
+                "./dist/rollup/plugins/esbuild/index.d.ts",
+                "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.ts",
+                "./dist/rollup/plugins/sucrase/index.d.ts",
+                "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.ts",
+                "./dist/rollup/plugins/swc/swc-plugin.d.ts",
+                "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.ts"
+            ]
+        }
+    },
     "bin": {
         "packem": "./dist/cli.mjs"
     },
@@ -208,6 +228,7 @@
         "@anolilab/prettier-config": "^5.0.14",
         "@anolilab/semantic-release-pnpm": "^1.1.3",
         "@anolilab/semantic-release-preset": "^9.0.0",
+        "@arethetypeswrong/cli": "^0.15.4",
         "@babel/core": "^7.25.2",
         "@rushstack/eslint-plugin-security": "^0.8.2",
         "@secretlint/secretlint-rule-preset-recommend": "^8.2.4",

@@ -16,8 +16,15 @@ export const cjsInterop = ({
 } & CJSInteropOptions): Plugin => {
     return {
         name: "packem:cjs-interop",
-        // eslint-disable-next-line sonarjs/cognitive-complexity
-        renderChunk(code: string, chunk: RenderedChunk, options: NormalizedOutputOptions): { code: string; map: SourceMapInput } | null {
+        renderChunk: async (
+            code: string,
+            chunk: RenderedChunk,
+            options: NormalizedOutputOptions,
+        ): Promise<{
+            code: string;
+            map: SourceMapInput;
+            // eslint-disable-next-line sonarjs/cognitive-complexity
+        } | null> => {
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (chunk.type !== "chunk" || !chunk.isEntry) {
                 return null;
@@ -58,21 +65,44 @@ export const cjsInterop = ({
                 };
             }
 
+            /**
+             * JavaScript syntax      Type declaration syntax
+             * module.exports = x     export = x
+             * exports.default = x;   exports.__esModule = true	export default x
+             * export default x       export default x
+             *
+             * @see https://github.com/arethetypeswrong/arethetypeswrong.github.io/blob/main/docs/problems/FalseExportDefault.md
+             */
             if (options.format === "es" && /\.d\.(?:ts|cts)$/.test(chunk.fileName)) {
-                if (type !== "commonjs" && chunk.fileName.endsWith(".d.ts")) {
+                if (type !== "commonjs" && chunk.fileName.endsWith(".d.mts")) {
                     return null;
                 }
 
+                const matches: string[] = [];
+
+                let matchs;
                 // will match `export { ... }` statement
-                const matches = /export\s\{\s(.*)\s\}/i.exec(code);
+                const regex = /export\s\{\s(.*)\s\}/g;
 
-                if (matches === null || matches.length < 2) {
+                // eslint-disable-next-line no-loops/no-loops,no-cond-assign
+                while ((matchs = regex.exec(code)) !== null) {
+                    // This is necessary to avoid infinite loops with zero-width matches
+                    if (matchs.index === regex.lastIndex) {
+                        // eslint-disable-next-line no-plusplus
+                        regex.lastIndex++;
+                    }
+
+                    matchs.forEach((match) => {
+                        matches.push(match);
+                    });
+                }
+
+                if (matches.length === 0) {
                     return null;
                 }
 
-                const splitMatches = (matches[1] as string).split(", ");
-
-                const buildObjectEntries: string[] = [];
+                // we need the last match
+                const splitMatches = (matches.at(-1) as string).split(", ");
 
                 let defaultKey = "";
 
@@ -88,41 +118,27 @@ export const cjsInterop = ({
 
                         if (alias === "default") {
                             defaultKey = original as string;
-
-                            if (!addDefaultProperty) {
-                                // eslint-disable-next-line no-continue
-                                continue;
-                            }
                         }
-
-                        buildObjectEntries.push((alias as string) + ": typeof " + (original as string) + ";");
-                    } else {
-                        buildObjectEntries.push(match + ": typeof " + match + ";");
                     }
                 }
 
-                const dtsTransformed = new MagicString(code);
+                if (defaultKey !== "") {
+                    const dtsTransformed = new MagicString(code);
 
-                dtsTransformed.replace(" " + defaultKey + " as default,", "");
-                dtsTransformed.append(
-                    "\n\n" +
-                        "declare const defaultExport: {\n" +
-                        (buildObjectEntries.length > 0 ? "  " : "") +
-                        buildObjectEntries.join("\n  ") +
-                        "\n}" +
-                        (defaultKey ? " & typeof " + defaultKey : "") +
-                        ";\n\nexport default defaultExport;",
-                );
+                    // TODO: adjust regex to remove `export { ... } if its the only entry
+                    dtsTransformed.replace(new RegExp(`(,s)?${defaultKey} as default(,)?`), "");
+                    dtsTransformed.append("\n\nexport = " + defaultKey + ";");
 
-                logger.debug({
-                    message: "Applied CommonJS interop to entry chunk " + chunk.fileName + ".",
-                    prefix: "plugin:cjs-interop",
-                });
+                    logger.debug({
+                        message: "Applied CommonJS interop to entry chunk " + chunk.fileName + ".",
+                        prefix: "plugin:cjs-interop",
+                    });
 
-                return {
-                    code: dtsTransformed.toString(),
-                    map: dtsTransformed.generateMap({ hires: true }),
-                };
+                    return {
+                        code: dtsTransformed.toString(),
+                        map: dtsTransformed.generateMap({ hires: true }),
+                    };
+                }
             }
 
             return null;

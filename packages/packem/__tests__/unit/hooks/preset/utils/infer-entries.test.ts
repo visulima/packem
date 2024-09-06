@@ -5,8 +5,8 @@ import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import inferEntries from "../../../../src/preset/utils/infer-entries";
-import type { BuildContext, InferEntriesResult } from "../../../../src/types";
+import inferEntries from "../../../../../src/hooks/preset/utils/infer-entries";
+import type { BuildContext, InferEntriesResult } from "../../../../../src/types";
 
 const createFiles = (files: string[], directory: string) => {
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
@@ -58,6 +58,7 @@ describe("inferEntries", () => {
         createFiles(["src/test.ts"], temporaryDirectoryPath);
 
         expect(() =>
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             inferEntries(
                 { main: "dist/test.cjs" },
                 ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),

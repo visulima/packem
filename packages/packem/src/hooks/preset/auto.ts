@@ -5,9 +5,9 @@ import { collectSync } from "@visulima/fs";
 import type { NormalizedPackageJson } from "@visulima/package";
 import { join } from "@visulima/path";
 
-import type { BuildContext, BuildPreset } from "../types";
-import dumpObject from "../utils/dump-object";
-import warn from "../utils/warn";
+import type { BuildContext, BuildPreset } from "../../types";
+import dumpObject from "../../utils/dump-object";
+import warn from "../../utils/warn";
 import inferEntries from "./utils/infer-entries";
 import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";
 

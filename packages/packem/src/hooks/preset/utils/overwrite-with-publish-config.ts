@@ -1,6 +1,6 @@
 import type { NormalizedPackageJson } from "@visulima/package";
 
-import type { BuildConfig } from "../../types";
+import type { BuildConfig } from "../../../types";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const overwriteWithPublishConfig = (packageJson: NormalizedPackageJson, declaration: BuildConfig["declaration"]): NormalizedPackageJson => {

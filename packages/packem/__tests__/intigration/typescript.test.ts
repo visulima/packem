@@ -1317,4 +1317,256 @@ const index = /* @__PURE__ */ __name(() => "index", "default");
 module.exports = index;
 `);
     });
+
+    it("should fix dts files for commonjs when cjsInterop is enabled and the file has named exports with default", async () => {
+        expect.assertions(6);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `const test = () => {
+    return "this should be in final bundle, test function";
+};
+
+const test2 = "this should be in final bundle, test2 string";
+
+export { test2, test as default };
+`,
+        );
+
+        createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                baseUrl: ".",
+                moduleResolution: "bundler",
+            },
+        });
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            type: "commonjs",
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            cjsInterop: true,
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const test = /* @__PURE__ */ __name(() => {
+  return "this should be in final bundle, test function";
+}, "test");
+const test2 = "this should be in final bundle, test2 string";
+
+module.exports = test;
+module.exports.test2 = test2;
+`);
+        const cDtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(cDtsContent).toBe(`declare const test: () => string;
+declare const test2 = "this should be in final bundle, test2 string";
+
+export {  test2 };
+
+export = test;
+`);
+
+        const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dtsContent).toBe(`declare const test: () => string;
+declare const test2 = "this should be in final bundle, test2 string";
+
+export {  test2 };
+
+export = test;
+`);
+
+        const mDtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(mDtsContent).toBe(`declare const test: () => string;
+declare const test2 = "this should be in final bundle, test2 string";
+
+export { test as default, test2 };
+`);
+    });
+
+    it("should fix dts files for commonjs when cjsInterop is enabled and the file has named exports with default 2", async () => {
+        expect.assertions(6);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `const test = () => {
+    return "this should be in final bundle, test function";
+};
+
+const test2 = "this should be in final bundle, test2 string";
+
+export default test;
+export { test2 };
+`,
+        );
+
+        createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                baseUrl: ".",
+                moduleResolution: "bundler",
+            },
+        });
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            type: "commonjs",
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            cjsInterop: true,
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const test = /* @__PURE__ */ __name(() => {
+  return "this should be in final bundle, test function";
+}, "test");
+const test2 = "this should be in final bundle, test2 string";
+
+module.exports = test;
+module.exports.test2 = test2;
+`);
+        const cDtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(cDtsContent).toBe(`declare const test: () => string;
+declare const test2 = "this should be in final bundle, test2 string";
+
+export {  test2 };
+
+export = test;
+`);
+
+        const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dtsContent).toBe(`declare const test: () => string;
+declare const test2 = "this should be in final bundle, test2 string";
+
+export {  test2 };
+
+export = test;
+`);
+
+        const mDtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(mDtsContent).toBe(`declare const test: () => string;
+declare const test2 = "this should be in final bundle, test2 string";
+
+export { test as default, test2 };
+`);
+    });
+
+    it("should fix dts files for commonjs when cjsInterop is enabled and the file has a default export", async () => {
+        expect.assertions(6);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `const test = () => {
+    return "this should be in final bundle, test function";
+};
+
+export default test;
+`,
+        );
+
+        createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                baseUrl: ".",
+                moduleResolution: "bundler",
+            },
+        });
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            type: "commonjs",
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            cjsInterop: true,
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const test = /* @__PURE__ */ __name(() => {
+  return "this should be in final bundle, test function";
+}, "test");
+
+module.exports = test;
+`);
+        const cDtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(cDtsContent).toBe(`declare const test: () => string;
+
+export = test;
+`);
+
+        const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dtsContent).toBe(`declare const test: () => string;
+
+export = test;
+`);
+
+        const mDtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(mDtsContent).toBe(`declare const test: () => string;
+
+export { test as default };
+`);
+    });
 });
