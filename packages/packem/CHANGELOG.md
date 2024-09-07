@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.99](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.98...@visulima/packem@1.0.0-alpha.99) (2024-09-07)
+
+### Bug Fixes
+
+* prefixed shared and chunks folders, added check for node10 on shared folder ([fe7bbbc](https://github.com/visulima/packem/commit/fe7bbbc173bb2df2d0fcae6892b88d4d81f1bc7e))
+
 ## @visulima/packem [1.0.0-alpha.98](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.97...@visulima/packem@1.0.0-alpha.98) (2024-09-07)
 
 ### Bug Fixes
