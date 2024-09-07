@@ -3,6 +3,7 @@ import type { PackageJson } from "@visulima/package";
 import { join } from "@visulima/path";
 import type { Plugin } from "rollup";
 
+import { CHUNKS_PACKEM_FOLDER, SHARED_PACKEM_FOLDER } from "../../constants";
 import type { BuildContext } from "../../types";
 
 let logDisplayed = false;
@@ -21,7 +22,7 @@ const generateNode10Compatibility = (context: BuildContext): void => {
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const entry of context.buildEntries.filter((bEntry) => !bEntry.chunk)) {
-        if (entry.type === "entry" && entry.path.endsWith(".cjs")) {
+        if (entry.type === "entry" && entry.path.endsWith(".cjs") && !entry.path.includes(SHARED_PACKEM_FOLDER) && !entry.path.includes(CHUNKS_PACKEM_FOLDER)) {
             typesVersions.push("./" + join(context.options.outDir, entry.path.replace(/\.cjs$/, ".d.ts")));
         }
     }

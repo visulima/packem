@@ -44,3 +44,6 @@ export const SPECIAL_EXPORT_CONVENTIONS = new Set([DEVELOPMENT_ENV, PRODUCTION_E
 export const EXCLUDE_REGEXP = /node_modules/;
 
 export const ENDING_RE = /(?:\.d\.[mc]?ts|\.\w+)$/;
+
+export const CHUNKS_PACKEM_FOLDER = "packem_chunks";
+export const SHARED_PACKEM_FOLDER = "packem_shared";

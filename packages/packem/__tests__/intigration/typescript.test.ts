@@ -1690,4 +1690,76 @@ export { test as default };
         const packageJson = JSON.parse(readFileSync(`${temporaryDirectoryPath}/package.json`).toString());
         expect(packageJson.typesVersions).toMatchSnapshot("typesVersions");
     });
+
+    it("should generate a node10 typesVersions field on console with ignored shared files", async () => {
+        expect.assertions(4);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/shared/index.ts`, `export const shared = "this should be in final bundle, test2 string";`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export { shared } from "./shared";
+export const test = "this should be in final bundle, test2 string";`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/deep/index.ts`,
+            `export { shared } from "../shared";
+export const test = "this should be in final bundle, test2 string";`,
+        );
+
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: {
+                        default: "./dist/index.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/index.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                },
+                "./deep": {
+                    import: {
+                        default: "./dist/deep/index.mjs",
+                        types: "./dist/deep/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/deep/index.cjs",
+                        types: "./dist/deep/index.d.cts",
+                    },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            cjsInterop: true,
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).toContain("Declaration compatibility mode is enabled.");
+        expect(binProcess.stdout).toContain(`{
+    "typesVersions": {
+        "*": {
+            "*": [
+                "./dist/deep/index.d.ts",
+                "./dist/index.d.ts"
+            ]
+        }
+    }
+}`);
+    });
 });
