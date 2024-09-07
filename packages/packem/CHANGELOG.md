@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.98](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.97...@visulima/packem@1.0.0-alpha.98) (2024-09-07)
+
+### Bug Fixes
+
+* improved dx for node10 ([9868420](https://github.com/visulima/packem/commit/986842005338b6b4ba840bcc86882ba5a0232aeb))
+
 ## @visulima/packem [1.0.0-alpha.97](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.96...@visulima/packem@1.0.0-alpha.97) (2024-09-07)
 
 ### Bug Fixes
