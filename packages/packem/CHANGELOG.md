@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.95](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.94...@visulima/packem@1.0.0-alpha.95) (2024-09-07)
+
+### Bug Fixes
+
+* fixed broken chunk spliting ([326fe6a](https://github.com/visulima/packem/commit/326fe6a854826a75885c050437c684ac41e4a840))
+
 ## @visulima/packem [1.0.0-alpha.94](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.93...@visulima/packem@1.0.0-alpha.94) (2024-09-07)
 
 ### Bug Fixes
