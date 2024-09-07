@@ -88,7 +88,9 @@
     },
     "pnpm": {
         "overrides": {
+            "braces@<3.0.3": ">=3.0.3",
             "chrono-node@<2.2.4": ">=2.7.6",
+            "micromatch@<4.0.8": ">=4.0.8",
             "rollup": "^4.21.2"
         }
     }
