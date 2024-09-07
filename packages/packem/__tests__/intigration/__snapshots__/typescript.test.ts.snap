@@ -37,6 +37,17 @@ export { _default as default };
 "
 `;
 
+exports[`packem typescript > should generate a node10 typesVersions field in package.json when writeTypesVersionsToPackageJson is true > typesVersions 1`] = `
+{
+  "*": {
+    "*": [
+      "./dist/deep/index.d.ts",
+      "./dist/index.d.ts",
+    ],
+  },
+}
+`;
+
 exports[`packem typescript > should support typescript decorator > cjs code output 1`] = `
 "'use strict';
 

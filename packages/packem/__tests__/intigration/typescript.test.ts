@@ -1569,4 +1569,124 @@ export = test;
 export { test as default };
 `);
     });
+
+    it("should generate a node10 typesVersions field console info", async () => {
+        expect.assertions(4);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const test = "this should be in final bundle, test2 string";`);
+        writeFileSync(`${temporaryDirectoryPath}/src/deep/index.ts`, `export const test = "this should be in final bundle, test2 string";`);
+
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: {
+                        default: "./dist/index.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/index.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                },
+                "./deep": {
+                    import: {
+                        default: "./dist/deep/index.mjs",
+                        types: "./dist/deep/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/deep/index.cjs",
+                        types: "./dist/deep/index.d.cts",
+                    },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            cjsInterop: true,
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).toContain("Declaration compatibility mode is enabled.");
+        expect(binProcess.stdout).toContain(`{
+    "typesVersions": {
+        "*": {
+            "*": [
+                "./dist/deep/index.d.ts",
+                "./dist/index.d.ts"
+            ]
+        }
+    }
+}`);
+    });
+
+    it("should generate a node10 typesVersions field in package.json when writeTypesVersionsToPackageJson is true", async () => {
+        expect.assertions(4);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const test = "this should be in final bundle, test2 string";`);
+        writeFileSync(`${temporaryDirectoryPath}/src/deep/index.ts`, `export const test = "this should be in final bundle, test2 string";`);
+
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: {
+                        default: "./dist/index.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/index.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                },
+                "./deep": {
+                    import: {
+                        default: "./dist/deep/index.mjs",
+                        types: "./dist/deep/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/deep/index.cjs",
+                        types: "./dist/deep/index.d.cts",
+                    },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            cjsInterop: true,
+            writeTypesVersionsToPackageJson: true,
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).toContain("Declaration compatibility mode is enabled.");
+
+        const packageJson = JSON.parse(readFileSync(`${temporaryDirectoryPath}/package.json`).toString());
+        expect(packageJson.typesVersions).toMatchSnapshot("typesVersions");
+    });
 });
