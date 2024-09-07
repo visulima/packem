@@ -1634,7 +1634,7 @@ export { test as default };
     });
 
     it("should generate a node10 typesVersions field in package.json when writeTypesVersionsToPackageJson is true", async () => {
-        expect.assertions(4);
+        expect.assertions(5);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -1685,6 +1685,7 @@ export { test as default };
         expect(binProcess.exitCode).toBe(0);
 
         expect(binProcess.stdout).toContain("Declaration compatibility mode is enabled.");
+        expect(binProcess.stdout).toContain("Your package.json has been updated to enable node 10 compatibility.");
 
         const packageJson = JSON.parse(readFileSync(`${temporaryDirectoryPath}/package.json`).toString());
         expect(packageJson.typesVersions).toMatchSnapshot("typesVersions");

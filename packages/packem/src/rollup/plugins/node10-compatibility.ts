@@ -5,11 +5,18 @@ import type { Plugin } from "rollup";
 
 import type { BuildContext } from "../../types";
 
+let logDisplayed = false;
+
 const generateNode10Compatibility = (context: BuildContext): void => {
-    context.logger.info({
-        message: "Declaration compatibility mode is enabled.",
-        prefix: "dts",
-    });
+    if (!logDisplayed) {
+        context.logger.info({
+            message: "Declaration compatibility mode is enabled.",
+            prefix: "dts",
+        });
+
+        logDisplayed = true;
+    }
+
     const typesVersions: string[] = [];
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
@@ -19,10 +26,22 @@ const generateNode10Compatibility = (context: BuildContext): void => {
         }
     }
 
-    if (context.options.writeTypesVersionsToPackageJson && typesVersions.length > 0) {
-        const rootPackageJsonPath = join(context.options.rootDir, "package.json");
-        const packageJson = readJsonSync(rootPackageJsonPath) as PackageJson;
+    const rootPackageJsonPath = join(context.options.rootDir, "package.json");
+    const packageJson = readJsonSync(rootPackageJsonPath) as PackageJson;
 
+    // eslint-disable-next-line etc/no-assign-mutated-array
+    const sortedTypesVersions = typesVersions.sort((a, b) => a.localeCompare(b));
+
+    if (sortedTypesVersions === packageJson.typesVersions?.["*"]?.["*"]) {
+        context.logger.debug({
+            message: "No changes to typesVersions field in package.json",
+            prefix: "dts",
+        });
+
+        return;
+    }
+
+    if (context.options.writeTypesVersionsToPackageJson && typesVersions.length > 0) {
         writeJsonSync(
             rootPackageJsonPath,
             {
@@ -30,8 +49,7 @@ const generateNode10Compatibility = (context: BuildContext): void => {
                 typesVersions: {
                     ...packageJson.typesVersions,
                     "*": {
-                        // eslint-disable-next-line @typescript-eslint/require-array-sort-compare,etc/no-assign-mutated-array
-                        "*": typesVersions.sort(),
+                        "*": sortedTypesVersions,
                     },
                 },
             },
@@ -39,10 +57,14 @@ const generateNode10Compatibility = (context: BuildContext): void => {
                 detectIndent: true,
             },
         );
+
+        context.logger.info({
+            message: `Your package.json has been updated to enable node 10 compatibility.`,
+            prefix: "dts",
+        });
     } else if (typesVersions.length > 0) {
         context.logger.info(
-            // eslint-disable-next-line etc/no-assign-mutated-array,@typescript-eslint/require-array-sort-compare
-            `Please add the following field into your package.json to enable node 10 compatibility:\n\n${JSON.stringify({ typesVersions: { "*": { "*": typesVersions.sort() } } }, null, 4)}`,
+            `Please add the following field into your package.json to enable node 10 compatibility:\n\n${JSON.stringify({ typesVersions: { "*": { "*": sortedTypesVersions } } }, null, 4)}`,
         );
     }
 };
@@ -51,10 +73,6 @@ const node10Compatibility = (context: BuildContext): Plugin => {
     return {
         name: "packem:node10-compatibility",
         writeBundle() {
-            if (context.options.declaration !== "compatible") {
-                return;
-            }
-
             generateNode10Compatibility(context);
         },
     };

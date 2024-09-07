@@ -511,6 +511,8 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             prependDirectivePlugin(),
 
+            context.options.emitCJS && context.options.declaration === "compatible" && node10Compatibility(context),
+
             context.options.rollup.visualizer &&
                 visualizerPlugin({
                     brotliSize: true,
@@ -686,8 +688,6 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                     mode: "types",
                     packageName: context.pkg.name,
                 }),
-
-            node10Compatibility(context),
         ].filter(Boolean),
     };
 };
