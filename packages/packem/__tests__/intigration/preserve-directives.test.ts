@@ -297,29 +297,29 @@ export const baz = 'baz';`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`export { f as foo } from './shared/foo-Dz9XMQGO.mjs';
-export { b as bar } from './shared/bar-pKIa1waU.mjs';
+        expect(mjsContent).toBe(`export { foo } from './shared/foo-Dx82TkZf.mjs';
+export { bar } from './shared/bar-dfxpx6LX.mjs';
 
 const baz = "baz";
 
 export { baz };
 `);
 
-        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/foo-Dz9XMQGO.mjs`);
+        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/foo-Dx82TkZf.mjs`);
 
         expect(mjsChunk1Content).toBe(`'use client';
 'use sukka';
 const foo = "foo";
 
-export { foo as f };
+export { foo };
 `);
 
-        const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/bar-pKIa1waU.mjs`);
+        const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/bar-dfxpx6LX.mjs`);
 
         expect(mjsChunk2Content).toBe(`'use client';
 const bar = "bar";
 
-export { bar as b };
+export { bar };
 `);
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);

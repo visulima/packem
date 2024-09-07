@@ -418,7 +418,7 @@ export { getFilename } from "./filename.js";`,
 import __cjs_path__ from "node:path"; // -- packem CommonJS __dirname shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
 const __dirname = __cjs_path__.dirname(__filename);
-export { g as getFilename } from './shared/getFilename-CAC-3KI_.mjs';
+export { getFilename } from './shared/getFilename-CyjjIqAi.mjs';
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -430,7 +430,7 @@ __name(getDirname, "getDirname");
 export { getDirname };
 `);
 
-        const mjsSharedContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/getFilename-CAC-3KI_.mjs`);
+        const mjsSharedContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/getFilename-CyjjIqAi.mjs`);
 
         expect(mjsSharedContent).toBe(`import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
@@ -441,12 +441,12 @@ function getFilename() {
 }
 __name(getFilename, "getFilename");
 
-export { getFilename as g };
+export { getFilename };
 `);
     });
 
     it("should include esm shim only once per file on the same dir level, if dirname, filename or require are found", async () => {
-        expect.assertions(3);
+        expect.assertions(4);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/level2/filename.js`,
@@ -480,7 +480,7 @@ export { getFilename } from "./level2/filename.js";`,
 import __cjs_path__ from "node:path"; // -- packem CommonJS __dirname shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
 const __dirname = __cjs_path__.dirname(__filename);
-export { g as getFilename } from './shared/getFilename-CAC-3KI_.mjs';
+export { getFilename } from './shared/getFilename-CyjjIqAi.mjs';
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -492,7 +492,7 @@ __name(getDirname, "getDirname");
 export { getDirname };
 `);
 
-        const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/getFilename-CAC-3KI_.mjs`);
+        const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/getFilename-CyjjIqAi.mjs`);
 
         expect(mjsFilenameContent).toBe(`
 // -- pack CommonJS Shims --
