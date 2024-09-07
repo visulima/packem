@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.94](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.93...@visulima/packem@1.0.0-alpha.94) (2024-09-07)
+
+### Bug Fixes
+
+* fixed interface change ([7b427f7](https://github.com/visulima/packem/commit/7b427f7fb98e590f79894dc42c65502e1cdedac6))
+* update dependencies, added attw lint, add pkg preview ([703d97e](https://github.com/visulima/packem/commit/703d97e9a9d1fc00558c73cfb3a479a424405261))
+
 ## @visulima/packem [1.0.0-alpha.93](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.92...@visulima/packem@1.0.0-alpha.93) (2024-09-06)
 
 ### Features
