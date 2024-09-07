@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.97](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.96...@visulima/packem@1.0.0-alpha.97) (2024-09-07)
+
+### Bug Fixes
+
+* added test for node10 support ([a30370b](https://github.com/visulima/packem/commit/a30370bd34a833717ce5724d70e73744dc79ec81))
+
 ## @visulima/packem [1.0.0-alpha.96](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.95...@visulima/packem@1.0.0-alpha.96) (2024-09-07)
 
 ### Bug Fixes
