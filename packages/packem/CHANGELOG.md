@@ -1,3 +1,11 @@
+## @visulima/packem [1.0.0-alpha.96](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.95...@visulima/packem@1.0.0-alpha.96) (2024-09-07)
+
+### Bug Fixes
+
+* dont normalize modified package.json, when typesVersions is written, fixed wrong export for bin files, fixed some tests ([1459c62](https://github.com/visulima/packem/commit/1459c6233c21ebbf5c73e12bbd39c906610c0160))
+* fixed more tests ([668ecc7](https://github.com/visulima/packem/commit/668ecc77e785759f273e1ed762e62a667dcaafc8))
+* updated dependencies ([94a4c6c](https://github.com/visulima/packem/commit/94a4c6ca1f7159eea81b89be36354e2c370d27d4))
+
 ## @visulima/packem [1.0.0-alpha.95](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.94...@visulima/packem@1.0.0-alpha.95) (2024-09-07)
 
 ### Bug Fixes
