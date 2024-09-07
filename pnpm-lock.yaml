@@ -483,8 +483,8 @@ importers:
         specifier: ^1.0.9
         version: 1.0.9
       '@visulima/package':
-        specifier: ^3.0.9
-        version: 3.0.9(yaml@2.5.0)
+        specifier: 3.0.0
+        version: 3.0.0(yaml@2.5.0)
       '@visulima/pail':
         specifier: ^2.1.6
         version: 2.1.6
@@ -2749,6 +2749,16 @@ packages:
       yaml:
         optional: true
 
+  '@visulima/fs@2.1.7':
+    resolution: {integrity: sha512-zrdAoYrjayGWLVZgxbBvumxMeBgXyh3TPpyyZXKYkllCn2+9lTjYmBUhHyq8IwnDFWMBD6/04I2CaWzTJvW48g==}
+    engines: {node: '>=18.* <=22.*'}
+    os: [darwin, linux, win32]
+    peerDependencies:
+      yaml: ^2.4.0
+    peerDependenciesMeta:
+      yaml:
+        optional: true
+
   '@visulima/humanizer@1.0.9':
     resolution: {integrity: sha512-FjxUrOW2T4Qt6VA5HQw9MzX7ImU2CUF6CJGPCukKXD236JfLWIcAiyN47avUiwxRb761aKnjlwwtbxO72hqX6g==}
     engines: {node: '>=18.* <=22.*'}
@@ -2767,8 +2777,8 @@ packages:
     engines: {node: '>=18.* <=22.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/package@3.0.9':
-    resolution: {integrity: sha512-+wi+3lAOlGHJaApYpEEUWei6c4gd72ybLe5IzVuX5IwHyE1dWhPN3IAvdNmMTPd0VEuwryOQjv/3VC6s2FyDpw==}
+  '@visulima/package@3.0.0':
+    resolution: {integrity: sha512-J5Spz5EFwecR/wDlhvBlAZkCmwArty226H2ff/V/UNAgK83faQLQzThN70vQvH00qyJ/+yUHMf0m2mhvmGuqHA==}
     engines: {node: '>=18.* <=22.*'}
     os: [darwin, linux, win32]
 
@@ -10924,6 +10934,12 @@ snapshots:
     optionalDependencies:
       yaml: 2.5.0
 
+  '@visulima/fs@2.1.7(yaml@2.5.0)':
+    dependencies:
+      '@visulima/path': 1.0.2
+    optionalDependencies:
+      yaml: 2.5.0
+
   '@visulima/humanizer@1.0.9': {}
 
   '@visulima/inspector@1.0.7': {}
@@ -10935,15 +10951,15 @@ snapshots:
       '@visulima/fs': 2.1.5(yaml@2.5.0)
       '@visulima/path': 1.0.2
       jsonc-parser: 3.2.1
-      normalize-package-data: 6.0.1
+      normalize-package-data: 6.0.2
       resolve-pkg-maps: 1.0.0
     transitivePeerDependencies:
       - yaml
 
-  '@visulima/package@3.0.9(yaml@2.5.0)':
+  '@visulima/package@3.0.0(yaml@2.5.0)':
     dependencies:
-      '@visulima/fs': 2.1.15(yaml@2.5.0)
-      '@visulima/path': 1.0.6
+      '@visulima/fs': 2.1.7(yaml@2.5.0)
+      '@visulima/path': 1.0.2
       normalize-package-data: 6.0.2
     transitivePeerDependencies:
       - yaml

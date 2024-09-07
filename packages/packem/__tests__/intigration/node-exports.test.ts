@@ -632,4 +632,84 @@ export class Child extends Parent {
 
         expect(dContent).toMatchSnapshot("dts output");
     });
+
+    it("should generate correct chunks names, when chunk per export is generated", async () => {
+        expect.assertions(6);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/package.ts`,
+            `export const packageA = () => "This is a named export"; const d = "This is a default export"; export default d;`,
+        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export { packageA } from "./package";`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: "./dist/index.mjs",
+                    require: "./dist/index.cjs",
+                    types: "./dist/index.d.ts",
+                },
+                "./package": {
+                    import: "./dist/package.mjs",
+                    require: "./dist/package.cjs",
+                    types: "./dist/package.d.ts",
+                },
+            },
+        });
+        await createPackemConfig(temporaryDirectoryPath, {});
+        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsPackageContent = readFileSync(`${temporaryDirectoryPath}/dist/package.mjs`);
+
+        expect(mjsPackageContent).toBe(`var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const packageA = /* @__PURE__ */ __name(() => "This is a named export", "packageA");
+const d = "This is a default export";
+
+export { d as default, packageA };
+`);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toBe(`export { packageA } from './package.mjs';\n`);
+
+        const cjsPackageContent = readFileSync(`${temporaryDirectoryPath}/dist/package.cjs`);
+
+        expect(cjsPackageContent).toBe(`'use strict';
+
+Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const packageA = /* @__PURE__ */ __name(() => "This is a named export", "packageA");
+const d = "This is a default export";
+
+exports.default = d;
+exports.packageA = packageA;
+`);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const _package = require('./package.cjs');
+
+
+
+exports.packageA = _package.packageA;
+`);
+    });
 });

@@ -6,7 +6,7 @@ export interface CJSInteropOptions {
     addDefaultProperty?: boolean;
 }
 
-export const cjsInterop = ({
+export const cjsInteropPlugin = ({
     addDefaultProperty = false,
     logger,
     type,

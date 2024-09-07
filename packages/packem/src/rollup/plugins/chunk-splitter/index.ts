@@ -1,11 +1,11 @@
 /**
  * Modified copy of https://github.com/cprecioso/rollup-plugin-chunk-per-export/blob/main/src/index.ts
  */
-import type { ModuleInfo, Plugin, PreserveEntrySignaturesOption } from "rollup";
+import type { ModuleInfo, Plugin } from "rollup";
 
 import gatherExports from "./gather";
 
-const chunkSplitter = ({ preserveChunkSignature = false }: { preserveChunkSignature?: PreserveEntrySignaturesOption | undefined } = {}): Plugin => {
+const chunkSplitter = (): Plugin => {
     return {
         moduleParsed: {
             async handler(info: ModuleInfo) {
@@ -23,7 +23,7 @@ const chunkSplitter = ({ preserveChunkSignature = false }: { preserveChunkSignat
                     this.emitFile({
                         id: exported.id,
                         name: exported.exportedName,
-                        preserveSignature: preserveChunkSignature,
+                        preserveSignature: "exports-only",
                         type: "chunk",
                     });
                 }

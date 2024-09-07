@@ -22,7 +22,7 @@ import type FileCache from "../utils/file-cache";
 import getPackageName from "../utils/get-package-name";
 import memoizeByKey from "../utils/memoize";
 import chunkSplitter from "./plugins/chunk-splitter";
-import { cjsInterop as cjsInteropPlugin } from "./plugins/cjs-interop";
+import { cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
 import { esmShimCjsSyntaxPlugin } from "./plugins/esm-shim-cjs-syntax";
@@ -422,7 +422,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     ...context.options.rollup.json,
                 }),
 
-            chunkSplitter(/* { preserveChunkSignature: context.options.rollup.preserveChunkSignature } */),
+            chunkSplitter(),
 
             context.options.rollup.wsam && wasmPlugin(context.options.rollup.wsam),
 
