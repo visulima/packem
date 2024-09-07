@@ -1,7 +1,7 @@
 import type { NormalizedPackageJson } from "@visulima/package";
 import { describe, expect, it } from "vitest";
 
-import overwriteWithPublishConfig from "../../../src/preset/utils/overwrite-with-publish-config";
+import overwriteWithPublishConfig from "../../../src/hooks/preset/utils/overwrite-with-publish-config";
 
 // eslint-disable-next-line no-secrets/no-secrets
 describe("overwriteWithPublishConfig", () => {

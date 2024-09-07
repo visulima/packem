@@ -994,15 +994,15 @@ export const AppContext = React.createContext(null)`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`export { s as sharedApi } from './shared/anotherSharedApi-DwwxX0VF.mjs';
-export { A as AppContext } from './shared/AppContext-CA88-UyG.mjs';
+        expect(mjsContent).toBe(`export { sharedApi } from './shared/anotherSharedApi-lhzhzq4G.mjs';
+export { AppContext } from './shared/AppContext-BSWWkl28.mjs';
 
 const index = "index";
 
 export { index };
 `);
 
-        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/anotherSharedApi-DwwxX0VF.mjs`);
+        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/anotherSharedApi-lhzhzq4G.mjs`);
 
         expect(mjsChunk1Content).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -1011,16 +1011,16 @@ function sharedApi() {
 }
 __name(sharedApi, "sharedApi");
 
-export { sharedApi as s };
+export { sharedApi };
 `);
-        const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/AppContext-CA88-UyG.mjs`);
+        const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/AppContext-BSWWkl28.mjs`);
 
         expect(mjsChunk2Content).toBe(`'use client';
 import React from 'react';
 
 const AppContext = React.createContext(null);
 
-export { AppContext as A };
+export { AppContext };
 `);
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);

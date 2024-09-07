@@ -125,7 +125,7 @@ export const cjsInteropPlugin = ({
                 if (defaultKey !== "") {
                     const dtsTransformed = new MagicString(code);
 
-                    // TODO: adjust regex to remove `export { ... } if its the only entry
+                    // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
                     dtsTransformed.replace(new RegExp(`(,s)?${defaultKey} as default(,)?`), "");
                     dtsTransformed.append("\n\nexport = " + defaultKey + ";");
 
@@ -135,7 +135,8 @@ export const cjsInteropPlugin = ({
                     });
 
                     return {
-                        code: dtsTransformed.toString(),
+                        // replace a empty export statement
+                        code: dtsTransformed.toString().replace(/export\s\{\s\s\};/, ""),
                         map: dtsTransformed.generateMap({ hires: true }),
                     };
                 }

@@ -7,16 +7,9 @@ declare const test3 = "this should be in final bundle";
 declare const test4 = "this should be in final bundle";
 declare const test5 = "this should be in final bundle";
 
-export { test2, test3, test4, test5 };
+export {  test2, test3, test4, test5 };
 
-declare const defaultExport: {
-  test2: typeof test2;
-  test3: typeof test3;
-  test4: typeof test4;
-  test5: typeof test5;
-} & typeof test;
-
-export default defaultExport;
+export = test;
 "
 `;
 
@@ -50,16 +43,9 @@ declare const test3 = "this should be in final bundle";
 declare const test4 = "this should be in final bundle";
 declare const test5 = "this should be in final bundle";
 
-export { test2, test3, test4, test5 };
+export {  test2, test3, test4, test5 };
 
-declare const defaultExport: {
-  test2: typeof test2;
-  test3: typeof test3;
-  test4: typeof test4;
-  test5: typeof test5;
-} & typeof test;
-
-export default defaultExport;
+export = test;
 "
 `;
 
@@ -93,13 +79,9 @@ exports[`packem node exports > cjs-interop > should output 'default export with 
 "declare const test: () => string;
 declare const test2 = "this should be in final bundle";
 
-export { test2 };
+export {  test2 };
 
-declare const defaultExport: {
-  test2: typeof test2;
-} & typeof test;
-
-export default defaultExport;
+export = test;
 "
 `;
 
@@ -124,13 +106,9 @@ exports[`packem node exports > cjs-interop > should output 'default export with 
 "declare const test: () => string;
 declare const test2 = "this should be in final bundle";
 
-export { test2 };
+export {  test2 };
 
-declare const defaultExport: {
-  test2: typeof test2;
-} & typeof test;
-
-export default defaultExport;
+export = test;
 "
 `;
 
@@ -642,7 +620,39 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > cjs output 1`] = `
-""use strict";var o=Object.defineProperty;var e=(t,s)=>o(t,"name",{value:s,configurable:!0});Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});var c=Object.defineProperty,r=e((t,s)=>c(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{r(this,"Parent")}constructor(){}}class l{static{e(this,"c")}static{r(this,"Feature")}constructor(){}}class i extends a{static{e(this,"Child")}static{r(this,"Child")}feature=new l;constructor(){console.log("before"),super(),console.log("after")}}exports.Child=i;
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+class Parent {
+  static {
+    __name(this, "Parent");
+  }
+  constructor() {
+  }
+}
+class Feature {
+  static {
+    __name(this, "Feature");
+  }
+  constructor() {
+  }
+}
+class Child extends Parent {
+  static {
+    __name(this, "Child");
+  }
+  feature = new Feature();
+  constructor() {
+    console.log("before");
+    super();
+    console.log("after");
+  }
+}
+
+exports.Child = Child;
 "
 `;
 
@@ -679,6 +689,34 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > mjs output 1`] = `
-"var c=Object.defineProperty;var e=(t,s)=>c(t,"name",{value:s,configurable:!0});var o=Object.defineProperty,r=e((t,s)=>o(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{r(this,"Parent")}constructor(){}}class l{static{e(this,"c")}static{r(this,"Feature")}constructor(){}}class i extends a{static{e(this,"Child")}static{r(this,"Child")}feature=new l;constructor(){console.log("before"),super(),console.log("after")}}export{i as Child};
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+class Parent {
+  static {
+    __name(this, "Parent");
+  }
+  constructor() {
+  }
+}
+class Feature {
+  static {
+    __name(this, "Feature");
+  }
+  constructor() {
+  }
+}
+class Child extends Parent {
+  static {
+    __name(this, "Child");
+  }
+  feature = new Feature();
+  constructor() {
+    console.log("before");
+    super();
+    console.log("after");
+  }
+}
+
+export { Child };
 "
 `;

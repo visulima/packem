@@ -14,7 +14,7 @@ class FileCache {
 
     #isEnabled = true;
 
-    readonly #memoryCache = new Map<string, unknown>();
+    readonly #memoryCache = new Map<string>();
 
     readonly #logger: Pail;
 

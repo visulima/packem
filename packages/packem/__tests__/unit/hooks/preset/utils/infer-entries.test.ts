@@ -58,7 +58,6 @@ describe("inferEntries", () => {
         createFiles(["src/test.ts"], temporaryDirectoryPath);
 
         expect(() =>
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             inferEntries(
                 { main: "dist/test.cjs" },
                 ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),

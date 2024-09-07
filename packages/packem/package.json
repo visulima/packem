@@ -33,9 +33,7 @@
         "bunchee"
     ],
     "homepage": "https://www.visulima.com/docs/package/packem",
-    "bugs": {
-        "url": "https://github.com/visulima/packem/issues"
-    },
+    "bugs": "https://github.com/visulima/packem/issues",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/visulima/packem.git",

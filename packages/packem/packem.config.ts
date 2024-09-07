@@ -5,11 +5,11 @@ import transformer from "./src/rollup/plugins/esbuild";
 export default defineConfig({
     cjsInterop: true,
     fileCache: false,
-    writeTypesVersionsToPackageJson: true,
     rollup: {
         license: {
             path: "./LICENSE.md",
         },
     },
     transformer,
+    writeTypesVersionsToPackageJson: true,
 });

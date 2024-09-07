@@ -32,6 +32,7 @@ import JSONPlugin from "./plugins/json";
 import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
 import { license as licensePlugin } from "./plugins/license";
 import metafilePlugin from "./plugins/metafile";
+import node10Compatibility from "./plugins/node10-compatibility";
 import cachingPlugin from "./plugins/plugin-cache";
 import prependDirectivePlugin from "./plugins/prepend-directives";
 import preserveDirectivesPlugin from "./plugins/preserve-directives";
@@ -685,6 +686,8 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                     mode: "types",
                     packageName: context.pkg.name,
                 }),
+
+            node10Compatibility(context),
         ].filter(Boolean),
     };
 };

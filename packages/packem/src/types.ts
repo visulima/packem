@@ -99,7 +99,7 @@ export type BuildEntry = {
     declaration?: boolean | "compatible" | "node16";
     environment?: Environment;
     esm?: boolean;
-    executable?: boolean;
+    executable?: true;
     fileAlias?: string;
     input: string;
     isGlob?: boolean;
@@ -158,6 +158,7 @@ export interface BuildHooks {
     "rollup:options": (context: BuildContext, options: RollupOptions) => Promise<void> | void;
     "rollup:watch": (context: BuildContext, watcher: RollupWatcher) => Promise<void> | void;
 
+    "validate:before": (context: BuildContext) => Promise<void> | void;
     "validate:done": (context: BuildContext) => Promise<void> | void;
 }
 

@@ -9,6 +9,7 @@ import { ENDING_RE } from "../constants";
 import type { BuildContext, BuildEntry } from "../types";
 import dumpObject from "./dump-object";
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<void> => {
     if (typeof entry.name !== "string") {
         let relativeInput = isAbsolute(entry.input) ? relative(context.options.rootDir, entry.input) : normalize(entry.input);
@@ -35,14 +36,29 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<vo
         entry.declaration = context.options.declaration;
     }
 
-    if (context.options.emitCJS !== undefined && entry.cjs === undefined) {
-        // eslint-disable-next-line no-param-reassign
-        entry.cjs = context.options.emitCJS;
-    }
+    // @TODO: improve this logic
+    if (entry.executable && (entry.cjs === undefined || entry.esm === undefined)) {
+        if (context.pkg.type === "commonjs" && entry.cjs === undefined && context.options.emitCJS !== undefined) {
+            // eslint-disable-next-line no-param-reassign
+            entry.cjs = context.options.emitCJS;
+            // eslint-disable-next-line no-param-reassign
+            entry.esm = false;
+        } else if (context.pkg.type === "module" && entry.esm === undefined && context.options.emitESM !== undefined) {
+            // eslint-disable-next-line no-param-reassign
+            entry.esm = context.options.emitESM;
+            // eslint-disable-next-line no-param-reassign
+            entry.cjs = false;
+        }
+    } else {
+        if (context.options.emitCJS !== undefined && entry.cjs === undefined) {
+            // eslint-disable-next-line no-param-reassign
+            entry.cjs = context.options.emitCJS;
+        }
 
-    if (context.options.emitESM !== undefined && entry.esm === undefined) {
-        // eslint-disable-next-line no-param-reassign
-        entry.esm = context.options.emitESM;
+        if (context.options.emitESM !== undefined && entry.esm === undefined) {
+            // eslint-disable-next-line no-param-reassign
+            entry.esm = context.options.emitESM;
+        }
     }
 
     // eslint-disable-next-line no-param-reassign

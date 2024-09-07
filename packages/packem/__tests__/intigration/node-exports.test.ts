@@ -66,13 +66,7 @@ module.exports = test;
 
             expect(dCtsContent).toBe(`declare const test: () => string;
 
-export { test as default };
-
-declare const defaultExport: {
-
-} & typeof test;
-
-export default defaultExport;
+export = test;
 `);
 
             const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
@@ -86,13 +80,7 @@ export { test as default };
 
             expect(dContent).toBe(`declare const test: () => string;
 
-export { test as default };
-
-declare const defaultExport: {
-
-} & typeof test;
-
-export default defaultExport;
+export = test;
 `);
         });
 
