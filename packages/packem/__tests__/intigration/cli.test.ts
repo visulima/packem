@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
-import { readFileSync, writeFileSync } from "@visulima/fs";
+import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -229,5 +229,50 @@ export { a };
 `);
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         expect(existsSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`)).toBeFalsy();
+    });
+
+    it("should generate only d.ts files when --dts-only option was given", async () => {
+        expect.assertions(7);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
+
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: {
+                        default: "./dist/index.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/index.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackemSync("build", ["--dts-only"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBeFalsy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.cjs`)).toBeFalsy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.mts`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.cts`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.ts`)).toBeTruthy();
     });
 });

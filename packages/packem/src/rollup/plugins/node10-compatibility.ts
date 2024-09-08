@@ -65,7 +65,7 @@ const generateNode10Compatibility = (context: BuildContext): void => {
         });
     } else if (typesVersions.length > 0) {
         context.logger.info(
-            `Please add the following field into your package.json to enable node 10 compatibility:\n\n${JSON.stringify({ typesVersions: { "*": { "*": sortedTypesVersions } } }, null, 4)}`,
+            `Please add the following field into your package.json to enable node 10 compatibility:\n\n${JSON.stringify({ typesVersions: { "*": { "*": sortedTypesVersions } } }, null, 4)}\n`,
         );
     }
 };

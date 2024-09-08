@@ -13,23 +13,35 @@ import warn from "../utils/warn";
 const validatePackage = (packageJson: PackageJson, context: BuildContext): void => {
     const filenames = new Set(
         [
-            ...(typeof packageJson.bin === "string" ? [packageJson.bin] : Object.values(packageJson.bin ?? {})),
-            packageJson.main,
-            packageJson.module,
             context.options.declaration ? packageJson.types : "",
             context.options.declaration ? packageJson.typings : "",
+            ...(context.options.dtsOnly ? [""] : typeof packageJson.bin === "string" ? [packageJson.bin] : Object.values(packageJson.bin ?? {})),
+            context.options.dtsOnly ? "" : packageJson.main,
+            context.options.dtsOnly ? "" : packageJson.module,
             ...extractExportFilenames(packageJson.exports, packageJson.type === "module" ? "esm" : "cjs", context.options.declaration).map(
-                (index) => index.file,
+                (outputDescriptor) => {
+                    if (context.options.dtsOnly) {
+                        if (outputDescriptor.subKey === "types") {
+                            return outputDescriptor.file;
+                        }
+
+                        return undefined;
+                    }
+
+                    return outputDescriptor.file;
+                },
             ),
-        ].map(
-            (index) =>
-                index &&
-                resolve(
-                    context.options.rootDir,
-                    // eslint-disable-next-line security/detect-unsafe-regex
-                    index.replace(/\/[^*/]*\*[^\n\r/\u2028\u2029]*(?:[\n\r\u2028\u2029][^*/]*\*[^\n\r/\u2028\u2029]*)*(?:\/.*)?$/, ""),
-                ),
-        ),
+        ]
+            .filter(Boolean)
+            .map(
+                (index) =>
+                    index &&
+                    resolve(
+                        context.options.rootDir,
+                        // eslint-disable-next-line security/detect-unsafe-regex
+                        index.replace(/\/[^*/]*\*[^\n\r/\u2028\u2029]*(?:[\n\r\u2028\u2029][^*/]*\*[^\n\r/\u2028\u2029]*)*(?:\/.*)?$/, ""),
+                    ),
+            ),
     );
 
     const missingOutputs = [];

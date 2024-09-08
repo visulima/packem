@@ -60,7 +60,6 @@ const showSizeInformation = (logger: Pail, context: BuildContext, packageJson: P
             line += moduleList.length > 0 ? "\n  inlined modules:\n" + moduleList : "";
         }
 
-        // find types for entry
         if (context.options.declaration && entry.type === "entry") {
             let dtsPath = entry.path.replace(/\.js$/, ".d.ts");
             let type = "commonjs";
@@ -124,7 +123,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                 ...context,
             };
 
-            if (environment !== "undefined" || runtime !== "undefined") {
+            if (!context.options.dtsOnly && (environment !== "undefined" || runtime !== "undefined")) {
                 context.logger.info(
                     "Preparing build for " +
                         (environment === "undefined" ? "" : cyan(environment) + " environment" + (runtime === "undefined" ? "" : " with ")) +
@@ -205,7 +204,9 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                     },
                 };
 
-                rollups.push(rollupBuild(adjustedEsmAndCjsContext, fileCache, subDirectory));
+                if (!context.options.dtsOnly) {
+                    rollups.push(rollupBuild(adjustedEsmAndCjsContext, fileCache, subDirectory));
+                }
 
                 const typedEntries = adjustedEsmAndCjsContext.options.entries.filter((entry) => entry.declaration);
 
@@ -238,7 +239,9 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                     },
                 };
 
-                rollups.push(rollupBuild(adjustedEsmContext, fileCache, subDirectory));
+                if (!context.options.dtsOnly) {
+                    rollups.push(rollupBuild(adjustedEsmContext, fileCache, subDirectory));
+                }
 
                 const typedEntries = adjustedEsmContext.options.entries.filter((entry) => entry.declaration);
 
@@ -271,7 +274,9 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                     },
                 };
 
-                rollups.push(rollupBuild(adjustedCjsContext, fileCache, subDirectory));
+                if (!context.options.dtsOnly) {
+                    rollups.push(rollupBuild(adjustedCjsContext, fileCache, subDirectory));
+                }
 
                 const typedEntries = adjustedCjsContext.options.entries.filter((entry) => entry.declaration);
 
@@ -309,51 +314,11 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
         }
     }
 
-    return rollups;
+    return rollups.filter(Boolean);
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 const build = async (context: BuildContext, packageJson: PackemPackageJson, fileCache: FileCache): Promise<boolean> => {
-    // Call build:before
     await context.hooks.callHook("build:before", context);
-
-    if (context.options.minify) {
-        context.logger.info("Minification is enabled, the output will be minified");
-    }
-
-    const hasTypescript = packageJson.dependencies?.typescript !== undefined || packageJson.devDependencies?.typescript !== undefined;
-
-    if (context.options.declaration && context.tsconfig === undefined && hasTypescript) {
-        throw new Error("Cannot build declaration files without a tsconfig.json");
-    }
-
-    if (!hasTypescript) {
-        context.options.declaration = false;
-
-        context.logger.info({
-            message: "Typescript is not installed. Generation of declaration files are disabled.",
-            prefix: "dts",
-        });
-    } else if (context.options.declaration === false) {
-        context.logger.info({
-            message: "Generation of declaration files are disabled.",
-            prefix: "dts",
-        });
-    }
-
-    if (context.options.declaration) {
-        context.logger.info("Using typescript version: " + cyan(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript ?? "unknown"));
-    }
-
-    if (
-        context.options.declaration &&
-        (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript) &&
-        !context.tsconfig?.config.compilerOptions?.isolatedModules
-    ) {
-        context.logger.warn(
-            `'compilerOptions.isolatedModules' is not enabled in tsconfig.\nBecause none of the third-party transpiler, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.\nTo mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.`,
-        );
-    }
 
     await Promise.all(prepareRollupConfig(context, fileCache));
 
@@ -381,7 +346,6 @@ const build = async (context: BuildContext, packageJson: PackemPackageJson, file
         }
     }
 
-    // Call build:done
     await context.hooks.callHook("build:done", context);
 
     return showSizeInformation(context.logger, context, packageJson);

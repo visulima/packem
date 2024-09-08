@@ -121,6 +121,11 @@ export interface BuildOptions {
      * `undefined` will auto-detect based on "package.json". If "package.json" has "types" field, it will be `"compatible"`, otherwise `false`.
      */
     declaration?: boolean | "compatible" | "node16" | undefined;
+    /**
+     * If `true`, only generate declaration files.
+     * If `false` or `undefined`, generate both declaration and source files.
+     */
+    dtsOnly?: boolean;
     emitCJS?: boolean;
     emitESM?: boolean;
     entries: BuildEntry[];

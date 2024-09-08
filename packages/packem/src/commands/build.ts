@@ -57,6 +57,7 @@ const createBuildCommand = (cli: Cli): void => {
                     clean: options.clean,
                     configPath: options.config ?? undefined,
                     debug: options.debug,
+                    dtsOnly: options.dtsOnly,
                     minify: options.minify === undefined ? nodeEnvironment === PRODUCTION_ENV : options.minify,
                     replace: {
                         ...environments,
@@ -177,6 +178,11 @@ const createBuildCommand = (cli: Cli): void => {
                 name: "no-clean",
                 type: Boolean,
             },
+            {
+                description: "Only generate .d.ts files",
+                name: "dts-only",
+                type: Boolean,
+            }
         ],
     });
 };
