@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.100](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.99...@visulima/packem@1.0.0-alpha.100) (2024-09-08)
+
+### Features
+
+* added dts-only flag ([07a1ebb](https://github.com/visulima/packem/commit/07a1ebb4ec3ebef595f914467f02233d72d4647d))
+
 ## @visulima/packem [1.0.0-alpha.99](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.98...@visulima/packem@1.0.0-alpha.99) (2024-09-07)
 
 ### Bug Fixes
