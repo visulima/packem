@@ -168,12 +168,24 @@ module.exports = defineConfig({
             {
                 description: "Choose a transformer",
                 name: "transformer",
-                type: String,
+                type: (value: unknown) => {
+                    if (typeof value === "string" && ["esbuild", "sucrase", "swc"].includes(value)) {
+                        return value;
+                    }
+
+                    throw new Error("Invalid transformer, please choose one of 'swc', 'sucrase' or 'esbuild'");
+                },
             },
             {
                 description: "Choose a isolated declaration transformer",
                 name: "isolated-declaration-transformer",
-                type: String,
+                type: (value: unknown) => {
+                    if (typeof value === "string" && ["none", "oxc", "swc", "typescript"].includes(value)) {
+                        return value;
+                    }
+
+                    throw new Error("Invalid isolated declaration isolated declaration, please choose one of 'none', 'oxc', 'swc' or 'typescript'");
+                },
             },
         ],
     });

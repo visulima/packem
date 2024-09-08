@@ -1,5 +1,16 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`packem typescript > node10 compatibility > should generate a node10 typesVersions field in package.json when rollup.node10Compatibility.writeToPackageJson is true > typesVersions 1`] = `
+{
+  "*": {
+    "*": [
+      "./dist/deep/index.d.ts",
+      "./dist/index.d.ts",
+    ],
+  },
+}
+`;
+
 exports[`packem typescript > resolve-typescript-tsconfig-paths plugin > should resolve tsconfig paths > cjs code output 1`] = `
 "'use strict';
 

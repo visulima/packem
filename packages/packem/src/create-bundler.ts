@@ -191,6 +191,9 @@ const generateOptions = (
                     `# Bundled types:\n` +
                     dependencyLicenseTexts,
             },
+            node10Compatibility: {
+                writeToPackageJson: false,
+            },
             patchTypes: {},
             polyfillNode: {},
             preserveDirectives: {

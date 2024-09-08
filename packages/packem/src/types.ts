@@ -22,6 +22,7 @@ import type { EsmShimCjsSyntaxOptions } from "./rollup/plugins/esm-shim-cjs-synt
 import type { IsolatedDeclarationsOptions } from "./rollup/plugins/isolated-declarations";
 import type { JSXRemoveAttributesPlugin } from "./rollup/plugins/jsx-remove-attributes";
 import type { LicenseOptions } from "./rollup/plugins/license";
+import type { Node10CompatibilityOptions } from "./rollup/plugins/node10-compatibility-plugin";
 import type { RawLoaderOptions } from "./rollup/plugins/raw";
 import type { SucrasePluginConfig } from "./rollup/plugins/sucrase/types";
 import type { SwcPluginConfig } from "./rollup/plugins/swc/types";
@@ -71,6 +72,7 @@ export interface RollupBuildOptions {
     jsxRemoveAttributes?: JSXRemoveAttributesPlugin | false;
     license?: LicenseOptions | false;
     metafile?: boolean;
+    node10Compatibility?: Node10CompatibilityOptions | false;
     output?: OutputOptions;
     patchTypes: PatchTypesOptions | false;
     polyfillNode?: NodePolyfillsOptions | false;
@@ -145,7 +147,6 @@ export interface BuildOptions {
     stub: boolean;
     stubOptions: { jiti: Omit<JITIOptions, "onError" | "transform"> };
     transformer?: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
-    writeTypesVersionsToPackageJson?: boolean;
 }
 
 export interface BuildHooks {
