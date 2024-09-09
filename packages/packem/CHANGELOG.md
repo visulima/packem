@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.103](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.102...@visulima/packem@1.0.0-alpha.103) (2024-09-09)
+
+### Features
+
+* added validation flag for the cli, fixed some tests ([36599b4](https://github.com/visulima/packem/commit/36599b468cb0dcd364a82e6e914f1dd624701d0e))
+
 ## @visulima/packem [1.0.0-alpha.102](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.101...@visulima/packem@1.0.0-alpha.102) (2024-09-09)
 
 ### Features
