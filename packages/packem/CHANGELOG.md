@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.104](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.103...@visulima/packem@1.0.0-alpha.104) (2024-09-09)
+
+### Features
+
+* added new typeScriptVersion option for node10 compatibility, fixed missing reload of package.json on validation ([bfa7426](https://github.com/visulima/packem/commit/bfa74264b75a8dcc73555593a745855679039f8f))
+
 ## @visulima/packem [1.0.0-alpha.103](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.102...@visulima/packem@1.0.0-alpha.103) (2024-09-09)
 
 ### Features
