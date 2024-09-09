@@ -5,7 +5,6 @@ import { bold, cyan } from "@visulima/colorize";
 import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync } from "@visulima/fs";
 import { duration } from "@visulima/humanizer";
 import type { PackageJson } from "@visulima/package";
-import { parsePackageJson } from "@visulima/package/package-json";
 import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
 import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
@@ -25,13 +24,12 @@ import dumpObject from "./utils/dump-object";
 import enhanceRollupError from "./utils/enhance-rollup-error";
 import FileCache from "./utils/file-cache";
 import getPackageSideEffect from "./utils/get-package-side-effect";
+import loadPackageJson from "./utils/load-package-json";
 import logBuildErrors from "./utils/log-build-errors";
 import prepareEntries from "./utils/prepare-entries";
 import tryRequire from "./utils/try-require";
 import packageJsonValidator from "./validator/package-json";
 import validateAliasEntries from "./validator/validate-alias-entries";
-
-type PackemPackageJson = { packem?: BuildConfig } & PackageJson;
 
 const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX): "automatic" | "preserve" | "transform" | undefined => {
     switch (jsx) {
@@ -61,7 +59,7 @@ const generateOptions = (
     inputConfig: BuildConfig,
     buildConfig: BuildConfig,
     preset: BuildPreset,
-    packageJson: PackemPackageJson,
+    packageJson: PackageJson,
     tsconfig: TsConfigResult | undefined,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): InternalBuildOptions => {
@@ -190,9 +188,7 @@ const generateOptions = (
                     `# Bundled types:\n` +
                     dependencyLicenseTexts,
             },
-            node10Compatibility: {
-                writeToPackageJson: false,
-            },
+            node10Compatibility: {},
             patchTypes: {},
             polyfillNode: {},
             preserveDirectives: {
@@ -382,7 +378,7 @@ const createContext = async (
     debug: boolean,
     inputConfig: BuildConfig,
     buildConfig: BuildConfig,
-    packageJson: PackemPackageJson,
+    packageJson: PackageJson,
     tsconfig: TsConfigResult | undefined,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<BuildContext> => {
@@ -525,13 +521,7 @@ const createBundler = async (
 
     logger.debug("Root directory:", rootDirectory);
 
-    const packageJsonPath = join(rootDirectory, "package.json");
-
-    if (!isAccessibleSync(packageJsonPath)) {
-        throw new Error("package.json not found at " + packageJsonPath);
-    }
-
-    const packageJson = parsePackageJson(packageJsonPath);
+    const { packageJson, packageJsonPath } = loadPackageJson(rootDirectory);
 
     logger.debug("Using package.json found at", packageJsonPath);
 
@@ -670,7 +660,7 @@ const createBundler = async (
             return;
         }
 
-        const logged = await build(context, packageJson as PackemPackageJson, fileCache);
+        const logged = await build(context, packageJson as PackageJson, fileCache);
 
         await context.hooks.callHook("validate:before", context);
 

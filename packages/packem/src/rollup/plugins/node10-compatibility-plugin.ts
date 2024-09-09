@@ -2,6 +2,7 @@ import { readJsonSync, writeJsonSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { join } from "@visulima/path";
 import type { Plugin } from "rollup";
+import { valid, coerce } from "semver"
 
 import { CHUNKS_PACKEM_FOLDER, SHARED_PACKEM_FOLDER } from "../../constants";
 import type { BuildContext } from "../../types";
@@ -9,6 +10,7 @@ import type { BuildContext } from "../../types";
 let logDisplayed = false;
 
 export type Node10CompatibilityOptions = {
+    typeScriptVersion?: string;
     writeToPackageJson?: boolean;
 };
 
@@ -18,7 +20,13 @@ export const node10CompatibilityPlugin = (
     outDirectory: string,
     rootDirectory: string,
     mode: "console" | "file",
+    typeScriptVersion: string,
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Plugin => {
+    if (typeScriptVersion !== "*" && valid(coerce(typeScriptVersion)) === null) {
+        throw new Error("Invalid typeScriptVersion option. It must be a valid semver range.");
+    }
+
     return {
         name: "packem:node10-compatibility",
         writeBundle() {
@@ -67,7 +75,7 @@ export const node10CompatibilityPlugin = (
                         ...packageJson,
                         typesVersions: {
                             ...packageJson.typesVersions,
-                            "*": {
+                            [typeScriptVersion]: {
                                 "*": sortedTypesVersions,
                             },
                         },
