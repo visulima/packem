@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.105](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.104...@visulima/packem@1.0.0-alpha.105) (2024-09-09)
+
+### Bug Fixes
+
+* fixed validation, updated dependencies ([7df9fb8](https://github.com/visulima/packem/commit/7df9fb89bc268de990fa5acb3eb7c485795c5f6d))
+
 ## @visulima/packem [1.0.0-alpha.104](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.103...@visulima/packem@1.0.0-alpha.104) (2024-09-09)
 
 ### Features
