@@ -1,11 +1,15 @@
 import { cyan } from "@visulima/colorize";
 
-import type { BuildContext } from "../types";
-import arrayIncludes from "../utils/array-includes";
-import getPackageName from "../utils/get-package-name";
-import warn from "../utils/warn";
+import type { BuildContext } from "../../types";
+import arrayIncludes from "../../utils/array-includes";
+import getPackageName from "../../utils/get-package-name";
+import warn from "../../utils/warn";
 
 const validateDependencies = (context: BuildContext): void => {
+    if (context.options.validation?.packageJson?.dependencies === false) {
+        return;
+    }
+
     const usedDependencies = new Set<string>();
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const unusedDependencies = new Set<string>(Object.keys(context.pkg?.dependencies ?? {}));

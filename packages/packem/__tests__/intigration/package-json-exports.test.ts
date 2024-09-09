@@ -2,7 +2,7 @@ import { existsSync, readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
 
-import { readFileSync, writeFileSync } from "@visulima/fs";
+import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -1196,5 +1196,76 @@ __name(Client, "Client");
 
 exports.Client = Client;
 `);
+    });
+
+    it("should find all files in the same directory if globstar is used", async () => {
+        expect.assertions(22);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+
+        Array.from({ length: 10 }).forEach((_, index) => {
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            writeFileSync(`${temporaryDirectoryPath}/src/deep/index-${index}.js`, `export default 'index-${index}'`);
+        });
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "typescript": "*",
+            },
+            exports: {
+                ".": {
+                    import: {
+                        default: "./dist/index.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/index.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                },
+                "./deep/*": {
+                    import: {
+                        default: "./dist/deep/*.mjs",
+                        types: "./dist/deep/*.d.mts",
+                    },
+                    require: {
+                        default: "./dist/deep/*.cjs",
+                        types: "./dist/deep/*.d.cts",
+                    },
+                },
+            },
+        });
+        createTsConfig(temporaryDirectoryPath, {});
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-0.mjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-1.mjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-2.mjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-3.mjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-4.mjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-5.mjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-6.mjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-7.mjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-8.mjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-9.mjs`)).toBeTruthy();
+
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-0.cjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-1.cjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-2.cjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-3.cjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-4.cjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-5.cjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-6.cjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-7.cjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-8.cjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-9.cjs`)).toBeTruthy();
     });
 });

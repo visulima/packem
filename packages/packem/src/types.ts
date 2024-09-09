@@ -147,6 +147,18 @@ export interface BuildOptions {
     stub: boolean;
     stubOptions: { jiti: Omit<JITIOptions, "onError" | "transform"> };
     transformer?: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
+    validation?: {
+        packageJson?: {
+            bin?: boolean;
+            dependencies?: boolean;
+            exports?: boolean;
+            files?: boolean;
+            main?: boolean;
+            module?: boolean;
+            types?: boolean;
+            typesVersions?: boolean;
+        };
+    };
 }
 
 export interface BuildHooks {

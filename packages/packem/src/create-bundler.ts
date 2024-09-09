@@ -28,9 +28,8 @@ import getPackageSideEffect from "./utils/get-package-side-effect";
 import logBuildErrors from "./utils/log-build-errors";
 import prepareEntries from "./utils/prepare-entries";
 import tryRequire from "./utils/try-require";
+import packageJsonValidator from "./validator/package-json";
 import validateAliasEntries from "./validator/validate-alias-entries";
-import validateDependencies from "./validator/validate-dependencies";
-import validatePackage from "./validator/validate-package";
 
 type PackemPackageJson = { packem?: BuildConfig } & PackageJson;
 
@@ -674,8 +673,7 @@ const createBundler = async (
 
         await context.hooks.callHook("validate:before", context);
 
-        validateDependencies(context);
-        validatePackage(packageJson, context);
+        packageJsonValidator(context);
 
         await context.hooks.callHook("validate:done", context);
 
