@@ -55,17 +55,6 @@ const validatePackageEntries = (context: BuildContext): void => {
             ),
     );
 
-    if (packageJson?.typesVersions !== false && options.declaration === "compatible" && options.rollup.node10Compatibility !== undefined) {
-        if (context.pkg.typesVersions?.["*"]?.["*"] === undefined) {
-            warn(context, "No typesVersions entry found in package.json, please add one, or change the declaration option to 'node16' or 'false'.");
-        } else {
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-            for (const version of context.pkg.typesVersions["*"]["*"]) {
-                filenames.add(resolve(options.rootDir, version));
-            }
-        }
-    }
-
     const missingOutputs = [];
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
@@ -94,6 +83,27 @@ const validatePackageEntries = (context: BuildContext): void => {
         }
 
         warn(context, message);
+    }
+
+    if (
+        packageJson?.typesVersions !== false &&
+        options.declaration === "compatible" &&
+        options.rollup.node10Compatibility &&
+        options.rollup.node10Compatibility.writeToPackageJson !== true
+    ) {
+        let typescriptVersion = "*";
+
+        if (options.rollup.node10Compatibility.typeScriptVersion) {
+            typescriptVersion = options.rollup.node10Compatibility.typeScriptVersion;
+        }
+
+        // eslint-disable-next-line security/detect-object-injection
+        if (context.pkg.typesVersions?.[typescriptVersion]?.["*"] === undefined || context.pkg.typesVersions[typescriptVersion]?.["*"]?.length === 0) {
+            warn(
+                context,
+                "No typesVersions entry found in package.json, change the declaration option to 'node16' or 'false' or enable the writeToPackageJson in the node10Compatibility option.",
+            );
+        }
     }
 };
 

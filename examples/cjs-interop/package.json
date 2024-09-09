@@ -11,9 +11,9 @@
         "build": "packem build --cjsInterop"
     },
     "devDependencies": {
-        "@arethetypeswrong/cli": "^0.16.1",
+        "@arethetypeswrong/cli": "^0.16.2",
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.23.1",
-        "typescript": "^5.5.4"
+        "typescript": "^5.6.2"
     }
 }

@@ -22,6 +22,6 @@
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.23.1",
         "oxc-transform": "^0.27.0",
-        "typescript": "^5.5.4"
+        "typescript": "^5.6.2"
     }
 }

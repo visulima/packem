@@ -65,6 +65,6 @@
         "@types/node": "^20.11.5",
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.23.1",
-        "typescript": "^5.5.4"
+        "typescript": "^5.6.2"
     }
 }
