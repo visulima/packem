@@ -384,6 +384,7 @@ const createContext = async (
     buildConfig: BuildConfig,
     packageJson: PackemPackageJson,
     tsconfig: TsConfigResult | undefined,
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<BuildContext> => {
     const preset = resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", rootDirectory);
 

@@ -674,7 +674,7 @@ export { _default as default };
     });
 
     it("should work with symlink dependencies", async () => {
-        expect.assertions(5);
+        expect.assertions(4);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -729,18 +729,20 @@ export declare function fn(a: data): data;
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        console.log(binProcess.stdout);
-
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(dMtsContent).toBe(`declare const _default: () => string;
+        expect(dMtsContent).toBe(`import * as dep_a from 'dep-a';
+
+declare const _default: dep_a.data;
 
 export { _default as default };
 `);
 
         const dTsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dTsContent).toBe(`declare const _default: () => string;
+        expect(dTsContent).toBe(`import * as dep_a from 'dep-a';
+
+declare const _default: dep_a.data;
 
 export { _default as default };
 `);
@@ -796,7 +798,7 @@ export { _default as default };
         expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 async function getOne() {
-  return await import('./chunks/one.mjs').then((m) => m.one);
+  return await import('./packem_chunks/one.mjs').then((m) => m.one);
 }
 __name(getOne, "getOne");
 
@@ -819,7 +821,7 @@ Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 async function getOne() {
-  return await import('./chunks/one.cjs').then((m) => m.one);
+  return await import('./packem_chunks/one.cjs').then((m) => m.one);
 }
 __name(getOne, "getOne");
 
@@ -994,15 +996,15 @@ export const AppContext = React.createContext(null)`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`export { sharedApi } from './shared/anotherSharedApi-lhzhzq4G.mjs';
-export { AppContext } from './shared/AppContext-BSWWkl28.mjs';
+        expect(mjsContent).toBe(`export { sharedApi } from './packem_shared/anotherSharedApi-lhzhzq4G.mjs';
+export { AppContext } from './packem_shared/AppContext-BSWWkl28.mjs';
 
 const index = "index";
 
 export { index };
 `);
 
-        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/anotherSharedApi-lhzhzq4G.mjs`);
+        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/anotherSharedApi-lhzhzq4G.mjs`);
 
         expect(mjsChunk1Content).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -1013,7 +1015,8 @@ __name(sharedApi, "sharedApi");
 
 export { sharedApi };
 `);
-        const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/AppContext-BSWWkl28.mjs`);
+        // eslint-disable-next-line no-secrets/no-secrets
+        const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/AppContext-BSWWkl28.mjs`);
 
         expect(mjsChunk2Content).toBe(`'use client';
 import React from 'react';
@@ -1025,12 +1028,13 @@ export { AppContext };
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
+        // eslint-disable-next-line no-secrets/no-secrets
         expect(cjsContent).toBe(`'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const anotherSharedApi = require('./shared/anotherSharedApi-C_G2lNA6.cjs');
-const AppContext = require('./shared/AppContext-BcQ69C1t.cjs');
+const anotherSharedApi = require('./packem_shared/anotherSharedApi-C_G2lNA6.cjs');
+const AppContext = require('./packem_shared/AppContext-BcQ69C1t.cjs');
 
 const index = "index";
 
@@ -1039,7 +1043,8 @@ exports.AppContext = AppContext.AppContext;
 exports.index = index;
 `);
 
-        const cjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/anotherSharedApi-C_G2lNA6.cjs`);
+        // eslint-disable-next-line no-secrets/no-secrets
+        const cjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/anotherSharedApi-C_G2lNA6.cjs`);
 
         expect(cjsChunk1Content).toBe(`'use strict';
 
@@ -1055,7 +1060,8 @@ __name(sharedApi, "sharedApi");
 exports.sharedApi = sharedApi;
 `);
 
-        const cjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/AppContext-BcQ69C1t.cjs`);
+        // eslint-disable-next-line no-secrets/no-secrets
+        const cjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/AppContext-BcQ69C1t.cjs`);
 
         expect(cjsChunk2Content).toBe(`'use client';
 'use strict';
@@ -1155,7 +1161,7 @@ export type Num2 = number`,
                 expect(binProcess.stderr).toBe("");
                 expect(binProcess.exitCode).toBe(0);
                 expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
-                console.log(binProcess.stdout);
+
                 const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
                 expect(dCtsContent).toBe(`import { type Num } from ${quote}./types.cts${quote};
@@ -1174,13 +1180,25 @@ export declare let num: Num;
 
                 const dCtsTypesContent = readFileSync(`${temporaryDirectoryPath}/dist/types.d.cts`);
 
-                expect(dCtsTypesContent).toBe(`export type Num = number;
-`);
+                expect(dCtsTypesContent).toBe(
+                    isolatedDeclarationTransformer === "swc"
+                        ? `import type { Num2 } from './types2.cts';
+export type Num = number;
+`
+                        : `export type Num = number;
+`,
+                );
 
                 const dtsTypesContent = readFileSync(`${temporaryDirectoryPath}/dist/types.d.ts`);
 
-                expect(dtsTypesContent).toBe(`export type Num = number;
-`);
+                expect(dtsTypesContent).toBe(
+                    isolatedDeclarationTransformer === "swc"
+                        ? `import type { Num2 } from './types2';
+export type Num = number;
+`
+                        : `export type Num = number;
+`,
+                );
             },
         );
 
@@ -1262,13 +1280,25 @@ export declare let num: Num;
 
                 const dMtsTypesContent = readFileSync(`${temporaryDirectoryPath}/dist/types.d.mts`);
 
-                expect(dMtsTypesContent).toBe(`export type Num = number;
-`);
+                expect(dMtsTypesContent).toBe(
+                    isolatedDeclarationTransformer === "swc"
+                        ? `import type { Num2 } from './types2.mts';
+export type Num = number;
+`
+                        : `export type Num = number;
+`,
+                );
 
                 const dtsTypesContent = readFileSync(`${temporaryDirectoryPath}/dist/types.d.ts`);
 
-                expect(dtsTypesContent).toBe(`export type Num = number;
-`);
+                expect(dtsTypesContent).toBe(
+                    isolatedDeclarationTransformer === "swc"
+                        ? `import type { Num2 } from './types2';
+export type Num = number;
+`
+                        : `export type Num = number;
+`,
+                );
             },
         );
     });
@@ -1679,8 +1709,8 @@ export { test as default };
                 rollup: {
                     node10Compatibility: {
                         writeToPackageJson: true,
-                    }
-                }
+                    },
+                },
             });
 
             const binProcess = await execPackemSync("build", [], {

@@ -382,7 +382,7 @@ export { Tr as default };
     });
 
     // Lets see how this can be supported
-    it.skip("should support custom jsx", async () => {
+    it.todo("should support custom jsx", async () => {
         expect.assertions(7);
 
         writeFileSync(

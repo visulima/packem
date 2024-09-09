@@ -155,6 +155,7 @@ export interface BuildOptions {
             files?: boolean;
             main?: boolean;
             module?: boolean;
+            name?: boolean;
             types?: boolean;
             typesVersions?: boolean;
         };

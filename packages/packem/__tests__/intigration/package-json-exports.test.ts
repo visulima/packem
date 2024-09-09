@@ -964,7 +964,7 @@ export function Client() {
 
         expect(mjsContent).toBe(`'use client';
 import React, { useState } from 'react';
-export { C as Client } from './shared/Client-DWTUoKrV.mjs';
+export { Client } from './packem_shared/Client-C2Syj0qA.mjs';
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -977,7 +977,8 @@ __name(Button, "Button");
 export { Button };
 `);
 
-        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/Client-DWTUoKrV.mjs`);
+        // eslint-disable-next-line no-secrets/no-secrets
+        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-C2Syj0qA.mjs`);
 
         expect(mjsClientContent).toBe(`'use client';
 var __defProp = Object.defineProperty;
@@ -987,7 +988,7 @@ function Client() {
 }
 __name(Client, "Client");
 
-export { Client as C };
+export { Client };
 `);
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
@@ -998,7 +999,7 @@ export { Client as C };
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 const React = require('react');
-const Client = require('./shared/Client-CjMHur1x.cjs');
+const Client = require('./packem_shared/Client-CjMHur1x.cjs');
 
 const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
 
@@ -1016,7 +1017,7 @@ exports.Client = Client.Client;
 exports.Button = Button;
 `);
 
-        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/Client-CjMHur1x.cjs`);
+        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-CjMHur1x.cjs`);
 
         expect(cjsClientContent).toBe(`'use client';
 'use strict';
@@ -1114,12 +1115,12 @@ export const asset = "asset-module";
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`export { B as Button } from './ui.mjs';
-export { a as action } from './shared/action-CHfTqOfG.mjs';
-export { C as Client, C as UIClient } from './shared/Client-DWTUoKrV.mjs';
+        expect(mjsContent).toBe(`export { Button } from './ui.mjs';
+export { action } from './packem_shared/action-DScVMxSh.mjs';
+export { Client, Client as UIClient } from './packem_shared/Client-C2Syj0qA.mjs';
 `);
 
-        const mjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/action-CHfTqOfG.mjs`);
+        const mjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-DScVMxSh.mjs`);
 
         expect(mjsActionContent).toBe(`'use server';
 var __defProp = Object.defineProperty;
@@ -1129,10 +1130,11 @@ async function action() {
 }
 __name(action, "action");
 
-export { action as a };
+export { action };
 `);
 
-        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/Client-DWTUoKrV.mjs`);
+        // eslint-disable-next-line no-secrets/no-secrets
+        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-C2Syj0qA.mjs`);
 
         expect(mjsClientContent).toBe(`'use client';
 var __defProp = Object.defineProperty;
@@ -1142,7 +1144,7 @@ function Client() {
 }
 __name(Client, "Client");
 
-export { Client as C };
+export { Client };
 `);
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
@@ -1152,8 +1154,8 @@ export { Client as C };
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 const ui = require('./ui.cjs');
-const action = require('./shared/action-DdW0-Ipg.cjs');
-const Client = require('./shared/Client-CjMHur1x.cjs');
+const action = require('./packem_shared/action-DdW0-Ipg.cjs');
+const Client = require('./packem_shared/Client-CjMHur1x.cjs');
 
 
 
@@ -1163,7 +1165,7 @@ exports.Client = Client.Client;
 exports.UIClient = Client.Client;
 `);
 
-        const cjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/action-DdW0-Ipg.cjs`);
+        const cjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-DdW0-Ipg.cjs`);
 
         expect(cjsActionContent).toBe(`'use server';
 'use strict';
@@ -1180,7 +1182,7 @@ __name(action, "action");
 exports.action = action;
 `);
 
-        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/shared/Client-CjMHur1x.cjs`);
+        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-CjMHur1x.cjs`);
 
         expect(cjsClientContent).toBe(`'use client';
 'use strict';
@@ -1212,7 +1214,7 @@ exports.Client = Client;
 
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
-                "typescript": "*",
+                typescript: "*",
             },
             exports: {
                 ".": {

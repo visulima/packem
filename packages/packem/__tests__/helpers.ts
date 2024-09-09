@@ -31,6 +31,10 @@ export const execPackemSync = async (command: "build" | "init", flags: string[] 
         flags = flags.filter((flag) => flag !== "--no-environment");
     }
 
+    if (!flags.includes("--validation")) {
+        flags.push("--no-validation");
+    }
+
     return await execaNode(join(distributionPath, "cli.mjs"), [command, environmentFlag, ...flags].filter(Boolean) as string[], {
         ...options,
     });

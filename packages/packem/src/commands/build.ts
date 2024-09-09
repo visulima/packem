@@ -74,6 +74,22 @@ const createBuildCommand = (cli: Cli): void => {
                     },
                     sourcemap: options.sourcemap,
                     tsconfigPath: options.tsconfig ?? undefined,
+                    validation:
+                        options.validation === false
+                            ? {
+                                  packageJson: {
+                                      bin: false,
+                                      dependencies: false,
+                                      exports: false,
+                                      files: false,
+                                      main: false,
+                                      module: false,
+                                      name: false,
+                                      types: false,
+                                      typesVersions: false,
+                                  },
+                              }
+                            : {},
                 });
             } catch (error) {
                 logger.error(error);
@@ -182,7 +198,12 @@ const createBuildCommand = (cli: Cli): void => {
                 description: "Only generate .d.ts files",
                 name: "dts-only",
                 type: Boolean,
-            }
+            },
+            {
+                description: "Enable or disable the output validation",
+                name: "no-validation",
+                type: Boolean,
+            },
         ],
     });
 };

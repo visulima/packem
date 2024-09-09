@@ -8,6 +8,10 @@ const validatePackageFields = (context: BuildContext): void => {
         pkg,
     } = context;
 
+    if (pkg.name === undefined && validation?.packageJson?.name !== false) {
+        warn(context, "'name' field is missing in your package.json");
+    }
+
     if (validation?.packageJson?.files !== false) {
         if (pkg.files === undefined) {
             warn(context, "'files' field is missing in your package.json");
@@ -65,6 +69,10 @@ const validatePackageFields = (context: BuildContext): void => {
                 warn(context, "'exports' field is missing in your package.json");
             }
         }
+    }
+
+    if (typeof pkg.exports === "object") {
+        // TODO: add validation for exports
     }
 
     if (validation?.packageJson?.bin !== false) {

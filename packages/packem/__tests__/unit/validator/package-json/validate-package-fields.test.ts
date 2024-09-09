@@ -99,4 +99,17 @@ describe("validatePackageFields", () => {
         validatePackageFields(contextObjectBin as unknown as BuildContext);
         expect(warn).toHaveBeenCalledWith(contextObjectBin, "'bin.cli1' field in your package.json should not have a .mjs extension");
     });
+
+    it("should handle 'namae' field in package.json", () => {
+        expect.assertions(1);
+
+        const context = {
+            options: { validation: { packageJson: { name: true } } },
+            pkg: {},
+        };
+
+        validatePackageFields(context as BuildContext);
+
+        expect(warn).toHaveBeenCalledWith(context, "'name' field is missing in your package.json");
+    });
 });

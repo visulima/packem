@@ -297,15 +297,15 @@ export const baz = 'baz';`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`export { foo } from './shared/foo-Dx82TkZf.mjs';
-export { bar } from './shared/bar-dfxpx6LX.mjs';
+        expect(mjsContent).toBe(`export { foo } from './packem_shared/foo-Dx82TkZf.mjs';
+export { bar } from './packem_shared/bar-dfxpx6LX.mjs';
 
 const baz = "baz";
 
 export { baz };
 `);
 
-        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/foo-Dx82TkZf.mjs`);
+        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/foo-Dx82TkZf.mjs`);
 
         expect(mjsChunk1Content).toBe(`'use client';
 'use sukka';
@@ -314,7 +314,7 @@ const foo = "foo";
 export { foo };
 `);
 
-        const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/bar-dfxpx6LX.mjs`);
+        const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/bar-dfxpx6LX.mjs`);
 
         expect(mjsChunk2Content).toBe(`'use client';
 const bar = "bar";
@@ -328,8 +328,8 @@ export { bar };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const foo = require('./shared/foo-CPDxWGQe.cjs');
-const bar = require('./shared/bar-ChnaedqB.cjs');
+const foo = require('./packem_shared/foo-CPDxWGQe.cjs');
+const bar = require('./packem_shared/bar-ChnaedqB.cjs');
 
 const baz = "baz";
 
@@ -338,7 +338,7 @@ exports.bar = bar.bar;
 exports.baz = baz;
 `);
 
-        const cjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/foo-CPDxWGQe.cjs`);
+        const cjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/foo-CPDxWGQe.cjs`);
 
         expect(cjsChunk1Content).toBe(`'use client';
 'use sukka';
@@ -351,7 +351,7 @@ const foo = "foo";
 exports.foo = foo;
 `);
 
-        const cjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/shared/bar-ChnaedqB.cjs`);
+        const cjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/bar-ChnaedqB.cjs`);
 
         expect(cjsChunk2Content).toBe(`'use client';
 'use strict';
