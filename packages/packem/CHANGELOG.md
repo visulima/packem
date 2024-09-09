@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.102](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.101...@visulima/packem@1.0.0-alpha.102) (2024-09-09)
+
+### Features
+
+* added a better validation ([2a74494](https://github.com/visulima/packem/commit/2a74494e7ab3c9b3bfb2544f5462eb03277f6f57))
+
 ## @visulima/packem [1.0.0-alpha.101](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.100...@visulima/packem@1.0.0-alpha.101) (2024-09-08)
 
 ### Features
