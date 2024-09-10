@@ -143,16 +143,30 @@
     "module": "dist/create-bundler.mjs",
     "types": "dist/create-bundler.d.ts",
     "typesVersions": {
-        "*": {
-            "*": [
-                "./dist/config.d.ts",
-                "./dist/create-bundler.d.ts",
-                "./dist/rollup/plugins/esbuild/index.d.ts",
-                "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.ts",
-                "./dist/rollup/plugins/sucrase/index.d.ts",
-                "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.ts",
-                "./dist/rollup/plugins/swc/swc-plugin.d.ts",
+        ">=5.0": {
+            ".": [
+                "./dist/create-bundler.d.ts"
+            ],
+            "config": [
+                "./dist/config.d.ts"
+            ],
+            "transformer/esbuild": [
+                "./dist/rollup/plugins/esbuild/index.d.ts"
+            ],
+            "transformer/swc": [
+                "./dist/rollup/plugins/swc/swc-plugin.d.ts"
+            ],
+            "dts/isolated/transformer/swc": [
+                "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.ts"
+            ],
+            "dts/isolated/transformer/oxc": [
+                "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.ts"
+            ],
+            "dts/isolated/transformer/typescript": [
                 "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.ts"
+            ],
+            "transformer/sucrase": [
+                "./dist/rollup/plugins/sucrase/index.d.ts"
             ]
         }
     },

@@ -9,12 +9,15 @@
 import { basename, extname } from "@visulima/path";
 import type { GetManualChunk } from "rollup";
 
-import type { BuildContextBuildEntry } from "../../../types";
+import type { BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "../../../types";
 import getCustomModuleLayer from "./get-custom-module-layer";
 import getModuleLayer from "./get-module-layer";
 
-const createSplitChunks = (dependencyGraphMap: Map<string, Set<[string, string]>>, entryFiles: BuildContextBuildEntry[]): GetManualChunk => {
-    // If there's existing chunk being splitted, and contains a layer { <id>: <chunkGroup> }
+const createSplitChunks = (
+    dependencyGraphMap: Map<string, Set<[string, string]>>,
+    entryFiles: (BuildContextBuildEntry | BuildContextBuildAssetAndChunk)[],
+): GetManualChunk => {
+    // If there's existing chunk being separated, and contains a layer { <id>: <chunkGroup> }
     const splitChunksGroupMap = new Map<string, string>();
 
     // eslint-disable-next-line sonarjs/cognitive-complexity

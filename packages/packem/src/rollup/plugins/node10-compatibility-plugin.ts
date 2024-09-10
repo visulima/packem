@@ -1,10 +1,11 @@
+// This should not change the slash on windows, so we use the node path module
+import { dirname, join } from "node:path";
+
 import { readJsonSync, writeJsonSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
-import { join } from "@visulima/path";
 import type { Plugin } from "rollup";
 import { coerce, valid } from "semver";
 
-import { CHUNKS_PACKEM_FOLDER, SHARED_PACKEM_FOLDER } from "../../constants";
 import type { BuildContext } from "../../types";
 
 let logDisplayed = false;
@@ -16,7 +17,7 @@ export type Node10CompatibilityOptions = {
 
 export const node10CompatibilityPlugin = (
     logger: BuildContext["logger"],
-    buildEntries: BuildContext["buildEntries"],
+    entries: BuildContext["options"]["entries"],
     outDirectory: string,
     rootDirectory: string,
     mode: "console" | "file",
@@ -39,45 +40,30 @@ export const node10CompatibilityPlugin = (
                 logDisplayed = true;
             }
 
-            const typesVersions: string[] = [];
+            const typesVersions: Record<string, string[]> = {};
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
-            for (const entry of buildEntries.filter((bEntry) => !bEntry.chunk)) {
-                if (
-                    entry.type === "entry" &&
-                    entry.path.endsWith(".cjs") &&
-                    !entry.path.includes(SHARED_PACKEM_FOLDER) &&
-                    !entry.path.includes(CHUNKS_PACKEM_FOLDER)
-                ) {
-                    typesVersions.push("./" + join(outDirectory, entry.path.replace(/\.cjs$/, ".d.ts")));
+            for (const entry of entries) {
+                if (entry.exportKey) {
+                    if (entry.exportKey.includes("/*")) {
+                        typesVersions[entry.exportKey as string] = ["./" + join(outDirectory, dirname(entry.name as string), "*.d.ts")];
+                    } else {
+                        typesVersions[entry.exportKey as string] = [...(typesVersions[entry.exportKey as string] ?? []), "./" + join(outDirectory, (entry.name as string) + ".d.ts")];
+                    }
                 }
             }
 
             const rootPackageJsonPath = join(rootDirectory, "package.json");
             const packageJson = readJsonSync(rootPackageJsonPath) as PackageJson;
 
-            // eslint-disable-next-line etc/no-assign-mutated-array
-            const sortedTypesVersions = typesVersions.sort((a, b) => a.localeCompare(b));
-
-            if (sortedTypesVersions === packageJson.typesVersions?.["*"]?.["*"]) {
-                logger.debug({
-                    message: "No changes to typesVersions field in package.json",
-                    prefix: "plugin:node10-compatibility",
-                });
-
-                return;
-            }
-
-            if (mode === "file" && typesVersions.length > 0) {
+            if (mode === "file" && Object.keys(typesVersions).length > 0) {
                 writeJsonSync(
                     rootPackageJsonPath,
                     {
                         ...packageJson,
                         typesVersions: {
                             ...packageJson.typesVersions,
-                            [typeScriptVersion]: {
-                                "*": sortedTypesVersions,
-                            },
+                            [typeScriptVersion]: typesVersions,
                         },
                     },
                     {
@@ -89,9 +75,9 @@ export const node10CompatibilityPlugin = (
                     message: `Your package.json "typesVersions" field has been updated.`,
                     prefix: "plugin:node10-compatibility",
                 });
-            } else if (typesVersions.length > 0) {
+            } else if (Object.keys(typesVersions).length > 0) {
                 logger.info({
-                    message: `Please add the following field into your package.json to enable node 10 compatibility:\n\n${JSON.stringify({ typesVersions: { "*": { "*": sortedTypesVersions } } }, null, 4)}\n`,
+                    message: `Please add the following field into your package.json to enable node 10 compatibility:\n\n${JSON.stringify({ typesVersions: { "*": typesVersions } }, null, 4)}\n`,
                     prefix: "plugin:node10-compatibility",
                 });
             }

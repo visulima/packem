@@ -1655,9 +1655,11 @@ export { test as default };
             expect(binProcess.stdout).toContain(`{
     "typesVersions": {
         "*": {
-            "*": [
-                "./dist/deep/index.d.ts",
+            ".": [
                 "./dist/index.d.ts"
+            ],
+            "deep": [
+                "./dist/deep/index.d.ts"
             ]
         }
     }
@@ -1790,9 +1792,67 @@ export const test = "this should be in final bundle, test2 string";`,
             expect(binProcess.stdout).toContain(`{
     "typesVersions": {
         "*": {
-            "*": [
-                "./dist/deep/index.d.ts",
+            ".": [
                 "./dist/index.d.ts"
+            ],
+            "deep": [
+                "./dist/deep/index.d.ts"
+            ]
+        }
+    }
+}`);
+        });
+
+        it("should generate a node10 typesVersions field on console on array exports", async () => {
+            expect.assertions(4);
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+
+            writeFileSync(`${temporaryDirectoryPath}/src/shared/index.ts`, `export const shared = "this should be in final bundle, test2 string";`);
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                `export { shared } from "./shared";
+export const test = "this should be in final bundle, test2 string";`,
+            );
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/deep/index.ts`,
+                `export { shared } from "../shared";
+export const test = "this should be in final bundle, test2 string";`,
+            );
+
+            createTsConfig(temporaryDirectoryPath, {});
+            createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
+                },
+                exports: [
+                    "./dist/index.mjs",
+                    "./dist/index.cjs",
+                    "./dist/deep/index.cjs",
+                    "./dist/deep/index.mjs",
+                ],
+                main: "./dist/index.cjs",
+                module: "./dist/index.mjs",
+                types: "./dist/index.d.ts",
+            });
+            await createPackemConfig(temporaryDirectoryPath, {
+                cjsInterop: true,
+            });
+
+            const binProcess = await execPackemSync("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Declaration node10 compatibility mode is enabled.");
+            expect(binProcess.stdout).toContain(`{
+    "typesVersions": {
+        "*": {
+            "*": [
+                "./dist/index.d.ts",
+                "./dist/deep/index.d.ts"
             ]
         }
     }

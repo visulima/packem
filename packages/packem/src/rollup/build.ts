@@ -1,7 +1,7 @@
 import type { OutputAsset, OutputChunk, OutputOptions, RollupCache } from "rollup";
 import { rollup } from "rollup";
 
-import type { BuildContext, BuildContextBuildEntry } from "../types";
+import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "../types";
 import type FileCache from "../utils/file-cache";
 import { getRollupOptions } from "./get-rollup-options";
 
@@ -25,7 +25,7 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
 
     await context.hooks.callHook("rollup:build", context, buildResult);
 
-    const assets = new Map<string, BuildContextBuildEntry>();
+    const assets = new Map<string, BuildContextBuildEntry | BuildContextBuildAssetAndChunk>();
 
     // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const outputOptions of rollupOptions.output as OutputOptions[]) {

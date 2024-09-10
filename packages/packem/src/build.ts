@@ -9,7 +9,7 @@ import { join, relative, resolve } from "@visulima/path";
 
 import rollupBuild from "./rollup/build";
 import rollupBuildTypes from "./rollup/build-types";
-import type { BuildConfig, BuildContext, BuildContextBuildEntry } from "./types";
+import type { BuildConfig, BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "./types";
 import type FileCache from "./utils/file-cache";
 import groupByKeys from "./utils/group-by-keys";
 
@@ -74,7 +74,7 @@ const showSizeInformation = (logger: Pail, context: BuildContext, packageJson: P
             const foundDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
 
             if (foundDts) {
-                let foundCompatibleDts: BuildContextBuildEntry | undefined;
+                let foundCompatibleDts: BuildContextBuildEntry | BuildContextBuildAssetAndChunk | undefined;
 
                 if (!dtsPath.includes(".d.ts")) {
                     dtsPath = (dtsPath as string).replace(type === "commonjs" ? ".d.c" : ".d.m", ".d.");
@@ -87,7 +87,7 @@ const showSizeInformation = (logger: Pail, context: BuildContext, packageJson: P
                         ? "\n  types:\n" +
                           [foundDts, foundCompatibleDts]
                               .map(
-                                  (value: BuildContextBuildEntry) =>
+                                  (value: BuildContextBuildEntry | BuildContextBuildAssetAndChunk) =>
                                       gray("  └─ ") + bold(rPath(value.path)) + " (total size: " + cyan(formatBytes(value.bytes ?? 0)) + ")",
                               )
                               .join("\n")

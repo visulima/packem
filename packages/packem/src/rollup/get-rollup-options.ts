@@ -517,7 +517,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 context.options.rollup.node10Compatibility &&
                 node10CompatibilityPlugin(
                     context.logger,
-                    context.buildEntries,
+                    context.options.entries,
                     context.options.outDir,
                     context.options.rootDir,
                     context.options.rollup.node10Compatibility.writeToPackageJson ? "file" : "console",

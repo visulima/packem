@@ -689,6 +689,7 @@ export default createBundler;
 export type {
     BuildConfig,
     BuildContext,
+    BuildContextBuildAssetAndChunk,
     BuildContextBuildEntry,
     BuildEntry,
     BuildHooks,

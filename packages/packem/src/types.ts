@@ -103,6 +103,7 @@ export type BuildEntry = {
     environment?: Environment;
     esm?: boolean;
     executable?: true;
+    exportKey?: string;
     fileAlias?: string;
     input: string;
     isGlob?: boolean;
@@ -189,7 +190,17 @@ export type BuildContextBuildEntry = {
     exports?: string[];
     modules?: { bytes: number; id: string }[];
     path: string;
-    type?: "asset" | "chunk" | "entry";
+    type?: "entry";
+};
+
+export type BuildContextBuildAssetAndChunk = {
+    bytes?: number;
+    chunk?: boolean;
+    chunks?: string[];
+    exports?: string[];
+    modules?: { bytes: number; id: string }[];
+    path: string;
+    type?: "asset" | "chunk";
 };
 
 export interface InternalBuildOptions extends BuildOptions {
@@ -197,7 +208,7 @@ export interface InternalBuildOptions extends BuildOptions {
 }
 
 export interface BuildContext {
-    buildEntries: BuildContextBuildEntry[];
+    buildEntries: (BuildContextBuildEntry | BuildContextBuildAssetAndChunk)[];
     dependencyGraphMap: Map<string, Set<[string, string]>>;
     environment: Environment;
     hooks: Hookable<BuildHooks>;

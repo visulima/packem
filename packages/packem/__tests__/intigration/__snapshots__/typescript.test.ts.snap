@@ -3,9 +3,11 @@
 exports[`packem typescript > node10 compatibility > should generate a node10 typesVersions field in package.json when rollup.node10Compatibility.writeToPackageJson is true > typesVersions 1`] = `
 {
   "*": {
-    "*": [
-      "./dist/deep/index.d.ts",
+    ".": [
       "./dist/index.d.ts",
+    ],
+    "deep": [
+      "./dist/deep/index.d.ts",
     ],
   },
 }
@@ -46,17 +48,6 @@ exports[`packem typescript > should allow support for "allowJs" and generate pro
 
 export { _default as default };
 "
-`;
-
-exports[`packem typescript > should generate a node10 typesVersions field in package.json when writeTypesVersionsToPackageJson is true > typesVersions 1`] = `
-{
-  "*": {
-    "*": [
-      "./dist/deep/index.d.ts",
-      "./dist/index.d.ts",
-    ],
-  },
-}
 `;
 
 exports[`packem typescript > should support typescript decorator > cjs code output 1`] = `
