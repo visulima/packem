@@ -1,7 +1,6 @@
-import { DEFAULTS as RESOLVE_DEFAULTS } from "@rollup/plugin-node-resolve";
 import type { Loader } from "esbuild";
 
-export const DEFAULT_EXTENSIONS = [...RESOLVE_DEFAULTS.extensions, ".cjs", ".ts", ".cts", ".mts", ".tsx", ".jsx"];
+export const DEFAULT_EXTENSIONS: string[] = [".mjs", ".js", ".json", ".node", ".cjs", ".ts", ".cts", ".mts", ".tsx", ".jsx"];
 
 export const DEFAULT_LOADERS: Record<string, Loader> = {
     ".aac": "file",
@@ -38,12 +37,14 @@ export const DEFAULT_LOADERS: Record<string, Loader> = {
 export const PRODUCTION_ENV = "production";
 export const DEVELOPMENT_ENV = "development";
 
-export const RUNTIME_EXPORT_CONVENTIONS = new Set(["react-server", "react-native", "edge-light"]);
-export const SPECIAL_EXPORT_CONVENTIONS = new Set([DEVELOPMENT_ENV, PRODUCTION_ENV, ...RUNTIME_EXPORT_CONVENTIONS]);
+export const RUNTIME_EXPORT_CONVENTIONS: Set<string> = new Set<string>(["react-server", "react-native", "edge-light"]);
+export const SPECIAL_EXPORT_CONVENTIONS: Set<string> = new Set<string>([DEVELOPMENT_ENV, PRODUCTION_ENV, ...RUNTIME_EXPORT_CONVENTIONS]);
 
-export const EXCLUDE_REGEXP = /node_modules/;
+// eslint-disable-next-line @typescript-eslint/no-inferrable-types
+export const EXCLUDE_REGEXP: RegExp = /node_modules/;
 
-export const ENDING_RE = /(?:\.d\.[mc]?ts|\.\w+)$/;
+// eslint-disable-next-line @typescript-eslint/no-inferrable-types
+export const ENDING_RE: RegExp = /(?:\.d\.[mc]?ts|\.\w+)$/;
 
 export const CHUNKS_PACKEM_FOLDER = "packem_chunks";
 export const SHARED_PACKEM_FOLDER = "packem_shared";

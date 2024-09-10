@@ -4,7 +4,8 @@ import { SPECIAL_EXPORT_CONVENTIONS } from "../constants";
 import type { BuildOptions } from "../types";
 import { inferExportType, inferExportTypeFromFileName } from "./infer-export-type";
 
-const exportsKeys = new Set(["import", "require", "node", "node-addons", "default", "types", "deno", "browser", ...SPECIAL_EXPORT_CONVENTIONS]);
+// eslint-disable-next-line @typescript-eslint/consistent-generic-constructors
+const exportsKeys: Set<string> = new Set(["import", "require", "node", "node-addons", "default", "types", "deno", "browser", ...SPECIAL_EXPORT_CONVENTIONS]);
 
 export type OutputDescriptor = {
     exportKey?: string;
@@ -49,7 +50,7 @@ export const extractExportFilenames = (
         // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [exportKey, packageExport] of filteredEntries) {
             if (typeof packageExport === "string") {
-                let descriptor = { };
+                let descriptor = {};
 
                 if (Number.isInteger(+exportKey)) {
                     descriptor = { exportKey: "*" };
