@@ -2,7 +2,7 @@ import { readJsonSync, writeJsonSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { join } from "@visulima/path";
 import type { Plugin } from "rollup";
-import { valid, coerce } from "semver"
+import { coerce, valid } from "semver";
 
 import { CHUNKS_PACKEM_FOLDER, SHARED_PACKEM_FOLDER } from "../../constants";
 import type { BuildContext } from "../../types";

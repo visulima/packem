@@ -450,6 +450,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     .filter((entry) => entry.executable)
                     .map((entry) => entry.name)
                     .filter(Boolean) as string[],
+                context.options.rollup.shebang ?? "#!/usr/bin/env node",
             ),
 
             context.options.cjsInterop &&

@@ -1,0 +1,91 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`shebang > should preserve shebang in files without an EOF character > cjs output 1`] = `
+"#!/usr/bin/env node
+'use strict';
+
+for (let i = 0; i < 10; i++) {
+  console.log("🦄");
+}
+"
+`;
+
+exports[`shebang > should preserve shebang in files without an EOF character > mjs output 1`] = `
+"#!/usr/bin/env node
+for (let i = 0; i < 10; i++) {
+  console.log("🦄");
+}
+"
+`;
+
+exports[`shebang > should preseves existing shebang after successful rollup bundle > cjs output 1`] = `
+"#!/usr/bin/env node
+'use strict';
+
+console.log("Hello, world!");
+"
+`;
+
+exports[`shebang > should preseves existing shebang after successful rollup bundle > mjs output 1`] = `
+"#!/usr/bin/env node
+console.log("Hello, world!");
+"
+`;
+
+exports[`shebang > should retain comments defined after a shebang > cjs output 1`] = `
+"#!/usr/bin/env node // <-- this thing is a shebang. :)
+'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function getNodeSheBang() {
+  return "#!/usr/bin/env node";
+}
+__name(getNodeSheBang, "getNodeSheBang");
+
+exports.getNodeSheBang = getNodeSheBang;
+"
+`;
+
+exports[`shebang > should retain comments defined after a shebang > mjs output 1`] = `
+"#!/usr/bin/env node // <-- this thing is a shebang. :)
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function getNodeSheBang() {
+  return "#!/usr/bin/env node";
+}
+__name(getNodeSheBang, "getNodeSheBang");
+
+export { getNodeSheBang };
+"
+`;
+
+exports[`shebang > should retain shebangs defined elsewhere in a file > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function getNodeSheBang() {
+  return "#!/usr/bin/env node";
+}
+__name(getNodeSheBang, "getNodeSheBang");
+
+exports.getNodeSheBang = getNodeSheBang;
+"
+`;
+
+exports[`shebang > should retain shebangs defined elsewhere in a file > mjs output 1`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function getNodeSheBang() {
+  return "#!/usr/bin/env node";
+}
+__name(getNodeSheBang, "getNodeSheBang");
+
+export { getNodeSheBang };
+"
+`;

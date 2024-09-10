@@ -85,6 +85,7 @@ export interface RollupBuildOptions {
     raw?: RawLoaderOptions | false;
     replace: RollupReplaceOptions | false;
     resolve: RollupNodeResolveOptions | false;
+    shebang?: string;
     shim?: EsmShimCjsSyntaxOptions | false;
     sucrase?: SucrasePluginConfig | false;
     swc?: SwcPluginConfig | false;

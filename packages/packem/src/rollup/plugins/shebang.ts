@@ -12,7 +12,7 @@ export const makeExecutable = async (filePath: string): Promise<void> => {
     await chmod(filePath, 0o755 /* rwx r-x r-x */).catch(() => {});
 };
 
-export const shebangPlugin = (executablePaths: string[], shebang = "#!/usr/bin/env node\n"): Plugin => {
+export const shebangPlugin = (executablePaths: string[], shebang: string): Plugin => {
     return {
         name: "packem:shebang",
 
@@ -30,7 +30,7 @@ export const shebangPlugin = (executablePaths: string[], shebang = "#!/usr/bin/e
                 if (executablePaths.includes(chunk.name)) {
                     const transformed = new MagicString(code);
 
-                    transformed.prepend(shebang);
+                    transformed.prepend(shebang + "\n");
 
                     return {
                         code: transformed.toString(),

@@ -95,7 +95,8 @@ const validatePackageFields = (context: BuildContext): void => {
 
         if (
             (context.options.declaration === true || context.options.declaration === "compatible") &&
-            validation?.packageJson?.typesVersions !== false && (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
+            validation?.packageJson?.typesVersions !== false &&
+            (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
         ) {
             warn(context, "No 'typesVersions' field found in your package.json, or change the declaration option to 'node16' or 'false'.");
         }
