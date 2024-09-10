@@ -1,3 +1,13 @@
+## @visulima/packem [1.0.0-alpha.106](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.105...@visulima/packem@1.0.0-alpha.106) (2024-09-10)
+
+### Features
+
+* improved node10 handling ([70b322a](https://github.com/visulima/packem/commit/70b322ad1706e4d9c0e7d68686e6761d4bb4ee90))
+
+### Bug Fixes
+
+* added shebang test cases ([18e5755](https://github.com/visulima/packem/commit/18e575505a89f7568607339cae0cc2d78d8add21))
+
 ## @visulima/packem [1.0.0-alpha.105](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.104...@visulima/packem@1.0.0-alpha.105) (2024-09-09)
 
 ### Bug Fixes
