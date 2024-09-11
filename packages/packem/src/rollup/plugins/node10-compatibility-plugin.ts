@@ -48,7 +48,10 @@ export const node10CompatibilityPlugin = (
                     if (entry.exportKey.includes("/*")) {
                         typesVersions[entry.exportKey as string] = ["./" + join(outDirectory, dirname(entry.name as string), "*.d.ts")];
                     } else {
-                        typesVersions[entry.exportKey as string] = [...(typesVersions[entry.exportKey as string] ?? []), "./" + join(outDirectory, (entry.name as string) + ".d.ts")];
+                        typesVersions[entry.exportKey as string] = [
+                            ...(typesVersions[entry.exportKey as string] ?? []),
+                            "./" + join(outDirectory, (entry.name as string) + ".d.ts"),
+                        ];
                     }
                 }
             }

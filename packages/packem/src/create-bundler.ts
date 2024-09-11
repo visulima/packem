@@ -288,6 +288,7 @@ const generateOptions = (
                 preset: "recommended",
                 propertyReadSideEffects: true,
             },
+            visualizer: {},
             watch: {
                 chokidar: {
                     ignoreInitial: true,

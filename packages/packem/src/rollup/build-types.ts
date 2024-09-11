@@ -7,6 +7,8 @@ import type FileCache from "../utils/file-cache";
 import { getRollupDtsOptions } from "./get-rollup-options";
 import getChunkFilename from "./utils/get-chunk-filename";
 
+const DTS_CACHE_KEY = "rollup-dts.json";
+
 const buildTypes = async (context: BuildContext, fileCache: FileCache, subDirectory: string): Promise<void> => {
     if (context.options.declaration && context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer) {
         context.logger.info({
@@ -26,13 +28,11 @@ const buildTypes = async (context: BuildContext, fileCache: FileCache, subDirect
         return;
     }
 
-    const cacheKey = "rollup-dts.json";
-
-    rollupTypeOptions.cache = fileCache.get<RollupCache>(cacheKey, subDirectory);
+    rollupTypeOptions.cache = fileCache.get<RollupCache>(DTS_CACHE_KEY, subDirectory);
 
     const typesBuild = await rollup(rollupTypeOptions);
 
-    fileCache.set(cacheKey, typesBuild.cache, subDirectory);
+    fileCache.set(DTS_CACHE_KEY, typesBuild.cache, subDirectory);
 
     await context.hooks.callHook("rollup:dts:build", context, typesBuild);
 

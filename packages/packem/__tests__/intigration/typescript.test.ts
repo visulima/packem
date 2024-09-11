@@ -1825,12 +1825,7 @@ export const test = "this should be in final bundle, test2 string";`,
                 devDependencies: {
                     typescript: "*",
                 },
-                exports: [
-                    "./dist/index.mjs",
-                    "./dist/index.cjs",
-                    "./dist/deep/index.cjs",
-                    "./dist/deep/index.mjs",
-                ],
+                exports: ["./dist/index.mjs", "./dist/index.cjs", "./dist/deep/index.cjs", "./dist/deep/index.mjs"],
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
                 types: "./dist/index.d.ts",

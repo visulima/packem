@@ -65,6 +65,7 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<vo
     entry.outDir = resolve(context.options.rootDir, entry.outDir ?? context.options.outDir);
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const prepareEntries = async (context: BuildContext): Promise<void> => {
     context.options.entries = context.options.entries.map((entry) =>
         (typeof entry === "string" ? { input: entry, isGlob: isGlob(entry) } : { ...entry, isGlob: isGlob(entry.input) }),
@@ -74,11 +75,29 @@ const prepareEntries = async (context: BuildContext): Promise<void> => {
     for (const entry of context.options.entries.filter((entry) => entry.isGlob)) {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const { isGlob: _, ...entryWithoutGlob } = entry;
+        const ignore = [
+            "**/.git/**",
+            "**/node_modules/**",
+            "**/test-results/**", // Playwright
+        ];
+
+        if (context.options.rollup.watch) {
+            if (typeof context.options.rollup.watch.exclude === "string") {
+                ignore.push(context.options.rollup.watch.exclude);
+            } else if (Array.isArray(context.options.rollup.watch.exclude)) {
+                // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+                for (const pattern of context.options.rollup.watch.exclude) {
+                    if (typeof pattern === "string") {
+                        ignore.push(pattern);
+                    }
+                }
+            }
+        }
 
         const files = globSync([entryWithoutGlob.input], {
             cwd: context.options.rootDir,
             dot: false,
-            ignore: ["**/node_modules/**"],
+            ignore,
             onlyFiles: true,
         });
 

@@ -27,6 +27,7 @@ const createOrUpdateEntry = (
     outputSlug: string,
     output: OutputDescriptor,
     context: BuildContext,
+    isGlob: boolean,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): void => {
     const entryEnvironment = getEnvironment(output, context.environment);
@@ -46,6 +47,10 @@ const createOrUpdateEntry = (
 
     if (entry === undefined) {
         entry = entries[entries.push({ environment: entryEnvironment, exportKey: output.exportKey, input, runtime }) - 1] as BuildEntry;
+    }
+
+    if (isGlob) {
+        entry.isGlob = true;
     }
 
     if (isDirectory) {
@@ -234,7 +239,7 @@ const inferEntries = (
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const input of inputs) {
-                createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context);
+                createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context, true);
             }
 
             // eslint-disable-next-line no-continue
@@ -268,10 +273,10 @@ const inferEntries = (
         const inputWithoutExtension = input.replace(ENDING_RE, "");
 
         if (isAccessibleSync(inputWithoutExtension + ".cts") && isAccessibleSync(inputWithoutExtension + ".mts")) {
-            createOrUpdateEntry(entries, inputWithoutExtension + ".cts", isDirectory, outputSlug, { ...output, type: "cjs" }, context);
-            createOrUpdateEntry(entries, inputWithoutExtension + ".mts", isDirectory, outputSlug, { ...output, type: "esm" }, context);
+            createOrUpdateEntry(entries, inputWithoutExtension + ".cts", isDirectory, outputSlug, { ...output, type: "cjs" }, context, false);
+            createOrUpdateEntry(entries, inputWithoutExtension + ".mts", isDirectory, outputSlug, { ...output, type: "esm" }, context, false);
         } else {
-            createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context);
+            createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context, false);
         }
     }
 

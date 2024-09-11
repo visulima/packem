@@ -513,6 +513,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             prependDirectivePlugin(),
 
             context.options.emitCJS &&
+                context.mode === "build" &&
                 context.options.declaration === "compatible" &&
                 context.options.rollup.node10Compatibility &&
                 node10CompatibilityPlugin(
@@ -524,15 +525,16 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     context.options.rollup.node10Compatibility.typeScriptVersion ?? "*",
                 ),
 
-            context.options.rollup.visualizer &&
+            context.options.analyze &&
+                context.options.rollup.visualizer !== false &&
                 visualizerPlugin({
                     brotliSize: true,
-                    filename: "packem-bundle-analyze.html",
                     gzipSize: true,
                     projectRoot: context.options.rootDir,
                     sourcemap: context.options.sourcemap,
-                    title: "Packem Visualizer",
                     ...context.options.rollup.visualizer,
+                    filename: "packem-bundle-analyze.html",
+                    title: "Packem Visualizer",
                 }),
         ].filter(Boolean),
     }) as RollupOptions;

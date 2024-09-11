@@ -1,7 +1,7 @@
 import { cyan, gray } from "@visulima/colorize";
 import type { Pail } from "@visulima/pail";
 import { join, relative } from "@visulima/path";
-import type { RollupWatcher, RollupWatcherEvent } from "rollup";
+import type { RollupCache, RollupWatcher, RollupWatcherEvent } from "rollup";
 import { watch as rollupWatch } from "rollup";
 
 import type { BuildContext } from "../types";
@@ -9,7 +9,9 @@ import enhanceRollupError from "../utils/enhance-rollup-error";
 import type FileCache from "../utils/file-cache";
 import { getRollupDtsOptions, getRollupOptions } from "./get-rollup-options";
 
-const watchHandler = (watcher: RollupWatcher, mode: "bundle" | "types", logger: Pail) => {
+const WATCH_CACHE_KEY = "rollup-watch.json";
+
+const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, cacheKey: string, mode: "bundle" | "types", logger: Pail) => {
     const prefix = "watcher:" + mode;
 
     watcher.on("change", (id, { event }) => {
@@ -48,6 +50,8 @@ const watchHandler = (watcher: RollupWatcher, mode: "bundle" | "types", logger: 
             case "BUNDLE_END": {
                 await event.result.close();
 
+                fileCache.set(cacheKey, event.result.cache);
+
                 logger.info({
                     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
                     message: cyan(`built in ${event.duration + ""}ms.`),
@@ -81,14 +85,31 @@ const watch = async (context: BuildContext, fileCache: FileCache): Promise<void>
         return;
     }
 
-    rollupOptions.cache = fileCache.get("rollup-watch");
+    rollupOptions.cache = fileCache.get<RollupCache>(WATCH_CACHE_KEY);
 
-    if (typeof rollupOptions.watch === "object" && rollupOptions.watch.include === undefined) {
-        rollupOptions.watch.include = [join(context.options.sourceDir, "**")];
+    if (context.options.rollup.watch && typeof rollupOptions.watch === "object" && rollupOptions.watch.include === undefined) {
+        rollupOptions.watch = {
+            ...rollupOptions.watch,
+            ...context.options.rollup.watch,
+        };
+
+        rollupOptions.watch.include = [join(context.options.sourceDir, "**", "*"), "package.json"];
+
+        if (Array.isArray(context.options.rollup.watch.include)) {
+            rollupOptions.watch.include = [...rollupOptions.watch.include, ...context.options.rollup.watch.include];
+        } else if (context.options.rollup.watch.include) {
+            rollupOptions.watch.include.push(context.options.rollup.watch.include);
+        }
 
         rollupOptions.watch.chokidar = {
             cwd: context.options.rootDir,
             ...rollupOptions.watch.chokidar,
+            ignored: [
+                "**/.git/**",
+                "**/node_modules/**",
+                "**/test-results/**", // Playwright
+                ...(rollupOptions.watch.chokidar?.ignored ?? []),
+            ],
         };
     }
 
@@ -113,10 +134,12 @@ const watch = async (context: BuildContext, fileCache: FileCache): Promise<void>
 
     context.logger.info(infoMessage);
 
-    watchHandler(watcher, "bundle", context.logger);
+    watchHandler(watcher, fileCache, WATCH_CACHE_KEY, "bundle", context.logger);
 
     if (context.options.declaration) {
         const rollupDtsOptions = await getRollupDtsOptions(context, fileCache);
+
+        rollupDtsOptions.cache = fileCache.get("dts-" + WATCH_CACHE_KEY);
 
         await context.hooks.callHook("rollup:dts:options", context, rollupDtsOptions);
 
@@ -124,7 +147,7 @@ const watch = async (context: BuildContext, fileCache: FileCache): Promise<void>
 
         await context.hooks.callHook("rollup:watch", context, dtsWatcher);
 
-        watchHandler(dtsWatcher, "types", context.logger);
+        watchHandler(dtsWatcher, fileCache, "dts-" + WATCH_CACHE_KEY, "types", context.logger);
     }
 };
 

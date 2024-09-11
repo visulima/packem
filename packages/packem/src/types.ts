@@ -114,6 +114,7 @@ export type BuildEntry = {
 
 export interface BuildOptions {
     alias: Record<string, string>;
+    analyze?: boolean;
     cjsInterop?: boolean;
     clean: boolean;
     debug: boolean;
