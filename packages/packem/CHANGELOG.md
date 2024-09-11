@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.107](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.106...@visulima/packem@1.0.0-alpha.107) (2024-09-11)
+
+### Bug Fixes
+
+* fixed some types ([59f2e7e](https://github.com/visulima/packem/commit/59f2e7e2abd6a9feca9000ee442d52f01d91f88a))
+* improved watch mode, added new test, ([98f5915](https://github.com/visulima/packem/commit/98f591518aa055416d9cec8ca7f3c898259e8f9b))
+
 ## @visulima/packem [1.0.0-alpha.106](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.105...@visulima/packem@1.0.0-alpha.106) (2024-09-10)
 
 ### Features
