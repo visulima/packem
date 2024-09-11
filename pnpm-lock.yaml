@@ -434,6 +434,18 @@ importers:
         specifier: ^5.6.2
         version: 5.6.2
 
+  examples/watch:
+    devDependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.23.1
+        version: 0.23.1
+      typescript:
+        specifier: ^5.6.2
+        version: 5.6.2
+
   packages/packem:
     dependencies:
       '@antfu/install-pkg':

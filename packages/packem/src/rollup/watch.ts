@@ -1,5 +1,4 @@
 import { cyan, gray } from "@visulima/colorize";
-import type { Pail } from "@visulima/pail";
 import { join, relative } from "@visulima/path";
 import type { RollupCache, RollupWatcher, RollupWatcherEvent } from "rollup";
 import { watch as rollupWatch } from "rollup";
@@ -11,18 +10,18 @@ import { getRollupDtsOptions, getRollupOptions } from "./get-rollup-options";
 
 const WATCH_CACHE_KEY = "rollup-watch.json";
 
-const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, cacheKey: string, mode: "bundle" | "types", logger: Pail) => {
+const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, mode: "bundle" | "types", context: BuildContext) => {
     const prefix = "watcher:" + mode;
 
     watcher.on("change", (id, { event }) => {
-        logger.info({
+        context.logger.info({
             message: `${cyan(relative(".", id))} was ${event}d`,
             prefix,
         });
     });
 
     watcher.on("restart", () => {
-        logger.info({
+        context.logger.info({
             message: "Rebuilding " + mode + "...",
             prefix,
         });
@@ -32,7 +31,7 @@ const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, cacheKey: st
         // eslint-disable-next-line default-case,@typescript-eslint/switch-exhaustiveness-check
         switch (event.code) {
             case "END": {
-                logger.success({
+                context.logger.success({
                     message: "Rebuild " + mode + " finished",
                     prefix,
                 });
@@ -40,7 +39,7 @@ const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, cacheKey: st
                 break;
             }
             case "BUNDLE_START": {
-                logger.info({
+                context.logger.info({
                     message: cyan(`build started...`),
                     prefix,
                 });
@@ -50,9 +49,9 @@ const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, cacheKey: st
             case "BUNDLE_END": {
                 await event.result.close();
 
-                fileCache.set(cacheKey, event.result.cache);
+                fileCache.set(mode === "bundle" ? WATCH_CACHE_KEY : "dts-" + WATCH_CACHE_KEY, event.result.cache);
 
-                logger.info({
+                context.logger.info({
                     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
                     message: cyan(`built in ${event.duration + ""}ms.`),
                     prefix,
@@ -63,7 +62,7 @@ const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, cacheKey: st
             case "ERROR": {
                 enhanceRollupError(event.error);
 
-                logger.error({
+                context.logger.error({
                     context: [event.error],
                     message: "Rebuild " + mode + " failed: " + event.error.message,
                     prefix,
@@ -134,7 +133,7 @@ const watch = async (context: BuildContext, fileCache: FileCache): Promise<void>
 
     context.logger.info(infoMessage);
 
-    watchHandler(watcher, fileCache, WATCH_CACHE_KEY, "bundle", context.logger);
+    watchHandler(watcher, fileCache, "bundle", context);
 
     if (context.options.declaration) {
         const rollupDtsOptions = await getRollupDtsOptions(context, fileCache);
@@ -147,7 +146,7 @@ const watch = async (context: BuildContext, fileCache: FileCache): Promise<void>
 
         await context.hooks.callHook("rollup:watch", context, dtsWatcher);
 
-        watchHandler(dtsWatcher, fileCache, "dts-" + WATCH_CACHE_KEY, "types", context.logger);
+        watchHandler(dtsWatcher, fileCache, "types", context);
     }
 };
 

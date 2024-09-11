@@ -1,0 +1,33 @@
+{
+    "name": "example_packem_watch",
+    "version": "1.0.0",
+    "private": true,
+    "type": "commonjs",
+    "exports": {
+        ".": {
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.cjs"
+        },
+        "./watch/*": {
+            "import": {
+                "types": "./dist/watch/*.d.ts",
+                "default": "./dist/watch/*.mjs"
+            },
+            "require": {
+                "types": "./dist/watch/*.d.ts",
+                "default": "./dist/watch/*.cjs"
+            }
+        }
+    },
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "watch": "packem build --watch"
+    },
+    "devDependencies": {
+        "@visulima/packem": "workspace:*",
+        "esbuild": "^0.23.1",
+        "typescript": "^5.6.2"
+    }
+}
