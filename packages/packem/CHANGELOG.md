@@ -1,3 +1,14 @@
+## @visulima/packem [1.0.0-alpha.108](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.107...@visulima/packem@1.0.0-alpha.108) (2024-09-11)
+
+### Bug Fixes
+
+* improved node10 handling ([961e03c](https://github.com/visulima/packem/commit/961e03c626d5392d25d3c74e02544ffb898c5f9d))
+
+### Miscellaneous Chores
+
+* added watch example ([e3eaa17](https://github.com/visulima/packem/commit/e3eaa1759c59f2fa803fe6475267cd737948357d))
+* dev dependency updates ([21fc2eb](https://github.com/visulima/packem/commit/21fc2ebe3c3142fd602e9214dfbfec409970c4e3))
+
 ## @visulima/packem [1.0.0-alpha.107](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.106...@visulima/packem@1.0.0-alpha.107) (2024-09-11)
 
 ### Bug Fixes
