@@ -103,7 +103,7 @@ export type BuildEntry = {
     environment?: Environment;
     esm?: boolean;
     executable?: true;
-    exportKey?: string;
+    exportKey?: Set<string>;
     fileAlias?: string;
     input: string;
     isGlob?: boolean;

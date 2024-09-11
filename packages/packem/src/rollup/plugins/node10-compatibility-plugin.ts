@@ -44,12 +44,13 @@ export const node10CompatibilityPlugin = (
 
             // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const entry of entries) {
-                if (entry.exportKey) {
-                    if (entry.exportKey.includes("/*")) {
-                        typesVersions[entry.exportKey as string] = ["./" + join(outDirectory, dirname(entry.name as string), "*.d.ts")];
+                // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+                for (const exportKey of entry.exportKey as Set<string>) {
+                    if (exportKey.includes("/*")) {
+                        typesVersions[exportKey as string] = ["./" + join(outDirectory, dirname(entry.name as string), "*.d.ts")];
                     } else {
-                        typesVersions[entry.exportKey as string] = [
-                            ...(typesVersions[entry.exportKey as string] ?? []),
+                        typesVersions[exportKey as string] = [
+                            ...(typesVersions[exportKey as string] ?? []),
                             "./" + join(outDirectory, (entry.name as string) + ".d.ts"),
                         ];
                     }

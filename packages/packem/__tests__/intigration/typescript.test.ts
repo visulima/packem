@@ -1853,5 +1853,177 @@ export const test = "this should be in final bundle, test2 string";`,
     }
 }`);
         });
+
+        it("should generate a node10 typesVersions field on console with complex exports", async () => {
+            expect.assertions(4);
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+
+            writeFileSync(`${temporaryDirectoryPath}/src/index.browser.ts`, `export const browser = "browser";`);
+            writeFileSync(`${temporaryDirectoryPath}/src/index.server.ts`, `export const server = "server";`);
+            writeFileSync(`${temporaryDirectoryPath}/src/pail.browser.ts`, `export const browser = "server";`);
+            writeFileSync(`${temporaryDirectoryPath}/src/pail.server.ts`, `export const server = "server";`);
+            writeFileSync(`${temporaryDirectoryPath}/src/processor.browser.ts`, `export const browser = "server";`);
+            writeFileSync(`${temporaryDirectoryPath}/src/processor.server.ts`, `export const server = "server";`);
+            writeFileSync(`${temporaryDirectoryPath}/src/reporter.browser.ts`, `export const browser = "server";`);
+            writeFileSync(`${temporaryDirectoryPath}/src/reporter.server.ts`, `export const server = "server";`);
+
+            createTsConfig(temporaryDirectoryPath, {});
+            createPackageJson(temporaryDirectoryPath, {
+                browser: "dist/index.browser.mjs",
+                devDependencies: {
+                    typescript: "*",
+                },
+                exports: {
+                    ".": {
+                        browser: "./dist/index.browser.mjs",
+                        import: {
+                            default: "./dist/index.server.mjs",
+                            types: "./dist/index.server.d.mts",
+                        },
+                        require: {
+                            default: "./dist/index.server.cjs",
+                            types: "./dist/index.server.d.cts",
+                        },
+                    },
+                    "./browser": {
+                        import: {
+                            default: "./dist/index.browser.mjs",
+                            types: "./dist/index.browser.d.mts",
+                        },
+                        require: {
+                            default: "./dist/index.browser.cjs",
+                            types: "./dist/index.browser.d.cts",
+                        },
+                    },
+                    "./browser/processor": {
+                        browser: "./dist/processor.browser.mjs",
+                        import: {
+                            default: "./dist/processor.browser.mjs",
+                            types: "./dist/processor.browser.d.mts",
+                        },
+                        require: {
+                            default: "./dist/processor.browser.cjs",
+                            types: "./dist/processor.browser.d.cts",
+                        },
+                    },
+                    "./browser/reporter": {
+                        browser: "./dist/reporter.browser.mjs",
+                        import: {
+                            default: "./dist/reporter.browser.mjs",
+                            types: "./dist/reporter.browser.d.mts",
+                        },
+                        require: {
+                            default: "./dist/reporter.browser.cjs",
+                            types: "./dist/reporter.browser.d.cts",
+                        },
+                    },
+                    "./package.json": "./package.json",
+                    "./processor": {
+                        browser: "./dist/processor.browser.mjs",
+                        import: {
+                            default: "./dist/processor.server.mjs",
+                            types: "./dist/processor.server.d.mts",
+                        },
+                        require: {
+                            default: "./dist/processor.server.cjs",
+                            types: "./dist/processor.server.d.cts",
+                        },
+                    },
+                    "./reporter": {
+                        browser: "./dist/reporter.browser.mjs",
+                        import: {
+                            default: "./dist/reporter.server.mjs",
+                            types: "./dist/reporter.server.d.mts",
+                        },
+                        require: {
+                            default: "./dist/reporter.server.cjs",
+                            types: "./dist/reporter.server.d.cts",
+                        },
+                    },
+                    "./server": {
+                        import: {
+                            default: "./dist/index.server.mjs",
+                            types: "./dist/index.server.d.mts",
+                        },
+                        require: {
+                            default: "./dist/index.server.cjs",
+                            types: "./dist/index.server.d.cts",
+                        },
+                    },
+                    "./server/processor": {
+                        import: {
+                            default: "./dist/processor.server.mjs",
+                            types: "./dist/processor.server.d.mts",
+                        },
+                        require: {
+                            default: "./dist/processor.server.cjs",
+                            types: "./dist/processor.server.d.cts",
+                        },
+                    },
+                    "./server/reporter": {
+                        import: {
+                            default: "./dist/reporter.server.mjs",
+                            types: "./dist/reporter.server.d.mts",
+                        },
+                        require: {
+                            default: "./dist/reporter.server.cjs",
+                            types: "./dist/reporter.server.d.cts",
+                        },
+                    },
+                },
+                main: "dist/index.server.cjs",
+                module: "dist/index.server.mjs",
+                types: "dist/index.server.d.ts",
+            });
+            await createPackemConfig(temporaryDirectoryPath, {
+                cjsInterop: true,
+            });
+
+            const binProcess = await execPackemSync("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Declaration node10 compatibility mode is enabled.");
+            expect(binProcess.stdout).toContain(`{
+    "typesVersions": {
+        "*": {
+            ".": [
+                "./dist/index.browser.d.ts",
+                "./dist/index.server.d.ts"
+            ],
+            "browser": [
+                "./dist/index.browser.d.ts"
+            ],
+            "server": [
+                "./dist/index.server.d.ts"
+            ],
+            "browser/processor": [
+                "./dist/processor.browser.d.ts"
+            ],
+            "processor": [
+                "./dist/processor.browser.d.ts",
+                "./dist/processor.server.d.ts"
+            ],
+            "browser/reporter": [
+                "./dist/reporter.browser.d.ts"
+            ],
+            "reporter": [
+                "./dist/reporter.browser.d.ts",
+                "./dist/reporter.server.d.ts"
+            ],
+            "server/processor": [
+                "./dist/processor.server.d.ts"
+            ],
+            "server/reporter": [
+                "./dist/reporter.server.d.ts"
+            ]
+        }
+    }
+}`);
+        });
     });
 });

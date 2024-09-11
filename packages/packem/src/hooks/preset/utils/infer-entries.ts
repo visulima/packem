@@ -46,7 +46,11 @@ const createOrUpdateEntry = (
     let entry: BuildEntry | undefined = entries.find((index) => index.input === input && index.environment === entryEnvironment && index.runtime === runtime);
 
     if (entry === undefined) {
-        entry = entries[entries.push({ environment: entryEnvironment, exportKey: output.exportKey, input, runtime }) - 1] as BuildEntry;
+        entry = entries[
+            entries.push({ environment: entryEnvironment, exportKey: new Set([output.exportKey].filter(Boolean)), input, runtime }) - 1
+        ] as BuildEntry;
+    } else if (entry.exportKey && output.exportKey) {
+        entry.exportKey.add(output.exportKey);
     }
 
     if (isGlob) {
