@@ -1,3 +1,13 @@
+## @visulima/packem [1.0.0-alpha.110](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.109...@visulima/packem@1.0.0-alpha.110) (2024-09-12)
+
+### Bug Fixes
+
+* fixed cjs and esm file handling, fixed node10 support for windows, extended the init command ([ba523a2](https://github.com/visulima/packem/commit/ba523a2890d6f1011972609664417182c054de43))
+
+### Miscellaneous Chores
+
+* clean up ([37cc90f](https://github.com/visulima/packem/commit/37cc90f42165cfb99c4009746272a7ac97759efd))
+
 ## @visulima/packem [1.0.0-alpha.109](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.108...@visulima/packem@1.0.0-alpha.109) (2024-09-11)
 
 ### Bug Fixes
