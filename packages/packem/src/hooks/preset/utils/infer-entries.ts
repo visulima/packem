@@ -1,6 +1,6 @@
 import { isAccessibleSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
-import { extname, resolve } from "@visulima/path";
+import { extname, resolve, toNamespacedPath } from "@visulima/path";
 
 import { DEVELOPMENT_ENV, ENDING_RE, PRODUCTION_ENV, RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "../../../constants";
 import type { BuildContext, BuildEntry, Environment, InferEntriesResult, Runtime } from "../../../types";
@@ -68,9 +68,7 @@ const createOrUpdateEntry = (
 
         if (output.type === "cjs") {
             entry.cjs = true;
-        }
-
-        if (output.type === "esm") {
+        } else if (output.type === "esm") {
             entry.esm = true;
         }
     } else {
@@ -80,9 +78,7 @@ const createOrUpdateEntry = (
 
         if (output.type === "cjs") {
             entry.cjs = true;
-        }
-
-        if (output.type === "esm") {
+        } else if (output.type === "esm") {
             entry.esm = true;
         }
     }
@@ -274,7 +270,7 @@ const inferEntries = (
             validateIfTypescriptIsInstalled(context);
         }
 
-        const inputWithoutExtension = input.replace(ENDING_RE, "");
+        const inputWithoutExtension = toNamespacedPath(input.replace(ENDING_RE, ""));
 
         if (isAccessibleSync(inputWithoutExtension + ".cts") && isAccessibleSync(inputWithoutExtension + ".mts")) {
             createOrUpdateEntry(entries, inputWithoutExtension + ".cts", isDirectory, outputSlug, { ...output, type: "cjs" }, context, false);

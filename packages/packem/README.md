@@ -28,15 +28,15 @@
 ## Install
 
 ```sh
-npm install @visulima/packem
+npm install --save-dev @visulima/packem
 ```
 
 ```sh
-yarn add @visulima/packem
+yarn add -D @visulima/packem
 ```
 
 ```sh
-pnpm add @visulima/packem
+pnpm add -D @visulima/packem
 ```
 
 ### Choose you transformer

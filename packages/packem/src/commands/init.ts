@@ -1,5 +1,5 @@
 import { installPackage } from "@antfu/install-pkg";
-import { cancel, confirm, intro, isCancel, outro, select, spinner } from "@clack/prompts";
+import { cancel, confirm, intro, outro, select, spinner } from "@clack/prompts";
 import type { Cli } from "@visulima/cerebro";
 import { isAccessibleSync, writeFileSync } from "@visulima/fs";
 import { parsePackageJson } from "@visulima/package/package-json";
@@ -14,12 +14,6 @@ const createInitCommand = (cli: Cli): void => {
 
             if (isAccessibleSync(join(options.dir, "packem.config.ts"))) {
                 logger.info("Packem project already initialized, you can use `packem build` to build your project");
-
-                return;
-            }
-
-            if (isCancel(options.transformer)) {
-                cancel("Operation cancelled");
 
                 return;
             }
@@ -40,6 +34,23 @@ const createInitCommand = (cli: Cli): void => {
 
             if (packageJson.devDependencies) {
                 packages.push(...Object.keys(packageJson.devDependencies));
+            }
+
+            const hasTypescript = Boolean(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript);
+
+            if (options.typescript === undefined && !hasTypescript) {
+                // eslint-disable-next-line no-param-reassign
+                options.typescript = await confirm({
+                    message: "Do you want to use TypeScript?",
+                });
+
+                if (options.typescript) {
+                    const s = spinner();
+
+                    s.start("Installing typescript@latest");
+                    await installPackage("typescript@latest", { cwd: options.dir, dev: true, silent: true });
+                    s.stop("");
+                }
             }
 
             if (options.transformer === undefined) {
@@ -186,6 +197,11 @@ module.exports = defineConfig({
 
                     throw new Error("Invalid isolated declaration isolated declaration, please choose one of 'none', 'oxc', 'swc' or 'typescript'");
                 },
+            },
+            {
+                Description: "Use TypeScript",
+                name: "typescript",
+                type: Boolean,
             },
         ],
     });

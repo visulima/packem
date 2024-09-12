@@ -1,8 +1,6 @@
-// This should not change the slash on windows, so we use the node path module
-import { dirname, join } from "node:path";
-
 import { readJsonSync, writeJsonSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
+import { dirname, join } from "@visulima/path";
 import type { Plugin } from "rollup";
 import { coerce, valid } from "semver";
 

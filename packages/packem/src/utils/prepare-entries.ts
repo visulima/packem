@@ -49,13 +49,13 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<vo
             // eslint-disable-next-line no-param-reassign
             entry.cjs = false;
         }
-    } else {
-        if (context.options.emitCJS !== undefined && entry.cjs === undefined) {
+    } else if (entry.cjs === undefined && entry.esm === undefined) {
+        if (context.options.emitCJS !== undefined) {
             // eslint-disable-next-line no-param-reassign
             entry.cjs = context.options.emitCJS;
         }
 
-        if (context.options.emitESM !== undefined && entry.esm === undefined) {
+        if (context.options.emitESM !== undefined) {
             // eslint-disable-next-line no-param-reassign
             entry.esm = context.options.emitESM;
         }
