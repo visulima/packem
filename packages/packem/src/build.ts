@@ -3,20 +3,17 @@ import { stat } from "node:fs/promises";
 import { bold, cyan, gray, green } from "@visulima/colorize";
 import { walk } from "@visulima/fs";
 import { formatBytes } from "@visulima/humanizer";
-import type { PackageJson } from "@visulima/package";
 import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
 
 import rollupBuild from "./rollup/build";
 import rollupBuildTypes from "./rollup/build-types";
-import type { BuildConfig, BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "./types";
+import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "./types";
 import type FileCache from "./utils/file-cache";
 import groupByKeys from "./utils/group-by-keys";
 
-type PackemPackageJson = { packem?: BuildConfig } & PackageJson;
-
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const showSizeInformation = (logger: Pail, context: BuildContext, packageJson: PackemPackageJson): boolean => {
+const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
     const rPath = (p: string) => relative(context.options.rootDir, resolve(context.options.outDir, p));
 
     let loggedEntries = false;
@@ -83,7 +80,7 @@ const showSizeInformation = (logger: Pail, context: BuildContext, packageJson: P
                 }
 
                 line +=
-                    foundCompatibleDts && type === packageJson.type
+                    foundCompatibleDts && type === context.pkg.type
                         ? "\n  types:\n" +
                           [foundDts, foundCompatibleDts]
                               .map(
@@ -317,7 +314,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
     return rollups.filter(Boolean);
 };
 
-const build = async (context: BuildContext, packageJson: PackemPackageJson, fileCache: FileCache): Promise<boolean> => {
+const build = async (context: BuildContext, fileCache: FileCache): Promise<boolean> => {
     await context.hooks.callHook("build:before", context);
 
     await Promise.all(prepareRollupConfig(context, fileCache));
@@ -348,7 +345,7 @@ const build = async (context: BuildContext, packageJson: PackemPackageJson, file
 
     await context.hooks.callHook("build:done", context);
 
-    return showSizeInformation(context.logger, context, packageJson);
+    return showSizeInformation(context.logger, context);
 };
 
 export default build;

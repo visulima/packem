@@ -661,7 +661,7 @@ const createBundler = async (
             return;
         }
 
-        const logged = await build(context, packageJson as PackageJson, fileCache);
+        const logged = await build(context, fileCache);
 
         await context.hooks.callHook("validate:before", context);
 
