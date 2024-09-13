@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.111](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.110...@visulima/packem@1.0.0-alpha.111) (2024-09-13)
+
+### Bug Fixes
+
+* fixed missing include typescript endings on all transformers ([4cbf718](https://github.com/visulima/packem/commit/4cbf718826e4248eff444b1049e2623668ecd8f7))
+
 ## @visulima/packem [1.0.0-alpha.110](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.109...@visulima/packem@1.0.0-alpha.110) (2024-09-12)
 
 ### Bug Fixes
