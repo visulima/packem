@@ -13,8 +13,6 @@ describe("packem package.json exports", () => {
 
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
-
-        await createPackemConfig(temporaryDirectoryPath, {});
     });
 
     afterEach(async () => {
@@ -35,6 +33,8 @@ export function method() {
 }
 `,
         );
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 "my-mod": "*",
@@ -65,6 +65,8 @@ export function method() {
         expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export default 'exports-sugar'`);
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 "my-mod": "*",
@@ -97,6 +99,8 @@ export function method() {
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -153,6 +157,8 @@ export function method() {
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -237,6 +243,8 @@ export { IString };`,
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -282,6 +290,8 @@ export { IString };`,
         expect.assertions(3);
 
         writeFileSync(`${temporaryDirectoryPath}/src/foo/bar.js`, `export const value = 'foo.bar';`);
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             exports: {
                 "./foo/bar": "./dist/foo/bar.mjs",
@@ -308,6 +318,8 @@ export { value };
         expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const value = 'cjs';`);
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             exports: {
                 ".": {
@@ -342,6 +354,8 @@ export { value };
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -381,6 +395,8 @@ export { value };
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -428,6 +444,8 @@ export { index as default };
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -475,6 +493,8 @@ export { index as default };
         writeFileSync(`${temporaryDirectoryPath}/src/foo.js`, `export const foo = 'foo'`);
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const index = 'index'`);
         writeFileSync(`${temporaryDirectoryPath}/src/index.react-server.js`, `export const index = 'index.react-server'`);
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             bin: {
                 cli: "./dist/bin/cli.cjs",
@@ -540,6 +560,8 @@ export { index as default };
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -635,6 +657,8 @@ export { render };
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             exports: "./dist/index.mjs",
         });
@@ -655,6 +679,8 @@ export { render };
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             exports: "./dist/index.cjs",
             type: "module",
@@ -676,6 +702,8 @@ export { render };
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -754,6 +782,8 @@ export type Shared = string;
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -822,6 +852,8 @@ module.exports = client;
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -883,6 +915,8 @@ exports.index = index;
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const isEdge = process.env.EdgeRuntime;`);
 
         createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             exports: {
                 "edge-light": "./dist/index.edge.mjs",
@@ -941,6 +975,8 @@ export function Client() {
 `,
         );
 
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             exports: {
                 ".": {
@@ -1089,6 +1125,8 @@ export const asset = "asset-module";
 `,
         );
 
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             exports: {
                 ".": {
@@ -1212,6 +1250,8 @@ exports.Client = Client;
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
+
+        await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -1269,5 +1309,175 @@ exports.Client = Client;
         expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-7.cjs`)).toBeTruthy();
         expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-8.cjs`)).toBeTruthy();
         expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-9.cjs`)).toBeTruthy();
+    });
+
+    it("should generate different files, if file with same name, cts and mts ending was found", async () => {
+        expect.assertions(4);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.mts`,
+            `export const result = "mts"`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.cts`,
+            `export const result = "cts"`,);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        await createPackemConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: "./dist/index.mjs",
+                    require: "./dist/index.cjs",
+                    types: "./dist/index.d.ts",
+                }
+            },
+        });
+
+        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toBe(`const result = "mts";
+
+export { result };
+`);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const result = "cts";
+
+exports.result = result;
+`);
+    });
+
+    it("should generate different files for mts and cts with same shared code", async () => {
+        expect.assertions(4);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/types.ts`,
+            `export type Result = string;
+export type Colorize = {
+    color: string;
+    text: string;
+};`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/color.ts`,
+            `const Colorize = function () {
+    return {
+        color: "red",
+        text: "hello world",
+    };
+}
+
+export default Colorize;`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.mts`,
+            `import ColorizeImpl from "./color";
+import type { Colorize } from "./types";
+
+const result: Colorize = ColorizeImpl() as Colorize;
+
+export default result as Colorize;
+
+export const {
+    text,
+    color,
+} = result;
+
+export type { Colorize } from "./types";`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.cts`,
+            `import ColorizeImpl from "./color";
+import type { Colorize } from "./types";
+
+const result: Colorize = ColorizeImpl() as Colorize;
+
+export default result as Colorize;
+
+export type { Colorize } from "./types";`,);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            cjsInterop: true,
+        });
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: "./dist/index.mjs",
+                    require: "./dist/index.cjs",
+                    types: "./dist/index.d.ts",
+                }
+            },
+        });
+
+        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const Colorize = /* @__PURE__ */ __name(function() {
+  return {
+    color: "red",
+    text: "hello world"
+  };
+}, "Colorize");
+
+const result = Colorize();
+const {
+  text,
+  color
+} = result;
+
+export { color, result as default, text };
+`);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const Colorize = /* @__PURE__ */ __name(function() {
+  return {
+    color: "red",
+    text: "hello world"
+  };
+}, "Colorize");
+
+const result = Colorize();
+
+module.exports = result;
+`);
     });
 });

@@ -14,7 +14,7 @@ import { createHooks } from "hookable";
 import { VERSION } from "rollup";
 
 import build from "./build";
-import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "./constants";
+import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV, TYPESCRIPT_EXTENSIONS_REGEX } from "./constants";
 import resolvePreset from "./hooks/preset/utils/resolve-preset";
 import createStub from "./jit/create-stub";
 import getHash from "./rollup/utils/get-hash";
@@ -140,7 +140,7 @@ const generateOptions = (
             },
             esbuild: {
                 charset: "utf8",
-                include: /\.[jt]sx?$/,
+                include: TYPESCRIPT_EXTENSIONS_REGEX,
                 jsx: jsxRuntime,
                 jsxDev: tsconfig?.config.compilerOptions?.jsx === "react-jsxdev",
                 jsxFactory: tsconfig?.config.compilerOptions?.jsxFactory,
@@ -169,7 +169,7 @@ const generateOptions = (
             isolatedDeclarations: {
                 exclude: EXCLUDE_REGEXP,
                 ignoreErrors: false,
-                include: [/\.[cm]?ts$/],
+                include: TYPESCRIPT_EXTENSIONS_REGEX,
             },
             json: {
                 preferConst: true,
@@ -223,7 +223,7 @@ const generateOptions = (
                 disableESTransforms: true,
                 enableLegacyBabel5ModuleInterop: false,
                 enableLegacyTypeScriptModuleInterop: tsconfig?.config.compilerOptions?.esModuleInterop === false,
-                include: /\.[jt]sx?$/,
+                include: TYPESCRIPT_EXTENSIONS_REGEX,
                 injectCreateRequireForImportRequire: false,
                 preserveDynamicImport: true,
                 production: environment === PRODUCTION_ENV,
@@ -240,7 +240,7 @@ const generateOptions = (
                       }),
             },
             swc: {
-                include: /\.[jt]sx?$/,
+                include: TYPESCRIPT_EXTENSIONS_REGEX,
                 inlineSourcesContent: false,
                 inputSourceMap: false,
                 isModule: true,
