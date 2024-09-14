@@ -1,7 +1,7 @@
 import { installPackage } from "@antfu/install-pkg";
 import { cancel, confirm, intro, outro, select, spinner } from "@clack/prompts";
 import type { Cli } from "@visulima/cerebro";
-import { isAccessibleSync, writeFileSync } from "@visulima/fs";
+import { isAccessibleSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { parsePackageJson } from "@visulima/package/package-json";
 import { join } from "@visulima/path";
 
@@ -41,7 +41,7 @@ const createInitCommand = (cli: Cli): void => {
             if (options.typescript === undefined && !hasTypescript) {
                 // eslint-disable-next-line no-param-reassign
                 options.typescript = await confirm({
-                    message: "Do you want to use TypeScript?",
+                    message: "Do you want to install TypeScript?",
                 });
 
                 if (options.typescript) {
@@ -49,6 +49,44 @@ const createInitCommand = (cli: Cli): void => {
 
                     s.start("Installing typescript@latest");
                     await installPackage("typescript@latest", { cwd: options.dir, dev: true, silent: true });
+                    s.stop("");
+                }
+            }
+
+            if (!isAccessibleSync(join(options.dir, "tsconfig.json"))) {
+                const shouldGenerate = await confirm({
+                    message: "Do you want to use generate a tsconfig.json?",
+                });
+                const runInDom = await confirm({
+                    message: "Do you want to run your code in the DOM?",
+                });
+
+                if (shouldGenerate) {
+                    const s = spinner();
+
+                    s.start("Generating tsconfig.json");
+                    // eslint-disable-next-line eslint-comments/disable-enable-pair
+                    /* eslint-disable perfectionist/sort-objects */
+                    writeJsonSync(join(options.dir, "tsconfig.json"), {
+                        compilerOptions: {
+                            esModuleInterop: true,
+                            skipLibCheck: true,
+                            target: "es2022",
+                            allowJs: true,
+                            resolveJsonModule: true,
+                            moduleDetection: "force",
+                            isolatedModules: true,
+                            verbatimModuleSyntax: true,
+                            strict: true,
+                            noUncheckedIndexedAccess: true,
+                            noImplicitOverride: true,
+                            module: "NodeNext",
+                            outDir: "dist",
+                            sourceMap: true,
+                            declaration: true,
+                            lib: runInDom ? ["es2022", "dom", "dom.iterable"] : ["es2022"],
+                        },
+                    });
                     s.stop("");
                 }
             }
