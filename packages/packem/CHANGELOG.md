@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.112](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.111...@visulima/packem@1.0.0-alpha.112) (2024-09-14)
+
+### Bug Fixes
+
+* improved init command ([468f395](https://github.com/visulima/packem/commit/468f395ca1cb96614128c019d735af2db8ce4e31))
+
 ## @visulima/packem [1.0.0-alpha.111](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.110...@visulima/packem@1.0.0-alpha.111) (2024-09-13)
 
 ### Bug Fixes
