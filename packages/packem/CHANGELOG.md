@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.113](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.112...@visulima/packem@1.0.0-alpha.113) (2024-09-15)
+
+### Bug Fixes
+
+* fixed tests, fixed file url resolution, added support for multi config, add new readme ([f89a46b](https://github.com/visulima/packem/commit/f89a46b99f1863b0582708dfc8fa27e9286b42d0))
+
 ## @visulima/packem [1.0.0-alpha.112](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.111...@visulima/packem@1.0.0-alpha.112) (2024-09-14)
 
 ### Bug Fixes
