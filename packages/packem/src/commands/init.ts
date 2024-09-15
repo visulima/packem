@@ -1,5 +1,5 @@
 import { installPackage } from "@antfu/install-pkg";
-import { cancel, confirm, intro, outro, select, spinner } from "@clack/prompts";
+import { cancel, confirm, intro, log, outro, select, spinner } from "@clack/prompts";
 import type { Cli } from "@visulima/cerebro";
 import { isAccessibleSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { parsePackageJson } from "@visulima/package/package-json";
@@ -51,6 +51,11 @@ const createInitCommand = (cli: Cli): void => {
                     await installPackage("typescript@latest", { cwd: options.dir, dev: true, silent: true });
                     s.stop("");
                 }
+            } else {
+                log.message(
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands,no-unsafe-optional-chaining
+                    "TypeScript version " + (packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript) + " is already installed",
+                );
             }
 
             if (!isAccessibleSync(join(options.dir, "tsconfig.json"))) {
@@ -91,6 +96,17 @@ const createInitCommand = (cli: Cli): void => {
                 }
             }
 
+            if (packages.includes("esbuild")) {
+                // eslint-disable-next-line no-param-reassign
+                options.transformer = "esbuild";
+            } else if (packages.includes("@swc/core")) {
+                // eslint-disable-next-line no-param-reassign
+                options.transformer = "swc";
+            } else if (packages.includes("sucrase")) {
+                // eslint-disable-next-line no-param-reassign
+                options.transformer = "sucrase";
+            }
+
             if (options.transformer === undefined) {
                 // eslint-disable-next-line no-param-reassign
                 options.transformer = await select({
@@ -117,9 +133,21 @@ const createInitCommand = (cli: Cli): void => {
                         s.stop("");
                     }
                 }
+            } else {
+                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                log.message("Transformer " + options.transformer + " is already installed.");
             }
 
+            let useIsolatedDeclarationTransformer = true;
+
             if (options.isolatedDeclarationTransformer === undefined) {
+                useIsolatedDeclarationTransformer = (await confirm({
+                    message: "Do you want to use an isolated declaration types?",
+                    initialValue: false,
+                })) as boolean;
+            }
+
+            if (options.isolatedDeclarationTransformer === undefined && useIsolatedDeclarationTransformer) {
                 // eslint-disable-next-line no-param-reassign
                 options.isolatedDeclarationTransformer = await select({
                     message: "Pick a isolated declaration transformer",
@@ -172,37 +200,33 @@ const createInitCommand = (cli: Cli): void => {
                 }
             }
 
-            if (packages.includes("typescript") || packageJson.type === "module") {
-                const template = `import { defineConfig } from "@visulima/packem/config";
+            let template = "";
+
+            if (hasTypescript || packageJson.type === "module") {
+                template = `import { defineConfig } from "@visulima/packem/config";
 import transformer from "@visulima/packem/transformer/${options.transformer as string}";
-${options.isolatedDeclarationTransformer === null ? "" : `import isolatedDeclarationTransformer from "@visulima/packem/dts/isolated/transformer/${options.isolatedDeclarationTransformer as string}";\n`}
+${!useIsolatedDeclarationTransformer || !options.isolatedDeclarationTransformer ? "" : `import isolatedDeclarationTransformer from "@visulima/packem/dts/isolated/transformer/${options.isolatedDeclarationTransformer as string}";\n`}
 export default defineConfig({
-    transformer${options.isolatedDeclarationTransformer === null ? "" : ",\n    isolatedDeclarationTransformer"}
+    transformer${!useIsolatedDeclarationTransformer || !options.isolatedDeclarationTransformer ? "" : ",\n    isolatedDeclarationTransformer"}
 });
 `;
-
-                const s = spinner();
-
-                const extension = packageJson.type === "module" ? "mjs" : "ts";
-
-                s.start("Creating packem.config." + extension);
-                writeFileSync(join(options.dir, "packem.config." + extension), template);
-                s.stop("Created packem.config." + extension);
             } else {
-                const template = `const { defineConfig } = require("@visulima/packem/config");
+                template = `const { defineConfig } = require("@visulima/packem/config");
 const transformer = require("@visulima/packem/transformer/${options.transformer as string}");
-
+${!useIsolatedDeclarationTransformer || !options.isolatedDeclarationTransformer ? "" : `const isolatedDeclarationTransformer = require("@visulima/packem/dts/isolated/transformer/${options.isolatedDeclarationTransformer as string}");\n`}
 module.exports = defineConfig({
-    transformer
+    transformer${!useIsolatedDeclarationTransformer || !options.isolatedDeclarationTransformer ? "" : ",\n    isolatedDeclarationTransformer"}
 });
 `;
-
-                const s = spinner();
-
-                s.start("Creating packem.config.js");
-                writeFileSync(join(options.dir, "packem.config.js"), template);
-                s.stop("Created packem.config.js");
             }
+
+            const s = spinner();
+
+            const extension = hasTypescript ? "ts" : "js";
+
+            s.start("Creating packem.config." + extension);
+            writeFileSync(join(options.dir, "packem.config." + extension), template);
+            s.stop("Created packem.config." + extension);
 
             outro("Now you can run `packem build` to build your project");
         },

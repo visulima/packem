@@ -46,11 +46,7 @@ export default log`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.mjs`);
 
-        expect(mjsContent).toBe(`function log() {
-  return 'this should be in final bundle'
-}
-
-export { log as effect };
+        expect(mjsContent).toBe(`export { default as effect } from './packem_shared/effect-U3Biba7s.mjs';
 `);
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.cjs`);
@@ -59,11 +55,11 @@ export { log as effect };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-function log() {
-  return 'this should be in final bundle'
-}
+const effect = require('./packem_shared/effect-2dEibUu8.cjs');
 
-exports.effect = log;
+
+
+exports.effect = effect;
 `);
     });
 });

@@ -70,7 +70,7 @@ const createBuildCommand = (cli: Cli): void => {
                             path: options.license,
                         },
                         metafile: options.metafile,
-                        ...(options.analyze ? { visualizer: {} } : { visualizer: false }),
+                        ...(options.visualize ? { visualizer: {} } : { visualizer: false }),
                     },
                     sourcemap: options.sourcemap,
                     tsconfigPath: options.tsconfig ?? undefined,
@@ -169,7 +169,7 @@ const createBuildCommand = (cli: Cli): void => {
             {
                 conflicts: "watch",
                 description: "Visualize and analyze the bundle",
-                name: "analyze",
+                name: "visualize",
                 type: Boolean,
             },
             {

@@ -226,7 +226,7 @@ export type BuildPreset = BuildConfig | (() => BuildConfig);
 
 /**
  * In addition to basic `entries`, `presets`, and `hooks`,
- * there are also all the properties of `BuildOptions` except for BuildOptions's `entries`.
+ * there are also all the properties of `BuildOptions` except for BuildOption's `entries`.
  */
 export interface BuildConfig extends DeepPartial<Omit<BuildOptions, "entries">> {
     entries?: (BuildEntry | string)[];

@@ -308,7 +308,7 @@ export { IString };`,
 
         const content = readFileSync(`${temporaryDirectoryPath}/dist/foo/bar.mjs`);
 
-        expect(content).toMatch(`const value = "foo.bar";
+        expect(content).toMatch(`const value = 'foo.bar';
 
 export { value };
 `);
@@ -975,7 +975,6 @@ export function Client() {
 `,
         );
 
-
         await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             exports: {
@@ -1000,29 +999,22 @@ export function Client() {
 
         expect(mjsContent).toBe(`'use client';
 import React, { useState } from 'react';
-export { Client } from './packem_shared/Client-C2Syj0qA.mjs';
+export { Client } from './packem_shared/Client-0aUfCstW.mjs';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Button() {
-  const [count] = useState(0);
-  return React.createElement("button", \`count: \${count}\`);
+    const [count] = useState(0);
+    return React.createElement("button", \`count: \${count}\`);
 }
-__name(Button, "Button");
 
 export { Button };
 `);
 
-        // eslint-disable-next-line no-secrets/no-secrets
-        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-C2Syj0qA.mjs`);
+        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-0aUfCstW.mjs`);
 
         expect(mjsClientContent).toBe(`'use client';
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Client() {
-  return "client-module";
+    return "client-module";
 }
-__name(Client, "Client");
 
 export { Client };
 `);
@@ -1035,37 +1027,31 @@ export { Client };
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 const React = require('react');
-const Client = require('./packem_shared/Client-CjMHur1x.cjs');
+const Client = require('./packem_shared/Client-DHI4OAAj.cjs');
 
 const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
 
 const React__default = /*#__PURE__*/_interopDefaultCompat(React);
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Button() {
-  const [count] = React.useState(0);
-  return React__default.createElement("button", \`count: \${count}\`);
+    const [count] = React.useState(0);
+    return React__default.createElement("button", \`count: \${count}\`);
 }
-__name(Button, "Button");
 
 exports.Client = Client.Client;
 exports.Button = Button;
 `);
 
-        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-CjMHur1x.cjs`);
+        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-DHI4OAAj.cjs`);
 
         expect(cjsClientContent).toBe(`'use client';
 'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Client() {
-  return "client-module";
+    return "client-module";
 }
-__name(Client, "Client");
 
 exports.Client = Client;
 `);
@@ -1125,7 +1111,6 @@ export const asset = "asset-module";
 `,
         );
 
-
         await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
             exports: {
@@ -1154,33 +1139,26 @@ export const asset = "asset-module";
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`export { Button } from './ui.mjs';
-export { action } from './packem_shared/action-DScVMxSh.mjs';
-export { Client, Client as UIClient } from './packem_shared/Client-C2Syj0qA.mjs';
+export { action } from './packem_shared/action-REGqcVNs.mjs';
+export { Client, Client as UIClient } from './packem_shared/Client-0aUfCstW.mjs';
 `);
 
-        const mjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-DScVMxSh.mjs`);
+        const mjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-REGqcVNs.mjs`);
 
         expect(mjsActionContent).toBe(`'use server';
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 async function action() {
-  return "server-action";
+    return "server-action";
 }
-__name(action, "action");
 
 export { action };
 `);
 
-        // eslint-disable-next-line no-secrets/no-secrets
-        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-C2Syj0qA.mjs`);
+        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-0aUfCstW.mjs`);
 
         expect(mjsClientContent).toBe(`'use client';
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Client() {
-  return "client-module";
+    return "client-module";
 }
-__name(Client, "Client");
 
 export { Client };
 `);
@@ -1192,8 +1170,8 @@ export { Client };
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 const ui = require('./ui.cjs');
-const action = require('./packem_shared/action-DdW0-Ipg.cjs');
-const Client = require('./packem_shared/Client-CjMHur1x.cjs');
+const action = require('./packem_shared/action-CVnwqfrD.cjs');
+const Client = require('./packem_shared/Client-DHI4OAAj.cjs');
 
 
 
@@ -1203,36 +1181,31 @@ exports.Client = Client.Client;
 exports.UIClient = Client.Client;
 `);
 
-        const cjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-DdW0-Ipg.cjs`);
+        const cjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-CVnwqfrD.cjs`);
 
         expect(cjsActionContent).toBe(`'use server';
 'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 async function action() {
-  return "server-action";
+    return "server-action";
 }
-__name(action, "action");
 
 exports.action = action;
 `);
 
-        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-CjMHur1x.cjs`);
+        // eslint-disable-next-line no-secrets/no-secrets
+        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-DHI4OAAj.cjs`);
 
         expect(cjsClientContent).toBe(`'use client';
 'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Client() {
-  return "client-module";
+    return "client-module";
 }
-__name(Client, "Client");
 
 exports.Client = Client;
 `);
@@ -1249,7 +1222,6 @@ exports.Client = Client;
         });
 
         await installPackage(temporaryDirectoryPath, "typescript");
-
 
         await createPackemConfig(temporaryDirectoryPath, {});
         createPackageJson(temporaryDirectoryPath, {
@@ -1314,13 +1286,8 @@ exports.Client = Client;
     it("should generate different files, if file with same name, cts and mts ending was found", async () => {
         expect.assertions(4);
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.mts`,
-            `export const result = "mts"`,
-        );
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.cts`,
-            `export const result = "cts"`,);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.mts`, `export const result = "mts"`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.cts`, `export const result = "cts"`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -1334,7 +1301,7 @@ exports.Client = Client;
                     import: "./dist/index.mjs",
                     require: "./dist/index.cjs",
                     types: "./dist/index.d.ts",
-                }
+                },
             },
         });
 
@@ -1413,7 +1380,8 @@ const result: Colorize = ColorizeImpl() as Colorize;
 
 export default result as Colorize;
 
-export type { Colorize } from "./types";`,);
+export type { Colorize } from "./types";`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -1429,7 +1397,7 @@ export type { Colorize } from "./types";`,);
                     import: "./dist/index.mjs",
                     require: "./dist/index.cjs",
                     types: "./dist/index.d.ts",
-                }
+                },
             },
         });
 

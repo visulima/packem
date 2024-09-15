@@ -5,7 +5,7 @@ exports[`packem package.json exports > should generate output with all cjs expor
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const index = "index";
+const index = 'index';
 
 exports.index = index;
 "
@@ -16,7 +16,7 @@ exports[`packem package.json exports > should generate output with all cjs expor
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const index = "index.react-server";
+const index = 'index.react-server';
 
 exports.index = index;
 "
@@ -27,7 +27,7 @@ exports[`packem package.json exports > should generate output with all cjs expor
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const foo = "foo";
+const foo = 'foo';
 
 exports.foo = foo;
 "
@@ -39,7 +39,7 @@ exports[`packem package.json exports > should generate output with all cjs expor
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const cli = "cli";
+const cli = 'cli';
 
 exports.cli = cli;
 "
@@ -56,13 +56,11 @@ const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e 
 
 const myMod__default = /*#__PURE__*/_interopDefaultCompat(myMod);
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = "exports-sugar-default";
+const index = 'exports-sugar-default';
+
 function method() {
-  return myMod__default.test();
+  return myMod__default.test()
 }
-__name(method, "method");
 
 exports.default = index;
 exports.method = method;
@@ -72,13 +70,11 @@ exports.method = method;
 exports[`packem package.json exports > should generate proper assets with js based on the package.json exports default > mjs output 1`] = `
 "import myMod from 'my-mod';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = "exports-sugar-default";
+const index = 'exports-sugar-default';
+
 function method() {
-  return myMod.test();
+  return myMod.test()
 }
-__name(method, "method");
 
 export { index as default, method };
 "
@@ -89,14 +85,14 @@ exports[`packem package.json exports > should work with ESM package with CJS mai
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const value = "cjs";
+const value = 'cjs';
 
 exports.value = value;
 "
 `;
 
 exports[`packem package.json exports > should work with ESM package with CJS main field > mjs output 1`] = `
-"const value = "cjs";
+"const value = 'cjs';
 
 export { value };
 "

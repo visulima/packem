@@ -1,25 +1,13 @@
 import { fileURLToPath } from "node:url";
 
-import { readFile } from "@visulima/fs";
 import type { Plugin } from "rollup";
-
-const resolverPrefix = "\0__file_url__";
 
 const resolveFileUrl = (): Plugin => {
     return {
-        async load(id) {
-            if (id.startsWith(resolverPrefix)) {
-                const path = fileURLToPath(id.slice(resolverPrefix.length));
-
-                return await readFile(path);
-            }
-
-            return undefined;
-        },
         name: "packem:resolve-file-url",
         resolveId(id) {
             if (id.startsWith("file://")) {
-                return `${resolverPrefix}${id}`;
+                return fileURLToPath(id);
             }
 
             return undefined;

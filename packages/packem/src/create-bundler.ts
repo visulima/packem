@@ -14,12 +14,14 @@ import { createHooks } from "hookable";
 import { VERSION } from "rollup";
 
 import build from "./build";
+import type { BuildConfigFunction } from "./config";
 import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV, TYPESCRIPT_EXTENSIONS_REGEX } from "./constants";
 import resolvePreset from "./hooks/preset/utils/resolve-preset";
 import createStub from "./jit/create-stub";
 import getHash from "./rollup/utils/get-hash";
 import rollupWatch from "./rollup/watch";
 import type { BuildConfig, BuildContext, BuildOptions, BuildPreset, Environment, InternalBuildOptions, Mode } from "./types";
+import arrayify from "./utils/arrayify";
 import dumpObject from "./utils/dump-object";
 import enhanceRollupError from "./utils/enhance-rollup-error";
 import FileCache from "./utils/file-cache";
@@ -578,10 +580,10 @@ const createBundler = async (
             throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.");
         }
 
-        let buildConfig = tryRequire(packemConfigFilePath, rootDirectory);
+        let buildConfig: BuildConfig | BuildConfig[] | BuildConfigFunction = tryRequire(packemConfigFilePath, rootDirectory);
 
         if (typeof buildConfig === "function") {
-            buildConfig = buildConfig(environment, mode);
+            buildConfig = await buildConfig(environment, mode);
         }
 
         logger.debug("Using packem config found at", join(rootDirectory, packemConfigFilePath));
@@ -590,7 +592,7 @@ const createBundler = async (
 
         const getDuration = () => duration(Math.floor(Date.now() - start));
 
-        const cachekey = getHash(
+        const packageJsonCacheKey = getHash(
             JSON.stringify({
                 version: packageJson.version,
                 ...packageJson.dependencies,
@@ -606,72 +608,68 @@ const createBundler = async (
                 types: packageJson.types,
             }),
         );
-        const fileCache = new FileCache(rootDirectory, cachekey, logger);
 
-        // clear cache if the cache key has changed
-        if (fileCache.cachePath && !isAccessibleSync(join(fileCache.cachePath, cachekey)) && isAccessibleSync(fileCache.cachePath)) {
-            logger.info("Clearing file cache because the cache key has changed.");
+        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+        for await (const buildOptions of arrayify(buildConfig)) {
+            const cacheKey = packageJsonCacheKey + getHash(JSON.stringify(buildOptions));
 
-            await emptyDir(fileCache.cachePath);
-        }
+            const fileCache = new FileCache(rootDirectory, cacheKey, logger);
 
-        const context = await createContext(
-            logger,
-            rootDirectory,
-            mode,
-            environment,
-            debug ?? false,
-            restInputConfig,
-            buildConfig as BuildConfig,
-            packageJson,
-            tsconfig,
-        );
+            // clear cache if the cache key has changed
+            if (fileCache.cachePath && !isAccessibleSync(join(fileCache.cachePath, cacheKey)) && isAccessibleSync(fileCache.cachePath)) {
+                logger.info("Clearing file cache because the cache key has changed.");
 
-        fileCache.isEnabled = context.options.fileCache as boolean;
-
-        await prepareEntries(context);
-
-        context.logger.info(cyan((mode === "watch" ? "Watching" : mode === "jit" ? "Stubbing" : "Building") + " " + context.options.name));
-
-        context.logger.debug(
-            `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}\n  ${context.options.entries.map((entry) => `  ${dumpObject(entry)}`).join("\n  ")}`,
-        );
-
-        // Clean dist dirs
-        await cleanDistributionDirectories(context);
-
-        // Skip rest for stub
-        if (context.options.stub) {
-            await createStub(context);
-
-            await context.hooks.callHook("build:done", context);
-
-            return;
-        }
-
-        if (mode === "watch") {
-            if (context.options.rollup.watch === false) {
-                throw new Error("Rollup watch is disabled. You should check your packem.config file.");
+                await emptyDir(fileCache.cachePath);
             }
 
-            await rollupWatch(context, fileCache);
+            const context = await createContext(logger, rootDirectory, mode, environment, debug ?? false, restInputConfig, buildOptions, packageJson, tsconfig);
 
-            logBuildErrors(context, false);
+            fileCache.isEnabled = context.options.fileCache as boolean;
 
-            return;
+            await prepareEntries(context);
+
+            context.logger.info(cyan((mode === "watch" ? "Watching" : mode === "jit" ? "Stubbing" : "Building") + " " + context.options.name));
+
+            context.logger.debug(
+                `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}\n  ${context.options.entries.map((entry) => `  ${dumpObject(entry)}`).join("\n  ")}`,
+            );
+
+            // Clean dist dirs
+            await cleanDistributionDirectories(context);
+
+            // Skip rest for stub
+            if (context.options.stub) {
+                await createStub(context);
+
+                await context.hooks.callHook("build:done", context);
+
+                return;
+            }
+
+            if (mode === "watch") {
+                if (context.options.rollup.watch === false) {
+                    throw new Error("Rollup watch is disabled. You should check your packem.config file.");
+                }
+
+                await rollupWatch(context, fileCache);
+
+                logBuildErrors(context, false);
+
+                return;
+            }
+
+            const logged = await build(context, fileCache);
+
+            await context.hooks.callHook("validate:before", context);
+
+            packageJsonValidator(context);
+
+            await context.hooks.callHook("validate:done", context);
+
+            logBuildErrors(context, logged);
+
+            logger.raw("\n⚡️ Build run in " + getDuration());
         }
-
-        const logged = await build(context, fileCache);
-
-        await context.hooks.callHook("validate:before", context);
-
-        packageJsonValidator(context);
-
-        await context.hooks.callHook("validate:done", context);
-
-        logBuildErrors(context, logged);
-
-        logger.raw("\n⚡️ Build run in " + getDuration());
 
         // Restore all wrapped console methods
         logger.restoreAll();
