@@ -308,7 +308,6 @@ console.log(1);
             writeFileSync(`${temporaryDirectoryPath}/tt/a/aa.ts`, "export const a = 1;");
             writeFileSync(`${temporaryDirectoryPath}/tt/b/bb.ts`, 'import { a } from "./aa";\nnconsole.log(a);\n\nexport const b = 2;');
 
-            await installPackage(temporaryDirectoryPath, "typescript");
             createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: {
                     rootDir: ".",
@@ -320,6 +319,7 @@ console.log(1);
                     typescript: "*",
                 },
                 main: "./dist/index.cjs",
+                module: "./dist/index.mjs",
             });
             await createPackemConfig(temporaryDirectoryPath, {});
 

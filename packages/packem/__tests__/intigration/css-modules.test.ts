@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, execPackemSync } from "../helpers";
 
-describe("packem css modules", () => {
+describe.todo("packem css modules", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {

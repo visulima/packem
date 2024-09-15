@@ -48,6 +48,9 @@ It uses the `exports` configuration in `package.json` and recognizes entry file 
 - ✅ Supports react server and client components
 - ✅ Supports shared modules
 - ✅ Supports dynamic import
+- ✅ Supports `tsconfig.json` paths and `package.json` imports resolution
+- ✅ ESM ⇄ CJS interoperability
+- ✅ Supports isolated declaration types (experimental)
 
 And more...
 
@@ -380,7 +383,7 @@ console.log(text); // "Hello World"
 
 #### Visualize Bundle Makeup
 
-Use the `--visualize` flag to generate a `stats.html` file at build time, showing the makeup of your bundle.
+Use the `--visualize` flag to generate a `packem-bundle-analyze.html` file at build time, showing the makeup of your bundle.
 
 #### Building Module Workers (Experimental) (WIP)
 
@@ -393,6 +396,50 @@ worker = new Worker('./worker.js', { type: 'module' });
 ```
 
 #### CSS and CSS Modules (Coming Soon)
+
+### Aliases
+Aliases can be configured in the [import map](https://nodejs.org/api/packages.html#imports), defined in `package.json#imports`.
+
+For native Node.js import mapping, all entries must be prefixed with `#` to indicate an internal [subpath import](https://nodejs.org/api/packages.html#subpath-imports). `Packem` takes advantage of this behavior to define entries that are _not prefixed_ with `#` as an alias.
+
+Native Node.js import mapping supports conditional imports (eg. resolving different paths for Node.js and browser), but `packem` does not.
+
+> ⚠️ Aliases are not supported in type declaration generation. If you need type support, do not use aliases.
+
+```json5
+{
+    // ...
+
+    "imports": {
+        // Mapping '~utils' to './src/utils.js'
+        "~utils": "./src/utils.js",
+
+        // Native Node.js import mapping (can't reference ./src)
+        "#internal-package": "./vendors/package/index.js",
+    }
+}
+```
+
+### ESM ⇄ CJS interoperability
+
+Node.js ESM offers [interoperability with CommonJS](https://nodejs.org/api/esm.html#interoperability-with-commonjs) via [static analysis](https://github.com/nodejs/cjs-module-lexer). However, not all bundlers compile ESM to CJS syntax in a way that is statically analyzable.
+
+Because `packem` uses Rollup, it's able to produce CJS modules that are minimal and interoperable with Node.js ESM.
+
+This means you can technically output in CommonJS to get ESM and CommonJS support.
+
+#### `require()` in ESM
+Sometimes it's useful to use `require()` or `require.resolve()` in ESM. ESM code that uses `require()` can be seamlessly compiled to CommonJS, but when compiling to ESM, Node.js will error because `require` doesn't exist in the module scope.
+
+When compiling to ESM, `packem` detects `require()` usages and shims it with [`createRequire(import.meta.url)`](https://nodejs.org/api/module.html#modulecreaterequirefilename).
+
+### Environment variables
+Pass in compile-time environment variables with the `--env` flag.
+
+This will replace all instances of `process.env.NODE_ENV` with `'production'` and remove unused code:
+```sh
+packem build --env.NODE_ENV=production
+```
 
 ## Validating
 

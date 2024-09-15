@@ -63,8 +63,8 @@ jobs:
             - name: "Build Production"
               run: "pnpm run build:packages:prod"
 
-#            - name: "test and coverage"
-#              run: "pnpm run test:coverage"
+            - name: "test and coverage"
+              run: "pnpm run test:coverage"
 
             - name: "Prepare nx cache"
               shell: "bash"
