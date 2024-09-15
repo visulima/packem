@@ -92,7 +92,7 @@ export interface RollupBuildOptions {
     treeshake?: RollupOptions["treeshake"];
     visualizer?: PluginVisualizerOptions | false;
     watch?: RollupOptions["watch"];
-    wsam?: RollupWasmOptions | false;
+    wasm?: RollupWasmOptions | false;
 }
 
 export type Runtime = "react-server" | "react-native" | "edge-light" | "node";

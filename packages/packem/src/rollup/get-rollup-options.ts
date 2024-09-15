@@ -425,7 +425,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             chunkSplitter(),
 
-            context.options.rollup.wsam && wasmPlugin(context.options.rollup.wsam),
+            context.options.rollup.wasm && wasmPlugin(context.options.rollup.wasm),
 
             context.options.declaration &&
                 context.options.rollup.isolatedDeclarations &&

@@ -51,6 +51,7 @@ It uses the `exports` configuration in `package.json` and recognizes entry file 
 - ✅ Supports `tsconfig.json` paths and `package.json` imports resolution
 - ✅ ESM ⇄ CJS interoperability
 - ✅ Supports isolated declaration types (experimental)
+- ✅ Supports wasm [WebAssembly modules](http://webassembly.org)
 
 And more...
 
