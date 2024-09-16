@@ -100,23 +100,25 @@ describe("packem error cases", () => {
         expect(binProcess.exitCode).toBe(1);
     });
 
-    it.todo("should throw a error if conflicting entry in package.json", async () => {
+    it("should throw a error if conflicting entry in package.json", async () => {
         expect.assertions(2);
 
         createPackageJson(temporaryDirectoryPath, {
             dependencies: {},
+            files: ["dist"],
             main: "dist/index.mjs",
             module: "dist/index.mjs",
             name: "pkg",
         });
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, "");
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", ["--validation"], {
             cwd: temporaryDirectoryPath,
+            reject: false,
         });
 
-        expect(binProcess.stderr).toContain(
-            `Conflicting field "module" with entry "dist/index.mjs" detected. Conflicts with "main" field. Please change one of the entries inside your package.json.`,
+        expect(binProcess.stdout).toContain(
+            `Conflict detected: The 'module' and 'main' fields both point to \n'dist/index.mjs'. Please ensure they refer to different module types.`,
         );
         expect(binProcess.exitCode).toBe(1);
     });
@@ -146,7 +148,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain(`'main' field in your package.json should not have a '.mjs' extension`);
+        expect(binProcess.stdout).toContain(`The 'main' field in your package.json should not use a '.mjs' extension for\n CommonJS modules.`);
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -175,7 +177,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain(`'module' field in your package.json should not have a '.cjs' extension`);
+        expect(binProcess.stdout).toContain(`The 'module' field in your package.json should not use a '.cjs' extension \nfor ES modules.`);
         expect(binProcess.exitCode).toBe(1);
     });
 });

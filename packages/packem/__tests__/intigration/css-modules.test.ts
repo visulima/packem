@@ -17,7 +17,7 @@ describe.todo("packem css modules", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it("should support css modules", async () => {
+    it.todo("should support css modules", async () => {
         expect.assertions(3);
 
         writeFileSync(

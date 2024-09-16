@@ -12,7 +12,9 @@ describe("packem shims", () => {
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
 
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath, {
+            cjsInterop: true,
+        });
     });
 
     afterEach(async () => {
