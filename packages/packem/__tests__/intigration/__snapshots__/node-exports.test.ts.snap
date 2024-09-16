@@ -485,6 +485,33 @@ export { indent };
 "
 `;
 
+exports[`packem node exports > should handle externals > cjs output 1`] = `
+"'use strict';
+
+const a = require('peer-dep');
+const b = require('peer-dep-meta');
+
+const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
+
+const a__default = /*#__PURE__*/_interopDefaultCompat(a);
+const b__default = /*#__PURE__*/_interopDefaultCompat(b);
+
+const index = a__default + b__default;
+
+module.exports = index;
+"
+`;
+
+exports[`packem node exports > should handle externals > mjs output 1`] = `
+"import a from 'peer-dep';
+import b from 'peer-dep-meta';
+
+const index = a + b;
+
+export { index as default };
+"
+`;
+
 exports[`packem node exports > should output 'class' with 'extends correctly > cjs dts output 1`] = `
 "declare class Parent {
     constructor();

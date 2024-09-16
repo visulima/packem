@@ -216,6 +216,10 @@ const generateOptions = (
                 // Following option must be *false* for polyfill to work
                 preferBuiltins: false,
             },
+            shebang: {
+                replace: false,
+                shebang: "#!/usr/bin/env node",
+            },
             shim: {
                 exclude: EXCLUDE_REGEXP,
                 include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,

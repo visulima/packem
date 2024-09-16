@@ -18,7 +18,7 @@ for (let i = 0; i < 10; i++) {
 "
 `;
 
-exports[`shebang > should preseves existing shebang after successful rollup bundle > cjs output 1`] = `
+exports[`shebang > should preserves existing shebang after successful rollup bundle > cjs output 1`] = `
 "#!/usr/bin/env node
 'use strict';
 
@@ -26,8 +26,24 @@ console.log("Hello, world!");
 "
 `;
 
-exports[`shebang > should preseves existing shebang after successful rollup bundle > mjs output 1`] = `
+exports[`shebang > should preserves existing shebang after successful rollup bundle > mjs output 1`] = `
 "#!/usr/bin/env node
+console.log("Hello, world!");
+"
+`;
+
+exports[`shebang > should replaces an existing shebang with a custom shebang > cjs output 1`] = `
+"#!/path/to/custom/interpreter
+
+'use strict';
+
+console.log("Hello, world!");
+"
+`;
+
+exports[`shebang > should replaces an existing shebang with a custom shebang > mjs output 1`] = `
+"#!/path/to/custom/interpreter
+
 console.log("Hello, world!");
 "
 `;

@@ -101,7 +101,7 @@ describe("packem error cases", () => {
     });
 
     it("should throw a error if conflicting entry in package.json", async () => {
-        expect.assertions(2);
+        expect.assertions(3);
 
         createPackageJson(temporaryDirectoryPath, {
             dependencies: {},
@@ -117,14 +117,13 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain(
-            `Conflict detected: The 'module' and 'main' fields both point to \n'dist/index.mjs'. Please ensure they refer to different module types.`,
-        );
+        expect(binProcess.stdout).toContain(`Conflict detected: The 'module' and 'main' fields both point to `);
+        expect(binProcess.stdout).toContain(`'dist/index.mjs'. Please ensure they refer to different module types.`);
         expect(binProcess.exitCode).toBe(1);
     });
 
     it("should warn on invalid exports as ESM", async () => {
-        expect.assertions(2);
+        expect.assertions(3);
 
         writeFileSync(`${temporaryDirectoryPath}/src/foo.js`, `export const foo = "foo";`);
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const index = "index";`);
@@ -148,12 +147,13 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain(`The 'main' field in your package.json should not use a '.mjs' extension for\n CommonJS modules.`);
+        expect(binProcess.stdout).toContain(`The 'main' field in your package.json should not use a '.mjs' extension for`);
+        expect(binProcess.stdout).toContain(`CommonJS modules.`);
         expect(binProcess.exitCode).toBe(1);
     });
 
     it("should warn on invalid exports as CJS", async () => {
-        expect.assertions(2);
+        expect.assertions(3);
 
         writeFileSync(`${temporaryDirectoryPath}/src/foo.js`, `export const foo = "foo";`);
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const index = "index";`);
@@ -177,7 +177,8 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain(`The 'module' field in your package.json should not use a '.cjs' extension \nfor ES modules.`);
+        expect(binProcess.stdout).toContain(`The 'module' field in your package.json should not use a '.cjs' extension`);
+        expect(binProcess.stdout).toContain(`for ES modules.`);
         expect(binProcess.exitCode).toBe(1);
     });
 });

@@ -40,6 +40,7 @@ import prependDirectivePlugin from "./plugins/prepend-directives";
 import preserveDirectivesPlugin from "./plugins/preserve-directives";
 import { rawPlugin } from "./plugins/raw";
 import resolveFileUrlPlugin from "./plugins/resolve-file-url";
+import type { ShebangOptions } from "./plugins/shebang";
 import { removeShebangPlugin, shebangPlugin } from "./plugins/shebang";
 import type { SucrasePluginConfig } from "./plugins/sucrase/types";
 import type { SwcPluginConfig } from "./plugins/swc/types";
@@ -472,13 +473,14 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 logger: context.logger,
             }),
 
-            shebangPlugin(
-                context.options.entries
-                    .filter((entry) => entry.executable)
-                    .map((entry) => entry.name)
-                    .filter(Boolean) as string[],
-                context.options.rollup.shebang ?? "#!/usr/bin/env node",
-            ),
+            context.options.rollup.shebang &&
+                shebangPlugin(
+                    context.options.entries
+                        .filter((entry) => entry.executable)
+                        .map((entry) => entry.name)
+                        .filter(Boolean) as string[],
+                    context.options.rollup.shebang as ShebangOptions,
+                ),
 
             context.options.cjsInterop &&
                 context.options.emitCJS &&

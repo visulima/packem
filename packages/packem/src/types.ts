@@ -24,6 +24,7 @@ import type { JSXRemoveAttributesPlugin } from "./rollup/plugins/jsx-remove-attr
 import type { LicenseOptions } from "./rollup/plugins/license";
 import type { Node10CompatibilityOptions } from "./rollup/plugins/node10-compatibility-plugin";
 import type { RawLoaderOptions } from "./rollup/plugins/raw";
+import type { ShebangOptions } from "./rollup/plugins/shebang";
 import type { SucrasePluginConfig } from "./rollup/plugins/sucrase/types";
 import type { SwcPluginConfig } from "./rollup/plugins/swc/types";
 import type { PatchTypesOptions } from "./rollup/plugins/typescript/patch-typescript-types";
@@ -85,7 +86,7 @@ export interface RollupBuildOptions {
     raw?: RawLoaderOptions | false;
     replace: RollupReplaceOptions | false;
     resolve: RollupNodeResolveOptions | false;
-    shebang?: string;
+    shebang?: Partial<ShebangOptions> | false;
     shim?: EsmShimCjsSyntaxOptions | false;
     sucrase?: SucrasePluginConfig | false;
     swc?: SwcPluginConfig | false;

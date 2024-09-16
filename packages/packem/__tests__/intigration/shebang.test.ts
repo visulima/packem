@@ -17,7 +17,7 @@ describe("shebang", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it("should preseves existing shebang after successful rollup bundle", async () => {
+    it("should preserves existing shebang after successful rollup bundle", async () => {
         expect.assertions(4);
 
         writeFileSync(
@@ -57,8 +57,8 @@ console.log('Hello, world!');
         expect(mjsContent).toMatchSnapshot("mjs output");
     });
 
-    it.todo("replaces an existing shebang with a custom shebang", async () => {
-        expect.assertions(4);
+    it("should replaces an existing shebang with a custom shebang", async () => {
+        expect.assertions(6);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
@@ -82,7 +82,10 @@ console.log('Hello, world!');
         });
         await createPackemConfig(temporaryDirectoryPath, {
             rollup: {
-                shebang: customShebang,
+                shebang: {
+                    replace: true,
+                    shebang: customShebang,
+                },
             },
         });
         createTsConfig(temporaryDirectoryPath, {});

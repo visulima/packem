@@ -320,8 +320,8 @@ export { test as default };
 `);
     });
 
-    it.todo("should handle externals", async () => {
-        expect.assertions(7);
+    it("should handle externals", async () => {
+        expect.assertions(4);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         writeFileSync(
@@ -340,7 +340,6 @@ export default a + b
                 ".": {
                     import: "./dist/index.mjs",
                     require: "./dist/index.cjs",
-                    types: "./dist/index.d.ts",
                 },
             },
             peerDependencies: {
@@ -369,18 +368,6 @@ export default a + b
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
-
-        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
-
-        expect(dCtsContent).toMatchSnapshot("cjs dts output");
-
-        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
-
-        expect(dMtsContent).toMatchSnapshot("mjs dts output");
-
-        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
-
-        expect(dContent).toMatchSnapshot("dts output");
     });
 
     it("should bundle 'devDependencies' that are used inside the code and are not marked as external", async () => {
