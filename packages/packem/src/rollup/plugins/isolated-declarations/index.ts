@@ -133,24 +133,25 @@ export const isolatedDeclarationsPlugin = (
                     }
                 }
 
+                const quote = source.includes("from '") ? "'" : '"';
+
                 if ((declaration === true || declaration === "compatible") && outputOptions.format === format) {
                     this.emitFile({
                         fileName: entryFileNames.replace("[name]", relative(outBase, filename)).replace(format === "cjs" ? ".cts" : ".mts", ".ts"),
-                        source,
+                        source: source.replaceAll(
+                        /from\s+['"]([^'"]+)['"]/g,
+                        (_, p1) => `from ${quote}${(p1 as string).replace(ENDING_RE, "")}.js${quote}`,
+                    ),
                         type: "asset",
                     });
                 }
-
-                const hasSingleQuoted = source.includes("from '");
-
-                const quote = hasSingleQuoted ? "'" : '"';
 
                 this.emitFile({
                     fileName: entryFileNames.replace("[name]", relative(outBase, filename)),
                     // imports need correct extension for the declarations .cts or .mts
                     source: source.replaceAll(
                         /from\s+['"]([^'"]+)['"]/g,
-                        (_, p1) => `from ${quote}${(p1 as string).replace(ENDING_RE, "")}${outputOptions.format === "cjs" ? ".cts" : ".mts"}${quote}`,
+                        (_, p1) => `from ${quote}${(p1 as string).replace(ENDING_RE, "")}${outputOptions.format === "cjs" ? ".cjs" : ".mjs"}${quote}`,
                     ),
                     type: "asset",
                 });
