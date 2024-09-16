@@ -218,8 +218,8 @@ const generateOptions = (
                 preferBuiltins: false,
             },
             shim: {
-                exclude: [/node_modules/],
-                include: [/\.(js|cjs|mjs|tsx|mts|cts)$/],
+                exclude: EXCLUDE_REGEXP,
+                include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
             },
             sucrase: {
                 disableESTransforms: true,

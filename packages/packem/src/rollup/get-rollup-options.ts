@@ -506,7 +506,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 },
             },
 
-            context.options.rollup.shim && esmShimCjsSyntaxPlugin(context.pkg, context.options.rollup.shim),
+            context.options.cjsInterop && context.options.rollup.shim && esmShimCjsSyntaxPlugin(context.pkg, context.options.rollup.shim),
 
             context.options.rollup.raw && rawPlugin(context.options.rollup.raw),
 

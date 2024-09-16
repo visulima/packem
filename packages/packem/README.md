@@ -434,6 +434,17 @@ Sometimes it's useful to use `require()` or `require.resolve()` in ESM. ESM code
 
 When compiling to ESM, `packem` detects `require()` usages and shims it with [`createRequire(import.meta.url)`](https://nodejs.org/api/module.html#modulecreaterequirefilename).
 
+Not only does `packem` shim `ESM ⇄ CJS`, but fixes the `export` and `export types` for `default` exports in your commonjs files.
+
+To enable both features you need to add `cjsInterop: true` to your `packem` config.
+
+```ts
+export default defineConfig({
+    cjsInterop: true,
+    // ...
+});
+```
+
 ### Environment variables
 
 Pass in compile-time environment variables with the `--env` flag.
