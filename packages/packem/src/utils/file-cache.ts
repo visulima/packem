@@ -5,6 +5,16 @@ import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import type { Pail } from "@visulima/pail";
 import { join, toNamespacedPath } from "@visulima/path";
 
+const isJson = (value: string): boolean => {
+    try {
+        JSON.parse(value);
+    } catch {
+        return false;
+    }
+
+    return true;
+};
+
 class FileCache {
     readonly #cwd: string;
 
@@ -75,23 +85,29 @@ class FileCache {
 
         const fileData = readFileSync(filePath);
 
-        try {
-            const value = JSON.parse(fileData);
+        if (isJson(fileData)) {
+            try {
+                const value = JSON.parse(fileData);
 
-            this.#memoryCache.set(filePath, value);
+                this.#memoryCache.set(filePath, value);
 
-            return value as unknown as R;
-        } catch {
-            this.#logger.warn(`Could not parse cache file: ${filePath}, deleting the broken cache file.`);
+                return value as unknown as R;
+            } catch {
+                this.#logger.warn(`Could not parse cache file: ${filePath} deleting the broken cache file.`);
 
-            this.#memoryCache.delete(filePath);
+                this.#memoryCache.delete(filePath);
 
-            rmSync(filePath, {
-                force: true,
-            });
+                rmSync(filePath, {
+                    force: true,
+                });
 
-            return undefined;
+                return undefined;
+            }
         }
+
+        this.#memoryCache.set(filePath, fileData);
+
+        return fileData as unknown as R;
     }
 
     public set(name: string, data: object | ArrayBuffer | ArrayBufferView | string | undefined, subDirectory?: string): void {
