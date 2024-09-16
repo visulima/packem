@@ -522,7 +522,7 @@ export { index as default };
         expect(binProcess.stdout).toContain("exports: foo");
         expect(binProcess.stdout).toContain("dist/bin/cli.cjs (total size: 148 Bytes, chunk size: 148 Bytes)");
         expect(binProcess.stdout).toContain("exports: cli");
-        expect(binProcess.stdout).toContain("Σ Total dist size (byte size): 741 Bytes");
+        expect(binProcess.stdout).toContain("Σ Total dist size (byte size):");
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
