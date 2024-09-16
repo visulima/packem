@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.117](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.116...@visulima/packem@1.0.0-alpha.117) (2024-09-16)
+
+### Bug Fixes
+
+* added cjs interop support for isolated declarations ([52e8c33](https://github.com/visulima/packem/commit/52e8c33cf8f57601d670a3df50ad026ff0e14cc9))
+
 ## @visulima/packem [1.0.0-alpha.116](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.115...@visulima/packem@1.0.0-alpha.116) (2024-09-16)
 
 ### Bug Fixes
