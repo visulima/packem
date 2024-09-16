@@ -1,3 +1,14 @@
+## @visulima/packem [1.0.0-alpha.115](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.114...@visulima/packem@1.0.0-alpha.115) (2024-09-16)
+
+### Bug Fixes
+
+* improved external handling of package imports ([39defc9](https://github.com/visulima/packem/commit/39defc9ae6f783bd3a32c2c57143537e05c4af06))
+
+### Miscellaneous Chores
+
+* renamed test ([35c7269](https://github.com/visulima/packem/commit/35c726930d6a8af046f5f53bd9deb523d31d7370))
+* renamed test ([4ac1ce0](https://github.com/visulima/packem/commit/4ac1ce0f1567c4b46e3628bfbd441b9f1db06b25))
+
 ## @visulima/packem [1.0.0-alpha.114](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.113...@visulima/packem@1.0.0-alpha.114) (2024-09-16)
 
 ### Bug Fixes
