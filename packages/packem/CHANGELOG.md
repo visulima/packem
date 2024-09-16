@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.120](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.119...@visulima/packem@1.0.0-alpha.120) (2024-09-16)
+
+### Bug Fixes
+
+* fixed file caching ([fdc08a4](https://github.com/visulima/packem/commit/fdc08a45c0e38a9c79d31df0b286920d146bc710))
+
 ## @visulima/packem [1.0.0-alpha.119](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.118...@visulima/packem@1.0.0-alpha.119) (2024-09-16)
 
 ### Bug Fixes
