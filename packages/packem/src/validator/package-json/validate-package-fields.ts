@@ -18,7 +18,10 @@ const validatePackageFields = (context: BuildContext): void => {
         } else if (pkg.files.length === 0) {
             warn(context, "The 'files' field in your package.json is empty. Please specify the files to be included in the package.");
         } else if (!pkg.files.some((file) => file.includes(context.options.outDir))) {
-            warn(context, `The 'files' field in your package.json is missing the '${context.options.outDir}' directory. Ensure the output directory is included.`);
+            warn(
+                context,
+                `The 'files' field in your package.json is missing the '${context.options.outDir}' directory. Ensure the output directory is included.`,
+            );
         }
     }
 
@@ -42,7 +45,10 @@ const validatePackageFields = (context: BuildContext): void => {
             }
 
             if (pkg.module && pkg.main && pkg.module === pkg.main) {
-                warn(context, `Conflict detected: The 'module' and 'main' fields both point to '${pkg.module as string}'. Please ensure they refer to different module types.`);
+                warn(
+                    context,
+                    `Conflict detected: The 'module' and 'main' fields both point to '${pkg.module as string}'. Please ensure they refer to different module types.`,
+                );
             }
 
             if (context.options.emitESM && pkg.module?.includes(".cjs")) {
@@ -69,7 +75,10 @@ const validatePackageFields = (context: BuildContext): void => {
                 }
 
                 if (pkg.module && pkg.main && pkg.module === pkg.main) {
-                    warn(context, `Conflict detected: The 'module' and 'main' fields both point to '${pkg.module as string}'. Please ensure they refer to different module types.`);
+                    warn(
+                        context,
+                        `Conflict detected: The 'module' and 'main' fields both point to '${pkg.module as string}'. Please ensure they refer to different module types.`,
+                    );
                 }
             }
 
@@ -85,11 +94,17 @@ const validatePackageFields = (context: BuildContext): void => {
 
     if (validation?.packageJson?.bin !== false) {
         if (typeof pkg.bin === "string" && pkg.bin.includes(isCjs ? ".mjs" : ".cjs")) {
-            warn(context, `The 'bin' field in your package.json should not use a ${isCjs ? ".mjs" : ".cjs"} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`);
+            warn(
+                context,
+                `The 'bin' field in your package.json should not use a ${isCjs ? ".mjs" : ".cjs"} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
+            );
         } else if (typeof pkg.bin === "object") {
             for (const [bin, binPath] of Object.entries(pkg.bin)) {
                 if (binPath && (binPath as string).includes(isCjs ? ".mjs" : ".cjs")) {
-                    warn(context, `The 'bin.${bin}' field in your package.json should not use a ${isCjs ? ".mjs" : ".cjs"} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`);
+                    warn(
+                        context,
+                        `The 'bin.${bin}' field in your package.json should not use a ${isCjs ? ".mjs" : ".cjs"} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
+                    );
                 }
             }
         }
@@ -105,7 +120,10 @@ const validatePackageFields = (context: BuildContext): void => {
             validation?.packageJson?.typesVersions !== false &&
             (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
         ) {
-            warn(context, "No 'typesVersions' field found in your package.json. Consider adding this field, or change the declaration option to 'node16' or 'false'.");
+            warn(
+                context,
+                "No 'typesVersions' field found in your package.json. Consider adding this field, or change the declaration option to 'node16' or 'false'.",
+            );
         }
     }
 };

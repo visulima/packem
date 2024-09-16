@@ -438,7 +438,7 @@ Not only does `packem` shim `ESM ⇄ CJS`, but fixes the `export` and `export ty
 
 To enable both features you need to add `cjsInterop: true` to your `packem` config.
 
-```ts
+```js
 export default defineConfig({
     cjsInterop: true,
     // ...

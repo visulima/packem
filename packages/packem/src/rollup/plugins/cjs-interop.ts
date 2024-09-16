@@ -25,7 +25,6 @@ export const cjsInteropPlugin = ({
         ): Promise<{
             code: string;
             map: SourceMapInput;
-             
         } | null> => {
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (chunk.type !== "chunk" || !chunk.isEntry) {

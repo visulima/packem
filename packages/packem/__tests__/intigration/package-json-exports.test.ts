@@ -85,7 +85,6 @@ export function method() {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-         
         for (const file of ["index.cjs", "index.mjs"]) {
             // eslint-disable-next-line security/detect-non-literal-fs-filename
             expect(existsSync(`${temporaryDirectoryPath}/dist/${file}`)).toBeTruthy();
@@ -129,7 +128,6 @@ export function method() {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-         
         for (const [file, regex] of [
             ["index.development.cjs", /= "development"/],
             ["index.development.mjs", /= "development"/],
@@ -198,7 +196,6 @@ export function method() {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-         
         for (const [file, regex] of [
             ["index.development.cjs", /= "development"/],
             ["index.development.mjs", /= "development"/],
@@ -271,7 +268,6 @@ export { IString };`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-         
         for (const [file, regex] of [
             ["./index.mjs", /const shared = true/],
             ["./index.react-server.mjs", /"react-server"/],

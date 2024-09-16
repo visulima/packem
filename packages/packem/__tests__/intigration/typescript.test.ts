@@ -1300,7 +1300,7 @@ export type Num = number;
             },
         );
 
-        it.each(["typescript", /* "oxc", "swc" */])(
+        it.each(["typescript", "oxc", "swc"])(
             "should patch cjs default export with '%s' isolated declarations transformer",
             async (isolatedDeclarationTransformer) => {
                 expect.assertions(6);

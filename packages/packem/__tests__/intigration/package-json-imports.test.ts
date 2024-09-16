@@ -33,8 +33,8 @@ describe("packem package.json imports", () => {
             },
             exports: {
                 ".": {
-                    "import": "./dist/index.mjs",
-                    "require": "./dist/index.cjs",
+                    import: "./dist/index.mjs",
+                    require: "./dist/index.cjs",
                 },
             },
             imports: {
