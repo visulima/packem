@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 
-describe("packem package.json bin", () => {
+describe("packem package.json imports", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
@@ -19,7 +19,7 @@ describe("packem package.json bin", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it("should use the package.json imports", async () => {
+    it("should not show a warning of external imports, when a glob star is used", async () => {
         expect.assertions(5);
 
         writeFileSync(`${temporaryDirectoryPath}/src/x.ts`, `export const x = 2;`);
