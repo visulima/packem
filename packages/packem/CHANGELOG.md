@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.119](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.118...@visulima/packem@1.0.0-alpha.119) (2024-09-16)
+
+### Bug Fixes
+
+* improved cjs interoperability ([b878719](https://github.com/visulima/packem/commit/b8787197e78701f3ae4f4db96f3d551f9c7470b8))
+* improved error messages ([50142a6](https://github.com/visulima/packem/commit/50142a6e978f97c164c9b307998c44632719ce4e))
+
 ## @visulima/packem [1.0.0-alpha.118](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.117...@visulima/packem@1.0.0-alpha.118) (2024-09-16)
 
 ### Bug Fixes
