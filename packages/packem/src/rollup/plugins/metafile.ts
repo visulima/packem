@@ -17,12 +17,10 @@ const metafilePlugin = (options: MetafileOptions): Plugin =>
         async buildEnd() {
             const deps: MetaInfo[] = [];
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const id of this.getModuleIds()) {
                 const moduleInfo = this.getModuleInfo(id);
 
                 if (moduleInfo != null && !moduleInfo.isExternal) {
-                    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                     for (const target of moduleInfo.importedIds) {
                         deps.push({
                             source: id,

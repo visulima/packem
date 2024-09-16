@@ -25,7 +25,6 @@ const createStub = async (context: BuildContext): Promise<void> => {
         2,
     );
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const entry of context.options.entries) {
         const output = resolve(context.options.rootDir, context.options.outDir, entry.name as string);
 

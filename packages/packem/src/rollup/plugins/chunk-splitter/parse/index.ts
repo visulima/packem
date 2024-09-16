@@ -23,9 +23,7 @@ const exportName = function* (statement: ExportNamedDeclaration): Generator<stri
         }
 
         case "VariableDeclaration": {
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const declarator of statement.declaration.declarations) {
-                // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const name of extractAssignedNames(declarator.id)) {
                     yield name;
                 }
@@ -40,7 +38,6 @@ const exportName = function* (statement: ExportNamedDeclaration): Generator<stri
 
 const parseExportNamed = function* (statement: ExportNamedDeclaration): Generator<ParsedExportInfo> {
     if (statement.declaration) {
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const exportedName of exportName(statement)) {
             yield { exportedName, from: "self", type: "named" };
         }
@@ -57,7 +54,6 @@ const parseExportNamed = function* (statement: ExportNamedDeclaration): Generato
             type: "named",
         };
     } else {
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const specifier of statement.specifiers) {
             yield {
                 exportedName: specifier.exported.name,
@@ -92,7 +88,6 @@ const parseExports = function* (context: PluginContext, module_: ModuleInfo): Ge
     assert(module_.code != null, `Module ${module_.id} doesn't have associated code`);
     const node = context.parse(module_.code);
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const statement of node.body) {
         switch (statement.type) {
             case "ExportAllDeclaration": {

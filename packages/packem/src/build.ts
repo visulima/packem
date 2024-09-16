@@ -18,11 +18,9 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
 
     let loggedEntries = false;
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const entry of context.buildEntries.filter((bEntry) => !bEntry.chunk)) {
         let totalBytes = entry.bytes ?? 0;
 
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const chunk of entry.chunks ?? []) {
             totalBytes += context.buildEntries.find((bEntry) => bEntry.path === chunk)?.bytes ?? 0;
         }
@@ -112,9 +110,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
 
     const rollups: Promise<void>[] = [];
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [runtime, entries] of Object.entries(environmentEntries)) {
             const environmentRuntimeContext = {
                 ...context,
@@ -176,7 +172,6 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
             const cjsEntries = [];
             const dtsEntries = [];
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const entry of entries) {
                 if (entry.cjs && entry.esm) {
                     esmAndCjsEntries.push(entry);
@@ -322,7 +317,7 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<boole
     context.logger.success(green(context.options.name ? "Build succeeded for " + context.options.name : "Build succeeded"));
 
     // Find all dist files and add missing entries as chunks
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+
     for await (const file of walk(join(context.options.rootDir, context.options.outDir))) {
         let entry = context.buildEntries.find((bEntry) => join(context.options.rootDir, context.options.outDir, bEntry.path) === file.path);
 

@@ -59,6 +59,8 @@ module.exports = {
                 "prefer-template": "off",
 
                 "@typescript-eslint/sort-type-constituents": "off",
+                "no-loops/no-loops": "off",
+                "no-restricted-syntax": "off",
             },
         },
         {

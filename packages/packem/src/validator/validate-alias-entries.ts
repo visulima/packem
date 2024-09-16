@@ -72,7 +72,6 @@ const reservedKeywords = new Set([
 const validateAliasEntries = (entries: ReadonlyArray<Alias> | Record<string, string>): void => {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!Array.isArray(entries) && entries !== null) {
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [alias, target] of Object.entries(entries)) {
             if (typeof alias !== "string" || alias.trim() === "") {
                 throw new Error(`Alias name "${alias}" is invalid. Alias names should be non-empty strings.`);

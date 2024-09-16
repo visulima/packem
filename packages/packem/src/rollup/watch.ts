@@ -126,7 +126,6 @@ const watch = async (context: BuildContext, fileCache: FileCache): Promise<void>
 
     let infoMessage = `Starting watchers for entries:`;
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const input of inputs) {
         infoMessage += gray(`\n  └─ ${relative(process.cwd(), input)}`);
     }

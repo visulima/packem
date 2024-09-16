@@ -79,7 +79,6 @@ const validatePackageFields = (context: BuildContext): void => {
         if (typeof pkg.bin === "string" && pkg.bin.includes(isCjs ? ".mjs" : ".cjs")) {
             warn(context, `'bin' field in your package.json should not have a ${isCjs ? ".mjs" : ".cjs"} extension`);
         } else if (typeof pkg.bin === "object") {
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const [bin, binPath] of Object.entries(pkg.bin)) {
                 if (binPath && (binPath as string).includes(isCjs ? ".mjs" : ".cjs")) {
                     warn(context, `'bin.${bin}' field in your package.json should not have a ${isCjs ? ".mjs" : ".cjs"} extension`);

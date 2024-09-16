@@ -52,7 +52,6 @@ const createSplitChunks = (
         if (isEntry) {
             const subModuleIds = context.getModuleIds();
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const subId of subModuleIds) {
                 const subModuleInfo = context.getModuleInfo(subId);
                 if (!subModuleInfo) {

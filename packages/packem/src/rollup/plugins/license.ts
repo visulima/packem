@@ -81,7 +81,6 @@ export const license = ({
 
                     const names = new Set();
 
-                    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                     for (const person of [author, ...maintainers, ...contributors]) {
                         const personName = typeof person === "string" ? person : person?.name;
 

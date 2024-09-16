@@ -40,9 +40,7 @@ export const node10CompatibilityPlugin = (
 
             const typesVersions: Record<string, string[]> = {};
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const entry of entries) {
-                // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const exportKey of entry.exportKey as Set<string>) {
                     if (exportKey.includes("/*")) {
                         typesVersions[exportKey as string] = ["./" + join(outDirectory, dirname(entry.name as string), "*.d.ts")];

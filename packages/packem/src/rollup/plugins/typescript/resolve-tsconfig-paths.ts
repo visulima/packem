@@ -35,7 +35,6 @@ export const getConfigAlias = (tsconfig?: TsConfigResult, addBaseUrl = true): Al
 
     // compile any alias expressions and push them to the list
     if (paths) {
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [alias, values] of Object.entries(paths)) {
             let find: RegExp;
 
@@ -52,7 +51,6 @@ export const getConfigAlias = (tsconfig?: TsConfigResult, addBaseUrl = true): Al
             /** Internal index used to calculate the matching id in a replacement. */
             let matchId = 0;
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const value of values) {
                 /** String used to replace a matched path. */
                 const replacement = [...normalizePath(resolve(resolvedBaseUrl, value))]
@@ -116,7 +114,7 @@ export const resolveTsconfigPaths = (tsconfig: TsConfigResult, logger: Pail): Pl
 
             // Handle aliases found from `compilerOptions.paths`. Unlike @rollup/plugin-alias, tsconfig aliases
             // are the best effort only, so we have to manually replace them here, instead of using `alias` or `rollup.alias`
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+
             for (const { find, replacement } of configAlias) {
                 if (find.test(id)) {
                     const updatedId = id.replace(find, replacement);

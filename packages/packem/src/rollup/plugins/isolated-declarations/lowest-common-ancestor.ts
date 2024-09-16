@@ -23,13 +23,11 @@ const lowestCommonAncestor = (...filepaths: string[]): string => {
 
     let ancestor = (first as string).split("/");
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const filepath of rest) {
         const directories = filepath.split("/", ancestor.length);
 
         let index = 0;
 
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const directory of directories) {
             // eslint-disable-next-line security/detect-object-injection
             if (directory === ancestor[index]) {

@@ -71,14 +71,14 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail): Plugin => 
             const results = await Promise.all(
                 (targets as SingleTargetDesc[])
                     .flatMap((target) =>
-                        (Array.isArray(target.src)
+                        Array.isArray(target.src)
                             ? target.src.map((itemSource) => {
                                   return {
                                       ...target,
                                       src: itemSource,
                                   };
                               })
-                            : target),
+                            : target,
                     )
                     .map(
                         async (target) =>
@@ -92,9 +92,7 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail): Plugin => 
                     ),
             );
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const result of results) {
-                // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const file of result.src) {
                     let fileDesc: FileDesc;
 
@@ -158,7 +156,6 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail): Plugin => 
                         return;
                     }
 
-                    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                     for (const destination of fileDesc.dest) {
                         if (config.copyOnce && fileDesc.copied.includes(destination)) {
                             // eslint-disable-next-line no-continue

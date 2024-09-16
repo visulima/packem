@@ -475,7 +475,6 @@ const cleanDistributionDirectories = async (context: BuildContext): Promise<void
     const cleanedDirectories: string[] = [];
 
     if (context.options.clean) {
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const directory of new Set(
             // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
             context.options.entries
@@ -567,7 +566,6 @@ const createBundler = async (
                 "packem.config.mts",
             ];
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const file of packemConfigFiles) {
                 if (isAccessibleSync(join(rootDirectory, file))) {
                     packemConfigFilePath = "./" + file;
@@ -609,7 +607,6 @@ const createBundler = async (
             }),
         );
 
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for await (const buildOptions of arrayify(buildConfig)) {
             const cacheKey = packageJsonCacheKey + getHash(JSON.stringify(buildOptions));
 

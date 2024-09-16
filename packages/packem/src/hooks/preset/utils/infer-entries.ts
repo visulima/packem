@@ -34,7 +34,6 @@ const createOrUpdateEntry = (
 
     let runtime: Runtime = "node";
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const runtimeExportConvention of RUNTIME_EXPORT_CONVENTIONS) {
         if (output.file.includes("." + runtimeExportConvention + ".") || output.subKey === runtimeExportConvention) {
             runtime = runtimeExportConvention as Runtime;
@@ -136,7 +135,6 @@ const inferEntries = (
     if (packageJson.bin) {
         const binaries = (typeof packageJson.bin === "string" ? [packageJson.bin] : Object.values(packageJson.bin)).filter(Boolean);
 
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const file of binaries) {
             const inferredType = inferExportTypeFromFileName(file);
 
@@ -176,7 +174,6 @@ const inferEntries = (
     // Infer entries from package files
     const entries: BuildEntry[] = [];
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const output of outputs) {
         if (context.options.declaration === undefined && (output.key === "types" || output.subKey === "types")) {
             context.options.declaration = output.file.includes(".d.ts") ? "compatible" : true;
@@ -223,7 +220,6 @@ const inferEntries = (
             // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
             const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace(/(.*)\.[^.]*$/, "$1").replace("*", "(.*)") + fileExtensionRegex);
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const source of sourceFiles) {
                 if (SOURCE_RE.test(source) || (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && SPECIAL_SOURCE_RE.test(source))) {
                     inputs.push(source);
@@ -237,7 +233,6 @@ const inferEntries = (
                 continue;
             }
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const input of inputs) {
                 createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context, true);
             }

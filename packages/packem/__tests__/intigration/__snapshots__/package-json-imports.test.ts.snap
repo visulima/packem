@@ -1,0 +1,29 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem package.json bin > should use the package.json imports > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const x = 2;
+
+const x$1 = /*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	x
+}, Symbol.toStringTag, { value: 'Module' });
+
+exports.warns = x$1;
+"
+`;
+
+exports[`packem package.json bin > should use the package.json imports > mjs output 1`] = `
+"const x = 2;
+
+const x$1 = /*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	x
+}, Symbol.toStringTag, { value: 'Module' });
+
+export { x$1 as warns };
+"
+`;

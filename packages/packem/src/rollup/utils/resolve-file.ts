@@ -5,7 +5,6 @@ import { join } from "@visulima/path";
 const resolveFile = (extensions: string[], resolved: string, index = false): string | null => {
     const fileWithoutExtension = resolved.replace(/\.[jt]sx?$/, "");
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const extension of extensions) {
         const file = index ? join(resolved, `index${extension}`) : `${fileWithoutExtension}${extension}`;
 

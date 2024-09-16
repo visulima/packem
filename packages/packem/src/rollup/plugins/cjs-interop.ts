@@ -84,7 +84,7 @@ export const cjsInteropPlugin = ({
                 // will match `export { ... }` statement
                 const regex = /export\s\{\s(.*)\s\}/g;
 
-                // eslint-disable-next-line no-loops/no-loops,no-cond-assign
+                // eslint-disable-next-line no-cond-assign
                 while ((matchs = regex.exec(code)) !== null) {
                     // This is necessary to avoid infinite loops with zero-width matches
                     if (matchs.index === regex.lastIndex) {
@@ -106,7 +106,6 @@ export const cjsInteropPlugin = ({
 
                 let defaultKey = "";
 
-                // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const match of splitMatches) {
                     if (match.includes("type")) {
                         // eslint-disable-next-line no-continue

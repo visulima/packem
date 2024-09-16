@@ -57,7 +57,6 @@ const validatePackageEntries = (context: BuildContext): void => {
 
     const missingOutputs = [];
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const filename of filenames) {
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         if (filename && !filename.includes("*") && !existsSync(filename)) {
@@ -72,7 +71,6 @@ const validatePackageEntries = (context: BuildContext): void => {
     if (missingOutputs.length > 0) {
         let message = "Potential missing or wrong package.json files:";
 
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const missingOutput of missingOutputs) {
             const levensteinOutput = levenstein(missingOutput, listOfGeneratedFiles);
 

@@ -129,7 +129,7 @@ const preserveDirectives = ({
             if (code.startsWith("#") && code[1] === "!") {
                 let firstNewLineIndex = 0;
 
-                // eslint-disable-next-line no-loops/no-loops,@typescript-eslint/naming-convention,no-plusplus
+                // eslint-disable-next-line @typescript-eslint/naming-convention,no-plusplus
                 for (let index = 2, length_ = code.length; index < length_; index++) {
                     const charCode = code.codePointAt(index);
 
@@ -177,7 +177,6 @@ const preserveDirectives = ({
                 return null;
             }
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const node of ast.body.filter(Boolean)) {
                 // Only parse the top level directives, once reached to the first non statement literal node, stop parsing
                 if (node.type !== "ExpressionStatement") {

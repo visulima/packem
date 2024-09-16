@@ -1,3 +1,4 @@
+import { readdirSync } from "node:fs";
 import { versions } from "node:process";
 
 import type { ResolverObject } from "@rollup/plugin-alias";
@@ -8,13 +9,14 @@ import { nodeResolve as nodeResolvePlugin } from "@rollup/plugin-node-resolve";
 import replacePlugin from "@rollup/plugin-replace";
 import { wasm as wasmPlugin } from "@rollup/plugin-wasm";
 import { cyan } from "@visulima/colorize";
-import { isAbsolute, relative, resolve } from "@visulima/path";
+import { isAbsolute, join, relative, resolve } from "@visulima/path";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
 import polyfillPlugin from "rollup-plugin-polyfill-node";
 import { visualizer as visualizerPlugin } from "rollup-plugin-visualizer";
 import { minVersion } from "semver";
 
+import { ENDING_RE } from "../constants";
 import type { BuildContext, InternalBuildOptions } from "../types";
 import arrayIncludes from "../utils/array-includes";
 import arrayify from "../utils/arrayify";
@@ -187,11 +189,11 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext): boolean => {
 };
 
 const calledImplicitExternals = new Map<string, boolean>();
+const cachedGlobFiles = new Map<string, string[]>();
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string, string>, type: "dependencies" | "dts"): RollupOptions => {
     const findAlias = (id: string): string | undefined => {
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [key, replacement] of Object.entries(resolvedAliases)) {
             if (id.startsWith(key)) {
                 return id.replace(key, replacement);
@@ -226,13 +228,37 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
             }
 
             // package.json imports are not externals
-            // eslint-disable-next-line security/detect-object-injection,@typescript-eslint/no-unnecessary-condition
-            if ((pkg?.imports as Record<string, string>)?.[id] !== undefined) {
-                return false;
+            if (pkg.imports) {
+                for (const [key, value] of Object.entries(pkg.imports)) {
+                    if (key === id) {
+                        return false;
+                    }
+
+                    // if a glob is used, we need to check if the id matches the files in the source directory
+                    if (key.includes("*")) {
+                        let files: string[];
+
+                        if (cachedGlobFiles.has(key)) {
+                            files = cachedGlobFiles.get(key) as string[];
+                        } else {
+                            // eslint-disable-next-line security/detect-non-literal-fs-filename
+                            files = readdirSync(join(context.options.rootDir, (value as string).replace("/*", "")), { withFileTypes: true })
+                                .filter((dirent) => dirent.isFile())
+                                .map((dirent) => dirent.name);
+
+                            cachedGlobFiles.set(key, files);
+                        }
+
+                        for (const file of files) {
+                            if (file.replace(ENDING_RE, "") === id.replace(ENDING_RE, "").replace("#", "")) {
+                                return false;
+                            }
+                        }
+                    }
+                }
             }
 
             if (configAlias) {
-                // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const { find } of configAlias) {
                     if (find.test(id)) {
                         context.logger.debug({

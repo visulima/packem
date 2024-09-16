@@ -47,7 +47,6 @@ const autoPreset: BuildPreset = {
 
             const result = inferEntries(packageJson, sourceFiles, context);
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const message of result.warnings) {
                 warn(context, message);
             }

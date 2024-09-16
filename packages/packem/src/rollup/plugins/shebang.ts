@@ -44,7 +44,6 @@ export const shebangPlugin = (executablePaths: string[], shebang: string): Plugi
         },
 
         async writeBundle(options, bundle) {
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const [fileName, output] of Object.entries(bundle)) {
                 if (output.type !== "chunk") {
                     // eslint-disable-next-line no-continue

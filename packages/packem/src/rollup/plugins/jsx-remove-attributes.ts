@@ -70,9 +70,7 @@ export const jsxRemoveAttributes = ({ attributes, logger }: { logger: Pail } & J
                             (argument) => argument.type === "ObjectExpression" && Array.isArray(argument.properties),
                         ) as ObjectExpression[];
 
-                        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                         for (const object of filteredArguments) {
-                            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                             for (const property of object.properties) {
                                 if (
                                     property.type === "Property" &&

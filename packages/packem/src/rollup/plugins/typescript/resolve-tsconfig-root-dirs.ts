@@ -23,7 +23,6 @@ const getRootDirectories = (cwd: string, tsconfig?: TsConfigResult): string[] | 
 
     const mappedRootDirectories: string[] = [];
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const rootDirectory of rootDirs) {
         if (rootDirectory.startsWith(".")) {
             throw new Error(`Invalid rootDir value '.' in ${tsConfigPath}.`);
@@ -71,7 +70,6 @@ const resolveTsconfigRootDirectories = (cwd: string, logger: Pail, tsconfig: TsC
             }
 
             if (id.startsWith(".")) {
-                // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const rootDirectory of rootDirectories) {
                     const updatedId = join(rootDirectory, id);
 

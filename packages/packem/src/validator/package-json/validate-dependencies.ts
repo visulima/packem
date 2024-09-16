@@ -15,7 +15,6 @@ const validateDependencies = (context: BuildContext): void => {
     const unusedDependencies = new Set<string>(Object.keys(context.pkg?.dependencies ?? {}));
     const implicitDependencies = new Set<string>();
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const id of context.usedImports) {
         unusedDependencies.delete(id);
         usedDependencies.add(id);
@@ -23,13 +22,12 @@ const validateDependencies = (context: BuildContext): void => {
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (context.pkg?.dependencies) {
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax,@typescript-eslint/no-unnecessary-condition
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         for (const id of Object.keys(context.pkg?.dependencies)) {
             unusedDependencies.delete(id);
         }
     }
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const id of usedDependencies) {
         const packageId = getPackageName(id);
 

@@ -34,7 +34,7 @@ const calledDtsFiles = new Map<string, boolean>();
 function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: RenderedChunk, { identifierReplacements }: PatchTypesOptions, logger: Pail) {
     const imports = findStaticImports(code);
 
-    // eslint-disable-next-line guard-for-in,no-loops/no-loops,no-restricted-syntax
+    // eslint-disable-next-line guard-for-in
     for (const moduleName in identifierReplacements) {
         // eslint-disable-next-line @typescript-eslint/no-shadow
         const imp = imports.find((imp) => imp.specifier === moduleName && imp.imports.includes("{"));
@@ -52,7 +52,7 @@ function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: Ren
         // eslint-disable-next-line security/detect-object-injection
         const replacements = identifierReplacements[moduleName];
 
-        // eslint-disable-next-line guard-for-in,no-loops/no-loops,no-restricted-syntax
+        // eslint-disable-next-line guard-for-in
         for (const id in replacements) {
             // Validate that `identifierReplacements` is not outdated if there's no match
             if (!imp.imports.includes(id)) {

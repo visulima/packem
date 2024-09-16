@@ -9,7 +9,7 @@ import inferEntries from "../../../../../src/hooks/preset/utils/infer-entries";
 import type { BuildContext, InferEntriesResult } from "../../../../../src/types";
 
 const createFiles = (files: string[], directory: string) => {
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
+     
     for (const file of files) {
         writeFileSync(`${directory}/${file}`, "", {
             overwrite: true,

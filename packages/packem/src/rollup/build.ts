@@ -27,18 +27,15 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
 
     const assets = new Map<string, BuildContextBuildEntry | BuildContextBuildAssetAndChunk>();
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const outputOptions of rollupOptions.output as OutputOptions[]) {
         // eslint-disable-next-line no-await-in-loop
         const { output } = await buildResult.write(outputOptions);
         const chunkFileNames = new Set<string>();
         const outputChunks = output.filter((fOutput) => fOutput.type === "chunk") as OutputChunk[];
 
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const entry of outputChunks) {
             chunkFileNames.add(entry.fileName);
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const id of entry.imports) {
                 context.usedImports.add(id);
             }
@@ -62,7 +59,6 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
 
         const outputAssets = output.filter((fOutput) => fOutput.type === "asset") as OutputAsset[];
 
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const entry of outputAssets) {
             if (assets.has(entry.fileName)) {
                 // eslint-disable-next-line no-continue
@@ -76,7 +72,6 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
             });
         }
 
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const chunkFileName of chunkFileNames) {
             context.usedImports.delete(chunkFileName);
         }

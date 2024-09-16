@@ -48,7 +48,7 @@ const gatherNamedReExports = async function* (context: PluginContext, reexported
 
     const bindingsByImportedName = new Map<string, ExportBinding>(reexported.bindings.map((binding) => [binding.importedName, binding]));
 
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define,no-loops/no-loops,no-restricted-syntax
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     for await (const exportInfo of gatherExports(context, importedModule)) {
         const binding = bindingsByImportedName.get(exportInfo.exportedName);
 
@@ -70,7 +70,6 @@ const gatherNamedSelfExports = async function* (module_: ModuleInfo, exported: N
 };
 
 const gatherExports = async function* (context: PluginContext, module_: ModuleInfo): AsyncGenerator<ExportInfo> {
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const exported of parseExports(context, module_)) {
         if (exported.from === "self") {
             yield* gatherNamedSelfExports(module_, exported);

@@ -68,12 +68,12 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<vo
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const prepareEntries = async (context: BuildContext): Promise<void> => {
     context.options.entries = context.options.entries.map((entry) =>
-        (typeof entry === "string"
+        typeof entry === "string"
             ? { input: entry, isGlob: isGlob(entry) }
-            : { ...entry, exportKey: entry.exportKey ?? new Set(), isGlob: isGlob(entry.input) }),
+            : { ...entry, exportKey: entry.exportKey ?? new Set(), isGlob: isGlob(entry.input) },
     );
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax,@typescript-eslint/no-shadow
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     for (const entry of context.options.entries.filter((entry) => entry.isGlob)) {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const { isGlob: _, ...entryWithoutGlob } = entry;
@@ -87,7 +87,6 @@ const prepareEntries = async (context: BuildContext): Promise<void> => {
             if (typeof context.options.rollup.watch.exclude === "string") {
                 ignore.push(context.options.rollup.watch.exclude);
             } else if (Array.isArray(context.options.rollup.watch.exclude)) {
-                // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const pattern of context.options.rollup.watch.exclude) {
                     if (typeof pattern === "string") {
                         ignore.push(pattern);
@@ -107,7 +106,6 @@ const prepareEntries = async (context: BuildContext): Promise<void> => {
             throw new NotFoundError("No files found in the glob pattern: " + cyan(join(context.options.rootDir, entryWithoutGlob.input)));
         }
 
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const file of files) {
             context.options.entries.push({
                 ...entryWithoutGlob,
@@ -118,12 +116,12 @@ const prepareEntries = async (context: BuildContext): Promise<void> => {
         context.options.entries.splice(context.options.entries.indexOf(entry), 1);
     }
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax,@typescript-eslint/no-shadow
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     for await (const entry of context.options.entries.filter((entry) => entry.fileAlias === undefined)) {
         await extendEntry(entry, context);
     }
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax,@typescript-eslint/no-shadow
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     for await (const entry of context.options.entries.filter((entry) => entry.fileAlias !== undefined)) {
         entry.name = entry.fileAlias;
         entry.fileAlias = undefined;

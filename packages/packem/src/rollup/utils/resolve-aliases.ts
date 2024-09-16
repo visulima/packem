@@ -14,7 +14,6 @@ const resolveAliases = (context: BuildContext, mode: "build" | "jit" | "types"):
     if (context.pkg.imports) {
         const { imports } = context.pkg;
 
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const alias in imports) {
             if (alias.startsWith("#")) {
                 // eslint-disable-next-line no-continue

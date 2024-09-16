@@ -84,7 +84,6 @@ export const isolatedDeclarationsPlugin = (
             return (node.specifiers || []).every((spec: any) => spec.type === "ImportSpecifier" && spec.importKind === "type");
         });
 
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for await (const typeImport of typeImports) {
             const resolved = await this.resolve(typeImport.source.value, id);
 
@@ -122,7 +121,6 @@ export const isolatedDeclarationsPlugin = (
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             const entryFileNames = outputOptions.entryFileNames.replace(/\.(.)?[jt]s$/, (_, s) => `.d.${s || ""}ts`);
 
-            // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
             for (const [filename, source] of Object.entries(outputFiles)) {
                 if ((declaration === true || declaration === "compatible") && outputOptions.format === format) {
                     this.emitFile({

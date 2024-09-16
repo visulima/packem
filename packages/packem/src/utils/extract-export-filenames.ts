@@ -47,7 +47,6 @@ export const extractExportFilenames = (
 
         let descriptors: OutputDescriptor[] = [];
 
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const [exportKey, packageExport] of filteredEntries) {
             if (typeof packageExport === "string") {
                 let descriptor = {};
@@ -67,7 +66,6 @@ export const extractExportFilenames = (
                     type: inferExportType(exportKey, conditions, packageType, packageExport),
                 } as OutputDescriptor);
             } else if (typeof packageExport === "object" && packageExport !== null) {
-                // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const [condition, entryExport] of Object.entries(packageExport)) {
                     if (declaration === false && condition === "types") {
                         return [];

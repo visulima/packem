@@ -13,7 +13,6 @@ const chunkSplitter = (): Plugin => {
                     return;
                 }
 
-                // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for await (const exported of gatherExports(this, info)) {
                     if (exported.id === info.id) {
                         // eslint-disable-next-line no-continue

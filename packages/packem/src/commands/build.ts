@@ -28,7 +28,6 @@ const createBuildCommand = (cli: Cli): void => {
             }
 
             if (options.env) {
-                // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
                 for (const environment of options.env) {
                     if (environment.key === "NODE_ENV") {
                         if (nodeEnvironment) {

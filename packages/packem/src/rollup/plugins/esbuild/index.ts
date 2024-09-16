@@ -25,7 +25,7 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
     const loaders = DEFAULT_LOADERS;
 
     if (_loaders !== undefined) {
-        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax,prefer-const
+        // eslint-disable-next-line prefer-const
         for (let [key, value] of Object.entries(_loaders)) {
             key = key.startsWith(".") ? key : `.${key}`;
 
