@@ -1,3 +1,12 @@
+## @visulima/packem [1.0.0-alpha.114](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.113...@visulima/packem@1.0.0-alpha.114) (2024-09-16)
+
+### Bug Fixes
+
+* added Security Policy, added test run on release, updated readme ([c07ea0f](https://github.com/visulima/packem/commit/c07ea0fa7140b83fe8ef13c49afe8ef838034686))
+* fixed tests ([fb69a7b](https://github.com/visulima/packem/commit/fb69a7b98d4498c0844da18e179965f0ee7ca310))
+* fixed tests ([b0558c3](https://github.com/visulima/packem/commit/b0558c3449df4e2322b4b44faf27719b21c2e2ee))
+* renamed variables ([273079e](https://github.com/visulima/packem/commit/273079e1ff802231916ecdd9a047b67e754a2b84))
+
 ## @visulima/packem [1.0.0-alpha.113](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.112...@visulima/packem@1.0.0-alpha.113) (2024-09-15)
 
 ### Bug Fixes
