@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.122](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.121...@visulima/packem@1.0.0-alpha.122) (2024-09-16)
+
+### Bug Fixes
+
+* improved the code ([6757baa](https://github.com/visulima/packem/commit/6757baab37c3fd776fa26e159f6e96cff9ef8b9f))
+
 ## @visulima/packem [1.0.0-alpha.121](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.120...@visulima/packem@1.0.0-alpha.121) (2024-09-16)
 
 ### Bug Fixes
