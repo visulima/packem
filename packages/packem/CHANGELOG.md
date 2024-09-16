@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.116](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.115...@visulima/packem@1.0.0-alpha.116) (2024-09-16)
+
+### Bug Fixes
+
+* improved information about assets and entries, fixed lint error ([6fe6fce](https://github.com/visulima/packem/commit/6fe6fce87a893c088f0de6f727a4680bcd906641))
+
 ## @visulima/packem [1.0.0-alpha.115](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.114...@visulima/packem@1.0.0-alpha.115) (2024-09-16)
 
 ### Bug Fixes
