@@ -478,7 +478,7 @@ export const value = dep
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const dep = 'polyfill-dep';
+const dep = "polyfill-dep";
 
 const value = dep;
 

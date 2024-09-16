@@ -72,7 +72,7 @@ const validatePackageFields = (context: BuildContext): void => {
     }
 
     if (typeof pkg.exports === "object") {
-        // TODO: add validation for exports
+        // @TODO: add validation for exports
     }
 
     if (validation?.packageJson?.bin !== false) {

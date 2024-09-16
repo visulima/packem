@@ -28,7 +28,9 @@ exports[`packem typescript > resolve-typescript-tsconfig-paths plugin > should r
 exports[`packem typescript > should allow support for "allowJs" and generate proper assets > cjs code output 1`] = `
 "'use strict';
 
-const index = () => 'index';
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const index = /* @__PURE__ */ __name(() => "index", "default");
 
 module.exports = index;
 "

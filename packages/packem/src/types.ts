@@ -91,8 +91,8 @@ export interface RollupBuildOptions {
     swc?: SwcPluginConfig | false;
     treeshake?: RollupOptions["treeshake"];
     visualizer?: PluginVisualizerOptions | false;
-    watch?: RollupOptions["watch"];
     wasm?: RollupWasmOptions | false;
+    watch?: RollupOptions["watch"];
 }
 
 export type Runtime = "react-server" | "react-native" | "edge-light" | "node";

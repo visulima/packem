@@ -96,7 +96,7 @@ let privateSubfolderWarningShown = false;
 const validateIfTypescriptIsInstalled = (context: BuildContext): void => {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (context.pkg?.dependencies?.typescript === undefined && context.pkg?.devDependencies?.typescript === undefined) {
-        // @TODO Add command to install typescript
+        // @TODO: Add command to install typescript
         throw new Error("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");
     }
 };

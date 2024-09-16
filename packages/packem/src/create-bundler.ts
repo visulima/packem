@@ -15,7 +15,7 @@ import { VERSION } from "rollup";
 
 import build from "./build";
 import type { BuildConfigFunction } from "./config";
-import { DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV, ALLOWED_TRANSFORM_EXTENSIONS_REGEX } from "./constants";
+import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "./constants";
 import resolvePreset from "./hooks/preset/utils/resolve-preset";
 import createStub from "./jit/create-stub";
 import getHash from "./rollup/utils/get-hash";

@@ -93,9 +93,12 @@ export const a = 1`,
 import __cjs_path__ from "node:path"; // -- packem CommonJS __dirname shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
 const __dirname = __cjs_path__.dirname(__filename);
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getDirname() {
-  return __dirname
+  return __dirname;
 }
+__name(getDirname, "getDirname");
 
 export { getDirname };
 `);
@@ -106,9 +109,12 @@ export { getDirname };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getDirname() {
-  return __dirname
+  return __dirname;
 }
+__name(getDirname, "getDirname");
 
 exports.getDirname = getDirname;
 `);
@@ -117,9 +123,12 @@ exports.getDirname = getDirname;
 
         expect(mjsFilenameContent).toBe(`import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getFilename() {
-  return __filename
+  return __filename;
 }
+__name(getFilename, "getFilename");
 
 export { getFilename };
 `);
@@ -130,9 +139,12 @@ export { getFilename };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getFilename() {
-  return __filename
+  return __filename;
 }
+__name(getFilename, "getFilename");
 
 exports.getFilename = getFilename;
 `);
@@ -141,13 +153,16 @@ exports.getFilename = getFilename;
 
         expect(mjsRequireContent).toBe(`import __cjs_mod__ from "node:module"; // -- packem CommonJS require shim --
 const require = __cjs_mod__.createRequire(import.meta.url);
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getRequireModule() {
-  return require('node:fs')
+  return require("node:fs");
 }
-
+__name(getRequireModule, "getRequireModule");
 function esmImport() {
-  return import.meta.url
+  return import.meta.url;
 }
+__name(esmImport, "esmImport");
 
 export { esmImport, getRequireModule };
 `);
@@ -159,13 +174,16 @@ export { esmImport, getRequireModule };
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getRequireModule() {
-  return require('node:fs')
+  return require("node:fs");
 }
-
+__name(getRequireModule, "getRequireModule");
 function esmImport() {
-  return (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('require.cjs', document.baseURI).href))
+  return (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('require.cjs', document.baseURI).href));
 }
+__name(esmImport, "esmImport");
 
 exports.esmImport = esmImport;
 exports.getRequireModule = getRequireModule;
@@ -245,9 +263,12 @@ export function esmImport() {
         const mjsDirnameContent = readFileSync(`${temporaryDirectoryPath}/dist/dirname.mjs`);
 
         expect(mjsDirnameContent).toBe(`const __dirname = import.meta.dirname; // -- packem CommonJS __dirname shim --
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getDirname() {
-  return __dirname
+  return __dirname;
 }
+__name(getDirname, "getDirname");
 
 export { getDirname };
 `);
@@ -258,9 +279,12 @@ export { getDirname };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getDirname() {
-  return __dirname
+  return __dirname;
 }
+__name(getDirname, "getDirname");
 
 exports.getDirname = getDirname;
 `);
@@ -268,9 +292,12 @@ exports.getDirname = getDirname;
         const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/filename.mjs`);
 
         expect(mjsFilenameContent).toBe(`const __filename = import.meta.filename; // -- packem CommonJS __filename shim --
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getFilename() {
-  return __filename
+  return __filename;
 }
+__name(getFilename, "getFilename");
 
 export { getFilename };
 `);
@@ -281,9 +308,12 @@ export { getFilename };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getFilename() {
-  return __filename
+  return __filename;
 }
+__name(getFilename, "getFilename");
 
 exports.getFilename = getFilename;
 `);
@@ -292,13 +322,16 @@ exports.getFilename = getFilename;
 
         expect(mjsRequireContent).toBe(`import __cjs_mod__ from "node:module"; // -- packem CommonJS require shim --
 const require = __cjs_mod__.createRequire(import.meta.url);
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getRequireModule() {
-  return require('node:fs')
+  return require("node:fs");
 }
-
+__name(getRequireModule, "getRequireModule");
 function esmImport() {
-  return import.meta.url
+  return import.meta.url;
 }
+__name(esmImport, "esmImport");
 
 export { esmImport, getRequireModule };
 `);
@@ -310,13 +343,16 @@ export { esmImport, getRequireModule };
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getRequireModule() {
-  return require('node:fs')
+  return require("node:fs");
 }
-
+__name(getRequireModule, "getRequireModule");
 function esmImport() {
-  return (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('require.cjs', document.baseURI).href))
+  return (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('require.cjs', document.baseURI).href));
 }
+__name(esmImport, "esmImport");
 
 exports.esmImport = esmImport;
 exports.getRequireModule = getRequireModule;
@@ -382,22 +418,28 @@ export { getFilename } from "./filename.js";`,
 import __cjs_path__ from "node:path"; // -- packem CommonJS __dirname shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
 const __dirname = __cjs_path__.dirname(__filename);
-export { getFilename } from './packem_shared/getFilename-CLKd-Q-c.mjs';
+export { getFilename } from './packem_shared/getFilename-CyjjIqAi.mjs';
 
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getDirname() {
-  return __dirname
+  return __dirname;
 }
+__name(getDirname, "getDirname");
 
 export { getDirname };
 `);
 
-        const mjsSharedContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/getFilename-CLKd-Q-c.mjs`);
+        const mjsSharedContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/getFilename-CyjjIqAi.mjs`);
 
         expect(mjsSharedContent).toBe(`import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getFilename() {
-  return __filename
+  return __filename;
 }
+__name(getFilename, "getFilename");
 
 export { getFilename };
 `);

@@ -34,24 +34,24 @@ It uses the `exports` configuration in `package.json` and recognizes entry file 
 
 ## Features
 
-- ✅ package.json#exports, package.json#main, package.json#module to define entry-points
-- ✅ package.json#bin to define executables
-- ✅ package.json#types to define types
-- ✅ Generates package.json#typeVersions to support node 10
-- ✅ Dependency externalization
-- ✅ Minification
-- ✅ TypeScript support + .d.ts bundling
-- ✅ Watch mode
-- ✅ CLI outputs (auto hashbang insertion)
-- ✅ Validates package.json and checks if all fields that are needed to publish your package are configured correctly
-- ✅ Supports multiple runtimes (default, react-server, edge-light)
-- ✅ Supports react server and client components
-- ✅ Supports shared modules
-- ✅ Supports dynamic import
-- ✅ Supports `tsconfig.json` paths and `package.json` imports resolution
-- ✅ ESM ⇄ CJS interoperability
-- ✅ Supports isolated declaration types (experimental)
-- ✅ Supports wasm [WebAssembly modules](http://webassembly.org)
+-   ✅ package.json#exports, package.json#main, package.json#module to define entry-points
+-   ✅ package.json#bin to define executables
+-   ✅ package.json#types to define types
+-   ✅ Generates package.json#typeVersions to support node 10
+-   ✅ Dependency externalization
+-   ✅ Minification
+-   ✅ TypeScript support + .d.ts bundling
+-   ✅ Watch mode
+-   ✅ CLI outputs (auto hashbang insertion)
+-   ✅ Validates package.json and checks if all fields that are needed to publish your package are configured correctly
+-   ✅ Supports multiple runtimes (default, react-server, edge-light)
+-   ✅ Supports react server and client components
+-   ✅ Supports shared modules
+-   ✅ Supports dynamic import
+-   ✅ Supports `tsconfig.json` paths and `package.json` imports resolution
+-   ✅ ESM ⇄ CJS interoperability
+-   ✅ Supports isolated declaration types (experimental)
+-   ✅ Supports wasm [WebAssembly modules](http://webassembly.org)
 
 And more...
 
@@ -241,9 +241,8 @@ For instance:
 
 If you need to separate the `production` and `development` exports condition, `packem` provides `process.env.NODE_ENV` injected by default if present that you don't need to manually inject yourself.
 
-
-- When the `production` exports condition is defined and the file ends with `*.production.*` in the package.json, the bundle will be minified.
-- When the `development` exports condition is defined and the file ends with `*.development.*` in the package.json, the bundle will not be minified.
+-   When the `production` exports condition is defined and the file ends with `*.production.*` in the package.json, the bundle will be minified.
+-   When the `development` exports condition is defined and the file ends with `*.development.*` in the package.json, the bundle will not be minified.
 
 ```json
 {
@@ -258,8 +257,7 @@ If you need to separate the `production` and `development` exports condition, `p
 
 To build executable files with the `bin` field in package.json. The source file matching will be same as the entry files convention.
 
-> [!NOTE]
-> `packem` automatically preserves and prepends the shebang to the executable file, and fix correct permissions for the executable file.
+> [!NOTE] > `packem` automatically preserves and prepends the shebang to the executable file, and fix correct permissions for the executable file.
 
 For example:
 
@@ -391,14 +389,15 @@ Use the `--visualize` flag to generate a `packem-bundle-analyze.html` file at bu
 `packem` supports building module workers with the `--workers` flag, which are a special type of bundle that can be used to run code in a web worker.
 
 ```js
-worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
+worker = new Worker(new URL("./worker.js", import.meta.url), { type: "module" });
 // or simply:
-worker = new Worker('./worker.js', { type: 'module' });
+worker = new Worker("./worker.js", { type: "module" });
 ```
 
 #### CSS and CSS Modules (Coming Soon)
 
 ### Aliases
+
 Aliases can be configured in the [import map](https://nodejs.org/api/packages.html#imports), defined in `package.json#imports`.
 
 For native Node.js import mapping, all entries must be prefixed with `#` to indicate an internal [subpath import](https://nodejs.org/api/packages.html#subpath-imports). `Packem` takes advantage of this behavior to define entries that are _not prefixed_ with `#` as an alias.
@@ -411,13 +410,13 @@ Native Node.js import mapping supports conditional imports (eg. resolving differ
 {
     // ...
 
-    "imports": {
+    imports: {
         // Mapping '~utils' to './src/utils.js'
         "~utils": "./src/utils.js",
 
         // Native Node.js import mapping (can't reference ./src)
         "#internal-package": "./vendors/package/index.js",
-    }
+    },
 }
 ```
 
@@ -430,14 +429,17 @@ Because `packem` uses Rollup, it's able to produce CJS modules that are minimal 
 This means you can technically output in CommonJS to get ESM and CommonJS support.
 
 #### `require()` in ESM
+
 Sometimes it's useful to use `require()` or `require.resolve()` in ESM. ESM code that uses `require()` can be seamlessly compiled to CommonJS, but when compiling to ESM, Node.js will error because `require` doesn't exist in the module scope.
 
 When compiling to ESM, `packem` detects `require()` usages and shims it with [`createRequire(import.meta.url)`](https://nodejs.org/api/module.html#modulecreaterequirefilename).
 
 ### Environment variables
+
 Pass in compile-time environment variables with the `--env` flag.
 
 This will replace all instances of `process.env.NODE_ENV` with `'production'` and remove unused code:
+
 ```sh
 packem build --env.NODE_ENV=production
 ```

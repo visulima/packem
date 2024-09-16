@@ -12,7 +12,7 @@ export default defineConfig({
         node10Compatibility: {
             typeScriptVersion: ">=5.0",
             writeToPackageJson: true,
-        }
+        },
     },
     transformer,
 });

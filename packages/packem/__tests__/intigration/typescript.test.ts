@@ -1015,7 +1015,7 @@ __name(sharedApi, "sharedApi");
 
 export { sharedApi };
 `);
-        // eslint-disable-next-line no-secrets/no-secrets
+
         const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/AppContext-BSWWkl28.mjs`);
 
         expect(mjsChunk2Content).toBe(`'use client';
@@ -1028,7 +1028,6 @@ export { AppContext };
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        // eslint-disable-next-line no-secrets/no-secrets
         expect(cjsContent).toBe(`'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
@@ -1043,7 +1042,6 @@ exports.AppContext = AppContext.AppContext;
 exports.index = index;
 `);
 
-        // eslint-disable-next-line no-secrets/no-secrets
         const cjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/anotherSharedApi-C_G2lNA6.cjs`);
 
         expect(cjsChunk1Content).toBe(`'use strict';
@@ -1060,7 +1058,6 @@ __name(sharedApi, "sharedApi");
 exports.sharedApi = sharedApi;
 `);
 
-        // eslint-disable-next-line no-secrets/no-secrets
         const cjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/AppContext-BcQ69C1t.cjs`);
 
         expect(cjsChunk2Content).toBe(`'use client';
@@ -1666,7 +1663,6 @@ export { test as default };
 }`);
         });
 
-        // eslint-disable-next-line no-secrets/no-secrets
         it("should generate a node10 typesVersions field in package.json when rollup.node10Compatibility.writeToPackageJson is true", async () => {
             expect.assertions(5);
 

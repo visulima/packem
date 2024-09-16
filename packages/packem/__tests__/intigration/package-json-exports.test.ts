@@ -308,7 +308,7 @@ export { IString };`,
 
         const content = readFileSync(`${temporaryDirectoryPath}/dist/foo/bar.mjs`);
 
-        expect(content).toMatch(`const value = 'foo.bar';
+        expect(content).toMatch(`const value = "foo.bar";
 
 export { value };
 `);
@@ -999,22 +999,28 @@ export function Client() {
 
         expect(mjsContent).toBe(`'use client';
 import React, { useState } from 'react';
-export { Client } from './packem_shared/Client-0aUfCstW.mjs';
+export { Client } from './packem_shared/Client-C2Syj0qA.mjs';
 
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Button() {
-    const [count] = useState(0);
-    return React.createElement("button", \`count: \${count}\`);
+  const [count] = useState(0);
+  return React.createElement("button", \`count: \${count}\`);
 }
+__name(Button, "Button");
 
 export { Button };
 `);
 
-        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-0aUfCstW.mjs`);
+        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-C2Syj0qA.mjs`);
 
         expect(mjsClientContent).toBe(`'use client';
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Client() {
-    return "client-module";
+  return "client-module";
 }
+__name(Client, "Client");
 
 export { Client };
 `);
@@ -1027,31 +1033,37 @@ export { Client };
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 const React = require('react');
-const Client = require('./packem_shared/Client-DHI4OAAj.cjs');
+const Client = require('./packem_shared/Client-CjMHur1x.cjs');
 
 const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
 
 const React__default = /*#__PURE__*/_interopDefaultCompat(React);
 
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Button() {
-    const [count] = React.useState(0);
-    return React__default.createElement("button", \`count: \${count}\`);
+  const [count] = React.useState(0);
+  return React__default.createElement("button", \`count: \${count}\`);
 }
+__name(Button, "Button");
 
 exports.Client = Client.Client;
 exports.Button = Button;
 `);
 
-        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-DHI4OAAj.cjs`);
+        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-CjMHur1x.cjs`);
 
         expect(cjsClientContent).toBe(`'use client';
 'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Client() {
-    return "client-module";
+  return "client-module";
 }
+__name(Client, "Client");
 
 exports.Client = Client;
 `);
@@ -1139,26 +1151,32 @@ export const asset = "asset-module";
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`export { Button } from './ui.mjs';
-export { action } from './packem_shared/action-REGqcVNs.mjs';
-export { Client, Client as UIClient } from './packem_shared/Client-0aUfCstW.mjs';
+export { action } from './packem_shared/action-DScVMxSh.mjs';
+export { Client, Client as UIClient } from './packem_shared/Client-C2Syj0qA.mjs';
 `);
 
-        const mjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-REGqcVNs.mjs`);
+        const mjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-DScVMxSh.mjs`);
 
         expect(mjsActionContent).toBe(`'use server';
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 async function action() {
-    return "server-action";
+  return "server-action";
 }
+__name(action, "action");
 
 export { action };
 `);
 
-        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-0aUfCstW.mjs`);
+        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-C2Syj0qA.mjs`);
 
         expect(mjsClientContent).toBe(`'use client';
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Client() {
-    return "client-module";
+  return "client-module";
 }
+__name(Client, "Client");
 
 export { Client };
 `);
@@ -1170,8 +1188,8 @@ export { Client };
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 const ui = require('./ui.cjs');
-const action = require('./packem_shared/action-CVnwqfrD.cjs');
-const Client = require('./packem_shared/Client-DHI4OAAj.cjs');
+const action = require('./packem_shared/action-DdW0-Ipg.cjs');
+const Client = require('./packem_shared/Client-CjMHur1x.cjs');
 
 
 
@@ -1181,31 +1199,36 @@ exports.Client = Client.Client;
 exports.UIClient = Client.Client;
 `);
 
-        const cjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-CVnwqfrD.cjs`);
+        const cjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-DdW0-Ipg.cjs`);
 
         expect(cjsActionContent).toBe(`'use server';
 'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 async function action() {
-    return "server-action";
+  return "server-action";
 }
+__name(action, "action");
 
 exports.action = action;
 `);
 
-        // eslint-disable-next-line no-secrets/no-secrets
-        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-DHI4OAAj.cjs`);
+        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-CjMHur1x.cjs`);
 
         expect(cjsClientContent).toBe(`'use client';
 'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Client() {
-    return "client-module";
+  return "client-module";
 }
+__name(Client, "Client");
 
 exports.Client = Client;
 `);
