@@ -17,84 +17,116 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
     const rPath = (p: string) => relative(context.options.rootDir, resolve(context.options.outDir, p));
 
     let loggedEntries = false;
+    const foundDtsEntries: string[] = [];
 
-    for (const entry of context.buildEntries.filter((bEntry) => !bEntry.chunk)) {
-        let totalBytes = entry.bytes ?? 0;
+    const entries = context.buildEntries.filter((bEntry) => bEntry.type === "entry");
 
-        for (const chunk of entry.chunks ?? []) {
-            totalBytes += context.buildEntries.find((bEntry) => bEntry.path === chunk)?.bytes ?? 0;
-        }
+    if (entries.length > 0) {
+        logger.raw("Entries:\n");
 
-        let line = `  ${bold(rPath(entry.path))} (${[
-            "total size: " + cyan(formatBytes(totalBytes)),
-            entry.type !== "asset" && entry.bytes && "chunk size: " + cyan(formatBytes(entry.bytes)),
-        ]
-            .filter(Boolean)
-            .join(", ")})`;
+        for (const entry of entries) {
+            let totalBytes = entry.bytes ?? 0;
 
-        line += entry.exports?.length ? "\n  exports: " + gray(entry.exports.join(", ")) : "";
-
-        if (entry.chunks?.length) {
-            line += `\n${entry.chunks
-                .map((p) => {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const chunk = context.buildEntries.find((buildEntry) => buildEntry.path === p) ?? ({} as any);
-
-                    return gray("  └─ " + rPath(p) + bold(chunk.bytes ? " (" + formatBytes(chunk?.bytes) + ")" : ""));
-                })
-                .join("\n")}`;
-        }
-
-        if (entry.modules && entry.modules.length > 0) {
-            const moduleList = entry.modules
-                .filter((m) => m.id.includes("node_modules"))
-                .sort((a, b) => (b.bytes || 0) - (a.bytes || 0))
-                .map((m) => gray("  📦 " + rPath(m.id) + bold(m.bytes ? " (" + formatBytes(m.bytes) + ")" : "")))
-                .join("\n");
-
-            line += moduleList.length > 0 ? "\n  inlined modules:\n" + moduleList : "";
-        }
-
-        if (context.options.declaration && entry.type === "entry") {
-            let dtsPath = entry.path.replace(/\.js$/, ".d.ts");
-            let type = "commonjs";
-
-            if (entry.path.endsWith(".cjs")) {
-                dtsPath = entry.path.replace(/\.cjs$/, ".d.cts");
-            } else if (entry.path.endsWith(".mjs")) {
-                type = "module";
-                dtsPath = entry.path.replace(/\.mjs$/, ".d.mts");
+            for (const chunk of entry.chunks ?? []) {
+                totalBytes += context.buildEntries.find((bEntry) => bEntry.path === chunk)?.bytes ?? 0;
             }
 
-            const foundDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
+            let line = `  ${bold(rPath(entry.path))} (${[
+                "total size: " + cyan(formatBytes(totalBytes)),
+                entry.type !== "asset" && entry.bytes && "chunk size: " + cyan(formatBytes(entry.bytes)),
+            ]
+                .filter(Boolean)
+                .join(", ")})`;
 
-            if (foundDts) {
-                let foundCompatibleDts: BuildContextBuildEntry | BuildContextBuildAssetAndChunk | undefined;
+            line += entry.exports?.length ? "\n  exports: " + gray(entry.exports.join(", ")) : "";
 
-                if (!dtsPath.includes(".d.ts")) {
-                    dtsPath = (dtsPath as string).replace(type === "commonjs" ? ".d.c" : ".d.m", ".d.");
+            if (entry.chunks?.length) {
+                line += `\n${entry.chunks
+                    .map((p) => {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const chunk = context.buildEntries.find((buildEntry) => buildEntry.path === p) ?? ({} as any);
 
-                    foundCompatibleDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
+                        return gray("  └─ " + rPath(p) + bold(chunk.bytes ? " (" + formatBytes(chunk?.bytes) + ")" : ""));
+                    })
+                    .join("\n")}`;
+            }
+
+            if (entry.modules && entry.modules.length > 0) {
+                const moduleList = entry.modules
+                    .filter((m) => m.id.includes("node_modules"))
+                    .sort((a, b) => (b.bytes || 0) - (a.bytes || 0))
+                    .map((m) => gray("  📦 " + rPath(m.id) + bold(m.bytes ? " (" + formatBytes(m.bytes) + ")" : "")))
+                    .join("\n");
+
+                line += moduleList.length > 0 ? "\n  inlined modules:\n" + moduleList : "";
+            }
+
+            if (context.options.declaration) {
+                let dtsPath = entry.path.replace(/\.js$/, ".d.ts");
+                let type = "commonjs";
+
+                if (entry.path.endsWith(".cjs")) {
+                    dtsPath = entry.path.replace(/\.cjs$/, ".d.cts");
+                } else if (entry.path.endsWith(".mjs")) {
+                    type = "module";
+                    dtsPath = entry.path.replace(/\.mjs$/, ".d.mts");
                 }
 
-                line +=
-                    foundCompatibleDts && type === context.pkg.type
-                        ? "\n  types:\n" +
-                          [foundDts, foundCompatibleDts]
-                              .map(
-                                  (value: BuildContextBuildEntry | BuildContextBuildAssetAndChunk) =>
-                                      gray("  └─ ") + bold(rPath(value.path)) + " (total size: " + cyan(formatBytes(value.bytes ?? 0)) + ")",
-                              )
-                              .join("\n")
-                        : "\n  types: " + bold(rPath(foundDts.path)) + " (total size: " + cyan(formatBytes(foundDts.bytes ?? 0)) + ")";
-            }
-        }
+                const foundDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
 
-        loggedEntries = true;
+                if (foundDts) {
+                    foundDtsEntries.push(foundDts.path);
+
+                    let foundCompatibleDts: BuildContextBuildEntry | BuildContextBuildAssetAndChunk | undefined;
+
+                    if (!dtsPath.includes(".d.ts")) {
+                        dtsPath = (dtsPath as string).replace(".d.c", ".d.");
+
+                        foundCompatibleDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
+                    }
+
+                    if (foundCompatibleDts) {
+                        foundDtsEntries.push(foundCompatibleDts.path);
+
+                        line +=
+                            type === "commonjs"
+                                ? "\n  types:\n" +
+                                  [foundDts, foundCompatibleDts]
+                                      .map(
+                                          (value: BuildContextBuildEntry | BuildContextBuildAssetAndChunk) =>
+                                              gray("  └─ ") + bold(rPath(value.path)) + " (total size: " + cyan(formatBytes(value.bytes ?? 0)) + ")",
+                                      )
+                                      .join("\n")
+                                : "\n  types: " + bold(rPath(foundDts.path)) + " (total size: " + cyan(formatBytes(foundDts.bytes ?? 0)) + ")";
+                    }
+                }
+            }
+
+            loggedEntries = true;
+
+            line += "\n\n";
+
+            logger.raw(entry.chunk ? gray(line) : line);
+        }
+    }
+
+    const assets = context.buildEntries.filter((bEntry) => bEntry.type === "asset");
+
+    if (assets.length > 0) {
+        let line = "Assets:";
+
+        for (const asset of context.buildEntries.filter((bEntry) => bEntry.type === "asset")) {
+            if (foundDtsEntries.includes(asset.path)) {
+                // eslint-disable-next-line no-continue
+                continue;
+            }
+
+            line += gray("\n  └─ ") + bold(rPath(asset.path)) + " (total size: " + cyan(formatBytes(asset.bytes ?? 0)) + ")";
+        }
 
         line += "\n\n";
 
-        logger.raw(entry.chunk ? gray(line) : line);
+        logger.raw(line);
     }
 
     if (loggedEntries) {
@@ -200,22 +232,24 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                     rollups.push(rollupBuild(adjustedEsmAndCjsContext, fileCache, subDirectory));
                 }
 
-                const typedEntries = adjustedEsmAndCjsContext.options.entries.filter((entry) => entry.declaration);
+                if (context.options.declaration) {
+                    const typedEntries = adjustedEsmAndCjsContext.options.entries.filter((entry) => entry.declaration);
 
-                if (context.options.declaration && typedEntries.length > 0) {
-                    rollups.push(
-                        rollupBuildTypes(
-                            {
-                                ...adjustedEsmAndCjsContext,
-                                options: {
-                                    ...adjustedEsmAndCjsContext.options,
-                                    entries: typedEntries,
+                    if (typedEntries.length > 0) {
+                        rollups.push(
+                            rollupBuildTypes(
+                                {
+                                    ...adjustedEsmAndCjsContext,
+                                    options: {
+                                        ...adjustedEsmAndCjsContext.options,
+                                        entries: typedEntries,
+                                    },
                                 },
-                            },
-                            fileCache,
-                            subDirectory,
-                        ),
-                    );
+                                fileCache,
+                                subDirectory,
+                            ),
+                        );
+                    }
                 }
             }
 
@@ -235,22 +269,24 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                     rollups.push(rollupBuild(adjustedEsmContext, fileCache, subDirectory));
                 }
 
-                const typedEntries = adjustedEsmContext.options.entries.filter((entry) => entry.declaration);
+                if (context.options.declaration) {
+                    const typedEntries = adjustedEsmContext.options.entries.filter((entry) => entry.declaration);
 
-                if (context.options.declaration && typedEntries.length > 0) {
-                    rollups.push(
-                        rollupBuildTypes(
-                            {
-                                ...adjustedEsmContext,
-                                options: {
-                                    ...adjustedEsmContext.options,
-                                    entries: typedEntries,
+                    if (typedEntries.length > 0) {
+                        rollups.push(
+                            rollupBuildTypes(
+                                {
+                                    ...adjustedEsmContext,
+                                    options: {
+                                        ...adjustedEsmContext.options,
+                                        entries: typedEntries,
+                                    },
                                 },
-                            },
-                            fileCache,
-                            subDirectory,
-                        ),
-                    );
+                                fileCache,
+                                subDirectory,
+                            ),
+                        );
+                    }
                 }
             }
 
@@ -270,22 +306,24 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                     rollups.push(rollupBuild(adjustedCjsContext, fileCache, subDirectory));
                 }
 
-                const typedEntries = adjustedCjsContext.options.entries.filter((entry) => entry.declaration);
+                if (context.options.declaration) {
+                    const typedEntries = adjustedCjsContext.options.entries.filter((entry) => entry.declaration);
 
-                if (context.options.declaration && typedEntries.length > 0) {
-                    rollups.push(
-                        rollupBuildTypes(
-                            {
-                                ...adjustedCjsContext,
-                                options: {
-                                    ...adjustedCjsContext.options,
-                                    entries: typedEntries,
+                    if (typedEntries.length > 0) {
+                        rollups.push(
+                            rollupBuildTypes(
+                                {
+                                    ...adjustedCjsContext,
+                                    options: {
+                                        ...adjustedCjsContext.options,
+                                        entries: typedEntries,
+                                    },
                                 },
-                            },
-                            fileCache,
-                            subDirectory,
-                        ),
-                    );
+                                fileCache,
+                                subDirectory,
+                            ),
+                        );
+                    }
                 }
             }
 
