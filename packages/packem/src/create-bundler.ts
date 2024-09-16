@@ -22,7 +22,6 @@ import getHash from "./rollup/utils/get-hash";
 import rollupWatch from "./rollup/watch";
 import type { BuildConfig, BuildContext, BuildOptions, BuildPreset, Environment, InternalBuildOptions, Mode } from "./types";
 import arrayify from "./utils/arrayify";
-import dumpObject from "./utils/dump-object";
 import enhanceRollupError from "./utils/enhance-rollup-error";
 import FileCache from "./utils/file-cache";
 import getPackageSideEffect from "./utils/get-package-side-effect";
@@ -195,7 +194,7 @@ const generateOptions = (
             polyfillNode: {},
             preserveDirectives: {
                 exclude: EXCLUDE_REGEXP,
-                include: [/\.(?:m|c)?(?:j|t)sx?$/],
+                include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
             },
             preserveDynamicImports: true,
             raw: {
@@ -627,9 +626,10 @@ const createBundler = async (
 
             context.logger.info(cyan((mode === "watch" ? "Watching" : mode === "jit" ? "Stubbing" : "Building") + " " + context.options.name));
 
-            context.logger.debug(
-                `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}\n  ${context.options.entries.map((entry) => `  ${dumpObject(entry)}`).join("\n  ")}`,
-            );
+            context.logger.debug({
+                context: context.options.entries,
+                message: `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}}`,
+            });
 
             // Clean dist dirs
             await cleanDistributionDirectories(context);

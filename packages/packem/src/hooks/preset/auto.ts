@@ -6,7 +6,6 @@ import type { NormalizedPackageJson } from "@visulima/package";
 import { join } from "@visulima/path";
 
 import type { BuildContext, BuildPreset } from "../../types";
-import dumpObject from "../../utils/dump-object";
 import warn from "../../utils/warn";
 import inferEntries from "./utils/infer-entries";
 import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";
@@ -40,7 +39,7 @@ const autoPreset: BuildPreset = {
                         Object.keys(packageJson.publishConfig).join(", ") +
                         '".',
                 );
-                context.logger.debug(dumpObject(packageJson.publishConfig));
+                context.logger.debug(packageJson.publishConfig);
 
                 packageJson = overwriteWithPublishConfig(packageJson, context.options.declaration);
             }

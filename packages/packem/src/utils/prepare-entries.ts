@@ -7,7 +7,6 @@ import { globSync } from "tinyglobby";
 
 import { ENDING_RE } from "../constants";
 import type { BuildContext, BuildEntry } from "../types";
-import dumpObject from "./dump-object";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<void> => {
@@ -23,7 +22,7 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<vo
     }
 
     if (!entry.input) {
-        throw new Error(`Missing entry input: ${dumpObject(entry)}`);
+        throw new Error(`Missing entry input: ${JSON.stringify(entry)}`);
     }
 
     if (isRelative(entry.input)) {

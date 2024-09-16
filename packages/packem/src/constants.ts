@@ -49,4 +49,4 @@ export const ENDING_RE: RegExp = /(?:\.d\.[mc]?ts|\.\w+)$/;
 export const CHUNKS_PACKEM_FOLDER = "packem_chunks";
 export const SHARED_PACKEM_FOLDER = "packem_shared";
 
-export const ALLOWED_TRANSFORM_EXTENSIONS_REGEX = /\.(js|cjs|mjs|cts|mts|ts|tsx)$/;
+export const ALLOWED_TRANSFORM_EXTENSIONS_REGEX = /\.(?:m|c)?(?:j|t)sx?$/;
