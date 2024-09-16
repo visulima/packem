@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.121](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.120...@visulima/packem@1.0.0-alpha.121) (2024-09-16)
+
+### Bug Fixes
+
+* enabled test back ([01ea66f](https://github.com/visulima/packem/commit/01ea66f5527a7bec08e71d87c761dc9c9cd17da8))
+
 ## @visulima/packem [1.0.0-alpha.120](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.119...@visulima/packem@1.0.0-alpha.120) (2024-09-16)
 
 ### Bug Fixes
