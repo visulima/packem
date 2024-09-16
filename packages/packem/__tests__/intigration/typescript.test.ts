@@ -1099,6 +1099,7 @@ export { AppContext, index };
 `);
     });
 
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     describe("isolated declarations", () => {
         it.each(["typescript", "oxc", "swc"])(
             "should work with '%s' isolated declarations transformer and commonjs package",
@@ -1296,6 +1297,86 @@ export type Num = number;
                         : `export type Num = number;
 `,
                 );
+            },
+        );
+
+        it.each(["typescript", /* "oxc", "swc" */])(
+            "should patch cjs default export with '%s' isolated declarations transformer",
+            async (isolatedDeclarationTransformer) => {
+                expect.assertions(6);
+
+                writeFileSync(
+                    `${temporaryDirectoryPath}/src/index.ts`,
+                    `const test = () => {
+    return "this should be in final bundle, test function";
+};
+
+export default test;
+`,
+                );
+
+                await installPackage(temporaryDirectoryPath, "typescript");
+
+                createPackageJson(temporaryDirectoryPath, {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    exports: {
+                        ".": {
+                            import: {
+                                default: "./dist/index.mjs",
+                                types: "./dist/index.d.mts",
+                            },
+                            require: {
+                                default: "./dist/index.cjs",
+                                types: "./dist/index.d.cts",
+                            },
+                        },
+                    },
+                });
+                await createPackemConfig(
+                    temporaryDirectoryPath,
+                    {
+                        cjsInterop: true,
+                    },
+                    "esbuild",
+                    isolatedDeclarationTransformer as "swc" | "typescript" | "oxc" | undefined,
+                );
+                createTsConfig(temporaryDirectoryPath, {
+                    compilerOptions: {
+                        isolatedDeclarations: true,
+                        noErrorTruncation: true,
+                    },
+                });
+
+                const binProcess = await execPackemSync("build", [], {
+                    cwd: temporaryDirectoryPath,
+                    reject: false,
+                });
+
+                expect(binProcess.stderr).toBe("");
+                expect(binProcess.exitCode).toBe(0);
+                expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
+
+                const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+                expect(dCtsContent).toBe(`declare const test: () => ${isolatedDeclarationTransformer === "swc" ? "any" : "string"};
+
+
+export = test;`);
+
+                const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+                expect(dtsContent).toBe(`declare const test: () => ${isolatedDeclarationTransformer === "swc" ? "any" : "string"};
+
+
+export = test;`);
+
+                const dCtsTypesContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+                expect(dCtsTypesContent).toBe(`declare const test: () => ${isolatedDeclarationTransformer === "swc" ? "any" : "string"};
+export default test;
+`);
             },
         );
     });

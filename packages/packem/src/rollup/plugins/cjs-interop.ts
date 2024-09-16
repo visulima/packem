@@ -2,6 +2,8 @@ import type { Pail } from "@visulima/pail";
 import MagicString from "magic-string";
 import type { NormalizedOutputOptions, Plugin, RenderedChunk, SourceMapInput } from "rollup";
 
+import patchCjsDefaultExport from "./typescript/utils/patch-cjs-default-export";
+
 export interface CJSInteropOptions {
     addDefaultProperty?: boolean;
 }
@@ -23,7 +25,7 @@ export const cjsInteropPlugin = ({
         ): Promise<{
             code: string;
             map: SourceMapInput;
-            // eslint-disable-next-line sonarjs/cognitive-complexity
+             
         } | null> => {
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (chunk.type !== "chunk" || !chunk.isEntry) {
@@ -78,67 +80,7 @@ export const cjsInteropPlugin = ({
                     return null;
                 }
 
-                const matches: string[] = [];
-
-                let matchs;
-                // will match `export { ... }` statement
-                const regex = /export\s\{\s(.*)\s\}/g;
-
-                // eslint-disable-next-line no-cond-assign
-                while ((matchs = regex.exec(code)) !== null) {
-                    // This is necessary to avoid infinite loops with zero-width matches
-                    if (matchs.index === regex.lastIndex) {
-                        // eslint-disable-next-line no-plusplus
-                        regex.lastIndex++;
-                    }
-
-                    matchs.forEach((match) => {
-                        matches.push(match);
-                    });
-                }
-
-                if (matches.length === 0) {
-                    return null;
-                }
-
-                // we need the last match
-                const splitMatches = (matches.at(-1) as string).split(", ");
-
-                let defaultKey = "";
-
-                for (const match of splitMatches) {
-                    if (match.includes("type")) {
-                        // eslint-disable-next-line no-continue
-                        continue;
-                    }
-
-                    if (match.includes("as")) {
-                        const [original, alias] = match.split(" as ");
-
-                        if (alias === "default") {
-                            defaultKey = original as string;
-                        }
-                    }
-                }
-
-                if (defaultKey !== "") {
-                    const dtsTransformed = new MagicString(code);
-
-                    // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-                    dtsTransformed.replace(new RegExp(`(,s)?${defaultKey} as default(,)?`), "");
-                    dtsTransformed.append("\n\nexport = " + defaultKey + ";");
-
-                    logger.debug({
-                        message: "Applied CommonJS interop to entry chunk " + chunk.fileName + ".",
-                        prefix: "plugin:cjs-interop",
-                    });
-
-                    return {
-                        // replace a empty export statement
-                        code: dtsTransformed.toString().replace(/export\s\{\s\s\};/, ""),
-                        map: dtsTransformed.generateMap({ hires: true }),
-                    };
-                }
+                return patchCjsDefaultExport(code);
             }
 
             return null;

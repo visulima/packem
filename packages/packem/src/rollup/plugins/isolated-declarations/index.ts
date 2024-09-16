@@ -14,6 +14,7 @@ import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginCon
 
 import { ENDING_RE } from "../../../constants";
 import type { IsolatedDeclarationsResult } from "../../../types";
+import patchCjsDefaultExport from "../typescript/utils/patch-cjs-default-export";
 import lowestCommonAncestor from "./lowest-common-ancestor";
 
 export type IsolatedDeclarationsOptions = {
@@ -26,6 +27,7 @@ export const isolatedDeclarationsPlugin = (
     transformer: (code: string, id: string) => Promise<IsolatedDeclarationsResult>,
     declaration: boolean | "compatible" | "node16" | undefined,
     packageType: "commonjs" | "module" | undefined,
+    cjsInterop: boolean,
     options: IsolatedDeclarationsOptions = {},
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Plugin => {
@@ -121,7 +123,16 @@ export const isolatedDeclarationsPlugin = (
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             const entryFileNames = outputOptions.entryFileNames.replace(/\.(.)?[jt]s$/, (_, s) => `.d.${s || ""}ts`);
 
-            for (const [filename, source] of Object.entries(outputFiles)) {
+            // eslint-disable-next-line prefer-const
+            for (let [filename, source] of Object.entries(outputFiles)) {
+                if (cjsInterop && outputOptions.format === "cjs") {
+                    const patched = patchCjsDefaultExport(source);
+
+                    if (patched !== null) {
+                        source = patched.code;
+                    }
+                }
+
                 if ((declaration === true || declaration === "compatible") && outputOptions.format === format) {
                     this.emitFile({
                         fileName: entryFileNames.replace("[name]", relative(outBase, filename)).replace(format === "cjs" ? ".cts" : ".mts", ".ts"),
