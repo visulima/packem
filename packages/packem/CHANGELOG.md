@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.118](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.117...@visulima/packem@1.0.0-alpha.118) (2024-09-16)
+
+### Bug Fixes
+
+* fixed isolated declarations extension on import ([390d4d2](https://github.com/visulima/packem/commit/390d4d25ccce780c310d48277e3cde83fb8278d4))
+* fixed isolated declarations extension on import ([bd0a67c](https://github.com/visulima/packem/commit/bd0a67cc84f8f43cbcf4beaec4009ef77e9c7be3))
+
 ## @visulima/packem [1.0.0-alpha.117](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.116...@visulima/packem@1.0.0-alpha.117) (2024-09-16)
 
 ### Bug Fixes
