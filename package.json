@@ -40,7 +40,7 @@
         "nx": "nx",
         "plop": "plop",
         "prepare": "is-ci || husky || exit 0",
-        "sort-package-json": "sort-package-json packages/**/package.json example_*/**/package.json ./package.json",
+        "sort-package-json": "sort-package-json packages/**/package.json examples/**/package.json ./package.json",
         "test": "nx run-many --target=test --all --parallel",
         "test:affected": "nx affected --target=test --parallel --exclude=*-bench,docs,example_* --nxBail",
         "test:affected:coverage": "nx affected --target=test:coverage --parallel --exclude=*-bench,docs,example_* --nxBail",
