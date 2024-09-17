@@ -23,10 +23,15 @@
             ".": [
                 "./dist/index.d.cts"
             ]
+        },
+        "*": {
+            ".": [
+                "./dist/index.d.ts"
+            ]
         }
     },
     "files": [
-        "dist"
+        "./dist"
     ],
     "scripts": {
         "build": "packem build"

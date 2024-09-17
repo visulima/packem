@@ -7,4 +7,9 @@ export default defineConfig({
     entries: ["./types/*.types.ts"],
     declaration: true,
     transformer,
+    rollup: {
+        node10Compatibility: {
+            writeToPackageJson: true,
+        },
+    },
 });

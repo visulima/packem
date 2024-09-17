@@ -54,6 +54,22 @@
     "main": "./dist/index.cjs",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.ts",
+    "typesVersions": {
+        "*": {
+            ".": [
+                "./dist/index.production.d.ts"
+            ],
+            "core": [
+                "./dist/core/index.production.d.ts"
+            ],
+            "react": [
+                "./dist/react/index.production.d.ts"
+            ]
+        }
+    },
+    "files": [
+        "./dist"
+    ],
     "scripts": {
         "build": "packem build"
     },

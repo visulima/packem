@@ -128,6 +128,9 @@ importers:
       esbuild:
         specifier: ^0.23.1
         version: 0.23.1
+      typescript:
+        specifier: ^5.6.2
+        version: 5.6.2
 
   examples/esm-cjs-exports:
     devDependencies:
@@ -169,18 +172,6 @@ importers:
         version: 5.6.2
 
   examples/isolated-declarations-typescript:
-    devDependencies:
-      '@visulima/packem':
-        specifier: workspace:*
-        version: link:../../packages/packem
-      esbuild:
-        specifier: ^0.23.1
-        version: 0.23.1
-      typescript:
-        specifier: ^5.6.2
-        version: 5.6.2
-
-  examples/minifed-class:
     devDependencies:
       '@visulima/packem':
         specifier: workspace:*
@@ -253,6 +244,9 @@ importers:
       nodehun:
         specifier: ^3.0.2
         version: 3.0.2
+      typescript:
+        specifier: ^5.6.2
+        version: 5.6.2
 
   examples/react-tsx:
     dependencies:

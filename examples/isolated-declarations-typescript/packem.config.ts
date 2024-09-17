@@ -6,5 +6,10 @@ import isolatedDeclarationTransformer from "@visulima/packem/dts/isolated/transf
 export default defineConfig({
     fileCache: false,
     transformer,
-    isolatedDeclarationTransformer
+    isolatedDeclarationTransformer,
+    rollup: {
+        node10Compatibility: {
+            writeToPackageJson: true,
+        },
+    },
 });

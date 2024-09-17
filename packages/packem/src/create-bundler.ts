@@ -270,6 +270,7 @@ const generateOptions = (
                     target: tsconfig?.config.compilerOptions?.target?.toLowerCase(),
                     transform: {
                         decoratorMetadata: tsconfig?.config.compilerOptions?.emitDecoratorMetadata,
+                        decoratorVersion: "2022-03",
                         legacyDecorator: tsconfig?.config.compilerOptions?.experimentalDecorators,
                         react: {
                             development: environment !== PRODUCTION_ENV,
@@ -289,9 +290,6 @@ const generateOptions = (
                     strict: false, // no __esModule
                     strictMode: false, // no 'use strict';
                     type: "es6",
-                },
-                transform: {
-                    decoratorVersion: "2022-03",
                 },
             },
             treeshake: {

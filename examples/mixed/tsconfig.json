@@ -19,7 +19,7 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "noEmit": false,
-        "outDir": "dist",
+        "outDir": "./dist",
         "isolatedModules": true
     }
 }
