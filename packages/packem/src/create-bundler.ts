@@ -66,7 +66,7 @@ const generateOptions = (
 ): InternalBuildOptions => {
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
 
-    const options = defu(buildConfig, inputConfig, preset, <BuildOptions>{
+    const options = defu(buildConfig, inputConfig, preset, <Partial<BuildOptions>>{
         alias: {},
         cjsInterop: false,
         clean: true,
@@ -81,6 +81,7 @@ const generateOptions = (
         // @see https://github.com/unjs/jiti#%EF%B8%8F-options
         jiti: {
             alias: {},
+            debug,
             interopDefault: true,
         },
         minify: environment === PRODUCTION_ENV,
@@ -575,7 +576,7 @@ const createBundler = async (
             }
         }
 
-        const jiti = createJiti(rootDirectory);
+        const jiti = createJiti(rootDirectory, { debug, interopDefault: true });
 
         if (!/\.(?:js|mjs|cjs|ts|cts|mts)$/.test(packemConfigFilePath)) {
             throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.");

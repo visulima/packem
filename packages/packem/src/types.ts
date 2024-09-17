@@ -152,7 +152,7 @@ export interface BuildOptions {
     sourceDir: string;
     /** @experimental */
     sourcemap: boolean;
-    transformer?: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
+    transformer: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
     validation?: {
         packageJson?: {
             bin?: boolean;

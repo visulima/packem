@@ -2,8 +2,7 @@ import { cyan } from "@visulima/colorize";
 import { NotFoundError } from "@visulima/fs/error";
 import { isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
-// eslint-disable-next-line import/no-namespace
-import * as isGlob from "is-glob";
+import isGlob from "is-glob";
 import { globSync } from "tinyglobby";
 
 import { ENDING_RE } from "../constants";

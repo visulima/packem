@@ -181,8 +181,8 @@
         "LICENSE.md"
     ],
     "scripts": {
-        "build": "cross-env INTERNAL_PACKEM_BUILD=1 NODE_ENV=development node --import jiti/register ./src/cli.ts build",
-        "build:prod": "cross-env INTERNAL_PACKEM_BUILD=1 NODE_ENV=production node --import jiti/register ./src/cli.ts build --minify",
+        "build": "cross-env INTERNAL_PACKEM_BUILD=1 JITI_INTEROP_DEFAULT=1 node --import jiti/register ./src/cli.ts build --development",
+        "build:prod": "cross-env INTERNAL_PACKEM_BUILD=1 JITI_INTEROP_DEFAULT=1 node --import jiti/register ./src/cli.ts build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build",
         "lint:attw": "attw --pack",
