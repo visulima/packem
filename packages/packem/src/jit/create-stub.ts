@@ -11,19 +11,19 @@ import warn from "../utils/warn";
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const createStub = async (context: BuildContext): Promise<void> => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const babelPlugins: (string | any[])[] = context.options.stubOptions.jiti.transformOptions?.babel?.plugins as any;
+    const babelPlugins: (string | any[])[] = context.options.jiti.transformOptions?.babel?.plugins as any;
     const importedBabelPlugins: string[] = [];
     const serializedJitiOptions = JSON.stringify(
         {
-            ...context.options.stubOptions.jiti,
+            ...context.options.jiti,
             alias: {
                 ...resolveAliases(context, "jit"),
-                ...context.options.stubOptions.jiti.alias,
+                ...context.options.jiti.alias,
             },
             transformOptions: {
-                ...context.options.stubOptions.jiti.transformOptions,
+                ...context.options.jiti.transformOptions,
                 babel: {
-                    ...context.options.stubOptions.jiti.transformOptions?.babel,
+                    ...context.options.jiti.transformOptions?.babel,
                     plugins: "__$BABEL_PLUGINS",
                 },
             },

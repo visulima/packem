@@ -55,7 +55,6 @@ const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX):
 const generateOptions = (
     logger: Pail,
     rootDirectory: string,
-    mode: Mode,
     environment: Environment,
     debug: boolean,
     inputConfig: BuildConfig,
@@ -79,6 +78,11 @@ const generateOptions = (
         externals: [...Module.builtinModules, ...Module.builtinModules.map((m) => `node:${m}`)],
         failOnWarn: true,
         fileCache: true,
+        // @see https://github.com/unjs/jiti#%EF%B8%8F-options
+        jiti: {
+            alias: {},
+            interopDefault: true,
+        },
         minify: environment === PRODUCTION_ENV,
         name: (packageJson.name ?? "").split("/").pop() ?? "default",
         outDir: tsconfig?.config.compilerOptions?.outDir ?? "dist",
@@ -142,7 +146,7 @@ const generateOptions = (
             },
             esbuild: {
                 charset: "utf8",
-                include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
+                exclude: EXCLUDE_REGEXP,
                 jsx: jsxRuntime,
                 jsxDev: tsconfig?.config.compilerOptions?.jsx === "react-jsxdev",
                 jsxFactory: tsconfig?.config.compilerOptions?.jsxFactory,
@@ -306,15 +310,8 @@ const generateOptions = (
         },
         rootDir: rootDirectory,
         sourceDir: "src",
+
         sourcemap: false,
-        stub: mode === "jit",
-        stubOptions: {
-            // @see https://github.com/unjs/jiti#%EF%B8%8F-options
-            jiti: {
-                alias: {},
-                interopDefault: true,
-            },
-        },
         transformerName: undefined,
     }) as InternalBuildOptions;
 
@@ -389,7 +386,7 @@ const createContext = async (
 ): Promise<BuildContext> => {
     const preset = await resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", jiti);
 
-    const options = generateOptions(logger, rootDirectory, mode, environment, debug, inputConfig, buildConfig, preset, packageJson, tsconfig);
+    const options = generateOptions(logger, rootDirectory, environment, debug, inputConfig, buildConfig, preset, packageJson, tsconfig);
 
     ensureDirSync(join(options.rootDir, options.outDir));
 
@@ -400,7 +397,7 @@ const createContext = async (
         environment,
         hooks: createHooks(),
         // Create shared jiti instance for context
-        jiti: createJiti(options.rootDir, options.stubOptions.jiti),
+        jiti: createJiti(options.rootDir, options.jiti),
         logger,
         mode,
         options,
@@ -642,7 +639,7 @@ const createBundler = async (
             await cleanDistributionDirectories(context);
 
             // Skip rest for stub
-            if (context.options.stub) {
+            if (mode === "jit") {
                 await createStub(context);
 
                 await context.hooks.callHook("build:done", context);

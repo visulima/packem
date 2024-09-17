@@ -139,6 +139,10 @@ export interface BuildOptions {
     failOnWarn?: boolean;
     fileCache?: boolean;
     isolatedDeclarationTransformer?: (code: string, id: string) => Promise<IsolatedDeclarationsResult>;
+    /**
+     * Jiti options, where [jiti](https://github.com/unjs/jiti) is used to load the entry files.
+     */
+    jiti: Omit<JitiOptions, "onError" | "transform">;
     minify?: boolean | undefined;
     name: string;
     outDir: string;
@@ -148,12 +152,6 @@ export interface BuildOptions {
     sourceDir: string;
     /** @experimental */
     sourcemap: boolean;
-    stub: boolean;
-    /**
-     * Stub options, where [jiti](https://github.com/unjs/jiti)
-     * is an object of type `Omit<JitiOptions, "transform" | "onError">`.
-     */
-    stubOptions: { jiti: Omit<JitiOptions, "onError" | "transform"> };
     transformer?: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
     validation?: {
         packageJson?: {
