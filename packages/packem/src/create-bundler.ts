@@ -309,11 +309,10 @@ const generateOptions = (
         sourcemap: false,
         stub: mode === "jit",
         stubOptions: {
-            /**
-             * See https://github.com/unjs/jiti#%EF%B8%8F-options
-             */
+            // @see https://github.com/unjs/jiti#%EF%B8%8F-options
             jiti: {
                 alias: {},
+                interopDefault: true,
             },
         },
         transformerName: undefined,

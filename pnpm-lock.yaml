@@ -573,8 +573,8 @@ importers:
         specifier: ^9.0.0
         version: 9.0.0(@anolilab/semantic-release-pnpm@1.1.3(yaml@2.5.0))(@semantic-release/npm@12.0.1(semantic-release@24.1.1(typescript@5.6.2)))(semantic-release@24.1.1(typescript@5.6.2))
       '@arethetypeswrong/cli':
-        specifier: ^0.16.2
-        version: 0.16.2
+        specifier: ^0.16.4
+        version: 0.16.4
       '@babel/core':
         specifier: ^7.25.2
         version: 7.25.2
@@ -609,8 +609,8 @@ importers:
         specifier: 18.19.39
         version: 18.19.39
       '@types/react':
-        specifier: ^18.3.5
-        version: 18.3.5
+        specifier: ^18.3.7
+        version: 18.3.7
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.0
@@ -660,8 +660,8 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3
       execa:
-        specifier: ^9.3.1
-        version: 9.3.1
+        specifier: ^9.4.0
+        version: 9.4.0
       jiti:
         specifier: 2.0.0-beta.3
         version: 2.0.0-beta.3
@@ -903,8 +903,17 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  '@arethetypeswrong/cli@0.16.4':
+    resolution: {integrity: sha512-qMmdVlJon5FtA+ahn0c1oAVNxiq4xW5lqFiTZ21XHIeVwAVIQ+uRz4UEivqRMsjVV1grzRgJSKqaOrq1MvlVyQ==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   '@arethetypeswrong/core@0.16.2':
     resolution: {integrity: sha512-gAYzWaIbq8m9MuvxKmeDn24Or4mIWCSpRR0NNXAVoGUTPraB1SP3blPa5NycUPTnToKLA5DAwHLhwtWpslMbKQ==}
+    engines: {node: '>=18'}
+
+  '@arethetypeswrong/core@0.16.4':
+    resolution: {integrity: sha512-RI3HXgSuKTfcBf1hSEg1P9/cOvmI0flsMm6/QL3L3wju4AlHDqd55JFPfXs4pzgEAgy5L9pul4/HPPz99x2GvA==}
     engines: {node: '>=18'}
 
   '@azu/format-text@1.0.2':
@@ -2521,6 +2530,9 @@ packages:
 
   '@types/react@18.3.5':
     resolution: {integrity: sha512-WeqMfGJLGuLCqHGYRGHxnKrXcTitc6L/nBUWfWPcTarG3t9PsquqUMuVeXZeca+mglY4Vo5GZjCi0A3Or2lnxA==}
+
+  '@types/react@18.3.7':
+    resolution: {integrity: sha512-KUnDCJF5+AiZd8owLIeVHqmW9yM4sqmDVf2JRJiBMFkGvkoZ4/WyV2lL4zVsoinmRS/W3FeEdZLEWFRofnT2FQ==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -4224,8 +4236,8 @@ packages:
     resolution: {integrity: sha512-VyhnebXciFV2DESc+p6B+y0LjSm0krU4OgJN44qFAhBY0TJ+1V61tYD2+wHusZ6F9n5K+vl8k0sTy7PEfV4qpg==}
     engines: {node: '>=16.17'}
 
-  execa@9.3.1:
-    resolution: {integrity: sha512-gdhefCCNy/8tpH/2+ajP9IQc14vXchNdd0weyzSJEFURhRMGncQ+zKFxwjAufIewPEJm9BPOaJnvg2UtlH2gPQ==}
+  execa@9.4.0:
+    resolution: {integrity: sha512-yKHlle2YGxZE842MERVIplWwNH5VYmqqcPFgtnlU//K8gxuFFXu0pwd/CrfXTumFpeEiufsP7+opT/bPJa1yVw==}
     engines: {node: ^18.19.0 || >=20.5.0}
 
   execall@1.0.0:
@@ -6262,6 +6274,10 @@ packages:
     resolution: {integrity: sha512-ppwTtiJZq0O/ai0z7yfudtBpWIoxM8yE6nHi1X47eFR2EWORqfbu6CnPlNsjeN683eT0qG6H/Pyf9fCcvjnnnQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
+  npm-run-path@6.0.0:
+    resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
+    engines: {node: '>=18'}
+
   npm@10.8.0:
     resolution: {integrity: sha512-wh93uRczgp7HDnPMiLXcCkv2hagdJS0zJ9KT/31d0FoXP02+qgN2AOwpaW85fxRWkinl2rELfPw+CjBXW48/jQ==}
     engines: {node: ^18.17.0 || >=20.5.0}
@@ -8026,6 +8042,10 @@ packages:
     resolution: {integrity: sha512-lRfVq8fE8gz6QMBuDM6a+LO3IAzTi05H6gCVaUpir2E1Rwpo4ZUog45KpNXKC/Mn3Yb9UDuHumeFTo9iV/D9FQ==}
     engines: {node: '>=18'}
 
+  unicorn-magic@0.3.0:
+    resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
+    engines: {node: '>=18'}
+
   unified-diff@4.0.1:
     resolution: {integrity: sha512-qiI0GaHi/50NVrChnmZOBeB0aNhHRMG6VnjKEAikaQD/I3gxjTsDp8gycCOUxyVCJrV/Rv3y6zEWMZczO+o3Lw==}
 
@@ -8566,7 +8586,7 @@ snapshots:
       debug: 4.3.5
       detect-indent: 7.0.1
       detect-newline: 4.0.1
-      execa: 9.3.1
+      execa: 9.4.0
       git-log-parser: 1.2.0
       lodash-es: 4.17.21
       resolve-from: 5.0.0
@@ -8605,7 +8625,7 @@ snapshots:
       '@visulima/package': 1.10.1(yaml@2.5.0)
       '@visulima/path': 1.0.8
       aggregate-error: 5.0.0
-      execa: 9.3.1
+      execa: 9.4.0
       ini: 4.1.3
       move-file: 3.1.0
       normalize-url: 8.0.1
@@ -8678,7 +8698,27 @@ snapshots:
       marked-terminal: 7.1.0(marked@9.1.6)
       semver: 7.6.3
 
+  '@arethetypeswrong/cli@0.16.4':
+    dependencies:
+      '@arethetypeswrong/core': 0.16.4
+      chalk: 4.1.2
+      cli-table3: 0.6.5
+      commander: 10.0.1
+      marked: 9.1.6
+      marked-terminal: 7.1.0(marked@9.1.6)
+      semver: 7.6.3
+
   '@arethetypeswrong/core@0.16.2':
+    dependencies:
+      '@andrewbranch/untar.js': 1.0.3
+      cjs-module-lexer: 1.4.0
+      fflate: 0.8.2
+      lru-cache: 10.4.3
+      semver: 7.6.3
+      typescript: 5.6.1-rc
+      validate-npm-package-name: 5.0.1
+
+  '@arethetypeswrong/core@0.16.4':
     dependencies:
       '@andrewbranch/untar.js': 1.0.3
       cjs-module-lexer: 1.4.0
@@ -9954,7 +9994,7 @@ snapshots:
     dependencies:
       '@semantic-release/error': 4.0.0
       aggregate-error: 5.0.0
-      execa: 9.3.1
+      execa: 9.4.0
       fs-extra: 11.2.0
       lodash-es: 4.17.21
       nerf-dart: 1.0.0
@@ -10508,6 +10548,11 @@ snapshots:
       '@types/react': 18.3.5
 
   '@types/react@18.3.5':
+    dependencies:
+      '@types/prop-types': 15.7.12
+      csstype: 3.1.3
+
+  '@types/react@18.3.7':
     dependencies:
       '@types/prop-types': 15.7.12
       csstype: 3.1.3
@@ -12540,7 +12585,7 @@ snapshots:
       signal-exit: 4.1.0
       strip-final-newline: 3.0.0
 
-  execa@9.3.1:
+  execa@9.4.0:
     dependencies:
       '@sindresorhus/merge-streams': 4.0.0
       cross-spawn: 7.0.3
@@ -12549,7 +12594,7 @@ snapshots:
       human-signals: 8.0.0
       is-plain-obj: 4.1.0
       is-stream: 4.0.1
-      npm-run-path: 5.3.0
+      npm-run-path: 6.0.0
       pretty-ms: 9.0.0
       signal-exit: 4.1.0
       strip-final-newline: 4.0.0
@@ -15143,6 +15188,11 @@ snapshots:
     dependencies:
       path-key: 4.0.0
 
+  npm-run-path@6.0.0:
+    dependencies:
+      path-key: 4.0.0
+      unicorn-magic: 0.3.0
+
   npm@10.8.0: {}
 
   nx@19.7.3(@swc/core@1.7.26(@swc/helpers@0.5.13)):
@@ -16314,7 +16364,7 @@ snapshots:
       cosmiconfig: 9.0.0(typescript@5.6.2)
       debug: 4.3.6
       env-ci: 11.0.0
-      execa: 9.3.1
+      execa: 9.4.0
       figures: 6.1.0
       find-versions: 6.0.0
       get-stream: 6.0.1
@@ -17179,6 +17229,8 @@ snapshots:
   unicode-emoji-modifier-base@1.0.0: {}
 
   unicorn-magic@0.1.0: {}
+
+  unicorn-magic@0.3.0: {}
 
   unified-diff@4.0.1:
     dependencies:
