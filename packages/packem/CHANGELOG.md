@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.123](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.122...@visulima/packem@1.0.0-alpha.123) (2024-09-17)
+
+### Bug Fixes
+
+* improved shebang plugin ([a47a5af](https://github.com/visulima/packem/commit/a47a5afa2b44f1fc53dd7a2b6a26296803dce1aa))
+
 ## @visulima/packem [1.0.0-alpha.122](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.121...@visulima/packem@1.0.0-alpha.122) (2024-09-16)
 
 ### Bug Fixes
