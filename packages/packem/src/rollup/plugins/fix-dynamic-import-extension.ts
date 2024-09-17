@@ -2,7 +2,7 @@ import type { Plugin } from "rollup";
 
 const fixDynamicImportExtension = (): Plugin =>
     ({
-        name: "packem:cjs",
+        name: "packem:fix-dynamic-import-extension",
         renderChunk(code, _chunk, options) {
             if (options.format === "es" || options.format === "cjs") {
                 return {

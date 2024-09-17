@@ -16,6 +16,7 @@ const swcPlugin = ({ exclude, extensions = DEFAULT_EXTENSIONS, include, ...trans
     const resolveIdCache = new Map();
 
     return <Plugin>{
+        name: "packem:swc",
         async resolveId(id, importer, { isEntry }): Promise<string | null> {
             if (!importer || isEntry || !filter(id) || id.startsWith("\0")) {
                 return null;

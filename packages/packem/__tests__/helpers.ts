@@ -51,7 +51,7 @@ export const installPackage = async (fixturePath: string, packageName: string): 
 
 export const createPackemConfig = async (
     fixturePath: string,
-    config: BuildConfig | BuildConfig[] = {},
+    config: BuildConfig | string = {},
     transformer: "esbuild" | "swc" | "sucrase" = "esbuild",
     isolatedDeclarationTransformer: "swc" | "typescript" | "oxc" | undefined = undefined,
 ): Promise<void> => {
@@ -68,7 +68,7 @@ ${isolatedDeclarationTransformer ? `import isolatedDeclarationTransformer from "
 export default defineConfig({
     transformer,
     ${isolatedDeclarationTransformer ? `isolatedDeclarationTransformer,` : ""}
-    ${JSON.stringify(config, null, 4).slice(1, -1)}
+    ${typeof config === "string" ? config : JSON.stringify(config, null, 4).slice(1, -1)}
 });
 `,
         {

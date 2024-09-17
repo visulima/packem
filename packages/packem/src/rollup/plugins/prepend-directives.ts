@@ -2,7 +2,7 @@ import type { Plugin } from "rollup";
 
 const prependDirectivePlugin = (): Plugin => {
     return {
-        name: "prependDirective",
+        name: "packem:prepend-directive",
         transform: {
             handler(code, id) {
                 const moduleInfo = this.getModuleInfo(id);

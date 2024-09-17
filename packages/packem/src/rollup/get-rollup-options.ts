@@ -48,6 +48,7 @@ import { patchTypescriptTypes as patchTypescriptTypesPlugin } from "./plugins/ty
 import { getConfigAlias, resolveTsconfigPaths as resolveTsconfigPathsPlugin } from "./plugins/typescript/resolve-tsconfig-paths";
 import resolveTsconfigRootDirectoriesPlugin from "./plugins/typescript/resolve-tsconfig-root-dirs";
 import resolveTypescriptMjsCtsPlugin from "./plugins/typescript/resolve-typescript-mjs-cjs";
+import appendPlugins from "./utils/append-plugins";
 import createSplitChunks from "./utils/chunks/create-split-chunks";
 import getChunkFilename from "./utils/get-chunk-filename";
 import getEntryFileNames from "./utils/get-entry-file-names";
@@ -412,160 +413,171 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 },
         ].filter(Boolean),
 
-        plugins: [
-            cachingPlugin(resolveFileUrlPlugin(), fileCache),
-            cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
+        plugins: appendPlugins(
+            [
+                cachingPlugin(resolveFileUrlPlugin(), fileCache),
+                cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
-            context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
-            context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.tsconfig, context.logger), fileCache),
+                context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
+                context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.tsconfig, context.logger), fileCache),
 
-            context.options.rollup.replace &&
-                replacePlugin({
-                    sourcemap: context.options.sourcemap,
-                    ...context.options.rollup.replace,
-                    values: {
-                        ...context.options.replace,
-                        ...context.options.rollup.replace.values,
-                    },
-                }),
+                context.options.rollup.replace &&
+                    replacePlugin({
+                        sourcemap: context.options.sourcemap,
+                        ...context.options.rollup.replace,
+                        values: {
+                            ...context.options.replace,
+                            ...context.options.rollup.replace.values,
+                        },
+                    }),
 
-            context.options.rollup.alias &&
-                aliasPlugin({
-                    // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                    customResolver: nodeResolver as ResolverObject,
-                    ...context.options.rollup.alias,
-                    entries: resolvedAliases,
-                }),
+                context.options.rollup.alias &&
+                    aliasPlugin({
+                        // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
+                        customResolver: nodeResolver as ResolverObject,
+                        ...context.options.rollup.alias,
+                        entries: resolvedAliases,
+                    }),
 
-            nodeResolver,
+                nodeResolver,
 
-            context.options.rollup.polyfillNode &&
-                polyfillPlugin({
-                    sourceMap: context.options.sourcemap,
-                    ...context.options.rollup.polyfillNode,
-                }),
-
-            context.options.rollup.json &&
-                JSONPlugin({
-                    ...context.options.rollup.json,
-                }),
-
-            chunkSplitter(),
-
-            context.options.rollup.wasm && wasmPlugin(context.options.rollup.wasm),
-
-            context.options.declaration &&
-                context.options.rollup.isolatedDeclarations &&
-                context.options.isolatedDeclarationTransformer &&
-                isolatedDeclarationsPlugin(
-                    context.options.isolatedDeclarationTransformer,
-                    context.options.declaration,
-                    context.pkg.type,
-                    Boolean(context.options.rollup.cjsInterop),
-                    context.options.rollup.isolatedDeclarations,
-                ),
-
-            context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
-
-            preserveDirectivesPlugin({
-                directiveRegex: /^['|"](use (\w+))['|"]$/,
-                ...context.options.rollup.preserveDirectives,
-                logger: context.logger,
-            }),
-
-            context.options.rollup.shebang &&
-                shebangPlugin(
-                    context.options.entries
-                        .filter((entry) => entry.executable)
-                        .map((entry) => entry.name)
-                        .filter(Boolean) as string[],
-                    context.options.rollup.shebang as ShebangOptions,
-                ),
-
-            context.options.cjsInterop &&
-                context.options.emitCJS &&
-                cjsInteropPlugin({
-                    ...context.options.rollup.cjsInterop,
-                    logger: context.logger,
-                    type: context.pkg.type ?? "commonjs",
-                }),
-
-            context.options.rollup.dynamicVars && fixDynamicImportExtension(),
-            context.options.rollup.dynamicVars && dynamicImportVarsPlugin(context.options.rollup.dynamicVars),
-
-            context.options.rollup.commonjs &&
-                cachingPlugin(
-                    commonjsPlugin({
+                context.options.rollup.polyfillNode &&
+                    polyfillPlugin({
                         sourceMap: context.options.sourcemap,
-                        ...context.options.rollup.commonjs,
+                        ...context.options.rollup.polyfillNode,
+                    }),
+
+                context.options.rollup.json &&
+                    JSONPlugin({
+                        ...context.options.rollup.json,
+                    }),
+
+                chunkSplitter(),
+
+                context.options.rollup.wasm && wasmPlugin(context.options.rollup.wasm),
+
+                context.options.declaration &&
+                    context.options.rollup.isolatedDeclarations &&
+                    context.options.isolatedDeclarationTransformer &&
+                    isolatedDeclarationsPlugin(
+                        context.options.isolatedDeclarationTransformer,
+                        context.options.declaration,
+                        context.pkg.type,
+                        Boolean(context.options.rollup.cjsInterop),
+                        context.options.rollup.isolatedDeclarations,
+                    ),
+
+                context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
+
+                cachingPlugin(
+                    preserveDirectivesPlugin({
+                        directiveRegex: /^['|"](use (\w+))['|"]$/,
+                        ...context.options.rollup.preserveDirectives,
+                        logger: context.logger,
                     }),
                     fileCache,
                 ),
 
-            context.options.rollup.preserveDynamicImports && {
-                renderDynamicImport() {
-                    return { left: "import(", right: ")" };
-                },
-            },
+                context.options.rollup.shebang &&
+                    shebangPlugin(
+                        context.options.entries
+                            .filter((entry) => entry.executable)
+                            .map((entry) => entry.name)
+                            .filter(Boolean) as string[],
+                        context.options.rollup.shebang as ShebangOptions,
+                    ),
 
-            context.options.cjsInterop && context.options.rollup.shim && esmShimCjsSyntaxPlugin(context.pkg, context.options.rollup.shim),
+                context.options.cjsInterop &&
+                    context.options.emitCJS &&
+                    cjsInteropPlugin({
+                        ...context.options.rollup.cjsInterop,
+                        logger: context.logger,
+                        type: context.pkg.type ?? "commonjs",
+                    }),
 
-            context.options.rollup.raw && rawPlugin(context.options.rollup.raw),
+                context.options.rollup.dynamicVars && fixDynamicImportExtension(),
+                context.options.rollup.dynamicVars && dynamicImportVarsPlugin(context.options.rollup.dynamicVars),
 
-            context.options.rollup.jsxRemoveAttributes &&
-                jsxRemoveAttributes({
-                    attributes: context.options.rollup.jsxRemoveAttributes.attributes,
-                    logger: context.logger,
-                }),
+                context.options.rollup.commonjs &&
+                    cachingPlugin(
+                        commonjsPlugin({
+                            sourceMap: context.options.sourcemap,
+                            ...context.options.rollup.commonjs,
+                        }),
+                        fileCache,
+                    ),
 
-            context.options.rollup.metafile &&
-                metafilePlugin({
-                    outDir: resolve(context.options.rootDir, context.options.outDir),
-                    rootDir: context.options.rootDir,
-                }),
+                context.options.rollup.preserveDynamicImports &&
+                    ({
+                        name: "packem:preserve-dynamic-imports",
+                        renderDynamicImport() {
+                            return { left: "import(", right: ")" };
+                        },
+                    } as Plugin),
 
-            context.options.rollup.copy && copyPlugin(context.options.rollup.copy, context.logger),
+                context.options.cjsInterop && context.options.rollup.shim && esmShimCjsSyntaxPlugin(context.pkg, context.options.rollup.shim),
 
-            context.options.rollup.license &&
-                context.options.rollup.license.path &&
-                typeof context.options.rollup.license.dependenciesTemplate === "function" &&
-                licensePlugin({
-                    dtsMarker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
-                    licenseFilePath: context.options.rollup.license.path,
-                    licenseTemplate: context.options.rollup.license.dependenciesTemplate,
-                    logger: context.logger,
-                    marker: context.options.rollup.license.dependenciesMarker ?? "DEPENDENCIES",
-                    mode: "dependencies",
-                    packageName: context.pkg.name,
-                }),
+                context.options.rollup.raw && cachingPlugin(rawPlugin(context.options.rollup.raw), fileCache),
 
-            prependDirectivePlugin(),
+                context.options.rollup.jsxRemoveAttributes &&
+                    cachingPlugin(
+                        jsxRemoveAttributes({
+                            attributes: context.options.rollup.jsxRemoveAttributes.attributes,
+                            logger: context.logger,
+                        }),
+                        fileCache,
+                    ),
 
-            context.options.emitCJS &&
-                context.mode === "build" &&
-                context.options.declaration === "compatible" &&
-                context.options.rollup.node10Compatibility &&
-                node10CompatibilityPlugin(
-                    context.logger,
-                    context.options.entries,
-                    context.options.outDir,
-                    context.options.rootDir,
-                    context.options.rollup.node10Compatibility.writeToPackageJson ? "file" : "console",
-                    context.options.rollup.node10Compatibility.typeScriptVersion ?? "*",
-                ),
+                context.options.rollup.metafile &&
+                    metafilePlugin({
+                        outDir: resolve(context.options.rootDir, context.options.outDir),
+                        rootDir: context.options.rootDir,
+                    }),
 
-            context.options.analyze &&
-                context.options.rollup.visualizer !== false &&
-                visualizerPlugin({
-                    brotliSize: true,
-                    gzipSize: true,
-                    projectRoot: context.options.rootDir,
-                    sourcemap: context.options.sourcemap,
-                    ...context.options.rollup.visualizer,
-                    filename: "packem-bundle-analyze.html",
-                    title: "Packem Visualizer",
-                }),
-        ].filter(Boolean),
+                context.options.rollup.copy && copyPlugin(context.options.rollup.copy, context.logger),
+
+                context.options.rollup.license &&
+                    context.options.rollup.license.path &&
+                    typeof context.options.rollup.license.dependenciesTemplate === "function" &&
+                    licensePlugin({
+                        dtsMarker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
+                        licenseFilePath: context.options.rollup.license.path,
+                        licenseTemplate: context.options.rollup.license.dependenciesTemplate,
+                        logger: context.logger,
+                        marker: context.options.rollup.license.dependenciesMarker ?? "DEPENDENCIES",
+                        mode: "dependencies",
+                        packageName: context.pkg.name,
+                    }),
+
+                prependDirectivePlugin(),
+
+                context.options.emitCJS &&
+                    context.mode === "build" &&
+                    context.options.declaration === "compatible" &&
+                    context.options.rollup.node10Compatibility &&
+                    node10CompatibilityPlugin(
+                        context.logger,
+                        context.options.entries,
+                        context.options.outDir,
+                        context.options.rootDir,
+                        context.options.rollup.node10Compatibility.writeToPackageJson ? "file" : "console",
+                        context.options.rollup.node10Compatibility.typeScriptVersion ?? "*",
+                    ),
+
+                context.options.analyze &&
+                    context.options.rollup.visualizer !== false &&
+                    visualizerPlugin({
+                        brotliSize: true,
+                        gzipSize: true,
+                        projectRoot: context.options.rootDir,
+                        sourcemap: context.options.sourcemap,
+                        ...context.options.rollup.visualizer,
+                        filename: "packem-bundle-analyze.html",
+                        title: "Packem Visualizer",
+                    }),
+            ].filter(Boolean),
+            context.options.rollup.plugins,
+        ),
     }) as RollupOptions;
 };
 
@@ -671,65 +683,68 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                 },
         ].filter(Boolean),
 
-        plugins: [
-            cachingPlugin(resolveFileUrlPlugin(), fileCache),
-            cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
+        plugins: appendPlugins(
+            [
+                cachingPlugin(resolveFileUrlPlugin(), fileCache),
+                cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
-            context.options.rollup.json &&
-                JSONPlugin({
-                    ...context.options.rollup.json,
-                }),
+                context.options.rollup.json &&
+                    JSONPlugin({
+                        ...context.options.rollup.json,
+                    }),
 
-            ignoreFiles,
+                ignoreFiles,
 
-            context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
-            context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.tsconfig, context.logger), fileCache),
+                context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
+                context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.tsconfig, context.logger), fileCache),
 
-            context.options.rollup.replace &&
-                replacePlugin({
-                    sourcemap: context.options.sourcemap,
-                    ...context.options.rollup.replace,
-                    values: {
-                        ...context.options.replace,
-                        ...context.options.rollup.replace.values,
-                    },
-                }),
+                context.options.rollup.replace &&
+                    replacePlugin({
+                        sourcemap: context.options.sourcemap,
+                        ...context.options.rollup.replace,
+                        values: {
+                            ...context.options.replace,
+                            ...context.options.rollup.replace.values,
+                        },
+                    }),
 
-            context.options.rollup.alias &&
-                aliasPlugin({
-                    // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                    customResolver: nodeResolver as ResolverObject,
-                    ...context.options.rollup.alias,
-                    entries: resolvedAliases,
-                }),
+                context.options.rollup.alias &&
+                    aliasPlugin({
+                        // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
+                        customResolver: nodeResolver as ResolverObject,
+                        ...context.options.rollup.alias,
+                        entries: resolvedAliases,
+                    }),
 
-            nodeResolver,
+                nodeResolver,
 
-            await memoizeDtsPluginByKey(uniqueProcessId)(context),
+                await memoizeDtsPluginByKey(uniqueProcessId)(context),
 
-            context.options.cjsInterop &&
-                context.options.emitCJS &&
-                cjsInteropPlugin({
-                    ...context.options.rollup.cjsInterop,
-                    logger: context.logger,
-                    type: context.pkg.type ?? "commonjs",
-                }),
+                context.options.cjsInterop &&
+                    context.options.emitCJS &&
+                    cjsInteropPlugin({
+                        ...context.options.rollup.cjsInterop,
+                        logger: context.logger,
+                        type: context.pkg.type ?? "commonjs",
+                    }),
 
-            context.options.rollup.patchTypes && patchTypescriptTypesPlugin(context.options.rollup.patchTypes, context.logger),
+                context.options.rollup.patchTypes && cachingPlugin(patchTypescriptTypesPlugin(context.options.rollup.patchTypes, context.logger), fileCache),
 
-            removeShebangPlugin(),
+                removeShebangPlugin(),
 
-            context.options.rollup.license &&
-                context.options.rollup.license.path &&
-                typeof context.options.rollup.license.dtsTemplate === "function" &&
-                licensePlugin({
-                    licenseFilePath: context.options.rollup.license.path,
-                    licenseTemplate: context.options.rollup.license.dtsTemplate,
-                    logger: context.logger,
-                    marker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
-                    mode: "types",
-                    packageName: context.pkg.name,
-                }),
-        ].filter(Boolean),
+                context.options.rollup.license &&
+                    context.options.rollup.license.path &&
+                    typeof context.options.rollup.license.dtsTemplate === "function" &&
+                    licensePlugin({
+                        licenseFilePath: context.options.rollup.license.path,
+                        licenseTemplate: context.options.rollup.license.dtsTemplate,
+                        logger: context.logger,
+                        marker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
+                        mode: "types",
+                        packageName: context.pkg.name,
+                    }),
+            ].filter(Boolean),
+            context.options.rollup.plugins,
+        ),
     };
 };

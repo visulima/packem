@@ -67,7 +67,7 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
             logger.debug("optimized %O", optimizeDepsResult.optimized);
         },
 
-        name: "esbuild",
+        name: "packem:esbuild",
 
         options({ context }) {
             if (context) {

@@ -16,6 +16,7 @@ const sucrasePlugin = ({ exclude, extensions = DEFAULT_EXTENSIONS, include, ...t
     const resolveIdCache = new Map();
 
     return <Plugin>{
+        name: "packem:sucrase",
         async resolveId(id, importer, { isEntry }): Promise<string | null> {
             if (!importer || isEntry || !filter(id) || id.startsWith("\0")) {
                 return null;
