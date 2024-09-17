@@ -2,9 +2,9 @@ import type { Alias } from "@rollup/plugin-alias";
 import type { PackageJson } from "@visulima/package";
 import { join } from "@visulima/path";
 
-import type { BuildContext } from "../../types";
+import type { BuildContext, Mode } from "../../types";
 
-const resolveAliases = (context: BuildContext, mode: "build" | "jit" | "types"): Record<string, string> => {
+const resolveAliases = (context: BuildContext, mode: Mode): Record<string, string> => {
     let aliases: Record<string, string> = {};
 
     if (context.pkg.name) {

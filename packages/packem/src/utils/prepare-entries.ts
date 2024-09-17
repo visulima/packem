@@ -67,9 +67,9 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<vo
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const prepareEntries = async (context: BuildContext): Promise<void> => {
     context.options.entries = context.options.entries.map((entry) =>
-        (typeof entry === "string"
+        typeof entry === "string"
             ? { input: entry, isGlob: isGlob(entry) }
-            : { ...entry, exportKey: entry.exportKey ?? new Set(), isGlob: isGlob(entry.input) }),
+            : { ...entry, exportKey: entry.exportKey ?? new Set(), isGlob: isGlob(entry.input) },
     );
 
     // eslint-disable-next-line @typescript-eslint/no-shadow

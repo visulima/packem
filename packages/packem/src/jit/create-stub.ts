@@ -75,7 +75,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
             `${output}.mjs`,
             shebang +
                 [
-                    `import jiti from ${JSON.stringify(pathToFileURL(jitiPath).href)};`,
+                    `import jiti from ${JSON.stringify(jitiPath)};`,
                     "",
                     `const _jiti = jiti(null, ${serializedJitiOptions})`,
                     "",
