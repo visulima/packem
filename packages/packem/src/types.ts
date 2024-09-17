@@ -9,7 +9,7 @@ import type { PackageJson } from "@visulima/package";
 import type { Pail } from "@visulima/pail";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { Hookable } from "hookable";
-import type { JITIOptions } from "jiti";
+import type { Jiti, JitiOptions } from "jiti";
 import type { OutputOptions, Plugin, RollupBuild, RollupOptions, RollupWatcher } from "rollup";
 import type { Options as RollupDtsOptions } from "rollup-plugin-dts";
 import type { NodePolyfillsOptions } from "rollup-plugin-polyfill-node";
@@ -139,6 +139,10 @@ export interface BuildOptions {
     failOnWarn?: boolean;
     fileCache?: boolean;
     isolatedDeclarationTransformer?: (code: string, id: string) => Promise<IsolatedDeclarationsResult>;
+    /**
+     * Jiti options, where [jiti](https://github.com/unjs/jiti) is used to load the entry files.
+     */
+    jiti: Omit<JitiOptions, "onError" | "transform">;
     minify?: boolean | undefined;
     name: string;
     outDir: string;
@@ -148,9 +152,7 @@ export interface BuildOptions {
     sourceDir: string;
     /** @experimental */
     sourcemap: boolean;
-    stub: boolean;
-    stubOptions: { jiti: Omit<JITIOptions, "onError" | "transform"> };
-    transformer?: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
+    transformer: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
     validation?: {
         packageJson?: {
             bin?: boolean;
@@ -214,6 +216,7 @@ export interface BuildContext {
     dependencyGraphMap: Map<string, Set<[string, string]>>;
     environment: Environment;
     hooks: Hookable<BuildHooks>;
+    jiti: Jiti;
     logger: Pail;
     mode: Mode;
     options: InternalBuildOptions;

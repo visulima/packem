@@ -13,8 +13,6 @@ export const DEFAULT_LOADERS: Record<string, Loader> = {
     ".jpeg": "file",
     ".jpg": "file",
     ".js": "js",
-    // Add .json files support - require @rollup/plugin-json
-    ".json": "json",
     ".jsx": "jsx",
     ".mjs": "js",
     ".mp3": "file",

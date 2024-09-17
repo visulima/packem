@@ -11,6 +11,8 @@ import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
 import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
 import { defu } from "defu";
 import { createHooks } from "hookable";
+import type { Jiti } from "jiti";
+import { createJiti } from "jiti";
 import { VERSION } from "rollup";
 
 import build from "./build";
@@ -28,7 +30,6 @@ import getPackageSideEffect from "./utils/get-package-side-effect";
 import loadPackageJson from "./utils/load-package-json";
 import logBuildErrors from "./utils/log-build-errors";
 import prepareEntries from "./utils/prepare-entries";
-import tryRequire from "./utils/try-require";
 import packageJsonValidator from "./validator/package-json";
 import validateAliasEntries from "./validator/validate-alias-entries";
 
@@ -54,7 +55,6 @@ const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX):
 const generateOptions = (
     logger: Pail,
     rootDirectory: string,
-    mode: Mode,
     environment: Environment,
     debug: boolean,
     inputConfig: BuildConfig,
@@ -66,7 +66,7 @@ const generateOptions = (
 ): InternalBuildOptions => {
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
 
-    const options = defu(buildConfig, inputConfig, preset, <BuildOptions>{
+    const options = defu(buildConfig, inputConfig, preset, <Partial<BuildOptions>>{
         alias: {},
         cjsInterop: false,
         clean: true,
@@ -78,6 +78,12 @@ const generateOptions = (
         externals: [...Module.builtinModules, ...Module.builtinModules.map((m) => `node:${m}`)],
         failOnWarn: true,
         fileCache: true,
+        // @see https://github.com/unjs/jiti#%EF%B8%8F-options
+        jiti: {
+            alias: {},
+            debug,
+            interopDefault: true,
+        },
         minify: environment === PRODUCTION_ENV,
         name: (packageJson.name ?? "").split("/").pop() ?? "default",
         outDir: tsconfig?.config.compilerOptions?.outDir ?? "dist",
@@ -141,7 +147,7 @@ const generateOptions = (
             },
             esbuild: {
                 charset: "utf8",
-                include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
+                exclude: EXCLUDE_REGEXP,
                 jsx: jsxRuntime,
                 jsxDev: tsconfig?.config.compilerOptions?.jsx === "react-jsxdev",
                 jsxFactory: tsconfig?.config.compilerOptions?.jsxFactory,
@@ -264,6 +270,7 @@ const generateOptions = (
                     target: tsconfig?.config.compilerOptions?.target?.toLowerCase(),
                     transform: {
                         decoratorMetadata: tsconfig?.config.compilerOptions?.emitDecoratorMetadata,
+                        decoratorVersion: "2022-03",
                         legacyDecorator: tsconfig?.config.compilerOptions?.experimentalDecorators,
                         react: {
                             development: environment !== PRODUCTION_ENV,
@@ -284,9 +291,6 @@ const generateOptions = (
                     strictMode: false, // no 'use strict';
                     type: "es6",
                 },
-                transform: {
-                    decoratorVersion: "2022-03",
-                },
             },
             treeshake: {
                 moduleSideEffects: getPackageSideEffect(rootDirectory, packageJson),
@@ -305,18 +309,8 @@ const generateOptions = (
         },
         rootDir: rootDirectory,
         sourceDir: "src",
+
         sourcemap: false,
-        stub: mode === "jit",
-        stubOptions: {
-            /**
-             * See https://github.com/unjs/jiti#options
-             */
-            jiti: {
-                alias: {},
-                esmResolve: true,
-                interopDefault: true,
-            },
-        },
         transformerName: undefined,
     }) as InternalBuildOptions;
 
@@ -386,11 +380,12 @@ const createContext = async (
     buildConfig: BuildConfig,
     packageJson: PackageJson,
     tsconfig: TsConfigResult | undefined,
+    jiti: Jiti,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<BuildContext> => {
-    const preset = resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", rootDirectory);
+    const preset = await resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", jiti);
 
-    const options = generateOptions(logger, rootDirectory, mode, environment, debug, inputConfig, buildConfig, preset, packageJson, tsconfig);
+    const options = generateOptions(logger, rootDirectory, environment, debug, inputConfig, buildConfig, preset, packageJson, tsconfig);
 
     ensureDirSync(join(options.rootDir, options.outDir));
 
@@ -400,6 +395,8 @@ const createContext = async (
         dependencyGraphMap: new Map<string, Set<[string, string]>>(),
         environment,
         hooks: createHooks(),
+        // Create shared jiti instance for context
+        jiti: createJiti(options.rootDir, options.jiti),
         logger,
         mode,
         options,
@@ -577,11 +574,13 @@ const createBundler = async (
             }
         }
 
+        const jiti = createJiti(rootDirectory, { debug, interopDefault: true });
+
         if (!/\.(?:js|mjs|cjs|ts|cts|mts)$/.test(packemConfigFilePath)) {
             throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.");
         }
 
-        let buildConfig: BuildConfig | BuildConfig[] | BuildConfigFunction = tryRequire(packemConfigFilePath, rootDirectory);
+        let buildConfig = ((await jiti.import(packemConfigFilePath, { try: true })) || {}) as BuildConfig | BuildConfig[] | BuildConfigFunction;
 
         if (typeof buildConfig === "function") {
             buildConfig = await buildConfig(environment, mode);
@@ -610,8 +609,8 @@ const createBundler = async (
             }),
         );
 
-        for await (const buildOptions of arrayify(buildConfig)) {
-            const cacheKey = packageJsonCacheKey + getHash(JSON.stringify(buildOptions));
+        for await (const config of arrayify(buildConfig)) {
+            const cacheKey = packageJsonCacheKey + getHash(JSON.stringify(config));
 
             const fileCache = new FileCache(rootDirectory, cacheKey, logger);
 
@@ -622,7 +621,7 @@ const createBundler = async (
                 await emptyDir(fileCache.cachePath);
             }
 
-            const context = await createContext(logger, rootDirectory, mode, environment, debug ?? false, restInputConfig, buildOptions, packageJson, tsconfig);
+            const context = await createContext(logger, rootDirectory, mode, environment, debug ?? false, restInputConfig, config, packageJson, tsconfig, jiti);
 
             fileCache.isEnabled = context.options.fileCache as boolean;
 
@@ -639,7 +638,7 @@ const createBundler = async (
             await cleanDistributionDirectories(context);
 
             // Skip rest for stub
-            if (context.options.stub) {
+            if (mode === "jit") {
                 await createStub(context);
 
                 await context.hooks.callHook("build:done", context);

@@ -6,12 +6,16 @@
     "main": "./dist/index.cjs",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.ts",
+    "files": [
+        "./dist"
+    ],
     "scripts": {
         "build": "packem build --cjsInterop"
     },
     "devDependencies": {
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.23.1",
-        "nodehun": "^3.0.2"
+        "nodehun": "^3.0.2",
+        "typescript": "^5.6.2"
     }
 }

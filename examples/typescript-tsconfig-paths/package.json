@@ -3,6 +3,9 @@
     "version": "1.0.0",
     "private": true,
     "main": "./dist/index.cjs",
+    "files": [
+        "./dist"
+    ],
     "scripts": {
         "build": "packem build"
     },

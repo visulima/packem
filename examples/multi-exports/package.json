@@ -1,5 +1,5 @@
 {
-    "name": "example_packem_multi-exports",
+    "name": "example_packem_multi_exports",
     "version": "1.0.0",
     "private": true,
     "type": "module",
@@ -33,6 +33,22 @@
             }
         }
     },
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "typesVersions": {
+        "*": {
+            ".": [
+                "./dist/index.production.d.ts"
+            ],
+            "react": [
+                "./dist/react.production.d.ts"
+            ]
+        }
+    },
+    "files": [
+        "./dist"
+    ],
     "scripts": {
         "build": "packem build"
     },

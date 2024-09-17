@@ -13,7 +13,7 @@ import type { Loader } from "esbuild";
 import { transform } from "esbuild";
 import type { Plugin as RollupPlugin } from "rollup";
 
-import { DEFAULT_LOADERS, EXCLUDE_REGEXP } from "../../../constants";
+import { DEFAULT_LOADERS } from "../../../constants";
 import resolveFile from "../../utils/resolve-file";
 import getRenderChunk from "./get-render-chunk";
 import doOptimizeDeps from "./optmize-deps";
@@ -44,7 +44,7 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
     // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
     const INCLUDE_REGEXP = new RegExp(`\\.(${extensions.map((extension) => extension.slice(1)).join("|")})$`);
 
-    const filter = createFilter(include ?? INCLUDE_REGEXP, exclude ?? EXCLUDE_REGEXP);
+    const filter = createFilter(include ?? INCLUDE_REGEXP, exclude);
 
     let optimizeDepsResult: OptimizeDepsResult | undefined;
     let cwd = process.cwd();

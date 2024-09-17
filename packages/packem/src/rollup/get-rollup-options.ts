@@ -465,7 +465,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     context.options.rollup.isolatedDeclarations,
                 ),
 
-            context.options.transformer?.(getTransformerConfig(context.options.transformerName, context)),
+            context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
 
             preserveDirectivesPlugin({
                 directiveRegex: /^['|"](use (\w+))['|"]$/,

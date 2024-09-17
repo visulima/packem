@@ -21,7 +21,6 @@ const preserveDirectives = ({
     directiveRegex: RegExp;
     exclude?: FilterPattern;
     include?: FilterPattern;
-
     logger: Pail;
 }): Plugin => {
     const directives: Record<string, Set<string>> = {};
