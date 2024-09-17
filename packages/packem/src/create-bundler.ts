@@ -585,7 +585,7 @@ const createBundler = async (
             throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.");
         }
 
-        let buildConfig: BuildConfig | BuildConfig[] | BuildConfigFunction = (jiti.import(packemConfigFilePath, { try: true }) || {});
+        let buildConfig = ((await jiti.import(packemConfigFilePath, { try: true })) || {}) as BuildConfig | BuildConfig[] | BuildConfigFunction;
 
         if (typeof buildConfig === "function") {
             buildConfig = await buildConfig(environment, mode);
@@ -614,8 +614,8 @@ const createBundler = async (
             }),
         );
 
-        for await (const buildOptions of arrayify(buildConfig)) {
-            const cacheKey = packageJsonCacheKey + getHash(JSON.stringify(buildOptions));
+        for await (const config of arrayify(buildConfig)) {
+            const cacheKey = packageJsonCacheKey + getHash(JSON.stringify(config));
 
             const fileCache = new FileCache(rootDirectory, cacheKey, logger);
 
@@ -626,7 +626,7 @@ const createBundler = async (
                 await emptyDir(fileCache.cachePath);
             }
 
-            const context = await createContext(logger, rootDirectory, mode, debug ?? false, restInputConfig, buildConfig, packageJson, tsconfig, jiti);
+            const context = await createContext(logger, rootDirectory, mode, environment, debug ?? false, restInputConfig, config, packageJson, tsconfig, jiti);
 
             fileCache.isEnabled = context.options.fileCache as boolean;
 

@@ -57,11 +57,10 @@ const createStub = async (context: BuildContext): Promise<void> => {
             : "[]",
     );
 
-    // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
     for (const entry of context.options.entries) {
         const output = resolve(context.options.rootDir, context.options.outDir, entry.name as string);
 
-        const resolvedEntry = normalize(context.jiti.esmResolve(entry.input, { try: true }) || entry.input);
+        const resolvedEntry = normalize(context.jiti.esmResolve(entry.input, { try: true }) ?? entry.input);
         const resolvedEntryWithoutExtension = resolvedEntry.slice(0, Math.max(0, resolvedEntry.length - extname(resolvedEntry).length));
         // eslint-disable-next-line no-await-in-loop
         const code = await readFile(resolvedEntry);

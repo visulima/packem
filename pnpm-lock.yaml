@@ -663,8 +663,8 @@ importers:
         specifier: ^9.3.1
         version: 9.3.1
       jiti:
-        specifier: ^1.21.6
-        version: 1.21.6
+        specifier: 2.0.0-beta.3
+        version: 2.0.0-beta.3
       oxc-transform:
         specifier: ^0.29.0
         version: 0.29.0
@@ -5267,6 +5267,10 @@ packages:
 
   jiti@2.0.0-beta.2:
     resolution: {integrity: sha512-c+PHQZakiQuMKbnhvrjZUvrK6E/AfmTOf4P+E3Y4FNVHcNMX9e/XrnbEvO+m4wS6ZjsvhHh/POQTlfy8uXFc0A==}
+    hasBin: true
+
+  jiti@2.0.0-beta.3:
+    resolution: {integrity: sha512-pmfRbVRs/7khFrSAYnSiJ8C0D5GvzkE4Ey2pAvUcJsw1ly/p+7ut27jbJrjY79BpAJQJ4gXYFtK6d1Aub+9baQ==}
     hasBin: true
 
   jju@1.4.0:
@@ -13640,6 +13644,8 @@ snapshots:
   jiti@1.21.6: {}
 
   jiti@2.0.0-beta.2: {}
+
+  jiti@2.0.0-beta.3: {}
 
   jju@1.4.0: {}
 

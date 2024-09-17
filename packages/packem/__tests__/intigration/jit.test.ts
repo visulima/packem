@@ -1,8 +1,6 @@
-import { existsSync, symlinkSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
-import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
-import { join } from "@visulima/path";
+import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
