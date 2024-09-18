@@ -1,3 +1,13 @@
+## @visulima/packem [1.0.0-alpha.125](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.124...@visulima/packem@1.0.0-alpha.125) (2024-09-18)
+
+### Bug Fixes
+
+* added more test for the transformers ([06a5f4e](https://github.com/visulima/packem/commit/06a5f4e5b0b7ed57dc6aac6e9e3087a550a5b77e))
+
+### Continuous Integration
+
+* fixed build script ([542fe79](https://github.com/visulima/packem/commit/542fe7948ca1552ad633c3fe4ec758a0ada9bba1))
+
 ## @visulima/packem [1.0.0-alpha.124](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.123...@visulima/packem@1.0.0-alpha.124) (2024-09-18)
 
 ### Features
