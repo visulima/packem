@@ -1,3 +1,19 @@
+## @visulima/packem [1.0.0-alpha.124](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.123...@visulima/packem@1.0.0-alpha.124) (2024-09-18)
+
+### Features
+
+* added support for adding additional rollup plugins ([d96ec64](https://github.com/visulima/packem/commit/d96ec6458f2e52e8bee4b683346b158ff3f637e8))
+* upgrade jiti, fixed examples, renamed options ([#19](https://github.com/visulima/packem/issues/19)) ([14429c6](https://github.com/visulima/packem/commit/14429c6b30b5e98b23c23446b4637a3edb6663a9))
+
+### Bug Fixes
+
+* added test for --jit ([4a8b79d](https://github.com/visulima/packem/commit/4a8b79d443a6872dd52aa4f98e81caadd3f0f47d))
+* fixed jit ([26f7e13](https://github.com/visulima/packem/commit/26f7e136f338f5942f6446c007093cdf5f29657b))
+
+### Miscellaneous Chores
+
+* added more tests ([235a7b6](https://github.com/visulima/packem/commit/235a7b6e6e83ce2ec443896b73f96896bca6fc33))
+
 ## @visulima/packem [1.0.0-alpha.123](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.122...@visulima/packem@1.0.0-alpha.123) (2024-09-17)
 
 ### Bug Fixes
