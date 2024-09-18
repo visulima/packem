@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 
 import { extractAssignedNames } from "@rollup/pluginutils";
-import type { ExportAllDeclaration, ExportNamedDeclaration } from "estree";
+import type { ExportAllDeclaration, ExportNamedDeclaration, Identifier } from "estree";
 import type { ModuleInfo, PluginContext } from "rollup";
 
 import type { ParsedExportInfo } from "./types";
@@ -45,8 +45,8 @@ const parseExportNamed = function* (statement: ExportNamedDeclaration): Generato
         yield {
             bindings: statement.specifiers.map((specifier) => {
                 return {
-                    exportedName: specifier.exported.name,
-                    importedName: specifier.local.name,
+                    exportedName: (specifier.exported as Identifier).name,
+                    importedName: (specifier.local as Identifier).name,
                 };
             }),
             from: "other",
@@ -56,7 +56,7 @@ const parseExportNamed = function* (statement: ExportNamedDeclaration): Generato
     } else {
         for (const specifier of statement.specifiers) {
             yield {
-                exportedName: specifier.exported.name,
+                exportedName: (specifier.exported as Identifier).name,
                 from: "self",
                 type: "named",
             };
@@ -67,7 +67,7 @@ const parseExportNamed = function* (statement: ExportNamedDeclaration): Generato
 const parseExportAll = function* (statement: ExportAllDeclaration): Generator<ParsedExportInfo> {
     if (statement.exported) {
         yield {
-            exportedName: statement.exported.name,
+            exportedName: (statement.exported as Identifier).name,
             from: "self",
             type: "named",
         };

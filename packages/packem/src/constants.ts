@@ -42,9 +42,10 @@ export const SPECIAL_EXPORT_CONVENTIONS: Set<string> = new Set<string>([DEVELOPM
 export const EXCLUDE_REGEXP: RegExp = /node_modules/;
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types
-export const ENDING_RE: RegExp = /(?:\.d\.[mc]?ts|\.\w+)$/;
+export const ENDING_RE: RegExp = /(?:\.d\.[mc]?tsx?|\.\w+)$/;
 
 export const CHUNKS_PACKEM_FOLDER = "packem_chunks";
 export const SHARED_PACKEM_FOLDER = "packem_shared";
 
-export const ALLOWED_TRANSFORM_EXTENSIONS_REGEX = /\.(?:m|c)?(?:j|t)sx?$/;
+// eslint-disable-next-line @typescript-eslint/no-inferrable-types
+export const ALLOWED_TRANSFORM_EXTENSIONS_REGEX: RegExp = /\.(?:m|c)?(?:j|t)sx?$/;
