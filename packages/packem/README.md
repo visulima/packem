@@ -1,4 +1,5 @@
 <div align="center">
+  <img src="./assets/packem.png" width="200">
   <h3>Visulima Packem</h3>
   <p>
   A fast and modern bundler for Node.js and TypeScript. <br /> Bundles anything that's supported by Node.js natively, namely .js, .json, .mjs, .cjs and TypeScript .ts, .cts, .mts, .tsx.
