@@ -1,11 +1,11 @@
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import { join } from "@visulima/path";
+import { join, relative } from "@visulima/path";
+import { resolvePath } from "mlly";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import packageJson from "../../package.json";
 import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 
 describe("packem build --jit", () => {
@@ -55,11 +55,16 @@ describe("packem build --jit", () => {
         expect(binProcess.exitCode).toBe(0);
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const jitiCJSPath = relative(
+            join(temporaryDirectoryPath, "dist"),
 
-        const projectPath = join(__dirname, "..", "..", "..", "..");
+            await resolvePath("jiti", {
+                conditions: ["node", "require"],
+                url: import.meta.url,
+            }),
+        );
 
-        expect(cjsContent)
-            .toBe(`const { createJiti } = require("../../..${projectPath}/node_modules/.pnpm/jiti@${packageJson.dependencies.jiti}/node_modules/jiti/lib/jiti.cjs");
+        expect(cjsContent).toBe(`const { createJiti } = require("${jitiCJSPath}");
 
 const jiti = createJiti(__filename, {
   "alias": {},
@@ -81,9 +86,16 @@ module.exports = jiti("${temporaryDirectoryPath}/src/index.ts")`);
 export { default } from "${temporaryDirectoryPath}/src/index.d.cts";`);
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const jitiESMPath = relative(
+            join(temporaryDirectoryPath, "dist"),
 
-        expect(mjsContent)
-            .toBe(`import { createJiti } from "../../..${projectPath}/node_modules/.pnpm/jiti@${packageJson.dependencies.jiti}/node_modules/jiti/lib/jiti.mjs";
+            await resolvePath("jiti", {
+                conditions: ["node", "import"],
+                url: import.meta.url,
+            }),
+        );
+
+        expect(mjsContent).toBe(`import { createJiti } from "${jitiESMPath}";
 
 const jiti = createJiti(import.meta.url, {
   "alias": {},
