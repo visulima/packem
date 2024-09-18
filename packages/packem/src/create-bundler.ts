@@ -309,7 +309,6 @@ const generateOptions = (
         },
         rootDir: rootDirectory,
         sourceDir: "src",
-
         sourcemap: false,
         transformerName: undefined,
     }) as InternalBuildOptions;

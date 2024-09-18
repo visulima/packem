@@ -12,12 +12,6 @@ import type { BuildConfig } from "../src/types";
 
 const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../dist");
 
-const transformerPackageNames = {
-    esbuild: "esbuild",
-    sucrase: "sucrase",
-    swc: "@swc/core",
-};
-
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const execPackemSync = async (command: "build" | "init", flags: string[] = [], options: Options = {}) => {
     let environmentFlag: string | undefined = "--development";
@@ -36,6 +30,7 @@ export const execPackemSync = async (command: "build" | "init", flags: string[] 
     }
 
     return await execaNode(join(distributionPath, "cli.mjs"), [command, environmentFlag, ...flags].filter(Boolean) as string[], {
+        cleanup: true,
         ...options,
     });
 };
@@ -55,13 +50,12 @@ export const createPackemConfig = async (
     transformer: "esbuild" | "swc" | "sucrase" = "esbuild",
     isolatedDeclarationTransformer: "swc" | "typescript" | "oxc" | undefined = undefined,
 ): Promise<void> => {
-    // eslint-disable-next-line security/detect-object-injection
-    await installPackage(fixturePath, transformerPackageNames[transformer]);
+    await installPackage(fixturePath, transformer === "swc" ? "@swc" : transformer);
 
     writeFileSync(
         join(fixturePath, "packem.config.ts"),
         `import { defineConfig } from "${distributionPath}/config";
-import transformer from "${distributionPath}/rollup/plugins/${transformer}/index";
+import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : "index"}";
 ${isolatedDeclarationTransformer ? `import isolatedDeclarationTransformer from "${distributionPath}/rollup/plugins/${isolatedDeclarationTransformer}/isolated-declarations-${isolatedDeclarationTransformer}-transformer";` : ""}
 
 // eslint-disable-next-line import/no-unused-modules
@@ -81,10 +75,11 @@ export const createPackageJson = (fixturePAth: string, data: PackageJson, transf
     writeJsonSync(`${fixturePAth}/package.json`, {
         ...data,
         devDependencies: {
-            // eslint-disable-next-line security/detect-object-injection
-            [transformerPackageNames[transformer]]: "*",
+            [transformer === "swc" ? "@swc/core" : transformer]: "*",
             ...data.devDependencies,
         },
+    }, {
+        overwrite: true,
     });
 };
 
@@ -95,5 +90,7 @@ export const createTsConfig = (fixturePath: string, config: TsConfigJson, name =
             isolatedModules: true,
             ...config.compilerOptions,
         },
-    } satisfies TsConfigJson);
+    } satisfies TsConfigJson, {
+        overwrite: true,
+    });
 };

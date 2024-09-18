@@ -142,7 +142,7 @@ const getTransformerConfig = (
                         comments: "some",
                     },
                     mangle: {
-                        toplevel: true,
+                        topLevel: true,
                     },
                     sourceMap: context.options.sourcemap,
                     toplevel: context.options.emitCJS ?? context.options.emitESM,
@@ -158,9 +158,7 @@ const getTransformerConfig = (
             throw new Error("No sucrase options found in your configuration.");
         }
 
-        return {
-            ...context.options.rollup.sucrase,
-        } satisfies SucrasePluginConfig;
+        return context.options.rollup.sucrase satisfies SucrasePluginConfig;
     }
 
     throw new Error(`A Unknown transformer was provided`);
