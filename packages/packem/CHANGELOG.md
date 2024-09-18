@@ -1,3 +1,14 @@
+## @visulima/packem [1.0.0-alpha.126](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.125...@visulima/packem@1.0.0-alpha.126) (2024-09-18)
+
+### Features
+
+* added logo ([5f3f4ad](https://github.com/visulima/packem/commit/5f3f4ad712c20b7dafa951168363d7eb5c933c91))
+
+### Continuous Integration
+
+* fixed tests ([f3064be](https://github.com/visulima/packem/commit/f3064be8e6fd65a66fd0a8e49d2b65cff8120959))
+* updated deps ([c0046d6](https://github.com/visulima/packem/commit/c0046d68c39a1b048c96f194b7a776c721286fc3))
+
 ## @visulima/packem [1.0.0-alpha.125](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.124...@visulima/packem@1.0.0-alpha.125) (2024-09-18)
 
 ### Bug Fixes
