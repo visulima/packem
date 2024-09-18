@@ -1,9 +1,11 @@
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
+import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import packageJson from "../../package.json";
 import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 
 describe("packem build --jit", () => {
@@ -43,7 +45,7 @@ describe("packem build --jit", () => {
             },
             types: "./dist/index.d.ts",
         });
-        await createPackemConfig(temporaryDirectoryPath, { declaration: false });
+        await createPackemConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", ["--jit"], {
             cwd: temporaryDirectoryPath,
@@ -54,41 +56,54 @@ describe("packem build --jit", () => {
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
+        const projectPath = join(__dirname, "..", "..", "..", "..");
+
         expect(cjsContent)
-            .toBe(`const jiti = require("/home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/jiti@1.21.6/node_modules/jiti/lib/index.js")
+            .toBe(`const { createJiti } = require("../../..${projectPath}/node_modules/.pnpm/jiti@${packageJson.dependencies.jiti}/node_modules/jiti/lib/jiti.cjs");
 
-const _jiti = jiti(null, {
+const jiti = createJiti(__filename, {
   "alias": {},
-  "esmResolve": true,
-  "interopDefault": true
-})
+  "debug": false,
+  "interopDefault": true,
+  "transformOptions": {
+    "babel": {
+      "plugins": []
+    }
+  }
+});
 
-/** @type {import("${temporaryDirectoryPath}/src/index")} */
-module.exports = _jiti("${temporaryDirectoryPath}/src/index.ts")`);
+/** @type {import("${temporaryDirectoryPath}/src/index.d.cts")} */
+module.exports = jiti("${temporaryDirectoryPath}/src/index.ts")`);
 
         const cDtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(cDtsContent).toBe(`export * from "${temporaryDirectoryPath}/src/index";
-export { default } from "${temporaryDirectoryPath}/src/index";`);
+        expect(cDtsContent).toBe(`export * from "${temporaryDirectoryPath}/src/index.d.cts";
+export { default } from "${temporaryDirectoryPath}/src/index.d.cts";`);
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`import jiti from "/home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/jiti@1.21.6/node_modules/jiti/lib/index.js";
+        expect(mjsContent)
+            .toBe(`import { createJiti } from "../../..${projectPath}/node_modules/.pnpm/jiti@${packageJson.dependencies.jiti}/node_modules/jiti/lib/jiti.mjs";
 
-const _jiti = jiti(null, {
+const jiti = createJiti(import.meta.url, {
   "alias": {},
-  "esmResolve": true,
-  "interopDefault": true
-})
+  "debug": false,
+  "interopDefault": true,
+  "transformOptions": {
+    "babel": {
+      "plugins": []
+    }
+  }
+});
 
-/** @type {import("${temporaryDirectoryPath}/src/index.ts")} */
-const _module = await _jiti.import("${temporaryDirectoryPath}/src/index.ts");
+/** @type {import("${temporaryDirectoryPath}/src/index.d.mts")} */
+const _module = await jiti.import("${temporaryDirectoryPath}/src/index.ts");
 
 export default _module;`);
 
         const mDtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(mDtsContent).toBe(`export * from "${temporaryDirectoryPath}/src/index.ts";
-export { default } from "${temporaryDirectoryPath}/src/index.ts";`);
+        expect(mDtsContent).toBe(`export * from "${temporaryDirectoryPath}/src/index.d.mts";
+export { default } from "${temporaryDirectoryPath}/src/index.d.mts";`);
     });
 });

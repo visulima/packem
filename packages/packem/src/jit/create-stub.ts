@@ -1,8 +1,8 @@
-import { readFile, writeFile } from "@visulima/fs";
-import { dirname, extname, normalize, relative, resolve } from "@visulima/path";
+import { readFile, writeFileSync } from "@visulima/fs";
+import { dirname, normalize, relative, resolve } from "@visulima/path";
 import { resolveModuleExportNames, resolvePath } from "mlly";
 
-import { DEFAULT_EXTENSIONS } from "../constants";
+import { DEFAULT_EXTENSIONS, ENDING_RE } from "../constants";
 import { getShebang, makeExecutable } from "../rollup/plugins/shebang";
 import resolveAliases from "../rollup/utils/resolve-aliases";
 import type { BuildContext } from "../types";
@@ -61,38 +61,10 @@ const createStub = async (context: BuildContext): Promise<void> => {
         const output = resolve(context.options.rootDir, context.options.outDir, entry.name as string);
 
         const resolvedEntry = normalize(context.jiti.esmResolve(entry.input, { try: true }) ?? entry.input);
-        const resolvedEntryWithoutExtension = resolvedEntry.slice(0, Math.max(0, resolvedEntry.length - extname(resolvedEntry).length));
+        const resolvedEntryWithoutExtension = resolvedEntry.replace(ENDING_RE, "");
         // eslint-disable-next-line no-await-in-loop
         const code = await readFile(resolvedEntry);
         const shebang = getShebang(code);
-
-        // CJS Stub
-        if (context.options.emitCJS) {
-            const jitiCJSPath = relative(
-                dirname(output),
-                // eslint-disable-next-line no-await-in-loop
-                await resolvePath("jiti", {
-                    conditions: ["node", "require"],
-                    url: import.meta.url,
-                }),
-            );
-
-            // eslint-disable-next-line no-await-in-loop
-            await writeFile(
-                `${output}.cjs`,
-                shebang +
-                    [
-                        `const { createJiti } = require(${JSON.stringify(jitiCJSPath)});`,
-                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                        ...importedBabelPlugins.map((plugin, index) => "const plugin" + index + " = require(" + JSON.stringify(plugin) + ")"),
-                        "",
-                        `const jiti = createJiti(__filename, ${serializedJitiOptions});`,
-                        "",
-                        `/** @type {import(${JSON.stringify(resolvedEntryWithoutExtension)})} */`,
-                        `module.exports = jiti(${JSON.stringify(resolvedEntry)})`,
-                    ].join("\n"),
-            );
-        }
 
         // MJS Stub
         // Try to analyze exports
@@ -123,42 +95,69 @@ const createStub = async (context: BuildContext): Promise<void> => {
                 }),
             );
 
-            // eslint-disable-next-line no-await-in-loop
-            await writeFile(
+            const typePath = resolvedEntryWithoutExtension + ".d.mts";
+
+            writeFileSync(
                 `${output}.mjs`,
                 shebang +
                     [
-                        "import { createJiti } from " + JSON.stringify(jitiESMPath) + ";",
+                        'import { createJiti } from "' + jitiESMPath + '";',
                         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                        ...importedBabelPlugins.map((plugin, index) => "import plugin" + index + " from " + JSON.stringify(plugin)),
+                        ...importedBabelPlugins.map((plugin, index) => "import plugin" + index + ' from "' + plugin + '";'),
                         "",
                         "const jiti = createJiti(import.meta.url, " + serializedJitiOptions + ");",
                         "",
-                        "/** @type {import(" + JSON.stringify(resolvedEntry) + ")} */",
-                        "const _module = await jiti.import(" + JSON.stringify(resolvedEntry) + ");",
+                        '/** @type {import("' + typePath + '")} */',
+                        'const _module = await jiti.import("' + resolvedEntry + '");',
                         hasDefaultExport ? "\nexport default _module;" : "",
                         ...namedExports.filter((name) => name !== "default").map((name) => `export const ${name} = _module.${name};`),
                     ].join("\n"),
             );
+
+            // DTS Stub
+            if (context.options.declaration) {
+                writeFileSync(
+                    `${output}.d.mts`,
+                    'export * from "' + typePath + '";\n' + (hasDefaultExport ? 'export { default } from "' + typePath + '";' : ""),
+                );
+            }
         }
 
-        if (context.options.declaration) {
+        // CJS Stub
+        if (context.options.emitCJS) {
+            const jitiCJSPath = relative(
+                dirname(output),
+                // eslint-disable-next-line no-await-in-loop
+                await resolvePath("jiti", {
+                    conditions: ["node", "require"],
+                    url: import.meta.url,
+                }),
+            );
+
+            const typePath = resolvedEntryWithoutExtension + ".d.cts";
+
+            writeFileSync(
+                `${output}.cjs`,
+                shebang +
+                    [
+                        'const { createJiti } = require("' + jitiCJSPath + '");',
+                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                        ...importedBabelPlugins.map((plugin, index) => "const plugin" + index + " = require(" + JSON.stringify(plugin) + ")"),
+                        "",
+                        "const jiti = createJiti(__filename, " + serializedJitiOptions + ");",
+                        "",
+                        '/** @type {import("' + typePath + '")} */',
+                        'module.exports = jiti("' + resolvedEntry + '")',
+                    ].join("\n"),
+            );
+
             // DTS Stub
-            // eslint-disable-next-line no-await-in-loop
-            await writeFile(
-                `${output}.d.cts`,
-                [
-                    `export * from ${JSON.stringify(resolvedEntryWithoutExtension)};`,
-                    hasDefaultExport ? `export { default } from ${JSON.stringify(resolvedEntryWithoutExtension)};` : "",
-                ].join("\n"),
-            );
-            // eslint-disable-next-line no-await-in-loop
-            await writeFile(
-                `${output}.d.mts`,
-                [`export * from ${JSON.stringify(resolvedEntry)};`, hasDefaultExport ? `export { default } from ${JSON.stringify(resolvedEntry)};` : ""].join(
-                    "\n",
-                ),
-            );
+            if (context.options.declaration) {
+                writeFileSync(
+                    output + ".d.cts",
+                    'export * from "' + typePath + '";\n' + (hasDefaultExport ? 'export { default } from "' + typePath + '";' : ""),
+                );
+            }
         }
 
         if (shebang) {

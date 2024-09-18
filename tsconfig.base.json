@@ -46,6 +46,8 @@
         "allowUnusedLabels": false,
         "allowUnreachableCode": false,
 
+        "resolveJsonModule": true,
+
         "checkJs": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true
