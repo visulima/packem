@@ -68,11 +68,11 @@
         "husky": "^9.1.6",
         "is-ci": "^3.0.1",
         "lint-staged": "^15.2.10",
-        "nx": "^19.7.3",
+        "nx": "^19.7.4",
         "pkg-pr-new": "^0.0.24",
         "plop": "^4.0.1",
         "prettier": "^3.3.3",
-        "publint": "^0.2.10",
+        "publint": "^0.2.11",
         "rimraf": "6.0.1",
         "secretlint": "8.2.4",
         "semantic-release": "^24.1.1",
@@ -89,9 +89,10 @@
     "pnpm": {
         "overrides": {
             "braces@<3.0.3": ">=3.0.3",
-            "chrono-node@<2.2.4": ">=2.7.6",
+            "chrono-node@<2.2.4": ">=2.7.7",
             "micromatch@<4.0.8": ">=4.0.8",
-            "rollup": "^4.21.3"
+            "rollup": "^4.21.3",
+            "vite@>=5.3.0 <=5.3.5": ">=5.3.6"
         }
     }
 }
