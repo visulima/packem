@@ -1,8 +1,11 @@
+import { readdirSync } from "node:fs";
+import { rm } from "node:fs/promises";
 import Module from "node:module";
 import { cwd } from "node:process";
 
 import { bold, cyan } from "@visulima/colorize";
-import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync } from "@visulima/fs";
+import { findCacheDirSync } from "@visulima/find-cache-dir";
+import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync, readJsonSync } from "@visulima/fs";
 import { duration } from "@visulima/humanizer";
 import type { PackageJson } from "@visulima/package";
 import type { Pail } from "@visulima/pail";
@@ -500,6 +503,31 @@ const cleanDistributionDirectories = async (context: BuildContext): Promise<void
     }
 };
 
+const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail): Promise<void> => {
+    if (cachePath && isAccessibleSync(join(cachePath, "keystore.json"))) {
+        const keyStore: Record<string, string> = readJsonSync(join(cachePath, "keystore.json"));
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        const cacheDirectories = readdirSync(cachePath, {
+            withFileTypes: true,
+        }).filter((dirent) => dirent.isDirectory());
+
+        for await (const dirent of cacheDirectories) {
+            if (!keyStore[dirent.name]) {
+                await rm(join(cachePath, dirent.name), {
+                    force: true,
+                    recursive: true,
+                });
+
+                logger.info({
+                    message: "Removing " + dirent.name + " file cache, the cache key is not used anymore.",
+                    prefix: "file-cache"
+                })
+            }
+        }
+    }
+};
+
 const createBundler = async (
     rootDirectory: string,
     mode: Mode,
@@ -608,18 +636,13 @@ const createBundler = async (
             }),
         );
 
+        const cachePath = findCacheDirSync(packageJson.name as string, {
+            cwd: rootDirectory,
+        });
+
         for await (const config of arrayify(buildConfig)) {
             const cacheKey = packageJsonCacheKey + getHash(JSON.stringify(config));
-
-            const fileCache = new FileCache(rootDirectory, cacheKey, logger);
-
-            // clear cache if the cache key has changed
-            if (fileCache.cachePath && !isAccessibleSync(join(fileCache.cachePath, cacheKey)) && isAccessibleSync(fileCache.cachePath)) {
-                logger.info("Clearing file cache because the cache key has changed.");
-
-                await emptyDir(fileCache.cachePath);
-            }
-
+            const fileCache = new FileCache(rootDirectory, cachePath, cacheKey, logger);
             const context = await createContext(logger, rootDirectory, mode, environment, debug ?? false, restInputConfig, config, packageJson, tsconfig, jiti);
 
             fileCache.isEnabled = context.options.fileCache as boolean;
@@ -669,6 +692,8 @@ const createBundler = async (
 
             logger.raw("\n⚡️ Build run in " + getDuration());
         }
+
+        await removeOldCacheFolders(cachePath, logger);
 
         // Restore all wrapped console methods
         logger.restoreAll();
