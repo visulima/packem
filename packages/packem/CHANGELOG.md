@@ -1,3 +1,11 @@
+## @visulima/packem [1.0.0-alpha.127](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.126...@visulima/packem@1.0.0-alpha.127) (2024-09-19)
+
+### Bug Fixes
+
+* improved the file-cache ([90fa704](https://github.com/visulima/packem/commit/90fa704787fc177ddfa2bd80ed2350509433b548))
+* improved types ([f7e2d23](https://github.com/visulima/packem/commit/f7e2d23a206bb8403878a319019dbc716b743635))
+* moved cache delete into finally ([469eecc](https://github.com/visulima/packem/commit/469eecc0ae82e78ed1e4b8b4c5cd28f68da775e8))
+
 ## @visulima/packem [1.0.0-alpha.126](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.125...@visulima/packem@1.0.0-alpha.126) (2024-09-18)
 
 ### Features
