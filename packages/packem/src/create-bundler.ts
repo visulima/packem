@@ -521,8 +521,8 @@ const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail
 
                 logger.info({
                     message: "Removing " + dirent.name + " file cache, the cache key is not used anymore.",
-                    prefix: "file-cache"
-                })
+                    prefix: "file-cache",
+                });
             }
         }
     }
@@ -578,6 +578,10 @@ const createBundler = async (
             logger.info("No tsconfig.json or jsconfig.json found.");
         }
     }
+
+    const cachePath = findCacheDirSync(packageJson.name as string, {
+        cwd: rootDirectory,
+    });
 
     try {
         let packemConfigFilePath = configPath ?? "";
@@ -636,10 +640,6 @@ const createBundler = async (
             }),
         );
 
-        const cachePath = findCacheDirSync(packageJson.name as string, {
-            cwd: rootDirectory,
-        });
-
         for await (const config of arrayify(buildConfig)) {
             const cacheKey = packageJsonCacheKey + getHash(JSON.stringify(config));
             const fileCache = new FileCache(rootDirectory, cachePath, cacheKey, logger);
@@ -692,9 +692,6 @@ const createBundler = async (
 
             logger.raw("\n⚡️ Build run in " + getDuration());
         }
-
-        await removeOldCacheFolders(cachePath, logger);
-
         // Restore all wrapped console methods
         logger.restoreAll();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -704,6 +701,8 @@ const createBundler = async (
         enhanceRollupError(error);
 
         throw error;
+    } finally {
+        await removeOldCacheFolders(cachePath, logger);
     }
 };
 
