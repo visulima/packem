@@ -188,8 +188,8 @@ export const isolatedDeclarationsPlugin = (
                 if ((declaration === true || declaration === "compatible") && outputOptions.format === "cjs") {
                     this.emitFile({
                         fileName: entryFileNames.replace("[name]", relative(outBase, filename)).replace(".cts", ".ts"),
-                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                        source: source.replaceAll(/(from\s)['|"](.*)['|"];?/g, (_, group1, group2) => group1 + quote + group2 + ".d.ts" + quote + ";"),
+                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands,regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
+                        source: source.replaceAll(/(from\s)['|"](.*)\..+['|"];?/g, (_, group1, group2) => group1 + quote + group2 + ".d.ts" + quote + ";"),
                         type: "asset",
                     });
                 }
@@ -197,7 +197,8 @@ export const isolatedDeclarationsPlugin = (
                 this.emitFile({
                     fileName: entryFileNames.replace("[name]", relative(outBase, filename)),
                     source: source.replaceAll(
-                        /(from\s)['|"](.*)['|"];?/g,
+                        // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
+                        /(from\s)['|"](.*)\..+['|"];?/g,
                         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
                         (_, group1, group2) => group1 + quote + group2 + (outputOptions.format === "cjs" ? ".d.cts" : ".d.mts") + quote + ";",
                     ),
