@@ -6,8 +6,8 @@ import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 import getRegexMatches from "../../src/utils/get-regex-matches";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 
 describe("packem typescript", () => {
     let temporaryDirectoryPath: string;
