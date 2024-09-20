@@ -68,8 +68,8 @@
         "husky": "^9.1.6",
         "is-ci": "^3.0.1",
         "lint-staged": "^15.2.10",
-        "nx": "^19.7.4",
-        "pkg-pr-new": "^0.0.24",
+        "nx": "^19.8.0",
+        "pkg-pr-new": "^0.0.25",
         "plop": "^4.0.1",
         "prettier": "^3.3.3",
         "publint": "^0.2.11",
@@ -82,7 +82,7 @@
         "typescript": "^5.6.2",
         "vitest": "^2.1.1"
     },
-    "packageManager": "pnpm@9.10.0",
+    "packageManager": "pnpm@9.11.0",
     "engines": {
         "node": ">=18.* <=22.*"
     },
