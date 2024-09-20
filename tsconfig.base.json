@@ -50,9 +50,9 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
 
-        "allowJs": false,
-        "checkJs": false,
-        "isolatedDeclarations": true,
+        "allowJs": true,
+        "checkJs": true,
+        "isolatedDeclarations": false,
         "noErrorTruncation": true
     },
     "exclude": ["dist/**/*", "node_modules/**/*", "build/**/*", "scripts/**/*", "examples/**", "**/coverage/**"]

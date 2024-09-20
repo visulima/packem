@@ -17,7 +17,9 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
         return;
     }
 
-    rollupOptions.cache = fileCache.get<RollupCache>(BUNDLE_CACHE_KEY, subDirectory);
+    if (!context.options.rollup.isolatedDeclarations || !context.options.isolatedDeclarationTransformer) {
+        rollupOptions.cache = fileCache.get<RollupCache>(BUNDLE_CACHE_KEY, subDirectory);
+    }
 
     const buildResult = await rollup(rollupOptions);
 

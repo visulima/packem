@@ -84,7 +84,9 @@ const watch = async (context: BuildContext, fileCache: FileCache): Promise<void>
         return;
     }
 
-    rollupOptions.cache = fileCache.get<RollupCache>(WATCH_CACHE_KEY);
+    if (!context.options.rollup.isolatedDeclarations || !context.options.isolatedDeclarationTransformer) {
+        rollupOptions.cache = fileCache.get<RollupCache>(WATCH_CACHE_KEY);
+    }
 
     if (context.options.rollup.watch && typeof rollupOptions.watch === "object" && rollupOptions.watch.include === undefined) {
         rollupOptions.watch = {
