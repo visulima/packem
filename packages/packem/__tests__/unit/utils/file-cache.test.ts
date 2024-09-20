@@ -25,7 +25,7 @@ describe("fileCache", () => {
 
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
-        cacheDirectoryPath = join(temporaryDirectoryPath, "cache")
+        cacheDirectoryPath = join(temporaryDirectoryPath, "cache");
     });
 
     afterEach(async () => {
@@ -40,7 +40,7 @@ describe("fileCache", () => {
 
         expect(hoisted.logger.debug).toHaveBeenCalledWith({
             message: "Cache path is: " + cacheDirectoryPath,
-            prefix: "file-cache"
+            prefix: "file-cache",
         });
     });
 
@@ -99,7 +99,7 @@ describe("fileCache", () => {
 
         expect(hoisted.logger.debug).toHaveBeenCalledWith({
             message: "Could not create cache directory.",
-            prefix: "file-cache"
+            prefix: "file-cache",
         });
     });
 

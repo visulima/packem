@@ -1162,7 +1162,7 @@ export type Num2 = number`,
 
                 const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-                expect(dCtsContent).toBe(`import { type Num } from ${quote}./types.cjs${quote};
+                expect(dCtsContent).toBe(`import { type Num } from ${quote}./types.d.cts${quote};
 export type Str = string;
 export declare function hello(s: Str): Str;
 export declare let num: Num;
@@ -1170,7 +1170,7 @@ export declare let num: Num;
 
                 const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-                expect(dtsContent).toBe(`import { type Num } from ${quote}./types${quote};
+                expect(dtsContent).toBe(`import { type Num } from ${quote}./types.d.ts${quote};
 export type Str = string;
 export declare function hello(s: Str): Str;
 export declare let num: Num;
@@ -1180,7 +1180,7 @@ export declare let num: Num;
 
                 expect(dCtsTypesContent).toBe(
                     isolatedDeclarationTransformer === "swc"
-                        ? `import type { Num2 } from './types2.cjs';
+                        ? `import type { Num2 } from './types2.d.cts';
 export type Num = number;
 `
                         : `export type Num = number;
@@ -1191,7 +1191,7 @@ export type Num = number;
 
                 expect(dtsTypesContent).toBe(
                     isolatedDeclarationTransformer === "swc"
-                        ? `import type { Num2 } from './types2';
+                        ? `import type { Num2 } from './types2.d.ts';
 export type Num = number;
 `
                         : `export type Num = number;
@@ -1203,7 +1203,7 @@ export type Num = number;
         it.each(["typescript", "oxc", "swc"])(
             "should work with '%s' isolated declarations transformer and module package",
             async (isolatedDeclarationTransformer) => {
-                expect.assertions(7);
+                expect.assertions(5);
 
                 const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : '"';
 
@@ -1262,15 +1262,7 @@ export type Num2 = number`,
 
                 const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-                expect(dMtsContent).toBe(`import { type Num } from ${quote}./types.mjs${quote};
-export type Str = string;
-export declare function hello(s: Str): Str;
-export declare let num: Num;
-`);
-
-                const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
-
-                expect(dtsContent).toBe(`import { type Num } from ${quote}./types${quote};
+                expect(dMtsContent).toBe(`import { type Num } from ${quote}./types.d.mts${quote};
 export type Str = string;
 export declare function hello(s: Str): Str;
 export declare let num: Num;
@@ -1280,18 +1272,7 @@ export declare let num: Num;
 
                 expect(dMtsTypesContent).toBe(
                     isolatedDeclarationTransformer === "swc"
-                        ? `import type { Num2 } from './types2.mjs';
-export type Num = number;
-`
-                        : `export type Num = number;
-`,
-                );
-
-                const dtsTypesContent = readFileSync(`${temporaryDirectoryPath}/dist/types.d.ts`);
-
-                expect(dtsTypesContent).toBe(
-                    isolatedDeclarationTransformer === "swc"
-                        ? `import type { Num2 } from './types2';
+                        ? `import type { Num2 } from './types2.d.mts';
 export type Num = number;
 `
                         : `export type Num = number;

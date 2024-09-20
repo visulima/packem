@@ -44,7 +44,6 @@ describe("packem error cases", () => {
 
         const NODE_JS_VERSION = Number(process.versions.node.split(".")[0]);
 
-
         expect(binProcess.stderr).toContain(NODE_JS_VERSION < 20 ? "Unexpected end of JSON input in" : "Expected property name or");
         expect(binProcess.exitCode).toBe(1);
     });

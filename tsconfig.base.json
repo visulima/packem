@@ -37,7 +37,6 @@
         "esModuleInterop": true,
 
         "declaration": true,
-        "allowJs": true,
         "removeComments": true,
         "incremental": true,
 
@@ -48,9 +47,13 @@
 
         "resolveJsonModule": true,
 
-        "checkJs": true,
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+
+        "allowJs": false,
+        "checkJs": false,
+        "isolatedDeclarations": true,
+        "noErrorTruncation": true
     },
     "exclude": ["dist/**/*", "node_modules/**/*", "build/**/*", "scripts/**/*", "examples/**", "**/coverage/**"]
 }

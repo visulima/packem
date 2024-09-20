@@ -72,25 +72,33 @@ export default defineConfig({
 };
 
 export const createPackageJson = (fixturePAth: string, data: PackageJson, transformer: "esbuild" | "swc" | "sucrase" = "esbuild"): void => {
-    writeJsonSync(`${fixturePAth}/package.json`, {
-        ...data,
-        devDependencies: {
-            [transformer === "swc" ? "@swc/core" : transformer]: "*",
-            ...data.devDependencies,
+    writeJsonSync(
+        `${fixturePAth}/package.json`,
+        {
+            ...data,
+            devDependencies: {
+                [transformer === "swc" ? "@swc/core" : transformer]: "*",
+                ...data.devDependencies,
+            },
         },
-    }, {
-        overwrite: true,
-    });
+        {
+            overwrite: true,
+        },
+    );
 };
 
 export const createTsConfig = (fixturePath: string, config: TsConfigJson, name = ""): void => {
-    writeJsonSync(fixturePath + "/tsconfig" + name + ".json", {
-        ...config,
-        compilerOptions: {
-            isolatedModules: true,
-            ...config.compilerOptions,
+    writeJsonSync(
+        fixturePath + "/tsconfig" + name + ".json",
+        {
+            ...config,
+            compilerOptions: {
+                isolatedModules: true,
+                ...config.compilerOptions,
+            },
+        } satisfies TsConfigJson,
+        {
+            overwrite: true,
         },
-    } satisfies TsConfigJson, {
-        overwrite: true,
-    });
+    );
 };

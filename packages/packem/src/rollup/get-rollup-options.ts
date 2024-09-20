@@ -458,9 +458,9 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     context.options.rollup.isolatedDeclarations &&
                     context.options.isolatedDeclarationTransformer &&
                     isolatedDeclarationsPlugin(
+                        join(context.options.rootDir, context.options.sourceDir),
                         context.options.isolatedDeclarationTransformer,
                         context.options.declaration,
-                        context.pkg.type,
                         Boolean(context.options.rollup.cjsInterop),
                         context.options.rollup.isolatedDeclarations,
                     ),

@@ -230,7 +230,7 @@
         "magic-string": "0.30.11",
         "mlly": "1.7.1",
         "oxc-parser": "0.29.0",
-        "rollup": "4.21.3",
+        "rollup": "4.22.2",
         "rollup-plugin-dts": "6.1.1",
         "rollup-plugin-license": "3.5.2",
         "rollup-plugin-polyfill-node": "0.13.0",
