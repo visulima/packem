@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.129](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.128...@visulima/packem@1.0.0-alpha.129) (2024-09-20)
+
+### Bug Fixes
+
+* improved test for shared chunks ([337d12e](https://github.com/visulima/packem/commit/337d12e408705f73c9b52a6eceaa9ac4d22cfd22))
+
 ## @visulima/packem [1.0.0-alpha.128](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.127...@visulima/packem@1.0.0-alpha.128) (2024-09-20)
 
 ### Bug Fixes
