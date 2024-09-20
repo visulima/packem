@@ -1,3 +1,10 @@
+## @visulima/packem [1.0.0-alpha.128](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.127...@visulima/packem@1.0.0-alpha.128) (2024-09-20)
+
+### Bug Fixes
+
+* fixed cache issue with isolated-declarations ([92d1029](https://github.com/visulima/packem/commit/92d1029337e5b58226484f065097fb9d7d45bcac))
+* fixed isolated-declarations auto extensions ([7119b6b](https://github.com/visulima/packem/commit/7119b6b375d55005272eae5c173a076702cce898))
+
 ## @visulima/packem [1.0.0-alpha.127](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.126...@visulima/packem@1.0.0-alpha.127) (2024-09-19)
 
 ### Bug Fixes
