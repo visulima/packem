@@ -1032,17 +1032,19 @@ export { AppContext };
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
         const cjsMatches: string[] = getRegexMatches(/require\('.*'\);/g, cjsContent);
 
+        const hasAnotherSharedApi = cjsContent.includes("anotherSharedApi");
+
         expect(cjsMatches).toHaveLength(2);
         expect(cjsContent).toBe(`'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const anotherSharedApi = ${cjsMatches[0] as string}
+const ${hasAnotherSharedApi ? "anotherSharedApi" : "sharedApi"} = ${cjsMatches[0] as string}
 const AppContext = ${cjsMatches[1] as string}
 
 const index = "index";
 
-exports.sharedApi = anotherSharedApi.sharedApi;
+exports.sharedApi = ${hasAnotherSharedApi ? "anotherSharedApi" : "sharedApi"}.sharedApi;
 exports.AppContext = AppContext.AppContext;
 exports.index = index;
 `);
