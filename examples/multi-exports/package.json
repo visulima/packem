@@ -1,5 +1,5 @@
 {
-    "name": "example_packem_multi_exports",
+    "name": "examples_packem_multi_exports",
     "version": "1.0.0",
     "private": true,
     "type": "module",

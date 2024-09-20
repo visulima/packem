@@ -1,5 +1,5 @@
 {
-    "name": "example_packem_typescript_tsconfig_paths",
+    "name": "examples_packem_typescript_tsconfig_paths",
     "version": "1.0.0",
     "private": true,
     "main": "./dist/index.cjs",

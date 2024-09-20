@@ -1,5 +1,5 @@
 {
-    "name": "example_packem_native_node_module",
+    "name": "examples_packem_native_node_module",
     "version": "1.0.0",
     "private": true,
     "type": "commonjs",

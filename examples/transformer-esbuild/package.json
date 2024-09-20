@@ -1,5 +1,5 @@
 {
-    "name": "example_packem_transformer_esbuild",
+    "name": "examples_packem_transformer_esbuild",
     "version": "1.0.0",
     "private": true,
     "type": "module",

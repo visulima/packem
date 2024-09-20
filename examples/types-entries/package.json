@@ -1,5 +1,5 @@
 {
-    "name": "example_packem_type_entries",
+    "name": "examples_packem_type_entries",
     "version": "1.0.0",
     "private": true,
     "main": "./dist/index.cjs",

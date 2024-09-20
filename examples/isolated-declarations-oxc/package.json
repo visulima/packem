@@ -1,5 +1,5 @@
 {
-    "name": "example_packem_isolated_declarations_oxc",
+    "name": "examples_packem_isolated_declarations_oxc",
     "version": "1.0.0",
     "private": true,
     "type": "module",
