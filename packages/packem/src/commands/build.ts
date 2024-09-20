@@ -52,6 +52,7 @@ const createBuildCommand = (cli: Cli): void => {
 
             try {
                 await createBundler(options.dir, mode, nodeEnvironment as Environment, logger, {
+                    analyze: options.analyze,
                     cjsInterop: options.cjsInterop,
                     clean: options.clean,
                     configPath: options.config ?? undefined,
@@ -69,9 +70,8 @@ const createBuildCommand = (cli: Cli): void => {
                             path: options.license,
                         },
                         metafile: options.metafile,
-                        ...(options.visualize ? { visualizer: {} } : { visualizer: false }),
                     },
-                    sourcemap: options.sourcemap,
+                    sourcemap: options.analyze || options.sourcemap,
                     tsconfigPath: options.tsconfig ?? undefined,
                     validation:
                         options.validation === false
@@ -168,7 +168,7 @@ const createBuildCommand = (cli: Cli): void => {
             {
                 conflicts: "watch",
                 description: "Visualize and analyze the bundle",
-                name: "visualize",
+                name: "analyze",
                 type: Boolean,
             },
             {

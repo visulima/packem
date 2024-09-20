@@ -692,6 +692,7 @@ const createBundler = async (
 
             logger.raw("\n⚡️ Build run in " + getDuration());
         }
+
         // Restore all wrapped console methods
         logger.restoreAll();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
