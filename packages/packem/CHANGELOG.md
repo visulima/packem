@@ -1,3 +1,14 @@
+## @visulima/packem [1.0.0-alpha.130](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.129...@visulima/packem@1.0.0-alpha.130) (2024-09-20)
+
+### Bug Fixes
+
+* fixed attw ([1dccbac](https://github.com/visulima/packem/commit/1dccbaccdd39226d5623fd8f812eb6bbe829126e))
+* improved regex of isolated declarations ([d01352a](https://github.com/visulima/packem/commit/d01352a93fe06e2ee111609df9dde17dd45e9ea6))
+
+### Styles
+
+* cs fixes ([2b0cb4f](https://github.com/visulima/packem/commit/2b0cb4f57c6cd13f24e1d250b453722b897ea3aa))
+
 ## @visulima/packem [1.0.0-alpha.129](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.128...@visulima/packem@1.0.0-alpha.129) (2024-09-20)
 
 ### Bug Fixes
