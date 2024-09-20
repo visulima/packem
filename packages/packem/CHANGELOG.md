@@ -1,3 +1,13 @@
+## @visulima/packem [1.0.0-alpha.131](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.130...@visulima/packem@1.0.0-alpha.131) (2024-09-20)
+
+### Bug Fixes
+
+* updated deps ([6ce45d8](https://github.com/visulima/packem/commit/6ce45d8a1a4368ebb4c9f6e5009ebad129f891eb))
+
+### Continuous Integration
+
+* one more fix for chunk test ([53d6586](https://github.com/visulima/packem/commit/53d65860051ff020f8885dc15f968afd4ddcd004))
+
 ## @visulima/packem [1.0.0-alpha.130](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.129...@visulima/packem@1.0.0-alpha.130) (2024-09-20)
 
 ### Bug Fixes
