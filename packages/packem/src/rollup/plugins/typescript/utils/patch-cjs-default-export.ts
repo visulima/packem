@@ -1,33 +1,16 @@
 import MagicString from "magic-string";
 import type { SourceMap } from "rollup";
 
+import getRegexMatches from "../../../../utils/get-regex-matches";
+
 const patchCjsDefaultExport = (
     source: string,
 ): null | {
     code: string;
     map: SourceMap;
 } => {
-    let matches: string[] = [];
-
-    let regexMatches;
     // will match `export { ... }` statement
-    const regex = /export\s(\{\s(.*)\s\}|default\s.*);/g;
-
-    // eslint-disable-next-line no-cond-assign
-    while ((regexMatches = regex.exec(source)) !== null) {
-        // This is necessary to avoid infinite loops with zero-width matches
-        if (regexMatches.index === regex.lastIndex) {
-            // eslint-disable-next-line no-plusplus
-            regex.lastIndex++;
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-loop-func
-        regexMatches.forEach((match) => {
-            matches.push(match);
-        });
-    }
-
-    matches = matches.filter(Boolean);
+    const matches: string[] = getRegexMatches(/export\s(\{\s(.*)\s\}|default\s.*);/g, source);
 
     if (matches.length === 0) {
         return null;

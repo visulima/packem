@@ -7,6 +7,7 @@ import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import getRegexMatches from "../../src/utils/get-regex-matches";
 
 describe("packem typescript", () => {
     let temporaryDirectoryPath: string;
@@ -928,7 +929,7 @@ export { getOne };
     });
 
     it("should contain correct type file path of shared chunks", async () => {
-        expect.assertions(10);
+        expect.assertions(13);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "react");
@@ -995,16 +996,18 @@ export const AppContext = React.createContext(null)`,
         expect(binProcess.exitCode).toBe(0);
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsMatches: string[] = getRegexMatches(/from\s'.*';/g, mjsContent);
 
-        expect(mjsContent).toBe(`export { sharedApi } from './packem_shared/anotherSharedApi-lhzhzq4G.mjs';
-export { AppContext } from './packem_shared/AppContext-BSWWkl28.mjs';
+        expect(mjsMatches).toHaveLength(2);
+        expect(mjsContent).toBe(`export { sharedApi } ${mjsMatches[0] as string}
+export { AppContext } ${mjsMatches[1] as string}
 
 const index = "index";
 
 export { index };
 `);
 
-        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/anotherSharedApi-lhzhzq4G.mjs`);
+        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/${(mjsMatches[0] as string).replace("from './", "").replace("';", "")}`);
 
         expect(mjsChunk1Content).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -1016,7 +1019,7 @@ __name(sharedApi, "sharedApi");
 export { sharedApi };
 `);
 
-        const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/AppContext-BSWWkl28.mjs`);
+        const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/${(mjsMatches[1] as string).replace("from './", "").replace("';", "")}`);
 
         expect(mjsChunk2Content).toBe(`'use client';
 import React from 'react';
@@ -1027,13 +1030,15 @@ export { AppContext };
 `);
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsMatches: string[] = getRegexMatches(/require\('.*'\);/g, cjsContent);
 
+        expect(cjsMatches).toHaveLength(2);
         expect(cjsContent).toBe(`'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const anotherSharedApi = require('./packem_shared/anotherSharedApi-C_G2lNA6.cjs');
-const AppContext = require('./packem_shared/AppContext-BcQ69C1t.cjs');
+const anotherSharedApi = ${cjsMatches[0] as string}
+const AppContext = ${cjsMatches[1] as string}
 
 const index = "index";
 
@@ -1042,7 +1047,7 @@ exports.AppContext = AppContext.AppContext;
 exports.index = index;
 `);
 
-        const cjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/anotherSharedApi-C_G2lNA6.cjs`);
+        const cjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/${(cjsMatches[0] as string).replace("require('./", "").replace("');", "")}`);
 
         expect(cjsChunk1Content).toBe(`'use strict';
 
@@ -1058,7 +1063,7 @@ __name(sharedApi, "sharedApi");
 exports.sharedApi = sharedApi;
 `);
 
-        const cjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/AppContext-BcQ69C1t.cjs`);
+        const cjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/${(cjsMatches[1] as string).replace("require('./", "").replace("');", "")}`);
 
         expect(cjsChunk2Content).toBe(`'use client';
 'use strict';
@@ -1079,6 +1084,17 @@ exports.AppContext = AppContext;
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`export { anotherSharedApi as sharedApi } from './another.mjs';
+
+declare const AppContext: any;
+
+declare const index = "index";
+
+export { AppContext, index };
+`);
+
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(dCtsContent).toBe(`export { anotherSharedApi as sharedApi } from './another.cjs';
 
 declare const AppContext: any;
 
