@@ -6,6 +6,11 @@ import { name, version } from "../package.json";
 import createBuildCommand from "./commands/build";
 import createInitCommand from "./commands/init";
 
+/**
+ * Create a new instance of the packem CLI.
+ *
+ * @type {Cli}
+ */
 const cli = new Cli("packem", {
     logger: {
         reporters: [

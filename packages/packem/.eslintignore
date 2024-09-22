@@ -13,4 +13,5 @@ vitest.config.ts
 _meta.*.json
 
 LICENSE.md
+README.md
 CHANGELOG.md

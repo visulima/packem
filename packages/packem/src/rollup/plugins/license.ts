@@ -10,6 +10,8 @@ import type { Pail } from "@visulima/pail";
 import type { Plugin } from "rollup";
 import licensePlugin from "rollup-plugin-license";
 
+import replaceContentWithinMarker from "../../utils/replace-content-within-marker";
+
 const sortLicenses = (licenses: Set<string>) => {
     const withParenthesis: string[] = [];
     const noParenthesis: string[] = [];
@@ -24,18 +26,6 @@ const sortLicenses = (licenses: Set<string>) => {
 
     // eslint-disable-next-line @typescript-eslint/require-array-sort-compare,etc/no-assign-mutated-array
     return [...noParenthesis.sort(), ...withParenthesis.sort()];
-};
-
-const replaceContentWithin = (content: string, marker: string, replacement: string): string | undefined => {
-    /** Replaces the content within the comments and re appends/prepends the comments to the replacement for follow-up workflow runs. */
-    // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-    const regex = new RegExp(`(<!-- ${marker} -->)[\\s\\S]*?(<!-- ${marker} -->)`, "g");
-
-    if (!regex.test(content)) {
-        return undefined;
-    }
-
-    return content.replace(regex, `$1\n${replacement}\n$2`);
 };
 
 export interface LicenseOptions {
@@ -140,7 +130,7 @@ export const license = ({
             try {
                 const existingLicenseText = readFileSync(licenseFilePath);
 
-                const content = replaceContentWithin(existingLicenseText, marker, licenseText);
+                const content = replaceContentWithinMarker(existingLicenseText, marker, licenseText);
 
                 if (!content) {
                     logger.error({

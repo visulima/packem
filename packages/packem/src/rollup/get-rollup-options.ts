@@ -423,10 +423,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     replacePlugin({
                         sourcemap: context.options.sourcemap,
                         ...context.options.rollup.replace,
-                        values: {
-                            ...context.options.replace,
-                            ...context.options.rollup.replace.values,
-                        },
                     }),
 
                 context.options.rollup.alias &&
@@ -700,10 +696,6 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                     replacePlugin({
                         sourcemap: context.options.sourcemap,
                         ...context.options.rollup.replace,
-                        values: {
-                            ...context.options.replace,
-                            ...context.options.rollup.replace.values,
-                        },
                     }),
 
                 context.options.rollup.alias &&

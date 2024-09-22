@@ -59,9 +59,6 @@ const createBuildCommand = (cli: Cli): void => {
                     debug: options.debug,
                     dtsOnly: options.dtsOnly,
                     minify: options.minify === undefined ? nodeEnvironment === PRODUCTION_ENV : options.minify,
-                    replace: {
-                        ...environments,
-                    },
                     rollup: {
                         esbuild: {
                             target: options.target,
@@ -70,6 +67,9 @@ const createBuildCommand = (cli: Cli): void => {
                             path: options.license,
                         },
                         metafile: options.metafile,
+                        replace: {
+                            values: environments,
+                        },
                     },
                     sourcemap: options.analyze || options.sourcemap,
                     tsconfigPath: options.tsconfig ?? undefined,

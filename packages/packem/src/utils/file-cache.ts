@@ -1,4 +1,4 @@
-import { isAccessibleSync, readFileSync, readJsonSync, writeFileSync, writeJsonSync } from "@visulima/fs";
+import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import type { Pail } from "@visulima/pail";
 import { join, toNamespacedPath } from "@visulima/path";
 
@@ -40,8 +40,6 @@ class FileCache {
                 prefix: "file-cache",
             });
         }
-
-        this.createOrUpdateKeyStorage(hashKey, logger);
     }
 
     public set isEnabled(value: boolean) {
@@ -121,35 +119,6 @@ class FileCache {
         optimizedName = optimizedName.replaceAll(":", "-");
 
         return join(this.#cachePath as string, this.#hashKey, subDirectory?.replaceAll(":", "-") ?? "", toNamespacedPath(optimizedName));
-    }
-
-    private createOrUpdateKeyStorage(hashKey: string, logger: Pail): void {
-        try {
-            let keyStore: Record<string, string> = {};
-
-            const keyStorePath = join(this.#cachePath as string, "keystore.json");
-
-            if (isAccessibleSync(keyStorePath)) {
-                keyStore = readJsonSync(keyStorePath);
-            }
-
-            // eslint-disable-next-line security/detect-object-injection
-            if (keyStore[hashKey] === undefined) {
-                // eslint-disable-next-line security/detect-object-injection
-                keyStore[hashKey] = new Date().toISOString();
-            }
-
-            writeJsonSync(keyStorePath, keyStore, {
-                overwrite: true,
-            });
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
-            logger.debug({
-                context: error,
-                message: error.message,
-                prefix: "file-cache",
-            });
-        }
     }
 }
 

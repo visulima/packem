@@ -14,6 +14,7 @@ import type { OutputOptions, Plugin, RollupBuild, RollupOptions, RollupWatcher }
 import type { Options as RollupDtsOptions } from "rollup-plugin-dts";
 import type { NodePolyfillsOptions } from "rollup-plugin-polyfill-node";
 import type { PluginVisualizerOptions } from "rollup-plugin-visualizer";
+import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
 import type { CJSInteropOptions } from "./rollup/plugins/cjs-interop";
 import type { CopyPluginOptions } from "./rollup/plugins/copy";
@@ -135,6 +136,29 @@ export interface RollupBuildOptions {
     watch?: RollupOptions["watch"];
 }
 
+export type TypeDocumentOptions = {
+    /**
+     * The format of the output.
+     *
+     * @default "inline"
+     */
+    format?: "inline" | "json" | "markdown" | "html";
+    /**
+     * A marker to replace the content within the file on the correct location.
+     *
+     * @default "TYPEDOC" This marker need to be placed in the readme <!-- TYPEDOC --><!-- TYPEDOC -->
+     */
+    marker?: string;
+    /**
+     * The path of the output directory.
+     */
+    output?: string;
+    /**
+     * The path of the README file.
+     */
+    readmePath?: string;
+} & Partial<Omit<BaseTypeDocumentOptions, "entryPoints" | "out" | "hideGenerator" | "watch" | "preserveWatchOutput">>;
+
 export type Runtime = "react-server" | "react-native" | "edge-light" | "node";
 
 export type BuildEntry = {
@@ -185,13 +209,13 @@ export interface BuildOptions {
     minify?: boolean | undefined;
     name: string;
     outDir: string;
-    replace: Record<string, string>;
     rollup: RollupBuildOptions;
     rootDir: string;
     sourceDir: string;
     /** @experimental */
     sourcemap: boolean;
     transformer: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
+    typedoc: TypeDocumentOptions | false;
     validation?: {
         packageJson?: {
             bin?: boolean;
@@ -221,6 +245,9 @@ export interface BuildHooks {
 
     "rollup:options": (context: BuildContext, options: RollupOptions) => Promise<void> | void;
     "rollup:watch": (context: BuildContext, watcher: RollupWatcher) => Promise<void> | void;
+
+    "typedoc:before": (context: BuildContext) => Promise<void> | void;
+    "typedoc:done": (context: BuildContext) => Promise<void> | void;
 
     "validate:before": (context: BuildContext) => Promise<void> | void;
     "validate:done": (context: BuildContext) => Promise<void> | void;
@@ -282,7 +309,7 @@ export type InferEntriesResult = {
     warnings: string[];
 };
 
-export type Mode = "build" | "jit" | "watch";
+export type Mode = "build" | "jit" | "watch" | "tsdoc";
 
 export interface IsolatedDeclarationsResult {
     errors: string[];

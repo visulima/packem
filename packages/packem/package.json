@@ -201,6 +201,7 @@
     "dependencies": {
         "@antfu/install-pkg": "0.4.1",
         "@babel/parser": "7.25.6",
+        "@ckeditor/typedoc-plugins": "43.0.0",
         "@clack/prompts": "0.7.0",
         "@rollup/plugin-alias": "5.1.0",
         "@rollup/plugin-commonjs": "26.0.1",
@@ -236,7 +237,10 @@
         "rollup-plugin-polyfill-node": "0.13.0",
         "rollup-plugin-visualizer": "5.12.0",
         "semver": "7.6.3",
-        "tinyglobby": "0.2.6"
+        "tinyglobby": "0.2.6",
+        "typedoc": "0.26.7",
+        "typedoc-plugin-markdown": "4.2.7",
+        "typedoc-plugin-rename-defaults": "0.7.1"
     },
     "devDependencies": {
         "@anolilab/eslint-config": "^15.0.3",
@@ -263,7 +267,7 @@
         "conventional-changelog-conventionalcommits": "8.0.0",
         "cross-env": "^7.0.3",
         "detect-indent": "^7.0.1",
-        "esbuild": "^0.23.1",
+        "esbuild": "^0.24.0",
         "eslint": "8.57.0",
         "eslint-plugin-deprecation": "^3.0.0",
         "eslint-plugin-etc": "^2.0.3",

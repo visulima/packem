@@ -25,8 +25,9 @@ import resolvePreset from "./hooks/preset/utils/resolve-preset";
 import createStub from "./jit/create-stub";
 import getHash from "./rollup/utils/get-hash";
 import rollupWatch from "./rollup/watch";
+import generateReferenceDocumentation from "./typedoc";
 import type { BuildConfig, BuildContext, BuildOptions, BuildPreset, Environment, InternalBuildOptions, Mode } from "./types";
-import arrayify from "./utils/arrayify";
+import createOrUpdateKeyStorage from "./utils/create-or-update-key-storage";
 import enhanceRollupError from "./utils/enhance-rollup-error";
 import FileCache from "./utils/file-cache";
 import getPackageSideEffect from "./utils/get-package-side-effect";
@@ -90,7 +91,6 @@ const generateOptions = (
         minify: environment === PRODUCTION_ENV,
         name: (packageJson.name ?? "").split("/").pop() ?? "default",
         outDir: tsconfig?.config.compilerOptions?.outDir ?? "dist",
-        replace: {},
         rollup: {
             alias: {},
             cjsInterop: { addDefaultProperty: false },
@@ -314,6 +314,57 @@ const generateOptions = (
         sourceDir: "src",
         sourcemap: false,
         transformerName: undefined,
+        typedoc: {
+            excludePrivate: true,
+            // Sorts the main index for a namespace / module; not the sidebar tab.
+            groupOrder: [
+                "Classes",
+                "Constructors",
+                "Accessors",
+                "Methods",
+                "Functions",
+                "Namespaces",
+                "Variables",
+                "Enumerations",
+                "Interfaces",
+                "Type Aliases",
+                "*",
+            ],
+            // Sorts the navigation sidebar order for symbol types.
+            kindSortOrder: [
+                "Project",
+                "Module",
+                "Class",
+                "Interface",
+                "Function",
+                "Namespace",
+                "Variable",
+                "Enum",
+                "EnumMember",
+                "TypeAlias",
+                "Reference",
+                "Constructor",
+                "Property",
+                "Accessor",
+                "Method",
+                "Parameter",
+                "TypeParameter",
+                "TypeLiteral",
+                "CallSignature",
+                "ConstructorSignature",
+                "IndexSignature",
+                "GetSignature",
+                "SetSignature",
+            ],
+            marker: "TYPEDOC",
+            name: packageJson.name ?? "unknown",
+            outputFileStrategy: "modules",
+            pretty: true,
+            readme: "none",
+            showConfig: debug,
+            tsconfig: tsconfig?.path,
+            useCodeBlocks: true,
+        },
     }) as InternalBuildOptions;
 
     if (!options.transformerName) {
@@ -470,6 +521,8 @@ const createContext = async (
         );
     }
 
+    await prepareEntries(context);
+
     return context;
 };
 
@@ -503,14 +556,16 @@ const cleanDistributionDirectories = async (context: BuildContext): Promise<void
     }
 };
 
-const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail): Promise<void> => {
-    if (cachePath && isAccessibleSync(join(cachePath, "keystore.json"))) {
+const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail, logged: boolean): Promise<void> => {
+    if (cachePath && isAccessibleSync(join(cachePath, "keystore1.json"))) {
         const keyStore: Record<string, string> = readJsonSync(join(cachePath, "keystore.json"));
 
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         const cacheDirectories = readdirSync(cachePath, {
             withFileTypes: true,
         }).filter((dirent) => dirent.isDirectory());
+
+        let hasLogged = logged;
 
         for await (const dirent of cacheDirectories) {
             if (!keyStore[dirent.name]) {
@@ -519,11 +574,34 @@ const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail
                     recursive: true,
                 });
 
+                if (hasLogged) {
+                    logger.raw("\n\n");
+                }
+
                 logger.info({
                     message: "Removing " + dirent.name + " file cache, the cache key is not used anymore.",
                     prefix: "file-cache",
                 });
+
+                hasLogged = false;
             }
+        }
+    }
+};
+
+const getMode = (mode: Mode): string => {
+    switch (mode) {
+        case "jit": {
+            return "Stubbing";
+        }
+        case "watch": {
+            return "Watching";
+        }
+        case "tsdoc": {
+            return "Generating TSDoc";
+        }
+        default: {
+            return "Building";
         }
     }
 };
@@ -583,6 +661,8 @@ const createBundler = async (
         cwd: rootDirectory,
     });
 
+    let logged = false;
+
     try {
         let packemConfigFilePath = configPath ?? "";
 
@@ -611,7 +691,7 @@ const createBundler = async (
             throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.");
         }
 
-        let buildConfig = ((await jiti.import(packemConfigFilePath, { try: true })) || {}) as BuildConfig | BuildConfig[] | BuildConfigFunction;
+        let buildConfig = ((await jiti.import(packemConfigFilePath, { try: true })) || {}) as BuildConfig | BuildConfigFunction;
 
         if (typeof buildConfig === "function") {
             buildConfig = await buildConfig(environment, mode);
@@ -619,68 +699,77 @@ const createBundler = async (
 
         logger.debug("Using packem config found at", join(rootDirectory, packemConfigFilePath));
 
+        const cacheKey =
+            getHash(
+                JSON.stringify({
+                    version: packageJson.version,
+                    ...packageJson.dependencies,
+                    ...packageJson.devDependencies,
+                    ...packageJson.peerDependencies,
+                    ...packageJson.peerDependenciesMeta,
+                    browser: packageJson.browser,
+                    eNode: packageJson.engines?.node,
+                    exports: packageJson.exports,
+                    main: packageJson.main,
+                    module: packageJson.module,
+                    type: packageJson.type,
+                    types: packageJson.types,
+                }),
+            ) + getHash(JSON.stringify(buildConfig));
+
+        if (cachePath) {
+            createOrUpdateKeyStorage(cacheKey, cachePath as string, logger);
+        }
+
+        const fileCache = new FileCache(rootDirectory, cachePath, cacheKey, logger);
+
+        const context = await createContext(
+            logger,
+            rootDirectory,
+            mode,
+            environment,
+            debug ?? false,
+            restInputConfig,
+            buildConfig,
+            packageJson,
+            tsconfig,
+            jiti,
+        );
+
+        fileCache.isEnabled = context.options.fileCache as boolean;
+
+        context.logger.info(cyan(getMode(mode) + " " + context.options.name));
+
+        context.logger.debug({
+            context: context.options.entries,
+            message: `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}}`,
+        });
+
+        // Clean dist dirs
+        await cleanDistributionDirectories(context);
+
         const start = Date.now();
 
         const getDuration = () => duration(Math.floor(Date.now() - start));
 
-        const packageJsonCacheKey = getHash(
-            JSON.stringify({
-                version: packageJson.version,
-                ...packageJson.dependencies,
-                ...packageJson.devDependencies,
-                ...packageJson.peerDependencies,
-                ...packageJson.peerDependenciesMeta,
-                browser: packageJson.browser,
-                eNode: packageJson.engines?.node,
-                exports: packageJson.exports,
-                main: packageJson.main,
-                module: packageJson.module,
-                type: packageJson.type,
-                types: packageJson.types,
-            }),
-        );
-
-        for await (const config of arrayify(buildConfig)) {
-            const cacheKey = packageJsonCacheKey + getHash(JSON.stringify(config));
-            const fileCache = new FileCache(rootDirectory, cachePath, cacheKey, logger);
-            const context = await createContext(logger, rootDirectory, mode, environment, debug ?? false, restInputConfig, config, packageJson, tsconfig, jiti);
-
-            fileCache.isEnabled = context.options.fileCache as boolean;
-
-            await prepareEntries(context);
-
-            context.logger.info(cyan((mode === "watch" ? "Watching" : mode === "jit" ? "Stubbing" : "Building") + " " + context.options.name));
-
-            context.logger.debug({
-                context: context.options.entries,
-                message: `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}}`,
-            });
-
-            // Clean dist dirs
-            await cleanDistributionDirectories(context);
-
-            // Skip rest for stub
-            if (mode === "jit") {
-                await createStub(context);
-
-                await context.hooks.callHook("build:done", context);
-
-                return;
+        if (mode === "watch") {
+            if (context.options.rollup.watch === false) {
+                throw new Error("Rollup watch is disabled. You should check your packem.config file.");
             }
 
-            if (mode === "watch") {
-                if (context.options.rollup.watch === false) {
-                    throw new Error("Rollup watch is disabled. You should check your packem.config file.");
-                }
+            await rollupWatch(context, fileCache);
 
-                await rollupWatch(context, fileCache);
+            logBuildErrors(context, false);
 
-                logBuildErrors(context, false);
+            return;
+        }
 
-                return;
-            }
+        if (mode === "jit") {
+            await createStub(context);
 
-            const logged = await build(context, fileCache);
+            await context.hooks.callHook("build:done", context);
+        } else {
+            logged = await build(context, fileCache);
 
             await context.hooks.callHook("validate:before", context);
 
@@ -689,9 +778,48 @@ const createBundler = async (
             await context.hooks.callHook("validate:done", context);
 
             logBuildErrors(context, logged);
-
-            logger.raw("\n⚡️ Build run in " + getDuration());
         }
+
+        if (context.options.typedoc) {
+            let typedocVersion = "unknown";
+
+            if (packageJson.dependencies?.typedoc) {
+                typedocVersion = packageJson.dependencies.typedoc;
+            } else if (packageJson.devDependencies?.typedoc) {
+                typedocVersion = packageJson.devDependencies.typedoc;
+            }
+
+            if (cachePath) {
+                createOrUpdateKeyStorage("typedoc", cachePath as string, logger, true);
+            }
+
+            if (logged) {
+                context.logger.raw("\n");
+            }
+
+            context.logger.info({
+                message: "Using " + cyan("typedoc") + " " + typedocVersion + " to generate reference documentation",
+                prefix: "typedoc",
+            });
+
+            await context.hooks.callHook("typedoc:before", context);
+
+            let outputDirectory = join(context.options.rootDir, "api-docs");
+
+            if (context.options.typedoc.format === "inline" && cachePath) {
+                outputDirectory = cachePath;
+            }
+
+            if (context.options.typedoc.output) {
+                outputDirectory = context.options.typedoc.output;
+            }
+
+            await generateReferenceDocumentation(context.options.typedoc, context.options.entries, outputDirectory, context.logger);
+
+            await context.hooks.callHook("typedoc:done", context);
+        }
+
+        logger.raw("\n⚡️ Build run in " + getDuration());
 
         // Restore all wrapped console methods
         logger.restoreAll();
@@ -703,7 +831,7 @@ const createBundler = async (
 
         throw error;
     } finally {
-        await removeOldCacheFolders(cachePath, logger);
+        await removeOldCacheFolders(cachePath, logger, logged);
     }
 };
 

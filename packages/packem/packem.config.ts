@@ -17,4 +17,8 @@ export default defineConfig({
         },
     },
     transformer,
+    typedoc: {
+        format: "inline",
+        readmePath: "./README.md",
+    },
 });
