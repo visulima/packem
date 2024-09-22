@@ -95,6 +95,8 @@ export const license = ({
                                 .replaceAll(/\r\n|\r/g, "\n")
                                 .replaceAll(`<!-- ${marker} -->`, "")
                                 .replaceAll(dtsMarker ? `<!-- ${dtsMarker} -->` : "", "")
+                                .replaceAll(`<!-- /${marker} -->`, "")
+                                .replaceAll(dtsMarker ? `<!-- /${dtsMarker} -->` : "", "")
                                 .trim()
                                 .split("\n")
                                 .map((line) => {

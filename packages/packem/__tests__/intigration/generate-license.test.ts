@@ -115,7 +115,7 @@ export const data = { dep, devDep };`,
             `${temporaryDirectoryPath}/LICENSE.md`,
             `The MIT License (MIT) root
 <!-- DEPENDENCIES -->
-<!-- DEPENDENCIES -->
+<!-- /DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
 <!-- /TYPE_DEPENDENCIES -->`,
@@ -163,7 +163,7 @@ The published  artifact additionally contains code with the following licenses:
 
 > The MIT License (MIT) dev-dep
 
-<!-- DEPENDENCIES -->
+<!-- /DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
 <!-- /TYPE_DEPENDENCIES -->`);
@@ -188,7 +188,7 @@ The published  artifact additionally contains code with the following licenses:
 
 > The MIT License (MIT) dev-dep
 
-<!-- DEPENDENCIES -->
+<!-- /DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
 <!-- /TYPE_DEPENDENCIES -->`);
@@ -216,7 +216,7 @@ The published  artifact additionally contains code with the following licenses:
 
 > The MIT License (MIT) dev-dep
 
-<!-- DEPENDENCIES -->
+<!-- /DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
 <!-- /TYPE_DEPENDENCIES -->`,
@@ -233,7 +233,7 @@ export const data = { dep, devDep };`,
             `${temporaryDirectoryPath}/LICENSE.md`,
             `The MIT License (MIT) root
 <!-- DEPENDENCIES -->
-<!-- DEPENDENCIES -->
+<!-- /DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
 <!-- /TYPE_DEPENDENCIES -->`,
@@ -290,7 +290,7 @@ The published  artifact additionally contains code with the following licenses:
 >
 > > The MIT License (MIT) dev-dep
 
-<!-- DEPENDENCIES -->
+<!-- /DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
 <!-- /TYPE_DEPENDENCIES -->`);
@@ -324,7 +324,7 @@ The published  artifact additionally contains code with the following licenses:
 >
 > > The MIT License (MIT) dev-dep
 
-<!-- DEPENDENCIES -->
+<!-- /DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
 <!-- /TYPE_DEPENDENCIES -->`);
