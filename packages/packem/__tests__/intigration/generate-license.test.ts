@@ -39,10 +39,10 @@ export const data = { dep, devDep };`,
             `${temporaryDirectoryPath}/LICENSE.md`,
             `The MIT License (MIT) root
 <!-- DEPENDENCIES -->
-<!-- DEPENDENCIES -->
+<!-- /DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
-<!-- TYPE_DEPENDENCIES -->`,
+<!-- /TYPE_DEPENDENCIES -->`,
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
@@ -87,10 +87,10 @@ The published  artifact additionally contains code with the following licenses:
 
 > The MIT License (MIT) dev-dep
 
-<!-- DEPENDENCIES -->
+<!-- /DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
-<!-- TYPE_DEPENDENCIES -->`);
+<!-- /TYPE_DEPENDENCIES -->`);
     });
 
     it("should bundle license file placeholder only once if a dev-required package is bundled", async () => {
@@ -118,7 +118,7 @@ export const data = { dep, devDep };`,
 <!-- DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
-<!-- TYPE_DEPENDENCIES -->`,
+<!-- /TYPE_DEPENDENCIES -->`,
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
@@ -166,7 +166,7 @@ The published  artifact additionally contains code with the following licenses:
 <!-- DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
-<!-- TYPE_DEPENDENCIES -->`);
+<!-- /TYPE_DEPENDENCIES -->`);
 
         const binProcess2 = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -191,7 +191,7 @@ The published  artifact additionally contains code with the following licenses:
 <!-- DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
-<!-- TYPE_DEPENDENCIES -->`);
+<!-- /TYPE_DEPENDENCIES -->`);
     });
 
     it("should bundle license file placeholder only once and remove placeholder if the dev-dep was bundle with packem", async () => {
@@ -219,7 +219,7 @@ The published  artifact additionally contains code with the following licenses:
 <!-- DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
-<!-- TYPE_DEPENDENCIES -->`,
+<!-- /TYPE_DEPENDENCIES -->`,
         );
 
         writeFileSync(
@@ -236,7 +236,7 @@ export const data = { dep, devDep };`,
 <!-- DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
-<!-- TYPE_DEPENDENCIES -->`,
+<!-- /TYPE_DEPENDENCIES -->`,
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
@@ -293,7 +293,7 @@ The published  artifact additionally contains code with the following licenses:
 <!-- DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
-<!-- TYPE_DEPENDENCIES -->`);
+<!-- /TYPE_DEPENDENCIES -->`);
 
         const binProcess2 = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -327,6 +327,6 @@ The published  artifact additionally contains code with the following licenses:
 <!-- DEPENDENCIES -->
 
 <!-- TYPE_DEPENDENCIES -->
-<!-- TYPE_DEPENDENCIES -->`);
+<!-- /TYPE_DEPENDENCIES -->`);
     });
 });

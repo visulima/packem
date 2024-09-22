@@ -780,7 +780,7 @@ const createBundler = async (
             logBuildErrors(context, logged);
         }
 
-        if (context.options.typedoc) {
+        if (context.options.typedoc && context.options.typedoc.format !== undefined) {
             let typedocVersion = "unknown";
 
             if (packageJson.dependencies?.typedoc) {

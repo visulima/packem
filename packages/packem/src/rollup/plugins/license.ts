@@ -134,7 +134,7 @@ export const license = ({
 
                 if (!content) {
                     logger.error({
-                        message: `Could not find the license marker: <!-- ${marker} --> in ${licenseFilePath}`,
+                        message: `Could not find the license marker: <!-- ${marker} --><!-- /${marker} --> in ${licenseFilePath}`,
                         prefix: "plugin:license:" + mode,
                     });
 

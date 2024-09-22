@@ -14,7 +14,7 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
         return;
     }
 
-    const { format, marker, plugin, readmePath, ...typedocOptions } = options;
+    const { format, marker, output, plugin, readmePath, ...typedocOptions } = options;
 
     if (format === "inline" && readmePath === undefined) {
         throw new Error("The `readmePath` option is required when using the `inline` format.");
@@ -84,11 +84,11 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
             }
 
             const readmeContent = readFileSync(readmePath as string);
-            const updatedReadmeContent = replaceContentWithinMarker(readmeContent, marker, markdownContent);
+            const updatedReadmeContent = replaceContentWithinMarker(readmeContent, marker, "\n" + markdownContent + "\n");
 
             if (!updatedReadmeContent) {
                 logger.error({
-                    message: `Could not find the license marker: <!-- ${marker} --> in ${readmePath as string}`,
+                    message: `Could not find the typedoc marker: <!-- ${marker} --><!-- /${marker} --> in ${readmePath as string}`,
                     prefix: "typedoc",
                 });
 
