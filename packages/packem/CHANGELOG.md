@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.1](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0...@visulima/packem@1.0.1) (2024-09-23)
+
+### Bug Fixes
+
+* hardcoded cache dir to "@visulima/packem" ([b256aa7](https://github.com/visulima/packem/commit/b256aa7e2d22f07f011d5584d16c668bee782e55))
+
 ## @visulima/packem 1.0.0 (2024-09-23)
 
 ### Features
