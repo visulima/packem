@@ -1,0 +1,22 @@
+{
+    "name": "examples_packem_native_node_module",
+    "version": "1.0.0",
+    "private": true,
+    "type": "commonjs",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "./dist"
+    ],
+    "scripts": {
+        "build": "packem build --cjsInterop"
+    },
+    "devDependencies": {
+        "@visulima/packem": "workspace:*",
+        "esbuild": "^0.24.0",
+        "nodehun": "^3.0.2",
+        "rimraf": "^6.0.1",
+        "typescript": "^5.6.2"
+    }
+}

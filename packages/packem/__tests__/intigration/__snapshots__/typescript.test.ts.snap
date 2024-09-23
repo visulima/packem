@@ -1,0 +1,119 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem typescript > node10 compatibility > should generate a node10 typesVersions field in package.json when rollup.node10Compatibility.writeToPackageJson is true > typesVersions 1`] = `
+{
+  "*": {
+    ".": [
+      "./dist/index.d.ts",
+    ],
+    "deep": [
+      "./dist/deep/index.d.ts",
+    ],
+  },
+}
+`;
+
+exports[`packem typescript > resolve-typescript-tsconfig-paths plugin > should resolve tsconfig paths > cjs code output 1`] = `
+"'use strict';
+
+console.log(1);
+"
+`;
+
+exports[`packem typescript > resolve-typescript-tsconfig-paths plugin > should resolve tsconfig paths > mjs code output 1`] = `
+"console.log(1);
+"
+`;
+
+exports[`packem typescript > should allow support for "allowJs" and generate proper assets > cjs code output 1`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const index = /* @__PURE__ */ __name(() => "index", "default");
+
+module.exports = index;
+"
+`;
+
+exports[`packem typescript > should allow support for "allowJs" and generate proper assets > cts type code output 1`] = `
+"declare function _default(): string;
+
+export { _default as default };
+"
+`;
+
+exports[`packem typescript > should allow support for "allowJs" and generate proper assets > ts type code output 1`] = `
+"declare function _default(): string;
+
+export { _default as default };
+"
+`;
+
+exports[`packem typescript > should support typescript decorator > cjs code output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __decorateClass = (decorators, target, key, kind) => {
+  var result = void 0 ;
+  for (var i = decorators.length - 1, decorator; i >= 0; i--)
+    if (decorator = decorators[i])
+      result = (decorator(target, key, result) ) || result;
+  if (result) __defProp(target, key, result);
+  return result;
+};
+function first() {
+  console.log("first(): factory evaluated");
+  return function(target, propertyKey, descriptor) {
+    console.log("first(): called");
+  };
+}
+__name(first, "first");
+class ExampleClass {
+  static {
+    __name(this, "ExampleClass");
+  }
+  value;
+}
+__decorateClass([
+  first()
+], ExampleClass.prototype, "value");
+
+exports.ExampleClass = ExampleClass;
+"
+`;
+
+exports[`packem typescript > should support typescript decorator > mjs code output 1`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __decorateClass = (decorators, target, key, kind) => {
+  var result = void 0 ;
+  for (var i = decorators.length - 1, decorator; i >= 0; i--)
+    if (decorator = decorators[i])
+      result = (decorator(target, key, result) ) || result;
+  if (result) __defProp(target, key, result);
+  return result;
+};
+function first() {
+  console.log("first(): factory evaluated");
+  return function(target, propertyKey, descriptor) {
+    console.log("first(): called");
+  };
+}
+__name(first, "first");
+class ExampleClass {
+  static {
+    __name(this, "ExampleClass");
+  }
+  value;
+}
+__decorateClass([
+  first()
+], ExampleClass.prototype, "value");
+
+export { ExampleClass };
+"
+`;

@@ -1,0 +1,344 @@
+{
+    "name": "@visulima/packem",
+    "version": "1.0.0-alpha.133",
+    "description": "A fast and modern bundler for Node.js and TypeScript.",
+    "keywords": [
+        "anolilab",
+        "assets",
+        "bundle",
+        "bundler",
+        "cjs",
+        "commonjs",
+        "compiler",
+        "css",
+        "declaration",
+        "es6",
+        "esbuild",
+        "esm",
+        "exports",
+        "package.json",
+        "packem",
+        "rollup",
+        "sucrase",
+        "swc",
+        "declarations",
+        "isolated declarations",
+        "isolated-declarations",
+        "transformer",
+        "oxc",
+        "typescript",
+        "visulima",
+        "zero config",
+        "tsup",
+        "unbuild",
+        "bunchee"
+    ],
+    "homepage": "https://www.visulima.com/docs/package/packem",
+    "bugs": "https://github.com/visulima/packem/issues",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/visulima/packem.git",
+        "directory": "packages/packem"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/prisis"
+        },
+        {
+            "type": "consulting",
+            "url": "https://anolilab.com/support"
+        }
+    ],
+    "license": "MIT",
+    "author": {
+        "name": "Daniel Bannert",
+        "email": "d.bannert@anolilab.de"
+    },
+    "sideEffects": false,
+    "type": "module",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/create-bundler.d.mts",
+                "default": "./dist/create-bundler.mjs"
+            },
+            "require": {
+                "types": "./dist/create-bundler.d.cts",
+                "default": "./dist/create-bundler.cjs"
+            }
+        },
+        "./config": {
+            "import": {
+                "types": "./dist/config.d.mts",
+                "default": "./dist/config.mjs"
+            },
+            "require": {
+                "types": "./dist/config.d.cts",
+                "default": "./dist/config.cjs"
+            }
+        },
+        "./transformer/esbuild": {
+            "import": {
+                "types": "./dist/rollup/plugins/esbuild/index.d.mts",
+                "default": "./dist/rollup/plugins/esbuild/index.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/esbuild/index.d.cts",
+                "default": "./dist/rollup/plugins/esbuild/index.cjs"
+            }
+        },
+        "./transformer/swc": {
+            "import": {
+                "types": "./dist/rollup/plugins/swc/swc-plugin.d.mts",
+                "default": "./dist/rollup/plugins/swc/swc-plugin.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/swc/swc-plugin.d.cts",
+                "default": "./dist/rollup/plugins/swc/swc-plugin.cjs"
+            }
+        },
+        "./dts/isolated/transformer/swc": {
+            "import": {
+                "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.mts",
+                "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.cts",
+                "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.cjs"
+            }
+        },
+        "./dts/isolated/transformer/oxc": {
+            "import": {
+                "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.mts",
+                "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.cts",
+                "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.cjs"
+            }
+        },
+        "./dts/isolated/transformer/typescript": {
+            "import": {
+                "types": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.mts",
+                "default": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.cts",
+                "default": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.cjs"
+            }
+        },
+        "./transformer/sucrase": {
+            "import": {
+                "types": "./dist/rollup/plugins/sucrase/index.d.mts",
+                "default": "./dist/rollup/plugins/sucrase/index.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/sucrase/index.d.cts",
+                "default": "./dist/rollup/plugins/sucrase/index.cjs"
+            }
+        },
+        "./package.json": "./package.json"
+    },
+    "main": "dist/create-bundler.cjs",
+    "module": "dist/create-bundler.mjs",
+    "types": "dist/create-bundler.d.ts",
+    "typesVersions": {
+        ">=5.0": {
+            ".": [
+                "./dist/create-bundler.d.ts"
+            ],
+            "config": [
+                "./dist/config.d.ts"
+            ],
+            "transformer/esbuild": [
+                "./dist/rollup/plugins/esbuild/index.d.ts"
+            ],
+            "transformer/swc": [
+                "./dist/rollup/plugins/swc/swc-plugin.d.ts"
+            ],
+            "dts/isolated/transformer/swc": [
+                "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.ts"
+            ],
+            "dts/isolated/transformer/oxc": [
+                "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.ts"
+            ],
+            "dts/isolated/transformer/typescript": [
+                "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.ts"
+            ],
+            "transformer/sucrase": [
+                "./dist/rollup/plugins/sucrase/index.d.ts"
+            ]
+        }
+    },
+    "bin": {
+        "packem": "./dist/cli.mjs"
+    },
+    "files": [
+        "dist/**",
+        "README.md",
+        "CHANGELOG.md",
+        "LICENSE.md"
+    ],
+    "scripts": {
+        "build": "cross-env INTERNAL_PACKEM_BUILD=1 JITI_INTEROP_DEFAULT=1 jiti ./src/cli.ts build --development",
+        "build:prod": "cross-env INTERNAL_PACKEM_BUILD=1 JITI_INTEROP_DEFAULT=1 jiti ./src/cli.ts build --production",
+        "clean": "rimraf node_modules dist .eslintcache",
+        "dev": "pnpm run build",
+        "lint:attw": "attw --pack",
+        "lint:eslint": "eslint . --ext js,cjs,mjs,jsx,ts,tsx,json,yaml,yml,md,mdx --max-warnings=0 --config .eslintrc.cjs",
+        "lint:eslint:fix": "eslint . --ext js,cjs,mjs,jsx,ts,tsx,json,yaml,yml,md,mdx --max-warnings=0 --config .eslintrc.cjs --fix",
+        "lint:fix": "pnpm run lint:prettier:fix && pnpm run lint:eslint:fix",
+        "lint:packagejson": "publint --strict",
+        "lint:prettier": "prettier --config=.prettierrc.cjs --check .",
+        "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
+        "lint:types": "tsc --noEmit",
+        "test": "vitest run",
+        "test:coverage": "vitest run --coverage",
+        "test:ui": "vitest --ui --coverage.enabled=true",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "@antfu/install-pkg": "0.4.1",
+        "@babel/parser": "7.25.6",
+        "@ckeditor/typedoc-plugins": "43.0.0",
+        "@clack/prompts": "0.7.0",
+        "@rollup/plugin-alias": "5.1.0",
+        "@rollup/plugin-commonjs": "26.0.1",
+        "@rollup/plugin-dynamic-import-vars": "2.1.2",
+        "@rollup/plugin-inject": "5.0.5",
+        "@rollup/plugin-json": "6.1.0",
+        "@rollup/plugin-node-resolve": "15.2.3",
+        "@rollup/plugin-replace": "5.0.7",
+        "@rollup/plugin-wasm": "6.2.2",
+        "@rollup/pluginutils": "5.1.0",
+        "@visulima/cerebro": "1.1.20",
+        "@visulima/colorize": "1.4.9",
+        "@visulima/find-cache-dir": "1.0.10",
+        "@visulima/fs": "2.1.17",
+        "@visulima/humanizer": "1.0.11",
+        "@visulima/package": "3.1.0",
+        "@visulima/pail": "2.1.8",
+        "@visulima/path": "1.0.8",
+        "@visulima/tsconfig": "1.0.12",
+        "defu": "6.1.4",
+        "es-module-lexer": "1.5.4",
+        "fastest-levenshtein": "1.0.16",
+        "glob-parent": "6.0.2",
+        "hookable": "5.5.3",
+        "is-glob": "4.0.3",
+        "jiti": "2.0.0-beta.3",
+        "magic-string": "0.30.11",
+        "mlly": "1.7.1",
+        "oxc-parser": "0.29.0",
+        "rollup": "4.22.2",
+        "rollup-plugin-dts": "6.1.1",
+        "rollup-plugin-license": "3.5.2",
+        "rollup-plugin-polyfill-node": "0.13.0",
+        "rollup-plugin-visualizer": "5.12.0",
+        "semver": "7.6.3",
+        "tinyglobby": "0.2.6",
+        "typedoc": "0.26.7",
+        "typedoc-plugin-markdown": "4.2.7",
+        "typedoc-plugin-rename-defaults": "0.7.1"
+    },
+    "devDependencies": {
+        "@anolilab/eslint-config": "^15.0.3",
+        "@anolilab/prettier-config": "^5.0.14",
+        "@anolilab/semantic-release-pnpm": "^1.1.3",
+        "@anolilab/semantic-release-preset": "^9.0.0",
+        "@arethetypeswrong/cli": "^0.16.4",
+        "@babel/core": "^7.25.2",
+        "@rushstack/eslint-plugin-security": "^0.8.3",
+        "@secretlint/secretlint-rule-preset-recommend": "^8.2.4",
+        "@swc/core": "^1.7.26",
+        "@swc/types": "0.1.12",
+        "@total-typescript/ts-reset": "^0.6.1",
+        "@types/estree": "^1.0.6",
+        "@types/glob": "^8.1.0",
+        "@types/glob-parent": "^5.1.3",
+        "@types/is-glob": "^4.0.4",
+        "@types/node": "18.19.39",
+        "@types/react": "^18.3.8",
+        "@types/react-dom": "^18.3.0",
+        "@types/semver": "^7.5.8",
+        "@vitest/coverage-v8": "^2.1.1",
+        "@vitest/ui": "^2.1.1",
+        "conventional-changelog-conventionalcommits": "8.0.0",
+        "cross-env": "^7.0.3",
+        "detect-indent": "^7.0.1",
+        "esbuild": "^0.24.0",
+        "eslint": "8.57.0",
+        "eslint-plugin-deprecation": "^3.0.0",
+        "eslint-plugin-etc": "^2.0.3",
+        "eslint-plugin-import": "npm:eslint-plugin-i@^2.29.1",
+        "eslint-plugin-mdx": "^3.1.5",
+        "eslint-plugin-vitest": "0.4.1",
+        "eslint-plugin-vitest-globals": "^1.5.0",
+        "estree-walker": "^3.0.3",
+        "execa": "^9.4.0",
+        "oxc-transform": "^0.30.0",
+        "prettier": "^3.3.3",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "rimraf": "^6.0.1",
+        "secretlint": "8.2.4",
+        "semantic-release": "^24.1.1",
+        "sort-package-json": "^2.10.1",
+        "sucrase": "^3.35.0",
+        "tempy": "^3.1.0",
+        "ts-essentials": "^10.0.2",
+        "typescript": "^5.6.2",
+        "vitest": "^2.1.1"
+    },
+    "peerDependencies": {
+        "@swc/core": "^1.5.7",
+        "esbuild": "^0.20.2 || ^0.21.3",
+        "oxc-transform": "^0.20.0",
+        "sucrase": "^3.35.0",
+        "typescript": "^4.5 || ^5.0"
+    },
+    "peerDependenciesMeta": {
+        "@swc/core": {
+            "optional": true
+        },
+        "esbuild": {
+            "optional": true
+        },
+        "oxc-transform": {
+            "optional": true
+        },
+        "sucrase": {
+            "optional": true
+        },
+        "typescript": {
+            "optional": true
+        }
+    },
+    "engines": {
+        "node": ">=18.* <=22.*"
+    },
+    "publishConfig": {
+        "access": "public",
+        "provenance": true
+    },
+    "anolilab": {
+        "eslint-config": {
+            "plugin": {
+                "tsdoc": false,
+                "testing-library-react": false,
+                "react-usememo": false,
+                "react-hooks": false,
+                "jsx-a11y": false,
+                "react": false,
+                "validate-jsx-nesting": false,
+                "ssr-friendly": false
+            },
+            "warn_on_unsupported_typescript_version": false,
+            "info_on_disabling_jsx_react_rule": false,
+            "info_on_disabling_prettier_conflict_rule": false,
+            "info_on_disabling_jsonc_sort_keys_rule": false,
+            "info_on_disabling_etc_no_deprecated": false
+        }
+    }
+}

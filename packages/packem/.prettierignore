@@ -1,0 +1,15 @@
+.gitkeep
+.env*
+*.ico
+*.lock
+
+dist
+coverage
+node_modules
+
+.eslintcache
+tsconfig.json
+tsconfig.eslint.json
+
+CHANGELOG.md
+LICENSE.md
