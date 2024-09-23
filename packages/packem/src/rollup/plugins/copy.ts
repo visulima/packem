@@ -124,7 +124,7 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail): Plugin => 
 
             await Promise.all(
                 [...files].map(async ([fileName, fileDesc]) => {
-                    let source: Buffer | undefined;
+                    let source: Uint8Array | undefined;
 
                     try {
                         // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -143,9 +143,9 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail): Plugin => 
                             fileDesc.copied = [];
                         }
 
-                        source = await readFile(fileName, {
+                        source = (await readFile(fileName, {
                             buffer: true,
-                        });
+                        })) as unknown as Uint8Array;
                     } catch (error: unknown) {
                         logger.error({
                             context: [error],

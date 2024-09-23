@@ -5,8 +5,8 @@
  *
  * Copyright (c) 2020 EGOIST
  */
-import { findCacheDir } from "@visulima/find-cache-dir";
-import { readFile } from "@visulima/fs";
+import { findCacheDirSync } from "@visulima/find-cache-dir";
+import { readFileSync } from "@visulima/fs";
 import { join } from "@visulima/path";
 import { init, parse } from "es-module-lexer";
 import type { OnResolveArgs, OnResolveResult } from "esbuild";
@@ -19,7 +19,7 @@ const slash = (p: string) => p.replaceAll("\\", "/");
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsResult> => {
     // eslint-disable-next-line unicorn/prevent-abbreviations
-    const cacheDir = await findCacheDir("@visulima/packem/optimize-deps", {
+    const cacheDir = findCacheDirSync("@visulima/packem/optimize-deps", {
         create: true,
         cwd: options.cwd,
     });
@@ -81,8 +81,7 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
 
                     build.onLoad({ filter: /.*/, namespace: "optimize-deps" }, async (arguments_) => {
                         const { absolute, resolveDir } = arguments_.pluginData;
-                        const contents = await readFile(absolute);
-                        const [, exported] = parse(contents);
+                        const [, exported] = parse(readFileSync(absolute) as unknown as string);
 
                         return {
                             contents: exported.length > 0 ? `export * from '${slash(absolute)}'` : `module.exports = require('${slash(absolute)}')`,

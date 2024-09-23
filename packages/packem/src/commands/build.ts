@@ -89,6 +89,13 @@ const createBuildCommand = (cli: Cli): void => {
                                   },
                               }
                             : {},
+                    ...(options.typedoc
+                        ? {
+                              typedoc: {
+                                  format: "html",
+                              },
+                          }
+                        : {}),
                 });
             } catch (error) {
                 logger.error(error);
@@ -201,6 +208,11 @@ const createBuildCommand = (cli: Cli): void => {
             {
                 description: "Enable or disable the output validation",
                 name: "no-validation",
+                type: Boolean,
+            },
+            {
+                description: "Generate type documentation",
+                name: "typedoc",
                 type: Boolean,
             },
         ],

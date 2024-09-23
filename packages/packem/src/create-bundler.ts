@@ -70,6 +70,8 @@ const generateOptions = (
 ): InternalBuildOptions => {
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
 
+    // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error,@typescript-eslint/ban-ts-comment
+    // @ts-ignore TS2589 is just deeply nested and this is needed for typedoc
     const options = defu(buildConfig, inputConfig, preset, <Partial<BuildOptions>>{
         alias: {},
         cjsInterop: false,
@@ -358,12 +360,10 @@ const generateOptions = (
             ],
             marker: "TYPEDOC",
             name: packageJson.name ?? "unknown",
-            outputFileStrategy: "modules",
             pretty: true,
             readme: "none",
             showConfig: debug,
             tsconfig: tsconfig?.path,
-            useCodeBlocks: true,
         },
     }) as InternalBuildOptions;
 

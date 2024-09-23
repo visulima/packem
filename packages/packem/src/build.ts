@@ -33,7 +33,7 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
 
             let line = `  ${bold(rPath(entry.path))} (${[
                 "total size: " + cyan(formatBytes(totalBytes)),
-                entry.type !== "asset" && entry.bytes && "chunk size: " + cyan(formatBytes(entry.bytes)),
+                entry.bytes && "chunk size: " + cyan(formatBytes(entry.bytes)),
             ]
                 .filter(Boolean)
                 .join(", ")})`;

@@ -21,7 +21,8 @@ class FileCache {
 
     #isEnabled = true;
 
-    readonly #memoryCache = new Map<string>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    readonly #memoryCache = new Map<string, any>();
 
     public constructor(cwd: string, cachePath: string | undefined, hashKey: string, logger: Pail) {
         this.#cwd = cwd;
@@ -77,7 +78,7 @@ class FileCache {
             return undefined;
         }
 
-        const fileData = readFileSync(filePath);
+        const fileData = readFileSync(filePath) as unknown as string;
 
         if (isJson(fileData)) {
             const value = JSON.parse(fileData);

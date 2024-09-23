@@ -130,8 +130,7 @@ export const license = ({
             const licenseText = licenseTemplate(sortLicenses(licenses), dependencyLicenseTexts, packageName);
 
             try {
-                const existingLicenseText = readFileSync(licenseFilePath);
-
+                const existingLicenseText = readFileSync(licenseFilePath) as unknown as string;
                 const content = replaceContentWithinMarker(existingLicenseText, marker, licenseText);
 
                 if (!content) {

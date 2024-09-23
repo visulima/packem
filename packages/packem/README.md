@@ -2,7 +2,9 @@
   <img src="./assets/packem.png" width="200">
   <h3>Visulima Packem</h3>
   <p>
-  A fast and modern bundler for Node.js and TypeScript. <br /> Bundles anything that's supported by Node.js natively, namely .js, .json, .mjs, .cjs and TypeScript .ts, .cts, .mts, .tsx.
+  A fast and modern bundler for Node.js and TypeScript.
+<br /> Supports multiple runtimes, shared modules, server components, dynamic import, wasm, css, and more.
+<br /> Built on top of Rollup, combined with your preferred transformer like esbuild, swc, or sucrase.
   </p>
 </div>
 
@@ -53,6 +55,8 @@ It uses the `exports` configuration in `package.json` and recognizes entry file 
 -   ✅ ESM ⇄ CJS interoperability
 -   ✅ Supports isolated declaration types (experimental)
 -   ✅ Supports wasm [WebAssembly modules](http://webassembly.org)
+-   ✅ Supports css and css modules (coming soon)
+-   ✅ [TypeDoc](https://github.com/TypeStrong/TypeDoc) documentation generation
 
 And more...
 
@@ -463,6 +467,31 @@ packem build --env.NODE_ENV=production
 > [!NOTE]
 > To have a full validation checkup, visit [publint](https://github.com/bluwy/publint) and [are the types wrong](https://github.com/arethetypeswrong/arethetypeswrong.github.io).
 
+## TypeDoc
+
+To generate documentation for your project, you can use the `--typedoc` flag.
+
+```sh
+packem build --typedoc
+```
+
+This will generate a `api-docs` folder in the root of your project.
+
+### Different formats
+
+You can specify the output format inside the `packem.config.js` file.
+
+```js
+export default defineConfig({
+    // ...
+    typedoc: {
+        format: "inline",
+        readmePath: "./README.md",
+    },
+    // ...
+});
+```
+
 ## Configuration
 
 ### packem.config.js
@@ -481,7 +510,6 @@ You choose which one of the three supported transformer to use.
 
 <!-- TYPEDOC -->
 <!-- /TYPEDOC -->
-
 
 ## Related
 

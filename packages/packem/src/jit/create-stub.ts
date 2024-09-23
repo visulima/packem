@@ -1,4 +1,4 @@
-import { readFile, writeFileSync } from "@visulima/fs";
+import { readFileSync, writeFileSync } from "@visulima/fs";
 import { dirname, normalize, relative, resolve } from "@visulima/path";
 import { resolveModuleExportNames, resolvePath } from "mlly";
 
@@ -62,8 +62,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
 
         const resolvedEntry = normalize(context.jiti.esmResolve(entry.input, { try: true }) ?? entry.input);
         const resolvedEntryWithoutExtension = resolvedEntry.replace(ENDING_RE, "");
-        // eslint-disable-next-line no-await-in-loop
-        const code = await readFile(resolvedEntry);
+        const code = readFileSync(resolvedEntry) as unknown as string;
         const shebang = getShebang(code);
 
         // MJS Stub

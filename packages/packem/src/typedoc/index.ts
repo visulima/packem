@@ -22,56 +22,61 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
 
     const entryPoints = entries.map((entry) => entry.input);
 
-    const app = await Application.bootstrapWithPlugins({
-        ...typedocOptions,
-        compilerOptions: {
-            allowJs: true,
-            declaration: false,
-            declarationMap: false,
-            esModuleInterop: true,
-            module: 7, // "ES2022"
-            moduleResolution: 100, // Bundler,
-            noEmit: true,
-            noImplicitAny: false,
-            skipLibCheck: true,
-            sourceMap: false,
-            // Ensure we can parse the latest code
-            target: 99, // ESNext
-            ...(typedocOptions.compilerOptions as object),
+    const app = await Application.bootstrapWithPlugins(
+        {
+            ...typedocOptions,
+            compilerOptions: {
+                allowJs: true,
+                declaration: false,
+                declarationMap: false,
+                esModuleInterop: true,
+                module: 99, // "ESNext"
+                moduleResolution: 100, // Bundler,
+                noEmit: true,
+                noImplicitAny: false,
+                skipLibCheck: true,
+                sourceMap: false,
+                // Ensure we can parse the latest code
+                target: 99, // ESNext
+                ...(typedocOptions.compilerOptions as object),
+            },
+            entryPoints,
+            hideGenerator: true,
+            plugin: [
+                ...(plugin ?? []),
+                // eslint-disable-next-line unicorn/prefer-module
+                require.resolve("@ckeditor/typedoc-plugins/lib/module-fixer"),
+                // eslint-disable-next-line unicorn/prefer-module
+                require.resolve("@ckeditor/typedoc-plugins/lib/symbol-fixer"),
+                // eslint-disable-next-line unicorn/prefer-module
+                require.resolve("@ckeditor/typedoc-plugins/lib/interface-augmentation-fixer"),
+                // eslint-disable-next-line unicorn/prefer-module
+                require.resolve("@ckeditor/typedoc-plugins/lib/event-inheritance-fixer"),
+                // eslint-disable-next-line unicorn/prefer-module
+                require.resolve("@ckeditor/typedoc-plugins/lib/purge-private-api-docs"),
+                // eslint-disable-next-line unicorn/prefer-module
+                require.resolve("@ckeditor/typedoc-plugins/lib/tag-error"),
+                // eslint-disable-next-line unicorn/prefer-module
+                require.resolve("@ckeditor/typedoc-plugins/lib/tag-event"),
+                // eslint-disable-next-line unicorn/prefer-module
+                require.resolve("@ckeditor/typedoc-plugins/lib/tag-observable"),
+                // eslint-disable-next-line unicorn/prefer-module
+                require.resolve("typedoc-plugin-rename-defaults"),
+                ...(format === "inline" || format === "markdown" ? ["typedoc-plugin-markdown"] : []),
+            ],
+            ...(format === "inline"
+                ? {
+                      hideBreadcrumbs: true,
+                      hidePageHeader: true,
+                      navigation: false,
+                      outputFileStrategy: "modules",
+                      useCodeBlocks: true,
+                  }
+                : {}),
+            // we dont need the default loader
         },
-        entryPoints,
-        hideGenerator: true,
-        plugin: [
-            ...(plugin ?? []),
-            // eslint-disable-next-line unicorn/prefer-module
-            require.resolve("@ckeditor/typedoc-plugins/lib/module-fixer"),
-            // eslint-disable-next-line unicorn/prefer-module
-            require.resolve("@ckeditor/typedoc-plugins/lib/symbol-fixer"),
-            // eslint-disable-next-line unicorn/prefer-module
-            require.resolve("@ckeditor/typedoc-plugins/lib/interface-augmentation-fixer"),
-            // eslint-disable-next-line unicorn/prefer-module
-            require.resolve("@ckeditor/typedoc-plugins/lib/event-inheritance-fixer"),
-            // eslint-disable-next-line unicorn/prefer-module
-            require.resolve("@ckeditor/typedoc-plugins/lib/purge-private-api-docs"),
-            // eslint-disable-next-line unicorn/prefer-module
-            require.resolve("@ckeditor/typedoc-plugins/lib/tag-error"),
-            // eslint-disable-next-line unicorn/prefer-module
-            require.resolve("@ckeditor/typedoc-plugins/lib/tag-event"),
-            // eslint-disable-next-line unicorn/prefer-module
-            require.resolve("@ckeditor/typedoc-plugins/lib/tag-observable"),
-            // eslint-disable-next-line unicorn/prefer-module
-            require.resolve("typedoc-plugin-rename-defaults"),
-            ...(format === "inline" || format === "markdown" ? ["typedoc-plugin-markdown"] : []),
-        ],
-        ...(format === "inline"
-            ? {
-                  hideBreadcrumbs: true,
-                  hidePageHeader: true,
-                  navigation: false,
-              }
-            : {}),
-        // we dont need the default loader
-    }, []);
+        [],
+    );
 
     const project = await app.convert();
 
@@ -96,14 +101,14 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
                     continue;
                 }
 
-                markdownContent += readFileSync(join(outputDirectory, item.name))
+                markdownContent += (readFileSync(join(outputDirectory, item.name)) as unknown as string)
                     // This is needed to not include the content in the wrong place
                     .replaceAll(`<!-- ${marker}`, `<!-- _REPLACE_${marker}`)
                     .replaceAll(`<!-- \${marker}`, `<!-- _REPLACE_\\${marker}`);
             }
 
             if (markdownContent !== "") {
-                const readmeContent = readFileSync(readmePath as string);
+                const readmeContent = readFileSync(readmePath as string) as unknown as string;
                 const updatedReadmeContent = replaceContentWithinMarker(readmeContent, marker, "\n" + markdownContent);
 
                 if (!updatedReadmeContent) {
@@ -112,6 +117,10 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
                         prefix: "typedoc",
                     });
 
+                    return;
+                }
+
+                if (readmeContent === updatedReadmeContent) {
                     return;
                 }
 
