@@ -1,8 +1,8 @@
-import { mkdir, symlink } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { writeFileSync, writeJsonSync } from "@visulima/fs";
+import { writeFileSync, writeJsonSync, ensureSymlink } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import type { TsConfigJson } from "@visulima/tsconfig";
 import type { Options } from "execa";
@@ -41,7 +41,7 @@ export const installPackage = async (fixturePath: string, packageName: string): 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await mkdir(nodeModulesDirectory, { recursive: true });
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await symlink(resolve("node_modules/" + packageName), join(nodeModulesDirectory, packageName), "dir");
+    await ensureSymlink(resolve("node_modules/" + packageName), join(nodeModulesDirectory, packageName));
 };
 
 export const createPackemConfig = async (
