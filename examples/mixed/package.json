@@ -1,0 +1,88 @@
+{
+    "name": "examples_packem_mixed",
+    "version": "1.0.0",
+    "description": "",
+    "type": "commonjs",
+    "exports": {
+        ".": {
+            "react-server": "./dist/index.react-server.mjs",
+            "import": {
+                "types": "./dist/index.d.mts",
+                "production": "./dist/index.production.mjs",
+                "development": "./dist/index.development.mjs",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "types": "./dist/index.d.cts",
+                "production": "./dist/index.production.cjs",
+                "development": "./dist/index.development.cjs",
+                "default": "./dist/index.cjs"
+            },
+            "default": "./dist/index.cjs"
+        },
+        "./core": {
+            "import": {
+                "types": "./dist/core/index.d.mts",
+                "production": "./dist/core/index.production.mjs",
+                "development": "./dist/core/index.development.mjs",
+                "default": "./dist/core/index.mjs"
+            },
+            "require": {
+                "types": "./dist/core/index.d.cts",
+                "production": "./dist/core/index.production.cjs",
+                "development": "./dist/core/index.development.cjs",
+                "default": "./dist/core/index.cjs"
+            },
+            "default": "./dist/core/index.cjs"
+        },
+        "./react": {
+            "import": {
+                "types": "./dist/react/index.d.mts",
+                "production": "./dist/react/index.production.mjs",
+                "development": "./dist/react/index.development.mjs",
+                "default": "./dist/react/index.mjs"
+            },
+            "require": {
+                "types": "./dist/react/index.d.ts",
+                "production": "./dist/react/index.production.cjs",
+                "development": "./dist/react/index.development.cjs",
+                "default": "./dist/react/index.cjs"
+            },
+            "default": "./dist/react/index.cjs"
+        }
+    },
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "typesVersions": {
+        "*": {
+            ".": [
+                "./dist/index.production.d.ts"
+            ],
+            "core": [
+                "./dist/core/index.production.d.ts"
+            ],
+            "react": [
+                "./dist/react/index.production.d.ts"
+            ]
+        }
+    },
+    "files": [
+        "./dist"
+    ],
+    "scripts": {
+        "build": "packem build",
+        "clean": "rimraf node_modules dist"
+    },
+    "dependencies": {
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1"
+    },
+    "devDependencies": {
+        "@types/node": "^18.19.50",
+        "@visulima/packem": "workspace:*",
+        "esbuild": "^0.24.0",
+        "rimraf": "^6.0.1",
+        "typescript": "^5.6.2"
+    }
+}

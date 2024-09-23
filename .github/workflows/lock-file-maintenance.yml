@@ -1,0 +1,18 @@
+name: "Lock File Maintenance"
+
+on: # yamllint disable-line rule:truthy
+    schedule:
+        - cron: "0 */3 * * *" # At minute 0 past every 3rd hour.
+    pull_request:
+        branches:
+            - "dependabot/**"
+    workflow_dispatch: # yamllint disable-line rule:empty-values
+
+permissions:
+    contents: "read" # for checkout
+
+jobs:
+    stale-issues:
+        uses: "anolilab/workflows/.github/workflows/lock-file-maintenance.yml@main"
+        with:
+            target-repo: "visulima/packem"

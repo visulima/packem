@@ -64,3 +64,6 @@ storybook-static/
 
 # Package build output
 dist
+
+
+.nx/cache

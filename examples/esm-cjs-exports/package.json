@@ -1,0 +1,26 @@
+{
+    "name": "examples_packem_esm_cjs_exports",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": {
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "files": [
+        "./dist"
+    ],
+    "scripts": {
+        "build": "packem build",
+        "clean": "rimraf node_modules dist"
+    },
+    "devDependencies": {
+        "@visulima/packem": "workspace:*",
+        "esbuild": "^0.24.0",
+        "rimraf": "^6.0.1"
+    }
+}

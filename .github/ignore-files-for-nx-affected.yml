@@ -2,6 +2,7 @@
 plop/**
 .husky/**
 .nx/**
+examples/**
 .czrc
 .editorconfig
 .gitattributes

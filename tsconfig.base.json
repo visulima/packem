@@ -5,7 +5,7 @@
         "downlevelIteration": true,
         "isolatedModules": true,
         "lib": ["ES2023"],
-        "module": "preserve",
+        "module": "Preserve",
         "target": "ESNext",
         "moduleResolution": "Bundler",
         "tsBuildInfoFile": ".tsbuildinfo",
@@ -37,7 +37,6 @@
         "esModuleInterop": true,
 
         "declaration": true,
-        "allowJs": true,
         "removeComments": true,
         "incremental": true,
 
@@ -46,9 +45,15 @@
         "allowUnusedLabels": false,
         "allowUnreachableCode": false,
 
-        "checkJs": true,
+        "resolveJsonModule": true,
+
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+
+        "allowJs": true,
+        "checkJs": true,
+        "isolatedDeclarations": false,
+        "noErrorTruncation": true
     },
     "exclude": ["dist/**/*", "node_modules/**/*", "build/**/*", "scripts/**/*", "examples/**", "**/coverage/**"]
 }

@@ -1,0 +1,29 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem package.json imports > should not show a warning of external imports, when a glob star is used > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const x = 2;
+
+const x$1 = /*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	x
+}, Symbol.toStringTag, { value: 'Module' });
+
+exports.warns = x$1;
+"
+`;
+
+exports[`packem package.json imports > should not show a warning of external imports, when a glob star is used > mjs output 1`] = `
+"const x = 2;
+
+const x$1 = /*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	x
+}, Symbol.toStringTag, { value: 'Module' });
+
+export { x$1 as warns };
+"
+`;

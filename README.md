@@ -1,8 +1,10 @@
-<p align="center">
-  Add your <em>motivational</em> tagline here.
-</p>
-
-<br />
+<div align="center">
+  <img src="./packages/packem/assets/packem.png" width="200">
+  <h3>Visulima Packem</h3>
+  <p>
+  A fast and modern bundler for Node.js and TypeScript.
+  </p>
+</div>
 
 ---
 
@@ -15,6 +17,26 @@
 </div>
 
 ---
+
+## Usage
+
+Check the README for each configuration within the `packages` directory for specific usage instructions.
+
+## Featured Packages
+
+| Package                               | Version                                                                                                        | Description                                       |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| [packem](./packages/packem/README.md) | ![npm](https://img.shields.io/npm/v/@visulima/packem?style=flat-square&labelColor=292a44&color=663399&label=v) | The main package for the visulima packem project. |
+
+## Badge
+
+Show the world that you are using Anolilab’s code style in your project by including the badge in your readme.
+
+[![packem](https://img.shields.io/badge/visulima-packem-663399.svg?labelColor=292a44&style=flat-square)][repository]
+
+```md
+[![packem](https://img.shields.io/badge/visulima-packem-663399.svg?labelColor=292a44&style=flat-square)](https://github.com/anolilab/javascript-style-guide)
+```
 
 ## Versioning
 
@@ -39,4 +61,6 @@ If you would like to help take a look at the [list of issues](https://github.com
 
 ## License
 
-The anolilab monorepo-template is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT)
+The visulima packem is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT)
+
+[repository]: https://github.com/visulima/packem
