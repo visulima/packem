@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.0-alpha.133](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.132...@visulima/packem@1.0.0-alpha.133) (2024-09-23)
+
+### Bug Fixes
+
+* fixes for windows ([e49b61c](https://github.com/visulima/packem/commit/e49b61c3077aeef35b7f44b7840c619276cd98f2))
+
 ## @visulima/packem [1.0.0-alpha.132](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.131...@visulima/packem@1.0.0-alpha.132) (2024-09-23)
 
 ### Features
