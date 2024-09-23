@@ -183,7 +183,7 @@ function getRequireModule() {
 }
 __name(getRequireModule, "getRequireModule");
 function esmImport() {
-  return (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('require.cjs', document.baseURI).href));
+  return (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('require.cjs', document.baseURI).href));
 }
 __name(esmImport, "esmImport");
 
@@ -352,7 +352,7 @@ function getRequireModule() {
 }
 __name(getRequireModule, "getRequireModule");
 function esmImport() {
-  return (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.src || new URL('require.cjs', document.baseURI).href));
+  return (typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('require.cjs', document.baseURI).href));
 }
 __name(esmImport, "esmImport");
 

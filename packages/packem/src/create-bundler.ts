@@ -807,7 +807,7 @@ const createBundler = async (
             let outputDirectory = join(context.options.rootDir, "api-docs");
 
             if (context.options.typedoc.format === "inline" && cachePath) {
-                outputDirectory = cachePath;
+                outputDirectory = join(cachePath, "typedoc");
             }
 
             if (context.options.typedoc.output) {

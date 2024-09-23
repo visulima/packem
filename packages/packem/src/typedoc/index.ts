@@ -24,6 +24,21 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
 
     const app = await Application.bootstrapWithPlugins({
         ...typedocOptions,
+        compilerOptions: {
+            allowJs: true,
+            declaration: false,
+            declarationMap: false,
+            esModuleInterop: true,
+            module: 7, // "ES2022"
+            moduleResolution: 100, // Bundler,
+            noEmit: true,
+            noImplicitAny: false,
+            skipLibCheck: true,
+            sourceMap: false,
+            // Ensure we can parse the latest code
+            target: 99, // ESNext
+            ...(typedocOptions.compilerOptions as object),
+        },
         entryPoints,
         hideGenerator: true,
         plugin: [
@@ -75,30 +90,39 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
             let markdownContent = "";
 
             for (const item of markdownPathsList) {
-                if (item.name === "README.md") {
+                if (item.name === "README.md" && entries.length > 1) {
                     // eslint-disable-next-line no-continue
                     continue;
                 }
 
-                markdownContent += readFileSync(join(outputDirectory, item.name));
+                markdownContent += readFileSync(join(outputDirectory, item.name))
+                    // This is needed to not include the content in the wrong place
+                    .replaceAll(`<!-- ${marker}`, `<!-- _REPLACE_${marker}`)
+                    .replaceAll(`<!-- \${marker}`, `<!-- _REPLACE_\\${marker}`);
             }
 
-            const readmeContent = readFileSync(readmePath as string);
-            const updatedReadmeContent = replaceContentWithinMarker(readmeContent, marker, "\n" + markdownContent + "\n");
+            if (markdownContent !== "") {
+                const readmeContent = readFileSync(readmePath as string);
+                const updatedReadmeContent = replaceContentWithinMarker(readmeContent, marker, "\n" + markdownContent);
 
-            if (!updatedReadmeContent) {
-                logger.error({
-                    message: `Could not find the typedoc marker: <!-- ${marker} --><!-- /${marker} --> in ${readmePath as string}`,
-                    prefix: "typedoc",
-                });
+                if (!updatedReadmeContent) {
+                    logger.error({
+                        message: `Could not find the typedoc marker: <!-- ${marker} --><!-- /${marker} --> in ${readmePath as string}`,
+                        prefix: "typedoc",
+                    });
 
-                return;
-            }
+                    return;
+                }
 
-            if (updatedReadmeContent) {
-                writeFileSync(readmePath as string, updatedReadmeContent, {
-                    overwrite: true,
-                });
+                if (updatedReadmeContent) {
+                    writeFileSync(
+                        readmePath as string,
+                        updatedReadmeContent.replaceAll(`<!-- _REPLACE_${marker}`, `<!-- ${marker}`).replaceAll(`<!-- _REPLACE_\\${marker}`, `<!-- \${marker}`),
+                        {
+                            overwrite: true,
+                        },
+                    );
+                }
             }
         }
     }

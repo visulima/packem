@@ -73,7 +73,7 @@ const preserveDirectives = ({
                     magicString.prepend(`${[...outputDirectives].map((directive) => `'${directive}';`).join("\n")}\n`);
                 }
 
-                let shebang = null;
+                let shebang: string | undefined;
 
                 if (chunk.facadeModuleId && typeof shebangs[chunk.facadeModuleId] === "string") {
                     shebang = shebangs[chunk.facadeModuleId];
@@ -89,7 +89,7 @@ const preserveDirectives = ({
                 }
 
                 // Neither outputDirectives is present, no change is needed
-                if (outputDirectives.size === 0 && shebang === null) {
+                if (outputDirectives.size === 0 && shebang === undefined) {
                     return null;
                 }
 

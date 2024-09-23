@@ -8,7 +8,7 @@ import { join, relative, resolve } from "@visulima/path";
 
 import rollupBuild from "./rollup/build";
 import rollupBuildTypes from "./rollup/build-types";
-import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "./types";
+import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry, BuildEntry } from "./types";
 import type FileCache from "./utils/file-cache";
 import groupByKeys from "./utils/group-by-keys";
 
@@ -199,10 +199,10 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                 minify = true;
             }
 
-            const esmAndCjsEntries = [];
-            const esmEntries = [];
-            const cjsEntries = [];
-            const dtsEntries = [];
+            const esmAndCjsEntries: BuildEntry[] = [];
+            const esmEntries: BuildEntry[] = [];
+            const cjsEntries: BuildEntry[] = [];
+            const dtsEntries: BuildEntry[] = [];
 
             for (const entry of entries) {
                 if (entry.cjs && entry.esm) {

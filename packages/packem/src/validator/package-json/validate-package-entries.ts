@@ -55,7 +55,7 @@ const validatePackageEntries = (context: BuildContext): void => {
             ),
     );
 
-    const missingOutputs = [];
+    const missingOutputs: string[] = [];
 
     for (const filename of filenames) {
         // eslint-disable-next-line security/detect-non-literal-fs-filename

@@ -26,7 +26,7 @@ const createInitCommand = (cli: Cli): void => {
 
             const packageJson = parsePackageJson(packageJsonPath);
 
-            const packages = [];
+            const packages: string[] = [];
 
             if (packageJson.dependencies) {
                 packages.push(...Object.keys(packageJson.dependencies));
@@ -118,7 +118,7 @@ const createInitCommand = (cli: Cli): void => {
                     ],
                 });
 
-                if (!packages.includes(options.transformer)) {
+                if (options.transformer && !packages.includes(options.transformer as string)) {
                     const shouldInstall = await confirm({
                         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
                         message: "Do you want to install " + options.transformer + "?",
@@ -183,7 +183,7 @@ const createInitCommand = (cli: Cli): void => {
                         }
                     }
 
-                    if (packageName && !packages.includes(packageName)) {
+                    if (packageName !== undefined && !packages.includes(packageName as string)) {
                         const shouldInstall = await confirm({
                             message: "Do you want to install " + packageName + "?",
                         });

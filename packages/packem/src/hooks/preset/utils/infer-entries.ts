@@ -114,7 +114,7 @@ const inferEntries = (
     context: BuildContext,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): InferEntriesResult => {
-    const warnings = [];
+    const warnings: string[] = [];
 
     // Sort files so least-nested files are first
     sourceFiles.sort((a, b) => a.split("/").length - b.split("/").length);
