@@ -657,7 +657,7 @@ const createBundler = async (
         }
     }
 
-    const cachePath = findCacheDirSync(packageJson.name as string, {
+    const cachePath = findCacheDirSync("@visulima/packem", {
         cwd: rootDirectory,
     });
 
