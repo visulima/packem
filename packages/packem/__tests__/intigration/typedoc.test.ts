@@ -120,7 +120,6 @@ factorial(1)
 
 index.ts:19
 
-
 <!-- /TYPEDOC -->`);
     });
 });

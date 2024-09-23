@@ -70,7 +70,8 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
                   navigation: false,
               }
             : {}),
-    });
+        // we dont need the default loader
+    }, []);
 
     const project = await app.convert();
 
