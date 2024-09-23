@@ -1,3 +1,9 @@
+## @visulima/packem 1.0.0 (2024-09-23)
+
+### Features
+
+* **packem:** new bundler based on rollup ([#18](https://github.com/visulima/packem/issues/18)) ([6b29a0c](https://github.com/visulima/packem/commit/6b29a0cbc8b1686d08ca3c979fe12152bc5c2f88))
+
 ## @visulima/packem [1.0.0-alpha.133](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.132...@visulima/packem@1.0.0-alpha.133) (2024-09-23)
 
 ### Bug Fixes
