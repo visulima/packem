@@ -1,3 +1,17 @@
+## @visulima/packem [1.0.0-alpha.132](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.131...@visulima/packem@1.0.0-alpha.132) (2024-09-23)
+
+### Features
+
+* added typedoc ([f4a0711](https://github.com/visulima/packem/commit/f4a0711c4afd2db00561357b92b0b5ddda545461))
+
+### Bug Fixes
+
+* disabled default loader of typedoc ([fe11953](https://github.com/visulima/packem/commit/fe119534504b8ff3f4043e3584bc35e5ec87e4e0))
+* fixed analyze option ([7a1bd14](https://github.com/visulima/packem/commit/7a1bd14e00b5f1a1aa2acfc78342ce79248d42fa))
+* fixed found bugs, change marker ending ([3981f31](https://github.com/visulima/packem/commit/3981f3182c227aa6f43633426bee400323d4a76f))
+* fixed found bugs, change marker ending ([4bb0dcc](https://github.com/visulima/packem/commit/4bb0dcc35eb6ad0f657e9917d0629772bd1995c5))
+* fixed found issues with types, improve typedoc with 1 entry ([295b9bd](https://github.com/visulima/packem/commit/295b9bd9f58477f14c0447f2044ba31e1fea7dc5))
+
 ## @visulima/packem [1.0.0-alpha.131](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0-alpha.130...@visulima/packem@1.0.0-alpha.131) (2024-09-20)
 
 ### Bug Fixes
