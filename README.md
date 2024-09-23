@@ -26,7 +26,7 @@ Check the README for each configuration within the `packages` directory for spec
 
 | Package                               | Version                                                                                                        | Description                                       |
 | ------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| [packem](./packages/packem/README.md) | ![npm](https://img.shields.io/npm/v/@visulima/packem?style=flat-square&labelColor=292a44&color=663399&label=v) | The main package for the visulima packem project. |
+| [packem](./packages/packem/README.md) | ![npm](https://img.shields.io/npm/v/@visulima/packem?style=flat-square&labelColor=292a44&color=663399) | The main package for the visulima packem project. |
 
 ## Badge
 
