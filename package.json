@@ -60,7 +60,7 @@
         "@commitlint/cli": "^19.5.0",
         "@commitlint/config-conventional": "^19.5.0",
         "@secretlint/secretlint-rule-preset-recommend": "^8.2.4",
-        "@types/node": "18.19.39",
+        "@types/node": "18.19.50",
         "audit-ci": "^7.1.0",
         "browserslist-config-anolilab": "^5.0.14",
         "commitizen": "^4.3.0",
