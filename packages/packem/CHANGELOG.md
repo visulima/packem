@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.2](https://github.com/visulima/packem/compare/@visulima/packem@1.0.1...@visulima/packem@1.0.2) (2024-09-24)
+
+### Bug Fixes
+
+* **deps:** update patch updates ([a6a649d](https://github.com/visulima/packem/commit/a6a649d1457fd39a03c5d4f6c40bf34155c176ae))
+
 ## @visulima/packem [1.0.1](https://github.com/visulima/packem/compare/@visulima/packem@1.0.0...@visulima/packem@1.0.1) (2024-09-23)
 
 ### Bug Fixes
