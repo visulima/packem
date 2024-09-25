@@ -4,6 +4,8 @@ import { RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "../const
 import type { BuildOptions } from "../types";
 import { inferExportType, inferExportTypeFromFileName } from "./infer-export-type";
 
+// This Set contains keys representing various JavaScript runtime environments and module systems.
+// It is used to identify and process different types of exports in package.json files.
 // You can find the list of runtime keys here: https://runtime-keys.proposal.wintercg.org/
 // eslint-disable-next-line @typescript-eslint/consistent-generic-constructors
 const runtimeExportConventions: Set<string> = new Set([
@@ -17,8 +19,6 @@ const runtimeExportConventions: Set<string> = new Set([
     "deno",
     "browser",
     "module-sync",
-    "node",
-    "deno",
     "bun",
     "workerd",
     ...RUNTIME_EXPORT_CONVENTIONS,
