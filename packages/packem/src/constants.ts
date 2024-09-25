@@ -35,18 +35,7 @@ export const DEFAULT_LOADERS: Record<string, Loader> = {
 export const PRODUCTION_ENV = "production";
 export const DEVELOPMENT_ENV = "development";
 
-export const RUNTIME_EXPORT_CONVENTIONS: Set<string> = new Set<string>([
-    "electron",
-    "react-server",
-    "react-native",
-    "edge-light",
-    "node",
-    "deno",
-    "bun",
-    "workerd",
-    // Browser only
-    "browser",
-]);
+export const RUNTIME_EXPORT_CONVENTIONS: Set<string> = new Set<string>(["react-server", "react-native", "edge-light"]);
 export const SPECIAL_EXPORT_CONVENTIONS: Set<string> = new Set<string>([DEVELOPMENT_ENV, PRODUCTION_ENV, ...RUNTIME_EXPORT_CONVENTIONS]);
 
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types

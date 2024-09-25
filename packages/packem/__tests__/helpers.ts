@@ -105,11 +105,12 @@ export const createTsConfig = (fixturePath: string, config: TsConfigJson, name =
     );
 };
 
-export const assertContainFiles = (dir: string, filePaths: string[]): void => {
+export const assertContainFiles = (directory: string, filePaths: string[]): void => {
     const results = [];
 
     for (const filePath of filePaths) {
-        const fullPath = resolve(dir, filePath);
+        const fullPath = resolve(directory, filePath);
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         const existed = existsSync(fullPath);
 
         if (existed) {
@@ -117,5 +118,5 @@ export const assertContainFiles = (dir: string, filePaths: string[]): void => {
         }
     }
 
-    expect(results).toEqual(filePaths);
-}
+    expect(results).toStrictEqual(filePaths);
+};

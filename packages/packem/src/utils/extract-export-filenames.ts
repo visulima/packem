@@ -5,7 +5,23 @@ import type { BuildOptions } from "../types";
 import { inferExportType, inferExportTypeFromFileName } from "./infer-export-type";
 
 // eslint-disable-next-line @typescript-eslint/consistent-generic-constructors
-const exportsKeys: Set<string> = new Set(["import", "require", "node", "node-addons", "default", "types", "deno", "browser", ...SPECIAL_EXPORT_CONVENTIONS]);
+const exportsKeys: Set<string> = new Set([
+    "electron",
+    "import",
+    "require",
+    "node",
+    "node-addons",
+    "default",
+    "types",
+    "deno",
+    "browser",
+    "module-sync",
+    "node",
+    "deno",
+    "bun",
+    "workerd",
+    ...SPECIAL_EXPORT_CONVENTIONS,
+]);
 
 export type OutputDescriptor = {
     exportKey?: string;

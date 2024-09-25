@@ -223,6 +223,7 @@ const generateOptions = (
             resolve: {
                 // old behavior node 14 and removed in node 17
                 allowExportsFolderMapping: false,
+                exportConditions: ["module-sync"],
                 extensions: DEFAULT_EXTENSIONS,
                 // Following option must be *false* for polyfill to work
                 preferBuiltins: false,
