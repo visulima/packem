@@ -11,6 +11,10 @@ export const inferExportTypeFromFileName = (filename: string): "cjs" | "esm" | u
 };
 
 export const inferExportType = (condition: string, previousConditions: string[], packageType: "cjs" | "esm", filename?: string): "cjs" | "esm" => {
+    if (condition === "module-sync") {
+        return "esm";
+    }
+
     if (filename) {
         const inferredType = inferExportTypeFromFileName(filename);
 

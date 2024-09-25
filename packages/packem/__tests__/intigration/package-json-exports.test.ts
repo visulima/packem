@@ -1,4 +1,4 @@
-import { existsSync, readdirSync } from "node:fs";
+import { cpSync, existsSync, readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -6,7 +6,12 @@ import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import { assertContainFiles, createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+
+const splitedNodeJsVersion = process.versions.node.split(".");
+
+// eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+const NODE_JS_VERSION = splitedNodeJsVersion[0] + "." + splitedNodeJsVersion[1];
 
 describe("packem package.json exports", () => {
     let temporaryDirectoryPath: string;
@@ -1465,6 +1470,324 @@ const Colorize = /* @__PURE__ */ __name(function() {
 const result = Colorize();
 
 module.exports = result;
+`);
+    });
+
+    it("should work with multiple exports conditions", async () => {
+        expect.assertions(9);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const runtime = 'node';`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.browser.ts`, `export const runtime = 'browser';`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.edge-light.ts`, `export const runtime = 'edge-light';`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.workerd.ts`, `export const runtime = 'workerd';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    browser: {
+                        default: "./dist/index.browser.mjs",
+                        types: "./dist/index.browser.d.mts",
+                    },
+                    "edge-light": {
+                        default: "./dist/index.edge-light.mjs",
+                        types: "./dist/index.edge-light.d.mts",
+                    },
+                    import: {
+                        default: "./dist/index.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                    node: {
+                        default: "./dist/index.cjs",
+                        import: "./dist/index.mjs",
+                        types: "./dist/index.d.ts",
+                    },
+                    require: {
+                        default: "./dist/index.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                    workerd: {
+                        default: "./dist/index.workerd.mjs",
+                        types: "./dist/index.workerd.d.mts",
+                    },
+                },
+            },
+            main: "dist/index.cjs",
+            module: "dist/index.mjs",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const distributionFiles = [
+            // entry files
+            "index.mjs",
+            "index.cjs",
+            "index.browser.mjs",
+            "index.workerd.mjs",
+            "index.edge-light.mjs",
+            // types
+            "index.d.cts",
+            "index.d.ts",
+            "index.browser.d.mts",
+            "index.workerd.d.mts",
+            "index.edge-light.d.mts",
+        ];
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        const files = readdirSync(join(temporaryDirectoryPath, "dist"));
+
+        expect(files).toHaveLength(14);
+
+        assertContainFiles(join(temporaryDirectoryPath, "dist"), distributionFiles);
+
+        for (const [file, regex] of [
+            ["index.cjs", /const runtime = "node"/],
+            ["index.mjs", /const runtime = "node"/],
+            ["index.browser.mjs", /const runtime = "browser"/],
+            ["index.workerd.mjs", /const runtime = "workerd"/],
+            ["index.edge-light.mjs", /const runtime = "edge-light"/],
+        ]) {
+            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
+
+            expect(content).toMatch(regex as RegExp);
+        }
+    });
+
+    it.skipIf(NODE_JS_VERSION !== "22.9")("should support the new 'module-sync' exports", async () => {
+        expect.assertions(3);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.mts`,
+            `import { resolved as import_module_require } from 'import-module-require';
+import { resolved as module_and_import } from 'module-and-import';
+import { resolved as module_and_require } from 'module-and-require';
+import { resolved as module_import_require } from 'module-import-require';
+import { resolved as module_only } from 'module-only';
+import { resolved as module_require_import } from 'module-require-import';
+import { resolved as require_module_import } from 'require-module-import';
+
+console.log('import-module-require', import_module_require);
+console.log('module-and-import', module_and_import);
+console.log('module-and-require', module_and_require);
+console.log('module-import-require', module_import_require);
+console.log('module-only', module_only);
+console.log('module-require-import', module_require_import);
+console.log('require-module-import', require_module_import);`,
+        );
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.cts`,
+            `console.log('import-module-require', require('import-module-require').resolved);
+console.log('module-and-import', require('module-and-import').resolved);
+console.log('module-and-require', require('module-and-require').resolved);
+console.log('module-import-require', require('module-import-require').resolved);
+console.log('module-only', require('module-only').resolved);
+console.log('module-require-import', require('module-require-import').resolved);
+console.log('require-module-import', require('require-module-import').resolved);`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                // On older version of Node.js, where "module-sync" and require(esm) are
+                // not supported, use the CJS version to avoid dual-package hazard.
+                // When package authors think it's time to drop support for older versions of
+                // On new version of Node.js, both require() and import get the ESM version
+                default: "./dist/index.cjs",
+                // Node.js, they can remove the exports conditions and just use "main": "index.js".
+                "module-sync": "./dist/index.mjs",
+            },
+            type: "module",
+        });
+
+        const fixturePath = join(__dirname, "../../__fixtures__/module-conditions");
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        const moduleConditionsFixture = readdirSync(fixturePath);
+
+        for (const file of moduleConditionsFixture) {
+            cpSync(`${fixturePath}/${file}`, `${temporaryDirectoryPath}/node_modules/${file}`, {
+                recursive: true,
+            });
+        }
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+            nodeOptions: ["--experimental-require-module"],
+            reject: false,
+        });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjs).toBe(`'use strict';
+
+console.log("import-module-require", require("import-module-require").resolved);
+console.log("module-and-import", require("module-and-import").resolved);
+console.log("module-and-require", require("module-and-require").resolved);
+console.log("module-import-require", require("module-import-require").resolved);
+console.log("module-only", require("module-only").resolved);
+console.log("module-require-import", require("module-require-import").resolved);
+console.log("require-module-import", require("require-module-import").resolved);
+`);
+
+        const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjs).toBe(`const resolved$6 = "module";
+
+const resolved$5 = "module";
+
+const resolved$4 = "module";
+
+const resolved$3 = "module";
+
+const resolved$2 = "module";
+
+const resolved$1 = "module";
+
+const resolved = "module";
+
+console.log("import-module-require", resolved$6);
+console.log("module-and-import", resolved$5);
+console.log("module-and-require", resolved$4);
+console.log("module-import-require", resolved$3);
+console.log("module-only", resolved$2);
+console.log("module-require-import", resolved$1);
+console.log("require-module-import", resolved);
+`);
+    });
+
+    it.skipIf(NODE_JS_VERSION !== "22.9")("should support the new 'module-sync' exports node", async () => {
+        expect.assertions(3);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.mts`,
+            `import { resolved as import_module_require } from 'import-module-require';
+import { resolved as module_and_import } from 'module-and-import';
+import { resolved as module_and_require } from 'module-and-require';
+import { resolved as module_import_require } from 'module-import-require';
+// This use the new "module-sync" export condition, this is only supported on newest Node.js version
+import { resolved as module_only } from 'module-only';
+import { resolved as module_require_import } from 'module-require-import';
+import { resolved as require_module_import } from 'require-module-import';
+
+console.log('import-module-require', import_module_require);
+console.log('module-and-import', module_and_import);
+console.log('module-and-require', module_and_require);
+console.log('module-import-require', module_import_require);
+console.log('module-only', module_only);
+console.log('module-require-import', module_require_import);
+console.log('require-module-import', require_module_import);`,
+        );
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.cts`,
+            `console.log('import-module-require', require('import-module-require').resolved);
+console.log('module-and-import', require('module-and-import').resolved);
+console.log('module-and-require', require('module-and-require').resolved);
+console.log('module-import-require', require('module-import-require').resolved);
+console.log('module-only', require('module-only').resolved);
+console.log('module-require-import', require('module-require-import').resolved);
+console.log('require-module-import', require('require-module-import').resolved);`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                // On any other environment, use the ESM version.
+                default: "./dist/index.js",
+                node: {
+                    // On older version of Node.js, where "module-sync" and require(esm) are
+                    // not supported, use the CJS version to avoid dual-package hazard.
+                    // When package authors think it's time to drop support for older versions of
+                    // the ESM version
+                    default: "./dist/index.cjs",
+                    // On new version of Node.js, both require() and import get
+                    // Node.js, they can remove the exports conditions and just use "main": "index.js".
+                    "module-sync": "./dist/index.mjs",
+                },
+            },
+            type: "module",
+        });
+
+        const fixturePath = join(__dirname, "../../__fixtures__/module-conditions");
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        const moduleConditionsFixture = readdirSync(fixturePath);
+
+        for (const file of moduleConditionsFixture) {
+            cpSync(`${fixturePath}/${file}`, `${temporaryDirectoryPath}/node_modules/${file}`, {
+                recursive: true,
+            });
+        }
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+            nodeOptions: ["--experimental-require-module"],
+        });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjs).toBe(`'use strict';
+
+console.log("import-module-require", require("import-module-require").resolved);
+console.log("module-and-import", require("module-and-import").resolved);
+console.log("module-and-require", require("module-and-require").resolved);
+console.log("module-import-require", require("module-import-require").resolved);
+console.log("module-only", require("module-only").resolved);
+console.log("module-require-import", require("module-require-import").resolved);
+console.log("require-module-import", require("require-module-import").resolved);
+`);
+
+        const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjs).toBe(`const resolved$6 = "module";
+
+const resolved$5 = "module";
+
+const resolved$4 = "module";
+
+const resolved$3 = "module";
+
+const resolved$2 = "module";
+
+const resolved$1 = "module";
+
+const resolved = "module";
+
+console.log("import-module-require", resolved$6);
+console.log("module-and-import", resolved$5);
+console.log("module-and-require", resolved$4);
+console.log("module-import-require", resolved$3);
+console.log("module-only", resolved$2);
+console.log("module-require-import", resolved$1);
+console.log("require-module-import", resolved);
 `);
     });
 });

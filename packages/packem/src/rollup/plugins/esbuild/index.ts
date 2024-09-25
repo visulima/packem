@@ -155,7 +155,6 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
                 // @see https://github.com/evanw/esbuild/issues/1932#issuecomment-1013380565
                 sourcefile: id.replace(/\.[cm]ts/, ".ts"),
                 sourcemap: sourceMap,
-
                 ...esbuildOptions,
             });
 
