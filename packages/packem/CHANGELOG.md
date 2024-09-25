@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.3](https://github.com/visulima/packem/compare/@visulima/packem@1.0.2...@visulima/packem@1.0.3) (2024-09-25)
+
+### Bug Fixes
+
+* support more special fields of target runtime ([#22](https://github.com/visulima/packem/issues/22)) ([827da5e](https://github.com/visulima/packem/commit/827da5ed3db60b5c10ab90b61a092871714b1eb7))
+
 ## @visulima/packem [1.0.2](https://github.com/visulima/packem/compare/@visulima/packem@1.0.1...@visulima/packem@1.0.2) (2024-09-24)
 
 ### Bug Fixes
