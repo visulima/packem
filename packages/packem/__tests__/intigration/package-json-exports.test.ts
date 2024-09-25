@@ -6,7 +6,14 @@ import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import {
+    assertContainFiles,
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackemSync,
+    installPackage,
+} from "../helpers";
 
 describe("packem package.json exports", () => {
     let temporaryDirectoryPath: string;
@@ -1466,5 +1473,98 @@ const result = Colorize();
 
 module.exports = result;
 `);
+    });
+
+    it("should work with multiple exports conditions", async () => {
+        expect.assertions(9);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const runtime = 'node';`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.browser.ts`, `export const runtime = 'browser';`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.edge-light.ts`, `export const runtime = 'edge-light';`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.workerd.ts`, `export const runtime = 'workerd';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    browser: {
+                        default: "./dist/index.browser.mjs",
+                        types: "./dist/index.browser.d.mts",
+                    },
+                    "edge-light": {
+                        default: "./dist/index.edge-light.mjs",
+                        types: "./dist/index.edge-light.d.mts",
+                    },
+                    import: {
+                        default: "./dist/index.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                    node: {
+                        default: "./dist/index.cjs",
+                        import: "./dist/index.mjs",
+                        types: "./dist/index.d.ts",
+                    },
+                    require: {
+                        default: "./dist/index.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                    workerd: {
+                        default: "./dist/index.workerd.mjs",
+                        types: "./dist/index.workerd.d.mts",
+                    },
+                },
+            },
+            main: "dist/index.cjs",
+            module: "dist/index.mjs",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const distributionFiles = [
+            // entry files
+            "index.mjs",
+            "index.cjs",
+            "index.browser.mjs",
+            "index.workerd.mjs",
+            "index.edge-light.mjs",
+            // types
+            "index.d.cts",
+            "index.d.ts",
+            "index.browser.d.mts",
+            "index.workerd.d.mts",
+            "index.edge-light.d.mts",
+        ];
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        const files = readdirSync(join(temporaryDirectoryPath, "dist"));
+
+        expect(files).toHaveLength(14);
+
+        assertContainFiles(join(temporaryDirectoryPath, "dist"), distributionFiles);
+
+        for (const [file, regex] of [
+            ["index.cjs", /const runtime = "node"/],
+            ["index.mjs", /const runtime = "node"/],
+            ["index.browser.mjs", /const runtime = "browser"/],
+            ["index.workerd.mjs", /const runtime = "workerd"/],
+            ["index.edge-light.mjs", /const runtime = "edge-light"/],
+        ]) {
+            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
+
+            expect(content).toMatch(regex as RegExp);
+        }
     });
 });

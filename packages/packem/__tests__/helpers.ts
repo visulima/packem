@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -7,6 +8,7 @@ import type { PackageJson } from "@visulima/package";
 import type { TsConfigJson } from "@visulima/tsconfig";
 import type { Options } from "execa";
 import { execaNode } from "execa";
+import { expect } from "vitest";
 
 import type { BuildConfig } from "../src/types";
 
@@ -102,3 +104,18 @@ export const createTsConfig = (fixturePath: string, config: TsConfigJson, name =
         },
     );
 };
+
+export const assertContainFiles = (dir: string, filePaths: string[]): void => {
+    const results = [];
+
+    for (const filePath of filePaths) {
+        const fullPath = resolve(dir, filePath);
+        const existed = existsSync(fullPath);
+
+        if (existed) {
+            results.push(filePath);
+        }
+    }
+
+    expect(results).toEqual(filePaths);
+}
