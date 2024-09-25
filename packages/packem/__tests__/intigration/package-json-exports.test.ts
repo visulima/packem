@@ -1652,19 +1652,19 @@ console.log("require-module-import", require("require-module-import").resolved);
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`const resolved$6 = 'module';
+        expect(mjs).toBe(`const resolved$6 = "module";
 
-const resolved$5 = 'module';
+const resolved$5 = "module";
 
-const resolved$4 = 'module';
+const resolved$4 = "module";
 
-const resolved$3 = 'module';
+const resolved$3 = "module";
 
-const resolved$2 = 'module';
+const resolved$2 = "module";
 
-const resolved$1 = 'module';
+const resolved$1 = "module";
 
-const resolved = 'module';
+const resolved = "module";
 
 console.log("import-module-require", resolved$6);
 console.log("module-and-import", resolved$5);
@@ -1767,19 +1767,19 @@ console.log("require-module-import", require("require-module-import").resolved);
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`const resolved$6 = 'module';
+        expect(mjs).toBe(`const resolved$6 = "module";
 
-const resolved$5 = 'module';
+const resolved$5 = "module";
 
-const resolved$4 = 'module';
+const resolved$4 = "module";
 
-const resolved$3 = 'module';
+const resolved$3 = "module";
 
-const resolved$2 = 'module';
+const resolved$2 = "module";
 
-const resolved$1 = 'module';
+const resolved$1 = "module";
 
-const resolved = 'module';
+const resolved = "module";
 
 console.log("import-module-require", resolved$6);
 console.log("module-and-import", resolved$5);

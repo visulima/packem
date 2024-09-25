@@ -1,11 +1,12 @@
 import type { PackageJson } from "@visulima/package";
 
-import { SPECIAL_EXPORT_CONVENTIONS } from "../constants";
+import { RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "../constants";
 import type { BuildOptions } from "../types";
 import { inferExportType, inferExportTypeFromFileName } from "./infer-export-type";
 
+// You can find the list of runtime keys here: https://runtime-keys.proposal.wintercg.org/
 // eslint-disable-next-line @typescript-eslint/consistent-generic-constructors
-const exportsKeys: Set<string> = new Set([
+const runtimeExportConventions: Set<string> = new Set([
     "electron",
     "import",
     "require",
@@ -20,6 +21,7 @@ const exportsKeys: Set<string> = new Set([
     "deno",
     "bun",
     "workerd",
+    ...RUNTIME_EXPORT_CONVENTIONS,
     ...SPECIAL_EXPORT_CONVENTIONS,
 ]);
 
@@ -29,7 +31,7 @@ export type OutputDescriptor = {
     file: string;
     isExecutable?: true;
     key: "exports" | "main" | "types" | "module" | "bin";
-    subKey?: typeof exportsKeys | (NonNullable<unknown> & string);
+    subKey?: typeof runtimeExportConventions | (NonNullable<unknown> & string);
     type?: "cjs" | "esm";
 };
 
@@ -94,7 +96,7 @@ export const extractExportFilenames = (
                             exportKey: key.replace("./", ""),
                             file: entryExport,
                             key: "exports",
-                            ...(exportsKeys.has(condition) ? { subKey: condition as OutputDescriptor["subKey"] } : {}),
+                            ...(runtimeExportConventions.has(condition) ? { subKey: condition as OutputDescriptor["subKey"] } : {}),
                             type: inferExportType(condition, conditions, packageType, entryExport),
                         } as OutputDescriptor);
                     } else {
