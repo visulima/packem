@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import { dirname, normalize, relative, resolve } from "@visulima/path";
-import { resolveModuleExportNames, resolvePath } from "mlly";
+import { dirname, relative, resolve } from "@visulima/path";
+import { fileURLToPath, resolveModuleExportNames, resolvePath } from "mlly";
 
 import { DEFAULT_EXTENSIONS, ENDING_RE } from "../constants";
 import { getShebang, makeExecutable } from "../rollup/plugins/shebang";
@@ -60,7 +60,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
     for (const entry of context.options.entries) {
         const output = resolve(context.options.rootDir, context.options.outDir, entry.name as string);
 
-        const resolvedEntry = normalize(context.jiti.esmResolve(entry.input, { try: true }) ?? entry.input);
+        const resolvedEntry = fileURLToPath(context.jiti.esmResolve(entry.input, { try: true }) ?? entry.input);
         const resolvedEntryWithoutExtension = resolvedEntry.replace(ENDING_RE, "");
         const code = readFileSync(resolvedEntry) as unknown as string;
         const shebang = getShebang(code);
@@ -107,6 +107,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
                         "const jiti = createJiti(import.meta.url, " + serializedJitiOptions + ");",
                         "",
                         '/** @type {import("' + typePath + '")} */',
+
                         'const _module = await jiti.import("' + resolvedEntry + '");',
                         hasDefaultExport ? "\nexport default _module;" : "",
                         ...namedExports.filter((name) => name !== "default").map((name) => `export const ${name} = _module.${name};`),
@@ -146,6 +147,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
                         "const jiti = createJiti(__filename, " + serializedJitiOptions + ");",
                         "",
                         '/** @type {import("' + typePath + '")} */',
+
                         'module.exports = jiti("' + resolvedEntry + '")',
                     ].join("\n"),
             );
