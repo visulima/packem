@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.4](https://github.com/visulima/packem/compare/@visulima/packem@1.0.3...@visulima/packem@1.0.4) (2024-09-26)
+
+### Bug Fixes
+
+* Use fileURLToPath for path normalization in createStub and update dependencies ([bd71bd7](https://github.com/visulima/packem/commit/bd71bd759e9c587568f0028f866c7d07f548e0ff))
+
 ## @visulima/packem [1.0.3](https://github.com/visulima/packem/compare/@visulima/packem@1.0.2...@visulima/packem@1.0.3) (2024-09-25)
 
 ### Bug Fixes
