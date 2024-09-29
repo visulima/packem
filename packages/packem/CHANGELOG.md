@@ -1,3 +1,13 @@
+## @visulima/packem [1.0.5](https://github.com/visulima/packem/compare/@visulima/packem@1.0.4...@visulima/packem@1.0.5) (2024-09-29)
+
+### Bug Fixes
+
+* fixed wrong entries finding if declaration are off, updated rollup to v4.22.5 and oxc-parser to 0.30.5 ([17e0ff5](https://github.com/visulima/packem/commit/17e0ff52bc6bc192387254dee26e8e9f0eeeaae0))
+
+### Miscellaneous Chores
+
+* updated dev dependencies ([cfbb2be](https://github.com/visulima/packem/commit/cfbb2beda943dccd4a1c9bce6d8ba15271096d29))
+
 ## @visulima/packem [1.0.4](https://github.com/visulima/packem/compare/@visulima/packem@1.0.3...@visulima/packem@1.0.4) (2024-09-26)
 
 ### Bug Fixes
