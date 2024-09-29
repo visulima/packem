@@ -86,7 +86,8 @@ export const extractExportFilenames = (
             } else if (typeof packageExport === "object" && packageExport !== null) {
                 for (const [condition, entryExport] of Object.entries(packageExport)) {
                     if (declaration === false && condition === "types") {
-                        return [];
+                        // eslint-disable-next-line no-continue
+                        continue;
                     }
 
                     const key: string = Number.isInteger(+exportKey) ? condition : (exportKey as string);

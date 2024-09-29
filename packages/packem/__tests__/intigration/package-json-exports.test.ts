@@ -438,6 +438,74 @@ export { index as default };
 `);
     });
 
+    it("should allow to have folder name the same like file for export", async () => {
+        expect.assertions(4);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/config/index.ts`, `export default () => 'index';`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+        writeFileSync(`${temporaryDirectoryPath}/src/config.ts`, `export default () => 'config';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
+
+        await createPackemConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: {
+                        default: "./dist/index.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/index.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                },
+                "./config": {
+                    import: {
+                        default: "./dist/config.mjs",
+                        types: "./dist/config.d.mts",
+                    },
+                    require: {
+                        default: "./dist/config.cjs",
+                        types: "./dist/config.d.cts",
+                    },
+                },
+            },
+            type: "module",
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/config.cjs`);
+
+        expect(cjs).toBe(`'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const config = /* @__PURE__ */ __name(() => "config", "default");
+
+module.exports = config;
+`);
+
+        const mjs = readFileSync(`${temporaryDirectoryPath}/dist/config.mjs`);
+
+        expect(mjs).toBe(`var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const config = /* @__PURE__ */ __name(() => "config", "default");
+
+export { config as default };
+`);
+    });
+
     it("should export dual package for type commonjs", async () => {
         expect.assertions(4);
 
