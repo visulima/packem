@@ -1,0 +1,8 @@
+{
+    "name": "rollup-plugin-styles",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/rollup-plugin-styles/src",
+    "projectType": "library",
+    "tags": ["rollup-plugin-styles", "styles", "type:package"],
+    "implicitDependencies": ["packem"]
+}
