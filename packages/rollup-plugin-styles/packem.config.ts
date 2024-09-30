@@ -5,14 +5,7 @@ import transformer from "@visulima/packem/transformer/esbuild";
 export default defineConfig({
     cjsInterop: true,
     declaration: false,
-    externals: [
-        "stylus",
-        "less",
-        "sass",
-        "node-sass",
-        "postcss",
-        "rollup",
-    ],
+    externals: ["stylus", "less", "sass", "node-sass", "postcss", "rollup"],
     fileCache: false,
     rollup: {
         license: {

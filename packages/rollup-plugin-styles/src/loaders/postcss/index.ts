@@ -2,7 +2,7 @@ import { fileURLToPath } from "node:url";
 
 import { makeLegalIdentifier } from "@rollup/pluginutils";
 import { isAccessibleSync, writeFileSync } from "@visulima/fs";
-import { dirname, join } from "@visulima/path";
+import { basename, dirname, join } from "@visulima/path";
 import cssnano from "cssnano";
 import type { AcceptedPlugin, ProcessOptions } from "postcss";
 import postcss from "postcss";
@@ -29,7 +29,7 @@ const testing = process.env.NODE_ENV === "test";
 const cssVariableName = "css";
 const reservedWords = new Set([cssVariableName]);
 
-function getClassNameDefault(name: string): string {
+const getClassNameDefault = (name: string): string => {
     const id = makeLegalIdentifier(name);
 
     if (reservedWords.has(id)) {
@@ -37,9 +37,9 @@ function getClassNameDefault(name: string): string {
     }
 
     return id;
-}
+};
 
-function ensureAutoModules(am: PostCSSLoaderOptions["autoModules"], id: string): boolean {
+const ensureAutoModules = (am: PostCSSLoaderOptions["autoModules"], id: string): boolean => {
     if (typeof am === "function") {
         return am(id);
     }
@@ -49,13 +49,14 @@ function ensureAutoModules(am: PostCSSLoaderOptions["autoModules"], id: string):
     }
 
     return am && /\.module\.[A-Za-z]+$/.test(id);
-}
+};
 
 type PostCSSOptions = Pick<Required<ProcessOptions>, "from" | "map" | "to"> & PostCSSLoaderOptions["postcss"];
 
 const loader: Loader<PostCSSLoaderOptions> = {
     alwaysProcess: true,
     name: "postcss",
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     async process({ code, extracted, map }) {
         const options = { ...this.options };
         const config = await loadConfig(this.id, options.config);
@@ -245,13 +246,14 @@ const loader: Loader<PostCSSLoaderOptions> = {
 
         output.push(defaultExport);
 
-        if (options.dts && (isAccessibleSync(this.id))) {
+        if (options.dts && isAccessibleSync(this.id)) {
             if (supportModules)
                 dts.push(
-                    `interface ModulesExports ${JSON.stringify(modulesExports)}`,
-
+                    `interface ModulesExports {${Object.keys(modulesExports)
+                        .map((key) => `  '${key}': string;`)
+                        .join("\n")}
+}`,
                     typeof options.inject === "object" && options.inject.treeshakeable ? `interface ModulesExports {inject:()=>void}` : "",
-
                     `declare const ${modulesVariableName}: ModulesExports;`,
                 );
 

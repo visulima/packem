@@ -280,7 +280,7 @@ export default (options: Options = {}): Plugin => {
                     });
 
                     res.css = resMin.css;
-                    res.map = resMin.map?.toString();
+                    res.map = resMin.map.toString();
                 }
 
                 const cssFile = { fileName: res.name, name: res.name, source: res.css, type: "asset" as const };

@@ -131,4 +131,4 @@ export const ensurePCSSPlugins = (plugins: Options["plugins"]): Result["plugins"
     }
 
     return ps;
-}
+};

@@ -44,6 +44,7 @@ pnpm add @visulima/rollup-plugin-styles
 ### PostCSS
 
 Install all the necessary dependencies:
+
 ```sh
 npm install --save-dev postcss postcss-load-config postcss-modules postcss-modules-extract-imports postcss-modules-local-by-default postcss-modules-scope postcss-modules-values postcss-value-parser icss-utils
 ```
@@ -78,3 +79,4 @@ The visulima rollup-plugin-styles is open-sourced software licensed under the [M
 [license-url]: LICENSE.md "license"
 [npm-image]: https://img.shields.io/npm/v/@visulima/rollup-plugin-styles/latest.svg?style=for-the-badge&logo=npm
 [npm-url]: https://www.npmjs.com/package/@visulima/rollup-plugin-styles/v/latest "npm"
+```

@@ -21,12 +21,12 @@ const loader: Loader<LESSLoaderOptions> = {
             plugins.push(...options.plugins);
         }
 
-        const result: Less.RenderOutput = await less.render(code, {
+        const result: Less.RenderOutput = (await less.render(code, {
             ...options,
             filename: this.id,
             plugins,
             sourceMap: { outputSourceFiles: true, sourceMapBasepath: path.dirname(this.id) },
-        }) as Less.RenderOutput;
+        })) as Less.RenderOutput;
 
         const deps = result.imports;
 
@@ -41,7 +41,7 @@ const loader: Loader<LESSLoaderOptions> = {
     test: /\.less$/i,
 };
 
-// eslint-disable-next-line import/no-unused-modules
+ 
 export interface LESSLoaderOptions extends Record<string, unknown>, Less.Options {}
 
 export default loader;

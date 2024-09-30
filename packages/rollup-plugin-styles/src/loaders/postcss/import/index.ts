@@ -1,3 +1,4 @@
+import { dirname } from "@visulima/path";
 import type { AtRule, PluginCreator, Result } from "postcss";
 import postcss from "postcss";
 import valueParser from "postcss-value-parser";
@@ -5,7 +6,6 @@ import valueParser from "postcss-value-parser";
 import { isAbsolutePath, normalizePath } from "../../../utils/path";
 import type { ImportResolve } from "./resolve";
 import resolveDefault from "./resolve";
-import { dirname } from "@visulima/path";
 
 const name = "styles-import";
 const extensionsDefault = [".css", ".pcss", ".postcss", ".sss"];

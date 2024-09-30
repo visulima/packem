@@ -124,13 +124,12 @@
         "@visulima/fs": "2.2.0",
         "@visulima/path": "1.0.9",
         "cssnano": "7.0.6",
+        "mime-types": "2.1.35",
         "resolve": "2.0.0-next.5",
         "resolve.exports": "2.0.2",
-        "mime-types": "2.1.35",
         "source-map-js": "1.2.1"
     },
     "devDependencies": {
-        "@types/resolve": "^1.20.6",
         "@anolilab/eslint-config": "^15.0.3",
         "@anolilab/prettier-config": "^5.0.14",
         "@anolilab/semantic-release-pnpm": "1.1.3",
@@ -142,6 +141,7 @@
         "@types/mime-types": "^2.1.4",
         "@types/node": "18.19.54",
         "@types/node-sass": "^4.11.7",
+        "@types/resolve": "^1.20.6",
         "@types/stylus": "^0.48.43",
         "@types/uglifycss": "^0.0.11",
         "@visulima/packem": "^1.0.5",
