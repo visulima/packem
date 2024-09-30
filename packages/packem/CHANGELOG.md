@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.6](https://github.com/visulima/packem/compare/@visulima/packem@1.0.5...@visulima/packem@1.0.6) (2024-09-30)
+
+### Bug Fixes
+
+* added missing ctsx and mtsx extensions ([0d2c637](https://github.com/visulima/packem/commit/0d2c6377d96de910805cb229349fe515acb28cb5))
+
 ## @visulima/packem [1.0.5](https://github.com/visulima/packem/compare/@visulima/packem@1.0.4...@visulima/packem@1.0.5) (2024-09-29)
 
 ### Bug Fixes
