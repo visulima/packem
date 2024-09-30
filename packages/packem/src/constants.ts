@@ -1,12 +1,13 @@
 import type { Loader } from "esbuild";
 
-export const DEFAULT_EXTENSIONS: string[] = [".mjs", ".js", ".json", ".node", ".cjs", ".ts", ".cts", ".mts", ".tsx", ".jsx"];
+export const DEFAULT_EXTENSIONS: string[] = [".mjs", ".js", ".json", ".node", ".cjs", ".ts", ".cts", ".mts", ".tsx", ".ctsx", ".mtsx", ".jsx"];
 
 export const DEFAULT_LOADERS: Record<string, Loader> = {
     ".aac": "file",
     ".cjs": "js",
     ".css": "file",
     ".cts": "ts",
+    ".ctsx": "ts",
     ".eot": "file",
     ".flac": "file",
     ".gif": "file",
@@ -18,6 +19,7 @@ export const DEFAULT_LOADERS: Record<string, Loader> = {
     ".mp3": "file",
     ".mp4": "file",
     ".mts": "ts",
+    ".mtsx": "ts",
     ".ogg": "file",
     ".otf": "file",
     ".png": "file",

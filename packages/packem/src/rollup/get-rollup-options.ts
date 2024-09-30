@@ -601,7 +601,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
     const resolvedAliases = resolveAliases(context, "types");
     const ignoreFiles: Plugin = {
         load(id) {
-            if (!/\.(?:js|cjs|mjs|jsx|ts|tsx|mts|json)$/.test(id)) {
+            if (!/\.(?:js|cjs|mjs|jsx|ts|tsx|ctsx|mtsx|mts|json)$/.test(id)) {
                 return "";
             }
 

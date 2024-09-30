@@ -76,7 +76,14 @@ export const isolatedDeclarationsPlugin = (
                     continue;
                 }
 
-                if (resolved.id.endsWith(".ts") || resolved.id.endsWith(".cts") || resolved.id.endsWith(".mts") || resolved.id.endsWith(".tsx")) {
+                if (
+                    resolved.id.endsWith(".ts") ||
+                    resolved.id.endsWith(".cts") ||
+                    resolved.id.endsWith(".mts") ||
+                    resolved.id.endsWith(".tsx") ||
+                    resolved.id.endsWith(".ctsx") ||
+                    resolved.id.endsWith(".mtsx")
+                ) {
                     const resolvedId = resolved.id.replace(sourceDirectory + "/", "");
 
                     // eslint-disable-next-line no-param-reassign,@typescript-eslint/restrict-plus-operands
