@@ -210,7 +210,7 @@ const generateOptions = (
             preserveDynamicImports: true,
             raw: {
                 exclude: EXCLUDE_REGEXP,
-                include: [/\.(md|txt|css|htm|html|data)$/],
+                include: [/\.(md|txt|htm|html|data)$/],
             },
             replace: {
                 /**

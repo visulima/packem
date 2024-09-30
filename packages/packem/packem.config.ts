@@ -5,6 +5,7 @@ import isolatedDeclarationTransformer from "./src/rollup/plugins/typescript/isol
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
     cjsInterop: true,
+    externals: ["stylus", "less", "sass", "node-sass", "postcss", "rollup"],
     fileCache: true,
     isolatedDeclarationTransformer,
     rollup: {

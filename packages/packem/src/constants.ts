@@ -5,7 +5,7 @@ export const DEFAULT_EXTENSIONS: string[] = [".mjs", ".js", ".json", ".node", ".
 export const DEFAULT_LOADERS: Record<string, Loader> = {
     ".aac": "file",
     ".cjs": "js",
-    ".css": "file",
+    // ".css": "file",
     ".cts": "ts",
     ".ctsx": "ts",
     ".eot": "file",

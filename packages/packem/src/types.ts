@@ -26,6 +26,7 @@ import type { LicenseOptions } from "./rollup/plugins/license";
 import type { Node10CompatibilityOptions } from "./rollup/plugins/node10-compatibility-plugin";
 import type { RawLoaderOptions } from "./rollup/plugins/raw";
 import type { ShebangOptions } from "./rollup/plugins/shebang";
+import type { StyleOptions } from "./rollup/plugins/styles/types";
 import type { SucrasePluginConfig } from "./rollup/plugins/sucrase/types";
 import type { SwcPluginConfig } from "./rollup/plugins/swc/types";
 import type { PatchTypesOptions } from "./rollup/plugins/typescript/patch-typescript-types";
@@ -128,6 +129,7 @@ export interface RollupBuildOptions {
     resolve: RollupNodeResolveOptions | false;
     shebang?: Partial<ShebangOptions> | false;
     shim?: EsmShimCjsSyntaxOptions | false;
+    style?: StyleOptions | false,
     sucrase?: SucrasePluginConfig | false;
     swc?: SwcPluginConfig | false;
     treeshake?: RollupOptions["treeshake"];
