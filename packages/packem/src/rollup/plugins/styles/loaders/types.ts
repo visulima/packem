@@ -1,8 +1,9 @@
 import type { PluginContext } from "rollup";
 import type { RawSourceMap } from "source-map-js";
 
+import type { InternalStyleOptions } from "../types";
+
 /**
- * Loader
  * @param T type of loader's options
  */
 export interface Loader<T = Record<string, unknown>> {
@@ -20,7 +21,6 @@ export interface Loader<T = Record<string, unknown>> {
 }
 
 /**
- * Loader's context
  * @param T type of loader's options
  */
 export interface LoaderContext<T = Record<string, unknown>> {
@@ -28,8 +28,24 @@ export interface LoaderContext<T = Record<string, unknown>> {
     readonly assets: Map<string, Uint8Array>;
     /** Files to watch */
     readonly deps: Set<string>;
+    /** @see {@link InternalStyleOptions.dts} */
+    readonly dts: InternalStyleOptions["dts"];
+    /** @see {@link InternalStyleOptions.emit} */
+    readonly emit: InternalStyleOptions["emit"];
+    /** @see {@link InternalStyleOptions.extensions} */
+    readonly extensions: InternalStyleOptions["extensions"];
+    /** @see {@link InternalStyleOptions.extract} */
+    readonly extract: InternalStyleOptions["extract"];
     /** Resource path */
     readonly id: string;
+    /** @see {@link InternalStyleOptions.import} */
+    readonly import: InternalStyleOptions["import"];
+    /** @see {@link InternalStyleOptions.inject} */
+    readonly inject: InternalStyleOptions["inject"];
+    /** @see {@link InternalStyleOptions.minimize} */
+    readonly minimize: InternalStyleOptions["minimize"];
+    /** @see {@link InternalStyleOptions.namedExports} */
+    readonly namedExports: InternalStyleOptions["namedExports"];
     /**
      * Loader's options
      * @default {}
@@ -37,13 +53,13 @@ export interface LoaderContext<T = Record<string, unknown>> {
     readonly options: T;
     /** [Plugin's context](https://rollupjs.org/guide/en#plugin-context) */
     readonly plugin: PluginContext;
-    /** @see {@link Options.sourceMap} */
+    /** @see {@link InternalStyleOptions.sourceMap} */
     readonly sourceMap: false | ({ inline: boolean } & SourceMapOptions);
+    readonly url: InternalStyleOptions["url"];
     /** [Function for emitting a warning](https://rollupjs.org/guide/en/#thiswarnwarning-string--rollupwarning-position-number---column-number-line-number---void) */
     readonly warn: PluginContext["warn"];
 }
 
-/** Extracted data */
 export interface Extracted {
     /** CSS */
     css: string;
@@ -53,7 +69,6 @@ export interface Extracted {
     map?: string;
 }
 
-/** Loader's payload */
 export interface Payload {
     /** File content */
     code: string;
@@ -63,7 +78,6 @@ export interface Payload {
     map?: string;
 }
 
-/** Options for sourcemaps */
 export interface SourceMapOptions {
     /**
      * Include sources content

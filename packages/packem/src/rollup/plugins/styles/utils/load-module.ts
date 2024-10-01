@@ -15,21 +15,28 @@ const options: ResolveOptions = {
     preserveSymlinks: false,
 };
 
-export default function (moduleId: string): unknown {
+export default (moduleId: string): unknown => {
+    // eslint-disable-next-line security/detect-object-injection
     if (loaded[moduleId]) {
+        // eslint-disable-next-line security/detect-object-injection
         return loaded[moduleId];
     }
 
+    // eslint-disable-next-line security/detect-object-injection
     if (loaded[moduleId] === null) {
-        return;
+        return null;
     }
 
     try {
+        // eslint-disable-next-line security/detect-object-injection,import/no-dynamic-require,security/detect-non-literal-require
         loaded[moduleId] = require(resolveSync([moduleId, `./${moduleId}`], options));
     } catch {
+        // eslint-disable-next-line security/detect-object-injection
         loaded[moduleId] = null;
-        return;
+
+        return null;
     }
 
+    // eslint-disable-next-line security/detect-object-injection
     return loaded[moduleId];
 }

@@ -129,7 +129,7 @@ export interface RollupBuildOptions {
     resolve: RollupNodeResolveOptions | false;
     shebang?: Partial<ShebangOptions> | false;
     shim?: EsmShimCjsSyntaxOptions | false;
-    style?: StyleOptions | false,
+    css?: StyleOptions | false,
     sucrase?: SucrasePluginConfig | false;
     swc?: SwcPluginConfig | false;
     treeshake?: RollupOptions["treeshake"];

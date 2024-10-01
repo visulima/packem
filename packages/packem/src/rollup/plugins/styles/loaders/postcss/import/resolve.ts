@@ -1,5 +1,4 @@
 import { readFile } from "@visulima/fs";
-import qs from "query-string";
 
 import { resolveAsync } from "../../../utils/resolve";
 
@@ -14,13 +13,13 @@ export interface ImportFile {
 /** `@import` resolver */
 export type ImportResolve = (url: string, basedir: string, extensions: string[]) => Promise<ImportFile>;
 
-const resolve: ImportResolve = async (inputUrl, basedir, extensions) => {
+export const resolve: ImportResolve = async (inputUrl, basedir, extensions): Promise<ImportFile> => {
     const options = { basedirs: [basedir], caller: "@import resolver", extensions };
-    const parseOptions = { decode: false, parseFragmentIdentifier: true, sort: false as const };
-    const { url } = qs.parseUrl(inputUrl, parseOptions);
+
+    const urlObject = new URL(inputUrl, "file://");
+    const url = urlObject.pathname;
+
     const from = await resolveAsync([url, `./${url}`], options);
 
-    return { from, source: await readFile(from) };
+    return { from, source: await readFile(from, { buffer: true }) };
 };
-
-export default resolve;

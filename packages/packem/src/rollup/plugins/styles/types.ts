@@ -20,48 +20,15 @@ export interface PostCSSConfigLoaderOptions {
     path?: string;
 }
 
-/** Options for PostCSS loader */
-export interface PostCSSLoaderOptions extends Record<string, unknown> {
-    /** @see {@link StyleOptions.autoModules} */
-    autoModules: NonNullable<StyleOptions["autoModules"]>;
-    /** @see {@link StyleOptions.config} */
-    config: Exclude<StyleOptions["config"], true | undefined>;
-    /** @see {@link StyleOptions.dts} */
-    dts: NonNullable<StyleOptions["dts"]>;
+export interface InternalStyleOptions extends StyleOptions {
     /** @see {@link StyleOptions.mode} */
     emit: boolean;
-    /** @see {@link StyleOptions.extensions} */
     extensions: NonNullable<StyleOptions["extensions"]>;
-
     /** @see {@link StyleOptions.mode} */
     extract: boolean | string;
-    /** @see {@link StyleOptions.import} */
-    import: Exclude<StyleOptions["import"], true | undefined>;
     /** @see {@link StyleOptions.mode} */
     inject: InjectOptions | boolean | ((varname: string, id: string, output: string[]) => string);
-
-    /** @see {@link StyleOptions.minimize} */
-    minimize: Exclude<StyleOptions["minimize"], true | undefined>;
-    /** @see {@link StyleOptions.modules} */
-    modules: Exclude<StyleOptions["modules"], true | undefined>;
-    /** @see {@link StyleOptions.namedExports} */
-    namedExports: NonNullable<StyleOptions["namedExports"]>;
-    /** Options for PostCSS processor */
-    postcss: {
-        /** @see {@link StyleOptions.parser} */
-        parser?: postcss.Parser;
-        /** @see {@link StyleOptions.plugins} */
-        plugins?: postcss.AcceptedPlugin[];
-        /** @see {@link StyleOptions.stringifier} */
-        stringifier?: postcss.Stringifier;
-        /** @see {@link StyleOptions.syntax} */
-        syntax?: postcss.Syntax;
-    };
-    /** @see {@link StyleOptions.to} */
-    to: StyleOptions["to"];
-
-    /** @see {@link StyleOptions.url} */
-    url: Exclude<StyleOptions["url"], true | undefined>;
+    postcss: NonNullable<StyleOptions["postcss"]>;
 }
 
 /** CSS data for extraction */
@@ -114,20 +81,6 @@ export interface StyleOptions {
      */
     alias?: Record<string, string>;
     /**
-     * Automatically enable
-     * [CSS Modules](https://github.com/css-modules/css-modules)
-     * for files named `[name].module.[ext]`
-     * (e.g. `foo.module.css`, `bar.module.stylus`),
-     * or pass your own function or regular expression
-     * @default false
-     */
-    autoModules?: RegExp | boolean | ((id: string) => boolean);
-    /**
-     * Enable/disable or pass options for PostCSS config loader
-     * @default true
-     */
-    config?: PostCSSConfigLoaderOptions | boolean;
-    /**
      * Generate TypeScript declarations files for input style files
      * @default false
      */
@@ -135,7 +88,7 @@ export interface StyleOptions {
     /** Files to exclude from processing */
     exclude?: ReadonlyArray<RegExp | string> | RegExp | string | null;
     /**
-     * PostCSS will process files ending with these extensions
+     * Plugin will process files ending with these extensions
      * @default [".css", ".pcss", ".postcss", ".sss"]
      */
     extensions?: string[];
@@ -169,21 +122,7 @@ export interface StyleOptions {
      * Useful if you want to preprocess CSS before using it with CSS consuming plugins.
      * @default "inject"
      */
-    mode?:
-        | "emit"
-        | "extract"
-        | "inject"
-        | ["emit"]
-        | ["extract", string]
-        | ["extract"]
-        | ["inject", InjectOptions | ((varname: string, id: string) => string)]
-        | ["inject"];
-    /**
-     * Enable/disable or pass options for
-     * [CSS Modules](https://github.com/css-modules/css-modules)
-     * @default false
-     */
-    modules?: ModulesOptions | boolean;
+    mode?: "emit" | "extract" | "inject" | ["extract", string] | ["inject", InjectOptions | ((varname: string, id: string) => string)];
     /**
      * Use named exports alongside default export.
      * You can pass a function to control how exported name is generated.
@@ -200,25 +139,59 @@ export interface StyleOptions {
      * before any transformations are applied
      */
     onImport?: (code: string, id: string) => void;
-    /**
-     * Set PostCSS parser, e.g. `sugarss`.
-     * Overrides the one loaded from PostCSS config file, if any.
-     */
-    parser?: postcss.Parser | string;
-    /**
-     * A list of plugins for PostCSS,
-     * which are used before plugins loaded from PostCSS config file, if any
-     */
-    plugins?:
-        | (
-              | postcss.AcceptedPlugin
-              | string
-              | [postcss.PluginCreator<unknown> | string, Record<string, unknown>]
-              | [postcss.PluginCreator<unknown> | string]
-              | null
-              | undefined
-          )[]
-        | Record<string, unknown>;
+    postcss?: {
+        /**
+         * Automatically enable
+         * [CSS Modules](https://github.com/css-modules/css-modules)
+         * for files named `[name].module.[ext]`
+         * (e.g. `foo.module.css`, `bar.module.stylus`),
+         * or pass your own function or regular expression
+         * @default false
+         */
+        autoModules?: RegExp | boolean | ((id: string) => boolean);
+        /**
+         * Enable/disable or pass options for PostCSS config loader
+         * @default {}
+         */
+        config?: PostCSSConfigLoaderOptions | false;
+        /**
+         * Enable/disable or pass options for
+         * [CSS Modules](https://github.com/css-modules/css-modules)
+         * @default false
+         */
+        modules?: ModulesOptions | false;
+        /**
+         * Set PostCSS parser, e.g. `sugarss`.
+         * Overrides the one loaded from PostCSS config file, if any.
+         */
+        parser?: postcss.Parser | string;
+        /**
+         * A list of plugins for PostCSS,
+         * which are used before plugins loaded from PostCSS config file, if any
+         */
+        plugins?:
+            | (
+                  | postcss.AcceptedPlugin
+                  | string
+                  | [postcss.PluginCreator<unknown> | string, Record<string, unknown>]
+                  | [postcss.PluginCreator<unknown> | string]
+                  | null
+                  | undefined
+              )[]
+            | Record<string, unknown>;
+        /**
+         * Set PostCSS stringifier.
+         * Overrides the one loaded from PostCSS config file, if any.
+         */
+        stringifier?: postcss.Stringifier | string;
+        /**
+         * Set PostCSS syntax.
+         * Overrides the one loaded from PostCSS config file, if any.
+         */
+        syntax?: postcss.Syntax | string;
+        /** `to` option for PostCSS, required for some plugins */
+        to?: string;
+    };
     /** Options for Sass loader */
     sass?: SASSLoaderOptions;
     /**
@@ -226,32 +199,11 @@ export interface StyleOptions {
      * @default false
      */
     sourceMap?: boolean | "inline" | [boolean | "inline", SourceMapOptions] | [boolean | "inline"];
-    /**
-     * Set PostCSS stringifier.
-     * Overrides the one loaded from PostCSS config file, if any.
-     */
-    stringifier?: postcss.Stringifier | string;
     /** Options for Stylus loader */
     stylus?: StylusLoaderOptions;
-    /**
-     * Set PostCSS syntax.
-     * Overrides the one loaded from PostCSS config file, if any.
-     */
-    syntax?: postcss.Syntax | string;
-    /** `to` option for PostCSS, required for some plugins */
-    to?: string;
     /**
      * Enable/disable or pass options for CSS URL resolver
      * @default true
      */
     url?: UrlOptions | boolean;
-    /**
-     * Array of loaders to use, executed from right to left.
-     * Currently built-in loaders are:
-     * - `sass` (Supports `.scss` and `.sass` files)
-     * - `less` (Supports `.less` files)
-     * - `stylus` (Supports `.styl` and `.stylus` files)
-     * @default ["sass", "less", "stylus"]
-     */
-    use?: string[];
 }

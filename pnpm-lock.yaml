@@ -672,6 +672,9 @@ importers:
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
+      cssnano:
+        specifier: 7.0.6
+        version: 7.0.6(postcss@8.4.47)
       detect-indent:
         specifier: ^7.0.1
         version: 7.0.1

@@ -7,7 +7,7 @@ import { ensurePCSSOption, ensurePCSSPlugins } from "../../utils/options";
 
 let configCache: Result | undefined;
 
-export default async (id: string, config: PostCSSConfigLoaderOptions | false): Promise<Result> => {
+export default async (id: string, config?: PostCSSConfigLoaderOptions | false): Promise<Result> => {
     if (!config) {
         return { file: "", options: {}, plugins: [] };
     }

@@ -1,16 +1,16 @@
-import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { PackageJSON } from "resolve";
+import type { PackageJson } from "@visulima/package";
+import { dirname } from "@visulima/path";
 import { legacy as resolveFields, resolve as resolveExports } from "resolve.exports";
 import internalResolveAsync from "resolve/async";
 import internalResolveSync from "resolve/sync";
 
 import arrayFmt from "./array-fmt";
 
-const baseDirectory = path.dirname(fileURLToPath(import.meta.url));
+const baseDirectory = dirname(fileURLToPath(import.meta.url));
 
-type PackageFilterFunction = (package_: PackageJSON, pkgfile: string) => PackageJSON;
+type PackageFilterFunction = (package_: PackageJson, pkgfile: string) => PackageJson;
 
 interface ResolveDefaultOptions {
     basedirs: ReadonlyArray<string>;
@@ -32,7 +32,7 @@ export const packageFilterBuilder: PackageFilterBuilderFunction = (options = {})
     const conditions = options.conditions ?? ["style", "import", "require"];
     const fields = options.fields ?? ["style", "module", "main"];
 
-    return (packageJson: PackageJSON) => {
+    return (packageJson: PackageJson) => {
         // Check `exports` fields
         try {
             const resolvedExport = resolveExports(packageJson, ".", { conditions, unsafe: true });

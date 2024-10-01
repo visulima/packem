@@ -261,6 +261,10 @@ module.exports = defineConfig({
                 },
             },
             {
+                name: "css-loader",
+                description: "Use CSS loader",
+            },
+            {
                 Description: "Use TypeScript",
                 name: "typescript",
                 type: Boolean,

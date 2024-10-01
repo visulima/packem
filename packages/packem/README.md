@@ -55,7 +55,7 @@ It uses the `exports` configuration in `package.json` and recognizes entry file 
 -   ✅ ESM ⇄ CJS interoperability
 -   ✅ Supports isolated declaration types (experimental)
 -   ✅ Supports wasm [WebAssembly modules](http://webassembly.org)
--   ✅ Supports css and css modules (coming soon)
+-   ✅ Supports css,sass,less,stylus and css modules
 -   ✅ [TypeDoc](https://github.com/TypeStrong/TypeDoc) documentation generation
 
 And more...
@@ -490,6 +490,56 @@ export default defineConfig({
     },
     // ...
 });
+```
+
+## Styles
+
+`packem` supports CSS, SASS, LESS, and Stylus. You can import them in your JavaScript or TypeScript files.
+
+### PostCSS
+
+PostCSS is a tool for transforming styles with JS plugins. These plugins can lint your CSS, support variables and mixins, transpile future CSS syntax, inline images, and more.
+
+Install all the necessary dependencies:
+
+```sh
+npm install --save-dev postcss postcss-load-config icss-utils
+```
+
+```sh
+yarn add -D postcss postcss-load-config icss-utils
+```
+
+```sh
+pnpm add -D postcss postcss-load-config icss-utils
+```
+
+Then you can import your CSS files in your JavaScript or TypeScript files:
+
+```js
+import "./styles.css";
+```
+
+#### CSS Modules
+
+For `css modules` support, you need to install:
+
+```sh
+npm install --save-dev postcss-modules postcss-modules-extract-imports postcss-modules-local-by-default postcss-modules-scope postcss-modules-values postcss-value-parser
+```
+
+```sh
+yarn add -D postcss-modules postcss-modules-extract-imports postcss-modules-local-by-default postcss-modules-scope postcss-modules-values postcss-value-parser
+```
+
+```sh
+pnpm add -D postcss-modules postcss-modules-extract-imports postcss-modules-local-by-default postcss-modules-scope postcss-modules-values postcss-value-parser
+```
+
+Then you can import your CSS files in your JavaScript or TypeScript files:
+
+```js
+import styles from "./styles.css";
 ```
 
 ## Configuration

@@ -8,7 +8,7 @@ import type { AcceptedPlugin, ProcessOptions } from "postcss";
 import postcss from "postcss";
 import type { RawSourceMap } from "source-map-js";
 
-import type { InjectOptions, PostCSSLoaderOptions } from "../../types";
+import type { InjectOptions, InternalStyleOptions } from "../../types";
 import { humanlizePath, normalizePath } from "../../utils/path";
 import { resolveAsync } from "../../utils/resolve";
 import safeId from "../../utils/safe-id";
@@ -39,7 +39,11 @@ const getClassNameDefault = (name: string): string => {
     return id;
 };
 
-const ensureAutoModules = (am: PostCSSLoaderOptions["autoModules"], id: string): boolean => {
+const ensureAutoModules = (am: InternalStyleOptions["postcss"]["autoModules"] | undefined, id: string): boolean => {
+    if (am === undefined) {
+        return true;
+    }
+
     if (typeof am === "function") {
         return am(id);
     }
@@ -51,23 +55,22 @@ const ensureAutoModules = (am: PostCSSLoaderOptions["autoModules"], id: string):
     return am && /\.module\.[A-Za-z]+$/.test(id);
 };
 
-type PostCSSOptions = Pick<Required<ProcessOptions>, "from" | "map" | "to"> & PostCSSLoaderOptions["postcss"];
+type PostCSSOptions = InternalStyleOptions["postcss"] & Pick<Required<ProcessOptions>, "from" | "map" | "to">;
 
-const loader: Loader<PostCSSLoaderOptions> = {
+const loader: Loader<InternalStyleOptions["postcss"]> = {
     alwaysProcess: true,
     name: "postcss",
     // eslint-disable-next-line sonarjs/cognitive-complexity
     async process({ code, extracted, map }) {
-        const options = { ...this.options };
-        const config = await loadConfig(this.id, options.config);
+        const config = await loadConfig(this.id, this.options.config);
         const plugins: AcceptedPlugin[] = [];
-        const autoModules = ensureAutoModules(options.autoModules, this.id);
-        const supportModules = Boolean(options.modules || autoModules);
+        const autoModules = ensureAutoModules(this.options.autoModules, this.id);
+        const supportModules = Boolean((this.options.modules && ensureAutoModules(this.options.modules.include, this.id)) || autoModules);
         const modulesExports: Record<string, string> = {};
 
         const postcssOptions: PostCSSOptions = {
             ...config.options,
-            ...options.postcss,
+            ...this.options,
             from: this.id,
             map: {
                 annotation: false,
@@ -75,21 +78,21 @@ const loader: Loader<PostCSSLoaderOptions> = {
                 prev: mm(map).relative(dirname(this.id)).toObject(),
                 sourcesContent: this.sourceMap ? this.sourceMap.content : true,
             },
-            to: options.to ?? this.id,
+            to: this.options.to ?? this.id,
         };
 
         delete postcssOptions.plugins;
 
-        if (options.import) {
-            plugins.push(postcssImport({ extensions: options.extensions, ...options.import }));
+        if (this.import) {
+            plugins.push(postcssImport({ extensions: this.extensions, ...this.import }));
         }
 
-        if (options.url) {
-            plugins.push(postcssUrl({ inline: Boolean(options.inject), ...options.url }));
+        if (this.url) {
+            plugins.push(postcssUrl({ inline: Boolean(this.inject), ...this.url }));
         }
 
-        if (options.postcss.plugins) {
-            plugins.push(...options.postcss.plugins);
+        if (this.options.plugins) {
+            plugins.push(...this.options.plugins);
         }
 
         if (config.plugins) {
@@ -97,7 +100,7 @@ const loader: Loader<PostCSSLoaderOptions> = {
         }
 
         if (supportModules) {
-            const modulesOptions = typeof options.modules === "object" ? options.modules : {};
+            const modulesOptions = typeof this.options.modules === "object" ? this.options.modules : {};
 
             plugins.push(
                 ...postcssModules({
@@ -105,12 +108,12 @@ const loader: Loader<PostCSSLoaderOptions> = {
                     generateScopedName: testing ? "[name]_[local]" : undefined,
                     ...modulesOptions,
                 }),
-                postcssICSS({ extensions: options.extensions }),
+                postcssICSS({ extensions: this.extensions }),
             );
         }
 
-        if (options.minimize) {
-            const cssnanoOptions = typeof options.minimize === "object" ? options.minimize : {};
+        if (this.minimize) {
+            const cssnanoOptions = typeof this.minimize === "object" ? this.minimize : {};
 
             plugins.push(cssnano(cssnanoOptions));
         }
@@ -120,9 +123,10 @@ const loader: Loader<PostCSSLoaderOptions> = {
             plugins.push(postcssNoop);
         }
 
-        const res = await postcss(plugins).process(code, postcssOptions);
+        const result = await postcss(plugins).process(code, postcssOptions);
 
-        for (const message of res.messages)
+        for (const message of result.messages) {
+            // eslint-disable-next-line default-case
             switch (message.type) {
                 case "warning": {
                     this.warn({ message: message.text as string, plugin: message.plugin });
@@ -144,10 +148,11 @@ const loader: Loader<PostCSSLoaderOptions> = {
                     break;
                 }
             }
+        }
 
-        map = mm(res.map.toJSON()).resolve(dirname(postcssOptions.to)).toString();
+        map = mm(result.map.toJSON()).resolve(dirname(postcssOptions.to)).toString();
 
-        if (!options.extract && this.sourceMap) {
+        if (!this.extract && this.sourceMap) {
             const m = mm(map)
                 .modify((map) => void delete (map as Partial<RawSourceMap>).file)
                 .relative();
@@ -157,23 +162,25 @@ const loader: Loader<PostCSSLoaderOptions> = {
             }
 
             map = m.toString();
-            res.css += m.toCommentData();
+
+            result.css += m.toCommentData();
         }
 
-        if (options.emit) {
-            return { code: res.css, map };
+        if (this.emit) {
+            return { code: result.css, map };
         }
 
         const saferId = (id: string): string => safeId(id, basename(this.id));
         const modulesVariableName = saferId("modules");
 
-        const output = [`var ${cssVariableName} = ${JSON.stringify(res.css)};`];
+        const output = [`var ${cssVariableName} = ${JSON.stringify(result.css)};`];
         const dts = [`var ${cssVariableName}: string;`];
         const outputExports = [cssVariableName];
 
-        if (options.namedExports) {
-            const getClassName = typeof options.namedExports === "function" ? options.namedExports : getClassNameDefault;
+        if (this.namedExports) {
+            const getClassName = typeof this.namedExports === "function" ? this.namedExports : getClassNameDefault;
 
+            // eslint-disable-next-line guard-for-in
             for (const name in modulesExports) {
                 const newName = getClassName(name);
 
@@ -181,11 +188,12 @@ const loader: Loader<PostCSSLoaderOptions> = {
                     this.warn(`Exported \`${name}\` as \`${newName}\` in ${humanlizePath(this.id)}`);
                 }
 
+                // eslint-disable-next-line security/detect-object-injection
                 const fmt = JSON.stringify(modulesExports[name]);
 
                 output.push(`var ${newName} = ${fmt};`);
 
-                if (options.dts) {
+                if (this.dts) {
                     dts.push(`var ${newName}: ${fmt};`);
                 }
 
@@ -193,16 +201,16 @@ const loader: Loader<PostCSSLoaderOptions> = {
             }
         }
 
-        if (options.extract) {
+        if (this.extract) {
             // eslint-disable-next-line no-param-reassign
-            extracted = { css: res.css, id: this.id, map };
+            extracted = { css: result.css, id: this.id, map };
         }
 
-        if (options.inject) {
-            if (typeof options.inject === "function") {
-                output.push(options.inject(cssVariableName, this.id, output), `var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`);
+        if (this.inject) {
+            if (typeof this.inject === "function") {
+                output.push(this.inject(cssVariableName, this.id, output), `var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`);
             } else {
-                const { treeshakeable, ...injectorOptions } = typeof options.inject === "object" ? options.inject : ({} as InjectOptions);
+                const { treeshakeable, ...injectorOptions } = typeof this.inject === "object" ? this.inject : ({} as InjectOptions);
 
                 const injectorName = saferId("injector");
                 const injectorCall = `${injectorName}(${cssVariableName},${JSON.stringify(injectorOptions)});`;
@@ -242,7 +250,7 @@ const loader: Loader<PostCSSLoaderOptions> = {
             }
         }
 
-        if (!options.inject) {
+        if (!this.inject) {
             output.push(`var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`);
         }
 
@@ -251,14 +259,14 @@ const loader: Loader<PostCSSLoaderOptions> = {
         const namedExport = `export {\n  ${outputExports.filter(Boolean).join(",\n  ")}\n};`;
         output.push(defaultExport, namedExport);
 
-        if (options.dts && isAccessibleSync(this.id)) {
+        if (this.dts && isAccessibleSync(this.id)) {
             if (supportModules)
                 dts.push(
                     `interface ModulesExports {${Object.keys(modulesExports)
                         .map((key) => `  '${key}': string;`)
                         .join("\n")}
 }`,
-                    typeof options.inject === "object" && options.inject.treeshakeable ? `interface ModulesExports {inject:()=>void}` : "",
+                    typeof this.inject === "object" && this.inject.treeshakeable ? `interface ModulesExports {inject:()=>void}` : "",
                     `declare const ${modulesVariableName}: ModulesExports;`,
                 );
 

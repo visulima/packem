@@ -9,14 +9,14 @@ import { dataURIRe, firstExtRe as firstExtensionRe } from "../common";
 import generateName from "./generate";
 import inlineFile from "./inline";
 import type { UrlFile, UrlResolve } from "./resolve";
-import resolveDefault from "./resolve";
+import { resolve as defaultResolve } from "./resolve";
 import { isDeclWithUrl, walkUrls } from "./utils";
 
 const name = "styles-url";
 const placeholderHashDefault = "assets/[name]-[hash][extname]";
 const placeholderNoHashDefault = "assets/[name][extname]";
 const defaultpublicPath = "./";
-const defaultAssetDir = ".";
+const defaultAssetDirectory = ".";
 
 /** URL handler options */
 export interface UrlOptions {
@@ -65,8 +65,8 @@ export interface UrlOptions {
 const plugin: PluginCreator<UrlOptions> = (options = {}) => {
     const inline = options.inline ?? false;
     const publicPath = options.publicPath ?? defaultpublicPath;
-    const assetDirectory = options.assetDir ?? defaultAssetDir;
-    const resolve = options.resolve ?? resolveDefault;
+    const assetDirectory = options.assetDir ?? defaultAssetDirectory;
+    const resolve = options.resolve ?? defaultResolve;
     const alias = options.alias ?? {};
     const placeholder = (options.hash ?? true) ? (typeof options.hash === "string" ? options.hash : placeholderHashDefault) : placeholderNoHashDefault;
 
@@ -77,8 +77,8 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
             }
 
             const { file } = css.source.input;
-
-            const map = mm(css.source.input.map?.text).resolve(dirname(file)).toConsumer();
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            const map = mm(css.source.input.map?.text ?? undefined).resolve(dirname(file)).toConsumer();
 
             const urlList: {
                 basedirs: Set<string>;
@@ -96,6 +96,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                 }
 
                 const parsed = valueParser(decl.value);
+
                 walkUrls(parsed, (url, node) => {
                     // Resolve aliases
 
@@ -198,8 +199,9 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                     // Avoid file overrides
                     const hasExtension = firstExtensionRe.test(unsafeTo);
 
+                    // eslint-disable-next-line no-plusplus
                     for (let index = 1; usedNames.has(to) && usedNames.get(to) !== from; index++) {
-                        to = hasExtension ? unsafeTo.replace(firstExtensionRe, `${index}$1`) : `${unsafeTo}${index}`;
+                        to = hasExtension ? unsafeTo.replace(firstExtensionRe, `${String(index)}$1`) : `${unsafeTo}${String(index)}`;
                     }
 
                     usedNames.set(to, from);
@@ -216,12 +218,13 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                         node.value += urlQuery;
                     }
 
-                    to = normalizePath(typeof assetDirectory === "string" ? assetDirectory : defaultAssetDir, to);
+                    to = normalizePath(typeof assetDirectory === "string" ? assetDirectory : defaultAssetDirectory, to);
                     to = typeof assetDirectory === "function" ? assetDirectory(from, to, file) : to;
 
                     result.messages.push({ plugin: name, source, to, type: "asset" });
                 }
 
+                // eslint-disable-next-line @typescript-eslint/no-base-to-string
                 decl.value = parsed.toString();
             }
         },

@@ -462,7 +462,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         context.options.rollup.isolatedDeclarations,
                     ),
 
-                context.options.rollup.style && stylesPlugin(context.options.rollup.style),
+                context.options.rollup.css && stylesPlugin(context.options.rollup.css, context.options.rootDir, context.environment),
 
                 context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
 

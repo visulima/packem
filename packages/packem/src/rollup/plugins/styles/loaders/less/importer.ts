@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync } from "@visulima/fs";
 
 import { resolveAsync } from "../../utils/resolve";
 import { getUrlOfPartial, normalizeUrl } from "../../utils/url";
@@ -25,8 +25,7 @@ const getStylesFileManager = (less: LessStatic): Less.FileManager =>
             // Give precedence to importing a partial
             const id = await resolveAsync([partialUrl, url], options);
 
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
-            return { contents: readFileSync(id, "utf8"), filename: id };
+            return { contents: readFileSync(id), filename: id };
         }
     })();
 

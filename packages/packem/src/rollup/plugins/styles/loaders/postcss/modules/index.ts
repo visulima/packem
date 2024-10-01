@@ -6,6 +6,7 @@ import modulesScope from "postcss-modules-scope";
 import modulesValues from "postcss-modules-values";
 
 import generateScopedNameDefault from "./generate";
+import type { InternalStyleOptions } from "../../../types";
 
 /** Options for [CSS Modules](https://github.com/css-modules/css-modules) */
 export interface ModulesOptions {
@@ -27,7 +28,15 @@ export interface ModulesOptions {
      * Default mode for classes
      * @default "local"
      */
-    mode?: "global" | "local" | "pure";
+    mode?: "global" | "local" | "pure"
+    /**
+     * Files to include for [CSS Modules](https://github.com/css-modules/css-modules)
+     * for files named `[name].module.[ext]`
+     * (e.g. `foo.module.css`, `bar.module.stylus`),
+     * or pass your own function or regular expression
+     * @default false
+     */;
+    include?: InternalStyleOptions["postcss"]["autoModules"];
 }
 
 export default (options: ModulesOptions): (Plugin | Processor)[] => {

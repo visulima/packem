@@ -1,4 +1,4 @@
-import path from "node:path";
+import { dirname } from "@visulima/path";
 
 import { normalizePath } from "../../utils/path";
 import type { Loader } from "../types";
@@ -25,7 +25,7 @@ const loader: Loader<LESSLoaderOptions> = {
             ...options,
             filename: this.id,
             plugins,
-            sourceMap: { outputSourceFiles: true, sourceMapBasepath: path.dirname(this.id) },
+            sourceMap: { outputSourceFiles: true, sourceMapBasepath: dirname(this.id) },
         })) as Less.RenderOutput;
 
         const deps = result.imports;

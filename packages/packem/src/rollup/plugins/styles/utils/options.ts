@@ -1,31 +1,20 @@
 import type { Result } from "postcss-load-config";
 
 import type { LoaderContext } from "../loaders/types";
-import type { PostCSSLoaderOptions, StyleOptions } from "../types";
+import type { InternalStyleOptions,StyleOptions } from "../types";
 import arrayFmt from "./array-fmt";
 import loadModule from "./load-module";
 
-export function inferOption<T, TDef extends T | boolean>(option: T | boolean | undefined, defaultValue: TDef): T | TDef | false {
-    if (typeof option === "boolean") {
-        return option && ({} as TDef);
-    }
-
-    if (typeof option === "object") {
-        return option;
-    }
-
-    return defaultValue;
-}
-
 interface Mode {
-    emit: PostCSSLoaderOptions["emit"];
-    extract: PostCSSLoaderOptions["extract"];
-    inject: PostCSSLoaderOptions["inject"];
+    emit: InternalStyleOptions["emit"];
+    extract: InternalStyleOptions["extract"];
+    inject: InternalStyleOptions["inject"];
 }
 
 const modes = ["inject", "extract", "emit"];
 const modesFmt = arrayFmt(modes);
-export function inferModeOption(mode: StyleOptions["mode"]): Mode {
+
+export const inferModeOption = (mode: StyleOptions["mode"]): Mode => {
     const m = Array.isArray(mode) ? mode : ([mode] as const);
 
     if (m[0] && !modes.includes(m[0])) {
@@ -59,30 +48,6 @@ export const inferHandlerOption = <T extends { alias?: Record<string, string> }>
     return opt;
 };
 
-export const ensureUseOption = (options: StyleOptions): [string, Record<string, unknown>][] => {
-    const all: Record<string, [string, Record<string, unknown>]> = {
-        less: ["less", options.less ?? {}],
-        sass: ["sass", options.sass ?? {}],
-        stylus: ["stylus", options.stylus ?? {}],
-    };
-
-    if (options.use === undefined) {
-        return Object.values(all);
-    }
-
-    if (!Array.isArray(options.use)) {
-        throw new TypeError("`use` option must be an array!");
-    }
-
-    return options.use.map((loader) => {
-        if (typeof loader !== "string") {
-            throw new TypeError("`use` option must be an array of strings!");
-        }
-
-        return all[loader] ?? [loader, {}];
-    });
-};
-
 type PCSSOption = "parser" | "plugin" | "stringifier" | "syntax";
 
 export const ensurePCSSOption = <T>(option: T | string, type: PCSSOption): T => {
@@ -99,7 +64,7 @@ export const ensurePCSSOption = <T>(option: T | string, type: PCSSOption): T => 
     return module as T;
 };
 
-export const ensurePCSSPlugins = (plugins: StyleOptions["plugins"]): Result["plugins"] => {
+export const ensurePCSSPlugins = (plugins: StyleOptions["postcss"]["plugins"]): Result["plugins"] => {
     if (plugins === undefined) {
         return [];
     }
@@ -112,6 +77,7 @@ export const ensurePCSSPlugins = (plugins: StyleOptions["plugins"]): Result["plu
 
     for (const p of Array.isArray(plugins) ? plugins : Object.entries(plugins)) {
         if (!p) {
+            // eslint-disable-next-line no-continue
             continue;
         }
 
@@ -132,3 +98,15 @@ export const ensurePCSSPlugins = (plugins: StyleOptions["plugins"]): Result["plu
 
     return ps;
 };
+
+export const inferOption = <T, TDefine extends T | boolean>(option: T | boolean | undefined, defaultValue: TDefine): T | TDefine | false => {
+    if (typeof option === "boolean") {
+        return option && ({} as TDefine);
+    }
+
+    if (typeof option === "object") {
+        return option;
+    }
+
+    return defaultValue;
+}

@@ -12,7 +12,7 @@ const load = async (impl?: string): Promise<[sass.Sass, string]> => {
                     return [provided, impl] as [sass.Sass, string];
                 }
 
-                throw undefined;
+                throw new Error(`The provided Sass implementation at "${impl}" does not have a default export.`);
             })
             .catch(() => {
                 throw new Error(`Could not load \`${impl}\` Sass implementation`);

@@ -1,34 +1,35 @@
-import path from "node:path";
-
 import { createFilter } from "@rollup/pluginutils";
+import { basename, dirname, parse, resolve } from "@visulima/path";
 import cssnano from "cssnano";
 import type { OutputAsset, OutputChunk, Plugin } from "rollup";
 
+import type { Environment } from "../../../types";
 import Loaders from "./loaders";
 import type { Extracted, LoaderContext } from "./loaders/types";
-import type { ExtractedData, PostCSSLoaderOptions, StyleOptions } from "./types";
+import type { ExtractedData, InternalStyleOptions, StyleOptions } from "./types";
 import concat from "./utils/concat";
-import { ensurePCSSOption, ensurePCSSPlugins, ensureUseOption, inferHandlerOption, inferModeOption, inferOption, inferSourceMapOption } from "./utils/options";
+import { ensurePCSSOption, ensurePCSSPlugins, inferHandlerOption, inferModeOption, inferOption, inferSourceMapOption } from "./utils/options";
 import { humanlizePath, isAbsolutePath, isRelativePath, normalizePath } from "./utils/path";
 import { mm } from "./utils/sourcemap";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export default (options: StyleOptions = {}): Plugin => {
+export default (options: StyleOptions, cwd: string, environment: Environment): Plugin => {
     const isIncluded = createFilter(options.include, options.exclude);
 
     const sourceMap = inferSourceMapOption(options.sourceMap);
-    const loaderOptions: PostCSSLoaderOptions = {
+    const loaderOptions: InternalStyleOptions = {
         ...inferModeOption(options.mode),
-        autoModules: options.autoModules ?? false,
-        config: inferOption(options.config, {}),
         dts: options.dts ?? false,
         extensions: options.extensions ?? [".css", ".pcss", ".postcss", ".sss"],
         import: inferHandlerOption(options.import, options.alias),
         minimize: inferOption(options.minimize, false),
-        modules: inferOption(options.modules, false),
         namedExports: options.namedExports ?? false,
-        postcss: {},
-        to: options.to,
+        postcss: {
+            autoModules: options.postcss?.autoModules ?? false,
+            config: inferOption(options.postcss?.config, {}),
+            modules: inferOption(options.postcss?.modules, false),
+            to: options.postcss?.to,
+        },
         url: inferHandlerOption(options.url, options.alias),
     };
 
@@ -36,26 +37,29 @@ export default (options: StyleOptions = {}): Plugin => {
         throw new Error("`inject.treeshakeable` option is incompatible with `namedExports` option");
     }
 
-    if (options.parser) {
-        loaderOptions.postcss.parser = ensurePCSSOption(options.parser, "parser");
+    if (options.postcss?.parser) {
+        loaderOptions.postcss.parser = ensurePCSSOption(options.postcss.parser, "parser");
     }
 
-    if (options.syntax) {
-        loaderOptions.postcss.syntax = ensurePCSSOption(options.syntax, "syntax");
+    if (options.postcss?.syntax) {
+        loaderOptions.postcss.syntax = ensurePCSSOption(options.postcss.syntax, "syntax");
     }
 
-    if (options.stringifier) {
-        loaderOptions.postcss.stringifier = ensurePCSSOption(options.stringifier, "stringifier");
+    if (options.postcss?.stringifier) {
+        loaderOptions.postcss.stringifier = ensurePCSSOption(options.postcss.stringifier, "stringifier");
     }
 
-    if (options.plugins) {
-        loaderOptions.postcss.plugins = ensurePCSSPlugins(options.plugins);
+    if (options.postcss?.plugins) {
+        loaderOptions.postcss.plugins = ensurePCSSPlugins(options.postcss.plugins);
     }
 
     const loaders = new Loaders({
         extensions: loaderOptions.extensions,
-        loaders: options.loaders,
-        use: [["postcss", loaderOptions], ...ensureUseOption(options), ["sourcemap", {}]],
+        loaders: options.loaders ?? [],
+        options: {
+            ...options,
+            ...loaderOptions,
+        },
     });
 
     let extracted: Extracted[] = [];
@@ -95,7 +99,9 @@ export default (options: StyleOptions = {}): Plugin => {
 
                         const index = this.getModuleInfo(id);
 
-                        index && imports.push(...index.importedIds);
+                        if (index) {
+                            imports.push(...index.importedIds);
+                        }
                     }
 
                     current = imports;
@@ -107,7 +113,7 @@ export default (options: StyleOptions = {}): Plugin => {
             const hashable = extracted
                 .filter((e) => ids.includes(e.id))
                 .sort((a, b) => ids.lastIndexOf(a.id) - ids.lastIndexOf(b.id))
-                .map((e) => `${path.basename(e.id)}:${e.css}`);
+                .map((e) => `${basename(e.id)}:${e.css}`);
 
             if (hashable.length === 0) {
                 return;
@@ -121,7 +127,7 @@ export default (options: StyleOptions = {}): Plugin => {
                 return;
             }
 
-            const directory = options_.dir ?? path.dirname(options_.file!);
+            const directory = options_.dir ?? dirname(options_.file!);
             const chunks = Object.values(bundle).filter((c): c is OutputChunk => c.type === "chunk");
             const manual = chunks.filter((c) => !c.facadeModuleId);
             const emitted = options_.preserveModules ? chunks : chunks.filter((c) => c.isEntry || c.isDynamicEntry);
@@ -147,7 +153,7 @@ export default (options: StyleOptions = {}): Plugin => {
                 return {
                     css: result.css,
                     map: mm(result.map.toString())
-                        .relative(path.dirname(path.resolve(directory, fileName)))
+                        .relative(dirname(resolve(directory, fileName)))
                         .toString(),
                     name: fileName,
                 };
@@ -155,11 +161,11 @@ export default (options: StyleOptions = {}): Plugin => {
 
             const getName = (chunk: OutputChunk): string => {
                 if (options_.file) {
-                    return path.parse(options_.file).name;
+                    return parse(options_.file).name;
                 }
 
                 if (options_.preserveModules) {
-                    const { dir, name } = path.parse(chunk.fileName);
+                    const { dir, name } = parse(chunk.fileName);
 
                     return dir ? `${dir}/${name}` : name;
                 }
@@ -180,6 +186,7 @@ export default (options: StyleOptions = {}): Plugin => {
 
                         for (const id of current) {
                             if (traversed.has(id)) {
+                                // eslint-disable-next-line no-continue
                                 continue;
                             }
 
@@ -188,6 +195,7 @@ export default (options: StyleOptions = {}): Plugin => {
                                     imports.push(id);
                                 }
 
+                                // eslint-disable-next-line no-continue
                                 continue;
                             }
 
@@ -257,12 +265,13 @@ export default (options: StyleOptions = {}): Plugin => {
             }
 
             for await (const [name, ids] of emittedList) {
-                const res = await getExtractedData(name, ids);
+                const extractedData = await getExtractedData(name, ids);
 
                 if (typeof options.onExtract === "function") {
-                    const shouldExtract = options.onExtract(res);
+                    const shouldExtract = options.onExtract(extractedData);
 
                     if (!shouldExtract) {
+                        // eslint-disable-next-line no-continue
                         continue;
                     }
                 }
@@ -272,49 +281,55 @@ export default (options: StyleOptions = {}): Plugin => {
                     const cssnanoOptions = typeof loaderOptions.minimize === "object" ? loaderOptions.minimize : {};
                     const minifier = cssnano(cssnanoOptions);
 
-                    const resMin = await minifier.process(res.css, {
-                        from: res.name,
+                    const resultMinified = await minifier.process(extractedData.css, {
+                        from: extractedData.name,
                         map: sourceMap && {
                             annotation: false,
                             inline: false,
-                            prev: res.map,
+                            prev: extractedData.map,
                             sourcesContent: sourceMap.content,
                         },
-                        to: res.name,
+                        to: extractedData.name,
                     });
 
-                    res.css = resMin.css;
-                    res.map = resMin.map.toString();
+                    extractedData.css = resultMinified.css;
+                    extractedData.map = resultMinified.map.toString();
                 }
 
-                const cssFile = { fileName: res.name, name: res.name, source: res.css, type: "asset" as const };
+                const cssFile = {
+                    fileName: extractedData.name,
+                    name: extractedData.name,
+                    originalFileName: extractedData.name,
+                    source: extractedData.css,
+                    type: "asset" as const,
+                };
                 const cssFileId = this.emitFile(cssFile);
 
-                if (res.map && sourceMap) {
+                if (extractedData.map && sourceMap) {
                     const fileName = this.getFileName(cssFileId);
 
-                    const assetDir =
+                    const assetDirectory =
                         typeof options_.assetFileNames === "string"
-                            ? normalizePath(path.dirname(options_.assetFileNames))
+                            ? normalizePath(dirname(options_.assetFileNames))
                             : typeof options_.assetFileNames === "function"
-                              ? normalizePath(path.dirname(options_.assetFileNames(cssFile)))
+                              ? normalizePath(dirname(options_.assetFileNames(cssFile)))
                               : "assets"; // Default for Rollup v2
 
-                    const map = mm(res.map)
-                        .modify((m) => (m.file = path.basename(fileName)))
+                    const map = mm(extractedData.map)
+                        .modify((m) => (m.file = basename(fileName)))
                         .modifySources((s) => {
                             // Compensate for possible nesting depending on `assetFileNames` value
                             if (s === "<no source>") {
                                 return s;
                             }
 
-                            if (assetDir.length <= 1) {
+                            if (assetDirectory.length <= 1) {
                                 return s;
                             }
 
                             s = `../${s}`; // ...then there's definitely at least 1 level offset
 
-                            for (const c of assetDir) {
+                            for (const c of assetDirectory) {
                                 if (c === "/") {
                                     s = `../${s}`;
                                 }
@@ -334,7 +349,7 @@ export default (options: StyleOptions = {}): Plugin => {
 
                         this.emitFile({ fileName: mapFileName, source: map.toString(), type: "asset" });
 
-                        const { base } = path.parse(mapFileName);
+                        const { base } = parse(mapFileName);
 
                         (bundle[fileName] as OutputAsset).source += map.toCommentFile(base);
                     }

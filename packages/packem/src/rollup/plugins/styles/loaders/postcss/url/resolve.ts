@@ -1,5 +1,4 @@
 import { readFile } from "@visulima/fs";
-import qs from "query-string";
 
 import { resolveAsync } from "../../../utils/resolve";
 
@@ -16,14 +15,16 @@ export interface UrlFile {
 /** URL resolver */
 export type UrlResolve = (inputUrl: string, basedir: string) => Promise<UrlFile>;
 
-const resolve: UrlResolve = async (inputUrl, basedir) => {
+export const resolve: UrlResolve = async (inputUrl: string, basedir: string): Promise<UrlFile> => {
     const options = { basedirs: [basedir], caller: "URL resolver" };
-    const parseOptions = { decode: false, parseFragmentIdentifier: true, sort: false as const };
-    const { fragmentIdentifier, query, url } = qs.parseUrl(inputUrl, parseOptions);
+
+    const urlObject = new URL(inputUrl, "file://");
+    const fragmentIdentifier = urlObject.hash ? urlObject.hash.slice(1) : "";
+    const query = Object.fromEntries(new URLSearchParams(urlObject.search));
+    const url = urlObject.pathname;
+
     const from = await resolveAsync([url, `./${url}`], options);
-    const urlQuery = qs.stringifyUrl({ fragmentIdentifier, query, url: "" }, parseOptions);
+    const urlQuery = new URLSearchParams({ ...query, fragmentIdentifier }).toString();
 
-    return { from, source: await readFile(from), urlQuery };
+    return { from, source: await readFile(from, { buffer: true }), urlQuery };
 };
-
-export default resolve;

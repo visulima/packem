@@ -1,13 +1,12 @@
 import type PQueue from "p-queue";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import PQueueClass from "p-queue";
 
-import lessLoader from "./less";
-import postcssLoader from "./postcss";
-import sassLoader from "./sass";
+import type { InternalStyleOptions } from "../types";
 import sourcemapLoader from "./sourcemap";
-import stylusLoader from "./stylus";
 import type { Loader, LoaderContext, Payload } from "./types";
 
-function matchFile(file: string, condition: Loader["test"]): boolean {
+const matchFile = (file: string, condition: Loader["test"]): boolean => {
     if (!condition) {
         return false;
     }
@@ -17,7 +16,7 @@ function matchFile(file: string, condition: Loader["test"]): boolean {
     }
 
     return condition.test(file);
-}
+};
 
 // This queue makes sure one thread is always available,
 // which is necessary for some cases
@@ -29,33 +28,34 @@ interface LoadersOptions {
     /** @see {@link Options.extensions} */
     extensions: string[];
     /** @see {@link Options.loaders} */
-    loaders?: Loader[];
-    /** @see {@link Options.use} */
-    use: [string, Record<string, unknown>][];
+    loaders: Loader[];
+    options: InternalStyleOptions;
 }
 
 export default class Loaders {
-    private readonly use: Map<string, Record<string, unknown>>;
-
     private readonly test: (file: string) => boolean;
 
     private readonly loaders = new Map<string, Loader>();
 
+    private readonly options: InternalStyleOptions;
+
     private workQueue?: PQueue;
 
-    public constructor(options: LoadersOptions) {
-        this.use = new Map(options.use.reverse());
-        this.test = (file): boolean => options.extensions.some((extension) => file.toLowerCase().endsWith(extension));
-        this.add(postcssLoader, sourcemapLoader, sassLoader, lessLoader, stylusLoader);
+    public constructor({ extensions, loaders, options }: LoadersOptions) {
+        this.test = (file): boolean => extensions.some((extension) => file.toLowerCase().endsWith(extension));
+        this.add(sourcemapLoader);
 
-        if (options.loaders) {
-            this.add(...options.loaders);
+        if (loaders.length > 0) {
+            this.add(...loaders);
         }
+
+        this.options = options;
     }
 
     public add<T extends Record<string, unknown>>(...loaders: Loader<T>[]): void {
         for (const loader of loaders) {
-            if (!this.use.has(loader.name)) {
+            if (this.loaders.has(loader.name)) {
+                // eslint-disable-next-line no-continue
                 continue;
             }
 
@@ -79,27 +79,35 @@ export default class Loaders {
 
     public async process(payload: Payload, context: LoaderContext): Promise<Payload> {
         if (!this.workQueue) {
-            const { default: pQueue } = await import("p-queue");
-
-            this.workQueue = new pQueue({ concurrency: threadPoolSize - 1 });
+            this.workQueue = new PQueueClass({ concurrency: threadPoolSize - 1 });
         }
 
-        const { workQueue } = this;
+        let processed: Payload = payload;
 
-        for await (const [name, options] of this.use) {
-            const loader = this.loaders.get(name);
+        for await (const [name, loader] of this.loaders) {
+            const loaderContext: LoaderContext = {
+                ...context,
+                dts: this.options.dts,
+                emit: this.options.emit,
+                extensions: this.options.extensions,
+                extract: this.options.extract,
+                import: this.options.import,
+                inject: this.options.inject,
+                minimize: this.options.minimize,
+                namedExports: this.options.namedExports,
+                options: this.options[name] ?? {},
+                url: this.options.url,
+            };
 
-            if (!loader) {
-                continue;
-            }
+            if (loader.alwaysProcess || matchFile(loaderContext.id, loader.test)) {
+                const process = await this.workQueue.add(loader.process.bind(loaderContext, payload));
 
-            const context_: LoaderContext = { ...context, options };
-
-            if (loader.alwaysProcess || matchFile(context_.id, loader.test)) {
-                payload = (await workQueue.add(loader.process.bind(context_, payload)))!;
+                if (process) {
+                    processed = process;
+                }
             }
         }
 
-        return payload;
+        return processed;
     }
 }

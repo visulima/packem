@@ -5,10 +5,7 @@ const loader: Loader = {
     alwaysProcess: true,
     name: "sourcemap",
     async process({ code, map }) {
-        // eslint-disable-next-line no-param-reassign
-        map = (await getMap(code, this.id)) ?? map;
-
-        return { code: stripMap(code), map };
+        return { code: stripMap(code), map: (await getMap(code, this.id)) ?? map };
     },
 };
 
