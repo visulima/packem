@@ -1,4 +1,3 @@
-import type { Options as CssNanoOptions } from "cssnano";
 import type * as postcss from "postcss";
 
 import type { LESSLoaderOptions } from "./loaders/less";
@@ -8,6 +7,7 @@ import type { UrlOptions } from "./loaders/postcss/url";
 import type { SASSLoaderOptions } from "./loaders/sass";
 import type { StylusLoaderOptions } from "./loaders/stylus";
 import type { Loader, SourceMapOptions } from "./loaders/types";
+import type { Minifier } from "./minifiers/types";
 
 /** Options for PostCSS config loader */
 export interface PostCSSConfigLoaderOptions {
@@ -103,12 +103,8 @@ export interface StyleOptions {
     less?: LESSLoaderOptions;
     /** Array of custom loaders */
     loaders?: Loader[];
-    /**
-     * Enable/disable or pass options for
-     * [cssnano](https://github.com/cssnano/cssnano)
-     * @default false
-     */
-    minimize?: CssNanoOptions | boolean;
+    /** Enable the css minifier */
+    minifier?: Minifier;
     /**
      * Select mode for this plugin:
      * - `"inject"` *(default)* - Embeds CSS inside JS and injects it into `<head>` at runtime.

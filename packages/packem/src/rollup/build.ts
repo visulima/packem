@@ -17,13 +17,22 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
         return;
     }
 
-    if (!context.options.rollup.isolatedDeclarations || !context.options.isolatedDeclarationTransformer) {
+    let loadCache = true;
+
+    // This is a hack to prevent caching when using isolated declarations or css loaders
+    if (context.options.rollup.isolatedDeclarations || context.options.isolatedDeclarationTransformer || context.options.rollup.css) {
+        loadCache = false;
+    }
+
+    if (loadCache) {
         rollupOptions.cache = fileCache.get<RollupCache>(BUNDLE_CACHE_KEY, subDirectory);
     }
 
     const buildResult = await rollup(rollupOptions);
 
-    fileCache.set(BUNDLE_CACHE_KEY, buildResult.cache, subDirectory);
+    if (loadCache) {
+        fileCache.set(BUNDLE_CACHE_KEY, buildResult.cache, subDirectory);
+    }
 
     await context.hooks.callHook("rollup:build", context, buildResult);
 

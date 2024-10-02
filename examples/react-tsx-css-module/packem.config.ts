@@ -8,7 +8,6 @@ export default defineConfig({
     transformer,
     rollup: {
         css: {
-            mode: "extract",
             loaders: [postcssLoader],
             minifier: cssnano()
         },

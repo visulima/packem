@@ -1,4 +1,5 @@
 import { dirname } from "@visulima/path";
+import less from "less";
 
 import { normalizePath } from "../../utils/path";
 import type { Loader } from "../types";
@@ -8,13 +9,6 @@ const loader: Loader<LESSLoaderOptions> = {
     name: "less",
     async process({ code, map }) {
         const options = { ...this.options };
-        const less = await import("less").then((m) => m.default);
-
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (!less) {
-            throw new Error("You need to install `less` package in order to process Less files");
-        }
-
         const plugins = [importer];
 
         if (options.plugins) {

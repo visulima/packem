@@ -307,7 +307,7 @@ importers:
         specifier: 5.4.8
         version: 5.4.8(@types/node@20.14.11)
 
-  examples/react-tsx-css:
+  examples/react-tsx-css-module:
     dependencies:
       react:
         specifier: ^18.3.1

@@ -1,3 +1,4 @@
+import type { Pail } from "@visulima/pail";
 import type { PluginContext } from "rollup";
 import type { RawSourceMap } from "source-map-js";
 
@@ -26,6 +27,7 @@ export interface Loader<T = Record<string, unknown>> {
 export interface LoaderContext<T = Record<string, unknown>> {
     /** Assets to emit */
     readonly assets: Map<string, Uint8Array>;
+    readonly cwd?: string;
     /** Files to watch */
     readonly deps: Set<string>;
     /** @see {@link InternalStyleOptions.dts} */
@@ -42,8 +44,7 @@ export interface LoaderContext<T = Record<string, unknown>> {
     readonly import: InternalStyleOptions["import"];
     /** @see {@link InternalStyleOptions.inject} */
     readonly inject: InternalStyleOptions["inject"];
-    /** @see {@link InternalStyleOptions.minimize} */
-    readonly minimize: InternalStyleOptions["minimize"];
+    logger: Pail;
     /** @see {@link InternalStyleOptions.namedExports} */
     readonly namedExports: InternalStyleOptions["namedExports"];
     /**
@@ -53,6 +54,7 @@ export interface LoaderContext<T = Record<string, unknown>> {
     readonly options: T;
     /** [Plugin's context](https://rollupjs.org/guide/en#plugin-context) */
     readonly plugin: PluginContext;
+    readonly sourceDir?: string;
     /** @see {@link InternalStyleOptions.sourceMap} */
     readonly sourceMap: false | ({ inline: boolean } & SourceMapOptions);
     readonly url: InternalStyleOptions["url"];
@@ -72,6 +74,7 @@ export interface Extracted {
 export interface Payload {
     /** File content */
     code: string;
+    dts?: string;
     /** Extracted data */
     extracted?: Extracted;
     /** Sourcemap */

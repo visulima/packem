@@ -3,9 +3,9 @@ import cssnano from "cssnano";
 
 import type { LoaderContext } from "../loaders/types";
 import type { ExtractedData } from "../types";
-import type { Minfier } from "./types";
+import type { Minifier } from "./types";
 
-const cssnanoMinifier: Minfier = async (data: ExtractedData, sourceMap: LoaderContext["sourceMap"], options: Options): Promise<ExtractedData> => {
+const cssnanoMinifier = (options: Options = {}): Minifier => async (data: ExtractedData, sourceMap: LoaderContext["sourceMap"]): Promise<ExtractedData> => {
     const minifier = cssnano(options);
 
     const resultMinified = await minifier.process(data.css, {
@@ -19,10 +19,15 @@ const cssnanoMinifier: Minfier = async (data: ExtractedData, sourceMap: LoaderCo
         to: data.name,
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (resultMinified.map) {
+        // eslint-disable-next-line no-param-reassign
+        data.map = resultMinified.map.toString();
+    }
+
     return {
         ...data,
         css: resultMinified.css,
-        map: resultMinified.map.toString(),
     };
 };
 

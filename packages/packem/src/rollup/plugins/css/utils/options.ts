@@ -14,6 +14,8 @@ interface Mode {
 const modes = ["inject", "extract", "emit"];
 const modesFmt = arrayFmt(modes);
 
+type PCSSOption = "parser" | "plugin" | "stringifier" | "syntax";
+
 export const inferModeOption = (mode: StyleOptions["mode"]): Mode => {
     const m = Array.isArray(mode) ? mode : ([mode] as const);
 
@@ -47,8 +49,6 @@ export const inferHandlerOption = <T extends { alias?: Record<string, string> }>
 
     return opt;
 };
-
-type PCSSOption = "parser" | "plugin" | "stringifier" | "syntax";
 
 export const ensurePCSSOption = <T>(option: T | string, type: PCSSOption): T => {
     if (typeof option !== "string") {

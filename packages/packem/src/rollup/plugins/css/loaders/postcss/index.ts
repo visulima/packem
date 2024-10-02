@@ -3,7 +3,6 @@ import { fileURLToPath } from "node:url";
 import { makeLegalIdentifier } from "@rollup/pluginutils";
 import { isAccessibleSync, writeFileSync } from "@visulima/fs";
 import { basename, dirname, join } from "@visulima/path";
-import cssnano from "cssnano";
 import type { AcceptedPlugin, ProcessOptions } from "postcss";
 import postcss from "postcss";
 import type { RawSourceMap } from "source-map-js";
@@ -24,7 +23,6 @@ import postcssUrl from "./url";
 const baseDirectory = dirname(fileURLToPath(import.meta.url));
 
 let injectorId: string;
-const testing = process.env.NODE_ENV === "test";
 
 const cssVariableName = "css";
 const reservedWords = new Set([cssVariableName]);
@@ -112,12 +110,6 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
             );
         }
 
-        if (this.minimize) {
-            const cssnanoOptions = typeof this.minimize === "object" ? this.minimize : {};
-
-            plugins.push(cssnano(cssnanoOptions));
-        }
-
         // Avoid PostCSS warning
         if (plugins.length === 0) {
             plugins.push(postcssNoop);
@@ -174,7 +166,7 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
         const modulesVariableName = saferId("modules");
 
         const output = [`var ${cssVariableName} = ${JSON.stringify(result.css)};`];
-        const dts = [`var ${cssVariableName}: string;`];
+        const dts = this.dts ? [`var ${cssVariableName}: string;`] : [];
         const outputExports = [cssVariableName];
 
         if (this.namedExports) {
@@ -216,7 +208,7 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
                 const injectorCall = `${injectorName}(${cssVariableName},${JSON.stringify(injectorOptions)});`;
 
                 if (!injectorId) {
-                    injectorId = await resolveAsync(["./runtime/inject-css"], { basedirs: [join(testing ? process.cwd() : join(baseDirectory, ".."))] });
+                    injectorId = await resolveAsync(["./runtime/inject-css"], { basedirs: [join(baseDirectory, "..", "..")] });
                     injectorId = `"${normalizePath(injectorId)}"`;
                 }
 
@@ -255,11 +247,11 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
         }
 
         const defaultExport = `export default ${supportModules ? modulesVariableName : cssVariableName};`;
-
         const namedExport = `export {\n  ${outputExports.filter(Boolean).join(",\n  ")}\n};`;
+
         output.push(defaultExport, namedExport);
 
-        if (this.dts && isAccessibleSync(this.id)) {
+        if (this.dts) {
             if (supportModules)
                 dts.push(
                     `interface ModulesExports {${Object.keys(modulesExports)
@@ -271,11 +263,9 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
                 );
 
             dts.push(defaultExport, namedExport);
-
-            writeFileSync(`${this.id}.d.ts`, dts.filter(Boolean).join("\n"));
         }
 
-        return { code: output.filter(Boolean).join("\n"), extracted, map };
+        return { code: output.filter(Boolean).join("\n"), dts: dts.length > 0 ? dts.filter(Boolean).join("\n") : undefined, extracted, map };
     },
 };
 

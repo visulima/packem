@@ -39,7 +39,7 @@ import cachingPlugin from "./plugins/plugin-cache";
 import prependDirectivePlugin from "./plugins/prepend-directives";
 import preserveDirectivesPlugin from "./plugins/preserve-directives";
 import { rawPlugin } from "./plugins/raw";
-import stylesPlugin from "./plugins/styles";
+import cssPlugin from "./plugins/css";
 import resolveFileUrlPlugin from "./plugins/resolve-file-url";
 import type { ShebangOptions } from "./plugins/shebang";
 import { removeShebangPlugin, shebangPlugin } from "./plugins/shebang";
@@ -462,7 +462,18 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         context.options.rollup.isolatedDeclarations,
                     ),
 
-                context.options.rollup.css && stylesPlugin(context.options.rollup.css, context.options.rootDir, context.environment),
+                context.options.rollup.css &&
+                    cssPlugin(
+                        {
+                            dts: Boolean(context.options.declaration) || context.options.isolatedDeclarationTransformer !== undefined,
+                            sourceMap: context.options.sourcemap,
+                            ...context.options.rollup.css,
+                        },
+                        context.logger,
+                        context.options.rootDir,
+                        context.options.sourceDir,
+                        context.environment,
+                    ),
 
                 context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
 

@@ -1,6 +1,6 @@
 import { createFilter } from "@rollup/pluginutils";
+import type { Pail } from "@visulima/pail";
 import { basename, dirname, parse, resolve } from "@visulima/path";
-import cssnano from "cssnano";
 import type { OutputAsset, OutputChunk, Plugin } from "rollup";
 
 import type { Environment } from "../../../types";
@@ -13,7 +13,7 @@ import { humanlizePath, isAbsolutePath, isRelativePath, normalizePath } from "./
 import { mm } from "./utils/sourcemap";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export default (options: StyleOptions, cwd: string, environment: Environment): Plugin => {
+export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: string, environment: Environment): Plugin => {
     const isIncluded = createFilter(options.include, options.exclude);
 
     const sourceMap = inferSourceMapOption(options.sourceMap);
@@ -22,7 +22,6 @@ export default (options: StyleOptions, cwd: string, environment: Environment): P
         dts: options.dts ?? false,
         extensions: options.extensions ?? [".css", ".pcss", ".postcss", ".sss"],
         import: inferHandlerOption(options.import, options.alias),
-        minimize: inferOption(options.minimize, false),
         namedExports: options.namedExports ?? false,
         postcss: {
             autoModules: options.postcss?.autoModules ?? false,
@@ -54,17 +53,19 @@ export default (options: StyleOptions, cwd: string, environment: Environment): P
     }
 
     const loaders = new Loaders({
+        cwd,
         extensions: loaderOptions.extensions,
         loaders: options.loaders ?? [],
         options: {
             ...options,
             ...loaderOptions,
         },
+        sourceDir,
     });
 
     let extracted: Extracted[] = [];
 
-    return {
+    return <Plugin>{
         augmentChunkHash(chunk) {
             if (extracted.length === 0) {
                 return;
@@ -127,7 +128,7 @@ export default (options: StyleOptions, cwd: string, environment: Environment): P
                 return;
             }
 
-            const directory = options_.dir ?? dirname(options_.file!);
+            const directory = options_.dir ?? dirname(options_.file as string);
             const chunks = Object.values(bundle).filter((c): c is OutputChunk => c.type === "chunk");
             const manual = chunks.filter((c) => !c.facadeModuleId);
             const emitted = options_.preserveModules ? chunks : chunks.filter((c) => c.isEntry || c.isDynamicEntry);
@@ -147,7 +148,6 @@ export default (options: StyleOptions, cwd: string, environment: Environment): P
                 }
 
                 const entries = extracted.filter((e) => ids.includes(e.id)).sort((a, b) => ids.lastIndexOf(a.id) - ids.lastIndexOf(b.id));
-
                 const result = await concat(entries);
 
                 return {
@@ -218,6 +218,11 @@ export default (options: StyleOptions, cwd: string, environment: Environment): P
             const moved: string[] = [];
 
             if (typeof loaderOptions.extract === "string") {
+                logger.debug({
+                    message: `Extracting to ${loaderOptions.extract}`,
+                    prefix: "css",
+                });
+
                 const ids: string[] = [];
 
                 for (const chunk of manual) {
@@ -235,6 +240,11 @@ export default (options: StyleOptions, cwd: string, environment: Environment): P
 
                 emittedList.push([name, ids]);
             } else {
+                logger.debug({
+                    message: "Extracting to individual files",
+                    prefix: "css",
+                });
+
                 for (const chunk of manual) {
                     const ids = getImports(chunk);
 
@@ -277,23 +287,16 @@ export default (options: StyleOptions, cwd: string, environment: Environment): P
                 }
 
                 // Perform minimization on the extracted file
-                if (loaderOptions.minimize) {
-                    const cssnanoOptions = typeof loaderOptions.minimize === "object" ? loaderOptions.minimize : {};
-                    const minifier = cssnano(cssnanoOptions);
-
-                    const resultMinified = await minifier.process(extractedData.css, {
-                        from: extractedData.name,
-                        map: sourceMap && {
-                            annotation: false,
-                            inline: false,
-                            prev: extractedData.map,
-                            sourcesContent: sourceMap.content,
-                        },
-                        to: extractedData.name,
+                if (options.minifier) {
+                    logger.info({
+                        message: `Minifying ${extractedData.name}`,
+                        prefix: "css",
                     });
 
-                    extractedData.css = resultMinified.css;
-                    extractedData.map = resultMinified.map.toString();
+                    const { css: minifiedCss, map: minifiedMap } = await options.minifier(extractedData, sourceMap);
+
+                    extractedData.css = minifiedCss;
+                    extractedData.map = minifiedMap;
                 }
 
                 const cssFile = {
@@ -303,6 +306,7 @@ export default (options: StyleOptions, cwd: string, environment: Environment): P
                     source: extractedData.css,
                     type: "asset" as const,
                 };
+
                 const cssFileId = this.emitFile(cssFile);
 
                 if (extractedData.map && sourceMap) {
@@ -356,11 +360,9 @@ export default (options: StyleOptions, cwd: string, environment: Environment): P
                 }
             }
         },
-
         name: "packem:styles",
-
-        async transform(code, id) {
-            if (!isIncluded(id) || !loaders.isSupported(id)) {
+        async transform(code, transformId) {
+            if (!isIncluded(transformId) || !loaders.isSupported(transformId)) {
                 return null;
             }
 
@@ -370,16 +372,25 @@ export default (options: StyleOptions, cwd: string, environment: Environment): P
             }
 
             if (typeof options.onImport === "function") {
-                options.onImport(code, id);
+                options.onImport(code, transformId);
             }
 
             const context: LoaderContext = {
                 assets: new Map<string, Uint8Array>(),
                 deps: new Set(),
-                id,
+                dts: loaderOptions.dts,
+                emit: loaderOptions.emit,
+                extensions: loaderOptions.extensions,
+                extract: loaderOptions.extract,
+                id: transformId,
+                import: loaderOptions.import,
+                inject: loaderOptions.inject,
+                logger,
+                namedExports: loaderOptions.namedExports,
                 options: {},
                 plugin: this,
                 sourceMap,
+                url: loaderOptions.url,
                 warn: this.warn.bind(this),
             };
 
@@ -400,9 +411,29 @@ export default (options: StyleOptions, cwd: string, environment: Environment): P
                 extracted.push(result.extracted);
             }
 
+            // if (result.dts) {
+            //     // @TODO: get the correct file name
+            //     const dtsfileName = transformId.replace(join(cwd, sourceDir + "/"), "") + ".d.ts";
+            //
+            //     logger.info({
+            //         code: "css-dts",
+            //         message: "Generated declaration file for " + dtsfileName,
+            //     });
+            //
+            //     this.emitFile({
+            //         fileName: dtsfileName,
+            //         originalFileName: dtsfileName,
+            //         source: result.dts,
+            //         type: "asset",
+            //     });
+            // }
+
             return {
                 code: result.code,
                 map: sourceMap && result.map ? result.map : { mappings: "" as const },
+                meta: {
+                    cssTypes: result.dts,
+                },
                 moduleSideEffects: result.extracted ? true : null,
             };
         },
