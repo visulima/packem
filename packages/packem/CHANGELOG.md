@@ -1,3 +1,13 @@
+## @visulima/packem [1.0.7](https://github.com/visulima/packem/compare/@visulima/packem@1.0.6...@visulima/packem@1.0.7) (2024-10-02)
+
+### Bug Fixes
+
+* updated jiti to 2.1.0, rollup to 4.24.0, tinyglobby to 0.2.9, typedoc-plugin-markdown to 4.2.9 and @ckeditor/typedoc-plugins to 44.0.0, removed is-glob ([4a090ac](https://github.com/visulima/packem/commit/4a090ace9c8051168f814113aaeb29841e82061e))
+
+### Miscellaneous Chores
+
+* update dev dependencies ([be7a73e](https://github.com/visulima/packem/commit/be7a73ee1150145b59ccac554cd68da910e0720b))
+
 ## @visulima/packem [1.0.6](https://github.com/visulima/packem/compare/@visulima/packem@1.0.5...@visulima/packem@1.0.6) (2024-09-30)
 
 ### Bug Fixes
