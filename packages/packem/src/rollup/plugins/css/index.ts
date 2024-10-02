@@ -1,7 +1,7 @@
 import { createFilter } from "@rollup/pluginutils";
 import type { Pail } from "@visulima/pail";
 import { basename, dirname, parse, resolve } from "@visulima/path";
-import type { OutputAsset, OutputChunk, Plugin } from "rollup";
+import type { GetModuleInfo, OutputAsset, OutputChunk, Plugin } from "rollup";
 
 import type { Environment } from "../../../types";
 import Loaders from "./loaders";
@@ -65,51 +65,55 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
 
     let extracted: Extracted[] = [];
 
+    const traverseImportedModules = (chunkModules: Record<string, any>, getModuleInfo: GetModuleInfo): string[] => {
+        const ids: string[] = [];
+
+        for (const module of Object.keys(chunkModules)) {
+            const traversed = new Set<string>();
+            let current = [module];
+
+            do {
+                const imports: string[] = [];
+
+                for (const id of current) {
+                    if (traversed.has(id)) {
+                        // eslint-disable-next-line no-continue
+                        continue;
+                    }
+
+                    if (loaders.isSupported(id)) {
+                        if (isIncluded(id)) {
+                            imports.push(id);
+                        }
+
+                        // eslint-disable-next-line no-continue
+                        continue;
+                    }
+
+                    traversed.add(id);
+
+                    const index = getModuleInfo(id);
+
+                    if (index) {
+                        imports.push(...index.importedIds);
+                    }
+                }
+
+                current = imports;
+            } while (current.some((id) => !loaders.isSupported(id)));
+
+            ids.push(...current);
+        }
+        return ids;
+    };
+
     return <Plugin>{
         augmentChunkHash(chunk) {
             if (extracted.length === 0) {
                 return;
             }
 
-            const ids: string[] = [];
-
-            for (const module of Object.keys(chunk.modules)) {
-                const traversed = new Set<string>();
-
-                let current = [module];
-
-                do {
-                    const imports: string[] = [];
-
-                    for (const id of current) {
-                        if (traversed.has(id)) {
-                            // eslint-disable-next-line no-continue
-                            continue;
-                        }
-
-                        if (loaders.isSupported(id)) {
-                            if (isIncluded(id)) {
-                                imports.push(id);
-                            }
-
-                            // eslint-disable-next-line no-continue
-                            continue;
-                        }
-
-                        traversed.add(id);
-
-                        const index = this.getModuleInfo(id);
-
-                        if (index) {
-                            imports.push(...index.importedIds);
-                        }
-                    }
-
-                    current = imports;
-                } while (current.some((id) => !loaders.isSupported(id)));
-
-                ids.push(...current);
-            }
+            const ids = traverseImportedModules(chunk.modules, this.getModuleInfo);
 
             const hashable = extracted
                 .filter((e) => ids.includes(e.id))
@@ -173,48 +177,6 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
                 return chunk.name;
             };
 
-            const getImports = (chunk: OutputChunk): string[] => {
-                const ids: string[] = [];
-
-                for (const module of Object.keys(chunk.modules)) {
-                    const traversed = new Set<string>();
-
-                    let current = [module];
-
-                    do {
-                        const imports: string[] = [];
-
-                        for (const id of current) {
-                            if (traversed.has(id)) {
-                                // eslint-disable-next-line no-continue
-                                continue;
-                            }
-
-                            if (loaders.isSupported(id)) {
-                                if (isIncluded(id)) {
-                                    imports.push(id);
-                                }
-
-                                // eslint-disable-next-line no-continue
-                                continue;
-                            }
-
-                            traversed.add(id);
-
-                            const index = this.getModuleInfo(id);
-
-                            index && imports.push(...index.importedIds);
-                        }
-
-                        current = imports;
-                    } while (current.some((id) => !loaders.isSupported(id)));
-
-                    ids.push(...current);
-                }
-
-                return ids;
-            };
-
             const moved: string[] = [];
 
             if (typeof loaderOptions.extract === "string") {
@@ -226,14 +188,14 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
                 const ids: string[] = [];
 
                 for (const chunk of manual) {
-                    const chunkIds = getImports(chunk);
+                    const chunkIds = traverseImportedModules(chunk, this.getModuleInfo);
 
                     moved.push(...chunkIds);
                     ids.push(...chunkIds);
                 }
 
                 for (const chunk of emitted) {
-                    ids.push(...getImports(chunk).filter((id) => !moved.includes(id)));
+                    ids.push(...traverseImportedModules(chunk, this.getModuleInfo).filter((id) => !moved.includes(id)));
                 }
 
                 const name = getName(chunks[0] as OutputChunk);
@@ -246,7 +208,7 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
                 });
 
                 for (const chunk of manual) {
-                    const ids = getImports(chunk);
+                    const ids = traverseImportedModules(chunk, this.getModuleInfo);
 
                     if (ids.length === 0) {
                         // eslint-disable-next-line no-continue
@@ -261,7 +223,7 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
                 }
 
                 for (const chunk of emitted) {
-                    const ids = getImports(chunk).filter((id) => !moved.includes(id));
+                    const ids = traverseImportedModules(chunk, this.getModuleInfo).filter((id) => !moved.includes(id));
 
                     if (ids.length === 0) {
                         // eslint-disable-next-line no-continue
