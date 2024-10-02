@@ -2,8 +2,7 @@ import { cyan } from "@visulima/colorize";
 import { NotFoundError } from "@visulima/fs/error";
 import { isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
-import isGlob from "is-glob";
-import { globSync } from "tinyglobby";
+import { globSync, isDynamicPattern } from "tinyglobby";
 
 import { ENDING_RE } from "../constants";
 import type { BuildContext, BuildEntry } from "../types";
@@ -68,8 +67,8 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<vo
 const prepareEntries = async (context: BuildContext): Promise<void> => {
     context.options.entries = context.options.entries.map((entry) =>
         (typeof entry === "string"
-            ? { input: entry, isGlob: isGlob(entry) }
-            : { ...entry, exportKey: entry.exportKey ?? new Set(), isGlob: isGlob(entry.input) }),
+            ? { input: entry, isGlob: isDynamicPattern(entry) }
+            : { ...entry, exportKey: entry.exportKey ?? new Set(), isGlob: isDynamicPattern(entry.input) }),
     );
 
     // eslint-disable-next-line @typescript-eslint/no-shadow
