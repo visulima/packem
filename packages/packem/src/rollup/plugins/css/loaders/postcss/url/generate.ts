@@ -1,12 +1,12 @@
 import { basename, parse } from "@visulima/path";
 
 import hasher from "../../../utils/hasher";
-import { hashRe } from "../common";
+import { HASH_REGEXP } from "../constants";
 
 export default (placeholder: string, file: string, source: Uint8Array): string => {
     const { base, dir, ext, name } = parse(file);
     const hash = hasher(`${base}:${Buffer.from(source).toString()}`);
-    const match = hashRe.exec(placeholder);
+    const match = HASH_REGEXP.exec(placeholder);
     const hashLength = match && Number.parseInt(match[1] as string, 10);
 
     return placeholder
@@ -15,5 +15,5 @@ export default (placeholder: string, file: string, source: Uint8Array): string =
         .replace("[extname]", ext)
         .replace(".[ext]", ext)
         .replace("[ext]", ext.slice(1))
-        .replace(hashRe, hashLength ? hash.slice(0, hashLength) : hash.slice(0, 8));
+        .replace(HASH_REGEXP, hashLength ? hash.slice(0, hashLength) : hash.slice(0, 8));
 };

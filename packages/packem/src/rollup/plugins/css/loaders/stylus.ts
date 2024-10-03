@@ -67,4 +67,5 @@ const loader: Loader<StylusLoaderOptions> = {
 
 export interface StylusLoaderOptions extends Record<string, unknown>, RenderOptions {}
 
+// eslint-disable-next-line import/no-unused-modules
 export default loader;

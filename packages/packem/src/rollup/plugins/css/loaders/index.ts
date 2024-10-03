@@ -6,18 +6,7 @@ import PQueueClass from "p-queue";
 import type { InternalStyleOptions, StyleOptions } from "../types";
 import sourcemapLoader from "./sourcemap";
 import type { Loader, LoaderContext, Payload } from "./types";
-
-const matchFile = (file: string, condition: Loader["test"]): boolean => {
-    if (!condition) {
-        return false;
-    }
-
-    if (typeof condition === "function") {
-        return condition(file);
-    }
-
-    return condition.test(file);
-};
+import matchFile from "./utils/match-file";
 
 // This queue makes sure one thread is always available,
 // which is necessary for some cases

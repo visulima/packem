@@ -10,5 +10,6 @@ export default defineConfig({
             loaders: [postcssLoader],
         },
     },
-    declaration: "node16"
+    declaration: false,
+    fileCache: true,
 });

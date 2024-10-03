@@ -1,5 +1,5 @@
 import type { Options } from "cssnano";
-import type { Parser, Plugin, Stringifier, Syntax, Transformer } from "postcss";
+import type { Plugin, ProcessOptions, Transformer } from "postcss";
 import type Processor from "postcss/lib/processor";
 
 import type { LESSLoaderOptions } from "./loaders/less";
@@ -162,7 +162,7 @@ export interface StyleOptions {
          * Set PostCSS parser, e.g. `sugarss`.
          * Overrides the one loaded from PostCSS config file, if any.
          */
-        parser?: Parser | string;
+        parser?: ProcessOptions["parser"] | string;
         /**
          * A list of plugins for PostCSS,
          * which are used before plugins loaded from PostCSS config file, if any
@@ -172,14 +172,14 @@ export interface StyleOptions {
          * Set PostCSS stringifier.
          * Overrides the one loaded from PostCSS config file, if any.
          */
-        stringifier?: Stringifier | string;
+        stringifier?: ProcessOptions["stringifier"] | string;
         /**
          * Set PostCSS syntax.
          * Overrides the one loaded from PostCSS config file, if any.
          */
-        syntax?: Syntax | string;
+        syntax?: ProcessOptions["syntax"] | string;
         /** `to` option for PostCSS, required for some plugins */
-        to?: string;
+        to?: ProcessOptions["to"];
         /**
          * Enable/disable or pass options for CSS URL resolver
          * @default true

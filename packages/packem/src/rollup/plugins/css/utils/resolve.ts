@@ -52,6 +52,7 @@ export const packageFilterBuilder: PackageFilterBuilderFunction = (options = {})
             const resolvedField = resolveFields(packageJson, { browser: false, fields });
 
             if (typeof resolvedField === "string") {
+                // eslint-disable-next-line no-param-reassign
                 packageJson.main = resolvedField;
 
                 return packageJson;
@@ -76,12 +77,12 @@ export const resolveAsync = async (ids: string[], userOptions: ResolveOptions): 
     const options = { ...defaultOptions, ...userOptions };
 
     for await (const basedir of options.basedirs) {
-        const options_ = { ...options, basedir, basedirs: undefined, caller: undefined };
+        const resolveOptions = { ...options, basedir, basedirs: undefined, caller: undefined };
 
         for await (const id of ids) {
-            const resolved = await new Promise<string>((resolve, reject) => {
+            const resolved = await new Promise<string | undefined>((resolve, reject) => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                internalResolveAsync(id, options_, (error: any, result: PromiseLike<string> | string) => {
+                internalResolveAsync(id, resolveOptions, (error: any, result: string | undefined) => {
                     if (error) {
                         // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
                         reject(error);
@@ -104,11 +105,11 @@ export const resolveSync = (ids: string[], userOptions: ResolveOptions): string 
     const options = { ...defaultOptions, ...userOptions };
 
     for (const basedir of options.basedirs) {
-        const options_ = { ...options, basedir, basedirs: undefined, caller: undefined };
+        const resolveOptions = { ...options, basedir, basedirs: undefined, caller: undefined };
 
         for (const id of ids) {
             try {
-                const resolved = internalResolveSync(id, options_);
+                const resolved = internalResolveSync(id, resolveOptions);
 
                 if (resolved) {
                     return resolved;
@@ -128,7 +129,7 @@ export interface ResolveOptions {
     /** name of the caller for error message (default to `Resolver`) */
     caller?: string;
     /** array of file extensions to search in order (defaults to `[".mjs", ".js", ".cjs", ".json"]`) */
-    extensions?: ReadonlyArray<string> | string;
+    extensions?: string[];
     /** transform the parsed `package.json` contents before looking at the "main" field */
     packageFilter?: PackageFilterFunction;
     /** don't resolve `basedirs` to real path before resolving. (defaults to `true`) */

@@ -103,7 +103,7 @@ const generateOptions = (
                 // https://github.com/rollup/plugins/tree/master/packages/commonjs#transformmixedesmodules
                 transformMixedEsModules: false,
             },
-            css:{
+            css: {
                 namedExports: true,
                 postcss: {
                     autoModules: true,

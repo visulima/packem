@@ -3,7 +3,7 @@ import { dirname, resolve } from "@visulima/path";
 import type { RawSourceMap } from "source-map-js";
 import { SourceMapConsumer } from "source-map-js";
 
-import { dataURIRe } from "../loaders/postcss/common";
+import { DATA_URI_REGEXP } from "../loaders/postcss/constants";
 import { isAbsolutePath, normalizePath, relativePath, resolvePath } from "./path";
 
 // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
@@ -40,6 +40,7 @@ class MapModifier {
             return this;
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (this.map.sources) {
             this.map.sources = this.map.sources.map((s) => op(s));
         }
@@ -119,7 +120,7 @@ export const getMap = async (code: string, id?: string): Promise<string | undefi
         return undefined;
     }
 
-    const [, uriMap] = dataURIRe.exec(data) ?? [];
+    const [, uriMap] = DATA_URI_REGEXP.exec(data) ?? [];
 
     if (uriMap) {
         return Buffer.from(uriMap, "base64").toString();

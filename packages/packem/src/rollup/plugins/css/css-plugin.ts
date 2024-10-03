@@ -338,7 +338,7 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDirector
                 }
             }
         },
-        name: "packem:styles",
+        name: "packem:css",
         async transform(code, transformId) {
             if (!isIncluded(transformId) || !loaders.isSupported(transformId)) {
                 return null;
@@ -353,10 +353,13 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDirector
                 options.onImport(code, transformId);
             }
 
+            // Add css files to watch list
+            this.addWatchFile(transformId);
+
             const context: LoaderContext = {
                 assets: new Map<string, Uint8Array>(),
                 deps: new Set(),
-                dts: loaderOptions.dts,
+                dts: false,
                 emit: loaderOptions.emit,
                 extensions: loaderOptions.extensions,
                 extract: loaderOptions.extract,
@@ -390,9 +393,6 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDirector
             return {
                 code: result.code,
                 map: sourceMap && result.map ? result.map : { mappings: "" as const },
-                meta: {
-                    cssTypes: result.dts,
-                },
                 moduleSideEffects: result.extracted ? true : null,
             };
         },

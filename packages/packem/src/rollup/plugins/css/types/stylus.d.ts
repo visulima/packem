@@ -1,4 +1,4 @@
-// eslint-disable-next-line import/no-unused-modules
+ 
 declare namespace stylus {
     type Callback = (error: Error, css: string) => void;
 

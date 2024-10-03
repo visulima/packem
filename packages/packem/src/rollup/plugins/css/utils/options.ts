@@ -1,7 +1,9 @@
+import type { Plugin, Transformer } from "postcss";
+import type Processor from "postcss/lib/processor";
 import type { Result } from "postcss-load-config";
 
 import type { LoaderContext } from "../loaders/types";
-import type { InternalStyleOptions,StyleOptions } from "../types";
+import type { InternalStyleOptions, StyleOptions } from "../types";
 import arrayFmt from "./array-fmt";
 import loadModule from "./load-module";
 
@@ -28,7 +30,19 @@ export const inferModeOption = (mode: StyleOptions["mode"]): Mode => {
         extract: m[0] === "extract" && (m[1] ?? true),
         inject: (!m[0] || m[0] === "inject") && (m[1] ?? true),
     };
-}
+};
+
+export const inferOption = <T, TDefine extends T | boolean>(option: T | boolean | undefined, defaultValue: TDefine): T | TDefine | false => {
+    if (typeof option === "boolean") {
+        return option && ({} as TDefine);
+    }
+
+    if (typeof option === "object") {
+        return option;
+    }
+
+    return defaultValue;
+};
 
 export const inferSourceMapOption = (sourceMap: StyleOptions["sourceMap"]): LoaderContext["sourceMap"] => {
     const sm = Array.isArray(sourceMap) ? sourceMap : ([sourceMap] as const);
@@ -64,49 +78,35 @@ export const ensurePCSSOption = <T>(option: T | string, type: PCSSOption): T => 
     return module as T;
 };
 
-export const ensurePCSSPlugins = (plugins: StyleOptions["postcss"]["plugins"]): Result["plugins"] => {
+export const ensurePCSSPlugins = (plugins: undefined | (Plugin | Transformer | Processor)[]): Result["plugins"] => {
     if (plugins === undefined) {
         return [];
     }
 
-    if (typeof plugins !== "object") {
-        throw new TypeError("`plugins` option must be an array or an object!");
+    if (plugins.length === 0) {
+        return [];
     }
 
     const ps: Result["plugins"] = [];
 
-    for (const p of Array.isArray(plugins) ? plugins : Object.entries(plugins)) {
-        if (!p) {
+    for (const plugin of plugins.filter(Boolean)) {
+        if (!Array.isArray(plugin)) {
+            ps.push(ensurePCSSOption(plugin, "plugin"));
+
             // eslint-disable-next-line no-continue
             continue;
         }
 
-        if (!Array.isArray(p)) {
-            ps.push(ensurePCSSOption(p, "plugin"));
-
-            continue;
-        }
-
-        const [plug, options] = p;
+        const [plug, options] = plugin;
 
         if (options) {
-            ps.push(ensurePCSSOption(plug, "plugin")(options));
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ps.push(ensurePCSSOption<any>(plug, "plugin")(options));
         } else {
-            ps.push(ensurePCSSOption(plug, "plugin"));
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ps.push(ensurePCSSOption<any>(plug, "plugin"));
         }
     }
 
     return ps;
 };
-
-export const inferOption = <T, TDefine extends T | boolean>(option: T | boolean | undefined, defaultValue: TDefine): T | TDefine | false => {
-    if (typeof option === "boolean") {
-        return option && ({} as TDefine);
-    }
-
-    if (typeof option === "object") {
-        return option;
-    }
-
-    return defaultValue;
-}

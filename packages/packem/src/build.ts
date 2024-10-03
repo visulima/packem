@@ -355,7 +355,6 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<boole
     context.logger.success(green(context.options.name ? "Build succeeded for " + context.options.name : "Build succeeded"));
 
     // Find all dist files and add missing entries as chunks
-
     for await (const file of walk(join(context.options.rootDir, context.options.outDir))) {
         let entry = context.buildEntries.find((bEntry) => join(context.options.rootDir, context.options.outDir, bEntry.path) === file.path);
 

@@ -3,14 +3,6 @@ import type { Loader } from "../types";
 import { importer, importerSync } from "./importer";
 import loadSass from "./load";
 
-/** Options for Sass loader */
-export interface SASSLoaderOptions extends Record<string, unknown>, sass.PublicOptions {
-    /** Force Sass implementation */
-    impl?: string;
-    /** Forcefully enable/disable sync mode */
-    sync?: boolean;
-}
-
 const loader: Loader<SASSLoaderOptions> = {
     name: "sass",
     // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -30,12 +22,13 @@ const loader: Loader<SASSLoaderOptions> = {
             Array.isArray(options.importer) ? importers.push(...options.importer) : importers.push(options.importer);
         }
 
-        const render = async (options: sass.Options): Promise<sass.Result> =>
+        const render = async (sassOptions: sass.Options): Promise<sass.Result> =>
             await new Promise((resolve, reject) => {
                 if (sync) {
-                    resolve(sass.renderSync(options));
+                    resolve(sass.renderSync(sassOptions));
                 } else {
-                    sass.render(options, (error, css) => (error ? reject(error) : resolve(css)));
+                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                    sass.render(sassOptions, (error, css) => (error ? reject(error) : resolve(css)));
                 }
             });
 
@@ -77,4 +70,13 @@ const loader: Loader<SASSLoaderOptions> = {
     test: /\.(sass|scss)$/i,
 };
 
+/** Options for Sass loader */
+export interface SASSLoaderOptions extends Record<string, unknown>, sass.PublicOptions {
+    /** Force Sass implementation */
+    impl?: string;
+    /** Forcefully enable/disable sync mode */
+    sync?: boolean;
+}
+
+// eslint-disable-next-line import/no-unused-modules
 export default loader;

@@ -1,7 +1,8 @@
-// eslint-disable-next-line import/no-unused-modules
+
 declare namespace sass {
     type Data = Error | { contents: string } | { file: string } | null;
 
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
     type Importer = (url: string, previous: string, done: (data: Data) => void) => Data | void;
 
     interface PublicOptions {

@@ -39,4 +39,4 @@ export default (moduleId: string): unknown => {
 
     // eslint-disable-next-line security/detect-object-injection
     return loaded[moduleId];
-}
+};

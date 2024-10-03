@@ -47,15 +47,17 @@ const finalize = (id: string): sass.Data => {
     return { file: id.replace(/\.css$/i, "") };
 };
 
-export const importer: sass.Importer = (url, importer, done): void => {
-    void importerImpl(url, importer, resolveAsync)
+export const importer: sass.Importer = (url, previous, done): void => {
+    importerImpl(url, previous, resolveAsync)
+        // eslint-disable-next-line promise/no-callback-in-promise
         .then((id) => done(finalize(id)))
+        // eslint-disable-next-line promise/no-callback-in-promise
         .catch(() => done(null));
 };
 
-export const importerSync: sass.Importer = (url, importer): sass.Data => {
+export const importerSync: sass.Importer = (url, previous): sass.Data => {
     try {
-        return finalize(importerImpl(url, importer, resolveSync));
+        return finalize(importerImpl(url, previous, resolveSync));
     } catch {
         return null;
     }

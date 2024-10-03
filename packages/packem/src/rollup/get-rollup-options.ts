@@ -26,7 +26,7 @@ import memoizeByKey from "../utils/memoize";
 import chunkSplitter from "./plugins/chunk-splitter";
 import { cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
-import cssPlugin from "./plugins/css";
+import cssPlugin from "./plugins/css/css-plugin";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
 import { esmShimCjsSyntaxPlugin } from "./plugins/esm-shim-cjs-syntax";
 import fixDynamicImportExtension from "./plugins/fix-dynamic-import-extension";
@@ -451,6 +451,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
                 context.options.rollup.wasm && wasmPlugin(context.options.rollup.wasm),
 
+                // @TODO check if this can be moved into the dts build
                 context.options.declaration &&
                     context.options.rollup.isolatedDeclarations &&
                     context.options.isolatedDeclarationTransformer &&
@@ -614,17 +615,6 @@ const memoizeDtsPluginByKey = memoizeByKey<typeof createDtsPlugin>(createDtsPlug
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export const getRollupDtsOptions = async (context: BuildContext, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context, "types");
-    const ignoreFiles: Plugin = {
-        load(id) {
-            if (!/\.(?:js|cjs|mjs|jsx|ts|tsx|ctsx|mtsx|mts|json)$/.test(id)) {
-                return "";
-            }
-
-            return null;
-        },
-        name: "packem:ignore-files",
-    };
-
     const compilerOptions = context.tsconfig?.config.compilerOptions;
 
     delete compilerOptions?.lib;
@@ -702,7 +692,16 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                         ...context.options.rollup.json,
                     }),
 
-                ignoreFiles,
+                <Plugin>{
+                    load(id) {
+                        if (!/\.(?:js|cjs|mjs|jsx|ts|tsx|ctsx|mtsx|mts|json)$/.test(id)) {
+                            return "";
+                        }
+
+                        return null;
+                    },
+                    name: "packem:ignore-files",
+                },
 
                 context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
                 context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.tsconfig, context.logger), fileCache),

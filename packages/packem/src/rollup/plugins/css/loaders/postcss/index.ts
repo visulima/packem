@@ -1,7 +1,6 @@
 import { fileURLToPath } from "node:url";
 
 import { makeLegalIdentifier } from "@rollup/pluginutils";
-import { writeFileSync } from "@visulima/fs";
 import { basename, dirname, join } from "@visulima/path";
 import type { AcceptedPlugin, ProcessOptions } from "postcss";
 import postcss from "postcss";
@@ -15,10 +14,12 @@ import { mm } from "../../utils/sourcemap";
 import type { Loader } from "../types";
 import loadConfig from "./config";
 import postcssICSS from "./icss";
-import postcssImport, { type ImportOptions } from "./import";
+import type { ImportOptions } from "./import";
+import postcssImport from "./import";
 import postcssModules from "./modules";
 import postcssNoop from "./noop";
-import postcssUrl, { type UrlOptions } from "./url";
+import type { UrlOptions } from "./url";
+import postcssUrl from "./url";
 
 const baseDirectory = dirname(fileURLToPath(import.meta.url));
 
@@ -66,7 +67,7 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
         const supportModules = Boolean((this.options.modules && ensureAutoModules(this.options.modules.include, this.id)) || autoModules);
         const modulesExports: Record<string, string> = {};
 
-        const postcssOptions = {
+        const postcssOptions: PostCSSOptions = {
             ...config.options,
             ...this.options,
             from: this.id,
@@ -77,7 +78,7 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
                 sourcesContent: this.sourceMap ? this.sourceMap.content : true,
             },
             to: this.options.to ?? this.id,
-        } satisfies PostCSSOptions;
+        };
 
         delete postcssOptions.plugins;
 
@@ -284,18 +285,9 @@ ${Object.keys(modulesExports)
             }
         }
 
-        if (this.dts) {
-            this.logger.info({
-                code: "css-dts",
-                message: "Generated declaration file for " + this.id.replace(join(this.cwd as string, (this.sourceDir as string) + "/"), ""),
-            });
-
-            // This is a hack to write the declaration file to the source directory
-            writeFileSync(this.id + ".d.ts", dts.filter(Boolean).join("\n"));
-        }
-
         return { code: output.filter(Boolean).join("\n"), dts: dts.length > 0 ? dts.filter(Boolean).join("\n") : undefined, extracted, map };
     },
 };
 
+// eslint-disable-next-line import/no-unused-modules
 export default loader;

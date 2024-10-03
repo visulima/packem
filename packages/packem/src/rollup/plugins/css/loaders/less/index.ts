@@ -36,4 +36,5 @@ const loader: Loader<LESSLoaderOptions> = {
 
 export interface LESSLoaderOptions extends Record<string, unknown>, Less.Options {}
 
+// eslint-disable-next-line import/no-unused-modules
 export default loader;

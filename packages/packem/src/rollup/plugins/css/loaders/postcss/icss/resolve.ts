@@ -18,8 +18,8 @@ const resolve = async (
         const exports = await load(url, file, extensions, processor, options);
 
         for (const [k, v] of Object.entries(values)) {
-            // eslint-disable-next-line security/detect-object-injection
-            imports[k] = exports[v];
+            // eslint-disable-next-line security/detect-object-injection,antfu/no-cjs-exports,import/no-commonjs
+            imports[k] = exports[v] as string;
         }
     }
 

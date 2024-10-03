@@ -3,7 +3,7 @@ import { readFile } from "@visulima/fs";
 import { resolveAsync } from "../../../utils/resolve";
 
 /** File resolved by `@import` resolver */
-export interface ImportFile {
+interface ImportFile {
     /** Absolute path to file */
     from: string;
     /** File source */

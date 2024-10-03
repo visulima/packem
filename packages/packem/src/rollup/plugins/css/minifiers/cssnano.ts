@@ -34,4 +34,5 @@ const cssnanoMinifier: Minifier<Options> = {
     name: "cssnano",
 };
 
+// eslint-disable-next-line import/no-unused-modules
 export default cssnanoMinifier;

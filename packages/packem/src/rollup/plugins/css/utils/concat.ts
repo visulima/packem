@@ -16,33 +16,35 @@ const concat = async (extracted: Extracted[]): Promise<Concatenated> => {
 
     for await (const { css, map } of extracted) {
         content.push(css);
-        const _map = mm(map);
+        const mapModifier = mm(map);
 
-        const data = _map.toObject();
+        const data = mapModifier.toObject();
+
         if (!data) {
+            // eslint-disable-next-line no-continue
             continue;
         }
 
-        const consumer = _map.toConsumer();
+        const consumer = mapModifier.toConsumer();
 
         if (!consumer) {
+            // eslint-disable-next-line no-continue
             continue;
         }
 
-        consumer.eachMapping((m) =>
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
+        consumer.eachMapping((item) => {
             sm.addMapping({
-                generated: { column: m.generatedColumn, line: offset + m.generatedLine },
-                name: m.name,
-                original: { column: m.originalColumn, line: m.originalLine },
-                source: m.source,
-            }),
-        );
+                generated: { column: item.generatedColumn, line: offset + item.generatedLine },
+                name: item.name,
+                original: { column: item.originalColumn as number, line: item.originalLine as number },
+                source: item.source,
+            });
+        });
 
         if (data.sourcesContent) {
             for (const source of data.sources) {
-                const content = consumer.sourceContentFor(source, true);
-
-                sm.setSourceContent(source, content);
+                sm.setSourceContent(source, consumer.sourceContentFor(source, true));
             }
         }
 

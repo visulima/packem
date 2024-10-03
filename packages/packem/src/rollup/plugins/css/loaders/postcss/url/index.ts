@@ -5,7 +5,7 @@ import valueParser from "postcss-value-parser";
 
 import { isAbsolutePath, normalizePath } from "../../../utils/path";
 import { mm } from "../../../utils/sourcemap";
-import { dataURIRe, firstExtRe as firstExtensionRe } from "../common";
+import { DATA_URI_REGEXP, FIRST_EXTENSION_REGEXP } from "../constants";
 import generateName from "./generate";
 import inlineFile from "./inline";
 import type { UrlFile, UrlResolve } from "./resolve";
@@ -17,49 +17,6 @@ const placeholderHashDefault = "assets/[name]-[hash][extname]";
 const placeholderNoHashDefault = "assets/[name][extname]";
 const defaultpublicPath = "./";
 const defaultAssetDirectory = ".";
-
-/** URL handler options */
-export interface UrlOptions {
-    /**
-     * Aliases for URL paths.
-     * Overrides the global `alias` option.
-     * - ex.: `{"foo":"bar"}`
-     */
-    alias?: Record<string, string>;
-    /**
-     * Directory path for outputted CSS assets,
-     * which is not included into resulting URL
-     * @default "."
-     */
-    assetDir?: string | ((original: string, resolved: string, file: string) => string);
-    /**
-     * Enable/disable name generation with hash for outputted CSS assets
-     * or provide your own placeholder with the following blocks:
-     * - `[extname]`: The file extension of the asset including a leading dot, e.g. `.png`.
-     * - `[ext]`: The file extension without a leading dot, e.g. `png`.
-     * - `[hash(:<num>)]`: A hash based on the name and content of the asset (with optional length).
-     * - `[name]`: The file name of the asset excluding any extension.
-     *
-     * Forward slashes / can be used to place files in sub-directories.
-     * @default "assets/[name]-[hash][extname]" ("assets/[name][extname]" if false)
-     */
-    hash?: boolean | string;
-    /**
-     * Inline files instead of copying
-     * @default true for `inject` mode, otherwise false
-     */
-    inline?: boolean;
-    /**
-     * Public Path for URLs in CSS files
-     * @default "./"
-     */
-    publicPath?: string | ((original: string, resolved: string, file: string) => string);
-    /**
-     * Provide custom resolver for URLs
-     * in place of the default one
-     */
-    resolve?: UrlResolve;
-}
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const plugin: PluginCreator<UrlOptions> = (options = {}) => {
@@ -78,7 +35,9 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
 
             const { file } = css.source.input;
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            const map = mm(css.source.input.map?.text ?? undefined).resolve(dirname(file)).toConsumer();
+            const map = mm(css.source.input.map?.text ?? undefined)
+                .resolve(dirname(file))
+                .toConsumer();
 
             const urlList: {
                 basedirs: Set<string>;
@@ -117,7 +76,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                     }
 
                     // Skip Data URI
-                    if (dataURIRe.test(url)) {
+                    if (DATA_URI_REGEXP.test(url)) {
                         return;
                     }
 
@@ -197,11 +156,11 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                     let to = unsafeTo;
 
                     // Avoid file overrides
-                    const hasExtension = firstExtensionRe.test(unsafeTo);
+                    const hasExtension = FIRST_EXTENSION_REGEXP.test(unsafeTo);
 
                     // eslint-disable-next-line no-plusplus
                     for (let index = 1; usedNames.has(to) && usedNames.get(to) !== from; index++) {
-                        to = hasExtension ? unsafeTo.replace(firstExtensionRe, `${String(index)}$1`) : `${unsafeTo}${String(index)}`;
+                        to = hasExtension ? unsafeTo.replace(FIRST_EXTENSION_REGEXP, `${String(index)}$1`) : `${unsafeTo}${String(index)}`;
                     }
 
                     usedNames.set(to, from);
@@ -233,5 +192,48 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
 };
 
 plugin.postcss = true;
+
+/** URL handler options */
+export interface UrlOptions {
+    /**
+     * Aliases for URL paths.
+     * Overrides the global `alias` option.
+     * - ex.: `{"foo":"bar"}`
+     */
+    alias?: Record<string, string>;
+    /**
+     * Directory path for outputted CSS assets,
+     * which is not included into resulting URL
+     * @default "."
+     */
+    assetDir?: string | ((original: string, resolved: string, file: string) => string);
+    /**
+     * Enable/disable name generation with hash for outputted CSS assets
+     * or provide your own placeholder with the following blocks:
+     * - `[extname]`: The file extension of the asset including a leading dot, e.g. `.png`.
+     * - `[ext]`: The file extension without a leading dot, e.g. `png`.
+     * - `[hash(:<num>)]`: A hash based on the name and content of the asset (with optional length).
+     * - `[name]`: The file name of the asset excluding any extension.
+     *
+     * Forward slashes / can be used to place files in sub-directories.
+     * @default "assets/[name]-[hash][extname]" ("assets/[name][extname]" if false)
+     */
+    hash?: boolean | string;
+    /**
+     * Inline files instead of copying
+     * @default true for `inject` mode, otherwise false
+     */
+    inline?: boolean;
+    /**
+     * Public Path for URLs in CSS files
+     * @default "./"
+     */
+    publicPath?: string | ((original: string, resolved: string, file: string) => string);
+    /**
+     * Provide custom resolver for URLs
+     * in place of the default one
+     */
+    resolve?: UrlResolve;
+}
 
 export default plugin;

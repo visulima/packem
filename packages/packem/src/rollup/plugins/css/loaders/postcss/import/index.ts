@@ -10,27 +10,6 @@ import { resolve as resolveDefault } from "./resolve";
 const name = "styles-import";
 const extensionsDefault = [".css", ".pcss", ".postcss", ".sss"];
 
-/** `@import` handler options */
-export interface ImportOptions {
-    /**
-     * Aliases for import paths.
-     * Overrides the global `alias` option.
-     * - ex.: `{"foo":"bar"}`
-     */
-    alias?: Record<string, string>;
-    /**
-     * Import files ending with these extensions.
-     * Overrides the global `extensions` option.
-     * @default [".css", ".pcss", ".postcss", ".sss"]
-     */
-    extensions?: string[];
-    /**
-     * Provide custom resolver for imports
-     * in place of the default one
-     */
-    resolve?: ImportResolve;
-}
-
 const plugin: PluginCreator<ImportOptions> = (options = {}) => {
     const resolve = options.resolve ?? resolveDefault;
     const alias = options.alias ?? {};
@@ -43,8 +22,7 @@ const plugin: PluginCreator<ImportOptions> = (options = {}) => {
                 return;
             }
 
-            const options_: Result["opts"] = { ...result.opts };
-            delete options_.map;
+            const resultOptions: Result["opts"] = { ...result.opts, map: undefined };
 
             const { file } = css.source.input;
             const importList: { rule: AtRule; url: string }[] = [];
@@ -109,6 +87,7 @@ const plugin: PluginCreator<ImportOptions> = (options = {}) => {
                 // Skip Web URLs
                 if (!isAbsolutePath(url)) {
                     try {
+                        // eslint-disable-next-line no-new
                         new URL(url);
                         return;
                     } catch {
@@ -135,7 +114,7 @@ const plugin: PluginCreator<ImportOptions> = (options = {}) => {
                         continue;
                     }
 
-                    const imported = await postcss(plugin(options)).process(source, { ...options_, from });
+                    const imported = await postcss(plugin(options)).process(source, { ...resultOptions, from });
 
                     result.messages.push(...imported.messages, { file: from, plugin: name, type: "dependency" });
 
@@ -155,5 +134,26 @@ const plugin: PluginCreator<ImportOptions> = (options = {}) => {
 };
 
 plugin.postcss = true;
+
+/** `@import` handler options */
+export interface ImportOptions {
+    /**
+     * Aliases for import paths.
+     * Overrides the global `alias` option.
+     * - ex.: `{"foo":"bar"}`
+     */
+    alias?: Record<string, string>;
+    /**
+     * Import files ending with these extensions.
+     * Overrides the global `extensions` option.
+     * @default [".css", ".pcss", ".postcss", ".sss"]
+     */
+    extensions?: string[];
+    /**
+     * Provide custom resolver for imports
+     * in place of the default one
+     */
+    resolve?: ImportResolve;
+}
 
 export default plugin;

@@ -5,8 +5,8 @@ import localByDefault from "postcss-modules-local-by-default";
 import modulesScope from "postcss-modules-scope";
 import modulesValues from "postcss-modules-values";
 
-import generateScopedNameDefault from "./generate";
 import type { InternalStyleOptions } from "../../../types";
+import generateScopedNameDefault from "./generate";
 
 /** Options for [CSS Modules](https://github.com/css-modules/css-modules) */
 export interface ModulesOptions {
@@ -25,18 +25,18 @@ export interface ModulesOptions {
      */
     generateScopedName?: string | ((name: string, file: string, css: string) => string);
     /**
-     * Default mode for classes
-     * @default "local"
-     */
-    mode?: "global" | "local" | "pure"
-    /**
      * Files to include for [CSS Modules](https://github.com/css-modules/css-modules)
      * for files named `[name].module.[ext]`
      * (e.g. `foo.module.css`, `bar.module.stylus`),
      * or pass your own function or regular expression
      * @default false
-     */;
+     */
     include?: InternalStyleOptions["postcss"]["autoModules"];
+    /**
+     * Default mode for classes
+     * @default "local"
+     */
+    mode?: "global" | "local" | "pure";
 }
 
 export default (options: ModulesOptions): (Plugin | Processor)[] => {
