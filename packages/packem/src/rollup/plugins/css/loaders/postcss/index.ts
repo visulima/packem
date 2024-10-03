@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 
 import { makeLegalIdentifier } from "@rollup/pluginutils";
-import { isAccessibleSync, writeFileSync } from "@visulima/fs";
+import { writeFileSync } from "@visulima/fs";
 import { basename, dirname, join } from "@visulima/path";
 import type { AcceptedPlugin, ProcessOptions } from "postcss";
 import postcss from "postcss";
@@ -15,10 +15,10 @@ import { mm } from "../../utils/sourcemap";
 import type { Loader } from "../types";
 import loadConfig from "./config";
 import postcssICSS from "./icss";
-import postcssImport from "./import";
+import postcssImport, { type ImportOptions } from "./import";
 import postcssModules from "./modules";
 import postcssNoop from "./noop";
-import postcssUrl from "./url";
+import postcssUrl, { type UrlOptions } from "./url";
 
 const baseDirectory = dirname(fileURLToPath(import.meta.url));
 
@@ -66,7 +66,7 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
         const supportModules = Boolean((this.options.modules && ensureAutoModules(this.options.modules.include, this.id)) || autoModules);
         const modulesExports: Record<string, string> = {};
 
-        const postcssOptions: PostCSSOptions = {
+        const postcssOptions = {
             ...config.options,
             ...this.options,
             from: this.id,
@@ -77,25 +77,23 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
                 sourcesContent: this.sourceMap ? this.sourceMap.content : true,
             },
             to: this.options.to ?? this.id,
-        };
+        } satisfies PostCSSOptions;
 
         delete postcssOptions.plugins;
 
-        if (this.import) {
-            plugins.push(postcssImport({ extensions: this.extensions, ...this.import }));
+        if (this.options.import) {
+            plugins.push(postcssImport({ extensions: this.extensions, ...(this.options.import as ImportOptions) }));
         }
 
-        if (this.url) {
-            plugins.push(postcssUrl({ inline: Boolean(this.inject), ...this.url }));
+        if (this.options.url) {
+            plugins.push(postcssUrl({ inline: Boolean(this.inject), ...(this.options.url as UrlOptions) }));
         }
 
         if (this.options.plugins) {
             plugins.push(...this.options.plugins);
         }
 
-        if (config.plugins) {
-            plugins.push(...config.plugins);
-        }
+        plugins.push(...config.plugins);
 
         if (supportModules) {
             const modulesOptions = typeof this.options.modules === "object" ? this.options.modules : {};
@@ -103,7 +101,8 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
             plugins.push(
                 ...postcssModules({
                     failOnWrongOrder: true,
-                    generateScopedName: testing ? "[name]_[local]" : undefined,
+                    // @TODO: use a option
+                    // generateScopedName: testing ? "[name]_[local]" : undefined,
                     ...modulesOptions,
                 }),
                 postcssICSS({ extensions: this.extensions }),
@@ -115,7 +114,7 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
             plugins.push(postcssNoop);
         }
 
-        const result = await postcss(plugins).process(code, postcssOptions);
+        const result = await postcss(plugins).process(code, postcssOptions as ProcessOptions);
 
         for (const message of result.messages) {
             // eslint-disable-next-line default-case
@@ -142,20 +141,25 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
             }
         }
 
+        // eslint-disable-next-line no-param-reassign
         map = mm(result.map.toJSON()).resolve(dirname(postcssOptions.to)).toString();
 
         if (!this.extract && this.sourceMap) {
-            const m = mm(map)
-                .modify((map) => void delete (map as Partial<RawSourceMap>).file)
+            const mapModifier = mm(map)
+                .modify((rawMM) => {
+                    // eslint-disable-next-line no-param-reassign
+                    (rawMM as Partial<RawSourceMap>).file = undefined;
+                })
                 .relative();
 
             if (this.sourceMap.transform) {
-                m.modify(this.sourceMap.transform);
+                mapModifier.modify(this.sourceMap.transform);
             }
 
-            map = m.toString();
+            // eslint-disable-next-line no-param-reassign
+            map = mapModifier.toString();
 
-            result.css += m.toCommentData();
+            result.css += mapModifier.toCommentData();
         }
 
         if (this.emit) {
@@ -166,10 +170,14 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
         const modulesVariableName = saferId("modules");
 
         const output = [`var ${cssVariableName} = ${JSON.stringify(result.css)};`];
-        const dts = this.dts ? [`var ${cssVariableName}: string;`] : [];
+        const dts = [];
         const outputExports = [cssVariableName];
 
         if (this.namedExports) {
+            if (this.dts) {
+                dts.push(`declare const ${cssVariableName}: string;`);
+            }
+
             const getClassName = typeof this.namedExports === "function" ? this.namedExports : getClassNameDefault;
 
             // eslint-disable-next-line guard-for-in
@@ -186,7 +194,7 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
                 output.push(`var ${newName} = ${fmt};`);
 
                 if (this.dts) {
-                    dts.push(`var ${newName}: ${fmt};`);
+                    dts.push(`declare const ${newName}: ${fmt};`);
                 }
 
                 outputExports.push(newName);
@@ -246,23 +254,44 @@ const loader: Loader<InternalStyleOptions["postcss"]> = {
             output.push(`var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`);
         }
 
-        const defaultExport = `export default ${supportModules ? modulesVariableName : cssVariableName};`;
-        const namedExport = `export {\n  ${outputExports.filter(Boolean).join(",\n  ")}\n};`;
+        const defaultExport = `\nexport default ${supportModules ? modulesVariableName : cssVariableName};\n`;
 
-        output.push(defaultExport, namedExport);
+        output.push(defaultExport);
 
         if (this.dts) {
-            if (supportModules)
+            if (supportModules) {
                 dts.push(
-                    `interface ModulesExports {${Object.keys(modulesExports)
-                        .map((key) => `  '${key}': string;`)
-                        .join("\n")}
-}`,
+                    `\ninterface ModulesExports {
+${Object.keys(modulesExports)
+    .map((key) => `  '${key}': string;`)
+    .join("\n")}
+}\n`,
                     typeof this.inject === "object" && this.inject.treeshakeable ? `interface ModulesExports {inject:()=>void}` : "",
                     `declare const ${modulesVariableName}: ModulesExports;`,
                 );
+            }
 
-            dts.push(defaultExport, namedExport);
+            dts.push(defaultExport);
+        }
+
+        if (this.namedExports) {
+            const namedExport = `export {\n  ${outputExports.filter(Boolean).join(",\n  ")}\n};`;
+
+            output.push(namedExport);
+
+            if (this.dts) {
+                dts.push(namedExport);
+            }
+        }
+
+        if (this.dts) {
+            this.logger.info({
+                code: "css-dts",
+                message: "Generated declaration file for " + this.id.replace(join(this.cwd as string, (this.sourceDir as string) + "/"), ""),
+            });
+
+            // This is a hack to write the declaration file to the source directory
+            writeFileSync(this.id + ".d.ts", dts.filter(Boolean).join("\n"));
         }
 
         return { code: output.filter(Boolean).join("\n"), dts: dts.length > 0 ? dts.filter(Boolean).join("\n") : undefined, extracted, map };

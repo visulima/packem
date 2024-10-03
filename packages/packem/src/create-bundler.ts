@@ -103,6 +103,12 @@ const generateOptions = (
                 // https://github.com/rollup/plugins/tree/master/packages/commonjs#transformmixedesmodules
                 transformMixedEsModules: false,
             },
+            css:{
+                namedExports: true,
+                postcss: {
+                    autoModules: true,
+                },
+            },
             dts: {
                 compilerOptions: {
                     baseUrl: tsconfig?.config.compilerOptions?.baseUrl ?? ".",

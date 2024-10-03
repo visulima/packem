@@ -1,8 +1,9 @@
+import type { Pail } from "@visulima/pail";
 import type PQueue from "p-queue";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PQueueClass from "p-queue";
 
-import type { InternalStyleOptions } from "../types";
+import type { InternalStyleOptions, StyleOptions } from "../types";
 import sourcemapLoader from "./sourcemap";
 import type { Loader, LoaderContext, Payload } from "./types";
 
@@ -30,8 +31,9 @@ interface LoadersOptions {
     extensions: string[];
     /** @see {@link Options.loaders} */
     loaders: Loader[];
+    logger: Pail;
     options: InternalStyleOptions;
-    sourceDir: string;
+    sourceDirectory: string;
 }
 
 export default class Loaders {
@@ -45,9 +47,11 @@ export default class Loaders {
 
     private readonly cwd: string;
 
-    private readonly sourceDir: string;
+    private readonly sourceDirectory: string;
 
-    public constructor({ cwd, extensions, loaders, options, sourceDir }: LoadersOptions) {
+    private readonly logger: Pail;
+
+    public constructor({ cwd, extensions, loaders, logger, options, sourceDirectory }: LoadersOptions) {
         this.test = (file): boolean => extensions.some((extension) => file.toLowerCase().endsWith(extension));
         this.add(sourcemapLoader);
 
@@ -57,7 +61,8 @@ export default class Loaders {
 
         this.options = options;
         this.cwd = cwd;
-        this.sourceDir = sourceDir;
+        this.sourceDirectory = sourceDirectory;
+        this.logger = logger;
     }
 
     public add<T extends Record<string, unknown>>(...loaders: Loader<T>[]): void {
@@ -96,11 +101,14 @@ export default class Loaders {
             const loaderContext: LoaderContext = {
                 ...context,
                 cwd: this.cwd,
-                options: this.options[name] ?? {},
-                sourceDir: this.sourceDir,
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                options: (this.options[name as keyof StyleOptions] as Record<string, unknown>) ?? {},
+                sourceDir: this.sourceDirectory,
             };
 
             if (loader.alwaysProcess || matchFile(loaderContext.id, loader.test)) {
+                this.logger.debug(`Processing ${name} loader for ${loaderContext.id}`);
+
                 const process = await this.workQueue.add(loader.process.bind(loaderContext, payload));
 
                 if (process) {

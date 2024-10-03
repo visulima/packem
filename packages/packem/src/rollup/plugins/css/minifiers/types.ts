@@ -1,4 +1,8 @@
 import type { LoaderContext } from "../loaders/types";
 import type { ExtractedData } from "../types";
 
-export type Minifier = (data: ExtractedData, sourceMap: LoaderContext["sourceMap"]) => Promise<ExtractedData>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Minifier<Options = Record<string, any>> = {
+    handler: (data: ExtractedData, sourceMap: LoaderContext["sourceMap"], options: Options) => Promise<ExtractedData>;
+    name: string;
+};

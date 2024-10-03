@@ -40,8 +40,6 @@ export interface LoaderContext<T = Record<string, unknown>> {
     readonly extract: InternalStyleOptions["extract"];
     /** Resource path */
     readonly id: string;
-    /** @see {@link InternalStyleOptions.import} */
-    readonly import: InternalStyleOptions["import"];
     /** @see {@link InternalStyleOptions.inject} */
     readonly inject: InternalStyleOptions["inject"];
     logger: Pail;
@@ -57,7 +55,6 @@ export interface LoaderContext<T = Record<string, unknown>> {
     readonly sourceDir?: string;
     /** @see {@link InternalStyleOptions.sourceMap} */
     readonly sourceMap: false | ({ inline: boolean } & SourceMapOptions);
-    readonly url: InternalStyleOptions["url"];
     /** [Function for emitting a warning](https://rollupjs.org/guide/en/#thiswarnwarning-string--rollupwarning-position-number---column-number-line-number---void) */
     readonly warn: PluginContext["warn"];
 }

@@ -3,7 +3,6 @@ import type { Pail } from "@visulima/pail";
 import { basename, dirname, parse, resolve } from "@visulima/path";
 import type { GetModuleInfo, OutputAsset, OutputChunk, Plugin } from "rollup";
 
-import type { Environment } from "../../../types";
 import Loaders from "./loaders";
 import type { Extracted, LoaderContext } from "./loaders/types";
 import type { ExtractedData, InternalStyleOptions, StyleOptions } from "./types";
@@ -13,7 +12,7 @@ import { humanlizePath, isAbsolutePath, isRelativePath, normalizePath } from "./
 import { mm } from "./utils/sourcemap";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: string, environment: Environment): Plugin => {
+export default (options: StyleOptions, logger: Pail, cwd: string, sourceDirectory: string): Plugin => {
     const isIncluded = createFilter(options.include, options.exclude);
 
     const sourceMap = inferSourceMapOption(options.sourceMap);
@@ -21,15 +20,16 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
         ...inferModeOption(options.mode),
         dts: options.dts ?? false,
         extensions: options.extensions ?? [".css", ".pcss", ".postcss", ".sss"],
-        import: inferHandlerOption(options.import, options.alias),
         namedExports: options.namedExports ?? false,
         postcss: {
+            ...options.postcss,
             autoModules: options.postcss?.autoModules ?? false,
             config: inferOption(options.postcss?.config, {}),
+            import: inferHandlerOption(options.postcss?.import, options.alias),
             modules: inferOption(options.postcss?.modules, false),
             to: options.postcss?.to,
+            url: inferHandlerOption(options.postcss?.url, options.alias),
         },
-        url: inferHandlerOption(options.url, options.alias),
     };
 
     if (typeof loaderOptions.inject === "object" && loaderOptions.inject.treeshakeable && loaderOptions.namedExports) {
@@ -56,15 +56,17 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
         cwd,
         extensions: loaderOptions.extensions,
         loaders: options.loaders ?? [],
+        logger,
         options: {
             ...options,
             ...loaderOptions,
         },
-        sourceDir,
+        sourceDirectory,
     });
 
     let extracted: Extracted[] = [];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const traverseImportedModules = (chunkModules: Record<string, any>, getModuleInfo: GetModuleInfo): string[] => {
         const ids: string[] = [];
 
@@ -110,32 +112,32 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
     return <Plugin>{
         augmentChunkHash(chunk) {
             if (extracted.length === 0) {
-                return;
+                return null;
             }
 
             const ids = traverseImportedModules(chunk.modules, this.getModuleInfo);
 
             const hashable = extracted
-                .filter((e) => ids.includes(e.id))
+                .filter((extract) => ids.includes(extract.id))
                 .sort((a, b) => ids.lastIndexOf(a.id) - ids.lastIndexOf(b.id))
-                .map((e) => `${basename(e.id)}:${e.css}`);
+                .map((extract) => `${basename(extract.id)}:${extract.css}`);
 
             if (hashable.length === 0) {
-                return;
+                return null;
             }
 
             return hashable.join(":");
         },
-
         async generateBundle(options_, bundle) {
             if (extracted.length === 0 || !(options_.dir || options_.file)) {
                 return;
             }
 
+            const bundleValues = Object.values(bundle);
             const directory = options_.dir ?? dirname(options_.file as string);
-            const chunks = Object.values(bundle).filter((c): c is OutputChunk => c.type === "chunk");
-            const manual = chunks.filter((c) => !c.facadeModuleId);
-            const emitted = options_.preserveModules ? chunks : chunks.filter((c) => c.isEntry || c.isDynamicEntry);
+            const chunks = bundleValues.filter((chunk): chunk is OutputChunk => chunk.type === "chunk");
+            const manual = chunks.filter((chunk) => !chunk.facadeModuleId);
+            const emitted = options_.preserveModules ? chunks : chunks.filter((chunk) => chunk.isEntry || chunk.isDynamicEntry);
 
             const emittedList: [string, string[]][] = [];
 
@@ -151,7 +153,7 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
                     this.error(["Extraction path must be nested inside output directory,", `which is ${humanlizePath(directory)}`].join("\n"));
                 }
 
-                const entries = extracted.filter((e) => ids.includes(e.id)).sort((a, b) => ids.lastIndexOf(a.id) - ids.lastIndexOf(b.id));
+                const entries = extracted.filter((extract) => ids.includes(extract.id)).sort((a, b) => ids.lastIndexOf(a.id) - ids.lastIndexOf(b.id));
                 const result = await concat(entries);
 
                 return {
@@ -188,14 +190,14 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
                 const ids: string[] = [];
 
                 for (const chunk of manual) {
-                    const chunkIds = traverseImportedModules(chunk, this.getModuleInfo);
+                    const chunkIds = traverseImportedModules(chunk.modules, this.getModuleInfo);
 
                     moved.push(...chunkIds);
                     ids.push(...chunkIds);
                 }
 
                 for (const chunk of emitted) {
-                    ids.push(...traverseImportedModules(chunk, this.getModuleInfo).filter((id) => !moved.includes(id)));
+                    ids.push(...traverseImportedModules(chunk.modules, this.getModuleInfo).filter((id) => !moved.includes(id)));
                 }
 
                 const name = getName(chunks[0] as OutputChunk);
@@ -208,7 +210,7 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
                 });
 
                 for (const chunk of manual) {
-                    const ids = traverseImportedModules(chunk, this.getModuleInfo);
+                    const ids = traverseImportedModules(chunk.modules, this.getModuleInfo);
 
                     if (ids.length === 0) {
                         // eslint-disable-next-line no-continue
@@ -223,7 +225,7 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
                 }
 
                 for (const chunk of emitted) {
-                    const ids = traverseImportedModules(chunk, this.getModuleInfo).filter((id) => !moved.includes(id));
+                    const ids = traverseImportedModules(chunk.modules, this.getModuleInfo).filter((id) => !moved.includes(id));
 
                     if (ids.length === 0) {
                         // eslint-disable-next-line no-continue
@@ -251,11 +253,16 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
                 // Perform minimization on the extracted file
                 if (options.minifier) {
                     logger.info({
-                        message: `Minifying ${extractedData.name}`,
+                        message: `Minifying ${extractedData.name} with ${options.minifier.name as string}`,
                         prefix: "css",
                     });
 
-                    const { css: minifiedCss, map: minifiedMap } = await options.minifier(extractedData, sourceMap);
+                    const { css: minifiedCss, map: minifiedMap } = await options.minifier.handler(
+                        extractedData,
+                        sourceMap,
+                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition,@typescript-eslint/no-explicit-any
+                        (options[options.minifier.name as keyof StyleOptions] as Record<string, any>) ?? {},
+                    );
 
                     extractedData.css = minifiedCss;
                     extractedData.map = minifiedMap;
@@ -263,8 +270,10 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
 
                 const cssFile = {
                     fileName: extractedData.name,
-                    name: extractedData.name,
-                    originalFileName: extractedData.name,
+                    name: extractedData.name, // @TODO: remove this later
+                    names: [extractedData.name],
+                    originalFileName: extractedData.name, // @TODO: remove this later
+                    originalFileNames: [extractedData.name],
                     source: extractedData.css,
                     type: "asset" as const,
                 };
@@ -279,34 +288,40 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
                             ? normalizePath(dirname(options_.assetFileNames))
                             : typeof options_.assetFileNames === "function"
                               ? normalizePath(dirname(options_.assetFileNames(cssFile)))
-                              : "assets"; // Default for Rollup v2
+                              : "assets";
 
                     const map = mm(extractedData.map)
-                        .modify((m) => (m.file = basename(fileName)))
-                        .modifySources((s) => {
+                        .modify((m) => {
+                            // eslint-disable-next-line no-param-reassign
+                            m.file = basename(fileName);
+                        })
+                        .modifySources((source) => {
                             // Compensate for possible nesting depending on `assetFileNames` value
-                            if (s === "<no source>") {
-                                return s;
+                            if (source === "<no source>") {
+                                return source;
                             }
 
                             if (assetDirectory.length <= 1) {
-                                return s;
+                                return source;
                             }
 
-                            s = `../${s}`; // ...then there's definitely at least 1 level offset
+                            // eslint-disable-next-line no-param-reassign
+                            source = `../${source}`; // ...then there's definitely at least 1 level offset
 
                             for (const c of assetDirectory) {
                                 if (c === "/") {
-                                    s = `../${s}`;
+                                    // eslint-disable-next-line no-param-reassign
+                                    source = `../${source}`;
                                 }
                             }
 
-                            return s;
+                            return source;
                         });
 
                     if (sourceMap.inline) {
                         map.modify((m) => sourceMap.transform?.(m, normalizePath(directory, fileName)));
 
+                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands,no-param-reassign,security/detect-object-injection
                         (bundle[fileName] as OutputAsset).source += map.toCommentData();
                     } else {
                         const mapFileName = `${fileName}.map`;
@@ -317,6 +332,7 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
 
                         const { base } = parse(mapFileName);
 
+                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands,no-param-reassign,security/detect-object-injection
                         (bundle[fileName] as OutputAsset).source += map.toCommentFile(base);
                     }
                 }
@@ -345,14 +361,12 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
                 extensions: loaderOptions.extensions,
                 extract: loaderOptions.extract,
                 id: transformId,
-                import: loaderOptions.import,
                 inject: loaderOptions.inject,
                 logger,
                 namedExports: loaderOptions.namedExports,
                 options: {},
                 plugin: this,
                 sourceMap,
-                url: loaderOptions.url,
                 warn: this.warn.bind(this),
             };
 
@@ -369,26 +383,9 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDir: str
             if (result.extracted) {
                 const { id } = result.extracted;
 
-                extracted = extracted.filter((e) => e.id !== id);
+                extracted = extracted.filter((extract) => extract.id !== id);
                 extracted.push(result.extracted);
             }
-
-            // if (result.dts) {
-            //     // @TODO: get the correct file name
-            //     const dtsfileName = transformId.replace(join(cwd, sourceDir + "/"), "") + ".d.ts";
-            //
-            //     logger.info({
-            //         code: "css-dts",
-            //         message: "Generated declaration file for " + dtsfileName,
-            //     });
-            //
-            //     this.emitFile({
-            //         fileName: dtsfileName,
-            //         originalFileName: dtsfileName,
-            //         source: result.dts,
-            //         type: "asset",
-            //     });
-            // }
 
             return {
                 code: result.code,

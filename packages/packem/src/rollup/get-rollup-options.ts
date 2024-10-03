@@ -26,6 +26,7 @@ import memoizeByKey from "../utils/memoize";
 import chunkSplitter from "./plugins/chunk-splitter";
 import { cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
+import cssPlugin from "./plugins/css";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
 import { esmShimCjsSyntaxPlugin } from "./plugins/esm-shim-cjs-syntax";
 import fixDynamicImportExtension from "./plugins/fix-dynamic-import-extension";
@@ -39,7 +40,6 @@ import cachingPlugin from "./plugins/plugin-cache";
 import prependDirectivePlugin from "./plugins/prepend-directives";
 import preserveDirectivesPlugin from "./plugins/preserve-directives";
 import { rawPlugin } from "./plugins/raw";
-import cssPlugin from "./plugins/css";
 import resolveFileUrlPlugin from "./plugins/resolve-file-url";
 import type { ShebangOptions } from "./plugins/shebang";
 import { removeShebangPlugin, shebangPlugin } from "./plugins/shebang";
@@ -463,6 +463,8 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     ),
 
                 context.options.rollup.css &&
+                    context.options.rollup.css.loaders &&
+                    context.options.rollup.css.loaders.length > 0 &&
                     cssPlugin(
                         {
                             dts: Boolean(context.options.declaration) || context.options.isolatedDeclarationTransformer !== undefined,
@@ -472,7 +474,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         context.logger,
                         context.options.rootDir,
                         context.options.sourceDir,
-                        context.environment,
                     ),
 
                 context.options.transformer(getTransformerConfig(context.options.transformerName, context)),

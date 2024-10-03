@@ -1,4 +1,6 @@
-import type * as postcss from "postcss";
+import type { Options } from "cssnano";
+import type { Parser, Plugin, Stringifier, Syntax, Transformer } from "postcss";
+import type Processor from "postcss/lib/processor";
 
 import type { LESSLoaderOptions } from "./loaders/less";
 import type { ImportOptions } from "./loaders/postcss/import";
@@ -80,9 +82,9 @@ export interface StyleOptions {
      * - ex.: `{"foo":"bar"}`
      */
     alias?: Record<string, string>;
+    cssnano?: Options;
     /**
      * Generate TypeScript declarations files for input style files
-     * @default false
      */
     dts?: boolean;
     /** Files to exclude from processing */
@@ -92,11 +94,6 @@ export interface StyleOptions {
      * @default [".css", ".pcss", ".postcss", ".sss"]
      */
     extensions?: string[];
-    /**
-     * Enable/disable or pass options for CSS `@import` resolver
-     * @default true
-     */
-    import?: ImportOptions | boolean;
     /** Files to include for processing */
     include?: ReadonlyArray<RegExp | string> | RegExp | string | null;
     /** Options for Less loader */
@@ -151,6 +148,11 @@ export interface StyleOptions {
          */
         config?: PostCSSConfigLoaderOptions | false;
         /**
+         * Enable/disable or pass options for CSS `@import` resolver
+         * @default true
+         */
+        import?: ImportOptions | boolean;
+        /**
          * Enable/disable or pass options for
          * [CSS Modules](https://github.com/css-modules/css-modules)
          * @default false
@@ -160,33 +162,29 @@ export interface StyleOptions {
          * Set PostCSS parser, e.g. `sugarss`.
          * Overrides the one loaded from PostCSS config file, if any.
          */
-        parser?: postcss.Parser | string;
+        parser?: Parser | string;
         /**
          * A list of plugins for PostCSS,
          * which are used before plugins loaded from PostCSS config file, if any
          */
-        plugins?:
-            | (
-                  | postcss.AcceptedPlugin
-                  | string
-                  | [postcss.PluginCreator<unknown> | string, Record<string, unknown>]
-                  | [postcss.PluginCreator<unknown> | string]
-                  | null
-                  | undefined
-              )[]
-            | Record<string, unknown>;
+        plugins?: (Plugin | Transformer | Processor)[];
         /**
          * Set PostCSS stringifier.
          * Overrides the one loaded from PostCSS config file, if any.
          */
-        stringifier?: postcss.Stringifier | string;
+        stringifier?: Stringifier | string;
         /**
          * Set PostCSS syntax.
          * Overrides the one loaded from PostCSS config file, if any.
          */
-        syntax?: postcss.Syntax | string;
+        syntax?: Syntax | string;
         /** `to` option for PostCSS, required for some plugins */
         to?: string;
+        /**
+         * Enable/disable or pass options for CSS URL resolver
+         * @default true
+         */
+        url?: UrlOptions | boolean;
     };
     /** Options for Sass loader */
     sass?: SASSLoaderOptions;
@@ -197,9 +195,4 @@ export interface StyleOptions {
     sourceMap?: boolean | "inline" | [boolean | "inline", SourceMapOptions] | [boolean | "inline"];
     /** Options for Stylus loader */
     stylus?: StylusLoaderOptions;
-    /**
-     * Enable/disable or pass options for CSS URL resolver
-     * @default true
-     */
-    url?: UrlOptions | boolean;
 }
