@@ -188,6 +188,16 @@
                 "default": "./dist/rollup/plugins/css/loaders/stylus.mjs"
             }
         },
+        "./css/loader/lightningcss": {
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/lightningcss.cjs"
+            },
+            "import": {
+                "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.mts",
+                "default": "./dist/rollup/plugins/css/loaders/lightningcss.mjs"
+            }
+        },
         "./css/minifier/cssnano": {
             "require": {
                 "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.cts",
@@ -254,6 +264,9 @@
             "css/loader/stylus": [
                 "./dist/rollup/plugins/css/loaders/stylus.d.ts"
             ],
+            "css/loader/lightningcss": [
+                "./dist/rollup/plugins/css/loaders/lightningcss.d.ts"
+            ],
             "css/minifier/cssnano": [
                 "./dist/rollup/plugins/css/minifiers/cssnano.d.ts"
             ],
@@ -312,6 +325,7 @@
         "@visulima/pail": "2.1.10",
         "@visulima/path": "1.1.0",
         "@visulima/tsconfig": "1.0.15",
+        "browserslist": "4.24.0",
         "defu": "6.1.4",
         "es-module-lexer": "1.5.4",
         "fastest-levenshtein": "1.0.16",

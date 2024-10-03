@@ -12,6 +12,7 @@ import { resolveAsync } from "../../utils/resolve";
 import safeId from "../../utils/safe-id";
 import { mm } from "../../utils/sourcemap";
 import type { Loader } from "../types";
+import ensureAutoModules from "../utils/ensure-auto-modules";
 import loadConfig from "./config";
 import postcssICSS from "./icss";
 import type { ImportOptions } from "./import";
@@ -38,25 +39,9 @@ const getClassNameDefault = (name: string): string => {
     return id;
 };
 
-const ensureAutoModules = (am: InternalStyleOptions["postcss"]["autoModules"] | undefined, id: string): boolean => {
-    if (am === undefined) {
-        return true;
-    }
-
-    if (typeof am === "function") {
-        return am(id);
-    }
-
-    if (am instanceof RegExp) {
-        return am.test(id);
-    }
-
-    return am && /\.module\.[A-Za-z]+$/.test(id);
-};
-
 type PostCSSOptions = InternalStyleOptions["postcss"] & Pick<Required<ProcessOptions>, "from" | "map" | "to">;
 
-const loader: Loader<InternalStyleOptions["postcss"]> = {
+const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
     alwaysProcess: true,
     name: "postcss",
     // eslint-disable-next-line sonarjs/cognitive-complexity

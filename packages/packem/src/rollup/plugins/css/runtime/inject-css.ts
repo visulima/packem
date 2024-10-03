@@ -1,7 +1,7 @@
 /** @type {HTMLElement[]} */
-const containers: any[] = [];
+const containers: (Element | null)[] = [];
 /** @type {{prepend:HTMLStyleElement,append:HTMLStyleElement}[]} */
-const styleTags: Record<string, any>[] = [];
+const styleTags: Record<string, Record<"prepend" | "append", HTMLStyleElement>>[] = [];
 
 /**
  * @param {string} css
@@ -12,6 +12,7 @@ const styleTags: Record<string, any>[] = [];
  * @param {Record<string,string>} [options.attributes]
  * @returns {void}
  */
+// eslint-disable-next-line import/no-unused-modules
 export default (
     css: string,
     options: {
@@ -20,6 +21,7 @@ export default (
         prepend?: boolean;
         singleTag?: boolean;
     },
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): void => {
     if (!css || typeof document === "undefined") {
         return;
@@ -39,6 +41,7 @@ export default (
             const k = Object.keys(options.attributes);
 
             for (const element of k) {
+                // eslint-disable-next-line security/detect-object-injection
                 styleTag.setAttribute(element, options.attributes[element]);
             }
         }
@@ -51,6 +54,7 @@ export default (
 
         container.insertAdjacentElement(pos, styleTag);
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return styleTag;
     };
 
@@ -63,20 +67,24 @@ export default (
         if (id === -1) {
             id = containers.push(container) - 1;
 
+            // eslint-disable-next-line security/detect-object-injection
             styleTags[id] = {};
         }
 
-        styleTag = styleTags[id]?.[position] ? styleTags[id][position] : (styleTags[id][position] = createStyleTag());
+        // eslint-disable-next-line security/detect-object-injection,@typescript-eslint/no-explicit-any
+        styleTag = styleTags[id]?.[position] ?? ((styleTags[id] as any)[position] = createStyleTag());
     } else {
         styleTag = createStyleTag();
     }
 
     // strip potential UTF-8 BOM if css was read from a file
-    if (css.charCodeAt(0) === 0xfe_ff) {
+    if (css.codePointAt(0) === 0xfe_ff) {
+        // eslint-disable-next-line no-param-reassign
         css = css.slice(1);
     }
 
     if (styleTag.styleSheet) {
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
         styleTag.styleSheet.cssText += css;
     } else {
         styleTag.append(document.createTextNode(css));

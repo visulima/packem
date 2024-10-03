@@ -130,7 +130,18 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
     }
 
     if (loggedEntries) {
-        logger.raw("Σ Total dist size (byte size):", cyan(formatBytes(context.buildEntries.reduce((index, entry) => index + (entry.bytes ?? 0), 0))), "\n");
+        logger.raw(
+            "Σ Total dist size (byte size):",
+            cyan(
+                formatBytes(
+                    context.buildEntries.reduce((index, entry) => index + (entry.bytes ?? 0), 0),
+                    {
+                        decimals: 2,
+                    },
+                ),
+            ),
+            "\n",
+        );
     }
 
     return loggedEntries;

@@ -1,4 +1,5 @@
 import type { Options } from "cssnano";
+import type { CustomAtRules, TransformOptions } from "lightningcss";
 import type { Plugin, ProcessOptions, Transformer } from "postcss";
 import type Processor from "postcss/lib/processor";
 
@@ -30,7 +31,6 @@ export interface InternalStyleOptions extends StyleOptions {
     extract: boolean | string;
     /** @see {@link StyleOptions.mode} */
     inject: InjectOptions | boolean | ((varname: string, id: string, output: string[]) => string);
-    postcss: NonNullable<StyleOptions["postcss"]>;
 }
 
 /** CSS data for extraction */
@@ -75,6 +75,8 @@ export interface InjectOptions {
     treeshakeable?: boolean;
 }
 
+export type AutoModules = RegExp | boolean | ((id: string) => boolean);
+
 /** `rollup-plugin-styles`'s full option list */
 export interface StyleOptions {
     /**
@@ -98,6 +100,27 @@ export interface StyleOptions {
     include?: ReadonlyArray<RegExp | string> | RegExp | string | null;
     /** Options for Less loader */
     less?: LESSLoaderOptions;
+    lightningcss?: {
+        /**
+         * Automatically enable
+         * [CSS Modules](https://github.com/css-modules/css-modules)
+         * for files named `[name].module.[ext]`
+         * (e.g. `foo.module.css`, `bar.module.stylus`),
+         * or pass your own function or regular expression
+         * @default false
+         */
+        autoModules?: AutoModules;
+        modules?: {
+            /**
+             * Files to include for [CSS Modules](https://github.com/css-modules/css-modules)
+             * for files named `[name].module.[ext]`
+             * (e.g. `foo.module.css`, `bar.module.stylus`),
+             * or pass your own function or regular expression
+             * @default false
+             */
+            include?: AutoModules;
+        };
+    } & Omit<TransformOptions<CustomAtRules>, "filename" | "code" | "minify" | "targets">;
     /** Array of custom loaders */
     loaders?: Loader[];
     /** Enable the css minifier */
@@ -141,7 +164,7 @@ export interface StyleOptions {
          * or pass your own function or regular expression
          * @default false
          */
-        autoModules?: RegExp | boolean | ((id: string) => boolean);
+        autoModules?: AutoModules;
         /**
          * Enable/disable or pass options for PostCSS config loader
          * @default {}

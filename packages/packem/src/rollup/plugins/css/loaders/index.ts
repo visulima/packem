@@ -15,6 +15,7 @@ const threadPoolSize = process.env.UV_THREADPOOL_SIZE ? Number.parseInt(process.
 
 /** Options for {@link Loaders} class */
 interface LoadersOptions {
+    browserTargets: string[];
     cwd: string;
     /** @see {@link Options.extensions} */
     extensions: string[];
@@ -40,7 +41,9 @@ export default class Loaders {
 
     private readonly logger: Pail;
 
-    public constructor({ cwd, extensions, loaders, logger, options, sourceDirectory }: LoadersOptions) {
+    private readonly browserTargets: string[];
+
+    public constructor({ browserTargets, cwd, extensions, loaders, logger, options, sourceDirectory }: LoadersOptions) {
         this.test = (file): boolean => extensions.some((extension) => file.toLowerCase().endsWith(extension));
         this.add(sourcemapLoader);
 
@@ -52,6 +55,7 @@ export default class Loaders {
         this.cwd = cwd;
         this.sourceDirectory = sourceDirectory;
         this.logger = logger;
+        this.browserTargets = browserTargets;
     }
 
     public add<T extends Record<string, unknown>>(...loaders: Loader<T>[]): void {
@@ -89,6 +93,7 @@ export default class Loaders {
         for await (const [name, loader] of this.loaders) {
             const loaderContext: LoaderContext = {
                 ...context,
+                browserTargets: this.browserTargets,
                 cwd: this.cwd,
                 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                 options: (this.options[name as keyof StyleOptions] as Record<string, unknown>) ?? {},

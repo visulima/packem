@@ -27,6 +27,8 @@ export interface Loader<T = Record<string, unknown>> {
 export interface LoaderContext<T = Record<string, unknown>> {
     /** Assets to emit */
     readonly assets: Map<string, Uint8Array>;
+    /** Browser targets */
+    readonly browserTargets: string[];
     readonly cwd?: string;
     /** Files to watch */
     readonly deps: Set<string>;

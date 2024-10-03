@@ -1,4 +1,3 @@
- 
 declare namespace stylus {
     type Callback = (error: Error, css: string) => void;
 

@@ -12,6 +12,7 @@ import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
 import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
 import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
+import browserslist from "browserslist";
 import { defu } from "defu";
 import { createHooks } from "hookable";
 import type { Jiti } from "jiti";
@@ -74,6 +75,7 @@ const generateOptions = (
     // @ts-ignore TS2589 is just deeply nested and this is needed for typedoc
     const options = defu(buildConfig, inputConfig, preset, <Partial<BuildOptions>>{
         alias: {},
+        browserTargets: browserslist(),
         cjsInterop: false,
         clean: true,
         debug,
@@ -104,6 +106,9 @@ const generateOptions = (
                 transformMixedEsModules: false,
             },
             css: {
+                lightningcss: {
+                    autoModules: true,
+                },
                 namedExports: true,
                 postcss: {
                     autoModules: true,
@@ -406,6 +411,10 @@ const generateOptions = (
         options.rollup.polyfillNode = false;
 
         logger.debug("Disabling polyfillNode because preferBuiltins is set to true");
+    }
+
+    if (options.browserTargets && options.browserTargets.length > 0) {
+        logger.debug("Using browser targets: " + options.browserTargets.join(", "));
     }
 
     // Add all dependencies as externals

@@ -6,7 +6,7 @@ import type { ExtractedData } from "../types";
 import type { Minifier } from "./types";
 
 const cssnanoMinifier: Minifier<Options> = {
-    handler: async (data: ExtractedData, sourceMap: LoaderContext["sourceMap"], options: Options): Promise<ExtractedData> => {
+    async handler(data: ExtractedData, sourceMap: LoaderContext["sourceMap"], options: Options): Promise<ExtractedData> {
         const minifier = cssnano(options);
 
         const resultMinified = await minifier.process(data.css, {

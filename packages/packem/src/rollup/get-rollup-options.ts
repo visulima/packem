@@ -473,6 +473,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                             ...context.options.rollup.css,
                         },
                         context.logger,
+                        context.options.browserTargets as string[],
                         context.options.rootDir,
                         context.options.sourceDir,
                     ),

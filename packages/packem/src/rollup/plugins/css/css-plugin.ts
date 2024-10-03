@@ -12,16 +12,45 @@ import { humanlizePath, isAbsolutePath, isRelativePath, normalizePath } from "./
 import { mm } from "./utils/sourcemap";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export default (options: StyleOptions, logger: Pail, cwd: string, sourceDirectory: string): Plugin => {
+export default (options: StyleOptions, logger: Pail, browserTargets: string[], cwd: string, sourceDirectory: string): Plugin => {
     const isIncluded = createFilter(options.include, options.exclude);
 
     const sourceMap = inferSourceMapOption(options.sourceMap);
-    const loaderOptions: InternalStyleOptions = {
+    const loaderOptions: NonNullable<InternalStyleOptions> = {
         ...inferModeOption(options.mode),
         dts: options.dts ?? false,
         extensions: options.extensions ?? [".css", ".pcss", ".postcss", ".sss"],
         namedExports: options.namedExports ?? false,
-        postcss: {
+    };
+
+    if (typeof loaderOptions.inject === "object" && loaderOptions.inject.treeshakeable && loaderOptions.namedExports) {
+        throw new Error("`inject.treeshakeable` option is incompatible with `namedExports` option");
+    }
+
+    let hasPostCssLoader = false;
+    let hasLightCssLoader = false;
+
+    if (options.loaders) {
+        for (const loader of options.loaders) {
+            if (loader.name === "postcss") {
+                hasPostCssLoader = true;
+            }
+
+            if (loader.name === "lightcss") {
+                hasLightCssLoader = true;
+            }
+        }
+
+        if (hasPostCssLoader && hasLightCssLoader) {
+            throw new Error("You cannot use `postcss` and `lightcss` loader at the same time, please choose one.");
+        }
+    } else {
+        // eslint-disable-next-line no-param-reassign
+        options.loaders = [];
+    }
+
+    if (hasPostCssLoader) {
+        loaderOptions.postcss = {
             ...options.postcss,
             autoModules: options.postcss?.autoModules ?? false,
             config: inferOption(options.postcss?.config, {}),
@@ -29,33 +58,30 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDirector
             modules: inferOption(options.postcss?.modules, false),
             to: options.postcss?.to,
             url: inferHandlerOption(options.postcss?.url, options.alias),
-        },
-    };
+        };
 
-    if (typeof loaderOptions.inject === "object" && loaderOptions.inject.treeshakeable && loaderOptions.namedExports) {
-        throw new Error("`inject.treeshakeable` option is incompatible with `namedExports` option");
-    }
+        if (options.postcss?.parser) {
+            loaderOptions.postcss.parser = ensurePCSSOption(options.postcss.parser, "parser");
+        }
 
-    if (options.postcss?.parser) {
-        loaderOptions.postcss.parser = ensurePCSSOption(options.postcss.parser, "parser");
-    }
+        if (options.postcss?.syntax) {
+            loaderOptions.postcss.syntax = ensurePCSSOption(options.postcss.syntax, "syntax");
+        }
 
-    if (options.postcss?.syntax) {
-        loaderOptions.postcss.syntax = ensurePCSSOption(options.postcss.syntax, "syntax");
-    }
+        if (options.postcss?.stringifier) {
+            loaderOptions.postcss.stringifier = ensurePCSSOption(options.postcss.stringifier, "stringifier");
+        }
 
-    if (options.postcss?.stringifier) {
-        loaderOptions.postcss.stringifier = ensurePCSSOption(options.postcss.stringifier, "stringifier");
-    }
-
-    if (options.postcss?.plugins) {
-        loaderOptions.postcss.plugins = ensurePCSSPlugins(options.postcss.plugins);
+        if (options.postcss?.plugins) {
+            loaderOptions.postcss.plugins = ensurePCSSPlugins(options.postcss.plugins);
+        }
     }
 
     const loaders = new Loaders({
+        browserTargets,
         cwd,
         extensions: loaderOptions.extensions,
-        loaders: options.loaders ?? [],
+        loaders: options.loaders,
         logger,
         options: {
             ...options,
@@ -257,7 +283,10 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDirector
                         prefix: "css",
                     });
 
-                    const { css: minifiedCss, map: minifiedMap } = await options.minifier.handler(
+                    const { css: minifiedCss, map: minifiedMap } = await options.minifier.handler.bind({
+                        browserTargets,
+                        warn: this.warn.bind(this),
+                    })(
                         extractedData,
                         sourceMap,
                         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition,@typescript-eslint/no-explicit-any
@@ -358,6 +387,7 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDirector
 
             const context: LoaderContext = {
                 assets: new Map<string, Uint8Array>(),
+                browserTargets: [],
                 deps: new Set(),
                 dts: false,
                 emit: loaderOptions.emit,

@@ -1,4 +1,3 @@
-
 declare namespace sass {
     type Data = Error | { contents: string } | { file: string } | null;
 

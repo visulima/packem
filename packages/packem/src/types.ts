@@ -181,6 +181,7 @@ export type BuildEntry = {
 export interface BuildOptions {
     alias: Record<string, string>;
     analyze?: boolean;
+    browserTargets?: string[];
     cjsInterop?: boolean;
     clean: boolean;
     debug: boolean;

@@ -77,6 +77,7 @@ const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, mode: "bundl
     });
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const watch = async (context: BuildContext, fileCache: FileCache): Promise<void> => {
     const rollupOptions = await getRollupOptions(context, fileCache);
 

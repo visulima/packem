@@ -8,6 +8,7 @@ import type { LoaderContext } from "../rollup/plugins/css/loaders/types";
 import type { StyleOptions } from "../rollup/plugins/css/types";
 import { ensurePCSSOption, ensurePCSSPlugins, inferHandlerOption, inferOption } from "../rollup/plugins/css/utils/options";
 
+// eslint-disable-next-line sonarjs/cognitive-complexity,import/no-unused-modules
 export default (options: StyleOptions, logger: Pail, cwd: string, sourceDirectory: string): Plugin => {
     const isIncluded = createFilter(options.include, options.exclude);
 
