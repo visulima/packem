@@ -4,7 +4,6 @@ import type PQueue from "p-queue";
 import PQueueClass from "p-queue";
 
 import type { InternalStyleOptions, StyleOptions } from "../types";
-import sourcemapLoader from "./sourcemap";
 import type { Loader, LoaderContext, Payload } from "./types";
 import matchFile from "./utils/match-file";
 
@@ -36,7 +35,6 @@ export default class Loaders {
 
     public constructor({ extensions, loaders, logger, options }: LoadersOptions) {
         this.test = (file): boolean => extensions.some((extension) => file.toLowerCase().endsWith(extension));
-        this.add(sourcemapLoader);
 
         if (loaders.length > 0) {
             this.add(...loaders);
@@ -89,7 +87,7 @@ export default class Loaders {
                 this.logger.debug(`Processing ${name} loader for ${loaderContext.id}`);
 
                 const process = await this.workQueue.add(loader.process.bind(loaderContext, payload));
-
+                console.log(process);
                 if (process) {
                     processed = process;
                 }

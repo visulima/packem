@@ -361,6 +361,11 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
         output: [
             context.options.emitCJS &&
                 <OutputOptions>{
+                    // Governs names of CSS files (for assets from CSS use `hash` option for url handler).
+                    // Note: using value below will put `.css` files near js,
+                    // but make sure to adjust `hash`, `assetDir` and `publicPath`
+                    // options for url handler accordingly.
+                    assetFileNames: "[name]-[hash][extname]",
                     chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "cjs"),
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "cjs"),
@@ -376,7 +381,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         reservedNamesAsProps: true,
                         symbols: true,
                     },
-                    // By default in rollup, when creating multiple chunks, transitive imports of entry chunks
+                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
                     // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
                     hoistTransitiveImports: false,
                     interop: "compat",
@@ -387,6 +392,11 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 },
             context.options.emitESM &&
                 <OutputOptions>{
+                    // Governs names of CSS files (for assets from CSS use `hash` option for url handler).
+                    // Note: using value below will put `.css` files near js,
+                    // but make sure to adjust `hash`, `assetDir` and `publicPath`
+                    // options for url handler accordingly.
+                    assetFileNames: "[name]-[hash][extname]",
                     chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "mjs"),
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "mjs"),
@@ -402,7 +412,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         reservedNamesAsProps: true,
                         symbols: true,
                     },
-                    // By default in rollup, when creating multiple chunks, transitive imports of entry chunks
+                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
                     // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
                     hoistTransitiveImports: false,
                     sourcemap: context.options.sourcemap,
@@ -477,7 +487,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         context.options.rootDir,
                         context.options.sourceDir,
                         context.environment,
-                        context.options.sourcemap
+                        context.options.sourcemap,
                     ),
 
                 context.options.transformer(getTransformerConfig(context.options.transformerName, context)),

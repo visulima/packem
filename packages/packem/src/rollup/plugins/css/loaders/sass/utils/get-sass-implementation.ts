@@ -1,29 +1,29 @@
+// eslint-disable-next-line import/no-namespace
+import type * as nodeSass from "node-sass";
+// eslint-disable-next-line import/no-namespace
+import type * as sass from "sass";
+// eslint-disable-next-line import/no-namespace
+import type * as sassEmbedded from "sass-embedded";
+
 export const getDefaultSassImplementation = (): string => {
-    let sassImplPackage = "sass";
+    const implementations = ["sass-embedded", "sass", "node-sass"];
 
-    try {
-        require.resolve("sass-embedded");
-
-        sassImplPackage = "sass-embedded";
-    } catch {
+    for (const impl of implementations) {
         try {
-            require.resolve("sass");
+            // eslint-disable-next-line unicorn/prefer-module
+            require.resolve(impl);
+            return impl;
         } catch {
-            try {
-                require.resolve("node-sass");
-
-                sassImplPackage = "node-sass";
-            } catch {
-                sassImplPackage = "sass";
-            }
+            // Continue to the next implementation
         }
     }
 
-    return sassImplPackage;
+    return "sass"; // Default fallback
 };
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-explicit-any
-export const getSassImplementation = (implementation: Record<string, any> | string | undefined) => {
+export const getSassImplementation = (
+    implementation?: string | typeof sass | typeof sassEmbedded | typeof nodeSass,
+): typeof sass | typeof sassEmbedded | typeof nodeSass => {
     let resolvedImplementation = implementation;
 
     if (!resolvedImplementation) {
@@ -50,15 +50,15 @@ export const getSassImplementation = (implementation: Record<string, any> | stri
     const [implementationName] = infoParts;
 
     if (implementationName === "dart-sass") {
-        return resolvedImplementation;
+        return resolvedImplementation as typeof sass;
     }
 
     if (implementationName === "node-sass") {
-        return resolvedImplementation;
+        return resolvedImplementation as typeof nodeSass;
     }
 
     if (implementationName === "sass-embedded") {
-        return resolvedImplementation;
+        return resolvedImplementation as typeof sassEmbedded;
     }
 
     throw new Error(`Unknown Sass implementation "${implementationName as string}".`);

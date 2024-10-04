@@ -1,9 +1,9 @@
 import { dirname } from "@visulima/path";
-import type { Importer, ImporterReturnType } from "node-sass";
+import type { ImporterReturnType } from "node-sass";
 
 import { isAbsolutePath, isRelativePath } from "../../../utils/path";
 import type { ResolveOptions } from "../../../utils/resolve";
-import { packageFilterBuilder, resolveAsync } from "../../../utils/resolve";
+import { packageFilterBuilder, resolveSync } from "../../../utils/resolve";
 import { getUrlOfPartial, hasModuleSpecifier, normalizeUrl } from "../../../utils/url";
 
 const extensions = [".scss", ".sass", ".css"];
@@ -50,12 +50,12 @@ const finalize = (id: string): ImporterReturnType => {
     return { file: id.replace(/\.css$/i, "") };
 };
 
-const importer: Importer = (url, previous, done): void => {
-    importerImpl(url, previous, resolveAsync)
-        // eslint-disable-next-line promise/no-callback-in-promise
-        .then((id) => done(finalize(id)))
-        // eslint-disable-next-line promise/no-callback-in-promise
-        .catch(() => done(null));
+const importer: (url: string, previousImporter: string) => ImporterReturnType | null = (url: string, previousImporter: string): ImporterReturnType | null => {
+    try {
+        return finalize(importerImpl(url, previousImporter, resolveSync));
+    } catch {
+        return null;
+    }
 };
 
 export default importer;

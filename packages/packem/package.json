@@ -161,6 +161,16 @@
                 "default": "./dist/rollup/plugins/css/runtime/inject-css.cjs"
             }
         },
+        "./css/loader/sourcemap": {
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/sourcemap.cjs"
+            },
+            "import": {
+                "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.mts",
+                "default": "./dist/rollup/plugins/css/loaders/sourcemap.mjs"
+            }
+        },
         "./css/loader/less": {
             "require": {
                 "types": "./dist/rollup/plugins/css/loaders/less/index.d.cts",

@@ -95,7 +95,7 @@ const getSassOptions = async (
         (sassOptions as StringOptions<"async">).url = new URL(pathToFileURL(resourcePath));
 
         if (useSourceMap) {
-            sassOptions.sourceMap = true;
+            (sassOptions as StringOptions<"async">).sourceMap = true;
         }
 
         // If we are compiling sass and indentedSyntax isn't set, automatically set it.

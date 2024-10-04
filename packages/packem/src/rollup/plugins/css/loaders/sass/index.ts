@@ -8,8 +8,9 @@
 import { fileURLToPath } from "node:url";
 
 import { isAbsolute, normalize } from "@visulima/path";
-import type { Importer as NodeSassImporter, Options as NodeSassOptions, Result as NodeSassResult } from "node-sass";
-import type { CompileResult, StringOptions } from "sass";
+import type { Result as NodeSassResult, SyncImporter as NodeSassSyncImporter, SyncOptions as NodeSassSyncOptions } from "node-sass";
+import type { CompileResult, StringOptions as SassStringOptions } from "sass";
+import type { StringOptions as SassEmbeddedStringOptions } from "sass-embedded";
 import type { RawSourceMap } from "source-map-js";
 
 import type { Environment } from "../../../../../types";
@@ -57,20 +58,22 @@ const loader: Loader<SassLoaderOptions> = {
         if (isModernAPI) {
             options.importers.push(modernImporter(this.id));
         } else {
-            if ((options as NodeSassOptions).importer && !Array.isArray((options as NodeSassOptions).importer)) {
-                (options as NodeSassOptions).importer = [(options as NodeSassOptions).importer as NodeSassImporter];
+            if ((options as NodeSassSyncOptions).importer && !Array.isArray((options as NodeSassSyncOptions).importer)) {
+                (options as NodeSassSyncOptions).importer = [(options as NodeSassSyncOptions).importer as NodeSassSyncImporter];
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            (options as NodeSassOptions).importer = [...(((options as NodeSassOptions).importer as NodeSassImporter[]) ?? []), legacyImporter];
+            (options as NodeSassSyncOptions).importer = [...(((options as NodeSassSyncOptions).importer as NodeSassSyncImporter[]) ?? []), legacyImporter];
         }
 
-        const compile = getCompileFunction(implementation, apiType);
+        const compile = await getCompileFunction(implementation, apiType);
 
         let result;
 
         try {
-            result = (await compile(options)) as CompileResult | NodeSassResult;
+            // The typing resolution is incorrect - @TODO: fix it if possible
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            result = (await compile(options as any)) as CompileResult | NodeSassResult;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             // There are situations when the `file`/`span.url` property do not exist
@@ -145,7 +148,11 @@ export type SassLoaderOptions = {
         | ((content: string | Buffer, loaderContext: SassLoaderContext) => string)
         | ((content: string | Buffer, loaderContext: SassLoaderContext) => Promise<string>);
     warnRuleAsWarning?: boolean;
-} & (StringOptions<"async"> | NodeSassOptions);
+} & (
+    | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">
+    | Omit<SassEmbeddedStringOptions<"sync">, "charset" | "indentedSyntax">
+    | Omit<NodeSassSyncOptions, "data" | "sourceMapContents" | "sourceMapEmbed" | "sourceMapRoot" | "outFile">
+);
 
 // eslint-disable-next-line import/no-unused-modules
 export default loader;

@@ -55,7 +55,7 @@ export default (
 
         container.insertAdjacentElement(pos, styleTag);
 
-        return styleTag;
+        return styleTag as HTMLStyleElement;
     };
 
     /** @type {HTMLStyleElement} */

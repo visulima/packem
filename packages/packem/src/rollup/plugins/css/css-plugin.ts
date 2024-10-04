@@ -12,7 +12,6 @@ import { ensurePCSSOption, ensurePCSSPlugins, inferHandlerOption, inferModeOptio
 import { humanlizePath, isAbsolutePath, isRelativePath, normalizePath } from "./utils/path";
 import { mm } from "./utils/sourcemap";
 
-
 export default (
     options: StyleOptions,
     logger: Pail,
