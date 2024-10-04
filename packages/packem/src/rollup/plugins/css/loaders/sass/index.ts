@@ -1,82 +1,151 @@
-import { normalizePath } from "../../utils/path";
-import type { Loader } from "../types";
-import { importer, importerSync } from "./importer";
-import loadSass from "./load";
+/**
+ * Modified copy of https://github.com/webpack-contrib/sass-loader
+ *
+ * MIT License
+ *
+ * Copyright JS Foundation and other contributors
+ */
+import { fileURLToPath } from "node:url";
 
-const loader: Loader<SASSLoaderOptions> = {
+import { isAbsolute, normalize } from "@visulima/path";
+import type { Importer as NodeSassImporter, Options as NodeSassOptions, Result as NodeSassResult } from "node-sass";
+import type { CompileResult, StringOptions } from "sass";
+import type { RawSourceMap } from "source-map-js";
+
+import type { Environment } from "../../../../../types";
+import type { Loader } from "../types";
+import legacyImporter from "./legacy/importer";
+import modernImporter from "./modern/importer";
+import type { SassApiType } from "./types";
+import getCompileFunction from "./utils/get-compile-function";
+import { getDefaultSassImplementation, getSassImplementation } from "./utils/get-sass-implementation";
+import getSassOptions from "./utils/get-sass-options";
+import normalizeSourceMap from "./utils/normalize-source-map";
+import errorFactory from "./utils/sass-error-factory";
+
+const loader: Loader<SassLoaderOptions> = {
     name: "sass",
     // eslint-disable-next-line sonarjs/cognitive-complexity
     async process({ code, map }) {
-        const options = { ...this.options };
-        const [sass, type] = await loadSass(options.impl);
-        const sync = options.sync ?? type !== "node-sass";
-        const importers = [sync ? importerSync : importer];
+        let apiType: SassApiType = "modern-compiler";
 
-        if (options.data) {
-            // eslint-disable-next-line no-param-reassign
-            code = options.data + code;
+        const foundSassPackage = getDefaultSassImplementation();
+
+        if (foundSassPackage === "sass") {
+            apiType = "modern";
+        } else if (foundSassPackage === "node-sass") {
+            apiType = "legacy";
         }
 
-        if (options.importer) {
-            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            Array.isArray(options.importer) ? importers.push(...options.importer) : importers.push(options.importer);
+        const isModernAPI = apiType === "modern" || apiType === "modern-compiler";
+        const implementation = getSassImplementation(foundSassPackage);
+
+        const options = await getSassOptions(
+            {
+                environment: this.environment,
+                resourcePath: this.id,
+                rootContext: this.cwd as string,
+            },
+            this.logger,
+            this.warn,
+            { ...this.options },
+            code,
+            this.useSourcemap,
+            apiType,
+        );
+
+        if (isModernAPI) {
+            options.importers.push(modernImporter(this.id));
+        } else {
+            if ((options as NodeSassOptions).importer && !Array.isArray((options as NodeSassOptions).importer)) {
+                (options as NodeSassOptions).importer = [(options as NodeSassOptions).importer as NodeSassImporter];
+            }
+
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            (options as NodeSassOptions).importer = [...(((options as NodeSassOptions).importer as NodeSassImporter[]) ?? []), legacyImporter];
         }
 
-        const render = async (sassOptions: sass.Options): Promise<sass.Result> =>
-            await new Promise((resolve, reject) => {
-                if (sync) {
-                    resolve(sass.renderSync(sassOptions));
-                } else {
-                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                    sass.render(sassOptions, (error, css) => (error ? reject(error) : resolve(css)));
+        const compile = getCompileFunction(implementation, apiType);
+
+        let result;
+
+        try {
+            result = (await compile(options)) as CompileResult | NodeSassResult;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            // There are situations when the `file`/`span.url` property do not exist
+            // Modern API
+            if (error.span && error.span.url !== undefined) {
+                this.deps.add(fileURLToPath(error.span.url));
+            }
+            // Legacy API
+            else if (error.file !== undefined) {
+                // `node-sass` returns POSIX paths
+                this.deps.add(normalize(error.file));
+            }
+
+            throw errorFactory(error);
+        }
+
+        let resultMap: RawSourceMap | undefined =
+            // Modern API, then legacy API
+            (result as CompileResult).sourceMap ??
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            ((result as NodeSassResult).map ? (JSON.parse((result as NodeSassResult).map.toString()) as RawSourceMap) : undefined);
+
+        // Modify source paths only for webpack, otherwise we do nothing
+        if (resultMap && this.useSourcemap) {
+            resultMap = normalizeSourceMap(resultMap, this.cwd as string);
+        }
+
+        // Modern API
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if ((result as CompileResult).loadedUrls !== undefined) {
+            (result as CompileResult).loadedUrls
+                .filter((loadedUrl) => loadedUrl.protocol === "file:")
+                .forEach((includedFile) => {
+                    const normalizedIncludedFile = fileURLToPath(includedFile);
+
+                    // Custom `importer` can return only `contents` so includedFile will be relative
+                    if (isAbsolute(normalizedIncludedFile)) {
+                        this.deps.add(normalizedIncludedFile);
+                    }
+                });
+        }
+        // Legacy API
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        else if ((result as NodeSassResult).stats.includedFiles !== undefined) {
+            (result as NodeSassResult).stats.includedFiles.forEach((includedFile: string) => {
+                const normalizedIncludedFile = normalize(includedFile);
+
+                // Custom `importer` can return only `contents` so includedFile will be relative
+                if (isAbsolute(normalizedIncludedFile)) {
+                    this.deps.add(normalizedIncludedFile);
                 }
             });
-
-        // Remove non-Sass options
-        delete options.impl;
-        delete options.sync;
-
-        // node-sass won't produce sourcemaps if the `data`
-        // option is used and `sourceMap` option is not a string.
-        //
-        // In case it is a string, `sourceMap` option
-        // should be a path where the sourcemap is written.
-        //
-        // But since we're using the `data` option,
-        // the sourcemap will not actually be written, but
-        // all paths in sourcemap's sources will be relative to that path.
-        const result = await render({
-            ...options,
-            data: code,
-            file: this.id,
-            importer: importers,
-            indentedSyntax: /\.sass$/i.test(this.id),
-            omitSourceMapUrl: true,
-            sourceMap: this.id,
-            sourceMapContents: true,
-        });
-
-        const deps = result.stats.includedFiles;
-
-        for (const dep of deps) {
-            this.deps.add(normalizePath(dep));
         }
 
         return {
             code: Buffer.from(result.css).toString(),
-            map: result.map ? Buffer.from(result.map).toString() : map,
+            map: resultMap ? JSON.stringify(resultMap) : map,
         };
     },
     test: /\.(sass|scss)$/i,
 };
 
-/** Options for Sass loader */
-export interface SASSLoaderOptions extends Record<string, unknown>, sass.PublicOptions {
-    /** Force Sass implementation */
-    impl?: string;
-    /** Forcefully enable/disable sync mode */
-    sync?: boolean;
-}
+export type SassLoaderContext = {
+    environment: Environment;
+    resourcePath: string;
+    rootContext: string;
+};
+
+export type SassLoaderOptions = {
+    additionalData:
+        | string
+        | ((content: string | Buffer, loaderContext: SassLoaderContext) => string)
+        | ((content: string | Buffer, loaderContext: SassLoaderContext) => Promise<string>);
+    warnRuleAsWarning?: boolean;
+} & (StringOptions<"async"> | NodeSassOptions);
 
 // eslint-disable-next-line import/no-unused-modules
 export default loader;

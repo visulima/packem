@@ -476,6 +476,8 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         context.options.browserTargets as string[],
                         context.options.rootDir,
                         context.options.sourceDir,
+                        context.environment,
+                        context.options.sourcemap
                     ),
 
                 context.options.transformer(getTransformerConfig(context.options.transformerName, context)),

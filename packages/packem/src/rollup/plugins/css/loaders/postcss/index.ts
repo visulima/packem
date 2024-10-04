@@ -62,10 +62,9 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
                 prev: mm(map).relative(dirname(this.id)).toObject(),
                 sourcesContent: this.sourceMap ? this.sourceMap.content : true,
             },
+            plugins: undefined,
             to: this.options.to ?? this.id,
         };
-
-        delete postcssOptions.plugins;
 
         if (this.options.import) {
             plugins.push(postcssImport({ extensions: this.extensions, ...(this.options.import as ImportOptions) }));

@@ -3,16 +3,26 @@ import type { Pail } from "@visulima/pail";
 import { basename, dirname, parse, resolve } from "@visulima/path";
 import type { GetModuleInfo, OutputAsset, OutputChunk, Plugin } from "rollup";
 
+import type { Environment } from "../../../types";
 import Loaders from "./loaders";
-import type { Extracted, LoaderContext } from "./loaders/types";
+import type { Extracted, Loader, LoaderContext } from "./loaders/types";
 import type { ExtractedData, InternalStyleOptions, StyleOptions } from "./types";
 import concat from "./utils/concat";
 import { ensurePCSSOption, ensurePCSSPlugins, inferHandlerOption, inferModeOption, inferOption, inferSourceMapOption } from "./utils/options";
 import { humanlizePath, isAbsolutePath, isRelativePath, normalizePath } from "./utils/path";
 import { mm } from "./utils/sourcemap";
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
-export default (options: StyleOptions, logger: Pail, browserTargets: string[], cwd: string, sourceDirectory: string): Plugin => {
+
+export default (
+    options: StyleOptions,
+    logger: Pail,
+    browserTargets: string[],
+    cwd: string,
+    sourceDirectory: string,
+    environment: Environment,
+    useSourcemap: boolean,
+    // eslint-disable-next-line sonarjs/cognitive-complexity
+): Plugin => {
     const isIncluded = createFilter(options.include, options.exclude);
 
     const sourceMap = inferSourceMapOption(options.sourceMap);
@@ -28,21 +38,14 @@ export default (options: StyleOptions, logger: Pail, browserTargets: string[], c
     }
 
     let hasPostCssLoader = false;
-    let hasLightCssLoader = false;
+    let postcssLoader: Loader | undefined;
 
     if (options.loaders) {
         for (const loader of options.loaders) {
             if (loader.name === "postcss") {
                 hasPostCssLoader = true;
+                postcssLoader = loader;
             }
-
-            if (loader.name === "lightcss") {
-                hasLightCssLoader = true;
-            }
-        }
-
-        if (hasPostCssLoader && hasLightCssLoader) {
-            throw new Error("You cannot use `postcss` and `lightcss` loader at the same time, please choose one.");
         }
     } else {
         // eslint-disable-next-line no-param-reassign
@@ -77,9 +80,14 @@ export default (options: StyleOptions, logger: Pail, browserTargets: string[], c
         }
     }
 
+    // We need to change the order if postcss loader is present
+    if (hasPostCssLoader && postcssLoader) {
+        // eslint-disable-next-line no-param-reassign
+        options.loaders = options.loaders.filter((loader) => loader.name !== "postcss");
+        options.loaders.push(postcssLoader);
+    }
+
     const loaders = new Loaders({
-        browserTargets,
-        cwd,
         extensions: loaderOptions.extensions,
         loaders: options.loaders,
         logger,
@@ -87,7 +95,6 @@ export default (options: StyleOptions, logger: Pail, browserTargets: string[], c
             ...options,
             ...loaderOptions,
         },
-        sourceDirectory,
     });
 
     let extracted: Extracted[] = [];
@@ -323,6 +330,8 @@ export default (options: StyleOptions, logger: Pail, browserTargets: string[], c
                         .modify((m) => {
                             // eslint-disable-next-line no-param-reassign
                             m.file = basename(fileName);
+
+                            return m;
                         })
                         .modifySources((source) => {
                             // Compensate for possible nesting depending on `assetFileNames` value
@@ -387,10 +396,12 @@ export default (options: StyleOptions, logger: Pail, browserTargets: string[], c
 
             const context: LoaderContext = {
                 assets: new Map<string, Uint8Array>(),
-                browserTargets: [],
+                browserTargets,
+                cwd,
                 deps: new Set(),
                 dts: false,
                 emit: loaderOptions.emit,
+                environment,
                 extensions: loaderOptions.extensions,
                 extract: loaderOptions.extract,
                 id: transformId,
@@ -399,7 +410,9 @@ export default (options: StyleOptions, logger: Pail, browserTargets: string[], c
                 namedExports: loaderOptions.namedExports,
                 options: {},
                 plugin: this,
+                sourceDir: sourceDirectory,
                 sourceMap,
+                useSourcemap,
                 warn: this.warn.bind(this),
             };
 

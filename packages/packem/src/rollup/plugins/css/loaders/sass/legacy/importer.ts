@@ -1,9 +1,10 @@
 import { dirname } from "@visulima/path";
+import type { Importer, ImporterReturnType } from "node-sass";
 
-import { isAbsolutePath, isRelativePath } from "../../utils/path";
-import type { ResolveOptions } from "../../utils/resolve";
-import { packageFilterBuilder, resolveAsync, resolveSync } from "../../utils/resolve";
-import { getUrlOfPartial, hasModuleSpecifier, normalizeUrl } from "../../utils/url";
+import { isAbsolutePath, isRelativePath } from "../../../utils/path";
+import type { ResolveOptions } from "../../../utils/resolve";
+import { packageFilterBuilder, resolveAsync } from "../../../utils/resolve";
+import { getUrlOfPartial, hasModuleSpecifier, normalizeUrl } from "../../../utils/url";
 
 const extensions = [".scss", ".sass", ".css"];
 const conditions = ["sass", "style"];
@@ -34,20 +35,22 @@ const importerImpl = <T extends (ids: string[], userOptions: ResolveOptions) => 
             candidates.push(getUrlOfPartial(moduleUrl), moduleUrl);
         }
     }
+
     const options = {
         basedirs: [dirname(importer)],
         caller: "Sass importer",
         extensions,
         packageFilter: packageFilterBuilder({ conditions }),
     };
+
     return resolve(candidates, options) as ReturnType<T>;
 };
 
-const finalize = (id: string): sass.Data => {
+const finalize = (id: string): ImporterReturnType => {
     return { file: id.replace(/\.css$/i, "") };
 };
 
-export const importer: sass.Importer = (url, previous, done): void => {
+const importer: Importer = (url, previous, done): void => {
     importerImpl(url, previous, resolveAsync)
         // eslint-disable-next-line promise/no-callback-in-promise
         .then((id) => done(finalize(id)))
@@ -55,10 +58,4 @@ export const importer: sass.Importer = (url, previous, done): void => {
         .catch(() => done(null));
 };
 
-export const importerSync: sass.Importer = (url, previous): sass.Data => {
-    try {
-        return finalize(importerImpl(url, previous, resolveSync));
-    } catch {
-        return null;
-    }
-};
+export default importer;

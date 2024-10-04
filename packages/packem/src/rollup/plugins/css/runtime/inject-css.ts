@@ -30,7 +30,12 @@ export default (
     const position = options.prepend === true ? "prepend" : "append";
     const singleTag = options.singleTag === true;
 
-    const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+    const container =
+        typeof options.container === "string" ? (document.querySelector(options.container) as HTMLElement | null) : document.querySelectorAll("head")[0];
+
+    if (!container) {
+        throw new Error("Unable to find container element");
+    }
 
     const createStyleTag = () => {
         const styleTag = document.createElement("style");
@@ -42,19 +47,14 @@ export default (
 
             for (const element of k) {
                 // eslint-disable-next-line security/detect-object-injection
-                styleTag.setAttribute(element, options.attributes[element]);
+                styleTag.setAttribute(element, options.attributes[element] as string);
             }
-        }
-
-        if (typeof __webpack_nonce__ !== "undefined") {
-            styleTag.setAttribute("nonce", __webpack_nonce__);
         }
 
         const pos = position === "prepend" ? "afterbegin" : "beforeend";
 
         container.insertAdjacentElement(pos, styleTag);
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return styleTag;
     };
 
@@ -72,7 +72,13 @@ export default (
         }
 
         // eslint-disable-next-line security/detect-object-injection,@typescript-eslint/no-explicit-any
-        styleTag = styleTags[id]?.[position] ?? ((styleTags[id] as any)[position] = createStyleTag());
+        if (!(styleTags[id] as any)[position]) {
+            // eslint-disable-next-line security/detect-object-injection,@typescript-eslint/no-explicit-any
+            (styleTags[id] as any)[position] = createStyleTag();
+        }
+
+        // eslint-disable-next-line security/detect-object-injection,@typescript-eslint/no-explicit-any
+        styleTag = (styleTags[id] as any)[position];
     } else {
         styleTag = createStyleTag();
     }

@@ -23,8 +23,7 @@ const plugin: PluginCreator<InteroperableCSSOptions> = (options = {}) => {
                 return;
             }
 
-            const resultOptions: Result["opts"] = { ...result.opts };
-            delete resultOptions.map;
+            const resultOptions: Result["opts"] = { ...result.opts, map: undefined };
 
             const { icssExports, icssImports } = extractICSS(css);
 

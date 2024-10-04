@@ -2,6 +2,7 @@ import type { Pail } from "@visulima/pail";
 import type { PluginContext } from "rollup";
 import type { RawSourceMap } from "source-map-js";
 
+import type { Environment } from "../../../../types";
 import type { InternalStyleOptions } from "../types";
 
 /**
@@ -36,6 +37,7 @@ export interface LoaderContext<T = Record<string, unknown>> {
     readonly dts: InternalStyleOptions["dts"];
     /** @see {@link InternalStyleOptions.emit} */
     readonly emit: InternalStyleOptions["emit"];
+    readonly environment: Environment;
     /** @see {@link InternalStyleOptions.extensions} */
     readonly extensions: InternalStyleOptions["extensions"];
     /** @see {@link InternalStyleOptions.extract} */
@@ -57,6 +59,7 @@ export interface LoaderContext<T = Record<string, unknown>> {
     readonly sourceDir?: string;
     /** @see {@link InternalStyleOptions.sourceMap} */
     readonly sourceMap: false | ({ inline: boolean } & SourceMapOptions);
+    readonly useSourcemap: boolean;
     /** [Function for emitting a warning](https://rollupjs.org/guide/en/#thiswarnwarning-string--rollupwarning-position-number---column-number-line-number---void) */
     readonly warn: PluginContext["warn"];
 }
