@@ -9,7 +9,7 @@ const ABSOLUTE_SCHEME = /^[A-Z0-9+\-.]+:/i;
 
 const getURLType = (source: string): "absolute" | "scheme-relative" | "path-absolute" | "path-relative" => {
     if (source.startsWith("/")) {
-        if (source[1] === "/") {
+        if (source.length > 1 && source[1] === "/") {
             return "scheme-relative";
         }
 
