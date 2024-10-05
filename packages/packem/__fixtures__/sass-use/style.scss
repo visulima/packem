@@ -1,0 +1,7 @@
+@use "src/corners" as *;
+@import "~minireset.css/minireset.min";
+
+.button {
+  @include rounded;
+  padding: 5px + $radius;
+}
