@@ -20,9 +20,7 @@
     "devDependencies": {
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.24.0",
-        "sass-embedded": "^1.79.4",
         "less": "^4.2.0",
-        "stylus": "^0.63.0",
         "postcss": "^8.4.47",
         "postcss-load-config": "^6.0.1",
         "postcss-modules": "6.0.0",
@@ -32,6 +30,9 @@
         "postcss-modules-values": "^4.0.0",
         "postcss-value-parser": "^4.2.0",
         "rimraf": "^6.0.1",
+        "rollup-plugin-styler": "1.8.0",
+        "sass": "^1.79.4",
+        "stylus": "^0.63.0",
         "typescript": "^5.6.2"
     }
 }

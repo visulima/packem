@@ -1,8 +1,6 @@
-import { join, relative, resolve } from "@visulima/path";
+import { join } from "@visulima/path";
 
 export const isAbsolutePath = (path: string): boolean => /^(?:\/|(?:[A-Z]:)?[/\\|])/i.test(path);
-
-export const isRelativePath = (path: string): boolean => /^\.?\.[/\\]/.test(path);
 
 export const normalizePath = (...paths: string[]): string => {
     const f = join(...paths).replaceAll("\\", "/");
@@ -14,8 +12,3 @@ export const normalizePath = (...paths: string[]): string => {
     return f;
 };
 
-export const resolvePath = (...paths: string[]): string => normalizePath(resolve(...paths));
-
-export const relativePath = (from: string, to: string): string => normalizePath(relative(from, to));
-
-export const humanlizePath = (file: string): string => relativePath(process.cwd(), file);

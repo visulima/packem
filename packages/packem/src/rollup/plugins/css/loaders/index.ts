@@ -87,7 +87,7 @@ export default class Loaders {
                 this.logger.debug(`Processing ${name} loader for ${loaderContext.id}`);
 
                 const process = await this.workQueue.add(loader.process.bind(loaderContext, payload));
-                console.log(process);
+
                 if (process) {
                     processed = process;
                 }

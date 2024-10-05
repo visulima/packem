@@ -1,13 +1,13 @@
 import { fileURLToPath } from "node:url";
 
 import { makeLegalIdentifier } from "@rollup/pluginutils";
-import { basename, dirname, join } from "@visulima/path";
+import { basename, dirname, join, relative } from "@visulima/path";
 import type { AcceptedPlugin, ProcessOptions } from "postcss";
 import postcss from "postcss";
 import type { RawSourceMap } from "source-map-js";
 
 import type { InjectOptions, InternalStyleOptions } from "../../types";
-import { humanlizePath, normalizePath } from "../../utils/path";
+import { normalizePath } from "../../utils/path";
 import { resolveAsync } from "../../utils/resolve";
 import safeId from "../../utils/safe-id";
 import { mm } from "../../utils/sourcemap";
@@ -170,7 +170,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
                 const newName = getClassName(name);
 
                 if (name !== newName) {
-                    this.warn(`Exported \`${name}\` as \`${newName}\` in ${humanlizePath(this.id)}`);
+                    this.warn(`Exported \`${name}\` as \`${newName}\` in ${relative(this.cwd as string, this.id)}`);
                 }
 
                 // eslint-disable-next-line security/detect-object-injection

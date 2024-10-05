@@ -1,10 +1,10 @@
 import { isAccessibleSync, readFileSync } from "@visulima/fs";
-import { dirname, resolve } from "@visulima/path";
+import { dirname, relative, resolve } from "@visulima/path";
 import type { RawSourceMap } from "source-map-js";
 import { SourceMapConsumer } from "source-map-js";
 
 import { DATA_URI_REGEXP } from "../loaders/postcss/constants";
-import { isAbsolutePath, normalizePath, relativePath, resolvePath } from "./path";
+import { isAbsolutePath, normalizePath } from "./path";
 
 // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
 const mapBlockRe = /(?:\n|\r\n)?\/\*[#*@]+\s*sourceMappingURL\s*=\s*(\S+)\s*\*+\//g;
@@ -54,7 +54,7 @@ class MapModifier {
                 return source;
             }
 
-            return resolvePath(directory, source);
+            return resolve(directory, source);
         });
     }
 
@@ -65,7 +65,7 @@ class MapModifier {
             }
 
             if (isAbsolutePath(source)) {
-                return relativePath(directory, source);
+                return relative(directory, source);
             }
 
             return normalizePath(source);

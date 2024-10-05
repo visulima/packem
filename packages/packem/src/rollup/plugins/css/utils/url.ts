@@ -1,6 +1,6 @@
 import { isAbsolute, parse, toNamespacedPath } from "@visulima/path";
 
-import { isRelativePath } from "./path";
+import { isRelative } from "@visulima/path/utils";
 
 export const hasModuleSpecifier = (url: string): boolean => /^~[\d@A-Z]/i.test(url);
 
@@ -15,7 +15,7 @@ export const normalizeUrl = (url: string): string => {
         return toNamespacedPath(url.slice(1));
     }
 
-    if (isAbsolute(url) || isRelativePath(url)) {
+    if (isAbsolute(url) || isRelative(url)) {
         return toNamespacedPath(url);
     }
 

@@ -1,6 +1,7 @@
 import { createFilter } from "@rollup/pluginutils";
 import type { Pail } from "@visulima/pail";
-import { basename, dirname, parse, resolve } from "@visulima/path";
+import { basename, dirname, parse, relative, resolve } from "@visulima/path";
+import { isRelative } from "@visulima/path/utils";
 import type { GetModuleInfo, OutputAsset, OutputChunk, Plugin } from "rollup";
 
 import type { Environment } from "../../../types";
@@ -9,7 +10,7 @@ import type { Extracted, Loader, LoaderContext } from "./loaders/types";
 import type { ExtractedData, InternalStyleOptions, StyleOptions } from "./types";
 import concat from "./utils/concat";
 import { ensurePCSSOption, ensurePCSSPlugins, inferHandlerOption, inferModeOption, inferOption, inferSourceMapOption } from "./utils/options";
-import { humanlizePath, isAbsolutePath, isRelativePath, normalizePath } from "./utils/path";
+import { isAbsolutePath, normalizePath } from "./utils/path";
 import { mm } from "./utils/sourcemap";
 
 export default (
@@ -178,11 +179,11 @@ export default (
                     typeof loaderOptions.extract === "string" ? normalizePath(loaderOptions.extract).replace(/^\.[/\\]/, "") : normalizePath(`${name}.css`);
 
                 if (isAbsolutePath(fileName)) {
-                    this.error(["Extraction path must be relative to the output directory,", `which is ${humanlizePath(directory)}`].join("\n"));
+                    this.error(["Extraction path must be relative to the output directory,", `which is ${relative(cwd, directory)}`].join("\n"));
                 }
 
-                if (isRelativePath(fileName)) {
-                    this.error(["Extraction path must be nested inside output directory,", `which is ${humanlizePath(directory)}`].join("\n"));
+                if (isRelative(fileName)) {
+                    this.error(["Extraction path must be nested inside output directory,", `which is ${relative(cwd, directory)}`].join("\n"));
                 }
 
                 const entries = extracted.filter((extract) => ids.includes(extract.id)).sort((a, b) => ids.lastIndexOf(a.id) - ids.lastIndexOf(b.id));
@@ -384,6 +385,16 @@ export default (
             // Skip empty files
             if (code.replaceAll(/\s/g, "") === "") {
                 return null;
+            }
+
+            // Check if file was already processed into JS
+            // by other instance(s) of this or other plugin(s)
+            try {
+                this.parse(code, {}); // If it doesn't throw...
+                this.warn(`Skipping processed file ${relative(cwd, transformId)}`);
+                return null;
+            } catch {
+                // Was not already processed, continuing
             }
 
             if (typeof options.onImport === "function") {
