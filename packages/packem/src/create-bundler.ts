@@ -686,13 +686,13 @@ const createBundler = async (
             }
         }
 
-        const jiti = createJiti(rootDirectory, { debug, interopDefault: true });
+        const jiti = createJiti(rootDirectory, { debug });
 
         if (!/\.(?:js|mjs|cjs|ts|cts|mts)$/.test(packemConfigFilePath)) {
             throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.");
         }
 
-        let buildConfig = ((await jiti.import(packemConfigFilePath, { try: true })) || {}) as BuildConfig | BuildConfigFunction;
+        let buildConfig = ((await jiti.import(packemConfigFilePath, { default: true, try: true })) || {}) as BuildConfig | BuildConfigFunction;
 
         if (typeof buildConfig === "function") {
             buildConfig = await buildConfig(environment, mode);
