@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.8](https://github.com/visulima/packem/compare/@visulima/packem@1.0.7...@visulima/packem@1.0.8) (2024-10-05)
+
+### Bug Fixes
+
+* updated packem dependencies ([818e146](https://github.com/visulima/packem/commit/818e146f5414f6c9f8d3d8058fd0f034e570f99f))
+
 ## @visulima/packem [1.0.7](https://github.com/visulima/packem/compare/@visulima/packem@1.0.6...@visulima/packem@1.0.7) (2024-10-02)
 
 ### Bug Fixes
