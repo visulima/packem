@@ -1,12 +1,11 @@
 import { existsSync } from "node:fs";
 
 import { readFileSync } from "@visulima/fs";
-import { dirname } from "@visulima/path";
+import { dirname, join, normalize } from "@visulima/path";
 import type { RawSourceMap } from "source-map-js";
 import type { RenderOptions } from "stylus";
 import stylus from "stylus";
 
-import { normalizePath } from "../utils/path";
 import { mm } from "../utils/sourcemap";
 import type { Loader } from "./types";
 
@@ -14,7 +13,7 @@ const loader: Loader<StylusLoaderOptions> = {
     name: "stylus",
     async process({ code, map }) {
         const options = { ...this.options };
-        const basePath = normalizePath(dirname(this.id));
+        const basePath = normalize(dirname(this.id));
         const paths = [`${basePath}/node_modules`, basePath];
 
         if (options.paths) {
@@ -39,7 +38,7 @@ const loader: Loader<StylusLoaderOptions> = {
         const deps = style.deps();
 
         for (const dep of deps) {
-            this.deps.add(normalizePath(dep));
+            this.deps.add(normalize(dep));
         }
 
         // We have to manually modify the `sourcesContent` field
@@ -48,7 +47,7 @@ const loader: Loader<StylusLoaderOptions> = {
         if (style.sourcemap?.sources && !style.sourcemap.sourcesContent) {
             style.sourcemap.sourcesContent = await Promise.all(
                 style.sourcemap.sources.map(async (source) => {
-                    const file = normalizePath(basePath, source);
+                    const file = normalize(join(basePath, source));
 
                     // eslint-disable-next-line security/detect-non-literal-fs-filename
                     if (!existsSync(file)) {

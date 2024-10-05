@@ -1,13 +1,12 @@
 import { fileURLToPath } from "node:url";
 
 import { makeLegalIdentifier } from "@rollup/pluginutils";
-import { basename, dirname, join, relative } from "@visulima/path";
+import { basename, dirname, join, normalize, relative } from "@visulima/path";
 import type { AcceptedPlugin, ProcessOptions } from "postcss";
 import postcss from "postcss";
 import type { RawSourceMap } from "source-map-js";
 
 import type { InjectOptions, InternalStyleOptions } from "../../types";
-import { normalizePath } from "../../utils/path";
 import { resolveAsync } from "../../utils/resolve";
 import safeId from "../../utils/safe-id";
 import { mm } from "../../utils/sourcemap";
@@ -115,7 +114,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
                 }
 
                 case "dependency": {
-                    this.deps.add(normalizePath(message.file as string));
+                    this.deps.add(normalize(message.file as string));
                     break;
                 }
 
@@ -202,7 +201,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
 
                 if (!injectorId) {
                     injectorId = await resolveAsync(["./runtime/inject-css"], { basedirs: [join(baseDirectory, "..", "..")] });
-                    injectorId = `"${normalizePath(injectorId)}"`;
+                    injectorId = `"${normalize(injectorId)}"`;
                 }
 
                 output.unshift(`import ${injectorName} from ${injectorId};`);

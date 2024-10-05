@@ -1,8 +1,7 @@
-import { dirname } from "@visulima/path";
+import { dirname, isAbsolute } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 import type { ImporterReturnType } from "node-sass";
 
-import { isAbsolutePath } from "../../../utils/path";
 import type { ResolveOptions } from "../../../utils/resolve";
 import { packageFilterBuilder, resolveSync } from "../../../utils/resolve";
 import { getUrlOfPartial, hasModuleSpecifier, normalizeUrl } from "../../../utils/url";
@@ -31,7 +30,7 @@ const importerImpl = <T extends (ids: string[], userOptions: ResolveOptions) => 
         candidates.push(getUrlOfPartial(relativeUrl), relativeUrl);
 
         // fall back to module imports
-        if (!isAbsolutePath(url) && !isRelative(url)) {
+        if (!isAbsolute(url) && !isRelative(url)) {
             const moduleUrl = normalizeUrl(`~${url}`);
             candidates.push(getUrlOfPartial(moduleUrl), moduleUrl);
         }

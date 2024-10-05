@@ -1,6 +1,6 @@
 import { createFilter } from "@rollup/pluginutils";
 import type { Pail } from "@visulima/pail";
-import { basename, dirname, parse, relative, resolve } from "@visulima/path";
+import { basename, dirname, isAbsolute, join, normalize, parse, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 import type { GetModuleInfo, OutputAsset, OutputChunk, Plugin } from "rollup";
 
@@ -10,7 +10,6 @@ import type { Extracted, Loader, LoaderContext } from "./loaders/types";
 import type { ExtractedData, InternalStyleOptions, StyleOptions } from "./types";
 import concat from "./utils/concat";
 import { ensurePCSSOption, ensurePCSSPlugins, inferHandlerOption, inferModeOption, inferOption, inferSourceMapOption } from "./utils/options";
-import { isAbsolutePath, normalizePath } from "./utils/path";
 import { mm } from "./utils/sourcemap";
 
 export default (
@@ -176,9 +175,9 @@ export default (
 
             const getExtractedData = async (name: string, ids: string[]): Promise<ExtractedData> => {
                 const fileName =
-                    typeof loaderOptions.extract === "string" ? normalizePath(loaderOptions.extract).replace(/^\.[/\\]/, "") : normalizePath(`${name}.css`);
+                    typeof loaderOptions.extract === "string" ? normalize(loaderOptions.extract).replace(/^\.[/\\]/, "") : normalize(`${name}.css`);
 
-                if (isAbsolutePath(fileName)) {
+                if (isAbsolute(fileName)) {
                     this.error(["Extraction path must be relative to the output directory,", `which is ${relative(cwd, directory)}`].join("\n"));
                 }
 
@@ -321,9 +320,9 @@ export default (
 
                     const assetDirectory =
                         typeof options_.assetFileNames === "string"
-                            ? normalizePath(dirname(options_.assetFileNames))
+                            ? normalize(dirname(options_.assetFileNames))
                             : typeof options_.assetFileNames === "function"
-                              ? normalizePath(dirname(options_.assetFileNames(cssFile)))
+                              ? normalize(dirname(options_.assetFileNames(cssFile)))
                               : "assets";
 
                     const map = mm(extractedData.map)
@@ -357,14 +356,14 @@ export default (
                         });
 
                     if (sourceMap.inline) {
-                        map.modify((m) => sourceMap.transform?.(m, normalizePath(directory, fileName)));
+                        map.modify((m) => sourceMap.transform?.(m, normalize(join(directory, fileName))));
 
                         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands,no-param-reassign,security/detect-object-injection
                         (bundle[fileName] as OutputAsset).source += map.toCommentData();
                     } else {
                         const mapFileName = `${fileName}.map`;
 
-                        map.modify((m) => sourceMap.transform?.(m, normalizePath(directory, mapFileName)));
+                        map.modify((m) => sourceMap.transform?.(m, normalize(join(directory, mapFileName))));
 
                         this.emitFile({ fileName: mapFileName, source: map.toString(), type: "asset" });
 

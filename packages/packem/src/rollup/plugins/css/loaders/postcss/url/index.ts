@@ -1,9 +1,8 @@
-import { basename, dirname, normalize } from "@visulima/path";
+import { basename, dirname, isAbsolute, join, normalize } from "@visulima/path";
 import type { Declaration, PluginCreator } from "postcss";
 import type { Node, ParsedValue } from "postcss-value-parser";
 import valueParser from "postcss-value-parser";
 
-import { isAbsolutePath, normalizePath } from "../../../utils/path";
 import { mm } from "../../../utils/sourcemap";
 import { DATA_URI_REGEXP, FIRST_EXTENSION_REGEXP } from "../constants";
 import generateName from "./generate";
@@ -66,7 +65,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                         }
 
                         // eslint-disable-next-line no-param-reassign
-                        url = normalizePath(to) + url.slice(from.length);
+                        url = normalize(to) + url.slice(from.length);
                     }
 
                     // Empty URL
@@ -81,7 +80,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                     }
 
                     // Skip Web URLs
-                    if (!isAbsolutePath(url)) {
+                    if (!isAbsolute(url)) {
                         try {
                             // eslint-disable-next-line no-new
                             new URL(url);
@@ -152,7 +151,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                     node.type = "string";
                     node.value = inlineFile(from, source);
                 } else {
-                    const unsafeTo = normalizePath(generateName(placeholder, from, source));
+                    const unsafeTo = normalize(generateName(placeholder, from, source));
                     let to = unsafeTo;
 
                     // Avoid file overrides
@@ -177,7 +176,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                         node.value += urlQuery;
                     }
 
-                    to = normalizePath(typeof assetDirectory === "string" ? assetDirectory : defaultAssetDirectory, to);
+                    to = normalize(join(typeof assetDirectory === "string" ? assetDirectory : defaultAssetDirectory, to));
                     to = typeof assetDirectory === "function" ? assetDirectory(from, to, file) : to;
 
                     result.messages.push({ plugin: name, source, to, type: "asset" });

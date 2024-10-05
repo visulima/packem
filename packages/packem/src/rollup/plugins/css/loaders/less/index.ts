@@ -1,7 +1,6 @@
-import { dirname } from "@visulima/path";
+import { dirname, normalize } from "@visulima/path";
 import less from "less";
 
-import { normalizePath } from "../../utils/path";
 import type { Loader } from "../types";
 import importer from "./importer";
 
@@ -25,7 +24,7 @@ const loader: Loader<LESSLoaderOptions> = {
         const deps = result.imports;
 
         for (const dep of deps) {
-            this.deps.add(normalizePath(dep));
+            this.deps.add(normalize(dep));
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

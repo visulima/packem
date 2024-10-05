@@ -1,6 +1,5 @@
-import { normalizePath } from "@rollup/pluginutils";
 import type { Pail } from "@visulima/pail";
-import { dirname, resolve } from "@visulima/path";
+import { dirname, normalize, resolve } from "@visulima/path";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { Plugin } from "rollup";
 
@@ -53,7 +52,7 @@ export const getConfigAlias = (tsconfig?: TsConfigResult, addBaseUrl = true): Al
 
             for (const value of values) {
                 /** String used to replace a matched path. */
-                const replacement = [...normalizePath(resolve(resolvedBaseUrl, value))]
+                const replacement = [...normalize(resolve(resolvedBaseUrl, value))]
                     // eslint-disable-next-line @typescript-eslint/no-loop-func,no-plusplus,@typescript-eslint/restrict-plus-operands
                     .map((segment) => (segment === "*" ? "$" + (++matchId + "") : segment === "$" ? "$$" : segment))
                     .join("");
@@ -70,7 +69,7 @@ export const getConfigAlias = (tsconfig?: TsConfigResult, addBaseUrl = true): Al
         aliases.push({
             find: /^(?!\.*\/|\.*$|\w:)(.+)$/,
 
-            replacement: `${[...normalizePath(resolvedBaseUrl)].map((segment) => (segment === "$" ? "$$" : segment)).join("")}/$1`,
+            replacement: `${[...normalize(resolvedBaseUrl)].map((segment) => (segment === "$" ? "$$" : segment)).join("")}/$1`,
         });
     }
 

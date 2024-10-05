@@ -1,9 +1,8 @@
-import { dirname } from "@visulima/path";
+import { dirname, isAbsolute, normalize } from "@visulima/path";
 import type { AtRule, PluginCreator, Result } from "postcss";
 import postcss from "postcss";
 import valueParser from "postcss-value-parser";
 
-import { isAbsolutePath, normalizePath } from "../../../utils/path";
 import type { ImportResolve } from "./resolve";
 import { resolve as resolveDefault } from "./resolve";
 
@@ -75,7 +74,7 @@ const plugin: PluginCreator<ImportOptions> = (options = {}) => {
                         continue;
                     }
 
-                    url = normalizePath(to) + url.slice(from.length);
+                    url = normalize(to) + url.slice(from.length);
                 }
 
                 // Empty URL
@@ -85,7 +84,7 @@ const plugin: PluginCreator<ImportOptions> = (options = {}) => {
                 }
 
                 // Skip Web URLs
-                if (!isAbsolutePath(url)) {
+                if (!isAbsolute(url)) {
                     try {
                         // eslint-disable-next-line no-new
                         new URL(url);
@@ -108,7 +107,7 @@ const plugin: PluginCreator<ImportOptions> = (options = {}) => {
                         continue;
                     }
 
-                    if (normalizePath(from) === normalizePath(file)) {
+                    if (normalize(from) === normalize(file)) {
                         rule.warn(result, `\`@import\` loop in \`${rule.toString()}\``);
                         // eslint-disable-next-line no-continue
                         continue;
