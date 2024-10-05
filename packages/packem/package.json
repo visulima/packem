@@ -435,11 +435,11 @@
     },
     "peerDependencies": {
         "@swc/core": "^1.5.7",
-        "cssnano": "7.0.6",
+        "cssnano": "^7.0.6",
         "esbuild": "^0.20.2 || ^0.21.3",
         "icss-utils": "^5.1.0",
         "less": "^4.2.0",
-        "lightningcss": "1.27.0",
+        "lightningcss": "^1.27.0",
         "node-sass": "^9.0.0",
         "oxc-transform": "^0.20.0",
         "postcss": "^8.4.38",
