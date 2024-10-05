@@ -12,6 +12,10 @@ import concat from "./utils/concat";
 import { ensurePCSSOption, ensurePCSSPlugins, inferHandlerOption, inferModeOption, inferOption, inferSourceMapOption } from "./utils/options";
 import { mm } from "./utils/sourcemap";
 
+const sortByNameOrder = (objectsArray: Loader[], nameOrder: string[]): Loader[] =>
+    // eslint-disable-next-line etc/no-assign-mutated-array
+    objectsArray.sort((a, b) => nameOrder.indexOf(a.name) - nameOrder.indexOf(b.name));
+
 export default (
     options: StyleOptions,
     logger: Pail,
@@ -37,13 +41,11 @@ export default (
     }
 
     let hasPostCssLoader = false;
-    let postcssLoader: Loader | undefined;
 
     if (options.loaders) {
         for (const loader of options.loaders) {
             if (loader.name === "postcss") {
                 hasPostCssLoader = true;
-                postcssLoader = loader;
             }
         }
     } else {
@@ -79,16 +81,9 @@ export default (
         }
     }
 
-    // We need to change the order if postcss loader is present
-    if (hasPostCssLoader && postcssLoader) {
-        // eslint-disable-next-line no-param-reassign
-        options.loaders = options.loaders.filter((loader) => loader.name !== "postcss");
-        options.loaders.push(postcssLoader);
-    }
-
     const loaders = new Loaders({
         extensions: loaderOptions.extensions,
-        loaders: options.loaders,
+        loaders: sortByNameOrder(options.loaders, ["sourcemap", "stylus", "less", "sass", "postcss"]),
         logger,
         options: {
             ...options,
@@ -160,16 +155,16 @@ export default (
 
             return hashable.join(":");
         },
-        async generateBundle(options_, bundle) {
-            if (extracted.length === 0 || !(options_.dir || options_.file)) {
+        async generateBundle(outputOptions, bundle) {
+            if (extracted.length === 0 || !(outputOptions.dir || outputOptions.file)) {
                 return;
             }
 
             const bundleValues = Object.values(bundle);
-            const directory = options_.dir ?? dirname(options_.file as string);
+            const directory = outputOptions.dir ?? dirname(outputOptions.file as string);
             const chunks = bundleValues.filter((chunk): chunk is OutputChunk => chunk.type === "chunk");
             const manual = chunks.filter((chunk) => !chunk.facadeModuleId);
-            const emitted = options_.preserveModules ? chunks : chunks.filter((chunk) => chunk.isEntry || chunk.isDynamicEntry);
+            const emitted = outputOptions.preserveModules ? chunks : chunks.filter((chunk) => chunk.isEntry || chunk.isDynamicEntry);
 
             const emittedList: [string, string[]][] = [];
 
@@ -198,14 +193,14 @@ export default (
             };
 
             const getName = (chunk: OutputChunk): string => {
-                if (options_.file) {
-                    return parse(options_.file).name;
+                if (outputOptions.file) {
+                    return parse(outputOptions.file).name;
                 }
 
-                if (options_.preserveModules) {
+                if (outputOptions.preserveModules) {
                     const { dir, name } = parse(chunk.fileName);
 
-                    return dir ? `${dir}/${name}` : name;
+                    return dir ? join(dir, name) : name;
                 }
 
                 return chunk.name;
@@ -319,10 +314,10 @@ export default (
                     const fileName = this.getFileName(cssFileId);
 
                     const assetDirectory =
-                        typeof options_.assetFileNames === "string"
-                            ? normalize(dirname(options_.assetFileNames))
-                            : typeof options_.assetFileNames === "function"
-                              ? normalize(dirname(options_.assetFileNames(cssFile)))
+                        typeof outputOptions.assetFileNames === "string"
+                            ? normalize(dirname(outputOptions.assetFileNames))
+                            : typeof outputOptions.assetFileNames === "function"
+                              ? normalize(dirname(outputOptions.assetFileNames(cssFile)))
                               : "assets";
 
                     const map = mm(extractedData.map)
@@ -399,9 +394,6 @@ export default (
             if (typeof options.onImport === "function") {
                 options.onImport(code, transformId);
             }
-
-            // Add css files to watch list
-            this.addWatchFile(transformId);
 
             const context: LoaderContext = {
                 assets: new Map<string, Uint8Array>(),

@@ -74,8 +74,6 @@ export default class Loaders {
             this.workQueue = new PQueueClass({ concurrency: threadPoolSize - 1 });
         }
 
-        let processed: Payload = payload;
-
         for await (const [name, loader] of this.loaders) {
             const loaderContext: LoaderContext = {
                 ...context,
@@ -89,11 +87,12 @@ export default class Loaders {
                 const process = await this.workQueue.add(loader.process.bind(loaderContext, payload));
 
                 if (process) {
-                    processed = process;
+                    // eslint-disable-next-line no-param-reassign
+                    payload = process;
                 }
             }
         }
 
-        return processed;
+        return payload;
     }
 }
