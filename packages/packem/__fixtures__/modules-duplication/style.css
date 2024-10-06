@@ -1,7 +1,7 @@
 html {
-  --color-primary: green;
+    --color-primary: green;
 }
 
 .primary {
-  color: var(--color-primary);
+    color: var(--color-primary);
 }

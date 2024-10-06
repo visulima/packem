@@ -43,12 +43,9 @@ export default (
         styleTag.setAttribute("type", "text/css");
 
         if (options.attributes) {
-            const k = Object.keys(options.attributes);
-
-            for (const element of k) {
-                // eslint-disable-next-line security/detect-object-injection
-                styleTag.setAttribute(element, options.attributes[element] as string);
-            }
+            Object.entries(options.attributes).forEach(([key, value]) => {
+                styleTag.setAttribute(key, value);
+            });
         }
 
         const pos = position === "prepend" ? "afterbegin" : "beforeend";
@@ -81,12 +78,6 @@ export default (
         styleTag = (styleTags[id] as any)[position];
     } else {
         styleTag = createStyleTag();
-    }
-
-    // strip potential UTF-8 BOM if css was read from a file
-    if (css.codePointAt(0) === 0xfe_ff) {
-        // eslint-disable-next-line no-param-reassign
-        css = css.slice(1);
     }
 
     if (styleTag.styleSheet) {

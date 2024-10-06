@@ -9,6 +9,28 @@ import stylus from "stylus";
 import { mm } from "../utils/sourcemap";
 import type { Loader } from "./types";
 
+const populateSourcemapContent = async (sourcemap: RawSourceMap, basePath: string): Promise<string[] | undefined> => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!sourcemap.sources || sourcemap.sourcesContent) {
+        return undefined;
+    }
+
+    // We have to manually modify the `sourcesContent` field
+    // since stylus compiler doesn't support it yet
+    return await Promise.all(
+        sourcemap.sources.map(async (source) => {
+            const file = normalize(join(basePath, source));
+
+            // eslint-disable-next-line security/detect-non-literal-fs-filename
+            if (!existsSync(file)) {
+                return null as unknown as string;
+            }
+
+            return readFileSync(file);
+        }),
+    );
+};
+
 const loader: Loader<StylusLoaderOptions> = {
     name: "stylus",
     async process({ code, map }) {
@@ -41,22 +63,9 @@ const loader: Loader<StylusLoaderOptions> = {
             this.deps.add(normalize(dep));
         }
 
-        // We have to manually modify the `sourcesContent` field
-        // since stylus compiler doesn't support it yet
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (style.sourcemap?.sources && !style.sourcemap.sourcesContent) {
-            style.sourcemap.sourcesContent = await Promise.all(
-                style.sourcemap.sources.map(async (source) => {
-                    const file = normalize(join(basePath, source));
-
-                    // eslint-disable-next-line security/detect-non-literal-fs-filename
-                    if (!existsSync(file)) {
-                        return null as unknown as string;
-                    }
-
-                    return readFileSync(file);
-                }),
-            );
+        if (style.sourcemap) {
+            style.sourcemap.sourcesContent = await populateSourcemapContent(style.sourcemap, basePath);
         }
 
         return { code, map: mm(style.sourcemap as unknown as RawSourceMap).toString() ?? map };

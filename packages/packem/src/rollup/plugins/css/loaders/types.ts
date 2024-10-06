@@ -28,6 +28,8 @@ export interface Loader<T = Record<string, unknown>> {
 export interface LoaderContext<T = Record<string, unknown>> {
     /** Assets to emit */
     readonly assets: Map<string, Uint8Array>;
+    /** @see {@link InternalStyleOptions.autoModules} */
+    readonly autoModules: InternalStyleOptions["autoModules"];
     /** Browser targets */
     readonly browserTargets: string[];
     readonly cwd?: string;

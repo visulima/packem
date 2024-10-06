@@ -1,11 +1,11 @@
 import { basename, parse } from "@visulima/path";
 
-import hasher from "../../../utils/hasher";
+import getHash from "../../../../../utils/get-hash";
 import { HASH_REGEXP } from "../constants";
 
 export default (placeholder: string, file: string, source: Uint8Array): string => {
     const { base, dir, ext, name } = parse(file);
-    const hash = hasher(`${base}:${Buffer.from(source).toString()}`);
+    const hash = getHash(`${base}:${Buffer.from(source).toString()}`);
     const match = HASH_REGEXP.exec(placeholder);
     const hashLength = match && Number.parseInt(match[1] as string, 10);
 

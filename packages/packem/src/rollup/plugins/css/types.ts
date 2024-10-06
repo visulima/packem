@@ -7,10 +7,56 @@ import type { LESSLoaderOptions } from "./loaders/less";
 import type { ImportOptions } from "./loaders/postcss/import";
 import type { ModulesOptions } from "./loaders/postcss/modules";
 import type { UrlOptions } from "./loaders/postcss/url";
-import type { SASSLoaderOptions } from "./loaders/sass";
+import type { SassLoaderOptions } from "./loaders/sass";
 import type { StylusLoaderOptions } from "./loaders/stylus";
 import type { Loader, SourceMapOptions } from "./loaders/types";
 import type { Minifier } from "./minifiers/types";
+
+interface PostCSSOptions {
+    /**
+     * Enable/disable or pass options for PostCSS config loader
+     * @default {}
+     */
+    config?: PostCSSConfigLoaderOptions | false;
+    /**
+     * Enable/disable or pass options for CSS `@import` resolver
+     * @default true
+     */
+    import?: ImportOptions | boolean;
+    /**
+     * Enable/disable or pass options for
+     * [CSS Modules](https://github.com/css-modules/css-modules)
+     * @default false
+     */
+    modules?: ModulesOptions | false;
+    /**
+     * Set PostCSS parser, e.g. `sugarss`.
+     * Overrides the one loaded from PostCSS config file, if any.
+     */
+    parser?: ProcessOptions["parser"] | string;
+    /**
+     * A list of plugins for PostCSS,
+     * which are used before plugins loaded from PostCSS config file, if any
+     */
+    plugins?: (Plugin | Transformer | Processor)[];
+    /**
+     * Set PostCSS stringifier.
+     * Overrides the one loaded from PostCSS config file, if any.
+     */
+    stringifier?: ProcessOptions["stringifier"] | string;
+    /**
+     * Set PostCSS syntax.
+     * Overrides the one loaded from PostCSS config file, if any.
+     */
+    syntax?: ProcessOptions["syntax"] | string;
+    /** `to` option for PostCSS, required for some plugins */
+    to?: ProcessOptions["to"];
+    /**
+     * Enable/disable or pass options for CSS URL resolver
+     * @default true
+     */
+    url?: UrlOptions | boolean;
+}
 
 /** Options for PostCSS config loader */
 export interface PostCSSConfigLoaderOptions {
@@ -82,8 +128,22 @@ export interface StyleOptions {
     /**
      * Aliases for URL and import paths
      * - ex.: `{"foo":"bar"}`
+     * @default {}
      */
     alias?: Record<string, string>;
+    /**
+     * Automatically enable
+     * [CSS Modules](https://github.com/css-modules/css-modules)
+     * for files named `[name].module.[ext]`
+     * (e.g. `foo.module.css`, `bar.module.stylus`),
+     * or pass your own function or regular expression
+     * @default false
+     */
+    autoModules?: AutoModules;
+    /**
+     * Options for cssnano minifier
+     * @default {}
+     */
     cssnano?: Options;
     /**
      * Generate TypeScript declarations files for input style files
@@ -101,15 +161,6 @@ export interface StyleOptions {
     /** Options for Less loader */
     less?: LESSLoaderOptions;
     lightningcss?: {
-        /**
-         * Automatically enable
-         * [CSS Modules](https://github.com/css-modules/css-modules)
-         * for files named `[name].module.[ext]`
-         * (e.g. `foo.module.css`, `bar.module.stylus`),
-         * or pass your own function or regular expression
-         * @default false
-         */
-        autoModules?: AutoModules;
         modules?: {
             /**
              * Files to include for [CSS Modules](https://github.com/css-modules/css-modules)
@@ -155,62 +206,12 @@ export interface StyleOptions {
      * before any transformations are applied
      */
     onImport?: (code: string, id: string) => void;
-    postcss?: {
-        /**
-         * Automatically enable
-         * [CSS Modules](https://github.com/css-modules/css-modules)
-         * for files named `[name].module.[ext]`
-         * (e.g. `foo.module.css`, `bar.module.stylus`),
-         * or pass your own function or regular expression
-         * @default false
-         */
-        autoModules?: AutoModules;
-        /**
-         * Enable/disable or pass options for PostCSS config loader
-         * @default {}
-         */
-        config?: PostCSSConfigLoaderOptions | false;
-        /**
-         * Enable/disable or pass options for CSS `@import` resolver
-         * @default true
-         */
-        import?: ImportOptions | boolean;
-        /**
-         * Enable/disable or pass options for
-         * [CSS Modules](https://github.com/css-modules/css-modules)
-         * @default false
-         */
-        modules?: ModulesOptions | false;
-        /**
-         * Set PostCSS parser, e.g. `sugarss`.
-         * Overrides the one loaded from PostCSS config file, if any.
-         */
-        parser?: ProcessOptions["parser"] | string;
-        /**
-         * A list of plugins for PostCSS,
-         * which are used before plugins loaded from PostCSS config file, if any
-         */
-        plugins?: (Plugin | Transformer | Processor)[];
-        /**
-         * Set PostCSS stringifier.
-         * Overrides the one loaded from PostCSS config file, if any.
-         */
-        stringifier?: ProcessOptions["stringifier"] | string;
-        /**
-         * Set PostCSS syntax.
-         * Overrides the one loaded from PostCSS config file, if any.
-         */
-        syntax?: ProcessOptions["syntax"] | string;
-        /** `to` option for PostCSS, required for some plugins */
-        to?: ProcessOptions["to"];
-        /**
-         * Enable/disable or pass options for CSS URL resolver
-         * @default true
-         */
-        url?: UrlOptions | boolean;
-    };
+    /**
+     * Options for PostCSS
+     */
+    postcss?: PostCSSOptions;
     /** Options for Sass loader */
-    sass?: SASSLoaderOptions;
+    sass?: SassLoaderOptions;
     /**
      * Enable/disable or configure sourcemaps
      * @default false

@@ -1,5 +1,7 @@
 import type { AutoModules } from "../../types";
 
+const MODULE_FILE_PATTERN = /\.module\.[A-Za-z]+$/;
+
 const ensureAutoModules = (am: AutoModules | undefined, id: string): boolean => {
     if (am === undefined) {
         return true;
@@ -13,7 +15,7 @@ const ensureAutoModules = (am: AutoModules | undefined, id: string): boolean => 
         return am.test(id);
     }
 
-    return am && /\.module\.[A-Za-z]+$/.test(id);
+    return am && MODULE_FILE_PATTERN.test(id);
 };
 
 export default ensureAutoModules;

@@ -7,6 +7,7 @@ import type { Importer, SourceSpan, StringOptions } from "sass";
 
 import type { SassLoaderContext, SassLoaderOptions } from "..";
 import type { SassApiType } from "../types";
+import resolveSyntax from "./resolve-syntax";
 
 /**
  * Derives the sass options from the loader context and normalizes its values with sane defaults.
@@ -102,12 +103,8 @@ const getSassOptions = async (
         if ((sassOptions as StringOptions<"async">).syntax === undefined) {
             const extension = extname(resourcePath);
 
-            if (extension && extension.toLowerCase() === ".scss") {
-                (sassOptions as StringOptions<"async">).syntax = "scss";
-            } else if (extension && extension.toLowerCase() === ".sass") {
-                (sassOptions as StringOptions<"async">).syntax = "indented";
-            } else if (extension && extension.toLowerCase() === ".css") {
-                (sassOptions as StringOptions<"async">).syntax = "css";
+            if (extension) {
+                (sassOptions as StringOptions<"async">).syntax = resolveSyntax(extension.toLowerCase());
             }
         }
 

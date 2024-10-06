@@ -20,20 +20,15 @@ const conditions = ["sass", "style"];
  */
 const importerImpl = <T extends (ids: string[], userOptions: ResolveOptions) => unknown>(url: string, importer: string, resolve: T): ReturnType<T> => {
     const candidates: string[] = [];
+    const normalizedUrl = normalizeUrl(url);
 
-    if (hasModuleSpecifier(url)) {
-        const moduleUrl = normalizeUrl(url);
-        // Give precedence to importing a partial
+    // Always add partial and full URL as candidates
+    candidates.push(getUrlOfPartial(normalizedUrl), normalizedUrl);
+
+    // Add module import candidates if necessary
+    if (!hasModuleSpecifier(url) && !isAbsolute(url) && !isRelative(url)) {
+        const moduleUrl = normalizeUrl(`~${url}`);
         candidates.push(getUrlOfPartial(moduleUrl), moduleUrl);
-    } else {
-        const relativeUrl = normalizeUrl(url);
-        candidates.push(getUrlOfPartial(relativeUrl), relativeUrl);
-
-        // fall back to module imports
-        if (!isAbsolute(url) && !isRelative(url)) {
-            const moduleUrl = normalizeUrl(`~${url}`);
-            candidates.push(getUrlOfPartial(moduleUrl), moduleUrl);
-        }
     }
 
     const options = {

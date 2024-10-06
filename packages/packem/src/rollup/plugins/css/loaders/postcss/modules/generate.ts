@@ -1,14 +1,14 @@
 import { makeLegalIdentifier } from "@rollup/pluginutils";
 import { basename, parse } from "@visulima/path";
 
-import hasher from "../../../utils/hasher";
+import getHash from "../../../../../utils/get-hash";
 import { HASH_REGEXP } from "../constants";
 
 const generate =
     (placeholder = "[name]_[local]__[hash:8]") =>
     (local: string, file: string, css: string): string => {
         const { base, dir, name } = parse(file);
-        const hash = hasher(`${base}:${css}`);
+        const hash = getHash(`${base}:${css}`);
         const match = HASH_REGEXP.exec(placeholder);
         const hashLength = match && Number.parseInt(match[1] as string, 10);
 

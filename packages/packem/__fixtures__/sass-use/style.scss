@@ -2,6 +2,6 @@
 @import "~minireset.css/minireset.min";
 
 .button {
-  @include rounded;
-  padding: 5px + $radius;
+    @include rounded;
+    padding: 5px + $radius;
 }

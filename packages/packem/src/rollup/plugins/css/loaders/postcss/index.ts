@@ -47,7 +47,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
     async process({ code, extracted, map }) {
         const config = await loadConfig(this.id, this.options.config);
         const plugins: AcceptedPlugin[] = [];
-        const autoModules = ensureAutoModules(this.options.autoModules, this.id);
+        const autoModules = ensureAutoModules(this.autoModules, this.id);
         const supportModules = Boolean((this.options.modules && ensureAutoModules(this.options.modules.include, this.id)) || autoModules);
         const modulesExports: Record<string, string> = {};
 

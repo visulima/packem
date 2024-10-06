@@ -1,11 +1,12 @@
-import { readFile } from "node:fs";
 import { fileURLToPath } from "node:url";
 
+import { readFile } from "@visulima/fs";
 import { dirname, extname } from "@visulima/path";
 import { pathToFileURL } from "mlly";
 import type { CanonicalizeContext, Importer, ImporterResult, Syntax } from "sass";
 
 import { packageFilterBuilder, resolveAsync } from "../../../utils/resolve";
+import resolveSyntax from "../utils/resolve-syntax";
 
 const extensions = [".scss", ".sass", ".css"];
 const conditions = ["sass", "style"];
@@ -34,28 +35,10 @@ const importer = async (resourcePath: string): Promise<Importer<"async">> => {
         async load(canonicalUrl: URL): Promise<ImporterResult | null> {
             const extension = extname(canonicalUrl.pathname);
 
-            let syntax: Syntax = "scss"; // Default syntax
-
-            if (extension && extension.toLowerCase() === ".scss") {
-                syntax = "scss";
-            } else if (extension && extension.toLowerCase() === ".sass") {
-                syntax = "indented";
-            } else if (extension && extension.toLowerCase() === ".css") {
-                syntax = "css";
-            }
+            const syntax: Syntax = extension ? (resolveSyntax(extension.toLowerCase()) ?? "scss") : "scss"; // Default syntax
 
             try {
-                const contents = await new Promise((resolve, reject) => {
-                    // eslint-disable-next-line security/detect-non-literal-fs-filename
-                    readFile(canonicalUrl, "utf8", (error, content) => {
-                        if (error) {
-                            reject(error);
-                            return;
-                        }
-
-                        resolve(content);
-                    });
-                });
+                const contents = await readFile(canonicalUrl);
 
                 return { contents: contents as string, sourceMapUrl: canonicalUrl, syntax };
             } catch {

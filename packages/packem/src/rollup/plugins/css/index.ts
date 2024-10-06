@@ -31,9 +31,10 @@ export default (
     const sourceMap = inferSourceMapOption(options.sourceMap);
     const loaderOptions: NonNullable<InternalStyleOptions> = {
         ...inferModeOption(options.mode),
-        dts: options.dts ?? false,
-        extensions: options.extensions ?? [".css", ".pcss", ".postcss", ".sss"],
-        namedExports: options.namedExports ?? false,
+        autoModules: options.autoModules ?? false,
+        dts: options.dts as boolean,
+        extensions: options.extensions as string[],
+        namedExports: options.namedExports as boolean,
     };
 
     if (typeof loaderOptions.inject === "object" && loaderOptions.inject.treeshakeable && loaderOptions.namedExports) {
@@ -56,7 +57,6 @@ export default (
     if (hasPostCssLoader) {
         loaderOptions.postcss = {
             ...options.postcss,
-            autoModules: options.postcss?.autoModules ?? false,
             config: inferOption(options.postcss?.config, {}),
             import: inferHandlerOption(options.postcss?.import, options.alias),
             modules: inferOption(options.postcss?.modules, false),
@@ -397,6 +397,7 @@ export default (
 
             const context: LoaderContext = {
                 assets: new Map<string, Uint8Array>(),
+                autoModules: loaderOptions.autoModules,
                 browserTargets,
                 cwd,
                 deps: new Set(),

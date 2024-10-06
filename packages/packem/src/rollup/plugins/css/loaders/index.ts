@@ -7,10 +7,12 @@ import type { InternalStyleOptions, StyleOptions } from "../types";
 import type { Loader, LoaderContext, Payload } from "./types";
 import matchFile from "./utils/match-file";
 
+const DEFAULT_THREAD_POOL_SIZE = 4;
+
 // This queue makes sure one thread is always available,
 // which is necessary for some cases
 // ex.: https://github.com/sass/node-sass/issues/857
-const threadPoolSize = process.env.UV_THREADPOOL_SIZE ? Number.parseInt(process.env.UV_THREADPOOL_SIZE, 10) : 4; // default `libuv` threadpool size
+const threadPoolSize = process.env.UV_THREADPOOL_SIZE ? Number.parseInt(process.env.UV_THREADPOOL_SIZE, 10) : DEFAULT_THREAD_POOL_SIZE; // default `libuv` threadpool size
 
 /** Options for {@link Loaders} class */
 interface LoadersOptions {
@@ -34,7 +36,7 @@ export default class Loaders {
     private readonly logger: Pail;
 
     public constructor({ extensions, loaders, logger, options }: LoadersOptions) {
-        this.test = (file): boolean => extensions.some((extension) => file.toLowerCase().endsWith(extension));
+        this.test = (file: string): boolean => extensions.some((extension) => file.toLowerCase().endsWith(extension));
 
         if (loaders.length > 0) {
             this.add(...loaders);

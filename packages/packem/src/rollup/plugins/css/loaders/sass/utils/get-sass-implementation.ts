@@ -18,7 +18,7 @@ export const getDefaultSassImplementation = (): string => {
         }
     }
 
-    return "sass"; // Default fallback
+    throw new Error("No supported Sass implementation found. Please install 'sass-embedded', 'sass', or 'node-sass'.");
 };
 
 export const getSassImplementation = (
@@ -38,13 +38,13 @@ export const getSassImplementation = (
     const { info = undefined } = resolvedImplementation as Record<string, any>;
 
     if (!info) {
-        throw new Error("Unknown Sass implementation.");
+        throw new Error(`Sass implementation is missing 'info' property. Implementation: ${JSON.stringify(resolvedImplementation)}`);
     }
 
     const infoParts = info.split("\t");
 
     if (infoParts.length < 2) {
-        throw new Error(`Unknown Sass implementation "${info as string}".`);
+        throw new Error(`Invalid Sass implementation info format. Expected at least 2 parts, got: "${info as string}".`);
     }
 
     const [implementationName] = infoParts;
@@ -61,5 +61,5 @@ export const getSassImplementation = (
         return resolvedImplementation as typeof sassEmbedded;
     }
 
-    throw new Error(`Unknown Sass implementation "${implementationName as string}".`);
+    throw new Error(`Unsupported Sass implementation: "${implementationName as string}". Supported implementations are: dart-sass, node-sass, sass-embedded.`);
 };

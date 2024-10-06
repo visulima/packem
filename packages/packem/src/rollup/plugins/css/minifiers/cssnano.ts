@@ -21,15 +21,11 @@ const cssnanoMinifier: Minifier<Options> = {
                 to: data.name,
             });
 
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            if (resultMinified.map) {
-                // eslint-disable-next-line no-param-reassign
-                data.map = resultMinified.map.toString();
-            }
-
             return {
                 ...data,
                 css: resultMinified.css,
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                map: resultMinified.map ? resultMinified.map.toString() : undefined,
             };
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {

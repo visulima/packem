@@ -9,7 +9,11 @@ const matchFile = (file: string, condition: Loader["test"]): boolean => {
         return condition(file);
     }
 
-    return condition.test(file);
+    if (typeof condition.test === "function") {
+        return condition.test(file);
+    }
+
+    throw new Error("Invalid condition type");
 };
 
 export default matchFile;
