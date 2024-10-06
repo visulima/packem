@@ -1,9 +1,27 @@
 import { installPackage } from "@antfu/install-pkg";
-import { cancel, confirm, intro, log, outro, select, spinner } from "@clack/prompts";
+import { cancel, confirm, intro, log, multiselect, outro, select, spinner } from "@clack/prompts";
 import type { Cli } from "@visulima/cerebro";
 import { isAccessibleSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { parsePackageJson } from "@visulima/package/package-json";
 import { join } from "@visulima/path";
+
+const cssLoaderDependencies = {
+    less: ["less"],
+    "node-sass": ["node-sass"],
+    postcss: [
+        "postcss",
+        "postcss-load-config",
+        "postcss-modules",
+        "postcss-modules-extract-imports",
+        "postcss-modules-local-by-default",
+        "postcss-modules-scope",
+        "postcss-modules-values",
+        "postcss-value-parser",
+    ],
+    sass: ["sass"],
+    "sass-embedded": ["sass-embedded"],
+    stylus: ["stylus"],
+};
 
 const createInitCommand = (cli: Cli): void => {
     cli.addCommand({
@@ -138,16 +156,15 @@ const createInitCommand = (cli: Cli): void => {
                 log.message("Transformer " + options.transformer + " is already installed.");
             }
 
-            let useIsolatedDeclarationTransformer = true;
-
             if (options.isolatedDeclarationTransformer === undefined) {
-                useIsolatedDeclarationTransformer = (await confirm({
+                // eslint-disable-next-line no-param-reassign
+                options.isolatedDeclarationTransformer = (await confirm({
                     message: "Do you want to use an isolated declaration types?",
                     initialValue: false,
                 })) as boolean;
             }
 
-            if (options.isolatedDeclarationTransformer === undefined && useIsolatedDeclarationTransformer) {
+            if (options.isolatedDeclarationTransformer === undefined) {
                 // eslint-disable-next-line no-param-reassign
                 options.isolatedDeclarationTransformer = await select({
                     message: "Pick a isolated declaration transformer",
@@ -200,22 +217,134 @@ const createInitCommand = (cli: Cli): void => {
                 }
             }
 
+            if (options.css === undefined) {
+                // eslint-disable-next-line no-param-reassign
+                options.css = (await confirm({
+                    message: "Do you want to use css in your project?",
+                    initialValue: false,
+                })) as boolean;
+            }
+
+            let cssLoaders: (keyof typeof cssLoaderDependencies | "sourceMap")[] = [];
+
+            if (options.css) {
+                cssLoaders = (await multiselect({
+                    message: "Pick your loaders",
+                    options: [
+                        { label: "Sass", value: "sass" },
+                        { label: "Stylus", value: "stylus" },
+                        { label: "Less", value: "less" },
+                    ],
+                    required: false,
+                })) as (keyof typeof cssLoaderDependencies)[];
+
+                cssLoaders.push("postcss");
+
+                if (cssLoaders.includes("sass")) {
+                    const sassLoader = await select({
+                        message: "Pick a sass loader",
+                        options: [
+                            { label: "Sass embedded", value: "sass-embedded", hint: "recommended" },
+                            { label: "Sass", value: "sass" },
+                            { label: "Node Sass", value: "node-sass", hint: "legacy" },
+                        ],
+                    });
+
+                    if (sassLoader !== "sass") {
+                        cssLoaders = cssLoaders.filter((loader) => loader !== "sass");
+
+                        cssLoaders.push(sassLoader as keyof typeof cssLoaderDependencies);
+                    }
+                }
+
+                const shouldInstall = await confirm({
+                    message: 'Do you want to install "' + cssLoaders.join('", "') + '"?',
+                });
+
+                if (shouldInstall) {
+                    const s = spinner();
+
+                    s.start('Installing dependencies for "' + cssLoaders.join('", "') + '"');
+                    for await (const loader of cssLoaders) {
+                        await installPackage(cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies], {
+                            cwd: options.dir,
+                            dev: true,
+                            silent: true,
+                        });
+                    }
+                    s.stop("");
+                }
+
+                cssLoaders.push("sourceMap");
+            }
+
             let template = "";
+            let packemConfig = "";
+
+            if (options.isolatedDeclarationTransformer) {
+                packemConfig += ",\n    isolatedDeclarationTransformer";
+            }
+
+            if (options.css) {
+                packemConfig += ",\n    rollup: {\n        css: {\n            loaders: [";
+
+                for (let loader of cssLoaders) {
+                    if (loader === "sass-embedded" || loader === "node-sass") {
+                        loader = "sass";
+                    }
+
+                    packemConfig += `${loader as string}Loader, `;
+                }
+
+                packemConfig += "]\n        }\n    }";
+            }
 
             if (hasTypescript || packageJson.type === "module") {
+                let imports = "";
+
+                if (options.isolatedDeclarationTransformer) {
+                    imports += `import isolatedDeclarationTransformer from "@visulima/packem/dts/isolated/transformer/${options.isolatedDeclarationTransformer as string}";\n`;
+                }
+
+                if (options.css) {
+                    for (let loader of cssLoaders) {
+                        if (loader === "sass-embedded" || loader === "node-sass") {
+                            loader = "sass";
+                        }
+
+                        imports += `import ${loader as string}Loader from "@visulima/packem/css/loader/${loader.toLowerCase() as string}";\n`;
+                    }
+                }
+
                 template = `import { defineConfig } from "@visulima/packem/config";
 import transformer from "@visulima/packem/transformer/${options.transformer as string}";
-${!useIsolatedDeclarationTransformer || !options.isolatedDeclarationTransformer ? "" : `import isolatedDeclarationTransformer from "@visulima/packem/dts/isolated/transformer/${options.isolatedDeclarationTransformer as string}";\n`}
+${imports}
 export default defineConfig({
-    transformer${!useIsolatedDeclarationTransformer || !options.isolatedDeclarationTransformer ? "" : ",\n    isolatedDeclarationTransformer"}
+    transformer${packemConfig}
 });
 `;
             } else {
+                let imports = "";
+
+                if (options.isolatedDeclarationTransformer) {
+                    imports += `const isolatedDeclarationTransformer = require("@visulima/packem/dts/isolated/transformer/${options.isolatedDeclarationTransformer as string}");\n`;
+                }
+
+                if (options.css) {
+                    for (let loader of cssLoaders) {
+                        if (loader === "sass-embedded" || loader === "node-sass") {
+                            loader = "sass";
+                        }
+
+                        imports += `const ${loader as string}Loader = require("@visulima/packem/css/loader/${loader.toLowerCase() as string}");\n`;
+                    }
+                }
+
                 template = `const { defineConfig } = require("@visulima/packem/config");
 const transformer = require("@visulima/packem/transformer/${options.transformer as string}");
-${!useIsolatedDeclarationTransformer || !options.isolatedDeclarationTransformer ? "" : `const isolatedDeclarationTransformer = require("@visulima/packem/dts/isolated/transformer/${options.isolatedDeclarationTransformer as string}");\n`}
+${imports}
 module.exports = defineConfig({
-    transformer${!useIsolatedDeclarationTransformer || !options.isolatedDeclarationTransformer ? "" : ",\n    isolatedDeclarationTransformer"}
+    transformer${packemConfig}
 });
 `;
             }
@@ -261,8 +390,9 @@ module.exports = defineConfig({
                 },
             },
             {
-                name: "css-loader",
-                description: "Use CSS loader",
+                description: "Use CSS",
+                name: "css",
+                type: Boolean,
             },
             {
                 Description: "Use TypeScript",
