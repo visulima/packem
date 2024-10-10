@@ -759,7 +759,7 @@ const createBundler = async (
 
         context.logger.debug({
             context: context.options.entries,
-            message: `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}}`,
+            message: `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}`,
         });
 
         // Clean dist dirs

@@ -24,7 +24,7 @@ interface LoadersOptions {
     options: InternalStyleOptions;
 }
 
-export default class Loaders {
+export default class LoaderManager {
     private readonly test: (file: string) => boolean;
 
     private readonly loaders = new Map<string, Loader>();

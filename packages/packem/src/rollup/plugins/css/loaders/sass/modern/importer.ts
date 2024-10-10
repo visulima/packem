@@ -5,11 +5,11 @@ import { dirname, extname } from "@visulima/path";
 import { pathToFileURL } from "mlly";
 import type { CanonicalizeContext, Importer, ImporterResult, Syntax } from "sass";
 
-import { packageFilterBuilder, resolveAsync } from "../../../utils/resolve";
+import { resolve } from "../../../utils/resolve";
 import resolveSyntax from "../utils/resolve-syntax";
 
 const extensions = [".scss", ".sass", ".css"];
-const conditions = ["sass", "style"];
+const mainFields = ["sass", "style"];
 
 const importer = async (resourcePath: string): Promise<Importer<"async">> => {
     return {
@@ -19,11 +19,11 @@ const importer = async (resourcePath: string): Promise<Importer<"async">> => {
             let result;
 
             try {
-                result = await resolveAsync([originalUrl], {
+                result = resolve([originalUrl], {
                     basedirs: [dirname(previous)],
                     caller: "Sass modern importer",
                     extensions,
-                    packageFilter: packageFilterBuilder({ conditions }),
+                    mainFields
                 });
             } catch {
                 // If no stylesheets are found, the importer should return null.

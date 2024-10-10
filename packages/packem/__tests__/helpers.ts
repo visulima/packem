@@ -3,7 +3,7 @@ import { mkdir } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { ensureSymlink, writeFileSync, writeJsonSync } from "@visulima/fs";
+import { ensureSymlink, writeFile, writeJsonSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import type { TsConfigJson } from "@visulima/tsconfig";
 import type { Options } from "execa";
@@ -11,6 +11,7 @@ import { execaNode } from "execa";
 import { expect } from "vitest";
 
 import type { BuildConfig } from "../src/types";
+import type { StyleOptions } from "../src/rollup/plugins/css/types";
 
 const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../dist");
 
@@ -51,20 +52,36 @@ export const createPackemConfig = async (
     config: BuildConfig | string = {},
     transformer: "esbuild" | "swc" | "sucrase" = "esbuild",
     isolatedDeclarationTransformer: "swc" | "typescript" | "oxc" | undefined = undefined,
+    cssLoader: ("postcss" | "less" | "stylus" | "sass" | "sourcemap")[] = [],
+    cssOptions: StyleOptions | string | undefined = undefined,
+    minimizer: "cssnano" | "lightningcss" | undefined = undefined,
 ): Promise<void> => {
     await installPackage(fixturePath, transformer === "swc" ? "@swc" : transformer);
 
-    writeFileSync(
+    await writeFile(
         join(fixturePath, "packem.config.ts"),
-        `import { defineConfig } from "${distributionPath}/config";
+        `import { normalize } from "node:path";
+import { defineConfig } from "${distributionPath}/config";
 import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : "index"}";
 ${isolatedDeclarationTransformer ? `import isolatedDeclarationTransformer from "${distributionPath}/rollup/plugins/${isolatedDeclarationTransformer}/isolated-declarations-${isolatedDeclarationTransformer}-transformer";` : ""}
-
+${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/rollup/plugins/css/loaders/${loader}";`).join("\n")}
+${minimizer ? `import ${minimizer} from "${distributionPath}/rollup/plugins/css/minifiers/${minimizer}";` : ""}
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
     transformer,
     ${isolatedDeclarationTransformer ? `isolatedDeclarationTransformer,` : ""}
     ${typeof config === "string" ? config : JSON.stringify(config, null, 4).slice(1, -1)}
+    ${
+        cssLoader.length > 0
+            ? `rollup: {
+    css: {
+        ${typeof cssOptions === "string" ? cssOptions : typeof cssOptions === "object" ? JSON.stringify(cssOptions, null, 4).slice(1, -1) + ", " : ""}
+        loaders: [${cssLoader.map((loader) => `${loader}Loader`).join(", ")}],
+        ${minimizer ? `minifier: ${minimizer},` : ""}
+        }
+    },`
+            : ""
+    }
 });
 `,
         {

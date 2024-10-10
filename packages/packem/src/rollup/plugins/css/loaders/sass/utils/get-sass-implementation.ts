@@ -5,14 +5,14 @@ import type * as sass from "sass";
 // eslint-disable-next-line import/no-namespace
 import type * as sassEmbedded from "sass-embedded";
 
-export const getDefaultSassImplementation = (): string => {
+export const getDefaultSassImplementation = (): "sass-embedded" | "sass" | "node-sass" => {
     const implementations = ["sass-embedded", "sass", "node-sass"];
 
     for (const impl of implementations) {
         try {
             // eslint-disable-next-line unicorn/prefer-module
             require.resolve(impl);
-            return impl;
+            return impl as "sass-embedded" | "sass" | "node-sass";
         } catch {
             // Continue to the next implementation
         }

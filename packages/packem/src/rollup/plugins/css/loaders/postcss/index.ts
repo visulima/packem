@@ -7,7 +7,7 @@ import postcss from "postcss";
 import type { RawSourceMap } from "source-map-js";
 
 import type { InjectOptions, InternalStyleOptions } from "../../types";
-import { resolveAsync } from "../../utils/resolve";
+import { resolve } from "../../utils/resolve";
 import safeId from "../../utils/safe-id";
 import { mm } from "../../utils/sourcemap";
 import type { Loader } from "../types";
@@ -200,7 +200,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
                 const injectorCall = `${injectorName}(${cssVariableName},${JSON.stringify(injectorOptions)});`;
 
                 if (!injectorId) {
-                    injectorId = await resolveAsync(["./runtime/inject-css"], { basedirs: [join(baseDirectory, "..", "..")] });
+                    injectorId = resolve(["./runtime/inject-css"], { basedirs: [join(baseDirectory, "..", "..")] });
                     injectorId = `"${normalize(injectorId)}"`;
                 }
 

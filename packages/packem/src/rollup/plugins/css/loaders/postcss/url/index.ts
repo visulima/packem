@@ -8,21 +8,21 @@ import { DATA_URI_REGEXP, FIRST_EXTENSION_REGEXP } from "../constants";
 import generateName from "./generate";
 import inlineFile from "./inline";
 import type { UrlFile, UrlResolve } from "./resolve";
-import { resolve as defaultResolve } from "./resolve";
+import { urlResolve } from "./resolve";
 import { isDeclWithUrl, walkUrls } from "./utils";
 
 const name = "styles-url";
 const placeholderHashDefault = "assets/[name]-[hash][extname]";
 const placeholderNoHashDefault = "assets/[name][extname]";
-const defaultpublicPath = "./";
+const defaultPublicPath = "./";
 const defaultAssetDirectory = ".";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const plugin: PluginCreator<UrlOptions> = (options = {}) => {
     const inline = options.inline ?? false;
-    const publicPath = options.publicPath ?? defaultpublicPath;
+    const publicPath = options.publicPath ?? defaultPublicPath;
     const assetDirectory = options.assetDir ?? defaultAssetDirectory;
-    const resolve = options.resolve ?? defaultResolve;
+    const resolve = options.resolve ?? urlResolve;
     const alias = options.alias ?? {};
     const placeholder = (options.hash ?? true) ? (typeof options.hash === "string" ? options.hash : placeholderHashDefault) : placeholderNoHashDefault;
 
@@ -167,7 +167,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                     const resolvedPublicPath =
                         typeof publicPath === "string"
                             ? publicPath + (/[/\\]$/.test(publicPath) ? "" : "/") + basename(to)
-                            : `${defaultpublicPath}${basename(to)}`;
+                            : `${defaultPublicPath}${basename(to)}`;
 
                     node.type = "string";
                     node.value = typeof publicPath === "function" ? publicPath(node.value, resolvedPublicPath, file) : resolvedPublicPath;

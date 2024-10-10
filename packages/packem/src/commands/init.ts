@@ -17,6 +17,7 @@ const cssLoaderDependencies = {
         "postcss-modules-scope",
         "postcss-modules-values",
         "postcss-value-parser",
+        "icss-utils"
     ],
     sass: ["sass"],
     "sass-embedded": ["sass-embedded"],

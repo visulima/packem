@@ -17,19 +17,28 @@ const populateSourcemapContent = async (sourcemap: RawSourceMap, basePath: strin
 
     // We have to manually modify the `sourcesContent` field
     // since stylus compiler doesn't support it yet
-    return await Promise.all(
-        sourcemap.sources.map(async (source) => {
-            const file = normalize(join(basePath, source));
+    return (await Promise.all(
+        sourcemap.sources
+            .map(async (source) => {
+                const file = normalize(join(basePath, source));
 
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
-            if (!existsSync(file)) {
-                return null as unknown as string;
-            }
+                // eslint-disable-next-line security/detect-non-literal-fs-filename
+                if (!existsSync(file)) {
+                    return undefined;
+                }
 
-            return readFileSync(file);
-        }),
-    );
+                return readFileSync(file);
+            })
+            .filter(Boolean),
+    )) as string[];
 };
+
+interface StylusInstance {
+    deps: (filename?: string) => string[];
+    filename: string;
+    render: (callback: (error: Error | null, css: string) => void) => void;
+    sourcemap: RawSourceMap;
+}
 
 const loader: Loader<StylusLoaderOptions> = {
     name: "stylus",
@@ -42,12 +51,10 @@ const loader: Loader<StylusLoaderOptions> = {
             paths.push(...options.paths);
         }
 
-        const style = stylus(code, options).set("filename", this.id).set("paths", paths).set("sourcemap", { basePath, comment: false }) as unknown as {
-            deps: (filename?: string) => string[];
-            filename: string;
-            render: (callback: (error: Error | null, css: string) => void) => void;
-            sourcemap: RawSourceMap;
-        };
+        const style = stylus(code, options)
+            .set("filename", this.id)
+            .set("paths", paths)
+            .set("sourcemap", { basePath, comment: false }) as unknown as StylusInstance;
 
         const render = async (): Promise<string> =>
             await new Promise((resolve, reject) => {

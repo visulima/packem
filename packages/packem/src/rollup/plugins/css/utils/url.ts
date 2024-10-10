@@ -1,4 +1,4 @@
-import { isAbsolute, parse, toNamespacedPath } from "@visulima/path";
+import { isAbsolute, parse, normalize } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 
 /**
@@ -9,20 +9,22 @@ import { isRelative } from "@visulima/path/utils";
  */
 export const hasModuleSpecifier = (url: string): boolean => /^~[\d@A-Z]/i.test(url);
 
+// handle importing Sass partials in node_modules
+// @import ~foo/bar/partial where "partial" has the filename "_partial.scss".
 export const getUrlOfPartial = (url: string): string => {
     const { base, dir } = parse(url);
 
-    return dir ? `${toNamespacedPath(dir)}/_${base}` : `_${base}`;
+    return dir ? `${normalize(dir)}/_${base}` : `_${base}`;
 };
 
 export const normalizeUrl = (url: string): string => {
     if (hasModuleSpecifier(url)) {
-        return toNamespacedPath(url.slice(1));
+        return normalize(url.slice(1));
     }
 
     if (isAbsolute(url) || isRelative(url)) {
-        return toNamespacedPath(url);
+        return normalize(url);
     }
 
-    return `./${toNamespacedPath(url)}`;
+    return `./${normalize(url)}`;
 };

@@ -5,18 +5,18 @@ import { isRelative } from "@visulima/path/utils";
 import type { GetModuleInfo, OutputAsset, OutputChunk, Plugin } from "rollup";
 
 import type { Environment } from "../../../types";
-import Loaders from "./loaders";
+import LoaderManager from "./loaders/loader";
 import type { Extracted, Loader, LoaderContext } from "./loaders/types";
 import type { ExtractedData, InternalStyleOptions, StyleOptions } from "./types";
 import concat from "./utils/concat";
 import { ensurePCSSOption, ensurePCSSPlugins, inferHandlerOption, inferModeOption, inferOption, inferSourceMapOption } from "./utils/options";
 import { mm } from "./utils/sourcemap";
 
-const sortByNameOrder = (objectsArray: Loader[], nameOrder: string[]): Loader[] =>
+const sortByNameOrder = async (objectsArray: Loader[], nameOrder: string[]): Promise<Loader[]> =>
     // eslint-disable-next-line etc/no-assign-mutated-array
     objectsArray.sort((a, b) => nameOrder.indexOf(a.name) - nameOrder.indexOf(b.name));
 
-export default (
+export default async (
     options: StyleOptions,
     logger: Pail,
     browserTargets: string[],
@@ -25,7 +25,7 @@ export default (
     environment: Environment,
     useSourcemap: boolean,
     // eslint-disable-next-line sonarjs/cognitive-complexity
-): Plugin => {
+): Promise<Plugin> => {
     const isIncluded = createFilter(options.include, options.exclude);
 
     const sourceMap = inferSourceMapOption(options.sourceMap);
@@ -65,25 +65,25 @@ export default (
         };
 
         if (options.postcss?.parser) {
-            loaderOptions.postcss.parser = ensurePCSSOption(options.postcss.parser, "parser");
+            loaderOptions.postcss.parser = await ensurePCSSOption(options.postcss.parser, "parser", cwd);
         }
 
         if (options.postcss?.syntax) {
-            loaderOptions.postcss.syntax = ensurePCSSOption(options.postcss.syntax, "syntax");
+            loaderOptions.postcss.syntax = await ensurePCSSOption(options.postcss.syntax, "syntax", cwd);
         }
 
         if (options.postcss?.stringifier) {
-            loaderOptions.postcss.stringifier = ensurePCSSOption(options.postcss.stringifier, "stringifier");
+            loaderOptions.postcss.stringifier = await ensurePCSSOption(options.postcss.stringifier, "stringifier", cwd);
         }
 
         if (options.postcss?.plugins) {
-            loaderOptions.postcss.plugins = ensurePCSSPlugins(options.postcss.plugins);
+            loaderOptions.postcss.plugins = await ensurePCSSPlugins(options.postcss.plugins);
         }
     }
 
-    const loaders = new Loaders({
+    const loaders = new LoaderManager({
         extensions: loaderOptions.extensions,
-        loaders: sortByNameOrder(options.loaders, ["sourcemap", "stylus", "less", "sass", "postcss"]),
+        loaders: await sortByNameOrder(options.loaders, ["sourcemap", "stylus", "less", "sass", "postcss"]),
         logger,
         options: {
             ...options,

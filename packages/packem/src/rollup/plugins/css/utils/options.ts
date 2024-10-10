@@ -64,12 +64,12 @@ export const inferHandlerOption = <T extends { alias?: Record<string, string> }>
     return opt;
 };
 
-export const ensurePCSSOption = <T>(option: T | string, type: PCSSOption): T => {
+export const ensurePCSSOption = async <T>(option: T | string, type: PCSSOption, cwd: string): Promise<T> => {
     if (typeof option !== "string") {
         return option;
     }
 
-    const module = loadModule(option);
+    const module = await loadModule(option, cwd);
 
     if (!module) {
         throw new Error(`Unable to load PostCSS ${type} \`${option}\``);
@@ -78,7 +78,7 @@ export const ensurePCSSOption = <T>(option: T | string, type: PCSSOption): T => 
     return module as T;
 };
 
-export const ensurePCSSPlugins = (plugins: undefined | (Plugin | Transformer | Processor)[]): Result["plugins"] => {
+export const ensurePCSSPlugins = async (plugins: undefined | (Plugin | Transformer | Processor)[]): Promise<Result["plugins"]> => {
     if (plugins === undefined) {
         return [];
     }
@@ -89,9 +89,9 @@ export const ensurePCSSPlugins = (plugins: undefined | (Plugin | Transformer | P
 
     const ps: Result["plugins"] = [];
 
-    for (const plugin of plugins.filter(Boolean)) {
+    for await (const plugin of plugins.filter(Boolean)) {
         if (!Array.isArray(plugin)) {
-            ps.push(ensurePCSSOption(plugin, "plugin"));
+            ps.push(await ensurePCSSOption(plugin, "plugin"));
 
             // eslint-disable-next-line no-continue
             continue;
@@ -101,10 +101,10 @@ export const ensurePCSSPlugins = (plugins: undefined | (Plugin | Transformer | P
 
         if (options) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ps.push(ensurePCSSOption<any>(plug, "plugin")(options));
+            ps.push((await ensurePCSSOption<any>(plug, "plugin"))(options));
         } else {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ps.push(ensurePCSSOption<any>(plug, "plugin"));
+            ps.push(await ensurePCSSOption<any>(plug, "plugin"));
         }
     }
 

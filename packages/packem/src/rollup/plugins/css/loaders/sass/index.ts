@@ -30,7 +30,7 @@ const loader: Loader<SassLoaderOptions> = {
     async process({ code, map }) {
         let apiType: SassApiType = "modern-compiler";
 
-        const foundSassPackage = getDefaultSassImplementation();
+        const foundSassPackage = this.options.implementation ?? getDefaultSassImplementation();
 
         if (foundSassPackage === "sass") {
             apiType = "modern";
@@ -147,6 +147,7 @@ export type SassLoaderOptions = {
         | string
         | ((content: string | Buffer, loaderContext: SassLoaderContext) => string)
         | ((content: string | Buffer, loaderContext: SassLoaderContext) => Promise<string>);
+    implementation?: "sass-embedded" | "sass" | "node-sass";
     warnRuleAsWarning?: boolean;
 } & (
     | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">

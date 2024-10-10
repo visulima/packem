@@ -1,4 +1,4 @@
-import foo from "./foo.css";
+import foo from "./foo.css" with { type: "css" };
 import bar from "./bar.css";
 import "./style.styl";
 import "./style.pcss";

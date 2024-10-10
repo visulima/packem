@@ -3,13 +3,12 @@ import { dirname } from "@visulima/path";
 import type { ProcessOptions } from "postcss";
 import type Processor from "postcss/lib/processor";
 
-import { resolveAsync } from "../../../utils/resolve";
+import { resolve } from "../../../utils/resolve";
 
-const load: Load = async (url, file, extensions, processor, options_) => {
-    const options = { basedirs: [dirname(file)], caller: "ICSS loader", extensions };
-    const from = await resolveAsync([url, `./${url}`], options);
+const load: Load = async (url, file, extensions, processor, options) => {
+    const from = resolve([url, `./${url}`], { basedirs: [dirname(file)], caller: "ICSS loader", extensions });
     const source = await readFile(from);
-    const { messages } = await processor.process(source, { ...options_, from });
+    const { messages } = await processor.process(source, { ...options, from });
 
     const exports: Record<string, string> = {};
 

@@ -34,18 +34,18 @@ export default async (id: string, config?: PostCSSConfigLoaderOptions | false): 
             configCache = postcssConfig;
         }
 
-        const result: Result = { file: postcssConfig.file, options: postcssConfig.options, plugins: ensurePCSSPlugins(postcssConfig.plugins) };
+        const result: Result = { file: postcssConfig.file, options: postcssConfig.options, plugins: await ensurePCSSPlugins(postcssConfig.plugins) };
 
         if (result.options.parser) {
-            result.options.parser = ensurePCSSOption(result.options.parser, "parser");
+            result.options.parser = await ensurePCSSOption(result.options.parser, "parser");
         }
 
         if (result.options.syntax) {
-            result.options.syntax = ensurePCSSOption(result.options.syntax, "syntax");
+            result.options.syntax = await ensurePCSSOption(result.options.syntax, "syntax");
         }
 
         if (result.options.stringifier) {
-            result.options.stringifier = ensurePCSSOption(result.options.stringifier, "stringifier");
+            result.options.stringifier = await ensurePCSSOption(result.options.stringifier, "stringifier");
         }
 
         return result;

@@ -8,18 +8,21 @@ const loader: Loader<LESSLoaderOptions> = {
     name: "less",
     async process({ code, map }) {
         const options = { ...this.options };
-        const plugins = [importer];
+        const plugins: Less.Plugin[] = [importer(this.cwd as string)];
 
         if (options.plugins) {
             plugins.push(...options.plugins);
         }
 
-        const result: Less.RenderOutput = (await less.render(code, {
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        const render = less.render as (input: string, options: Less.Options) => Promise<Less.RenderOutput>;
+
+        const result: Less.RenderOutput = await render(code, {
             ...options,
             filename: this.id,
             plugins,
             sourceMap: { outputSourceFiles: true, sourceMapBasepath: dirname(this.id) },
-        })) as Less.RenderOutput;
+        });
 
         const deps = result.imports;
 

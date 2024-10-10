@@ -476,7 +476,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 context.options.rollup.css &&
                     context.options.rollup.css.loaders &&
                     context.options.rollup.css.loaders.length > 0 &&
-                    cssPlugin(
+                    await cssPlugin(
                         {
                             dts: Boolean(context.options.declaration) || context.options.isolatedDeclarationTransformer !== undefined,
                             sourceMap: context.options.sourcemap,

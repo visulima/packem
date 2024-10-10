@@ -3,11 +3,11 @@ import { isRelative } from "@visulima/path/utils";
 import type { ImporterReturnType } from "node-sass";
 
 import type { ResolveOptions } from "../../../utils/resolve";
-import { packageFilterBuilder, resolveSync } from "../../../utils/resolve";
+import { resolve } from "../../../utils/resolve";
 import { getUrlOfPartial, hasModuleSpecifier, normalizeUrl } from "../../../utils/url";
 
 const extensions = [".scss", ".sass", ".css"];
-const conditions = ["sass", "style"];
+const mainFields = ["sass", "style"];
 
 /**
  * The exact behavior of importers defined here differ slightly between dart-sass and node-sass:
@@ -18,7 +18,7 @@ const conditions = ["sass", "style"];
  * agnostic, the first attempt to resolve a file by a relative is unneeded in dart-sass and can be
  * removed once support for node-sass is fully deprecated.
  */
-const importerImpl = <T extends (ids: string[], userOptions: ResolveOptions) => unknown>(url: string, importer: string, resolve: T): ReturnType<T> => {
+const importerImpl = <T extends (ids: string[], userOptions: ResolveOptions) => unknown>(url: string, importer: string, resolver: T): ReturnType<T> => {
     const candidates: string[] = [];
     const normalizedUrl = normalizeUrl(url);
 
@@ -28,6 +28,7 @@ const importerImpl = <T extends (ids: string[], userOptions: ResolveOptions) => 
     // Add module import candidates if necessary
     if (!hasModuleSpecifier(url) && !isAbsolute(url) && !isRelative(url)) {
         const moduleUrl = normalizeUrl(`~${url}`);
+
         candidates.push(getUrlOfPartial(moduleUrl), moduleUrl);
     }
 
@@ -35,10 +36,10 @@ const importerImpl = <T extends (ids: string[], userOptions: ResolveOptions) => 
         basedirs: [dirname(importer)],
         caller: "Sass importer",
         extensions,
-        packageFilter: packageFilterBuilder({ conditions }),
+        mainFields,
     };
 
-    return resolve(candidates, options) as ReturnType<T>;
+    return resolver(candidates, options) as ReturnType<T>;
 };
 
 const finalize = (id: string): ImporterReturnType => {
@@ -47,7 +48,7 @@ const finalize = (id: string): ImporterReturnType => {
 
 const importer: (url: string, previousImporter: string) => ImporterReturnType | null = (url: string, previousImporter: string): ImporterReturnType | null => {
     try {
-        return finalize(importerImpl(url, previousImporter, resolveSync));
+        return finalize(importerImpl(url, previousImporter, resolve));
     } catch {
         return null;
     }

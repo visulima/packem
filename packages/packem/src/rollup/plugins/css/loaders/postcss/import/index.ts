@@ -4,13 +4,13 @@ import postcss from "postcss";
 import valueParser from "postcss-value-parser";
 
 import type { ImportResolve } from "./resolve";
-import { resolve as resolveDefault } from "./resolve";
+import { importResolve } from "./resolve";
 
 const name = "styles-import";
 const extensionsDefault = [".css", ".pcss", ".postcss", ".sss"];
 
 const plugin: PluginCreator<ImportOptions> = (options = {}) => {
-    const resolve = options.resolve ?? resolveDefault;
+    const resolve = options.resolve ?? importResolve;
     const alias = options.alias ?? {};
     const extensions = options.extensions ?? extensionsDefault;
 
@@ -99,6 +99,7 @@ const plugin: PluginCreator<ImportOptions> = (options = {}) => {
 
             for await (const { rule, url } of importList) {
                 try {
+
                     const { from, source } = await resolve(url, basedir, extensions);
 
                     if (!(source instanceof Uint8Array) || typeof from !== "string") {
