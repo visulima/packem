@@ -130,7 +130,18 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
     }
 
     if (loggedEntries) {
-        logger.raw("Σ Total dist size (byte size):", cyan(formatBytes(context.buildEntries.reduce((index, entry) => index + (entry.bytes ?? 0), 0))), "\n");
+        logger.raw(
+            "Σ Total dist size (byte size):",
+            cyan(
+                formatBytes(
+                    context.buildEntries.reduce((index, entry) => index + (entry.bytes ?? 0), 0),
+                    {
+                        decimals: 2,
+                    },
+                ),
+            ),
+            "\n",
+        );
     }
 
     return loggedEntries;
@@ -355,7 +366,6 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<boole
     context.logger.success(green(context.options.name ? "Build succeeded for " + context.options.name : "Build succeeded"));
 
     // Find all dist files and add missing entries as chunks
-
     for await (const file of walk(join(context.options.rootDir, context.options.outDir))) {
         let entry = context.buildEntries.find((bEntry) => join(context.options.rootDir, context.options.outDir, bEntry.path) === file.path);
 

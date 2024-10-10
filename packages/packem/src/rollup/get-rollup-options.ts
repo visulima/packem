@@ -26,6 +26,7 @@ import memoizeByKey from "../utils/memoize";
 import chunkSplitter from "./plugins/chunk-splitter";
 import { cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
+import cssPlugin from "./plugins/css";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
 import { esmShimCjsSyntaxPlugin } from "./plugins/esm-shim-cjs-syntax";
 import fixDynamicImportExtension from "./plugins/fix-dynamic-import-extension";
@@ -360,6 +361,11 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
         output: [
             context.options.emitCJS &&
                 <OutputOptions>{
+                    // Governs names of CSS files (for assets from CSS use `hash` option for url handler).
+                    // Note: using value below will put `.css` files near js,
+                    // but make sure to adjust `hash`, `assetDir` and `publicPath`
+                    // options for url handler accordingly.
+                    assetFileNames: "[name]-[hash][extname]",
                     chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "cjs"),
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "cjs"),
@@ -375,7 +381,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         reservedNamesAsProps: true,
                         symbols: true,
                     },
-                    // By default in rollup, when creating multiple chunks, transitive imports of entry chunks
+                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
                     // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
                     hoistTransitiveImports: false,
                     interop: "compat",
@@ -386,6 +392,11 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 },
             context.options.emitESM &&
                 <OutputOptions>{
+                    // Governs names of CSS files (for assets from CSS use `hash` option for url handler).
+                    // Note: using value below will put `.css` files near js,
+                    // but make sure to adjust `hash`, `assetDir` and `publicPath`
+                    // options for url handler accordingly.
+                    assetFileNames: "[name]-[hash][extname]",
                     chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "mjs"),
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "mjs"),
@@ -401,7 +412,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         reservedNamesAsProps: true,
                         symbols: true,
                     },
-                    // By default in rollup, when creating multiple chunks, transitive imports of entry chunks
+                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
                     // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
                     hoistTransitiveImports: false,
                     sourcemap: context.options.sourcemap,
@@ -450,6 +461,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
                 context.options.rollup.wasm && wasmPlugin(context.options.rollup.wasm),
 
+                // @TODO check if this can be moved into the dts build
                 context.options.declaration &&
                     context.options.rollup.isolatedDeclarations &&
                     context.options.isolatedDeclarationTransformer &&
@@ -460,6 +472,23 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         Boolean(context.options.rollup.cjsInterop),
                         context.options.rollup.isolatedDeclarations,
                     ),
+
+                context.options.rollup.css &&
+                    context.options.rollup.css.loaders &&
+                    context.options.rollup.css.loaders.length > 0 &&
+                    (await cssPlugin(
+                        {
+                            dts: Boolean(context.options.declaration) || context.options.isolatedDeclarationTransformer !== undefined,
+                            sourceMap: context.options.sourcemap,
+                            ...context.options.rollup.css,
+                        },
+                        context.logger,
+                        context.options.browserTargets as string[],
+                        context.options.rootDir,
+                        context.options.sourceDir,
+                        context.environment,
+                        context.options.sourcemap,
+                    )),
 
                 context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
 
@@ -599,17 +628,6 @@ const memoizeDtsPluginByKey = memoizeByKey<typeof createDtsPlugin>(createDtsPlug
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export const getRollupDtsOptions = async (context: BuildContext, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context, "types");
-    const ignoreFiles: Plugin = {
-        load(id) {
-            if (!/\.(?:js|cjs|mjs|jsx|ts|tsx|ctsx|mtsx|mts|json)$/.test(id)) {
-                return "";
-            }
-
-            return null;
-        },
-        name: "packem:ignore-files",
-    };
-
     const compilerOptions = context.tsconfig?.config.compilerOptions;
 
     delete compilerOptions?.lib;
@@ -687,7 +705,16 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                         ...context.options.rollup.json,
                     }),
 
-                ignoreFiles,
+                <Plugin>{
+                    load(id) {
+                        if (!/\.(?:js|cjs|mjs|jsx|ts|tsx|ctsx|mtsx|mts|json)$/.test(id)) {
+                            return "";
+                        }
+
+                        return null;
+                    },
+                    name: "packem:ignore-files",
+                },
 
                 context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
                 context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.tsconfig, context.logger), fileCache),
