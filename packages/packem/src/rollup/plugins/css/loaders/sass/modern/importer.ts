@@ -1,29 +1,38 @@
 import { fileURLToPath } from "node:url";
 
-import { readFile } from "@visulima/fs";
+import { readFileSync } from "@visulima/fs";
 import { dirname, extname } from "@visulima/path";
 import { pathToFileURL } from "mlly";
 import type { CanonicalizeContext, Importer, ImporterResult, Syntax } from "sass";
 
 import { resolve } from "../../../utils/resolve";
+import { getUrlOfPartial, normalizeUrl } from "../../../utils/url";
+import isModule from "../utils/is-module";
 import resolveSyntax from "../utils/resolve-syntax";
 
 const extensions = [".scss", ".sass", ".css"];
 const mainFields = ["sass", "style"];
 
-const importer = async (resourcePath: string): Promise<Importer<"async">> => {
+const importer = (resourcePath: string): Importer<"sync"> => {
     return {
-        async canonicalize(originalUrl: string, context: CanonicalizeContext) {
+        canonicalize(originalUrl: string, context: CanonicalizeContext): URL | null {
+            if (!isModule(originalUrl)) {
+                return null;
+            }
+
             const previous = context.containingUrl ? fileURLToPath(context.containingUrl.toString()) : resourcePath;
 
             let result;
 
+            const moduleUrl = normalizeUrl(originalUrl);
+            const partialUrl = getUrlOfPartial(moduleUrl);
+
             try {
-                result = resolve([originalUrl], {
+                result = resolve([partialUrl, moduleUrl], {
                     basedirs: [dirname(previous)],
                     caller: "Sass modern importer",
                     extensions,
-                    mainFields
+                    mainFields,
                 });
             } catch {
                 // If no stylesheets are found, the importer should return null.
@@ -32,13 +41,13 @@ const importer = async (resourcePath: string): Promise<Importer<"async">> => {
 
             return new URL(pathToFileURL(result));
         },
-        async load(canonicalUrl: URL): Promise<ImporterResult | null> {
+        load(canonicalUrl: URL): ImporterResult | null {
             const extension = extname(canonicalUrl.pathname);
 
             const syntax: Syntax = extension ? (resolveSyntax(extension.toLowerCase()) ?? "scss") : "scss"; // Default syntax
 
             try {
-                const contents = await readFile(canonicalUrl);
+                const contents = readFileSync(canonicalUrl);
 
                 return { contents: contents as string, sourceMapUrl: canonicalUrl, syntax };
             } catch {

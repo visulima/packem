@@ -1,4 +1,4 @@
-import { isAbsolute, parse, normalize } from "@visulima/path";
+import { isAbsolute, normalize,parse } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 
 /**

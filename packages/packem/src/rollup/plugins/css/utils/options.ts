@@ -78,7 +78,7 @@ export const ensurePCSSOption = async <T>(option: T | string, type: PCSSOption, 
     return module as T;
 };
 
-export const ensurePCSSPlugins = async (plugins: undefined | (Plugin | Transformer | Processor)[]): Promise<Result["plugins"]> => {
+export const ensurePCSSPlugins = async (plugins: undefined | (Plugin | Transformer | Processor)[], cwd: string): Promise<Result["plugins"]> => {
     if (plugins === undefined) {
         return [];
     }
@@ -91,7 +91,7 @@ export const ensurePCSSPlugins = async (plugins: undefined | (Plugin | Transform
 
     for await (const plugin of plugins.filter(Boolean)) {
         if (!Array.isArray(plugin)) {
-            ps.push(await ensurePCSSOption(plugin, "plugin"));
+            ps.push(await ensurePCSSOption(plugin, "plugin", cwd));
 
             // eslint-disable-next-line no-continue
             continue;
@@ -101,10 +101,10 @@ export const ensurePCSSPlugins = async (plugins: undefined | (Plugin | Transform
 
         if (options) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ps.push((await ensurePCSSOption<any>(plug, "plugin"))(options));
+            ps.push((await ensurePCSSOption<any>(plug, "plugin", cwd))(options));
         } else {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ps.push(await ensurePCSSOption<any>(plug, "plugin"));
+            ps.push(await ensurePCSSOption<any>(plug, "plugin", cwd));
         }
     }
 

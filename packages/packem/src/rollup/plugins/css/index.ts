@@ -77,7 +77,7 @@ export default async (
         }
 
         if (options.postcss?.plugins) {
-            loaderOptions.postcss.plugins = await ensurePCSSPlugins(options.postcss.plugins);
+            loaderOptions.postcss.plugins = await ensurePCSSPlugins(options.postcss.plugins, cwd);
         }
     }
 

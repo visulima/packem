@@ -8,9 +8,9 @@ vi.mock("@visulima/pail", () => {
         pail: {
             log: vi.fn(),
             warn: vi.fn(),
-        }
-    }
-})
+        },
+    };
+});
 
 describe("loader", () => {
     it("should return the same input, when no loader was found", async () => {

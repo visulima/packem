@@ -5,6 +5,7 @@ import type { ImporterReturnType } from "node-sass";
 import type { ResolveOptions } from "../../../utils/resolve";
 import { resolve } from "../../../utils/resolve";
 import { getUrlOfPartial, hasModuleSpecifier, normalizeUrl } from "../../../utils/url";
+import isModule from "../utils/is-module";
 
 const extensions = [".scss", ".sass", ".css"];
 const mainFields = ["sass", "style"];
@@ -47,6 +48,10 @@ const finalize = (id: string): ImporterReturnType => {
 };
 
 const importer: (url: string, previousImporter: string) => ImporterReturnType | null = (url: string, previousImporter: string): ImporterReturnType | null => {
+    if (!isModule(url)) {
+        return null;
+    }
+
     try {
         return finalize(importerImpl(url, previousImporter, resolve));
     } catch {

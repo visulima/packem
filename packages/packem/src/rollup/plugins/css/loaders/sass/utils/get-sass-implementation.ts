@@ -22,13 +22,9 @@ export const getDefaultSassImplementation = (): "sass-embedded" | "sass" | "node
 };
 
 export const getSassImplementation = (
-    implementation?: string | typeof sass | typeof sassEmbedded | typeof nodeSass,
+    implementation: string | typeof sass | typeof sassEmbedded | typeof nodeSass,
 ): typeof sass | typeof sassEmbedded | typeof nodeSass => {
     let resolvedImplementation = implementation;
-
-    if (!resolvedImplementation) {
-        resolvedImplementation = getDefaultSassImplementation();
-    }
 
     if (typeof resolvedImplementation === "string") {
         // eslint-disable-next-line import/no-dynamic-require,global-require,@typescript-eslint/no-require-imports,unicorn/prefer-module,security/detect-non-literal-require

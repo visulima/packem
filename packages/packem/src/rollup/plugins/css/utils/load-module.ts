@@ -1,11 +1,7 @@
-import { createRequire } from "node:module";
-
 import { interopDefault, loadModule } from "mlly";
 
 import type { ResolveOptions } from "./resolve";
 import { resolve } from "./resolve";
-
-const require = createRequire(import.meta.url);
 
 const loaded: Record<string, unknown> = {};
 const extensions = [".js", ".mjs", ".cjs", ".json"];
@@ -30,7 +26,7 @@ export default async (moduleId: string, cwd: string): Promise<unknown> => {
     };
 
     try {
-        // eslint-disable-next-line security/detect-object-injection,import/no-dynamic-require,security/detect-non-literal-require
+        // eslint-disable-next-line security/detect-object-injection,import/no-dynamic-require,security/detect-non-literal-require,@typescript-eslint/no-require-imports,global-require,unicorn/prefer-module
         loaded[moduleId] = require(resolve([moduleId, `./${moduleId}`], options));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

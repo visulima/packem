@@ -49,7 +49,7 @@ const loader: Loader<SassLoaderOptions> = {
             },
             this.logger,
             this.warn,
-            { ...this.options },
+            this.options,
             code,
             this.useSourcemap,
             apiType,

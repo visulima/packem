@@ -6,6 +6,6 @@ describe("option", () => {
     it("wrong postcss option", () => {
         expect.assertions(1);
 
-        expect(() => ensurePCSSOption("pumpinizer", "plugin")).toThrowErrorMatchingSnapshot();
+        expect(async () => await ensurePCSSOption("pumpinizer", "plugin")).toThrowErrorMatchingSnapshot();
     });
 });

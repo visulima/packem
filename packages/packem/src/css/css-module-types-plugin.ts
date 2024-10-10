@@ -3,13 +3,13 @@ import { writeFileSync } from "@visulima/fs";
 import type { Pail } from "@visulima/pail";
 import type { Plugin } from "rollup";
 
-import Loaders from "../rollup/plugins/css/loaders";
+import Loaders from "../rollup/plugins/css/loaders/loader";
 import type { LoaderContext } from "../rollup/plugins/css/loaders/types";
 import type { StyleOptions } from "../rollup/plugins/css/types";
 import { ensurePCSSOption, ensurePCSSPlugins, inferHandlerOption, inferOption } from "../rollup/plugins/css/utils/options";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity,import/no-unused-modules
-export default (options: StyleOptions, logger: Pail, cwd: string, sourceDirectory: string): Plugin => {
+export default async (options: StyleOptions, logger: Pail, cwd: string): Promise<Plugin> => {
     const isIncluded = createFilter(options.include, options.exclude);
 
     const loaderOptions = {
@@ -18,7 +18,7 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDirector
         namedExports: options.namedExports ?? false,
         postcss: {
             ...options.postcss,
-            autoModules: options.postcss?.autoModules ?? false,
+            autoModules: options.autoModules ?? false,
             config: inferOption(options.postcss?.config, {}),
             import: inferHandlerOption(options.postcss?.import, options.alias),
             modules: inferOption(options.postcss?.modules, false),
@@ -28,25 +28,24 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDirector
     };
 
     if (options.postcss?.parser) {
-        loaderOptions.postcss.parser = ensurePCSSOption(options.postcss.parser, "parser");
+        loaderOptions.postcss.parser = await ensurePCSSOption(options.postcss.parser, "parser", cwd);
     }
 
     if (options.postcss?.syntax) {
-        loaderOptions.postcss.syntax = ensurePCSSOption(options.postcss.syntax, "syntax");
+        loaderOptions.postcss.syntax = await ensurePCSSOption(options.postcss.syntax, "syntax", cwd);
     }
 
     if (options.postcss?.stringifier) {
-        loaderOptions.postcss.stringifier = ensurePCSSOption(options.postcss.stringifier, "stringifier");
+        loaderOptions.postcss.stringifier = await ensurePCSSOption(options.postcss.stringifier, "stringifier", cwd);
     }
 
     if (options.postcss?.plugins) {
-        loaderOptions.postcss.plugins = ensurePCSSPlugins(options.postcss.plugins);
+        loaderOptions.postcss.plugins = await ensurePCSSPlugins(options.postcss.plugins, cwd);
     }
 
     const postCssLoader = options.loaders?.find((loader) => loader.name === "postcss");
 
     const loaders = new Loaders({
-        cwd,
         extensions: loaderOptions.extensions,
         loaders: postCssLoader ? [postCssLoader] : [],
         logger,
@@ -57,7 +56,6 @@ export default (options: StyleOptions, logger: Pail, cwd: string, sourceDirector
             extract: false,
             inject: false,
         },
-        sourceDirectory,
     });
 
     let dtsCode:

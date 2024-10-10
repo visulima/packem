@@ -491,27 +491,29 @@ export default defineConfig({
     // ...
 });
 ```
+
 <!-- Modified copy of https://github.com/Anidetrix/rollup-plugin-styles/blob/main/README.md -->
+
 ## Css
 
 `packem` supports:
 
-- [PostCSS](https://github.com/postcss/postcss)
-- [Sass](https://github.com/sass/dart-sass)
-- [Less](https://github.com/less/less.js)
-- [Stylus](https://github.com/stylus/stylus)
-- Up-to-date [CSS Modules](https://github.com/css-modules/css-modules) implementation
-- URL resolving/rewriting with asset handling
-- Ability to use `@import` statements inside regular CSS
-- Built-in assets handler
-- Ability to emit pure CSS for other plugins
-- Complete code splitting support, with respect for multiple entries, `preserveModules` and `manualChunks`
-- Multiple instances support, with check for already processed files
-- Proper sourcemaps, with included sources content by default
-- Respects `assetFileNames` for CSS file names
-- Respects sourcemaps from loaded files
-- Support for implementation forcing for Sass
-- Support for partials and `~` in Less import statements
+-   [PostCSS](https://github.com/postcss/postcss)
+-   [Sass](https://github.com/sass/dart-sass)
+-   [Less](https://github.com/less/less.js)
+-   [Stylus](https://github.com/stylus/stylus)
+-   Up-to-date [CSS Modules](https://github.com/css-modules/css-modules) implementation
+-   URL resolving/rewriting with asset handling
+-   Ability to use `@import` statements inside regular CSS
+-   Built-in assets handler
+-   Ability to emit pure CSS for other plugins
+-   Complete code splitting support, with respect for multiple entries, `preserveModules` and `manualChunks`
+-   Multiple instances support, with check for already processed files
+-   Proper sourcemaps, with included sources content by default
+-   Respects `assetFileNames` for CSS file names
+-   Respects sourcemaps from loaded files
+-   Support for implementation forcing for Sass
+-   Support for partials and `~` in Less import statements
 
 ### PostCSS
 
@@ -726,14 +728,11 @@ Will look for `_custom` first (_with the appropriate extension(s)_), and then fo
 
 ```js
 styles({
-  mode: "inject", // Unnecessary, set by default
-  // ...or with custom options for injector
-  mode: [
-    "inject",
-    { container: "body", singleTag: true, prepend: true, attributes: { id: "global" } },
-  ],
-  // ...or with custom injector
-  mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(id)})`],
+    mode: "inject", // Unnecessary, set by default
+    // ...or with custom options for injector
+    mode: ["inject", { container: "body", singleTag: true, prepend: true, attributes: { id: "global" } }],
+    // ...or with custom injector
+    mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(id)})`],
 });
 ```
 
@@ -741,9 +740,9 @@ styles({
 
 ```js
 styles({
-  mode: "extract",
-  // ... or with relative to output dir/output file's basedir (but not outside of it)
-  mode: ["extract", "awesome-bundle.css"],
+    mode: "extract",
+    // ... or with relative to output dir/output file's basedir (but not outside of it)
+    mode: ["extract", "awesome-bundle.css"],
 });
 ```
 

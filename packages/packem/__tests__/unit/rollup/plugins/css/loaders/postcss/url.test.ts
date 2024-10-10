@@ -1,5 +1,5 @@
 import postcss from "postcss";
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { UrlOptions } from "../../../../../../../src/rollup/plugins/css/loaders/postcss/url";
 import urlResolver from "../../../../../../../src/rollup/plugins/css/loaders/postcss/url";

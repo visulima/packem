@@ -10,8 +10,8 @@ import type { Options } from "execa";
 import { execaNode } from "execa";
 import { expect } from "vitest";
 
-import type { BuildConfig } from "../src/types";
 import type { StyleOptions } from "../src/rollup/plugins/css/types";
+import type { BuildConfig } from "../src/types";
 
 const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../dist");
 

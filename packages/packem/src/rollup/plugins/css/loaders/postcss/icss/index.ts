@@ -13,7 +13,7 @@ interface InteroperableCSSOptions {
     load?: Load;
 }
 
-const plugin: PluginCreator<InteroperableCSSOptions> = (options ) => {
+const plugin: PluginCreator<InteroperableCSSOptions> = (options) => {
     const load = options?.load ?? loadDefault;
     const extensions = options?.extensions ?? extensionsDefault;
 
