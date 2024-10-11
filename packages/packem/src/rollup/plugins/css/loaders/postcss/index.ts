@@ -45,7 +45,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
     name: "postcss",
     // eslint-disable-next-line sonarjs/cognitive-complexity
     async process({ code, extracted, map }) {
-        const config = await loadConfig(this.id, this.options.config);
+        const config = await loadConfig(this.id, this.cwd as string, this.options.config);
         const plugins: AcceptedPlugin[] = [];
         const autoModules = ensureAutoModules(this.autoModules, this.id);
         const supportModules = Boolean((this.options.modules && ensureAutoModules(this.options.modules.include, this.id)) || autoModules);
@@ -200,7 +200,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
                 const injectorCall = `${injectorName}(${cssVariableName},${JSON.stringify(injectorOptions)});`;
 
                 if (!injectorId) {
-                    injectorId = resolve(["./runtime/inject-css"], { basedirs: [join(baseDirectory, "..", "..")] });
+                    injectorId = resolve(["./runtime/inject-css"], { baseDirs: [join(baseDirectory, "..", "..")] });
                     injectorId = `"${normalize(injectorId)}"`;
                 }
 

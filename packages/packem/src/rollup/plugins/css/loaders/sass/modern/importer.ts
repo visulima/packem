@@ -7,7 +7,6 @@ import type { CanonicalizeContext, Importer, ImporterResult, Syntax } from "sass
 
 import { resolve } from "../../../utils/resolve";
 import { getUrlOfPartial, normalizeUrl } from "../../../utils/url";
-import isModule from "../utils/is-module";
 import resolveSyntax from "../utils/resolve-syntax";
 
 const extensions = [".scss", ".sass", ".css"];
@@ -16,10 +15,6 @@ const mainFields = ["sass", "style"];
 const importer = (resourcePath: string): Importer<"sync"> => {
     return {
         canonicalize(originalUrl: string, context: CanonicalizeContext): URL | null {
-            if (!isModule(originalUrl)) {
-                return null;
-            }
-
             const previous = context.containingUrl ? fileURLToPath(context.containingUrl.toString()) : resourcePath;
 
             let result;
@@ -29,7 +24,7 @@ const importer = (resourcePath: string): Importer<"sync"> => {
 
             try {
                 result = resolve([partialUrl, moduleUrl], {
-                    basedirs: [dirname(previous)],
+                    baseDirs: [dirname(previous)],
                     caller: "Sass modern importer",
                     extensions,
                     mainFields,

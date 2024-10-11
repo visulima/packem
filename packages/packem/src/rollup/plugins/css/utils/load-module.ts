@@ -19,7 +19,7 @@ export default async (moduleId: string, cwd: string): Promise<unknown> => {
     }
 
     const options: ResolveOptions = {
-        basedirs: [cwd],
+        baseDirs: [cwd],
         caller: "Module loader",
         extensions,
         symlinks: false,

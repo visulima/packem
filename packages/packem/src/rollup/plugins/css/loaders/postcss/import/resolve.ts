@@ -1,4 +1,4 @@
-import { readFile } from "@visulima/fs";
+import { readFileSync } from "@visulima/fs";
 import { isRelative } from "@visulima/path/utils";
 
 import { resolve } from "../../../utils/resolve";
@@ -12,16 +12,16 @@ interface ImportFile {
 }
 
 /** `@import` resolver */
-export type ImportResolve = (url: string, basedir: string, extensions: string[]) => Promise<ImportFile>;
+export type ImportResolve = (url: string, basedir: string, extensions: string[]) => ImportFile;
 
-export const importResolve: ImportResolve = async (inputUrl: string, basedir: string, extensions: string[]): Promise<ImportFile> => {
-    const options = { basedirs: [basedir], caller: "@import resolver", extensions };
+export const importResolve: ImportResolve = (inputUrl: string, basedir: string, extensions: string[]): ImportFile => {
+    const options = { baseDirs: [basedir], caller: "@import resolver", extensions };
     const urlObject = new URL(inputUrl, "file://");
     const url = urlObject.pathname;
 
     const paths = [url];
 
-    if (isRelative(url)) {
+    if (isRelative(url) || url.startsWith("/")) {
         paths.push("." + url);
     }
 
@@ -31,5 +31,5 @@ export const importResolve: ImportResolve = async (inputUrl: string, basedir: st
 
     const from = resolve(paths, options);
 
-    return { from, source: await readFile(from, { buffer: true }) };
+    return { from, source: readFileSync(from, { buffer: true }) };
 };

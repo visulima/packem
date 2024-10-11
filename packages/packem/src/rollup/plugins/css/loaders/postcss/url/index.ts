@@ -39,7 +39,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                 .toConsumer();
 
             const urlList: {
-                basedirs: Set<string>;
+                baseDirs: Set<string>;
                 decl: Declaration;
                 node: Node;
                 parsed: ParsedValue;
@@ -57,7 +57,6 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
 
                 walkUrls(parsed, (url, node) => {
                     // Resolve aliases
-
                     for (const [from, to] of Object.entries(alias)) {
                         if (url !== from && !url.startsWith(`${from}/`)) {
                             // eslint-disable-next-line no-continue
@@ -91,11 +90,11 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                         }
                     }
 
-                    const basedirs = new Set<string>();
+                    const baseDirectories = new Set<string>();
 
                     // Use PostCSS imports
                     if (decl.source?.input.file && imported.has(decl.source.input.file)) {
-                        basedirs.add(dirname(decl.source.input.file));
+                        baseDirectories.add(dirname(decl.source.input.file));
                     }
 
                     // Use SourceMap
@@ -105,28 +104,29 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                         const basedir = realPos?.source && dirname(realPos.source);
 
                         if (basedir) {
-                            basedirs.add(normalize(basedir));
+                            baseDirectories.add(normalize(basedir));
                         }
                     }
 
                     // Use current file
-                    basedirs.add(dirname(file));
+                    baseDirectories.add(dirname(file));
 
-                    urlList.push({ basedirs, decl, node, parsed, url });
+                    urlList.push({ baseDirs: baseDirectories, decl, node, parsed, url });
                 });
             });
 
             const usedNames = new Map<string, string>();
 
-            for await (const { basedirs, decl, node, parsed, url } of urlList) {
+            for await (const { baseDirs, decl, node, parsed, url } of urlList) {
                 let resolved: UrlFile | undefined;
 
-                for await (const basedir of basedirs) {
+                for await (const basedir of baseDirs) {
                     try {
                         if (!resolved) {
                             resolved = await resolve(url, basedir);
                         }
-                    } catch {
+                    } catch (er) {
+                        console.log(er);
                         /* noop */
                     }
                 }

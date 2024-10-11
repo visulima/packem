@@ -99,7 +99,7 @@ const plugin: PluginCreator<ImportOptions> = (options = {}) => {
 
             for await (const { rule, url } of importList) {
                 try {
-                    const { from, source } = await resolve(url, basedir, extensions);
+                    const { from, source } = resolve(url, basedir, extensions);
 
                     if (!(source instanceof Uint8Array) || typeof from !== "string") {
                         rule.warn(result, `Incorrectly resolved \`@import\` in \`${rule.toString()}\``);

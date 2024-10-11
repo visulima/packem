@@ -6,7 +6,7 @@ import type Processor from "postcss/lib/processor";
 import { resolve } from "../../../utils/resolve";
 
 const load: Load = async (url, file, extensions, processor, options) => {
-    const from = resolve([url, `./${url}`], { basedirs: [dirname(file)], caller: "ICSS loader", extensions });
+    const from = resolve([url, `./${url}`], { baseDirs: [dirname(file)], caller: "ICSS loader", extensions });
     const source = await readFile(from);
     const { messages } = await processor.process(source, { ...options, from });
 

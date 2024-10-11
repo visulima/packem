@@ -17,10 +17,10 @@ const getStylesFileManager = (less: LessStatic, cwd: string): Less.FileManager =
             const url = normalizeUrl(filename);
             const partialUrl = getUrlOfPartial(url);
 
-            const options = { basedirs: [cwd, filedir], caller: "Less importer", extensions };
+            const options = { baseDirs: [cwd, filedir], caller: "Less importer", extensions };
 
             if (options_.paths) {
-                options.basedirs.push(...options_.paths);
+                options.baseDirs.push(...options_.paths);
             }
 
             // Give precedence to importing a partial

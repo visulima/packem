@@ -1,6 +1,6 @@
-import { readFile } from "@visulima/fs";
+import { readFileSync } from "@visulima/fs";
 
-import { resolve as utilResolve } from "../../../utils/resolve";
+import { resolve } from "../../../utils/resolve";
 
 /** File resolved by URL resolver */
 export interface UrlFile {
@@ -16,15 +16,26 @@ export interface UrlFile {
 export type UrlResolve = (inputUrl: string, basedir: string) => Promise<UrlFile>;
 
 export const urlResolve: UrlResolve = async (inputUrl: string, basedir: string): Promise<UrlFile> => {
-    const options = { basedirs: [basedir], caller: "URL resolver" };
-
     const urlObject = new URL(inputUrl, "file://");
     const fragmentIdentifier = urlObject.hash ? urlObject.hash.slice(1) : "";
-    const query = Object.fromEntries(new URLSearchParams(urlObject.search));
-    const url = urlObject.pathname;
+    const url = inputUrl.split("?")[0] ?? "";
 
-    const from = utilResolve([url, `./${url}`], options);
-    const urlQuery = new URLSearchParams({ ...query, fragmentIdentifier }).toString();
+    const paths = [url];
 
-    return { from, source: await readFile(from, { buffer: true }), urlQuery };
+    if (url.startsWith("/")) {
+        paths.push("." + url);
+    }
+
+    if (!url.startsWith("/") && !url.startsWith(".")) {
+        paths.push("./" + url);
+    }
+
+    const from = resolve(paths, { baseDirs: [basedir], caller: "URL resolver" });
+    const urlQuery = new URLSearchParams(urlObject.search).toString();
+
+    return {
+        from,
+        source: readFileSync(from, { buffer: true }),
+        urlQuery: (urlQuery ? "?" + urlQuery : "") + (fragmentIdentifier ? "#" + fragmentIdentifier : ""),
+    };
 };

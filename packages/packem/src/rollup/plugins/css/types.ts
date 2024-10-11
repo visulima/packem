@@ -1,7 +1,7 @@
 import type { Options } from "cssnano";
 import type { CustomAtRules, TransformOptions } from "lightningcss";
-import type { Plugin, ProcessOptions, Transformer } from "postcss";
-import type Processor from "postcss/lib/processor";
+import type { AcceptedPlugin } from "postcss";
+import type { Config as PostCSSConfig } from "postcss-load-config";
 
 import type { LESSLoaderOptions } from "./loaders/less";
 import type { ImportOptions } from "./loaders/postcss/import";
@@ -33,24 +33,24 @@ interface PostCSSOptions {
      * Set PostCSS parser, e.g. `sugarss`.
      * Overrides the one loaded from PostCSS config file, if any.
      */
-    parser?: ProcessOptions["parser"] | string;
+    parser?: PostCSSConfig["parser"] | string;
     /**
      * A list of plugins for PostCSS,
      * which are used before plugins loaded from PostCSS config file, if any
      */
-    plugins?: (Plugin | Transformer | Processor)[];
+    plugins?: AcceptedPlugin[];
     /**
      * Set PostCSS stringifier.
      * Overrides the one loaded from PostCSS config file, if any.
      */
-    stringifier?: ProcessOptions["stringifier"] | string;
+    stringifier?: PostCSSConfig["stringifier"] | string;
     /**
      * Set PostCSS syntax.
      * Overrides the one loaded from PostCSS config file, if any.
      */
-    syntax?: ProcessOptions["syntax"] | string;
+    syntax?: PostCSSConfig["syntax"] | string;
     /** `to` option for PostCSS, required for some plugins */
-    to?: ProcessOptions["to"];
+    to?: PostCSSConfig["to"];
     /**
      * Enable/disable or pass options for CSS URL resolver
      * @default true

@@ -10,7 +10,7 @@ const baseDirectory = dirname(fileURLToPath(import.meta.url));
 
 export const resolve = (ids: string[], userOptions: ResolveOptions): string => {
     const options = {
-        basedirs: [baseDirectory],
+        baseDirs: [baseDirectory],
         caller: "Resolver",
         extensions: [".mjs", ".js", ".cjs", ".json"],
         symlinks: true,
@@ -22,7 +22,7 @@ export const resolve = (ids: string[], userOptions: ResolveOptions): string => {
         symlinks: options.symlinks,
     });
 
-    for (const basedir of options.basedirs) {
+    for (const basedir of options.baseDirs) {
         for (const id of ids) {
             try {
                 const { error, path } = resolver.sync(basedir, id);
@@ -37,6 +37,7 @@ export const resolve = (ids: string[], userOptions: ResolveOptions): string => {
                         context: {
                             basedir,
                             caller: userOptions.caller,
+                            extensions: userOptions.extensions,
                             id,
                         },
                     });
@@ -49,6 +50,7 @@ export const resolve = (ids: string[], userOptions: ResolveOptions): string => {
                         basedir,
                         caller: userOptions.caller,
                         error,
+                        extensions: userOptions.extensions,
                         id,
                     },
                 });
@@ -61,7 +63,7 @@ export const resolve = (ids: string[], userOptions: ResolveOptions): string => {
 
 export interface ResolveOptions extends NapiResolveOptions {
     /** directories to begin resolving from (defaults to `[__dirname]`) */
-    basedirs?: string[];
+    baseDirs?: string[];
     /** name of the caller for error message (default to `Resolver`) */
     caller?: string;
 }
