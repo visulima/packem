@@ -291,7 +291,7 @@
         "vitest": "^2.1.2"
     },
     "peerDependencies": {
-        "@swc/core": "^1.5.7",
+        "@swc/core": "^1.7.36",
         "esbuild": "^0.20.2 || ^0.21.3",
         "oxc-transform": "^0.20.0",
         "sucrase": "^3.35.0",
