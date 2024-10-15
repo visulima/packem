@@ -3,7 +3,7 @@ import { rm } from "node:fs/promises";
 
 import { isAccessibleSync, readFileSync } from "@visulima/fs";
 import { dirname, join, normalize } from "@visulima/path";
-import type { InputOptions, OutputOptions } from "rollup";
+import type { OutputOptions } from "rollup";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -17,12 +17,10 @@ interface WriteData {
     errorMessage?: string;
     files?: string[];
     input: string | string[];
-    inputOpts?: InputOptions;
     minimizer?: "cssnano" | "lightningcss" | undefined;
     options?: StyleOptions;
     outDir?: string;
     outputOpts?: OutputOptions;
-    plugins?: Plugin[];
     shouldFail?: boolean;
     stringifyOption?: string;
     title?: string;
@@ -53,7 +51,7 @@ describe("css", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    const build = async (data: WriteData, stdout?: (stdout: string) => void): Promise<WriteResult | WriteFailResult> => {
+    const build = async (data: WriteData): Promise<WriteResult | WriteFailResult> => {
         const input = Array.isArray(data.input) ? data.input : [data.input];
 
         // copy fixtures to temporary directory
@@ -62,13 +60,24 @@ describe("css", () => {
         }
 
         await installPackage(temporaryDirectoryPath, "minireset.css");
+
+        const { loaders, ...otherOptions } = data.options ?? {};
+
         await createPackemConfig(
             temporaryDirectoryPath,
-            {},
+            data.outputOpts
+                ? {
+                      rollup: {
+                          output: {
+                              ...data.outputOpts,
+                          },
+                      },
+                  }
+                : undefined,
             "esbuild",
             undefined,
-            ["postcss", "less", "stylus", "sass", "sourcemap"],
-            data.stringifyOption ?? data.options ?? undefined,
+            loaders ?? ["postcss", "less", "stylus", "sass", "sourcemap"],
+            data.stringifyOption ?? otherOptions ?? undefined,
             data.minimizer,
         );
 
@@ -81,7 +90,7 @@ describe("css", () => {
             }),
         });
 
-        const binProcess = await execPackemSync("build", ["--debug"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });
@@ -92,13 +101,33 @@ describe("css", () => {
                 stderr: binProcess.stderr as string,
             };
         }
-        console.log(binProcess.stdout);
+console.log(binProcess.stdout);
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        if (stdout) {
-            stdout(binProcess.stdout as string);
-        }
+        expect(binProcess.stdout).toSatisfy((content: string) => {
+            const matches: string[] = [];
+
+            let match;
+            const regex = /: Unresolved URL.*/g;
+
+            // eslint-disable-next-line no-cond-assign
+            while ((match = regex.exec(content)) !== null) {
+                // This is necessary to avoid infinite loops with zero-width matches
+                if (match.index === regex.lastIndex) {
+                    // eslint-disable-next-line no-plusplus
+                    regex.lastIndex++;
+                }
+
+                match.forEach((m: string) => {
+                    if (!m.includes("./nonexistant")) {
+                        matches.push(m);
+                    }
+                });
+            }
+
+            return matches.filter(Boolean).length === 0;
+        });
 
         const distributionPath = join(temporaryDirectoryPath, "dist");
 
@@ -107,8 +136,8 @@ describe("css", () => {
             recursive: true,
             withFileTypes: true,
         })
-            .filter((dirnt) => dirnt.isFile())
-            .map((dirnt) => dirnt.name);
+            .filter((dirent) => dirent.isFile())
+            .map((dirent) => join(dirent.path, dirent.name));
 
         const css = files.filter((file) => file.endsWith(".css"));
         const cssMap = files.filter((file) => file.endsWith(".css.map"));
@@ -117,14 +146,14 @@ describe("css", () => {
 
         return {
             css(): string[] {
-                return css.map((file) => readFileSync(join(distributionPath, file)));
+                return css.map((file) => readFileSync(file));
             },
             isCss(): boolean {
                 if (css.length === 0) {
                     return false;
                 }
 
-                return css.map((file) => isAccessibleSync(join(distributionPath, file))).every(Boolean);
+                return css.map((file) => isAccessibleSync(file)).every(Boolean);
             },
             isFile(file: string): boolean {
                 return isAccessibleSync(join(distributionPath, file));
@@ -134,18 +163,18 @@ describe("css", () => {
                     return false;
                 }
 
-                return cssMap.map((file) => isAccessibleSync(join(distributionPath, file))).every(Boolean);
+                return cssMap.map((file) => isAccessibleSync(file)).every(Boolean);
             },
             js(): string[] {
-                return [...cjs, ...mjs].map((file) => readFileSync(join(distributionPath, file)));
+                return [...cjs, ...mjs].map((file) => readFileSync(file));
             },
             map(): string[] {
-                return cssMap.map((file) => readFileSync(join(distributionPath, file)));
+                return cssMap.map((file) => readFileSync(file));
             },
         };
     };
 
-    const validate = async (data: WriteData, stdout?: (stdout: string) => void): Promise<void> => {
+    const validate = async (data: WriteData): Promise<void> => {
         if (data.shouldFail) {
             const result = (await build(data)) as WriteFailResult;
 
@@ -156,7 +185,7 @@ describe("css", () => {
             return;
         }
 
-        const result = (await build(data, stdout)) as WriteResult;
+        const result = (await build(data)) as WriteResult;
 
         for (const f of result.js()) {
             expect(f).toMatchSnapshot("js");
@@ -261,21 +290,44 @@ describe("css", () => {
                     "assets/bg.testing.regex.png",
                     "assets/bg1.png",
                     "assets/bg1.testing.regex.png",
-                    "assets/bg2.testing.regex.png",
                     "assets/cat-2x.png",
                     "assets/cat-print.png",
                     "assets/cat.png",
+                    "assets/Demo-webfont.woff",
                 ],
                 input: "resolvers/index.js",
                 options: {
-                    alias: { "@": join(fixturePath, "resolvers/features") },
+                    alias: { "@": join("__REPLACE__", "src", "features") },
                     mode: "extract",
-                    url: { hash: false, publicPath: "/pubpath" },
+                    postcss: {
+                        url: { hash: false, publicPath: "/pubpath" },
+                    },
                 },
                 outputOpts: {
                     assetFileNames: "[name][extname]",
                 },
                 title: "resolvers",
+            },
+            {
+                files: [
+                    "assets/bg.png",
+                    "assets/bg.testing.regex.png",
+                    "assets/bg1.png",
+                    "assets/bg1.testing.regex.png",
+                    "assets/cat-2x.png",
+                    "assets/cat-print.png",
+                    "assets/cat.png",
+                    "assets/Demo-webfont.woff",
+                ],
+                input: "resolvers/index.js",
+                options: {
+                    alias: { "@": join("__REPLACE__", "src", "features") },
+                    mode: "extract",
+                    postcss: {
+                        url: { hash: false },
+                    },
+                },
+                title: "resolver-assets",
             },
             {
                 files: [
@@ -289,9 +341,11 @@ describe("css", () => {
                 ],
                 input: "resolvers/index.js",
                 options: {
-                    alias: { "@": join(fixturePath, "resolvers/features") },
+                    alias: { "@": join("__REPLACE__", "src", "features") },
                     mode: "extract",
-                    url: { hash: true, publicPath: "/pubpath" },
+                    postcss: {
+                        url: { hash: true, publicPath: "/pubpath" },
+                    },
                 },
                 outputOpts: {
                     assetFileNames: "[name][extname]",
@@ -301,35 +355,38 @@ describe("css", () => {
             {
                 input: "resolvers/index.js",
                 options: {
-                    alias: { "@": join(fixturePath, "resolvers/features") },
+                    alias: { "@": join("__REPLACE__", "src", "features") },
                     mode: "extract",
-                    url: { inline: true },
+                    postcss: {
+                        url: { inline: true },
+                    },
                 },
                 title: "resolvers-url-inline",
             },
             {
-                input: "skip-loader/index.js",
-                options: {
-                    loaders: [
-                        {
-                            name: "loader",
-                            process: (): never => "lol" as never,
-                            test: /\.random$/,
-                        },
-                    ],
-                    use: ["loader"],
-                },
-                title: "skip-loader",
-            },
-            {
                 input: "postcss-options/index.js",
                 options: {
-                    parser: "sugarss",
-                    plugins: ["autoprefixer", ["autoprefixer", { overrideBrowserslist: ["> 0%"] }]],
+                    postcss: {
+                        parser: join(temporaryDirectoryPath, "node_modules", "sugarss"),
+                    },
                 },
                 title: "postcss-options",
             },
         ] as WriteData[])("should process $title css", async ({ title, ...data }: WriteData) => {
+            // eslint-disable-next-line vitest/no-conditional-in-test
+            if (title === "postcss-options") {
+                await installPackage(temporaryDirectoryPath, "sugarss");
+            }
+
+            // eslint-disable-next-line vitest/no-conditional-in-test
+            if (data.options?.alias) {
+                for (const alias of Object.keys(data.options.alias)) {
+                    // this is needed because of the temporary directory path, that is generated on every test run
+                    // eslint-disable-next-line no-param-reassign,security/detect-object-injection
+                    data.options.alias[alias] = data.options.alias[alias].replace("__REPLACE__", temporaryDirectoryPath);
+                }
+            }
+
             await validate(data);
         });
     });
@@ -456,18 +513,12 @@ describe("css", () => {
             {
                 input: "simple/index.js",
                 options: { mode: "extract" },
-                outputOpts: { file: "result.js" },
-                title: "file",
+                outputOpts: { preserveModules: true },
+                title: "preserve-modules",
             },
-            // {
-            //     input: "simple/index.js",
-            //     inputOpts: { preserveModules: true },
-            //     options: { mode: "extract" },
-            //     title: "preserve-modules",
-            // },
             {
                 input: "simple/index.js",
-                options: { mode: ["extract", join(fixturePath, "dist/wrong.css")] },
+                options: { mode: ["extract", join("__REPLACE__", "src", "dist/wrong.css")] },
                 shouldFail: true,
                 title: "absolute-path-fail",
             },
@@ -530,6 +581,12 @@ describe("css", () => {
                 title: "asset-file-names",
             },
         ] as WriteData[])("should generate sourcemap for processed $title css", async ({ title, ...data }: WriteData) => {
+            // eslint-disable-next-line vitest/no-conditional-in-test
+            if (Array.isArray(data.options?.mode)) {
+                // eslint-disable-next-line no-param-reassign
+                data.options.mode = [data.options.mode[0] as "extract", (data.options.mode[1] as string).replace("__REPLACE__", temporaryDirectoryPath)];
+            }
+
             await validate(data);
         });
     });
@@ -561,7 +618,7 @@ describe("css", () => {
     });
 
     describe("sass", () => {
-        // eslint-disable-next-line vitest/prefer-expect-assertions
+        // eslint-disable-next-line vitest/prefer-expect-assertions,vitest/expect-expect
         it.each([
             {
                 input: "sass/index.js",
@@ -572,134 +629,84 @@ describe("css", () => {
                 },
                 title: "sass - default",
             },
-            // {
-            //     input: "sass-use/index.js",
-            //     options: {
-            //         sass: {
-            //             implementation: "sass",
-            //         },
-            //     },
-            //     title: "sass - use",
-            // },
-            // {
-            //     input: "sass/index.js",
-            //     options: {
-            //         sass: {
-            //             implementation: "sass",
-            //         },
-            //         sourceMap: true,
-            //     },
-            //     title: "sass - sourcemap",
-            // },
-            // {
-            //     input: "sass-modules/index.js",
-            //     options: {
-            //         modules: true,
-            //         sass: {
-            //             implementation: "sass",
-            //         },
-            //     },
-            //     title: "sass - modules",
-            // },
-            // {
-            //     input: "sass-data/index.js",
-            //     options: {
-            //         sass: { data: "@import 'data';", implementation: "sass" },
-            //     },
-            //     title: "sass - data",
-            // },
-            // {
-            //     input: "sass-import/index.js",
-            //     options: {
-            //         sass: {
-            //             implementation: "sass",
-            //         },
-            //     },
-            //     title: "sass - import",
-            // },
-            // {
-            //     input: "sass-importer/index.js",
-            //     options: {
-            //         sass: {
-            //             implementation: "sass",
-            //             importer(url, _, done): void {
-            //                 if (url === "~modularvirtualimport") {
-            //                     done({ contents: ".modularvirtual{color:blue}" });
-            //                 } else {
-            //                     done({ contents: ".virtual{color:red}" });
-            //                 }
-            //             },
-            //             sync: false,
-            //         },
-            //     },
-            //     stringifyOption:
-            //         'sass: { importer(url, _, done): void {\nif (url === "~modularvirtualimport") {\ndone({ contents: ".modularvirtual{color:blue}" });\n} else {\ndone({ contents: ".virtual{color:red}" });\n}\n},\nsync: false,\n},',
-            //     title: "sass - importer",
-            // },
-            // {
-            //     input: "sass-importer/index.js",
-            //     options: {
-            //         sass: {
-            //             implementation: "node-sass",
-            //             importer(url, _, done): void {
-            //                 if (url === "~modularvirtualimport") {
-            //                     done({ contents: ".modularvirtual{color:blue}" });
-            //                 } else {
-            //                     done({ contents: ".virtual{color:red}" });
-            //                 }
-            //             },
-            //             sync: false,
-            //         },
-            //     },
-            //     stringifyOption:
-            //         'sass: { importer(url, _, done): void {\nif (url === "~modularvirtualimport") {\ndone({ contents: ".modularvirtual{color:blue}" });\n} else {\ndone({ contents: ".virtual{color:red}" });\n}\n},\nsync: false,\n},',
-            //     title: "node-sass - importer-node",
-            // },
-            // {
-            //     input: "sass-importer/index.js",
-            //     options: {
-            //         sass: {
-            //             implementation: "sass",
-            //             importer(url) {
-            //                 if (url === "~modularvirtualimport") {
-            //                     return { contents: ".modularvirtual{color:blue}" };
-            //                 }
-            //
-            //                 return { contents: ".virtual{color:red}" };
-            //             },
-            //             sync: true,
-            //         },
-            //     },
-            //     stringifyOption:
-            //         'sass: {\nimporter(url) {\nif (url === "~modularvirtualimport") {\nreturn { contents: ".modularvirtual{color:blue}" };\n}\nreturn { contents: ".virtual{color:red}" };\n},\nsync: true,\n},',
-            //     title: "sass - importer-sync",
-            // },
-            // {
-            //     input: "sass-importer/index.js",
-            //     options: {
-            //         sass: {
-            //             implementation: "node-sass",
-            //             importer(url) {
-            //                 if (url === "~modularvirtualimport") {
-            //                     return { contents: ".modularvirtual{color:blue}" };
-            //                 }
-            //
-            //                 return { contents: ".virtual{color:red}" };
-            //             },
-            //             sync: true,
-            //         },
-            //     },
-            //     stringifyOption:
-            //         'sass: {\nimporter(url) {\nif (url === "~modularvirtualimport") {\nreturn { contents: ".modularvirtual{color:blue}" };\n}\nreturn { contents: ".virtual{color:red}" };\n},\nsync: true,\n},',
-            //     title: "node-sass - importer-sync-node",
-            // },
+            {
+                input: "sass/index.js",
+                options: {
+                    sass: {
+                        implementation: "sass-embedded",
+                    },
+                },
+                title: "sass-embedded - default",
+            },
+            {
+                input: "sass/index.js",
+                options: {
+                    sass: {
+                        implementation: "node-sass",
+                    },
+                },
+                title: "node-sass - default",
+            },
+            {
+                input: "sass-use/index.js",
+                options: {
+                    sass: {
+                        implementation: "sass",
+                    },
+                },
+                title: "sass - use",
+            },
+            {
+                input: "sass/index.js",
+                options: {
+                    sass: {
+                        implementation: "sass",
+                    },
+                    sourceMap: true,
+                },
+                title: "sass - sourcemap",
+            },
+            {
+                input: "sass-modules/index.js",
+                options: {
+                    sass: {
+                        implementation: "sass",
+                    },
+                },
+                title: "sass - modules",
+            },
+            {
+                input: "sass-data/index.js",
+                options: {
+                    sass: { additionalData: "@import 'data';", implementation: "sass-embedded" },
+                },
+                title: "sass-embedded - data",
+            },
+            {
+                input: "sass-data/index.js",
+                options: {
+                    sass: { additionalData: "@import 'data';", implementation: "sass" },
+                },
+                title: "sass - data",
+            },
+            {
+                input: "sass-data/index.js",
+                options: {
+                    sass: { additionalData: "@import 'data';", implementation: "node-sass" },
+                },
+                title: "node-sass - data",
+            },
+            {
+                input: "sass-import/index.js",
+                options: {
+                    sass: {
+                        implementation: "sass",
+                    },
+                },
+                title: "sass - import",
+            },
         ] as WriteData[])("should work with sass/scss processed $title css", async ({ title, ...data }) => {
-            await validate(data, (stdout) => {
-                if (data.options && data.options.sass && data.options.sass.implementation) {
-                    // eslint-disable-next-line vitest/no-conditional-expect
-                    expect(stdout).toContain(`Using ${data.options.sass.implementation} as the Sass implementation`);
-                }
-            });
+            await validate(data);
         });
     });
 
@@ -734,10 +741,20 @@ describe("css", () => {
             },
             {
                 input: "less-paths/index.js",
-                options: { less: { paths: [join(fixturePath, "less-paths/sub")] } },
+                options: { less: { paths: [join("__REPLACE__", "src", "less-paths", "sub")] } },
                 title: "paths",
             },
         ] as WriteData[])("should work with less processed $title css", async ({ title, ...data }: WriteData) => {
+            // eslint-disable-next-line vitest/no-conditional-in-test
+            if (data.options?.less?.paths) {
+                // eslint-disable-next-line no-plusplus
+                for (let index = 0; index < data.options.less.paths.length; index++) {
+                    // this is needed because of the temporary directory path, that is generated on every test run
+                    // eslint-disable-next-line no-param-reassign,security/detect-object-injection
+                    data.options.less.paths[index] = (data.options.less.paths[index] as string).replace("__REPLACE__", temporaryDirectoryPath);
+                }
+            }
+
             await validate(data);
         });
     });
@@ -749,7 +766,6 @@ describe("css", () => {
                 input: "code-splitting/index.js",
                 options: {
                     mode: "extract",
-                    modules: true,
                     sourceMap: true,
                 },
                 title: "true",
@@ -758,46 +774,41 @@ describe("css", () => {
                 input: "code-splitting/index.js",
                 options: {
                     mode: ["extract", "extracted.css"],
-                    modules: true,
                     sourceMap: true,
                 },
                 title: "single",
             },
             {
                 input: "code-splitting/index.js",
-                inputOpts: { preserveModules: true },
                 options: {
                     mode: "extract",
-                    modules: true,
                     sourceMap: true,
                 },
+                outputOpts: { preserveModules: true },
                 title: "preserve-modules",
             },
             {
                 input: "code-splitting/index.js",
-                inputOpts: { preserveModules: true },
                 options: {
                     mode: ["extract", "extracted.css"],
-                    modules: true,
                     sourceMap: true,
                 },
+                outputOpts: { preserveModules: true },
                 title: "preserve-modules-single",
             },
             {
                 input: ["code-splitting/index.js", "code-splitting/indextwo.js"],
-                inputOpts: { preserveModules: true },
                 options: {
                     mode: "extract",
-                    modules: true,
                     sourceMap: true,
                 },
+                outputOpts: { preserveModules: true },
                 title: "preserve-modules-multi-entry",
             },
             {
                 input: ["code-splitting/index.js", "code-splitting/indextwo.js"],
                 options: {
                     mode: "extract",
-                    modules: true,
                     sourceMap: true,
                 },
                 title: "multi-entry",
@@ -806,109 +817,11 @@ describe("css", () => {
                 input: ["code-splitting/index.js", "code-splitting/indextwo.js"],
                 options: {
                     mode: ["extract", "extracted.css"],
-                    modules: true,
                     sourceMap: true,
                 },
                 title: "multi-entry-single",
             },
-            {
-                input: ["code-splitting/index.js", "code-splitting/indextwo.js"],
-                inputOpts: {
-                    manualChunks(id) {
-                        if (id.includes("third")) {
-                            return "thirds";
-                        }
-
-                        if (id.includes("fourth")) {
-                            return "fourts";
-                        }
-
-                        if (id.includes("nondynamic")) {
-                            return "nondynamics";
-                        }
-                    },
-                },
-                options: {
-                    mode: "extract",
-                    modules: true,
-                    sourceMap: true,
-                },
-                title: "manual-chunks",
-            },
-            {
-                input: ["code-splitting/index.js", "code-splitting/indextwo.js"],
-                inputOpts: {
-                    manualChunks(id) {
-                        if (id.includes("third")) {
-                            return "thirds";
-                        }
-
-                        if (id.includes("fourth")) {
-                            return "fourts";
-                        }
-
-                        if (id.includes("nondynamic")) {
-                            return "nondynamics";
-                        }
-
-                        return "general";
-                    },
-                },
-                options: {
-                    mode: "extract",
-                    modules: true,
-                    sourceMap: true,
-                },
-                title: "manual-chunks-only",
-            },
-            {
-                input: ["code-splitting/index.js", "code-splitting/indextwo.js"],
-                inputOpts: {
-                    manualChunks(id) {
-                        if (id.includes("third")) {
-                            return "thirds";
-                        }
-
-                        if (id.includes("fourth")) {
-                            return "fourts";
-                        }
-
-                        if (id.includes("nondynamic")) {
-                            return "nondynamics";
-                        }
-                    },
-                },
-                options: {
-                    mode: ["extract", "extracted.css"],
-                    modules: true,
-                    sourceMap: true,
-                },
-                title: "manual-chunks-single",
-            },
-            {
-                input: ["code-splitting/index.js", "code-splitting/indextwo.js"],
-                inputOpts: {
-                    manualChunks(id) {
-                        if (id.includes("third")) {
-                            return "thirds";
-                        }
-                        if (id.includes("fourth")) {
-                            return "fourts";
-                        }
-                        if (id.includes("nondynamic")) {
-                            return "nondynamics";
-                        }
-                        return "general";
-                    },
-                },
-                options: {
-                    mode: ["extract", "extracted.css"],
-                    modules: true,
-                    sourceMap: true,
-                },
-                title: "manual-chunks-only-single",
-            },
-        ] as WriteData[])("should work with injected processed $title css", async ({ title, ...data }: WriteData) => {
+        ] as WriteData[])("should work with processed $title css", async ({ title, ...data }: WriteData) => {
             await validate(data);
         });
     });

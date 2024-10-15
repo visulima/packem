@@ -24,8 +24,11 @@ export default async (
     sourceDirectory: string,
     environment: Environment,
     useSourcemap: boolean,
+    debug: boolean,
+    alias: Record<string, string>,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<Plugin> => {
+    const mergedAlias = { ...alias, ...options.alias };
     const isIncluded = createFilter(options.include, options.exclude);
 
     const sourceMap = inferSourceMapOption(options.sourceMap);
@@ -58,10 +61,10 @@ export default async (
         loaderOptions.postcss = {
             ...options.postcss,
             config: inferOption(options.postcss?.config, {}),
-            import: inferHandlerOption(options.postcss?.import, options.alias),
+            import: inferHandlerOption(options.postcss?.import, mergedAlias),
             modules: inferOption(options.postcss?.modules, false),
             to: options.postcss?.to,
-            url: inferHandlerOption(options.postcss?.url, options.alias),
+            url: inferHandlerOption(options.postcss?.url, mergedAlias),
         };
 
         if (options.postcss?.parser) {
@@ -88,6 +91,7 @@ export default async (
         options: {
             ...options,
             ...loaderOptions,
+            alias: mergedAlias,
         },
     });
 
@@ -396,10 +400,12 @@ export default async (
             }
 
             const context: LoaderContext = {
+                alias: mergedAlias,
                 assets: new Map<string, Uint8Array>(),
                 autoModules: loaderOptions.autoModules,
                 browserTargets,
                 cwd,
+                debug,
                 deps: new Set(),
                 dts: false,
                 emit: loaderOptions.emit,

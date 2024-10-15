@@ -26,6 +26,7 @@ export interface Loader<T = Record<string, unknown>> {
  * @param T type of loader's options
  */
 export interface LoaderContext<T = Record<string, unknown>> {
+    readonly alias?: Record<string, string>;
     /** Assets to emit */
     readonly assets: Map<string, Uint8Array>;
     /** @see {@link InternalStyleOptions.autoModules} */
@@ -33,6 +34,7 @@ export interface LoaderContext<T = Record<string, unknown>> {
     /** Browser targets */
     readonly browserTargets: string[];
     readonly cwd?: string;
+    readonly debug?: boolean;
     /** Files to watch */
     readonly deps: Set<string>;
     /** @see {@link InternalStyleOptions.dts} */

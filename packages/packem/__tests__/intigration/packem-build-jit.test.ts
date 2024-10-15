@@ -53,7 +53,7 @@ describe("packem build --jit", () => {
                     name: "packem:test-plugin:after"
                 }
             }
-        ]
+        ],
 }`,
         );
 

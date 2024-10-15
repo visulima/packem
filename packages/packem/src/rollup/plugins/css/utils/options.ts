@@ -1,9 +1,7 @@
-import type { Plugin, Transformer } from "postcss";
-import type Processor from "postcss/lib/processor";
 import type { Result } from "postcss-load-config";
 
 import type { LoaderContext } from "../loaders/types";
-import type { InternalStyleOptions, StyleOptions } from "../types";
+import type { InternalStyleOptions, PostCSSOptions, StyleOptions } from "../types";
 import arrayFmt from "./array-fmt";
 import loadModule from "./load-module";
 
@@ -78,7 +76,7 @@ export const ensurePCSSOption = async <T>(option: T | string, type: PCSSOption, 
     return module as T;
 };
 
-export const ensurePCSSPlugins = async (plugins: undefined | (Plugin | Transformer | Processor)[], cwd: string): Promise<Result["plugins"]> => {
+export const ensurePCSSPlugins = async (plugins: PostCSSOptions["plugins"], cwd: string): Promise<Result["plugins"]> => {
     if (plugins === undefined) {
         return [];
     }
@@ -89,7 +87,8 @@ export const ensurePCSSPlugins = async (plugins: undefined | (Plugin | Transform
 
     const ps: Result["plugins"] = [];
 
-    for await (const plugin of plugins.filter(Boolean)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    for await (const plugin of (plugins as any[]).filter(Boolean)) {
         if (!Array.isArray(plugin)) {
             ps.push(await ensurePCSSOption(plugin, "plugin", cwd));
 

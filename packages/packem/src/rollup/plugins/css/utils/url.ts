@@ -1,4 +1,4 @@
-import { isAbsolute, normalize,parse } from "@visulima/path";
+import { isAbsolute, normalize, parse } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 
 /**
@@ -26,5 +26,5 @@ export const normalizeUrl = (url: string): string => {
         return normalize(url);
     }
 
-    return `./${normalize(url)}`;
+    return "./" + normalize(url);
 };

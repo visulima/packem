@@ -14,7 +14,6 @@ import type { Loader } from "../types";
 import ensureAutoModules from "../utils/ensure-auto-modules";
 import loadConfig from "./config";
 import postcssICSS from "./icss";
-import type { ImportOptions } from "./import";
 import postcssImport from "./import";
 import postcssModules from "./modules";
 import postcssNoop from "./noop";
@@ -61,12 +60,21 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
                 prev: mm(map).relative(dirname(this.id)).toObject(),
                 sourcesContent: this.sourceMap ? this.sourceMap.content : true,
             },
-            plugins: undefined,
+            plugins: [],
             to: this.options.to ?? this.id,
         };
 
         if (this.options.import) {
-            plugins.push(postcssImport({ extensions: this.extensions, ...(this.options.import as ImportOptions) }));
+            plugins.push(
+                postcssImport({
+                    debug: this.debug,
+                    extensions: this.extensions,
+                    plugins: [],
+                    root: this.cwd as string,
+                    warnOnEmpty: true,
+                    ...this.options.import,
+                }),
+            );
         }
 
         if (this.options.url) {
@@ -74,6 +82,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
         }
 
         if (this.options.plugins) {
+            // @ts-expect-error - @TODO - fix typing
             plugins.push(...this.options.plugins);
         }
 

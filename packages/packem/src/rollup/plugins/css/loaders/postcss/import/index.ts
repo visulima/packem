@@ -1,158 +1,52 @@
-import { dirname, isAbsolute, normalize } from "@visulima/path";
-import type { AtRule, PluginCreator, Result } from "postcss";
-import postcss from "postcss";
-import valueParser from "postcss-value-parser";
+import type { Helpers, PluginCreator, Root } from "postcss";
 
-import type { ImportResolve } from "./resolve";
-import { importResolve } from "./resolve";
+import applyConditions from "./apply-conditions";
+import applyRaws from "./apply-raws";
+import applyStyles from "./apply-styles";
+import { importResolve } from "./import-resolve";
+import parseStyles from "./parser/parse-styles";
+import type { ImportOptions, State } from "./types";
+import loadContent from "./utils/load-content";
 
 const name = "styles-import";
 const extensionsDefault = [".css", ".pcss", ".postcss", ".sss"];
 
-const plugin: PluginCreator<ImportOptions> = (options = {}) => {
-    const resolve = options.resolve ?? importResolve;
-    const alias = options.alias ?? {};
-    const extensions = options.extensions ?? extensionsDefault;
+const plugin: PluginCreator<Partial<ImportOptions>> = (options) => {
+    const config: ImportOptions = {
+        alias: options?.alias ?? {},
+        extensions: options?.extensions ?? extensionsDefault,
+        load: loadContent,
+        plugins: [],
+        resolve: options?.resolve ?? importResolve,
+        skipDuplicates: false,
+        ...options,
+    };
 
     return {
-        // eslint-disable-next-line sonarjs/cognitive-complexity
-        async Once(css, { result }) {
-            if (!css.source?.input.file) {
-                return;
+        async Once(styles: Root, { atRule, postcss, result }: Helpers) {
+            const state: State = {
+                hashFiles: {},
+                importedFiles: {},
+            };
+
+            if (styles.source?.input.file) {
+                state.importedFiles[styles.source.input.file] = {};
             }
 
-            const resultOptions: Result["opts"] = { ...result.opts, map: undefined };
-
-            const { file } = css.source.input;
-            const importList: { rule: AtRule; url: string }[] = [];
-            const basedir = dirname(file);
-
-            css.walkAtRules(/^import$/i, (rule) => {
-                // Top level only
-                if (rule.parent && rule.parent.type !== "root") {
-                    rule.warn(result, "`@import` should be top level");
-                    return;
-                }
-
-                // Child nodes should not exist
-                if (rule.nodes) {
-                    rule.warn(result, "`@import` was not terminated correctly");
-                    return;
-                }
-
-                const [urlNode] = valueParser(rule.params).nodes;
-
-                // No URL detected
-                if (!urlNode || (urlNode.type !== "string" && urlNode.type !== "function")) {
-                    rule.warn(result, `No URL in \`${rule.toString()}\``);
-                    return;
-                }
-
-                let url = "";
-
-                if (urlNode.type === "string") {
-                    url = urlNode.value;
-                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                } else if (urlNode.type === "function") {
-                    // Invalid function
-                    if (!/^url$/i.test(urlNode.value)) {
-                        rule.warn(result, `Invalid \`url\` function in \`${rule.toString()}\``);
-                        return;
-                    }
-
-                    const isString = urlNode.nodes[0]?.type === "string";
-
-                    url = isString ? (urlNode.nodes[0] as valueParser.Node).value : valueParser.stringify(urlNode.nodes);
-                }
-
-                url = url.replaceAll(/^\s+|\s+$/g, "");
-
-                // Resolve aliases
-                for (const [from, to] of Object.entries(alias)) {
-                    if (url !== from && !url.startsWith(`${from}/`)) {
-                        // eslint-disable-next-line no-continue
-                        continue;
-                    }
-
-                    url = normalize(to) + url.slice(from.length);
-                }
-
-                // Empty URL
-                if (url.length === 0) {
-                    rule.warn(result, `Empty URL in \`${rule.toString()}\``);
-                    return;
-                }
-
-                // Skip Web URLs
-                if (!isAbsolute(url)) {
-                    try {
-                        // eslint-disable-next-line no-new
-                        new URL(url);
-                        return;
-                    } catch {
-                        // Is not a Web URL, continuing
-                    }
-                }
-
-                importList.push({ rule, url });
-            });
-
-            for await (const { rule, url } of importList) {
-                try {
-                    const { from, source } = resolve(url, basedir, extensions);
-
-                    if (!(source instanceof Uint8Array) || typeof from !== "string") {
-                        rule.warn(result, `Incorrectly resolved \`@import\` in \`${rule.toString()}\``);
-                        // eslint-disable-next-line no-continue
-                        continue;
-                    }
-
-                    if (normalize(from) === normalize(file)) {
-                        rule.warn(result, `\`@import\` loop in \`${rule.toString()}\``);
-                        // eslint-disable-next-line no-continue
-                        continue;
-                    }
-
-                    const imported = await postcss(plugin(options)).process(source, { ...resultOptions, from });
-
-                    result.messages.push(...imported.messages, { file: from, plugin: name, type: "dependency" });
-
-                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                    if (imported.root) {
-                        rule.replaceWith(imported.root);
-                    } else {
-                        rule.remove();
-                    }
-                } catch {
-                    rule.warn(result, `Unresolved \`@import\` in \`${rule.toString()}\``);
-                }
+            if (!Array.isArray(config.plugins)) {
+                throw new TypeError("plugins option must be an array");
             }
+
+            const bundle = await parseStyles(result, styles, config, state, [], undefined, postcss);
+
+            applyRaws(bundle);
+            applyConditions(bundle, atRule);
+            applyStyles(bundle, styles);
         },
         postcssPlugin: name,
     };
 };
 
 plugin.postcss = true;
-
-/** `@import` handler options */
-export interface ImportOptions {
-    /**
-     * Aliases for import paths.
-     * Overrides the global `alias` option.
-     * - ex.: `{"foo":"bar"}`
-     */
-    alias?: Record<string, string>;
-    /**
-     * Import files ending with these extensions.
-     * Overrides the global `extensions` option.
-     * @default [".css", ".pcss", ".postcss", ".sss"]
-     */
-    extensions?: string[];
-    /**
-     * Provide custom resolver for imports
-     * in place of the default one
-     */
-    resolve?: ImportResolve;
-}
 
 export default plugin;

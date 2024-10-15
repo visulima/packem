@@ -7,18 +7,17 @@ import importer from "./importer";
 const loader: Loader<LESSLoaderOptions> = {
     name: "less",
     async process({ code, map }) {
-        const options = { ...this.options };
-        const plugins: Less.Plugin[] = [importer(this.cwd as string)];
+        const plugins: Less.Plugin[] = [importer(this.alias as Record<string, string>)];
 
-        if (options.plugins) {
-            plugins.push(...options.plugins);
+        if (this.options.plugins) {
+            plugins.push(...this.options.plugins);
         }
 
         // eslint-disable-next-line @typescript-eslint/unbound-method
         const render = less.render as (input: string, options: Less.Options) => Promise<Less.RenderOutput>;
 
         const result: Less.RenderOutput = await render(code, {
-            ...options,
+            ...this.options,
             filename: this.id,
             plugins,
             sourceMap: { outputSourceFiles: true, sourceMapBasepath: dirname(this.id) },

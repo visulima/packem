@@ -10,6 +10,7 @@ import replacePlugin from "@rollup/plugin-replace";
 import { wasm as wasmPlugin } from "@rollup/plugin-wasm";
 import { cyan } from "@visulima/colorize";
 import { isAbsolute, join, relative, resolve } from "@visulima/path";
+import { resolveAlias } from "@visulima/path/utils";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
 import polyfillPlugin from "rollup-plugin-polyfill-node";
@@ -194,26 +195,12 @@ const cachedGlobFiles = new Map<string, string[]>();
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string, string>, type: "dependencies" | "dts"): RollupOptions => {
-    const findAlias = (id: string): string | undefined => {
-        for (const [key, replacement] of Object.entries(resolvedAliases)) {
-            if (id.startsWith(key)) {
-                return id.replace(key, replacement);
-            }
-        }
-
-        return undefined;
-    };
-
     const configAlias = getConfigAlias(context.tsconfig, false);
 
     return <RollupOptions>{
         external(id) {
-            const foundAlias = findAlias(id);
-
-            if (foundAlias) {
-                // eslint-disable-next-line no-param-reassign
-                id = foundAlias;
-            }
+            // eslint-disable-next-line no-param-reassign
+            id = resolveAlias(id, resolvedAliases);
 
             // eslint-disable-next-line @typescript-eslint/naming-convention
             const package_ = getPackageName(id);
@@ -367,6 +354,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     // options for url handler accordingly.
                     assetFileNames: "[name]-[hash][extname]",
                     chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "cjs"),
+                    compact: context.options.minify,
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "cjs"),
                     exports: "auto",
@@ -398,6 +386,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     // options for url handler accordingly.
                     assetFileNames: "[name]-[hash][extname]",
                     chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "mjs"),
+                    compact: context.options.minify,
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "mjs"),
                     exports: "auto",
@@ -488,6 +477,8 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         context.options.sourceDir,
                         context.environment,
                         context.options.sourcemap,
+                        context.options.debug,
+                        resolvedAliases,
                     )),
 
                 context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
@@ -668,6 +659,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             context.options.emitCJS &&
                 <OutputOptions>{
                     chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "d.cts"),
+                    compact: context.options.minify,
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: "[name].d.cts",
                     format: "cjs",
@@ -677,6 +669,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             context.options.emitESM &&
                 <OutputOptions>{
                     chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "d.mts"),
+                    compact: context.options.minify,
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: "[name].d.mts",
                     format: "esm",
@@ -687,6 +680,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             context.options.declaration === "compatible" &&
                 <OutputOptions>{
                     chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "d.ts"),
+                    compact: context.options.minify,
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: "[name].d.ts",
                     format: "cjs",

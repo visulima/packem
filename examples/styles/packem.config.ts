@@ -10,6 +10,7 @@ export default defineConfig({
     transformer,
     rollup: {
         css: {
+            mode: "extract",
             loaders: [lessLoader, postcssLoader, sassLoader, stylusLoader, sourceMapLoader],
         },
     },

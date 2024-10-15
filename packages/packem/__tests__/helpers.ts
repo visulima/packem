@@ -49,14 +49,54 @@ export const installPackage = async (fixturePath: string, packageName: string): 
 
 export const createPackemConfig = async (
     fixturePath: string,
-    config: BuildConfig | string = {},
+    config: BuildConfig | string | undefined = undefined,
     transformer: "esbuild" | "swc" | "sucrase" = "esbuild",
     isolatedDeclarationTransformer: "swc" | "typescript" | "oxc" | undefined = undefined,
     cssLoader: ("postcss" | "less" | "stylus" | "sass" | "sourcemap")[] = [],
     cssOptions: StyleOptions | string | undefined = undefined,
     minimizer: "cssnano" | "lightningcss" | undefined = undefined,
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
     await installPackage(fixturePath, transformer === "swc" ? "@swc" : transformer);
+
+    let rollupConfig = "";
+
+    if (config === undefined) {
+        // eslint-disable-next-line no-param-reassign
+        config = "";
+    } else if (typeof config === "object") {
+        rollupConfig += "\nrollup: {";
+
+        const { rollup, ...rest } = config;
+
+        if (rollup?.css && cssLoader.length > 0) {
+            throw new Error("Cannot use both `rollup.css` and `cssLoader` options in the same configuration");
+        }
+
+        if (rollup) {
+            rollupConfig += JSON.stringify(rollup, null, 4).slice(1, -1) + ",\n";
+        }
+
+        if (typeof rest === "object") {
+            // eslint-disable-next-line no-param-reassign
+            config = JSON.stringify(rest, null, 4).slice(1, -1);
+
+            if (config !== "") {
+                // eslint-disable-next-line no-param-reassign
+                config += ",";
+            }
+        }
+    }
+
+    if (cssLoader.length > 0) {
+        rollupConfig += `    css: {\n        loaders: [${cssLoader.map((loader) => `${loader}Loader`).join(", ")}],${minimizer ? `\n        minifier: ${minimizer},` : ""}
+            ${typeof cssOptions === "string" ? cssOptions : typeof cssOptions === "object" ? JSON.stringify(cssOptions, null, 4).slice(1, -1) : ""}
+    }`;
+    }
+
+    if (rollupConfig !== "") {
+        rollupConfig += "\n},";
+    }
 
     await writeFile(
         join(fixturePath, "packem.config.ts"),
@@ -68,20 +108,7 @@ ${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/ro
 ${minimizer ? `import ${minimizer} from "${distributionPath}/rollup/plugins/css/minifiers/${minimizer}";` : ""}
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
-    transformer,
-    ${isolatedDeclarationTransformer ? `isolatedDeclarationTransformer,` : ""}
-    ${typeof config === "string" ? config : JSON.stringify(config, null, 4).slice(1, -1)}
-    ${
-        cssLoader.length > 0
-            ? `rollup: {
-    css: {
-        ${typeof cssOptions === "string" ? cssOptions : typeof cssOptions === "object" ? JSON.stringify(cssOptions, null, 4).slice(1, -1) + ", " : ""}
-        loaders: [${cssLoader.map((loader) => `${loader}Loader`).join(", ")}],
-        ${minimizer ? `minifier: ${minimizer},` : ""}
-        }
-    },`
-            : ""
-    }
+    transformer,${isolatedDeclarationTransformer ? `\nisolatedDeclarationTransformer,` : ""}${config as string}${rollupConfig}
 });
 `,
         {

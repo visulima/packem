@@ -1,11 +1,13 @@
 import { readFileSync } from "@visulima/fs";
 
+import type { ResolveOptions } from "../../utils/resolve";
 import { resolve } from "../../utils/resolve";
 import { getUrlOfPartial, normalizeUrl } from "../../utils/url";
+import { resolveAlias } from "@visulima/path/utils";
 
 const extensions = [".less", ".css"];
 
-const getStylesFileManager = (less: LessStatic, cwd: string): Less.FileManager =>
+const getStylesFileManager = (less: LessStatic, aliases: Record<string, string>): Less.FileManager =>
     new (class extends less.FileManager implements Less.FileManager {
         // eslint-disable-next-line class-methods-use-this
         public override supports(): boolean {
@@ -13,27 +15,29 @@ const getStylesFileManager = (less: LessStatic, cwd: string): Less.FileManager =
         }
 
         // eslint-disable-next-line class-methods-use-this
-        public override async loadFile(filename: string, filedir: string, options_: Less.Options): Promise<Less.FileLoadResult> {
-            const url = normalizeUrl(filename);
+        public override async loadFile(filename: string, fileDirectory: string, options: Less.Options): Promise<Less.FileLoadResult> {
+            const url = normalizeUrl(resolveAlias(filename, aliases));
             const partialUrl = getUrlOfPartial(url);
 
-            const options = { baseDirs: [cwd, filedir], caller: "Less importer", extensions };
+            const resolveOptions: { baseDirs: string[] } & ResolveOptions = { baseDirs: [], caller: "Less importer", extensions };
 
-            if (options_.paths) {
-                options.baseDirs.push(...options_.paths);
+            if (Array.isArray(options.paths)) {
+                resolveOptions.baseDirs.push(...options.paths);
             }
 
-            // Give precedence to importing a partial
-            const id = resolve([partialUrl, url], options);
+            resolveOptions.baseDirs.push(fileDirectory);
 
+            // Give precedence to importing a partial
+            const id = resolve([partialUrl, url], resolveOptions);
+            console.log({ id });
             return { contents: readFileSync(id), filename: id };
         }
     })();
 
-const importer: (cwd: string) => Less.Plugin = (cwd: string) => {
+const importer = (alias: Record<string, string>): Less.Plugin => {
     return {
         install(less, pluginManager) {
-            pluginManager.addFileManager(getStylesFileManager(less, cwd));
+            pluginManager.addFileManager(getStylesFileManager(less, alias));
         },
     };
 };

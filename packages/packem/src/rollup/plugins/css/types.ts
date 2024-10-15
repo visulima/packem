@@ -1,10 +1,10 @@
 import type { Options } from "cssnano";
 import type { CustomAtRules, TransformOptions } from "lightningcss";
-import type { AcceptedPlugin } from "postcss";
+import type { AcceptedPlugin, PluginCreator } from "postcss";
 import type { Config as PostCSSConfig } from "postcss-load-config";
 
 import type { LESSLoaderOptions } from "./loaders/less";
-import type { ImportOptions } from "./loaders/postcss/import";
+import type { ImportOptions } from "./loaders/postcss/import/types";
 import type { ModulesOptions } from "./loaders/postcss/modules";
 import type { UrlOptions } from "./loaders/postcss/url";
 import type { SassLoaderOptions } from "./loaders/sass";
@@ -12,7 +12,7 @@ import type { StylusLoaderOptions } from "./loaders/stylus";
 import type { Loader, SourceMapOptions } from "./loaders/types";
 import type { Minifier } from "./minifiers/types";
 
-interface PostCSSOptions {
+export interface PostCSSOptions {
     /**
      * Enable/disable or pass options for PostCSS config loader
      * @default {}
@@ -38,7 +38,9 @@ interface PostCSSOptions {
      * A list of plugins for PostCSS,
      * which are used before plugins loaded from PostCSS config file, if any
      */
-    plugins?: AcceptedPlugin[];
+    plugins?:
+        | Record<string, unknown>
+        | (AcceptedPlugin | string | [string | PluginCreator<unknown>] | [string | PluginCreator<unknown>, Record<string, unknown>] | null | undefined)[];
     /**
      * Set PostCSS stringifier.
      * Overrides the one loaded from PostCSS config file, if any.

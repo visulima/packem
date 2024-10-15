@@ -42,7 +42,9 @@ const importer = (resourcePath: string): Importer<"sync"> => {
             const syntax: Syntax = extension ? (resolveSyntax(extension.toLowerCase()) ?? "scss") : "scss"; // Default syntax
 
             try {
-                const contents = readFileSync(canonicalUrl);
+                let contents = readFileSync(canonicalUrl);
+
+                contents = "/* " + canonicalUrl.pathname + " */\n" + contents;
 
                 return { contents: contents as string, sourceMapUrl: canonicalUrl, syntax };
             } catch {

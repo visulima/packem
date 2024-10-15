@@ -7,23 +7,25 @@ import { mm } from "../../../utils/sourcemap";
 import { DATA_URI_REGEXP, FIRST_EXTENSION_REGEXP } from "../constants";
 import generateName from "./generate";
 import inlineFile from "./inline";
-import type { UrlFile, UrlResolve } from "./resolve";
-import { urlResolve } from "./resolve";
+import type { UrlFile, UrlResolve } from "./url-resolve";
+import { urlResolve } from "./url-resolve";
 import { isDeclWithUrl, walkUrls } from "./utils";
 
 const name = "styles-url";
 const placeholderHashDefault = "assets/[name]-[hash][extname]";
 const placeholderNoHashDefault = "assets/[name][extname]";
-const defaultPublicPath = "./";
+const defaultPublicPath = "./assets/";
 const defaultAssetDirectory = ".";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const plugin: PluginCreator<UrlOptions> = (options = {}) => {
-    const inline = options.inline ?? false;
-    const publicPath = options.publicPath ?? defaultPublicPath;
-    const assetDirectory = options.assetDir ?? defaultAssetDirectory;
-    const resolve = options.resolve ?? urlResolve;
-    const alias = options.alias ?? {};
+const plugin: PluginCreator<UrlOptions> = (userOptions) => {
+    const options = {
+        alias: {},
+        assetDir: defaultAssetDirectory,
+        inline: false,
+        resolve: urlResolve,
+        ...userOptions,
+    };
     const placeholder = (options.hash ?? true) ? (typeof options.hash === "string" ? options.hash : placeholderHashDefault) : placeholderNoHashDefault;
 
     return {
@@ -33,6 +35,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
             }
 
             const { file } = css.source.input;
+
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             const map = mm(css.source.input.map?.text ?? undefined)
                 .resolve(dirname(file))
@@ -57,7 +60,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
 
                 walkUrls(parsed, (url, node) => {
                     // Resolve aliases
-                    for (const [from, to] of Object.entries(alias)) {
+                    for (const [from, to] of Object.entries(options.alias)) {
                         if (url !== from && !url.startsWith(`${from}/`)) {
                             // eslint-disable-next-line no-continue
                             continue;
@@ -120,15 +123,12 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
             for await (const { baseDirs, decl, node, parsed, url } of urlList) {
                 let resolved: UrlFile | undefined;
 
-                for await (const basedir of baseDirs) {
-                    try {
-                        if (!resolved) {
-                            resolved = await resolve(url, basedir);
-                        }
-                    } catch (er) {
-                        console.log(er);
-                        /* noop */
+                try {
+                    if (!resolved) {
+                        resolved = await options.resolve(url, [...baseDirs]);
                     }
+                } catch {
+                    /* noop */
                 }
 
                 if (!resolved) {
@@ -147,7 +147,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
 
                 result.messages.push({ file: from, plugin: name, type: "dependency" });
 
-                if (inline) {
+                if (options.inline) {
                     node.type = "string";
                     node.value = inlineFile(from, source);
                 } else {
@@ -165,19 +165,22 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
                     usedNames.set(to, from);
 
                     const resolvedPublicPath =
-                        typeof publicPath === "string"
-                            ? publicPath + (/[/\\]$/.test(publicPath) ? "" : "/") + basename(to)
+                        typeof options.publicPath === "string"
+                            ? options.publicPath + (/[/\\]$/.test(options.publicPath) ? "" : "/") + basename(to)
                             : `${defaultPublicPath}${basename(to)}`;
 
                     node.type = "string";
-                    node.value = typeof publicPath === "function" ? publicPath(node.value, resolvedPublicPath, file) : resolvedPublicPath;
+                    node.value = typeof options.publicPath === "function" ? options.publicPath(node.value, resolvedPublicPath, file) : resolvedPublicPath;
 
                     if (urlQuery) {
                         node.value += urlQuery;
                     }
 
-                    to = normalize(join(typeof assetDirectory === "string" ? assetDirectory : defaultAssetDirectory, to));
-                    to = typeof assetDirectory === "function" ? assetDirectory(from, to, file) : to;
+                    if (typeof options.assetDir === "string") {
+                        to = join(options.assetDir, to);
+                    } else if (typeof options.assetDir === "function") {
+                        to = options.assetDir(from, to, file);
+                    }
 
                     result.messages.push({ plugin: name, source, to, type: "asset" });
                 }
@@ -227,7 +230,7 @@ export interface UrlOptions {
      * Public Path for URLs in CSS files
      * @default "./"
      */
-    publicPath?: string | ((original: string, resolved: string, file: string) => string);
+    publicPath: string | ((original: string, resolved: string, file: string) => string);
     /**
      * Provide custom resolver for URLs
      * in place of the default one
