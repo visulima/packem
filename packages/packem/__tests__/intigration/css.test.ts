@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import type { StyleOptions } from "../../src/rollup/plugins/css/types";
 import { inferModeOption, inferSourceMapOption } from "../../src/rollup/plugins/css/utils/options";
+import type { PackemConfigProperties } from "../helpers";
 import { createPackageJson, createPackemConfig, execPackemSync, installPackage } from "../helpers";
 
 const fixturePath = join(__dirname, "../..", "__fixtures__", "css");
@@ -18,11 +19,12 @@ interface WriteData {
     files?: string[];
     input: string | string[];
     minimizer?: "cssnano" | "lightningcss" | undefined;
-    options?: StyleOptions;
     outDir?: string;
     outputOpts?: OutputOptions;
+    packemPlugins?: PackemConfigProperties["plugins"];
     shouldFail?: boolean;
-    stringifyOption?: string;
+    stringifyStyleOption?: string;
+    styleOptions?: StyleOptions;
     title?: string;
 }
 
@@ -51,6 +53,7 @@ describe("css", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     const build = async (data: WriteData): Promise<WriteResult | WriteFailResult> => {
         const input = Array.isArray(data.input) ? data.input : [data.input];
 
@@ -61,11 +64,10 @@ describe("css", () => {
 
         await installPackage(temporaryDirectoryPath, "minireset.css");
 
-        const { loaders, ...otherOptions } = data.options ?? {};
+        const { loaders, ...otherOptions } = data.styleOptions ?? {};
 
-        await createPackemConfig(
-            temporaryDirectoryPath,
-            data.outputOpts
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: data.outputOpts
                 ? {
                       rollup: {
                           output: {
@@ -74,12 +76,12 @@ describe("css", () => {
                       },
                   }
                 : undefined,
-            "esbuild",
-            undefined,
-            loaders ?? ["postcss", "less", "stylus", "sass", "sourcemap"],
-            data.stringifyOption ?? otherOptions ?? undefined,
-            data.minimizer,
-        );
+            cssLoader: loaders ?? ["postcss", "less", "stylus", "sass", "sourcemap"],
+            cssOptions: data.stringifyStyleOption ?? otherOptions ?? undefined,
+            minimizer: data.minimizer,
+            plugins: data.packemPlugins,
+            transformer: "esbuild",
+        });
 
         createPackageJson(temporaryDirectoryPath, {
             exports: input.map((file) => {
@@ -101,7 +103,7 @@ describe("css", () => {
                 stderr: binProcess.stderr as string,
             };
         }
-console.log(binProcess.stdout);
+
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
@@ -137,7 +139,7 @@ console.log(binProcess.stdout);
             withFileTypes: true,
         })
             .filter((dirent) => dirent.isFile())
-            .map((dirent) => join(dirent.path, dirent.name));
+            .map((dirent) => join(dirent.parentPath, dirent.name));
 
         const css = files.filter((file) => file.endsWith(".css"));
         const cssMap = files.filter((file) => file.endsWith(".css.map"));
@@ -191,7 +193,7 @@ console.log(binProcess.stdout);
             expect(f).toMatchSnapshot("js");
         }
 
-        const options = data.options ?? {};
+        const options = data.styleOptions ?? {};
 
         const mode = inferModeOption(options.mode);
 
@@ -234,46 +236,46 @@ console.log(binProcess.stdout);
             {
                 errorMessage: "Incorrect mode provided, allowed modes are `inject`, `extract` or `emit`",
                 input: "simple/index.js",
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                options: { mode: "mash" as any },
                 shouldFail: true,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                styleOptions: { mode: "mash" as any },
                 title: "mode-fail",
             },
             {
                 errorMessage: "Unable to load PostCSS parser `walrus`",
                 input: "simple/index.js",
-                options: { postcss: { parser: "walrus" } },
                 shouldFail: true,
+                styleOptions: { postcss: { parser: "walrus" } },
                 title: "parser-fail",
             },
             {
                 errorMessage: "Unable to load PostCSS syntax `walrus`",
                 input: "simple/index.js",
-                options: { postcss: { syntax: "walrus" } },
                 shouldFail: true,
+                styleOptions: { postcss: { syntax: "walrus" } },
                 title: "syntax-fail",
             },
             {
                 errorMessage: "Unable to load PostCSS stringifier `walrus`",
                 input: "simple/index.js",
-                options: { postcss: { stringifier: "walrus" } },
                 shouldFail: true,
+                styleOptions: { postcss: { stringifier: "walrus" } },
                 title: "stringifier-fail",
             },
             {
                 errorMessage: "Unable to load PostCSS plugin `pulverizer`",
                 input: "simple/index.js",
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                options: { postcss: { plugins: ["pulverizer"] as any } },
                 shouldFail: true,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                styleOptions: { postcss: { plugins: ["pulverizer"] as any } },
                 title: "plugin-fail",
             },
             {
                 errorMessage: "plugins.filter(...) is not a function or its return value is not async iterable",
                 input: "simple/index.js",
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                options: { postcss: { plugins: "pulverizer" as any } },
                 shouldFail: true,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                styleOptions: { postcss: { plugins: "pulverizer" as any } },
                 title: "plugin-type-fail",
             },
             {
@@ -296,15 +298,15 @@ console.log(binProcess.stdout);
                     "assets/Demo-webfont.woff",
                 ],
                 input: "resolvers/index.js",
-                options: {
+                outputOpts: {
+                    assetFileNames: "[name][extname]",
+                },
+                styleOptions: {
                     alias: { "@": join("__REPLACE__", "src", "features") },
                     mode: "extract",
                     postcss: {
                         url: { hash: false, publicPath: "/pubpath" },
                     },
-                },
-                outputOpts: {
-                    assetFileNames: "[name][extname]",
                 },
                 title: "resolvers",
             },
@@ -320,7 +322,7 @@ console.log(binProcess.stdout);
                     "assets/Demo-webfont.woff",
                 ],
                 input: "resolvers/index.js",
-                options: {
+                styleOptions: {
                     alias: { "@": join("__REPLACE__", "src", "features") },
                     mode: "extract",
                     postcss: {
@@ -340,21 +342,21 @@ console.log(binProcess.stdout);
                     "assets/Demo-webfont-423f69d5.woff",
                 ],
                 input: "resolvers/index.js",
-                options: {
+                outputOpts: {
+                    assetFileNames: "[name][extname]",
+                },
+                styleOptions: {
                     alias: { "@": join("__REPLACE__", "src", "features") },
                     mode: "extract",
                     postcss: {
                         url: { hash: true, publicPath: "/pubpath" },
                     },
                 },
-                outputOpts: {
-                    assetFileNames: "[name][extname]",
-                },
                 title: "resolvers-hash",
             },
             {
                 input: "resolvers/index.js",
-                options: {
+                styleOptions: {
                     alias: { "@": join("__REPLACE__", "src", "features") },
                     mode: "extract",
                     postcss: {
@@ -365,7 +367,7 @@ console.log(binProcess.stdout);
             },
             {
                 input: "postcss-options/index.js",
-                options: {
+                styleOptions: {
                     postcss: {
                         parser: join(temporaryDirectoryPath, "node_modules", "sugarss"),
                     },
@@ -379,11 +381,11 @@ console.log(binProcess.stdout);
             }
 
             // eslint-disable-next-line vitest/no-conditional-in-test
-            if (data.options?.alias) {
-                for (const alias of Object.keys(data.options.alias)) {
+            if (data.styleOptions?.alias) {
+                for (const [key, value] of Object.entries(data.styleOptions.alias)) {
                     // this is needed because of the temporary directory path, that is generated on every test run
                     // eslint-disable-next-line no-param-reassign,security/detect-object-injection
-                    data.options.alias[alias] = data.options.alias[alias].replace("__REPLACE__", temporaryDirectoryPath);
+                    data.styleOptions.alias[key] = value.replace("__REPLACE__", temporaryDirectoryPath);
                 }
             }
 
@@ -402,7 +404,7 @@ console.log(binProcess.stdout);
             {
                 input: "simple/index.js",
                 minimizer: "cssnano",
-                options: {
+                styleOptions: {
                     mode: "extract",
                 },
                 title: "extract",
@@ -410,7 +412,7 @@ console.log(binProcess.stdout);
             {
                 input: "simple/index.js",
                 minimizer: "cssnano",
-                options: {
+                styleOptions: {
                     mode: "extract",
                     sourceMap: true,
                 },
@@ -419,7 +421,7 @@ console.log(binProcess.stdout);
             {
                 input: "simple/index.js",
                 minimizer: "cssnano",
-                options: {
+                styleOptions: {
                     mode: "extract",
                     sourceMap: "inline",
                 },
@@ -434,7 +436,7 @@ console.log(binProcess.stdout);
             {
                 input: "simple/index.js",
                 minimizer: "lightningcss",
-                options: {
+                styleOptions: {
                     mode: "extract",
                 },
                 title: "extract",
@@ -442,7 +444,7 @@ console.log(binProcess.stdout);
             {
                 input: "simple/index.js",
                 minimizer: "lightningcss",
-                options: {
+                styleOptions: {
                     mode: "extract",
                     sourceMap: true,
                 },
@@ -451,7 +453,7 @@ console.log(binProcess.stdout);
             {
                 input: "simple/index.js",
                 minimizer: "lightningcss",
-                options: {
+                styleOptions: {
                     mode: "extract",
                     sourceMap: "inline",
                 },
@@ -467,34 +469,34 @@ console.log(binProcess.stdout);
         it.each([
             {
                 input: "simple/index.js",
-                options: { sourceMap: true },
+                styleOptions: { sourceMap: true },
                 title: "true",
             },
             {
                 input: "simple/index.js",
-                options: { sourceMap: [true, { content: false }] },
+                styleOptions: { sourceMap: [true, { content: false }] },
                 title: "no-content",
             },
             {
                 input: "simple/index.js",
                 // eslint-disable-next-line no-return-assign,no-param-reassign
-                options: { sourceMap: [true, { transform: (map) => (map.sources = ["virt"]) }] },
+                styleOptions: { sourceMap: [true, { transform: (map) => (map.sources = ["virt"]) }] },
                 title: "transform",
             },
             {
                 input: "simple/index.js",
-                options: { sourceMap: "inline" },
+                styleOptions: { sourceMap: "inline" },
                 title: "inline",
             },
             {
                 input: "simple/index.js",
-                options: { sourceMap: ["inline", { content: false }] },
+                styleOptions: { sourceMap: ["inline", { content: false }] },
                 title: "inline-no-content",
             },
             {
                 input: "simple/index.js",
                 // eslint-disable-next-line no-param-reassign,no-return-assign
-                options: { sourceMap: ["inline", { transform: (m) => (m.sources = ["virt"]) }] },
+                styleOptions: { sourceMap: ["inline", { transform: (m) => (m.sources = ["virt"]) }] },
                 title: "inline-transform",
             },
         ] as WriteData[])("should generate sourcemap for processed $title css", async ({ title, ...data }: WriteData) => {
@@ -507,30 +509,30 @@ console.log(binProcess.stdout);
         it.each([
             {
                 input: "simple/index.js",
-                options: { mode: "extract" },
+                styleOptions: { mode: "extract" },
                 title: "true",
             },
             {
                 input: "simple/index.js",
-                options: { mode: "extract" },
                 outputOpts: { preserveModules: true },
+                styleOptions: { mode: "extract" },
                 title: "preserve-modules",
             },
             {
                 input: "simple/index.js",
-                options: { mode: ["extract", join("__REPLACE__", "src", "dist/wrong.css")] },
                 shouldFail: true,
+                styleOptions: { mode: ["extract", join("__REPLACE__", "src", "dist/wrong.css")] },
                 title: "absolute-path-fail",
             },
             {
                 input: "simple/index.js",
-                options: { mode: ["extract", "../wrong.css"] },
                 shouldFail: true,
+                styleOptions: { mode: ["extract", "../wrong.css"] },
                 title: "relative-path-fail",
             },
             {
                 input: "simple/index.js",
-                options: {
+                styleOptions: {
                     mode: ["extract", "i/am/extracted.css"],
                     sourceMap: true,
                 },
@@ -538,27 +540,28 @@ console.log(binProcess.stdout);
             },
             {
                 input: "simple/index.js",
-                options: { mode: "extract", sourceMap: true },
+                styleOptions: { mode: "extract", sourceMap: true },
                 title: "sourcemap-true",
             },
             {
                 input: "simple/index.js",
-                options: { mode: "extract", sourceMap: [true, { transform: (m) => (m.sources = ["virt"]) }] },
+                // eslint-disable-next-line no-return-assign,no-param-reassign
+                styleOptions: { mode: "extract", sourceMap: [true, { transform: (map) => (map.sources = ["virt"]) }] },
                 title: "sourcemap-transform",
             },
             {
                 input: "simple/index.js",
-                options: { mode: "extract", sourceMap: "inline" },
+                styleOptions: { mode: "extract", sourceMap: "inline" },
                 title: "sourcemap-inline",
             },
             {
                 input: "simple/index.js",
-                options: { mode: "extract", sourceMap: ["inline", { transform: (m) => (m.sources = ["virt"]) }] },
+                // eslint-disable-next-line no-return-assign,no-param-reassign
+                styleOptions: { mode: "extract", sourceMap: ["inline", { transform: (map) => (map.sources = ["virt"]) }] },
                 title: "sourcemap-inline-transform",
             },
             {
                 input: "simple/index.js",
-                options: { mode: "extract", sourceMap: true },
                 outputOpts: {
                     assetFileNames({ name }) {
                         const p = "[name][extname]";
@@ -578,13 +581,17 @@ console.log(binProcess.stdout);
                         return p;
                     },
                 },
+                styleOptions: { mode: "extract", sourceMap: true },
                 title: "asset-file-names",
             },
         ] as WriteData[])("should generate sourcemap for processed $title css", async ({ title, ...data }: WriteData) => {
             // eslint-disable-next-line vitest/no-conditional-in-test
-            if (Array.isArray(data.options?.mode)) {
+            if (Array.isArray(data.styleOptions?.mode)) {
                 // eslint-disable-next-line no-param-reassign
-                data.options.mode = [data.options.mode[0] as "extract", (data.options.mode[1] as string).replace("__REPLACE__", temporaryDirectoryPath)];
+                data.styleOptions.mode = [
+                    data.styleOptions.mode[0] as "extract",
+                    (data.styleOptions.mode[1] as string).replace("__REPLACE__", temporaryDirectoryPath),
+                ];
             }
 
             await validate(data);
@@ -596,22 +603,24 @@ console.log(binProcess.stdout);
         it.each([
             {
                 input: "simple/index.js",
-                options: {
+                styleOptions: {
                     mode: ["inject", { prepend: true }],
                 },
                 title: "top",
             },
             {
                 input: "simple/index.js",
-                options: { mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(normalize(id))})`] },
-                // eslint-disable-next-line no-template-curly-in-string
-                stringifyOption: 'mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(normalize(id.replace("__REPLACE__", "")))})`],',
+
+                stringifyStyleOption:
+                    // eslint-disable-next-line no-template-curly-in-string
+                    'mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(normalize(id.replace("__REPLACE__", "")))})`],',
+                styleOptions: { mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(normalize(id))})`] },
                 title: "function",
             },
         ] as WriteData[])("should work with injected processed $title css", async ({ title, ...data }: WriteData) => {
             // this is needed because of the temporary directory path, that is generated on every test run
             // eslint-disable-next-line no-param-reassign
-            data.stringifyOption = data.stringifyOption?.replace("__REPLACE__", temporaryDirectoryPath);
+            data.stringifyStyleOption = data.stringifyStyleOption?.replace("__REPLACE__", temporaryDirectoryPath);
 
             await validate(data);
         });
@@ -622,7 +631,7 @@ console.log(binProcess.stdout);
         it.each([
             {
                 input: "sass/index.js",
-                options: {
+                styleOptions: {
                     sass: {
                         implementation: "sass",
                     },
@@ -631,7 +640,7 @@ console.log(binProcess.stdout);
             },
             {
                 input: "sass/index.js",
-                options: {
+                styleOptions: {
                     sass: {
                         implementation: "sass-embedded",
                     },
@@ -640,7 +649,7 @@ console.log(binProcess.stdout);
             },
             {
                 input: "sass/index.js",
-                options: {
+                styleOptions: {
                     sass: {
                         implementation: "node-sass",
                     },
@@ -649,7 +658,7 @@ console.log(binProcess.stdout);
             },
             {
                 input: "sass-use/index.js",
-                options: {
+                styleOptions: {
                     sass: {
                         implementation: "sass",
                     },
@@ -658,7 +667,7 @@ console.log(binProcess.stdout);
             },
             {
                 input: "sass/index.js",
-                options: {
+                styleOptions: {
                     sass: {
                         implementation: "sass",
                     },
@@ -668,7 +677,7 @@ console.log(binProcess.stdout);
             },
             {
                 input: "sass-modules/index.js",
-                options: {
+                styleOptions: {
                     sass: {
                         implementation: "sass",
                     },
@@ -677,28 +686,28 @@ console.log(binProcess.stdout);
             },
             {
                 input: "sass-data/index.js",
-                options: {
+                styleOptions: {
                     sass: { additionalData: "@import 'data';", implementation: "sass-embedded" },
                 },
                 title: "sass-embedded - data",
             },
             {
                 input: "sass-data/index.js",
-                options: {
+                styleOptions: {
                     sass: { additionalData: "@import 'data';", implementation: "sass" },
                 },
                 title: "sass - data",
             },
             {
                 input: "sass-data/index.js",
-                options: {
+                styleOptions: {
                     sass: { additionalData: "@import 'data';", implementation: "node-sass" },
                 },
                 title: "node-sass - data",
             },
             {
                 input: "sass-import/index.js",
-                options: {
+                styleOptions: {
                     sass: {
                         implementation: "sass",
                     },
@@ -719,7 +728,7 @@ console.log(binProcess.stdout);
             },
             {
                 input: "stylus-import/index.js",
-                options: { mode: "extract", sourceMap: true },
+                styleOptions: { mode: "extract", sourceMap: true },
                 title: "sourcemap",
             },
         ] as WriteData[])("should work with stylus processed $title css", async ({ title, ...data }: WriteData) => {
@@ -736,22 +745,22 @@ console.log(binProcess.stdout);
             },
             {
                 input: "less-import/index.js",
-                options: { mode: "extract", sourceMap: true },
+                styleOptions: { mode: "extract", sourceMap: true },
                 title: "sourcemap",
             },
             {
                 input: "less-paths/index.js",
-                options: { less: { paths: [join("__REPLACE__", "src", "less-paths", "sub")] } },
+                styleOptions: { less: { paths: [join("__REPLACE__", "src", "sub")] } },
                 title: "paths",
             },
         ] as WriteData[])("should work with less processed $title css", async ({ title, ...data }: WriteData) => {
             // eslint-disable-next-line vitest/no-conditional-in-test
-            if (data.options?.less?.paths) {
+            if (data.styleOptions?.less?.paths) {
                 // eslint-disable-next-line no-plusplus
-                for (let index = 0; index < data.options.less.paths.length; index++) {
+                for (let index = 0; index < data.styleOptions.less.paths.length; index++) {
                     // this is needed because of the temporary directory path, that is generated on every test run
                     // eslint-disable-next-line no-param-reassign,security/detect-object-injection
-                    data.options.less.paths[index] = (data.options.less.paths[index] as string).replace("__REPLACE__", temporaryDirectoryPath);
+                    data.styleOptions.less.paths[index] = (data.styleOptions.less.paths[index] as string).replace("__REPLACE__", temporaryDirectoryPath);
                 }
             }
 
@@ -764,7 +773,7 @@ console.log(binProcess.stdout);
         it.each([
             {
                 input: "code-splitting/index.js",
-                options: {
+                styleOptions: {
                     mode: "extract",
                     sourceMap: true,
                 },
@@ -772,7 +781,7 @@ console.log(binProcess.stdout);
             },
             {
                 input: "code-splitting/index.js",
-                options: {
+                styleOptions: {
                     mode: ["extract", "extracted.css"],
                     sourceMap: true,
                 },
@@ -780,34 +789,34 @@ console.log(binProcess.stdout);
             },
             {
                 input: "code-splitting/index.js",
-                options: {
+                outputOpts: { preserveModules: true },
+                styleOptions: {
                     mode: "extract",
                     sourceMap: true,
                 },
-                outputOpts: { preserveModules: true },
                 title: "preserve-modules",
             },
             {
                 input: "code-splitting/index.js",
-                options: {
+                outputOpts: { preserveModules: true },
+                styleOptions: {
                     mode: ["extract", "extracted.css"],
                     sourceMap: true,
                 },
-                outputOpts: { preserveModules: true },
                 title: "preserve-modules-single",
             },
             {
                 input: ["code-splitting/index.js", "code-splitting/indextwo.js"],
-                options: {
+                outputOpts: { preserveModules: true },
+                styleOptions: {
                     mode: "extract",
                     sourceMap: true,
                 },
-                outputOpts: { preserveModules: true },
                 title: "preserve-modules-multi-entry",
             },
             {
                 input: ["code-splitting/index.js", "code-splitting/indextwo.js"],
-                options: {
+                styleOptions: {
                     mode: "extract",
                     sourceMap: true,
                 },
@@ -815,7 +824,7 @@ console.log(binProcess.stdout);
             },
             {
                 input: ["code-splitting/index.js", "code-splitting/indextwo.js"],
-                options: {
+                styleOptions: {
                     mode: ["extract", "extracted.css"],
                     sourceMap: true,
                 },
@@ -826,26 +835,74 @@ console.log(binProcess.stdout);
         });
     });
 
-    // describe("emit", () => {
-    //     // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
-    //     it.each([
-    //         {
-    //             input: "emit/index.js",
-    //             plugins: [styles({ mode: "emit", plugins: [["autoprefixer", { overrideBrowserslist: ["> 0%"] }]] }), litCss()],
-    //             title: "true",
-    //         },
-    //         {
-    //             input: "emit/index.js",
-    //             plugins: [styles({ mode: "emit", sourceMap: true }), litCss()],
-    //             title: "sourcemap",
-    //         },
-    //         {
-    //             input: "emit/index.js",
-    //             plugins: [styles({ mode: "emit", sourceMap: [true, { transform: (m) => (m.sources = ["virt"]) }] }), litCss()],
-    //             title: "sourcemap-transform",
-    //         },
-    //     ] as WriteData[])("should work with injected processed $title css", async ({ title, ...data }: WriteData) => {
-    //         await validate(data);
-    //     });
-    // });
+    it("should work with onExtract function", async () => {
+        expect.assertions(7);
+
+        const result = (await build({
+            input: "simple/index.js",
+            stringifyStyleOption: `mode: "extract",
+            onExtract(): boolean {
+                return false;
+            },`,
+        })) as WriteResult;
+
+        for (const f of result.js()) {
+            expect(f).toMatchSnapshot("js");
+        }
+
+        expect(result.isCss()).toBeFalsy();
+        expect(result.isMap()).toBeFalsy();
+    });
+
+    describe("emit", () => {
+        // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
+        it.each([
+            {
+                input: "emit/index.js",
+                packemPlugins: [
+                    {
+                        code: "litCss()",
+                        from: "rollup-plugin-lit-css",
+                        importName: "litCss",
+                        namedExport: true,
+                        when: "after",
+                    },
+                ],
+                styleOptions: { mode: "emit", plugins: [["autoprefixer", { overrideBrowserslist: ["> 0%"] }]] },
+                title: "basic-emit",
+            },
+            {
+                input: "emit/index.js",
+                packemPlugins: [
+                    {
+                        code: "litCss()",
+                        from: "rollup-plugin-lit-css",
+                        importName: "litCss",
+                        namedExport: true,
+                        when: "after",
+                    },
+                ],
+                styleOptions: { mode: "emit", sourceMap: true },
+                title: "sourcemap-emit",
+            },
+            {
+                input: "emit/index.js",
+                packemPlugins: [
+                    {
+                        code: "litCss()",
+                        from: "rollup-plugin-lit-css",
+                        importName: "litCss",
+                        namedExport: true,
+                        when: "after",
+                    },
+                ],
+                stringifyStyleOption: `mode: "emit", sourceMap: [true, { transform: (m) => (m.sources = ["virt"]) }]`,
+                title: "sourcemap-transform",
+            },
+        ] as WriteData[])("should work with emitted processed $title css", async ({ title, ...data }: WriteData) => {
+            await installPackage(temporaryDirectoryPath, "rollup-plugin-lit-css");
+
+            await validate(data);
+        });
+    });
 });

@@ -1,11 +1,40 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 
 import { ensurePCSSOption } from "../../../../../../src/rollup/plugins/css/utils/options";
 
 describe("option", () => {
-    it("wrong postcss option", () => {
-        expect.assertions(1);
+    const consoleDebugMock = vi.spyOn(console, "debug").mockImplementation(() => undefined);
 
-        expect(async () => await ensurePCSSOption("pumpinizer", "plugin")).toThrowErrorMatchingSnapshot();
+    afterAll(() => {
+        consoleDebugMock.mockReset();
+    });
+
+    it("wrong postcss option", async () => {
+        expect.assertions(3);
+
+        try {
+            await ensurePCSSOption("pumpinizer", "plugin", __dirname);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            // eslint-disable-next-line vitest/no-conditional-expect
+            expect(error.message).toBe("Unable to load PostCSS plugin `pumpinizer`");
+        }
+
+        expect(consoleDebugMock).toHaveBeenCalledWith("Cannot find module 'pumpinizer'", {
+            context: {
+                basedir: __dirname,
+                caller: "Module loader",
+                extensions: [".js", ".mjs", ".cjs", ".json"],
+                id: "pumpinizer",
+            },
+        });
+        expect(consoleDebugMock).toHaveBeenCalledWith("Cannot find module './pumpinizer'", {
+            context: {
+                basedir: __dirname,
+                caller: "Module loader",
+                extensions: [".js", ".mjs", ".cjs", ".json"],
+                id: "./pumpinizer",
+            },
+        });
     });
 });

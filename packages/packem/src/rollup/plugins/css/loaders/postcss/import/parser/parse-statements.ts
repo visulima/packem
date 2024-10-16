@@ -1,9 +1,9 @@
 import type { AtRule, ChildNode, Document, Helpers, Root, Warning } from "postcss";
 import valueParser from "postcss-value-parser";
 
-import type { ImportStatement, Statement } from "../types";
+import type { Condition, ImportStatement, Statement } from "../types";
 
-const parseCharset = (result: Helpers["result"], atRule: AtRule, conditions, from: string | undefined): Warning | Statement => {
+const parseCharset = (result: Helpers["result"], atRule: AtRule, conditions: Condition[], from: string | undefined): Warning | Statement => {
     if (atRule.prev()) {
         return result.warn("@charset must precede all other statements", {
             node: atRule,
@@ -19,7 +19,7 @@ const parseCharset = (result: Helpers["result"], atRule: AtRule, conditions, fro
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const parseImport = (result: Helpers["result"], atRule: AtRule, conditions, from: string | undefined): Warning | Statement => {
+const parseImport = (result: Helpers["result"], atRule: AtRule, conditions: Condition[], from: string | undefined): Warning | Statement => {
     let previous = atRule.prev();
 
     // `@import` statements may follow other `@import` statements.
@@ -57,7 +57,7 @@ const parseImport = (result: Helpers["result"], atRule: AtRule, conditions, from
     }
 
     const parameters = valueParser(atRule.params).nodes;
-    const stmt = {
+    const stmt: Statement = {
         conditions: [...conditions],
         from,
         fullUri: "",
@@ -73,7 +73,7 @@ const parseImport = (result: Helpers["result"], atRule: AtRule, conditions, from
     // eslint-disable-next-line no-plusplus
     for (let index = 0; index < parameters.length; index++) {
         // eslint-disable-next-line security/detect-object-injection
-        const node = parameters[index];
+        const node = parameters[index] as valueParser.Node;
 
         if (node.type === "space" || node.type === "comment") {
             // eslint-disable-next-line no-continue
@@ -107,13 +107,13 @@ const parseImport = (result: Helpers["result"], atRule: AtRule, conditions, from
                 });
             }
 
-            if (!node.nodes?.[0]?.value) {
+            if (Array.isArray(node.nodes) && !node.nodes[0]?.value) {
                 return result.warn(`Unable to find uri in '${atRule.toString()}'`, {
                     node: atRule,
                 });
             }
 
-            stmt.uri = node.nodes[0].value;
+            stmt.uri = node.nodes[0]?.value;
             stmt.fullUri = valueParser.stringify(node);
 
             // eslint-disable-next-line no-continue
@@ -139,7 +139,7 @@ const parseImport = (result: Helpers["result"], atRule: AtRule, conditions, from
                 });
             }
 
-            layer = node.nodes ? valueParser.stringify(node.nodes) : "";
+            layer = "nodes" in node ? valueParser.stringify(node.nodes) : "";
 
             // eslint-disable-next-line no-continue
             continue;
@@ -176,13 +176,13 @@ const parseImport = (result: Helpers["result"], atRule: AtRule, conditions, from
         });
     }
 
-    return stmt;
+    return stmt as Statement;
 };
 
 const parseStatements = (
     result: Helpers["result"],
     styles: Root | Document,
-    conditions,
+    conditions: Condition[],
     from: string | undefined,
 ): (Warning | Statement | ImportStatement)[] => {
     const statements: (Warning | Statement)[] = [];
@@ -206,7 +206,7 @@ const parseStatements = (
                     from,
                     nodes,
                     type: "nodes",
-                });
+                } satisfies Statement);
 
                 nodes = [];
             }
@@ -221,7 +221,7 @@ const parseStatements = (
             from,
             nodes,
             type: "nodes",
-        });
+        } satisfies Statement);
     }
 
     return statements;

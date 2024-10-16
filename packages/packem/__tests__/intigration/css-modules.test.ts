@@ -39,9 +39,11 @@ console.log(styles.Button);
             type: "commonjs",
         });
         await createPackemConfig(temporaryDirectoryPath, {
-            rollup: {
-                copy: {
-                    targets: "assets/*",
+            config: {
+                rollup: {
+                    copy: {
+                        targets: "assets/*",
+                    },
                 },
             },
         });

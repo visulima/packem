@@ -1,7 +1,7 @@
 import { dirname, normalize } from "@visulima/path";
 import type { AtRule, Document, Helpers, Node, Postcss, Root, Source } from "postcss";
 
-import type { ImportOptions, ImportStatement, State, Statement } from "../types";
+import type { Condition, ImportOptions, ImportStatement, State, Statement } from "../types";
 import { isValid } from "../utils/data-url";
 import formatImportPrelude from "../utils/format-import-prelude";
 import processContent from "../utils/process-content";
@@ -9,6 +9,7 @@ import parseStatements from "./parse-statements";
 
 const isProcessableURL = (uri: string): boolean => {
     // skip protocol base uri (protocol://url) or protocol-relative
+    // eslint-disable-next-line security/detect-unsafe-regex
     if (/^(?:[a-z]+:)?\/\//i.test(uri)) {
         return false;
     }
@@ -28,14 +29,14 @@ const isProcessableURL = (uri: string): boolean => {
     return true;
 };
 
-
 const loadImportContent = async (
     result: Helpers["result"],
     stmt: Statement | ImportStatement,
     filename: string,
-    options: ImportOptions,
+    options: { root: string } & ImportOptions,
     state: State,
     postcss: Postcss,
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<undefined | Statement[]> => {
     const atRule = stmt.node;
     const { conditions, from } = stmt;
@@ -107,7 +108,7 @@ const loadImportContent = async (
     return await parseStyles(result, styles, options, state, conditions, filename, postcss);
 };
 
-const resolveImportId = async (result: Helpers["result"], stmt: ImportStatement, options: ImportOptions, state: State, postcss: Postcss) => {
+const resolveImportId = async (result: Helpers["result"], stmt: ImportStatement, options: { root: string } & ImportOptions, state: State, postcss: Postcss) => {
     if (isValid(stmt.uri)) {
         // eslint-disable-next-line no-param-reassign
         stmt.children = await loadImportContent(result, stmt, stmt.uri, options, state, postcss);
@@ -141,7 +142,15 @@ const resolveImportId = async (result: Helpers["result"], stmt: ImportStatement,
         stmt.uri = normalize(to) + stmt.uri.slice(from.length);
     }
 
-    const resolved = await options.resolve(stmt.uri, base, options.extensions, atRule);
+    let resolved;
+
+    try {
+        resolved = await options.resolve(stmt.uri, base, options.extensions, atRule);
+    } catch {
+        stmt.node.warn(result, `Unable to resolve "${stmt.uri}" from "${base}"`);
+
+        return;
+    }
 
     // Add dependency messages:
     result.messages.push({
@@ -155,7 +164,7 @@ const resolveImportId = async (result: Helpers["result"], stmt: ImportStatement,
 
     // Merge loaded statements
     if (importedContent) {
-        // eslint-disable-next-line no-param-reassign
+        // eslint-disable-next-line no-param-reassign,@typescript-eslint/no-unnecessary-condition
         stmt.children = importedContent.filter((x) => !!x);
     }
 };
@@ -163,9 +172,9 @@ const resolveImportId = async (result: Helpers["result"], stmt: ImportStatement,
 const parseStyles = async (
     result: Helpers["result"],
     styles: Root | Document,
-    options: ImportOptions,
+    options: { root: string } & ImportOptions,
     state: State,
-    conditions,
+    conditions: Condition[],
     from: string | undefined,
     postcss: Postcss,
     // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -178,6 +187,7 @@ const parseStyles = async (
             continue;
         }
 
+        // eslint-disable-next-line unicorn/no-array-callback-reference
         if (options.filter && !options.filter((stmt as ImportStatement).uri)) {
             // rejected by filter
             // eslint-disable-next-line no-continue

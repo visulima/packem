@@ -12,7 +12,7 @@ import resolveSyntax from "../utils/resolve-syntax";
 const extensions = [".scss", ".sass", ".css"];
 const mainFields = ["sass", "style"];
 
-const importer = (resourcePath: string): Importer<"sync"> => {
+const importer = (resourcePath: string, debug: boolean): Importer<"sync"> => {
     return {
         canonicalize(originalUrl: string, context: CanonicalizeContext): URL | null {
             const previous = context.containingUrl ? fileURLToPath(context.containingUrl.toString()) : resourcePath;
@@ -44,7 +44,9 @@ const importer = (resourcePath: string): Importer<"sync"> => {
             try {
                 let contents = readFileSync(canonicalUrl);
 
-                contents = "/* " + canonicalUrl.pathname + " */\n" + contents;
+                if (debug) {
+                    contents = "/* " + canonicalUrl.pathname + " */\n" + contents;
+                }
 
                 return { contents: contents as string, sourceMapUrl: canonicalUrl, syntax };
             } catch {

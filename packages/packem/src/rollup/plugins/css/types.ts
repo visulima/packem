@@ -14,15 +14,13 @@ import type { Minifier } from "./minifiers/types";
 
 export interface PostCSSOptions {
     /**
-     * Enable/disable or pass options for PostCSS config loader
-     * @default {}
+     * Enable/disable or pass options for PostCSS config loader.
      */
     config?: PostCSSConfigLoaderOptions | false;
     /**
-     * Enable/disable or pass options for CSS `@import` resolver
-     * @default true
+     * Enable/disable or pass options for CSS `@import` resolver.
      */
-    import?: ImportOptions | boolean;
+    import?: Partial<ImportOptions> | false;
     /**
      * Enable/disable or pass options for
      * [CSS Modules](https://github.com/css-modules/css-modules)
@@ -36,7 +34,7 @@ export interface PostCSSOptions {
     parser?: PostCSSConfig["parser"] | string;
     /**
      * A list of plugins for PostCSS,
-     * which are used before plugins loaded from PostCSS config file, if any
+     * which are used before plugins loaded from PostCSS config file, if any.
      */
     plugins?:
         | Record<string, unknown>
@@ -51,13 +49,12 @@ export interface PostCSSOptions {
      * Overrides the one loaded from PostCSS config file, if any.
      */
     syntax?: PostCSSConfig["syntax"] | string;
-    /** `to` option for PostCSS, required for some plugins */
+    /** `to` option for PostCSS, required for some plugins. */
     to?: PostCSSConfig["to"];
     /**
-     * Enable/disable or pass options for CSS URL resolver
-     * @default true
+     * Enable/disable or pass options for CSS URL resolver.
      */
-    url?: UrlOptions | boolean;
+    url?: Partial<UrlOptions> | false;
 }
 
 /** Options for PostCSS config loader */

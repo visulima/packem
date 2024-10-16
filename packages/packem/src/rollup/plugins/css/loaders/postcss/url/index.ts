@@ -230,7 +230,7 @@ export interface UrlOptions {
      * Public Path for URLs in CSS files
      * @default "./"
      */
-    publicPath: string | ((original: string, resolved: string, file: string) => string);
+    publicPath?: string | ((original: string, resolved: string, file: string) => string);
     /**
      * Provide custom resolver for URLs
      * in place of the default one

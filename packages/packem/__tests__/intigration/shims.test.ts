@@ -13,7 +13,9 @@ describe("packem shims", () => {
         temporaryDirectoryPath = temporaryDirectory();
 
         await createPackemConfig(temporaryDirectoryPath, {
-            cjsInterop: true,
+            config: {
+                cjsInterop: true,
+            },
         });
     });
 

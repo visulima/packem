@@ -1,9 +1,9 @@
 import { readFileSync } from "@visulima/fs";
+import { resolveAlias } from "@visulima/path/utils";
 
 import type { ResolveOptions } from "../../utils/resolve";
 import { resolve } from "../../utils/resolve";
 import { getUrlOfPartial, normalizeUrl } from "../../utils/url";
-import { resolveAlias } from "@visulima/path/utils";
 
 const extensions = [".less", ".css"];
 
@@ -29,7 +29,7 @@ const getStylesFileManager = (less: LessStatic, aliases: Record<string, string>)
 
             // Give precedence to importing a partial
             const id = resolve([partialUrl, url], resolveOptions);
-            console.log({ id });
+
             return { contents: readFileSync(id), filename: id };
         }
     })();

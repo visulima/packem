@@ -1,21 +1,35 @@
-import type { AcceptedPlugin, ChildNode, Node, Root } from "postcss";
+import type { AcceptedPlugin, AtRuleProps, ChildNode, Node, Root } from "postcss";
 
 import type { ImportResolve } from "./import-resolve";
 
+export type Condition = {
+    layer: string | undefined;
+    media: string | undefined;
+    supports: string | undefined;
+};
+
 export type Statement = {
+    // @TODO: find the correct type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     children?: any[];
-    conditions: any[];
+    conditions: Condition[];
     from: string | undefined;
     fullUri?: string;
-    node?: Root | ChildNode;
+    node?: Root | ChildNode | AtRuleProps | Node;
     nodes?: (Root | ChildNode)[];
+    // @TODO: find the correct type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parent?: any;
     type: "charset" | "import" | "nodes" | "warning";
-    uri?: string;
+    uri?: string | undefined;
 };
 
 export type ImportStatement = {
+    // @TODO: find the correct type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     children?: any[];
+    // @TODO: find the correct type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     conditions: any[];
     from: string;
     fullUri?: string;
@@ -64,12 +78,6 @@ export interface ImportOptions {
      */
     resolve: ImportResolve;
     /**
-     * Define the root where to resolve path (eg: place where `node_modules` are). Should not be used that much.
-     *
-     * _Note: nested @import will additionally benefit of the relative dirname of imported files._
-     */
-    root: string;
-    /**
      * By default, similar files (based on the same content) are being skipped. It's to optimize output and skip similar files like `normalize.css` for example. If this behavior is not what you
      * want, just set this option to false to disable it.
      *
@@ -82,7 +90,7 @@ export interface ImportOptions {
      *
      * @default true
      */
-    warnOnEmpty: boolean;
+    warnOnEmpty?: boolean;
 }
 
 export type State = { hashFiles: Record<string, Record<string, boolean>>; importedFiles: Record<string, Record<string, boolean>> };

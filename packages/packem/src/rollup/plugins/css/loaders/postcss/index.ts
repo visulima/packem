@@ -17,7 +17,6 @@ import postcssICSS from "./icss";
 import postcssImport from "./import";
 import postcssModules from "./modules";
 import postcssNoop from "./noop";
-import type { UrlOptions } from "./url";
 import postcssUrl from "./url";
 
 const baseDirectory = dirname(fileURLToPath(import.meta.url));
@@ -78,7 +77,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
         }
 
         if (this.options.url) {
-            plugins.push(postcssUrl({ inline: Boolean(this.inject), ...(this.options.url as UrlOptions) }));
+            plugins.push(postcssUrl({ inline: Boolean(this.inject), ...this.options.url }));
         }
 
         if (this.options.plugins) {
@@ -94,8 +93,6 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             plugins.push(
                 ...postcssModules({
                     failOnWrongOrder: true,
-                    // @TODO: use a option
-                    // generateScopedName: testing ? "[name]_[local]" : undefined,
                     ...modulesOptions,
                 }),
                 postcssICSS({ extensions: this.extensions }),

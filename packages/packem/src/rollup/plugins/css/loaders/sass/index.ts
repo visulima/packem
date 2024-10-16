@@ -56,7 +56,7 @@ const loader: Loader<SassLoaderOptions> = {
         );
 
         if (isModernAPI) {
-            options.importers.push(modernImporter(this.id));
+            options.importers.push(modernImporter(this.id, this.debug ?? false));
         } else {
             if ((options as NodeSassSyncOptions).importer && !Array.isArray((options as NodeSassSyncOptions).importer)) {
                 (options as NodeSassSyncOptions).importer = [(options as NodeSassSyncOptions).importer as NodeSassSyncImporter];

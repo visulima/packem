@@ -1,4 +1,4 @@
-const anyDataURLRegexp = /^data:text\/css(?:;(base64|plain))?,/i;
+const anyDataURLRegexp = /^data:text\/css(?:;(?:base64|plain))?,/i;
 const base64DataURLRegexp = /^data:text\/css;base64,/i;
 const plainDataURLRegexp = /^data:text\/css;plain,/i;
 

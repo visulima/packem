@@ -11,7 +11,7 @@ const applyConditions = (bundle: Statement[], atRule: (defaults?: AtRuleProps) =
 
         if (stmt.type === "import") {
             // eslint-disable-next-line no-param-reassign
-            stmt.node.params = base64EncodedConditionalImport(stmt.fullUri as string, stmt.conditions);
+            (stmt.node as AtRuleProps).params = base64EncodedConditionalImport(stmt.fullUri as string, stmt.conditions);
             return;
         }
 

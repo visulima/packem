@@ -47,26 +47,47 @@ export const installPackage = async (fixturePath: string, packageName: string): 
     await ensureSymlink(resolve("node_modules/" + packageName), join(nodeModulesDirectory, packageName));
 };
 
+export type PackemConfigProperties = {
+    config?: BuildConfig | string | undefined;
+    cssLoader?: ("postcss" | "less" | "stylus" | "sass" | "sourcemap")[];
+    cssOptions?: StyleOptions | string | undefined;
+    isolatedDeclarationTransformer?: "swc" | "typescript" | "oxc" | undefined;
+    minimizer?: "cssnano" | "lightningcss" | undefined;
+    plugins?: {
+        code: string;
+        from: string;
+        importName: string;
+        namedExport?: true;
+        when: "after" | "before";
+    }[];
+    transformer?: "esbuild" | "swc" | "sucrase";
+};
+
 export const createPackemConfig = async (
     fixturePath: string,
-    config: BuildConfig | string | undefined = undefined,
-    transformer: "esbuild" | "swc" | "sucrase" = "esbuild",
-    isolatedDeclarationTransformer: "swc" | "typescript" | "oxc" | undefined = undefined,
-    cssLoader: ("postcss" | "less" | "stylus" | "sass" | "sourcemap")[] = [],
-    cssOptions: StyleOptions | string | undefined = undefined,
-    minimizer: "cssnano" | "lightningcss" | undefined = undefined,
+    {
+        config = undefined,
+        cssLoader = [],
+        cssOptions = undefined,
+        isolatedDeclarationTransformer = undefined,
+        minimizer = undefined,
+        plugins = [],
+        transformer = "esbuild",
+    }: PackemConfigProperties = {},
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
     await installPackage(fixturePath, transformer === "swc" ? "@swc" : transformer);
 
     let rollupConfig = "";
 
+    if (typeof config === "object" || cssLoader.length > 0 || plugins.length > 0) {
+        rollupConfig = "\n    rollup: {\n";
+    }
+
     if (config === undefined) {
         // eslint-disable-next-line no-param-reassign
         config = "";
     } else if (typeof config === "object") {
-        rollupConfig += "\nrollup: {";
-
         const { rollup, ...rest } = config;
 
         if (rollup?.css && cssLoader.length > 0) {
@@ -89,9 +110,22 @@ export const createPackemConfig = async (
     }
 
     if (cssLoader.length > 0) {
-        rollupConfig += `    css: {\n        loaders: [${cssLoader.map((loader) => `${loader}Loader`).join(", ")}],${minimizer ? `\n        minifier: ${minimizer},` : ""}
-            ${typeof cssOptions === "string" ? cssOptions : typeof cssOptions === "object" ? JSON.stringify(cssOptions, null, 4).slice(1, -1) : ""}
-    }`;
+        rollupConfig += `        css: {\n        loaders: [${cssLoader.map((loader) => `${loader}Loader`).join(", ")}],${minimizer ? `\n        minifier: ${minimizer},` : ""}${typeof cssOptions === "string" ? cssOptions : typeof cssOptions === "object" ? JSON.stringify(cssOptions, null, 4).slice(1, -1) : ""}
+    },`;
+    }
+
+    const pluginImports: string[] = [];
+    const pluginCode: string[] = [];
+
+    for (const plugin of plugins) {
+        pluginImports.push(
+            `import ${plugin.namedExport ? "{" + plugin.importName + "}" : plugin.importName} from "${plugin.from.replace("__dist__", distributionPath)}";`,
+        );
+        pluginCode.push(`{ ${plugin.when}: "packem:${transformer}", plugin: ${plugin.code}, }`);
+    }
+
+    if (pluginCode.length > 0) {
+        rollupConfig += `\n    plugins: [\n        ${pluginCode.join(",\n")}\n    ],`;
     }
 
     if (rollupConfig !== "") {
@@ -106,6 +140,7 @@ import transformer from "${distributionPath}/rollup/plugins/${transformer}/${tra
 ${isolatedDeclarationTransformer ? `import isolatedDeclarationTransformer from "${distributionPath}/rollup/plugins/${isolatedDeclarationTransformer}/isolated-declarations-${isolatedDeclarationTransformer}-transformer";` : ""}
 ${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/rollup/plugins/css/loaders/${loader}";`).join("\n")}
 ${minimizer ? `import ${minimizer} from "${distributionPath}/rollup/plugins/css/minifiers/${minimizer}";` : ""}
+${pluginImports.join("\n")}
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
     transformer,${isolatedDeclarationTransformer ? `\nisolatedDeclarationTransformer,` : ""}${config as string}${rollupConfig}

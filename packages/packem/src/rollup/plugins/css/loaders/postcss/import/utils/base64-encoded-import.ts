@@ -1,9 +1,10 @@
+import type { Condition } from "../types";
 import formatImportPrelude from "./format-import-prelude";
 
-const base64EncodedConditionalImport = (prelude: string, conditions): string => {
+const base64EncodedConditionalImport = (prelude: string, conditions: Condition[]): string => {
     conditions.reverse();
 
-    const first = conditions.pop();
+    const first = conditions.pop() as Condition;
 
     let parameters = `${prelude} ${formatImportPrelude(first.layer, first.media, first.supports)}`;
 
