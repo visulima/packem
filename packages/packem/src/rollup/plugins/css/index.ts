@@ -444,6 +444,9 @@ export default async (
             return {
                 code: result.code,
                 map: sourceMap && result.map ? result.map : { mappings: "" as const },
+                meta: {
+                    styles: result.meta,
+                },
                 moduleSideEffects: result.extracted ? true : null,
             };
         },

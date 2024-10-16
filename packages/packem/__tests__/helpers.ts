@@ -55,9 +55,9 @@ export type PackemConfigProperties = {
     minimizer?: "cssnano" | "lightningcss" | undefined;
     plugins?: {
         code: string;
-        from: string;
-        importName: string;
-        namedExport?: true;
+        from?: string;
+        importName?: string;
+        namedExport?: boolean;
         when: "after" | "before";
     }[];
     transformer?: "esbuild" | "swc" | "sucrase";
@@ -118,9 +118,12 @@ export const createPackemConfig = async (
     const pluginCode: string[] = [];
 
     for (const plugin of plugins) {
-        pluginImports.push(
-            `import ${plugin.namedExport ? "{" + plugin.importName + "}" : plugin.importName} from "${plugin.from.replace("__dist__", distributionPath)}";`,
-        );
+        if (plugin.namedExport !== undefined && plugin.importName && plugin.from) {
+            pluginImports.push(
+                `import ${plugin.namedExport ? "{" + plugin.importName + "}" : plugin.importName} from "${plugin.from.replace("__dist__", distributionPath)}";`,
+            );
+        }
+
         pluginCode.push(`{ ${plugin.when}: "packem:${transformer}", plugin: ${plugin.code}, }`);
     }
 

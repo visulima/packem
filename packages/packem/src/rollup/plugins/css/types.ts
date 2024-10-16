@@ -26,7 +26,7 @@ export interface PostCSSOptions {
      * [CSS Modules](https://github.com/css-modules/css-modules)
      * @default false
      */
-    modules?: ModulesOptions | false;
+    modules?: ModulesOptions | boolean;
     /**
      * Set PostCSS parser, e.g. `sugarss`.
      * Overrides the one loaded from PostCSS config file, if any.

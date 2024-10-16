@@ -1,9 +1,14 @@
 import type { Pail } from "@visulima/pail";
-import type { PluginContext } from "rollup";
+import type { CustomPluginOptions, PluginContext } from "rollup";
 import type { RawSourceMap } from "source-map-js";
 
 import type { Environment } from "../../../../types";
 import type { InternalStyleOptions } from "../types";
+
+export type PostCSSMeta = {
+    icssDependencies: string[];
+    moduleContents: string;
+};
 
 /**
  * @param T type of loader's options
@@ -85,6 +90,8 @@ export interface Payload {
     extracted?: Extracted;
     /** Sourcemap */
     map?: string;
+    /** Additional metadata exposed to other Rollup plugins */
+    meta?: CustomPluginOptions;
 }
 
 export interface SourceMapOptions {

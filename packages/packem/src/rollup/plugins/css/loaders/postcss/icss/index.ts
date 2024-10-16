@@ -38,6 +38,14 @@ const plugin: PluginCreator<InteroperableCSSOptions> = (options) => {
                     type: "icss",
                 });
             }
+
+            for (const key of Object.keys(icssImports)) {
+                result.messages.push({
+                    import: key,
+                    plugin: name,
+                    type: "icss-dependency",
+                });
+            }
         },
         postcssPlugin: name,
     };

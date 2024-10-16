@@ -318,3 +318,8 @@ export interface IsolatedDeclarationsResult {
     errors: string[];
     sourceText: string;
 }
+
+// eslint-disable-next-line import/no-unused-modules
+export type { PostCSSMeta } from "./rollup/plugins/css/loaders/types";
+// eslint-disable-next-line import/no-unused-modules
+export type { InjectOptions, StyleOptions } from "./rollup/plugins/css/types";

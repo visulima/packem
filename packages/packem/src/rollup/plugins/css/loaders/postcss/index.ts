@@ -45,9 +45,21 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
     async process({ code, extracted, map }) {
         const config = await loadConfig(this.id, this.cwd as string, this.options.config);
         const plugins: AcceptedPlugin[] = [];
-        const autoModules = ensureAutoModules(this.autoModules, this.id);
-        const supportModules = Boolean((this.options.modules && ensureAutoModules(this.options.modules.include, this.id)) || autoModules);
+
+        let supportModules = false;
+
+        if (typeof this.options.modules === "boolean") {
+            supportModules = this.options.modules;
+        } else if (typeof this.options.modules === "object") {
+            supportModules = ensureAutoModules(this.options.modules.include, this.id);
+        }
+
+        if (this.autoModules && !this.options.modules) {
+            supportModules = ensureAutoModules(this.autoModules, this.id);
+        }
+
         const modulesExports: Record<string, string> = {};
+        const icssDependencies: string[] = [];
 
         const postcssOptions: PostCSSOptions = {
             ...config.options,
@@ -119,6 +131,11 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
                     break;
                 }
 
+                case "icss-dependency": {
+                    icssDependencies.push(message.import as string);
+                    break;
+                }
+
                 case "dependency": {
                     this.deps.add(normalize(message.file as string));
                     break;
@@ -150,10 +167,6 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             map = mapModifier.toString();
 
             result.css += mapModifier.toCommentData();
-        }
-
-        if (this.emit) {
-            return { code: result.css, map };
         }
 
         const saferId = (id: string): string => safeId(id, basename(this.id));
@@ -274,7 +287,13 @@ ${Object.keys(modulesExports)
             }
         }
 
-        return { code: output.filter(Boolean).join("\n"), dts: dts.length > 0 ? dts.filter(Boolean).join("\n") : undefined, extracted, map };
+        const outputString = output.filter(Boolean).join("\n");
+
+        if (this.emit) {
+            return { code: result.css, map, meta: { icssDependencies, moduleContents: outputString } };
+        }
+
+        return { code: outputString, dts: dts.length > 0 ? dts.filter(Boolean).join("\n") : undefined, extracted, map };
     },
 };
 

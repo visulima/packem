@@ -15,6 +15,7 @@ import { createPackageJson, createPackemConfig, execPackemSync, installPackage }
 const fixturePath = join(__dirname, "../..", "__fixtures__", "css");
 
 interface WriteData {
+    dependencies?: Record<string, string>;
     errorMessage?: string;
     files?: string[];
     input: string | string[];
@@ -77,6 +78,7 @@ describe("css", () => {
                   }
                 : undefined,
             cssLoader: loaders ?? ["postcss", "less", "stylus", "sass", "sourcemap"],
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             cssOptions: data.stringifyStyleOption ?? otherOptions ?? undefined,
             minimizer: data.minimizer,
             plugins: data.packemPlugins,
@@ -84,6 +86,7 @@ describe("css", () => {
         });
 
         createPackageJson(temporaryDirectoryPath, {
+            dependencies: data.dependencies ?? {},
             exports: input.map((file) => {
                 const splitFile = file.split("/");
                 const combinedFile = splitFile.slice(1).join("/");
@@ -139,7 +142,7 @@ describe("css", () => {
             withFileTypes: true,
         })
             .filter((dirent) => dirent.isFile())
-            .map((dirent) => join(dirent.parentPath, dirent.name));
+            .map((dirent) => join(distributionPath, dirent.parentPath, dirent.name));
 
         const css = files.filter((file) => file.endsWith(".css"));
         const cssMap = files.filter((file) => file.endsWith(".css.map"));
@@ -858,6 +861,9 @@ describe("css", () => {
         // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
         it.each([
             {
+                dependencies: {
+                    "rollup-plugin-lit-css": "*",
+                },
                 input: "emit/index.js",
                 packemPlugins: [
                     {
@@ -872,6 +878,9 @@ describe("css", () => {
                 title: "basic-emit",
             },
             {
+                dependencies: {
+                    "rollup-plugin-lit-css": "*",
+                },
                 input: "emit/index.js",
                 packemPlugins: [
                     {
@@ -886,6 +895,9 @@ describe("css", () => {
                 title: "sourcemap-emit",
             },
             {
+                dependencies: {
+                    "rollup-plugin-lit-css": "*",
+                },
                 input: "emit/index.js",
                 packemPlugins: [
                     {
@@ -898,6 +910,32 @@ describe("css", () => {
                 ],
                 stringifyStyleOption: `mode: "emit", sourceMap: [true, { transform: (m) => (m.sources = ["virt"]) }]`,
                 title: "sourcemap-transform",
+            },
+            {
+                input: "emit-with-modules/index.js",
+                packemPlugins: [
+                    {
+                        code: `{
+                            name: "expose-styles-meta",
+                            transform(_code, id) {
+                                const stylesMeta = this.getModuleInfo(id)?.meta.styles;
+
+                                if (stylesMeta) {
+                                    const { icssDependencies = [], moduleContents = "" } = stylesMeta;
+                                    return \`export var deps = \${JSON.stringify(icssDependencies)};\\n\${moduleContents}\`;
+                                }
+                            },
+                        }`,
+                        when: "after",
+                    },
+                ],
+                styleOptions: {
+                    mode: "emit",
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "meta",
             },
         ] as WriteData[])("should work with emitted processed $title css", async ({ title, ...data }: WriteData) => {
             await installPackage(temporaryDirectoryPath, "rollup-plugin-lit-css");
