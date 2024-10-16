@@ -2,11 +2,12 @@ import { cpSync, readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { isAccessibleSync, readFileSync } from "@visulima/fs";
-import { dirname, join, normalize } from "@visulima/path";
+import { dirname, join } from "@visulima/path";
 import type { OutputOptions } from "rollup";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import type { LESSLoaderOptions } from "../../src/rollup/plugins/css/loaders/less";
 import type { StyleOptions } from "../../src/rollup/plugins/css/types";
 import { inferModeOption, inferSourceMapOption } from "../../src/rollup/plugins/css/utils/options";
 import type { PackemConfigProperties } from "../helpers";
@@ -14,7 +15,7 @@ import { createPackageJson, createPackemConfig, execPackemSync, installPackage }
 
 const fixturePath = join(__dirname, "../..", "__fixtures__", "css");
 
-interface WriteData {
+type BaseWriteData = {
     dependencies?: Record<string, string>;
     errorMessage?: string;
     files?: string[];
@@ -24,10 +25,20 @@ interface WriteData {
     outputOpts?: OutputOptions;
     packemPlugins?: PackemConfigProperties["plugins"];
     shouldFail?: boolean;
-    stringifyStyleOption?: string;
-    styleOptions?: StyleOptions;
     title?: string;
-}
+};
+
+type StringWriteData = {
+    mode: StyleOptions["mode"];
+    sourceMap?: StyleOptions["sourceMap"];
+    styleOptions?: string;
+} & BaseWriteData;
+
+type WriteData =
+    | ({
+          styleOptions?: StyleOptions;
+      } & BaseWriteData)
+    | StringWriteData;
 
 interface WriteResult {
     css: () => string[];
@@ -65,7 +76,7 @@ describe("css", () => {
 
         await installPackage(temporaryDirectoryPath, "minireset.css");
 
-        const { loaders, ...otherOptions } = data.styleOptions ?? {};
+        const { loaders, ...otherOptions } = typeof data.styleOptions === "object" ? data.styleOptions : {};
 
         await createPackemConfig(temporaryDirectoryPath, {
             config: data.outputOpts
@@ -78,8 +89,7 @@ describe("css", () => {
                   }
                 : undefined,
             cssLoader: loaders ?? ["postcss", "less", "stylus", "sass", "sourcemap"],
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            cssOptions: data.stringifyStyleOption ?? otherOptions ?? undefined,
+            cssOptions: typeof data.styleOptions === "string" ? data.styleOptions : otherOptions,
             minimizer: data.minimizer,
             plugins: data.packemPlugins,
             transformer: "esbuild",
@@ -142,7 +152,7 @@ describe("css", () => {
             withFileTypes: true,
         })
             .filter((dirent) => dirent.isFile())
-            .map((dirent) => join(distributionPath, dirent.parentPath, dirent.name));
+            .map((dirent) => join(dirent.path, dirent.name));
 
         const css = files.filter((file) => file.endsWith(".css"));
         const cssMap = files.filter((file) => file.endsWith(".css.map"));
@@ -196,9 +206,11 @@ describe("css", () => {
             expect(f).toMatchSnapshot("js");
         }
 
-        const options = data.styleOptions ?? {};
+        const optionMode: StyleOptions["mode"] = typeof data.styleOptions === "object" ? data.styleOptions.mode : (data as StringWriteData).mode;
+        const optionSourceMap: StyleOptions["sourceMap"] =
+            typeof data.styleOptions === "object" ? data.styleOptions.sourceMap : (data as StringWriteData).sourceMap;
 
-        const mode = inferModeOption(options.mode);
+        const mode = inferModeOption(optionMode ?? "inject");
 
         if (mode.extract) {
             expect(result.isCss()).toBeTruthy();
@@ -208,9 +220,9 @@ describe("css", () => {
             }
         }
 
-        const soureMap = inferSourceMapOption(options.sourceMap);
+        const sourceMap = inferSourceMapOption(optionSourceMap);
 
-        if (soureMap && !soureMap.inline) {
+        if (sourceMap && !sourceMap.inline) {
             expect(result.isMap()).toBe(Boolean(mode.extract));
 
             for (const f of result.map()) {
@@ -384,11 +396,11 @@ describe("css", () => {
             }
 
             // eslint-disable-next-line vitest/no-conditional-in-test
-            if (data.styleOptions?.alias) {
-                for (const [key, value] of Object.entries(data.styleOptions.alias)) {
+            if (data.styleOptions && (data.styleOptions as StyleOptions).alias) {
+                for (const [key, value] of Object.entries((data.styleOptions as StyleOptions).alias as Record<string, string>)) {
                     // this is needed because of the temporary directory path, that is generated on every test run
                     // eslint-disable-next-line no-param-reassign,security/detect-object-injection
-                    data.styleOptions.alias[key] = value.replace("__REPLACE__", temporaryDirectoryPath);
+                    ((data.styleOptions as StyleOptions).alias as Record<string, string>)[key] = value.replace("__REPLACE__", temporaryDirectoryPath);
                 }
             }
 
@@ -589,11 +601,11 @@ describe("css", () => {
             },
         ] as WriteData[])("should generate sourcemap for processed $title css", async ({ title, ...data }: WriteData) => {
             // eslint-disable-next-line vitest/no-conditional-in-test
-            if (Array.isArray(data.styleOptions?.mode)) {
+            if (data.styleOptions && Array.isArray((data.styleOptions as StyleOptions).mode)) {
                 // eslint-disable-next-line no-param-reassign
-                data.styleOptions.mode = [
-                    data.styleOptions.mode[0] as "extract",
-                    (data.styleOptions.mode[1] as string).replace("__REPLACE__", temporaryDirectoryPath),
+                (data.styleOptions as StyleOptions).mode = [
+                    ((data.styleOptions as StyleOptions).mode as string[])[0] as "extract",
+                    (((data.styleOptions as StyleOptions).mode as string[])[1] as string).replace("__REPLACE__", temporaryDirectoryPath),
                 ];
             }
 
@@ -613,17 +625,18 @@ describe("css", () => {
             },
             {
                 input: "simple/index.js",
-
-                stringifyStyleOption:
+                styleOptions:
                     // eslint-disable-next-line no-template-curly-in-string
-                    'mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(normalize(id.replace("__REPLACE__", "")))})`],',
-                styleOptions: { mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(normalize(id))})`] },
+                    'mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(id.replace("__REPLACE__", ""))})`],',
                 title: "function",
             },
         ] as WriteData[])("should work with injected processed $title css", async ({ title, ...data }: WriteData) => {
             // this is needed because of the temporary directory path, that is generated on every test run
-            // eslint-disable-next-line no-param-reassign
-            data.stringifyStyleOption = data.stringifyStyleOption?.replace("__REPLACE__", temporaryDirectoryPath);
+            // eslint-disable-next-line vitest/no-conditional-in-test
+            if (typeof data.styleOptions === "string") {
+                // eslint-disable-next-line no-param-reassign
+                data.styleOptions = (data.styleOptions as string).replace("__REPLACE__", temporaryDirectoryPath);
+            }
 
             await validate(data);
         });
@@ -758,15 +771,130 @@ describe("css", () => {
             },
         ] as WriteData[])("should work with less processed $title css", async ({ title, ...data }: WriteData) => {
             // eslint-disable-next-line vitest/no-conditional-in-test
-            if (data.styleOptions?.less?.paths) {
+            if ((data.styleOptions as StyleOptions).less?.paths) {
                 // eslint-disable-next-line no-plusplus
-                for (let index = 0; index < data.styleOptions.less.paths.length; index++) {
+                for (let index = 0; index < (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[]).length; index++) {
                     // this is needed because of the temporary directory path, that is generated on every test run
                     // eslint-disable-next-line no-param-reassign,security/detect-object-injection
-                    data.styleOptions.less.paths[index] = (data.styleOptions.less.paths[index] as string).replace("__REPLACE__", temporaryDirectoryPath);
+                    (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] = (
+                        (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] as string
+                    ).replace("__REPLACE__", temporaryDirectoryPath);
                 }
             }
 
+            await validate(data);
+        });
+    });
+
+    describe("modules", () => {
+        // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
+        it.each([
+            {
+                input: "modules/index.js",
+                styleOptions: {
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "inject",
+            },
+            {
+                input: "modules/index.js",
+                mode: ["inject", (varname, id) => `console.log(${varname}, ${JSON.stringify(typeof id === "string")})`],
+                styleOptions: `
+                    mode: ["inject", (varname, id) => \`console.log(\${varname}, \${JSON.stringify(typeof id === "string")})\`],
+                    modules: true,
+                `,
+                title: "inject-fn",
+            },
+            {
+                input: "modules/index.js",
+                styleOptions: { mode: ["inject", { treeshakeable: true }], modules: true },
+                title: "inject-treeshakeable",
+            },
+            {
+                input: "keyword-fail/index.js",
+                shouldFail: true,
+                styleOptions: { mode: ["inject", { treeshakeable: true }], modules: true },
+                title: "inject-treeshakeable-keyword-fail",
+            },
+            // @TODO Add dts
+            // {
+            //     input: "modules/index.js",
+            //     styleOptions: { dts: true, mode: ["inject", { treeshakeable: true }], modules: true },
+            //     title: "inject-treeshakeable-dts",
+            // },
+            {
+                input: "modules-duplication/index.js",
+                styleOptions: `modules: { generateScopedName: (name) => \`\${name}hacked\` }`,
+                title: "generate-scoped-name",
+            },
+            {
+                input: "named-exports/index.js",
+                styleOptions: { modules: true, namedExports: true },
+                title: "named-exports",
+            },
+            {
+                input: "named-exports/index.js",
+                shouldFail: true,
+                styleOptions: { mode: ["inject", { treeshakeable: true }], modules: true, namedExports: true },
+                title: "named-exports-treeshakeable-fail",
+            },
+            // @TODO Add dts
+            // {
+            //     input: "named-exports/index.js",
+            //     styleOptions: { dts: true, modules: true, namedExports: true },
+            //     title: "named-exports-dts",
+            // },
+            {
+                input: "named-exports/index.js",
+                styleOptions: `
+                    modules: true,
+                    namedExports: (name) => \`\${name}hacked\`,
+                `,
+                title: "named-exports-custom-class-name",
+            },
+            {
+                input: "modules/index.js",
+                styleOptions: { mode: "extract", modules: true },
+                title: "extract",
+            },
+            {
+                input: "modules/index.js",
+                styleOptions: { mode: "extract", modules: true, sourceMap: true },
+                title: "extract-sourcemap-true",
+            },
+            {
+                input: "modules/index.js",
+                styleOptions: { mode: "extract", modules: true, sourceMap: "inline" },
+                title: "extract-sourcemap-inline",
+            },
+            {
+                input: "auto-modules/index.js",
+                styleOptions: { autoModules: true },
+                title: "auto-modules",
+            },
+            {
+                input: "auto-modules/index.js",
+                styleOptions: { autoModules: false },
+                title: "auto-modules-off",
+            },
+            {
+                input: "auto-modules/index.js",
+                styleOptions: { autoModules: /(?<!\.module\.)\.styl/ },
+                title: "auto-modules-regexp",
+            },
+            {
+                input: "auto-modules/index.js",
+                styleOptions: `autoModules: (id) => id.endsWith(".less")`,
+                title: "auto-modules-fn",
+            },
+            {
+                input: "modules-duplication/index.js",
+                styleOptions: { mode: "extract", modules: true },
+                title: "duplication",
+            },
+        ] as WriteData[])("should work with processed modules $title css", async ({ title, ...data }: WriteData) => {
             await validate(data);
         });
     });
@@ -843,7 +971,8 @@ describe("css", () => {
 
         const result = (await build({
             input: "simple/index.js",
-            stringifyStyleOption: `mode: "extract",
+            mode: "extract",
+            styleOptions: `mode: "extract",
             onExtract(): boolean {
                 return false;
             },`,
@@ -899,6 +1028,7 @@ describe("css", () => {
                     "rollup-plugin-lit-css": "*",
                 },
                 input: "emit/index.js",
+                mode: "emit",
                 packemPlugins: [
                     {
                         code: "litCss()",
@@ -908,7 +1038,9 @@ describe("css", () => {
                         when: "after",
                     },
                 ],
-                stringifyStyleOption: `mode: "emit", sourceMap: [true, { transform: (m) => (m.sources = ["virt"]) }]`,
+                // eslint-disable-next-line no-param-reassign,no-return-assign
+                sourceMap: [true, { transform: (map) => (map.sources = ["virt"]) }],
+                styleOptions: `mode: "emit", sourceMap: [true, { transform: (m) => (m.sources = ["virt"]) }]`,
                 title: "sourcemap-transform",
             },
             {

@@ -45,7 +45,7 @@ const loader: Loader<StylusLoaderOptions> = {
     async process({ code, map }) {
         const options = { ...this.options };
         const basePath = normalize(dirname(this.id));
-        const paths = [`${basePath}/node_modules`, basePath];
+        const paths = [basePath, join(basePath, 'node_modules'), join(this.cwd as string, 'node_modules')];
 
         if (options.paths) {
             paths.push(...options.paths);

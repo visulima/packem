@@ -49,7 +49,7 @@ export const installPackage = async (fixturePath: string, packageName: string): 
 
 export type PackemConfigProperties = {
     config?: BuildConfig | string | undefined;
-    cssLoader?: ("postcss" | "less" | "stylus" | "sass" | "sourcemap")[];
+    cssLoader?: ("postcss" | "less" | "stylus" | "sass" | "sourcemap" | "lightningcss")[];
     cssOptions?: StyleOptions | string | undefined;
     isolatedDeclarationTransformer?: "swc" | "typescript" | "oxc" | undefined;
     minimizer?: "cssnano" | "lightningcss" | undefined;

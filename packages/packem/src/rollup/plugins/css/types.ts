@@ -57,6 +57,19 @@ export interface PostCSSOptions {
     url?: Partial<UrlOptions> | false;
 }
 
+export type LightningCSSOptions = {
+    modules?: {
+        /**
+         * Files to include for [CSS Modules](https://github.com/css-modules/css-modules)
+         * for files named `[name].module.[ext]`
+         * (e.g. `foo.module.css`, `bar.module.stylus`),
+         * or pass your own function or regular expression
+         * @default false
+         */
+        include?: AutoModules;
+    } & TransformOptions<CustomAtRules>["cssModules"];
+} & Omit<TransformOptions<CustomAtRules>, "filename" | "code" | "minify" | "targets" | "cssModules">;
+
 /** Options for PostCSS config loader */
 export interface PostCSSConfigLoaderOptions {
     /**
@@ -159,18 +172,8 @@ export interface StyleOptions {
     include?: ReadonlyArray<RegExp | string> | RegExp | string | null;
     /** Options for Less loader */
     less?: LESSLoaderOptions;
-    lightningcss?: {
-        modules?: {
-            /**
-             * Files to include for [CSS Modules](https://github.com/css-modules/css-modules)
-             * for files named `[name].module.[ext]`
-             * (e.g. `foo.module.css`, `bar.module.stylus`),
-             * or pass your own function or regular expression
-             * @default false
-             */
-            include?: AutoModules;
-        };
-    } & Omit<TransformOptions<CustomAtRules>, "filename" | "code" | "minify" | "targets">;
+    /** Options for LightningCSS */
+    lightningcss?: LightningCSSOptions;
     /** Array of custom loaders */
     loaders?: Loader[];
     /** Enable the css minifier */
