@@ -84,7 +84,7 @@ export { index as default };
             },
             transformer as "esbuild" | "swc" | "sucrase",
         );
-        await createPackemConfig(temporaryDirectoryPath, {}, transformer as "esbuild" | "swc" | "sucrase");
+        await createPackemConfig(temporaryDirectoryPath, { transformer: transformer as "esbuild" | "swc" | "sucrase" });
 
         expect(readFileSync(`${temporaryDirectoryPath}/packem.config.ts`)).toContain(transformer === "swc" ? "swc/swc-plugin" : `${transformer}/index`);
 
