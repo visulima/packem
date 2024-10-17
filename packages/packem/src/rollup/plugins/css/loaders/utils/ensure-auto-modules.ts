@@ -1,6 +1,9 @@
 import type { AutoModules } from "../../types";
 
-const MODULE_FILE_PATTERN = /\.module\.[A-Za-z]+$/;
+// eslint-disable-next-line no-secrets/no-secrets
+// https://github.com/vitejs/vite/blob/37af8a7be417f1fb2cf9a0d5e9ad90b76ff211b4/packages/vite/src/node/plugins/css.ts#L185
+// eslint-disable-next-line regexp/no-unused-capturing-group
+const MODULE_FILE_PATTERN = /\.module\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/;
 
 const ensureAutoModules = (am: AutoModules | undefined, id: string): boolean => {
     if (am === undefined) {

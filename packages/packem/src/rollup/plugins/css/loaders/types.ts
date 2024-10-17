@@ -8,6 +8,7 @@ import type { InternalStyleOptions } from "../types";
 export type PostCSSMeta = {
     icssDependencies: string[];
     moduleContents: string;
+    types: string;
 };
 
 /**

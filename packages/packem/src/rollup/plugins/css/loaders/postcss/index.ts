@@ -54,7 +54,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             supportModules = ensureAutoModules(this.options.modules.include, this.id);
         }
 
-        if (this.autoModules && !this.options.modules) {
+        if (this.autoModules && this.options.modules === undefined) {
             supportModules = ensureAutoModules(this.autoModules, this.id);
         }
 
@@ -288,12 +288,20 @@ ${Object.keys(modulesExports)
         }
 
         const outputString = output.filter(Boolean).join("\n");
+        const types = dts.length > 0 ? dts.filter(Boolean).join("\n") : undefined;
 
         if (this.emit) {
-            return { code: result.css, map, meta: { icssDependencies, moduleContents: outputString } };
+            return { code: result.css, map, meta: { icssDependencies, moduleContents: outputString, types } };
         }
 
-        return { code: outputString, dts: dts.length > 0 ? dts.filter(Boolean).join("\n") : undefined, extracted, map };
+        return {
+            code: outputString,
+            extracted,
+            map,
+            meta: {
+                types,
+            },
+        };
     },
 };
 

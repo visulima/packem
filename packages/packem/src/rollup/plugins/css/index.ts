@@ -412,7 +412,7 @@ export default async (
                 cwd,
                 debug,
                 deps: new Set(),
-                dts: false,
+                dts: loaderOptions.dts,
                 emit: loaderOptions.emit,
                 environment,
                 extensions: loaderOptions.extensions,

@@ -15,7 +15,7 @@ const lightningCSSLoader: Loader<LightningCSSOptions> = {
             supportModules = ensureAutoModules(this.options.modules.include, this.id);
         }
 
-        if (this.autoModules && !this.options.modules) {
+        if (this.autoModules && this.options.modules === undefined) {
             supportModules = ensureAutoModules(this.autoModules, this.id);
         }
 

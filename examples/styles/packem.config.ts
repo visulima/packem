@@ -14,5 +14,4 @@ export default defineConfig({
             loaders: [lessLoader, postcssLoader, sassLoader, stylusLoader, sourceMapLoader],
         },
     },
-    declaration: false,
 });

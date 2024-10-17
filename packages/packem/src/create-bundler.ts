@@ -106,14 +106,9 @@ const generateOptions = (
                 transformMixedEsModules: false,
             },
             css: {
+                autoModules: true,
                 extensions: [".css", ".pcss", ".postcss", ".sss"],
-                lightningcss: {
-                    autoModules: true,
-                },
                 namedExports: true,
-                postcss: {
-                    autoModules: true,
-                },
             },
             dts: {
                 compilerOptions: {

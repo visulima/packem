@@ -147,11 +147,24 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
     return loggedEntries;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
-const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promise<void>[] => {
+type BuilderProperties = {
+    fileCache: FileCache;
+    options: BuildContext;
+    subDirectory: string;
+};
+
+const prepareRollupConfig = (
+    context: BuildContext,
+    fileCache: FileCache,
+): {
+    builders: BuilderProperties[];
+    typeBuilders: BuilderProperties[];
+    // eslint-disable-next-line sonarjs/cognitive-complexity
+} => {
     const groupedEntries = groupByKeys(context.options.entries, "environment", "runtime");
 
-    const rollups: Promise<void>[] = [];
+    const builders: BuilderProperties[] = [];
+    const typeBuilders: BuilderProperties[] = [];
 
     for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
         for (const [runtime, entries] of Object.entries(environmentEntries)) {
@@ -240,26 +253,24 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                 };
 
                 if (!context.options.dtsOnly) {
-                    rollups.push(rollupBuild(adjustedEsmAndCjsContext, fileCache, subDirectory));
+                    builders.push({ fileCache, options: adjustedEsmAndCjsContext, subDirectory });
                 }
 
                 if (context.options.declaration) {
                     const typedEntries = adjustedEsmAndCjsContext.options.entries.filter((entry) => entry.declaration);
 
                     if (typedEntries.length > 0) {
-                        rollups.push(
-                            rollupBuildTypes(
-                                {
-                                    ...adjustedEsmAndCjsContext,
-                                    options: {
-                                        ...adjustedEsmAndCjsContext.options,
-                                        entries: typedEntries,
-                                    },
+                        typeBuilders.push({
+                            fileCache,
+                            options: {
+                                ...adjustedEsmAndCjsContext,
+                                options: {
+                                    ...adjustedEsmAndCjsContext.options,
+                                    entries: typedEntries,
                                 },
-                                fileCache,
-                                subDirectory,
-                            ),
-                        );
+                            },
+                            subDirectory,
+                        });
                     }
                 }
             }
@@ -277,26 +288,24 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                 };
 
                 if (!context.options.dtsOnly) {
-                    rollups.push(rollupBuild(adjustedEsmContext, fileCache, subDirectory));
+                    builders.push({ fileCache, options: adjustedEsmContext, subDirectory });
                 }
 
                 if (context.options.declaration) {
                     const typedEntries = adjustedEsmContext.options.entries.filter((entry) => entry.declaration);
 
                     if (typedEntries.length > 0) {
-                        rollups.push(
-                            rollupBuildTypes(
-                                {
-                                    ...adjustedEsmContext,
-                                    options: {
-                                        ...adjustedEsmContext.options,
-                                        entries: typedEntries,
-                                    },
+                        typeBuilders.push({
+                            fileCache,
+                            options: {
+                                ...adjustedEsmContext,
+                                options: {
+                                    ...adjustedEsmContext.options,
+                                    entries: typedEntries,
                                 },
-                                fileCache,
-                                subDirectory,
-                            ),
-                        );
+                            },
+                            subDirectory,
+                        });
                     }
                 }
             }
@@ -314,54 +323,57 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                 };
 
                 if (!context.options.dtsOnly) {
-                    rollups.push(rollupBuild(adjustedCjsContext, fileCache, subDirectory));
+                    builders.push({ fileCache, options: adjustedCjsContext, subDirectory });
                 }
 
                 if (context.options.declaration) {
                     const typedEntries = adjustedCjsContext.options.entries.filter((entry) => entry.declaration);
 
                     if (typedEntries.length > 0) {
-                        rollups.push(
-                            rollupBuildTypes(
-                                {
-                                    ...adjustedCjsContext,
-                                    options: {
-                                        ...adjustedCjsContext.options,
-                                        entries: typedEntries,
-                                    },
+                        typeBuilders.push({
+                            fileCache,
+                            options: {
+                                ...adjustedCjsContext,
+                                options: {
+                                    ...adjustedCjsContext.options,
+                                    entries: typedEntries,
                                 },
-                                fileCache,
-                                subDirectory,
-                            ),
-                        );
+                            },
+                            subDirectory,
+                        });
                     }
                 }
             }
 
             if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
-                const adjustedCjsContext = {
-                    ...environmentRuntimeContext,
+                typeBuilders.push({
+                    fileCache,
                     options: {
-                        ...environmentRuntimeContext.options,
-                        emitCJS: false,
-                        emitESM: false,
-                        entries: dtsEntries,
-                        minify,
+                        ...environmentRuntimeContext,
+                        options: {
+                            ...environmentRuntimeContext.options,
+                            emitCJS: false,
+                            emitESM: false,
+                            entries: dtsEntries,
+                            minify,
+                        },
                     },
-                };
-
-                rollups.push(rollupBuildTypes(adjustedCjsContext, fileCache, subDirectory));
+                    subDirectory,
+                });
             }
         }
     }
 
-    return rollups.filter(Boolean);
+    return { builders, typeBuilders };
 };
 
 const build = async (context: BuildContext, fileCache: FileCache): Promise<boolean> => {
     await context.hooks.callHook("build:before", context);
 
-    await Promise.all(prepareRollupConfig(context, fileCache));
+    const { builders, typeBuilders } = prepareRollupConfig(context, fileCache);
+
+    await Promise.all(builders.map(async ({ fileCache: cache, options, subDirectory }) => await rollupBuild(options, cache, subDirectory)));
+    await Promise.all(typeBuilders.map(async ({ fileCache: cache, options, subDirectory }) => await rollupBuildTypes(options, cache, subDirectory)));
 
     context.logger.success(green(context.options.name ? "Build succeeded for " + context.options.name : "Build succeeded"));
 
