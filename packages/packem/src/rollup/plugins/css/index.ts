@@ -40,8 +40,13 @@ export default async (
         namedExports: options.namedExports as boolean,
     };
 
-    if (typeof loaderOptions.inject === "object" && loaderOptions.inject.treeshakeable && loaderOptions.namedExports) {
-        throw new Error("`inject.treeshakeable` option is incompatible with `namedExports` option");
+    if (typeof loaderOptions.inject === "object" && loaderOptions.inject.treeshakeable) {
+        loaderOptions.namedExports = false;
+
+        logger.info({
+            message: "Disabling named exports due to `inject.treeshakeable` option",
+            prefix: "css",
+        });
     }
 
     let hasPostCssLoader = false;

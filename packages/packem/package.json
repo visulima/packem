@@ -441,6 +441,7 @@
         "secretlint": "8.3.2",
         "semantic-release": "^24.1.2",
         "sort-package-json": "^2.10.1",
+        "@types/icss-utils": "^5.1.2",
         "stylus": "^0.63.0",
         "sucrase": "^3.35.0",
         "sugarss": "4.0.1",

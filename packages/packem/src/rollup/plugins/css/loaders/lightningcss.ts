@@ -1,10 +1,11 @@
 import { browserslistToTargets, transform } from "lightningcss";
 
-import type { Loader } from "./types";
 import type { LightningCSSOptions } from "../types";
+import type { Loader } from "./types";
 import ensureAutoModules from "./utils/ensure-auto-modules";
 
 const lightningCSSLoader: Loader<LightningCSSOptions> = {
+    name: "lightningCSS",
     async process({ code, map }) {
         let supportModules = false;
 
@@ -38,7 +39,6 @@ const lightningCSSLoader: Loader<LightningCSSOptions> = {
             map: "map" in result ? result.map?.toString() : undefined,
         };
     },
-    name: "lightningCSS",
     test: /\.css$/i,
 };
 

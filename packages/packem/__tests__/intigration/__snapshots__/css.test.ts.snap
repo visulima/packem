@@ -4356,21 +4356,19 @@ exports[`css > modules > should work with processed modules 'duplication' css > 
     --color-primary: green;
 }
 
-.primary {
+.style_primary_0c4c723d {
     color: green;
     color: var(--color-primary);
 }
 
-.test {
+.shared_test_aaf91828 {
     content: "test";
 }
 
-.foo {
-    composes: test from "./shared.css";
+.foo_foo_15d01375 {
 }
 
-.bar {
-    composes: test from "./shared.css";
+.bar_bar_932cc2fc {
 }
 "
 `;
@@ -4378,52 +4376,46 @@ exports[`css > modules > should work with processed modules 'duplication' css > 
 exports[`css > modules > should work with processed modules 'duplication' css > js 1`] = `
 "'use strict';
 
-var css$2 = ".test {\\n    content: \\"test\\";\\n}\\n";
+var modules_fa509c68 = {"test":"shared_test_aaf91828"};
 
-var css$1 = ".foo {\\n    composes: test from \\"./shared.css\\";\\n}\\n";
+var modules_52530603 = {"foo":"foo_foo_15d01375 shared_test_aaf91828"};
 
-var css = ".bar {\\n    composes: test from \\"./shared.css\\";\\n}\\n";
+var modules_ad1fd3ff = {"bar":"bar_bar_932cc2fc shared_test_aaf91828"};
 
-console.log(css$2, css$1, css);
+console.log(modules_fa509c68, modules_52530603, modules_ad1fd3ff);
 "
 `;
 
 exports[`css > modules > should work with processed modules 'duplication' css > js 2`] = `
-"var css$2 = ".test {\\n    content: \\"test\\";\\n}\\n";
+"var modules_fa509c68 = {"test":"shared_test_aaf91828"};
 
-var css$1 = ".foo {\\n    composes: test from \\"./shared.css\\";\\n}\\n";
+var modules_52530603 = {"foo":"foo_foo_15d01375 shared_test_aaf91828"};
 
-var css = ".bar {\\n    composes: test from \\"./shared.css\\";\\n}\\n";
+var modules_ad1fd3ff = {"bar":"bar_bar_932cc2fc shared_test_aaf91828"};
 
-console.log(css$2, css$1, css);
+console.log(modules_fa509c68, modules_52530603, modules_ad1fd3ff);
 "
 `;
 
 exports[`css > modules > should work with processed modules 'extract' css > css 1`] = `
-"@value primary, secondary from colors;
-
-.module {
-    color: secondary;
+".style_module_ea61eaf4 {
+    color: #1F4F7F;
 }
 
-.module2 {
-    composes: composition from "./composed.css";
+.style_module2_ea61eaf4 {
 }
-
-@value primary from colors;
 
 @media screen and (min-width: 900px) {
-    .composition {
-        composes: compositioned from "./subdir/composition2.css";
+    .composed_composition_b4c6ecd1 {
         background-color: aqua;
     }
 }
 
-.composition {
-    background-color: primary;
+.composed_composition_b4c6ecd1 {
+    background-color: #BF4040;
 }
 
-.compositioned {
+.composition2_compositioned_33aa26b9 {
     width: 30%;
 }
 "
@@ -4432,103 +4424,91 @@ exports[`css > modules > should work with processed modules 'extract' css > css 
 exports[`css > modules > should work with processed modules 'extract' css > js 1`] = `
 "'use strict';
 
-var css$1 = "@value primary, secondary from colors;\\n\\n.module {\\n    color: secondary;\\n}\\n\\n.module2 {\\n    composes: composition from \\"./composed.css\\";\\n}\\n";
+var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
 
-var css = ".compositioned {\\n    width: 30%;\\n}\\n";
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
 
-if (css.inject) css.inject();
-else console.log(css$1.module, css.compositioned);
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 "
 `;
 
 exports[`css > modules > should work with processed modules 'extract' css > js 2`] = `
-"var css$1 = "@value primary, secondary from colors;\\n\\n.module {\\n    color: secondary;\\n}\\n\\n.module2 {\\n    composes: composition from \\"./composed.css\\";\\n}\\n";
+"var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
 
-var css = ".compositioned {\\n    width: 30%;\\n}\\n";
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
 
-if (css.inject) css.inject();
-else console.log(css$1.module, css.compositioned);
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 "
 `;
 
 exports[`css > modules > should work with processed modules 'extract-sourcemap-inline' css > css 1`] = `
-"@value primary, secondary from colors;
-
-.module {
-    color: secondary;
+".style_module_ea61eaf4 {
+    color: #1F4F7F;
 }
 
-.module2 {
-    composes: composition from "./composed.css";
+.style_module2_ea61eaf4 {
 }
-
-@value primary from colors;
 
 @media screen and (min-width: 900px) {
-    .composition {
-        composes: compositioned from "./subdir/composition2.css";
+    .composed_composition_b4c6ecd1 {
         background-color: aqua;
     }
 }
 
-.composition {
-    background-color: primary;
+.composed_composition_b4c6ecd1 {
+    background-color: #BF4040;
 }
 
-.compositioned {
+.composition2_compositioned_33aa26b9 {
     width: 30%;
 }
 
-/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy9zdHlsZS5jc3MiLCIuLi9zcmMvY29tcG9zZWQuY3NzIiwiLi4vc3JjL3N1YmRpci9jb21wb3NpdGlvbjIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLHFDQUFxQzs7QUFFckM7SUFDSSxnQkFBZ0I7QUFDcEI7O0FBRUE7SUFDSSwyQ0FBMkM7QUFDL0M7O0FDUkEsMEJBQTBCOztBQUUxQjtJQUNJO1FBQ0ksd0RBQXdEO1FBQ3hELHNCQUFzQjtJQUMxQjtBQUNKOztBQUVBO0lBQ0kseUJBQXlCO0FBQzdCOztBQ1hBO0lBQ0ksVUFBVTtBQUNkIiwiZmlsZSI6ImluZGV4LmNzcyIsInNvdXJjZXNDb250ZW50IjpbIkB2YWx1ZSBwcmltYXJ5LCBzZWNvbmRhcnkgZnJvbSBjb2xvcnM7XG5cbi5tb2R1bGUge1xuICAgIGNvbG9yOiBzZWNvbmRhcnk7XG59XG5cbi5tb2R1bGUyIHtcbiAgICBjb21wb3NlczogY29tcG9zaXRpb24gZnJvbSBcIi4vY29tcG9zZWQuY3NzXCI7XG59XG4iLCJAdmFsdWUgcHJpbWFyeSBmcm9tIGNvbG9ycztcblxuQG1lZGlhIHNjcmVlbiBhbmQgKG1pbi13aWR0aDogOTAwcHgpIHtcbiAgICAuY29tcG9zaXRpb24ge1xuICAgICAgICBjb21wb3NlczogY29tcG9zaXRpb25lZCBmcm9tIFwiLi9zdWJkaXIvY29tcG9zaXRpb24yLmNzc1wiO1xuICAgICAgICBiYWNrZ3JvdW5kLWNvbG9yOiBhcXVhO1xuICAgIH1cbn1cblxuLmNvbXBvc2l0aW9uIHtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiBwcmltYXJ5O1xufVxuIiwiLmNvbXBvc2l0aW9uZWQge1xuICAgIHdpZHRoOiAzMCU7XG59XG4iXX0= */"
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy9zdHlsZS5jc3MiLCIuLi9zcmMvY29tcG9zZWQuY3NzIiwiLi4vc3JjL3N1YmRpci9jb21wb3NpdGlvbjIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUVBO0lBQ0ksY0FBZ0I7QUFDcEI7O0FBRUE7QUFFQTs7QUNOQTtJQUNJO1FBRUksc0JBQXNCO0lBQzFCO0FBQ0o7O0FBRUE7SUFDSSx5QkFBeUI7QUFDN0I7O0FDWEE7SUFDSSxVQUFVO0FBQ2QiLCJmaWxlIjoiaW5kZXguY3NzIiwic291cmNlc0NvbnRlbnQiOlsiQHZhbHVlIHByaW1hcnksIHNlY29uZGFyeSBmcm9tIGNvbG9ycztcblxuLm1vZHVsZSB7XG4gICAgY29sb3I6IHNlY29uZGFyeTtcbn1cblxuLm1vZHVsZTIge1xuICAgIGNvbXBvc2VzOiBjb21wb3NpdGlvbiBmcm9tIFwiLi9jb21wb3NlZC5jc3NcIjtcbn1cbiIsIkB2YWx1ZSBwcmltYXJ5IGZyb20gY29sb3JzO1xuXG5AbWVkaWEgc2NyZWVuIGFuZCAobWluLXdpZHRoOiA5MDBweCkge1xuICAgIC5jb21wb3NpdGlvbiB7XG4gICAgICAgIGNvbXBvc2VzOiBjb21wb3NpdGlvbmVkIGZyb20gXCIuL3N1YmRpci9jb21wb3NpdGlvbjIuY3NzXCI7XG4gICAgICAgIGJhY2tncm91bmQtY29sb3I6IGFxdWE7XG4gICAgfVxufVxuXG4uY29tcG9zaXRpb24ge1xuICAgIGJhY2tncm91bmQtY29sb3I6IHByaW1hcnk7XG59XG4iLCIuY29tcG9zaXRpb25lZCB7XG4gICAgd2lkdGg6IDMwJTtcbn1cbiJdfQ== */"
 `;
 
 exports[`css > modules > should work with processed modules 'extract-sourcemap-inline' css > js 1`] = `
 "'use strict';
 
-var css$1 = "@value primary, secondary from colors;\\n\\n.module {\\n    color: secondary;\\n}\\n\\n.module2 {\\n    composes: composition from \\"./composed.css\\";\\n}\\n";
+var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
 
-var css = ".compositioned {\\n    width: 30%;\\n}\\n";
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
 
-if (css.inject) css.inject();
-else console.log(css$1.module, css.compositioned);
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 "
 `;
 
 exports[`css > modules > should work with processed modules 'extract-sourcemap-inline' css > js 2`] = `
-"var css$1 = "@value primary, secondary from colors;\\n\\n.module {\\n    color: secondary;\\n}\\n\\n.module2 {\\n    composes: composition from \\"./composed.css\\";\\n}\\n";
+"var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
 
-var css = ".compositioned {\\n    width: 30%;\\n}\\n";
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
 
-if (css.inject) css.inject();
-else console.log(css$1.module, css.compositioned);
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 "
 `;
 
 exports[`css > modules > should work with processed modules 'extract-sourcemap-true' css > css 1`] = `
-"@value primary, secondary from colors;
-
-.module {
-    color: secondary;
+".style_module_ea61eaf4 {
+    color: #1F4F7F;
 }
 
-.module2 {
-    composes: composition from "./composed.css";
+.style_module2_ea61eaf4 {
 }
-
-@value primary from colors;
 
 @media screen and (min-width: 900px) {
-    .composition {
-        composes: compositioned from "./subdir/composition2.css";
+    .composed_composition_b4c6ecd1 {
         background-color: aqua;
     }
 }
 
-.composition {
-    background-color: primary;
+.composed_composition_b4c6ecd1 {
+    background-color: #BF4040;
 }
 
-.compositioned {
+.composition2_compositioned_33aa26b9 {
     width: 30%;
 }
 
@@ -4538,26 +4518,26 @@ exports[`css > modules > should work with processed modules 'extract-sourcemap-t
 exports[`css > modules > should work with processed modules 'extract-sourcemap-true' css > js 1`] = `
 "'use strict';
 
-var css$1 = "@value primary, secondary from colors;\\n\\n.module {\\n    color: secondary;\\n}\\n\\n.module2 {\\n    composes: composition from \\"./composed.css\\";\\n}\\n";
+var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
 
-var css = ".compositioned {\\n    width: 30%;\\n}\\n";
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
 
-if (css.inject) css.inject();
-else console.log(css$1.module, css.compositioned);
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 "
 `;
 
 exports[`css > modules > should work with processed modules 'extract-sourcemap-true' css > js 2`] = `
-"var css$1 = "@value primary, secondary from colors;\\n\\n.module {\\n    color: secondary;\\n}\\n\\n.module2 {\\n    composes: composition from \\"./composed.css\\";\\n}\\n";
+"var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
 
-var css = ".compositioned {\\n    width: 30%;\\n}\\n";
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
 
-if (css.inject) css.inject();
-else console.log(css$1.module, css.compositioned);
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 "
 `;
 
-exports[`css > modules > should work with processed modules 'extract-sourcemap-true' css > map 1`] = `"{"version":3,"sources":["../src/style.css","../src/composed.css","../src/subdir/composition2.css"],"names":[],"mappings":"AAAA,qCAAqC;;AAErC;IACI,gBAAgB;AACpB;;AAEA;IACI,2CAA2C;AAC/C;;ACRA,0BAA0B;;AAE1B;IACI;QACI,wDAAwD;QACxD,sBAAsB;IAC1B;AACJ;;AAEA;IACI,yBAAyB;AAC7B;;ACXA;IACI,UAAU;AACd","file":"index.css","sourcesContent":["@value primary, secondary from colors;\\n\\n.module {\\n    color: secondary;\\n}\\n\\n.module2 {\\n    composes: composition from \\"./composed.css\\";\\n}\\n","@value primary from colors;\\n\\n@media screen and (min-width: 900px) {\\n    .composition {\\n        composes: compositioned from \\"./subdir/composition2.css\\";\\n        background-color: aqua;\\n    }\\n}\\n\\n.composition {\\n    background-color: primary;\\n}\\n",".compositioned {\\n    width: 30%;\\n}\\n"]}"`;
+exports[`css > modules > should work with processed modules 'extract-sourcemap-true' css > map 1`] = `"{"version":3,"sources":["../src/style.css","../src/composed.css","../src/subdir/composition2.css"],"names":[],"mappings":"AAEA;IACI,cAAgB;AACpB;;AAEA;AAEA;;ACNA;IACI;QAEI,sBAAsB;IAC1B;AACJ;;AAEA;IACI,yBAAyB;AAC7B;;ACXA;IACI,UAAU;AACd","file":"index.css","sourcesContent":["@value primary, secondary from colors;\\n\\n.module {\\n    color: secondary;\\n}\\n\\n.module2 {\\n    composes: composition from \\"./composed.css\\";\\n}\\n","@value primary from colors;\\n\\n@media screen and (min-width: 900px) {\\n    .composition {\\n        composes: compositioned from \\"./subdir/composition2.css\\";\\n        background-color: aqua;\\n    }\\n}\\n\\n.composition {\\n    background-color: primary;\\n}\\n",".compositioned {\\n    width: 30%;\\n}\\n"]}"`;
 
 exports[`css > modules > should work with processed modules 'generate-scoped-name' css > js 1`] = `
 "'use strict';
@@ -4859,6 +4839,144 @@ else console.log(css$2.module, css.compositioned);
 "
 `;
 
+exports[`css > modules > should work with processed modules 'inject-treeshakeable' css > js 1`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$1 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
+var injected$1 = false;
+var modules_5a199c00 = {get "primary"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "#BF4040"; },
+get "secondary"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "#1F4F7F"; },
+get "module"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module_ea61eaf4"; },
+get "module2"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"; },
+inject: function inject() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } },};
+
+var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
+var injected = false;
+var modules_354770d7 = {get "compositioned"() { if (!injected) { injected = true; injectCss(css,{}); } return "composition2_compositioned_33aa26b9"; },
+inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > modules > should work with processed modules 'inject-treeshakeable' css > js 2`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$1 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
+var injected$1 = false;
+var modules_5a199c00 = {get "primary"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "#BF4040"; },
+get "secondary"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "#1F4F7F"; },
+get "module"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module_ea61eaf4"; },
+get "module2"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"; },
+inject: function inject() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } },};
+
+var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
+var injected = false;
+var modules_354770d7 = {get "compositioned"() { if (!injected) { injected = true; injectCss(css,{}); } return "composition2_compositioned_33aa26b9"; },
+inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
 exports[`css > modules > should work with processed modules 'named-exports' css > js 1`] = `
 "'use strict';
 
@@ -5044,128 +5162,6 @@ for (const name of Object.values(css)) {
 `;
 
 exports[`css > modules > should work with processed modules 'named-exports-custom-class-name' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
-
-var css = ".valid {\\n    color: red;\\n}\\n\\n.new {\\n    color: blue;\\n}\\n\\n.css {\\n    color: green;\\n}\\n";
-injectCss(css,{});
-
-console.log(css);
-for (const name of Object.values(css)) {
-  console.log(name);
-}
-"
-`;
-
-exports[`css > modules > should work with processed modules 'named-exports-dts' css > js 1`] = `
-"'use strict';
-
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
-
-var css = ".valid {\\n    color: red;\\n}\\n\\n.new {\\n    color: blue;\\n}\\n\\n.css {\\n    color: green;\\n}\\n";
-injectCss(css,{});
-
-console.log(css);
-for (const name of Object.values(css)) {
-  console.log(name);
-}
-"
-`;
-
-exports[`css > modules > should work with processed modules 'named-exports-dts' css > js 2`] = `
 "var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 var __defProp2 = Object.defineProperty;

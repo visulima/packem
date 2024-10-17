@@ -152,6 +152,8 @@ describe("css", () => {
             withFileTypes: true,
         })
             .filter((dirent) => dirent.isFile())
+            // @TODO: Change this readdir to @visulima/fs readdir
+            // eslint-disable-next-line deprecation/deprecation
             .map((dirent) => join(dirent.path, dirent.name));
 
         const css = files.filter((file) => file.endsWith(".css"));
@@ -194,7 +196,6 @@ describe("css", () => {
             const result = (await build(data)) as WriteFailResult;
 
             expect(result.stderr).toContain(data.errorMessage);
-
             expect(result.exitCode).toBe(1);
 
             return;
@@ -578,8 +579,9 @@ describe("css", () => {
             {
                 input: "simple/index.js",
                 outputOpts: {
-                    assetFileNames({ name }) {
+                    assetFileNames({ names }) {
                         const p = "[name][extname]";
+                        const name = names[0];
 
                         if (!name) {
                             return p;
@@ -770,15 +772,18 @@ describe("css", () => {
                 title: "paths",
             },
         ] as WriteData[])("should work with less processed $title css", async ({ title, ...data }: WriteData) => {
-            // eslint-disable-next-line vitest/no-conditional-in-test
-            if ((data.styleOptions as StyleOptions).less?.paths) {
+            // eslint-disable-next-line vitest/no-conditional-in-test,@typescript-eslint/no-unnecessary-condition
+            if ((data.styleOptions as StyleOptions)?.less?.paths) {
                 // eslint-disable-next-line no-plusplus
                 for (let index = 0; index < (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[]).length; index++) {
                     // this is needed because of the temporary directory path, that is generated on every test run
                     // eslint-disable-next-line no-param-reassign,security/detect-object-injection
-                    (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] = (
-                        (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] as string
-                    ).replace("__REPLACE__", temporaryDirectoryPath);
+                    (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] =
+                        // eslint-disable-next-line security/detect-object-injection
+                        ((((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] as string).replace(
+                            "__REPLACE__",
+                            temporaryDirectoryPath,
+                        );
                 }
             }
 
@@ -809,19 +814,32 @@ describe("css", () => {
             },
             {
                 input: "modules/index.js",
-                styleOptions: { mode: ["inject", { treeshakeable: true }], modules: true },
+                styleOptions: {
+                    mode: ["inject", { treeshakeable: true }],
+                    postcss: {
+                        modules: true,
+                    },
+                },
                 title: "inject-treeshakeable",
             },
             {
+                errorMessage: "`inject` keyword is reserved when using `inject.treeshakeable` option",
                 input: "keyword-fail/index.js",
                 shouldFail: true,
-                styleOptions: { mode: ["inject", { treeshakeable: true }], modules: true },
+                styleOptions: {
+                    mode: ["inject", { treeshakeable: true }],
+                    postcss: {
+                        modules: true,
+                    },
+                },
                 title: "inject-treeshakeable-keyword-fail",
             },
             // @TODO Add dts
             // {
             //     input: "modules/index.js",
-            //     styleOptions: { dts: true, mode: ["inject", { treeshakeable: true }], modules: true },
+            //     styleOptions: { dts: true, mode: ["inject", { treeshakeable: true }], postcss: {
+            //             modules: true,
+            //         }, },
             //     title: "inject-treeshakeable-dts",
             // },
             {
@@ -837,13 +855,21 @@ describe("css", () => {
             {
                 input: "named-exports/index.js",
                 shouldFail: true,
-                styleOptions: { mode: ["inject", { treeshakeable: true }], modules: true, namedExports: true },
+                styleOptions: {
+                    mode: ["inject", { treeshakeable: true }],
+                    namedExports: true,
+                    postcss: {
+                        modules: true,
+                    },
+                },
                 title: "named-exports-treeshakeable-fail",
             },
             // @TODO Add dts
             // {
             //     input: "named-exports/index.js",
-            //     styleOptions: { dts: true, modules: true, namedExports: true },
+            //     styleOptions: { dts: true, postcss: {
+            //             modules: true,
+            //         }, namedExports: true },
             //     title: "named-exports-dts",
             // },
             {
@@ -856,17 +882,34 @@ describe("css", () => {
             },
             {
                 input: "modules/index.js",
-                styleOptions: { mode: "extract", modules: true },
+                styleOptions: {
+                    mode: "extract",
+                    postcss: {
+                        modules: true,
+                    },
+                },
                 title: "extract",
             },
             {
                 input: "modules/index.js",
-                styleOptions: { mode: "extract", modules: true, sourceMap: true },
+                styleOptions: {
+                    mode: "extract",
+                    postcss: {
+                        modules: true,
+                    },
+                    sourceMap: true,
+                },
                 title: "extract-sourcemap-true",
             },
             {
                 input: "modules/index.js",
-                styleOptions: { mode: "extract", modules: true, sourceMap: "inline" },
+                styleOptions: {
+                    mode: "extract",
+                    postcss: {
+                        modules: true,
+                    },
+                    sourceMap: "inline",
+                },
                 title: "extract-sourcemap-inline",
             },
             {
@@ -891,7 +934,12 @@ describe("css", () => {
             },
             {
                 input: "modules-duplication/index.js",
-                styleOptions: { mode: "extract", modules: true },
+                styleOptions: {
+                    mode: "extract",
+                    postcss: {
+                        modules: true,
+                    },
+                },
                 title: "duplication",
             },
         ] as WriteData[])("should work with processed modules $title css", async ({ title, ...data }: WriteData) => {
