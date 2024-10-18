@@ -25,6 +25,7 @@ export default async (
     environment: Environment,
     useSourcemap: boolean,
     debug: boolean,
+    minify: boolean,
     alias: Record<string, string>,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<Plugin> => {
@@ -67,7 +68,7 @@ export default async (
             ...options.postcss,
             config: inferOption(options.postcss?.config, {}),
             import: inferHandlerOption(options.postcss?.import, mergedAlias),
-            modules: inferOption(options.postcss?.modules, false),
+            modules: inferOption(options.postcss?.modules, undefined),
             to: options.postcss?.to,
             url: inferHandlerOption(options.postcss?.url, mergedAlias),
         };
@@ -287,7 +288,7 @@ export default async (
                 }
 
                 // Perform minimization on the extracted file
-                if (options.minifier) {
+                if (minify && options.minifier) {
                     logger.info({
                         message: `Minifying ${extractedData.name} with ${options.minifier.name as string}`,
                         prefix: "css",

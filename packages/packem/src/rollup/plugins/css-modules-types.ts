@@ -3,8 +3,8 @@ import type { Pail } from "@visulima/pail";
 import { normalize } from "@visulima/path";
 import type { Plugin } from "rollup";
 
-import ensureAutoModules from "./loaders/utils/ensure-auto-modules";
-import type { StyleOptions } from "./types";
+import ensureAutoModules from "./css/loaders/utils/ensure-auto-modules";
+import type { StyleOptions } from "./css/types";
 
 const dtsComment = `
 /* eslint-disable */

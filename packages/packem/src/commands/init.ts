@@ -7,6 +7,7 @@ import { join } from "@visulima/path";
 
 const cssLoaderDependencies = {
     less: ["less"],
+    lightningcss: ["lightningcss"],
     "node-sass": ["node-sass"],
     postcss: [
         "postcss",
@@ -22,6 +23,11 @@ const cssLoaderDependencies = {
     sass: ["sass"],
     "sass-embedded": ["sass-embedded"],
     stylus: ["stylus"],
+};
+
+const cssMinifierDependencies = {
+    cssnano: ["cssnano"],
+    lightningcss: ["lightningcss"],
 };
 
 const createInitCommand = (cli: Cli): void => {
@@ -235,11 +241,11 @@ const createInitCommand = (cli: Cli): void => {
                         { label: "Sass", value: "sass" },
                         { label: "Stylus", value: "stylus" },
                         { label: "Less", value: "less" },
+                        { label: "Lightning CSS", value: "lightningcss" },
+                        { label: "PostCSS", value: "postcss" },
                     ],
                     required: false,
                 })) as (keyof typeof cssLoaderDependencies)[];
-
-                cssLoaders.push("postcss");
 
                 if (cssLoaders.includes("sass")) {
                     const sassLoader = await select({
@@ -279,6 +285,44 @@ const createInitCommand = (cli: Cli): void => {
                 cssLoaders.push("sourceMap");
             }
 
+            if (options.cssMinifier === undefined) {
+                // eslint-disable-next-line no-param-reassign
+                options.cssMinifier = (await confirm({
+                    message: "Do you want to minify your css?",
+                    initialValue: false,
+                })) as boolean;
+            }
+
+            let cssMinifier: keyof typeof cssMinifierDependencies | undefined;
+
+            if (options.cssMinifier) {
+                cssMinifier = await select({
+                    message: "Pick a css minifier",
+                    options: [
+                        { label: "CSSNano", value: "cssnano" },
+                        { label: "Lightning CSS", value: "lightningcss" },
+                    ],
+                }) as keyof typeof cssMinifierDependencies;
+
+                if (!cssLoaders.includes("lightningcss")) {
+                    const shouldInstall = await confirm({
+                        message: 'Do you want to install "' + cssMinifier + '"?',
+                    });
+
+                    if (shouldInstall) {
+                        const s = spinner();
+
+                        s.start("Installing css minifier");
+                        await installPackage(cssMinifier, {
+                            cwd: options.dir,
+                            dev: true,
+                            silent: true,
+                        });
+                        s.stop("");
+                    }
+                }
+            }
+
             let template = "";
             let packemConfig = "";
 
@@ -286,8 +330,12 @@ const createInitCommand = (cli: Cli): void => {
                 packemConfig += ",\n    isolatedDeclarationTransformer";
             }
 
+            if (options.css || options.cssMinifier) {
+                packemConfig += ",\n    rollup: {\n        css: {";
+            }
+
             if (options.css) {
-                packemConfig += ",\n    rollup: {\n        css: {\n            loaders: [";
+                packemConfig += "\n            loaders: [ ";
 
                 for (let loader of cssLoaders) {
                     if (loader === "sass-embedded" || loader === "node-sass") {
@@ -297,7 +345,15 @@ const createInitCommand = (cli: Cli): void => {
                     packemConfig += `${loader as string}Loader, `;
                 }
 
-                packemConfig += "]\n        }\n    }";
+                packemConfig += "],";
+            }
+
+            if (options.cssMinifier && cssMinifier) {
+                packemConfig += "\n            minifier: " + cssMinifier + "Minifier,";
+            }
+
+            if (options.css || options.cssMinifier) {
+                packemConfig += "\n        }\n    }";
             }
 
             if (hasTypescript || packageJson.type === "module") {
@@ -315,6 +371,10 @@ const createInitCommand = (cli: Cli): void => {
 
                         imports += `import ${loader as string}Loader from "@visulima/packem/css/loader/${loader.toLowerCase() as string}";\n`;
                     }
+                }
+
+                if (options.cssMinifier && cssMinifier) {
+                    imports += `import ${cssMinifier as string}Minifier from "@visulima/packem/css/minifier/${cssMinifier.toLowerCase() as string}";\n`;
                 }
 
                 template = `import { defineConfig } from "@visulima/packem/config";
@@ -339,6 +399,10 @@ export default defineConfig({
 
                         imports += `const ${loader as string}Loader = require("@visulima/packem/css/loader/${loader.toLowerCase() as string}");\n`;
                     }
+                }
+
+                if (options.cssMinifier && cssMinifier) {
+                    imports += `const ${cssMinifier as string}Minifier = require("@visulima/packem/css/minifier/${cssMinifier.toLowerCase() as string}");\n`;
                 }
 
                 template = `const { defineConfig } = require("@visulima/packem/config");
@@ -393,6 +457,11 @@ module.exports = defineConfig({
             {
                 description: "Use CSS",
                 name: "css",
+                type: Boolean,
+            },
+            {
+                description: "Use CSS minifier",
+                name: "css-minifier",
                 type: Boolean,
             },
             {

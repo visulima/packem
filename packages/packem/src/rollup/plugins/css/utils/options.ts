@@ -30,7 +30,7 @@ export const inferModeOption = (mode: StyleOptions["mode"]): Mode => {
     };
 };
 
-export const inferOption = <T, TDefine extends T | boolean>(option: T | boolean | undefined, defaultValue: TDefine): T | TDefine | false => {
+export const inferOption = <T, TDefine extends T | boolean | undefined>(option: T | boolean | undefined, defaultValue: TDefine): T | TDefine | false => {
     if (typeof option === "boolean") {
         return option && ({} as TDefine);
     }

@@ -28,7 +28,7 @@ import chunkSplitter from "./plugins/chunk-splitter";
 import { cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
 import cssPlugin from "./plugins/css";
-import cssModulesTypes from "./plugins/css/css-modules-types";
+import cssModulesTypesPlugin from "./plugins/css-modules-types";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
 import { esmShimCjsSyntaxPlugin } from "./plugins/esm-shim-cjs-syntax";
 import fixDynamicImportExtension from "./plugins/fix-dynamic-import-extension";
@@ -479,6 +479,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         context.environment,
                         context.options.sourcemap,
                         context.options.debug,
+                        context.options.minify ?? false,
                         resolvedAliases,
                     )),
 
@@ -486,7 +487,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     context.options.rollup.css.loaders &&
                     context.options.rollup.css.loaders.length > 0 &&
                     context.options.declaration &&
-                    cssModulesTypes(context.options.rollup.css, context.options.rootDir, context.logger),
+                    cssModulesTypesPlugin(context.options.rollup.css, context.options.rootDir, context.logger),
 
                 context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
 

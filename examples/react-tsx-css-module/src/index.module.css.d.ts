@@ -6,9 +6,20 @@
  * @see https://npmjs.com/@visulima/packem
  */
 declare const css: string;
+declare const test: "index_test_bcd2d774";
+declare const container: "index_container_bcd2d774";
 
-export default css;
+interface ModulesExports {
+  'test': string;
+  'container': string;
+}
+
+declare const modules_c21c94f2: ModulesExports;
+
+export default modules_c21c94f2;
 
 export {
-  css
+  css,
+  test,
+  container
 };
