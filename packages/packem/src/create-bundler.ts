@@ -632,7 +632,7 @@ const createBundler = async (
 ): Promise<void> => {
     const { configPath, debug, tsconfigPath, ...restInputConfig } = inputConfig;
 
-    logger.wrapAll();
+    // logger.wrapAll();
 
     // Determine rootDirectory
     // eslint-disable-next-line no-param-reassign

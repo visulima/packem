@@ -1,41 +1,49 @@
-import type { AcceptedPlugin, AtRuleProps, ChildNode, Node, Root } from "postcss";
+import type { AcceptedPlugin, AtRule, ChildNode, Warning } from "postcss";
 
 import type { ImportResolve } from "./import-resolve";
 
-export type Condition = {
-    layer: string | undefined;
-    media: string | undefined;
-    supports: string | undefined;
+export type Stylesheet = {
+    charset?: AtRule;
+    statements: Statement[];
 };
 
-export type Statement = {
-    // @TODO: find the correct type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    children?: any[];
+export type Condition = {
+    layer?: string;
+    media?: string;
+    scope?: string;
+    supports?: string;
+};
+
+export type Statement = ImportStatement | PreImportStatement | NodesStatement | Warning;
+
+export type NodesStatement = {
     conditions: Condition[];
-    from: string | undefined;
-    fullUri?: string;
-    node?: Root | ChildNode | AtRuleProps | Node;
-    nodes?: (Root | ChildNode)[];
-    // @TODO: find the correct type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    parent?: any;
-    type: "charset" | "import" | "nodes" | "warning";
-    uri?: string | undefined;
+    from: string[];
+    importingNode: AtRule | null;
+    nodes: ChildNode[];
+    parent?: Statement;
+    type: "nodes"
 };
 
 export type ImportStatement = {
-    // @TODO: find the correct type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    children?: any[];
-    // @TODO: find the correct type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    conditions: any[];
-    from: string;
-    fullUri?: string;
-    node: Node;
+    conditions: Condition[];
+    from: string[];
+    fullUri: string;
+    importingNode: AtRule | null;
+    node: AtRule;
+    parent?: Statement;
+    stylesheet?: Stylesheet;
     type: "import";
     uri: string;
+};
+
+export type PreImportStatement = {
+    conditions: Condition[];
+    from: string[];
+    importingNode: AtRule | null;
+    node: ChildNode;
+    parent?: Statement;
+    type: "pre-import";
 };
 
 /** `@import` handler options */
@@ -85,7 +93,7 @@ export interface ImportOptions {
      */
     skipDuplicates?: boolean | undefined;
     /**
-     * By default, postcss-import warns when an empty file is imported.
+     * By default, css-import warns when an empty file is imported.
      * Set this option to false to disable this warning.
      *
      * @default true

@@ -1,5 +1,6 @@
-import { cpSync, readdirSync } from "node:fs";
-import { rm } from "node:fs/promises";
+import { log } from "node:console";
+import { cpSync } from "node:fs";
+import { readdir,rm } from "node:fs/promises";
 
 import { isAccessibleSync, readFileSync } from "@visulima/fs";
 import { dirname, join } from "@visulima/path";
@@ -70,9 +71,7 @@ describe("css", () => {
         const input = Array.isArray(data.input) ? data.input : [data.input];
 
         // copy fixtures to temporary directory
-        for (const file of input) {
-            cpSync(join(fixturePath, dirname(file)), join(temporaryDirectoryPath, "src"), { recursive: true });
-        }
+        cpSync(join(fixturePath, dirname(input[0] as string)), join(temporaryDirectoryPath), { recursive: true });
 
         await installPackage(temporaryDirectoryPath, "minireset.css");
 
@@ -109,7 +108,7 @@ describe("css", () => {
             cwd: temporaryDirectoryPath,
             reject: false,
         });
-
+        log(binProcess.stdout);
         if (data.shouldFail) {
             return {
                 exitCode: binProcess.exitCode as number,
@@ -146,11 +145,15 @@ describe("css", () => {
 
         const distributionPath = join(temporaryDirectoryPath, "dist");
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        const files = readdirSync(distributionPath, {
-            recursive: true,
-            withFileTypes: true,
-        })
+
+        const files = (
+            // eslint-disable-next-line security/detect-non-literal-fs-filename
+            await readdir(distributionPath, {
+                recursive: true,
+                withFileTypes: true,
+            })
+        )
+            // eslint-disable-next-line unicorn/no-await-expression-member
             .filter((dirent) => dirent.isFile())
             // @TODO: Change this readdir to @visulima/fs readdir
             // eslint-disable-next-line deprecation/deprecation

@@ -1,11 +1,11 @@
 import type { PluginCreator } from "postcss";
 
-const name = "styles-noop";
+const name = "css-noop";
 
-const plugin: PluginCreator<unknown> = () => {
+const noopPlugin: PluginCreator<unknown> = () => {
     return { postcssPlugin: name };
 };
 
-plugin.postcss = true;
+noopPlugin.postcss = true;
 
-export default plugin;
+export default noopPlugin;

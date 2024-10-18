@@ -1,16 +1,19 @@
 import { dirname, normalize } from "@visulima/path";
-import type { AtRule, Document, Helpers, Node, Postcss, Root, Source } from "postcss";
+import type { AtRule, Document, Postcss, Result, Root } from "postcss";
 
-import type { Condition, ImportOptions, ImportStatement, State, Statement } from "../types";
-import { isValid } from "../utils/data-url";
+import type { Condition, ImportOptions, ImportStatement, State, Statement, Stylesheet } from "../types";
+import { isValidDataURL } from "../utils/data-url";
 import formatImportPrelude from "../utils/format-import-prelude";
 import processContent from "../utils/process-content";
-import parseStatements from "./parse-statements";
+import { isImportStatement } from "../utils/statement";
+import parseStylesheet from "./parse-stylesheet";
+
+// eslint-disable-next-line security/detect-unsafe-regex
+const PROTOCOL_REGEX = /^(?:[a-z]+:)?\/\//i;
 
 const isProcessableURL = (uri: string): boolean => {
     // skip protocol base uri (protocol://url) or protocol-relative
-    // eslint-disable-next-line security/detect-unsafe-regex
-    if (/^(?:[a-z]+:)?\/\//i.test(uri)) {
+    if (PROTOCOL_REGEX.test(uri)) {
         return false;
     }
 
@@ -30,23 +33,25 @@ const isProcessableURL = (uri: string): boolean => {
 };
 
 const loadImportContent = async (
-    result: Helpers["result"],
-    stmt: Statement | ImportStatement,
+    result: Result,
+    stmt: ImportStatement,
     filename: string,
     options: { root: string } & ImportOptions,
     state: State,
     postcss: Postcss,
     // eslint-disable-next-line sonarjs/cognitive-complexity
-): Promise<undefined | Statement[]> => {
-    const atRule = stmt.node;
-    const { conditions, from } = stmt;
-    const stmtDuplicateCheckKey = conditions.map((condition) => formatImportPrelude(condition.layer, condition.media, condition.supports)).join(":");
+): Promise<Stylesheet> => {
+    const { conditions, from, node } = stmt;
+
+    const stmtDuplicateCheckKey = conditions
+        .map((condition) => formatImportPrelude(condition.layer, condition.media, condition.supports, condition.scope))
+        .join(":");
 
     if (options.skipDuplicates) {
         // skip files already imported at the same scope
         // eslint-disable-next-line security/detect-object-injection
         if (state.importedFiles[filename]?.[stmtDuplicateCheckKey]) {
-            return undefined;
+            return { statements: [] };
         }
 
         // save imported files to skip them next time
@@ -60,21 +65,22 @@ const loadImportContent = async (
         state.importedFiles[filename][stmtDuplicateCheckKey] = true;
     }
 
-    if (from?.includes(filename)) {
-        return undefined;
+    if (from.includes(filename)) {
+        return { statements: [] };
     }
 
     const content = await options.load(filename, options);
 
     if (content.trim() === "" && options.warnOnEmpty) {
-        result.warn(`${filename} is empty`, { node: atRule as Node });
-        return undefined;
+        result.warn(`${filename} is empty`, { node });
+
+        return { statements: [] };
     }
 
     // skip previous imported files not containing @import rules
     // eslint-disable-next-line security/detect-object-injection
     if (options.skipDuplicates && state.hashFiles[content]?.[stmtDuplicateCheckKey]) {
-        return undefined;
+        return { statements: [] };
     }
 
     const importedResult = await processContent(result, content, filename, options, postcss);
@@ -105,20 +111,28 @@ const loadImportContent = async (
 
     // recursion: import @import from imported file
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return await parseStyles(result, styles, options, state, conditions, filename, postcss);
+    return await parseStyles(options, result, styles, state, node, conditions, [...from, filename], postcss);
 };
 
-const resolveImportId = async (result: Helpers["result"], stmt: ImportStatement, options: { root: string } & ImportOptions, state: State, postcss: Postcss) => {
-    if (isValid(stmt.uri)) {
+const resolveImportId = async (options: { root: string } & ImportOptions, result: Result, stmt: ImportStatement, state: State, postcss: Postcss) => {
+    if (isValidDataURL(stmt.uri)) {
         // eslint-disable-next-line no-param-reassign
-        stmt.children = await loadImportContent(result, stmt, stmt.uri, options, state, postcss);
+        stmt.stylesheet = await loadImportContent(result, stmt, stmt.uri, options, state, postcss);
 
         return;
     }
 
-    if (stmt.from && isValid(stmt.from)) {
+    if (isValidDataURL(stmt.from.at(-1))) {
         // Data urls can't be used as a base url to resolve imports.
-        throw stmt.node.error(`Unable to import '${stmt.uri as string}' from a stylesheet that is embedded in a data url`);
+        // Skip inlining and warn.
+        // eslint-disable-next-line no-param-reassign
+        stmt.stylesheet = { statements: [] };
+
+        result.warn(`Unable to import '${stmt.uri}' from a stylesheet that is embedded in a data url`, {
+            node: stmt.node,
+        });
+
+        return;
     }
 
     const atRule = stmt.node;
@@ -156,108 +170,78 @@ const resolveImportId = async (result: Helpers["result"], stmt: ImportStatement,
     result.messages.push({
         file: resolved,
         parent: sourceFile,
-        plugin: "postcss-import",
+        plugin: "packem-postcss-import",
         type: "dependency",
     });
 
-    const importedContent = await loadImportContent(result, stmt, resolved, options, state, postcss);
-
-    // Merge loaded statements
-    if (importedContent) {
-        // eslint-disable-next-line no-param-reassign,@typescript-eslint/no-unnecessary-condition
-        stmt.children = importedContent.filter((x) => !!x);
-    }
+    // eslint-disable-next-line no-param-reassign
+    stmt.stylesheet = await loadImportContent(result, stmt, resolved, options, state, postcss);
 };
 
 const parseStyles = async (
-    result: Helpers["result"],
-    styles: Root | Document,
     options: { root: string } & ImportOptions,
+    result: Result,
+    styles: Root | Document,
     state: State,
+    importingNode: AtRule | null,
     conditions: Condition[],
-    from: string | undefined,
+    from: string[],
     postcss: Postcss,
     // eslint-disable-next-line sonarjs/cognitive-complexity
-): Promise<Statement[]> => {
-    const statements = parseStatements(result, styles, conditions, from);
+): Promise<Stylesheet> => {
+    // eslint-disable-next-line prefer-const
+    let { charset, statements } = parseStylesheet(result, styles, importingNode, conditions, from);
 
-    for await (const stmt of statements) {
-        if (stmt.type !== "import" || (stmt.uri && !isProcessableURL(stmt.uri))) {
-            // eslint-disable-next-line no-continue
-            continue;
+    {
+        // Lazy because the current stylesheet might not contain any further @import statements
+        const jobs: Promise<void>[] = [];
+
+        for await (const stmt of statements) {
+            if (!isImportStatement(stmt) || !isProcessableURL(stmt.uri)) {
+                // eslint-disable-next-line no-continue
+                continue;
+            }
+
+            // eslint-disable-next-line unicorn/no-array-callback-reference
+            if (options.filter && !options.filter((stmt as ImportStatement).uri)) {
+                // rejected by filter
+                // eslint-disable-next-line no-continue
+                continue;
+            }
+
+            jobs.push(resolveImportId(options, result, stmt as ImportStatement, state, postcss));
         }
 
-        // eslint-disable-next-line unicorn/no-array-callback-reference
-        if (options.filter && !options.filter((stmt as ImportStatement).uri)) {
-            // rejected by filter
-            // eslint-disable-next-line no-continue
-            continue;
+        if (jobs.length > 0) {
+            await Promise.all(jobs);
         }
-
-        await resolveImportId(result, stmt as ImportStatement, options, state, postcss);
     }
 
-    let charset: Statement | undefined;
+    // eslint-disable-next-line no-plusplus
+    for (let index = 0; index < statements.length; index++) {
+        // eslint-disable-next-line security/detect-object-injection
+        const stmt = statements[index] as Statement;
 
-    const imports: ImportStatement[] = [];
-    const bundle: Statement[] = [];
-
-    const handleCharset = (stmt: Statement) => {
-        if (!charset) {
-            charset = stmt;
-        }
-
-        // charsets aren't case-sensitive, so convert to lower case to compare
-        else if (((stmt.node as AtRule).params as string).toLowerCase() !== ((charset.node as AtRule).params as string).toLowerCase()) {
-            throw (stmt.node as Node).error(
-                "Incompatible @charset statements: " +
+        if (isImportStatement(stmt) && stmt.stylesheet) {
+            if (charset && stmt.stylesheet.charset && charset.params.toLowerCase() !== stmt.stylesheet.charset.params.toLowerCase()) {
+                throw stmt.stylesheet.charset.error(
+                    "Incompatible @charset statements:\n" +
                     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                    `${(stmt.node as AtRule).params as string} specified in ${((stmt.node as Node).source as Source).input.file} ${(charset.node as AtRule).params} specified in ${((charset.node as Node).source as Source).input.file}`,
-            );
+                        `  ${stmt.stylesheet.charset.params} specified in ${stmt.stylesheet.charset.source?.input.file}\n` +
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                        `  ${charset.params} specified in ${charset.source?.input.file}`,
+                );
+            } else if (!charset && !!stmt.stylesheet.charset) {
+                charset = stmt.stylesheet.charset;
+            }
+
+            statements.splice(index, 1, ...stmt.stylesheet.statements);
+            // eslint-disable-next-line no-plusplus
+            index--;
         }
-    };
+    }
 
-    // squash statements and their children
-    statements.forEach((stmt) => {
-        switch (stmt.type) {
-            case "charset": {
-                handleCharset(stmt);
-                break;
-            }
-            case "import": {
-                if (stmt.children) {
-                    stmt.children.forEach((child, index) => {
-                        if (child.type === "import") {
-                            imports.push(child);
-                        } else if (child.type === "charset") {
-                            handleCharset(child);
-                        } else {
-                            bundle.push(child);
-                        }
-
-                        // For better output
-                        if (index === 0) {
-                            // eslint-disable-next-line no-param-reassign
-                            child.parent = stmt;
-                        }
-                    });
-                } else {
-                    imports.push(stmt as ImportStatement);
-                }
-
-                break;
-            }
-            case "nodes": {
-                bundle.push(stmt);
-
-                break;
-            }
-            default:
-            // No default
-        }
-    });
-
-    return charset ? [charset, ...imports, ...bundle] : [...imports, ...bundle];
+    return { charset, statements };
 };
 
 export default parseStyles;

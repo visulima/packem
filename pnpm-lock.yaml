@@ -624,6 +624,15 @@ importers:
       '@clack/prompts':
         specifier: 0.7.0
         version: 0.7.0
+      '@csstools/css-parser-algorithms':
+        specifier: 3.0.2
+        version: 3.0.2(@csstools/css-tokenizer@3.0.2)
+      '@csstools/css-tokenizer':
+        specifier: 3.0.2
+        version: 3.0.2
+      '@csstools/postcss-slow-plugins':
+        specifier: ^2.0.0
+        version: 2.0.0(postcss@8.4.47)
       '@rollup/plugin-alias':
         specifier: 5.1.1
         version: 5.1.1(rollup@4.24.0)
@@ -714,6 +723,27 @@ importers:
       oxc-resolver:
         specifier: 1.12.0
         version: 1.12.0
+      postcss-load-config:
+        specifier: ^6.0.1
+        version: 6.0.1(jiti@2.3.1)(postcss@8.4.47)(tsx@4.19.1)(yaml@2.5.1)
+      postcss-modules:
+        specifier: 6.0.0
+        version: 6.0.0(postcss@8.4.47)
+      postcss-modules-extract-imports:
+        specifier: ^3.1.0
+        version: 3.1.0(postcss@8.4.47)
+      postcss-modules-local-by-default:
+        specifier: ^4.0.5
+        version: 4.0.5(postcss@8.4.47)
+      postcss-modules-scope:
+        specifier: ^3.2.0
+        version: 3.2.0(postcss@8.4.47)
+      postcss-modules-values:
+        specifier: ^4.0.0
+        version: 4.0.0(postcss@8.4.47)
+      postcss-value-parser:
+        specifier: ^4.2.0
+        version: 4.2.0
       rollup:
         specifier: ^4.24.0
         version: 4.24.0
@@ -766,15 +796,6 @@ importers:
       '@babel/core':
         specifier: ^7.25.8
         version: 7.25.8
-      '@csstools/postcss-bundler':
-        specifier: ^2.0.3
-        version: 2.0.3(postcss@8.4.47)
-      '@csstools/postcss-debug-logger':
-        specifier: ^3.0.0
-        version: 3.0.0(postcss@8.4.47)
-      '@csstools/postcss-slow-plugins':
-        specifier: ^2.0.0
-        version: 2.0.0(postcss@8.4.47)
       '@rushstack/eslint-plugin-security':
         specifier: ^0.8.3
         version: 0.8.3(eslint@8.57.0)(typescript@5.6.3)
@@ -913,27 +934,6 @@ importers:
       postcss-custom-properties:
         specifier: 14.0.1
         version: 14.0.1(postcss@8.4.47)
-      postcss-load-config:
-        specifier: ^6.0.1
-        version: 6.0.1(jiti@2.3.1)(postcss@8.4.47)(tsx@4.19.1)(yaml@2.5.1)
-      postcss-modules:
-        specifier: 6.0.0
-        version: 6.0.0(postcss@8.4.47)
-      postcss-modules-extract-imports:
-        specifier: ^3.1.0
-        version: 3.1.0(postcss@8.4.47)
-      postcss-modules-local-by-default:
-        specifier: ^4.0.5
-        version: 4.0.5(postcss@8.4.47)
-      postcss-modules-scope:
-        specifier: ^3.2.0
-        version: 3.2.0(postcss@8.4.47)
-      postcss-modules-values:
-        specifier: ^4.0.0
-        version: 4.0.0(postcss@8.4.47)
-      postcss-value-parser:
-        specifier: ^4.2.0
-        version: 4.2.0
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
@@ -1522,43 +1522,15 @@ packages:
       '@csstools/css-parser-algorithms': ^3.0.1
       '@csstools/css-tokenizer': ^3.0.1
 
-  '@csstools/css-parser-algorithms@3.0.1':
-    resolution: {integrity: sha512-lSquqZCHxDfuTg/Sk2hiS0mcSFCEBuj49JfzPHJogDBT0mGCyY5A1AQzBWngitrp7i1/HAZpIgzF/VjhOEIJIg==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@csstools/css-tokenizer': ^3.0.1
-
   '@csstools/css-parser-algorithms@3.0.2':
     resolution: {integrity: sha512-6tC/MnlEvs5suR4Ahef4YlBccJDHZuxGsAlxXmybWjZ5jPxlzLSMlRZ9mVHSRvlD+CmtE7+hJ+UQbfXrws/rUQ==}
     engines: {node: '>=18'}
     peerDependencies:
       '@csstools/css-tokenizer': ^3.0.2
 
-  '@csstools/css-tokenizer@3.0.1':
-    resolution: {integrity: sha512-UBqaiu7kU0lfvaP982/o3khfXccVlHPWp0/vwwiIgDF0GmqqqxoiXC/6FCjlS9u92f7CoEz6nXKQnrn1kIAkOw==}
-    engines: {node: '>=18'}
-
   '@csstools/css-tokenizer@3.0.2':
     resolution: {integrity: sha512-IuTRcD53WHsXPCZ6W7ubfGqReTJ9Ra0yRRFmXYP/Re8hFYYfoIYIK4080X5luslVLWimhIeFq0hj09urVMQzTw==}
     engines: {node: '>=18'}
-
-  '@csstools/postcss-bundler@2.0.3':
-    resolution: {integrity: sha512-jpLm3zpB121mYIjV+ijxVAdDfjyZTO8gblgNHxC4Iqaz48vr7LGk7Rf66GYPqUVcwuVF8MJjU5i7dQ9f5gYIVA==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      postcss: ^8.4
-
-  '@csstools/postcss-debug-logger@3.0.0':
-    resolution: {integrity: sha512-39ucW1baVBGOB82G1DKhe0FaMjDuzWHffdEMuwiB+QgFDIT3cUnjI93tqm6icNiE0b0QgrvyyHYWdxm/HIIEaA==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      postcss: ^8.4
-
-  '@csstools/postcss-rebase-url@2.0.2':
-    resolution: {integrity: sha512-LDDDyRZ8zKqci1Fvbl2XfzQ6ED01jVXm0jySlMlYTdhbCHhueVFM8VssZFGNDNe7WaJKOGkcFrnPtEaiFqzO3w==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      postcss: ^8.4
 
   '@csstools/postcss-slow-plugins@2.0.0':
     resolution: {integrity: sha512-G3zDVtcACreTMr5xdzDoChLpPUEYi/1IXqVs7vHanS6zu4UCHd8vFfdSannQDBTP03cfTl/CuJJtUAK8kKVfcw==}
@@ -11147,39 +11119,16 @@ snapshots:
       '@types/conventional-commits-parser': 5.0.0
       chalk: 5.3.0
 
-  '@csstools/cascade-layer-name-parser@2.0.1(@csstools/css-parser-algorithms@3.0.1(@csstools/css-tokenizer@3.0.1))(@csstools/css-tokenizer@3.0.1)':
+  '@csstools/cascade-layer-name-parser@2.0.1(@csstools/css-parser-algorithms@3.0.2(@csstools/css-tokenizer@3.0.2))(@csstools/css-tokenizer@3.0.2)':
     dependencies:
-      '@csstools/css-parser-algorithms': 3.0.1(@csstools/css-tokenizer@3.0.1)
-      '@csstools/css-tokenizer': 3.0.1
-
-  '@csstools/css-parser-algorithms@3.0.1(@csstools/css-tokenizer@3.0.1)':
-    dependencies:
-      '@csstools/css-tokenizer': 3.0.1
+      '@csstools/css-parser-algorithms': 3.0.2(@csstools/css-tokenizer@3.0.2)
+      '@csstools/css-tokenizer': 3.0.2
 
   '@csstools/css-parser-algorithms@3.0.2(@csstools/css-tokenizer@3.0.2)':
     dependencies:
       '@csstools/css-tokenizer': 3.0.2
 
-  '@csstools/css-tokenizer@3.0.1': {}
-
   '@csstools/css-tokenizer@3.0.2': {}
-
-  '@csstools/postcss-bundler@2.0.3(postcss@8.4.47)':
-    dependencies:
-      '@csstools/css-parser-algorithms': 3.0.2(@csstools/css-tokenizer@3.0.2)
-      '@csstools/css-tokenizer': 3.0.2
-      '@csstools/postcss-rebase-url': 2.0.2(postcss@8.4.47)
-      postcss: 8.4.47
-
-  '@csstools/postcss-debug-logger@3.0.0(postcss@8.4.47)':
-    dependencies:
-      postcss: 8.4.47
-
-  '@csstools/postcss-rebase-url@2.0.2(postcss@8.4.47)':
-    dependencies:
-      '@csstools/css-parser-algorithms': 3.0.2(@csstools/css-tokenizer@3.0.2)
-      '@csstools/css-tokenizer': 3.0.2
-      postcss: 8.4.47
 
   '@csstools/postcss-slow-plugins@2.0.0(postcss@8.4.47)':
     dependencies:
@@ -18749,9 +18698,9 @@ snapshots:
 
   postcss-custom-properties@14.0.1(postcss@8.4.47):
     dependencies:
-      '@csstools/cascade-layer-name-parser': 2.0.1(@csstools/css-parser-algorithms@3.0.1(@csstools/css-tokenizer@3.0.1))(@csstools/css-tokenizer@3.0.1)
-      '@csstools/css-parser-algorithms': 3.0.1(@csstools/css-tokenizer@3.0.1)
-      '@csstools/css-tokenizer': 3.0.1
+      '@csstools/cascade-layer-name-parser': 2.0.1(@csstools/css-parser-algorithms@3.0.2(@csstools/css-tokenizer@3.0.2))(@csstools/css-tokenizer@3.0.2)
+      '@csstools/css-parser-algorithms': 3.0.2(@csstools/css-tokenizer@3.0.2)
+      '@csstools/css-tokenizer': 3.0.2
       '@csstools/utilities': 2.0.0(postcss@8.4.47)
       postcss: 8.4.47
       postcss-value-parser: 4.2.0

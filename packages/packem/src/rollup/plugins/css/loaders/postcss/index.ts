@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 
+import postcssSlowPlugins from "@csstools/postcss-slow-plugins";
 import { makeLegalIdentifier } from "@rollup/pluginutils";
 import { basename, dirname, join, normalize, relative } from "@visulima/path";
 import type { AcceptedPlugin, ProcessOptions } from "postcss";
@@ -114,6 +115,12 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
         // Avoid PostCSS warning
         if (plugins.length === 0) {
             plugins.push(postcssNoop);
+        }
+
+        if (this.debug) {
+            plugins.push(postcssSlowPlugins({
+                ignore: ["css-noop"],
+            }));
         }
 
         const result = await postcss(plugins).process(code, postcssOptions as ProcessOptions);
@@ -253,7 +260,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             }
         }
 
-        if (!this.inject) {
+        if (!this.inject && Object.keys(modulesExports).length > 0) {
             output.push(`var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`);
         }
 

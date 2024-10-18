@@ -1,10 +1,10 @@
 import { readFileSync } from "@visulima/fs";
 
-import { contents, isValid } from "./data-url";
+import { dataURLContents, isValidDataURL } from "./data-url";
 
 const loadContent = (filename: string): string => {
-    if (isValid(filename)) {
-        return contents(filename);
+    if (isValidDataURL(filename)) {
+        return dataURLContents(filename);
     }
 
     return readFileSync(filename);

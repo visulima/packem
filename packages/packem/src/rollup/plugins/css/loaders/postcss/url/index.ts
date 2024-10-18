@@ -11,7 +11,7 @@ import type { UrlFile, UrlResolve } from "./url-resolve";
 import { urlResolve } from "./url-resolve";
 import { isDeclWithUrl, walkUrls } from "./utils";
 
-const name = "styles-url";
+const name = "packem-css-url";
 const placeholderHashDefault = "assets/[name]-[hash][extname]";
 const placeholderNoHashDefault = "assets/[name][extname]";
 const defaultPublicPath = "./assets/";

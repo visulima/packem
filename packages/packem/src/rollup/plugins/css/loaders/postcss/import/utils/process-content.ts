@@ -1,5 +1,6 @@
-import type { AcceptedPlugin, Helpers, LazyResult, Postcss, ProcessOptions } from "postcss";
+import type { AcceptedPlugin, LazyResult, Postcss, ProcessOptions, Result } from "postcss";
 
+import postcssNoop from "../../noop";
 import type { ImportOptions } from "../types";
 
 const runPostcss = async (
@@ -13,6 +14,10 @@ const runPostcss = async (
     if (index === undefined) {
         // eslint-disable-next-line no-param-reassign
         index = 0;
+    }
+
+    if (plugins.length === 0) {
+        plugins.push(postcssNoop());
     }
 
     return await postcss(plugins)
@@ -35,7 +40,7 @@ const runPostcss = async (
         });
 };
 
-const processContent = async (result: Helpers["result"], content: string, filename: string, options: ImportOptions, postcss: Postcss): Promise<LazyResult> => {
+const processContent = async (result: Result, content: string, filename: string, options: ImportOptions, postcss: Postcss): Promise<LazyResult> => {
     const { plugins } = options;
 
     const parserList = [];

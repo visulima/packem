@@ -1,22 +1,34 @@
-import type { AtRule, AtRuleProps, Document, Root } from "postcss";
+import type { AtRule, AtRuleProps } from "postcss";
 
-import type { Statement } from "./types";
+import type { Stylesheet } from "./types";
 import base64EncodedConditionalImport from "./utils/base64-encoded-import";
+import { isImportStatement, isPreImportStatement, isWarning } from "./utils/statement";
 
-const applyConditions = (bundle: Statement[], atRule: (defaults?: AtRuleProps) => AtRule): void => {
-    bundle.forEach((stmt) => {
-        if (stmt.type === "charset" || stmt.type === "warning" || stmt.conditions.length === 0) {
+const applyConditions = (stylesheet: Stylesheet, atRule: (defaults?: AtRuleProps) => AtRule): void => {
+    // eslint-disable-next-line sonarjs/cognitive-complexity
+    stylesheet.statements.forEach((stmt, index) => {
+        if (isWarning(stmt) || isPreImportStatement(stmt) || stmt.conditions.length === 0) {
             return;
         }
 
-        if (stmt.type === "import") {
+        if (isImportStatement(stmt)) {
             // eslint-disable-next-line no-param-reassign
-            (stmt.node as AtRuleProps).params = base64EncodedConditionalImport(stmt.fullUri as string, stmt.conditions);
+            stmt.node.params = base64EncodedConditionalImport(stmt.fullUri, stmt.conditions);
+
             return;
         }
 
         const { nodes } = stmt;
-        const { parent } = (nodes as Root[])[0] as Root;
+
+        if (nodes.length === 0) {
+            return;
+        }
+
+        const { parent } = nodes[0] as AtRule;
+
+        if (!parent) {
+            return;
+        }
 
         const atRules = [];
 
@@ -26,17 +38,27 @@ const applyConditions = (bundle: Statement[], atRule: (defaults?: AtRuleProps) =
                 const mediaNode = atRule({
                     name: "media",
                     params: condition.media,
-                    source: (parent as Document).source,
+                    source: stmt.importingNode?.source ?? parent.source,
                 });
 
                 atRules.push(mediaNode);
             }
 
+            if (condition.scope !== undefined) {
+                const scopeNode = atRule({
+                    name: "scope",
+                    params: condition.scope,
+                    source: stmt.importingNode?.source ?? parent.source,
+                });
+
+                atRules.push(scopeNode);
+            }
+
             if (condition.supports !== undefined) {
                 const supportsNode = atRule({
                     name: "supports",
-                    params: `(${condition.supports})`,
-                    source: (parent as Document).source,
+                    params: "(" + condition.supports + ")",
+                    source: stmt.importingNode?.source ?? parent.source,
                 });
 
                 atRules.push(supportsNode);
@@ -46,7 +68,7 @@ const applyConditions = (bundle: Statement[], atRule: (defaults?: AtRuleProps) =
                 const layerNode = atRule({
                     name: "layer",
                     params: condition.layer,
-                    source: (parent as Document).source,
+                    source: stmt.importingNode?.source ?? parent.source,
                 });
 
                 atRules.push(layerNode);
@@ -54,35 +76,39 @@ const applyConditions = (bundle: Statement[], atRule: (defaults?: AtRuleProps) =
         }
 
         // Add nodes to AST
-        const outerAtRule: AtRule = atRules.shift() as AtRule;
-        // eslint-disable-next-line unicorn/no-array-reduce
-        const innerAtRule = atRules.reduce((previous, next) => {
-            (previous as AtRule).append(next);
+        const outerAtRule = atRules[0];
 
-            return next;
-        }, outerAtRule);
+        if (!outerAtRule) {
+            return;
+        }
 
-        (parent as Document).insertBefore((nodes as Root[])[0] as Root, outerAtRule);
+        // eslint-disable-next-line no-plusplus
+        for (let atRulesIndex = 0; atRulesIndex < atRules.length - 1; atRulesIndex++) {
+            // eslint-disable-next-line security/detect-object-injection
+            (atRules[atRulesIndex] as AtRule).append(atRules[atRulesIndex + 1]);
+        }
+
+        const innerAtRule = atRules.at(-1) as AtRule;
+
+        parent.insertBefore(nodes[0] as AtRule, outerAtRule);
 
         // remove nodes
-        (nodes as Root[]).forEach((node) => {
+        nodes.forEach((node) => {
             // eslint-disable-next-line no-param-reassign
             node.parent = undefined;
         });
 
-        // better output
-        ((nodes as Root[])[0] as Root).raws.before = ((nodes as Root[])[0] as Root).raws.before || "\n";
-
         // wrap new rules with media query and/or layer at rule
-        (innerAtRule as AtRule).append(nodes);
+        innerAtRule.append(nodes);
 
-        // eslint-disable-next-line no-param-reassign
-        stmt.type = "nodes";
-        // eslint-disable-next-line no-param-reassign
-        stmt.nodes = [outerAtRule];
-
-        // eslint-disable-next-line no-param-reassign
-        stmt.node = undefined;
+        // eslint-disable-next-line no-param-reassign,security/detect-object-injection
+        stylesheet.statements[index] = {
+            conditions: stmt.conditions,
+            from: stmt.from,
+            importingNode: stmt.importingNode,
+            nodes: [outerAtRule],
+            type: "nodes",
+        };
     });
 };
 

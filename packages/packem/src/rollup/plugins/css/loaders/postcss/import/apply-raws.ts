@@ -1,26 +1,27 @@
-import type { Root } from "postcss";
+import type { ChildNode } from "postcss";
 
-import type { Statement } from "./types";
+import type { ImportStatement, NodesStatement, PreImportStatement, Stylesheet } from "./types";
+import { isNodesStatement } from "./utils/statement";
 
-const applyRaws = (bundle: Statement[]): void => {
-    bundle.forEach((stmt, index) => {
+const applyRaws = (stylesheet: Stylesheet): void => {
+    stylesheet.statements.forEach((stmt, index) => {
         if (index === 0) {
             return;
         }
 
-        if (stmt.parent) {
-            const { before } = stmt.parent.node.raws;
+        if ((stmt as ImportStatement | PreImportStatement | NodesStatement).parent !== undefined) {
+            const { before } = ((stmt as ImportStatement | PreImportStatement).parent as ImportStatement | PreImportStatement).node.raws;
 
-            if (stmt.type === "nodes" && stmt.nodes) {
+            if (isNodesStatement(stmt)) {
                 // eslint-disable-next-line no-param-reassign
-                (stmt.nodes[0] as Root).raws.before = before;
+                (stmt.nodes[0] as ChildNode).raws.before = before;
             } else {
                 // eslint-disable-next-line no-param-reassign
-                (stmt.node as Root).raws.before = before;
+                stmt.node.raws.before = before;
             }
-        } else if (stmt.type === "nodes") {
+        } else if (isNodesStatement(stmt)) {
             // eslint-disable-next-line no-param-reassign
-            ((stmt.nodes as Root[])[0] as Root).raws.before = ((stmt.nodes as Root[])[0] as Root).raws.before || "\n";
+            (stmt.nodes[0] as ChildNode).raws.before = (stmt.nodes[0] as ChildNode).raws.before || "\n";
         }
     });
 };
