@@ -3,7 +3,6 @@ import type { Node } from "postcss";
 
 import { resolve } from "../../../utils/resolve";
 
-/** `@import` resolver */
 export type ImportResolve = (url: string, basedir: string, extensions: string[], atRule: Node) => string | Promise<string>;
 
 export const importResolve: ImportResolve = (inputUrl: string, basedir: string, extensions: string[]): string => {

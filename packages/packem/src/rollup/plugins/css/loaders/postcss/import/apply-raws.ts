@@ -21,7 +21,7 @@ const applyRaws = (stylesheet: Stylesheet): void => {
             }
         } else if (isNodesStatement(stmt)) {
             // eslint-disable-next-line no-param-reassign
-            (stmt.nodes[0] as ChildNode).raws.before = (stmt.nodes[0] as ChildNode).raws.before || "\n";
+            (stmt.nodes[0] as ChildNode).raws.before = (stmt.nodes[0] as ChildNode).raws.before ?? "\n";
         }
     });
 };

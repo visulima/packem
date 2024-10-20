@@ -1,3 +1,9 @@
+/**
+ * Modified copy of https://github.com/csstools/postcss-plugins/blob/main/plugin-packs/postcss-bundler/src/postcss-import/lib/parse-styles.ts
+ *
+ * MIT No Attribution (MIT-0)
+ * Copyright © CSSTools Contributors
+ */
 import { dirname, normalize } from "@visulima/path";
 import type { AtRule, Document, Postcss, Result, Root } from "postcss";
 
@@ -226,9 +232,9 @@ const parseStyles = async (
             if (charset && stmt.stylesheet.charset && charset.params.toLowerCase() !== stmt.stylesheet.charset.params.toLowerCase()) {
                 throw stmt.stylesheet.charset.error(
                     "Incompatible @charset statements:\n" +
-                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                         `  ${stmt.stylesheet.charset.params} specified in ${stmt.stylesheet.charset.source?.input.file}\n` +
-                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                         `  ${charset.params} specified in ${charset.source?.input.file}`,
                 );
             } else if (!charset && !!stmt.stylesheet.charset) {

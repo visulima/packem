@@ -55,7 +55,7 @@ It uses the `exports` configuration in `package.json` and recognizes entry file 
 -   ✅ ESM ⇄ CJS interoperability
 -   ✅ Supports isolated declaration types (experimental)
 -   ✅ Supports wasm [WebAssembly modules](http://webassembly.org)
--   ✅ Supports css,sass,less,stylus and css modules
+-   ✅ Supports css, [sass](https://github.com/sass/sass), [less](https://github.com/less/less.js), [stylus](https://github.com/stylus/stylus) and Up-to-date [CSS Modules](https://github.com/css-modules/css-modules) (experimental)
 -   ✅ [TypeDoc](https://github.com/TypeStrong/TypeDoc) documentation generation
 
 And more...
@@ -399,8 +399,6 @@ worker = new Worker(new URL("./worker.js", import.meta.url), { type: "module" })
 worker = new Worker("./worker.js", { type: "module" });
 ```
 
-#### CSS and CSS Modules (Coming Soon)
-
 ### Aliases
 
 Aliases can be configured in the [import map](https://nodejs.org/api/packages.html#imports), defined in `package.json#imports`.
@@ -494,12 +492,12 @@ export default defineConfig({
 
 <!-- Modified copy of https://github.com/Anidetrix/rollup-plugin-styles/blob/main/README.md -->
 
-## Css
+## Css and Css Modules
 
 `packem` supports:
 
 -   [PostCSS](https://github.com/postcss/postcss)
--   [Sass](https://github.com/sass/dart-sass)
+-   [Sass](https://github.com/sass/sass)
 -   [Less](https://github.com/less/less.js)
 -   [Stylus](https://github.com/stylus/stylus)
 -   Up-to-date [CSS Modules](https://github.com/css-modules/css-modules) implementation

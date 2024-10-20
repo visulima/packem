@@ -22,7 +22,7 @@ const base64EncodedConditionalImport = (prelude: string, conditions: Condition[]
             condition.layer,
             condition.media,
             condition.supports,
-            condition.scope
+            condition.scope,
         )}`;
     }
 

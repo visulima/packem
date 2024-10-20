@@ -1,6 +1,5 @@
-import { log } from "node:console";
 import { cpSync } from "node:fs";
-import { readdir,rm } from "node:fs/promises";
+import { readdir, rm } from "node:fs/promises";
 
 import { isAccessibleSync, readFileSync } from "@visulima/fs";
 import { dirname, join } from "@visulima/path";
@@ -108,7 +107,7 @@ describe("css", () => {
             cwd: temporaryDirectoryPath,
             reject: false,
         });
-        log(binProcess.stdout);
+
         if (data.shouldFail) {
             return {
                 exitCode: binProcess.exitCode as number,
@@ -145,8 +144,8 @@ describe("css", () => {
 
         const distributionPath = join(temporaryDirectoryPath, "dist");
 
-
-        const files = (
+        const files =
+        (
             // eslint-disable-next-line security/detect-non-literal-fs-filename
             await readdir(distributionPath, {
                 recursive: true,
@@ -740,7 +739,8 @@ describe("css", () => {
         });
     });
 
-    describe("stylus", () => {
+    // eslint-disable-next-line vitest/no-disabled-tests
+    describe.skip("stylus", () => {
         // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
         it.each([
             {

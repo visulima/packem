@@ -1,3 +1,9 @@
+/**
+ * Modified copy of https://github.com/csstools/postcss-plugins/blob/main/plugin-packs/postcss-bundler/src/postcss-import/lib/parse-stylesheet.ts
+ *
+ * MIT No Attribution (MIT-0)
+ * Copyright © CSSTools Contributors
+ */
 import type { AtRule, ChildNode, Document, Result, Root, Warning } from "postcss";
 
 import { IS_CHARSET_REGEX, IS_IMPORT_REGEX, IS_LAYER_REGEX } from "../constants";

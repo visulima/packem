@@ -1,3 +1,9 @@
+/**
+ * Modified copy of https://github.com/csstools/postcss-plugins/blob/main/plugin-packs/postcss-bundler/src/postcss-import/lib/names.ts
+ *
+ * MIT No Attribution (MIT-0)
+ * Copyright © CSSTools Contributors
+ */
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types
 export const IS_CHARSET_REGEX: RegExp = /^charset$/i;
 // eslint-disable-next-line @typescript-eslint/no-inferrable-types

@@ -1,3 +1,9 @@
+/**
+ * Modified copy of https://github.com/csstools/postcss-plugins/blob/main/plugin-packs/postcss-bundler/src/postcss-import/lib/apply-styles.ts
+ *
+ * MIT No Attribution (MIT-0)
+ * Copyright © CSSTools Contributors
+ */
 import type { Document, Root } from "postcss";
 
 import type { Stylesheet } from "./types";

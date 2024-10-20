@@ -1,3 +1,9 @@
+/**
+ * Modified copy of https://github.com/csstools/postcss-plugins/blob/main/plugin-packs/postcss-bundler/src/postcss-import/lib/apply-conditions.ts
+ *
+ * MIT No Attribution (MIT-0)
+ * Copyright © CSSTools Contributors
+ */
 import type { AtRule, AtRuleProps } from "postcss";
 
 import type { Stylesheet } from "./types";

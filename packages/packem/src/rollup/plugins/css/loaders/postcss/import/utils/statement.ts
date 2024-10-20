@@ -1,18 +1,11 @@
-import type { ImportStatement, NodesStatement, Statement, PreImportStatement } from "../types";
-import { Warning } from "postcss";
+import type { Warning } from "postcss";
 
-export const isWarning = (stmt: Statement): stmt is Warning => {
-    return stmt.type === "warning";
-};
+import type { ImportStatement, NodesStatement, PreImportStatement,Statement } from "../types";
 
-export const isNodesStatement = (stmt: Statement): stmt is NodesStatement => {
-    return stmt.type === "nodes";
-};
+export const isWarning = (stmt: Statement): stmt is Warning => stmt.type === "warning";
 
-export const isImportStatement = (stmt: Statement): stmt is ImportStatement => {
-    return stmt.type === "import";
-};
+export const isNodesStatement = (stmt: Statement): stmt is NodesStatement => stmt.type === "nodes";
 
-export const isPreImportStatement = (stmt: Statement): stmt is PreImportStatement => {
-    return stmt.type === "pre-import";
-};
+export const isImportStatement = (stmt: Statement): stmt is ImportStatement => stmt.type === "import";
+
+export const isPreImportStatement = (stmt: Statement): stmt is PreImportStatement => stmt.type === "pre-import";

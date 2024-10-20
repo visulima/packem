@@ -22,7 +22,7 @@ export type NodesStatement = {
     importingNode: AtRule | null;
     nodes: ChildNode[];
     parent?: Statement;
-    type: "nodes"
+    type: "nodes";
 };
 
 export type ImportStatement = {

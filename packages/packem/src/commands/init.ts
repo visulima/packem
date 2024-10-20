@@ -296,13 +296,13 @@ const createInitCommand = (cli: Cli): void => {
             let cssMinifier: keyof typeof cssMinifierDependencies | undefined;
 
             if (options.cssMinifier) {
-                cssMinifier = await select({
+                cssMinifier = (await select({
                     message: "Pick a css minifier",
                     options: [
                         { label: "CSSNano", value: "cssnano" },
                         { label: "Lightning CSS", value: "lightningcss" },
                     ],
-                }) as keyof typeof cssMinifierDependencies;
+                })) as keyof typeof cssMinifierDependencies;
 
                 if (!cssLoaders.includes("lightningcss")) {
                     const shouldInstall = await confirm({

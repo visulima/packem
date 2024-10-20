@@ -118,9 +118,11 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
         }
 
         if (this.debug) {
-            plugins.push(postcssSlowPlugins({
-                ignore: ["css-noop"],
-            }));
+            plugins.push(
+                postcssSlowPlugins({
+                    ignore: ["css-noop"],
+                }),
+            );
         }
 
         const result = await postcss(plugins).process(code, postcssOptions as ProcessOptions);

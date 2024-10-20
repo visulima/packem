@@ -1,3 +1,9 @@
+/**
+ * Modified copy of https://github.com/csstools/postcss-plugins/blob/main/plugin-packs/postcss-bundler/src/postcss-import/lib/parse-at-import.ts
+ *
+ * MIT No Attribution (MIT-0)
+ * Copyright © CSSTools Contributors
+ */
 import type { ComponentValue } from "@csstools/css-parser-algorithms";
 import {
     isFunctionNode,
@@ -51,6 +57,7 @@ const stripHash = (string_: string): string => {
     }
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const parseAtImport = (parameters: string): false | { fullUri: string; layer?: string; media?: string; scope?: string; supports?: string; uri: string } => {
     const tokens = tokenize({ css: parameters });
 
@@ -104,10 +111,10 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
                 return false;
             }
 
-            // eslint-disable-next-line @typescript-eslint/prefer-for-of
-            for (let index_ = 0; index_ < componentValue.value.length; index_++) {
+            // eslint-disable-next-line @typescript-eslint/prefer-for-of,no-plusplus
+            for (let cVIndex = 0; cVIndex < componentValue.value.length; cVIndex++) {
                 // eslint-disable-next-line security/detect-object-injection
-                const childComponentValue = componentValue.value[index_];
+                const childComponentValue = componentValue.value[cVIndex];
                 if (isWhiteSpaceOrCommentNode(childComponentValue)) {
                     // eslint-disable-next-line no-continue
                     continue;
