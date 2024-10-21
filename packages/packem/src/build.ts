@@ -130,17 +130,41 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
     }
 
     if (loggedEntries) {
-        logger.raw("Σ Total dist size (byte size):", cyan(formatBytes(context.buildEntries.reduce((index, entry) => index + (entry.bytes ?? 0), 0))), "\n");
+        logger.raw(
+            "Σ Total dist size (byte size):",
+            cyan(
+                formatBytes(
+                    context.buildEntries.reduce((index, entry) => index + (entry.bytes ?? 0), 0),
+                    {
+                        decimals: 2,
+                    },
+                ),
+            ),
+            "\n",
+        );
     }
 
     return loggedEntries;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
-const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promise<void>[] => {
+type BuilderProperties = {
+    context: BuildContext;
+    fileCache: FileCache;
+    subDirectory: string;
+};
+
+const prepareRollupConfig = (
+    context: BuildContext,
+    fileCache: FileCache,
+): {
+    builders: Set<BuilderProperties>;
+    typeBuilders: Set<BuilderProperties>;
+    // eslint-disable-next-line sonarjs/cognitive-complexity
+} => {
     const groupedEntries = groupByKeys(context.options.entries, "environment", "runtime");
 
-    const rollups: Promise<void>[] = [];
+    const builders = new Set<BuilderProperties>();
+    const typeBuilders = new Set<BuilderProperties>();
 
     for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
         for (const [runtime, entries] of Object.entries(environmentEntries)) {
@@ -156,23 +180,21 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                 );
             }
 
+            const replaceValues: Record<string, string> = {};
+
             if (environmentRuntimeContext.options.rollup.replace) {
                 if (environmentRuntimeContext.options.rollup.replace.values === undefined) {
                     environmentRuntimeContext.options.rollup.replace.values = {};
                 }
 
                 if (environment !== "undefined") {
-                    environmentRuntimeContext.options.rollup.replace.values = {
-                        ...environmentRuntimeContext.options.rollup.replace.values,
-                        // hack to make sure, that the replace plugin don't replace the environment
-                        [["process", "env", "NODE_ENV"].join(".")]: JSON.stringify(environment),
-                    };
+                    // hack to make sure, that the replace plugin don't replace the environment
+                    replaceValues[["process", "env", "NODE_ENV"].join(".")] = JSON.stringify(environment);
                 }
 
-                environmentRuntimeContext.options.rollup.replace.values = {
-                    ...environmentRuntimeContext.options.rollup.replace.values,
-                    [["process", "env", "EdgeRuntime"].join(".")]: JSON.stringify(runtime === "edge-light"),
-                };
+                replaceValues[["process", "env", "EdgeRuntime"].join(".")] = JSON.stringify(runtime === "edge-light");
+
+                Object.freeze(replaceValues);
             } else {
                 context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
             }
@@ -217,7 +239,7 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
             }
 
             if (esmAndCjsEntries.length > 0) {
-                const adjustedEsmAndCjsContext = {
+                const adjustedEsmAndCjsContext: BuildContext = {
                     ...environmentRuntimeContext,
                     options: {
                         ...environmentRuntimeContext.options,
@@ -225,36 +247,46 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                         emitESM: true,
                         entries: esmAndCjsEntries,
                         minify,
+                        rollup: {
+                            ...environmentRuntimeContext.options.rollup,
+                            replace: environmentRuntimeContext.options.rollup.replace
+                                ? {
+                                      ...environmentRuntimeContext.options.rollup.replace,
+                                      values: {
+                                          ...environmentRuntimeContext.options.rollup.replace.values,
+                                          ...replaceValues,
+                                      },
+                                  }
+                                : false,
+                        },
                     },
                 };
 
                 if (!context.options.dtsOnly) {
-                    rollups.push(rollupBuild(adjustedEsmAndCjsContext, fileCache, subDirectory));
+                    builders.add({ context: adjustedEsmAndCjsContext, fileCache, subDirectory });
                 }
 
                 if (context.options.declaration) {
                     const typedEntries = adjustedEsmAndCjsContext.options.entries.filter((entry) => entry.declaration);
 
                     if (typedEntries.length > 0) {
-                        rollups.push(
-                            rollupBuildTypes(
-                                {
-                                    ...adjustedEsmAndCjsContext,
-                                    options: {
-                                        ...adjustedEsmAndCjsContext.options,
-                                        entries: typedEntries,
-                                    },
+                        typeBuilders.add({
+                            context: {
+                                ...adjustedEsmAndCjsContext,
+                                options: {
+                                    ...adjustedEsmAndCjsContext.options,
+                                    entries: typedEntries,
                                 },
-                                fileCache,
-                                subDirectory,
-                            ),
-                        );
+                            },
+                            fileCache,
+                            subDirectory,
+                        });
                     }
                 }
             }
 
             if (esmEntries.length > 0) {
-                const adjustedEsmContext = {
+                const adjustedEsmContext: BuildContext = {
                     ...environmentRuntimeContext,
                     options: {
                         ...environmentRuntimeContext.options,
@@ -262,36 +294,46 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                         emitESM: true,
                         entries: esmEntries,
                         minify,
+                        rollup: {
+                            ...environmentRuntimeContext.options.rollup,
+                            replace: environmentRuntimeContext.options.rollup.replace
+                                ? {
+                                      ...environmentRuntimeContext.options.rollup.replace,
+                                      values: {
+                                          ...environmentRuntimeContext.options.rollup.replace.values,
+                                          ...replaceValues,
+                                      },
+                                  }
+                                : false,
+                        },
                     },
                 };
 
                 if (!context.options.dtsOnly) {
-                    rollups.push(rollupBuild(adjustedEsmContext, fileCache, subDirectory));
+                    builders.add({ context: adjustedEsmContext, fileCache, subDirectory });
                 }
 
                 if (context.options.declaration) {
                     const typedEntries = adjustedEsmContext.options.entries.filter((entry) => entry.declaration);
 
                     if (typedEntries.length > 0) {
-                        rollups.push(
-                            rollupBuildTypes(
-                                {
-                                    ...adjustedEsmContext,
-                                    options: {
-                                        ...adjustedEsmContext.options,
-                                        entries: typedEntries,
-                                    },
+                        typeBuilders.add({
+                            context: {
+                                ...adjustedEsmContext,
+                                options: {
+                                    ...adjustedEsmContext.options,
+                                    entries: typedEntries,
                                 },
-                                fileCache,
-                                subDirectory,
-                            ),
-                        );
+                            },
+                            fileCache,
+                            subDirectory,
+                        });
                     }
                 }
             }
 
             if (cjsEntries.length > 0) {
-                const adjustedCjsContext = {
+                const adjustedCjsContext: BuildContext = {
                     ...environmentRuntimeContext,
                     options: {
                         ...environmentRuntimeContext.options,
@@ -299,63 +341,93 @@ const prepareRollupConfig = (context: BuildContext, fileCache: FileCache): Promi
                         emitESM: false,
                         entries: cjsEntries,
                         minify,
+                        rollup: {
+                            ...environmentRuntimeContext.options.rollup,
+                            replace: environmentRuntimeContext.options.rollup.replace
+                                ? {
+                                      ...environmentRuntimeContext.options.rollup.replace,
+                                      values: {
+                                          ...environmentRuntimeContext.options.rollup.replace.values,
+                                          ...replaceValues,
+                                      },
+                                  }
+                                : false,
+                        },
                     },
                 };
 
                 if (!context.options.dtsOnly) {
-                    rollups.push(rollupBuild(adjustedCjsContext, fileCache, subDirectory));
+                    builders.add({ context: adjustedCjsContext, fileCache, subDirectory });
                 }
 
                 if (context.options.declaration) {
                     const typedEntries = adjustedCjsContext.options.entries.filter((entry) => entry.declaration);
 
                     if (typedEntries.length > 0) {
-                        rollups.push(
-                            rollupBuildTypes(
-                                {
-                                    ...adjustedCjsContext,
-                                    options: {
-                                        ...adjustedCjsContext.options,
-                                        entries: typedEntries,
-                                    },
+                        typeBuilders.add({
+                            context: {
+                                ...adjustedCjsContext,
+                                options: {
+                                    ...adjustedCjsContext.options,
+                                    entries: typedEntries,
                                 },
-                                fileCache,
-                                subDirectory,
-                            ),
-                        );
+                            },
+                            fileCache,
+                            subDirectory,
+                        });
                     }
                 }
             }
 
             if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
-                const adjustedCjsContext = {
-                    ...environmentRuntimeContext,
-                    options: {
-                        ...environmentRuntimeContext.options,
-                        emitCJS: false,
-                        emitESM: false,
-                        entries: dtsEntries,
-                        minify,
+                typeBuilders.add({
+                    context: {
+                        ...environmentRuntimeContext,
+                        options: {
+                            ...environmentRuntimeContext.options,
+                            emitCJS: false,
+                            emitESM: false,
+                            entries: dtsEntries,
+                            minify,
+                            rollup: {
+                                ...environmentRuntimeContext.options.rollup,
+                                replace: environmentRuntimeContext.options.rollup.replace
+                                    ? {
+                                          ...environmentRuntimeContext.options.rollup.replace,
+                                          values: {
+                                              ...environmentRuntimeContext.options.rollup.replace.values,
+                                              ...replaceValues,
+                                          },
+                                      }
+                                    : false,
+                            },
+                        },
                     },
-                };
-
-                rollups.push(rollupBuildTypes(adjustedCjsContext, fileCache, subDirectory));
+                    fileCache,
+                    subDirectory,
+                });
             }
         }
     }
 
-    return rollups.filter(Boolean);
+    return { builders, typeBuilders };
 };
 
 const build = async (context: BuildContext, fileCache: FileCache): Promise<boolean> => {
     await context.hooks.callHook("build:before", context);
 
-    await Promise.all(prepareRollupConfig(context, fileCache));
+    const { builders, typeBuilders } = prepareRollupConfig(context, fileCache);
+
+    await Promise.all(
+        [...builders].map(async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuild(rollupContext, cache, subDirectory)),
+    );
+    await Promise.all(
+        [...typeBuilders].map(async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuildTypes(rollupContext, cache, subDirectory)),
+    );
 
     context.logger.success(green(context.options.name ? "Build succeeded for " + context.options.name : "Build succeeded"));
 
     // Find all dist files and add missing entries as chunks
-
     for await (const file of walk(join(context.options.rootDir, context.options.outDir))) {
         let entry = context.buildEntries.find((bEntry) => join(context.options.rootDir, context.options.outDir, bEntry.path) === file.path);
 

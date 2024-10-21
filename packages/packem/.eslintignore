@@ -1,17 +1,20 @@
+# Build output and dependencies
 dist
 node_modules
 coverage
 
-recipes
+# Test and documentation
 __fixtures__
 __bench__
 
+# Configuration files
 vitest.config.ts
 .prettierrc.cjs
 .eslintrc.cjs
 .secretlintrc.cjs
 _meta.*.json
 
+# Documentation
 LICENSE.md
 README.md
 CHANGELOG.md

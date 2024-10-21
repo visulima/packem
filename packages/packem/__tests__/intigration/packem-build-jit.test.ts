@@ -31,9 +31,8 @@ describe("packem build --jit", () => {
             },
             main: "./dist/index.cjs",
         });
-        await createPackemConfig(
-            temporaryDirectoryPath,
-            `rollup: {
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: `rollup: {
         plugins: [
             {
                 before: "packem:esbuild",
@@ -53,9 +52,9 @@ describe("packem build --jit", () => {
                     name: "packem:test-plugin:after"
                 }
             }
-        ]
+        ],
 }`,
-        );
+        });
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,

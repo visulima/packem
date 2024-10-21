@@ -21,7 +21,7 @@
             "inputs": ["default", "{workspaceRoot}/.eslintrc.cjs", "{workspaceRoot}/.eslintrc.js"],
             "cache": true
         },
-        "lint:packagejson": {
+        "lint:package-json": {
             "dependsOn": ["default"],
             "cache": true
         },

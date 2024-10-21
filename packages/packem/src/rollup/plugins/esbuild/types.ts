@@ -8,7 +8,8 @@
 import type { FilterPattern } from "@rollup/pluginutils";
 import type { Pail } from "@visulima/pail";
 import type { BuildOptions as EsbuildOptions, Loader, TransformOptions } from "esbuild";
-import type { MarkOptional } from "ts-essentials";
+
+type MarkOptional<Type, Keys extends keyof Type> = Type extends Type ? Omit<Type, Keys> & Partial<Pick<Type, Keys>> : never;
 
 export type Options = {
     exclude?: FilterPattern;

@@ -38,7 +38,7 @@ console.log('Hello, world!');
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
         createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
@@ -81,10 +81,12 @@ console.log('Hello, world!');
             module: "./dist/index.mjs",
         });
         await createPackemConfig(temporaryDirectoryPath, {
-            rollup: {
-                shebang: {
-                    replace: true,
-                    shebang: customShebang,
+            config: {
+                rollup: {
+                    shebang: {
+                        replace: true,
+                        shebang: customShebang,
+                    },
                 },
             },
         });
@@ -134,7 +136,7 @@ export { getNodeSheBang };
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
         createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
@@ -181,7 +183,7 @@ export { getNodeSheBang };
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
         createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
@@ -219,7 +221,7 @@ for (let i = 0; i < 10; i++) { console.log('🦄');}`,
             main: "./dist/index.cjs",
             module: "./dist/index.mjs",
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
         createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {

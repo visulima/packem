@@ -44,9 +44,11 @@ export default log();`,
         });
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
         await createPackemConfig(temporaryDirectoryPath, {
-            alias: {
-                "@": resolve(temporaryDirectoryPath, "src"),
-                "@test2/abc": resolve(temporaryDirectoryPath, "src", "test2", "foo"),
+            config: {
+                alias: {
+                    "@": resolve(temporaryDirectoryPath, "src"),
+                    "@test2/abc": resolve(temporaryDirectoryPath, "src", "test2", "foo"),
+                },
             },
         });
 
@@ -88,8 +90,10 @@ export default log();`,
         });
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
         await createPackemConfig(temporaryDirectoryPath, {
-            alias: {
-                [alias + "/"]: resolve(temporaryDirectoryPath, "src"),
+            config: {
+                alias: {
+                    [alias + "/"]: resolve(temporaryDirectoryPath, "src"),
+                },
             },
         });
 

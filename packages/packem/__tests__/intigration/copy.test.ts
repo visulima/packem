@@ -29,9 +29,11 @@ describe("packem copy", () => {
             type: "module",
         });
         await createPackemConfig(temporaryDirectoryPath, {
-            rollup: {
-                copy: {
-                    targets: "assets/*",
+            config: {
+                rollup: {
+                    copy: {
+                        targets: "assets/*",
+                    },
                 },
             },
         });
