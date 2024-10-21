@@ -91,6 +91,10 @@ jobs:
               id: "setSHAs"
               uses: "nrwl/nx-set-shas@be2a36618456ad6f3abf921eb24900817da1af6b" # v4
 
+            - name: "Remove node-sass from unsupported node versions"
+              if: "matrix.os == 'macos-latest' || matrix.node_version != '18' || matrix.node_version != '20'"
+              run: "pnpm remove --filter packem node-sass"
+
             - name: "Setup resources and environment"
               id: "setup"
               uses: "anolilab/workflows/step/setup@main"
@@ -105,10 +109,6 @@ jobs:
                   files_ignore_from_source_file: ".github/ignore-files-for-nx-affected.yml"
                   base_sha: "${{ steps.setSHAs.outputs.base }}"
                   separator: ","
-
-            - name: "Remove node-sass from unsupported node versions"
-              if: "matrix.os == 'macos-latest' || matrix.node_version != '18' || matrix.node_version != '20'"
-              run: "pnpm remove --filter packem node-sass"
 
             - name: "Build"
               shell: "bash"

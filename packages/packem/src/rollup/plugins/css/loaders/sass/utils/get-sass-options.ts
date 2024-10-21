@@ -5,8 +5,7 @@ import type { Importer as NodeSassImporter, Options as NodeSassOptions } from "n
 import type { PluginContext } from "rollup";
 import type { Importer, SourceSpan, StringOptions } from "sass";
 
-import type { SassLoaderContext, SassLoaderOptions } from "..";
-import type { SassApiType } from "../types";
+import type { SassApiType, SassLoaderContext, SassLoaderOptions } from "../types";
 import resolveSyntax from "./resolve-syntax";
 
 /**

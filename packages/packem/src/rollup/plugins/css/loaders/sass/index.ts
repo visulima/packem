@@ -9,15 +9,13 @@ import { fileURLToPath } from "node:url";
 
 import { isAbsolute, normalize } from "@visulima/path";
 import type { Result as NodeSassResult, SyncImporter as NodeSassSyncImporter, SyncOptions as NodeSassSyncOptions } from "node-sass";
-import type { CompileResult, StringOptions as SassStringOptions } from "sass";
-import type { StringOptions as SassEmbeddedStringOptions } from "sass-embedded";
+import type { CompileResult } from "sass";
 import type { RawSourceMap } from "source-map-js";
 
-import type { Environment } from "../../../../../types";
 import type { Loader } from "../types";
 import legacyImporter from "./legacy/importer";
 import modernImporter from "./modern/importer";
-import type { SassApiType } from "./types";
+import type { SassApiType, SassLoaderOptions } from "./types";
 import getCompileFunction from "./utils/get-compile-function";
 import { getDefaultSassImplementation, getSassImplementation } from "./utils/get-sass-implementation";
 import getSassOptions from "./utils/get-sass-options";
@@ -135,25 +133,6 @@ const loader: Loader<SassLoaderOptions> = {
     },
     test: /\.(sass|scss)$/i,
 };
-
-export type SassLoaderContext = {
-    environment: Environment;
-    resourcePath: string;
-    rootContext: string;
-};
-
-export type SassLoaderOptions = {
-    additionalData:
-        | string
-        | ((content: string | Buffer, loaderContext: SassLoaderContext) => string)
-        | ((content: string | Buffer, loaderContext: SassLoaderContext) => Promise<string>);
-    implementation?: "sass-embedded" | "sass" | "node-sass";
-    warnRuleAsWarning?: boolean;
-} & (
-    | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">
-    | Omit<SassEmbeddedStringOptions<"sync">, "charset" | "indentedSyntax">
-    | Omit<NodeSassSyncOptions, "data" | "sourceMapContents" | "sourceMapEmbed" | "sourceMapRoot" | "outFile">
-);
 
 // eslint-disable-next-line import/no-unused-modules
 export default loader;

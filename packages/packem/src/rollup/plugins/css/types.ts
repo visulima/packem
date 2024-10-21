@@ -3,12 +3,12 @@ import type { CustomAtRules, TransformOptions } from "lightningcss";
 import type { AcceptedPlugin, PluginCreator } from "postcss";
 import type { Config as PostCSSConfig } from "postcss-load-config";
 
-import type { LESSLoaderOptions } from "./loaders/less";
+import type { LESSLoaderOptions } from "./loaders/less/types";
 import type { ImportOptions } from "./loaders/postcss/import/types";
 import type { ModulesOptions } from "./loaders/postcss/modules";
 import type { UrlOptions } from "./loaders/postcss/url";
-import type { SassLoaderOptions } from "./loaders/sass";
-import type { StylusLoaderOptions } from "./loaders/stylus";
+import type { SassLoaderOptions } from "./loaders/sass/types";
+import type { StylusLoaderOptions } from "./loaders/stylus/types";
 import type { Loader, SourceMapOptions } from "./loaders/types";
 import type { Minifier } from "./minifiers/types";
 

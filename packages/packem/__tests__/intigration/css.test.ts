@@ -6,8 +6,8 @@ import { dirname, join } from "@visulima/path";
 import type { OutputOptions } from "rollup";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import packageJson from "../../package.json";
 
+import packageJson from "../../package.json";
 import type { LESSLoaderOptions } from "../../src/rollup/plugins/css/loaders/less";
 import type { StyleOptions } from "../../src/rollup/plugins/css/types";
 import { inferModeOption, inferSourceMapOption } from "../../src/rollup/plugins/css/utils/options";
@@ -145,9 +145,8 @@ describe("css", () => {
 
         const distributionPath = join(temporaryDirectoryPath, "dist");
 
-        const files =
+        const files = // eslint-disable-next-line security/detect-non-literal-fs-filename
         (
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
             await readdir(distributionPath, {
                 recursive: true,
                 withFileTypes: true,

@@ -21,7 +21,7 @@
         "lint:affected:attw": "nx affected --target=lint:attw --parallel --exclude=*-bench,docs,storybook --nxBail",
         "lint:affected:eslint": "nx affected --target=lint:eslint --parallel --exclude=*-bench,docs,examples_* --nxBail",
         "lint:affected:eslint:fix": "nx affected --target=lint:eslint:fix --parallel --exclude=*-bench,docs,examples_* --nxBail",
-        "lint:affected:package-json": "nx affected --target=lint:packagejson --parallel --exclude=*-bench,docs,examples_* --nxBail",
+        "lint:affected:package-json": "nx affected --target=lint:package-json --parallel --exclude=*-bench,docs,examples_* --nxBail",
         "lint:affected:types": "nx affected --target=lint:types --parallel --exclude=*-bench,docs,examples_* --nxBail",
         "lint:attw": "nx run-many --target=lint:attw --all --parallel",
         "lint:eslint": "nx run-many --target=lint:eslint --all --parallel",

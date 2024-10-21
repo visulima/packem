@@ -3,6 +3,7 @@ import less from "less";
 
 import type { Loader } from "../types";
 import importer from "./importer";
+import type { LESSLoaderOptions } from "./types";
 
 const loader: Loader<LESSLoaderOptions> = {
     name: "less",
@@ -34,8 +35,6 @@ const loader: Loader<LESSLoaderOptions> = {
     },
     test: /\.less$/i,
 };
-
-export interface LESSLoaderOptions extends Record<string, unknown>, Less.Options {}
 
 // eslint-disable-next-line import/no-unused-modules
 export default loader;

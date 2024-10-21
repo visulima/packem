@@ -3,11 +3,11 @@ import { existsSync } from "node:fs";
 import { readFileSync } from "@visulima/fs";
 import { dirname, join, normalize } from "@visulima/path";
 import type { RawSourceMap } from "source-map-js";
-import type { RenderOptions } from "stylus";
 import stylus from "stylus";
 
-import { mm } from "../utils/sourcemap";
-import type { Loader } from "./types";
+import { mm } from "../../utils/sourcemap";
+import type { Loader } from "../types";
+import type { StylusLoaderOptions } from "./types";
 
 const populateSourcemapContent = async (sourcemap: RawSourceMap, basePath: string): Promise<string[] | undefined> => {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -79,8 +79,6 @@ const loader: Loader<StylusLoaderOptions> = {
     },
     test: /\.(styl|stylus)$/i,
 };
-
-export interface StylusLoaderOptions extends Record<string, unknown>, RenderOptions {}
 
 // eslint-disable-next-line import/no-unused-modules
 export default loader;
