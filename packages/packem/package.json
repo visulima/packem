@@ -31,7 +31,19 @@
         "zero config",
         "tsup",
         "unbuild",
-        "bunchee"
+        "bunchee",
+        "css-modules",
+        "sass",
+        "less",
+        "stylus",
+        "postcss",
+        "cssnano",
+        "lightningcss",
+        "css minifier",
+        "css minifiers",
+        "css loader",
+        "css loaders",
+        "css runtime"
     ],
     "homepage": "https://www.visulima.com/docs/package/packem",
     "bugs": "https://github.com/visulima/packem/issues",
@@ -148,6 +160,96 @@
                 "default": "./dist/builder/typedoc/index.cjs"
             }
         },
+        "./runtime/inject-css": {
+            "import": {
+                "types": "./dist/rollup/plugins/css/runtime/inject-css.d.mts",
+                "default": "./dist/rollup/plugins/css/runtime/inject-css.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/css/runtime/inject-css.d.cts",
+                "default": "./dist/rollup/plugins/css/runtime/inject-css.cjs"
+            }
+        },
+        "./css/loader/sourcemap": {
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/sourcemap.cjs"
+            },
+            "import": {
+                "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.mts",
+                "default": "./dist/rollup/plugins/css/loaders/sourcemap.mjs"
+            }
+        },
+        "./css/loader/less": {
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/less/index.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/less/index.cjs"
+            },
+            "import": {
+                "types": "./dist/rollup/plugins/css/loaders/less/index.d.mts",
+                "default": "./dist/rollup/plugins/css/loaders/less/index.mjs"
+            }
+        },
+        "./css/loader/postcss": {
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/postcss/index.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/postcss/index.cjs"
+            },
+            "import": {
+                "types": "./dist/rollup/plugins/css/loaders/postcss/index.d.mts",
+                "default": "./dist/rollup/plugins/css/loaders/postcss/index.mjs"
+            }
+        },
+        "./css/loader/sass": {
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/sass/index.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/sass/index.cjs"
+            },
+            "import": {
+                "types": "./dist/rollup/plugins/css/loaders/sass/index.d.mts",
+                "default": "./dist/rollup/plugins/css/loaders/sass/index.mjs"
+            }
+        },
+        "./css/loader/stylus": {
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/stylus/index.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/stylus/index.cjs"
+            },
+            "import": {
+                "types": "./dist/rollup/plugins/css/loaders/stylus/index.d.mts",
+                "default": "./dist/rollup/plugins/css/loaders/stylus/index.mjs"
+            }
+        },
+        "./css/loader/lightningcss": {
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/lightningcss.cjs"
+            },
+            "import": {
+                "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.mts",
+                "default": "./dist/rollup/plugins/css/loaders/lightningcss.mjs"
+            }
+        },
+        "./css/minifier/cssnano": {
+            "require": {
+                "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.cts",
+                "default": "./dist/rollup/plugins/css/minifiers/cssnano.cjs"
+            },
+            "import": {
+                "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.mts",
+                "default": "./dist/rollup/plugins/css/minifiers/cssnano.mjs"
+            }
+        },
+        "./css/minifier/lightningcss": {
+            "require": {
+                "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.cts",
+                "default": "./dist/rollup/plugins/css/minifiers/lightningcss.cjs"
+            },
+            "import": {
+                "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.mts",
+                "default": "./dist/rollup/plugins/css/minifiers/lightningcss.mjs"
+            }
+        },
         "./package.json": "./package.json"
     },
     "main": "dist/packem.cjs",
@@ -181,6 +283,33 @@
             ],
             "builder/typedoc": [
                 "./dist/builder/typedoc/index.d.ts"
+            ],
+            "runtime/inject-css": [
+                "./dist/rollup/plugins/css/runtime/inject-css.d.ts"
+            ],
+            "css/loader/sourcemap": [
+                "./dist/rollup/plugins/css/loaders/sourcemap.d.ts"
+            ],
+            "css/loader/less": [
+                "./dist/rollup/plugins/css/loaders/less/index.d.ts"
+            ],
+            "css/loader/postcss": [
+                "./dist/rollup/plugins/css/loaders/postcss/index.d.ts"
+            ],
+            "css/loader/sass": [
+                "./dist/rollup/plugins/css/loaders/sass/index.d.ts"
+            ],
+            "css/loader/stylus": [
+                "./dist/rollup/plugins/css/loaders/stylus/index.d.ts"
+            ],
+            "css/loader/lightningcss": [
+                "./dist/rollup/plugins/css/loaders/lightningcss.d.ts"
+            ],
+            "css/minifier/cssnano": [
+                "./dist/rollup/plugins/css/minifiers/cssnano.d.ts"
+            ],
+            "css/minifier/lightningcss": [
+                "./dist/rollup/plugins/css/minifiers/lightningcss.d.ts"
             ]
         }
     },
@@ -202,7 +331,7 @@
         "lint:eslint": "eslint . --ext js,cjs,mjs,jsx,ts,tsx,json,yaml,yml,md,mdx --max-warnings=0 --config .eslintrc.cjs",
         "lint:eslint:fix": "eslint . --ext js,cjs,mjs,jsx,ts,tsx,json,yaml,yml,md,mdx --max-warnings=0 --config .eslintrc.cjs --fix",
         "lint:fix": "pnpm run lint:prettier:fix && pnpm run lint:eslint:fix",
-        "lint:packagejson": "publint --strict",
+        "lint:package-json": "publint --strict",
         "lint:prettier": "prettier --config=.prettierrc.cjs --check .",
         "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
         "lint:types": "tsc --noEmit",
@@ -215,6 +344,9 @@
         "@antfu/install-pkg": "0.4.1",
         "@babel/parser": "7.26.2",
         "@clack/prompts": "0.7.0",
+        "@csstools/css-parser-algorithms": "3.0.2",
+        "@csstools/css-tokenizer": "3.0.2",
+        "@csstools/postcss-slow-plugins": "^2.0.0",
         "@rollup/plugin-alias": "5.1.1",
         "@rollup/plugin-commonjs": "28.0.1",
         "@rollup/plugin-dynamic-import-vars": "2.1.5",
@@ -233,6 +365,7 @@
         "@visulima/pail": "2.1.11",
         "@visulima/path": "1.1.1",
         "@visulima/tsconfig": "1.1.1",
+        "browserslist": "4.24.0",
         "defu": "6.1.4",
         "es-module-lexer": "1.5.4",
         "fastest-levenshtein": "1.0.16",
@@ -240,8 +373,10 @@
         "hookable": "5.5.3",
         "jiti": "2.4.0",
         "magic-string": "0.30.12",
+        "mime-types": "2.1.35",
         "mlly": "1.7.2",
         "oxc-parser": "0.33.0",
+        "oxc-resolver": "1.12.0",
         "rollup": "4.24.4",
         "rollup-plugin-dts": "6.1.1",
         "rollup-plugin-license": "3.5.3",
@@ -249,7 +384,11 @@
         "rollup-plugin-visualizer": "5.12.0",
         "semver": "7.6.3",
         "tinyexec": "0.3.1",
-        "tinyglobby": "0.2.10"
+        "source-map-js": "1.2.1",
+        "tinyglobby": "0.2.10",
+        "typedoc": "0.26.10",
+        "typedoc-plugin-markdown": "4.2.9",
+        "typedoc-plugin-rename-defaults": "0.7.1"
     },
     "devDependencies": {
         "@anolilab/eslint-config": "^15.0.3",
@@ -267,15 +406,24 @@
         "@types/estree": "^1.0.6",
         "@types/glob": "^8.1.0",
         "@types/glob-parent": "^5.1.3",
+        "@types/icss-utils": "^5.1.2",
         "@types/is-glob": "^4.0.4",
+        "@types/less": "3.0.6",
+        "@types/mime-types": "^2.1.4",
         "@types/node": "18.19.64",
+        "@types/node-sass": "^4.11.7",
+        "@types/postcss-modules-local-by-default": "^4.0.2",
+        "@types/postcss-modules-scope": "^3.0.4",
         "@types/react": "^18.3.12",
         "@types/react-dom": "^18.3.1",
         "@types/semver": "^7.5.8",
+        "@types/stylus": "^0.48.43",
+        "@types/uglifycss": "^0.0.11",
         "@vitest/coverage-v8": "^2.1.4",
         "@vitest/ui": "^2.1.4",
         "conventional-changelog-conventionalcommits": "8.0.0",
         "cross-env": "^7.0.3",
+        "cssnano": "7.0.6",
         "detect-indent": "^7.0.1",
         "esbuild": "^0.24.0",
         "eslint": "8.57.1",
@@ -287,15 +435,35 @@
         "eslint-plugin-vitest-globals": "^1.5.0",
         "estree-walker": "^3.0.3",
         "execa": "^9.5.1",
+        "icss-utils": "^5.1.0",
+        "less": "^4.2.0",
+        "lightningcss": "1.27.0",
+        "minireset.css": "0.0.7",
+        "node-sass": "^9.0.0",
         "oxc-transform": "^0.33.0",
+        "p-queue": "^8.0.1",
+        "postcss": "^8.4.47",
+        "postcss-custom-properties": "14.0.2",
+        "postcss-load-config": "^6.0.1",
+        "postcss-modules": "6.0.0",
+        "postcss-modules-extract-imports": "^3.1.0",
+        "postcss-modules-local-by-default": "^4.0.5",
+        "postcss-modules-scope": "^3.2.0",
+        "postcss-modules-values": "^4.0.0",
+        "postcss-value-parser": "^4.2.0",
         "prettier": "^3.3.3",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "rimraf": "^6.0.1",
+        "rollup-plugin-lit-css": "^5.0.1",
+        "sass": "^1.80.3",
+        "sass-embedded": "^1.80.3",
         "secretlint": "9.0.0",
         "semantic-release": "^24.2.0",
         "sort-package-json": "^2.10.1",
+        "stylus": "^0.64.0",
         "sucrase": "^3.35.0",
+        "sugarss": "4.0.1",
         "tempy": "^3.1.0",
         "tree-kill": "^1.2.2",
         "typedoc": "0.26.11",
@@ -305,14 +473,31 @@
         "vitest": "^2.1.4"
     },
     "peerDependencies": {
-        "@ckeditor/typedoc-plugins": "44.2.1",
-        "@swc/core": "^1.7.40",
-        "esbuild": "^0.20.2 || ^0.21.3 || ^0.24.0",
-        "oxc-transform": "^0.33.0",
-        "sucrase": "^3.35.0",
+        "@ckeditor/typedoc-plugins": ">=44.0.0",
+        "@swc/core": ">=1.5.7",
+        "cssnano": ">=7.0.6",
+        "esbuild": ">=0.20.2",
+        "icss-utils": ">=5.1.0",
+        "less": ">=4.2.0",
+        "lightningcss": ">=1.27.0",
+        "node-sass": ">=9.0.0",
+        "oxc-transform": ">=0.20.0",
         "typedoc": "0.26.10",
         "typedoc-plugin-markdown": "4.2.9",
         "typedoc-plugin-rename-defaults": "0.7.1",
+        "typescript": "^4.5 || ^5.0",
+        "postcss": ">=8.4.38",
+        "postcss-load-config": ">=6.0.1",
+        "postcss-modules": ">=6.0.0",
+        "postcss-modules-extract-imports": ">=3.1.0",
+        "postcss-modules-local-by-default": ">=4.0.5",
+        "postcss-modules-scope": ">=3.2.0",
+        "postcss-modules-values": ">=4.0.0",
+        "postcss-value-parser": ">=4.2.0",
+        "sass": ">=1.43.4",
+        "sass-embedded": ">=1.79.4",
+        "stylus": ">=0.63.0",
+        "sucrase": ">=3.35.0",
         "typescript": "^4.5 || ^5.0"
     },
     "peerDependenciesMeta": {
@@ -322,10 +507,58 @@
         "@swc/core": {
             "optional": true
         },
+        "cssnano": {
+            "optional": true
+        },
         "esbuild": {
             "optional": true
         },
+        "icss-utils": {
+            "optional": true
+        },
+        "less": {
+            "optional": true
+        },
+        "lightningcss": {
+            "optional": true
+        },
+        "node-sass": {
+            "optional": true
+        },
         "oxc-transform": {
+            "optional": true
+        },
+        "postcss": {
+            "optional": true
+        },
+        "postcss-load-config": {
+            "optional": true
+        },
+        "postcss-modules": {
+            "optional": true
+        },
+        "postcss-modules-extract-imports": {
+            "optional": true
+        },
+        "postcss-modules-local-by-default": {
+            "optional": true
+        },
+        "postcss-modules-scope": {
+            "optional": true
+        },
+        "postcss-modules-values": {
+            "optional": true
+        },
+        "postcss-value-parser": {
+            "optional": true
+        },
+        "sass": {
+            "optional": true
+        },
+        "sass-embedded": {
+            "optional": true
+        },
+        "stylus": {
             "optional": true
         },
         "sucrase": {
@@ -345,7 +578,7 @@
         }
     },
     "engines": {
-        "node": ">=18.* <=22.*"
+        "node": ">=18.* <=23.*"
     },
     "publishConfig": {
         "access": "public",

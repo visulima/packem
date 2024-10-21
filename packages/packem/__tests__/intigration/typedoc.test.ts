@@ -64,9 +64,11 @@ export const factorial = (n: number): number => {
         });
 
         await createPackemConfig(temporaryDirectoryPath, {
-            typedoc: {
-                format: "inline",
-                readmePath: "./README.md",
+            config: {
+                typedoc: {
+                    format: "inline",
+                    readmePath: "./README.md",
+                },
             },
         });
 
