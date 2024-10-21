@@ -8,7 +8,7 @@ import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import packageJson from "../../package.json";
-import type { LESSLoaderOptions } from "../../src/rollup/plugins/css/loaders/less";
+import type { LESSLoaderOptions } from "../../src/rollup/plugins/css/loaders/less/types";
 import type { StyleOptions } from "../../src/rollup/plugins/css/types";
 import { inferModeOption, inferSourceMapOption } from "../../src/rollup/plugins/css/utils/options";
 import type { PackemConfigProperties } from "../helpers";
@@ -145,14 +145,13 @@ describe("css", () => {
 
         const distributionPath = join(temporaryDirectoryPath, "dist");
 
-        const files = // eslint-disable-next-line security/detect-non-literal-fs-filename
-        (
-            await readdir(distributionPath, {
-                recursive: true,
-                withFileTypes: true,
-            })
-        )
-            // eslint-disable-next-line unicorn/no-await-expression-member
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        let files = await readdir(distributionPath, {
+            recursive: true,
+            withFileTypes: true,
+        });
+
+        files = files
             .filter((dirent) => dirent.isFile())
             // @TODO: Change this readdir to @visulima/fs readdir
             // eslint-disable-next-line deprecation/deprecation
