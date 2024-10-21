@@ -33,7 +33,7 @@ describe("packem node exports", () => {
                 type: "commonjs",
                 types: "./dist/index.d.ts",
             });
-            await createPackemConfig(temporaryDirectoryPath, {});
+            await createPackemConfig(temporaryDirectoryPath);
             createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
             const binProcess = await execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
@@ -107,7 +107,7 @@ export { test2, test as default };`,
                 type: "commonjs",
                 types: "./dist/index.d.ts",
             });
-            await createPackemConfig(temporaryDirectoryPath, {});
+            await createPackemConfig(temporaryDirectoryPath);
             createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
             const binProcess = await execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
@@ -164,7 +164,7 @@ export { test2, test3, test4, test5, test as default };`,
                 type: "commonjs",
                 types: "./dist/index.d.ts",
             });
-            await createPackemConfig(temporaryDirectoryPath, {});
+            await createPackemConfig(temporaryDirectoryPath);
             createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
             const binProcess = await execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
@@ -211,7 +211,7 @@ export { test2, test3, test4, test5, test as default };`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = await execPackemSync("build", [], {
@@ -273,7 +273,7 @@ export { test as default };
             type: "commonjs",
             types: "./dist/test/index.d.ts",
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = await execPackemSync("build", [], {
@@ -351,7 +351,7 @@ export default a + b
                 },
             },
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = await execPackemSync("build", [], {
@@ -394,7 +394,7 @@ export const indent = dIndent;
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
         createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 moduleResolution: "bundler",
@@ -448,7 +448,7 @@ export const value = dep
                 "#dep": "./src/lib/polyfill.js",
             },
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -508,7 +508,7 @@ export class Child extends Parent {
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
         createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
@@ -575,7 +575,7 @@ export class Child extends Parent {
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
         createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", ["--env NODE_ENV=production", "--minify"], {
@@ -635,7 +635,7 @@ export class Child extends Parent {
                 },
             },
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
         createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = await execPackemSync("build", [], {

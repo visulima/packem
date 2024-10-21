@@ -64,7 +64,7 @@ module.exports = {
             },
         },
         {
-            files: ["create-bundler.ts"],
+            files: ["create-bundler.ts", "src/rollup/plugins/css/types/*"],
             rules: {
                 "import/no-unused-modules": "off",
             },

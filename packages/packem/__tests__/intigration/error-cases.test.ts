@@ -13,7 +13,7 @@ describe("packem error cases", () => {
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
 
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
     });
 
     afterEach(async () => {

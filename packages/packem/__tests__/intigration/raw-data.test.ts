@@ -12,7 +12,7 @@ describe("packem raw data", () => {
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
 
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
     });
 
     afterEach(async () => {
