@@ -64,7 +64,7 @@ module.exports = {
             },
         },
         {
-            files: ["packem.ts"],
+            files: ["packem.ts", "src/rollup/plugins/css/types/*"],
             rules: {
                 "import/no-unused-modules": "off",
             },

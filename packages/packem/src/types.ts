@@ -18,6 +18,7 @@ import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
 import type { CJSInteropOptions } from "./rollup/plugins/cjs-interop";
 import type { CopyPluginOptions } from "./rollup/plugins/copy";
+import type { StyleOptions } from "./rollup/plugins/css/types";
 import type { EsbuildPluginConfig, Options as EsbuildOptions } from "./rollup/plugins/esbuild/types";
 import type { EsmShimCjsSyntaxOptions } from "./rollup/plugins/esm-shim-cjs-syntax";
 import type { IsolatedDeclarationsOptions } from "./rollup/plugins/isolated-declarations";
@@ -107,6 +108,7 @@ export interface RollupBuildOptions {
     cjsInterop?: CJSInteropOptions;
     commonjs: RollupCommonJSOptions | false;
     copy?: CopyPluginOptions | false;
+    css?: StyleOptions | false;
     dts: RollupDtsOptions;
     dynamicVars?: RollupDynamicImportVariablesOptions | false;
     esbuild: EsbuildOptions | false;
@@ -183,6 +185,7 @@ export interface BuildOptions {
     alias: Record<string, string>;
     analyze?: boolean;
     builder?: Record<string, (context: BuildContext, cachePath: string | undefined, fileCache: FileCache, logged: boolean) => Promise<void>>;
+    browserTargets?: string[];
     cjsInterop?: boolean;
     clean: boolean;
     debug: boolean;
@@ -328,3 +331,8 @@ export interface IsolatedDeclarationsResult {
     errors: string[];
     sourceText: string;
 }
+
+// eslint-disable-next-line import/no-unused-modules
+export type { PostCSSMeta } from "./rollup/plugins/css/loaders/types";
+// eslint-disable-next-line import/no-unused-modules
+export type { InjectOptions, StyleOptions } from "./rollup/plugins/css/types";
