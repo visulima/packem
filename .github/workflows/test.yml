@@ -106,9 +106,9 @@ jobs:
                   base_sha: "${{ steps.setSHAs.outputs.base }}"
                   separator: ","
 
-            - name: "Install node-sass"
-              if: "matrix.os == 'ubuntu-latest' && matrix.node_version == 18"
-              run: "pnpm install --filter packem -D node-sass"
+            - name: "Remove node-sass from unsupported node versions"
+              if: "matrix.os == 'macos-latest' || matrix.node_version != '18' || matrix.node_version != '20'"
+              run: "pnpm remove --filter packem node-sass"
 
             - name: "Build"
               shell: "bash"
