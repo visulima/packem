@@ -61,7 +61,7 @@ jobs:
                   cache-prefix: "semantic-release"
 
             - name: "Build Production"
-              run: "pnpm run build:packages:prod"
+              run: "pnpm run build:prod:packages"
 
             - name: "test and coverage"
               run: "pnpm run test:coverage"
