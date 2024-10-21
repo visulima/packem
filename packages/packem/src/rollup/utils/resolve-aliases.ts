@@ -20,15 +20,15 @@ const resolveAliases = (context: BuildContext, mode: "build" | "jit" | "types"):
                 continue;
             }
 
-            const subpath = imports[alias as keyof PackageJson["imports"]];
+            const subPath = imports[alias as keyof PackageJson["imports"]];
 
-            if (typeof subpath !== "string") {
+            if (typeof subPath !== "string") {
                 // eslint-disable-next-line no-continue
                 continue;
             }
 
             // eslint-disable-next-line security/detect-object-injection
-            aliases[alias] = join(context.options.rootDir, subpath);
+            aliases[alias] = join(context.options.rootDir, subPath);
         }
     }
 

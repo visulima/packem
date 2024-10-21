@@ -1,11 +1,5 @@
 import { createHash } from "node:crypto";
 
-const getHash = (data: string | NodeJS.ArrayBufferView): string => {
-    const hash = createHash("md5");
-
-    hash.update(data);
-
-    return hash.digest("hex");
-};
+const getHash = (data: string | NodeJS.ArrayBufferView): string => createHash("sha256").update(data).digest("hex");
 
 export default getHash;

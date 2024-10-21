@@ -60,9 +60,11 @@ export const data = { dep, devDep };`,
         });
 
         await createPackemConfig(temporaryDirectoryPath, {
-            rollup: {
-                license: {
-                    path: "./LICENSE.md",
+            config: {
+                rollup: {
+                    license: {
+                        path: "./LICENSE.md",
+                    },
                 },
             },
         });
@@ -136,9 +138,11 @@ export const data = { dep, devDep };`,
         });
 
         await createPackemConfig(temporaryDirectoryPath, {
-            rollup: {
-                license: {
-                    path: "./LICENSE.md",
+            config: {
+                rollup: {
+                    license: {
+                        path: "./LICENSE.md",
+                    },
                 },
             },
         });
@@ -254,9 +258,11 @@ export const data = { dep, devDep };`,
         });
 
         await createPackemConfig(temporaryDirectoryPath, {
-            rollup: {
-                license: {
-                    path: "./LICENSE.md",
+            config: {
+                rollup: {
+                    license: {
+                        path: "./LICENSE.md",
+                    },
                 },
             },
         });

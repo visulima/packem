@@ -12,7 +12,7 @@ describe("packem package.json imports", () => {
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
 
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
     });
 
     afterEach(async () => {

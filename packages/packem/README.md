@@ -55,7 +55,7 @@ It uses the `exports` configuration in `package.json` and recognizes entry file 
 -   ✅ ESM ⇄ CJS interoperability
 -   ✅ Supports isolated declaration types (experimental)
 -   ✅ Supports wasm [WebAssembly modules](http://webassembly.org)
--   ✅ Supports css and css modules (coming soon)
+-   ✅ Supports css, [sass](https://github.com/sass/sass), [less](https://github.com/less/less.js), [stylus](https://github.com/stylus/stylus) and Up-to-date [CSS Modules](https://github.com/css-modules/css-modules) (experimental)
 -   ✅ [TypeDoc](https://github.com/TypeStrong/TypeDoc) documentation generation
 
 And more...
@@ -399,8 +399,6 @@ worker = new Worker(new URL("./worker.js", import.meta.url), { type: "module" })
 worker = new Worker("./worker.js", { type: "module" });
 ```
 
-#### CSS and CSS Modules (Coming Soon)
-
 ### Aliases
 
 Aliases can be configured in the [import map](https://nodejs.org/api/packages.html#imports), defined in `package.json#imports`.
@@ -505,6 +503,260 @@ export default defineConfig({
         readmePath: "./README.md",
     },
     // ...
+});
+```
+
+<!-- Modified copy of https://github.com/Anidetrix/rollup-plugin-styles/blob/main/README.md -->
+
+## Css and Css Modules
+
+`packem` supports:
+
+-   [PostCSS](https://github.com/postcss/postcss)
+-   [Sass](https://github.com/sass/sass)
+-   [Less](https://github.com/less/less.js)
+-   [Stylus](https://github.com/stylus/stylus)
+-   Up-to-date [CSS Modules](https://github.com/css-modules/css-modules) implementation
+-   URL resolving/rewriting with asset handling
+-   Ability to use `@import` statements inside regular CSS
+-   Built-in assets handler
+-   Ability to emit pure CSS for other plugins
+-   Complete code splitting support, with respect for multiple entries, `preserveModules` and `manualChunks`
+-   Multiple instances support, with check for already processed files
+-   Proper sourcemaps, with included sources content by default
+-   Respects `assetFileNames` for CSS file names
+-   Respects sourcemaps from loaded files
+-   Support for implementation forcing for Sass
+-   Support for partials and `~` in Less import statements
+
+### PostCSS
+
+PostCSS is a tool for transforming styles with JS plugins.
+These plugins can lint your CSS, add support for variables and mixins, transpile future CSS syntax, inline images, and more.
+
+Install all the necessary dependencies:
+
+```sh
+npm install --save-dev postcss postcss-load-config postcss-modules postcss-modules-extract-imports postcss-modules-local-by-default postcss-modules-scope postcss-modules-values postcss-value-parser icss-utils
+```
+
+```sh
+yarn add -D postcss postcss-load-config postcss-modules postcss-modules-extract-imports postcss-modules-local-by-default postcss-modules-scope postcss-modules-values postcss-value-parser icss-utils
+```
+
+```sh
+pnpm add -D postcss postcss-load-config postcss-modules postcss-modules-extract-imports postcss-modules-local-by-default postcss-modules-scope postcss-modules-values postcss-value-parser icss-utils
+```
+
+Add the loader to your `packem.config.ts`:
+
+```typescript
+import { defineConfig } from "@visulima/packem/config";
+import transformer from "@visulima/packem/transformer/esbuild";
+import postcssLoader from "@visulima/packem/css/loader/postcss";
+import sourceMapLoader from "@visulima/packem/css/loader/sourcemap";
+
+export default defineConfig({
+    transformer,
+    rollup: {
+        css: {
+            loaders: [postcssLoader, sourceMapLoader],
+        },
+    },
+});
+```
+
+#### Sass
+
+To use Sass, you need to install the `sass` package:
+
+```sh
+npm install --save-dev sass-embedded // recommended
+// or
+npm install --save-dev sass
+// or
+npm install --save-dev node-sass
+```
+
+```sh
+yarn add -D sass-embedded // recommended
+// or
+yarn add -D sass
+// or
+yarn add -D node-sass
+```
+
+```sh
+pnpm add -D sass-embedded // recommended
+// or
+pnpm add -D sass
+// or
+pnpm add -D node-sass
+```
+
+Add the loader to your `packem.config.ts`:
+
+```typescript
+import { defineConfig } from "@visulima/packem/config";
+import transformer from "@visulima/packem/transformer/esbuild";
+import postcssLoader from "@visulima/packem/css/loader/postcss";
+import sassLoader from "@visulima/packem/css/loader/sass";
+import sourceMapLoader from "@visulima/packem/css/loader/sourcemap";
+
+export default defineConfig({
+    transformer,
+    rollup: {
+        css: {
+            loaders: [postcssLoader, sassLoader, sourceMapLoader],
+        },
+    },
+});
+```
+
+#### Less
+
+To use Less, you need to install the `less` package:
+
+```sh
+npm install --save-dev less
+```
+
+```sh
+yarn add -D less
+```
+
+```sh
+pnpm add -D less
+```
+
+Add the loader to your `packem.config.ts`:
+
+```typescript
+import { defineConfig } from "@visulima/packem/config";
+import transformer from "@visulima/packem/transformer/esbuild";
+import postcssLoader from "@visulima/packem/css/loader/postcss";
+import lessLoader from "@visulima/packem/css/loader/less";
+import sourceMapLoader from "@visulima/packem/css/loader/sourcemap";
+
+export default defineConfig({
+    transformer,
+    rollup: {
+        css: {
+            loaders: [postcssLoader, lessLoader, sourceMapLoader],
+        },
+    },
+});
+```
+
+#### Stylus
+
+To use Stylus, you need to install the `stylus` package:
+
+```sh
+npm install --save-dev stylus
+```
+
+```sh
+yarn add -D stylus
+```
+
+```sh
+pnpm add -D stylus
+```
+
+Add the loader to your `packem.config.ts`:
+
+```typescript
+import { defineConfig } from "@visulima/packem/config";
+import transformer from "@visulima/packem/transformer/esbuild";
+import postcssLoader from "@visulima/packem/css/loader/postcss";
+import stylusLoader from "@visulima/packem/css/loader/stylus";
+import sourceMapLoader from "@visulima/packem/css/loader/sourcemap";
+
+export default defineConfig({
+    transformer,
+    rollup: {
+        css: {
+            loaders: [postcssLoader, stylusLoader, sourceMapLoader],
+        },
+    },
+});
+```
+
+After that you can import CSS/Sass/Less/Stylus files in your code:
+
+```js
+import "./styles.css";
+```
+
+Default mode is `inject`, which means CSS is embedded inside JS and injected into `<head>` at runtime, with ability to pass options to CSS injector or even pass your own injector.
+
+CSS is available as default export in `inject` and `extract` modes, but if [CSS Modules](https://github.com/css-modules/css-modules) are enabled you need to use named `css` export.
+
+```js
+// Injects CSS, also available as `style` in this example
+import style from "./style.css";
+// Using named export of CSS string
+import { css } from "./style.css";
+```
+
+In `emit` mode none of the exports are available as CSS is purely processed and passed along the build pipeline, which is useful if you want to preprocess CSS before using it with CSS consuming plugins, e.g. [rollup-plugin-lit-css](https://github.com/bennypowers/rollup-plugin-lit-css).
+
+PostCSS configuration files will be found and loaded automatically, but this behavior is configurable using `config` option.
+
+### Importing a file
+
+#### CSS/Stylus
+
+```css
+/* Import from `node_modules` */
+@import "bulma/css/bulma";
+/* Local import */
+@import "./custom";
+/* ...or (if no package named `custom` in `node_modules`) */
+@import "custom";
+```
+
+#### Sass/Less
+
+You can prepend the path with `~` to resolve in `node_modules`:
+
+```scss
+// Import from `node_modules`
+@import "~bulma/css/bulma";
+// Local import
+@import "./custom";
+// ...or
+@import "custom";
+```
+
+Also note that partials are considered first, e.g.
+
+```scss
+@import "custom";
+```
+
+Will look for `_custom` first (_with the appropriate extension(s)_), and then for `custom` if `_custom` doesn't exist.
+
+### CSS Injection
+
+```js
+styles({
+    mode: "inject", // Unnecessary, set by default
+    // ...or with custom options for injector
+    mode: ["inject", { container: "body", singleTag: true, prepend: true, attributes: { id: "global" } }],
+    // ...or with custom injector
+    mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(id)})`],
+});
+```
+
+### CSS Extraction
+
+```js
+styles({
+    mode: "extract",
+    // ... or with relative to output dir/output file's basedir (but not outside of it)
+    mode: ["extract", "awesome-bundle.css"],
 });
 ```
 
