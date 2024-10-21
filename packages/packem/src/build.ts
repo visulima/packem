@@ -148,8 +148,8 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
 };
 
 type BuilderProperties = {
+    context: BuildContext;
     fileCache: FileCache;
-    options: BuildContext;
     subDirectory: string;
 };
 
@@ -157,14 +157,14 @@ const prepareRollupConfig = (
     context: BuildContext,
     fileCache: FileCache,
 ): {
-    builders: BuilderProperties[];
-    typeBuilders: BuilderProperties[];
+    builders: Set<BuilderProperties>;
+    typeBuilders: Set<BuilderProperties>;
     // eslint-disable-next-line sonarjs/cognitive-complexity
 } => {
     const groupedEntries = groupByKeys(context.options.entries, "environment", "runtime");
 
-    const builders: BuilderProperties[] = [];
-    const typeBuilders: BuilderProperties[] = [];
+    const builders = new Set<BuilderProperties>();
+    const typeBuilders = new Set<BuilderProperties>();
 
     for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
         for (const [runtime, entries] of Object.entries(environmentEntries)) {
@@ -180,23 +180,21 @@ const prepareRollupConfig = (
                 );
             }
 
+            const replaceValues: Record<string, string> = {};
+
             if (environmentRuntimeContext.options.rollup.replace) {
                 if (environmentRuntimeContext.options.rollup.replace.values === undefined) {
                     environmentRuntimeContext.options.rollup.replace.values = {};
                 }
 
                 if (environment !== "undefined") {
-                    environmentRuntimeContext.options.rollup.replace.values = {
-                        ...environmentRuntimeContext.options.rollup.replace.values,
-                        // hack to make sure, that the replace plugin don't replace the environment
-                        [["process", "env", "NODE_ENV"].join(".")]: JSON.stringify(environment),
-                    };
+                    // hack to make sure, that the replace plugin don't replace the environment
+                    replaceValues[["process", "env", "NODE_ENV"].join(".")] = JSON.stringify(environment);
                 }
 
-                environmentRuntimeContext.options.rollup.replace.values = {
-                    ...environmentRuntimeContext.options.rollup.replace.values,
-                    [["process", "env", "EdgeRuntime"].join(".")]: JSON.stringify(runtime === "edge-light"),
-                };
+                replaceValues[["process", "env", "EdgeRuntime"].join(".")] = JSON.stringify(runtime === "edge-light");
+
+                Object.freeze(replaceValues);
             } else {
                 context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
             }
@@ -241,7 +239,7 @@ const prepareRollupConfig = (
             }
 
             if (esmAndCjsEntries.length > 0) {
-                const adjustedEsmAndCjsContext = {
+                const adjustedEsmAndCjsContext: BuildContext = {
                     ...environmentRuntimeContext,
                     options: {
                         ...environmentRuntimeContext.options,
@@ -249,26 +247,38 @@ const prepareRollupConfig = (
                         emitESM: true,
                         entries: esmAndCjsEntries,
                         minify,
+                        rollup: {
+                            ...environmentRuntimeContext.options.rollup,
+                            replace: environmentRuntimeContext.options.rollup.replace
+                                ? {
+                                      ...environmentRuntimeContext.options.rollup.replace,
+                                      values: {
+                                          ...environmentRuntimeContext.options.rollup.replace.values,
+                                          ...replaceValues,
+                                      },
+                                  }
+                                : false,
+                        },
                     },
                 };
 
                 if (!context.options.dtsOnly) {
-                    builders.push({ fileCache, options: adjustedEsmAndCjsContext, subDirectory });
+                    builders.add({ context: adjustedEsmAndCjsContext, fileCache, subDirectory });
                 }
 
                 if (context.options.declaration) {
                     const typedEntries = adjustedEsmAndCjsContext.options.entries.filter((entry) => entry.declaration);
 
                     if (typedEntries.length > 0) {
-                        typeBuilders.push({
-                            fileCache,
-                            options: {
+                        typeBuilders.add({
+                            context: {
                                 ...adjustedEsmAndCjsContext,
                                 options: {
                                     ...adjustedEsmAndCjsContext.options,
                                     entries: typedEntries,
                                 },
                             },
+                            fileCache,
                             subDirectory,
                         });
                     }
@@ -276,7 +286,7 @@ const prepareRollupConfig = (
             }
 
             if (esmEntries.length > 0) {
-                const adjustedEsmContext = {
+                const adjustedEsmContext: BuildContext = {
                     ...environmentRuntimeContext,
                     options: {
                         ...environmentRuntimeContext.options,
@@ -284,26 +294,38 @@ const prepareRollupConfig = (
                         emitESM: true,
                         entries: esmEntries,
                         minify,
+                        rollup: {
+                            ...environmentRuntimeContext.options.rollup,
+                            replace: environmentRuntimeContext.options.rollup.replace
+                                ? {
+                                      ...environmentRuntimeContext.options.rollup.replace,
+                                      values: {
+                                          ...environmentRuntimeContext.options.rollup.replace.values,
+                                          ...replaceValues,
+                                      },
+                                  }
+                                : false,
+                        },
                     },
                 };
 
                 if (!context.options.dtsOnly) {
-                    builders.push({ fileCache, options: adjustedEsmContext, subDirectory });
+                    builders.add({ context: adjustedEsmContext, fileCache, subDirectory });
                 }
 
                 if (context.options.declaration) {
                     const typedEntries = adjustedEsmContext.options.entries.filter((entry) => entry.declaration);
 
                     if (typedEntries.length > 0) {
-                        typeBuilders.push({
-                            fileCache,
-                            options: {
+                        typeBuilders.add({
+                            context: {
                                 ...adjustedEsmContext,
                                 options: {
                                     ...adjustedEsmContext.options,
                                     entries: typedEntries,
                                 },
                             },
+                            fileCache,
                             subDirectory,
                         });
                     }
@@ -311,7 +333,7 @@ const prepareRollupConfig = (
             }
 
             if (cjsEntries.length > 0) {
-                const adjustedCjsContext = {
+                const adjustedCjsContext: BuildContext = {
                     ...environmentRuntimeContext,
                     options: {
                         ...environmentRuntimeContext.options,
@@ -319,26 +341,38 @@ const prepareRollupConfig = (
                         emitESM: false,
                         entries: cjsEntries,
                         minify,
+                        rollup: {
+                            ...environmentRuntimeContext.options.rollup,
+                            replace: environmentRuntimeContext.options.rollup.replace
+                                ? {
+                                      ...environmentRuntimeContext.options.rollup.replace,
+                                      values: {
+                                          ...environmentRuntimeContext.options.rollup.replace.values,
+                                          ...replaceValues,
+                                      },
+                                  }
+                                : false,
+                        },
                     },
                 };
 
                 if (!context.options.dtsOnly) {
-                    builders.push({ fileCache, options: adjustedCjsContext, subDirectory });
+                    builders.add({ context: adjustedCjsContext, fileCache, subDirectory });
                 }
 
                 if (context.options.declaration) {
                     const typedEntries = adjustedCjsContext.options.entries.filter((entry) => entry.declaration);
 
                     if (typedEntries.length > 0) {
-                        typeBuilders.push({
-                            fileCache,
-                            options: {
+                        typeBuilders.add({
+                            context: {
                                 ...adjustedCjsContext,
                                 options: {
                                     ...adjustedCjsContext.options,
                                     entries: typedEntries,
                                 },
                             },
+                            fileCache,
                             subDirectory,
                         });
                     }
@@ -346,9 +380,8 @@ const prepareRollupConfig = (
             }
 
             if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
-                typeBuilders.push({
-                    fileCache,
-                    options: {
+                typeBuilders.add({
+                    context: {
                         ...environmentRuntimeContext,
                         options: {
                             ...environmentRuntimeContext.options,
@@ -356,8 +389,21 @@ const prepareRollupConfig = (
                             emitESM: false,
                             entries: dtsEntries,
                             minify,
+                            rollup: {
+                                ...environmentRuntimeContext.options.rollup,
+                                replace: environmentRuntimeContext.options.rollup.replace
+                                    ? {
+                                          ...environmentRuntimeContext.options.rollup.replace,
+                                          values: {
+                                              ...environmentRuntimeContext.options.rollup.replace.values,
+                                              ...replaceValues,
+                                          },
+                                      }
+                                    : false,
+                            },
                         },
                     },
+                    fileCache,
                     subDirectory,
                 });
             }
@@ -372,8 +418,12 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<boole
 
     const { builders, typeBuilders } = prepareRollupConfig(context, fileCache);
 
-    await Promise.all(builders.map(async ({ fileCache: cache, options, subDirectory }) => await rollupBuild(options, cache, subDirectory)));
-    await Promise.all(typeBuilders.map(async ({ fileCache: cache, options, subDirectory }) => await rollupBuildTypes(options, cache, subDirectory)));
+    await Promise.all(
+        [...builders].map(async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuild(rollupContext, cache, subDirectory)),
+    );
+    await Promise.all(
+        [...typeBuilders].map(async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuildTypes(rollupContext, cache, subDirectory)),
+    );
 
     context.logger.success(green(context.options.name ? "Build succeeded for " + context.options.name : "Build succeeded"));
 

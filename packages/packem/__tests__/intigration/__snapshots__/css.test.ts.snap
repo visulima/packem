@@ -235,6 +235,118 @@ injectCss(css,{});
 "
 `;
 
+exports[`css > basic > should process 'postcss-options' css > js 1`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css = ".subpartial {\\n    box-shadow: inset 0 2px 0px #dcffa6,0 2px 5px #000\\n}\\n\\n.partial {\\n    color: red\\n}\\n\\n.prefixed {\\n  display: flex\\n}\\n";
+injectCss(css,{});
+"
+`;
+
+exports[`css > basic > should process 'postcss-options' css > js 2`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css = ".subpartial {\\n    box-shadow: inset 0 2px 0px #dcffa6,0 2px 5px #000\\n}\\n\\n.partial {\\n    color: red\\n}\\n\\n.prefixed {\\n  display: flex\\n}\\n";
+injectCss(css,{});
+"
+`;
+
 exports[`css > basic > should process 'resolver-assets' css > css 1`] = `
 ".subfoo {
     background-image: url("./assets/bg.png");

@@ -1,6 +1,6 @@
 import type { Warning } from "postcss";
 
-import type { ImportStatement, NodesStatement, PreImportStatement,Statement } from "../types";
+import type { ImportStatement, NodesStatement, PreImportStatement, Statement } from "../types";
 
 export const isWarning = (stmt: Statement): stmt is Warning => stmt.type === "warning";
 
