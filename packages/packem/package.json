@@ -1,6 +1,6 @@
 {
     "name": "@visulima/packem",
-    "version": "1.0.9",
+    "version": "1.1.0",
     "description": "A fast and modern bundler for Node.js and TypeScript.",
     "keywords": [
         "anolilab",

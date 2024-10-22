@@ -1,3 +1,9 @@
+## @visulima/packem [1.1.0](https://github.com/visulima/packem/compare/@visulima/packem@1.0.9...@visulima/packem@1.1.0) (2024-10-22)
+
+### Features
+
+* add command to install optional features & builder option ([#40](https://github.com/visulima/packem/issues/40)) ([2d64af9](https://github.com/visulima/packem/commit/2d64af92f0c3a5bd864da9dc4d5540cbbaa4fb31))
+
 ## @visulima/packem [1.0.9](https://github.com/visulima/packem/compare/@visulima/packem@1.0.8...@visulima/packem@1.0.9) (2024-10-21)
 
 ### Bug Fixes
