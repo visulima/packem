@@ -1,3 +1,9 @@
+## @visulima/packem [1.0.9](https://github.com/visulima/packem/compare/@visulima/packem@1.0.8...@visulima/packem@1.0.9) (2024-10-21)
+
+### Bug Fixes
+
+* updated @babel/parser, @rollup/plugin-commonjs, @rollup/plugin-dynamic-import-vars, [@visulima](https://github.com/visulima) packages, jiti, magic-string, mlly, typedoc and oxc-parser ([73d5a93](https://github.com/visulima/packem/commit/73d5a93cb503464b7e8718d426b090e53c32f986))
+
 ## @visulima/packem [1.0.8](https://github.com/visulima/packem/compare/@visulima/packem@1.0.7...@visulima/packem@1.0.8) (2024-10-05)
 
 ### Bug Fixes
