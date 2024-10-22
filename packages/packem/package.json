@@ -480,10 +480,6 @@
         "lightningcss": ">=1.27.0",
         "node-sass": ">=9.0.0",
         "oxc-transform": ">=0.20.0",
-        "typedoc": "0.26.10",
-        "typedoc-plugin-markdown": "4.2.9",
-        "typedoc-plugin-rename-defaults": "0.7.1",
-        "typescript": "^4.5 || ^5.0",
         "postcss": ">=8.4.38",
         "postcss-load-config": ">=6.0.1",
         "postcss-modules": ">=6.0.0",
@@ -496,6 +492,9 @@
         "sass-embedded": ">=1.79.4",
         "stylus": ">=0.63.0",
         "sucrase": ">=3.35.0",
+        "typedoc": "0.26.10",
+        "typedoc-plugin-markdown": "4.2.9",
+        "typedoc-plugin-rename-defaults": "0.7.1",
         "typescript": "^4.5 || ^5.0"
     },
     "peerDependenciesMeta": {
