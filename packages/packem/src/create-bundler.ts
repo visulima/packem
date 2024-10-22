@@ -25,11 +25,11 @@ import resolvePreset from "./hooks/preset/utils/resolve-preset";
 import createStub from "./jit/create-stub";
 import getHash from "./rollup/utils/get-hash";
 import rollupWatch from "./rollup/watch";
-import generateReferenceDocumentation from "./typedoc";
 import type { BuildConfig, BuildContext, BuildOptions, BuildPreset, Environment, InternalBuildOptions, Mode } from "./types";
 import createOrUpdateKeyStorage from "./utils/create-or-update-key-storage";
 import enhanceRollupError from "./utils/enhance-rollup-error";
 import FileCache from "./utils/file-cache";
+import findPackemFile from "./utils/find-packem-file";
 import getPackageSideEffect from "./utils/get-package-side-effect";
 import loadPackageJson from "./utils/load-package-json";
 import logBuildErrors from "./utils/log-build-errors";
@@ -619,7 +619,7 @@ const createBundler = async (
     } & BuildConfig = {},
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
-    const { configPath, debug, tsconfigPath, ...restInputConfig } = inputConfig;
+    const { configPath, debug, tsconfigPath, ...otherInputConfig } = inputConfig;
 
     logger.wrapAll();
 
@@ -665,32 +665,9 @@ const createBundler = async (
     let logged = false;
 
     try {
-        let packemConfigFilePath = configPath ?? "";
-
-        // find packem config file
-        if (!packemConfigFilePath) {
-            const packemConfigFiles = [
-                "packem.config.js",
-                "packem.config.mjs",
-                "packem.config.cjs",
-                "packem.config.ts",
-                "packem.config.cts",
-                "packem.config.mts",
-            ];
-
-            for (const file of packemConfigFiles) {
-                if (isAccessibleSync(join(rootDirectory, file))) {
-                    packemConfigFilePath = "./" + file;
-                    break;
-                }
-            }
-        }
+        const packemConfigFilePath = await findPackemFile(rootDirectory, configPath ?? "");
 
         const jiti = createJiti(rootDirectory, { debug });
-
-        if (!/\.(?:js|mjs|cjs|ts|cts|mts)$/.test(packemConfigFilePath)) {
-            throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.");
-        }
 
         let buildConfig = ((await jiti.import(packemConfigFilePath, { default: true, try: true })) || {}) as BuildConfig | BuildConfigFunction;
 
@@ -730,7 +707,7 @@ const createBundler = async (
             mode,
             environment,
             debug ?? false,
-            restInputConfig,
+            otherInputConfig,
             buildConfig,
             packageJson,
             tsconfig,
@@ -781,49 +758,26 @@ const createBundler = async (
             logBuildErrors(context, logged);
         }
 
-        if (context.options.typedoc && context.options.typedoc.format !== undefined) {
-            let typedocVersion = "unknown";
+        context.logger.raw("\n⚡️ Build run in " + getDuration());
 
-            if (packageJson.dependencies?.typedoc) {
-                typedocVersion = packageJson.dependencies.typedoc;
-            } else if (packageJson.devDependencies?.typedoc) {
-                typedocVersion = packageJson.devDependencies.typedoc;
-            }
+        for await (const [name, builder] of Object.entries(context.options.builder ?? {})) {
+            context.logger.raw("\n");
 
-            if (cachePath) {
-                createOrUpdateKeyStorage("typedoc", cachePath as string, logger, true);
-            }
+            await context.hooks.callHook("builder:before", name, context);
 
-            if (logged) {
-                context.logger.raw("\n");
-            }
+            const builderStart = Date.now();
 
-            context.logger.info({
-                message: "Using " + cyan("typedoc") + " " + typedocVersion + " to generate reference documentation",
-                prefix: "typedoc",
-            });
+            const getBuilderDuration = () => duration(Math.floor(Date.now() - builderStart));
 
-            await context.hooks.callHook("typedoc:before", context);
+            await builder(context, cachePath, fileCache, logged);
 
-            let outputDirectory = join(context.options.rootDir, "api-docs");
+            await context.hooks.callHook("builder:done", name, context);
 
-            if (context.options.typedoc.format === "inline" && cachePath) {
-                outputDirectory = join(cachePath, "typedoc");
-            }
-
-            if (context.options.typedoc.output) {
-                outputDirectory = context.options.typedoc.output;
-            }
-
-            await generateReferenceDocumentation(context.options.typedoc, context.options.entries, outputDirectory, context.logger);
-
-            await context.hooks.callHook("typedoc:done", context);
+            context.logger.raw("\n⚡️ " + name + " run in " + getBuilderDuration());
         }
 
-        logger.raw("\n⚡️ Build run in " + getDuration());
-
         // Restore all wrapped console methods
-        logger.restoreAll();
+        context.logger.restoreAll();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         logger.raw("\n");

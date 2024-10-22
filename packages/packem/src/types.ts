@@ -29,6 +29,7 @@ import type { ShebangOptions } from "./rollup/plugins/shebang";
 import type { SucrasePluginConfig } from "./rollup/plugins/sucrase/types";
 import type { SwcPluginConfig } from "./rollup/plugins/swc/types";
 import type { PatchTypesOptions } from "./rollup/plugins/typescript/patch-typescript-types";
+import type FileCache from "./utils/file-cache";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -179,6 +180,7 @@ export type BuildEntry = {
 export interface BuildOptions {
     alias: Record<string, string>;
     analyze?: boolean;
+    builder?: Record<string, (context: BuildContext, cachePath: string | undefined, fileCache: FileCache, logged: boolean) => Promise<void>>;
     cjsInterop?: boolean;
     clean: boolean;
     debug: boolean;
@@ -201,6 +203,7 @@ export interface BuildOptions {
     externals: (RegExp | string)[];
     failOnWarn?: boolean;
     fileCache?: boolean;
+    /** @experimental */
     isolatedDeclarationTransformer?: (code: string, id: string) => Promise<IsolatedDeclarationsResult>;
     /**
      * Jiti options, where [jiti](https://github.com/unjs/jiti) is used to load the entry files.
@@ -212,7 +215,6 @@ export interface BuildOptions {
     rollup: RollupBuildOptions;
     rootDir: string;
     sourceDir: string;
-    /** @experimental */
     sourcemap: boolean;
     transformer: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
     typedoc: TypeDocumentOptions | false;
@@ -236,17 +238,22 @@ export interface BuildHooks {
     "build:done": (context: BuildContext) => Promise<void> | void;
     "build:prepare": (context: BuildContext) => Promise<void> | void;
 
+    "builder:before": (name: string, context: BuildContext) => Promise<void> | void;
+    "builder:done": (name: string, context: BuildContext) => Promise<void> | void;
+
     "rollup:build": (context: BuildContext, build: RollupBuild) => Promise<void> | void;
     "rollup:done": (context: BuildContext) => Promise<void> | void;
-
     "rollup:dts:build": (context: BuildContext, build: RollupBuild) => Promise<void> | void;
+
     "rollup:dts:done": (context: BuildContext) => Promise<void> | void;
     "rollup:dts:options": (context: BuildContext, options: RollupOptions) => Promise<void> | void;
 
     "rollup:options": (context: BuildContext, options: RollupOptions) => Promise<void> | void;
     "rollup:watch": (context: BuildContext, watcher: RollupWatcher) => Promise<void> | void;
 
+    // @deprecated Use "builder:before" instead
     "typedoc:before": (context: BuildContext) => Promise<void> | void;
+    // @deprecated Use "builder:done" instead
     "typedoc:done": (context: BuildContext) => Promise<void> | void;
 
     "validate:before": (context: BuildContext) => Promise<void> | void;

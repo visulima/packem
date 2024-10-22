@@ -3,6 +3,7 @@ import Cli from "@visulima/cerebro";
 import { SimpleReporter } from "@visulima/pail/reporter";
 
 import { name, version } from "../package.json";
+import createAddCommand from "./commands/add";
 import createBuildCommand from "./commands/build";
 import createInitCommand from "./commands/init";
 
@@ -30,6 +31,7 @@ const cli = new Cli("packem", {
 
 createInitCommand(cli);
 createBuildCommand(cli);
+createAddCommand(cli);
 
 // eslint-disable-next-line no-void
 void cli.run({

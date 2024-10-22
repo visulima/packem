@@ -469,6 +469,22 @@ packem build --env.NODE_ENV=production
 
 ## TypeDoc
 
+### Installation
+
+To generate api documentation for your project, you need to install `typedoc` to your project.
+
+```sh
+npm exec packem add typedoc
+```
+
+```sh
+yarn exec packem add typedoc
+```
+
+```sh
+pnpm exec packem add typedoc
+```
+
 To generate documentation for your project, you can use the `--typedoc` flag.
 
 ```sh
