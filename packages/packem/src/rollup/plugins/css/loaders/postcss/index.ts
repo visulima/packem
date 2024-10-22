@@ -13,7 +13,7 @@ import safeId from "../../utils/safe-id";
 import { mm } from "../../utils/sourcemap";
 import type { Loader } from "../types";
 import ensureAutoModules from "../utils/ensure-auto-modules";
-import loadConfig from "./config";
+import loadConfig from "./load-config";
 import postcssICSS from "./icss";
 import postcssImport from "./import";
 import postcssModules from "./modules";
@@ -44,7 +44,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
     name: "postcss",
     // eslint-disable-next-line sonarjs/cognitive-complexity
     async process({ code, extracted, map }) {
-        const config = await loadConfig(this.id, this.cwd as string, this.options.config);
+        const config = await loadConfig(this.id, this.cwd as string, this.environment, this.options.config);
         const plugins: AcceptedPlugin[] = [];
 
         let supportModules = false;
