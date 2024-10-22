@@ -21,7 +21,7 @@ const createAddCommand = (cli: Cli): void => {
         execute: async ({ argument, logger, options }): Promise<void> => {
             const rootDirectory = resolve(cwd(), options.dir ?? ".");
 
-            const packemConfigFilePath = await findPackemFile(rootDirectory, options.cofig ?? "");
+            const packemConfigFilePath = await findPackemFile(rootDirectory, options.config ?? "");
             const packemConfig: string = await readFile(packemConfigFilePath, { buffer: false });
 
             const magic = new MagicString(packemConfig);
