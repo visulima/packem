@@ -2,19 +2,20 @@ import { parse, resolve } from "@visulima/path";
 import type { Result } from "postcss-load-config";
 import postcssrc from "postcss-load-config";
 
+import type { Environment } from "../../../../../types";
 import type { PostCSSConfigLoaderOptions } from "../../types";
 import { ensurePCSSOption, ensurePCSSPlugins } from "../../utils/options";
 
 let configCache: Result | undefined;
 
-export default async (id: string, cwd: string, config?: PostCSSConfigLoaderOptions | false): Promise<Result> => {
-    if (!config) {
+const loadConfig = async (id: string, cwd: string, environment: Environment, options?: PostCSSConfigLoaderOptions | false): Promise<Result> => {
+    if (!options) {
         return { file: "", options: {}, plugins: [] };
     }
 
     const { dir } = parse(id);
 
-    const searchPath = config.path ? resolve(config.path) : dir;
+    const searchPath = options.path ? resolve(options.path) : dir;
 
     try {
         let postcssConfig: Result;
@@ -24,9 +25,9 @@ export default async (id: string, cwd: string, config?: PostCSSConfigLoaderOptio
         } else {
             postcssConfig = await postcssrc(
                 {
-                    cwd: process.cwd(),
-                    env: process.env.NODE_ENV ?? "development",
-                    ...config.ctx,
+                    cwd,
+                    env: environment,
+                    ...options.ctx,
                 },
                 searchPath,
             );
@@ -58,3 +59,5 @@ export default async (id: string, cwd: string, config?: PostCSSConfigLoaderOptio
         throw error;
     }
 };
+
+export default loadConfig;
