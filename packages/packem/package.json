@@ -304,7 +304,7 @@
     },
     "peerDependencies": {
         "@ckeditor/typedoc-plugins": "44.0.0",
-        "@swc/core": "^1.5.29",
+        "@swc/core": "^1.7.39",
         "esbuild": "^0.20.2 || ^0.21.3",
         "oxc-transform": "^0.20.0",
         "sucrase": "^3.35.0",
