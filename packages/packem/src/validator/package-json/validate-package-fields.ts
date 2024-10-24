@@ -111,12 +111,19 @@ const validatePackageFields = (context: BuildContext): void => {
     }
 
     if (context.options.declaration) {
-        if (pkg.types === undefined && pkg.typings === undefined && validation?.packageJson?.types !== false) {
+        let showWarning = false;
+
+        if (pkg.type === "module") {
+            showWarning = pkg.main !== undefined && !pkg.main.includes(".d.mjs");
+        }
+
+        if (pkg.types === undefined && pkg.typings === undefined && showWarning && validation?.packageJson?.types !== false) {
             warn(context, "The 'types' field is missing in your package.json. This field should point to your type definitions file.");
         }
 
         if (
             (context.options.declaration === true || context.options.declaration === "compatible") &&
+            showWarning &&
             validation?.packageJson?.typesVersions !== false &&
             (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
         ) {

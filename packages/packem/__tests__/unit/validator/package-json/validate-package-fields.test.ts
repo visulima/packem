@@ -112,4 +112,27 @@ describe("validatePackageFields", () => {
 
         expect(warn).toHaveBeenCalledWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
     });
+
+    it("should not display a error if the pkg is module and has no cjs files", () => {
+        expect.assertions(1);
+
+        const context = {
+            options: { declaration: true, outDir: "dist" },
+            pkg: {
+                exports: {
+                    ".": {
+                        default: "./dist/test.mjs",
+                        types: "./dist/test.d.ts",
+                    },
+                },
+                files: ["dist"],
+                name: "test",
+                type: "module",
+            },
+        };
+
+        validatePackageFields(context as unknown as BuildContext);
+
+        expect(warn).not.toHaveBeenCalled();
+    });
 });
