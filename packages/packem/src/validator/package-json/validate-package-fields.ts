@@ -111,10 +111,10 @@ const validatePackageFields = (context: BuildContext): void => {
     }
 
     if (context.options.declaration) {
-        let showWarning = false;
+        let showWarning = true;
 
         if (pkg.type === "module") {
-            showWarning = pkg.main !== undefined && !pkg.main.includes(".d.mjs");
+            showWarning = Boolean(pkg.main?.endsWith(".cjs"));
         }
 
         if (pkg.types === undefined && pkg.typings === undefined && showWarning && validation?.packageJson?.types !== false) {

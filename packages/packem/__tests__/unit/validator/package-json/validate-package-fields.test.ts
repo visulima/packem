@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { BuildContext } from "../../../../src/types";
 import validatePackageFields from "../../../../src/validator/package-json/validate-package-fields";
@@ -16,6 +16,10 @@ vi.mock("../../../../src/utils/warn", () => {
 });
 
 describe("validatePackageFields", () => {
+    beforeEach(() => {
+        warn.mockClear();
+    })
+
     it('should warn if "files" field is missing in package.json when validation is enabled', () => {
         expect.assertions(1);
 
@@ -59,8 +63,12 @@ describe("validatePackageFields", () => {
         expect.assertions(1);
 
         const context = {
-            options: { declaration: true, validation: { packageJson: { types: true } } },
-            pkg: {},
+            options: { declaration: true, outDir: "dist", validation: { packageJson: { types: true } } },
+            pkg: {
+                files: ["dist"],
+                main: "dist/index.cjs",
+                name: "test",
+            },
         };
 
         validatePackageFields(context as BuildContext);
