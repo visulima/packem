@@ -4,6 +4,33 @@
 
 * added onSuccess - execute a command/function after successful run ([#50](https://github.com/visulima/packem/issues/50)) ([df34a47](https://github.com/visulima/packem/commit/df34a47d2b7e5def48044562765389495e9799f8))
 
+## @visulima/packem [1.2.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.1.0...@visulima/packem@1.2.0-alpha.1) (2024-10-30)
+
+### Features
+
+* support css (PostCSS, Sass, Less, Stylus, Lightningcss) ([#28](https://github.com/visulima/packem/issues/28)) ([492fb35](https://github.com/visulima/packem/commit/492fb35a968e342dfce5f21418cbc4c46bff1cc9))
+
+### Bug Fixes
+
+* fixed configuration for the postcss config loader ([ab2373d](https://github.com/visulima/packem/commit/ab2373d168e6ef645fcc04213848d6a7ed42c462))
+* fixed package.json types validator ([da06748](https://github.com/visulima/packem/commit/da0674883dc3083ef1d3db32d4a1fcd5a6fb576b))
+* updated dependencies ([623c23a](https://github.com/visulima/packem/commit/623c23a638989abf510b445d9b9ad8459aefef6f))
+
+### Miscellaneous Chores
+
+* **deps:** update babel monorepo to ^7.25.9 ([190c9a2](https://github.com/visulima/packem/commit/190c9a2a678623f14908d5f06c1f24e11d500517))
+* **deps:** update dependency @swc/core to ^1.7.39 ([052dcbf](https://github.com/visulima/packem/commit/052dcbf2e9a5bccc14d6401ced486df85ef7b34a))
+* **deps:** update dependency eslint to v8.57.1 ([bcee15c](https://github.com/visulima/packem/commit/bcee15cd9d50737bc4a1d33ca1a7868345f226ad))
+* **deps:** update minor updates ([0c20bbe](https://github.com/visulima/packem/commit/0c20bbe47f532aa422adabcfeac4586bca8d2f81))
+* **deps:** update patch updates ([fb1aa46](https://github.com/visulima/packem/commit/fb1aa46c823fa563d073be58a0e6e06852f6b578))
+* **deps:** update swc monorepo ([#25](https://github.com/visulima/packem/issues/25)) ([1e30f80](https://github.com/visulima/packem/commit/1e30f80e78cb960e63902343ec0a7b04938fd599))
+* fixed package.json types validator tests ([876f276](https://github.com/visulima/packem/commit/876f276e4669c9313caae1908285f107e0666086))
+* updated lock file ([9db1405](https://github.com/visulima/packem/commit/9db14057c9daa3dc139b1b240a9a9c64ff5ecd2e))
+
+### Continuous Integration
+
+* skip css test if prod build ([19b32ce](https://github.com/visulima/packem/commit/19b32ce513f7b345897834acc8b2a2fdff974056))
+
 ## @visulima/packem [1.2.2](https://github.com/visulima/packem/compare/@visulima/packem@1.2.1...@visulima/packem@1.2.2) (2024-11-04)
 
 ### Bug Fixes
