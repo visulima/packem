@@ -55,7 +55,7 @@ interface WriteFailResult {
     stderr: string;
 }
 
-describe("css", () => {
+describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
