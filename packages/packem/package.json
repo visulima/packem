@@ -268,7 +268,7 @@
         "@types/glob-parent": "^5.1.3",
         "@types/is-glob": "^4.0.4",
         "@types/node": "18.19.59",
-        "@types/react": "^18.3.11",
+        "@types/react": "^18.3.12",
         "@types/react-dom": "^18.3.1",
         "@types/semver": "^7.5.8",
         "@vitest/coverage-v8": "^2.1.3",
