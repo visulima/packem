@@ -34,9 +34,24 @@ const lightningCSSLoader: Loader<LightningCSSOptions> = {
             this.warn("warnings when transforming css:\n" + result.warnings.map((w) => w.message).join("\n"));
         }
 
+        // /**
+        //  * Addresses non-deterministic exports order:
+        //  * https://github.com/parcel-bundler/lightningcss/issues/291
+        //  */
+        // const exports = Object.fromEntries(
+        //     Object.entries(
+        //         // `exports` is defined if cssModules is true
+        //         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        //         result.exports!,
+        //     ).sort(
+        //         // Cheap alphabetical sort (localCompare is expensive)
+        //         ([a], [b]) => (a < b ? -1 : a > b ? 1 : 0),
+        //     ),
+        // );
+
         return {
             code: result.code.toString(),
-            map: "map" in result ? result.map?.toString() : undefined,
+            map: result.map ? (JSON.parse(Buffer.from(result.map).toString()) as string) : undefined,
         };
     },
     test: /\.css$/i,

@@ -12,7 +12,6 @@ const cssLoaderDependencies = {
     postcss: [
         "postcss",
         "postcss-load-config",
-        "postcss-modules",
         "postcss-modules-extract-imports",
         "postcss-modules-local-by-default",
         "postcss-modules-scope",
