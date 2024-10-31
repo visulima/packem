@@ -85,7 +85,7 @@ const loader: Loader<SassLoaderOptions> = {
                 this.deps.add(normalize(error.file));
             }
 
-            throw errorFactory(error);
+            throw errorFactory(error, this.id);
         }
 
         let resultMap: RawSourceMap | undefined =
