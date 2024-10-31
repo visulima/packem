@@ -1,3 +1,9 @@
+## @visulima/packem [1.2.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/packem@1.2.0-alpha.1...@visulima/packem@1.2.0-alpha.2) (2024-10-31)
+
+### Bug Fixes
+
+* improved sass error ([e7c6691](https://github.com/visulima/packem/commit/e7c669164e3d3ec02c411511c346169dbc2bee14))
+
 ## @visulima/packem [1.2.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.1.0...@visulima/packem@1.2.0-alpha.1) (2024-10-30)
 
 ### Features
