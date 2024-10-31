@@ -4,6 +4,12 @@
 
 * added onSuccess - execute a command/function after successful run ([#50](https://github.com/visulima/packem/issues/50)) ([df34a47](https://github.com/visulima/packem/commit/df34a47d2b7e5def48044562765389495e9799f8))
 
+## @visulima/packem [1.2.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/packem@1.2.0-alpha.1...@visulima/packem@1.2.0-alpha.2) (2024-10-31)
+
+### Bug Fixes
+
+* improved sass error ([e7c6691](https://github.com/visulima/packem/commit/e7c669164e3d3ec02c411511c346169dbc2bee14))
+
 ## @visulima/packem [1.2.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.1.0...@visulima/packem@1.2.0-alpha.1) (2024-10-30)
 
 ### Features
