@@ -1,3 +1,4 @@
+import { findMonorepoRoot, findPackageRoot } from "@visulima/package";
 import { parse, resolve } from "@visulima/path";
 import type { Result } from "postcss-load-config";
 import postcssrc from "postcss-load-config";
@@ -17,6 +18,22 @@ const loadConfig = async (id: string, cwd: string, environment: Environment, opt
 
     const searchPath = options.path ? resolve(options.path) : dir;
 
+    let stopDirectory: string | undefined;
+
+    try {
+        const foundMonorepoRoot = await findMonorepoRoot(cwd);
+
+        stopDirectory = foundMonorepoRoot.path;
+    } catch {
+        try {
+            const foundPackageRoot = await findPackageRoot(cwd);
+
+            stopDirectory = foundPackageRoot;
+        } catch {
+            // Do nothing
+        }
+    }
+
     try {
         let postcssConfig: Result;
 
@@ -30,6 +47,9 @@ const loadConfig = async (id: string, cwd: string, environment: Environment, opt
                     ...options.ctx,
                 },
                 searchPath,
+                {
+                    stopDir: stopDirectory,
+                },
             );
 
             configCache = postcssConfig;
