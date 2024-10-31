@@ -1,3 +1,10 @@
+## @visulima/packem [1.2.0-alpha.3](https://github.com/visulima/packem/compare/@visulima/packem@1.2.0-alpha.2...@visulima/packem@1.2.0-alpha.3) (2024-10-31)
+
+### Bug Fixes
+
+* load postcss config within workspace root or package root only ([e09aa5b](https://github.com/visulima/packem/commit/e09aa5b7f9e34f3a06a75c17dce7ff6bcf1539ec))
+* removed not use postcss-modules dep ([dea809a](https://github.com/visulima/packem/commit/dea809abbebe1e3e2a1bb7de1a25f3de1bb13077))
+
 ## @visulima/packem [1.2.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/packem@1.2.0-alpha.1...@visulima/packem@1.2.0-alpha.2) (2024-10-31)
 
 ### Bug Fixes
