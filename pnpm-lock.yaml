@@ -916,9 +916,6 @@ importers:
       postcss-load-config:
         specifier: ^6.0.1
         version: 6.0.1(jiti@2.3.3)(postcss@8.4.47)(tsx@4.19.1)(yaml@2.5.1)
-      postcss-modules:
-        specifier: 6.0.0
-        version: 6.0.0(postcss@8.4.47)
       postcss-modules-extract-imports:
         specifier: ^3.1.0
         version: 3.1.0(postcss@8.4.47)
