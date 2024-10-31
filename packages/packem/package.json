@@ -445,7 +445,6 @@
         "postcss": "^8.4.47",
         "postcss-custom-properties": "14.0.2",
         "postcss-load-config": "^6.0.1",
-        "postcss-modules": "6.0.0",
         "postcss-modules-extract-imports": "^3.1.0",
         "postcss-modules-local-by-default": "^4.0.5",
         "postcss-modules-scope": "^3.2.0",
@@ -484,7 +483,6 @@
         "oxc-transform": ">=0.20.0",
         "postcss": ">=8.4.38",
         "postcss-load-config": ">=6.0.1",
-        "postcss-modules": ">=6.0.0",
         "postcss-modules-extract-imports": ">=3.1.0",
         "postcss-modules-local-by-default": ">=4.0.5",
         "postcss-modules-scope": ">=3.2.0",
@@ -531,9 +529,6 @@
             "optional": true
         },
         "postcss-load-config": {
-            "optional": true
-        },
-        "postcss-modules": {
             "optional": true
         },
         "postcss-modules-extract-imports": {
