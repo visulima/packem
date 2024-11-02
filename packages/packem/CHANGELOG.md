@@ -1,3 +1,14 @@
+## @visulima/packem [1.2.0](https://github.com/visulima/packem/compare/@visulima/packem@1.1.1...@visulima/packem@1.2.0) (2024-11-02)
+
+### Features
+
+* added support for ?raw query to import content as inline ([#49](https://github.com/visulima/packem/issues/49)) ([b5d4fba](https://github.com/visulima/packem/commit/b5d4fba2aef9d1666ec85ed2cda34fd136912ff1))
+
+### Miscellaneous Chores
+
+* **deps:** update dependency @swc/core to ^1.7.40 ([a5006eb](https://github.com/visulima/packem/commit/a5006eb934c3385649cbd47df69e5dd3b8b8080f))
+* **deps:** update dependency @types/react to ^18.3.12 ([885eca4](https://github.com/visulima/packem/commit/885eca49ac5183271c23315b601f9bb373f0e4b1))
+
 ## @visulima/packem [1.1.1](https://github.com/visulima/packem/compare/@visulima/packem@1.1.0...@visulima/packem@1.1.1) (2024-10-24)
 
 ### Bug Fixes
