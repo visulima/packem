@@ -22,13 +22,13 @@ describe("packem raw data", () => {
     it("should generate js files with included raw content", async () => {
         expect.assertions(4);
 
+        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `thisismydata`);
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
-            `import content from './content.txt'
+            `import content from './content.txt';
 
 export const data = content;`,
         );
-        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `thisismydata`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         createTsConfig(temporaryDirectoryPath, {});
@@ -42,6 +42,59 @@ export const data = content;`,
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toBe(`const content = "thisismydata";
+
+const data = content;
+
+export { data };
+`);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const content = "thisismydata";
+
+const data = content;
+
+exports.data = data;
+`);
+    });
+
+    it("should generate js files with included raw content when the '?raw' query param is used", async () => {
+        expect.assertions(4);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `thisismydata`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `import content from './content.txt?raw';
+
+export const data = content;`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
         });
 
         expect(binProcess.stderr).toBe("");

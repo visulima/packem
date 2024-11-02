@@ -461,6 +461,8 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         context.options.rollup.isolatedDeclarations,
                     ),
 
+                context.options.rollup.raw && cachingPlugin(rawPlugin(context.options.rollup.raw), fileCache),
+
                 context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
 
                 cachingPlugin(
@@ -510,8 +512,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     } as Plugin),
 
                 context.options.cjsInterop && context.options.rollup.shim && esmShimCjsSyntaxPlugin(context.pkg, context.options.rollup.shim),
-
-                context.options.rollup.raw && cachingPlugin(rawPlugin(context.options.rollup.raw), fileCache),
 
                 context.options.rollup.jsxRemoveAttributes &&
                     cachingPlugin(

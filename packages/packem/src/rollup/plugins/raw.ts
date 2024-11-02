@@ -10,16 +10,30 @@ export interface RawLoaderOptions {
 export const rawPlugin = (options: RawLoaderOptions): Plugin => {
     const filter = createFilter(options.include, options.exclude);
 
-    return {
+    return <Plugin>{
+        async load(id) {
+            if (id.includes("?raw")) {
+                return await this.load({
+                    id: id.replace(/\?raw$/, ""),
+                });
+            }
+
+            return null;
+        },
         name: "packem:raw",
         transform(code, id) {
-            if (!filter(id)) {
+            if (!filter(id) && !id.includes("?raw")) {
                 return null;
             }
 
+            if (!id.includes("?raw")) {
+                // eslint-disable-next-line no-param-reassign
+                code = `export default ${JSON.stringify(code)}`
+            }
+
             return {
-                code: `export default ${JSON.stringify(code)}`,
-                map: null,
+                code,
+                map: { mappings: "" },
             };
         },
     };
