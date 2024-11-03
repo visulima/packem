@@ -60,12 +60,12 @@
     "exports": {
         ".": {
             "import": {
-                "types": "./dist/create-bundler.d.mts",
-                "default": "./dist/create-bundler.mjs"
+                "types": "./dist/packem.d.mts",
+                "default": "./dist/packem.mjs"
             },
             "require": {
-                "types": "./dist/create-bundler.d.cts",
-                "default": "./dist/create-bundler.cjs"
+                "types": "./dist/packem.d.cts",
+                "default": "./dist/packem.cjs"
             }
         },
         "./config": {
@@ -150,13 +150,13 @@
         },
         "./package.json": "./package.json"
     },
-    "main": "dist/create-bundler.cjs",
-    "module": "dist/create-bundler.mjs",
-    "types": "dist/create-bundler.d.ts",
+    "main": "dist/packem.cjs",
+    "module": "dist/packem.mjs",
+    "types": "dist/packem.d.ts",
     "typesVersions": {
         ">=5.0": {
             ".": [
-                "./dist/create-bundler.d.ts"
+                "./dist/packem.d.ts"
             ],
             "config": [
                 "./dist/config.d.ts"

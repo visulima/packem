@@ -3,7 +3,7 @@ import { env, exit } from "node:process";
 import type { Cli } from "@visulima/cerebro";
 
 import { DEVELOPMENT_ENV, PRODUCTION_ENV } from "../constants";
-import createBundler from "../create-bundler";
+import packem from "../packem";
 import type { Environment, Mode } from "../types";
 
 const createBuildCommand = (cli: Cli): void => {
@@ -51,7 +51,7 @@ const createBuildCommand = (cli: Cli): void => {
             }
 
             try {
-                await createBundler(options.dir, mode, nodeEnvironment as Environment, logger, {
+                await packem(options.dir, mode, nodeEnvironment as Environment, logger, {
                     analyze: options.analyze,
                     cjsInterop: options.cjsInterop,
                     clean: options.clean,

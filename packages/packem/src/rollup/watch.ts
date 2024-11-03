@@ -10,7 +10,19 @@ import { getRollupDtsOptions, getRollupOptions } from "./get-rollup-options";
 
 const WATCH_CACHE_KEY = "rollup-watch.json";
 
-const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, mode: "bundle" | "types", context: BuildContext) => {
+const watchHandler = ({
+    context,
+    fileCache,
+    mode,
+    runBuilder,
+    watcher,
+}: {
+    context: BuildContext;
+    fileCache: FileCache;
+    mode: "bundle" | "types";
+    runBuilder?: (watchMode?: true) => Promise<void>;
+    watcher: RollupWatcher;
+}): void => {
     const prefix = "watcher:" + mode;
 
     watcher.on("change", (id, { event }) => {
@@ -22,7 +34,7 @@ const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, mode: "bundl
 
     watcher.on("restart", () => {
         context.logger.info({
-            message: "Rebuilding " + mode + "...",
+            message: "Rebuilding ...",
             prefix,
         });
     });
@@ -32,7 +44,7 @@ const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, mode: "bundl
         switch (event.code) {
             case "END": {
                 context.logger.success({
-                    message: "Rebuild " + mode + " finished",
+                    message: "Rebuild finished",
                     prefix,
                 });
 
@@ -51,11 +63,12 @@ const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, mode: "bundl
 
                 fileCache.set(mode === "bundle" ? WATCH_CACHE_KEY : "dts-" + WATCH_CACHE_KEY, event.result.cache);
 
-                context.logger.info({
-                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                    message: cyan(`built in ${event.duration + ""}ms.`),
-                    prefix,
-                });
+                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                context.logger.raw("\n⚡️ Build run in " + event.duration + "ms\n\n");
+
+                if (runBuilder) {
+                    await runBuilder(true);
+                }
 
                 break;
             }
@@ -64,7 +77,7 @@ const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, mode: "bundl
 
                 context.logger.error({
                     context: [event.error],
-                    message: "Rebuild " + mode + " failed: " + event.error.message,
+                    message: "Rebuild failed: " + event.error.message,
                     prefix,
                 });
 
@@ -75,7 +88,7 @@ const watchHandler = (watcher: RollupWatcher, fileCache: FileCache, mode: "bundl
     });
 };
 
-const watch = async (context: BuildContext, fileCache: FileCache): Promise<void> => {
+const watch = async (context: BuildContext, fileCache: FileCache, runBuilder: () => Promise<void>): Promise<void> => {
     const rollupOptions = await getRollupOptions(context, fileCache);
 
     await context.hooks.callHook("rollup:options", context, rollupOptions);
@@ -126,7 +139,7 @@ const watch = async (context: BuildContext, fileCache: FileCache): Promise<void>
               : Object.keys(rollupOptions.input ?? {})),
     ];
 
-    let infoMessage = `Starting watchers for entries:`;
+    let infoMessage = `Starting watcher for entries:`;
 
     for (const input of inputs) {
         infoMessage += gray(`\n  └─ ${relative(process.cwd(), input)}`);
@@ -134,9 +147,20 @@ const watch = async (context: BuildContext, fileCache: FileCache): Promise<void>
 
     context.logger.info(infoMessage);
 
-    watchHandler(watcher, fileCache, "bundle", context);
+    watchHandler({
+        context,
+        fileCache,
+        mode: "bundle",
+        runBuilder,
+        watcher,
+    });
 
-    if (context.options.declaration) {
+    if (context.options.declaration && context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer) {
+        context.logger.info({
+            message: "Using isolated declaration transformer to generate declaration files...",
+            prefix: "dts",
+        });
+    } else if (context.options.declaration) {
         const rollupDtsOptions = await getRollupDtsOptions(context, fileCache);
 
         rollupDtsOptions.cache = fileCache.get("dts-" + WATCH_CACHE_KEY);
@@ -147,7 +171,12 @@ const watch = async (context: BuildContext, fileCache: FileCache): Promise<void>
 
         await context.hooks.callHook("rollup:watch", context, dtsWatcher);
 
-        watchHandler(dtsWatcher, fileCache, "types", context);
+        watchHandler({
+            context,
+            fileCache,
+            mode: "types",
+            watcher: dtsWatcher,
+        });
     }
 };
 

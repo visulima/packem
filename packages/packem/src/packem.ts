@@ -607,7 +607,7 @@ const getMode = (mode: Mode): string => {
     }
 };
 
-const createBundler = async (
+const packem = async (
     rootDirectory: string,
     mode: Mode,
     environment: Environment,
@@ -726,8 +726,29 @@ const createBundler = async (
         // Clean dist dirs
         await cleanDistributionDirectories(context);
 
-        const start = Date.now();
+        const runBuilder = async (watchMode?: true) => {
+            for await (const [name, builder] of Object.entries(context.options.builder ?? {})) {
+                context.logger.raw("\n");
 
+                await context.hooks.callHook("builder:before", name, context);
+
+                const builderStart = Date.now();
+
+                const getBuilderDuration = () => duration(Math.floor(Date.now() - builderStart));
+
+                await builder(context, cachePath, fileCache, logged);
+
+                await context.hooks.callHook("builder:done", name, context);
+
+                context.logger.raw("\n⚡️ " + name + " run in " + getBuilderDuration());
+
+                if (watchMode) {
+                    context.logger.raw("\n\n");
+                }
+            }
+        };
+
+        const start = Date.now();
         const getDuration = () => duration(Math.floor(Date.now() - start));
 
         if (mode === "watch") {
@@ -735,7 +756,7 @@ const createBundler = async (
                 throw new Error("Rollup watch is disabled. You should check your packem.config file.");
             }
 
-            await rollupWatch(context, fileCache);
+            await rollupWatch(context, fileCache, runBuilder);
 
             logBuildErrors(context, false);
 
@@ -760,24 +781,8 @@ const createBundler = async (
 
         context.logger.raw("\n⚡️ Build run in " + getDuration());
 
-        for await (const [name, builder] of Object.entries(context.options.builder ?? {})) {
-            context.logger.raw("\n");
+        await runBuilder();
 
-            await context.hooks.callHook("builder:before", name, context);
-
-            const builderStart = Date.now();
-
-            const getBuilderDuration = () => duration(Math.floor(Date.now() - builderStart));
-
-            await builder(context, cachePath, fileCache, logged);
-
-            await context.hooks.callHook("builder:done", name, context);
-
-            context.logger.raw("\n⚡️ " + name + " run in " + getBuilderDuration());
-        }
-
-        // Restore all wrapped console methods
-        context.logger.restoreAll();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         logger.raw("\n");
@@ -786,11 +791,14 @@ const createBundler = async (
 
         throw error;
     } finally {
+        // Restore all wrapped console methods
+        logger.restoreAll();
+
         await removeOldCacheFolders(cachePath, logger, logged);
     }
 };
 
-export default createBundler;
+export default packem;
 
 export type {
     BuildConfig,

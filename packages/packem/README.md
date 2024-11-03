@@ -525,6 +525,1953 @@ You choose which one of the three supported transformer to use.
 ## Api Docs
 
 <!-- TYPEDOC -->
+
+# cli
+# config
+
+## Functions
+
+### defineConfig()
+
+```ts
+function defineConfig(config): BuildConfig | BuildConfigFunction
+```
+
+Define a build configuration.
+
+#### Parameters
+
+• **config**: [`BuildConfig`](packem.md#buildconfig) \| [`BuildConfigFunction`](config.md#buildconfigfunction)
+
+#### Returns
+
+[`BuildConfig`](packem.md#buildconfig) \| [`BuildConfigFunction`](config.md#buildconfigfunction)
+
+#### Defined in
+
+[config.ts:14](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/config.ts#L14)
+
+***
+
+### definePreset()
+
+```ts
+function definePreset(preset): BuildPreset
+```
+
+Define a build preset.
+
+#### Parameters
+
+• **preset**: [`BuildPreset`](packem.md#buildpreset)
+
+#### Returns
+
+[`BuildPreset`](packem.md#buildpreset)
+
+#### Defined in
+
+[config.ts:24](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/config.ts#L24)
+
+## Type Aliases
+
+### BuildConfigFunction()
+
+```ts
+type BuildConfigFunction: (enviroment, mode) => BuildConfig | Promise<BuildConfig>;
+```
+
+#### Parameters
+
+• **enviroment**: [`Environment`](packem.md#environment-2)
+
+• **mode**: [`Mode`](packem.md#mode-1)
+
+#### Returns
+
+[`BuildConfig`](packem.md#buildconfig) \| `Promise`\<[`BuildConfig`](packem.md#buildconfig)\>
+
+#### Defined in
+
+[config.ts:3](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/config.ts#L3)
+
+## References
+
+### BuildConfig
+
+Re-exports [BuildConfig](packem.md#buildconfig)
+
+### BuildHooks
+
+Re-exports [BuildHooks](packem.md#buildhooks)
+
+### BuildPreset
+
+Re-exports [BuildPreset](packem.md#buildpreset)
+# packem
+
+## Functions
+
+### packem()
+
+```ts
+function packem(
+   rootDirectory, 
+   mode, 
+   environment, 
+   logger, 
+inputConfig): Promise<void>
+```
+
+#### Parameters
+
+• **rootDirectory**: `string`
+
+• **mode**: [`Mode`](packem.md#mode-1)
+
+• **environment**: [`Environment`](packem.md#environment-2)
+
+• **logger**: `PailServerType`
+
+• **inputConfig**: `object` & [`BuildConfig`](packem.md#buildconfig) = `{}`
+
+#### Returns
+
+`Promise`\<`void`\>
+
+#### Defined in
+
+[packem.ts:610](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/packem.ts#L610)
+
+## Interfaces
+
+### BuildConfig
+
+In addition to basic `entries`, `presets`, and `hooks`,
+there are also all the properties of `BuildOptions` except for BuildOption's `entries`.
+
+#### Extends
+
+- `DeepPartial`\<`Omit`\<[`BuildOptions`](packem.md#buildoptions), `"entries"`\>\>
+
+#### Properties
+
+##### alias?
+
+```ts
+optional alias: DeepPartial<Record<string, string>>;
+```
+
+###### Inherited from
+
+`DeepPartial.alias`
+
+###### Defined in
+
+[types.ts:181](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L181)
+
+##### analyze?
+
+```ts
+optional analyze: DeepPartial<boolean>;
+```
+
+###### Inherited from
+
+`DeepPartial.analyze`
+
+###### Defined in
+
+[types.ts:182](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L182)
+
+##### builder?
+
+```ts
+optional builder: DeepPartial<Record<string, (context, cachePath, fileCache, logged) => Promise<void>>>;
+```
+
+###### Inherited from
+
+`DeepPartial.builder`
+
+###### Defined in
+
+[types.ts:183](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L183)
+
+##### cjsInterop?
+
+```ts
+optional cjsInterop: DeepPartial<boolean>;
+```
+
+###### Inherited from
+
+`DeepPartial.cjsInterop`
+
+###### Defined in
+
+[types.ts:184](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L184)
+
+##### clean?
+
+```ts
+optional clean: DeepPartial<boolean>;
+```
+
+###### Inherited from
+
+`DeepPartial.clean`
+
+###### Defined in
+
+[types.ts:185](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L185)
+
+##### debug?
+
+```ts
+optional debug: DeepPartial<boolean>;
+```
+
+###### Inherited from
+
+`DeepPartial.debug`
+
+###### Defined in
+
+[types.ts:186](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L186)
+
+##### declaration?
+
+```ts
+optional declaration: DeepPartial<boolean | "compatible" | "node16">;
+```
+
+`compatible` means "src/gather.ts" will generate "dist/index.d.mts", "dist/index.d.cts" and "dist/index.d.ts".
+`node16` means "src/gather.ts" will generate "dist/index.d.mts" and "dist/index.d.cts".
+`true` is equivalent to `compatible`.
+`false` will disable declaration generation.
+`undefined` will auto-detect based on "package.json". If "package.json" has "types" field, it will be `"compatible"`, otherwise `false`.
+
+###### Inherited from
+
+`DeepPartial.declaration`
+
+###### Defined in
+
+[types.ts:194](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L194)
+
+##### dtsOnly?
+
+```ts
+optional dtsOnly: DeepPartial<boolean>;
+```
+
+If `true`, only generate declaration files.
+If `false` or `undefined`, generate both declaration and source files.
+
+###### Inherited from
+
+`DeepPartial.dtsOnly`
+
+###### Defined in
+
+[types.ts:199](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L199)
+
+##### emitCJS?
+
+```ts
+optional emitCJS: DeepPartial<boolean>;
+```
+
+###### Inherited from
+
+`DeepPartial.emitCJS`
+
+###### Defined in
+
+[types.ts:200](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L200)
+
+##### emitESM?
+
+```ts
+optional emitESM: DeepPartial<boolean>;
+```
+
+###### Inherited from
+
+`DeepPartial.emitESM`
+
+###### Defined in
+
+[types.ts:201](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L201)
+
+##### entries?
+
+```ts
+optional entries: (string | BuildEntry)[];
+```
+
+###### Defined in
+
+[types.ts:309](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L309)
+
+##### externals?
+
+```ts
+optional externals: DeepPartial<string | RegExp>[];
+```
+
+###### Inherited from
+
+`DeepPartial.externals`
+
+###### Defined in
+
+[types.ts:203](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L203)
+
+##### failOnWarn?
+
+```ts
+optional failOnWarn: DeepPartial<boolean>;
+```
+
+###### Inherited from
+
+`DeepPartial.failOnWarn`
+
+###### Defined in
+
+[types.ts:204](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L204)
+
+##### fileCache?
+
+```ts
+optional fileCache: DeepPartial<boolean>;
+```
+
+###### Inherited from
+
+`DeepPartial.fileCache`
+
+###### Defined in
+
+[types.ts:205](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L205)
+
+##### hooks?
+
+```ts
+optional hooks: Partial<BuildHooks>;
+```
+
+###### Defined in
+
+[types.ts:310](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L310)
+
+##### isolatedDeclarationTransformer?
+
+```ts
+optional isolatedDeclarationTransformer: DeepPartial<(code, id) => Promise<IsolatedDeclarationsResult>>;
+```
+
+**`Experimental`**
+
+###### Inherited from
+
+`DeepPartial.isolatedDeclarationTransformer`
+
+###### Defined in
+
+[types.ts:207](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L207)
+
+##### jiti?
+
+```ts
+optional jiti: DeepPartial<Omit<JitiOptions, "transform" | "onError">>;
+```
+
+Jiti options, where [jiti](https://github.com/unjs/jiti) is used to load the entry files.
+
+###### Inherited from
+
+`DeepPartial.jiti`
+
+###### Defined in
+
+[types.ts:211](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L211)
+
+##### minify?
+
+```ts
+optional minify: DeepPartial<boolean>;
+```
+
+###### Inherited from
+
+`DeepPartial.minify`
+
+###### Defined in
+
+[types.ts:212](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L212)
+
+##### name?
+
+```ts
+optional name: string;
+```
+
+###### Inherited from
+
+`DeepPartial.name`
+
+###### Defined in
+
+[types.ts:213](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L213)
+
+##### outDir?
+
+```ts
+optional outDir: string;
+```
+
+###### Inherited from
+
+`DeepPartial.outDir`
+
+###### Defined in
+
+[types.ts:214](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L214)
+
+##### preset?
+
+```ts
+optional preset: "none" | "auto" | BuildPreset | object & string;
+```
+
+###### Defined in
+
+[types.ts:311](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L311)
+
+##### rollup?
+
+```ts
+optional rollup: DeepPartial<RollupBuildOptions>;
+```
+
+###### Inherited from
+
+`DeepPartial.rollup`
+
+###### Defined in
+
+[types.ts:215](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L215)
+
+##### rootDir?
+
+```ts
+optional rootDir: string;
+```
+
+###### Inherited from
+
+`DeepPartial.rootDir`
+
+###### Defined in
+
+[types.ts:216](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L216)
+
+##### sourceDir?
+
+```ts
+optional sourceDir: string;
+```
+
+###### Inherited from
+
+`DeepPartial.sourceDir`
+
+###### Defined in
+
+[types.ts:217](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L217)
+
+##### sourcemap?
+
+```ts
+optional sourcemap: DeepPartial<boolean>;
+```
+
+###### Inherited from
+
+`DeepPartial.sourcemap`
+
+###### Defined in
+
+[types.ts:218](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L218)
+
+##### transformer?
+
+```ts
+optional transformer: DeepPartial<(config) => Plugin<any>>;
+```
+
+###### Inherited from
+
+`DeepPartial.transformer`
+
+###### Defined in
+
+[types.ts:219](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L219)
+
+##### typedoc?
+
+```ts
+optional typedoc: DeepPartial<false | TypeDocumentOptions>;
+```
+
+###### Inherited from
+
+`DeepPartial.typedoc`
+
+###### Defined in
+
+[types.ts:220](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L220)
+
+##### validation?
+
+```ts
+optional validation: DeepPartial<object>;
+```
+
+###### Type declaration
+
+###### packageJson?
+
+```ts
+optional packageJson: object;
+```
+
+###### packageJson.bin?
+
+```ts
+optional bin: boolean;
+```
+
+###### packageJson.dependencies?
+
+```ts
+optional dependencies: boolean;
+```
+
+###### packageJson.exports?
+
+```ts
+optional exports: boolean;
+```
+
+###### packageJson.files?
+
+```ts
+optional files: boolean;
+```
+
+###### packageJson.main?
+
+```ts
+optional main: boolean;
+```
+
+###### packageJson.module?
+
+```ts
+optional module: boolean;
+```
+
+###### packageJson.name?
+
+```ts
+optional name: boolean;
+```
+
+###### packageJson.types?
+
+```ts
+optional types: boolean;
+```
+
+###### packageJson.typesVersions?
+
+```ts
+optional typesVersions: boolean;
+```
+
+###### Inherited from
+
+`DeepPartial.validation`
+
+###### Defined in
+
+[types.ts:221](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L221)
+
+***
+
+### BuildContext
+
+#### Properties
+
+##### buildEntries
+
+```ts
+buildEntries: (BuildContextBuildEntry | BuildContextBuildAssetAndChunk)[];
+```
+
+###### Defined in
+
+[types.ts:288](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L288)
+
+##### dependencyGraphMap
+
+```ts
+dependencyGraphMap: Map<string, Set<[string, string]>>;
+```
+
+###### Defined in
+
+[types.ts:289](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L289)
+
+##### environment
+
+```ts
+environment: Environment;
+```
+
+###### Defined in
+
+[types.ts:290](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L290)
+
+##### hooks
+
+```ts
+hooks: Hookable<BuildHooks, HookKeys<BuildHooks>>;
+```
+
+###### Defined in
+
+[types.ts:291](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L291)
+
+##### jiti
+
+```ts
+jiti: Jiti;
+```
+
+###### Defined in
+
+[types.ts:292](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L292)
+
+##### logger
+
+```ts
+logger: PailServerType;
+```
+
+###### Defined in
+
+[types.ts:293](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L293)
+
+##### mode
+
+```ts
+mode: Mode;
+```
+
+###### Defined in
+
+[types.ts:294](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L294)
+
+##### options
+
+```ts
+options: InternalBuildOptions;
+```
+
+###### Defined in
+
+[types.ts:295](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L295)
+
+##### pkg
+
+```ts
+pkg: PackageJson<!-- TYPEDOC -->;
+```
+
+###### Defined in
+
+[types.ts:296](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L296)
+
+##### tsconfig?
+
+```ts
+optional tsconfig: TsConfigResult;
+```
+
+###### Defined in
+
+[types.ts:297](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L297)
+
+##### usedImports
+
+```ts
+usedImports: Set<string>;
+```
+
+###### Defined in
+
+[types.ts:298](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L298)
+
+##### warnings
+
+```ts
+warnings: Set<string>;
+```
+
+###### Defined in
+
+[types.ts:299](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L299)
+
+***
+
+### BuildHooks
+
+#### Properties
+
+##### build:before()
+
+```ts
+build:before: (context) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:237](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L237)
+
+##### build:done()
+
+```ts
+build:done: (context) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:238](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L238)
+
+##### build:prepare()
+
+```ts
+build:prepare: (context) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:239](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L239)
+
+##### builder:before()
+
+```ts
+builder:before: (name, context) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **name**: `string`
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:241](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L241)
+
+##### builder:done()
+
+```ts
+builder:done: (name, context) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **name**: `string`
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:242](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L242)
+
+##### rollup:build()
+
+```ts
+rollup:build: (context, build) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+• **build**: `RollupBuild`
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:244](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L244)
+
+##### rollup:done()
+
+```ts
+rollup:done: (context) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:245](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L245)
+
+##### rollup:dts:build()
+
+```ts
+rollup:dts:build: (context, build) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+• **build**: `RollupBuild`
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:246](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L246)
+
+##### rollup:dts:done()
+
+```ts
+rollup:dts:done: (context) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:248](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L248)
+
+##### rollup:dts:options()
+
+```ts
+rollup:dts:options: (context, options) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+• **options**: `RollupOptions`
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:249](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L249)
+
+##### rollup:options()
+
+```ts
+rollup:options: (context, options) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+• **options**: `RollupOptions`
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:251](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L251)
+
+##### rollup:watch()
+
+```ts
+rollup:watch: (context, watcher) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+• **watcher**: `RollupWatcher`
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:252](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L252)
+
+##### typedoc:before()
+
+```ts
+typedoc:before: (context) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:255](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L255)
+
+##### typedoc:done()
+
+```ts
+typedoc:done: (context) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:257](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L257)
+
+##### validate:before()
+
+```ts
+validate:before: (context) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:259](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L259)
+
+##### validate:done()
+
+```ts
+validate:done: (context) => void | Promise<void>;
+```
+
+###### Parameters
+
+• **context**: [`BuildContext`](packem.md#buildcontext)
+
+###### Returns
+
+`void` \| `Promise`\<`void`\>
+
+###### Defined in
+
+[types.ts:260](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L260)
+
+***
+
+### BuildOptions
+
+#### Properties
+
+##### alias
+
+```ts
+alias: Record<string, string>;
+```
+
+###### Defined in
+
+[types.ts:181](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L181)
+
+##### analyze?
+
+```ts
+optional analyze: boolean;
+```
+
+###### Defined in
+
+[types.ts:182](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L182)
+
+##### builder?
+
+```ts
+optional builder: Record<string, (context, cachePath, fileCache, logged) => Promise<void>>;
+```
+
+###### Defined in
+
+[types.ts:183](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L183)
+
+##### cjsInterop?
+
+```ts
+optional cjsInterop: boolean;
+```
+
+###### Defined in
+
+[types.ts:184](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L184)
+
+##### clean
+
+```ts
+clean: boolean;
+```
+
+###### Defined in
+
+[types.ts:185](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L185)
+
+##### debug
+
+```ts
+debug: boolean;
+```
+
+###### Defined in
+
+[types.ts:186](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L186)
+
+##### declaration?
+
+```ts
+optional declaration: boolean | "compatible" | "node16";
+```
+
+`compatible` means "src/gather.ts" will generate "dist/index.d.mts", "dist/index.d.cts" and "dist/index.d.ts".
+`node16` means "src/gather.ts" will generate "dist/index.d.mts" and "dist/index.d.cts".
+`true` is equivalent to `compatible`.
+`false` will disable declaration generation.
+`undefined` will auto-detect based on "package.json". If "package.json" has "types" field, it will be `"compatible"`, otherwise `false`.
+
+###### Defined in
+
+[types.ts:194](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L194)
+
+##### dtsOnly?
+
+```ts
+optional dtsOnly: boolean;
+```
+
+If `true`, only generate declaration files.
+If `false` or `undefined`, generate both declaration and source files.
+
+###### Defined in
+
+[types.ts:199](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L199)
+
+##### emitCJS?
+
+```ts
+optional emitCJS: boolean;
+```
+
+###### Defined in
+
+[types.ts:200](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L200)
+
+##### emitESM?
+
+```ts
+optional emitESM: boolean;
+```
+
+###### Defined in
+
+[types.ts:201](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L201)
+
+##### entries
+
+```ts
+entries: BuildEntry[];
+```
+
+###### Defined in
+
+[types.ts:202](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L202)
+
+##### externals
+
+```ts
+externals: (string | RegExp)[];
+```
+
+###### Defined in
+
+[types.ts:203](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L203)
+
+##### failOnWarn?
+
+```ts
+optional failOnWarn: boolean;
+```
+
+###### Defined in
+
+[types.ts:204](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L204)
+
+##### fileCache?
+
+```ts
+optional fileCache: boolean;
+```
+
+###### Defined in
+
+[types.ts:205](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L205)
+
+##### isolatedDeclarationTransformer()?
+
+```ts
+optional isolatedDeclarationTransformer: (code, id) => Promise<IsolatedDeclarationsResult>;
+```
+
+**`Experimental`**
+
+###### Parameters
+
+• **code**: `string`
+
+• **id**: `string`
+
+###### Returns
+
+`Promise`\<`IsolatedDeclarationsResult`\>
+
+###### Defined in
+
+[types.ts:207](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L207)
+
+##### jiti
+
+```ts
+jiti: Omit<JitiOptions, "transform" | "onError">;
+```
+
+Jiti options, where [jiti](https://github.com/unjs/jiti) is used to load the entry files.
+
+###### Defined in
+
+[types.ts:211](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L211)
+
+##### minify?
+
+```ts
+optional minify: boolean;
+```
+
+###### Defined in
+
+[types.ts:212](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L212)
+
+##### name
+
+```ts
+name: string;
+```
+
+###### Defined in
+
+[types.ts:213](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L213)
+
+##### outDir
+
+```ts
+outDir: string;
+```
+
+###### Defined in
+
+[types.ts:214](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L214)
+
+##### rollup
+
+```ts
+rollup: RollupBuildOptions;
+```
+
+###### Defined in
+
+[types.ts:215](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L215)
+
+##### rootDir
+
+```ts
+rootDir: string;
+```
+
+###### Defined in
+
+[types.ts:216](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L216)
+
+##### sourceDir
+
+```ts
+sourceDir: string;
+```
+
+###### Defined in
+
+[types.ts:217](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L217)
+
+##### sourcemap
+
+```ts
+sourcemap: boolean;
+```
+
+###### Defined in
+
+[types.ts:218](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L218)
+
+##### transformer()
+
+```ts
+transformer: (config) => Plugin<any>;
+```
+
+###### Parameters
+
+• **config**: `EsbuildPluginConfig` \| `SucrasePluginConfig` \| `SwcPluginConfig`
+
+###### Returns
+
+`Plugin`\<`any`\>
+
+###### Defined in
+
+[types.ts:219](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L219)
+
+##### typedoc
+
+```ts
+typedoc: false | TypeDocumentOptions;
+```
+
+###### Defined in
+
+[types.ts:220](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L220)
+
+##### validation?
+
+```ts
+optional validation: object;
+```
+
+###### packageJson?
+
+```ts
+optional packageJson: object;
+```
+
+###### packageJson.bin?
+
+```ts
+optional bin: boolean;
+```
+
+###### packageJson.dependencies?
+
+```ts
+optional dependencies: boolean;
+```
+
+###### packageJson.exports?
+
+```ts
+optional exports: boolean;
+```
+
+###### packageJson.files?
+
+```ts
+optional files: boolean;
+```
+
+###### packageJson.main?
+
+```ts
+optional main: boolean;
+```
+
+###### packageJson.module?
+
+```ts
+optional module: boolean;
+```
+
+###### packageJson.name?
+
+```ts
+optional name: boolean;
+```
+
+###### packageJson.types?
+
+```ts
+optional types: boolean;
+```
+
+###### packageJson.typesVersions?
+
+```ts
+optional typesVersions: boolean;
+```
+
+###### Defined in
+
+[types.ts:221](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L221)
+
+***
+
+### RollupBuildOptions
+
+#### Properties
+
+##### alias
+
+```ts
+alias: false | RollupAliasOptions;
+```
+
+###### Defined in
+
+[types.ts:104](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L104)
+
+##### cjsInterop?
+
+```ts
+optional cjsInterop: CJSInteropOptions;
+```
+
+###### Defined in
+
+[types.ts:105](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L105)
+
+##### commonjs
+
+```ts
+commonjs: false | RollupCommonJSOptions;
+```
+
+###### Defined in
+
+[types.ts:106](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L106)
+
+##### copy?
+
+```ts
+optional copy: false | CopyPluginOptions;
+```
+
+###### Defined in
+
+[types.ts:107](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L107)
+
+##### dts
+
+```ts
+dts: Options;
+```
+
+###### Defined in
+
+[types.ts:108](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L108)
+
+##### dynamicVars?
+
+```ts
+optional dynamicVars: false | RollupDynamicImportVariablesOptions;
+```
+
+###### Defined in
+
+[types.ts:109](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L109)
+
+##### esbuild
+
+```ts
+esbuild: false | Options;
+```
+
+###### Defined in
+
+[types.ts:110](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L110)
+
+##### isolatedDeclarations?
+
+```ts
+optional isolatedDeclarations: IsolatedDeclarationsOptions;
+```
+
+###### Defined in
+
+[types.ts:111](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L111)
+
+##### json
+
+```ts
+json: false | RollupJsonOptions;
+```
+
+###### Defined in
+
+[types.ts:112](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L112)
+
+##### jsxRemoveAttributes?
+
+```ts
+optional jsxRemoveAttributes: false | JSXRemoveAttributesPlugin;
+```
+
+###### Defined in
+
+[types.ts:113](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L113)
+
+##### license?
+
+```ts
+optional license: false | LicenseOptions;
+```
+
+###### Defined in
+
+[types.ts:114](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L114)
+
+##### metafile?
+
+```ts
+optional metafile: boolean;
+```
+
+###### Defined in
+
+[types.ts:115](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L115)
+
+##### node10Compatibility?
+
+```ts
+optional node10Compatibility: false | Node10CompatibilityOptions;
+```
+
+###### Defined in
+
+[types.ts:116](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L116)
+
+##### output?
+
+```ts
+optional output: OutputOptions;
+```
+
+###### Defined in
+
+[types.ts:117](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L117)
+
+##### patchTypes
+
+```ts
+patchTypes: false | PatchTypesOptions;
+```
+
+###### Defined in
+
+[types.ts:118](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L118)
+
+##### plugins?
+
+```ts
+optional plugins: RollupPlugins;
+```
+
+###### Defined in
+
+[types.ts:119](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L119)
+
+##### polyfillNode?
+
+```ts
+optional polyfillNode: false | NodePolyfillsOptions;
+```
+
+###### Defined in
+
+[types.ts:120](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L120)
+
+##### preserveDirectives?
+
+```ts
+optional preserveDirectives: object;
+```
+
+###### directiveRegex?
+
+```ts
+optional directiveRegex: RegExp;
+```
+
+###### exclude?
+
+```ts
+optional exclude: FilterPattern;
+```
+
+###### include?
+
+```ts
+optional include: FilterPattern;
+```
+
+###### Defined in
+
+[types.ts:121](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L121)
+
+##### preserveDynamicImports?
+
+```ts
+optional preserveDynamicImports: boolean;
+```
+
+###### Defined in
+
+[types.ts:126](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L126)
+
+##### raw?
+
+```ts
+optional raw: false | RawLoaderOptions;
+```
+
+###### Defined in
+
+[types.ts:127](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L127)
+
+##### replace
+
+```ts
+replace: false | RollupReplaceOptions;
+```
+
+###### Defined in
+
+[types.ts:128](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L128)
+
+##### resolve
+
+```ts
+resolve: false | RollupNodeResolveOptions;
+```
+
+###### Defined in
+
+[types.ts:129](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L129)
+
+##### shebang?
+
+```ts
+optional shebang: false | Partial<ShebangOptions>;
+```
+
+###### Defined in
+
+[types.ts:130](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L130)
+
+##### shim?
+
+```ts
+optional shim: false | EsmShimCjsSyntaxOptions;
+```
+
+###### Defined in
+
+[types.ts:131](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L131)
+
+##### sucrase?
+
+```ts
+optional sucrase: false | SucrasePluginConfig;
+```
+
+###### Defined in
+
+[types.ts:132](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L132)
+
+##### swc?
+
+```ts
+optional swc: false | SwcPluginConfig;
+```
+
+###### Defined in
+
+[types.ts:133](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L133)
+
+##### treeshake?
+
+```ts
+optional treeshake: boolean | TreeshakingPreset | TreeshakingOptions;
+```
+
+###### Defined in
+
+[types.ts:134](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L134)
+
+##### visualizer?
+
+```ts
+optional visualizer: false | PluginVisualizerOptions;
+```
+
+###### Defined in
+
+[types.ts:135](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L135)
+
+##### wasm?
+
+```ts
+optional wasm: false | RollupWasmOptions;
+```
+
+###### Defined in
+
+[types.ts:136](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L136)
+
+##### watch?
+
+```ts
+optional watch: false | WatcherOptions;
+```
+
+###### Defined in
+
+[types.ts:137](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L137)
+
+## Type Aliases
+
+### BuildContextBuildAssetAndChunk
+
+```ts
+type BuildContextBuildAssetAndChunk: object;
+```
+
+#### Type declaration
+
+##### bytes?
+
+```ts
+optional bytes: number;
+```
+
+##### chunk?
+
+```ts
+optional chunk: boolean;
+```
+
+##### chunks?
+
+```ts
+optional chunks: string[];
+```
+
+##### exports?
+
+```ts
+optional exports: string[];
+```
+
+##### modules?
+
+```ts
+optional modules: object[];
+```
+
+##### path
+
+```ts
+path: string;
+```
+
+##### type?
+
+```ts
+optional type: "asset" | "chunk";
+```
+
+#### Defined in
+
+[types.ts:273](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L273)
+
+***
+
+### BuildContextBuildEntry
+
+```ts
+type BuildContextBuildEntry: object;
+```
+
+#### Type declaration
+
+##### bytes?
+
+```ts
+optional bytes: number;
+```
+
+##### chunk?
+
+```ts
+optional chunk: boolean;
+```
+
+##### chunks?
+
+```ts
+optional chunks: string[];
+```
+
+##### exports?
+
+```ts
+optional exports: string[];
+```
+
+##### modules?
+
+```ts
+optional modules: object[];
+```
+
+##### path
+
+```ts
+path: string;
+```
+
+##### type?
+
+```ts
+optional type: "entry";
+```
+
+#### Defined in
+
+[types.ts:263](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L263)
+
+***
+
+### BuildEntry
+
+```ts
+type BuildEntry: object;
+```
+
+#### Type declaration
+
+##### cjs?
+
+```ts
+optional cjs: boolean;
+```
+
+##### declaration?
+
+```ts
+optional declaration: boolean | "compatible" | "node16";
+```
+
+##### environment?
+
+```ts
+optional environment: Environment;
+```
+
+##### esm?
+
+```ts
+optional esm: boolean;
+```
+
+##### executable?
+
+```ts
+optional executable: true;
+```
+
+##### exportKey?
+
+```ts
+optional exportKey: Set<string>;
+```
+
+##### fileAlias?
+
+```ts
+optional fileAlias: string;
+```
+
+##### input
+
+```ts
+input: string;
+```
+
+##### isGlob?
+
+```ts
+optional isGlob: boolean;
+```
+
+##### name?
+
+```ts
+optional name: string;
+```
+
+##### outDir?
+
+```ts
+optional outDir: string;
+```
+
+##### runtime?
+
+```ts
+optional runtime: Runtime;
+```
+
+#### Defined in
+
+[types.ts:165](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L165)
+
+***
+
+### BuildPreset
+
+```ts
+type BuildPreset: BuildConfig | () => BuildConfig;
+```
+
+#### Defined in
+
+[types.ts:302](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L302)
+
+***
+
+### Environment
+
+```ts
+type Environment: "production" | "development" | undefined;
+```
+
+#### Defined in
+
+[types.ts:90](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L90)
+
+***
+
+### Mode
+
+```ts
+type Mode: "build" | "jit" | "watch" | "tsdoc";
+```
+
+#### Defined in
+
+[types.ts:319](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L319)
+
+***
+
+### Runtime
+
+```ts
+type Runtime: "react-server" | "react-native" | "edge-light" | "node";
+```
+
+#### Defined in
+
+[types.ts:163](https://github.com/visulima/packem/blob/885eca49ac5183271c23315b601f9bb373f0e4b1/packages/packem/src/types.ts#L163)
+
 <!-- /TYPEDOC -->
 
 ## Related
