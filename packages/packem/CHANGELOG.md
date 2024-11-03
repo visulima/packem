@@ -1,3 +1,9 @@
+## @visulima/packem [1.2.1](https://github.com/visulima/packem/compare/@visulima/packem@1.2.0...@visulima/packem@1.2.1) (2024-11-03)
+
+### Bug Fixes
+
+* added missing builder run to watch, adjusted some watch text ([311b53f](https://github.com/visulima/packem/commit/311b53f3be087231568e34cb0aca657a80c188c1))
+
 ## @visulima/packem [1.2.0](https://github.com/visulima/packem/compare/@visulima/packem@1.1.1...@visulima/packem@1.2.0) (2024-11-02)
 
 ### Features
