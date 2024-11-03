@@ -275,4 +275,41 @@ export { a };
         expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.cts`)).toBeTruthy();
         expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.ts`)).toBeTruthy();
     });
+
+    it("should run 'onSuccess' when option was given", async () => {
+        expect.assertions(5);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
+
+        createTsConfig(temporaryDirectoryPath, {});
+        createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "dist/index.mjs",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackemSync("build", ["--onSuccess=echo hello && echo world"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).toContain("hello");
+        expect(binProcess.stdout).toContain("world");
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mtsContent).toBe(`const a = 1;
+
+export { a };
+`);
+    });
 });

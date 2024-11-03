@@ -87,6 +87,8 @@ interface RollupDynamicImportVariablesOptions {
     warnOnError?: boolean;
 }
 
+export type KillSignal = "SIGKILL" | "SIGTERM";
+
 export type Environment = "production" | "development" | undefined;
 
 export type RollupPlugins = (
@@ -209,8 +211,11 @@ export interface BuildOptions {
      * Jiti options, where [jiti](https://github.com/unjs/jiti) is used to load the entry files.
      */
     jiti: Omit<JitiOptions, "onError" | "transform">;
+    killSignal?: KillSignal;
     minify?: boolean | undefined;
     name: string;
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    onSuccess?: string | (() => Promise<void | undefined | (() => void | Promise<void>)>);
     outDir: string;
     rollup: RollupBuildOptions;
     rootDir: string;

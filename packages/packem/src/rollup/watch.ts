@@ -12,20 +12,26 @@ const WATCH_CACHE_KEY = "rollup-watch.json";
 
 const watchHandler = ({
     context,
+    doOnSuccessCleanup,
     fileCache,
     mode,
     runBuilder,
+    runOnsuccess,
     watcher,
 }: {
     context: BuildContext;
+    doOnSuccessCleanup?: () => Promise<void>;
     fileCache: FileCache;
     mode: "bundle" | "types";
     runBuilder?: (watchMode?: true) => Promise<void>;
+    runOnsuccess?: () => Promise<void>;
     watcher: RollupWatcher;
 }): void => {
     const prefix = "watcher:" + mode;
 
-    watcher.on("change", (id, { event }) => {
+    watcher.on("change", async (id, { event }) => {
+        await doOnSuccessCleanup?.();
+
         context.logger.info({
             message: `${cyan(relative(".", id))} was ${event}d`,
             prefix,
@@ -48,6 +54,8 @@ const watchHandler = ({
                     prefix,
                 });
 
+                await runOnsuccess?.();
+
                 break;
             }
             case "BUNDLE_START": {
@@ -66,9 +74,7 @@ const watchHandler = ({
                 // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
                 context.logger.raw("\n⚡️ Build run in " + event.duration + "ms\n\n");
 
-                if (runBuilder) {
-                    await runBuilder(true);
-                }
+                await runBuilder?.(true);
 
                 break;
             }
@@ -88,7 +94,14 @@ const watchHandler = ({
     });
 };
 
-const watch = async (context: BuildContext, fileCache: FileCache, runBuilder: () => Promise<void>): Promise<void> => {
+const watch = async (
+    context: BuildContext,
+    fileCache: FileCache,
+    runBuilder: () => Promise<void>,
+    runOnsuccess: () => Promise<void>,
+    doOnSuccessCleanup: () => Promise<void>,
+    // eslint-disable-next-line sonarjs/cognitive-complexity
+): Promise<void> => {
     const rollupOptions = await getRollupOptions(context, fileCache);
 
     await context.hooks.callHook("rollup:options", context, rollupOptions);
@@ -107,7 +120,7 @@ const watch = async (context: BuildContext, fileCache: FileCache, runBuilder: ()
             ...context.options.rollup.watch,
         };
 
-        rollupOptions.watch.include = [join(context.options.sourceDir, "**", "*"), "package.json"];
+        rollupOptions.watch.include = [join(context.options.sourceDir, "**", "*"), "package.json", "packem.config.*"];
 
         if (Array.isArray(context.options.rollup.watch.include)) {
             rollupOptions.watch.include = [...rollupOptions.watch.include, ...context.options.rollup.watch.include];
@@ -149,9 +162,11 @@ const watch = async (context: BuildContext, fileCache: FileCache, runBuilder: ()
 
     watchHandler({
         context,
+        doOnSuccessCleanup,
         fileCache,
         mode: "bundle",
         runBuilder,
+        runOnsuccess,
         watcher,
     });
 

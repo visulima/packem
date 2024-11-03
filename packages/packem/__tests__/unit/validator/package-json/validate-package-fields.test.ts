@@ -18,7 +18,7 @@ vi.mock("../../../../src/utils/warn", () => {
 describe("validatePackageFields", () => {
     beforeEach(() => {
         warn.mockClear();
-    })
+    });
 
     it('should warn if "files" field is missing in package.json when validation is enabled', () => {
         expect.assertions(1);
