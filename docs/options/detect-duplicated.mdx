@@ -1,0 +1,87 @@
+---
+title: Duplicate packages
+description: Detect dependencies that get bundled more than once and report them
+---
+
+## Overview
+
+When several of your dependencies depend on different versions of the same package — or the same version resolved from different locations (for example, distinct peer-dependency variants under pnpm) — that package ends up **bundled more than once**. This inflates bundle size and can cause subtle bugs when two copies of a library don't share state.
+
+Packem ships a built-in detector that walks the final module graph after each build and reports any package that was bundled multiple times, along with the files that imported each copy.
+
+It is **enabled by default**.
+
+## Example output
+
+```text
+WARNING  packages ms is bundled multiple times!
+
+  ms:
+    - 2.0.0 imported by packages/pkg1/index.js
+    - 2.1.3 imported by packages/pkg2/index.js
+```
+
+A runnable demo lives in [`examples/duplicated-packages`](https://github.com/visulima/packem/tree/main/examples/duplicated-packages).
+
+## Configuration
+
+Configure (or disable) it through the `rollup.detectDuplicated` option:
+
+```ts
+import { defineConfig } from "@visulima/packem/config";
+
+export default defineConfig({
+  rollup: {
+    detectDuplicated: {
+      // Stop reporting specific packages/versions. Use "*" to ignore all versions.
+      ignore: {
+        axios: ["0.27.2"],
+        lodash: ["*"],
+      },
+
+      // Only report duplicates imported directly by your own source,
+      // ignoring those pulled in transitively by another dependency.
+      // @default true
+      deep: true,
+
+      // Fail the build (non-zero exit) when duplicates are found.
+      // @default false
+      throwErrorWhenDuplicated: false,
+
+      // Build a custom report from the collected data instead of the default one.
+      // customErrorMessage: (packagesInfo) => `...`,
+    },
+  },
+});
+```
+
+### Disable it
+
+```ts
+import { defineConfig } from "@visulima/packem/config";
+
+export default defineConfig({
+  rollup: {
+    detectDuplicated: false,
+  },
+});
+```
+
+## Options
+
+| Option                     | Type                                            | Default | Description                                                                                                            |
+| -------------------------- | ----------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
+| `deep`                     | `boolean`                                       | `true`  | When `false`, only duplicates imported directly by your own source are reported (transitive ones are ignored).        |
+| `ignore`                   | `Record<string, string[]>`                      | `{}`    | Packages/versions to skip. Pass `"*"` as a version to ignore every version of that package.                           |
+| `throwErrorWhenDuplicated` | `boolean`                                       | `false` | Fail the build when duplicates are detected instead of only warning.                                                  |
+| `customErrorMessage`       | `(packagesInfo: PackagesInfo) => string`        | —       | Replace the default report with your own message, built from the collected duplicate map.                             |
+
+## Notes
+
+- The detector inspects the **bundled** module graph, so dependencies that are externalized (not bundled) are never flagged.
+- Detection runs at `buildEnd`, which means it works correctly with Packem's build cache and watch mode — there is no extra module resolution cost.
+- Set `detectDuplicated: false` if you don't want the check (for example, in a project that intentionally bundles multiple versions).
+
+## Tests
+
+See `packages/packem/__tests__/intigration/detect-duplicated.test.ts`.

@@ -1,0 +1,28 @@
+{
+    "name": "examples_packem_duplicated_packages_app",
+    "private": true,
+    "scripts": {
+        "clean": "rimraf node_modules dist",
+        "build": "packem build"
+    },
+    "type": "module",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/index.d.mts",
+                "default": "./dist/index.mjs"
+            }
+        }
+    },
+    "module": "./dist/index.mjs",
+    "files": [
+        "./dist"
+    ],
+    "devDependencies": {
+        "@visulima/packem": "workspace:*",
+        "esbuild": "catalog:build",
+        "examples_packem_duplicated_packages_pkg1": "workspace:*",
+        "examples_packem_duplicated_packages_pkg2": "workspace:*",
+        "rimraf": "^6.1.3"
+    }
+}

@@ -10,6 +10,17 @@ import stringify from "safe-stable-stringify";
 type CacheKeyResolver = string | ((...arguments_: any[]) => string);
 
 /**
+ * A memoized function with an additional `destroy` method to clear its cache.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Memoized<T extends (...arguments_: any[]) => any> = T & {
+    /**
+     * Manually clear the underlying cache to avoid memory leaks.
+     */
+    destroy: () => void;
+};
+
+/**
  * Creates a memoized version of a function that caches results based on input arguments.
  * @param function_ The function to memoize
  * @param cacheKey Optional cache key resolver (string or function)
@@ -21,7 +32,7 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
     function_: T,
     cacheKey?: CacheKeyResolver, // if you need specify a cache key
     cacheArgument?: Map<string, ReturnType<T>>,
-): T => {
+): Memoized<T> => {
     const cache: Map<string, ReturnType<T>> = cacheArgument ?? new Map<string, ReturnType<T>>();
 
     const resolveKey = (arguments_: Parameters<T>): string => {
@@ -32,7 +43,7 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
         return stringify({ args: arguments_ }) ?? JSON.stringify(arguments_);
     };
 
-    return ((...arguments_: Parameters<T>) => {
+    const memoized = ((...arguments_: Parameters<T>) => {
         const key = resolveKey(arguments_);
         const existing = cache.get(key);
 
@@ -45,7 +56,13 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
         cache.set(key, result);
 
         return result;
-    }) as T;
+    }) as Memoized<T>;
+
+    memoized.destroy = () => {
+        cache.clear();
+    };
+
+    return memoized;
 };
 
 /**
@@ -54,7 +71,7 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
  * @returns A function that returns memoized versions with optional cache key
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const memoizeByKey = <T extends (...arguments_: any[]) => any>(function_: T): (cacheKey?: CacheKeyResolver) => T => {
+export const memoizeByKey = <T extends (...arguments_: any[]) => any>(function_: T): (cacheKey?: CacheKeyResolver) => Memoized<T> => {
     const cache = new Map<string, ReturnType<T>>();
 
     return (cacheKey?: CacheKeyResolver) => memoize(function_, cacheKey, cache);

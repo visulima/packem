@@ -169,6 +169,7 @@ const generateOptions = (
                 srcset: true,
             },
             debarrel: {},
+            detectDuplicated: {},
             dts: {
                 compilerOptions: {
                     // `baseUrl` is deprecated in TS tooling but still a valid emit input we
