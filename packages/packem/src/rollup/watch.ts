@@ -30,7 +30,16 @@ const watchHandler = ({
     const prefix = "watcher:" + mode;
 
     watcher.on("change", async (id, { event }) => {
-        await doOnSuccessCleanup?.();
+        try {
+            await doOnSuccessCleanup?.();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            context.logger.error({
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                message: `Cleanup failed: ${error.message}`,
+                prefix,
+            });
+        }
 
         context.logger.info({
             message: `${cyan(relative(".", id))} was ${event}d`,

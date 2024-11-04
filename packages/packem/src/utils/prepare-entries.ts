@@ -115,15 +115,17 @@ const prepareEntries = async (context: BuildContext): Promise<void> => {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    for await (const entry of context.options.entries.filter((entry) => entry.fileAlias === undefined)) {
+    for (const entry of context.options.entries.filter((entry) => entry.fileAlias === undefined)) {
+        // eslint-disable-next-line no-await-in-loop
         await extendEntry(entry, context);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    for await (const entry of context.options.entries.filter((entry) => entry.fileAlias !== undefined)) {
+    for (const entry of context.options.entries.filter((entry) => entry.fileAlias !== undefined)) {
         entry.name = entry.fileAlias;
         entry.fileAlias = undefined;
 
+        // eslint-disable-next-line no-await-in-loop
         await extendEntry(entry, context);
     }
 };

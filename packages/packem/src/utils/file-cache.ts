@@ -59,6 +59,7 @@ class FileCache {
         return isAccessibleSync(this.getFilePath(name, subDirectory));
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
     public get<R>(name: string, subDirectory?: string): R | undefined {
         if (!this.#isEnabled) {
             return undefined;

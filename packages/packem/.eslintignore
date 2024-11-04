@@ -15,3 +15,6 @@ _meta.*.json
 LICENSE.md
 README.md
 CHANGELOG.md
+
+// eslint is somehow broken on this file
+src/types.ts
