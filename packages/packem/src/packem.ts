@@ -1,7 +1,7 @@
 import { readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import Module from "node:module";
-import { addListener as addProcessListener, cwd } from "node:process";
+import process from "node:process";
 
 import { bold, cyan } from "@visulima/colorize";
 import { findCacheDirSync } from "@visulima/find-cache-dir";
@@ -628,7 +628,7 @@ const packem = async (
 
     // Determine rootDirectory
     // eslint-disable-next-line no-param-reassign
-    rootDirectory = resolve(cwd(), rootDirectory);
+    rootDirectory = resolve(process.cwd(), rootDirectory);
 
     logger.debug("Root directory:", rootDirectory);
 
@@ -755,12 +755,12 @@ const packem = async (
         };
 
         const doOnSuccessCleanup = async () => {
-            if (onSuccessProcess) {
+            if (onSuccessProcess !== undefined) {
                 await killProcess({
                     pid: onSuccessProcess.pid as number,
                     signal: otherInputConfig.killSignal ?? buildConfig.killSignal ?? "SIGTERM",
                 });
-            } else if (onSuccessCleanup) {
+            } else if (onSuccessCleanup !== undefined) {
                 await onSuccessCleanup();
             }
 
@@ -827,12 +827,12 @@ const packem = async (
         await runOnsuccess();
 
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        addProcessListener("SIGINT", async () => {
+        process.on("SIGINT", async () => {
             await doOnSuccessCleanup();
         });
 
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        addProcessListener("SIGTERM", async () => {
+        process.on("SIGTERM", async () => {
             await doOnSuccessCleanup();
         });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

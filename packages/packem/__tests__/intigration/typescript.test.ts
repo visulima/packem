@@ -1,4 +1,4 @@
-import { existsSync, symlinkSync } from "node:fs";
+import { existsSync, readdirSync, symlinkSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";

@@ -33,11 +33,18 @@ const isTaskKillCmdProcessNotFoundError = (error: Error) =>
  */
 const killProcess = async ({ pid, signal }: { pid: number; signal: KillSignal }): Promise<void> =>
     await new Promise<void>((resolve, reject) => {
+        if (!Number.isInteger(pid) || pid <= 0) {
+            reject(new Error("Invalid process ID"));
+
+            return;
+        }
+
         kill(pid, signal, (error) => {
             if (error && !isTaskKillCmdProcessNotFoundError(error)) {
                 reject(error);
                 return;
             }
+
             resolve();
         });
     });
