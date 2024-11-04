@@ -1,3 +1,9 @@
+## @visulima/packem [1.4.1](https://github.com/visulima/packem/compare/@visulima/packem@1.4.0...@visulima/packem@1.4.1) (2024-11-04)
+
+### Bug Fixes
+
+* adjusted experimental rollup plugins config ([#52](https://github.com/visulima/packem/issues/52)) ([1573157](https://github.com/visulima/packem/commit/15731576e37d8b8eecee9fac8f0979cd74015e23))
+
 ## @visulima/packem [1.4.0](https://github.com/visulima/packem/compare/@visulima/packem@1.3.0...@visulima/packem@1.4.0) (2024-11-04)
 
 ### Features
