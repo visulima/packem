@@ -216,6 +216,7 @@ export interface BuildOptions {
     name: string;
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
     onSuccess?: string | (() => Promise<void | undefined | (() => void | Promise<void>)>);
+    onSuccessTimeout?: number;
     outDir: string;
     rollup: RollupBuildOptions;
     rootDir: string;

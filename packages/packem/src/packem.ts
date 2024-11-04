@@ -762,7 +762,13 @@ const packem = async (
                     signal: otherInputConfig.killSignal ?? buildConfig.killSignal ?? "SIGTERM",
                 });
             } else if (onSuccessCleanup !== undefined) {
-                await onSuccessCleanup();
+                try {
+                    await onSuccessCleanup();
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } catch (error: any) {
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                    throw new Error("onSuccess function cleanup failed: " + error.message, { cause: error });
+                }
             }
 
             // reset them in all occasions anyway
@@ -772,12 +778,21 @@ const packem = async (
 
         const runOnsuccess = async () => {
             if (typeof context.options.onSuccess === "function") {
-                onSuccessCleanup = await context.options.onSuccess();
+                try {
+                    onSuccessCleanup = await context.options.onSuccess();
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } catch (error: any) {
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                    throw new Error("onSuccess function failed: " + error.message, { cause: error });
+                }
             } else if (typeof context.options.onSuccess === "string") {
+                const timeout = context.options.onSuccessTimeout ?? 30_000; // 30 seconds default
+
                 onSuccessProcess = exec(context.options.onSuccess, [], {
                     nodeOptions: {
                         shell: true,
                         stdio: "inherit",
+                        timeout,
                     },
                 });
 
@@ -785,7 +800,7 @@ const packem = async (
 
                 if (onSuccessProcess.exitCode && onSuccessProcess.exitCode !== 0) {
                     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                    throw new Error("onSuccess script failed with exit code " + onSuccessProcess.exitCode);
+                    throw new Error("onSuccess script failed with exit code " + onSuccessProcess.exitCode + ". Check the output above for details.");
                 }
             }
         };
