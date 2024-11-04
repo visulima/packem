@@ -571,8 +571,9 @@ const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail
 
         let hasLogged = logged;
 
-        for await (const dirent of cacheDirectories) {
+        for (const dirent of cacheDirectories) {
             if (!keyStore[dirent.name]) {
+                // eslint-disable-next-line no-await-in-loop
                 await rm(join(cachePath, dirent.name), {
                     force: true,
                     recursive: true,
