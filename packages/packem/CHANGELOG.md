@@ -1,3 +1,30 @@
+## @visulima/packem [1.3.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.2.2...@visulima/packem@1.3.0-alpha.1) (2024-11-04)
+
+### Features
+
+* added onSuccess - execute a command/function after successful run ([#50](https://github.com/visulima/packem/issues/50)) ([df34a47](https://github.com/visulima/packem/commit/df34a47d2b7e5def48044562765389495e9799f8))
+* support css (PostCSS, Sass, Less, Stylus, Lightningcss) ([#28](https://github.com/visulima/packem/issues/28)) ([f413209](https://github.com/visulima/packem/commit/f413209d6225651c1a8af63f3cf37c9b391eb270))
+
+### Bug Fixes
+
+* fixed configuration for the postcss config loader ([f27bc25](https://github.com/visulima/packem/commit/f27bc25638ecaf48b1bff88e477d7cf3ccd33b98))
+* fixed found issue after rebase ([08779d6](https://github.com/visulima/packem/commit/08779d681c9537d10607921c4f5bb9ff7168cac4))
+* improved sass error ([730a12b](https://github.com/visulima/packem/commit/730a12ba59ba0cab73c15c64cecd49ed9404861a))
+* load postcss config within workspace root or package root only ([d91d879](https://github.com/visulima/packem/commit/d91d879f822cb43ebd8514d1f0752969d1823b60))
+* removed not use postcss-modules dep ([5bc44b1](https://github.com/visulima/packem/commit/5bc44b1b607c5383a1dd35f26190baf6547fac29))
+* updated dependencies ([933c290](https://github.com/visulima/packem/commit/933c290fd53862441a09d3f4a519daa30a3ebe36))
+
+### Miscellaneous Chores
+
+* **release:** @visulima/packem@1.2.0-alpha.1 [skip ci]\n\n## @visulima/packem [1.2.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.1.0...@visulima/packem@1.2.0-alpha.1) (2024-10-30) ([39068c8](https://github.com/visulima/packem/commit/39068c8cd64597a3d2842f4d397251d5be25a8a2)), closes [#28](https://github.com/visulima/packem/issues/28) [#25](https://github.com/visulima/packem/issues/25)
+* **release:** @visulima/packem@1.2.0-alpha.2 [skip ci]\n\n## @visulima/packem [1.2.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/packem@1.2.0-alpha.1...@visulima/packem@1.2.0-alpha.2) (2024-10-31) ([460bdc9](https://github.com/visulima/packem/commit/460bdc9ce887a4fc937a886efc15502496caa996))
+* **release:** @visulima/packem@1.2.0-alpha.3 [skip ci]\n\n## @visulima/packem [1.2.0-alpha.3](https://github.com/visulima/packem/compare/@visulima/packem@1.2.0-alpha.2...@visulima/packem@1.2.0-alpha.3) (2024-10-31) ([8de34da](https://github.com/visulima/packem/commit/8de34dad2671ec08951962620a4845bad01398ab))
+* updated lock file ([a2565a0](https://github.com/visulima/packem/commit/a2565a07fc15d4ba4505c839c57f850f988176b3))
+
+### Continuous Integration
+
+* skip css test if prod build ([9910924](https://github.com/visulima/packem/commit/991092433d7502fba9cb52dce08182a0f3f7559f))
+
 ## @visulima/packem [1.2.0-alpha.3](https://github.com/visulima/packem/compare/@visulima/packem@1.2.0-alpha.2...@visulima/packem@1.2.0-alpha.3) (2024-10-31)
 
 ### Bug Fixes
