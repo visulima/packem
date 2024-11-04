@@ -34,33 +34,6 @@ import type FileCache from "./utils/file-cache";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
-type RollupPluginName =
-    | "cached(packem:resolve-file-url)"
-    | "cached(packem:resolve-typescript-mjs-cjs)"
-    | "cached(packem:resolve-tsconfig-root-dirs)"
-    | "cached(packem:resolve-tsconfig-paths)"
-    | "replace"
-    | "alias"
-    | "cached(node-resolve)"
-    | "polyfill-node"
-    | "packem:json"
-    | "packem:chunk-splitter"
-    | "packem:esbuild"
-    | "packem:sucrase"
-    | "packem:swc"
-    | "cached(packem:preserve-directives)"
-    | "packem:shebang"
-    | "packem:cjs-interop"
-    | "packem:fix-dynamic-import-extension"
-    | "rollup-plugin-dynamic-import-variables"
-    | "cached(commonjs)"
-    | "packem:preserve-dynamic-imports"
-    | "packem:esm-shim-cjs-syntax"
-    | "cached(packem:raw)"
-    | "rollup-plugin-license"
-    | "packem:prepend-directive"
-    | "packem:node10-compatibility";
-
 interface RollupDynamicImportVariablesOptions {
     /**
      * By default, the plugin will not throw errors when target files are not found.
@@ -92,16 +65,11 @@ export type KillSignal = "SIGKILL" | "SIGTERM";
 
 export type Environment = "production" | "development" | undefined;
 
-export type RollupPlugins = (
-    | {
-          before: RollupPluginName;
-          plugin: Plugin;
-      }
-    | {
-          after: RollupPluginName;
-          plugin: Plugin;
-      }
-)[];
+export type RollupPlugins = {
+    enforce?: "pre" | "post";
+    plugin: Plugin;
+    type?: "build" | "dts";
+}[];
 
 export interface RollupBuildOptions {
     alias: RollupAliasOptions | false;

@@ -399,6 +399,41 @@ worker = new Worker(new URL("./worker.js", import.meta.url), { type: "module" })
 worker = new Worker("./worker.js", { type: "module" });
 ```
 
+### Plugins
+
+A plugin can additionally specify an enforce property (similar to webpack loaders) to adjust its application order.
+The value of `enforce` can be either `"pre"` or `"post"`.
+The value of `type` can be either `"build"` or `"dts"`, where `"build"` is the default value.
+
+> If `dts` is specified, the plugin will only run when declaration files are generated.
+
+The resolved plugins will be in the following order:
+
+- Alias
+- User plugins with enforce: 'pre'
+- Rollup core plugins
+- User plugins without enforce value
+- Rollup build plugins
+- User plugins with enforce: 'post'
+- Rollup post build plugins (minify, manifest, copy, reporting)
+
+```typescript
+import { defineConfig } from "@visulima/packem/config";
+import { optimizeLodashImports } from "@optimize-lodash/rollup-plugin";
+
+export default defineConfig({
+    // ...
+    plugins: [
+        {
+            enforce: "pre",
+            plugin: optimizeLodashImports(),
+            // type: "build" -> default value
+        },
+    ],
+    // ...
+});
+```
+
 ### Aliases
 
 Aliases can be configured in the [import map](https://nodejs.org/api/packages.html#imports), defined in `package.json#imports`.
