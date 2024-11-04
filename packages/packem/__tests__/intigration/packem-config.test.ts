@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 
-describe("packem build --jit", () => {
+describe("packem config", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
@@ -17,8 +17,8 @@ describe("packem build --jit", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it("should append plugins before and after a named plugin", async () => {
-        expect.assertions(4);
+    it("should append plugins based on enforce to pre/post and normal if enforce is undefined", async () => {
+        expect.assertions(5);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -35,17 +35,25 @@ describe("packem build --jit", () => {
             config: `rollup: {
         plugins: [
             {
-                before: "packem:esbuild",
-                plugin: <Plugin>{
+                enforce: "pre",
+                plugin: {
                     load() {
-                        console.log("packem:test-plugin:before");
+                        console.log("packem:test-plugin:pre");
                     },
                     name: "packem:test-plugin:before"
                 }
             },
             {
-                after: "packem:esbuild",
-                plugin: <Plugin>{
+                plugin: {
+                    load() {
+                        console.log("packem:test-plugin:normal");
+                    },
+                    name: "packem:test-plugin:before"
+                }
+            },
+            {
+                enforce: "post",
+                plugin: {
                     load() {
                         console.log("packem:test-plugin:after");
                     },
@@ -63,7 +71,8 @@ describe("packem build --jit", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        expect(binProcess.stdout).toContain("packem:test-plugin:before");
+        expect(binProcess.stdout).toContain("packem:test-plugin:pre");
+        expect(binProcess.stdout).toContain("packem:test-plugin:normal");
         expect(binProcess.stdout).toContain("packem:test-plugin:after");
     });
 });
