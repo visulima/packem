@@ -1,3 +1,9 @@
+## @visulima/packem [1.4.0](https://github.com/visulima/packem/compare/@visulima/packem@1.3.0...@visulima/packem@1.4.0) (2024-11-04)
+
+### Features
+
+* support css (PostCSS, Sass, Less, Stylus, Lightningcss) ([#28](https://github.com/visulima/packem/issues/28)) ([#46](https://github.com/visulima/packem/issues/46)) ([314d71f](https://github.com/visulima/packem/commit/314d71f66258c8a229dd309c1c382a6fc3ddcc45))
+
 ## @visulima/packem [1.3.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.2.2...@visulima/packem@1.3.0-alpha.1) (2024-11-04)
 
 ### Features
