@@ -587,6 +587,9 @@ importers:
       semver:
         specifier: 7.6.3
         version: 7.6.3
+      tinyexec:
+        specifier: 0.3.1
+        version: 0.3.1
       tinyglobby:
         specifier: 0.2.10
         version: 0.2.10
@@ -726,6 +729,9 @@ importers:
       tempy:
         specifier: ^3.1.0
         version: 3.1.0
+      tree-kill:
+        specifier: ^1.2.2
+        version: 1.2.2
       typedoc:
         specifier: 0.26.11
         version: 0.26.11(typescript@5.6.3)
@@ -8034,6 +8040,10 @@ packages:
   traverse@0.6.8:
     resolution: {integrity: sha512-aXJDbk6SnumuaZSANd21XAo15ucCDE38H4fkqiGsc3MhCK+wOlZvLP9cB/TvpHT0mOyWgC4Z8EwRlzqYSUzdsA==}
     engines: {node: '>= 0.4'}
+
+  tree-kill@1.2.2:
+    resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
+    hasBin: true
 
   trim-lines@3.0.1:
     resolution: {integrity: sha512-kRj8B+YHZCc9kQYdWfJB2/oUl9rA99qbowYYBtr4ui4mZyAQ2JpvVBd/6U2YloATfqBhBTSMhTpgBHtU0Mf3Rg==}
@@ -17345,6 +17355,8 @@ snapshots:
       which-typed-array: 1.1.15
 
   traverse@0.6.8: {}
+
+  tree-kill@1.2.2: {}
 
   trim-lines@3.0.1: {}
 

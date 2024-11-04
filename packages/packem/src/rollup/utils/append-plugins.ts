@@ -41,7 +41,7 @@ const appendPlugins = (plugins: InputPluginOption[], newPlugins: RollupPlugins |
 
     // @ts-expect-error type mismatch
     for (const { after = undefined, before = undefined, plugin } of newPlugins) {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises,no-param-reassign
+        // eslint-disable-next-line no-param-reassign
         plugins = after ? appendPlugin(plugins, plugin, after, true) : appendPlugin(plugins, plugin, before, false);
     }
 

@@ -58,7 +58,9 @@ const createBuildCommand = (cli: Cli): void => {
                     configPath: options.config ?? undefined,
                     debug: options.debug,
                     dtsOnly: options.dtsOnly,
+                    killSignal: options.killSignal,
                     minify: options.minify === undefined ? nodeEnvironment === PRODUCTION_ENV : options.minify,
+                    onSuccess: options.onSuccess,
                     rollup: {
                         esbuild: {
                             target: options.target,
@@ -214,6 +216,22 @@ const createBuildCommand = (cli: Cli): void => {
                 description: "Generate type documentation",
                 name: "typedoc",
                 type: Boolean,
+            },
+            {
+                description: "Execute command after successful build, specially useful for watch mode",
+                name: "onSuccess",
+                type: String,
+            },
+            {
+                description: 'Signal to kill child process, "SIGTERM" or "SIGKILL"',
+                name: "killSignal",
+                type: (input: string) => {
+                    if (input === "SIGTERM" || input === "SIGKILL") {
+                        return input;
+                    }
+
+                    throw new Error("Invalid kill signal. Use 'SIGTERM' or 'SIGKILL'.");
+                },
             },
         ],
     });

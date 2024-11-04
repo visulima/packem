@@ -248,6 +248,7 @@
         "rollup-plugin-polyfill-node": "0.13.0",
         "rollup-plugin-visualizer": "5.12.0",
         "semver": "7.6.3",
+        "tinyexec": "0.3.1",
         "tinyglobby": "0.2.10"
     },
     "devDependencies": {
@@ -296,6 +297,7 @@
         "sort-package-json": "^2.10.1",
         "sucrase": "^3.35.0",
         "tempy": "^3.1.0",
+        "tree-kill": "^1.2.2",
         "typedoc": "0.26.11",
         "typedoc-plugin-markdown": "4.2.10",
         "typedoc-plugin-rename-defaults": "0.7.1",

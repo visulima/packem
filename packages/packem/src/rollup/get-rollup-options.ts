@@ -576,7 +576,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 };
 
 const createDtsPlugin = async (context: BuildContext): Promise<Plugin> => {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports,@typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires,global-require,unicorn/prefer-module
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports,@typescript-eslint/no-require-imports,global-require,unicorn/prefer-module
     const { dts } = require("rollup-plugin-dts") as typeof import("rollup-plugin-dts");
 
     return dts({

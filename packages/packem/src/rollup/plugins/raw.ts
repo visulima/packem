@@ -28,7 +28,7 @@ export const rawPlugin = (options: RawLoaderOptions): Plugin => {
 
             if (!id.includes("?raw")) {
                 // eslint-disable-next-line no-param-reassign
-                code = `export default ${JSON.stringify(code)}`
+                code = `export default ${JSON.stringify(code)}`;
             }
 
             return {

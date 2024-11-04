@@ -1,7 +1,7 @@
 import { readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import Module from "node:module";
-import { cwd } from "node:process";
+import process from "node:process";
 
 import { bold, cyan } from "@visulima/colorize";
 import { findCacheDirSync } from "@visulima/find-cache-dir";
@@ -17,6 +17,8 @@ import { createHooks } from "hookable";
 import type { Jiti } from "jiti";
 import { createJiti } from "jiti";
 import { VERSION } from "rollup";
+import type { Result as ExecChild } from "tinyexec";
+import { exec } from "tinyexec";
 
 import build from "./build";
 import type { BuildConfigFunction } from "./config";
@@ -31,6 +33,7 @@ import enhanceRollupError from "./utils/enhance-rollup-error";
 import FileCache from "./utils/file-cache";
 import findPackemFile from "./utils/find-packem-file";
 import getPackageSideEffect from "./utils/get-package-side-effect";
+import killProcess from "./utils/kill-process";
 import loadPackageJson from "./utils/load-package-json";
 import logBuildErrors from "./utils/log-build-errors";
 import prepareEntries from "./utils/prepare-entries";
@@ -568,8 +571,9 @@ const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail
 
         let hasLogged = logged;
 
-        for await (const dirent of cacheDirectories) {
+        for (const dirent of cacheDirectories) {
             if (!keyStore[dirent.name]) {
+                // eslint-disable-next-line no-await-in-loop
                 await rm(join(cachePath, dirent.name), {
                     force: true,
                     recursive: true,
@@ -625,7 +629,7 @@ const packem = async (
 
     // Determine rootDirectory
     // eslint-disable-next-line no-param-reassign
-    rootDirectory = resolve(cwd(), rootDirectory);
+    rootDirectory = resolve(process.cwd(), rootDirectory);
 
     logger.debug("Root directory:", rootDirectory);
 
@@ -663,6 +667,9 @@ const packem = async (
     });
 
     let logged = false;
+    let onSuccessProcess: ExecChild | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type,@typescript-eslint/no-explicit-any
+    let onSuccessCleanup: (() => any) | undefined | void;
 
     try {
         const packemConfigFilePath = await findPackemFile(rootDirectory, configPath ?? "");
@@ -748,6 +755,56 @@ const packem = async (
             }
         };
 
+        const doOnSuccessCleanup = async () => {
+            if (onSuccessProcess !== undefined) {
+                await killProcess({
+                    pid: onSuccessProcess.pid as number,
+                    signal: otherInputConfig.killSignal ?? buildConfig.killSignal ?? "SIGTERM",
+                });
+            } else if (onSuccessCleanup !== undefined) {
+                try {
+                    await onSuccessCleanup();
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } catch (error: any) {
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                    throw new Error("onSuccess function cleanup failed: " + error.message, { cause: error });
+                }
+            }
+
+            // reset them in all occasions anyway
+            onSuccessProcess = undefined;
+            onSuccessCleanup = undefined;
+        };
+
+        const runOnsuccess = async () => {
+            if (typeof context.options.onSuccess === "function") {
+                try {
+                    onSuccessCleanup = await context.options.onSuccess();
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } catch (error: any) {
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                    throw new Error("onSuccess function failed: " + error.message, { cause: error });
+                }
+            } else if (typeof context.options.onSuccess === "string") {
+                const timeout = context.options.onSuccessTimeout ?? 30_000; // 30 seconds default
+
+                onSuccessProcess = exec(context.options.onSuccess, [], {
+                    nodeOptions: {
+                        shell: true,
+                        stdio: "inherit",
+                        timeout,
+                    },
+                });
+
+                await onSuccessProcess;
+
+                if (onSuccessProcess.exitCode && onSuccessProcess.exitCode !== 0) {
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                    throw new Error("onSuccess script failed with exit code " + onSuccessProcess.exitCode + ". Check the output above for details.");
+                }
+            }
+        };
+
         const start = Date.now();
         const getDuration = () => duration(Math.floor(Date.now() - start));
 
@@ -756,7 +813,7 @@ const packem = async (
                 throw new Error("Rollup watch is disabled. You should check your packem.config file.");
             }
 
-            await rollupWatch(context, fileCache, runBuilder);
+            await rollupWatch(context, fileCache, runBuilder, runOnsuccess, doOnSuccessCleanup);
 
             logBuildErrors(context, false);
 
@@ -783,6 +840,17 @@ const packem = async (
 
         await runBuilder();
 
+        await runOnsuccess();
+
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        process.on("SIGINT", async () => {
+            await doOnSuccessCleanup();
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        process.on("SIGTERM", async () => {
+            await doOnSuccessCleanup();
+        });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         logger.raw("\n");

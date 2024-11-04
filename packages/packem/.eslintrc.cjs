@@ -64,7 +64,7 @@ module.exports = {
             },
         },
         {
-            files: ["create-bundler.ts"],
+            files: ["packem.ts"],
             rules: {
                 "import/no-unused-modules": "off",
             },

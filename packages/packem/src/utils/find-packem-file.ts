@@ -7,7 +7,8 @@ const findPackemFile = async (rootDirectory: string, configPath = ""): Promise<s
     if (!packemConfigFilePath) {
         const packemConfigFiles = ["packem.config.js", "packem.config.mjs", "packem.config.cjs", "packem.config.ts", "packem.config.cts", "packem.config.mts"];
 
-        for await (const file of packemConfigFiles) {
+        for (const file of packemConfigFiles) {
+            // eslint-disable-next-line no-await-in-loop
             if (await isAccessible(join(rootDirectory, file))) {
                 packemConfigFilePath = "./" + file;
                 break;
