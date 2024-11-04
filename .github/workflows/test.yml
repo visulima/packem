@@ -24,7 +24,7 @@ env:
 jobs:
     files-changed:
         name: "Detect what files changed"
-        runs-on: "ubuntu-22.04"
+        runs-on: "ubuntu-24.04"
         timeout-minutes: 3
         # Map a step output to a job output
         outputs:
@@ -63,9 +63,9 @@ jobs:
                 # On the other platforms, we only test the lts node version
                 include:
                     - os: "macos-latest"
-                      node_version: "20"
+                      node_version: "22"
                       # - os: "windows-latest"
-                      #  node_version: "20.14" # https://github.com/nodejs/node/issues/48673
+                      #  node_version: "22"
             fail-fast: false
         runs-on: "${{ matrix.os }}"
         env:
@@ -96,6 +96,21 @@ jobs:
               uses: "anolilab/workflows/step/setup@main"
               with:
                   node-version: "${{ matrix.node_version }}"
+                  install-packages: 'false'
+
+            - name: "Remove node-sass from unsupported node versions"
+              shell: "bash"
+              if: "matrix.os == 'macos-latest' || matrix.node_version != '18' || matrix.node_version != '20'"
+              run: "pnpm remove --filter packem node-sass"
+
+            - name: "Install packages"
+              shell: "bash"
+              run: "pnpm install --frozen-lockfile --prefer-offline"
+              env:
+                  "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": true
+                  "CYPRESS_INSTALL_BINARY": true
+                  "SKIP_CHECK": "true" # is used to skip the check for the node version
+                  "HUSKY": 0 # disable husky hooks on ci
 
             # Temporary solution until Nx solve this https://github.com/nrwl/nx/issues/22259
             - name: "Get changed files"
@@ -145,7 +160,7 @@ jobs:
         name: "Check Test Run"
         # This is necessary since a failed/skipped dependent job would cause this job to be skipped
         if: "always() && (needs.test.result == 'success' || needs.test.result == 'skipped')"
-        runs-on: "ubuntu-22.04"
+        runs-on: "ubuntu-24.04"
         steps:
             # If any jobs we depend on fail, we will fail since this is a required check
             # NOTE: A timeout is considered a failure

@@ -45,7 +45,7 @@ describe("packem build --jit", () => {
             },
             types: "./dist/index.d.ts",
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", ["--jit"], {
             cwd: temporaryDirectoryPath,

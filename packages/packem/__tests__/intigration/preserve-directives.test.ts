@@ -12,7 +12,7 @@ describe("packem preserve-directives", () => {
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
 
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
     });
 
     afterEach(async () => {

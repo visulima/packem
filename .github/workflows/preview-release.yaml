@@ -16,7 +16,7 @@ env:
 jobs:
     preview:
         name: "Preview Release"
-        if: "github.repository == 'visulima/visulima'"
+        if: "github.repository == 'visulima/packem'"
         runs-on: "ubuntu-latest"
         permissions:
             contents: "write"

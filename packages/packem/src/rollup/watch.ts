@@ -18,6 +18,7 @@ const watchHandler = ({
     runBuilder,
     runOnsuccess,
     watcher,
+    useCache,
 }: {
     context: BuildContext;
     doOnSuccessCleanup?: () => Promise<void>;
@@ -26,6 +27,7 @@ const watchHandler = ({
     runBuilder?: (watchMode?: true) => Promise<void>;
     runOnsuccess?: () => Promise<void>;
     watcher: RollupWatcher;
+    useCache: boolean
 }): void => {
     const prefix = "watcher:" + mode;
 
@@ -69,7 +71,9 @@ const watchHandler = ({
             case "BUNDLE_END": {
                 await event.result.close();
 
-                fileCache.set(mode === "bundle" ? WATCH_CACHE_KEY : "dts-" + WATCH_CACHE_KEY, event.result.cache);
+                if (useCache) {
+                    fileCache.set(mode === "bundle" ? WATCH_CACHE_KEY : "dts-" + WATCH_CACHE_KEY, event.result.cache);
+                }
 
                 // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
                 context.logger.raw("\n⚡️ Build run in " + event.duration + "ms\n\n");
@@ -110,7 +114,14 @@ const watch = async (
         return;
     }
 
-    if (!context.options.rollup.isolatedDeclarations || !context.options.isolatedDeclarationTransformer) {
+    let useCache = true;
+
+    // This is a hack to prevent caching when using isolated declarations or css loaders
+    if (context.options.rollup.isolatedDeclarations || context.options.isolatedDeclarationTransformer || context.options.rollup.css) {
+        useCache = false;
+    }
+
+    if (useCache) {
         rollupOptions.cache = fileCache.get<RollupCache>(WATCH_CACHE_KEY);
     }
 
@@ -168,6 +179,7 @@ const watch = async (
         runBuilder,
         runOnsuccess,
         watcher,
+        useCache
     });
 
     if (context.options.declaration && context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer) {
@@ -178,7 +190,9 @@ const watch = async (
     } else if (context.options.declaration) {
         const rollupDtsOptions = await getRollupDtsOptions(context, fileCache);
 
-        rollupDtsOptions.cache = fileCache.get("dts-" + WATCH_CACHE_KEY);
+        if (useCache) {
+            rollupDtsOptions.cache = fileCache.get("dts-" + WATCH_CACHE_KEY);
+        }
 
         await context.hooks.callHook("rollup:dts:options", context, rollupDtsOptions);
 
@@ -191,6 +205,7 @@ const watch = async (
             fileCache,
             mode: "types",
             watcher: dtsWatcher,
+            useCache
         });
     }
 };

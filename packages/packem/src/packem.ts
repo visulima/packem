@@ -12,6 +12,7 @@ import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
 import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
 import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
+import browserslist from "browserslist";
 import { defu } from "defu";
 import { createHooks } from "hookable";
 import type { Jiti } from "jiti";
@@ -77,6 +78,7 @@ const generateOptions = (
     // @ts-ignore TS2589 is just deeply nested and this is needed for typedoc
     const options = defu(buildConfig, inputConfig, preset, <Partial<BuildOptions>>{
         alias: {},
+        browserTargets: browserslist(),
         cjsInterop: false,
         clean: true,
         debug,
@@ -105,6 +107,11 @@ const generateOptions = (
                 preserveSymlinks: true,
                 // https://github.com/rollup/plugins/tree/master/packages/commonjs#transformmixedesmodules
                 transformMixedEsModules: false,
+            },
+            css: {
+                autoModules: true,
+                extensions: [".css", ".pcss", ".postcss", ".sss"],
+                namedExports: true,
             },
             dts: {
                 compilerOptions: {
@@ -213,7 +220,7 @@ const generateOptions = (
             preserveDynamicImports: true,
             raw: {
                 exclude: EXCLUDE_REGEXP,
-                include: [/\.(md|txt|css|htm|html|data)$/],
+                include: [/\.(md|txt|htm|html|data)$/],
             },
             replace: {
                 /**
@@ -403,6 +410,10 @@ const generateOptions = (
         options.rollup.polyfillNode = false;
 
         logger.debug("Disabling polyfillNode because preferBuiltins is set to true");
+    }
+
+    if (options.browserTargets && options.browserTargets.length > 0) {
+        logger.debug("Using browser targets: " + options.browserTargets.join(", "));
     }
 
     // Add all dependencies as externals
@@ -727,7 +738,7 @@ const packem = async (
 
         context.logger.debug({
             context: context.options.entries,
-            message: `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}}`,
+            message: `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}`,
         });
 
         // Clean dist dirs

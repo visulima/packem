@@ -47,7 +47,7 @@ export default Tr;`,
                 moduleResolution: "bundler",
             },
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "react");
@@ -135,7 +135,7 @@ export default Tr;`,
                 moduleResolution: "bundler",
             },
         });
-        await createPackemConfig(temporaryDirectoryPath, {});
+        await createPackemConfig(temporaryDirectoryPath);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "react");
@@ -224,9 +224,11 @@ export default Tr;`,
             },
         });
         await createPackemConfig(temporaryDirectoryPath, {
-            rollup: {
-                jsxRemoveAttributes: {
-                    attributes: ["data-testid"],
+            config: {
+                rollup: {
+                    jsxRemoveAttributes: {
+                        attributes: ["data-testid"],
+                    },
                 },
             },
         });
@@ -318,9 +320,11 @@ export default Tr;`,
             },
         });
         await createPackemConfig(temporaryDirectoryPath, {
-            rollup: {
-                jsxRemoveAttributes: {
-                    attributes: ["data-testid", "data-test"],
+            config: {
+                rollup: {
+                    jsxRemoveAttributes: {
+                        attributes: ["data-testid", "data-test"],
+                    },
                 },
             },
         });

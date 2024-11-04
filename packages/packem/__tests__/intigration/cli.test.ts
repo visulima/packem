@@ -330,7 +330,9 @@ export { a };
             types: "dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath, {
-            onSuccess: "echo hello && echo world",
+            config: {
+                onSuccess: "echo hello && echo world",
+            }
         });
 
         const binProcess = await execPackemSync("build", [], {
