@@ -33,7 +33,7 @@
         "clean": "rimraf node_modules dist"
     },
     "devDependencies": {
-        "@swc/core": "^1.7.36",
+        "@swc/core": "^1.8.0",
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.24.0",
         "rimraf": "^6.0.1",
