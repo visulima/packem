@@ -1,3 +1,9 @@
+## @visulima/packem [1.2.2](https://github.com/visulima/packem/compare/@visulima/packem@1.2.1...@visulima/packem@1.2.2) (2024-11-04)
+
+### Bug Fixes
+
+* updated dependencies of @visulima/*,@babel/parser,jiti,rollup and tinyglobby ([46b8837](https://github.com/visulima/packem/commit/46b8837ab0876cdcacbde27ab2012c75b6a09b2f))
+
 ## @visulima/packem [1.2.1](https://github.com/visulima/packem/compare/@visulima/packem@1.2.0...@visulima/packem@1.2.1) (2024-11-03)
 
 ### Bug Fixes
