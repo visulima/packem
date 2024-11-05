@@ -74,7 +74,6 @@ const sortUserPlugins = (plugins: RollupPlugins | undefined, type: "build" | "dt
             .forEach((p) => {
                 if (p.enforce === "pre") {
                     prePlugins.push(p.plugin);
-                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                 } else if (p.enforce === "post") {
                     postPlugins.push(p.plugin);
                 } else {

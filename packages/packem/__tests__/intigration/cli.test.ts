@@ -332,7 +332,7 @@ export { a };
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 onSuccess: "echo hello && echo world",
-            }
+            },
         });
 
         const binProcess = await execPackemSync("build", [], {
