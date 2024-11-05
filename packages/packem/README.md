@@ -409,13 +409,13 @@ The value of `type` can be either `"build"` or `"dts"`, where `"build"` is the d
 
 The resolved plugins will be in the following order:
 
-- Alias
-- User plugins with enforce: 'pre'
-- Rollup core plugins
-- User plugins without enforce value
-- Rollup build plugins
-- User plugins with enforce: 'post'
-- Rollup post build plugins (minify, manifest, copy, reporting)
+-   Alias
+-   User plugins with enforce: 'pre'
+-   Rollup core plugins
+-   User plugins without enforce value
+-   Rollup build plugins
+-   User plugins with enforce: 'post'
+-   Rollup post build plugins (minify, manifest, copy, reporting)
 
 ```typescript
 import { defineConfig } from "@visulima/packem/config";

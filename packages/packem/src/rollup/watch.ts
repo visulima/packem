@@ -17,8 +17,8 @@ const watchHandler = ({
     mode,
     runBuilder,
     runOnsuccess,
-    watcher,
     useCache,
+    watcher,
 }: {
     context: BuildContext;
     doOnSuccessCleanup?: () => Promise<void>;
@@ -26,8 +26,8 @@ const watchHandler = ({
     mode: "bundle" | "types";
     runBuilder?: (watchMode?: true) => Promise<void>;
     runOnsuccess?: () => Promise<void>;
+    useCache: boolean;
     watcher: RollupWatcher;
-    useCache: boolean
 }): void => {
     const prefix = "watcher:" + mode;
 
@@ -178,8 +178,8 @@ const watch = async (
         mode: "bundle",
         runBuilder,
         runOnsuccess,
+        useCache,
         watcher,
-        useCache
     });
 
     if (context.options.declaration && context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer) {
@@ -204,8 +204,8 @@ const watch = async (
             context,
             fileCache,
             mode: "types",
+            useCache,
             watcher: dtsWatcher,
-            useCache
         });
     }
 };

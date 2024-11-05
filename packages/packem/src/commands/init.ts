@@ -5,29 +5,8 @@ import { isAccessibleSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { parsePackageJson } from "@visulima/package/package-json";
 import { join } from "@visulima/path";
 
-const cssLoaderDependencies = {
-    less: ["less"],
-    lightningcss: ["lightningcss"],
-    "node-sass": ["node-sass"],
-    postcss: [
-        "postcss",
-        "postcss-load-config",
-        "postcss-modules-extract-imports",
-        "postcss-modules-local-by-default",
-        "postcss-modules-scope",
-        "postcss-modules-values",
-        "postcss-value-parser",
-        "icss-utils",
-    ],
-    sass: ["sass"],
-    "sass-embedded": ["sass-embedded"],
-    stylus: ["stylus"],
-};
-
-const cssMinifierDependencies = {
-    cssnano: ["cssnano"],
-    lightningcss: ["lightningcss"],
-};
+import cssLoaderDependencies from "./utils/css-loader-dependencies";
+import type cssMinifierDependencies from "./utils/css-minifier-dependencies";
 
 const createInitCommand = (cli: Cli): void => {
     cli.addCommand({
@@ -49,7 +28,6 @@ const createInitCommand = (cli: Cli): void => {
             }
 
             const packageJson = parsePackageJson(packageJsonPath);
-
             const packages: string[] = [];
 
             if (packageJson.dependencies) {
@@ -62,6 +40,8 @@ const createInitCommand = (cli: Cli): void => {
 
             const hasTypescript = Boolean(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript);
 
+            const packagesToInstall: string[] = [];
+
             if (options.typescript === undefined && !hasTypescript) {
                 // eslint-disable-next-line no-param-reassign
                 options.typescript = await confirm({
@@ -69,11 +49,7 @@ const createInitCommand = (cli: Cli): void => {
                 });
 
                 if (options.typescript) {
-                    const s = spinner();
-
-                    s.start("Installing typescript@latest");
-                    await installPackage("typescript@latest", { cwd: options.dir, dev: true, silent: true });
-                    s.stop("");
+                    packagesToInstall.push("typescript@latest");
                 }
             } else {
                 log.message(
@@ -149,12 +125,7 @@ const createInitCommand = (cli: Cli): void => {
                     });
 
                     if (shouldInstall) {
-                        const s = spinner();
-
-                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                        s.start("Installing " + options.transformer);
-                        await installPackage(options.transformer === "swc" ? "@swc/core" : options.transformer, { cwd: options.dir, dev: true, silent: true });
-                        s.stop("");
+                        packagesToInstall.push(options.transformer === "swc" ? "@swc/core" : options.transformer);
                     }
                 }
             } else {
@@ -212,12 +183,7 @@ const createInitCommand = (cli: Cli): void => {
                         });
 
                         if (shouldInstall) {
-                            const s = spinner();
-
-                            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                            s.start("Installing " + options.isolatedDeclarationTransformer);
-                            await installPackage(packageName, { cwd: options.dir, dev: true, silent: true });
-                            s.stop("");
+                            packagesToInstall.push(packageName);
                         }
                     }
                 }
@@ -231,22 +197,30 @@ const createInitCommand = (cli: Cli): void => {
                 })) as boolean;
             }
 
-            let cssLoaders: (keyof typeof cssLoaderDependencies | "sourceMap")[] = [];
+            const cssLoaders: (keyof typeof cssLoaderDependencies | "sourceMap")[] = [];
 
             if (options.css) {
-                cssLoaders = (await multiselect({
+                const mainCssLoader = (await select({
+                    message: "Pick a css loader",
+                    options: [
+                        { label: "PostCSS", value: "postcss" },
+                        { label: "Lightning CSS", value: "lightningcss" },
+                    ],
+                })) as keyof typeof cssLoaderDependencies;
+
+                cssLoaders.push(mainCssLoader);
+
+                let extraCssLoaders = (await multiselect({
                     message: "Pick your loaders",
                     options: [
                         { label: "Sass", value: "sass" },
                         { label: "Stylus", value: "stylus" },
                         { label: "Less", value: "less" },
-                        { label: "Lightning CSS", value: "lightningcss" },
-                        { label: "PostCSS", value: "postcss" },
                     ],
                     required: false,
                 })) as (keyof typeof cssLoaderDependencies)[];
 
-                if (cssLoaders.includes("sass")) {
+                if (extraCssLoaders.includes("sass")) {
                     const sassLoader = await select({
                         message: "Pick a sass loader",
                         options: [
@@ -257,28 +231,22 @@ const createInitCommand = (cli: Cli): void => {
                     });
 
                     if (sassLoader !== "sass") {
-                        cssLoaders = cssLoaders.filter((loader) => loader !== "sass");
+                        extraCssLoaders = extraCssLoaders.filter((loader) => loader !== "sass");
 
-                        cssLoaders.push(sassLoader as keyof typeof cssLoaderDependencies);
+                        extraCssLoaders.push(sassLoader as keyof typeof cssLoaderDependencies);
                     }
                 }
+
+                cssLoaders.push(...extraCssLoaders);
 
                 const shouldInstall = await confirm({
                     message: 'Do you want to install "' + cssLoaders.join('", "') + '"?',
                 });
 
                 if (shouldInstall) {
-                    const s = spinner();
-
-                    s.start('Installing dependencies for "' + cssLoaders.join('", "') + '"');
-                    for await (const loader of cssLoaders) {
-                        await installPackage(cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies], {
-                            cwd: options.dir,
-                            dev: true,
-                            silent: true,
-                        });
+                    for (const loader of cssLoaders) {
+                        packagesToInstall.push(...cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies]);
                     }
-                    s.stop("");
                 }
 
                 cssLoaders.push("sourceMap");
@@ -309,15 +277,7 @@ const createInitCommand = (cli: Cli): void => {
                     });
 
                     if (shouldInstall) {
-                        const s = spinner();
-
-                        s.start("Installing css minifier");
-                        await installPackage(cssMinifier, {
-                            cwd: options.dir,
-                            dev: true,
-                            silent: true,
-                        });
-                        s.stop("");
+                        packagesToInstall.push(cssMinifier);
                     }
                 }
             }
@@ -334,17 +294,18 @@ const createInitCommand = (cli: Cli): void => {
             }
 
             if (options.css) {
-                packemConfig += "\n            loaders: [ ";
+                const stringCssLoaders = cssLoaders
+                    .map((loader) => {
+                        if (loader === "sass-embedded" || loader === "node-sass") {
+                            // eslint-disable-next-line no-param-reassign
+                            loader = "sass";
+                        }
 
-                for (let loader of cssLoaders) {
-                    if (loader === "sass-embedded" || loader === "node-sass") {
-                        loader = "sass";
-                    }
+                        return `${loader}Loader`;
+                    })
+                    .join(", ");
 
-                    packemConfig += `${loader as string}Loader, `;
-                }
-
-                packemConfig += "],";
+                packemConfig += `\n            loaders: [${stringCssLoaders}],`;
             }
 
             if (options.cssMinifier && cssMinifier) {
@@ -416,6 +377,12 @@ module.exports = defineConfig({
             const s = spinner();
 
             const extension = hasTypescript ? "ts" : "js";
+
+            if (packagesToInstall.length > 0) {
+                s.start("Installing packages");
+                await installPackage(packagesToInstall, { cwd: process.cwd(), dev: true, silent: true });
+                s.stop("Installed packages");
+            }
 
             s.start("Creating packem.config." + extension);
             writeFileSync(join(options.dir, "packem.config." + extension), template);
