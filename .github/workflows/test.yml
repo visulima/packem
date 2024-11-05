@@ -96,7 +96,7 @@ jobs:
               uses: "anolilab/workflows/step/setup@main"
               with:
                   node-version: "${{ matrix.node_version }}"
-                  install-packages: 'false'
+                  install-packages: "false"
 
             - name: "Remove node-sass from unsupported node versions"
               shell: "bash"
