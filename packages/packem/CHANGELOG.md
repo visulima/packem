@@ -1,3 +1,9 @@
+## @visulima/packem [1.4.2](https://github.com/visulima/packem/compare/@visulima/packem@1.4.1...@visulima/packem@1.4.2) (2024-11-05)
+
+### Bug Fixes
+
+* removed typedoc dependencies, that were wrongly added on rebase ([b468162](https://github.com/visulima/packem/commit/b468162f431178b1b16130f708bc1f39a7c81fd6))
+
 ## @visulima/packem [1.4.1](https://github.com/visulima/packem/compare/@visulima/packem@1.4.0...@visulima/packem@1.4.1) (2024-11-04)
 
 ### Bug Fixes
