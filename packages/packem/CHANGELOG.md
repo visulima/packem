@@ -1,3 +1,9 @@
+## @visulima/packem [1.5.0](https://github.com/visulima/packem/compare/@visulima/packem@1.4.2...@visulima/packem@1.5.0) (2024-11-05)
+
+### Features
+
+* added css to packem add command ([#53](https://github.com/visulima/packem/issues/53)) ([dbcba16](https://github.com/visulima/packem/commit/dbcba16d2b639b235aea43626042acec1663aa34))
+
 ## @visulima/packem [1.4.2](https://github.com/visulima/packem/compare/@visulima/packem@1.4.1...@visulima/packem@1.4.2) (2024-11-05)
 
 ### Bug Fixes
