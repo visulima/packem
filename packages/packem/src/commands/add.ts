@@ -9,7 +9,6 @@ import MagicString from "magic-string";
 
 import findPackemFile from "../utils/find-packem-file";
 import cssLoaderDependencies from "./utils/css-loader-dependencies";
-import type cssMinifierDependencies from "./utils/css-minifier-dependencies";
 
 const typedocPackages = ["typedoc", "typedoc-plugin-markdown", "typedoc-plugin-rename-defaults", "@ckeditor/typedoc-plugins"];
 
@@ -72,7 +71,7 @@ const createAddCommand = (cli: Cli): void => {
                 logger.info("Adding typedoc dependencies...");
 
                 s.start("Installing packages");
-                await installPackage(typedocPackages, { cwd: process.cwd(), dev: true, silent: true });
+                await installPackage(typedocPackages, { cwd: rootDirectory, dev: true, silent: true });
                 s.stop("Installed packages");
 
                 logger.success("\nTypedoc added!");
@@ -151,7 +150,7 @@ const createAddCommand = (cli: Cli): void => {
                     message: "Do you want to minify your css?",
                 })) as boolean;
 
-                let cssMinifier: keyof typeof cssMinifierDependencies | undefined;
+                let cssMinifier: "cssnano" | "lightningcss" | undefined;
 
                 if (useCssMinifier) {
                     cssMinifier = (await select({
@@ -160,7 +159,7 @@ const createAddCommand = (cli: Cli): void => {
                             { label: "CSSNano", value: "cssnano" },
                             { label: "Lightning CSS", value: "lightningcss" },
                         ],
-                    })) as keyof typeof cssMinifierDependencies;
+                    })) as "cssnano" | "lightningcss";
 
                     if (!cssLoaders.includes("lightningcss")) {
                         packagesToInstall.push(cssMinifier);
@@ -201,7 +200,7 @@ const createAddCommand = (cli: Cli): void => {
                 }
 
                 s.start("Installing packages");
-                await installPackage(packagesToInstall, { cwd: process.cwd(), dev: true, silent: true });
+                await installPackage(packagesToInstall, { cwd: rootDirectory, dev: true, silent: true });
                 s.stop("Installed packages");
 
                 logger.success("\nCSS loaders added!");

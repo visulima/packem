@@ -1,12 +1,13 @@
+import { cwd } from "node:process";
+
 import { installPackage } from "@antfu/install-pkg";
 import { cancel, confirm, intro, log, multiselect, outro, select, spinner } from "@clack/prompts";
 import type { Cli } from "@visulima/cerebro";
 import { isAccessibleSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { parsePackageJson } from "@visulima/package/package-json";
-import { join } from "@visulima/path";
+import { join, resolve } from "@visulima/path";
 
 import cssLoaderDependencies from "./utils/css-loader-dependencies";
-import type cssMinifierDependencies from "./utils/css-minifier-dependencies";
 
 const createInitCommand = (cli: Cli): void => {
     cli.addCommand({
@@ -21,7 +22,8 @@ const createInitCommand = (cli: Cli): void => {
                 return;
             }
 
-            const packageJsonPath = join(options.dir, "package.json");
+            const rootDirectory = resolve(cwd(), options.dir ?? ".");
+            const packageJsonPath = join(rootDirectory, "package.json");
 
             if (!isAccessibleSync(packageJsonPath)) {
                 throw new Error("No package.json found in the directory");
@@ -58,7 +60,7 @@ const createInitCommand = (cli: Cli): void => {
                 );
             }
 
-            if (!isAccessibleSync(join(options.dir, "tsconfig.json"))) {
+            if (!isAccessibleSync(join(rootDirectory, "tsconfig.json"))) {
                 const shouldGenerate = await confirm({
                     message: "Do you want to use generate a tsconfig.json?",
                 });
@@ -72,7 +74,7 @@ const createInitCommand = (cli: Cli): void => {
                     s.start("Generating tsconfig.json");
                     // eslint-disable-next-line eslint-comments/disable-enable-pair
                     /* eslint-disable perfectionist/sort-objects */
-                    writeJsonSync(join(options.dir, "tsconfig.json"), {
+                    writeJsonSync(join(rootDirectory, "tsconfig.json"), {
                         compilerOptions: {
                             esModuleInterop: true,
                             skipLibCheck: true,
@@ -260,7 +262,7 @@ const createInitCommand = (cli: Cli): void => {
                 })) as boolean;
             }
 
-            let cssMinifier: keyof typeof cssMinifierDependencies | undefined;
+            let cssMinifier: "cssnano" | "lightningcss" | undefined;
 
             if (options.cssMinifier) {
                 cssMinifier = (await select({
@@ -269,7 +271,7 @@ const createInitCommand = (cli: Cli): void => {
                         { label: "CSSNano", value: "cssnano" },
                         { label: "Lightning CSS", value: "lightningcss" },
                     ],
-                })) as keyof typeof cssMinifierDependencies;
+                })) as "cssnano" | "lightningcss";
 
                 if (!cssLoaders.includes("lightningcss")) {
                     const shouldInstall = await confirm({
@@ -380,12 +382,12 @@ module.exports = defineConfig({
 
             if (packagesToInstall.length > 0) {
                 s.start("Installing packages");
-                await installPackage(packagesToInstall, { cwd: process.cwd(), dev: true, silent: true });
+                await installPackage(packagesToInstall, { cwd: rootDirectory, dev: true, silent: true });
                 s.stop("Installed packages");
             }
 
             s.start("Creating packem.config." + extension);
-            writeFileSync(join(options.dir, "packem.config." + extension), template);
+            writeFileSync(join(rootDirectory, "packem.config." + extension), template);
             s.stop("Created packem.config." + extension);
 
             outro("Now you can run `packem build` to build your project");
