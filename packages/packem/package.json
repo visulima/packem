@@ -385,10 +385,7 @@
         "semver": "7.6.3",
         "tinyexec": "0.3.1",
         "source-map-js": "1.2.1",
-        "tinyglobby": "0.2.10",
-        "typedoc": "0.26.11",
-        "typedoc-plugin-markdown": "4.2.10",
-        "typedoc-plugin-rename-defaults": "0.7.1"
+        "tinyglobby": "0.2.10"
     },
     "devDependencies": {
         "@anolilab/eslint-config": "^15.0.3",
