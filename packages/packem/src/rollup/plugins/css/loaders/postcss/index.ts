@@ -310,6 +310,7 @@ ${Object.keys(modulesExports)
             meta: {
                 types,
             },
+            moduleSideEffects: supportModules || (typeof this.inject === "object" && this.inject.treeshakeable) ? false : "no-treeshake",
         };
     },
 };

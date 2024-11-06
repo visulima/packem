@@ -52,6 +52,7 @@ const lightningCSSLoader: Loader<LightningCSSOptions> = {
         return {
             code: result.code.toString(),
             map: result.map ? (JSON.parse(Buffer.from(result.map).toString()) as string) : undefined,
+            moduleSideEffects: supportModules || (typeof this.inject === "object" && this.inject.treeshakeable) ? false : "no-treeshake",
         };
     },
     test: /\.css$/i,

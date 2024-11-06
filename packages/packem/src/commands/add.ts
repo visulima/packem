@@ -90,7 +90,7 @@ const createAddCommand = (cli: Cli): void => {
                     message: "Pick a css loader",
                     options: [
                         { label: "PostCSS", value: "postcss" },
-                        { label: "Lightning CSS", value: "lightningcss" },
+                        { hint: "experimental", label: "Lightning CSS", value: "lightningcss" },
                     ],
                 })) as keyof typeof cssLoaderDependencies;
 

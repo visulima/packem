@@ -2334,6 +2334,1669 @@ exports[`css > code-splitting > should work with processed 'true' css > map 4`] 
 
 exports[`css > code-splitting > should work with processed 'true' css > map 5`] = `"{"version":3,"sources":["../src/second.scss"],"names":[],"mappings":"AAAA;EACE,gBAAgB;AAClB","file":"second.css","sourcesContent":[".second {\\n  color: royalblue;\\n}"]}"`;
 
+exports[`css > css-modules > should work with processed modules 'auto-modules' css > js 1`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$4 = ".global {\\n    color: red;\\n}\\n";
+injectCss(css$4,{});
+
+var css$3 = ".a_a_69de543e {\\n    color: red;\\n}\\n";
+var modules_bdb828b9 = {"a":"a_a_69de543e"};
+injectCss(css$3,{});
+
+var css$2 = ".b_b_cc874d97 {\\n  color: red;\\n}";
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+injectCss(css$2,{});
+
+var css$1 = ".c_c_4990a2ba {\\n  color: red;\\n}\\n";
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+injectCss(css$1,{});
+
+var css = ".d_d_964cca5f {\\n  color: #f00;\\n}\\n";
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+injectCss(css,{});
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'auto-modules' css > js 2`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$4 = ".global {\\n    color: red;\\n}\\n";
+injectCss(css$4,{});
+
+var css$3 = ".a_a_69de543e {\\n    color: red;\\n}\\n";
+var modules_bdb828b9 = {"a":"a_a_69de543e"};
+injectCss(css$3,{});
+
+var css$2 = ".b_b_cc874d97 {\\n  color: red;\\n}";
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+injectCss(css$2,{});
+
+var css$1 = ".c_c_4990a2ba {\\n  color: red;\\n}\\n";
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+injectCss(css$1,{});
+
+var css = ".d_d_964cca5f {\\n  color: #f00;\\n}\\n";
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+injectCss(css,{});
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'auto-modules-fn' css > js 1`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$4 = ".global {\\n    color: red;\\n}\\n";
+injectCss(css$4,{});
+
+var css$3 = ".a {\\n    color: red;\\n}\\n";
+injectCss(css$3,{});
+
+var css$2 = ".b {\\n  color: red;\\n}";
+injectCss(css$2,{});
+
+var css$1 = ".c_c_4990a2ba {\\n  color: red;\\n}\\n";
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+injectCss(css$1,{});
+
+var css = ".d {\\n  color: #f00;\\n}\\n";
+injectCss(css,{});
+
+console.log(css$3, css$2, modules_2b321dac, css);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'auto-modules-fn' css > js 2`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$4 = ".global {\\n    color: red;\\n}\\n";
+injectCss(css$4,{});
+
+var css$3 = ".a {\\n    color: red;\\n}\\n";
+injectCss(css$3,{});
+
+var css$2 = ".b {\\n  color: red;\\n}";
+injectCss(css$2,{});
+
+var css$1 = ".c_c_4990a2ba {\\n  color: red;\\n}\\n";
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+injectCss(css$1,{});
+
+var css = ".d {\\n  color: #f00;\\n}\\n";
+injectCss(css,{});
+
+console.log(css$3, css$2, modules_2b321dac, css);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'auto-modules-off' css > js 1`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$4 = ".global {\\n    color: red;\\n}\\n";
+injectCss(css$4,{});
+
+var css$3 = ".a {\\n    color: red;\\n}\\n";
+injectCss(css$3,{});
+
+var css$2 = ".b {\\n  color: red;\\n}";
+injectCss(css$2,{});
+
+var css$1 = ".c {\\n  color: red;\\n}\\n";
+injectCss(css$1,{});
+
+var css = ".d {\\n  color: #f00;\\n}\\n";
+injectCss(css,{});
+
+console.log(css$3, css$2, css$1, css);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'auto-modules-off' css > js 2`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$4 = ".global {\\n    color: red;\\n}\\n";
+injectCss(css$4,{});
+
+var css$3 = ".a {\\n    color: red;\\n}\\n";
+injectCss(css$3,{});
+
+var css$2 = ".b {\\n  color: red;\\n}";
+injectCss(css$2,{});
+
+var css$1 = ".c {\\n  color: red;\\n}\\n";
+injectCss(css$1,{});
+
+var css = ".d {\\n  color: #f00;\\n}\\n";
+injectCss(css,{});
+
+console.log(css$3, css$2, css$1, css);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'auto-modules-regexp' css > js 1`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$4 = ".global {\\n    color: red;\\n}\\n";
+injectCss(css$4,{});
+
+var css$3 = ".a_a_69de543e {\\n    color: red;\\n}\\n";
+var modules_bdb828b9 = {"a":"a_a_69de543e"};
+injectCss(css$3,{});
+
+var css$2 = ".b_b_cc874d97 {\\n  color: red;\\n}";
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+injectCss(css$2,{});
+
+var css$1 = ".c_c_4990a2ba {\\n  color: red;\\n}\\n";
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+injectCss(css$1,{});
+
+var css = ".d_d_964cca5f {\\n  color: #f00;\\n}\\n";
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+injectCss(css,{});
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'auto-modules-regexp' css > js 2`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$4 = ".global {\\n    color: red;\\n}\\n";
+injectCss(css$4,{});
+
+var css$3 = ".a_a_69de543e {\\n    color: red;\\n}\\n";
+var modules_bdb828b9 = {"a":"a_a_69de543e"};
+injectCss(css$3,{});
+
+var css$2 = ".b_b_cc874d97 {\\n  color: red;\\n}";
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+injectCss(css$2,{});
+
+var css$1 = ".c_c_4990a2ba {\\n  color: red;\\n}\\n";
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+injectCss(css$1,{});
+
+var css = ".d_d_964cca5f {\\n  color: #f00;\\n}\\n";
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+injectCss(css,{});
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'duplication' css > css 1`] = `
+"html {
+    --color-primary: green;
+}
+
+.style_primary_0c4c723d {
+    color: green;
+    color: var(--color-primary);
+}
+
+.shared_test_aaf91828 {
+    content: "test";
+}
+
+.foo_foo_15d01375 {
+}
+
+.bar_bar_932cc2fc {
+}
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'duplication' css > js 1`] = `
+"'use strict';
+
+var modules_fa509c68 = {"test":"shared_test_aaf91828"};
+
+var modules_52530603 = {"foo":"foo_foo_15d01375 shared_test_aaf91828"};
+
+var modules_ad1fd3ff = {"bar":"bar_bar_932cc2fc shared_test_aaf91828"};
+
+console.log(modules_fa509c68, modules_52530603, modules_ad1fd3ff);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'duplication' css > js 2`] = `
+"var modules_fa509c68 = {"test":"shared_test_aaf91828"};
+
+var modules_52530603 = {"foo":"foo_foo_15d01375 shared_test_aaf91828"};
+
+var modules_ad1fd3ff = {"bar":"bar_bar_932cc2fc shared_test_aaf91828"};
+
+console.log(modules_fa509c68, modules_52530603, modules_ad1fd3ff);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'extract' css > css 1`] = `
+".style_module_ea61eaf4 {
+    color: #1F4F7F;
+}
+
+.style_module2_ea61eaf4 {
+}
+
+@media screen and (min-width: 900px) {
+    .composed_composition_b4c6ecd1 {
+        background-color: aqua;
+    }
+}
+
+.composed_composition_b4c6ecd1 {
+    background-color: #BF4040;
+}
+
+.composition2_compositioned_33aa26b9 {
+    width: 30%;
+}
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'extract' css > js 1`] = `
+"'use strict';
+
+var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'extract' css > js 2`] = `
+"var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'extract-sourcemap-inline' css > css 1`] = `
+".style_module_ea61eaf4 {
+    color: #1F4F7F;
+}
+
+.style_module2_ea61eaf4 {
+}
+
+@media screen and (min-width: 900px) {
+    .composed_composition_b4c6ecd1 {
+        background-color: aqua;
+    }
+}
+
+.composed_composition_b4c6ecd1 {
+    background-color: #BF4040;
+}
+
+.composition2_compositioned_33aa26b9 {
+    width: 30%;
+}
+
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy9zdHlsZS5jc3MiLCIuLi9zcmMvY29tcG9zZWQuY3NzIiwiLi4vc3JjL3N1YmRpci9jb21wb3NpdGlvbjIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUVBO0lBQ0ksY0FBZ0I7QUFDcEI7O0FBRUE7QUFFQTs7QUNOQTtJQUNJO1FBRUksc0JBQXNCO0lBQzFCO0FBQ0o7O0FBRUE7SUFDSSx5QkFBeUI7QUFDN0I7O0FDWEE7SUFDSSxVQUFVO0FBQ2QiLCJmaWxlIjoiaW5kZXguY3NzIiwic291cmNlc0NvbnRlbnQiOlsiQHZhbHVlIHByaW1hcnksIHNlY29uZGFyeSBmcm9tIGNvbG9ycztcblxuLm1vZHVsZSB7XG4gICAgY29sb3I6IHNlY29uZGFyeTtcbn1cblxuLm1vZHVsZTIge1xuICAgIGNvbXBvc2VzOiBjb21wb3NpdGlvbiBmcm9tIFwiLi9jb21wb3NlZC5jc3NcIjtcbn1cbiIsIkB2YWx1ZSBwcmltYXJ5IGZyb20gY29sb3JzO1xuXG5AbWVkaWEgc2NyZWVuIGFuZCAobWluLXdpZHRoOiA5MDBweCkge1xuICAgIC5jb21wb3NpdGlvbiB7XG4gICAgICAgIGNvbXBvc2VzOiBjb21wb3NpdGlvbmVkIGZyb20gXCIuL3N1YmRpci9jb21wb3NpdGlvbjIuY3NzXCI7XG4gICAgICAgIGJhY2tncm91bmQtY29sb3I6IGFxdWE7XG4gICAgfVxufVxuXG4uY29tcG9zaXRpb24ge1xuICAgIGJhY2tncm91bmQtY29sb3I6IHByaW1hcnk7XG59XG4iLCIuY29tcG9zaXRpb25lZCB7XG4gICAgd2lkdGg6IDMwJTtcbn1cbiJdfQ== */"
+`;
+
+exports[`css > css-modules > should work with processed modules 'extract-sourcemap-inline' css > js 1`] = `
+"'use strict';
+
+var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'extract-sourcemap-inline' css > js 2`] = `
+"var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'extract-sourcemap-true' css > css 1`] = `
+".style_module_ea61eaf4 {
+    color: #1F4F7F;
+}
+
+.style_module2_ea61eaf4 {
+}
+
+@media screen and (min-width: 900px) {
+    .composed_composition_b4c6ecd1 {
+        background-color: aqua;
+    }
+}
+
+.composed_composition_b4c6ecd1 {
+    background-color: #BF4040;
+}
+
+.composition2_compositioned_33aa26b9 {
+    width: 30%;
+}
+
+/*# sourceMappingURL=index.css.map */"
+`;
+
+exports[`css > css-modules > should work with processed modules 'extract-sourcemap-true' css > js 1`] = `
+"'use strict';
+
+var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'extract-sourcemap-true' css > js 2`] = `
+"var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'extract-sourcemap-true' css > map 1`] = `"{"version":3,"sources":["../src/style.css","../src/composed.css","../src/subdir/composition2.css"],"names":[],"mappings":"AAEA;IACI,cAAgB;AACpB;;AAEA;AAEA;;ACNA;IACI;QAEI,sBAAsB;IAC1B;AACJ;;AAEA;IACI,yBAAyB;AAC7B;;ACXA;IACI,UAAU;AACd","file":"index.css","sourcesContent":["@value primary, secondary from colors;\\n\\n.module {\\n    color: secondary;\\n}\\n\\n.module2 {\\n    composes: composition from \\"./composed.css\\";\\n}\\n","@value primary from colors;\\n\\n@media screen and (min-width: 900px) {\\n    .composition {\\n        composes: compositioned from \\"./subdir/composition2.css\\";\\n        background-color: aqua;\\n    }\\n}\\n\\n.composition {\\n    background-color: primary;\\n}\\n",".compositioned {\\n    width: 30%;\\n}\\n"]}"`;
+
+exports[`css > css-modules > should work with processed modules 'generate-scoped-name' css > js 1`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$3 = "html {\\n    --color-primary: green;\\n}\\n\\n.primary {\\n    color: green;\\n    color: var(--color-primary);\\n}\\n";
+injectCss(css$3,{});
+
+var css$2 = ".test {\\n    content: \\"test\\";\\n}\\n";
+injectCss(css$2,{});
+
+var css$1 = ".foo {\\n    composes: test from \\"./shared.css\\";\\n}\\n";
+injectCss(css$1,{});
+
+var css = ".bar {\\n    composes: test from \\"./shared.css\\";\\n}\\n";
+injectCss(css,{});
+
+console.log(css$2, css$1, css);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'generate-scoped-name' css > js 2`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$3 = "html {\\n    --color-primary: green;\\n}\\n\\n.primary {\\n    color: green;\\n    color: var(--color-primary);\\n}\\n";
+injectCss(css$3,{});
+
+var css$2 = ".test {\\n    content: \\"test\\";\\n}\\n";
+injectCss(css$2,{});
+
+var css$1 = ".foo {\\n    composes: test from \\"./shared.css\\";\\n}\\n";
+injectCss(css$1,{});
+
+var css = ".bar {\\n    composes: test from \\"./shared.css\\";\\n}\\n";
+injectCss(css,{});
+
+console.log(css$2, css$1, css);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inject' css > js 1`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$2 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
+var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+injectCss(css$2,{});
+
+var css$1 = "@media screen and (min-width: 900px) {\\n    .composed_composition_b4c6ecd1 {\\n        background-color: aqua;\\n    }\\n}\\n\\n.composed_composition_b4c6ecd1 {\\n    background-color: #BF4040;\\n}\\n";
+injectCss(css$1,{});
+
+var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+injectCss(css,{});
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inject' css > js 2`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$2 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
+var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+injectCss(css$2,{});
+
+var css$1 = "@media screen and (min-width: 900px) {\\n    .composed_composition_b4c6ecd1 {\\n        background-color: aqua;\\n    }\\n}\\n\\n.composed_composition_b4c6ecd1 {\\n    background-color: #BF4040;\\n}\\n";
+injectCss(css$1,{});
+
+var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+injectCss(css,{});
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inject-fn' css > js 1`] = `
+"'use strict';
+
+var css$2 = "@value primary, secondary from colors;\\n\\n.module {\\n    color: secondary;\\n}\\n\\n.module2 {\\n    composes: composition from \\"./composed.css\\";\\n}\\n";
+console.log(css$2, true);
+
+var css$1 = "@value primary from colors;\\n\\n@media screen and (min-width: 900px) {\\n    .composition {\\n        composes: compositioned from \\"./subdir/composition2.css\\";\\n        background-color: aqua;\\n    }\\n}\\n\\n.composition {\\n    background-color: primary;\\n}\\n";
+console.log(css$1, true);
+
+var css = ".compositioned {\\n    width: 30%;\\n}\\n";
+console.log(css, true);
+
+if (css.inject) css.inject();
+else console.log(css$2.module, css.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inject-fn' css > js 2`] = `
+"var css$2 = "@value primary, secondary from colors;\\n\\n.module {\\n    color: secondary;\\n}\\n\\n.module2 {\\n    composes: composition from \\"./composed.css\\";\\n}\\n";
+console.log(css$2, true);
+
+var css$1 = "@value primary from colors;\\n\\n@media screen and (min-width: 900px) {\\n    .composition {\\n        composes: compositioned from \\"./subdir/composition2.css\\";\\n        background-color: aqua;\\n    }\\n}\\n\\n.composition {\\n    background-color: primary;\\n}\\n";
+console.log(css$1, true);
+
+var css = ".compositioned {\\n    width: 30%;\\n}\\n";
+console.log(css, true);
+
+if (css.inject) css.inject();
+else console.log(css$2.module, css.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inject-treeshakeable' css > js 1`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$1 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
+var injected$1 = false;
+var modules_5a199c00 = {get "primary"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "#BF4040"; },
+get "secondary"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "#1F4F7F"; },
+get "module"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module_ea61eaf4"; },
+get "module2"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"; },
+inject: function inject() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } },};
+
+var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
+var injected = false;
+var modules_354770d7 = {get "compositioned"() { if (!injected) { injected = true; injectCss(css,{}); } return "composition2_compositioned_33aa26b9"; },
+inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inject-treeshakeable' css > js 2`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css$1 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
+var injected$1 = false;
+var modules_5a199c00 = {get "primary"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "#BF4040"; },
+get "secondary"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "#1F4F7F"; },
+get "module"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module_ea61eaf4"; },
+get "module2"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"; },
+inject: function inject() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } },};
+
+var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
+var injected = false;
+var modules_354770d7 = {get "compositioned"() { if (!injected) { injected = true; injectCss(css,{}); } return "composition2_compositioned_33aa26b9"; },
+inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'named-exports' css > js 1`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css = ".valid {\\n    color: red;\\n}\\n\\n.new {\\n    color: blue;\\n}\\n\\n.css {\\n    color: green;\\n}\\n";
+injectCss(css,{});
+
+console.log(css);
+for (const name of Object.values(css)) {
+  console.log(name);
+}
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'named-exports' css > js 2`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css = ".valid {\\n    color: red;\\n}\\n\\n.new {\\n    color: blue;\\n}\\n\\n.css {\\n    color: green;\\n}\\n";
+injectCss(css,{});
+
+console.log(css);
+for (const name of Object.values(css)) {
+  console.log(name);
+}
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'named-exports-custom-class-name' css > js 1`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css = ".valid {\\n    color: red;\\n}\\n\\n.new {\\n    color: blue;\\n}\\n\\n.css {\\n    color: green;\\n}\\n";
+injectCss(css,{});
+
+console.log(css);
+for (const name of Object.values(css)) {
+  console.log(name);
+}
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'named-exports-custom-class-name' css > js 2`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+var css = ".valid {\\n    color: red;\\n}\\n\\n.new {\\n    color: blue;\\n}\\n\\n.css {\\n    color: green;\\n}\\n";
+injectCss(css,{});
+
+console.log(css);
+for (const name of Object.values(css)) {
+  console.log(name);
+}
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const a = require('./packem_shared/a-2f7fkQVS.cjs');
+const b = require('./packem_shared/b-e6P7ifVQ.cjs');
+
+
+
+exports.a = a.a;
+exports.b = b.b;
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 2`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const injectCss = require('./inject-css-LytPWKz2.cjs');
+
+var css = ".a_treeshakeModuleA_5bba2f91 {\\n  color: red;\\n}\\n";
+var injected = false;
+var modules_bdb828b9 = {get "treeshake-module-a"() { if (!injected) { injected = true; injectCss.injectCss(css,{}); } return "a_treeshakeModuleA_5bba2f91"; },
+inject: function inject() { if (!injected) { injected = true; injectCss.injectCss(css,{}); } },};
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function a() {
+  return modules_bdb828b9;
+}
+__name(a, "a");
+
+exports.a = a;
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 3`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const injectCss = require('./inject-css-LytPWKz2.cjs');
+
+var css = ".b_treeshakeModuleB_bae20ad9 {\\n  color: red;\\n}\\n";
+var injected = false;
+var modules_af8c69dd = {get "treeshake-module-b"() { if (!injected) { injected = true; injectCss.injectCss(css,{}); } return "b_treeshakeModuleB_bae20ad9"; },
+inject: function inject() { if (!injected) { injected = true; injectCss.injectCss(css,{}); } },};
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function b() {
+  return modules_af8c69dd;
+}
+__name(b, "b");
+
+exports.b = b;
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 4`] = `
+"'use strict';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+exports.injectCss = injectCss;
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 5`] = `
+"export { a } from './packem_shared/a-MvpDGwB2.mjs';
+export { b } from './packem_shared/b-DH22576n.mjs';
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 6`] = `
+"import { i as injectCss } from './inject-css-CahStUou.mjs';
+
+var css = ".a_treeshakeModuleA_5bba2f91 {\\n  color: red;\\n}\\n";
+var injected = false;
+var modules_bdb828b9 = {get "treeshake-module-a"() { if (!injected) { injected = true; injectCss(css,{}); } return "a_treeshakeModuleA_5bba2f91"; },
+inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function a() {
+  return modules_bdb828b9;
+}
+__name(a, "a");
+
+export { a };
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 7`] = `
+"import { i as injectCss } from './inject-css-CahStUou.mjs';
+
+var css = ".b_treeshakeModuleB_bae20ad9 {\\n  color: red;\\n}\\n";
+var injected = false;
+var modules_af8c69dd = {get "treeshake-module-b"() { if (!injected) { injected = true; injectCss(css,{}); } return "b_treeshakeModuleB_bae20ad9"; },
+inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function b() {
+  return modules_af8c69dd;
+}
+__name(b, "b");
+
+export { b };
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 8`] = `
+"var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+const containers = [];
+const styleTags = [];
+const injectCss = /* @__PURE__ */ __name2((css, options) => {
+  if (!css || typeof document === "undefined") {
+    return;
+  }
+  const position = options.prepend === true ? "prepend" : "append";
+  const singleTag = options.singleTag === true;
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = /* @__PURE__ */ __name2(() => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    const pos = position === "prepend" ? "afterbegin" : "beforeend";
+    container.insertAdjacentElement(pos, styleTag2);
+    return styleTag2;
+  }, "createStyleTag");
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    if (!styleTags[id][position]) {
+      styleTags[id][position] = createStyleTag();
+    }
+    styleTag = styleTags[id][position];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (styleTag.styleSheet) {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+}, "default");
+
+export { injectCss as i };
+"
+`;
+
 exports[`css > emit > should work with emitted processed 'basic-emit' css > js 1`] = `
 "'use strict';
 

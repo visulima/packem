@@ -804,7 +804,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         });
     });
 
-    describe("modules", () => {
+    describe("css-modules", () => {
         // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
         it.each([
             {
@@ -876,6 +876,17 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                     },
                 },
                 title: "named-exports-treeshakeable-fail",
+            },
+            {
+                input: "treeshake-module/index.js",
+                styleOptions: {
+                    mode: ["inject", { treeshakeable: true }],
+                    namedExports: true,
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "treeshake-module",
             },
             // @TODO Add dts
             // {
