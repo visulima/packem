@@ -1,3 +1,9 @@
+## @visulima/packem [1.5.1](https://github.com/visulima/packem/compare/@visulima/packem@1.5.0...@visulima/packem@1.5.1) (2024-11-06)
+
+### Bug Fixes
+
+* **css:** treeshake css modules ([749720d](https://github.com/visulima/packem/commit/749720dc1c9c00038933ba521f10172f8130cccd))
+
 ## @visulima/packem [1.5.0](https://github.com/visulima/packem/compare/@visulima/packem@1.4.2...@visulima/packem@1.5.0) (2024-11-05)
 
 ### Features
