@@ -31,6 +31,7 @@ import type { SucrasePluginConfig } from "./rollup/plugins/sucrase/types";
 import type { SwcPluginConfig } from "./rollup/plugins/swc/types";
 import type { PatchTypesOptions } from "./rollup/plugins/typescript/patch-typescript-types";
 import type FileCache from "./utils/file-cache";
+import type { UrlOptions } from "./rollup/plugins/url";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -105,6 +106,7 @@ export interface RollupBuildOptions {
     swc?: SwcPluginConfig | false;
     treeshake?: RollupOptions["treeshake"];
     visualizer?: PluginVisualizerOptions | false;
+    url?: UrlOptions | false;
     wasm?: RollupWasmOptions | false;
     watch?: RollupOptions["watch"];
 }

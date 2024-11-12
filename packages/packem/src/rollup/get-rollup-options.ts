@@ -51,6 +51,7 @@ import { patchTypescriptTypes as patchTypescriptTypesPlugin } from "./plugins/ty
 import { getConfigAlias, resolveTsconfigPaths as resolveTsconfigPathsPlugin } from "./plugins/typescript/resolve-tsconfig-paths";
 import resolveTsconfigRootDirectoriesPlugin from "./plugins/typescript/resolve-tsconfig-root-dirs";
 import resolveTypescriptMjsCtsPlugin from "./plugins/typescript/resolve-typescript-mjs-cjs";
+import { urlPlugin } from "./plugins/url";
 import createSplitChunks from "./utils/chunks/create-split-chunks";
 import getChunkFilename from "./utils/get-chunk-filename";
 import getEntryFileNames from "./utils/get-entry-file-names";
@@ -493,6 +494,8 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     Boolean(context.options.rollup.cjsInterop),
                     context.options.rollup.isolatedDeclarations,
                 ),
+
+            context.options.rollup.url && urlPlugin(context.options.rollup.url),
 
             context.options.rollup.css &&
                 context.options.rollup.css.loaders &&
