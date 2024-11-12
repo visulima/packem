@@ -155,6 +155,7 @@ const generateOptions = (
             },
             dynamicVars: {
                 errorWhenNoFilesFound: true,
+                exclude: EXCLUDE_REGEXP,
                 // fast path to check if source contains a dynamic import. we check for a
                 // trailing slash too as a dynamic import statement can have comments between
                 // the `import` and the `(`.
