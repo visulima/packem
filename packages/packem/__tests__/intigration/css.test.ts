@@ -1,3 +1,4 @@
+import type { Dirent } from "node:fs";
 import { cpSync } from "node:fs";
 import { readdir, rm } from "node:fs/promises";
 
@@ -71,7 +72,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         const input = Array.isArray(data.input) ? data.input : [data.input];
 
         // copy fixtures to temporary directory
-        cpSync(join(fixturePath, dirname(input[0] as string)), join(temporaryDirectoryPath), { recursive: true });
+        cpSync(join(fixturePath, dirname(input[0] as string)), temporaryDirectoryPath, { recursive: true });
 
         await installPackage(temporaryDirectoryPath, "minireset.css");
 
@@ -146,12 +147,12 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         const distributionPath = join(temporaryDirectoryPath, "dist");
 
         // eslint-disable-next-line security/detect-non-literal-fs-filename
-        let files = await readdir(distributionPath, {
+        const foundFiles: Dirent[] = await readdir(distributionPath, {
             recursive: true,
             withFileTypes: true,
         });
 
-        files = files
+        const files: string[] = foundFiles
             .filter((dirent) => dirent.isFile())
             // @TODO: Change this readdir to @visulima/fs readdir
             // eslint-disable-next-line deprecation/deprecation

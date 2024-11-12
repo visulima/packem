@@ -1,0 +1,273 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`url > copy "large" binary files, limit: 10 > cjs 1`] = `
+"'use strict';
+
+const svg = "98ea1a8cc8cd9baf.svg";
+
+module.exports = svg;
+"
+`;
+
+exports[`url > copy "large" binary files, limit: 10 > mjs 1`] = `
+"const svg = "98ea1a8cc8cd9baf.svg";
+
+export { svg as default };
+"
+`;
+
+exports[`url > inline "large" files > cjs 1`] = `
+"'use strict';
+
+const svg = "98ea1a8cc8cd9baf.svg";
+
+module.exports = svg;
+"
+`;
+
+exports[`url > inline "large" files > mjs 1`] = `
+"const svg = "98ea1a8cc8cd9baf.svg";
+
+export { svg as default };
+"
+`;
+
+exports[`url > should copy files with include by absolute path, limit: 0 > cjs 1`] = `
+"'use strict';
+
+const svg = "98ea1a8cc8cd9baf.svg";
+
+module.exports = svg;
+"
+`;
+
+exports[`url > should copy files with include by absolute path, limit: 0 > mjs 1`] = `
+"const svg = "98ea1a8cc8cd9baf.svg";
+
+export { svg as default };
+"
+`;
+
+exports[`url > should copy files, limit: 0 > cjs 1`] = `
+"'use strict';
+
+const svg = "98ea1a8cc8cd9baf.svg";
+
+module.exports = svg;
+"
+`;
+
+exports[`url > should copy files, limit: 0 > mjs 1`] = `
+"const svg = "98ea1a8cc8cd9baf.svg";
+
+export { svg as default };
+"
+`;
+
+exports[`url > should copy the file according to destDir option > cjs 1`] = `
+"'use strict';
+
+const png = "src/6b71fbe07b498a82.png";
+
+module.exports = png;
+"
+`;
+
+exports[`url > should copy the file according to destDir option > mjs 1`] = `
+"const png = "src/6b71fbe07b498a82.png";
+
+export { png as default };
+"
+`;
+
+exports[`url > should create a file with the name and extension of the file > cjs 1`] = `
+"'use strict';
+
+const png = "png.png";
+
+module.exports = png;
+"
+`;
+
+exports[`url > should create a file with the name and extension of the file > mjs 1`] = `
+"const png = "png.png";
+
+export { png as default };
+"
+`;
+
+exports[`url > should create a file with the name, hash and extension of the file > cjs 1`] = `
+"'use strict';
+
+const png = "png-6b71fbe07b498a82.png";
+
+module.exports = png;
+"
+`;
+
+exports[`url > should create a file with the name, hash and extension of the file > mjs 1`] = `
+"const png = "png-6b71fbe07b498a82.png";
+
+export { png as default };
+"
+`;
+
+exports[`url > should create a nested directory for the output, if required > cjs 1`] = `
+"'use strict';
+
+const png = "joker/6b71fbe07b498a82.png";
+
+module.exports = png;
+"
+`;
+
+exports[`url > should create a nested directory for the output, if required > mjs 1`] = `
+"const png = "joker/6b71fbe07b498a82.png";
+
+export { png as default };
+"
+`;
+
+exports[`url > should inline gif files > cjs 1`] = `
+"'use strict';
+
+const gif = "data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAAIf8LSW1hZ2VNYWdpY2sOZ2FtbWE9MC40NTQ1NDUALAAAAAABAAEAAAICRAEAOw==";
+
+module.exports = gif;
+"
+`;
+
+exports[`url > should inline gif files > mjs 1`] = `
+"const gif = "data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAAAAAAAIf8LSW1hZ2VNYWdpY2sOZ2FtbWE9MC40NTQ1NDUALAAAAAABAAEAAAICRAEAOw==";
+
+export { gif as default };
+"
+`;
+
+exports[`url > should inline jpeg files > cjs 1`] = `
+"'use strict';
+
+const jpeg = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAFA3PEY8MlBGQUZaVVBfeMiCeG5uePWvuZHI////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAABP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8Aa//Z";
+
+module.exports = jpeg;
+"
+`;
+
+exports[`url > should inline jpeg files > mjs 1`] = `
+"const jpeg = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAFA3PEY8MlBGQUZaVVBfeMiCeG5uePWvuZHI////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAABP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8Aa//Z";
+
+export { jpeg as default };
+"
+`;
+
+exports[`url > should inline jpg files > cjs 1`] = `
+"'use strict';
+
+const jpg = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAFA3PEY8MlBGQUZaVVBfeMiCeG5uePWvuZHI////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAABP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8Aa//Z";
+
+module.exports = jpg;
+"
+`;
+
+exports[`url > should inline jpg files > mjs 1`] = `
+"const jpg = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAFA3PEY8MlBGQUZaVVBfeMiCeG5uePWvuZHI////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAABP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8Aa//Z";
+
+export { jpg as default };
+"
+`;
+
+exports[`url > should inline png files > cjs 1`] = `
+"'use strict';
+
+const png = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGP6DwABBQECz6AuzQAAAABJRU5ErkJggg==";
+
+module.exports = png;
+"
+`;
+
+exports[`url > should inline png files > mjs 1`] = `
+"const png = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGP6DwABBQECz6AuzQAAAABJRU5ErkJggg==";
+
+export { png as default };
+"
+`;
+
+exports[`url > should inline text files > cjs 1`] = `
+"'use strict';
+
+const svg = "data:image/svg+xml,%3Csvg%3E%3Cpath%20d%3D%22%22%2F%3E%3C%2Fsvg%3E";
+
+module.exports = svg;
+"
+`;
+
+exports[`url > should inline text files > mjs 1`] = `
+"const svg = "data:image/svg+xml,%3Csvg%3E%3Cpath%20d%3D%22%22%2F%3E%3C%2Fsvg%3E";
+
+export { svg as default };
+"
+`;
+
+exports[`url > should inline webp files > cjs 1`] = `
+"'use strict';
+
+const webp = "data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAB0CWJaQAA3AA/u9gAAA=";
+
+module.exports = webp;
+"
+`;
+
+exports[`url > should inline webp files > mjs 1`] = `
+"const webp = "data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAB0CWJaQAA3AA/u9gAAA=";
+
+export { webp as default };
+"
+`;
+
+exports[`url > should limit: 0, emitFiles: false, publicPath: empty > cjs 1`] = `
+"'use strict';
+
+const svg = "98ea1a8cc8cd9baf.svg";
+
+module.exports = svg;
+"
+`;
+
+exports[`url > should limit: 0, emitFiles: false, publicPath: empty > mjs 1`] = `
+"const svg = "98ea1a8cc8cd9baf.svg";
+
+export { svg as default };
+"
+`;
+
+exports[`url > should prefix the file with the parent directory of the source file > cjs 1`] = `
+"'use strict';
+
+const png = "src/6b71fbe07b498a82.png";
+
+module.exports = png;
+"
+`;
+
+exports[`url > should prefix the file with the parent directory of the source file > mjs 1`] = `
+"const png = "src/6b71fbe07b498a82.png";
+
+export { png as default };
+"
+`;
+
+exports[`url > should use publicPath > cjs 1`] = `
+"'use strict';
+
+const png = "/batman/6b71fbe07b498a82.png";
+
+module.exports = png;
+"
+`;
+
+exports[`url > should use publicPath > mjs 1`] = `
+"const png = "/batman/6b71fbe07b498a82.png";
+
+export { png as default };
+"
+`;

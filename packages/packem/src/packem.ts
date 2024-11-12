@@ -1,15 +1,13 @@
-import { readdirSync } from "node:fs";
-import { rm } from "node:fs/promises";
 import Module from "node:module";
 import process from "node:process";
 
 import { bold, cyan } from "@visulima/colorize";
 import { findCacheDirSync } from "@visulima/find-cache-dir";
-import { emptyDir, ensureDirSync, isAccessible, isAccessibleSync, readJsonSync } from "@visulima/fs";
+import { ensureDirSync, isAccessible } from "@visulima/fs";
 import { duration } from "@visulima/humanizer";
 import type { PackageJson } from "@visulima/package";
 import type { Pail } from "@visulima/pail";
-import { join, relative, resolve } from "@visulima/path";
+import { join, resolve } from "@visulima/path";
 import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
 import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
 import browserslist from "browserslist";
@@ -29,6 +27,7 @@ import createStub from "./jit/create-stub";
 import getHash from "./rollup/utils/get-hash";
 import rollupWatch from "./rollup/watch";
 import type { BuildConfig, BuildContext, BuildOptions, BuildPreset, Environment, InternalBuildOptions, Mode } from "./types";
+import cleanDistributionDirectories from "./utils/clean-distribution-directories";
 import createOrUpdateKeyStorage from "./utils/create-or-update-key-storage";
 import enhanceRollupError from "./utils/enhance-rollup-error";
 import FileCache from "./utils/file-cache";
@@ -38,6 +37,7 @@ import killProcess from "./utils/kill-process";
 import loadPackageJson from "./utils/load-package-json";
 import logBuildErrors from "./utils/log-build-errors";
 import prepareEntries from "./utils/prepare-entries";
+import removeOldCacheFolders from "./utils/remove-old-cache-folders";
 import packageJsonValidator from "./validator/package-json";
 import validateAliasEntries from "./validator/validate-alias-entries";
 
@@ -155,6 +155,7 @@ const generateOptions = (
             },
             dynamicVars: {
                 errorWhenNoFilesFound: true,
+                exclude: EXCLUDE_REGEXP,
                 // fast path to check if source contains a dynamic import. we check for a
                 // trailing slash too as a dynamic import statement can have comments between
                 // the `import` and the `(`.
@@ -312,6 +313,13 @@ const generateOptions = (
                 moduleSideEffects: getPackageSideEffect(rootDirectory, packageJson),
                 preset: "recommended",
                 propertyReadSideEffects: true,
+            },
+            url: {
+                emitFiles: true,
+                exclude: EXCLUDE_REGEXP,
+                fileName: "[hash][extname]",
+                include: ["**/*.svg", "**/*.png", "**/*.jp(e)?g", "**/*.gif", "**/*.webp"],
+                limit: 14 * 1024,
             },
             visualizer: {},
             watch: {
@@ -539,70 +547,6 @@ const createContext = async (
     await prepareEntries(context);
 
     return context;
-};
-
-const cleanDistributionDirectories = async (context: BuildContext): Promise<void> => {
-    const cleanedDirectories: string[] = [];
-
-    if (context.options.clean) {
-        for (const directory of new Set(
-            // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
-            context.options.entries
-                .map((entry) => entry.outDir)
-                .filter(Boolean)
-                .sort() as unknown as Set<string>,
-        )) {
-            if (
-                directory === context.options.rootDir ||
-                directory === context.options.sourceDir ||
-                context.options.rootDir.startsWith(directory.endsWith("/") ? directory : `${directory}/`) ||
-                cleanedDirectories.some((c) => directory.startsWith(c))
-            ) {
-                // eslint-disable-next-line no-continue
-                continue;
-            }
-
-            cleanedDirectories.push(directory);
-            context.logger.info(`Cleaning dist directory: \`./${relative(context.options.rootDir, directory)}\``);
-
-            // eslint-disable-next-line no-await-in-loop
-            await emptyDir(directory);
-        }
-    }
-};
-
-const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail, logged: boolean): Promise<void> => {
-    if (cachePath && isAccessibleSync(join(cachePath, "keystore1.json"))) {
-        const keyStore: Record<string, string> = readJsonSync(join(cachePath, "keystore.json"));
-
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        const cacheDirectories = readdirSync(cachePath, {
-            withFileTypes: true,
-        }).filter((dirent) => dirent.isDirectory());
-
-        let hasLogged = logged;
-
-        for (const dirent of cacheDirectories) {
-            if (!keyStore[dirent.name]) {
-                // eslint-disable-next-line no-await-in-loop
-                await rm(join(cachePath, dirent.name), {
-                    force: true,
-                    recursive: true,
-                });
-
-                if (hasLogged) {
-                    logger.raw("\n\n");
-                }
-
-                logger.info({
-                    message: "Removing " + dirent.name + " file cache, the cache key is not used anymore.",
-                    prefix: "file-cache",
-                });
-
-                hasLogged = false;
-            }
-        }
-    }
 };
 
 const getMode = (mode: Mode): string => {
