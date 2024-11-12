@@ -405,7 +405,6 @@
         "@types/icss-utils": "^5.1.2",
         "@types/is-glob": "^4.0.4",
         "@types/less": "3.0.6",
-        "@types/mime-types": "^2.1.4",
         "@types/node": "18.19.64",
         "@types/node-sass": "^4.11.8",
         "@types/postcss-modules-local-by-default": "^4.0.2",

@@ -107,18 +107,21 @@ const copy = async (source: string, destination: string): Promise<void> => {
     });
 };
 
-const encodeSVG = (buffer: Buffer): string =>
-    encodeURIComponent(
-        buffer
-            .toString("utf8")
-            .replaceAll(/[\n\r]/g, "")
-            .replaceAll("\t", " ")
-            // eslint-disable-next-line regexp/no-unused-capturing-group
-            .replaceAll(/<!--(.*(?=-->))-->/g, "")
-            .replaceAll("'", "\\i"),
-    )
-        .replaceAll("(", "%28")
-        .replaceAll(")", "%29");
+const encodeSVG = (buffer: Buffer): string => {
+    let svgString = buffer
+        .toString("utf8")
+        .replaceAll(/[\n\r]/g, "")
+        .replaceAll("\t", " ");
+    let previous;
+
+    do {
+        previous = svgString;
+        // eslint-disable-next-line regexp/no-unused-capturing-group
+        svgString = svgString.replaceAll(/<!--(.*(?=-->))-->/g, "");
+    } while (svgString !== previous);
+
+    return encodeURIComponent(svgString.replaceAll("'", "\\i")).replaceAll("(", "%28").replaceAll(")", "%29");
+};
 
 export const urlPlugin = ({
     destDir: destinationDirectory,
@@ -169,7 +172,7 @@ export const urlPlugin = ({
                 const hash = crypto.createHash("sha1").update(buffer).digest("hex").slice(0, 16);
                 const extension = extname(id);
                 const name = basename(id, extension);
-                const relativeDirectory = sourceDirectory ? relative(sourceDirectory, dirname(id)) : (dirname(id).split("/").pop() ?? "");
+                const relativeDirectory = sourceDirectory ? relative(sourceDirectory, dirname(id)) : basename(dirname(id));
 
                 const outputFileName = fileName
                     .replaceAll("[hash]", hash)

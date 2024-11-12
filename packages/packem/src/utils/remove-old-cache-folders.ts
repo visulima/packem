@@ -5,7 +5,11 @@ import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
 
 const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail, logged: boolean): Promise<void> => {
-    if (cachePath && (await isAccessible(join(cachePath, "keystore1.json")))) {
+    if (!cachePath) {
+        return;
+    }
+
+    if (await isAccessible(join(cachePath, "keystore.json"))) {
         const keyStore: Record<string, string> = await readJson(join(cachePath, "keystore.json"));
 
         // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -19,11 +23,21 @@ const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail
 
         for (const dirent of cacheDirectories) {
             if (!keyStore[dirent.name]) {
-                // eslint-disable-next-line no-await-in-loop
-                await rm(join(cachePath, dirent.name), {
-                    force: true,
-                    recursive: true,
-                });
+                try {
+                    // eslint-disable-next-line no-await-in-loop
+                    await rm(join(cachePath, dirent.name), {
+                        force: true,
+                        recursive: true,
+                    });
+                } catch (error) {
+                    logger.error({
+                        message: `Failed to remove cache directory ${dirent.name}: ${error instanceof Error ? error.message : String(error)}`,
+                        prefix: "file-cache",
+                    });
+
+                    // eslint-disable-next-line no-continue
+                    continue;
+                }
 
                 if (hasLogged) {
                     logger.raw("\n\n");
