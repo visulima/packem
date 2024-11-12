@@ -717,9 +717,6 @@ importers:
       magic-string:
         specifier: 0.30.12
         version: 0.30.12
-      mime:
-        specifier: 4.0.4
-        version: 4.0.4
       mlly:
         specifier: 1.7.2
         version: 1.7.2
@@ -898,6 +895,9 @@ importers:
       lightningcss:
         specifier: 1.28.1
         version: 1.28.1
+      mime:
+        specifier: 4.0.4
+        version: 4.0.4
       minireset.css:
         specifier: 0.0.7
         version: 0.0.7
