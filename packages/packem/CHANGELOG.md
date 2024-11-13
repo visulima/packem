@@ -1,3 +1,9 @@
+## @visulima/packem [1.6.2](https://github.com/visulima/packem/compare/@visulima/packem@1.6.1...@visulima/packem@1.6.2) (2024-11-13)
+
+### Bug Fixes
+
+* updated dev dependencies and mlly and rollup dep ([c05290f](https://github.com/visulima/packem/commit/c05290f7ae438dd90d3fd3c83bb97408ef997a95))
+
 ## @visulima/packem [1.6.1](https://github.com/visulima/packem/compare/@visulima/packem@1.6.0...@visulima/packem@1.6.1) (2024-11-13)
 
 ### Bug Fixes
