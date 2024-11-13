@@ -1,3 +1,13 @@
+## @visulima/packem [1.6.0](https://github.com/visulima/packem/compare/@visulima/packem@1.5.1...@visulima/packem@1.6.0) (2024-11-13)
+
+### Features
+
+* added support for url which imports files as data-URIs or ES ([#60](https://github.com/visulima/packem/issues/60)) ([7342aad](https://github.com/visulima/packem/commit/7342aad4aa0e500af816431f444c60e20cf0d2a1))
+
+### Miscellaneous Chores
+
+* **deps:** update dependency postcss to >=8.4.47 ([#55](https://github.com/visulima/packem/issues/55)) ([7261f2c](https://github.com/visulima/packem/commit/7261f2c236835c6305d8e31695fe8f59bece163d))
+
 ## @visulima/packem [1.5.1](https://github.com/visulima/packem/compare/@visulima/packem@1.5.0...@visulima/packem@1.5.1) (2024-11-06)
 
 ### Bug Fixes
