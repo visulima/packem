@@ -1,3 +1,13 @@
+## @visulima/packem [1.6.1](https://github.com/visulima/packem/compare/@visulima/packem@1.6.0...@visulima/packem@1.6.1) (2024-11-13)
+
+### Bug Fixes
+
+* removed exclude from esbuild, preserveDirectives and url ([db4e0fd](https://github.com/visulima/packem/commit/db4e0fd157c144fa8db0708cf1dcedac8180c0ac))
+
+### Miscellaneous Chores
+
+* updated snapshot of a test ([fe94338](https://github.com/visulima/packem/commit/fe94338fbc18066e77aa18dcdda046a26501671f))
+
 ## @visulima/packem [1.6.0](https://github.com/visulima/packem/compare/@visulima/packem@1.5.1...@visulima/packem@1.6.0) (2024-11-13)
 
 ### Features
