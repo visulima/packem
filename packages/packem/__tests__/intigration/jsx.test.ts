@@ -26,7 +26,7 @@ describe("packem jsx", () => {
 
 export default Tr;`,
         );
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 react: "^18.2.0",
                 "react-dom": "^18.2.0",
@@ -41,7 +41,7 @@ export default Tr;`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        createTsConfig(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 jsx: "react-jsx",
                 moduleResolution: "bundler",
@@ -114,7 +114,7 @@ export { Tr as default };
 
 export default Tr;`,
         );
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 react: "^18.2.0",
                 "react-dom": "^18.2.0",
@@ -129,7 +129,7 @@ export default Tr;`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        createTsConfig(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 jsx: "react-jsx",
                 moduleResolution: "bundler",
@@ -202,7 +202,7 @@ export { Tr as default };
 
 export default Tr;`,
         );
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 react: "^18.2.0",
                 "react-dom": "^18.2.0",
@@ -217,7 +217,7 @@ export default Tr;`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        createTsConfig(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 jsx: "react-jsx",
                 moduleResolution: "bundler",
@@ -298,7 +298,7 @@ export { Tr as default };
 
 export default Tr;`,
         );
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 react: "^18.2.0",
                 "react-dom": "^18.2.0",
@@ -313,7 +313,7 @@ export default Tr;`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        createTsConfig(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 jsx: "react-jsx",
                 moduleResolution: "bundler",

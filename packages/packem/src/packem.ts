@@ -163,7 +163,6 @@ const generateOptions = (
             },
             esbuild: {
                 charset: "utf8",
-                exclude: EXCLUDE_REGEXP,
                 jsx: jsxRuntime,
                 jsxDev: tsconfig?.config.compilerOptions?.jsx === "react-jsxdev",
                 jsxFactory: tsconfig?.config.compilerOptions?.jsxFactory,
@@ -215,7 +214,6 @@ const generateOptions = (
             patchTypes: {},
             polyfillNode: {},
             preserveDirectives: {
-                exclude: EXCLUDE_REGEXP,
                 include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
             },
             preserveDynamicImports: true,
@@ -316,7 +314,6 @@ const generateOptions = (
             },
             url: {
                 emitFiles: true,
-                exclude: EXCLUDE_REGEXP,
                 fileName: "[hash][extname]",
                 include: ["**/*.svg", "**/*.png", "**/*.jp(e)?g", "**/*.gif", "**/*.webp"],
                 limit: 14 * 1024,

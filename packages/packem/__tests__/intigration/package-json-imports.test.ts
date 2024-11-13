@@ -27,7 +27,7 @@ describe("packem package.json imports", () => {
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -41,7 +41,7 @@ describe("packem package.json imports", () => {
                 "#*": "./src/*",
             },
         });
-        createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,

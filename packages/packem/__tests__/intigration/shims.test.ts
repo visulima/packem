@@ -63,7 +63,7 @@ var __commonJS = (cb, mod) =>
 export const a = 1`,
         );
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             exports: {
                 "./custom-require": {
                     import: "./dist/custom-require.mjs",
@@ -237,7 +237,7 @@ export function esmImport() {
   return import.meta.url
 }`,
         );
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             engines: {
                 node: "20.11",
             },
@@ -367,7 +367,7 @@ exports.getRequireModule = getRequireModule;
         expect.assertions(3);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `const test = "this should be in final bundle";\nexport default test;`);
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             module: "./dist/index.mjs",
             type: "module",
         });
@@ -404,7 +404,7 @@ export { test as default };
 
 export { getFilename } from "./filename.js";`,
         );
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             module: "./dist/index.mjs",
             type: "module",
         });
@@ -466,7 +466,7 @@ export { getFilename };
 
 export { getFilename } from "./level2/filename.js";`,
         );
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             module: "./dist/index.mjs",
             type: "module",
         });

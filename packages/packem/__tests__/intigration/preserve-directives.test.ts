@@ -29,7 +29,7 @@ console.log("Hello, world!");`,
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -38,7 +38,7 @@ console.log("Hello, world!");`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -68,7 +68,7 @@ console.log("Hello, world!");
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `console.log("Hello, world!");`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             bin: "./dist/index.cjs",
             devDependencies: {
                 typescript: "*",
@@ -77,7 +77,7 @@ console.log("Hello, world!");
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -112,7 +112,7 @@ const Tr = () => (<tr className={"m-0 border-t border-gray-300 p-0 dark:border-g
 
 export default Tr;`,
         );
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 react: "^18.2.0",
                 "react-dom": "^18.2.0",
@@ -127,7 +127,7 @@ export default Tr;`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        createTsConfig(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 jsx: "react-jsx",
                 moduleResolution: "bundler",
@@ -203,7 +203,7 @@ console.log("Hello, cli!");`,
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const foo = 'foo';`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             bin: {
                 packem: "./dist/cli.cjs",
             },
@@ -215,7 +215,7 @@ console.log("Hello, cli!");`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -270,7 +270,7 @@ export const baz = 'baz';`,
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -286,7 +286,7 @@ export const baz = 'baz';`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,

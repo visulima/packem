@@ -34,7 +34,7 @@ export default log();`,
         writeFileSync(`${temporaryDirectoryPath}/src/test2/foo/bar.ts`, `export const bar = () => console.log("bar");`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -42,7 +42,7 @@ export default log();`,
             module: "./dist/index.mjs",
             type: "commonjs",
         });
-        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 alias: {
@@ -80,7 +80,7 @@ export default log();`,
         writeFileSync(`${temporaryDirectoryPath}/src/test/logger.ts`, `export const log = () => console.log("test");`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -88,7 +88,7 @@ export default log();`,
             module: "./dist/index.mjs",
             type: "commonjs",
         });
-        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 alias: {

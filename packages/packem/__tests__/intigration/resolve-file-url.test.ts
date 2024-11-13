@@ -31,7 +31,7 @@ describe("packem resolve-file-url", () => {
 export default log`,
         );
         writeFileSync(`${temporaryDirectoryPath}/src/importer.mjs`, `export { default as effect } from "file://${temporaryDirectoryPath}/src/importee.mjs"`);
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             main: "./dist/importer.cjs",
             module: "./dist/importer.mjs",
             type: "commonjs",

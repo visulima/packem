@@ -46,8 +46,8 @@ export const data = { dep, devDep };`,
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        createTsConfig(temporaryDirectoryPath, {});
-        createPackageJson(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {});
+        await createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 dep: "*",
             },
@@ -124,8 +124,8 @@ export const data = { dep, devDep };`,
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        createTsConfig(temporaryDirectoryPath, {});
-        createPackageJson(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {});
+        await createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 dep: "*",
             },
@@ -244,8 +244,8 @@ export const data = { dep, devDep };`,
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        createTsConfig(temporaryDirectoryPath, {});
-        createPackageJson(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {});
+        await createPackageJson(temporaryDirectoryPath, {
             dependencies: {
                 dep: "*",
             },

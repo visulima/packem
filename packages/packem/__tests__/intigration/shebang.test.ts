@@ -31,7 +31,7 @@ console.log('Hello, world!');
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -39,7 +39,7 @@ console.log('Hello, world!');
             module: "./dist/index.mjs",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -73,7 +73,7 @@ console.log('Hello, world!');
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -90,7 +90,7 @@ console.log('Hello, world!');
                 },
             },
         });
-        createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -129,7 +129,7 @@ export { getNodeSheBang };
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -137,7 +137,7 @@ export { getNodeSheBang };
             module: "./dist/index.mjs",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -176,7 +176,7 @@ export { getNodeSheBang };
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -184,7 +184,7 @@ export { getNodeSheBang };
             module: "./dist/index.mjs",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -214,7 +214,7 @@ for (let i = 0; i < 10; i++) { console.log('🦄');}`,
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -222,7 +222,7 @@ for (let i = 0; i < 10; i++) { console.log('🦄');}`,
             module: "./dist/index.mjs",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,

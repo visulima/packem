@@ -2,7 +2,7 @@ import type { Dirent } from "node:fs";
 import { cpSync } from "node:fs";
 import { readdir, rm } from "node:fs/promises";
 
-import { isAccessibleSync, readFileSync } from "@visulima/fs";
+import { ensureDir, isAccessibleSync, readFileSync, writeFile, writeJson } from "@visulima/fs";
 import { join, resolve } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -28,7 +28,7 @@ describe("url", () => {
         cpSync(join(fixturePath, type + ".js"), join(temporaryDirectoryPath, "src", type + ".js"));
         cpSync(join(fixturePath, type + "." + type), join(temporaryDirectoryPath, "src", type + "." + type));
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             exports: {
                 ".": {
                     import: "./dist/" + type + ".mjs",
@@ -63,6 +63,7 @@ describe("url", () => {
 
             expect(cjsContent).toMatchSnapshot("cjs");
         }
+
         const distributionPath = join(temporaryDirectoryPath, "dist");
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         const foundFiles: Dirent[] = await readdir(distributionPath, {
@@ -196,7 +197,11 @@ describe("url", () => {
                 publicPath: "/batman/",
                 sourceDir: join(temporaryDirectoryPath, "src"),
             },
-            [join(temporaryDirectoryPath, "/dist/6b71fbe07b498a82.png"), join(temporaryDirectoryPath, "/dist/png.cjs"), join(temporaryDirectoryPath, "/dist/png.mjs")],
+            [
+                join(temporaryDirectoryPath, "/dist/6b71fbe07b498a82.png"),
+                join(temporaryDirectoryPath, "/dist/png.cjs"),
+                join(temporaryDirectoryPath, "/dist/png.mjs"),
+            ],
             false,
         );
 
@@ -273,7 +278,7 @@ module.exports = png;
             [
                 join(temporaryDirectoryPath, "/dist/png.cjs"),
                 join(temporaryDirectoryPath, "/dist/png.mjs"),
-                join(temporaryDirectoryPath, "/dist/", temporaryDirectoryPath.replace("/tmp/", ""),"/src/6b71fbe07b498a82.png"),
+                join(temporaryDirectoryPath, "/dist/", temporaryDirectoryPath.replace("/tmp/", ""), "/src/6b71fbe07b498a82.png"),
             ],
             false,
         );
@@ -310,5 +315,56 @@ module.exports = png;
         );
 
         expect(isAccessibleSync(join(temporaryDirectoryPath, "output/dest/src/6b71fbe07b498a82.png"))).toBeTruthy();
+    });
+
+    it("should import images from the node_modules", async () => {
+        const type = "svg";
+
+        await writeFile(join(temporaryDirectoryPath, "src", type + ".js"), `import svg from "@test/images/icons/${type}.${type}";
+
+export default svg;`);
+
+        const imagesPackagePath = join(temporaryDirectoryPath, "node_modules/@test/images");
+
+        await ensureDir(imagesPackagePath);
+
+        cpSync(join(fixturePath, type + "." + type), join(imagesPackagePath, "icons", type + "." + type));
+
+        await writeJson(
+            join(imagesPackagePath, "package.json"),
+            {
+                name: "@test/images",
+            },
+            {
+                recursive: true,
+            },
+        );
+
+        await createPackageJson(temporaryDirectoryPath, {
+            exports: {
+                ".": {
+                    import: "./dist/" + type + ".mjs",
+                    require: "./dist/" + type + ".cjs",
+                },
+            },
+        });
+
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", type + ".mjs"));
+
+        expect(mjsContent).toMatchSnapshot("mjs");
+
+        const cjsContent = readFileSync(join(temporaryDirectoryPath, "dist", type + ".cjs"));
+
+        expect(cjsContent).toMatchSnapshot("cjs");
     });
 });

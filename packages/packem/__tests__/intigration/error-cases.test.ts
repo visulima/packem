@@ -51,7 +51,7 @@ describe("packem error cases", () => {
     it("should throw a error if no src directory was found", async () => {
         expect.assertions(2);
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             dependencies: {},
             name: "pkg",
         });
@@ -68,7 +68,7 @@ describe("packem error cases", () => {
     it("should throw a error if src dir has no entries", async () => {
         expect.assertions(2);
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             dependencies: {},
             name: "pkg",
         });
@@ -87,7 +87,7 @@ describe("packem error cases", () => {
     it("should throw a error if package.json has no entry", async () => {
         expect.assertions(2);
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             dependencies: {},
             name: "pkg",
         });
@@ -105,7 +105,7 @@ describe("packem error cases", () => {
     it("should throw a error if conflicting entry in package.json", async () => {
         expect.assertions(3);
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             dependencies: {},
             files: ["dist"],
             main: "dist/index.mjs",
@@ -130,7 +130,7 @@ describe("packem error cases", () => {
         writeFileSync(`${temporaryDirectoryPath}/src/foo.js`, `export const foo = "foo";`);
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const index = "index";`);
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             exports: {
                 ".": {
                     require: "./dist/index.mjs",
@@ -160,7 +160,7 @@ describe("packem error cases", () => {
         writeFileSync(`${temporaryDirectoryPath}/src/foo.js`, `export const foo = "foo";`);
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const index = "index";`);
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             exports: {
                 ".": {
                     require: "./dist/index.mjs",

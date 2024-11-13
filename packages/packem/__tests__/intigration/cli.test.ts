@@ -22,14 +22,14 @@ describe("packem cli", () => {
         expect.assertions(5);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default class A {}`);
-        createTsConfig(
+        await createTsConfig(
             temporaryDirectoryPath,
             {
                 compilerOptions: { target: "es2018" },
             },
             ".build",
         );
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "5",
             },
@@ -38,7 +38,6 @@ describe("packem cli", () => {
             types: "dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath);
-
         await installPackage(temporaryDirectoryPath, "typescript");
 
         const binProcessEs2018 = await execPackemSync("build", ["--tsconfig=tsconfig.build.json"], {
@@ -84,8 +83,8 @@ export { A as default };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
-        createTsConfig(temporaryDirectoryPath, {});
-        createPackageJson(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {});
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -123,8 +122,8 @@ export { a };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
-        createTsConfig(temporaryDirectoryPath, {});
-        createPackageJson(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {});
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -161,8 +160,8 @@ export { a };
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
         writeFileSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`, `dot do it`);
 
-        createTsConfig(temporaryDirectoryPath, {});
-        createPackageJson(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {});
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -200,8 +199,8 @@ export { a };
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
         writeFileSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`, `dot do it`);
 
-        createTsConfig(temporaryDirectoryPath, {});
-        createPackageJson(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {});
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -238,8 +237,8 @@ export { a };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
-        createTsConfig(temporaryDirectoryPath, {});
-        createPackageJson(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {});
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -283,8 +282,8 @@ export { a };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
-        createTsConfig(temporaryDirectoryPath, {});
-        createPackageJson(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {});
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -320,8 +319,8 @@ export { a };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
-        createTsConfig(temporaryDirectoryPath, {});
-        createPackageJson(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {});
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },

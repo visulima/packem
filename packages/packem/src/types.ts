@@ -46,7 +46,7 @@ interface RollupDynamicImportVariablesOptions {
      * A picomatch pattern, or array of patterns, which specifies the files in the build the plugin
      * should _ignore_.
      *
-     * @default /node_modules/
+     * By default, no files are ignored.
      */
     exclude?: FilterPattern;
     /**

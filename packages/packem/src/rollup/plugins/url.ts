@@ -35,8 +35,9 @@ export interface UrlOptions {
      * A picomatch pattern, or array of patterns, which specifies the files in the build the plugin
      * should _ignore_.
      *
+     * By default, no files are ignored.
+     *
      * @type {FilterPattern}
-     * @default /node_modules/
      */
     exclude?: FilterPattern;
     /**

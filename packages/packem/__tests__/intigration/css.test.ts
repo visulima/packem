@@ -95,7 +95,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             transformer: "esbuild",
         });
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             dependencies: data.dependencies ?? {},
             exports: input.map((file) => {
                 const splitFile = file.split("/");

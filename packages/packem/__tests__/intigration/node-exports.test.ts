@@ -24,7 +24,7 @@ describe("packem node exports", () => {
             writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `const test = () => "this should be in final bundle";\nexport default test;`);
 
             await installPackage(temporaryDirectoryPath, "typescript");
-            createPackageJson(temporaryDirectoryPath, {
+            await createPackageJson(temporaryDirectoryPath, {
                 devDependencies: {
                     typescript: "^4.4.3",
                 },
@@ -34,7 +34,7 @@ describe("packem node exports", () => {
                 types: "./dist/index.d.ts",
             });
             await createPackemConfig(temporaryDirectoryPath);
-            createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+            await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
             const binProcess = await execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
                 cwd: temporaryDirectoryPath,
@@ -98,7 +98,7 @@ const test2 = "this should be in final bundle";
 
 export { test2, test as default };`,
             );
-            createPackageJson(temporaryDirectoryPath, {
+            await createPackageJson(temporaryDirectoryPath, {
                 devDependencies: {
                     typescript: "^4.4.3",
                 },
@@ -108,7 +108,7 @@ export { test2, test as default };`,
                 types: "./dist/index.d.ts",
             });
             await createPackemConfig(temporaryDirectoryPath);
-            createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+            await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
             const binProcess = await execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
                 cwd: temporaryDirectoryPath,
@@ -155,7 +155,7 @@ const test5 = "this should be in final bundle";
 
 export { test2, test3, test4, test5, test as default };`,
             );
-            createPackageJson(temporaryDirectoryPath, {
+            await createPackageJson(temporaryDirectoryPath, {
                 devDependencies: {
                     typescript: "^4.4.3",
                 },
@@ -165,7 +165,7 @@ export { test2, test3, test4, test5, test as default };`,
                 types: "./dist/index.d.ts",
             });
             await createPackemConfig(temporaryDirectoryPath);
-            createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+            await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
             const binProcess = await execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
                 cwd: temporaryDirectoryPath,
@@ -202,7 +202,7 @@ export { test2, test3, test4, test5, test as default };`,
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "^4.4.3",
             },
@@ -212,7 +212,7 @@ export { test2, test3, test4, test5, test as default };`,
             types: "./dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -264,7 +264,7 @@ export { test as default };
 
         await installPackage(temporaryDirectoryPath, "typescript");
         writeFileSync(`${temporaryDirectoryPath}/src/test/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "^4.4.3",
             },
@@ -274,7 +274,7 @@ export { test as default };
             types: "./dist/test/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -332,7 +332,7 @@ import b from 'peer-dep-meta'
 export default a + b
 `,
         );
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "^4.4.3",
             },
@@ -352,7 +352,7 @@ export default a + b
             },
         });
         await createPackemConfig(temporaryDirectoryPath);
-        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -384,7 +384,7 @@ const { indent: dIndent } = detectIndentFn("  file");
 export const indent = dIndent;
 `,
         );
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 "detect-indent": "^7.0.1",
                 typescript: "^4.4.3",
@@ -395,7 +395,7 @@ export const indent = dIndent;
             types: "./dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        createTsConfig(temporaryDirectoryPath, {
+        await createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
                 moduleResolution: "bundler",
             },
@@ -442,7 +442,7 @@ export const value = dep
 `,
         );
         writeFileSync(`${temporaryDirectoryPath}/src/lib/polyfill.js`, `export const dep = 'polyfill-dep'`);
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             exports: "./dist/index.cjs",
             imports: {
                 "#dep": "./src/lib/polyfill.js",
@@ -499,7 +499,7 @@ export class Child extends Parent {
   }
 }`,
         );
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "^4.4.3",
             },
@@ -509,7 +509,7 @@ export class Child extends Parent {
             types: "./dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -566,7 +566,7 @@ export class Child extends Parent {
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "^4.4.3",
             },
@@ -576,7 +576,7 @@ export class Child extends Parent {
             types: "./dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", ["--env NODE_ENV=production", "--minify"], {
             cwd: temporaryDirectoryPath,
@@ -618,7 +618,7 @@ export class Child extends Parent {
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export { packageA } from "./package";`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
             },
@@ -636,7 +636,7 @@ export class Child extends Parent {
             },
         });
         await createPackemConfig(temporaryDirectoryPath);
-        createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,

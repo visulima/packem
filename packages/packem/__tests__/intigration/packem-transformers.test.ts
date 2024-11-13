@@ -72,8 +72,8 @@ export { index as default };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
-        createTsConfig(temporaryDirectoryPath, {});
-        createPackageJson(
+        await createTsConfig(temporaryDirectoryPath, {});
+        await createPackageJson(
             temporaryDirectoryPath,
             {
                 devDependencies: {

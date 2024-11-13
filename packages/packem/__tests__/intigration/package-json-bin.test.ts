@@ -32,13 +32,13 @@ console.log(path.basename(__filename));
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             bin: "./dist/bin/index.cjs",
             devDependencies: {
                 typescript: "*",
             },
         });
-        createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -64,14 +64,14 @@ console.log("Hello, world!");
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             bin: "./dist/bin/index.mjs",
             devDependencies: {
                 typescript: "*",
             },
             type: "module",
         });
-        createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -103,7 +103,7 @@ console.log("b");
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             bin: {
                 a: "./dist/bin/a.cjs",
                 b: "./dist/bin/b.cjs",
@@ -112,7 +112,7 @@ console.log("b");
                 typescript: "*",
             },
         });
-        createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -141,13 +141,13 @@ console.log("b");
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             bin: "./dist/bin/index.cjs",
             devDependencies: {
                 typescript: "*",
             },
         });
-        createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath, {});
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,

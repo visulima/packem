@@ -3,7 +3,7 @@ import { mkdir } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { ensureSymlink, writeFile, writeJsonSync } from "@visulima/fs";
+import { ensureSymlink, writeFile, writeJson } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import type { TsConfigJson } from "@visulima/tsconfig";
 import type { Options } from "execa";
@@ -155,8 +155,8 @@ export default defineConfig({
     );
 };
 
-export const createPackageJson = (fixturePAth: string, data: PackageJson, transformer: "esbuild" | "swc" | "sucrase" = "esbuild"): void => {
-    writeJsonSync(
+export const createPackageJson = async (fixturePAth: string, data: PackageJson, transformer: "esbuild" | "swc" | "sucrase" = "esbuild"): Promise<void> => {
+    await writeJson(
         `${fixturePAth}/package.json`,
         {
             ...data,
@@ -171,8 +171,8 @@ export const createPackageJson = (fixturePAth: string, data: PackageJson, transf
     );
 };
 
-export const createTsConfig = (fixturePath: string, config: TsConfigJson, name = ""): void => {
-    writeJsonSync(
+export const createTsConfig = async (fixturePath: string, config: TsConfigJson, name = ""): Promise<void> => {
+    await writeJson(
         fixturePath + "/tsconfig" + name + ".json",
         {
             ...config,

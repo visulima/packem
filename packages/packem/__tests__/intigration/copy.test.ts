@@ -24,7 +24,7 @@ describe("packem copy", () => {
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `console.log("Hello, world!");`);
         writeFileSync(`${temporaryDirectoryPath}/assets/style.css`, `body { background-color: red; }`);
         writeFileSync(`${temporaryDirectoryPath}/assets/data.csv`, `name,age`);
-        createPackageJson(temporaryDirectoryPath, {
+        await createPackageJson(temporaryDirectoryPath, {
             main: "./dist/index.mjs",
             type: "module",
         });
