@@ -1,3 +1,9 @@
+## @visulima/packem [1.6.3](https://github.com/visulima/packem/compare/@visulima/packem@1.6.2...@visulima/packem@1.6.3) (2024-11-15)
+
+### Bug Fixes
+
+* fixed metafile generation, added docs how to use it ([f9fd349](https://github.com/visulima/packem/commit/f9fd3497277706da318d9ec653d6374c3a44765a))
+
 ## @visulima/packem [1.6.2](https://github.com/visulima/packem/compare/@visulima/packem@1.6.1...@visulima/packem@1.6.2) (2024-11-13)
 
 ### Bug Fixes
