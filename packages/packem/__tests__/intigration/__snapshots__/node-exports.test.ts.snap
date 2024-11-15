@@ -414,6 +414,80 @@ export { index as default };
 "
 `;
 
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension > cjs dts output 1`] = `
+"declare const test = "test content";
+
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension > cjs output 1`] = `
+"'use strict';
+
+const test = "test content";
+
+module.exports = test;
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension > dts output 1`] = `
+"declare const test = "test content";
+
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension > mjs dts output 1`] = `
+"declare const test = "test content";
+
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension > mjs output 1`] = `
+"const test = "test content";
+
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension - case 2 > cjs dts output 1`] = `
+"declare const test = "test content";
+
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension - case 2 > cjs output 1`] = `
+"'use strict';
+
+const test = "test content";
+
+module.exports = test;
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension - case 2 > dts output 1`] = `
+"declare const test = "test content";
+
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension - case 2 > mjs dts output 1`] = `
+"declare const test = "test content";
+
+export { test as default };
+"
+`;
+
+exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension - case 2 > mjs output 1`] = `
+"const test = "test content";
+
+export { test as default };
+"
+`;
+
 exports[`packem node exports > should output 'class' with 'extends correctly > cjs dts output 1`] = `
 "declare class Parent {
     constructor();

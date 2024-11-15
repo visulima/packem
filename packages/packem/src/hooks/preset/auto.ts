@@ -1,7 +1,5 @@
-import { existsSync } from "node:fs";
-
 import { bold, cyan, gray } from "@visulima/colorize";
-import { collectSync } from "@visulima/fs";
+import { collectSync, isAccessibleSync } from "@visulima/fs";
 import type { NormalizedPackageJson } from "@visulima/package";
 import { join } from "@visulima/path";
 
@@ -20,8 +18,7 @@ const autoPreset: BuildPreset = {
 
             const sourceDirectory = join(context.options.rootDir, context.options.sourceDir);
 
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
-            if (!existsSync(sourceDirectory)) {
+            if (!isAccessibleSync(sourceDirectory)) {
                 throw new Error("No 'src' directory found. Please provide entries manually.");
             }
 

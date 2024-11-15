@@ -1,6 +1,6 @@
 import { rm } from "node:fs/promises";
 
-import { readFileSync, writeFileSync } from "@visulima/fs";
+import { readFileSync, writeFile } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -21,7 +21,7 @@ describe("packem node exports", () => {
         it("should output 'default export' correctly and dont transform dts when cjsInterop", async () => {
             expect.assertions(7);
 
-            writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `const test = () => "this should be in final bundle";\nexport default test;`);
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, `const test = () => "this should be in final bundle";\nexport default test;`);
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -88,7 +88,7 @@ export = test;
             expect.assertions(7);
 
             await installPackage(temporaryDirectoryPath, "typescript");
-            writeFileSync(
+            await writeFile(
                 `${temporaryDirectoryPath}/src/index.ts`,
                 `const test = () => {
     return "this should be in final bundle";
@@ -142,7 +142,7 @@ export { test2, test as default };`,
             expect.assertions(7);
 
             await installPackage(temporaryDirectoryPath, "typescript");
-            writeFileSync(
+            await writeFile(
                 `${temporaryDirectoryPath}/src/index.ts`,
                 `const test = () => {
     return "this should be in final bundle";
@@ -199,7 +199,7 @@ export { test2, test3, test4, test5, test as default };`,
     it("should output 'default export' correctly", async () => {
         expect.assertions(7);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createPackageJson(temporaryDirectoryPath, {
@@ -263,7 +263,7 @@ export { test as default };
         expect.assertions(7);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        writeFileSync(`${temporaryDirectoryPath}/src/test/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
+        await writeFile(`${temporaryDirectoryPath}/src/test/index.ts`, `const test = "this should be in final bundle";\nexport default test;`);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "^4.4.3",
@@ -324,7 +324,7 @@ export { test as default };
         expect.assertions(4);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        writeFileSync(
+        await writeFile(
             `${temporaryDirectoryPath}/src/index.ts`,
             `import a from 'peer-dep'
 import b from 'peer-dep-meta'
@@ -375,7 +375,7 @@ export default a + b
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "detect-indent");
-        writeFileSync(
+        await writeFile(
             `${temporaryDirectoryPath}/src/index.ts`,
             `import detectIndentFn from "detect-indent";
 
@@ -434,14 +434,14 @@ export const indent = dIndent;
     it("should split shared module into one chunk layer", async () => {
         expect.assertions(4);
 
-        writeFileSync(
+        await writeFile(
             `${temporaryDirectoryPath}/src/index.js`,
             `import { dep } from '#dep'
 
 export const value = dep
 `,
         );
-        writeFileSync(`${temporaryDirectoryPath}/src/lib/polyfill.js`, `export const dep = 'polyfill-dep'`);
+        await writeFile(`${temporaryDirectoryPath}/src/lib/polyfill.js`, `export const dep = 'polyfill-dep'`);
         await createPackageJson(temporaryDirectoryPath, {
             exports: "./dist/index.cjs",
             imports: {
@@ -477,7 +477,7 @@ exports.value = value;
         expect.assertions(7);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        writeFileSync(
+        await writeFile(
             `${temporaryDirectoryPath}/src/index.ts`,
             `class Parent {
   constructor() {}
@@ -542,7 +542,7 @@ export class Child extends Parent {
     it("should output 'class' with 'extends correctly when minify is used", async () => {
         expect.assertions(8);
 
-        writeFileSync(
+        await writeFile(
             `${temporaryDirectoryPath}/src/index.ts`,
             `class Parent {
   constructor() {}
@@ -611,11 +611,11 @@ export class Child extends Parent {
     it("should generate correct chunks names, when chunk per export is generated", async () => {
         expect.assertions(6);
 
-        writeFileSync(
+        await writeFile(
             `${temporaryDirectoryPath}/src/package.ts`,
             `export const packageA = () => "This is a named export"; const d = "This is a default export"; export default d;`,
         );
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export { packageA } from "./package";`);
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, `export { packageA } from "./package";`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createPackageJson(temporaryDirectoryPath, {
@@ -686,5 +686,131 @@ const _package = require('./package.cjs');
 
 exports.packageA = _package.packageA;
 `);
+    });
+
+    it("should only find the correct export file, if files with the same name exist but with different extension", async () => {
+        expect.assertions(7);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `const test = "test content";
+export default test;`,
+        );
+
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.css`,
+            `.index {
+    color: red;
+}`,
+        );
+
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            type: "commonjs",
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            cssLoader: ["postcss", "sourcemap"],
+        });
+        await createTsConfig(temporaryDirectoryPath, {});
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toMatchSnapshot("mjs output");
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toMatchSnapshot("cjs output");
+
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(dCtsContent).toMatchSnapshot("cjs dts output");
+
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(dMtsContent).toMatchSnapshot("mjs dts output");
+
+        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dContent).toMatchSnapshot("dts output");
+    });
+
+    it("should only find the correct export file, if files with the same name exist but with different extension - case 2", async () => {
+        expect.assertions(7);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `const test = "test content";
+export default test;`,
+        );
+
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.css`,
+            `.index {
+    color: red;
+}`,
+        );
+
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: "./dist/index.js",
+                    require: "./dist/index.js",
+                },
+                "./index.css": "./dist/index.css",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            cssLoader: ["postcss", "sourcemap"],
+        });
+        await createTsConfig(temporaryDirectoryPath, {});
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toMatchSnapshot("mjs output");
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toMatchSnapshot("cjs output");
+
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(dCtsContent).toMatchSnapshot("cjs dts output");
+
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(dMtsContent).toMatchSnapshot("mjs dts output");
+
+        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dContent).toMatchSnapshot("dts output");
     });
 });

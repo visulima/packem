@@ -2,7 +2,7 @@ import { isAccessibleSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { extname, resolve, toNamespacedPath } from "@visulima/path";
 
-import { DEVELOPMENT_ENV, ENDING_RE, PRODUCTION_ENV, RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "../../../constants";
+import { DEFAULT_EXTENSIONS, DEVELOPMENT_ENV, ENDING_RE, PRODUCTION_ENV, RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "../../../constants";
 import type { BuildContext, BuildEntry, Environment, InferEntriesResult, Runtime } from "../../../types";
 import type { OutputDescriptor } from "../../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../../utils/extract-export-filenames";
@@ -175,6 +175,14 @@ const inferEntries = (
     const entries: BuildEntry[] = [];
 
     for (const output of outputs) {
+        const outputExtension = extname(output.file);
+
+        // Only javascript files are supported
+        if (outputExtension !== "" && !DEFAULT_EXTENSIONS.includes(outputExtension)) {
+            // eslint-disable-next-line no-continue
+            continue;
+        }
+
         if (context.options.declaration === undefined && (output.key === "types" || output.subKey === "types")) {
             context.options.declaration = output.file.includes(".d.ts") ? "compatible" : true;
         }
@@ -190,7 +198,6 @@ const inferEntries = (
         // Supported output file extensions are `.d.ts`, `.cjs` and `.mjs`
         // But we support any file extension here in case user has extended rollup options
         const outputSlug = output.file.replace(/(?:\*[^/\\]|\.d\.[mc]?ts|\.\w+)$/, "");
-
         const isDirectory = outputSlug.endsWith("/");
 
         // Skip top level directory
@@ -203,7 +210,7 @@ const inferEntries = (
         const sourceSlug = outputSlug.replace(new RegExp("(./)?" + context.options.outDir), context.options.sourceDir).replace("./", "");
 
         const beforeSourceRegex = "(?<=/|$)";
-        const fileExtensionRegex = isDirectory ? "" : "\\.\\w+$";
+        const fileExtensionRegex = isDirectory ? "" : "(\\.[cm]?[tj]sx?)$";
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if (output.file.includes("/*") && output.key === "exports") {
@@ -261,6 +268,7 @@ const inferEntries = (
             // eslint-disable-next-line no-continue
             continue;
         }
+
         if ((input.endsWith(".ts") || input.endsWith(".cts") || input.endsWith(".mts")) && isAccessibleSync(input)) {
             validateIfTypescriptIsInstalled(context);
         }

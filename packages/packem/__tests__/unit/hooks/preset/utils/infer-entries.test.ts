@@ -418,6 +418,7 @@ describe("inferEntries", () => {
                         ".": "./dist/index.cjs",
                         "./first-test": "./dist/first-test.cjs",
                         "./test": "./dist/test.cjs",
+                        "./test.css": "./dist/test.css",
                     },
                 },
                 ["src/", "src/index.ts", "src/first-test.ts", "src/test.mjs"].map((file) => join(temporaryDirectoryPath, file)),
@@ -452,7 +453,7 @@ describe("inferEntries", () => {
     });
 
     it("should recognise directory mappings", () => {
-        expect.assertions(4);
+        expect.assertions(5);
 
         createFiles(["src/runtime/test.js", "src/runtime/test2.js"], temporaryDirectoryPath);
 
@@ -522,6 +523,44 @@ describe("inferEntries", () => {
             inferEntries(
                 { exports: { "./test/*": "./test/*.js" } },
                 ["src/", "src/test/", "src/test/gather.ts", "src/test/test2/", "src/test/test2/gather.ts", "src/test/index2.ts", "src/gather.ts"].map((file) =>
+                    join(temporaryDirectoryPath, file),
+                ),
+                defaultContext,
+            ),
+        ).toStrictEqual({
+            entries: [
+                {
+                    cjs: true,
+                    environment: "development",
+                    exportKey: new Set<string>(["test/*"]),
+                    input: join(temporaryDirectoryPath, "src/test/gather.ts"),
+                    isGlob: true,
+                    runtime: "node",
+                },
+                {
+                    cjs: true,
+                    environment: "development",
+                    exportKey: new Set<string>(["test/*"]),
+                    input: join(temporaryDirectoryPath, "src/test/index2.ts"),
+                    isGlob: true,
+                    runtime: "node",
+                },
+                {
+                    cjs: true,
+                    environment: "development",
+                    exportKey: new Set<string>(["test/*"]),
+                    input: join(temporaryDirectoryPath, "src/test/test2/gather.ts"),
+                    isGlob: true,
+                    runtime: "node",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+
+        expect(
+            inferEntries(
+                { exports: { "./test/*": "./test/*.js", "./test/*.css": "./test/*.css" } },
+                ["src/", "src/test/", "src/test/gather.ts", "src/test/test2/", "src/test/test2/gather.ts", "src/test/index2.ts", "src/gather.ts", "src/test/gather.css"].map((file) =>
                     join(temporaryDirectoryPath, file),
                 ),
                 defaultContext,
