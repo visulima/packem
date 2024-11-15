@@ -1,3 +1,13 @@
+## @visulima/packem [1.6.5](https://github.com/visulima/packem/compare/@visulima/packem@1.6.4...@visulima/packem@1.6.5) (2024-11-15)
+
+### Bug Fixes
+
+* updated rollup version to v4.27.2, added treeshake optimization, fixed some cs issues ([359868c](https://github.com/visulima/packem/commit/359868c3dfb31c5cf900f53aed600d2b3c32a0de))
+
+### Miscellaneous Chores
+
+* updated test snapshot ([8d5f045](https://github.com/visulima/packem/commit/8d5f0459e78f7d281371b30116f6b1f1dbcf426c))
+
 ## @visulima/packem [1.6.4](https://github.com/visulima/packem/compare/@visulima/packem@1.6.3...@visulima/packem@1.6.4) (2024-11-15)
 
 ### Bug Fixes
