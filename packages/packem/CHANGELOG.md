@@ -1,3 +1,9 @@
+## @visulima/packem [1.6.4](https://github.com/visulima/packem/compare/@visulima/packem@1.6.3...@visulima/packem@1.6.4) (2024-11-15)
+
+### Bug Fixes
+
+* fixed selecting other extension then javascript/typescript ([1787270](https://github.com/visulima/packem/commit/178727078aa727e0cc4ce1c3c1dde6ae13a029b0))
+
 ## @visulima/packem [1.6.3](https://github.com/visulima/packem/compare/@visulima/packem@1.6.2...@visulima/packem@1.6.3) (2024-11-15)
 
 ### Bug Fixes
