@@ -320,9 +320,12 @@ module.exports = png;
     it("should import images from the node_modules", async () => {
         const type = "svg";
 
-        await writeFile(join(temporaryDirectoryPath, "src", type + ".js"), `import svg from "@test/images/icons/${type}.${type}";
+        await writeFile(
+            join(temporaryDirectoryPath, "src", type + ".js"),
+            `import svg from "@test/images/icons/${type}.${type}";
 
-export default svg;`);
+export default svg;`,
+        );
 
         const imagesPackagePath = join(temporaryDirectoryPath, "node_modules/@test/images");
 

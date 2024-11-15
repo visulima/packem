@@ -1,3 +1,3 @@
-import jpeg from './jpeg.jpeg';
+import jpeg from "./jpeg.jpeg";
 
 export default jpeg;

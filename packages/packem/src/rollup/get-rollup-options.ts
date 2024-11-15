@@ -346,6 +346,13 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
             }
         },
 
+        treeshake: {
+            // preserve side-effect-only imports:
+            moduleSideEffects: true,
+            // use Rollup's most optimal tree-shaking: (drops unused getter reads)
+            preset: "smallest",
+        },
+
         watch: context.mode === "watch" ? context.options.rollup.watch : false,
     };
 };
@@ -390,6 +397,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "cjs"),
                     exports: "auto",
+                    // turn off live bindings support (exports.* getters for re-exports)
                     externalLiveBindings: false,
                     format: "cjs",
                     freeze: false,
@@ -401,9 +409,9 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         reservedNamesAsProps: true,
                         symbols: true,
                     },
-                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
                     // will be added as empty imports to the entry chunks. Disable to avoid imports hoist outside of boundaries
                     hoistTransitiveImports: false,
+                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
                     interop: "compat",
                     sourcemap: context.options.sourcemap,
                     validate: true,
@@ -422,6 +430,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "mjs"),
                     exports: "auto",
+                    // turn off live bindings support (exports.* getters for re-exports)
                     externalLiveBindings: false,
                     format: "esm",
                     freeze: false,
@@ -588,8 +597,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             ...postPlugins,
 
-            context.options.rollup.metafile &&
-                metafilePlugin(),
+            context.options.rollup.metafile && metafilePlugin(),
 
             context.options.rollup.copy && copyPlugin(context.options.rollup.copy, context.logger),
 

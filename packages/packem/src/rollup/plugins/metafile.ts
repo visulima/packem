@@ -1,5 +1,5 @@
 import type { OutputBundle, OutputOptions, Plugin } from "rollup";
-import {  } from "@visulima/fs/utils";
+
 import { ENDING_RE } from "../../constants";
 
 interface MetaInfo {

@@ -560,9 +560,16 @@ describe("inferEntries", () => {
         expect(
             inferEntries(
                 { exports: { "./test/*": "./test/*.js", "./test/*.css": "./test/*.css" } },
-                ["src/", "src/test/", "src/test/gather.ts", "src/test/test2/", "src/test/test2/gather.ts", "src/test/index2.ts", "src/gather.ts", "src/test/gather.css"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                [
+                    "src/",
+                    "src/test/",
+                    "src/test/gather.ts",
+                    "src/test/test2/",
+                    "src/test/test2/gather.ts",
+                    "src/test/index2.ts",
+                    "src/gather.ts",
+                    "src/test/gather.css",
+                ].map((file) => join(temporaryDirectoryPath, file)),
                 defaultContext,
             ),
         ).toStrictEqual({

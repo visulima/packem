@@ -1,3 +1,3 @@
-import svg from './svg.svg';
+import svg from "./svg.svg";
 
 export default svg;

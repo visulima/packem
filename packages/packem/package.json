@@ -343,7 +343,7 @@
     "dependencies": {
         "@antfu/install-pkg": "0.4.1",
         "@babel/parser": "7.26.2",
-        "@clack/prompts": "0.7.0",
+        "@clack/prompts": "0.8.1",
         "@csstools/css-parser-algorithms": "3.0.4",
         "@csstools/css-tokenizer": "3.0.3",
         "@csstools/postcss-slow-plugins": "^2.0.0",
@@ -376,7 +376,7 @@
         "mlly": "1.7.3",
         "oxc-parser": "0.33.0",
         "oxc-resolver": "1.12.0",
-        "rollup": "4.26.0",
+        "rollup": "4.27.2",
         "rollup-plugin-dts": "6.1.1",
         "rollup-plugin-license": "3.5.3",
         "rollup-plugin-polyfill-node": "0.13.0",
@@ -414,8 +414,8 @@
         "@types/semver": "^7.5.8",
         "@types/stylus": "^0.48.43",
         "@types/uglifycss": "^0.0.11",
-        "@vitest/coverage-v8": "^2.1.4",
-        "@vitest/ui": "^2.1.4",
+        "@vitest/coverage-v8": "^2.1.5",
+        "@vitest/ui": "^2.1.5",
         "conventional-changelog-conventionalcommits": "8.0.0",
         "cross-env": "^7.0.3",
         "cssnano": "7.0.6",
@@ -451,8 +451,8 @@
         "react-dom": "^18.3.1",
         "rimraf": "^6.0.1",
         "rollup-plugin-lit-css": "^5.0.1",
-        "sass": "^1.80.7",
-        "sass-embedded": "^1.80.7",
+        "sass": "^1.81.0",
+        "sass-embedded": "^1.81.0",
         "secretlint": "9.0.0",
         "semantic-release": "^24.2.0",
         "sort-package-json": "^2.10.1",
@@ -465,7 +465,7 @@
         "typedoc-plugin-markdown": "4.2.10",
         "typedoc-plugin-rename-defaults": "0.7.1",
         "typescript": "^5.6.3",
-        "vitest": "^2.1.4"
+        "vitest": "^2.1.5"
     },
     "peerDependencies": {
         "@ckeditor/typedoc-plugins": ">=44.0.0",

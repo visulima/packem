@@ -1,5 +1,6 @@
-import { relative } from "@visulima/path";
 import { emptyDir } from "@visulima/fs";
+import { relative } from "@visulima/path";
+
 import type { BuildContext } from "../types";
 
 const cleanDistributionDirectories = async (context: BuildContext): Promise<void> => {

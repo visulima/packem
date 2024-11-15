@@ -3,7 +3,6 @@ import transformer from "./src/rollup/plugins/esbuild";
 
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
-
     cjsInterop: true,
     externals: ["stylus", "less", "sass", "node-sass", "postcss", "lightningcss"],
     fileCache: true,

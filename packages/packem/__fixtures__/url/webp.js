@@ -1,3 +1,3 @@
-import webp from './webp.webp';
+import webp from "./webp.webp";
 
 export default webp;

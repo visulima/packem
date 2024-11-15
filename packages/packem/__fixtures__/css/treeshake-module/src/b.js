@@ -1,5 +1,5 @@
-import style from './b.module.css'
+import style from "./b.module.css";
 
 export function b() {
-  return style
+    return style;
 }
