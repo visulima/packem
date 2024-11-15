@@ -795,6 +795,13 @@ styles({
 });
 ```
 
+### Metafile
+
+Passing `--metafile` flag to tell `packem` to produce some metadata about the build in JSON format.
+You can feed the output file to analysis tools like [bundle buddy](https://www.bundle-buddy.com/rollup) to visualize the modules in your bundle and how much space each one takes up.
+
+The file outputs as metafile-{bundleName}-{format}.json, e.g. `packem` will generate metafile-test-cjs.json and metafile-test-es.json.
+
 ## Configuration
 
 ### packem.config.js

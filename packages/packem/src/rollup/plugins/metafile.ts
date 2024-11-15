@@ -1,20 +1,15 @@
-import { writeJsonSync } from "@visulima/fs";
-import { resolve } from "@visulima/path";
-import type { Plugin } from "rollup";
-
-interface MetafileOptions {
-    outDir: string;
-    rootDir: string;
-}
+import type { OutputBundle, OutputOptions, Plugin } from "rollup";
+import {  } from "@visulima/fs/utils";
+import { ENDING_RE } from "../../constants";
 
 interface MetaInfo {
     source: string;
     target: string;
 }
 
-const metafilePlugin = (options: MetafileOptions): Plugin =>
+const metafilePlugin = (): Plugin =>
     ({
-        async buildEnd() {
+        async generateBundle(outputOptions: OutputOptions, outputBundle: OutputBundle) {
             const deps: MetaInfo[] = [];
 
             for (const id of this.getModuleIds()) {
@@ -34,9 +29,14 @@ const metafilePlugin = (options: MetafileOptions): Plugin =>
                 return;
             }
 
-            const outPath = resolve(options.rootDir, options.outDir, `graph.json`);
+            const outputBundleKeys = Object.keys(outputBundle);
 
-            writeJsonSync(outPath, deps);
+            this.emitFile({
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                fileName: `metafile-${(outputBundleKeys[0] as string).replace(ENDING_RE, "")}-${outputOptions.format}.json`,
+                source: JSON.stringify(deps, null, 2),
+                type: "asset",
+            });
         },
         name: "packem:metafile",
     }) as Plugin;

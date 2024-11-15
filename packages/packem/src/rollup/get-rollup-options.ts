@@ -589,10 +589,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             ...postPlugins,
 
             context.options.rollup.metafile &&
-                metafilePlugin({
-                    outDir: resolve(context.options.rootDir, context.options.outDir),
-                    rootDir: context.options.rootDir,
-                }),
+                metafilePlugin(),
 
             context.options.rollup.copy && copyPlugin(context.options.rollup.copy, context.logger),
 

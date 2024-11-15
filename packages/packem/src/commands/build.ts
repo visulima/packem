@@ -73,7 +73,7 @@ const createBuildCommand = (cli: Cli): void => {
                             values: environments,
                         },
                     },
-                    sourcemap: options.analyze || options.sourcemap,
+                    sourcemap: options.metafile || options.analyze || options.sourcemap,
                     tsconfigPath: options.tsconfig ?? undefined,
                     validation:
                         options.validation === false
