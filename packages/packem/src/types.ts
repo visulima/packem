@@ -32,6 +32,7 @@ import type { SwcPluginConfig } from "./rollup/plugins/swc/types";
 import type { PatchTypesOptions } from "./rollup/plugins/typescript/patch-typescript-types";
 import type FileCache from "./utils/file-cache";
 import type { UrlOptions } from "./rollup/plugins/url";
+import type { SourcemapsPluginOptions } from "./rollup/plugins/source-maps";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -110,6 +111,7 @@ export interface RollupBuildOptions {
     url?: UrlOptions | false;
     wasm?: RollupWasmOptions | false;
     watch?: RollupOptions["watch"];
+    sourcemap?: SourcemapsPluginOptions
 }
 
 export type TypeDocumentOptions = {

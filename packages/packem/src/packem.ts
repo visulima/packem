@@ -245,6 +245,7 @@ const generateOptions = (
                 exclude: EXCLUDE_REGEXP,
                 include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
             },
+            sourcemap: {},
             sucrase: {
                 disableESTransforms: true,
                 enableLegacyBabel5ModuleInterop: false,

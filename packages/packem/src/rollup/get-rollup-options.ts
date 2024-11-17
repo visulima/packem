@@ -56,6 +56,7 @@ import createSplitChunks from "./utils/chunks/create-split-chunks";
 import getChunkFilename from "./utils/get-chunk-filename";
 import getEntryFileNames from "./utils/get-entry-file-names";
 import resolveAliases from "./utils/resolve-aliases";
+import { sourcemapsPlugin } from "./plugins/source-maps";
 
 const sortUserPlugins = (plugins: RollupPlugins | undefined, type: "build" | "dts"): [Plugin[], Plugin[], Plugin[]] => {
     const prePlugins: Plugin[] = [];
@@ -453,6 +454,8 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
         ].filter(Boolean),
 
         plugins: [
+            context.options.sourcemap && sourcemapsPlugin(context.options.rollup.sourcemap),
+
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
@@ -741,6 +744,8 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
         ].filter(Boolean),
 
         plugins: [
+            context.options.sourcemap && sourcemapsPlugin(context.options.rollup.sourcemap),
+
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 

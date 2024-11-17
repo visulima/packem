@@ -690,6 +690,9 @@ importers:
       '@visulima/path':
         specifier: 1.1.1
         version: 1.1.1
+      '@visulima/source-map':
+        specifier: 1.0.10
+        version: 1.0.10
       '@visulima/tsconfig':
         specifier: 1.1.1
         version: 1.1.1(yaml@2.6.0)
@@ -3464,6 +3467,10 @@ packages:
     resolution: {integrity: sha512-QWw3HAr7M8gVjSx7K/ACn9C+0qx8+UxxGQP1cq2Ae5Mf1jaxghhpvpZikGV0RBY9bu4BMoyF3MdSev5uu2y1Vg==}
     engines: {node: '>=18.* <=22.*'}
     os: [darwin, linux, win32]
+
+  '@visulima/source-map@1.0.10':
+    resolution: {integrity: sha512-qDcOyz1ibs/QYImN4XVoyzl+9XwR6IK6cFJwYVJ3hpXzsgVjQ1T/S/2+zZS9sjNSICCJuCEV4A+SSGp6IoDL9Q==}
+    engines: {node: '>=18.* <=22.*'}
 
   '@visulima/tsconfig@1.1.1':
     resolution: {integrity: sha512-aYQoDr6Bxrrtrqzm5kVjyqxUWoooLLK0WqBzkW1XuVYyTVSibstyXNI2dpXGlSJ+yOhfnfCVk1Hgd017QZkBDg==}
@@ -12967,6 +12974,11 @@ snapshots:
       safe-stable-stringify: 2.5.0
 
   '@visulima/path@1.1.1': {}
+
+  '@visulima/source-map@1.0.10':
+    dependencies:
+      '@jridgewell/trace-mapping': 0.3.25
+      '@visulima/path': 1.1.1
 
   '@visulima/tsconfig@1.1.1(yaml@2.6.0)':
     dependencies:
