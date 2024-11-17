@@ -45,6 +45,7 @@ import { rawPlugin } from "./plugins/raw";
 import resolveFileUrlPlugin from "./plugins/resolve-file-url";
 import type { ShebangOptions } from "./plugins/shebang";
 import { removeShebangPlugin, shebangPlugin } from "./plugins/shebang";
+import { sourcemapsPlugin } from "./plugins/source-maps";
 import type { SucrasePluginConfig } from "./plugins/sucrase/types";
 import type { SwcPluginConfig } from "./plugins/swc/types";
 import { patchTypescriptTypes as patchTypescriptTypesPlugin } from "./plugins/typescript/patch-typescript-types";
@@ -56,7 +57,6 @@ import createSplitChunks from "./utils/chunks/create-split-chunks";
 import getChunkFilename from "./utils/get-chunk-filename";
 import getEntryFileNames from "./utils/get-entry-file-names";
 import resolveAliases from "./utils/resolve-aliases";
-import { sourcemapsPlugin } from "./plugins/source-maps";
 
 const sortUserPlugins = (plugins: RollupPlugins | undefined, type: "build" | "dts"): [Plugin[], Plugin[], Plugin[]] => {
     const prePlugins: Plugin[] = [];
@@ -454,8 +454,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
         ].filter(Boolean),
 
         plugins: [
-            context.options.sourcemap && sourcemapsPlugin(context.options.rollup.sourcemap),
-
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
@@ -495,18 +493,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             context.options.rollup.wasm && wasmPlugin(context.options.rollup.wasm),
 
-            // @TODO check if this can be moved into the dts build
-            context.options.declaration &&
-                context.options.rollup.isolatedDeclarations &&
-                context.options.isolatedDeclarationTransformer &&
-                isolatedDeclarationsPlugin(
-                    join(context.options.rootDir, context.options.sourceDir),
-                    context.options.isolatedDeclarationTransformer,
-                    context.options.declaration,
-                    Boolean(context.options.rollup.cjsInterop),
-                    context.options.rollup.isolatedDeclarations,
-                ),
-
             context.options.rollup.url && urlPlugin(context.options.rollup.url),
 
             context.options.rollup.css &&
@@ -537,7 +523,20 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             context.options.rollup.raw && cachingPlugin(rawPlugin(context.options.rollup.raw), fileCache),
 
+            context.options.sourcemap && sourcemapsPlugin(context.options.rollup.sourcemap),
+
             ...normalPlugins,
+
+            context.options.declaration &&
+                context.options.rollup.isolatedDeclarations &&
+                context.options.isolatedDeclarationTransformer &&
+                isolatedDeclarationsPlugin(
+                    join(context.options.rootDir, context.options.sourceDir),
+                    context.options.isolatedDeclarationTransformer,
+                    context.options.declaration,
+                    Boolean(context.options.rollup.cjsInterop),
+                    context.options.rollup.isolatedDeclarations,
+                ),
 
             context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
 
@@ -744,8 +743,6 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
         ].filter(Boolean),
 
         plugins: [
-            context.options.sourcemap && sourcemapsPlugin(context.options.rollup.sourcemap),
-
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
@@ -785,6 +782,8 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             ...prePlugins,
 
             nodeResolver,
+
+            context.options.sourcemap && sourcemapsPlugin(context.options.rollup.sourcemap),
 
             ...normalPlugins,
 
