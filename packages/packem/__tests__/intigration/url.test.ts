@@ -278,7 +278,7 @@ module.exports = png;
             [
                 join(temporaryDirectoryPath, "/dist/png.cjs"),
                 join(temporaryDirectoryPath, "/dist/png.mjs"),
-                join(temporaryDirectoryPath, "/dist/", temporaryDirectoryPath.replace("/tmp/", ""), "/src/6b71fbe07b498a82.png"),
+                join(temporaryDirectoryPath, "/dist/", temporaryDirectoryPath.split("/").pop() as string, "/src/6b71fbe07b498a82.png"),
             ],
             false,
         );
