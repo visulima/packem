@@ -53,7 +53,7 @@ It uses the `exports` configuration in `package.json` and recognizes entry file 
 -   ✅ Supports dynamic import
 -   ✅ Supports `tsconfig.json` paths and `package.json` imports resolution
 -   ✅ ESM ⇄ CJS interoperability
--   ✅ Supports isolated declaration types (experimental)
+-   ✅ Supports isolated declaration types (experimental) (Typescript version 5.5 or higher)
 -   ✅ Supports wasm [WebAssembly modules](http://webassembly.org)
 -   ✅ Supports css, [sass](https://github.com/sass/sass), [less](https://github.com/less/less.js), [stylus](https://github.com/stylus/stylus) and Up-to-date [CSS Modules](https://github.com/css-modules/css-modules) (experimental)
 -   ✅ [TypeDoc](https://github.com/TypeStrong/TypeDoc) documentation generation
@@ -541,6 +541,30 @@ export default defineConfig({
 });
 ```
 
+### Isolated declaration types (in TypeScript 5.5)
+
+> Generating .d.ts files with the default `rollup-plugin-dts` is slow because the TypeScript compiler must perform costly type inference, but these files streamline type checking by removing unnecessary details, and while shipping raw TypeScript files could simplify workflows, it is impractical due to ecosystem assumptions and performance trade-offs, which isolated declarations aim to address.
+
+You need to choose of the supported transformer to use isolated declaration types.
+
+-   [oxc](https://github.com/oxc-project/oxc)
+-   [@swc/core](https://github.com/swc-project/swc)
+-   [typescript](https://github.com/microsoft/TypeScript)
+
+Default is `typescript`.
+
+```ts
+import { defineConfig } from "@visulima/packem/config";
+import transformer from "@visulima/packem/transformer/esbuild";
+import isolatedDeclarationTransformer from "@visulima/packem/dts/isolated/transformer/typescript";
+
+// eslint-disable-next-line import/no-unused-modules
+export default defineConfig({
+    transformer,
+    isolatedDeclarationTransformer,
+});
+```
+
 <!-- Modified copy of https://github.com/Anidetrix/rollup-plugin-styles/blob/main/README.md -->
 
 ## Css and Css Modules
@@ -802,20 +826,6 @@ You can feed the output file to analysis tools like [bundle buddy](https://www.b
 
 The file outputs as metafile-{bundleName}-{format}.json, e.g. `packem` will generate metafile-test-cjs.json and metafile-test-es.json.
 
-## Configuration
-
-### packem.config.js
-
-The packem configuration file is a JavaScript file that exports an object with the following properties:
-
-#### transformer
-
-You choose which one of the three supported transformer to use.
-
--   [esbuild](https://github.com/evanw/esbuild)
--   [@swc/core](https://github.com/swc-project/swc)
--   [sucrase](https://github.com/alangpierce/sucrase)
-
 ### onSuccess
 
 You can specify command to be executed after a successful build, specially useful for **Watch mode**
@@ -856,6 +866,20 @@ export default defineConfig({
     },
 });
 ```
+
+## Configuration
+
+### packem.config.js
+
+The packem configuration file is a JavaScript file that exports an object with the following properties:
+
+#### transformer
+
+You choose which one of the three supported transformer to use.
+
+-   [esbuild](https://github.com/evanw/esbuild)
+-   [@swc/core](https://github.com/swc-project/swc)
+-   [sucrase](https://github.com/alangpierce/sucrase)
 
 ## Related
 

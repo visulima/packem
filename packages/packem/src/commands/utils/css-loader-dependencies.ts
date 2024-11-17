@@ -1,4 +1,4 @@
-const cssLoaderDependencies = {
+const cssLoaderDependencies: Record<string, string[]> = {
     less: ["less"],
     lightningcss: ["lightningcss"],
     "node-sass": ["node-sass"],

@@ -9,6 +9,7 @@ export default defineConfig({
     isolatedDeclarationTransformer,
     rollup: {
         node10Compatibility: {
+            typeScriptVersion: ">=5.5",
             writeToPackageJson: true,
         },
     },

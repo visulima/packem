@@ -19,7 +19,7 @@
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.ts",
     "typesVersions": {
-        "*": {
+        ">=5.5": {
             ".": [
                 "./dist/index.d.ts"
             ]
