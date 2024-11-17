@@ -13,7 +13,7 @@ export default defineConfig({
             path: "./LICENSE.md",
         },
         node10Compatibility: {
-            typeScriptVersion: ">=5.0",
+            typeScriptVersion: ">=5.5",
             writeToPackageJson: true,
         },
     },

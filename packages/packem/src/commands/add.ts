@@ -84,6 +84,7 @@ const createAddCommand = (cli: Cli): void => {
                     return;
                 }
 
+                // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
                 const cssLoaders: (keyof typeof cssLoaderDependencies | "sourceMap")[] = [];
 
                 const mainCssLoader = (await select({
@@ -128,7 +129,7 @@ const createAddCommand = (cli: Cli): void => {
                 const packagesToInstall: string[] = [];
 
                 for (const loader of cssLoaders) {
-                    packagesToInstall.push(...cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies]);
+                    packagesToInstall.push(...cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies] as string[]);
                 }
 
                 cssLoaders.push("sourceMap");

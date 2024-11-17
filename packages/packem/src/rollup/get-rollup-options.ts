@@ -783,8 +783,6 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
 
             nodeResolver,
 
-            context.options.sourcemap && sourcemapsPlugin(context.options.rollup.sourcemap),
-
             ...normalPlugins,
 
             await memoizeDtsPluginByKey(uniqueProcessId)(context),
