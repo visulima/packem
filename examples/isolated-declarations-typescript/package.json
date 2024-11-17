@@ -21,7 +21,7 @@
     "typesVersions": {
         ">=5.5": {
             ".": [
-                "./dist/index.d.cts"
+                "./dist/index.d.ts"
             ]
         }
     },

@@ -267,6 +267,8 @@ module.exports = png;
 
         const type = "png";
 
+        const pngPath = join(temporaryDirectoryPath.split("/").pop() as string, "/src/6b71fbe07b498a82.png");
+
         await build(
             type,
             {
@@ -278,14 +280,14 @@ module.exports = png;
             [
                 join(temporaryDirectoryPath, "/dist/png.cjs"),
                 join(temporaryDirectoryPath, "/dist/png.mjs"),
-                join(temporaryDirectoryPath, "/dist/", temporaryDirectoryPath.split("/").pop() as string, "/src/6b71fbe07b498a82.png"),
+                join(temporaryDirectoryPath, "/dist/", pngPath),
             ],
             false,
         );
 
         const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", type + ".mjs"));
 
-        expect(mjsContent).toBe(`const png = "${temporaryDirectoryPath.replace("/tmp/", "")}/src/6b71fbe07b498a82.png";
+        expect(mjsContent).toBe(`const png = "${pngPath}";
 
 export { png as default };
 `);
@@ -294,7 +296,7 @@ export { png as default };
 
         expect(cjsContent).toBe(`'use strict';
 
-const png = "${temporaryDirectoryPath.replace("/tmp/", "")}/src/6b71fbe07b498a82.png";
+const png = "${pngPath}";
 
 module.exports = png;
 `);
