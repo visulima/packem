@@ -1,3 +1,9 @@
+## @visulima/packem [1.7.1](https://github.com/visulima/packem/compare/@visulima/packem@1.7.0...@visulima/packem@1.7.1) (2024-11-17)
+
+### Bug Fixes
+
+* updated docs about isolated declarations, moved sourcemapsPlugin… ([#63](https://github.com/visulima/packem/issues/63)) ([d64d022](https://github.com/visulima/packem/commit/d64d022305df696c809aa7f0480e04e8829c2bfb))
+
 ## @visulima/packem [1.7.0](https://github.com/visulima/packem/compare/@visulima/packem@1.6.5...@visulima/packem@1.7.0) (2024-11-17)
 
 ### Features
