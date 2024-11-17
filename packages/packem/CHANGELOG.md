@@ -1,3 +1,9 @@
+## @visulima/packem [1.7.2](https://github.com/visulima/packem/compare/@visulima/packem@1.7.1...@visulima/packem@1.7.2) (2024-11-17)
+
+### Bug Fixes
+
+* updated oxc deps ([5989b86](https://github.com/visulima/packem/commit/5989b86dfd589bd3afb8557a8d962b368e077f0b))
+
 ## @visulima/packem [1.7.1](https://github.com/visulima/packem/compare/@visulima/packem@1.7.0...@visulima/packem@1.7.1) (2024-11-17)
 
 ### Bug Fixes
