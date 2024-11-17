@@ -51,8 +51,7 @@ export const isolatedDeclarationsPlugin = (
         try {
             const result = await parseAsync(code, { sourceFilename: id });
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            program = JSON.parse(result.program) as { body: any[] };
+            program = result.program;
         } catch {
             // empty
         }

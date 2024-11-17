@@ -1150,6 +1150,14 @@ export type Num2 = number`,
 
                 await installPackage(temporaryDirectoryPath, "typescript");
 
+                if (isolatedDeclarationTransformer === "oxc") {
+                    await installPackage(temporaryDirectoryPath, "oxc-transform");
+                }
+
+                if (isolatedDeclarationTransformer === "swc") {
+                    await installPackage(temporaryDirectoryPath, "@swc/core");
+                }
+
                 await createPackageJson(temporaryDirectoryPath, {
                     devDependencies: {
                         typescript: "*",
@@ -1176,7 +1184,7 @@ export type Num2 = number`,
                     cwd: temporaryDirectoryPath,
                     reject: false,
                 });
-
+console.log(binProcess.stdout)
                 expect(binProcess.stderr).toBe("");
                 expect(binProcess.exitCode).toBe(0);
                 expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
@@ -1252,6 +1260,14 @@ export type Num2 = number`,
 
                 await installPackage(temporaryDirectoryPath, "typescript");
 
+                if (isolatedDeclarationTransformer === "oxc") {
+                    await installPackage(temporaryDirectoryPath, "oxc-transform");
+                }
+
+                if (isolatedDeclarationTransformer === "swc") {
+                    await installPackage(temporaryDirectoryPath, "@swc/core");
+                }
+
                 await createPackageJson(temporaryDirectoryPath, {
                     devDependencies: {
                         typescript: "*",
@@ -1321,6 +1337,14 @@ export default test;
                 );
 
                 await installPackage(temporaryDirectoryPath, "typescript");
+
+                if (isolatedDeclarationTransformer === "oxc") {
+                    await installPackage(temporaryDirectoryPath, "oxc-transform");
+                }
+
+                if (isolatedDeclarationTransformer === "swc") {
+                    await installPackage(temporaryDirectoryPath, "@swc/core");
+                }
 
                 await createPackageJson(temporaryDirectoryPath, {
                     devDependencies: {
