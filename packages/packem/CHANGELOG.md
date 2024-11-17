@@ -1,3 +1,9 @@
+## @visulima/packem [1.7.0](https://github.com/visulima/packem/compare/@visulima/packem@1.6.5...@visulima/packem@1.7.0) (2024-11-17)
+
+### Features
+
+* added new source-maps plugin for loading files with existing source maps. ([a3407d6](https://github.com/visulima/packem/commit/a3407d67e3220db29b4ba65d7c73f9c486a7149c))
+
 ## @visulima/packem [1.6.5](https://github.com/visulima/packem/compare/@visulima/packem@1.6.4...@visulima/packem@1.6.5) (2024-11-15)
 
 ### Bug Fixes
