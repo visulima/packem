@@ -1,7 +1,7 @@
 import { existsSync, symlinkSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
-import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
+import { isAccessibleSync, readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -220,7 +220,10 @@ describe("packem typescript", () => {
 
             await installPackage(temporaryDirectoryPath, "typescript");
 
-            writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'import "components:Test";\n import { test2 } from "components:Test2";\n\nconsole.log(test2);');
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                'import "components:Test";\n import { test2 } from "components:Test2";\n\nconsole.log(test2);',
+            );
             writeFileSync(`${temporaryDirectoryPath}/src/components/Test.ts`, "console.log(1);");
             writeFileSync(`${temporaryDirectoryPath}/src/components/Test2.ts`, "export const test2 = 'test'");
 
@@ -1189,7 +1192,7 @@ export type Num2 = number`,
                     cwd: temporaryDirectoryPath,
                     reject: false,
                 });
-console.log(binProcess.stdout)
+
                 expect(binProcess.stderr).toBe("");
                 expect(binProcess.exitCode).toBe(0);
                 expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
@@ -1412,6 +1415,90 @@ export default test;
 `);
             },
         );
+
+        it.each(["typescript", "oxc", "swc"])("should resolve aliases with '%s' isolated declarations transformer", async (isolatedDeclarationTransformer) => {
+            expect.assertions(9);
+
+            writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'import { a } from "utils/a";\nexport default a;');
+            writeFileSync(`${temporaryDirectoryPath}/src/utils/a.ts`, "export const a: number = 1;");
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+
+            if (isolatedDeclarationTransformer === "oxc") {
+                await installPackage(temporaryDirectoryPath, "oxc-transform");
+            }
+
+            if (isolatedDeclarationTransformer === "swc") {
+                await installPackage(temporaryDirectoryPath, "@swc/core");
+            }
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
+                },
+                exports: {
+                    ".": {
+                        import: {
+                            default: "./dist/index.mjs",
+                            types: "./dist/index.d.mts",
+                        },
+                        require: {
+                            default: "./dist/index.cjs",
+                            types: "./dist/index.d.cts",
+                        },
+                    },
+                },
+            });
+            await createPackemConfig(temporaryDirectoryPath, {
+                config: {
+                    cjsInterop: true,
+                },
+                isolatedDeclarationTransformer: isolatedDeclarationTransformer as "swc" | "typescript" | "oxc" | undefined,
+                transformer: "esbuild",
+            });
+            await createTsConfig(temporaryDirectoryPath, {
+                compilerOptions: {
+                    baseUrl: "src",
+                    isolatedDeclarations: true,
+                    noErrorTruncation: true,
+                    paths: {
+                        "utils/*": ["utils/*.ts"],
+                    },
+                },
+            });
+
+            const binProcess = await execPackemSync("build", [], {
+                cwd: temporaryDirectoryPath,
+                reject: false,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+            expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
+
+            const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+            expect(dCtsContent).toBe(`import { a } from "./utils/a.d.cts";
+
+
+export = a;`);
+            expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/utils/a.d.cts`)).toBeTruthy();
+
+            const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+            expect(dtsContent).toBe(`import { a } from "./utils/a.d.ts";
+
+
+export = a;`);
+            expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/utils/a.d.ts`)).toBeTruthy();
+
+            const dCtsTypesContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+            expect(dCtsTypesContent).toBe(`import { a } from "./utils/a.d.mts";
+export default a;
+`);
+            expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/utils/a.d.mts`)).toBeTruthy();
+        });
     });
 
     it("should use the outDir option from tsconfig if present", async () => {

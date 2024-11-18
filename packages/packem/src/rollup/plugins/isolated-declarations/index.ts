@@ -9,6 +9,7 @@ import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { readFile } from "@visulima/fs";
 import { basename, relative } from "@visulima/path";
+import type { TsConfigResult } from "@visulima/tsconfig";
 import { parseAsync } from "oxc-parser";
 import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginContext, PreRenderedChunk } from "rollup";
 
@@ -29,7 +30,9 @@ export const isolatedDeclarationsPlugin = (
     transformer: (code: string, id: string) => Promise<IsolatedDeclarationsResult>,
     declaration: boolean | "compatible" | "node16" | undefined,
     cjsInterop: boolean,
-    options: IsolatedDeclarationsOptions = {},
+    options: IsolatedDeclarationsOptions,
+    tsconfig?: TsConfigResult,
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Plugin => {
     const filter = createFilter(options.include, options.exclude);
 
@@ -39,7 +42,15 @@ export const isolatedDeclarationsPlugin = (
         outputFiles[filename.replace(ENDING_RE, "")] = source;
     };
 
-    // eslint-disable-next-line func-style,sonarjs/cognitive-complexity
+    let tsconfigPathPatterns: RegExp[] = [];
+
+    if (tsconfig?.config.compilerOptions) {
+        tsconfigPathPatterns = Object.entries(tsconfig.config.compilerOptions.paths ?? {}).map(([key]) =>
+            (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
+        );
+    }
+
+    // eslint-disable-next-line func-style
     async function transform(this: PluginContext, code: string, id: string): Promise<undefined> {
         if (!filter(id)) {
             return;
@@ -61,13 +72,12 @@ export const isolatedDeclarationsPlugin = (
                 (node) => node.type === "ImportDeclaration" || node.type === "ExportAllDeclaration" || node.type === "ExportNamedDeclaration",
             );
 
-            for (const node of imports) {
+            for await (const node of imports) {
                 if (!node.source || basename(node.source.value).includes(".")) {
                     // eslint-disable-next-line no-continue
                     continue;
                 }
 
-                // eslint-disable-next-line no-await-in-loop
                 const resolved = await this.resolve(node.source.value, id);
 
                 if (!resolved || resolved.external) {
@@ -85,8 +95,19 @@ export const isolatedDeclarationsPlugin = (
                 ) {
                     const resolvedId = resolved.id.replace(sourceDirectory + "/", "");
 
-                    // eslint-disable-next-line no-param-reassign,@typescript-eslint/restrict-plus-operands
-                    code = code.replaceAll('from "' + node.source.value + '"', 'from "' + extendString(node.source.value, resolvedId) + '"');
+                    let extendedSourceValue = node.source.value;
+
+                    if (tsconfigPathPatterns.some((pattern) => pattern.test(node.source.value)) && !node.source.value.startsWith(".")) {
+                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                        extendedSourceValue = "./" + node.source.value;
+                    }
+
+                    // eslint-disable-next-line no-param-reassign
+                    code = code.replaceAll(
+                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                        'from "' + node.source.value + '"',
+                        'from "' + extendString(extendedSourceValue, resolvedId) + '"',
+                    );
                 }
             }
         }
@@ -167,7 +188,6 @@ export const isolatedDeclarationsPlugin = (
     return <Plugin>{
         name: "packem:isolated-declarations",
 
-        // eslint-disable-next-line sonarjs/cognitive-complexity
         async renderStart(outputOptions: NormalizedOutputOptions, { input }: NormalizedInputOptions): Promise<void> {
             const outBase = lowestCommonAncestor(...(Array.isArray(input) ? input : Object.values(input)));
 

@@ -247,7 +247,7 @@ const createInitCommand = (cli: Cli): void => {
 
                 if (shouldInstall) {
                     for (const loader of cssLoaders) {
-                        packagesToInstall.push(...cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies] as string[]);
+                        packagesToInstall.push(...(cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies] as string[]));
                     }
                 }
 

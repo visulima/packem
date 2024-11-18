@@ -16,6 +16,7 @@ describe("extendString", () => {
         ["../../types.mts", "types.ts", "../../types.ts"],
         ["../../types.js", "types.ts", "../../types.ts"],
         ["./types.d.ts", "types.d.cts", "./types.d.cts"],
+        ["utils:a", "utils/a.ts", "./utils/a.ts"],
     ])(
         "should append the additional parts of referenceString to baseString '%s' when they have common leading parts",
         (baseString, referenceString, expectedString) => {

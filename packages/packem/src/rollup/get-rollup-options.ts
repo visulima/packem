@@ -1,4 +1,3 @@
-import { readdirSync } from "node:fs";
 import { versions } from "node:process";
 
 import type { ResolverObject } from "@rollup/plugin-alias";
@@ -38,6 +37,7 @@ import cachingPlugin from "./plugins/plugin-cache";
 import prependDirectivePlugin from "./plugins/prepend-directives";
 import preserveDirectivesPlugin from "./plugins/preserve-directives";
 import { rawPlugin } from "./plugins/raw";
+import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
 import resolveFileUrlPlugin from "./plugins/resolve-file-url";
 import type { ShebangOptions } from "./plugins/shebang";
 import { removeShebangPlugin, shebangPlugin } from "./plugins/shebang";
@@ -53,7 +53,6 @@ import createSplitChunks from "./utils/chunks/create-split-chunks";
 import getChunkFilename from "./utils/get-chunk-filename";
 import getEntryFileNames from "./utils/get-entry-file-names";
 import resolveAliases from "./utils/resolve-aliases";
-import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
 
 const sortUserPlugins = (plugins: RollupPlugins | undefined, type: "build" | "dts"): [Plugin[], Plugin[], Plugin[]] => {
     const prePlugins: Plugin[] = [];
@@ -219,8 +218,8 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext): boolean => {
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const baseRollupOptions = (context: BuildContext, type: "build" | "dts"): RollupOptions => {
-    return <RollupOptions>{
+const baseRollupOptions = (context: BuildContext, type: "build" | "dts"): RollupOptions =>
+    <RollupOptions>{
         input: Object.fromEntries(context.options.entries.map((entry) => [entry.name, resolve(context.options.rootDir, entry.input)])),
 
         logLevel: context.options.debug ? "debug" : "info",
@@ -276,7 +275,6 @@ const baseRollupOptions = (context: BuildContext, type: "build" | "dts"): Rollup
 
         watch: context.mode === "watch" ? context.options.rollup.watch : false,
     };
-};
 
 // eslint-disable-next-line sonarjs/cognitive-complexity,import/exports-last
 export const getRollupOptions = async (context: BuildContext, fileCache: FileCache): Promise<RollupOptions> => {
@@ -380,7 +378,10 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
             context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger), fileCache),
 
-            cachingPlugin(resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}), fileCache),
+            cachingPlugin(
+                resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}),
+                fileCache,
+            ),
 
             context.options.rollup.replace &&
                 replacePlugin({
@@ -688,7 +689,10 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
             context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger), fileCache),
 
-            cachingPlugin(resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}), fileCache),
+            cachingPlugin(
+                resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}),
+                fileCache,
+            ),
 
             context.options.rollup.replace &&
                 replacePlugin({

@@ -129,7 +129,7 @@ const createAddCommand = (cli: Cli): void => {
                 const packagesToInstall: string[] = [];
 
                 for (const loader of cssLoaders) {
-                    packagesToInstall.push(...cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies] as string[]);
+                    packagesToInstall.push(...(cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies] as string[]));
                 }
 
                 cssLoaders.push("sourceMap");

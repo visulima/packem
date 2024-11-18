@@ -112,7 +112,7 @@ export interface RollupBuildOptions {
     url?: UrlOptions | false;
     wasm?: RollupWasmOptions | false;
     watch?: RollupOptions["watch"];
-    sourcemap?: SourcemapsPluginOptions
+    sourcemap?: SourcemapsPluginOptions;
     resolveExternals?: ResolveExternalsPluginOptions;
 }
 

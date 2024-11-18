@@ -121,11 +121,11 @@ export const resolveExternalsPlugin = (
     const isIncluded = (id: string) => include.some((rx) => rx.test(id));
     const isExcluded = (id: string) => exclude.some((rx) => rx.test(id));
 
-    let transformedTsconfigPaths: RegExp[] = [];
+    let tsconfigPathPatterns: RegExp[] = [];
 
     if (tsconfig) {
-        transformedTsconfigPaths = Object.entries(tsconfig.config.compilerOptions?.paths ?? {}).map((path) =>
-            (path[0].endsWith("*") ? new RegExp(`^${path[0].replace("*", "(.*)")}$`) : new RegExp(`^${path[0]}$`)),
+        tsconfigPathPatterns = Object.entries(tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) =>
+            (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
         );
     }
 
@@ -188,8 +188,8 @@ export const resolveExternalsPlugin = (
                     }
                 }
 
-                if (transformedTsconfigPaths.length > 0) {
-                    for (const regexp of transformedTsconfigPaths) {
+                if (tsconfigPathPatterns.length > 0) {
+                    for (const regexp of tsconfigPathPatterns) {
                         if (regexp.test(id)) {
                             return false;
                         }
