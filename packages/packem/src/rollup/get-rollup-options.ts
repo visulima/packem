@@ -9,20 +9,16 @@ import { nodeResolve as nodeResolvePlugin } from "@rollup/plugin-node-resolve";
 import replacePlugin from "@rollup/plugin-replace";
 import { wasm as wasmPlugin } from "@rollup/plugin-wasm";
 import { cyan } from "@visulima/colorize";
-import { isAbsolute, join, relative, resolve } from "@visulima/path";
-import { resolveAlias } from "@visulima/path/utils";
+import { join, relative, resolve } from "@visulima/path";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
 import polyfillPlugin from "rollup-plugin-polyfill-node";
 import { visualizer as visualizerPlugin } from "rollup-plugin-visualizer";
 import { minVersion } from "semver";
 
-import { ENDING_RE } from "../constants";
 import type { BuildContext, InternalBuildOptions, RollupPlugins } from "../types";
-import arrayIncludes from "../utils/array-includes";
 import arrayify from "../utils/arrayify";
 import type FileCache from "../utils/file-cache";
-import getPackageName from "../utils/get-package-name";
 import memoizeByKey from "../utils/memoize";
 import chunkSplitter from "./plugins/chunk-splitter";
 import { cjsInteropPlugin } from "./plugins/cjs-interop";
@@ -49,7 +45,7 @@ import { sourcemapsPlugin } from "./plugins/source-maps";
 import type { SucrasePluginConfig } from "./plugins/sucrase/types";
 import type { SwcPluginConfig } from "./plugins/swc/types";
 import { patchTypescriptTypes as patchTypescriptTypesPlugin } from "./plugins/typescript/patch-typescript-types";
-import { getConfigAlias, resolveTsconfigPaths as resolveTsconfigPathsPlugin } from "./plugins/typescript/resolve-tsconfig-paths";
+import { resolveTsconfigPathsPlugin } from "./plugins/typescript/resolve-tsconfig-paths-plugin";
 import resolveTsconfigRootDirectoriesPlugin from "./plugins/typescript/resolve-tsconfig-root-dirs";
 import resolveTypescriptMjsCtsPlugin from "./plugins/typescript/resolve-typescript-mjs-cjs";
 import { urlPlugin } from "./plugins/url";
@@ -57,6 +53,7 @@ import createSplitChunks from "./utils/chunks/create-split-chunks";
 import getChunkFilename from "./utils/get-chunk-filename";
 import getEntryFileNames from "./utils/get-entry-file-names";
 import resolveAliases from "./utils/resolve-aliases";
+import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
 
 const sortUserPlugins = (plugins: RollupPlugins | undefined, type: "build" | "dts"): [Plugin[], Plugin[], Plugin[]] => {
     const prePlugins: Plugin[] = [];
@@ -221,86 +218,9 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext): boolean => {
     return warning.code === "MIXED_EXPORTS" && context.options.cjsInterop === true;
 };
 
-const calledImplicitExternals = new Map<string, boolean>();
-const cachedGlobFiles = new Map<string, string[]>();
-
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string, string>, type: "build" | "dts"): RollupOptions => {
-    const configAlias = getConfigAlias(context.tsconfig, false);
-
+const baseRollupOptions = (context: BuildContext, type: "build" | "dts"): RollupOptions => {
     return <RollupOptions>{
-        external(id) {
-            // eslint-disable-next-line no-param-reassign
-            id = resolveAlias(id, resolvedAliases);
-
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            const package_ = getPackageName(id);
-
-            if (arrayIncludes(context.options.externals, package_) || arrayIncludes(context.options.externals, id)) {
-                return true;
-            }
-
-            const { pkg } = context;
-
-            if (id.startsWith(".") || isAbsolute(id) || /src[/\\]/.test(id) || (pkg.name && id.startsWith(pkg.name))) {
-                return false;
-            }
-
-            // package.json imports are not externals
-            if (pkg.imports) {
-                for (const [key, value] of Object.entries(pkg.imports)) {
-                    if (key === id) {
-                        return false;
-                    }
-
-                    // if a glob is used, we need to check if the id matches the files in the source directory
-                    if (key.includes("*")) {
-                        let files: string[];
-
-                        if (cachedGlobFiles.has(key)) {
-                            files = cachedGlobFiles.get(key) as string[];
-                        } else {
-                            // eslint-disable-next-line security/detect-non-literal-fs-filename
-                            files = readdirSync(join(context.options.rootDir, (value as string).replace("/*", "")), { withFileTypes: true })
-                                .filter((dirent) => dirent.isFile())
-                                .map((dirent) => dirent.name);
-
-                            cachedGlobFiles.set(key, files);
-                        }
-
-                        for (const file of files) {
-                            if (file.replace(ENDING_RE, "") === id.replace(ENDING_RE, "").replace("#", "")) {
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (configAlias) {
-                for (const { find } of configAlias) {
-                    if (find.test(id)) {
-                        context.logger.debug({
-                            message: `Resolved alias ${id} to ${find.source}`,
-                            prefix: type,
-                        });
-
-                        return false;
-                    }
-                }
-            }
-
-            if (!calledImplicitExternals.has(id)) {
-                context.logger.info({
-                    message: 'Inlined implicit external "' + cyan(id) + '". If this is incorrect, add it to the "externals" option.',
-                    prefix: type,
-                });
-            }
-
-            calledImplicitExternals.set(id, true);
-
-            return false;
-        },
         input: Object.fromEntries(context.options.entries.map((entry) => [entry.name, resolve(context.options.rootDir, entry.input)])),
 
         logLevel: context.options.debug ? "debug" : "info",
@@ -360,7 +280,7 @@ const baseRollupOptions = (context: BuildContext, resolvedAliases: Record<string
 
 // eslint-disable-next-line sonarjs/cognitive-complexity,import/exports-last
 export const getRollupOptions = async (context: BuildContext, fileCache: FileCache): Promise<RollupOptions> => {
-    const resolvedAliases = resolveAliases(context, "build");
+    const resolvedAliases = resolveAliases(context.pkg, context.options);
 
     let nodeResolver;
 
@@ -383,7 +303,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
     const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "build");
 
     return (<RollupOptions>{
-        ...baseRollupOptions(context, resolvedAliases, "build"),
+        ...baseRollupOptions(context, "build"),
 
         output: [
             context.options.emitCJS &&
@@ -458,7 +378,9 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
-            context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.tsconfig, context.logger), fileCache),
+            context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger), fileCache),
+
+            cachingPlugin(resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}), fileCache),
 
             context.options.rollup.replace &&
                 replacePlugin({
@@ -536,6 +458,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     context.options.declaration,
                     Boolean(context.options.rollup.cjsInterop),
                     context.options.rollup.isolatedDeclarations,
+                    context.tsconfig,
                 ),
 
             context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
@@ -669,7 +592,7 @@ const memoizeDtsPluginByKey = memoizeByKey<typeof createDtsPlugin>(createDtsPlug
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export const getRollupDtsOptions = async (context: BuildContext, fileCache: FileCache): Promise<RollupOptions> => {
-    const resolvedAliases = resolveAliases(context, "types");
+    const resolvedAliases = resolveAliases(context.pkg, context.options);
     const compilerOptions = context.tsconfig?.config.compilerOptions;
 
     delete compilerOptions?.lib;
@@ -694,7 +617,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
     const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "dts");
 
     return <RollupOptions>{
-        ...baseRollupOptions(context, resolvedAliases, "dts"),
+        ...baseRollupOptions(context, "dts"),
 
         onwarn(warning, rollupWarn) {
             if (sharedOnWarn(warning, context)) {
@@ -763,7 +686,9 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             },
 
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
-            context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.tsconfig, context.logger), fileCache),
+            context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger), fileCache),
+
+            cachingPlugin(resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}), fileCache),
 
             context.options.rollup.replace &&
                 replacePlugin({

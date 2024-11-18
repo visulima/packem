@@ -1,54 +1,30 @@
 import type { Alias } from "@rollup/plugin-alias";
 import type { PackageJson } from "@visulima/package";
-import { join } from "@visulima/path";
 
-import type { BuildContext } from "../../types";
+import type { InternalBuildOptions } from "../../types";
 
-const resolveAliases = (context: BuildContext, mode: "build" | "jit" | "types"): Record<string, string> => {
+const resolveAliases = (packageJson: PackageJson, options: InternalBuildOptions): Record<string, string> => {
     let aliases: Record<string, string> = {};
 
-    if (context.pkg.name) {
-        aliases[context.pkg.name] = context.options.rootDir;
-    }
-
-    if (context.pkg.imports) {
-        const { imports } = context.pkg;
-
-        for (const alias in imports) {
-            if (alias.startsWith("#")) {
-                // eslint-disable-next-line no-continue
-                continue;
-            }
-
-            const subPath = imports[alias as keyof PackageJson["imports"]];
-
-            if (typeof subPath !== "string") {
-                // eslint-disable-next-line no-continue
-                continue;
-            }
-
-            // eslint-disable-next-line security/detect-object-injection
-            aliases[alias] = join(context.options.rootDir, subPath);
-        }
+    if (packageJson.name) {
+        aliases[packageJson.name] = options.rootDir;
     }
 
     aliases = {
         ...aliases,
-        ...context.options.alias,
+        ...options.alias,
     };
 
-    if (context.options.rollup.alias) {
-        if (Array.isArray(context.options.rollup.alias.entries)) {
+    if (options.rollup.alias) {
+        if (Array.isArray(options.rollup.alias.entries)) {
             Object.assign(
                 aliases,
-                Object.fromEntries((context.options.rollup.alias.entries as Alias[]).map((entry: Alias) => [entry.find, entry.replacement])),
+                Object.fromEntries((options.rollup.alias.entries as Alias[]).map((entry: Alias) => [entry.find, entry.replacement])),
             );
         } else {
-            Object.assign(aliases, context.options.rollup.alias.entries ?? context.options.rollup.alias);
+            Object.assign(aliases, options.rollup.alias.entries ?? options.rollup.alias);
         }
     }
-
-    context.logger.debug({ message: "Resolved aliases: " + JSON.stringify(aliases), prefix: mode });
 
     return aliases;
 };

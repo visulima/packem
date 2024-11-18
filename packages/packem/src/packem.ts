@@ -237,6 +237,17 @@ const generateOptions = (
                 // Following option must be *false* for polyfill to work
                 preferBuiltins: false,
             },
+            resolveExternals: {
+                builtins: true,
+                builtinsPrefix: "add",
+                deps: true,
+                devDeps: false,
+                exclude: [],
+                include: [],
+                optDeps: true,
+                packagePath: [],
+                peerDeps: true,
+            },
             shebang: {
                 replace: false,
                 shebang: "#!/usr/bin/env node",

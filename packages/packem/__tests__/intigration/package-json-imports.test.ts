@@ -11,53 +11,61 @@ describe("packem package.json imports", () => {
 
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
-
-        await createPackemConfig(temporaryDirectoryPath);
     });
 
     afterEach(async () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it("should not show a warning of external imports, when a glob star is used", async () => {
-        expect.assertions(5);
+    it.each(["esbuild", "swc", "sucrase"] as ("esbuild" | "swc" | "sucrase")[])(
+        "should resolve package.json imports with a * and %s transformer",
+        async (transformer) => {
+            expect.assertions(5);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/x.ts`, `export const x = 2;`);
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export * as warns from '#x.ts';`);
+            writeFileSync(`${temporaryDirectoryPath}/src/x.ts`, `export const x = 2;`);
+            writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export * as warns from '#x.ts';`);
 
-        await installPackage(temporaryDirectoryPath, "typescript");
+            await installPackage(temporaryDirectoryPath, "typescript");
 
-        await createPackageJson(temporaryDirectoryPath, {
-            devDependencies: {
-                typescript: "*",
-            },
-            exports: {
-                ".": {
-                    import: "./dist/index.mjs",
-                    require: "./dist/index.cjs",
+            await createPackageJson(
+                temporaryDirectoryPath,
+                {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    exports: {
+                        ".": {
+                            import: "./dist/index.mjs",
+                            require: "./dist/index.cjs",
+                        },
+                    },
+                    imports: {
+                        "#*": "./src/*",
+                    },
                 },
-            },
-            imports: {
-                "#*": "./src/*",
-            },
-        });
-        await createTsConfig(temporaryDirectoryPath, {});
+                transformer,
+            );
+            await createTsConfig(temporaryDirectoryPath, {});
+            await createPackemConfig(temporaryDirectoryPath, {
+                transformer,
+            });
 
-        const binProcess = await execPackemSync("build", [], {
-            cwd: temporaryDirectoryPath,
-        });
+            const binProcess = await execPackemSync("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
 
-        expect(binProcess.stderr).toBe("");
-        expect(binProcess.exitCode).toBe(0);
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
 
-        expect(binProcess.stdout).not.toContain("If this is incorrect, add it to the");
+            expect(binProcess.stdout).not.toContain("If this is incorrect, add it to the");
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+            const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toMatchSnapshot("cjs output");
+            expect(cjsContent).toMatchSnapshot("cjs output");
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+            const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toMatchSnapshot("mjs output");
-    });
+            expect(mjsContent).toMatchSnapshot("mjs output");
+        },
+    );
 });
