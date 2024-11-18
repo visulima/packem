@@ -17,11 +17,19 @@ exports[`packem typescript > resolve-typescript-tsconfig-paths plugin > should r
 "'use strict';
 
 console.log(1);
+
+const test2 = "test";
+
+console.log(test2);
 "
 `;
 
 exports[`packem typescript > resolve-typescript-tsconfig-paths plugin > should resolve tsconfig paths > mjs code output 1`] = `
 "console.log(1);
+
+const test2 = "test";
+
+console.log(test2);
 "
 `;
 

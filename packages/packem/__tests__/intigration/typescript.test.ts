@@ -216,12 +216,13 @@ describe("packem typescript", () => {
 
     describe("resolve-typescript-tsconfig-paths plugin", () => {
         it("should resolve tsconfig paths", async () => {
-            expect.assertions(4);
+            expect.assertions(5);
 
             await installPackage(temporaryDirectoryPath, "typescript");
 
-            writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'import "components:Test";');
+            writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'import "components:Test";\n import { test2 } from "components:Test2";\n\nconsole.log(test2);');
             writeFileSync(`${temporaryDirectoryPath}/src/components/Test.ts`, "console.log(1);");
+            writeFileSync(`${temporaryDirectoryPath}/src/components/Test2.ts`, "export const test2 = 'test'");
 
             await createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: {
@@ -247,6 +248,8 @@ describe("packem typescript", () => {
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
+            expect(binProcess.stdout).not.toContain("If this is incorrect, add it to the");
+
             const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
             expect(cjs).toMatchSnapshot("cjs code output");
 
@@ -255,7 +258,7 @@ describe("packem typescript", () => {
         });
 
         it.each(["@", "#", "~"])("should resolve tsconfig paths with a '%s'", async (namespace) => {
-            expect.assertions(4);
+            expect.assertions(5);
 
             writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `import "${namespace}/Test";`);
             writeFileSync(`${temporaryDirectoryPath}/src/components/Test.ts`, "console.log(1);");
@@ -265,7 +268,7 @@ describe("packem typescript", () => {
                 compilerOptions: {
                     baseUrl: "src",
                     paths: {
-                        [namespace]: ["components/*.ts"],
+                        [namespace + "/*"]: ["components/*.ts"],
                     },
                 },
             });
@@ -284,6 +287,8 @@ describe("packem typescript", () => {
 
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).not.toContain("If this is incorrect, add it to the");
 
             const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
