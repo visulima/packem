@@ -1,3 +1,9 @@
+## @visulima/packem [1.7.3](https://github.com/visulima/packem/compare/@visulima/packem@1.7.2...@visulima/packem@1.7.3) (2024-11-19)
+
+### Bug Fixes
+
+* improved tsconfig paths resolving ([#64](https://github.com/visulima/packem/issues/64)) ([a79f79d](https://github.com/visulima/packem/commit/a79f79d83861b8c798216d4be8ff094bfe9bb607))
+
 ## @visulima/packem [1.7.2](https://github.com/visulima/packem/compare/@visulima/packem@1.7.1...@visulima/packem@1.7.2) (2024-11-17)
 
 ### Bug Fixes
