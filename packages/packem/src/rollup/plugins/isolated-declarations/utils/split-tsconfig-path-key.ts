@@ -1,10 +1,11 @@
+const namespaceRegex = /^([\w-]+):/;
+
 const splitTsconfigPathKey = (key: string): string[] => {
     if (!key || typeof key !== "string") {
         throw new Error("Invalid key: Key must be a non-empty string.");
     }
 
     const result: string[] = [];
-    const namespaceRegex = /^([\w-]+):/;
 
     // Extract namespace if present
     const namespaceMatch = namespaceRegex.exec(key);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import lowestCommonAncestor from "../../../../../src/rollup/plugins/isolated-declarations/lowest-common-ancestor";
+import lowestCommonAncestor from "../../../../../../src/rollup/plugins/isolated-declarations/utils/lowest-common-ancestor";
 
 describe("lowestCommonAncestor", () => {
     it("should return the lowest common ancestor", () => {

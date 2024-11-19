@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import splitTsconfigPathKey from "../../../../../src/rollup/plugins/isolated-declarations/split-tsconfig-path-key";
+import splitTsconfigPathKey from "../../../../../../src/rollup/plugins/isolated-declarations/utils/split-tsconfig-path-key";
 
 describe("splitTsconfigPathKey", () => {
     it("should split a simple path", () => {

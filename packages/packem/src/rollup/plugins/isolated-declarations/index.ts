@@ -16,8 +16,8 @@ import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginCon
 import { ENDING_RE } from "../../../constants";
 import type { IsolatedDeclarationsResult } from "../../../types";
 import patchCjsDefaultExport from "../typescript/utils/patch-cjs-default-export";
-import extendString from "./extend-string";
-import lowestCommonAncestor from "./lowest-common-ancestor";
+import extendString from "./utils/extend-string";
+import lowestCommonAncestor from "./utils/lowest-common-ancestor";
 
 export type IsolatedDeclarationsOptions = {
     exclude?: FilterPattern;
