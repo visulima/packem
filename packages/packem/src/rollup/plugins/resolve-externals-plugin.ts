@@ -11,8 +11,6 @@ import type { InputOptions, Plugin, ResolveIdResult } from "rollup";
 
 import { ENDING_RE } from "../../constants";
 import type { InternalBuildOptions } from "../../types";
-import arrayIncludes from "../../utils/array-includes";
-import getPackageName from "../../utils/get-package-name";
 import resolveAliases from "../utils/resolve-aliases";
 
 type MaybeFalsy<T> = T | undefined | null | false;
@@ -39,7 +37,16 @@ export type ResolveExternalsPluginOptions = {
     /**
      * Mark node built-in modules like `path`, `fs`... as external.
      *
-     * Defaults to `true`.
+     * Set the builtins option to false if you'd like to use some shims/polyfills for those.
+     *
+     * How to handle the node: scheme used in recent versions of Node (i.e., import path from 'node:path').
+     * If add (the default, recommended), the node: scheme is always added. In effect, this dedupes your imports of Node builtins by homogenizing their names to their schemed version.
+     * If strip, the scheme is always removed. In effect, this dedupes your imports of Node builtins by homogenizing their names to their unschemed version. Schemed-only builtins like node:test are not stripped.
+     * ignore will simply leave all builtins imports as written in your code.
+     *
+     * Note that scheme handling is always applied, regardless of the builtins options being enabled or not.
+     *
+     * @default true
      */
     builtins?: boolean;
     /**
@@ -48,7 +55,7 @@ export type ResolveExternalsPluginOptions = {
      * - `'strip'`  turns `'node:path'` to `'path'`
      * - `'ignore'` leaves Node builtin names as-is
      *
-     * Defaults to `add`.
+     * @default "add"
      */
     builtinsPrefix?: "add" | "strip" | "ignore";
     /**
@@ -69,12 +76,6 @@ export type ResolveExternalsPluginOptions = {
      * Defaults to `[]` (force exclude nothing).
      */
     exclude?: MaybeFalsy<string | RegExp>[];
-    /**
-     * Force include these deps in the list of externals, regardless of other settings.
-     *
-     * Defaults to `[]` (force include nothing).
-     */
-    include?: MaybeFalsy<string | RegExp>[];
     /**
      * Mark optionalDependencies as external.
      *
@@ -98,7 +99,7 @@ export const resolveExternalsPlugin = (
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Plugin => {
     // Map the include and exclude options to arrays of regexes.
-    const include = getRegExps([...(options.include ?? [])], "include", logger);
+    const include = getRegExps([...buildOptions.externals], "include", logger);
     const exclude = getRegExps([...(options.exclude ?? [])], "exclude", logger);
 
     const dependencies: Record<string, string> = {};
@@ -151,10 +152,6 @@ export const resolveExternalsPlugin = (
                 // Handle npm dependencies.
                 if (isIncluded(id) && !isExcluded(id)) {
                     return false;
-                }
-
-                if (arrayIncludes(buildOptions.externals, getPackageName(id)) || arrayIncludes(buildOptions.externals, id)) {
-                    return true;
                 }
 
                 // package.json imports are not externals
@@ -243,63 +240,6 @@ export const resolveExternalsPlugin = (
                 if (isIncluded(specifier) && !isExcluded(specifier)) {
                     return false;
                 }
-
-                // // eslint-disable-next-line no-param-reassign
-                // id = resolveAlias(id, resolvedAliases);
-                //
-                // // eslint-disable-next-line @typescript-eslint/naming-convention
-                // const package_ = getPackageName(id);
-                //
-                // if (arrayIncludes(buildOptions.externals, package_) || arrayIncludes(buildOptions.externals, id)) {
-                //     return id;
-                // }
-                //
-                // if (id.startsWith(".") || isAbsolute(id) || /src[/\\]/.test(id) || (packageJson.name && id.startsWith(packageJson.name))) {
-                //     return id;
-                // }
-
-                // // if (pathsKeys.length > 0) {
-                // //     return null
-                // // return await resolvePathsToIds(
-                // //     paths,
-                // //     pathsKeys,
-                // //     resolvedBaseUrl,
-                // //     id,
-                // //     async (candidate) => {
-                // //         try {
-                // //             const resolved = await this.resolve(candidate, importer, { skipSelf: true, ...options });
-                // //
-                // //             if (resolved) {
-                // //                 context.logger.debug({
-                // //                     message: `Resolved alias ${id} to ${resolved}`,
-                // //                     prefix: type,
-                // //                 });
-                // //                 return resolved;
-                // //             }
-                // //         } catch (error) {
-                // //             logger.debug({
-                // //                 context: error,
-                // //                 message: `Failed to resolve ${candidate} from ${id as string}`,
-                // //                 prefix: "plugin:packem:resolve-tsconfig-paths",
-                // //             });
-                // //         }
-                // //
-                // //         return null;
-                // //     },
-                // //     logger,
-                // // );
-                // // }
-                //
-                // if (!calledImplicitExternals.has(id)) {
-                //     // logger.info({
-                //     //     message: 'Inlined implicit external "' + cyan(id) + '". If this is incorrect, add it to the "externals" option.',
-                //     //     prefix: type,
-                //     // });
-                // }
-                //
-                // calledImplicitExternals.set(id, true);
-                //
-                // return id;
 
                 return null;
             },

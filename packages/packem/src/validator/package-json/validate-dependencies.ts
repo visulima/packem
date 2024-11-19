@@ -1,3 +1,5 @@
+import Module from "node:module";
+
 import { cyan } from "@visulima/colorize";
 
 import type { BuildContext } from "../../types";
@@ -34,6 +36,7 @@ const validateDependencies = (context: BuildContext): void => {
         if (
             !arrayIncludes(context.options.externals, id) &&
             !id.startsWith("chunks/") &&
+            ![...Module.builtinModules, ...Module.builtinModules.map((m) => `node:${m}`)].includes(packageId) &&
             // eslint-disable-next-line security/detect-object-injection,@typescript-eslint/no-unnecessary-condition
             context.pkg?.dependencies?.[packageId] === undefined &&
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition,security/detect-object-injection

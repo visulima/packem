@@ -1,4 +1,3 @@
-import Module from "node:module";
 import process from "node:process";
 
 import { bold, cyan } from "@visulima/colorize";
@@ -86,7 +85,7 @@ const generateOptions = (
         emitCJS: undefined,
         emitESM: undefined,
         entries: [],
-        externals: [...Module.builtinModules, ...Module.builtinModules.map((m) => `node:${m}`)],
+        externals: [],
         failOnWarn: true,
         fileCache: true,
         // @see https://github.com/unjs/jiti#%EF%B8%8F-options
@@ -243,9 +242,7 @@ const generateOptions = (
                 deps: true,
                 devDeps: false,
                 exclude: [],
-                include: [],
                 optDeps: true,
-                packagePath: [],
                 peerDeps: true,
             },
             shebang: {
@@ -435,19 +432,6 @@ const generateOptions = (
 
     if (options.browserTargets && options.browserTargets.length > 0) {
         logger.debug("Using browser targets: " + options.browserTargets.join(", "));
-    }
-
-    // Add all dependencies as externals
-    if (packageJson.dependencies) {
-        options.externals.push(...Object.keys(packageJson.dependencies));
-    }
-
-    if (packageJson.peerDependencies) {
-        options.externals.push(...Object.keys(packageJson.peerDependencies));
-    }
-
-    if (packageJson.optionalDependencies) {
-        options.externals.push(...Object.keys(packageJson.optionalDependencies));
     }
 
     validateAliasEntries(options.alias);
