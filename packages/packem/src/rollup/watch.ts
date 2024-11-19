@@ -131,7 +131,7 @@ const watch = async (
             ...context.options.rollup.watch,
         };
 
-        rollupOptions.watch.include = [join(context.options.sourceDir, "**", "*"), "package.json", "packem.config.*"];
+        rollupOptions.watch.include = [join(context.options.sourceDir, "**", "*"), "package.json", "packem.config.*", "tsconfig.json", "tsconfig.*.json"];
 
         if (Array.isArray(context.options.rollup.watch.include)) {
             rollupOptions.watch.include = [...rollupOptions.watch.include, ...context.options.rollup.watch.include];

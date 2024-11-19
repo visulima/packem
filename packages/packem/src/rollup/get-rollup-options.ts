@@ -376,7 +376,12 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
-            context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger), fileCache),
+            context.tsconfig &&
+                context.options.rollup.tsconfigPaths &&
+                cachingPlugin(
+                    resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger, context.options.rollup.tsconfigPaths),
+                    fileCache,
+                ),
 
             cachingPlugin(
                 resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}),
@@ -687,7 +692,12 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             },
 
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
-            context.tsconfig && cachingPlugin(resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger), fileCache),
+            context.tsconfig &&
+                context.options.rollup.tsconfigPaths &&
+                cachingPlugin(
+                    resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger, context.options.rollup.tsconfigPaths),
+                    fileCache,
+                ),
 
             cachingPlugin(
                 resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}),

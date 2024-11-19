@@ -104,7 +104,7 @@ const matchedText = (pattern: Pattern, candidate: string): string => candidate.s
 
 const patternText = ({ prefix, suffix }: Pattern): string => `${prefix}*${suffix}`;
 
-export const getTsconfigPaths = (
+const getTsconfigPaths = (
     rootDirectory: string,
     tsconfig: TsConfigResult,
     logger?: Pail,
@@ -139,90 +139,9 @@ export const getTsconfigPaths = (
     };
 };
 
-export const resolvePathsToIds = async (
-    paths: Record<string, string[]>,
-    pathsKeys: string[],
-    resolvedBaseUrl: string,
-    id: string,
-    matcher: (candidate: string) => Promise<ResolvedId | null>,
-    logger?: Pail,
-    // eslint-disable-next-line sonarjs/cognitive-complexity
-): Promise<ResolvedId | null> => {
-    if (pathsKeys.length === 0) {
-        return null;
-    }
-
-    if (id.includes("\0")) {
-        logger?.debug({
-            message: `Skipping resolution of ${id} as it is a virtual module`,
-            prefix: "plugin:packem:resolve-tsconfig-paths",
-        });
-
-        return null;
-    }
-
-    // Exclude node_modules from paths support (speeds up resolving)
-    if (id.includes("node_modules")) {
-        logger?.debug({
-            message: `Skipping request as it is inside node_modules ${id}`,
-            prefix: "plugin:packem:resolve-tsconfig-paths",
-        });
-
-        return null;
-    }
-
-    if (isAbsolute(id)) {
-        logger?.debug({
-            message: `Skipping request as it is an absolute path ${id}`,
-            prefix: "plugin:packem:resolve-tsconfig-paths",
-        });
-
-        return null;
-    }
-
-    if (isRelative(id)) {
-        logger?.debug({
-            message: `Skipping request as it is a relative path ${id}`,
-            prefix: "plugin:packem:resolve-tsconfig-paths",
-        });
-
-        return null;
-    }
-    // If the module name does not match any of the patterns in `paths` we hand off resolving to webpack
-    const matchedPattern = matchPatternOrExact(pathsKeys, id);
-
-    if (!matchedPattern) {
-        logger?.debug({
-            message: `moduleName did not match any paths pattern ${id}`,
-            prefix: "plugin:packem:resolve-tsconfig-paths",
-        });
-
-        return null;
-    }
-
-    const matchedStar = typeof matchedPattern === "string" ? undefined : matchedText(matchedPattern, id);
-    const matchedPatternText = typeof matchedPattern === "string" ? matchedPattern : patternText(matchedPattern);
-
-    for await (const tsPath of paths[matchedPatternText] as string[]) {
-        const currentPath = matchedStar ? tsPath.replace("*", matchedStar) : tsPath;
-
-        // Ensure .d.ts is not matched
-        if (currentPath.endsWith(".d.ts") || currentPath.endsWith(".d.cts") || currentPath.endsWith(".d.mts")) {
-            // eslint-disable-next-line no-continue
-            continue;
-        }
-
-        const candidate = join(resolvedBaseUrl, currentPath);
-
-        const matched = await matcher(candidate);
-
-        if (matched) {
-            return matched;
-        }
-    }
-
-    return null;
-};
+export type TsconfigPathsPluginOptions = {
+    resolveAbsolutePath?: boolean;
+}
 
 // eslint-disable-next-line no-secrets/no-secrets
 /**
@@ -230,37 +149,96 @@ export const resolvePathsToIds = async (
  * Largely based on how the TypeScript compiler handles it:
  * https://github.com/microsoft/TypeScript/blob/1a9c8197fffe3dace5f8dca6633d450a88cba66d/src/compiler/moduleNameResolver.ts#L1362
  */
-export const resolveTsconfigPathsPlugin = (rootDirectory: string, tsconfig: TsConfigResult, logger: Pail): Plugin => {
+export const resolveTsconfigPathsPlugin = (rootDirectory: string, tsconfig: TsConfigResult, logger: Pail, pluginOptions: TsconfigPathsPluginOptions): Plugin => {
     const { paths, resolvedBaseUrl } = getTsconfigPaths(rootDirectory, tsconfig, logger);
     const pathsKeys = Object.keys(paths);
 
     return {
         name: "packem:resolve-tsconfig-paths",
+        // eslint-disable-next-line sonarjs/cognitive-complexity
         async resolveId(id, importer, options) {
-            return await resolvePathsToIds(
-                paths,
-                pathsKeys,
-                resolvedBaseUrl,
-                id,
-                async (candidate) => {
-                    try {
-                        const resolved = await this.resolve(candidate, importer, { skipSelf: true, ...options });
+            if (pathsKeys.length === 0) {
+                return null;
+            }
 
-                        if (resolved) {
-                            return resolved;
-                        }
-                    } catch (error) {
-                        logger.debug({
-                            context: error,
-                            message: `Failed to resolve ${candidate} from ${id as string}`,
-                            prefix: "plugin:packem:resolve-tsconfig-paths",
-                        });
+            if (id.includes("\0")) {
+                logger.debug({
+                    message: `Skipping resolution of ${id} as it is a virtual module`,
+                    prefix: "plugin:packem:resolve-tsconfig-paths",
+                });
+
+                return null;
+            }
+
+            // Exclude node_modules from paths support (speeds up resolving)
+            if (id.includes("node_modules")) {
+                logger.debug({
+                    message: `Skipping request as it is inside node_modules ${id}`,
+                    prefix: "plugin:packem:resolve-tsconfig-paths",
+                });
+
+                return null;
+            }
+
+            if (!pluginOptions.resolveAbsolutePath && isAbsolute(id)) {
+                logger.debug({
+                    message: `Skipping request as it is an absolute path ${id}`,
+                    prefix: "plugin:packem:resolve-tsconfig-paths",
+                });
+
+                return null;
+            }
+
+            if (isRelative(id)) {
+                logger.debug({
+                    message: `Skipping request as it is a relative path ${id}`,
+                    prefix: "plugin:packem:resolve-tsconfig-paths",
+                });
+
+                return null;
+            }
+            // If the module name does not match any of the patterns in `paths` we hand off resolving to webpack
+            const matchedPattern = matchPatternOrExact(pathsKeys, id);
+
+            if (!matchedPattern) {
+                logger.debug({
+                    message: `moduleName did not match any paths pattern ${id}`,
+                    prefix: "plugin:packem:resolve-tsconfig-paths",
+                });
+
+                return null;
+            }
+
+            const matchedStar = typeof matchedPattern === "string" ? undefined : matchedText(matchedPattern, id);
+            const matchedPatternText = typeof matchedPattern === "string" ? matchedPattern : patternText(matchedPattern);
+
+            for await (const tsPath of paths[matchedPatternText] as string[]) {
+                const currentPath = matchedStar ? tsPath.replace("*", matchedStar) : tsPath;
+
+                // Ensure .d.ts is not matched
+                if (currentPath.endsWith(".d.ts") || currentPath.endsWith(".d.cts") || currentPath.endsWith(".d.mts")) {
+                    // eslint-disable-next-line no-continue
+                    continue;
+                }
+
+                const candidate = join(resolvedBaseUrl, currentPath);
+
+                try {
+                    const resolved = await this.resolve(candidate, importer, { skipSelf: true, ...options });
+
+                    if (resolved) {
+                        return resolved;
                     }
+                } catch (error) {
+                    logger.debug({
+                        context: error,
+                        message: `Failed to resolve ${candidate} from ${id as string}`,
+                        prefix: "plugin:packem:resolve-tsconfig-paths",
+                    });
+                }
+            }
 
-                    return null;
-                },
-                logger,
-            );
+            return null;
         },
     };
 };

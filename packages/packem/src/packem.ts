@@ -324,6 +324,10 @@ const generateOptions = (
                 preset: "recommended",
                 propertyReadSideEffects: true,
             },
+            tsconfigPaths: {
+                // Default is false to avoid performance issues
+                resolveAbsolutePath: false,
+            },
             url: {
                 emitFiles: true,
                 fileName: "[hash][extname]",

@@ -34,6 +34,7 @@ import type FileCache from "./utils/file-cache";
 import type { UrlOptions } from "./rollup/plugins/url";
 import type { SourcemapsPluginOptions } from "./rollup/plugins/source-maps";
 import type { ResolveExternalsPluginOptions } from "./rollup/plugins/resolve-externals-plugin";
+import type { TsconfigPathsPluginOptions } from "./rollup/plugins/typescript/resolve-tsconfig-paths-plugin";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -99,6 +100,7 @@ export interface RollupBuildOptions {
         exclude?: FilterPattern;
         include?: FilterPattern;
     };
+    tsconfigPaths?: TsconfigPathsPluginOptions | false;
     preserveDynamicImports?: boolean;
     raw?: RawLoaderOptions | false;
     replace: RollupReplaceOptions | false;
