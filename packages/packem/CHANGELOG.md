@@ -1,3 +1,13 @@
+## @visulima/packem [1.8.0](https://github.com/visulima/packem/compare/@visulima/packem@1.7.3...@visulima/packem@1.8.0) (2024-11-19)
+
+### Features
+
+* added options to resolve absolute path in tsconfig paths ([9bbb1b5](https://github.com/visulima/packem/commit/9bbb1b54bcc8ff54b8c28e6e7e5be9e9679a5680))
+
+### Bug Fixes
+
+* clean up after improved tsconfig paths resolving change ([365d872](https://github.com/visulima/packem/commit/365d8726a66766a6ea54a6aaddef221646b48e71))
+
 ## @visulima/packem [1.7.3](https://github.com/visulima/packem/compare/@visulima/packem@1.7.2...@visulima/packem@1.7.3) (2024-11-19)
 
 ### Bug Fixes
