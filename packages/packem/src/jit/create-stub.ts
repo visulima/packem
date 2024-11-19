@@ -17,7 +17,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
         {
             ...context.options.jiti,
             alias: {
-                ...resolveAliases(context, "jit"),
+                ...resolveAliases(context.pkg, context.options),
                 ...context.options.jiti.alias,
             },
             transformOptions: {

@@ -94,7 +94,7 @@ class FileCache {
         return fileData as unknown as R;
     }
 
-    public set(name: string, data: object | ArrayBuffer | ArrayBufferView | string | undefined, subDirectory?: string): void {
+    public set(name: string, data: object | ArrayBuffer | ArrayBufferView | string | undefined | number | null | boolean, subDirectory?: string): void {
         if (!this.#isEnabled) {
             return;
         }
@@ -105,7 +105,7 @@ class FileCache {
 
         const filePath = this.getFilePath(name, subDirectory);
 
-        if (typeof data === "object") {
+        if (typeof data === "object" || typeof data === "number" || typeof data === "boolean") {
             // eslint-disable-next-line no-param-reassign
             data = JSON.stringify(data);
         }

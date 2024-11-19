@@ -277,11 +277,7 @@ module.exports = png;
                 limit: 10,
                 sourceDir: join(temporaryDirectoryPath, ".."),
             },
-            [
-                join(temporaryDirectoryPath, "/dist/png.cjs"),
-                join(temporaryDirectoryPath, "/dist/png.mjs"),
-                join(temporaryDirectoryPath, "/dist/", pngPath),
-            ],
+            [join(temporaryDirectoryPath, "/dist/png.cjs"), join(temporaryDirectoryPath, "/dist/png.mjs"), join(temporaryDirectoryPath, "/dist/", pngPath)],
             false,
         );
 

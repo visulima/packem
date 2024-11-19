@@ -19,7 +19,7 @@ describe("packem alias", () => {
     });
 
     it("should not trigger a warning if alias option is used", async () => {
-        expect.assertions(4);
+        expect.assertions(5);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
@@ -58,6 +58,8 @@ export default log();`,
 
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).not.toContain("Inlined implicit external");
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 

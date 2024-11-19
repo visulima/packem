@@ -1,3 +1,5 @@
+import splitTsconfigPathKey from "./split-tsconfig-path-key";
+
 const extendString = (baseString: string, referenceString: string): string => {
     // Remove leading './' or '../' for accurate comparison
     const baseNormalized = baseString.replace(/^\.\//, "");
@@ -13,8 +15,8 @@ const extendString = (baseString: string, referenceString: string): string => {
     }
 
     // Split both strings into components
-    const baseParts = baseString.split("/");
-    const referenceParts = referenceString.split("/");
+    const baseParts = splitTsconfigPathKey(baseString);
+    const referenceParts = splitTsconfigPathKey(referenceString);
 
     // Find the first differing index, starting from the end
     let baseIndex = baseParts.length - 1;
@@ -28,8 +30,12 @@ const extendString = (baseString: string, referenceString: string): string => {
         referenceIndex--;
     }
 
-    const commonBase = baseParts.slice(0, baseIndex).join("/");
+    let commonBase = baseParts.slice(0, baseIndex).join("/");
     const missingPart = referenceParts.slice(referenceIndex).join("/");
+
+    if (!commonBase.startsWith(".") || commonBase === "") {
+        commonBase = "./" + commonBase;
+    }
 
     return commonBase + (missingPart ? "/" + missingPart : "");
 };
