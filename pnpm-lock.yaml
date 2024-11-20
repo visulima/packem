@@ -7,10 +7,10 @@ settings:
 overrides:
   braces@<3.0.3: '>=3.0.3'
   chrono-node@<2.2.4: '>=2.7.7'
+  cross-spawn@>=7.0.0 <7.0.5: '>=7.0.5'
   micromatch@<4.0.8: '>=4.0.8'
   rollup: ^4.27.3
   vite@>=5.3.0 <=5.3.5: '>=5.3.6'
-  cross-spawn@>=7.0.0 <7.0.5: '>=7.0.5'
 
 importers:
 
@@ -854,6 +854,9 @@ importers:
       cssnano:
         specifier: 7.0.6
         version: 7.0.6(postcss@8.4.49)
+      deeks:
+        specifier: ^3.1.1
+        version: 3.1.1
       detect-indent:
         specifier: ^7.0.1
         version: 7.0.1
@@ -4429,6 +4432,10 @@ packages:
 
   dedent@0.7.0:
     resolution: {integrity: sha512-Q6fKUPqnAHAyhiUgFU7BUzLiv0kd8saH9al7tnu5Q/okj6dnupxyTgFIBjVzJATdfIAm9NAsvXNzjaKa+bxVyA==}
+
+  deeks@3.1.1:
+    resolution: {integrity: sha512-YD/hG+YZt89ROCS7cXT7tfJ6R3dTIJhJk7gGmXLBV0OhN2A1uCSaagjLIfFr5dK4iUHlSW7Gd+ObKa/gXw1JVQ==}
+    engines: {node: '>= 16'}
 
   deep-eql@5.0.2:
     resolution: {integrity: sha512-h5k/5U50IJJFpzfL6nO9jaaumfjO/f2NjK/oYB2Djzm4p9L+3T9qWpZqZ2hAbLPuuYq9wrU08WQyBTL5GbPk5Q==}
@@ -14087,6 +14094,8 @@ snapshots:
       mimic-response: 3.1.0
 
   dedent@0.7.0: {}
+
+  deeks@3.1.1: {}
 
   deep-eql@5.0.2: {}
 

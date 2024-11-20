@@ -105,7 +105,7 @@ const generateOptions = (
                 ignoreTryCatch: true,
                 preserveSymlinks: true,
                 // https://github.com/rollup/plugins/tree/master/packages/commonjs#transformmixedesmodules
-                transformMixedEsModules: false,
+                transformMixedEsModules: true,
             },
             css: {
                 autoModules: true,
