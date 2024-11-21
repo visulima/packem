@@ -579,8 +579,21 @@ const memoizeDtsPluginByKey = memoizeByKey<typeof createDtsPlugin>(createDtsPlug
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export const getRollupDtsOptions = async (context: BuildContext, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
-    const compilerOptions = context.tsconfig?.config.compilerOptions;
+    const ignoreFiles: Plugin = cachingPlugin(
+        <Plugin>{
+            load(id) {
+                if (!/\.(?:js|cjs|mjs|jsx|ts|tsx|ctsx|mtsx|mts)$/.test(id)) {
+                    return "";
+                }
 
+                return null;
+            },
+            name: "packem:ignore-files",
+        },
+        fileCache,
+    );
+
+    const compilerOptions = context.tsconfig?.config.compilerOptions;
     delete compilerOptions?.lib;
 
     let nodeResolver;
@@ -625,7 +638,10 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: "[name].d.cts",
                     format: "cjs",
+                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
+                    minifyInternalExports: context.options.minify,
                     sourcemap: context.options.sourcemap,
+                    sourcemapDebugIds: true,
                     ...context.options.rollup.output,
                 },
             context.options.emitESM &&
@@ -635,7 +651,10 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: "[name].d.mts",
                     format: "esm",
+                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
+                    minifyInternalExports: context.options.minify,
                     sourcemap: context.options.sourcemap,
+                    sourcemapDebugIds: true,
                     ...context.options.rollup.output,
                 },
             // .d.ts for node10 compatibility (TypeScript version < 4.7)
@@ -646,7 +665,10 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: "[name].d.ts",
                     format: "cjs",
+                    // By default, in rollup, when creating multiple chunks, transitive imports of entry chunks
+                    minifyInternalExports: context.options.minify,
                     sourcemap: context.options.sourcemap,
+                    sourcemapDebugIds: true,
                     ...context.options.rollup.output,
                 },
         ].filter(Boolean),
@@ -655,16 +677,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
-            <Plugin>{
-                load(id) {
-                    if (!/\.(?:js|cjs|mjs|jsx|ts|tsx|ctsx|mtsx|mts)$/.test(id)) {
-                        return "";
-                    }
-
-                    return null;
-                },
-                name: "packem:ignore-files",
-            },
+            ignoreFiles,
 
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
             context.tsconfig &&
@@ -706,16 +719,15 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
 
             ...normalPlugins,
 
-            context.options.rollup.commonjs &&
-                cachingPlugin(
-                    commonjsPlugin({
-                        sourceMap: context.options.sourcemap,
-                        ...context.options.rollup.commonjs,
-                    }),
-                    fileCache,
-                ),
-
             await memoizeDtsPluginByKey(uniqueProcessId)(context),
+
+            context.options.cjsInterop &&
+                context.options.emitCJS &&
+                cjsInteropPlugin({
+                    ...context.options.rollup.cjsInterop,
+                    logger: context.logger,
+                    type: context.pkg.type ?? "commonjs",
+                }),
 
             context.options.rollup.patchTypes && cachingPlugin(patchTypescriptTypesPlugin(context.options.rollup.patchTypes, context.logger), fileCache),
 

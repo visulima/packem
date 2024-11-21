@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 
-describe("packem external-package", () => {
+describe("packem npm package", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
@@ -42,7 +42,7 @@ export { deepKeys, deepKeysFromList } from "deeks";`,
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "deeks");
 
-        const binProcessEs2018 = await execPackemSync("build", ["--dts-only"], {
+        const binProcessEs2018 = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -80,19 +80,48 @@ declare function deepKeys(object: object, options?: DeeksOptions): string[];
  * @returns Array[Array[String]]
  */
 declare function deepKeysFromList(list: object[], options?: DeeksOptions): string[][];
+
+export { type DeeksOptions as DeepKeysOptions, deepKeys, deepKeysFromList };
 `);
 
         const dTsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dTsContentEs2018).toBe(`declare class A {
+        expect(dTsContentEs2018).toBe(`interface DeeksOptions {
+    /** @default false */
+    arrayIndexesAsKeys?: boolean;
+    /** @default true */
+    expandNestedObjects?: boolean;
+    /** @default false */
+    expandArrayObjects?: boolean;
+    /** @default false */
+    ignoreEmptyArraysWhenExpanding?: boolean;
+    /** @default false */
+    escapeNestedDots?: boolean;
+    /** @default false */
+    ignoreEmptyArrays?: boolean;
 }
 
-export { A as default };
+/**
+ * Return the deep keys list for a single document
+ * @param object
+ * @param options
+ * @returns {Array}
+ */
+declare function deepKeys(object: object, options?: DeeksOptions): string[];
+/**
+ * Return the deep keys list for all documents in the provided list
+ * @param list
+ * @param options
+ * @returns Array[Array[String]]
+ */
+declare function deepKeysFromList(list: object[], options?: DeeksOptions): string[][];
+
+export { type DeeksOptions as DeepKeysOptions, deepKeys, deepKeysFromList };
 `);
 
-        const mtsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const ctsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(mtsContentEs2018).toBe(`var __defProp = Object.defineProperty;
+        expect(ctsContent).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 const _A = class _A {
 };
