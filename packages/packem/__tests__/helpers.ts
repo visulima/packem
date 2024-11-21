@@ -171,7 +171,7 @@ export const createPackageJson = async (fixturePAth: string, data: PackageJson, 
     );
 };
 
-export const createTsConfig = async (fixturePath: string, config: TsConfigJson, name = ""): Promise<void> => {
+export const createTsConfig = async (fixturePath: string, config: TsConfigJson = {}, name = ""): Promise<void> => {
     await writeJson(
         fixturePath + "/tsconfig" + name + ".json",
         {

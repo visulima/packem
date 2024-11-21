@@ -51,7 +51,7 @@ describe("packem typescript", () => {
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -77,7 +77,7 @@ describe("packem typescript", () => {
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -116,7 +116,7 @@ describe("packem typescript", () => {
                 main: "./dist/index.mjs",
                 type: "module",
             });
-            await createTsConfig(temporaryDirectoryPath, {});
+            await createTsConfig(temporaryDirectoryPath);
             await createPackemConfig(temporaryDirectoryPath);
 
             const binProcess = await execPackemSync("build", [], {
@@ -169,7 +169,7 @@ describe("packem typescript", () => {
                 main: "./dist/index.mjs",
                 type: "module",
             });
-            await createTsConfig(temporaryDirectoryPath, {});
+            await createTsConfig(temporaryDirectoryPath);
             await createPackemConfig(temporaryDirectoryPath);
 
             const binProcess = await execPackemSync("build", [], {
@@ -198,7 +198,7 @@ describe("packem typescript", () => {
                 main: "./dist/index.mjs",
                 type: "module",
             });
-            await createTsConfig(temporaryDirectoryPath, {});
+            await createTsConfig(temporaryDirectoryPath);
             await createPackemConfig(temporaryDirectoryPath);
 
             const binProcess = await execPackemSync("build", [], {
@@ -260,7 +260,12 @@ describe("packem typescript", () => {
             expect(mjs).toMatchSnapshot("mjs code output");
         });
 
-        it.each([["@/", "@/*", false], ["#/", "#/*", false], ["~/", "~/*", false], ["/", "/*", true]])("should resolve tsconfig paths with a '%s'", async (namespace, patchKey, resolveAbsolutePath) => {
+        it.each([
+            ["@/", "@/*", false],
+            ["#/", "#/*", false],
+            ["~/", "~/*", false],
+            ["/", "/*", true],
+        ])("should resolve tsconfig paths with a '%s'", async (namespace, patchKey, resolveAbsolutePath) => {
             expect.assertions(5);
 
             writeFileSync(`${temporaryDirectoryPath}/src/components/Test.ts`, "console.log(1);");
@@ -286,8 +291,8 @@ describe("packem typescript", () => {
                 config: {
                     rollup: {
                         tsconfigPaths: { resolveAbsolutePath },
-                    }
-                }
+                    },
+                },
             });
 
             const binProcess = await execPackemSync("build", [], {
@@ -1819,7 +1824,7 @@ export { test as default };
             writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const test = "this should be in final bundle, test2 string";`);
             writeFileSync(`${temporaryDirectoryPath}/src/deep/index.ts`, `export const test = "this should be in final bundle, test2 string";`);
 
-            await createTsConfig(temporaryDirectoryPath, {});
+            await createTsConfig(temporaryDirectoryPath);
             await createPackageJson(temporaryDirectoryPath, {
                 devDependencies: {
                     typescript: "*",
@@ -1886,7 +1891,7 @@ export { test as default };
             writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const test = "this should be in final bundle, test2 string";`);
             writeFileSync(`${temporaryDirectoryPath}/src/deep/index.ts`, `export const test = "this should be in final bundle, test2 string";`);
 
-            await createTsConfig(temporaryDirectoryPath, {});
+            await createTsConfig(temporaryDirectoryPath);
             await createPackageJson(temporaryDirectoryPath, {
                 devDependencies: {
                     typescript: "*",
@@ -1959,7 +1964,7 @@ export const test = "this should be in final bundle, test2 string";`,
 export const test = "this should be in final bundle, test2 string";`,
             );
 
-            await createTsConfig(temporaryDirectoryPath, {});
+            await createTsConfig(temporaryDirectoryPath);
             await createPackageJson(temporaryDirectoryPath, {
                 devDependencies: {
                     typescript: "*",
@@ -2035,7 +2040,7 @@ export const test = "this should be in final bundle, test2 string";`,
 export const test = "this should be in final bundle, test2 string";`,
             );
 
-            await createTsConfig(temporaryDirectoryPath, {});
+            await createTsConfig(temporaryDirectoryPath);
             await createPackageJson(temporaryDirectoryPath, {
                 devDependencies: {
                     typescript: "*",
@@ -2085,7 +2090,7 @@ export const test = "this should be in final bundle, test2 string";`,
             writeFileSync(`${temporaryDirectoryPath}/src/reporter.browser.ts`, `export const browser = "server";`);
             writeFileSync(`${temporaryDirectoryPath}/src/reporter.server.ts`, `export const server = "server";`);
 
-            await createTsConfig(temporaryDirectoryPath, {});
+            await createTsConfig(temporaryDirectoryPath);
             await createPackageJson(temporaryDirectoryPath, {
                 browser: "dist/index.browser.mjs",
                 devDependencies: {
@@ -2254,7 +2259,7 @@ export const test = "this should be in final bundle, test2 string";`,
         writeFileSync(`${temporaryDirectoryPath}/src/config.ts`, `export default () => 'config';`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
@@ -2316,5 +2321,117 @@ const config = /* @__PURE__ */ __name(() => "config", "default");
 
 export { config as default };
 `);
+    });
+
+    // This test is connected to the caching of the @rollup/plugin-node-resolve
+    it("should bundle deeks package", async () => {
+        expect.assertions(6);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export type { DeeksOptions as DeepKeysOptions } from "deeks";
+export { deepKeys, deepKeysFromList } from "deeks";`,
+        );
+
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                deeks: "*",
+                typescript: "*",
+            },
+            main: "dist/index.cjs",
+            module: "dist/index.mjs",
+            types: "dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await installPackage(temporaryDirectoryPath, "deeks");
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        console.log(binProcess.stdout);
+
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(dMtsContent).toBe(`interface DeeksOptions {
+    /** @default false */
+    arrayIndexesAsKeys?: boolean;
+    /** @default true */
+    expandNestedObjects?: boolean;
+    /** @default false */
+    expandArrayObjects?: boolean;
+    /** @default false */
+    ignoreEmptyArraysWhenExpanding?: boolean;
+    /** @default false */
+    escapeNestedDots?: boolean;
+    /** @default false */
+    ignoreEmptyArrays?: boolean;
+}
+
+/**
+ * Return the deep keys list for a single document
+ * @param object
+ * @param options
+ * @returns {Array}
+ */
+declare function deepKeys(object: object, options?: DeeksOptions): string[];
+/**
+ * Return the deep keys list for all documents in the provided list
+ * @param list
+ * @param options
+ * @returns Array[Array[String]]
+ */
+declare function deepKeysFromList(list: object[], options?: DeeksOptions): string[][];
+
+export { type DeeksOptions as DeepKeysOptions, deepKeys, deepKeysFromList };
+`);
+
+        const dTsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dTsContent).toBe(`interface DeeksOptions {
+    /** @default false */
+    arrayIndexesAsKeys?: boolean;
+    /** @default true */
+    expandNestedObjects?: boolean;
+    /** @default false */
+    expandArrayObjects?: boolean;
+    /** @default false */
+    ignoreEmptyArraysWhenExpanding?: boolean;
+    /** @default false */
+    escapeNestedDots?: boolean;
+    /** @default false */
+    ignoreEmptyArrays?: boolean;
+}
+
+/**
+ * Return the deep keys list for a single document
+ * @param object
+ * @param options
+ * @returns {Array}
+ */
+declare function deepKeys(object: object, options?: DeeksOptions): string[];
+/**
+ * Return the deep keys list for all documents in the provided list
+ * @param list
+ * @param options
+ * @returns Array[Array[String]]
+ */
+declare function deepKeysFromList(list: object[], options?: DeeksOptions): string[][];
+
+export { type DeeksOptions as DeepKeysOptions, deepKeys, deepKeysFromList };
+`);
+
+        const ctsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(ctsContent).toMatchSnapshot("cjs content");
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(mtsContent).toMatchSnapshot("mjs content");
     });
 });

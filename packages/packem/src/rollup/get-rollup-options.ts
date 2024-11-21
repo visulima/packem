@@ -283,12 +283,9 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
     let nodeResolver;
 
     if (context.options.rollup.resolve) {
-        nodeResolver = cachingPlugin(
-            nodeResolvePlugin({
-                ...context.options.rollup.resolve,
-            }),
-            fileCache,
-        );
+        nodeResolver = nodeResolvePlugin({
+            ...context.options.rollup.resolve,
+        });
     }
 
     const chunking = context.options.rollup.output?.preserveModules
@@ -606,12 +603,9 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
     let nodeResolver;
 
     if (context.options.rollup.resolve) {
-        nodeResolver = cachingPlugin(
-            nodeResolvePlugin({
-                ...context.options.rollup.resolve,
-            }),
-            fileCache,
-        );
+        nodeResolver = nodeResolvePlugin({
+            ...context.options.rollup.resolve,
+        });
     }
 
     // Each process should be unique
