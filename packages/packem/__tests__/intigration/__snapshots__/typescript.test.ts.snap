@@ -58,6 +58,362 @@ export { _default as default };
 "
 `;
 
+exports[`packem typescript > should bundle deeks package > cjs content 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var deeks = {};
+
+var utils = {};
+
+var hasRequiredUtils;
+
+function requireUtils () {
+	if (hasRequiredUtils) return utils;
+	hasRequiredUtils = 1;
+	var __defProp = Object.defineProperty;
+	var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+	Object.defineProperty(utils, "__esModule", { value: true });
+	utils.isDocumentToRecurOn = utils.flatten = utils.unique = void 0;
+	function unique(array) {
+	  return [...new Set(array)];
+	}
+	__name(unique, "unique");
+	utils.unique = unique;
+	function flatten(array) {
+	  return [].concat(...array);
+	}
+	__name(flatten, "flatten");
+	utils.flatten = flatten;
+	function isDocumentToRecurOn(val) {
+	  return typeof val === "object" && val !== null && !Array.isArray(val) && Object.keys(val).length;
+	}
+	__name(isDocumentToRecurOn, "isDocumentToRecurOn");
+	utils.isDocumentToRecurOn = isDocumentToRecurOn;
+	return utils;
+}
+
+var types = {};
+
+var hasRequiredTypes;
+
+function requireTypes () {
+	if (hasRequiredTypes) return types;
+	hasRequiredTypes = 1;
+	Object.defineProperty(types, "__esModule", { value: true });
+	return types;
+}
+
+var hasRequiredDeeks;
+
+function requireDeeks () {
+	if (hasRequiredDeeks) return deeks;
+	hasRequiredDeeks = 1;
+	(function (exports) {
+		var __defProp = Object.defineProperty;
+		var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+		var __createBinding = deeks && deeks.__createBinding || (Object.create ? function(o, m, k, k2) {
+		  if (k2 === void 0) k2 = k;
+		  var desc = Object.getOwnPropertyDescriptor(m, k);
+		  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+		    desc = { enumerable: true, get: /* @__PURE__ */ __name(function() {
+		      return m[k];
+		    }, "get") };
+		  }
+		  Object.defineProperty(o, k2, desc);
+		} : function(o, m, k, k2) {
+		  if (k2 === void 0) k2 = k;
+		  o[k2] = m[k];
+		});
+		var __setModuleDefault = deeks && deeks.__setModuleDefault || (Object.create ? function(o, v) {
+		  Object.defineProperty(o, "default", { enumerable: true, value: v });
+		} : function(o, v) {
+		  o["default"] = v;
+		});
+		var __importStar = deeks && deeks.__importStar || function(mod) {
+		  if (mod && mod.__esModule) return mod;
+		  var result = {};
+		  if (mod != null) {
+		    for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+		  }
+		  __setModuleDefault(result, mod);
+		  return result;
+		};
+		var __exportStar = deeks && deeks.__exportStar || function(m, exports2) {
+		  for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p)) __createBinding(exports2, m, p);
+		};
+		Object.defineProperty(exports, "__esModule", { value: true });
+		exports.deepKeysFromList = exports.deepKeys = void 0;
+		const utils = __importStar(requireUtils());
+		__exportStar(requireTypes(), exports);
+		function deepKeys(object, options) {
+		  const parsedOptions = mergeOptions(options);
+		  if (typeof object === "object" && object !== null) {
+		    return generateDeepKeysList("", object, parsedOptions);
+		  }
+		  return [];
+		}
+		__name(deepKeys, "deepKeys");
+		exports.deepKeys = deepKeys;
+		function deepKeysFromList(list, options) {
+		  const parsedOptions = mergeOptions(options);
+		  return list.map((document) => {
+		    if (typeof document === "object" && document !== null) {
+		      return deepKeys(document, parsedOptions);
+		    }
+		    return [];
+		  });
+		}
+		__name(deepKeysFromList, "deepKeysFromList");
+		exports.deepKeysFromList = deepKeysFromList;
+		function generateDeepKeysList(heading, data, options) {
+		  const keys = Object.keys(data).map((currentKey) => {
+		    const keyName = buildKeyName(heading, escapeNestedDotsIfSpecified(currentKey, options));
+		    if (options.expandNestedObjects && utils.isDocumentToRecurOn(data[currentKey]) || options.arrayIndexesAsKeys && Array.isArray(data[currentKey]) && data[currentKey].length) {
+		      return generateDeepKeysList(keyName, data[currentKey], options);
+		    } else if (options.expandArrayObjects && Array.isArray(data[currentKey])) {
+		      return processArrayKeys(data[currentKey], keyName, options);
+		    } else if (options.ignoreEmptyArrays && Array.isArray(data[currentKey]) && !data[currentKey].length) {
+		      return [];
+		    }
+		    return keyName;
+		  });
+		  return utils.flatten(keys);
+		}
+		__name(generateDeepKeysList, "generateDeepKeysList");
+		function processArrayKeys(subArray, currentKeyPath, options) {
+		  let subArrayKeys = deepKeysFromList(subArray, options);
+		  if (!subArray.length) {
+		    return options.ignoreEmptyArraysWhenExpanding ? [] : [currentKeyPath];
+		  } else if (subArray.length && utils.flatten(subArrayKeys).length === 0) {
+		    return [currentKeyPath];
+		  } else {
+		    subArrayKeys = subArrayKeys.map((schemaKeys) => {
+		      if (Array.isArray(schemaKeys) && schemaKeys.length === 0) {
+		        return [currentKeyPath];
+		      }
+		      return schemaKeys.map((subKey) => buildKeyName(currentKeyPath, escapeNestedDotsIfSpecified(subKey, options)));
+		    });
+		    return utils.unique(utils.flatten(subArrayKeys));
+		  }
+		}
+		__name(processArrayKeys, "processArrayKeys");
+		function escapeNestedDotsIfSpecified(key, options) {
+		  if (options.escapeNestedDots) {
+		    return key.replace(/\\./g, "\\\\.");
+		  }
+		  return key;
+		}
+		__name(escapeNestedDotsIfSpecified, "escapeNestedDotsIfSpecified");
+		function buildKeyName(upperKeyName, currentKeyName) {
+		  if (upperKeyName) {
+		    return upperKeyName + "." + currentKeyName;
+		  }
+		  return currentKeyName;
+		}
+		__name(buildKeyName, "buildKeyName");
+		function mergeOptions(options) {
+		  return {
+		    arrayIndexesAsKeys: false,
+		    expandNestedObjects: true,
+		    expandArrayObjects: false,
+		    ignoreEmptyArraysWhenExpanding: false,
+		    escapeNestedDots: false,
+		    ignoreEmptyArrays: false,
+		    ...options ?? {}
+		  };
+		}
+		__name(mergeOptions, "mergeOptions"); 
+	} (deeks));
+	return deeks;
+}
+
+var deeksExports = requireDeeks();
+
+exports.deepKeys = deeksExports.deepKeys;
+exports.deepKeysFromList = deeksExports.deepKeysFromList;
+"
+`;
+
+exports[`packem typescript > should bundle deeks package > mjs content 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var deeks = {};
+
+var utils = {};
+
+var hasRequiredUtils;
+
+function requireUtils () {
+	if (hasRequiredUtils) return utils;
+	hasRequiredUtils = 1;
+	var __defProp = Object.defineProperty;
+	var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+	Object.defineProperty(utils, "__esModule", { value: true });
+	utils.isDocumentToRecurOn = utils.flatten = utils.unique = void 0;
+	function unique(array) {
+	  return [...new Set(array)];
+	}
+	__name(unique, "unique");
+	utils.unique = unique;
+	function flatten(array) {
+	  return [].concat(...array);
+	}
+	__name(flatten, "flatten");
+	utils.flatten = flatten;
+	function isDocumentToRecurOn(val) {
+	  return typeof val === "object" && val !== null && !Array.isArray(val) && Object.keys(val).length;
+	}
+	__name(isDocumentToRecurOn, "isDocumentToRecurOn");
+	utils.isDocumentToRecurOn = isDocumentToRecurOn;
+	return utils;
+}
+
+var types = {};
+
+var hasRequiredTypes;
+
+function requireTypes () {
+	if (hasRequiredTypes) return types;
+	hasRequiredTypes = 1;
+	Object.defineProperty(types, "__esModule", { value: true });
+	return types;
+}
+
+var hasRequiredDeeks;
+
+function requireDeeks () {
+	if (hasRequiredDeeks) return deeks;
+	hasRequiredDeeks = 1;
+	(function (exports) {
+		var __defProp = Object.defineProperty;
+		var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+		var __createBinding = deeks && deeks.__createBinding || (Object.create ? function(o, m, k, k2) {
+		  if (k2 === void 0) k2 = k;
+		  var desc = Object.getOwnPropertyDescriptor(m, k);
+		  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+		    desc = { enumerable: true, get: /* @__PURE__ */ __name(function() {
+		      return m[k];
+		    }, "get") };
+		  }
+		  Object.defineProperty(o, k2, desc);
+		} : function(o, m, k, k2) {
+		  if (k2 === void 0) k2 = k;
+		  o[k2] = m[k];
+		});
+		var __setModuleDefault = deeks && deeks.__setModuleDefault || (Object.create ? function(o, v) {
+		  Object.defineProperty(o, "default", { enumerable: true, value: v });
+		} : function(o, v) {
+		  o["default"] = v;
+		});
+		var __importStar = deeks && deeks.__importStar || function(mod) {
+		  if (mod && mod.__esModule) return mod;
+		  var result = {};
+		  if (mod != null) {
+		    for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+		  }
+		  __setModuleDefault(result, mod);
+		  return result;
+		};
+		var __exportStar = deeks && deeks.__exportStar || function(m, exports2) {
+		  for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p)) __createBinding(exports2, m, p);
+		};
+		Object.defineProperty(exports, "__esModule", { value: true });
+		exports.deepKeysFromList = exports.deepKeys = void 0;
+		const utils = __importStar(requireUtils());
+		__exportStar(requireTypes(), exports);
+		function deepKeys(object, options) {
+		  const parsedOptions = mergeOptions(options);
+		  if (typeof object === "object" && object !== null) {
+		    return generateDeepKeysList("", object, parsedOptions);
+		  }
+		  return [];
+		}
+		__name(deepKeys, "deepKeys");
+		exports.deepKeys = deepKeys;
+		function deepKeysFromList(list, options) {
+		  const parsedOptions = mergeOptions(options);
+		  return list.map((document) => {
+		    if (typeof document === "object" && document !== null) {
+		      return deepKeys(document, parsedOptions);
+		    }
+		    return [];
+		  });
+		}
+		__name(deepKeysFromList, "deepKeysFromList");
+		exports.deepKeysFromList = deepKeysFromList;
+		function generateDeepKeysList(heading, data, options) {
+		  const keys = Object.keys(data).map((currentKey) => {
+		    const keyName = buildKeyName(heading, escapeNestedDotsIfSpecified(currentKey, options));
+		    if (options.expandNestedObjects && utils.isDocumentToRecurOn(data[currentKey]) || options.arrayIndexesAsKeys && Array.isArray(data[currentKey]) && data[currentKey].length) {
+		      return generateDeepKeysList(keyName, data[currentKey], options);
+		    } else if (options.expandArrayObjects && Array.isArray(data[currentKey])) {
+		      return processArrayKeys(data[currentKey], keyName, options);
+		    } else if (options.ignoreEmptyArrays && Array.isArray(data[currentKey]) && !data[currentKey].length) {
+		      return [];
+		    }
+		    return keyName;
+		  });
+		  return utils.flatten(keys);
+		}
+		__name(generateDeepKeysList, "generateDeepKeysList");
+		function processArrayKeys(subArray, currentKeyPath, options) {
+		  let subArrayKeys = deepKeysFromList(subArray, options);
+		  if (!subArray.length) {
+		    return options.ignoreEmptyArraysWhenExpanding ? [] : [currentKeyPath];
+		  } else if (subArray.length && utils.flatten(subArrayKeys).length === 0) {
+		    return [currentKeyPath];
+		  } else {
+		    subArrayKeys = subArrayKeys.map((schemaKeys) => {
+		      if (Array.isArray(schemaKeys) && schemaKeys.length === 0) {
+		        return [currentKeyPath];
+		      }
+		      return schemaKeys.map((subKey) => buildKeyName(currentKeyPath, escapeNestedDotsIfSpecified(subKey, options)));
+		    });
+		    return utils.unique(utils.flatten(subArrayKeys));
+		  }
+		}
+		__name(processArrayKeys, "processArrayKeys");
+		function escapeNestedDotsIfSpecified(key, options) {
+		  if (options.escapeNestedDots) {
+		    return key.replace(/\\./g, "\\\\.");
+		  }
+		  return key;
+		}
+		__name(escapeNestedDotsIfSpecified, "escapeNestedDotsIfSpecified");
+		function buildKeyName(upperKeyName, currentKeyName) {
+		  if (upperKeyName) {
+		    return upperKeyName + "." + currentKeyName;
+		  }
+		  return currentKeyName;
+		}
+		__name(buildKeyName, "buildKeyName");
+		function mergeOptions(options) {
+		  return {
+		    arrayIndexesAsKeys: false,
+		    expandNestedObjects: true,
+		    expandArrayObjects: false,
+		    ignoreEmptyArraysWhenExpanding: false,
+		    escapeNestedDots: false,
+		    ignoreEmptyArrays: false,
+		    ...options ?? {}
+		  };
+		}
+		__name(mergeOptions, "mergeOptions"); 
+	} (deeks));
+	return deeks;
+}
+
+var deeksExports = requireDeeks();
+
+exports.deepKeys = deeksExports.deepKeys;
+exports.deepKeysFromList = deeksExports.deepKeysFromList;
+"
+`;
+
 exports[`packem typescript > should support typescript decorator > cjs code output 1`] = `
 "'use strict';
 

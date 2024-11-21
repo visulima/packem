@@ -1,6 +1,8 @@
 import type { Loader } from "esbuild";
 
-export const DEFAULT_EXTENSIONS: string[] = [".mjs", ".js", ".json", ".node", ".cjs", ".ts", ".cts", ".mts", ".tsx", ".ctsx", ".mtsx", ".jsx"];
+export const DEFAULT_JS_EXTENSIONS: string[] = [".mjs", ".js", ".json", ".node", ".cjs", ".jsx"];
+
+export const DEFAULT_EXTENSIONS: string[] = [...DEFAULT_JS_EXTENSIONS, ".ts", ".cts", ".mts", ".tsx", ".ctsx", ".mtsx"];
 
 export const DEFAULT_LOADERS: Record<string, Loader> = {
     ".aac": "file",

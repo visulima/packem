@@ -123,6 +123,7 @@ const getTransformerConfig = (
             minifyWhitespace: context.options.minify,
             sourceMap: context.options.sourcemap,
             ...context.options.rollup.esbuild,
+            logLevel: context.options.debug ? "debug" : "silent",
         } satisfies EsbuildPluginConfig;
     }
 
@@ -259,12 +260,9 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
     let nodeResolver;
 
     if (context.options.rollup.resolve) {
-        nodeResolver = cachingPlugin(
-            nodeResolvePlugin({
-                ...context.options.rollup.resolve,
-            }),
-            fileCache,
-        );
+        nodeResolver = nodeResolvePlugin({
+            ...context.options.rollup.resolve,
+        });
     }
 
     const chunking = context.options.rollup.output?.preserveModules
@@ -352,15 +350,17 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
         ].filter(Boolean),
 
         plugins: [
-            cachingPlugin(resolveFileUrlPlugin(), fileCache),
-            cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
+            cachingPlugin(resolveFileUrlPlugin(), fileCache, context.logger),
+            cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache, context.logger),
 
-            context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
+            context.tsconfig &&
+                cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache, context.logger),
             context.tsconfig &&
                 context.options.rollup.tsconfigPaths &&
                 cachingPlugin(
                     resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger, context.options.rollup.tsconfigPaths),
                     fileCache,
+                    context.logger,
                 ),
 
             context.options.rollup.replace &&
@@ -380,11 +380,19 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             cachingPlugin(
                 resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}),
                 fileCache,
+                context.logger,
             ),
 
             ...prePlugins,
 
             nodeResolver,
+
+            context.options.rollup.json &&
+                JSONPlugin({
+                    ...context.options.rollup.json,
+                }),
+
+            context.options.rollup.url && urlPlugin(context.options.rollup.url),
 
             context.options.rollup.polyfillNode &&
                 polyfillPlugin({
@@ -392,16 +400,9 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     ...context.options.rollup.polyfillNode,
                 }),
 
-            context.options.rollup.json &&
-                JSONPlugin({
-                    ...context.options.rollup.json,
-                }),
-
             chunkSplitter(),
 
             context.options.rollup.wasm && wasmPlugin(context.options.rollup.wasm),
-
-            context.options.rollup.url && urlPlugin(context.options.rollup.url),
 
             context.options.rollup.css &&
                 context.options.rollup.css.loaders &&
@@ -429,7 +430,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 context.options.declaration &&
                 cssModulesTypesPlugin(context.options.rollup.css, context.options.rootDir, context.logger),
 
-            context.options.rollup.raw && cachingPlugin(rawPlugin(context.options.rollup.raw), fileCache),
+            context.options.rollup.raw && cachingPlugin(rawPlugin(context.options.rollup.raw), fileCache, context.logger),
 
             context.options.sourcemap && sourcemapsPlugin(context.options.rollup.sourcemap),
 
@@ -456,6 +457,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     logger: context.logger,
                 }),
                 fileCache,
+                context.logger,
             ),
 
             context.options.rollup.shebang &&
@@ -485,6 +487,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         ...context.options.rollup.commonjs,
                     }),
                     fileCache,
+                    context.logger,
                 ),
 
             context.options.rollup.preserveDynamicImports &&
@@ -504,6 +507,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         logger: context.logger,
                     }),
                     fileCache,
+                    context.logger,
                 ),
 
             ...postPlugins,
@@ -591,6 +595,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             name: "packem:ignore-files",
         },
         fileCache,
+        context.logger,
     );
 
     const compilerOptions = context.tsconfig?.config.compilerOptions;
@@ -599,12 +604,9 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
     let nodeResolver;
 
     if (context.options.rollup.resolve) {
-        nodeResolver = cachingPlugin(
-            nodeResolvePlugin({
-                ...context.options.rollup.resolve,
-            }),
-            fileCache,
-        );
+        nodeResolver = nodeResolvePlugin({
+            ...context.options.rollup.resolve,
+        });
     }
 
     // Each process should be unique
@@ -674,23 +676,20 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
         ].filter(Boolean),
 
         plugins: [
-            cachingPlugin(resolveFileUrlPlugin(), fileCache),
-            cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
+            cachingPlugin(resolveFileUrlPlugin(), fileCache, context.logger),
+            cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache, context.logger),
 
             ignoreFiles,
 
-            context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
+            context.tsconfig &&
+                cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache, context.logger),
             context.tsconfig &&
                 context.options.rollup.tsconfigPaths &&
                 cachingPlugin(
                     resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger, context.options.rollup.tsconfigPaths),
                     fileCache,
+                    context.logger,
                 ),
-
-            cachingPlugin(
-                resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}),
-                fileCache,
-            ),
 
             context.options.rollup.replace &&
                 replacePlugin({
@@ -705,6 +704,11 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                     ...context.options.rollup.alias,
                     entries: resolvedAliases,
                 }),
+
+            // cachingPlugin(
+            resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}),
+            //     fileCache,
+            // ),
 
             ...prePlugins,
 
@@ -729,7 +733,8 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                     type: context.pkg.type ?? "commonjs",
                 }),
 
-            context.options.rollup.patchTypes && cachingPlugin(patchTypescriptTypesPlugin(context.options.rollup.patchTypes, context.logger), fileCache),
+            context.options.rollup.patchTypes &&
+                cachingPlugin(patchTypescriptTypesPlugin(context.options.rollup.patchTypes, context.logger), fileCache, context.logger),
 
             removeShebangPlugin(),
 

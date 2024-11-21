@@ -51,7 +51,7 @@ const validatePackageFields = (context: BuildContext): void => {
                 );
             }
 
-            if (context.options.emitESM && pkg.module?.includes(".cjs")) {
+            if (pkg.module?.includes(".cjs")) {
                 warn(context, "The 'module' field in your package.json should not use a '.cjs' extension for ES modules.");
             }
         }
@@ -71,7 +71,7 @@ const validatePackageFields = (context: BuildContext): void => {
                 }
 
                 if (pkg.module?.includes(".cjs")) {
-                    warn(context, "The 'module' field should not use a '.cjs' extension for ES modules.");
+                    warn(context, "The 'module' field in your package.json should not use a '.cjs' extension for ES modules.");
                 }
 
                 if (pkg.module && pkg.main && pkg.module === pkg.main) {

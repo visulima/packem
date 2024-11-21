@@ -31,7 +31,7 @@ export const data = content;`,
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -83,7 +83,7 @@ export const data = content;`,
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",

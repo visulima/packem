@@ -36,7 +36,7 @@ describe("packem package.json legacy", () => {
             },
             main: "./dist/index.cjs",
         });
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -68,7 +68,7 @@ describe("packem package.json legacy", () => {
             main: "./dist/index.cjs",
             type: "module",
         });
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -99,7 +99,7 @@ describe("packem package.json legacy", () => {
             },
             module: "./dist/index.mjs",
         });
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -131,7 +131,7 @@ describe("packem package.json legacy", () => {
             module: "./dist/index.mjs",
             type: "module",
         });
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,

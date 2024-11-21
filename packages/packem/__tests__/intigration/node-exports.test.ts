@@ -509,7 +509,7 @@ export class Child extends Parent {
             types: "./dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -576,7 +576,7 @@ export class Child extends Parent {
             types: "./dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", ["--env NODE_ENV=production", "--minify"], {
             cwd: temporaryDirectoryPath,
@@ -718,7 +718,7 @@ export default test;`,
         await createPackemConfig(temporaryDirectoryPath, {
             cssLoader: ["postcss", "sourcemap"],
         });
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -784,7 +784,7 @@ export default test;`,
         await createPackemConfig(temporaryDirectoryPath, {
             cssLoader: ["postcss", "sourcemap"],
         });
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,

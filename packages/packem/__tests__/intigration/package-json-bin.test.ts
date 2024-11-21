@@ -38,7 +38,7 @@ console.log(path.basename(__filename));
                 typescript: "*",
             },
         });
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -71,7 +71,7 @@ console.log("Hello, world!");
             },
             type: "module",
         });
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -112,7 +112,7 @@ console.log("b");
                 typescript: "*",
             },
         });
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -147,7 +147,7 @@ console.log("b");
                 typescript: "*",
             },
         });
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,

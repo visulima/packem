@@ -18,7 +18,6 @@ export type Options = {
      * Map extension to esbuild loader
      * Note that each entry (the extension) needs to start with a dot
      */
-
     loaders?: Record<string, Loader | false>;
     optimizeDeps?: MarkOptional<OptimizeDepsOptions, "cwd" | "sourceMap">;
     sourceMap?: boolean;

@@ -45,7 +45,7 @@ describe("packem package.json imports", () => {
                 },
                 transformer,
             );
-            await createTsConfig(temporaryDirectoryPath, {});
+            await createTsConfig(temporaryDirectoryPath);
             await createPackemConfig(temporaryDirectoryPath, {
                 transformer,
             });

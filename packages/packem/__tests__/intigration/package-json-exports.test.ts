@@ -102,7 +102,7 @@ export function method() {
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = process.env.NODE_ENV;`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -159,7 +159,7 @@ export function method() {
         writeFileSync(`${temporaryDirectoryPath}/src/core.development.ts`, `export const value = 'core' + process.env.NODE_ENV;`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -244,7 +244,7 @@ export { IString };`,
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -354,7 +354,7 @@ export { value };
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = 'cjs';`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -395,7 +395,7 @@ export { value };
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -446,7 +446,7 @@ export { index as default };
         writeFileSync(`${temporaryDirectoryPath}/src/config.ts`, `export default () => 'config';`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -512,7 +512,7 @@ export { config as default };
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -628,7 +628,7 @@ export { index as default };
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -725,7 +725,7 @@ export { render };
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -747,7 +747,7 @@ export { render };
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -770,7 +770,7 @@ export { render };
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -850,7 +850,7 @@ export type Shared = string;
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -920,7 +920,7 @@ module.exports = client;
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const index = "index";`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -983,7 +983,7 @@ exports.index = index;
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const isEdge = process.env.EdgeRuntime;`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -1343,7 +1343,7 @@ exports.Client = Client;
                 },
             },
         });
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -1552,7 +1552,7 @@ module.exports = result;
         writeFileSync(`${temporaryDirectoryPath}/src/index.workerd.ts`, `export const runtime = 'workerd';`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -1670,7 +1670,7 @@ console.log('require-module-import', require('require-module-import').resolved);
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -1781,7 +1781,7 @@ console.log('require-module-import', require('require-module-import').resolved);
         );
 
         await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {

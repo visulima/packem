@@ -1,3 +1,4 @@
+import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
 import type { ObjectHook, Plugin } from "rollup";
 
@@ -9,13 +10,8 @@ const getHandler = (plugin: ObjectHook<any> | ((...arguments_: any[]) => any)): 
 
 /**
  * Wrap a Rollup plugin to add caching to various hooks.
- *
- * @param {Plugin} plugin
- * @param {FileCache} cache
- * @param {string} subDirectory
- * @returns {Plugin}
  */
-const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugin =>
+const cachingPlugin = (plugin: Plugin, cache: FileCache, logger: Pail, subDirectory = ""): Plugin =>
     <Plugin>{
         ...plugin,
 
@@ -40,12 +36,22 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
             const cacheKey = join("load", getHash(id));
 
             if (cache.has(cacheKey, pluginPath)) {
+                logger.debug({
+                    message: 'Cache hit for "load" hook with cache key: ' + cacheKey,
+                    prefix: "plugin:cache-plugin:" + plugin.name,
+                });
+
                 return await cache.get(cacheKey, pluginPath);
             }
 
             const result = await getHandler(plugin.load).call(this, id);
 
             cache.set(cacheKey, result, pluginPath);
+
+            logger.debug({
+                message: 'Cache miss for "load" hook with cache key: ' + cacheKey + ". Caching result.",
+                prefix: "plugin:cache-plugin:" + plugin.name,
+            });
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return result;
@@ -62,12 +68,22 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
             const cacheKey = join("resolveId", getHash(id), importer ? getHash(importer) : "", getHash(JSON.stringify(options)));
 
             if (cache.has(cacheKey, pluginPath)) {
+                logger.debug({
+                    message: 'Cache hit for "resolveId" hook with cache key: ' + cacheKey,
+                    prefix: "plugin:cache-plugin:" + plugin.name,
+                });
+
                 return await cache.get(cacheKey, pluginPath);
             }
 
             const result = await getHandler(plugin.resolveId).call(this, id, importer, options);
 
             cache.set(cacheKey, result, pluginPath);
+
+            logger.debug({
+                message: 'Cache miss for "resolveId" hook with cache key: ' + cacheKey + ". Caching result.",
+                prefix: "plugin:cache-plugin:" + plugin.name,
+            });
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return result;
@@ -82,12 +98,22 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
             const cacheKey = join("transform", getHash(id), getHash(code));
 
             if (cache.has(cacheKey, pluginPath)) {
+                logger.debug({
+                    message: 'Cache hit for "transform" hook with cache key: ' + cacheKey,
+                    prefix: "plugin:cache-plugin:" + plugin.name,
+                });
+
                 return await cache.get(cacheKey, pluginPath);
             }
 
             const result = await getHandler(plugin.transform).call(this, code, id);
 
             cache.set(cacheKey, result, pluginPath);
+
+            logger.debug({
+                message: 'Cache miss for "transform" hook with cache key: ' + cacheKey + ". Caching result.",
+                prefix: "plugin:cache-plugin:" + plugin.name,
+            });
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return result;

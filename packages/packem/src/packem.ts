@@ -20,7 +20,7 @@ import { exec } from "tinyexec";
 
 import build from "./build";
 import type { BuildConfigFunction } from "./config";
-import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "./constants";
+import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, DEFAULT_JS_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "./constants";
 import resolvePreset from "./hooks/preset/utils/resolve-preset";
 import createStub from "./jit/create-stub";
 import getHash from "./rollup/utils/get-hash";
@@ -101,7 +101,7 @@ const generateOptions = (
             alias: {},
             cjsInterop: { addDefaultProperty: false },
             commonjs: {
-                extensions: [".mjs", ".js", ".json", ".node", ".cjs"],
+                extensions: DEFAULT_JS_EXTENSIONS,
                 ignoreTryCatch: true,
                 preserveSymlinks: true,
                 // https://github.com/rollup/plugins/tree/master/packages/commonjs#transformmixedesmodules
