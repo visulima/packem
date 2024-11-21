@@ -1,3 +1,13 @@
+## @visulima/packem [1.8.1](https://github.com/visulima/packem/compare/@visulima/packem@1.8.0...@visulima/packem@1.8.1) (2024-11-21)
+
+### Bug Fixes
+
+* removed cache plugin from nodeResolvePlugin ([827a1f6](https://github.com/visulima/packem/commit/827a1f65ca48165469378cdb18dd32552e21d225))
+
+### Miscellaneous Chores
+
+* added missing dev dependency for the new test ([cb9d86f](https://github.com/visulima/packem/commit/cb9d86f38855114de0f80ced3d0ee98aaa46577c))
+
 ## @visulima/packem [1.8.0](https://github.com/visulima/packem/compare/@visulima/packem@1.7.3...@visulima/packem@1.8.0) (2024-11-19)
 
 ### Features
