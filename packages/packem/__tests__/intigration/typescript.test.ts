@@ -2347,7 +2347,7 @@ export { deepKeys, deepKeysFromList } from "deeks";`,
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "deeks");
 
-        const binProcess = await execPackemSync("build", ["--debug"], {
+        const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
