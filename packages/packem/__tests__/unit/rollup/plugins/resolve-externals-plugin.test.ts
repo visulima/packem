@@ -97,7 +97,7 @@ describe("resolve-externals-plugin", () => {
             context.options(rollupInputConfig);
 
             for (const builtin of ["path", "node:fs"]) {
-                expect((rollupInputConfig as ExternalRollupInputOptions).external(builtin, "index.js", false)).toBeTruthy();
+                expect((rollupInputConfig as ExternalRollupInputOptions).external(builtin, "index.js", false)).toBeFalsy();
             }
         });
 
@@ -121,7 +121,7 @@ describe("resolve-externals-plugin", () => {
             context.options(rollupInputConfig);
 
             for (const builtin of ["path", "node:fs"]) {
-                expect((rollupInputConfig as ExternalRollupInputOptions).external(builtin, "index.js", false)).toBeTruthy();
+                expect((rollupInputConfig as ExternalRollupInputOptions).external(builtin, "index.js", false)).toBeFalsy();
             }
         });
 
@@ -381,7 +381,7 @@ describe("resolve-externals-plugin", () => {
 
             context.options(rollupInputConfig);
 
-            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeFalsy();
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeTruthy();
         });
 
         it("should mark dependencies/peerDependencies/optionalDependencies subpath imports external", async () => {
@@ -403,7 +403,7 @@ describe("resolve-externals-plugin", () => {
 
             context.options(rollupInputConfig);
 
-            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeFalsy();
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeTruthy();
             expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep/sub", "index.js", false)).toBeTruthy();
         });
 
