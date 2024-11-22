@@ -15,8 +15,6 @@ import resolveAliases from "../utils/resolve-aliases";
 
 type MaybeFalsy<T> = T | undefined | null | false;
 
-const cacheResolved = new Map<string, boolean>();
-
 const getRegExps = (data: MaybeFalsy<string | RegExp>[], type: "include" | "exclude", logger: Pail): RegExp[] =>
     // eslint-disable-next-line unicorn/no-array-reduce
     data.reduce<RegExp[]>((result, entry, index) => {
@@ -31,9 +29,6 @@ const getRegExps = (data: MaybeFalsy<string | RegExp>[], type: "include" | "excl
 
         return result;
     }, []);
-
-const calledImplicitExternals = new Map<string, boolean>();
-const cachedGlobFiles = new Map<string, string[]>();
 
 export type ResolveExternalsPluginOptions = {
     /**
@@ -100,6 +95,10 @@ export const resolveExternalsPlugin = (
     options: ResolveExternalsPluginOptions,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Plugin => {
+    const calledImplicitExternals = new Map<string, boolean>();
+    const cachedGlobFiles = new Map<string, string[]>();
+    const cacheResolved = new Map<string, boolean>();
+
     // Map the include and exclude options to arrays of regexes.
     const include = new Set(getRegExps([...buildOptions.externals], "include", logger));
     const exclude = new Set(getRegExps([...(options.exclude ?? [])], "exclude", logger));
@@ -123,7 +122,7 @@ export const resolveExternalsPlugin = (
 
     if (packageJson.peerDependenciesMeta) {
         for (const [key, value] of Object.entries(packageJson.peerDependenciesMeta)) {
-            if (value.optional) {
+            if (value?.optional) {
                 include.add(new RegExp(`^${key}(?:/.+)?$`));
             }
         }
