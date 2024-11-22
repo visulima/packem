@@ -1,3 +1,9 @@
+## @visulima/packem [1.8.2](https://github.com/visulima/packem/compare/@visulima/packem@1.8.1...@visulima/packem@1.8.2) (2024-11-22)
+
+### Bug Fixes
+
+* fixed resolution of node externals ([#72](https://github.com/visulima/packem/issues/72)) ([4eecfcc](https://github.com/visulima/packem/commit/4eecfcc7fe76fb079088c2535edc080357ba0e8e))
+
 ## @visulima/packem [1.8.1](https://github.com/visulima/packem/compare/@visulima/packem@1.8.0...@visulima/packem@1.8.1) (2024-11-21)
 
 ### Bug Fixes
