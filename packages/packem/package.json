@@ -82,12 +82,12 @@
         },
         "./config": {
             "import": {
-                "types": "./dist/config.d.mts",
-                "default": "./dist/config.mjs"
+                "types": "./dist/config/index.d.mts",
+                "default": "./dist/config/index.mjs"
             },
             "require": {
-                "types": "./dist/config.d.cts",
-                "default": "./dist/config.cjs"
+                "types": "./dist/config/index.d.cts",
+                "default": "./dist/config/index.cjs"
             }
         },
         "./transformer/esbuild": {
@@ -317,7 +317,7 @@
                 "./dist/packem.d.ts"
             ],
             "config": [
-                "./dist/config.d.ts"
+                "./dist/config/index.d.ts"
             ],
             "transformer/esbuild": [
                 "./dist/rollup/plugins/esbuild/index.d.ts"
