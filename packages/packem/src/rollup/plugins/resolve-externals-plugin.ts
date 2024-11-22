@@ -15,7 +15,7 @@ import resolveAliases from "../utils/resolve-aliases";
 
 type MaybeFalsy<T> = T | undefined | null | false;
 
-const cacheResolved = new Map<string, boolean | null>();
+const cacheResolved = new Map<string, boolean>();
 
 const getRegExps = (data: MaybeFalsy<string | RegExp>[], type: "include" | "exclude", logger: Pail): RegExp[] =>
     // eslint-disable-next-line unicorn/no-array-reduce
@@ -92,15 +92,6 @@ export type ResolveExternalsPluginOptions = {
     peerDeps?: boolean;
 };
 
-/**
- *
- * @param {PackageJson} packageJson
- * @param {TsConfigResult | undefined} tsconfig
- * @param {InternalBuildOptions} buildOptions
- * @param {PailServerType} logger
- * @param {ResolveExternalsPluginOptions} options
- * @returns {Plugin}
- */
 export const resolveExternalsPlugin = (
     packageJson: PackageJson,
     tsconfig: TsConfigResult | undefined,
@@ -145,7 +136,7 @@ export const resolveExternalsPlugin = (
 
     if (tsconfig) {
         tsconfigPathPatterns = Object.entries(tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) =>
-            key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`),
+            (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
         );
     }
 
@@ -154,6 +145,7 @@ export const resolveExternalsPlugin = (
     return <Plugin>{
         name: "packem:resolve-externals",
         options: (rollupOptions: InputOptions) => {
+            // This function takes an id and returns true (external) or false (not external),
             // eslint-disable-next-line no-param-reassign
             rollupOptions.external = (id: string) => {
                 if (cacheResolved.has(id)) {
@@ -165,8 +157,9 @@ export const resolveExternalsPlugin = (
                     isAbsolute(id) || // Ignore already resolved ids
                     (packageJson.name && id.startsWith(packageJson.name)) // Ignore self import
                 ) {
-                    cacheResolved.set(id, null);
-                    return null;
+                    cacheResolved.set(id, true);
+
+                    return true;
                 }
 
                 if (isBuiltin(id)) {
@@ -175,20 +168,25 @@ export const resolveExternalsPlugin = (
                     return true;
                 }
 
+                if (Object.keys(resolvedAliases).length > 0) {
+                    // eslint-disable-next-line no-param-reassign
+                    id = resolveAlias(id, resolvedAliases);
+                }
+
                 // Handle npm dependencies.
                 if (isIncluded(id) && !isExcluded(id)) {
-                    cacheResolved.set(id, true);
+                    cacheResolved.set(id, false);
 
-                    return true;
+                    return false;
                 }
 
                 // package.json imports are not externals
                 if (packageJson.imports) {
                     for (const [key, value] of Object.entries(packageJson.imports)) {
                         if (key === id) {
-                            cacheResolved.set(id, true);
+                            cacheResolved.set(id, false);
 
-                            return true;
+                            return false;
                         }
 
                         // if a glob is used, we need to check if the id matches the files in the source directory
@@ -208,7 +206,7 @@ export const resolveExternalsPlugin = (
 
                             for (const file of files) {
                                 if (file.replace(ENDING_RE, "") === id.replace(ENDING_RE, "").replace("#", "")) {
-                                    return true;
+                                    return false;
                                 }
                             }
                         }
@@ -218,17 +216,11 @@ export const resolveExternalsPlugin = (
                 if (tsconfigPathPatterns.length > 0) {
                     for (const regexp of tsconfigPathPatterns) {
                         if (regexp.test(id)) {
-                            cacheResolved.set(id, true);
+                            cacheResolved.set(id, false);
 
-                            return true;
+                            return false;
                         }
                     }
-                }
-
-                if (Object.keys(resolvedAliases).length > 0 && resolveAlias(id, resolvedAliases) !== id) {
-                    cacheResolved.set(id, true);
-
-                    return true;
                 }
 
                 if (!calledImplicitExternals.has(id)) {

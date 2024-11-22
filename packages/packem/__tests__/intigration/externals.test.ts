@@ -132,7 +132,7 @@ export const indent = dIndent;
         expect(dContent).toMatchSnapshot("dts output");
     });
 
-    it("should not bundle 'devDependencies' that are used inside the code and are marked as external with peerDependenciesMeta", async () => {
+    it("should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta'", async () => {
         expect.assertions(8);
 
         await installPackage(temporaryDirectoryPath, "typescript");
@@ -159,9 +159,9 @@ export const indent = dIndent;
             peerDependenciesMeta: {
                 "detect-indent": {
                     optional: true,
-                }
+                },
             },
-            types: "./dist/index.d.ts"
+            types: "./dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath);
         await createTsConfig(temporaryDirectoryPath, {
@@ -173,7 +173,73 @@ export const indent = dIndent;
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
-console.log(binProcess.stdout);
+        console.log(binProcess.stdout);
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).not.toContain("Inlined implicit external");
+
+        const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toMatchSnapshot("mjs output");
+
+        const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toMatchSnapshot("cjs output");
+
+        const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(dCtsContent).toMatchSnapshot("cjs dts output");
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(dMtsContent).toMatchSnapshot("mjs dts output");
+
+        const dContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dContent).toMatchSnapshot("dts output");
+    });
+
+    it("should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta'", async () => {
+        expect.assertions(8);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await installPackage(temporaryDirectoryPath, "@svgr/core");
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `import { transform as svgrTransform } from "@svgr/core";
+
+export const transform = svgrTransform;
+`,
+        );
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "@svgr/core": "*",
+                typescript: "^4.4.3",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            peerDependencies: {
+                "@svgr/core": "*",
+            },
+            peerDependenciesMeta: {
+                "@svgr/core": {
+                    optional: true,
+                },
+            },
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                moduleResolution: "bundler",
+            },
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+        console.log(binProcess.stdout);
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 

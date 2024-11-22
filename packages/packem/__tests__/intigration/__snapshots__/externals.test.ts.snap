@@ -564,6 +564,64 @@ export { index as default };
 "
 `;
 
+exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > cjs dts output 1`] = `
+"import * as _svgr_core from '@svgr/core';
+
+declare const transform: {
+    (code: string, config?: _svgr_core.Config, state?: Partial<_svgr_core.State>): Promise<string>;
+    sync(code: string, config?: _svgr_core.Config, state?: Partial<_svgr_core.State>): string;
+};
+
+export { transform };
+"
+`;
+
+exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const core = require('@svgr/core');
+
+const transform = core.transform;
+
+exports.transform = transform;
+"
+`;
+
+exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > dts output 1`] = `
+"import * as _svgr_core from '@svgr/core';
+
+declare const transform: {
+    (code: string, config?: _svgr_core.Config, state?: Partial<_svgr_core.State>): Promise<string>;
+    sync(code: string, config?: _svgr_core.Config, state?: Partial<_svgr_core.State>): string;
+};
+
+export { transform };
+"
+`;
+
+exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > mjs dts output 1`] = `
+"import * as _svgr_core from '@svgr/core';
+
+declare const transform: {
+    (code: string, config?: _svgr_core.Config, state?: Partial<_svgr_core.State>): Promise<string>;
+    sync(code: string, config?: _svgr_core.Config, state?: Partial<_svgr_core.State>): string;
+};
+
+export { transform };
+"
+`;
+
+exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > mjs output 1`] = `
+"import { transform as transform$1 } from '@svgr/core';
+
+const transform = transform$1;
+
+export { transform };
+"
+`;
+
 exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with peerDependenciesMeta > cjs dts output 1`] = `
 "declare const indent: string;
 
