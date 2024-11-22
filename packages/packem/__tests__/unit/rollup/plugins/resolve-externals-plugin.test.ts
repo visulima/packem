@@ -301,7 +301,7 @@ describe("resolve-externals-plugin", () => {
 
             context.options(rollupInputConfig);
 
-            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeFalsy();
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-peer-dep", "index.js", false)).toBeTruthy();
         });
 
         it("should NOT mark peerDependencies external when peerDeps=false", async () => {
