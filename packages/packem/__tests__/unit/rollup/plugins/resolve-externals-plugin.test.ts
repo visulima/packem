@@ -1,6 +1,7 @@
 import type { PackageJson } from "@visulima/package";
 import type { Pail } from "@visulima/pail";
 import type { TsConfigResult } from "@visulima/tsconfig";
+import type { InputOptions, NullValue } from "rollup";
 import { describe, expect, it, vi } from "vitest";
 
 import type { ResolveExternalsPluginOptions } from "../../../../src/rollup/plugins/resolve-externals-plugin";
@@ -25,12 +26,27 @@ const defaultPluginConfig: ResolveExternalsPluginOptions = {
     peerDeps: true,
 };
 
+type ExternalRollupInputOptions = { external: (source: string, importer: string | undefined, isResolved: boolean) => boolean | NullValue } & InputOptions;
+
 describe("resolve-externals-plugin", () => {
     const getMockPluginContext = ({
         buildOptions,
         logger = mockedLogger,
         options,
-        packageJson,
+        packageJson = {
+            dependencies: {
+                "test-dep": "*",
+            },
+            devDependencies: {
+                "test-dev-dep": "*",
+            },
+            optionalDependencies: {
+                "test-opt-dep": "*",
+            },
+            peerDependencies: {
+                "test-peer-dep": "*",
+            },
+        },
         tsconfig = undefined,
     }: {
         buildOptions?: Partial<InternalBuildOptions>;
@@ -42,13 +58,14 @@ describe("resolve-externals-plugin", () => {
         new MockPluginContext(
             resolveExternalsPlugin(
                 {
-                    name: "test",
+                    name: "externals",
                     ...packageJson,
                 } as PackageJson,
                 tsconfig,
                 {
                     alias: {},
                     externals: [],
+                    // @ts-expect-error - mocked config
                     rollup: {},
                     rootDir: "/",
                     ...buildOptions,
@@ -58,44 +75,53 @@ describe("resolve-externals-plugin", () => {
             ),
         );
 
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     describe("buildins", () => {
         it("should mark Node builtins external by default", async () => {
             const context = getMockPluginContext({});
 
-            for await (const builtin of ["path", "node:fs"]) {
-                await expect(context.resolveId(builtin, "index.js")).resolves.toMatchObject({
-                    external: true,
-                });
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            for (const builtin of ["path", "node:fs"]) {
+                expect((rollupInputConfig as ExternalRollupInputOptions).external(builtin, "index.js", false)).toBeTruthy();
             }
         });
 
         it("should NOT mark Node builtins external when builtins=false", async () => {
             const context = getMockPluginContext({ options: { builtins: false } });
 
-            for await (const builtin of ["path", "node:fs"]) {
-                await expect(context.resolveId(builtin, "index.js")).resolves.toMatchObject({
-                    external: false,
-                });
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            for (const builtin of ["path", "node:fs"]) {
+                expect((rollupInputConfig as ExternalRollupInputOptions).external(builtin, "index.js", false)).toBeTruthy();
             }
         });
 
         it("should NOT mark Node builtins external when implicitely excluded", async () => {
             const context = getMockPluginContext({ options: { exclude: ["path", "node:fs"] } });
 
-            for await (const builtin of ["path", "node:fs"]) {
-                await expect(context.resolveId(builtin, "index.js")).resolves.toMatchObject({
-                    external: false,
-                });
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            for (const builtin of ["path", "node:fs"]) {
+                expect((rollupInputConfig as ExternalRollupInputOptions).external(builtin, "index.js", false)).toBeTruthy();
             }
         });
 
         it("should mark Node builtins external when builtins=false and implicitly included", async () => {
             const context = getMockPluginContext({ buildOptions: { externals: ["path", "node:fs"] } as InternalBuildOptions, options: { builtins: false } });
 
-            for await (const builtin of ["path", "node:fs"]) {
-                await expect(context.resolveId(builtin, "index.js")).resolves.toMatchObject({
-                    external: true,
-                });
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            for (const builtin of ["path", "node:fs"]) {
+                expect((rollupInputConfig as ExternalRollupInputOptions).external(builtin, "index.js", false)).toBeTruthy();
             }
         });
 
@@ -122,7 +148,25 @@ describe("resolve-externals-plugin", () => {
         it("should NOT remove 'node:test' prefix even with builtinsPrefix='add'", async () => {
             const context = getMockPluginContext({ options: { builtinsPrefix: "strip" } });
 
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
             for await (const builtin of ["node:test"]) {
+                await expect(context.resolveId(builtin, "index.js")).resolves.toMatchObject({
+                    id: builtin,
+                });
+            }
+        });
+
+        it("should ignore 'node:' prefix when using builtinsPrefix='ignore'", async () => {
+            const context = getMockPluginContext({ options: { builtinsPrefix: "ignore" } });
+
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            for (const builtin of ["node:path", "path"]) {
                 await expect(context.resolveId(builtin, "index.js")).resolves.toMatchObject({
                     id: builtin,
                 });
@@ -132,17 +176,12 @@ describe("resolve-externals-plugin", () => {
         it("should not recognize 'test' as a Node builtin", async () => {
             const context = getMockPluginContext({});
 
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
             await expect(context.resolveId("node", "index.js")).resolves.toBeNull();
-        });
-
-        it("should ignore 'node:' prefix when using builtinsPrefix='ignore'", async () => {
-            const context = getMockPluginContext({ options: { builtinsPrefix: "ignore" } });
-
-            for await (const builtin of ["node:path", "path"]) {
-                await expect(context.resolveId(builtin, "index.js")).resolves.toMatchObject({
-                    id: builtin,
-                });
-            }
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("node", "index.js", false)).toBeFalsy();
         });
     });
 
@@ -156,128 +195,247 @@ describe("resolve-externals-plugin", () => {
             virtual: ["\\0virtual"],
         };
 
-        it("always ignores bundle entry point", async () => {
+        it("should always ignores bundle entry point", async () => {
             const context = getMockPluginContext({});
+
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
 
             await expect(context.resolveId("./path/to/entry.js", undefined)).resolves.toBeNull();
         });
 
-        it("always ignores virtual modules from other plugins", async () => {
+        it("should always ignores virtual modules from other plugins", async () => {
             const context = getMockPluginContext({});
 
-            await expect(context.resolveId("\\0virtual", undefined), `Failed without importer`).resolves.toBeNull();
-            await expect(context.resolveId("\\0virtual", "file.js"), `Failed with importer`).resolves.toBeNull();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("\\0virtual", undefined, false), `Failed without importer`).toBeFalsy();
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("\\0virtual", "file.js", false), `Failed with importer`).toBeFalsy();
         });
 
-        it("always ignores absolute specifiers", async () => {
+        it("should always ignores absolute specifiers", async () => {
             const context = getMockPluginContext({});
 
-            for await (const specifier of specifiers[process.platform === "win32" ? "absoluteWin32" : "absolutePosix"]) {
-                await expect(context.resolveId(specifier, undefined), `Failed on: ${specifier} without importer`).resolves.toBeNull();
-                await expect(context.resolveId(specifier, "file.js"), `Failed on: ${specifier} with importer`).resolves.toBeNull();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            for (const specifier of specifiers[process.platform === "win32" ? "absoluteWin32" : "absolutePosix"]) {
+                expect(
+                    (rollupInputConfig as ExternalRollupInputOptions).external(specifier, undefined, false),
+                    `Failed on: ${specifier} without importer`,
+                ).toBeFalsy();
+                expect(
+                    (rollupInputConfig as ExternalRollupInputOptions).external(specifier, "file.js", false),
+                    `Failed on: ${specifier} with importer`,
+                ).toBeFalsy();
             }
         });
 
-        it("always ignores relative specifiers", async () => {
+        it("should always ignores relative specifiers", async () => {
             const context = getMockPluginContext({ buildOptions: { externals: specifiers.relative } });
 
-            for await (const specifier of specifiers.relative) {
-                await expect(context.resolveId(specifier, undefined), `Failed on: ${specifier} without importer`).resolves.toBeNull();
-                await expect(context.resolveId(specifier, "file.js"), `Failed on: ${specifier} with importer`).resolves.toBeNull();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            for (const specifier of specifiers.relative) {
+                expect(
+                    (rollupInputConfig as ExternalRollupInputOptions).external(specifier, undefined, false),
+                    `Failed on: ${specifier} without importer`,
+                ).toBeFalsy();
+                expect(
+                    (rollupInputConfig as ExternalRollupInputOptions).external(specifier, "file.js", false),
+                    `Failed on: ${specifier} with importer`,
+                ).toBeFalsy();
             }
         });
 
-        it("always ignores bare specifiers that are not dependencies", async () => {
+        it("should always ignores bare specifiers that are not dependencies", async () => {
             const context = getMockPluginContext({ options: { deps: true, devDeps: true, optDeps: true, peerDeps: true } });
 
-            await expect(context.resolveId("not-a-dep", "index.js")).resolves.toBeNull();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("not-a-dep", "index.js", false)).toBeFalsy();
         });
 
-        it("marks dependencies external by default", async () => {
+        it("should mark package.json dependencies external by default", async () => {
             const context = getMockPluginContext({});
 
-            await expect(context.resolveId("test-dep", "index.js")).resolves.resolves.toBeFalsy();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dep", "index.js", false)).toBeTruthy();
         });
 
-        it("does NOT mark dependencies external when deps=false", async () => {
+        it("should NOT mark package.json dependencies external when deps=false", async () => {
             const context = getMockPluginContext({ options: { deps: false } });
 
-            await expect(context.resolveId("test-dep", "index.js")).resolves.toBeNull();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dep", "index.js", false)).toBeFalsy();
         });
 
-        it("does NOT mark excluded dependencies external", async () => {
-            const context = getMockPluginContext({ options: { exclude: "test-dep" } });
+        it("should NOT mark excluded dependencies external", async () => {
+            const context = getMockPluginContext({ options: { exclude: ["test-dep"] } });
 
-            await expect(context.resolveId("test-dep", "index.js")).resolves.toBeNull();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dep", "index.js", false)).toBeFalsy();
         });
 
-        it("marks peerDependencies external by default", async () => {
+        it("should mark peerDependencies external by default", async () => {
             const context = getMockPluginContext({});
 
-            await expect(context.resolveId("test-dev-dep", "index.js")).resolves.toBeNull();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeFalsy();
         });
 
-        it("does NOT mark peerDependencies external when peerDeps=false", async () => {
+        it("should NOT mark peerDependencies external when peerDeps=false", async () => {
             const context = getMockPluginContext({ options: { peerDeps: false } });
 
-            await expect(context.resolveId("test-dev-dep", "index.js")).resolves.toBeNull();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeFalsy();
         });
 
-        it("does NOT mark excluded peerDependencies external", async () => {
-            const context = getMockPluginContext({ options: { exclude: "test-peer-dep" } });
+        it("should NOT mark excluded peerDependencies external", async () => {
+            const context = getMockPluginContext({ options: { exclude: ["test-peer-dep"] } });
 
-            await expect(context.resolveId("test-dev-dep", "index.js")).resolves.toBeNull();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeFalsy();
         });
 
-        it("marks optionalDependencies external by default", async () => {
+        it("should mark optionalDependencies external by default", async () => {
             const context = getMockPluginContext({});
 
-            await expect(context.resolveId("test-opt-dep", "index.js")).resolves.toBeFalsy();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-opt-dep", "index.js", false)).toBeTruthy();
         });
 
-        it("does NOT mark optionalDependencies external when optDeps=false", async () => {
+        it("should NOT mark optionalDependencies external when optDeps=false", async () => {
             const context = getMockPluginContext({ options: { optDeps: false } });
 
-            await expect(context.resolveId("test-dev-dep", "index.js")).resolves.toBeNull();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeFalsy();
         });
 
-        it("does NOT mark excluded optionalDependencies external", async () => {
-            const context = getMockPluginContext({ options: { exclude: "test-opt-dep" } });
+        it("should NOT mark excluded optionalDependencies external", async () => {
+            const context = getMockPluginContext({ options: { exclude: ["test-opt-dep"] } });
 
-            await expect(context.resolveId("test-dev-dep", "index.js")).resolves.toBeNull();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeFalsy();
         });
 
-        it("does NOT mark devDependencies external by default", async () => {
+        it("should NOT mark devDependencies external by default", async () => {
             const context = getMockPluginContext({});
 
-            await expect(context.resolveId("test-dev-dep", "index.js")).resolves.toBeNull();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeFalsy();
         });
 
-        it("marks devDependencies external when devDeps=true", async () => {
+        it("should mark devDependencies external when devDeps=true", async () => {
             const context = getMockPluginContext({ options: { devDeps: true } });
 
-            await expect(context.resolveId("test-dev-dep", "index.js")).resolves.resolves.toBeFalsy();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeTruthy();
         });
 
-        it("marks included devDependencies external", async () => {
-            const context = getMockPluginContext({ buildOptions: { externals: "test-dev-dep" } });
+        it("should mark included devDependencies external", async () => {
+            const context = getMockPluginContext({ buildOptions: { externals: ["test-dev-dep"] } });
 
-            await expect(context.resolveId("test-dev-dep", "index.js")).resolves.resolves.toBeFalsy();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeFalsy();
         });
 
-        it("marks dependencies/peerDependencies/optionalDependencies subpath imports external", async () => {
+        it("should mark dependencies/peerDependencies/optionalDependencies subpath imports external", async () => {
             const context = getMockPluginContext({});
 
-            await expect(context.resolveId("test-dep/sub", "index.js")).resolves.toBeFalsy();
-            await expect(context.resolveId("test-peer-dep/sub", "index.js")).resolves.toBeFalsy();
-            await expect(context.resolveId("test-opt-dep/sub", "index.js")).resolves.toBeFalsy();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dep/sub", "index.js", false)).toBeTruthy();
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-peer-dep/sub", "index.js", false)).toBeTruthy();
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-opt-dep/sub", "index.js", false)).toBeTruthy();
         });
 
-        it("marks subpath imports external (with regexes)", async () => {
+        it("should mark sub path imports external (with regexes)", async () => {
             const context = getMockPluginContext({ buildOptions: { externals: [/^test-dev-dep/] } });
 
-            await expect(context.resolveId("test-dev-dep", "index.js")).resolves.toBeFalsy();
-            await expect(context.resolveId("test-dev-dep/sub", "index.js")).resolves.toBeFalsy();
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep", "index.js", false)).toBeFalsy();
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("test-dev-dep/sub", "index.js", false)).toBeTruthy();
         });
+
+        it("should mark sub path of a package.json dependencies as external", () => {
+            const context = getMockPluginContext({
+                packageJson: {
+                    dependencies: {
+                        react: "^18.2.0",
+                        "react-dom": "^18.2.0",
+                    },
+                    devDependencies: {
+                        "@types/react": "^18.0.0",
+                        "@types/react-dom": "^18.0.0",
+                    },
+                },
+            });
+
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("react/jsx-runtime", "index.jsx", false)).toBeTruthy();
+        });
+    });
+
+    it("should mark absolute path as internal", async () => {
+        const context = getMockPluginContext({});
+
+        const rollupInputConfig: InputOptions = {};
+
+        context.options(rollupInputConfig);
+
+        expect((rollupInputConfig as ExternalRollupInputOptions).external("./index.js", undefined, false)).toBeFalsy();
     });
 });

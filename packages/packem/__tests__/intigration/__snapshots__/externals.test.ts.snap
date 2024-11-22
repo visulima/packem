@@ -622,6 +622,55 @@ export { transform };
 "
 `;
 
+exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > cjs dts output 1`] = `
+"declare const indent: string;
+
+export { indent };
+"
+`;
+
+exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const detectIndentFn = require('detect-indent');
+
+const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
+
+const detectIndentFn__default = /*#__PURE__*/_interopDefaultCompat(detectIndentFn);
+
+const { indent: dIndent } = detectIndentFn__default("  file");
+const indent = dIndent;
+
+exports.indent = indent;
+"
+`;
+
+exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > dts output 1`] = `
+"declare const indent: string;
+
+export { indent };
+"
+`;
+
+exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > mjs dts output 1`] = `
+"declare const indent: string;
+
+export { indent };
+"
+`;
+
+exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > mjs output 1`] = `
+"import detectIndentFn from 'detect-indent';
+
+const { indent: dIndent } = detectIndentFn("  file");
+const indent = dIndent;
+
+export { indent };
+"
+`;
+
 exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with peerDependenciesMeta > cjs dts output 1`] = `
 "declare const indent: string;
 

@@ -5,7 +5,7 @@ import { dirname } from "@visulima/path";
 import type { Options } from "execa";
 import { execaNode } from "execa";
 
-const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../dist");
+const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../dist");
 
 const execPackemSync = async (command: "build" | "init", flags: string[] = [], options: Options = {}) => {
     let environmentFlag: string | undefined = "--development";

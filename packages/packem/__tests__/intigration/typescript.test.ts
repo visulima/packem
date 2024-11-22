@@ -742,7 +742,7 @@ export declare function fn(a: data): data;
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackemSync("build", ["--debug"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -2353,8 +2353,6 @@ export { deepKeys, deepKeysFromList } from "deeks";`,
 
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
-
-        console.log(binProcess.stdout);
 
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 

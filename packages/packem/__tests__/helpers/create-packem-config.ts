@@ -6,9 +6,9 @@ import { dirname } from "@visulima/path";
 
 import type { StyleOptions } from "../../src/rollup/plugins/css/types";
 import type { BuildConfig } from "../../src/types";
-import { installPackage } from "./install-package";
+import installPackage from "./install-package";
 
-const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../dist");
+const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../dist");
 
 export type PackemConfigProperties = {
     config?: BuildConfig | string | undefined;

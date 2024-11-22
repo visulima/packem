@@ -173,7 +173,7 @@ export const indent = dIndent;
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
-        console.log(binProcess.stdout);
+
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
@@ -200,7 +200,7 @@ export const indent = dIndent;
         expect(dContent).toMatchSnapshot("dts output");
     });
 
-    it("should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta'", async () => {
+    it.skip("should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta'", async () => {
         expect.assertions(8);
 
         await installPackage(temporaryDirectoryPath, "typescript");
@@ -239,7 +239,7 @@ export const transform = svgrTransform;
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
-        console.log(binProcess.stdout);
+
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 

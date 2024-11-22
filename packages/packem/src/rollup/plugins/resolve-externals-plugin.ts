@@ -147,25 +147,9 @@ export const resolveExternalsPlugin = (
         options: (rollupOptions: InputOptions) => {
             // This function takes an id and returns true (external) or false (not external),
             // eslint-disable-next-line no-param-reassign
-            rollupOptions.external = (id: string) => {
+            rollupOptions.external = (id: string, specifier) => {
                 if (cacheResolved.has(id)) {
                     return cacheResolved.get(id);
-                }
-
-                if (
-                    /^(?:\0|\.{1,2}\/)/.test(id) || // Ignore virtual modules and relative imports
-                    isAbsolute(id) || // Ignore already resolved ids
-                    (packageJson.name && id.startsWith(packageJson.name)) // Ignore self import
-                ) {
-                    cacheResolved.set(id, true);
-
-                    return true;
-                }
-
-                if (isBuiltin(id)) {
-                    cacheResolved.set(id, true);
-
-                    return true;
                 }
 
                 if (Object.keys(resolvedAliases).length > 0) {
@@ -173,11 +157,33 @@ export const resolveExternalsPlugin = (
                     id = resolveAlias(id, resolvedAliases);
                 }
 
-                // Handle npm dependencies.
-                if (isIncluded(id) && !isExcluded(id)) {
+                if (
+                    /^(?:\0|\.{1,2}\/)/.test(id) || // Ignore virtual modules and relative imports
+                    isAbsolute(id) || // Ignore already resolved ids
+                    (packageJson.name && id.startsWith(packageJson.name)) // Ignore self import
+                ) {
                     cacheResolved.set(id, false);
 
                     return false;
+                }
+
+                if (isBuiltin(id)) {
+                    let result = options.builtins;
+
+                    if (result === undefined && specifier) {
+                        result = isIncluded(specifier) && !isExcluded(specifier);
+                    }
+
+                    cacheResolved.set(id, result as boolean);
+
+                    return result;
+                }
+
+                // Handle npm dependencies.
+                if (isIncluded(id) && !isExcluded(id)) {
+                    cacheResolved.set(id, true);
+
+                    return true;
                 }
 
                 // package.json imports are not externals
@@ -206,6 +212,8 @@ export const resolveExternalsPlugin = (
 
                             for (const file of files) {
                                 if (file.replace(ENDING_RE, "") === id.replace(ENDING_RE, "").replace("#", "")) {
+                                    cacheResolved.set(id, false);
+
                                     return false;
                                 }
                             }
@@ -237,12 +245,8 @@ export const resolveExternalsPlugin = (
         },
         resolveId: {
             async handler(specifier: string, _, { isEntry }): Promise<ResolveIdResult> {
-                if (
-                    isEntry || // Ignore entry points (they should always be resolved)
-                    /^(?:\0|\.{1,2}\/)/.test(specifier) || // Ignore virtual modules and relative imports
-                    isAbsolute(specifier) || // Ignore already resolved ids
-                    (packageJson.name && specifier.startsWith(packageJson.name)) // Ignore self import
-                ) {
+                // Ignore entry points (they should always be resolved)
+                if (isEntry) {
                     return null;
                 }
 
@@ -260,11 +264,6 @@ export const resolveExternalsPlugin = (
                                   : stripped,
                         moduleSideEffects: false,
                     };
-                }
-
-                // Handle npm dependencies.
-                if (isIncluded(specifier) && !isExcluded(specifier)) {
-                    return false;
                 }
 
                 return null;
