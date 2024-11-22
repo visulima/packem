@@ -82,12 +82,12 @@
         },
         "./config": {
             "import": {
-                "types": "./dist/config.d.mts",
-                "default": "./dist/config.mjs"
+                "types": "./dist/config/index.d.mts",
+                "default": "./dist/config/index.mjs"
             },
             "require": {
-                "types": "./dist/config.d.cts",
-                "default": "./dist/config.cjs"
+                "types": "./dist/config/index.d.cts",
+                "default": "./dist/config/index.cjs"
             }
         },
         "./transformer/esbuild": {
@@ -256,68 +256,12 @@
     "module": "dist/packem.mjs",
     "types": "dist/packem.d.ts",
     "typesVersions": {
-        ">=5.0": {
-            ".": [
-                "./dist/packem.d.ts"
-            ],
-            "config": [
-                "./dist/config.d.ts"
-            ],
-            "transformer/esbuild": [
-                "./dist/rollup/plugins/esbuild/index.d.ts"
-            ],
-            "transformer/swc": [
-                "./dist/rollup/plugins/swc/swc-plugin.d.ts"
-            ],
-            "dts/isolated/transformer/swc": [
-                "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.ts"
-            ],
-            "dts/isolated/transformer/oxc": [
-                "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.ts"
-            ],
-            "dts/isolated/transformer/typescript": [
-                "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.ts"
-            ],
-            "transformer/sucrase": [
-                "./dist/rollup/plugins/sucrase/index.d.ts"
-            ],
-            "builder/typedoc": [
-                "./dist/builder/typedoc/index.d.ts"
-            ],
-            "runtime/inject-css": [
-                "./dist/rollup/plugins/css/runtime/inject-css.d.ts"
-            ],
-            "css/loader/sourcemap": [
-                "./dist/rollup/plugins/css/loaders/sourcemap.d.ts"
-            ],
-            "css/loader/less": [
-                "./dist/rollup/plugins/css/loaders/less/index.d.ts"
-            ],
-            "css/loader/postcss": [
-                "./dist/rollup/plugins/css/loaders/postcss/index.d.ts"
-            ],
-            "css/loader/sass": [
-                "./dist/rollup/plugins/css/loaders/sass/index.d.ts"
-            ],
-            "css/loader/stylus": [
-                "./dist/rollup/plugins/css/loaders/stylus/index.d.ts"
-            ],
-            "css/loader/lightningcss": [
-                "./dist/rollup/plugins/css/loaders/lightningcss.d.ts"
-            ],
-            "css/minifier/cssnano": [
-                "./dist/rollup/plugins/css/minifiers/cssnano.d.ts"
-            ],
-            "css/minifier/lightningcss": [
-                "./dist/rollup/plugins/css/minifiers/lightningcss.d.ts"
-            ]
-        },
         ">=5.5": {
             ".": [
                 "./dist/packem.d.ts"
             ],
             "config": [
-                "./dist/config.d.ts"
+                "./dist/config/index.d.ts"
             ],
             "transformer/esbuild": [
                 "./dist/rollup/plugins/esbuild/index.d.ts"
@@ -453,6 +397,7 @@
         "@ckeditor/typedoc-plugins": "44.2.1",
         "@rushstack/eslint-plugin-security": "^0.8.3",
         "@secretlint/secretlint-rule-preset-recommend": "^9.0.0",
+        "@svgr/core": "^8.1.0",
         "@swc/core": "^1.8.0",
         "@swc/types": "0.1.12",
         "@total-typescript/ts-reset": "^0.6.1",

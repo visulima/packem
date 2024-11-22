@@ -40,7 +40,8 @@ const validateDependencies = (context: BuildContext): void => {
             // eslint-disable-next-line security/detect-object-injection,@typescript-eslint/no-unnecessary-condition
             context.pkg?.dependencies?.[packageId] === undefined &&
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition,security/detect-object-injection
-            context.pkg?.peerDependencies?.[packageId] === undefined
+            context.pkg?.peerDependencies?.[packageId] === undefined &&
+            context.pkg.peerDependenciesMeta?.[packageId]?.optional !== true
         ) {
             implicitDependencies.add(id);
         }

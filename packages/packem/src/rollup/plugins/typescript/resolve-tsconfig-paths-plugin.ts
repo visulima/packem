@@ -7,7 +7,7 @@ import type { Pail } from "@visulima/pail";
 import { dirname, isAbsolute, join, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 import type { TsConfigResult } from "@visulima/tsconfig";
-import type { Plugin, ResolvedId } from "rollup";
+import type { Plugin } from "rollup";
 
 interface Pattern {
     prefix: string;

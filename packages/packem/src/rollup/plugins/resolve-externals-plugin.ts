@@ -30,9 +30,6 @@ const getRegExps = (data: MaybeFalsy<string | RegExp>[], type: "include" | "excl
         return result;
     }, []);
 
-const calledImplicitExternals = new Map<string, boolean>();
-const cachedGlobFiles = new Map<string, string[]>();
-
 export type ResolveExternalsPluginOptions = {
     /**
      * Mark node built-in modules like `path`, `fs`... as external.
@@ -98,9 +95,13 @@ export const resolveExternalsPlugin = (
     options: ResolveExternalsPluginOptions,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Plugin => {
+    const calledImplicitExternals = new Map<string, boolean>();
+    const cachedGlobFiles = new Map<string, string[]>();
+    const cacheResolved = new Map<string, boolean>();
+
     // Map the include and exclude options to arrays of regexes.
-    const include = getRegExps([...buildOptions.externals], "include", logger);
-    const exclude = getRegExps([...(options.exclude ?? [])], "exclude", logger);
+    const include = new Set(getRegExps([...buildOptions.externals], "include", logger));
+    const exclude = new Set(getRegExps([...(options.exclude ?? [])], "exclude", logger));
 
     const dependencies: Record<string, string> = {};
 
@@ -116,11 +117,19 @@ export const resolveExternalsPlugin = (
     const names = Object.keys(dependencies);
 
     if (names.length > 0) {
-        include.push(new RegExp("^(?:" + names.join("|") + ")(?:/.+)?$"));
+        include.add(new RegExp("^(?:" + names.join("|") + ")(?:/.+)?$"));
     }
 
-    const isIncluded = (id: string) => include.some((rx) => rx.test(id));
-    const isExcluded = (id: string) => exclude.some((rx) => rx.test(id));
+    if (packageJson.peerDependenciesMeta) {
+        for (const [key, value] of Object.entries(packageJson.peerDependenciesMeta)) {
+            if (value?.optional) {
+                include.add(new RegExp(`^${key}(?:/.+)?$`));
+            }
+        }
+    }
+
+    const isIncluded = (id: string) => [...include].some((rx) => rx.test(id));
+    const isExcluded = (id: string) => [...exclude].some((rx) => rx.test(id));
 
     let tsconfigPathPatterns: RegExp[] = [];
 
@@ -135,29 +144,53 @@ export const resolveExternalsPlugin = (
     return <Plugin>{
         name: "packem:resolve-externals",
         options: (rollupOptions: InputOptions) => {
+            // This function takes an id and returns true (external) or false (not external),
             // eslint-disable-next-line no-param-reassign
-            rollupOptions.external = (id: string) => {
+            rollupOptions.external = (id: string, specifier) => {
+                if (cacheResolved.has(id)) {
+                    return cacheResolved.get(id);
+                }
+
+                if (Object.keys(resolvedAliases).length > 0) {
+                    // eslint-disable-next-line no-param-reassign
+                    id = resolveAlias(id, resolvedAliases);
+                }
+
                 if (
                     /^(?:\0|\.{1,2}\/)/.test(id) || // Ignore virtual modules and relative imports
                     isAbsolute(id) || // Ignore already resolved ids
                     (packageJson.name && id.startsWith(packageJson.name)) // Ignore self import
                 ) {
+                    cacheResolved.set(id, false);
+
                     return false;
                 }
 
                 if (isBuiltin(id)) {
-                    return false;
+                    let result = options.builtins;
+
+                    if (result === undefined && specifier) {
+                        result = isIncluded(specifier) && !isExcluded(specifier);
+                    }
+
+                    cacheResolved.set(id, result as boolean);
+
+                    return result;
                 }
 
                 // Handle npm dependencies.
                 if (isIncluded(id) && !isExcluded(id)) {
-                    return false;
+                    cacheResolved.set(id, true);
+
+                    return true;
                 }
 
                 // package.json imports are not externals
                 if (packageJson.imports) {
                     for (const [key, value] of Object.entries(packageJson.imports)) {
                         if (key === id) {
+                            cacheResolved.set(id, false);
+
                             return false;
                         }
 
@@ -178,6 +211,8 @@ export const resolveExternalsPlugin = (
 
                             for (const file of files) {
                                 if (file.replace(ENDING_RE, "") === id.replace(ENDING_RE, "").replace("#", "")) {
+                                    cacheResolved.set(id, false);
+
                                     return false;
                                 }
                             }
@@ -188,13 +223,11 @@ export const resolveExternalsPlugin = (
                 if (tsconfigPathPatterns.length > 0) {
                     for (const regexp of tsconfigPathPatterns) {
                         if (regexp.test(id)) {
+                            cacheResolved.set(id, false);
+
                             return false;
                         }
                     }
-                }
-
-                if (Object.keys(resolvedAliases).length > 0 && resolveAlias(id, resolvedAliases) !== id) {
-                    return false;
                 }
 
                 if (!calledImplicitExternals.has(id)) {
@@ -211,12 +244,8 @@ export const resolveExternalsPlugin = (
         },
         resolveId: {
             async handler(specifier: string, _, { isEntry }): Promise<ResolveIdResult> {
-                if (
-                    isEntry || // Ignore entry points (they should always be resolved)
-                    /^(?:\0|\.{1,2}\/)/.test(specifier) || // Ignore virtual modules and relative imports
-                    isAbsolute(specifier) || // Ignore already resolved ids
-                    (packageJson.name && specifier.startsWith(packageJson.name)) // Ignore self import
-                ) {
+                // Ignore entry points (they should always be resolved)
+                if (isEntry) {
                     return null;
                 }
 
@@ -234,11 +263,6 @@ export const resolveExternalsPlugin = (
                                   : stripped,
                         moduleSideEffects: false,
                     };
-                }
-
-                // Handle npm dependencies.
-                if (isIncluded(specifier) && !isExcluded(specifier)) {
-                    return false;
                 }
 
                 return null;

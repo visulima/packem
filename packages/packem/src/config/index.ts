@@ -1,9 +1,9 @@
-import type { BuildConfig, BuildPreset, Environment, Mode } from "./types";
+import type { BuildConfig, BuildPreset, Environment, Mode } from "../types";
 
 export type BuildConfigFunction = (enviroment: Environment, mode: Mode) => BuildConfig | Promise<BuildConfig>;
 
 // eslint-disable-next-line import/no-unused-modules
-export type { BuildConfig, BuildHooks, BuildPreset } from "./types";
+export type { BuildConfig, BuildHooks, BuildPreset } from "../types";
 
 /**
  * Define a build configuration.
