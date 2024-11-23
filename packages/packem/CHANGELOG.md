@@ -1,3 +1,9 @@
+## @visulima/packem [1.9.0](https://github.com/visulima/packem/compare/@visulima/packem@1.8.2...@visulima/packem@1.9.0) (2024-11-23)
+
+### Features
+
+* added a files shim types file, fixed log for externals ([3a93717](https://github.com/visulima/packem/commit/3a9371773367c9f99ad4c8ee00ad5d00cb1ec761))
+
 ## @visulima/packem [1.8.2](https://github.com/visulima/packem/compare/@visulima/packem@1.8.1...@visulima/packem@1.8.2) (2024-11-22)
 
 ### Bug Fixes
