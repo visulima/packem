@@ -250,6 +250,9 @@
                 "default": "./dist/rollup/plugins/css/minifiers/lightningcss.mjs"
             }
         },
+        "./files": {
+            "types": "./files.d.ts"
+        },
         "./package.json": "./package.json"
     },
     "main": "dist/packem.cjs",
@@ -317,7 +320,8 @@
         "packem": "./dist/cli.mjs"
     },
     "files": [
-        "dist/**",
+        "dist",
+        "files.d.ts",
         "README.md",
         "CHANGELOG.md",
         "LICENSE.md"

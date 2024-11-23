@@ -625,7 +625,6 @@ const packem = async (
 
     try {
         const packemConfigFilePath = await findPackemFile(rootDirectory, configPath ?? "");
-
         const jiti = createJiti(rootDirectory, { debug });
 
         let buildConfig = ((await jiti.import(packemConfigFilePath, { default: true, try: true })) || {}) as BuildConfig | BuildConfigFunction;

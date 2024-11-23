@@ -881,6 +881,49 @@ You choose which one of the three supported transformer to use.
 -   [@swc/core](https://github.com/swc-project/swc)
 -   [sucrase](https://github.com/alangpierce/sucrase)
 
+### File types
+
+Packem exports a `files.d.ts` file that contains all supported the types.
+
+To shim the types, you can use the following:
+
+```ts
+/// <reference types="@visulima/packem/files" />
+```
+
+Alternatively, you can add `@visulima/packem/files` to `compilerOptions.types` inside `tsconfig.json`:
+
+```json
+{
+    "compilerOptions": {
+        "types": ["@visulima/packem/files"]
+    }
+}
+```
+
+This will provide the following type shims:
+
+- Asset imports (e.g importing an `.svg`, `.module.css` file)
+
+> Tip:
+>
+> To override the default typing, add a type definition file that contains your typings. Then, add the type reference before `@visulima/packem/files`.
+>
+> packem-env-override.d.ts (the file that contains your typings):
+> ```ts
+> declare module '*.svg' {
+>  const content: React.FC<React.SVGProps<SVGElement>>
+>  export default content
+> }
+> ```
+>
+> The file containing the reference to `@visulima/packem/files`:
+>
+> ```ts
+> /// <reference types="./packem-env-override.d.ts" />
+> /// <reference types="@visulima/packem/files" />
+> ```
+
 ## Related
 
 -   [bunchee](https://github.com/huozhi/bunchee) - Zero config bundler for ECMAScript and TypeScript packages

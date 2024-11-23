@@ -30,6 +30,8 @@ const getRegExps = (data: MaybeFalsy<string | RegExp>[], type: "include" | "excl
         return result;
     }, []);
 
+const calledImplicitExternals = new Map<string, boolean>();
+
 export type ResolveExternalsPluginOptions = {
     /**
      * Mark node built-in modules like `path`, `fs`... as external.
@@ -95,7 +97,6 @@ export const resolveExternalsPlugin = (
     options: ResolveExternalsPluginOptions,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Plugin => {
-    const calledImplicitExternals = new Map<string, boolean>();
     const cachedGlobFiles = new Map<string, string[]>();
     const cacheResolved = new Map<string, boolean>();
 
@@ -135,7 +136,7 @@ export const resolveExternalsPlugin = (
 
     if (tsconfig) {
         tsconfigPathPatterns = Object.entries(tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) =>
-            (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
+            key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`),
         );
     }
 
