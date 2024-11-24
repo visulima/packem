@@ -34,7 +34,6 @@ import { license as licensePlugin } from "./plugins/license";
 import metafilePlugin from "./plugins/metafile";
 import { node10CompatibilityPlugin } from "./plugins/node10-compatibility-plugin";
 import cachingPlugin from "./plugins/plugin-cache";
-import prependDirectivePlugin from "./plugins/prepend-directives";
 import preserveDirectivesPlugin from "./plugins/preserve-directives";
 import { rawPlugin } from "./plugins/raw";
 import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
@@ -541,8 +540,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     mode: "dependencies",
                     packageName: context.pkg.name,
                 }),
-
-            prependDirectivePlugin(),
 
             context.options.emitCJS &&
                 context.mode === "build" &&
