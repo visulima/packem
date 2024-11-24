@@ -1,3 +1,12 @@
+## @visulima/packem [1.9.1](https://github.com/visulima/packem/compare/@visulima/packem@1.9.0...@visulima/packem@1.9.1) (2024-11-24)
+
+### Bug Fixes
+
+* fixed regex for esm shim ([c6e95b4](https://github.com/visulima/packem/commit/c6e95b4767cb768999c40a1702df74ca0fa09bd6))
+* improve the esm-shim matching ([196f250](https://github.com/visulima/packem/commit/196f2508a72b46d55ed048d6ece7969143e81efe))
+* improved types and added debug logger for isolated declarations ([4e380bc](https://github.com/visulima/packem/commit/4e380bc17f250d30581bec7d2d0b499b04198225))
+* removed dead code of prepend-directives.ts ([1d80cee](https://github.com/visulima/packem/commit/1d80cee2d8f7aefe775eb66d7d61558a23f537df))
+
 ## @visulima/packem [1.9.0](https://github.com/visulima/packem/compare/@visulima/packem@1.8.2...@visulima/packem@1.9.0) (2024-11-23)
 
 ### Features
