@@ -1,3 +1,15 @@
+## @visulima/packem [1.9.2](https://github.com/visulima/packem/compare/@visulima/packem@1.9.1...@visulima/packem@1.9.2) (2024-11-24)
+
+### Bug Fixes
+
+* enabled compile cache for node v22 and higher ([092521f](https://github.com/visulima/packem/commit/092521f4b89348c16dc4caddffef58787a547277))
+* updated oxc dep, fixed wrong logger context ([db2ded9](https://github.com/visulima/packem/commit/db2ded9c07eceb5e685a744c37595d39b46de513))
+* updated rollup to v4.27.4, @clack/prompts and dev dependencies ([57287f5](https://github.com/visulima/packem/commit/57287f598f7c58d8a4e251ef73e5e449f4a6038e))
+
+### Miscellaneous Chores
+
+* fixed test after logger context fix ([f30a486](https://github.com/visulima/packem/commit/f30a4866e0ff03642cbd570bcecab35b388a0423))
+
 ## @visulima/packem [1.9.1](https://github.com/visulima/packem/compare/@visulima/packem@1.9.0...@visulima/packem@1.9.1) (2024-11-24)
 
 ### Bug Fixes
