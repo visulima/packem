@@ -779,6 +779,9 @@ importers:
       '@ckeditor/typedoc-plugins':
         specifier: 44.2.1
         version: 44.2.1(typedoc@0.26.11(typescript@5.6.3))
+      '@oxc-project/types':
+        specifier: ^0.37.0
+        version: 0.37.0
       '@rushstack/eslint-plugin-security':
         specifier: ^0.8.3
         version: 0.8.3(eslint@8.57.1)(typescript@5.6.3)
@@ -2278,6 +2281,9 @@ packages:
 
   '@oxc-project/types@0.36.0':
     resolution: {integrity: sha512-VAv7ANBGE6glvOX5PEhGcca8hqBeGGDXt3xfPApZg7GhkrvbI8YCf01HojlpdIewixN2rnNpfO6cFgHS6Ixe5A==}
+
+  '@oxc-project/types@0.37.0':
+    resolution: {integrity: sha512-9shvIr/cpoNo5cX8nWdZmviHLJSidjZy4M0MyfR6ucREZBtABTNBIa1a4emWUJ3qAMwJW6G1v0zm8K2rj9Pf4A==}
 
   '@oxc-resolver/binding-darwin-arm64@2.0.1':
     resolution: {integrity: sha512-0l180Q0aBPRj23FlY7heLKo4znwXZGyTirxhtQewUeqLVnTzdyOuqGGKrnlL2rMXyE9cEXqQ4ZODdzdmWO6QsQ==}
@@ -11653,6 +11659,8 @@ snapshots:
     optional: true
 
   '@oxc-project/types@0.36.0': {}
+
+  '@oxc-project/types@0.37.0': {}
 
   '@oxc-resolver/binding-darwin-arm64@2.0.1':
     optional: true

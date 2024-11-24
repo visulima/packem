@@ -13,7 +13,8 @@ describe("esm-shim-cjs-syntax", () => {
         ['foo.require("foo")', false],
         ["\"require('module')\"", false],
         ["`require('module')`", false],
-        [`require.resolve(impl)`, true]
+        [`require.resolve(impl)`, true],
+        [`\nrequire.resolve(impl)`, true]
     ])("should match require regex with %s", (code, expected) => {
         expect(match(code)).toBe(expected);
     });
