@@ -5,6 +5,7 @@
  *
  * Copyright © 2024-PRESENT 三咲智子 (https://github.com/sxzz)
  */
+import type { ExportAllDeclaration, ExportNamedDeclaration, ImportDeclaration, StringLiteral } from "@oxc-project/types";
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { readFile } from "@visulima/fs";
@@ -18,6 +19,12 @@ import type { IsolatedDeclarationsResult } from "../../../types";
 import patchCjsDefaultExport from "../typescript/utils/patch-cjs-default-export";
 import extendString from "./utils/extend-string";
 import lowestCommonAncestor from "./utils/lowest-common-ancestor";
+import type { Pail } from "@visulima/pail";
+
+type OxcImport = {
+    source: StringLiteral;
+    suffix?: string;
+} & (ImportDeclaration | ExportAllDeclaration | ExportNamedDeclaration);
 
 export type IsolatedDeclarationsOptions = {
     exclude?: FilterPattern;
@@ -30,6 +37,7 @@ export const isolatedDeclarationsPlugin = (
     transformer: (code: string, id: string) => Promise<IsolatedDeclarationsResult>,
     declaration: boolean | "compatible" | "node16" | undefined,
     cjsInterop: boolean,
+    logger: Pail,
     options: IsolatedDeclarationsOptions,
     tsconfig?: TsConfigResult,
     // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -63,17 +71,22 @@ export const isolatedDeclarationsPlugin = (
             const result = await parseAsync(code, { sourceFilename: id });
 
             program = result.program;
-        } catch {
-            // empty
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            logger.debug({
+                message: error.message,
+                prefix: "packem:isolated-declarations",
+            });
         }
 
         if (program) {
             const imports = program.body.filter(
-                (node) => node.type === "ImportDeclaration" || node.type === "ExportAllDeclaration" || node.type === "ExportNamedDeclaration",
+                (node): node is OxcImport =>
+                    (node.type === "ImportDeclaration" || node.type === "ExportAllDeclaration" || node.type === "ExportNamedDeclaration") && !!node.source,
             );
 
             for await (const node of imports) {
-                if (!node.source || basename(node.source.value).includes(".")) {
+                if (basename(node.source.value).includes(".")) {
                     // eslint-disable-next-line no-continue
                     continue;
                 }
@@ -98,16 +111,11 @@ export const isolatedDeclarationsPlugin = (
                     let extendedSourceValue = node.source.value;
 
                     if (tsconfigPathPatterns.some((pattern) => pattern.test(node.source.value)) && !node.source.value.startsWith(".")) {
-                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
                         extendedSourceValue = "./" + node.source.value;
                     }
 
                     // eslint-disable-next-line no-param-reassign
-                    code = code.replaceAll(
-                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                        'from "' + node.source.value + '"',
-                        'from "' + extendString(extendedSourceValue, resolvedId) + '"',
-                    );
+                    code = code.replaceAll('from "' + node.source.value + '"', 'from "' + extendString(extendedSourceValue, resolvedId) + '"');
                 }
             }
         }
@@ -189,7 +197,12 @@ export const isolatedDeclarationsPlugin = (
         name: "packem:isolated-declarations",
 
         async renderStart(outputOptions: NormalizedOutputOptions, { input }: NormalizedInputOptions): Promise<void> {
-            const outBase = lowestCommonAncestor(...(Array.isArray(input) ? input : Object.values(input)));
+            const inputBase = lowestCommonAncestor(...(Array.isArray(input) ? input : Object.values(input)));
+
+            logger.debug({
+                message: "Input base:" + inputBase,
+                prefix: "packem:isolated-declarations",
+            });
 
             if (typeof outputOptions.entryFileNames === "function") {
                 // eslint-disable-next-line no-param-reassign
@@ -212,8 +225,13 @@ export const isolatedDeclarationsPlugin = (
                 const quote = source.includes("from '") ? "'" : '"';
 
                 if ((declaration === true || declaration === "compatible") && outputOptions.format === "cjs") {
+                    logger.debug({
+                        message: "Emit compatible dts file: " + filename,
+                        prefix: "packem:isolated-declarations",
+                    });
+
                     this.emitFile({
-                        fileName: entryFileNames.replace("[name]", relative(outBase, filename)).replace(".cts", ".ts"),
+                        fileName: entryFileNames.replace("[name]", relative(inputBase, filename)).replace(".cts", ".ts"),
 
                         source: source.replaceAll(
                             // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
@@ -225,8 +243,13 @@ export const isolatedDeclarationsPlugin = (
                     });
                 }
 
+                logger.debug({
+                    message: "Emit dts file: " + filename,
+                    prefix: "packem:isolated-declarations",
+                });
+
                 this.emitFile({
-                    fileName: entryFileNames.replace("[name]", relative(outBase, filename)),
+                    fileName: entryFileNames.replace("[name]", relative(inputBase, filename)),
                     source: source.replaceAll(
                         // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
                         /(from\s)['|"]((.*)\..+|['|"].*)['|"];?/g,

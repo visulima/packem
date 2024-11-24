@@ -459,6 +459,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     context.options.isolatedDeclarationTransformer,
                     context.options.declaration,
                     Boolean(context.options.rollup.cjsInterop),
+                    context.logger,
                     context.options.rollup.isolatedDeclarations,
                     context.tsconfig,
                 ),
