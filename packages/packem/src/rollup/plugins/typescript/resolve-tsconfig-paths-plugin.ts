@@ -236,7 +236,7 @@ export const resolveTsconfigPathsPlugin = (
                     }
                 } catch (error) {
                     logger.debug({
-                        context: error,
+                        context: [error],
                         message: `Failed to resolve ${candidate} from ${id as string}`,
                         prefix: "plugin:packem:resolve-tsconfig-paths",
                     });

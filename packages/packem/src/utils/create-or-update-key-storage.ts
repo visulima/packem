@@ -24,7 +24,7 @@ const createOrUpdateKeyStorage = (hashKey: string, storePath: string, logger: Pa
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         logger.debug({
-            context: error,
+            context: [error],
             message: error.message,
             prefix: "cache-key-store",
         });
