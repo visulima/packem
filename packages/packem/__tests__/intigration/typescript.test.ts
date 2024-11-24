@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import getRegexMatches from "../../src/utils/get-regex-matches";
 import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import type { PackageJson } from "@visulima/package";
 
 describe("packem typescript", () => {
     let temporaryDirectoryPath: string;
@@ -1943,7 +1944,9 @@ export { test as default };
             expect(binProcess.stdout).toContain("Declaration node10 compatibility mode is enabled.");
             expect(binProcess.stdout).toContain(`Your package.json "typesVersions" field has been updated.`);
 
-            const packageJson = JSON.parse(await readFile(`${temporaryDirectoryPath}/package.json`).toString());
+            const fileContent = await readFile(`${temporaryDirectoryPath}/package.json`);
+            const packageJson = JSON.parse(fileContent) as PackageJson;
+
             expect(packageJson.typesVersions).toMatchSnapshot("typesVersions");
         });
 

@@ -21,20 +21,20 @@ describe("option", () => {
         }
 
         expect(consoleDebugMock).toHaveBeenCalledWith("Cannot find module 'pumpinizer'", {
-            context: {
+            context: [{
                 basedir: __dirname,
                 caller: "Module loader",
                 extensions: [".js", ".mjs", ".cjs", ".json"],
                 id: "pumpinizer",
-            },
+            }],
         });
         expect(consoleDebugMock).toHaveBeenCalledWith("Cannot find module './pumpinizer'", {
-            context: {
+            context: [{
                 basedir: __dirname,
                 caller: "Module loader",
                 extensions: [".js", ".mjs", ".cjs", ".json"],
                 id: "./pumpinizer",
-            },
+            }],
         });
     });
 });
