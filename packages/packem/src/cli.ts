@@ -7,6 +7,17 @@ import createAddCommand from "./commands/add";
 import createBuildCommand from "./commands/build";
 import createInitCommand from "./commands/init";
 
+try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require,unicorn/prefer-module
+    const { enableCompileCache } = require("node:module");
+
+    if (enableCompileCache) {
+        enableCompileCache();
+    }
+} catch {
+    // empty
+}
+
 /**
  * Create a new instance of the packem CLI.
  *
