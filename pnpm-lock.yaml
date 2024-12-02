@@ -846,8 +846,8 @@ importers:
         specifier: ^0.0.11
         version: 0.0.11
       '@vitest/coverage-v8':
-        specifier: ^2.1.5
-        version: 2.1.5(vitest@2.1.5)
+        specifier: ^2.1.8
+        version: 2.1.8(vitest@2.1.5)
       '@vitest/ui':
         specifier: ^2.1.5
         version: 2.1.5(vitest@2.1.5)
@@ -3548,11 +3548,11 @@ packages:
     resolution: {integrity: sha512-aYQoDr6Bxrrtrqzm5kVjyqxUWoooLLK0WqBzkW1XuVYyTVSibstyXNI2dpXGlSJ+yOhfnfCVk1Hgd017QZkBDg==}
     engines: {node: '>=18.* <=22.*'}
 
-  '@vitest/coverage-v8@2.1.5':
-    resolution: {integrity: sha512-/RoopB7XGW7UEkUndRXF87A9CwkoZAJW01pj8/3pgmDVsjMH2IKy6H1A38po9tmUlwhSyYs0az82rbKd9Yaynw==}
+  '@vitest/coverage-v8@2.1.8':
+    resolution: {integrity: sha512-2Y7BPlKH18mAZYAW1tYByudlCYrQyl5RGvnnDYJKW5tCiO5qg3KSAy3XAxcxKz900a0ZXxWtKrMuZLe3lKBpJw==}
     peerDependencies:
-      '@vitest/browser': 2.1.5
-      vitest: 2.1.5
+      '@vitest/browser': 2.1.8
+      vitest: 2.1.8
     peerDependenciesMeta:
       '@vitest/browser':
         optional: true
@@ -13133,7 +13133,7 @@ snapshots:
     transitivePeerDependencies:
       - yaml
 
-  '@vitest/coverage-v8@2.1.5(vitest@2.1.5)':
+  '@vitest/coverage-v8@2.1.8(vitest@2.1.5)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
