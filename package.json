@@ -80,7 +80,7 @@
         "taze": "^0.18.0",
         "textlint": "^14.3.0",
         "typescript": "^5.7.2",
-        "vitest": "^2.1.5"
+        "vitest": "^2.1.8"
     },
     "packageManager": "pnpm@9.14.2",
     "engines": {
