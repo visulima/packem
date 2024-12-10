@@ -404,7 +404,7 @@
         "@secretlint/secretlint-rule-preset-recommend": "^9.0.0",
         "@svgr/core": "^8.1.0",
         "@swc/core": "^1.8.0",
-        "@swc/types": "0.1.12",
+        "@swc/types": "0.1.17",
         "@total-typescript/ts-reset": "^0.6.1",
         "@types/estree": "^1.0.6",
         "@types/glob": "^8.1.0",
@@ -477,7 +477,7 @@
     },
     "peerDependencies": {
         "@ckeditor/typedoc-plugins": ">=44.0.0",
-        "@swc/core": ">=1.5.7",
+        "@swc/core": ">=1.5.29",
         "cssnano": ">=7.0.6",
         "esbuild": ">=0.20.2",
         "icss-utils": ">=5.1.0",
