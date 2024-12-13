@@ -186,7 +186,7 @@ export interface BuildOptions {
     failOnWarn?: boolean;
     fileCache?: boolean;
     /** @experimental */
-    isolatedDeclarationTransformer?: (code: string, id: string) => Promise<IsolatedDeclarationsResult>;
+    isolatedDeclarationTransformer?: IsolatedDeclarationsTransformer;
     /**
      * Jiti options, where [jiti](https://github.com/unjs/jiti) is used to load the entry files.
      */
@@ -304,9 +304,12 @@ export type InferEntriesResult = {
 
 export type Mode = "build" | "jit" | "watch" | "tsdoc";
 
+export type IsolatedDeclarationsTransformer = (code: string, id: string, sourceMap?: boolean) => Promise<IsolatedDeclarationsResult>;
+
 export interface IsolatedDeclarationsResult {
     errors: string[];
     sourceText: string;
+    map?: string
 }
 
 // eslint-disable-next-line import/no-unused-modules
