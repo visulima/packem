@@ -2,7 +2,7 @@ import { transform as swcTransform } from "@swc/core";
 
 import type { IsolatedDeclarationsResult } from "../../../types";
 
-const isolatedDeclarationsSwcTransformer = async (id: string, code: string): Promise<IsolatedDeclarationsResult> => {
+const isolatedDeclarationsSwcTransformer = async (id: string, code: string, sourceMap?: boolean): Promise<IsolatedDeclarationsResult> => {
     try {
         const result = await swcTransform(code, {
             filename: id,
@@ -15,6 +15,7 @@ const isolatedDeclarationsSwcTransformer = async (id: string, code: string): Pro
                     tsx: false,
                 },
             },
+            sourceMaps: sourceMap,
         });
 
         // @ts-expect-error - we need to cast the output to a string
@@ -22,6 +23,7 @@ const isolatedDeclarationsSwcTransformer = async (id: string, code: string): Pro
 
         return {
             errors: [],
+            map: result.map ? (JSON.parse(result.map) as { mappings: string }).mappings : undefined,
             sourceText: (output as { __swc_isolated_declarations__: string }).__swc_isolated_declarations__,
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
