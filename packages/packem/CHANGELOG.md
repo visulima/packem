@@ -1,3 +1,9 @@
+## @visulima/packem [1.10.0](https://github.com/visulima/packem/compare/@visulima/packem@1.9.2...@visulima/packem@1.10.0) (2024-12-13)
+
+### Features
+
+* updated dependencies, added support for sourcemap for isolated-declarations, added node version into the output, added auto switch for importAttributesKey, improved v8-compile-cache loading ([3561045](https://github.com/visulima/packem/commit/356104578d0e3e20b05263d735b3f973eb5b5833))
+
 ## @visulima/packem [1.9.2](https://github.com/visulima/packem/compare/@visulima/packem@1.9.1...@visulima/packem@1.9.2) (2024-11-24)
 
 ### Bug Fixes
