@@ -7,15 +7,16 @@ import createAddCommand from "./commands/add";
 import createBuildCommand from "./commands/build";
 import createInitCommand from "./commands/init";
 
+// We need to load v8-compile-cache.js separately in order to have effect
 try {
+    // Use node.js 22 new API for better performance.
     // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require,unicorn/prefer-module
-    const { enableCompileCache } = require("node:module");
-
-    if (enableCompileCache) {
-        enableCompileCache();
+    if (!require("node:module")?.enableCompileCache?.()) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require,unicorn/prefer-module
+        require("v8-compile-cache");
     }
 } catch {
-    // empty
+    // We don't have/need to care about v8-compile-cache failed
 }
 
 /**

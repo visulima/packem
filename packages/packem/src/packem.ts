@@ -69,6 +69,7 @@ const generateOptions = (
     preset: BuildPreset,
     packageJson: PackageJson,
     tsconfig: TsConfigResult | undefined,
+    nodeVersion: string,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): InternalBuildOptions => {
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
@@ -210,6 +211,9 @@ const generateOptions = (
                     dependencyLicenseTexts,
             },
             node10Compatibility: {},
+            output: {
+                importAttributesKey: nodeVersion.startsWith("22") ? "with" : "assert",
+            },
             patchTypes: {},
             polyfillNode: {},
             preserveDirectives: {
@@ -419,6 +423,10 @@ const generateOptions = (
 
         logger.info("Using " + cyan("rollup ") + VERSION);
         logger.info({
+            message: "Using " + cyan("node ") + nodeVersion,
+            prefix: "system",
+        });
+        logger.info({
             message: "Using " + cyan(options.transformerName) + " " + version,
             prefix: "transformer",
         });
@@ -454,11 +462,12 @@ const createContext = async (
     packageJson: PackageJson,
     tsconfig: TsConfigResult | undefined,
     jiti: Jiti,
+    nodeVersion: string,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<BuildContext> => {
     const preset = await resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", jiti);
 
-    const options = generateOptions(logger, rootDirectory, environment, debug, inputConfig, buildConfig, preset, packageJson, tsconfig);
+    const options = generateOptions(logger, rootDirectory, environment, debug, inputConfig, buildConfig, preset, packageJson, tsconfig, nodeVersion);
 
     ensureDirSync(join(options.rootDir, options.outDir));
 
@@ -576,6 +585,7 @@ const packem = async (
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
     const { configPath, debug, tsconfigPath, ...otherInputConfig } = inputConfig;
+    const nodeVersion = process.version.slice(1);
 
     logger.wrapAll();
 
@@ -648,6 +658,7 @@ const packem = async (
                     exports: packageJson.exports,
                     main: packageJson.main,
                     module: packageJson.module,
+                    nodeVersion,
                     type: packageJson.type,
                     types: packageJson.types,
                 }),
@@ -670,6 +681,7 @@ const packem = async (
             packageJson,
             tsconfig,
             jiti,
+            nodeVersion,
         );
 
         fileCache.isEnabled = context.options.fileCache as boolean;
