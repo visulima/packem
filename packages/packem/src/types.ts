@@ -35,6 +35,7 @@ import type { UrlOptions } from "./rollup/plugins/url";
 import type { SourcemapsPluginOptions } from "./rollup/plugins/source-maps";
 import type { ResolveExternalsPluginOptions } from "./rollup/plugins/resolve-externals-plugin";
 import type { TsconfigPathsPluginOptions } from "./rollup/plugins/typescript/resolve-tsconfig-paths-plugin";
+import type { OxcResolveOptions } from "./rollup/plugins/oxc/oxc-resolve";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -116,6 +117,9 @@ export interface RollupBuildOptions {
     watch?: RollupOptions["watch"];
     sourcemap?: SourcemapsPluginOptions;
     resolveExternals?: ResolveExternalsPluginOptions;
+    experimental?: {
+        resolve?: OxcResolveOptions | false;
+    }
 }
 
 export type TypeDocumentOptions = {
@@ -170,6 +174,12 @@ export interface BuildOptions {
     cjsInterop?: boolean;
     clean: boolean;
     debug: boolean;
+    experimental?: {
+        /**
+         * If `true`, the `oxc resolve` plugin will be used instead of the default `@rollup/plugin-node-resolve` and `@rollup/plugin-alias`.
+         */
+        oxcResolve?: boolean;
+    };
     /**
      * `compatible` means "src/gather.ts" will generate "dist/index.d.mts", "dist/index.d.cts" and "dist/index.d.ts".
      * `node16` means "src/gather.ts" will generate "dist/index.d.mts" and "dist/index.d.cts".

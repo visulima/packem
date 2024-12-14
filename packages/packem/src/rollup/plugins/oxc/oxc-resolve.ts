@@ -25,7 +25,7 @@ export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: stri
             async handler(source, importer, { isEntry }) {
                 const resolveDirectory = isEntry || !importer ? dirname(source) : dirname(importer);
 
-                const { error, path: id } = resolver.sync(resolveDirectory, source);
+                const { error, path: id } = await resolver.async(resolveDirectory, source);
 
                 if (error) {
                     // console.debug(error, {
