@@ -187,6 +187,11 @@ const generateOptions = (
                 // Optionally preserve symbol names during minification
                 tsconfigRaw: tsconfig?.config,
             },
+            experimental: {
+                resolve: {
+                    extensions: DEFAULT_EXTENSIONS,
+                },
+            },
             // https://github.com/microsoft/TypeScript/issues/58944
             isolatedDeclarations: {
                 exclude: EXCLUDE_REGEXP,
