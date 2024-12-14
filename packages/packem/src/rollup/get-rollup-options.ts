@@ -52,6 +52,7 @@ import createSplitChunks from "./utils/chunks/create-split-chunks";
 import getChunkFilename from "./utils/get-chunk-filename";
 import getEntryFileNames from "./utils/get-entry-file-names";
 import resolveAliases from "./utils/resolve-aliases";
+import { oxcResolvePlugin } from "./plugins/oxc/oxc-resolve";
 import sortUserPlugins from "./utils/sort-user-plugins";
 
 const getTransformerConfig = (
@@ -373,7 +374,10 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             ...prePlugins,
 
-            nodeResolver,
+            oxcResolvePlugin({
+                extensions: context.options.rollup.resolve.extensions,
+            }, context.options.rootDir, context.tsconfig?.path),
+            // nodeResolver,
 
             context.options.rollup.polyfillNode &&
                 polyfillPlugin({
