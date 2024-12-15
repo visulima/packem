@@ -3,7 +3,7 @@
  * For licensing, see LICENSE.md.
  */
 
-import type { Context, DeclarationReflection } from "typedoc";
+import type { Application, Context, DeclarationReflection } from "typedoc";
 import { Converter } from "typedoc";
 
 /**
@@ -20,7 +20,9 @@ const isWrappedInSquareBrackets = (value: string): boolean => value.startsWith("
  *
  * @returns A function that processes reflections during the event.
  */
-const onEventCreateDeclaration = (): ((context: Context, reflection: DeclarationReflection) => void) => (context: Context, reflection: DeclarationReflection): void => {
+const onEventCreateDeclaration =
+    (): ((context: Context, reflection: DeclarationReflection) => void) =>
+    (context: Context, reflection: DeclarationReflection): void => {
         if (!isWrappedInSquareBrackets(reflection.name)) {
             return;
         }
@@ -38,23 +40,15 @@ const onEventCreateDeclaration = (): ((context: Context, reflection: Declaration
         }
     };
 
-
 /**
  * The `typedoc-plugin-symbol-fixer` plugin renames `Symbol.*` definitions to use the JSDoc style.
  *
  * Examples:
  * - Typedoc: `[iterator]() → Iterator`
  * - JSDoc: `Symbol.iterator() → Iterator`
+ *
+ * @param app - The TypeDoc application instance.
  */
-const typedocPluginSymbolFixer = {
-    /**
-     * Registers the plugin with the TypeDoc application.
-     *
-     * @param app - The TypeDoc application instance.
-     */
-    load: (app: Converter.Application): void => {
-        app.converter.on(Converter.EVENT_CREATE_DECLARATION, onEventCreateDeclaration());
-    },
+export const load = (app: Application): void => {
+    app.converter.on(Converter.EVENT_CREATE_DECLARATION, onEventCreateDeclaration());
 };
-
-export default typedocPluginSymbolFixer;

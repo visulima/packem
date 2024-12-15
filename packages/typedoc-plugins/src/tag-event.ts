@@ -3,7 +3,7 @@
  * For licensing, see LICENSE.md.
  */
 
-import type { Context, DeclarationReflection, Reflection } from "typedoc";
+import type { Application, Context, DeclarationReflection, Reflection } from "typedoc";
 import { Comment, Converter, IntrinsicType, ReflectionFlag, ReflectionKind, TypeParameterReflection } from "typedoc";
 
 import { getTarget } from "./utils";
@@ -143,7 +143,6 @@ const getTargetTypeReflections = (reflectionType: Reflection | undefined): Refle
  */
 const normalizeEventName = (eventName: string): string => (eventName.startsWith("event:") ? eventName : `event:${eventName}`);
 
-
 /**
  * The `typedoc-plugin-tag-event` collects event definitions from the `@eventName` tag and assigns them as children of the class or the
  * `Observable` interface.
@@ -178,16 +177,9 @@ const normalizeEventName = (eventName: string): string => (eventName.startsWith(
  *     ];
  * };
  * ```
+ *
+ * @param app - The TypeDoc application instance.
  */
-const typedocPluginTagEvent = {
-    /**
-     * Registers the plugin with the TypeDoc application.
-     *
-     * @param app - The TypeDoc application instance.
-     */
-    load: (app: Converter.Application): void => {
-        app.converter.on(Converter.EVENT_END, onEventEnd);
-    },
+export const load = (app: Application): void => {
+    app.converter.on(Converter.EVENT_END, onEventEnd);
 };
-
-export default typedocPluginTagEvent;

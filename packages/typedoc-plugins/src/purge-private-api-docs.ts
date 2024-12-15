@@ -6,8 +6,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { posix } from "node:path";
 
-import type { Context, DeclarationReflection } from "typedoc";
-import { Converter, ReflectionKind,TypeScript } from "typedoc";
+import type { Application, Context, DeclarationReflection } from "typedoc";
+import { Converter, ReflectionKind, TypeScript } from "typedoc";
 
 /**
  * Handles the `EVENT_END` event of the TypeDoc converter.
@@ -79,7 +79,7 @@ const isPrivatePackageFile = (fileName: string): boolean => {
  * @returns `true` if the reflection is from a private package, otherwise `false`.
  */
 const isInheritedReflectionFromPrivatePackage = (reflection: DeclarationReflection): boolean =>
-    (reflection.sources ? isPrivatePackageFile(reflection.sources[0].fullFileName) : false);
+    reflection.sources ? isPrivatePackageFile(reflection.sources[0].fullFileName) : false;
 
 /**
  * Determines if the reflection has an `@internal` tag.
@@ -153,7 +153,8 @@ const removeUrlSourcesFromReflection = (reflection: DeclarationReflection): void
  * @param node - The node to check.
  * @returns `true` if the node is marked as `@publicApi`, otherwise `false`.
  */
-const isPublicApi = (node): boolean => node.statements.some((statement) => {
+const isPublicApi = (node): boolean =>
+    node.statements.some((statement) => {
         if (!Array.isArray(statement.jsDoc)) {
             return false;
         }
@@ -191,16 +192,9 @@ const normalizePath = (value: string): string => value.replaceAll("\\", "/");
  * Private packages are marked with the `private: true` property in their `package.json` files.
  *
  * To expose specific private reflections in the documentation, use the `@publicApi` annotation in the block comment defining a module name.
+ *
+ * @param app - The TypeDoc application instance.
  */
-const typedocPluginPurgePrivateApiDocs = {
-    /**
-     * Registers the plugin with the TypeDoc application.
-     *
-     * @param app - The TypeDoc application instance.
-     */
-    load: (app: Converter.Application): void => {
-        app.converter.on(Converter.EVENT_END, onEventEnd());
-    },
+export const load = (app: Application): void => {
+    app.converter.on(Converter.EVENT_END, onEventEnd());
 };
-
-export default typedocPluginPurgePrivateApiDocs;

@@ -3,18 +3,8 @@
  * For licensing, see LICENSE.md.
  */
 
-import type {
-    Application,
-    Context} from "typedoc";
-import {
-    Comment,
-    Converter,
-    DeclarationReflection,
-    ProjectReflection,
-    ReferenceType,
-    ReflectionKind,
-    TypeParameterReflection,
-} from "typedoc";
+import type { Application, Context } from "typedoc";
+import { Comment, Converter, DeclarationReflection, ProjectReflection, ReferenceType, ReflectionKind, TypeParameterReflection } from "typedoc";
 
 /**
  * Handles the `EVENT_END` event of the TypeDoc converter.
@@ -62,20 +52,12 @@ const onEventEnd = (context: Context): void => {
     }
 };
 
-
 /**
  * The `typedoc-plugin-event-param-fixer` creates the `eventInfo` parameter that is of type `EventInfo` class,
  * and then inserts it as the first parameter for each found event reflection.
+ *
+ * @param app - The TypeDoc application instance.
  */
-const typedocPluginEventParamFixer = {
-    /**
-     * Registers the plugin with the TypeDoc application.
-     *
-     * @param app - The TypeDoc application instance.
-     */
-    load: (app: Application): void => {
-        app.converter.on(Converter.EVENT_END, onEventEnd);
-    },
+export const load = (app: Application): void => {
+    app.converter.on(Converter.EVENT_END, onEventEnd);
 };
-
-export default typedocPluginEventParamFixer;
