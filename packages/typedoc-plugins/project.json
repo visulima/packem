@@ -1,0 +1,8 @@
+{
+    "name": "typedoc-plugins",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/typedoc-plugins/src",
+    "projectType": "library",
+    "tags": ["typedoc-plugins", "type:package"],
+    "implicitDependencies": []
+}
