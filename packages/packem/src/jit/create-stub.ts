@@ -109,7 +109,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
                         '/** @type {import("' + typePath + '")} */',
 
                         'const _module = await jiti.import("' + resolvedEntry + '");',
-                        hasDefaultExport ? "\nexport default _module;" : "",
+                        hasDefaultExport ? "\nexport default _module?.default ?? _module;" : "",
                         ...namedExports.filter((name) => name !== "default").map((name) => `export const ${name} = _module.${name};`),
                     ].join("\n"),
             );
