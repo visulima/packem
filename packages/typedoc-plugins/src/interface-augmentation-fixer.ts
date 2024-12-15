@@ -68,16 +68,9 @@ const onEventEnd = (context: Context): void => {
  *
  * - Copies the externally added properties to the source definition.
  * - Replaces the duplicated interface with a reference to the source definition.
+ *
+ * @param app - The TypeDoc application instance.
  */
-const typedocPluginInterfaceAugmentationFixer = {
-    /**
-     * Registers the plugin with the TypeDoc application.
-     *
-     * @param app - The TypeDoc application instance.
-     */
-    load: (app: Application): void => {
-        app.converter.on(Converter.EVENT_END, onEventEnd);
-    },
+export const load = (app: Application): void => {
+    app.converter.on(Converter.EVENT_END, onEventEnd);
 };
-
-export default typedocPluginInterfaceAugmentationFixer;

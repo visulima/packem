@@ -3,7 +3,7 @@
  * For licensing, see LICENSE.md.
  */
 
-import type { Application,Context, DeclarationReflection } from "typedoc";
+import type { Application, Context, DeclarationReflection } from "typedoc";
 import { Converter, ReflectionKind, TypeScript } from "typedoc";
 
 /**
@@ -12,7 +12,9 @@ import { Converter, ReflectionKind, TypeScript } from "typedoc";
  *
  * @returns A function that processes reflections during the event.
  */
-const onEventCreateDeclaration = (): ((context: Context, reflection: DeclarationReflection) => void) => (context: Context, reflection: DeclarationReflection): void => {
+const onEventCreateDeclaration =
+    (): ((context: Context, reflection: DeclarationReflection) => void) =>
+    (context: Context, reflection: DeclarationReflection): void => {
         // Skip processing if the reflection is not a module.
         if (reflection.kind !== ReflectionKind.Module) {
             return;
@@ -66,16 +68,9 @@ const onEventCreateDeclaration = (): ((context: Context, reflection: Declaration
  *
  * The plugin handles cases where import statements precede the `@module` tag in the file, which might cause
  * TypeDoc's built-in plugin to miss the module name.
+ *
+ * @param app - The TypeDoc application instance.
  */
-const typedocPluginModuleFixer = {
-    /**
-     * Registers the plugin with the TypeDoc application.
-     *
-     * @param app - The TypeDoc application instance.
-     */
-    load: (app: Application): void => {
-        app.converter.on(Converter.EVENT_CREATE_DECLARATION, onEventCreateDeclaration());
-    },
+export const load = (app: Application): void => {
+    app.converter.on(Converter.EVENT_CREATE_DECLARATION, onEventCreateDeclaration());
 };
-
-export default typedocPluginModuleFixer;

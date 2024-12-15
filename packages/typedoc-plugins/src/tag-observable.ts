@@ -122,16 +122,9 @@ const typeParameterFactory = (
 /**
  * The `typedoc-plugin-tag-observable` handles the `@observable` tag assigned to a class property. When found, it creates two new events
  * (`change:{property}` and `set:{property}`) and adds them as children of the class or `Observable` interface.
+ *
+ * @param app - The TypeDoc application instance.
  */
-const typedocPluginTagObservable = {
-    /**
-     * Registers the plugin with the TypeDoc application.
-     *
-     * @param app - The TypeDoc application instance.
-     */
-    load: (app: Application): void => {
-        app.converter.on(Converter.EVENT_END, onEventEnd);
-    },
+export const load = (app: Application): void => {
+    app.converter.on(Converter.EVENT_END, onEventEnd);
 };
-
-export default typedocPluginTagObservable;

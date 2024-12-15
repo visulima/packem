@@ -3,7 +3,7 @@
  * For licensing, see LICENSE.md.
  */
 
-import type { DeclarationReflection,Reflection } from "typedoc";
+import type { DeclarationReflection, Reflection } from "typedoc";
 import { ReflectionKind } from "typedoc";
 
 /**

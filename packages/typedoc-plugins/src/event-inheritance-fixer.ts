@@ -126,20 +126,13 @@ const onEventEnd = (context: Context): void => {
 /**
  * The `typedoc-plugin-event-inheritance-fixer` takes care of inheriting events, which are not handled by TypeDoc by default.
  *
- * Events can be inherited from a class or from an interface. If a class or an interface fires an event and it is a base for another class or
+ * Events can be inherited from a class or from an interface. If a class or an interface fires an event, and it is a base for another class or
  * interface, then all events from the base reflection are copied and inserted into each derived reflection.
  *
  * The plugin also takes care of events specified in parent classes.
+ *
+ * @param app - The TypeDoc application instance.
  */
-const typedocPluginEventInheritanceFixer = {
-    /**
-     * Registers the plugin with the TypeDoc application.
-     *
-     * @param app - The TypeDoc application instance.
-     */
-    load(app: Application): void {
-        app.converter.on(Converter.EVENT_END, onEventEnd);
-    },
+export const load = (app: Application): void => {
+    app.converter.on(Converter.EVENT_END, onEventEnd);
 };
-
-export default typedocPluginEventInheritanceFixer;

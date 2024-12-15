@@ -3,7 +3,7 @@
  * For licensing, see LICENSE.md.
  */
 
-import type { CommentDisplayPart,Context, DeclarationReflection } from "typedoc";
+import type { Application, CommentDisplayPart, Context, DeclarationReflection } from "typedoc";
 import { Comment, Converter, ReflectionKind, TypeParameterReflection } from "typedoc";
 
 const ERROR_TAG_NAME = "error";
@@ -41,7 +41,7 @@ const onEventEnd = (context: Context): void => {
                 return false;
             }
 
-            const {parent} = (node as ts.Identifier);
+            const { parent } = node as ts.Identifier;
             if (parent.tagName?.escapedText !== ERROR_TAG_NAME) {
                 return false;
             }
@@ -118,7 +118,7 @@ const getCommentDisplayPart = (commentChildrenOrValue: ts.Node[] | string | null
 
     return (commentChildrenOrValue as ts.Node[])
         .map((item: ts.Node) => {
-            let {text} = (item as any);
+            let { text } = item as any;
 
             if (item.kind === ts.SyntaxKind.JSDocLink) {
                 if ((item as any).name) {
@@ -132,21 +132,13 @@ const getCommentDisplayPart = (commentChildrenOrValue: ts.Node[] | string | null
         .filter((part) => part.text.length);
 };
 
-
 /**
  * The `typedoc-plugin-tag-error` collects error definitions from the `@error` tag.
  *
  * Note: Currently, types for `@param` tags are not supported.
+ *
+ * @param app - The TypeDoc application instance.
  */
-const typedocPluginTagError = {
-    /**
-     * Registers the plugin with the TypeDoc application.
-     *
-     * @param app - The TypeDoc application instance.
-     */
-    load: (app: Converter.Application): void => {
-        app.converter.on(Converter.EVENT_END, onEventEnd);
-    },
+export const load = (app: Application): void => {
+    app.converter.on(Converter.EVENT_END, onEventEnd);
 };
-
-export default typedocPluginTagError;
