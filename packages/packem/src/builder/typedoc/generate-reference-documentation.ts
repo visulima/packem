@@ -44,28 +44,20 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
             hideGenerator: true,
             plugin: [
                 ...(plugin ?? []),
-                // eslint-disable-next-line unicorn/prefer-module
-                require.resolve("@ckeditor/typedoc-plugins/lib/module-fixer"),
-                // eslint-disable-next-line unicorn/prefer-module
-                require.resolve("@ckeditor/typedoc-plugins/lib/symbol-fixer"),
-                // eslint-disable-next-line unicorn/prefer-module
-                require.resolve("@ckeditor/typedoc-plugins/lib/interface-augmentation-fixer"),
-                // eslint-disable-next-line unicorn/prefer-module
-                require.resolve("@ckeditor/typedoc-plugins/lib/event-inheritance-fixer"),
-                // eslint-disable-next-line unicorn/prefer-module
-                require.resolve("@ckeditor/typedoc-plugins/lib/purge-private-api-docs"),
-                // eslint-disable-next-line unicorn/prefer-module
-                require.resolve("@ckeditor/typedoc-plugins/lib/tag-error"),
-                // eslint-disable-next-line unicorn/prefer-module
-                require.resolve("@ckeditor/typedoc-plugins/lib/tag-event"),
-                // eslint-disable-next-line unicorn/prefer-module
-                require.resolve("@ckeditor/typedoc-plugins/lib/tag-observable"),
-                // eslint-disable-next-line unicorn/prefer-module
-                require.resolve("typedoc-plugin-rename-defaults"),
+                "@ckeditor/typedoc-plugins/lib/module-fixer",
+                "@ckeditor/typedoc-plugins/lib/symbol-fixer",
+                "@ckeditor/typedoc-plugins/lib/interface-augmentation-fixer",
+                "@ckeditor/typedoc-plugins/lib/event-inheritance-fixer",
+                "@ckeditor/typedoc-plugins/lib/purge-private-api-docs",
+                "@ckeditor/typedoc-plugins/lib/tag-error",
+                "@ckeditor/typedoc-plugins/lib/tag-event",
+                "@ckeditor/typedoc-plugins/lib/tag-observable",
+                "typedoc-plugin-rename-defaults",
                 ...(format === "inline" || format === "markdown" ? ["typedoc-plugin-markdown"] : []),
             ],
             ...(format === "inline"
                 ? {
+                      githubPages: false,
                       hideBreadcrumbs: true,
                       hidePageHeader: true,
                       navigation: false,

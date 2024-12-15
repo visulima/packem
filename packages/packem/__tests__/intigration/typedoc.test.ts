@@ -6,8 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
 
-// eslint-disable-next-line vitest/no-disabled-tests
-describe.skip("packem typedoc", () => {
+describe("packem typedoc", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
