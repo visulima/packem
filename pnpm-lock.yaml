@@ -777,8 +777,8 @@ importers:
         specifier: ^7.26.0
         version: 7.26.0
       '@ckeditor/typedoc-plugins':
-        specifier: 44.2.1
-        version: 44.2.1(typedoc@0.27.4(typescript@5.7.2))
+        specifier: 45.0.8
+        version: 45.0.8(typedoc@0.27.4(typescript@5.7.2))
       '@oxc-project/types':
         specifier: 0.40.1
         version: 0.40.1
@@ -1306,8 +1306,8 @@ packages:
   '@bufbuild/protobuf@2.2.3':
     resolution: {integrity: sha512-tFQoXHJdkEOSwj5tRIZSPNUuXK3RaR7T1nUrPgbYX1pUbvqqaaZAsfo+NXBPsz5rZMSKVFrgK1WL8Q/MSLvprg==}
 
-  '@ckeditor/typedoc-plugins@44.2.1':
-    resolution: {integrity: sha512-7GNrSczAmccuyVY5CTI11UVzmbaGaiHn4pA/eci8a2S7b2vUg27WmUGybIbMFharJWJzfA1051Jh85JiqfTcCg==}
+  '@ckeditor/typedoc-plugins@45.0.8':
+    resolution: {integrity: sha512-eQaTJksGe8b1eOwernKU0GvowOk7wHjiM3T9y71ezDSftioGSOcdh4S/GeDRogZgkrWxqpAov+u/jdmbqm6fDA==}
     engines: {node: '>=18.0.0', npm: '>=5.7.1'}
     peerDependencies:
       typedoc: ^0.23.15
@@ -10736,7 +10736,7 @@ snapshots:
 
   '@bufbuild/protobuf@2.2.3': {}
 
-  '@ckeditor/typedoc-plugins@44.2.1(typedoc@0.27.4(typescript@5.7.2))':
+  '@ckeditor/typedoc-plugins@45.0.8(typedoc@0.27.4(typescript@5.7.2))':
     dependencies:
       typedoc: 0.27.4(typescript@5.7.2)
 
