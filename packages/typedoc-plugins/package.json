@@ -149,6 +149,43 @@
     "module": "dist/index.mjs",
     "browser": "./dist/index.mjs",
     "types": "dist/index.d.ts",
+    "typesVersions": {
+        ">=5.5": {
+            ".": [
+                "./dist/index.d.ts"
+            ],
+            "event-inheritance-fixer": [
+                "./dist/event-inheritance-fixer.d.ts"
+            ],
+            "event-param-fixer": [
+                "./dist/event-param-fixer.d.ts"
+            ],
+            "interface-augmentation-fixer": [
+                "./dist/interface-augmentation-fixer.d.ts"
+            ],
+            "module-fixer": [
+                "./dist/module-fixer.d.ts"
+            ],
+            "purge-private-api-docs": [
+                "./dist/purge-private-api-docs.d.ts"
+            ],
+            "symbol-fixer": [
+                "./dist/symbol-fixer.d.ts"
+            ],
+            "tag-error": [
+                "./dist/tag-error.d.ts"
+            ],
+            "tag-event": [
+                "./dist/tag-event.d.ts"
+            ],
+            "tag-observable": [
+                "./dist/tag-observable.d.ts"
+            ],
+            "utils": [
+                "./dist/utils.d.ts"
+            ]
+        }
+    },
     "files": [
         "dist",
         "README.md",
@@ -200,12 +237,13 @@
         "rimraf": "^6.0.1",
         "secretlint": "9.0.0",
         "semantic-release": "^24.2.0",
+        "tinyglobby": "0.2.10",
         "typedoc": "^0.27.5",
         "typescript": "^5.7.2",
         "vitest": "^2.1.8"
     },
     "peerDependencies": {
-        "typedoc": ">=0.23.15"
+        "typedoc": ">=0.27"
     },
     "engines": {
         "node": ">=18.* <=22.*"
@@ -225,43 +263,6 @@
             "info_on_disabling_prettier_conflict_rule": false,
             "info_on_disabling_jsonc_sort_keys_rule": false,
             "info_on_disabling_etc_no_deprecated": false
-        }
-    },
-    "typesVersions": {
-        ">=5.5": {
-            ".": [
-                "./dist/index.d.ts"
-            ],
-            "event-inheritance-fixer": [
-                "./dist/event-inheritance-fixer.d.ts"
-            ],
-            "event-param-fixer": [
-                "./dist/event-param-fixer.d.ts"
-            ],
-            "interface-augmentation-fixer": [
-                "./dist/interface-augmentation-fixer.d.ts"
-            ],
-            "module-fixer": [
-                "./dist/module-fixer.d.ts"
-            ],
-            "purge-private-api-docs": [
-                "./dist/purge-private-api-docs.d.ts"
-            ],
-            "symbol-fixer": [
-                "./dist/symbol-fixer.d.ts"
-            ],
-            "tag-error": [
-                "./dist/tag-error.d.ts"
-            ],
-            "tag-event": [
-                "./dist/tag-event.d.ts"
-            ],
-            "tag-observable": [
-                "./dist/tag-observable.d.ts"
-            ],
-            "utils": [
-                "./dist/utils.d.ts"
-            ]
         }
     }
 }

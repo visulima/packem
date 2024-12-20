@@ -12,6 +12,7 @@ import { Comment, Converter, IntrinsicType, ReflectionKind, TypeParameterReflect
  *
  * @param context - The TypeDoc converter context.
  */
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const onEventEnd = (context: Context): void => {
     const kinds = ReflectionKind.Property | ReflectionKind.GetSignature | ReflectionKind.SetSignature;
     const reflections = context.project.getReflectionsByKind(kinds);
@@ -25,9 +26,11 @@ const onEventEnd = (context: Context): void => {
         const classReflection = reflection.kindString === "Property" ? reflection.parent : reflection.parent?.parent;
 
         if (!classReflection) {
+            // eslint-disable-next-line no-continue
             continue;
         }
 
+        // eslint-disable-next-line no-loops/no-loops,no-restricted-syntax
         for (const eventName of ["change", "set"]) {
             const eventReflection = context
                 .withScope(classReflection)
@@ -93,7 +96,7 @@ const typeParameterFactory = (
     context: Context,
     options: {
         comment: string;
-        kind?: ts.SyntaxKind;
+        kind?: TypeScript.SyntaxKind;
         name: string;
         parent: DeclarationReflection;
         type?: IntrinsicType;
@@ -106,6 +109,7 @@ const typeParameterFactory = (
     } else if (options.kind) {
         const scope = context.withScope(typeParameter);
         const type = { kind: options.kind };
+
         typeParameter.type = context.converter.convertType(scope, type);
     }
 

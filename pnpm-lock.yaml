@@ -1089,6 +1089,9 @@ importers:
       semantic-release:
         specifier: ^24.2.0
         version: 24.2.0(typescript@5.7.2)
+      tinyglobby:
+        specifier: 0.2.10
+        version: 0.2.10
       typedoc:
         specifier: ^0.27.5
         version: 0.27.5(typescript@5.7.2)
