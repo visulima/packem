@@ -111,7 +111,7 @@ const jiti = createJiti(import.meta.url, {
 /** @type {import("${temporaryDirectoryPath}/src/index.d.mts")} */
 const _module = await jiti.import("${temporaryDirectoryPath}/src/index.ts");
 
-export default _module;`);
+export default _module?.default ?? _module;`);
 
         const mDtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 

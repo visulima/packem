@@ -19,7 +19,7 @@
     "devDependencies": {
         "@visulima/packem": "workspace:*",
         "cssnano": "7.0.6",
-        "esbuild": "^0.24.0",
+        "esbuild": "^0.24.2",
         "icss-utils": "^5.1.0",
         "less": "^4.2.1",
         "postcss": "^8.4.49",
@@ -31,7 +31,7 @@
         "postcss-modules-values": "^4.0.0",
         "postcss-value-parser": "^4.2.0",
         "rimraf": "^6.0.1",
-        "sass-embedded": "^1.82.0",
+        "sass-embedded": "^1.83.0",
         "stylus": "^0.64.0",
         "typescript": "^5.7.2"
     }

@@ -26,7 +26,7 @@
         "@types/react-dom": "^18.3.1",
         "@visulima/packem": "workspace:*",
         "cssnano": "7.0.6",
-        "esbuild": "^0.24.0",
+        "esbuild": "^0.24.2",
         "icss-utils": "^5.1.0",
         "postcss": "^8.4.49",
         "postcss-load-config": "^6.0.1",
