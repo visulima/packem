@@ -1,3 +1,10 @@
+## @visulima/packem [1.10.1](https://github.com/visulima/packem/compare/@visulima/packem@1.10.0...@visulima/packem@1.10.1) (2024-12-27)
+
+### Bug Fixes
+
+* fixed default export from jiti stub ([59d3186](https://github.com/visulima/packem/commit/59d318604ead7331778f9f88306b84055da2b0cb))
+* updated dependencies, @clack/prompts, @rollup/plugin-commonjs, @rollup/plugin-node-resolve, @rollup/plugin-replace, @rollup/pluginutils, @visulima/*, es-module-lexer, jiti, magic-string, oxc-parser, oxc-resolver, rollup, rollup-plugin-visualizer ([119e4f5](https://github.com/visulima/packem/commit/119e4f55a26bfb56919432ec520a629c0458853f))
+
 ## @visulima/packem [1.10.0](https://github.com/visulima/packem/compare/@visulima/packem@1.9.2...@visulima/packem@1.10.0) (2024-12-13)
 
 ### Features
