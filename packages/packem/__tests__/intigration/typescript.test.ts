@@ -948,6 +948,99 @@ export { getOne };
 `);
     });
 
+    it("should not automatically convert dynamic imports when 'ts' is in the name", async () => {
+        expect.assertions(6);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        await writeFile(`${temporaryDirectoryPath}/node_modules/@eslint-community/eslint-plugin-eslint-comments/index.js`, `export const one = 1`);
+        await writeFile(`${temporaryDirectoryPath}/node_modules/@eslint-community/eslint-plugin-eslint-comments/package.json`, `{ "main": "index.js" }`);
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export async function test() {
+  return await import("@eslint-community/eslint-plugin-eslint-comments")
+}`,
+        );
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: {
+                        default: "./dist/index.mjs",
+                        types: "./dist/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/index.cjs",
+                        types: "./dist/index.d.cts",
+                    },
+                },
+            },
+            type: "module",
+        });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                allowImportingTsExtensions: true,
+                module: "esnext",
+            },
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                externals: ["@eslint-community/eslint-plugin-eslint-comments"],
+            },
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+async function test() {
+  return await import('@eslint-community/eslint-plugin-eslint-comments');
+}
+__name(test, "test");
+
+export { test };
+`);
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(dMtsContent).toBe(`declare function test(): Promise<any>;
+
+export { test };
+`);
+
+        const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+async function test() {
+  return await import('@eslint-community/eslint-plugin-eslint-comments');
+}
+__name(test, "test");
+
+exports.test = test;
+`);
+
+        const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(dCtsContent).toBe(`declare function test(): Promise<any>;
+
+export { test };
+`);
+    });
+
     it("should contain correct type file path of shared chunks", async () => {
         expect.assertions(13);
 

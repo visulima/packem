@@ -6,7 +6,7 @@ const fixDynamicImportExtension = (): Plugin =>
         renderChunk(code, _chunk, options) {
             if (options.format === "es" || options.format === "cjs") {
                 return {
-                    code: code.replaceAll(/(import\(.*)(.ts)(['´"`]\))/g, "$1." + (options.format === "es" ? "mjs" : "cjs") + "$3"),
+                    code: code.replaceAll(/(import\(.*)(\.ts)(['´"`]\))/g, "$1." + (options.format === "es" ? "mjs" : "cjs") + "$3"),
                     map: null,
                 };
             }

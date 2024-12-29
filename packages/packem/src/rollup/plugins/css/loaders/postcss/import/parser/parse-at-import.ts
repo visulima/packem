@@ -64,7 +64,9 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
     // Fast path for common cases:
     if (tokens.length === 2 && (isTokenString(tokens[0]) || isTokenURL(tokens[0]))) {
         let uri = tokens[0][4].value;
+
         uri = stripHash(uri);
+
         if (!uri) {
             return false;
         }
