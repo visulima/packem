@@ -1,3 +1,9 @@
+## @visulima/packem [1.10.2](https://github.com/visulima/packem/compare/@visulima/packem@1.10.1...@visulima/packem@1.10.2) (2024-12-29)
+
+### Bug Fixes
+
+* fixed broken regex on dynamic imports ([7f1ca89](https://github.com/visulima/packem/commit/7f1ca89cf4b5be3da0f539ca47804c86e1c0f5aa))
+
 ## @visulima/packem [1.10.1](https://github.com/visulima/packem/compare/@visulima/packem@1.10.0...@visulima/packem@1.10.1) (2024-12-27)
 
 ### Bug Fixes
