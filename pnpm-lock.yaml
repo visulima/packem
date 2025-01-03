@@ -18,7 +18,7 @@ importers:
     dependencies:
       '@anolilab/commitlint-config':
         specifier: ^5.0.3
-        version: 5.0.3(@commitlint/cli@19.6.1(@types/node@22.10.2)(typescript@5.7.2))(@types/node@22.10.2)(typescript@5.7.2)
+        version: 5.0.3(@commitlint/cli@19.6.1(@types/node@22.10.5)(typescript@5.7.2))(@types/node@22.10.5)(typescript@5.7.2)
       '@anolilab/lint-staged-config':
         specifier: ^2.1.7
         version: 2.1.7(husky@9.1.7)(lint-staged@15.2.11)(prettier@3.4.2)(secretlint@9.0.0)
@@ -36,7 +36,7 @@ importers:
         version: 7.26.0
       '@commitlint/cli':
         specifier: ^19.6.1
-        version: 19.6.1(@types/node@22.10.2)(typescript@5.7.2)
+        version: 19.6.1(@types/node@22.10.5)(typescript@5.7.2)
       '@commitlint/config-conventional':
         specifier: ^19.6.0
         version: 19.6.0
@@ -44,8 +44,8 @@ importers:
         specifier: ^9.0.0
         version: 9.0.0
       '@types/node':
-        specifier: 22.10.2
-        version: 22.10.2
+        specifier: 22.10.5
+        version: 22.10.5
       audit-ci:
         specifier: ^7.1.0
         version: 7.1.0
@@ -54,7 +54,7 @@ importers:
         version: 5.0.14
       commitizen:
         specifier: ^4.3.1
-        version: 4.3.1(@types/node@22.10.2)(typescript@5.7.2)
+        version: 4.3.1(@types/node@22.10.5)(typescript@5.7.2)
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
@@ -105,7 +105,7 @@ importers:
         version: 5.7.2
       vitest:
         specifier: ^2.1.8
-        version: 2.1.8(@types/node@22.10.2)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+        version: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
 
   examples/cjs-interop:
     devDependencies:
@@ -257,7 +257,7 @@ importers:
         version: 5.7.2
       vite:
         specifier: 6.0.6
-        version: 6.0.6(@types/node@22.10.2)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+        version: 6.0.6(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
 
   examples/native-node-module:
     devDependencies:
@@ -364,7 +364,7 @@ importers:
         version: 5.7.2
       vite:
         specifier: 6.0.6
-        version: 6.0.6(@types/node@22.10.2)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+        version: 6.0.6(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
 
   examples/react-tsx-css-module:
     dependencies:
@@ -668,35 +668,35 @@ importers:
         specifier: 5.1.4
         version: 5.1.4(rollup@4.28.1)
       '@visulima/cerebro':
-        specifier: 1.1.26
-        version: 1.1.26(yaml@2.6.1)
+        specifier: 1.1.28
+        version: 1.1.28
       '@visulima/colorize':
-        specifier: 1.4.13
-        version: 1.4.13
+        specifier: 1.4.14
+        version: 1.4.14
       '@visulima/find-cache-dir':
-        specifier: 1.0.17
-        version: 1.0.17
+        specifier: 1.0.18
+        version: 1.0.18
       '@visulima/fs':
-        specifier: 2.3.2
-        version: 2.3.2
+        specifier: 2.3.3
+        version: 2.3.3
       '@visulima/humanizer':
-        specifier: 1.0.15
-        version: 1.0.15
+        specifier: 1.0.16
+        version: 1.0.16
       '@visulima/package':
-        specifier: 3.2.1
-        version: 3.2.1
+        specifier: 3.2.2
+        version: 3.2.2
       '@visulima/pail':
-        specifier: 2.1.12
-        version: 2.1.12
+        specifier: 2.1.13
+        version: 2.1.13
       '@visulima/path':
         specifier: 1.1.2
         version: 1.1.2
       '@visulima/source-map':
-        specifier: 1.0.11
-        version: 1.0.11
+        specifier: 1.0.12
+        version: 1.0.12
       '@visulima/tsconfig':
-        specifier: 1.1.3
-        version: 1.1.3
+        specifier: 1.1.4
+        version: 1.1.4
       browserslist:
         specifier: 4.24.3
         version: 4.24.3
@@ -752,8 +752,8 @@ importers:
         specifier: 1.2.1
         version: 1.2.1
       tinyexec:
-        specifier: 0.3.1
-        version: 0.3.1
+        specifier: 0.3.2
+        version: 0.3.2
       tinyglobby:
         specifier: 0.2.10
         version: 0.2.10
@@ -819,8 +819,8 @@ importers:
         specifier: 3.0.7
         version: 3.0.7
       '@types/node':
-        specifier: 22.10.2
-        version: 22.10.2
+        specifier: 22.10.5
+        version: 22.10.5
       '@types/node-sass':
         specifier: ^4.11.8
         version: 4.11.8
@@ -1003,7 +1003,7 @@ importers:
         version: 5.7.2
       vitest:
         specifier: ^2.1.8
-        version: 2.1.8(@types/node@22.10.2)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+        version: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
 
 packages:
 
@@ -1157,6 +1157,7 @@ packages:
   '@anolilab/package-json-utils@3.0.9':
     resolution: {integrity: sha512-CYwpW2hlsOSdwtksYG5vH7Y48X7qwSnvk4yTsplce/FZFZLKRxuCbwlUqgTEYUng3nZ55A+5EC3rEttgor7e9w==}
     engines: {node: '>=18.* <=21.*'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   '@anolilab/prettier-config@5.0.14':
     resolution: {integrity: sha512-P7nVwARFM0SKQ0j8Q2y6Q3acHaPNtXOKEX9lgZcf5veFdvNjzK79iZcFdpQikyix4VQBs8x6wBPAD0yDfpC6pQ==}
@@ -3107,8 +3108,8 @@ packages:
   '@types/node@18.19.68':
     resolution: {integrity: sha512-QGtpFH1vB99ZmTa63K4/FU8twThj4fuVSBkGddTp7uIL/cuoLWIUSL2RcOaigBhfR+hg5pgGkBnkoOxrTVBMKw==}
 
-  '@types/node@22.10.2':
-    resolution: {integrity: sha512-Xxr6BBRCAOQixvonOye19wnzyDiUtTeqldOOmj3CkeblonbccA12PFwlufvRdrpjXxqnmUaeiU5EOA+7s5diUQ==}
+  '@types/node@22.10.5':
+    resolution: {integrity: sha512-F8Q+SeGimwOo86fiovQh8qiXfFEh2/ocYv7tU5pJ3EXMSSxk1Joj5wefpFK2fHTf/N6HKGSxIDBT9f3gCxXPkQ==}
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -3362,32 +3363,28 @@ packages:
     resolution: {integrity: sha512-pCh/qEA8Lb1wVIqNvBke8UaRjJ6wrAWkJO5yyIbs8Yx6TNGYyfNjOo61tLv+WwLvoLPp4BQ8B7AHKijl8NGUfw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@visulima/boxen@1.0.22':
-    resolution: {integrity: sha512-y18w6Qhy++In+dR57ThjhkZSYFM+iQqsYD/wU5RTDEtWhY7v2oscnhSzJIVLsh5bER5aV8d3pobPu0gKz925OQ==}
+  '@visulima/boxen@1.0.23':
+    resolution: {integrity: sha512-os8zpUA6Iizcbp2JtH43diakJB1EagyEk57v1KaNd6Eh1A7XekNZw0AyUW5AdVmOoeWC0wZkrMXBNWxHL35AQQ==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/cerebro@1.1.26':
-    resolution: {integrity: sha512-Gn1ZHtlVDbM3JtzHLww1DNx9Suujnpe++dwfjTCH6YKQPpEftdf13u8esZnzqkgKqBjYVnP7Kjxcc7N0ZC3EuA==}
+  '@visulima/cerebro@1.1.28':
+    resolution: {integrity: sha512-jXYqE87Ad7OkA9ONp997YYj5QfycWXCNpB0QO7GvfBvJD3dpHnowmul6BoFlSrxlQ8twxtTx+kDxTxjgBmd+5w==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/colorize@1.4.13':
-    resolution: {integrity: sha512-aS3rzO8L51pUdU3WASMcdY4Rz2R+aLjxFi78dWVUOYXQLwCdkuNvfv2hu5l++nAvLQQyy0RlcJ986MWEnezhIg==}
+  '@visulima/colorize@1.4.14':
+    resolution: {integrity: sha512-d78gKcysz8kcD3Ki5m4kLUGYzyLwwaoGAY1IA/juhN9dvuJ+RJedi0Kx5nP/TdYmNDiQyNTFLSyr4F+yMsY2BA==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/error@4.4.8':
-    resolution: {integrity: sha512-GMKhzc5EWlazvfjdxxl6RYA03YC481LL6GrXDOxw86kH91bn0LtZZenugAEx8kytK/ARf3mmcLY1UsrplEwYUQ==}
+  '@visulima/error@4.4.9':
+    resolution: {integrity: sha512-oJ2Jm6qPmZ6LpuGAPghwDTud7RTuFRWrsSWdmd7ppym4DszDEXWhpCjwEGevOL4fGL8Q8gqvItGnzBwM0geFmQ==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/find-cache-dir@1.0.16':
-    resolution: {integrity: sha512-wuRLE96rDe61HdIMbIVRFJ39zIpvbKsSd+ZTsmBN6RrhYJRDg4DDZhHV4rSFBK+OML5ZwcehBMAmhQ2bUKLQtQ==}
-    engines: {node: '>=18.* <=23.*'}
-
-  '@visulima/find-cache-dir@1.0.17':
-    resolution: {integrity: sha512-fkJnqnxLaVmdBdBrAZ93dMPiimWfPo71vFE6QM/93GHEvn57F5hGV0DNoXXJ+ChvzUqb1us7CpECXsn2rATSyw==}
+  '@visulima/find-cache-dir@1.0.18':
+    resolution: {integrity: sha512-chxkcfQ2aTLeVDRNWCJkeSbBNEh7SugwD90ufzI08GHiDamXAnXjE9HEtRwX+b7HQnLnfSZxUOEHR1xl1WaFSA==}
     engines: {node: '>=18.* <=23.*'}
 
   '@visulima/fmt@1.1.12':
@@ -3395,27 +3392,17 @@ packages:
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/fs@2.3.1':
-    resolution: {integrity: sha512-kRCzcnZhbsBXgsWrwZh4mdOBGFfZ67uya4xkZLIqaAqtjngsdCRdR7e89nQ8Je8lgG9aL7OW8egK/BrEFMsXzw==}
-    engines: {node: '>=18.* <=23.*'}
-    os: [darwin, linux, win32]
-    peerDependencies:
-      yaml: '>=2.4'
-    peerDependenciesMeta:
-      yaml:
-        optional: true
-
-  '@visulima/fs@2.3.2':
-    resolution: {integrity: sha512-m1O2sVYNLDiSxlb0O0gmdxB3KRDm/s1bmBY8E5u52sCB3V3iVgkWAVBQKEzDDDluVFwjBsZrOZu67+BdpvmDoA==}
+  '@visulima/fs@2.3.3':
+    resolution: {integrity: sha512-IQCD9hJWLQDFMWi6FfDnDcAgHXbagqGyEgLdcsbgNhU14gfl/UpAJ3ypEY3r9//vx84ww1vGTT8X2yrXBIrBUQ==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/humanizer@1.0.15':
-    resolution: {integrity: sha512-Gbknob6396uYzOARn1spLW6YqFCzQL25d1y1NY68MxX1ZsSjXmEUc3AMhuBq/IL4d9vSucWvEvH0MmUOjjkuOw==}
+  '@visulima/humanizer@1.0.16':
+    resolution: {integrity: sha512-DW1bxGoaCkDTqXB9tFzAySCuyE93+xUE8jGl3DMxDQUIvDGA3gFdMAKJ7OwWsbnkRuP3kIY2RiF0ERu2mAmdiw==}
     engines: {node: '>=18.* <=23.*'}
 
-  '@visulima/inspector@1.0.13':
-    resolution: {integrity: sha512-hG/Exsr88vsCjzDzW0u7mpMGH/3Gbgat1mnS+7OGzgeI7yV8j5Slccb9JXKr45cd9njKixMo1T37E+N7dxhiIA==}
+  '@visulima/inspector@1.0.14':
+    resolution: {integrity: sha512-p7AYC8pSHmk+U2OupPFz4VZgKOyDtTq3Fw4wxXqOPfBeFh1Q5OcowLsWjfD/JgW3VNeAg/obN+8VAYPx+wbc/w==}
     engines: {node: '>=18.* <=23.*'}
 
   '@visulima/is-ansi-color-supported@2.2.9':
@@ -3423,13 +3410,13 @@ packages:
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/package@3.2.1':
-    resolution: {integrity: sha512-OWNfgSAeQ5kOPNOLyA88Bes7Mmuvp6SLN53nURMKHhbXkHJsKVe4BkYzcWYWz8z+rF0uPLXlFfhA/BeLlEH/vw==}
+  '@visulima/package@3.2.2':
+    resolution: {integrity: sha512-sfc0Xdxq571+fxMaQOI9AGMLVkfek7xl6fT7bajbHo0rrP1D1p5m8D0PUKUPlKmzD/rBSMEUZ0raHc+7a1xwIQ==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/pail@2.1.12':
-    resolution: {integrity: sha512-belEiJt98Rw4EV3iybDN/4LG4GEqKVoFI5FDYqo8gqe8cwSdWj4V2Msp21OC15go1oxRQTPdkiyy1j6d8zEkDw==}
+  '@visulima/pail@2.1.13':
+    resolution: {integrity: sha512-gCYNdC++vUAS/qfctrFRCJAkw1REqxWGJ7Jxk/CcwrjnqwpJdWnmxoaUY1oKIpYHvIQ+9M/UXeL5Ff4E6sp2HQ==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
     peerDependencies:
@@ -3446,12 +3433,17 @@ packages:
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/source-map@1.0.11':
-    resolution: {integrity: sha512-JmfiBT0unWRMLa9ygsM3ou8UD1NOJkbhsecLbJihC0XGYhklDyFGj6UsfskqwQ5DhCQoipGpre/D1zLWP/W9QA==}
+  '@visulima/path@1.2.0':
+    resolution: {integrity: sha512-OXiDZrK+wSM/qXx0bIiBwKRLvLFnedrBlq2IfczadBMAuobcxQzM+g/qMjoixT5/eHhJdK845zNKCY6NvjxOAw==}
+    engines: {node: '>=18.* <=23.*'}
+    os: [darwin, linux, win32]
+
+  '@visulima/source-map@1.0.12':
+    resolution: {integrity: sha512-ihyq+SIk1AB1TBehx2xo3bPZfWB8Qu19UXvx4ulTMUGQCDqUQdITbEwaChlXpTEPKbnw1j4RMXxsGvKjdDg4nQ==}
     engines: {node: '>=18.* <=23.*'}
 
-  '@visulima/tsconfig@1.1.3':
-    resolution: {integrity: sha512-JL4Wemxi5uotTdUl3LZ8N8Wccz6r5Jg0AyQqcy88fmuXG9JXfpve12p8qzXAmVmVaa4R/7lNphOexu9KgxzZgA==}
+  '@visulima/tsconfig@1.1.4':
+    resolution: {integrity: sha512-bgxcY4IkrhHnCiqDMu4/0eaoTzqn2leqMs+Edy+ZzImnGRvKYoxjAsf3hiW0WugIguHChCkzdIKCyutsCHKbSA==}
     engines: {node: '>=18.* <=23.*'}
 
   '@vitest/coverage-v8@2.1.8':
@@ -9686,6 +9678,9 @@ packages:
   tinyexec@0.3.1:
     resolution: {integrity: sha512-WiCJLEECkO18gwqIp6+hJg0//p23HXp4S+gGtAKu3mI2F2/sXC4FvHvXvB0zJVVaTPhx1/tOwdbRsa1sOBIKqQ==}
 
+  tinyexec@0.3.2:
+    resolution: {integrity: sha512-KQQR9yN7R5+OSwaK0XQoj22pwHoTlgYqmUscPYoknOoWCWfj/5/ABTMRi69FrKU5ffPVh5QcFikpWJI/P1ocHA==}
+
   tinyglobby@0.2.10:
     resolution: {integrity: sha512-Zc+8eJlFMvgatPZTl6A9L/yht8QqdmUNtURHaKZLmKBE12hNPSrqNkUp2cs3M/UKmNVVAMFQYSjYIVHDjW5zew==}
     engines: {node: '>=12.0.0'}
@@ -10459,15 +10454,15 @@ snapshots:
 
   '@andrewbranch/untar.js@1.0.3': {}
 
-  '@anolilab/commitlint-config@5.0.3(@commitlint/cli@19.6.1(@types/node@22.10.2)(typescript@5.7.2))(@types/node@22.10.2)(typescript@5.7.2)':
+  '@anolilab/commitlint-config@5.0.3(@commitlint/cli@19.6.1(@types/node@22.10.5)(typescript@5.7.2))(@types/node@22.10.5)(typescript@5.7.2)':
     dependencies:
       '@anolilab/package-json-utils': 3.0.9
-      '@commitlint/cli': 19.6.1(@types/node@22.10.2)(typescript@5.7.2)
+      '@commitlint/cli': 19.6.1(@types/node@22.10.5)(typescript@5.7.2)
       '@commitlint/config-conventional': 18.6.3
-      '@commitlint/core': 18.6.1(@types/node@22.10.2)(typescript@5.7.2)
-      commitizen: 4.3.1(@types/node@22.10.2)(typescript@5.7.2)
+      '@commitlint/core': 18.6.1(@types/node@22.10.5)(typescript@5.7.2)
+      commitizen: 4.3.1(@types/node@22.10.5)(typescript@5.7.2)
       conventional-changelog-conventionalcommits: 7.0.2
-      cz-conventional-changelog: 3.3.0(@types/node@22.10.2)(typescript@5.7.2)
+      cz-conventional-changelog: 3.3.0(@types/node@22.10.5)(typescript@5.7.2)
     transitivePeerDependencies:
       - '@types/node'
       - typescript
@@ -10578,7 +10573,7 @@ snapshots:
 
   '@anolilab/rc@1.1.4':
     dependencies:
-      '@visulima/fs': 2.3.2
+      '@visulima/fs': 2.3.3
       '@visulima/path': 1.1.2
       ini: 5.0.0
       ts-deepmerge: 7.0.2
@@ -10587,8 +10582,8 @@ snapshots:
     dependencies:
       '@anolilab/rc': 1.1.4
       '@semantic-release/error': 4.0.0
-      '@visulima/fs': 2.3.2
-      '@visulima/package': 3.2.1
+      '@visulima/fs': 2.3.3
+      '@visulima/package': 3.2.2
       '@visulima/path': 1.1.2
       aggregate-error: 5.0.0
       execa: 9.5.2
@@ -10645,7 +10640,7 @@ snapshots:
   '@antfu/install-pkg@0.5.0':
     dependencies:
       package-manager-detector: 0.2.7
-      tinyexec: 0.3.1
+      tinyexec: 0.3.2
 
   '@antfu/ni@0.23.1': {}
 
@@ -10812,11 +10807,11 @@ snapshots:
   '@colors/colors@1.5.0':
     optional: true
 
-  '@commitlint/cli@19.6.1(@types/node@22.10.2)(typescript@5.7.2)':
+  '@commitlint/cli@19.6.1(@types/node@22.10.5)(typescript@5.7.2)':
     dependencies:
       '@commitlint/format': 19.5.0
       '@commitlint/lint': 19.6.0
-      '@commitlint/load': 19.6.1(@types/node@22.10.2)(typescript@5.7.2)
+      '@commitlint/load': 19.6.1(@types/node@22.10.5)(typescript@5.7.2)
       '@commitlint/read': 19.5.0
       '@commitlint/types': 19.5.0
       tinyexec: 0.3.1
@@ -10845,11 +10840,11 @@ snapshots:
       '@commitlint/types': 19.5.0
       ajv: 8.17.1
 
-  '@commitlint/core@18.6.1(@types/node@22.10.2)(typescript@5.7.2)':
+  '@commitlint/core@18.6.1(@types/node@22.10.5)(typescript@5.7.2)':
     dependencies:
       '@commitlint/format': 18.6.1
       '@commitlint/lint': 18.6.1
-      '@commitlint/load': 18.6.1(@types/node@22.10.2)(typescript@5.7.2)
+      '@commitlint/load': 18.6.1(@types/node@22.10.5)(typescript@5.7.2)
       '@commitlint/read': 18.6.1
     transitivePeerDependencies:
       - '@types/node'
@@ -10911,7 +10906,7 @@ snapshots:
       '@commitlint/rules': 19.6.0
       '@commitlint/types': 19.5.0
 
-  '@commitlint/load@18.6.1(@types/node@22.10.2)(typescript@5.7.2)':
+  '@commitlint/load@18.6.1(@types/node@22.10.5)(typescript@5.7.2)':
     dependencies:
       '@commitlint/config-validator': 18.6.1
       '@commitlint/execute-rule': 18.6.1
@@ -10919,7 +10914,7 @@ snapshots:
       '@commitlint/types': 18.6.1
       chalk: 4.1.2
       cosmiconfig: 8.3.6(typescript@5.7.2)
-      cosmiconfig-typescript-loader: 5.1.0(@types/node@22.10.2)(cosmiconfig@8.3.6(typescript@5.7.2))(typescript@5.7.2)
+      cosmiconfig-typescript-loader: 5.1.0(@types/node@22.10.5)(cosmiconfig@8.3.6(typescript@5.7.2))(typescript@5.7.2)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -10928,7 +10923,7 @@ snapshots:
       - '@types/node'
       - typescript
 
-  '@commitlint/load@19.6.1(@types/node@22.10.2)(typescript@5.7.2)':
+  '@commitlint/load@19.6.1(@types/node@22.10.5)(typescript@5.7.2)':
     dependencies:
       '@commitlint/config-validator': 19.5.0
       '@commitlint/execute-rule': 19.5.0
@@ -10936,7 +10931,7 @@ snapshots:
       '@commitlint/types': 19.5.0
       chalk: 5.3.0
       cosmiconfig: 9.0.0(typescript@5.7.2)
-      cosmiconfig-typescript-loader: 6.1.0(@types/node@22.10.2)(cosmiconfig@9.0.0(typescript@5.7.2))(typescript@5.7.2)
+      cosmiconfig-typescript-loader: 6.1.0(@types/node@22.10.5)(cosmiconfig@9.0.0(typescript@5.7.2))(typescript@5.7.2)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -10973,7 +10968,7 @@ snapshots:
       '@commitlint/types': 19.5.0
       git-raw-commits: 4.0.0
       minimist: 1.2.8
-      tinyexec: 0.3.1
+      tinyexec: 0.3.2
 
   '@commitlint/resolve-extends@18.6.1':
     dependencies:
@@ -12585,11 +12580,11 @@ snapshots:
 
   '@types/concat-stream@2.0.3':
     dependencies:
-      '@types/node': 22.10.2
+      '@types/node': 22.10.5
 
   '@types/conventional-commits-parser@5.0.1':
     dependencies:
-      '@types/node': 22.10.2
+      '@types/node': 22.10.5
 
   '@types/debug@4.1.12':
     dependencies:
@@ -12608,7 +12603,7 @@ snapshots:
   '@types/glob@8.1.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 22.10.2
+      '@types/node': 22.10.5
 
   '@types/hast@2.3.10':
     dependencies:
@@ -12640,7 +12635,7 @@ snapshots:
   '@types/liftoff@4.0.3':
     dependencies:
       '@types/fined': 1.1.5
-      '@types/node': 22.10.2
+      '@types/node': 22.10.5
 
   '@types/mdast@3.0.15':
     dependencies:
@@ -12662,13 +12657,13 @@ snapshots:
 
   '@types/node-sass@4.11.8':
     dependencies:
-      '@types/node': 22.10.2
+      '@types/node': 22.10.5
 
   '@types/node@18.19.68':
     dependencies:
       undici-types: 5.26.5
 
-  '@types/node@22.10.2':
+  '@types/node@22.10.5':
     dependencies:
       undici-types: 6.20.0
 
@@ -12716,13 +12711,13 @@ snapshots:
 
   '@types/stylus@0.48.43':
     dependencies:
-      '@types/node': 22.10.2
+      '@types/node': 22.10.5
 
   '@types/supports-color@8.1.3': {}
 
   '@types/through@0.0.33':
     dependencies:
-      '@types/node': 22.10.2
+      '@types/node': 22.10.5
 
   '@types/uglifycss@0.0.11': {}
 
@@ -13015,14 +13010,14 @@ snapshots:
       '@typescript-eslint/types': 8.18.0
       eslint-visitor-keys: 4.2.0
 
-  '@visulima/boxen@1.0.22': {}
+  '@visulima/boxen@1.0.23': {}
 
-  '@visulima/cerebro@1.1.26(yaml@2.6.1)':
+  '@visulima/cerebro@1.1.28':
     dependencies:
-      '@visulima/boxen': 1.0.22
-      '@visulima/colorize': 1.4.13
-      '@visulima/find-cache-dir': 1.0.16(yaml@2.6.1)
-      '@visulima/pail': 2.1.12
+      '@visulima/boxen': 1.0.23
+      '@visulima/colorize': 1.4.14
+      '@visulima/find-cache-dir': 1.0.18
+      '@visulima/pail': 2.1.13
       cli-table3: 0.6.5
       command-line-args: 6.0.1
       fastest-levenshtein: 1.0.16
@@ -13030,70 +13025,58 @@ snapshots:
       - '@75lb/nature'
       - '@visulima/redact'
       - rotating-file-stream
-      - yaml
 
-  '@visulima/colorize@1.4.13':
+  '@visulima/colorize@1.4.14':
     dependencies:
       '@visulima/is-ansi-color-supported': 2.2.9
 
-  '@visulima/error@4.4.8': {}
+  '@visulima/error@4.4.9': {}
 
-  '@visulima/find-cache-dir@1.0.16(yaml@2.6.1)':
+  '@visulima/find-cache-dir@1.0.18':
     dependencies:
-      '@visulima/fs': 2.3.1(yaml@2.6.1)
-      '@visulima/path': 1.1.2
-    transitivePeerDependencies:
-      - yaml
-
-  '@visulima/find-cache-dir@1.0.17':
-    dependencies:
-      '@visulima/fs': 2.3.2
-      '@visulima/path': 1.1.2
+      '@visulima/fs': 2.3.3
+      '@visulima/path': 1.2.0
 
   '@visulima/fmt@1.1.12': {}
 
-  '@visulima/fs@2.3.1(yaml@2.6.1)':
+  '@visulima/fs@2.3.3':
     dependencies:
-      '@visulima/path': 1.1.2
-    optionalDependencies:
+      '@visulima/path': 1.2.0
       yaml: 2.6.1
 
-  '@visulima/fs@2.3.2':
-    dependencies:
-      '@visulima/path': 1.1.2
-      yaml: 2.6.1
+  '@visulima/humanizer@1.0.16': {}
 
-  '@visulima/humanizer@1.0.15': {}
-
-  '@visulima/inspector@1.0.13': {}
+  '@visulima/inspector@1.0.14': {}
 
   '@visulima/is-ansi-color-supported@2.2.9': {}
 
-  '@visulima/package@3.2.1':
+  '@visulima/package@3.2.2':
     dependencies:
-      '@visulima/fs': 2.3.2
-      '@visulima/path': 1.1.2
+      '@visulima/fs': 2.3.3
+      '@visulima/path': 1.2.0
       normalize-package-data: 7.0.0
 
-  '@visulima/pail@2.1.12':
+  '@visulima/pail@2.1.13':
     dependencies:
-      '@visulima/colorize': 1.4.13
-      '@visulima/error': 4.4.8
+      '@visulima/colorize': 1.4.14
+      '@visulima/error': 4.4.9
       '@visulima/fmt': 1.1.12
-      '@visulima/inspector': 1.0.13
+      '@visulima/inspector': 1.0.14
       safe-stable-stringify: 2.5.0
 
   '@visulima/path@1.1.2': {}
 
-  '@visulima/source-map@1.0.11':
+  '@visulima/path@1.2.0': {}
+
+  '@visulima/source-map@1.0.12':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
-      '@visulima/path': 1.1.2
+      '@visulima/path': 1.2.0
 
-  '@visulima/tsconfig@1.1.3':
+  '@visulima/tsconfig@1.1.4':
     dependencies:
-      '@visulima/fs': 2.3.2
-      '@visulima/path': 1.1.2
+      '@visulima/fs': 2.3.3
+      '@visulima/path': 1.2.0
       jsonc-parser: 3.3.1
       resolve-pkg-maps: 1.0.0
 
@@ -13111,7 +13094,7 @@ snapshots:
       std-env: 3.8.0
       test-exclude: 7.0.1
       tinyrainbow: 1.2.0
-      vitest: 2.1.8(@types/node@22.10.2)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+      vitest: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -13122,13 +13105,13 @@ snapshots:
       chai: 5.1.2
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.8(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1))':
+  '@vitest/mocker@2.1.8(vite@6.0.6(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1))':
     dependencies:
       '@vitest/spy': 2.1.8
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      vite: 6.0.6(@types/node@22.10.2)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+      vite: 6.0.6(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
 
   '@vitest/pretty-format@2.1.8':
     dependencies:
@@ -13158,7 +13141,7 @@ snapshots:
       sirv: 3.0.0
       tinyglobby: 0.2.10
       tinyrainbow: 1.2.0
-      vitest: 2.1.8(@types/node@22.10.2)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+      vitest: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
 
   '@vitest/utils@2.1.8':
     dependencies:
@@ -13839,10 +13822,10 @@ snapshots:
 
   commenting@1.1.0: {}
 
-  commitizen@4.3.1(@types/node@22.10.2)(typescript@5.7.2):
+  commitizen@4.3.1(@types/node@22.10.5)(typescript@5.7.2):
     dependencies:
       cachedir: 2.3.0
-      cz-conventional-changelog: 3.3.0(@types/node@22.10.2)(typescript@5.7.2)
+      cz-conventional-changelog: 3.3.0(@types/node@22.10.5)(typescript@5.7.2)
       dedent: 0.7.0
       detect-indent: 6.1.0
       find-node-modules: 2.1.3
@@ -13956,16 +13939,16 @@ snapshots:
 
   core-util-is@1.0.3: {}
 
-  cosmiconfig-typescript-loader@5.1.0(@types/node@22.10.2)(cosmiconfig@8.3.6(typescript@5.7.2))(typescript@5.7.2):
+  cosmiconfig-typescript-loader@5.1.0(@types/node@22.10.5)(cosmiconfig@8.3.6(typescript@5.7.2))(typescript@5.7.2):
     dependencies:
-      '@types/node': 22.10.2
+      '@types/node': 22.10.5
       cosmiconfig: 8.3.6(typescript@5.7.2)
       jiti: 1.21.6
       typescript: 5.7.2
 
-  cosmiconfig-typescript-loader@6.1.0(@types/node@22.10.2)(cosmiconfig@9.0.0(typescript@5.7.2))(typescript@5.7.2):
+  cosmiconfig-typescript-loader@6.1.0(@types/node@22.10.5)(cosmiconfig@9.0.0(typescript@5.7.2))(typescript@5.7.2):
     dependencies:
-      '@types/node': 22.10.2
+      '@types/node': 22.10.5
       cosmiconfig: 9.0.0(typescript@5.7.2)
       jiti: 2.4.2
       typescript: 5.7.2
@@ -14126,16 +14109,16 @@ snapshots:
 
   cuss@2.2.0: {}
 
-  cz-conventional-changelog@3.3.0(@types/node@22.10.2)(typescript@5.7.2):
+  cz-conventional-changelog@3.3.0(@types/node@22.10.5)(typescript@5.7.2):
     dependencies:
       chalk: 2.4.2
-      commitizen: 4.3.1(@types/node@22.10.2)(typescript@5.7.2)
+      commitizen: 4.3.1(@types/node@22.10.5)(typescript@5.7.2)
       conventional-commit-types: 3.0.0
       lodash.map: 4.6.0
       longest: 2.0.1
       word-wrap: 1.2.5
     optionalDependencies:
-      '@commitlint/load': 19.6.1(@types/node@22.10.2)(typescript@5.7.2)
+      '@commitlint/load': 19.6.1(@types/node@22.10.5)(typescript@5.7.2)
     transitivePeerDependencies:
       - '@types/node'
       - typescript
@@ -14888,7 +14871,7 @@ snapshots:
       '@typescript-eslint/utils': 7.18.0(eslint@9.17.0(jiti@2.4.2))(typescript@5.7.2)
       eslint: 9.17.0(jiti@2.4.2)
     optionalDependencies:
-      vitest: 2.1.8(@types/node@22.10.2)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+      vitest: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -20590,6 +20573,8 @@ snapshots:
 
   tinyexec@0.3.1: {}
 
+  tinyexec@0.3.2: {}
+
   tinyglobby@0.2.10:
     dependencies:
       fdir: 6.4.2(picomatch@4.0.2)
@@ -20877,7 +20862,7 @@ snapshots:
       '@types/concat-stream': 2.0.3
       '@types/debug': 4.1.12
       '@types/is-empty': 1.2.3
-      '@types/node': 22.10.2
+      '@types/node': 22.10.5
       '@types/unist': 3.0.3
       concat-stream: 2.0.0
       debug: 4.4.0
@@ -21240,13 +21225,13 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.2
 
-  vite-node@2.1.8(@types/node@22.10.2)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1):
+  vite-node@2.1.8(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1):
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
       es-module-lexer: 1.6.0
       pathe: 1.1.2
-      vite: 6.0.6(@types/node@22.10.2)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+      vite: 6.0.6(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -21261,13 +21246,13 @@ snapshots:
       - tsx
       - yaml
 
-  vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1):
+  vite@6.0.6(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1):
     dependencies:
       esbuild: 0.24.2
       postcss: 8.4.49
       rollup: 4.28.1
     optionalDependencies:
-      '@types/node': 22.10.2
+      '@types/node': 22.10.5
       fsevents: 2.3.3
       jiti: 2.4.2
       less: 4.2.1
@@ -21279,10 +21264,10 @@ snapshots:
       tsx: 4.19.2
       yaml: 2.6.1
 
-  vitest@2.1.8(@types/node@22.10.2)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1):
+  vitest@2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1):
     dependencies:
       '@vitest/expect': 2.1.8
-      '@vitest/mocker': 2.1.8(vite@6.0.6(@types/node@22.10.2)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1))
+      '@vitest/mocker': 2.1.8(vite@6.0.6(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1))
       '@vitest/pretty-format': 2.1.8
       '@vitest/runner': 2.1.8
       '@vitest/snapshot': 2.1.8
@@ -21298,11 +21283,11 @@ snapshots:
       tinyexec: 0.3.1
       tinypool: 1.0.2
       tinyrainbow: 1.2.0
-      vite: 6.0.6(@types/node@22.10.2)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
-      vite-node: 2.1.8(@types/node@22.10.2)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+      vite: 6.0.6(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+      vite-node: 2.1.8(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.28.2)(sass-embedded@1.83.0)(sass@1.83.0)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 22.10.2
+      '@types/node': 22.10.5
       '@vitest/ui': 2.1.8(vitest@2.1.8)
     transitivePeerDependencies:
       - jiti
