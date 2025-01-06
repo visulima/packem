@@ -20,7 +20,7 @@ describe("validatePackageFields", () => {
         warn.mockClear();
     });
 
-    it('should warn if "files" field is missing in package.json when validation is enabled', () => {
+    it('should not warn if "files" field is missing in package.json when validation is enabled', () => {
         expect.assertions(1);
 
         const context = {
@@ -30,7 +30,7 @@ describe("validatePackageFields", () => {
 
         validatePackageFields(context as BuildContext);
 
-        expect(warn).toHaveBeenCalledWith(context, "The 'files' field is missing in your package.json. Add the files to be included in the package.");
+        expect(warn).not.toHaveBeenCalledWith(context, "The 'files' field is missing in your package.json. Add the files to be included in the package.");
     });
 
     it('should warn if "main" field is missing in package.json for CJS packages', () => {
@@ -43,7 +43,7 @@ describe("validatePackageFields", () => {
 
         validatePackageFields(context as BuildContext);
 
-        expect(warn).toHaveBeenCalledWith(context, "The 'files' field is missing in your package.json. Add the files to be included in the package.");
+        expect(warn).toHaveBeenCalledWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
     });
 
     it('should warn if "exports" field is missing in package.json for ESM packages when emitCJS is false', () => {

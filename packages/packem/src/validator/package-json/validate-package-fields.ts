@@ -12,10 +12,10 @@ const validatePackageFields = (context: BuildContext): void => {
         warn(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
     }
 
-    if (validation?.packageJson?.files !== false) {
-        if (pkg.files === undefined) {
-            warn(context, "The 'files' field is missing in your package.json. Add the files to be included in the package.");
-        } else if (pkg.files.length === 0) {
+    // Omitting the field will make it default to ["*"], which means it will include all files.
+    // @see {@link https://docs.npmjs.com/cli/v11/configuring-npm/package-json#files}
+    if (validation?.packageJson?.files !== false && Array.isArray(pkg.files) && !pkg.files.includes("*")) {
+        if (pkg.files.length === 0) {
             warn(context, "The 'files' field in your package.json is empty. Please specify the files to be included in the package.");
         } else if (!pkg.files.some((file) => file.includes(context.options.outDir))) {
             warn(
