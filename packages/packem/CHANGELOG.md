@@ -1,3 +1,9 @@
+## @visulima/packem [1.10.5](https://github.com/visulima/packem/compare/@visulima/packem@1.10.4...@visulima/packem@1.10.5) (2025-01-07)
+
+### Bug Fixes
+
+* removed temporally @ckeditor/typedoc-plugins, fixed typedoc generation, added jsonFileName option for json format, fixed add command for typedoc ([92c5710](https://github.com/visulima/packem/commit/92c5710d3bb1fb02a7acb3ec35c1b3eadba5554c))
+
 ## @visulima/packem [1.10.4](https://github.com/visulima/packem/compare/@visulima/packem@1.10.3...@visulima/packem@1.10.4) (2025-01-07)
 
 ### Bug Fixes
