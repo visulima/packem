@@ -10,7 +10,7 @@ import MagicString from "magic-string";
 import findPackemFile from "../utils/find-packem-file";
 import cssLoaderDependencies from "./utils/css-loader-dependencies";
 
-const typedocPackages = ["typedoc", "typedoc-plugin-markdown", "typedoc-plugin-rename-defaults", "@ckeditor/typedoc-plugins"];
+const typedocPackages = ["typedoc", "typedoc-plugin-markdown", "typedoc-plugin-rename-defaults"];
 
 const createAddCommand = (cli: Cli): void => {
     cli.addCommand({
@@ -47,6 +47,13 @@ const createAddCommand = (cli: Cli): void => {
 
             const magic = new MagicString(packemConfig);
 
+            const transformerReplaceKey = "  transformer,";
+            let transformerSearchKey = "  transformer";
+
+            if (packemConfig.includes("  transformer,")) {
+                transformerSearchKey = "  transformer,";
+            }
+
             if (argument.includes("typedoc")) {
                 if (packemConfig.includes("typedoc: typedocBuilder") || packemConfig.includes("@visulima/packem/builder/typedoc")) {
                     logger.warn("Typedoc has already been added to the packem config.");
@@ -65,7 +72,7 @@ const createAddCommand = (cli: Cli): void => {
                     // add typedoc to the builder key
                     magic.replace("builder: {", `builder: {\n        typedoc: typedocBuilder,\n    `);
                 } else {
-                    magic.replace("transformer,", "transformer,\n    builder: {\n        typedoc: typedocBuilder,\n    },");
+                    magic.replace(transformerSearchKey, transformerReplaceKey + "\n    builder: {\n        typedoc: typedocBuilder,\n    },");
                 }
 
                 logger.info("Adding typedoc dependencies...");
@@ -192,11 +199,10 @@ const createAddCommand = (cli: Cli): void => {
                         `rollup: {\n        css: {${cssMinifier ? `\n            minifier: ${cssMinifier as string}Minifier,` : ""}\n            loaders: [${stringCssLoaders}],\n        },\n`,
                     );
                 } else {
-                    const transformerPlaceholder = packemConfig.includes("  transformer,") ? "  transformer," : "  transformer";
-
                     magic.replace(
-                        transformerPlaceholder,
-                        `  transformer,\n    rollup: {\n        css: {${cssMinifier ? `\n            minifier: ${cssMinifier as string}Minifier,` : ""}\n            loaders: [${stringCssLoaders}],\n        },\n    },`,
+                        transformerSearchKey,
+                        transformerReplaceKey +
+                            `\n    rollup: {\n        css: {${cssMinifier ? `\n            minifier: ${cssMinifier as string}Minifier,` : ""}\n            loaders: [${stringCssLoaders}],\n        },\n    },`,
                     );
                 }
 

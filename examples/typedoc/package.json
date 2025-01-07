@@ -1,0 +1,29 @@
+{
+    "name": "examples_packem_typedoc",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": {
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "files": [
+        "./dist"
+    ],
+    "scripts": {
+        "build": "packem build",
+        "clean": "rimraf node_modules dist"
+    },
+    "devDependencies": {
+        "@visulima/packem": "workspace:*",
+        "esbuild": "^0.24.2",
+        "rimraf": "^6.0.1",
+        "typedoc": "0.27.6",
+        "typedoc-plugin-markdown": "4.4.1",
+        "typedoc-plugin-rename-defaults": "0.7.2"
+    }
+}

@@ -350,6 +350,7 @@ const generateOptions = (
         sourcemap: false,
         transformerName: undefined,
         typedoc: {
+            githubPages: false,
             excludePrivate: true,
             // Sorts the main index for a namespace / module; not the sidebar tab.
             groupOrder: [
@@ -396,6 +397,7 @@ const generateOptions = (
             pretty: true,
             readme: "none",
             showConfig: debug,
+            format: "inline",
             tsconfig: tsconfig?.path,
         },
     }) as InternalBuildOptions;

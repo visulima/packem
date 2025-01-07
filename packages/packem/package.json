@@ -398,7 +398,6 @@
         "@anolilab/semantic-release-preset": "^9.0.3",
         "@arethetypeswrong/cli": "^0.17.2",
         "@babel/core": "^7.26.0",
-        "@ckeditor/typedoc-plugins": "44.2.1",
         "@oxc-project/types": "0.44.0",
         "@rushstack/eslint-plugin-security": "^0.8.3",
         "@secretlint/secretlint-rule-preset-recommend": "^9.0.0",
@@ -476,7 +475,6 @@
         "vitest": "^2.1.8"
     },
     "peerDependencies": {
-        "@ckeditor/typedoc-plugins": ">=44.0.0",
         "@swc/core": ">=1.5.7",
         "cssnano": ">=7.0.6",
         "esbuild": ">=0.20.2",

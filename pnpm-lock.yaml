@@ -581,6 +581,27 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2
 
+  examples/typedoc:
+    devDependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.24.2
+        version: 0.24.2
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.0.1
+      typedoc:
+        specifier: 0.27.6
+        version: 0.27.6(typescript@5.7.2)
+      typedoc-plugin-markdown:
+        specifier: 4.4.1
+        version: 4.4.1(typedoc@0.27.6(typescript@5.7.2))
+      typedoc-plugin-rename-defaults:
+        specifier: 0.7.2
+        version: 0.7.2(typedoc@0.27.6(typescript@5.7.2))
+
   examples/types-entries:
     devDependencies:
       '@visulima/packem':
@@ -773,9 +794,6 @@ importers:
       '@babel/core':
         specifier: ^7.26.0
         version: 7.26.0
-      '@ckeditor/typedoc-plugins':
-        specifier: 44.2.1
-        version: 44.2.1(typedoc@0.27.6(typescript@5.7.2))
       '@oxc-project/types':
         specifier: 0.44.0
         version: 0.44.0
@@ -1302,12 +1320,6 @@ packages:
 
   '@bufbuild/protobuf@2.2.3':
     resolution: {integrity: sha512-tFQoXHJdkEOSwj5tRIZSPNUuXK3RaR7T1nUrPgbYX1pUbvqqaaZAsfo+NXBPsz5rZMSKVFrgK1WL8Q/MSLvprg==}
-
-  '@ckeditor/typedoc-plugins@44.2.1':
-    resolution: {integrity: sha512-7GNrSczAmccuyVY5CTI11UVzmbaGaiHn4pA/eci8a2S7b2vUg27WmUGybIbMFharJWJzfA1051Jh85JiqfTcCg==}
-    engines: {node: '>=18.0.0', npm: '>=5.7.1'}
-    peerDependencies:
-      typedoc: ^0.23.15
 
   '@clack/core@0.4.0':
     resolution: {integrity: sha512-YJCYBsyJfNDaTbvDUVSJ3SgSuPrcujarRgkJ5NLjexDZKvaOiVVJvAQYx8lIgG0qRT8ff0fPgqyBCVivanIZ+A==}
@@ -10817,10 +10829,6 @@ snapshots:
 
   '@bufbuild/protobuf@2.2.3': {}
 
-  '@ckeditor/typedoc-plugins@44.2.1(typedoc@0.27.6(typescript@5.7.2))':
-    dependencies:
-      typedoc: 0.27.6(typescript@5.7.2)
-
   '@clack/core@0.4.0':
     dependencies:
       picocolors: 1.1.1
@@ -15558,7 +15566,7 @@ snapshots:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 3.0.8
+      minimatch: 3.1.2
       once: 1.4.0
       path-is-absolute: 1.0.1
 

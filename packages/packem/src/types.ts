@@ -122,7 +122,7 @@ export type TypeDocumentOptions = {
     /**
      * The format of the output.
      *
-     * @default "inline"
+     * @default "html"
      */
     format?: "inline" | "json" | "markdown" | "html";
     /**
@@ -139,6 +139,10 @@ export type TypeDocumentOptions = {
      * The path of the README file.
      */
     readmePath?: string;
+    /**
+     * The name of the JSON file.
+     */
+    jsonFileName?: string;
 } & Partial<Omit<BaseTypeDocumentOptions, "entryPoints" | "out" | "hideGenerator" | "watch" | "preserveWatchOutput">>;
 
 export type Runtime = "react-server" | "react-native" | "edge-light" | "node";
