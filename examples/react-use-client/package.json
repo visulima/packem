@@ -39,7 +39,7 @@
         "react-dom": "^19.0.0"
     },
     "devDependencies": {
-        "@types/react": "^19.0.1",
+        "@types/react": "^19.0.3",
         "@types/react-dom": "^19.0.2",
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.24.2",
