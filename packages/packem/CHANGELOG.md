@@ -1,3 +1,10 @@
+## @visulima/packem [1.10.3](https://github.com/visulima/packem/compare/@visulima/packem@1.10.2...@visulima/packem@1.10.3) (2025-01-07)
+
+### Bug Fixes
+
+* dont throw a error if the files filed is missing in the package.json ([c84a359](https://github.com/visulima/packem/commit/c84a35955ae732a9bf701f4c65eb6fecd701e51c))
+* updated dependencies, @visulima/*, rollup v4.30.1, rollup-plugin-visualizer v5.14.0, tinyexec v0.3.2 ([048bc64](https://github.com/visulima/packem/commit/048bc647032025065afd4ed13dffab60648b310a))
+
 ## @visulima/packem [1.10.2](https://github.com/visulima/packem/compare/@visulima/packem@1.10.1...@visulima/packem@1.10.2) (2024-12-29)
 
 ### Bug Fixes
