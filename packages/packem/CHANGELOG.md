@@ -1,3 +1,9 @@
+## @visulima/packem [1.10.4](https://github.com/visulima/packem/compare/@visulima/packem@1.10.3...@visulima/packem@1.10.4) (2025-01-07)
+
+### Bug Fixes
+
+* do not replace NODE_ENV by default ([a1e4ade](https://github.com/visulima/packem/commit/a1e4adeb1447176ba9f1b9382e13429c4e7369c0))
+
 ## @visulima/packem [1.10.3](https://github.com/visulima/packem/compare/@visulima/packem@1.10.2...@visulima/packem@1.10.3) (2025-01-07)
 
 ### Bug Fixes
