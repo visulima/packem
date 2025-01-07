@@ -115,6 +115,46 @@ export { a };
 `);
     });
 
+    it("should not replace the NODE_ENV by default if no development or production option was given", async () => {
+        expect.assertions(7);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await installPackage(temporaryDirectoryPath, "@types/node");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = process.env.NODE_ENV;`);
+
+        await createTsConfig(temporaryDirectoryPath, {});
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "dist/index.mjs",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackemSync("build", ["--no-environment"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).toContain("Preparing build for");
+        expect(binProcess.stdout).not.toContain("development");
+        expect(binProcess.stdout).not.toContain("environment with");
+        expect(binProcess.stdout).not.toContain("Minification is enabled, the output will be minified");
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mtsContent).toBe(`const a = process.env.NODE_ENV;
+
+export { a };
+`);
+    });
+
     it("should run in production mode if no NODE_ENV and production option was given", async () => {
         expect.assertions(7);
 

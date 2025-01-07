@@ -1,4 +1,4 @@
-import { env, exit } from "node:process";
+import { exit } from "node:process";
 
 import type { Cli } from "@visulima/cerebro";
 
@@ -22,19 +22,10 @@ const createBuildCommand = (cli: Cli): void => {
             const environments: Record<string, string> = {};
             let nodeEnvironment: string | undefined;
 
-            // use the NODE_ENV environment variable if it exists
-            if (env.NODE_ENV && [DEVELOPMENT_ENV, PRODUCTION_ENV].includes(env.NODE_ENV)) {
-                nodeEnvironment = env.NODE_ENV;
-            }
-
             if (options.env) {
                 for (const environment of options.env) {
                     if (environment.key === "NODE_ENV") {
-                        if (nodeEnvironment) {
-                            throw new Error("NODE_ENV was already set, this can't be overridden.");
-                        } else {
-                            nodeEnvironment = environment.value;
-                        }
+                        nodeEnvironment = environment.value;
                     } else {
                         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
                         environments["process.env." + environment.key] = JSON.stringify(environment.value);
