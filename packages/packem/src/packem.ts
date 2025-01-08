@@ -235,7 +235,8 @@ const generateOptions = (
             resolve: {
                 // old behavior node 14 and removed in node 17
                 allowExportsFolderMapping: false,
-                exportConditions: ["module-sync"],
+                // @see https://github.com/rollup/plugins/pull/1823 why we need to set the correct condition
+                exportConditions: [environment ?? "production", "module-sync"],
                 extensions: DEFAULT_EXTENSIONS,
                 // Following option must be *false* for polyfill to work
                 preferBuiltins: false,
