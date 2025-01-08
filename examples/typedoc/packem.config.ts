@@ -8,4 +8,7 @@ export default defineConfig({
     builder: {
         typedoc: typedocBuilder,
     },
+    typedoc: {
+        readmePath: "./README.md",
+    }
 });
