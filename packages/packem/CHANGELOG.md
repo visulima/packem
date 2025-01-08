@@ -1,3 +1,10 @@
+## @visulima/packem [1.10.6](https://github.com/visulima/packem/compare/@visulima/packem@1.10.5...@visulima/packem@1.10.6) (2025-01-08)
+
+### Bug Fixes
+
+* added missing external and no-external option to the cli ([c6fe2ac](https://github.com/visulima/packem/commit/c6fe2acfc576e749f28f8597c43432251e45a49b))
+* node resolve should use production condition if no environment was found ([a4b7ee9](https://github.com/visulima/packem/commit/a4b7ee943fead31db60039766ce90510d44f7f1a))
+
 ## @visulima/packem [1.10.5](https://github.com/visulima/packem/compare/@visulima/packem@1.10.4...@visulima/packem@1.10.5) (2025-01-07)
 
 ### Bug Fixes
