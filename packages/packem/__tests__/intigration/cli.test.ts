@@ -392,4 +392,63 @@ export { a };
 export { a };
 `);
     });
+
+    it("should externalize dependencies provided by --external option", async () => {
+        expect.assertions(7);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `import { __TEST_EXPECTED_STRING__ } from '@test/shouldbeexternal'
+import bar from 'bar-package'
+
+export function baz() {
+  return __TEST_EXPECTED_STRING__
+}
+
+export function barFunction() {
+  return bar
+}`);
+
+        await createTsConfig(temporaryDirectoryPath, {});
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "dist/index.mjs",
+            type: "module",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackemSync("build", ["--external=@test/shouldbeexternal"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).toContain("Preparing build for");
+        expect(binProcess.stdout).toContain("development");
+        expect(binProcess.stdout).toContain("environment with");
+        expect(binProcess.stdout).not.toContain("Minification is enabled, the output will be minified");
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mtsContent).toBe(`import { __TEST_EXPECTED_STRING__ } from '@test/shouldbeexternal';
+import bar from 'bar-package';
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function baz() {
+  return __TEST_EXPECTED_STRING__;
+}
+__name(baz, "baz");
+function barFunction() {
+  return bar;
+}
+__name(barFunction, "barFunction");
+
+export { barFunction, baz };
+`);
+    });
 });

@@ -41,6 +41,14 @@ const createBuildCommand = (cli: Cli): void => {
                 }
             }
 
+            const externals: string[] = [];
+
+            if (options.external) {
+                for (const ext of options.external) {
+                    externals.push(ext.split(","));
+                }
+            }
+
             try {
                 await packem(options.dir, mode, nodeEnvironment as Environment, logger, {
                     analyze: options.analyze,
@@ -52,6 +60,7 @@ const createBuildCommand = (cli: Cli): void => {
                     killSignal: options.killSignal,
                     minify: options.minify === undefined ? nodeEnvironment === PRODUCTION_ENV : options.minify,
                     onSuccess: options.onSuccess,
+                    externals: externals,
                     rollup: {
                         esbuild: {
                             target: options.target,
@@ -63,6 +72,15 @@ const createBuildCommand = (cli: Cli): void => {
                         replace: {
                             values: environments,
                         },
+                        resolveExternals: options.noExternal
+                            ? {
+                                  builtins: false,
+                                  deps: false,
+                                  devDeps: false,
+                                  peerDeps: false,
+                                  optDeps: false,
+                              }
+                            : {},
                     },
                     sourcemap: options.metafile || options.analyze || options.sourcemap,
                     tsconfigPath: options.tsconfig ?? undefined,
@@ -223,6 +241,17 @@ const createBuildCommand = (cli: Cli): void => {
 
                     throw new Error("Invalid kill signal. Use 'SIGTERM' or 'SIGKILL'.");
                 },
+            },
+            {
+                description: "Specify an external dependency, separate by comma (eg. --external lodash,react,react-dom)",
+                name: "external",
+                multiple: true,
+                typeLabel: "string[]",
+            },
+            {
+                description: "do not bundle external dependencies",
+                name: "no-external",
+                type: Boolean,
             },
         ],
     });

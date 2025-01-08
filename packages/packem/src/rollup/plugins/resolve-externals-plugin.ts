@@ -189,6 +189,15 @@ export const resolveExternalsPlugin = (
                 // package.json imports are not externals
                 if (packageJson.imports) {
                     for (const [key, value] of Object.entries(packageJson.imports)) {
+                        if (key[0] !== "#") {
+                            logger.debug({
+                                message: 'Ignoring package.json import "' + cyan(key) + '" because it does not start with "#".',
+                                prefix: "plugin:packem:resolve-externals",
+                            })
+
+                            continue;
+                        }
+
                         if (key === id) {
                             cacheResolved.set(id, false);
 
