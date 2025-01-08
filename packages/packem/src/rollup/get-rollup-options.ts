@@ -296,6 +296,9 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
     const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "build");
 
+    // Add esm mark and interop helper if esm export is detected
+    const useEsModuleMark = context.tsconfig?.config?.compilerOptions?.esModuleInterop;
+
     return (<RollupOptions>{
         ...baseRollupOptions(context, "build"),
 
@@ -311,6 +314,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     compact: context.options.minify,
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "cjs"),
+                    esModule: useEsModuleMark || "if-default-prop",
                     exports: "auto",
                     // turn off live bindings support (exports.* getters for re-exports)
                     externalLiveBindings: false,
@@ -344,6 +348,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     compact: context.options.minify,
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "mjs"),
+                    esModule: useEsModuleMark || "if-default-prop",
                     exports: "auto",
                     // turn off live bindings support (exports.* getters for re-exports)
                     externalLiveBindings: false,
