@@ -1,3 +1,9 @@
+## @visulima/packem [1.10.7](https://github.com/visulima/packem/compare/@visulima/packem@1.10.6...@visulima/packem@1.10.7) (2025-01-09)
+
+### Bug Fixes
+
+* added esModuleMark check when typescript compilerOptions esModuleInterop is used, default falls back to if-default-prop ([a385ff6](https://github.com/visulima/packem/commit/a385ff62ea3b881a2d0d12700ca9bbc54d5dfddd))
+
 ## @visulima/packem [1.10.6](https://github.com/visulima/packem/compare/@visulima/packem@1.10.5...@visulima/packem@1.10.6) (2025-01-08)
 
 ### Bug Fixes
