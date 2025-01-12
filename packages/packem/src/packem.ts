@@ -105,8 +105,11 @@ const generateOptions = (
                 extensions: [".mjs", ".js", ".json", ".node", ".cjs"],
                 ignoreTryCatch: true,
                 preserveSymlinks: true,
+                // Deal with mixed ESM and CJS modules, such as calling require() in ESM.
+                // For relative paths, the module will be bundled;
+                // For external libraries, the module will not be bundled.
                 // https://github.com/rollup/plugins/tree/master/packages/commonjs#transformmixedesmodules
-                transformMixedEsModules: false,
+                transformMixedEsModules: true,
             },
             css: {
                 autoModules: true,

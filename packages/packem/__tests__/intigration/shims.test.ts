@@ -155,12 +155,12 @@ exports.getFilename = getFilename;
 
         const mjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.mjs`);
 
-        expect(mjsRequireContent).toBe(`import __cjs_mod__ from "node:module"; // -- packem CommonJS require shim --
-const require = __cjs_mod__.createRequire(import.meta.url);
+        expect(mjsRequireContent).toBe(`import require$$0 from 'node:fs';
+
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getRequireModule() {
-  return require("node:fs");
+  return require$$0;
 }
 __name(getRequireModule, "getRequireModule");
 function esmImport() {
@@ -177,11 +177,17 @@ export { esmImport, getRequireModule };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
+const require$$0 = require('node:fs');
+
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
+const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
+
+const require$$0__default = /*#__PURE__*/_interopDefaultCompat(require$$0);
+
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getRequireModule() {
-  return require("node:fs");
+  return require$$0__default;
 }
 __name(getRequireModule, "getRequireModule");
 function esmImport() {
@@ -324,12 +330,12 @@ exports.getFilename = getFilename;
 
         const mjsRequireContent = readFileSync(`${temporaryDirectoryPath}/dist/require.mjs`);
 
-        expect(mjsRequireContent).toBe(`import __cjs_mod__ from "node:module"; // -- packem CommonJS require shim --
-const require = __cjs_mod__.createRequire(import.meta.url);
+        expect(mjsRequireContent).toBe(`import require$$0 from 'node:fs';
+
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getRequireModule() {
-  return require("node:fs");
+  return require$$0;
 }
 __name(getRequireModule, "getRequireModule");
 function esmImport() {
@@ -346,11 +352,17 @@ export { esmImport, getRequireModule };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
+const require$$0 = require('node:fs');
+
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
+const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
+
+const require$$0__default = /*#__PURE__*/_interopDefaultCompat(require$$0);
+
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getRequireModule() {
-  return require("node:fs");
+  return require$$0__default;
 }
 __name(getRequireModule, "getRequireModule");
 function esmImport() {
