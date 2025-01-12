@@ -436,7 +436,7 @@ export default defineConfig({
 
 ### Aliases
 
-Aliases can be configured in the [import map](https://nodejs.org/api/packages.html#imports), defined in `package.json#imports`.
+Aliases are automatically inferred from `paths` in your tsconfig.json file, and can also be configured in the [import map](https://nodejs.org/api/packages.html#imports) defined in `package.json#imports`.
 
 For native Node.js import mapping, all entries must be prefixed with `#` to indicate an internal [subpath import](https://nodejs.org/api/packages.html#subpath-imports). `Packem` takes advantage of this behavior to define entries that are _not prefixed_ with `#` as an alias.
 
