@@ -102,7 +102,7 @@ importers:
         version: 5.7.3
       vitest:
         specifier: ^2.1.8
-        version: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+        version: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0)
 
   examples/cjs-interop:
     devDependencies:
@@ -254,7 +254,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.0.7
-        version: 6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+        version: 6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0)
 
   examples/native-node-module:
     devDependencies:
@@ -303,7 +303,7 @@ importers:
         version: 8.4.49
       postcss-load-config:
         specifier: ^6.0.1
-        version: 6.0.1(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(yaml@2.6.1)
+        version: 6.0.1(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(yaml@2.7.0)
       postcss-modules:
         specifier: 6.0.1
         version: 6.0.1(postcss@8.4.49)
@@ -361,7 +361,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.0.7
-        version: 6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+        version: 6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0)
 
   examples/react-tsx-css-module:
     dependencies:
@@ -395,7 +395,7 @@ importers:
         version: 8.4.49
       postcss-load-config:
         specifier: ^6.0.1
-        version: 6.0.1(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(yaml@2.6.1)
+        version: 6.0.1(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(yaml@2.7.0)
       postcss-modules:
         specifier: 6.0.1
         version: 6.0.1(postcss@8.4.49)
@@ -471,7 +471,7 @@ importers:
         version: 8.4.49
       postcss-load-config:
         specifier: ^6.0.1
-        version: 6.0.1(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(yaml@2.6.1)
+        version: 6.0.1(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(yaml@2.7.0)
       postcss-modules:
         specifier: 6.0.1
         version: 6.0.1(postcss@8.4.49)
@@ -686,35 +686,35 @@ importers:
         specifier: 5.1.4
         version: 5.1.4(rollup@4.28.1)
       '@visulima/cerebro':
-        specifier: 1.1.31
-        version: 1.1.31
+        specifier: 1.1.32
+        version: 1.1.32
       '@visulima/colorize':
-        specifier: 1.4.16
-        version: 1.4.16
+        specifier: 1.4.17
+        version: 1.4.17
       '@visulima/find-cache-dir':
-        specifier: 1.0.20
-        version: 1.0.20
+        specifier: 1.0.21
+        version: 1.0.21
       '@visulima/fs':
-        specifier: 2.3.5
-        version: 2.3.5
+        specifier: 2.3.6
+        version: 2.3.6
       '@visulima/humanizer':
-        specifier: 1.0.18
-        version: 1.0.18
+        specifier: 1.0.19
+        version: 1.0.19
       '@visulima/package':
-        specifier: 3.4.2
-        version: 3.4.2(@types/node@22.10.5)
+        specifier: 3.4.3
+        version: 3.4.3(@types/node@22.10.5)
       '@visulima/pail':
-        specifier: 2.1.16
-        version: 2.1.16
+        specifier: 2.1.17
+        version: 2.1.17
       '@visulima/path':
-        specifier: 1.3.1
-        version: 1.3.1
+        specifier: 1.3.2
+        version: 1.3.2
       '@visulima/source-map':
-        specifier: 1.0.14
-        version: 1.0.14
+        specifier: 1.0.15
+        version: 1.0.15
       '@visulima/tsconfig':
-        specifier: 1.1.6
-        version: 1.1.6
+        specifier: 1.1.7
+        version: 1.1.7
       browserslist:
         specifier: 4.24.4
         version: 4.24.4
@@ -943,7 +943,7 @@ importers:
         version: 14.0.4(postcss@8.4.49)
       postcss-load-config:
         specifier: ^6.0.1
-        version: 6.0.1(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(yaml@2.6.1)
+        version: 6.0.1(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(yaml@2.7.0)
       postcss-modules-extract-imports:
         specifier: ^3.1.0
         version: 3.1.0(postcss@8.4.49)
@@ -1018,7 +1018,7 @@ importers:
         version: 5.7.3
       vitest:
         specifier: ^2.1.8
-        version: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+        version: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0)
 
 packages:
 
@@ -1209,9 +1209,6 @@ packages:
     engines: {node: '>=18.* <=21.*'}
     peerDependencies:
       textlint: ^13.3.2
-
-  '@antfu/install-pkg@0.5.0':
-    resolution: {integrity: sha512-dKnk2xlAyC7rvTkpkHmu+Qy/2Zc3Vm/l8PtNyIOGDBtXPY3kThfU4ORNEp3V7SXw5XSOb+tOJaUYpfquPzL/Tg==}
 
   '@antfu/install-pkg@1.0.0':
     resolution: {integrity: sha512-xvX6P/lo1B3ej0OsaErAjqgFYzYVcJpamjLAFLYh9vRJngBrMoUG7aVnrGTeqM7yxbyTD5p3F2+0/QUEh8Vzhw==}
@@ -1852,14 +1849,14 @@ packages:
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
     deprecated: Use @eslint/object-schema instead
 
-  '@inquirer/confirm@5.1.1':
-    resolution: {integrity: sha512-vVLSbGci+IKQvDOtzpPTCOiEJCNidHcAq9JYVoWTW0svb5FiwSLotkM+JXNXejfjnzVYV9n0DTBythl9+XgTxg==}
+  '@inquirer/confirm@5.1.2':
+    resolution: {integrity: sha512-VKgaKxw2I3cu2smedeMFyxuYyI+HABlFY1Px4j8NueA7xDskKAo9hxEQemTpp1Fu4OiTtOCgU4eK91BVuBKH3g==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/node': '>=18'
 
-  '@inquirer/core@10.1.2':
-    resolution: {integrity: sha512-bHd96F3ezHg1mf/J0Rb4CV8ndCN0v28kUlrHqP7+ECm1C/A+paB7Xh2lbMk6x+kweQC+rZOxM/YeKikzxco8bQ==}
+  '@inquirer/core@10.1.3':
+    resolution: {integrity: sha512-+7/dCYwDku2xfcWJWX6Urxb8aRz6d0K+4lRgIBM08ktE84dm++RPROgnVfWq4hLK5FVu/O4rbO9HnJtaz3pt2w==}
     engines: {node: '>=18'}
 
   '@inquirer/figures@1.0.8':
@@ -3396,64 +3393,64 @@ packages:
   '@ungap/structured-clone@1.2.1':
     resolution: {integrity: sha512-fEzPV3hSkSMltkw152tJKNARhOupqbH96MZWyRjNaYZOMIzbrTeQDG+MTc6Mr2pgzFQzFxAfmhGDNP5QK++2ZA==}
 
-  '@visulima/boxen@1.0.25':
-    resolution: {integrity: sha512-U6kzb4RKO+zEwnLTYdPOnuZ2+qg0jp7YxW+gyJk04jjTXC38dpllUuEeXu7lWH91UrJWUS8qTQiP3q8DIevfWA==}
+  '@visulima/boxen@1.0.26':
+    resolution: {integrity: sha512-lcQmryoryQmudNbWvJLWe9ohj4Hh8jYczY0RAoB8VJ93uUXbtJ+FEJx3WmSNljOwSK99PP9KoktWoBHFQKYlNg==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/cerebro@1.1.31':
-    resolution: {integrity: sha512-aBBJXEWxyGL7Kb6eet9zdJRA/Cjk7wr1TWdGv3hqjYRigdtBRaF86KfDxjqTsZnLofD7i/iIWlXJ9dNpy3xSVw==}
+  '@visulima/cerebro@1.1.32':
+    resolution: {integrity: sha512-z+C7LGktKiU0WT4RCM803Y5sH/MQGw2kLL96qjsDuptuxm/Xsb0bWQ3PFkCGPjFL7srPButypk4jb6qJDTDABg==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/colorize@1.4.16':
-    resolution: {integrity: sha512-QVpQUXJQ9chqgAxsNV3LwyU8zJtAFLaGAdSHd5OI6AHVDPmyDMchJSH2odeXg0ikQnCiEnlD5pqxvTfdhVyHog==}
+  '@visulima/colorize@1.4.17':
+    resolution: {integrity: sha512-ODSL4iVSz3NaO9wCVXc7aHps8ILZcI1v+6k3EaCy43UrZkK1GUUwcYe8iJsaYOJhw2RdR99ObXrUIXuLdrRbbg==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/error@4.4.11':
-    resolution: {integrity: sha512-7E8oWF+HJw/WejIXXoAwpu4SZ916IHo6vYO5OXPTeV0rKCVrcM2xI+D4X55D3MEAl7lXPsMZhcqtY1R3H72duw==}
+  '@visulima/error@4.4.12':
+    resolution: {integrity: sha512-niX9YmCF7+KkPHS7naAyE2fmnMDmfC50gqojKFSdH80qKKhRu5rXdNJnDb6o5XtvvIDwQ/XfAZwhKwiZphUb6A==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/find-cache-dir@1.0.20':
-    resolution: {integrity: sha512-AhMLDcs+eGbAb1oR1/cBS+caM/8iQZsvrj8Ii6WV40GDPoKE9ul1Ac5O2cEXgmrwQQnMp5DEowKtv9Lgtcbe9w==}
+  '@visulima/find-cache-dir@1.0.21':
+    resolution: {integrity: sha512-wmoBikVgAgZ1aNRSMRtRWQgXeCTWgEMmYVQxmQOxMwP3Xk+9p1ICUX30xVH8VA/9rAP5vQywCUCXTiP12H2Dmw==}
     engines: {node: '>=18.* <=23.*'}
 
-  '@visulima/fmt@1.1.12':
-    resolution: {integrity: sha512-+fguDgRwJacWSgDbeAgIrimEJXdgR3XDmMnTXyhsxSWgNqEgUiiGCPoxnof7xXMMJWN6LTRgVgRyRX7/u9ZNeg==}
-    engines: {node: '>=18.* <=23.*'}
-    os: [darwin, linux, win32]
-
-  '@visulima/fs@2.3.5':
-    resolution: {integrity: sha512-WS6bi0S20o/tLKyic++5QjncT9IpnkyoWLtQGbjBzDY5d+1hOLo6NsdalVRqj56u/j8Kmmx3Sghh2XY3qiMiBQ==}
+  '@visulima/fmt@1.1.13':
+    resolution: {integrity: sha512-NlXu4G/BM8Q6z4vbfNXkUUjjzvmYDz7DrASBQiToexAvKA25HqPRxxJL0+CjYlkZY/HTmDA9dXyksgcOMSQzig==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/humanizer@1.0.18':
-    resolution: {integrity: sha512-UOXQl1G54kT3lVCUyeOWT8dKTnaDG5mwQR9v9rLDhOa/Ns+faIQhSjCWTb6/ooWvWZpURK1zci0OKWaJsVDjPA==}
-    engines: {node: '>=18.* <=23.*'}
-
-  '@visulima/inspector@1.0.16':
-    resolution: {integrity: sha512-r48ulajJLYy7+vyAQX85fw+wwPSf4EvrrHiwtTnqIP2s7zc9Lys7E7eFNJ7L0x5IyXGRk41K5a+/U0COH109fQ==}
-    engines: {node: '>=18.* <=23.*'}
-
-  '@visulima/is-ansi-color-supported@2.2.9':
-    resolution: {integrity: sha512-w1LFr983XoNKKjriSw7M8HTKgm0+8sMP30piFjLGpZVR7tI3A1ShhF3nNX8im8yRcGZtGSKN401nOlABxHR0Dg==}
+  '@visulima/fs@2.3.6':
+    resolution: {integrity: sha512-EW5MCCfSY90eBUllL/yuHs9aTptW8nWyDrWVLD4AjfN9D5X9yRF3pookeCz8Kg4hSCjLadX2AKzBcH1NKZG5YA==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/package@3.4.2':
-    resolution: {integrity: sha512-b9PeY9Q0v2Hpf94HfRN3Q8K90tgVmmOnZqnoe3XoAKXrIXxcL/4lIc6+mJR8Ch7EcSuBMddXlt8GlWElMY7zqA==}
+  '@visulima/humanizer@1.0.19':
+    resolution: {integrity: sha512-tTEW1sESHZNOkQBQMS7zZzWxJIw7ZywVBj2zCdWq5A7rKcB39O8fnax+HDalht90gBF9ZxGFrrGSKjhLwq2+kQ==}
+    engines: {node: '>=18.* <=23.*'}
+
+  '@visulima/inspector@1.0.17':
+    resolution: {integrity: sha512-I6g68zOOi6pjQ8mUwJP/KnuPRMA4VfWd+ZmWO0PIcjxiyb2a4xaSENzhDzHb2dw2OYskXWjuH1+k3iU+MF+I/Q==}
+    engines: {node: '>=18.* <=23.*'}
+
+  '@visulima/is-ansi-color-supported@2.2.10':
+    resolution: {integrity: sha512-LFetJq1wRChBEon5ejdGM0ckHX5EAWYLpfswckDMwLhcmhoNmuBCM1KMt8Bs6ooHvqZfRsadlzfy2skR6XdE2A==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/pail@2.1.16':
-    resolution: {integrity: sha512-3aDBbARinGVBEgYH6vXMVHccU6RtJHcnwcvYE6kb4JyBrpWs6D82k6nydquBDfE2dth+D+z0/s4UMNnLv0Ogow==}
+  '@visulima/package@3.4.3':
+    resolution: {integrity: sha512-OqHnCgRN+iDj09f8aL4Ic+7o9y1qFatAFxfkAH9wlojiYmhWAMPXvXplp0lHNb1Jov4P28kIqobIJFclmXqb/w==}
+    engines: {node: '>=18.* <=23.*'}
+    os: [darwin, linux, win32]
+
+  '@visulima/pail@2.1.17':
+    resolution: {integrity: sha512-LiqJK8Y3qa1AGpvD5l01dnWK8lOfewHDwDrBVaH2yyJxYx2Qz0spiK8IcMgHFiKtJsjt6IvgriC0v0bbl07xTA==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
     peerDependencies:
-      '@visulima/redact': 1.0.10
+      '@visulima/redact': 1.0.11
       rotating-file-stream: ^3.1.1
     peerDependenciesMeta:
       '@visulima/redact':
@@ -3461,17 +3458,17 @@ packages:
       rotating-file-stream:
         optional: true
 
-  '@visulima/path@1.3.1':
-    resolution: {integrity: sha512-v6oMbiNR9mtDB6+0b8ccEMHNFF/je4bhEzqQ6g1Qo5tqVW0ur8bxftgWHzfP0aH6db/+ogtFo1NSrTwOnp0VmA==}
+  '@visulima/path@1.3.2':
+    resolution: {integrity: sha512-OnOsCMw35rKhkV1sR9nLjeNHY+FD9i1Tit8DLG7msgx1075NF5QAMfiEA1V/uMZG3GIrEgSfe1+NJ37hj3DPDQ==}
     engines: {node: '>=18.* <=23.*'}
     os: [darwin, linux, win32]
 
-  '@visulima/source-map@1.0.14':
-    resolution: {integrity: sha512-vtyDNWv6oddBPoU4wsUEus+cnGyvzQDzIzpq/9BUUflvOAfx5SH2jVo99ifNHS8sBlOnofxiBjjSiV9+PGeo4g==}
+  '@visulima/source-map@1.0.15':
+    resolution: {integrity: sha512-HS3CYsm6ttKl46Trq84SAMpfbyzq8j5l4IM/yhCAYbNoqDRN0qmaoFGrfQ5XFa+Cd9ypB2BPfXRhILFC33HGRw==}
     engines: {node: '>=18.* <=23.*'}
 
-  '@visulima/tsconfig@1.1.6':
-    resolution: {integrity: sha512-R2rJa7WRvEgaSm+7+ZCkQJi8AvCNxtAetmAIlpP0GXne5okfkki8Rhru4LMQX9baJvC+9UGRUXqBwcBd4jqjzg==}
+  '@visulima/tsconfig@1.1.7':
+    resolution: {integrity: sha512-41Ps8jEPv83CS6Yj/NZEVMGAHJFLYwnDXHnUmRsdObn3YHt4QriP1CWmiZyluSjDFketgponA5xzSq408fI52A==}
     engines: {node: '>=18.* <=23.*'}
 
   '@vitest/coverage-v8@2.1.8':
@@ -10216,6 +10213,11 @@ packages:
     engines: {node: '>= 14'}
     hasBin: true
 
+  yaml@2.7.0:
+    resolution: {integrity: sha512-+hSoy/QHluxmC9kCIJyL/uyFmLmc+e5CFR5Wa+bpIhIj85LVb9ZH2nVnqrHoSvKogwODv0ClqZkmiSSaIH5LTA==}
+    engines: {node: '>= 14'}
+    hasBin: true
+
   yargs-parser@20.2.9:
     resolution: {integrity: sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==}
     engines: {node: '>=10'}
@@ -10394,8 +10396,8 @@ snapshots:
 
   '@anolilab/rc@1.1.4':
     dependencies:
-      '@visulima/fs': 2.3.5
-      '@visulima/path': 1.3.1
+      '@visulima/fs': 2.3.6
+      '@visulima/path': 1.3.2
       ini: 5.0.0
       ts-deepmerge: 7.0.2
 
@@ -10403,9 +10405,9 @@ snapshots:
     dependencies:
       '@anolilab/rc': 1.1.4
       '@semantic-release/error': 4.0.0
-      '@visulima/fs': 2.3.5
-      '@visulima/package': 3.4.2(@types/node@22.10.5)
-      '@visulima/path': 1.3.1
+      '@visulima/fs': 2.3.6
+      '@visulima/package': 3.4.3(@types/node@22.10.5)
+      '@visulima/path': 1.3.2
       aggregate-error: 5.0.0
       execa: 9.5.2
       ini: 5.0.0
@@ -10459,11 +10461,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
       - supports-color
-
-  '@antfu/install-pkg@0.5.0':
-    dependencies:
-      package-manager-detector: 0.2.8
-      tinyexec: 0.3.2
 
   '@antfu/install-pkg@1.0.0':
     dependencies:
@@ -11081,13 +11078,13 @@ snapshots:
 
   '@humanwhocodes/object-schema@2.0.3': {}
 
-  '@inquirer/confirm@5.1.1(@types/node@22.10.5)':
+  '@inquirer/confirm@5.1.2(@types/node@22.10.5)':
     dependencies:
-      '@inquirer/core': 10.1.2(@types/node@22.10.5)
+      '@inquirer/core': 10.1.3(@types/node@22.10.5)
       '@inquirer/type': 3.0.2(@types/node@22.10.5)
       '@types/node': 22.10.5
 
-  '@inquirer/core@10.1.2(@types/node@22.10.5)':
+  '@inquirer/core@10.1.3(@types/node@22.10.5)':
     dependencies:
       '@inquirer/figures': 1.0.9
       '@inquirer/type': 3.0.2(@types/node@22.10.5)
@@ -12881,14 +12878,14 @@ snapshots:
 
   '@ungap/structured-clone@1.2.1': {}
 
-  '@visulima/boxen@1.0.25': {}
+  '@visulima/boxen@1.0.26': {}
 
-  '@visulima/cerebro@1.1.31':
+  '@visulima/cerebro@1.1.32':
     dependencies:
-      '@visulima/boxen': 1.0.25
-      '@visulima/colorize': 1.4.16
-      '@visulima/find-cache-dir': 1.0.20
-      '@visulima/pail': 2.1.16
+      '@visulima/boxen': 1.0.26
+      '@visulima/colorize': 1.4.17
+      '@visulima/find-cache-dir': 1.0.21
+      '@visulima/pail': 2.1.17
       cli-table3: 0.6.5
       command-line-args: 6.0.1
       fastest-levenshtein: 1.0.16
@@ -12897,59 +12894,59 @@ snapshots:
       - '@visulima/redact'
       - rotating-file-stream
 
-  '@visulima/colorize@1.4.16':
+  '@visulima/colorize@1.4.17':
     dependencies:
-      '@visulima/is-ansi-color-supported': 2.2.9
+      '@visulima/is-ansi-color-supported': 2.2.10
 
-  '@visulima/error@4.4.11': {}
+  '@visulima/error@4.4.12': {}
 
-  '@visulima/find-cache-dir@1.0.20':
+  '@visulima/find-cache-dir@1.0.21':
     dependencies:
-      '@visulima/fs': 2.3.5
-      '@visulima/path': 1.3.1
+      '@visulima/fs': 2.3.6
+      '@visulima/path': 1.3.2
 
-  '@visulima/fmt@1.1.12': {}
+  '@visulima/fmt@1.1.13': {}
 
-  '@visulima/fs@2.3.5':
+  '@visulima/fs@2.3.6':
     dependencies:
-      '@visulima/path': 1.3.1
-      yaml: 2.6.1
+      '@visulima/path': 1.3.2
+      yaml: 2.7.0
 
-  '@visulima/humanizer@1.0.18': {}
+  '@visulima/humanizer@1.0.19': {}
 
-  '@visulima/inspector@1.0.16': {}
+  '@visulima/inspector@1.0.17': {}
 
-  '@visulima/is-ansi-color-supported@2.2.9': {}
+  '@visulima/is-ansi-color-supported@2.2.10': {}
 
-  '@visulima/package@3.4.2(@types/node@22.10.5)':
+  '@visulima/package@3.4.3(@types/node@22.10.5)':
     dependencies:
-      '@antfu/install-pkg': 0.5.0
-      '@inquirer/confirm': 5.1.1(@types/node@22.10.5)
-      '@visulima/fs': 2.3.5
-      '@visulima/path': 1.3.1
+      '@antfu/install-pkg': 1.0.0
+      '@inquirer/confirm': 5.1.2(@types/node@22.10.5)
+      '@visulima/fs': 2.3.6
+      '@visulima/path': 1.3.2
       normalize-package-data: 7.0.0
     transitivePeerDependencies:
       - '@types/node'
 
-  '@visulima/pail@2.1.16':
+  '@visulima/pail@2.1.17':
     dependencies:
-      '@visulima/colorize': 1.4.16
-      '@visulima/error': 4.4.11
-      '@visulima/fmt': 1.1.12
-      '@visulima/inspector': 1.0.16
+      '@visulima/colorize': 1.4.17
+      '@visulima/error': 4.4.12
+      '@visulima/fmt': 1.1.13
+      '@visulima/inspector': 1.0.17
       safe-stable-stringify: 2.5.0
 
-  '@visulima/path@1.3.1': {}
+  '@visulima/path@1.3.2': {}
 
-  '@visulima/source-map@1.0.14':
+  '@visulima/source-map@1.0.15':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
-      '@visulima/path': 1.3.1
+      '@visulima/path': 1.3.2
 
-  '@visulima/tsconfig@1.1.6':
+  '@visulima/tsconfig@1.1.7':
     dependencies:
-      '@visulima/fs': 2.3.5
-      '@visulima/path': 1.3.1
+      '@visulima/fs': 2.3.6
+      '@visulima/path': 1.3.2
       jsonc-parser: 3.3.1
       resolve-pkg-maps: 1.0.0
 
@@ -12967,7 +12964,7 @@ snapshots:
       std-env: 3.8.0
       test-exclude: 7.0.1
       tinyrainbow: 1.2.0
-      vitest: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+      vitest: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -12978,13 +12975,13 @@ snapshots:
       chai: 5.1.2
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.8(vite@6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1))':
+  '@vitest/mocker@2.1.8(vite@6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0))':
     dependencies:
       '@vitest/spy': 2.1.8
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      vite: 6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+      vite: 6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0)
 
   '@vitest/pretty-format@2.1.8':
     dependencies:
@@ -13014,7 +13011,7 @@ snapshots:
       sirv: 3.0.0
       tinyglobby: 0.2.10
       tinyrainbow: 1.2.0
-      vitest: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+      vitest: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0)
 
   '@vitest/utils@2.1.8':
     dependencies:
@@ -14712,7 +14709,7 @@ snapshots:
       '@typescript-eslint/utils': 7.18.0(eslint@8.57.1)(typescript@5.7.3)
       eslint: 8.57.1
     optionalDependencies:
-      vitest: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+      vitest: 2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -18505,14 +18502,14 @@ snapshots:
     optionalDependencies:
       postcss: 8.4.49
 
-  postcss-load-config@6.0.1(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(yaml@2.6.1):
+  postcss-load-config@6.0.1(jiti@2.4.2)(postcss@8.4.49)(tsx@4.19.2)(yaml@2.7.0):
     dependencies:
       lilconfig: 3.1.3
     optionalDependencies:
       jiti: 2.4.2
       postcss: 8.4.49
       tsx: 4.19.2
-      yaml: 2.6.1
+      yaml: 2.7.0
 
   postcss-merge-longhand@7.0.4(postcss@8.4.49):
     dependencies:
@@ -20899,13 +20896,13 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.2
 
-  vite-node@2.1.8(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1):
+  vite-node@2.1.8(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0):
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
       es-module-lexer: 1.6.0
       pathe: 1.1.2
-      vite: 6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+      vite: 6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -20920,7 +20917,7 @@ snapshots:
       - tsx
       - yaml
 
-  vite@6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1):
+  vite@6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0):
     dependencies:
       esbuild: 0.24.2
       postcss: 8.4.49
@@ -20936,12 +20933,12 @@ snapshots:
       stylus: 0.64.0
       sugarss: 5.0.0(postcss@8.4.49)
       tsx: 4.19.2
-      yaml: 2.6.1
+      yaml: 2.7.0
 
-  vitest@2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1):
+  vitest@2.1.8(@types/node@22.10.5)(@vitest/ui@2.1.8)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0):
     dependencies:
       '@vitest/expect': 2.1.8
-      '@vitest/mocker': 2.1.8(vite@6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1))
+      '@vitest/mocker': 2.1.8(vite@6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0))
       '@vitest/pretty-format': 2.1.8
       '@vitest/runner': 2.1.8
       '@vitest/snapshot': 2.1.8
@@ -20957,8 +20954,8 @@ snapshots:
       tinyexec: 0.3.2
       tinypool: 1.0.2
       tinyrainbow: 1.2.0
-      vite: 6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
-      vite-node: 2.1.8(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.6.1)
+      vite: 6.0.7(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0)
+      vite-node: 2.1.8(@types/node@22.10.5)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.1)(sass@1.83.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.4.49))(tsx@4.19.2)(yaml@2.7.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 22.10.5
@@ -21126,6 +21123,8 @@ snapshots:
       yaml: 2.6.1
 
   yaml@2.6.1: {}
+
+  yaml@2.7.0: {}
 
   yargs-parser@20.2.9: {}
 
