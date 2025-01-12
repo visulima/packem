@@ -5,12 +5,13 @@ import { dirname } from "@visulima/path";
 import type { NapiResolveOptions } from "oxc-resolver";
 import { ResolverFactory } from "oxc-resolver";
 import type { Plugin } from "rollup";
+import type { Pail } from "@visulima/pail";
 
 export type OxcResolveOptions = { ignoreSideEffectsForRoot?: boolean } & Omit<NapiResolveOptions, "tsconfig">;
 
 const packageJsonCache = new Map<string, NormalizedPackageJson>();
 
-export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: string, tsconfigPath?: string) => {
+export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: string, logger: Pail, tsconfigPath?: string) => {
     const { ignoreSideEffectsForRoot, ...userOptions } = options;
 
     const resolver = new ResolverFactory({
@@ -28,16 +29,16 @@ export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: stri
                 const { error, path: id } = await resolver.async(resolveDirectory, source);
 
                 if (error) {
-                    // console.debug(error, {
-                    //     context: [
-                    //         {
-                    //             basedir,
-                    //             caller: userOptions.caller,
-                    //             extensions: userOptions.extensions,
-                    //             id,
-                    //         },
-                    //     ],
-                    // });
+                    logger.debug(error, {
+                        context: [
+                            {
+                                basedir: rootDirectory,
+                                // caller: userOptions.caller,
+                                extensions: userOptions.extensions,
+                                id,
+                            },
+                        ],
+                    });
                     return null;
                 }
 

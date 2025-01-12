@@ -580,7 +580,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             ...context.options.rollup.resolve,
         });
     } else if (context.options.experimental?.oxcResolve && context.options.rollup.experimental?.resolve) {
-        nodeResolver = oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, context.tsconfig?.path);
+        nodeResolver = oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, context.logger, context.tsconfig?.path);
     }
 
     // Each process should be unique
