@@ -1,3 +1,17 @@
+## @visulima/packem [1.11.0](https://github.com/visulima/packem/compare/@visulima/packem@1.10.7...@visulima/packem@1.11.0) (2025-01-12)
+
+### Features
+
+* handle dynamic require in ESM ([d45d512](https://github.com/visulima/packem/commit/d45d5122aef87e4f9f05f949727f9a31b99805e5))
+
+### Bug Fixes
+
+* updated all @visulima/* packages ([5aedc76](https://github.com/visulima/packem/commit/5aedc76d79fc6f7a3d71f0752b7863bf46fe0d12))
+
+### Miscellaneous Chores
+
+* Update readme to include alias support in tsconfig file. ([bdff288](https://github.com/visulima/packem/commit/bdff288146e727efad4d927d89ab1d279bd212fe))
+
 ## @visulima/packem [1.10.7](https://github.com/visulima/packem/compare/@visulima/packem@1.10.6...@visulima/packem@1.10.7) (2025-01-09)
 
 ### Bug Fixes
