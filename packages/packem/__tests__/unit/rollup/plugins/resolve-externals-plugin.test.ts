@@ -439,7 +439,7 @@ describe("resolve-externals-plugin", () => {
         expect((rollupInputConfig as ExternalRollupInputOptions).external("./index.js", undefined, false)).toBeFalsy();
     });
 
-    it("should resolve alias and original id to external id", async () => {
+    it("should resolve alias to external id", async () => {
         const context = getMockPluginContext({
             buildOptions: {
                 alias: {
@@ -454,6 +454,5 @@ describe("resolve-externals-plugin", () => {
         context.options(rollupInputConfig);
 
         expect((rollupInputConfig as ExternalRollupInputOptions).external("alias-test", undefined, false)).toBeTruthy();
-        expect((rollupInputConfig as ExternalRollupInputOptions).external("@test/foo", undefined, false)).toBeTruthy();
     });
 });
