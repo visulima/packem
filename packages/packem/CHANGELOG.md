@@ -1,3 +1,10 @@
+## @visulima/packem [1.11.1](https://github.com/visulima/packem/compare/@visulima/packem@1.11.0...@visulima/packem@1.11.1) (2025-01-15)
+
+### Bug Fixes
+
+* improved external handling, added new test to validate logic ([957881c](https://github.com/visulima/packem/commit/957881c986c3c6cfb7c03bdd52febac749389195))
+* improved external handling, check resolvedId and originalId if it exits in alias list, run originalId, resolvedId on all checks ([112d188](https://github.com/visulima/packem/commit/112d1888dba6aeba5f580bf25f44fb591c8b0501))
+
 ## @visulima/packem [1.11.0](https://github.com/visulima/packem/compare/@visulima/packem@1.10.7...@visulima/packem@1.11.0) (2025-01-12)
 
 ### Features
