@@ -30,17 +30,18 @@ const getRegExps = (data: MaybeFalsy<string | RegExp>[], type: "include" | "excl
         return result;
     }, []);
 
-const switchKeyValue = (object: Record<string, string>): Record<string, string> => {
-    const switchedObject: Record<string, string> = {};
+const calledImplicitExternals = new Map<string, boolean>();
 
-    for (const [key, value] of Object.entries(object)) {
-        switchedObject[value] = key;
+const logExternalMessage = (originalId: string, logger: Pail): void => {
+    if (!calledImplicitExternals.has(originalId)) {
+        logger.info({
+            message: 'Inlined implicit external "' + cyan(originalId) + '". If this is incorrect, add it to the "externals" option.',
+            prefix: "plugin:packem:resolve-externals",
+        });
     }
 
-    return switchedObject;
+    calledImplicitExternals.set(originalId, true);
 };
-
-const calledImplicitExternals = new Map<string, boolean>();
 
 export type ResolveExternalsPluginOptions = {
     /**
@@ -152,7 +153,6 @@ export const resolveExternalsPlugin = (
     }
 
     const resolvedAliases = resolveAliases(packageJson, buildOptions);
-    const mirroredAliases = switchKeyValue(resolvedAliases);
 
     return <Plugin>{
         name: "packem:resolve-externals",
@@ -169,22 +169,17 @@ export const resolveExternalsPlugin = (
                 if (Object.keys(resolvedAliases).length > 0) {
                     resolvedId = resolveAlias(originalId, resolvedAliases);
 
-                    const mirroredId = resolveAlias(resolvedId, mirroredAliases);
-
-                    if (isIncluded(mirroredId) && !isExcluded(mirroredId)) {
-                        cacheResolved.set(originalId, true);
-
-                        return true;
+                    if (resolvedId === originalId) {
+                        resolvedId = undefined;
                     }
                 }
 
-                // Source is always bundled
                 for (const id of [originalId, resolvedId].filter(Boolean)) {
                     if (
                         /^(?:\0|\.{1,2}\/)/.test(id) || // Ignore virtual modules and relative imports
                         isAbsolute(id) || // Ignore already resolved ids
                         new RegExp(`${buildOptions.sourceDir}[/.*|\\.*]`).test(id) || // Ignore source files
-                        (packageJson.name && originalId.startsWith(packageJson.name)) // Ignore self import
+                        (packageJson.name && id.startsWith(packageJson.name)) // Ignore self import
                     ) {
                         cacheResolved.set(id, false);
 
@@ -203,15 +198,9 @@ export const resolveExternalsPlugin = (
                         return result;
                     }
 
-                    // Handle npm dependencies.
-                    if (isIncluded(id) && !isExcluded(id)) {
-                        cacheResolved.set(id, true);
-
-                        return true;
-                    }
-
                     // package.json imports are not externals
-                    if (packageJson.imports) {
+                    // eslint-disable-next-line @typescript-eslint/prefer-string-starts-ends-with
+                    if (id[0] === "#" && packageJson.imports) {
                         for (const [key, value] of Object.entries(packageJson.imports)) {
                             // eslint-disable-next-line @typescript-eslint/prefer-string-starts-ends-with
                             if (key[0] !== "#") {
@@ -266,15 +255,15 @@ export const resolveExternalsPlugin = (
                         }
                     }
 
-                    if (!calledImplicitExternals.has(id)) {
-                        logger.info({
-                            message: 'Inlined implicit external "' + cyan(id) + '". If this is incorrect, add it to the "externals" option.',
-                            prefix: "plugin:packem:resolve-externals",
-                        });
-                    }
+                    // Handle npm dependencies.
+                    if (isIncluded(id) && !isExcluded(id)) {
+                        cacheResolved.set(id, true);
 
-                    calledImplicitExternals.set(originalId, true);
+                        return true;
+                    }
                 }
+
+                logExternalMessage(originalId, logger);
 
                 return false;
             };

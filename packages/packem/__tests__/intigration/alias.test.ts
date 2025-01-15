@@ -70,6 +70,59 @@ export default log();`,
         expect(cjsContent).toMatchSnapshot("cjs content");
     });
 
+    it("should not trigger a warning if alias option and original is used", async () => {
+        expect.assertions(5);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `import { log } from "./test/logger";
+import { bar } from "@test2/abc/bar";
+
+const a = bar();
+
+export default log();`,
+        );
+        writeFileSync(`${temporaryDirectoryPath}/src/test/logger.ts`, `export const log = () => console.log("test");`);
+        writeFileSync(`${temporaryDirectoryPath}/src/test2/foo/bar.ts`, `export const bar = () => console.log("bar");`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                react: "*",
+                typescript: "*",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            type: "commonjs",
+        });
+        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                alias: {
+                    "@": resolve(temporaryDirectoryPath, "src"),
+                    "@test2/abc": resolve(temporaryDirectoryPath, "src", "test2", "foo"),
+                },
+            },
+        });
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).not.toContain("Inlined implicit external");
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toMatchSnapshot("mjs content");
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toMatchSnapshot("cjs content");
+    });
+
     it.each(["@", "#", "~"])("should trigger a error if a invalid alias (%s) was used", async (alias) => {
         expect.assertions(2);
 
