@@ -30,6 +30,16 @@ const getRegExps = (data: MaybeFalsy<string | RegExp>[], type: "include" | "excl
         return result;
     }, []);
 
+const switchKeyValue = (object: Record<string, string>): Record<string, string> => {
+    const switchedObject: Record<string, string> = {};
+
+    for (const [key, value] of Object.entries(object)) {
+        switchedObject[value] = key;
+    }
+
+    return switchedObject;
+};
+
 const calledImplicitExternals = new Map<string, boolean>();
 
 export type ResolveExternalsPluginOptions = {
@@ -118,6 +128,7 @@ export const resolveExternalsPlugin = (
     const names = Object.keys(dependencies);
 
     if (names.length > 0) {
+        // eslint-disable-next-line regexp/no-empty-group
         include.add(new RegExp("^(?:" + names.join("|") + ")(?:/.+)?$"));
     }
 
@@ -136,118 +147,134 @@ export const resolveExternalsPlugin = (
 
     if (tsconfig) {
         tsconfigPathPatterns = Object.entries(tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) =>
-            key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`),
+            (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
         );
     }
 
     const resolvedAliases = resolveAliases(packageJson, buildOptions);
+    const mirroredAliases = switchKeyValue(resolvedAliases);
 
     return <Plugin>{
         name: "packem:resolve-externals",
         options: (rollupOptions: InputOptions) => {
             // This function takes an id and returns true (external) or false (not external),
             // eslint-disable-next-line no-param-reassign
-            rollupOptions.external = (id: string, specifier) => {
-                if (cacheResolved.has(id)) {
-                    return cacheResolved.get(id);
+            rollupOptions.external = (originalId: string, specifier) => {
+                if (cacheResolved.has(originalId)) {
+                    return cacheResolved.get(originalId);
                 }
+
+                let resolvedId: string | undefined;
 
                 if (Object.keys(resolvedAliases).length > 0) {
-                    // eslint-disable-next-line no-param-reassign
-                    id = resolveAlias(id, resolvedAliases);
+                    resolvedId = resolveAlias(originalId, resolvedAliases);
+
+                    const mirroredId = resolveAlias(resolvedId, mirroredAliases);
+
+                    if (isIncluded(mirroredId) && !isExcluded(mirroredId)) {
+                        cacheResolved.set(originalId, true);
+
+                        return true;
+                    }
                 }
 
-                if (
-                    /^(?:\0|\.{1,2}\/)/.test(id) || // Ignore virtual modules and relative imports
-                    isAbsolute(id) || // Ignore already resolved ids
-                    (packageJson.name && id.startsWith(packageJson.name)) // Ignore self import
-                ) {
-                    cacheResolved.set(id, false);
+                // Source is always bundled
+                for (const id of [originalId, resolvedId].filter(Boolean)) {
+                    if (
+                        /^(?:\0|\.{1,2}\/)/.test(id) || // Ignore virtual modules and relative imports
+                        isAbsolute(id) || // Ignore already resolved ids
+                        new RegExp(`${buildOptions.sourceDir}[/.*|\\.*]`).test(id) || // Ignore source files
+                        (packageJson.name && originalId.startsWith(packageJson.name)) // Ignore self import
+                    ) {
+                        cacheResolved.set(id, false);
 
-                    return false;
-                }
-
-                if (isBuiltin(id)) {
-                    let result = options.builtins;
-
-                    if (result === undefined && specifier) {
-                        result = isIncluded(specifier) && !isExcluded(specifier);
+                        return false;
                     }
 
-                    cacheResolved.set(id, result as boolean);
+                    if (isBuiltin(id)) {
+                        let result = options.builtins;
 
-                    return result;
-                }
-
-                // Handle npm dependencies.
-                if (isIncluded(id) && !isExcluded(id)) {
-                    cacheResolved.set(id, true);
-
-                    return true;
-                }
-
-                // package.json imports are not externals
-                if (packageJson.imports) {
-                    for (const [key, value] of Object.entries(packageJson.imports)) {
-                        if (key[0] !== "#") {
-                            logger.debug({
-                                message: 'Ignoring package.json import "' + cyan(key) + '" because it does not start with "#".',
-                                prefix: "plugin:packem:resolve-externals",
-                            })
-
-                            continue;
+                        if (result === undefined && specifier) {
+                            result = isIncluded(specifier) && !isExcluded(specifier);
                         }
 
-                        if (key === id) {
-                            cacheResolved.set(id, false);
+                        cacheResolved.set(id, result as boolean);
 
-                            return false;
-                        }
+                        return result;
+                    }
 
-                        // if a glob is used, we need to check if the id matches the files in the source directory
-                        if (key.includes("*")) {
-                            let files: string[];
+                    // Handle npm dependencies.
+                    if (isIncluded(id) && !isExcluded(id)) {
+                        cacheResolved.set(id, true);
 
-                            if (cachedGlobFiles.has(key)) {
-                                files = cachedGlobFiles.get(key) as string[];
-                            } else {
-                                // eslint-disable-next-line security/detect-non-literal-fs-filename
-                                files = readdirSync(join(buildOptions.rootDir, (value as string).replace("/*", "")), { withFileTypes: true })
-                                    .filter((dirent) => dirent.isFile())
-                                    .map((dirent) => dirent.name);
+                        return true;
+                    }
 
-                                cachedGlobFiles.set(key, files);
+                    // package.json imports are not externals
+                    if (packageJson.imports) {
+                        for (const [key, value] of Object.entries(packageJson.imports)) {
+                            // eslint-disable-next-line @typescript-eslint/prefer-string-starts-ends-with
+                            if (key[0] !== "#") {
+                                logger.debug({
+                                    message: 'Ignoring package.json import "' + cyan(key) + '" because it does not start with "#".',
+                                    prefix: "plugin:packem:resolve-externals",
+                                });
+
+                                // eslint-disable-next-line no-continue
+                                continue;
                             }
 
-                            for (const file of files) {
-                                if (file.replace(ENDING_RE, "") === id.replace(ENDING_RE, "").replace("#", "")) {
-                                    cacheResolved.set(id, false);
+                            if (key === id) {
+                                cacheResolved.set(id, false);
 
-                                    return false;
+                                return false;
+                            }
+
+                            // if a glob is used, we need to check if the id matches the files in the source directory
+                            if (key.includes("*")) {
+                                let files: string[];
+
+                                if (cachedGlobFiles.has(key)) {
+                                    files = cachedGlobFiles.get(key) as string[];
+                                } else {
+                                    // eslint-disable-next-line security/detect-non-literal-fs-filename
+                                    files = readdirSync(join(buildOptions.rootDir, (value as string).replace("/*", "")), { withFileTypes: true })
+                                        .filter((dirent) => dirent.isFile())
+                                        .map((dirent) => dirent.name);
+
+                                    cachedGlobFiles.set(key, files);
+                                }
+
+                                for (const file of files) {
+                                    if (file.replace(ENDING_RE, "") === id.replace(ENDING_RE, "").replace("#", "")) {
+                                        cacheResolved.set(id, false);
+
+                                        return false;
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                if (tsconfigPathPatterns.length > 0) {
-                    for (const regexp of tsconfigPathPatterns) {
-                        if (regexp.test(id)) {
-                            cacheResolved.set(id, false);
+                    if (tsconfigPathPatterns.length > 0) {
+                        for (const regexp of tsconfigPathPatterns) {
+                            if (regexp.test(id)) {
+                                cacheResolved.set(id, false);
 
-                            return false;
+                                return false;
+                            }
                         }
                     }
-                }
 
-                if (!calledImplicitExternals.has(id)) {
-                    logger.info({
-                        message: 'Inlined implicit external "' + cyan(id) + '". If this is incorrect, add it to the "externals" option.',
-                        prefix: "plugin:packem:resolve-externals",
-                    });
-                }
+                    if (!calledImplicitExternals.has(id)) {
+                        logger.info({
+                            message: 'Inlined implicit external "' + cyan(id) + '". If this is incorrect, add it to the "externals" option.',
+                            prefix: "plugin:packem:resolve-externals",
+                        });
+                    }
 
-                calledImplicitExternals.set(id, true);
+                    calledImplicitExternals.set(originalId, true);
+                }
 
                 return false;
             };
