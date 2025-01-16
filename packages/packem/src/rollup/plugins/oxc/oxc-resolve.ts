@@ -1,24 +1,32 @@
 import { createFilter } from "@rollup/pluginutils";
 import type { NormalizedPackageJson } from "@visulima/package";
 import { findPackageJson } from "@visulima/package/package-json";
+import type { Pail } from "@visulima/pail";
 import { dirname } from "@visulima/path";
 import type { NapiResolveOptions } from "oxc-resolver";
 import { ResolverFactory } from "oxc-resolver";
 import type { Plugin } from "rollup";
-import type { Pail } from "@visulima/pail";
 
-export type OxcResolveOptions = { ignoreSideEffectsForRoot?: boolean } & Omit<NapiResolveOptions, "tsconfig">;
+let cachedResolver: ResolverFactory | undefined
 
 const packageJsonCache = new Map<string, NormalizedPackageJson>();
 
-export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: string, logger: Pail, tsconfigPath?: string) => {
+export type OxcResolveOptions = { ignoreSideEffectsForRoot?: boolean } & Omit<NapiResolveOptions, "tsconfig">;
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: string, logger: Pail, tsconfigPath?: string): Plugin => {
     const { ignoreSideEffectsForRoot, ...userOptions } = options;
 
-    const resolver = new ResolverFactory({
-        ...userOptions,
-        roots: [...(userOptions.roots ?? []), rootDirectory],
-        tsconfig: tsconfigPath ? { configFile: tsconfigPath } : undefined,
-    });
+    let resolver = cachedResolver;
+
+    if (!resolver) {
+        // eslint-disable-next-line no-multi-assign
+        resolver = cachedResolver = new ResolverFactory({
+            ...userOptions,
+            roots: [...(userOptions.roots ?? []), rootDirectory],
+            tsconfig: tsconfigPath ? { configFile: tsconfigPath, references: "auto" } : undefined,
+        });
+    }
 
     return <Plugin>{
         name: "oxc-resolve",
