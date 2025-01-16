@@ -17,6 +17,8 @@ import { createPackageJson, createPackemConfig, execPackemSync, installPackage }
 
 const fixturePath = join(__dirname, "../..", "__fixtures__", "css");
 
+const splitedNodeJsVersion = process.versions.node.split(".");
+
 type BaseWriteData = {
     dependencies?: Record<string, string>;
     errorMessage?: string;
@@ -724,10 +726,10 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         });
     });
 
-    // This test will only run if node-sass is installed
-    describe.skipIf(!Object.keys(packageJson.devDependencies).includes("node-sass"))("node-sass", () => {
+    // This test will only run if node-sass is installed and node is not higher then v20
+    describe.skipIf(Number(splitedNodeJsVersion[0]) >= 20)("node-sass", () => {
         // eslint-disable-next-line vitest/prefer-expect-assertions,vitest/expect-expect
-        it.each([
+        it.skipIf(!Object.keys(packageJson.devDependencies).includes("node-sass")).each([
             {
                 input: "sass/index.js",
                 styleOptions: {

@@ -3,10 +3,12 @@ import { interopDefault, loadModule } from "mlly";
 import type { ResolveOptions } from "./resolve";
 import { resolve } from "./resolve";
 
-const loaded: Record<string, unknown> = {};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const loaded: Record<string, any> = {};
 const extensions = [".js", ".mjs", ".cjs", ".json"];
 
-export default async (moduleId: string, cwd: string): Promise<unknown> => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async (moduleId: string, cwd: string): Promise<any> => {
     // eslint-disable-next-line security/detect-object-injection
     if (loaded[moduleId]) {
         // eslint-disable-next-line security/detect-object-injection
@@ -46,5 +48,7 @@ export default async (moduleId: string, cwd: string): Promise<unknown> => {
     }
 
     // eslint-disable-next-line security/detect-object-injection
-    return loaded[moduleId];
+    const module = loaded[moduleId];
+
+    return module?.default ?? module;
 };

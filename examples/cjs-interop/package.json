@@ -15,7 +15,7 @@
         "clean": "rimraf node_modules dist"
     },
     "devDependencies": {
-        "@arethetypeswrong/cli": "^0.17.2",
+        "@arethetypeswrong/cli": "^0.17.3",
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.24.2",
         "rimraf": "^6.0.1",
