@@ -5,9 +5,4 @@ import transformer from "@visulima/packem/transformer/esbuild";
 export default defineConfig({
     transformer,
     cjsInterop: true,
-    rollup: {
-        node10Compatibility: {
-            writeToPackageJson: true,
-        },
-    },
 });
