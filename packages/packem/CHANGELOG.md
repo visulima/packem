@@ -1,3 +1,9 @@
+## @visulima/packem [1.11.2](https://github.com/visulima/packem/compare/@visulima/packem@1.11.1...@visulima/packem@1.11.2) (2025-01-16)
+
+### Bug Fixes
+
+* fixed support for node 23, updated all @visulima/*, mlly and oxc-parser dependencies, added node 23 to the workflow ([d3643f8](https://github.com/visulima/packem/commit/d3643f81aeed966bbb4b823da442751c4b03f573))
+
 ## @visulima/packem [1.11.1](https://github.com/visulima/packem/compare/@visulima/packem@1.11.0...@visulima/packem@1.11.1) (2025-01-15)
 
 ### Bug Fixes
