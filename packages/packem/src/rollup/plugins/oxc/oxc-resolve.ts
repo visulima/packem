@@ -1,5 +1,5 @@
 import { createFilter } from "@rollup/pluginutils";
-import type { NormalizedPackageJson } from "@visulima/package";
+import type { FindPackageJsonCache, NormalizedPackageJson } from "@visulima/package";
 import { findPackageJson } from "@visulima/package/package-json";
 import type { Pail } from "@visulima/pail";
 import { dirname } from "@visulima/path";
@@ -9,7 +9,7 @@ import type { Plugin } from "rollup";
 
 let cachedResolver: ResolverFactory | undefined
 
-const packageJsonCache = new Map<string, NormalizedPackageJson>();
+const packageJsonCache: FindPackageJsonCache = new Map<string, NormalizedPackageJson>();
 
 export type OxcResolveOptions = { ignoreSideEffectsForRoot?: boolean } & Omit<NapiResolveOptions, "tsconfig">;
 
@@ -55,7 +55,6 @@ export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: stri
 
                 try {
                     const { packageJson, path } = await findPackageJson(dirname(id as string), {
-                        // @ts-expect-error - missing the correct type export
                         cache: packageJsonCache,
                     });
 
@@ -83,14 +82,15 @@ export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: stri
                             });
                         }
                     }
-                } catch (error: any) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } catch (catchError: any) {
                     // eslint-disable-next-line no-console
-                    console.debug(error.message, {
+                    console.debug(catchError.message, {
                         context: [
                             {
                                 basedir: resolveDirectory,
                                 caller: "Resolver",
-                                error,
+                                error: catchError,
                                 extensions: userOptions.extensions,
                                 id,
                             },
