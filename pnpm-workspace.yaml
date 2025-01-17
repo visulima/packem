@@ -1,6 +1,9 @@
 packages:
     - "!**/__test__/**"
     - "!**/__tests__/**"
-    - "!**/__fixtures__/**"
+    - "!packages/packem/__fixtures__/css/**"
+    - "!packages/packem/__fixtures__/package/**"
+    - "!packages/packem/__fixtures__/url/**"
+    - "packages/packem/__fixtures__/ecosystem/**"
     - "packages/**"
     - "examples/**"

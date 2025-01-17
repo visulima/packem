@@ -23,6 +23,7 @@ export type PackemConfigProperties = {
         namedExport?: boolean;
         when: "after" | "before";
     }[];
+    runtime?: "browser" | "node";
     transformer?: "esbuild" | "swc" | "sucrase";
 };
 
@@ -35,8 +36,10 @@ export const createPackemConfig = async (
         isolatedDeclarationTransformer = undefined,
         minimizer = undefined,
         plugins = [],
+        runtime = "node",
         transformer = "esbuild",
     }: PackemConfigProperties = {},
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
     await installPackage(fixturePath, transformer === "swc" ? "@swc" : transformer);
 
@@ -47,6 +50,7 @@ export const createPackemConfig = async (
     }
 
     if (config === undefined) {
+        // eslint-disable-next-line no-param-reassign
         config = "";
     } else if (typeof config === "object") {
         const { rollup, ...rest } = config;
@@ -60,9 +64,11 @@ export const createPackemConfig = async (
         }
 
         if (typeof rest === "object") {
+            // eslint-disable-next-line no-param-reassign
             config = JSON.stringify(rest, null, 4).slice(1, -1);
 
             if (config !== "") {
+                // eslint-disable-next-line no-param-reassign
                 config += ",";
             }
         }
@@ -96,16 +102,15 @@ export const createPackemConfig = async (
 
     await writeFile(
         join(fixturePath, "packem.config.ts"),
-        `import { normalize } from "node:path";
-import { defineConfig } from "${distributionPath}/config";
+        `import { defineConfig } from "${distributionPath}/config";
 import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : "index"}";
 ${isolatedDeclarationTransformer ? `import isolatedDeclarationTransformer from "${distributionPath}/rollup/plugins/${isolatedDeclarationTransformer}/isolated-declarations-${isolatedDeclarationTransformer}-transformer";` : ""}
 ${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/rollup/plugins/css/loaders/${loader}";`).join("\n")}
-${minimizer ? `import ${minimizer} from "${distributionPath}/rollup/plugins/css/minifiers/${minimizer}";` : ""}
-${pluginImports.join("\n")}
+${minimizer ? `import ${minimizer} from "${distributionPath}/rollup/plugins/css/minifiers/${minimizer}";` : ""}${pluginImports.join("\n")}
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
-    transformer,${isolatedDeclarationTransformer ? `\nisolatedDeclarationTransformer,` : ""}${config as string}${rollupConfig}
+    runtime: "${runtime}",
+    transformer,${isolatedDeclarationTransformer ? `\n    isolatedDeclarationTransformer,` : ""}${config as string}${rollupConfig}
 });
 `,
         {

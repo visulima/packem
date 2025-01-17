@@ -54,7 +54,6 @@ import getEntryFileNames from "./utils/get-entry-file-names";
 import resolveAliases from "./utils/resolve-aliases";
 import sortUserPlugins from "./utils/sort-user-plugins";
 
-
 const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],
     context: BuildContext,
@@ -287,7 +286,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     compact: context.options.minify,
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "cjs"),
-                    esModule: useEsModuleMark || "if-default-prop",
+                    esModule: useEsModuleMark ?? "if-default-prop",
                     exports: "auto",
                     // turn off live bindings support (exports.* getters for re-exports)
                     externalLiveBindings: false,
@@ -321,7 +320,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     compact: context.options.minify,
                     dir: resolve(context.options.rootDir, context.options.outDir),
                     entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "mjs"),
-                    esModule: useEsModuleMark || "if-default-prop",
+                    esModule: useEsModuleMark ?? "if-default-prop",
                     exports: "auto",
                     // turn off live bindings support (exports.* getters for re-exports)
                     externalLiveBindings: false,
@@ -347,7 +346,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
         plugins: [
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
-            cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
             context.tsconfig &&
@@ -357,10 +355,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     fileCache,
                 ),
 
-            cachingPlugin(
-                resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}),
-                fileCache,
-            ),
+            resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}),
 
             context.options.rollup.replace &&
                 replacePlugin({
@@ -670,10 +665,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                     fileCache,
                 ),
 
-            cachingPlugin(
-                resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}),
-                fileCache,
-            ),
+            resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}),
 
             context.options.rollup.replace &&
                 replacePlugin({

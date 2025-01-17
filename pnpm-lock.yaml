@@ -1019,6 +1019,52 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1(@types/node@22.10.7)(@vitest/ui@3.0.1)(jiti@2.4.2)(less@4.2.1)(lightningcss@1.29.1)(sass-embedded@1.83.4)(sass@1.83.4)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.5.1))(tsx@4.19.2)(yaml@2.7.0)
 
+  packages/packem/__fixtures__/ecosystem/sitefetch:
+    dependencies:
+      cheerio:
+        specifier: ^1.0.0
+        version: 1.0.0
+      gpt-tokenizer:
+        specifier: ^2.8.1
+        version: 2.8.1
+      happy-dom:
+        specifier: ^16.5.3
+        version: 16.6.0
+      micromatch:
+        specifier: ^4.0.8
+        version: 4.0.8
+      turndown:
+        specifier: ^7.2.0
+        version: 7.2.0
+      turndown-plugin-gfm:
+        specifier: ^1.0.2
+        version: 1.0.2
+    devDependencies:
+      '@mozilla/readability':
+        specifier: ^0.5.0
+        version: 0.5.0
+      '@types/bun':
+        specifier: ^1.1.15
+        version: 1.1.17
+      '@types/micromatch':
+        specifier: ^4.0.9
+        version: 4.0.9
+      '@types/turndown':
+        specifier: ^5.0.5
+        version: 5.0.5
+      cac:
+        specifier: ^6.7.14
+        version: 6.7.14
+      p-queue:
+        specifier: ^8.0.1
+        version: 8.0.1
+      picocolors:
+        specifier: ^1.1.1
+        version: 1.1.1
+      typescript:
+        specifier: ^5.7.3
+        version: 5.7.3
+
 packages:
 
   '@adobe/css-tools@4.3.3':
