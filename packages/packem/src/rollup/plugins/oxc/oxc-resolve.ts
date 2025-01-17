@@ -1,5 +1,5 @@
 import { createFilter } from "@rollup/pluginutils";
-import type { FindPackageJsonCache, NormalizedPackageJson } from "@visulima/package";
+import type { FindPackageJsonCache } from "@visulima/package";
 import { findPackageJson } from "@visulima/package/package-json";
 import type { Pail } from "@visulima/pail";
 import { dirname } from "@visulima/path";
@@ -7,9 +7,9 @@ import type { NapiResolveOptions } from "oxc-resolver";
 import { ResolverFactory } from "oxc-resolver";
 import type { Plugin } from "rollup";
 
-let cachedResolver: ResolverFactory | undefined
+let cachedResolver: ResolverFactory | undefined;
 
-const packageJsonCache: FindPackageJsonCache = new Map<string, NormalizedPackageJson>();
+const packageJsonCache: FindPackageJsonCache = new Map();
 
 export type OxcResolveOptions = { ignoreSideEffectsForRoot?: boolean } & Omit<NapiResolveOptions, "tsconfig">;
 
@@ -41,7 +41,6 @@ export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: stri
                         context: [
                             {
                                 basedir: rootDirectory,
-                                // caller: userOptions.caller,
                                 extensions: userOptions.extensions,
                                 id,
                             },
@@ -99,7 +98,6 @@ export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: stri
                 }
 
                 const rollupResolvedResult = await this.resolve(id as string, importer, {
-                    // ...options,
                     skipSelf: true,
                 });
 

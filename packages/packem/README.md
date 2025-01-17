@@ -500,6 +500,26 @@ packem build --env.NODE_ENV=production
 > [!NOTE]
 > To have a full validation checkup, visit [publint](https://github.com/bluwy/publint) and [are the types wrong](https://github.com/arethetypeswrong/arethetypeswrong.github.io).
 
+## Experimental Features
+
+### OXC Resolver
+
+`packem` supports the [oxc-resolver](https://github.com/oxc-project/oxc-resolver) resolver to resolve modules in your project.
+
+To use the oxc resolver, you need to enable it in the packem configuration file.
+
+```ts
+import { defineConfig } from "@visulima/packem/config";
+
+export default defineConfig({
+    // ...
+    experimental: {
+        oxcResolve: true,
+    },
+    // ...
+});
+```
+
 ## TypeDoc
 
 ### Installation
