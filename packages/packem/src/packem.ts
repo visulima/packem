@@ -73,6 +73,7 @@ const generateOptions = (
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): InternalBuildOptions => {
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
+    const splitRuntimeVersion = runtimeVersion.split(".");
 
     // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error,@typescript-eslint/ban-ts-comment
     // @ts-ignore TS2589 is just deeply nested and this is needed for typedoc
@@ -215,7 +216,7 @@ const generateOptions = (
             },
             node10Compatibility: {},
             output: {
-                importAttributesKey: runtimeVersion.startsWith("22") ? "with" : "assert",
+                importAttributesKey: Number(splitRuntimeVersion[0] as string) >= 22 ? "with" : "assert",
             },
             patchTypes: {},
             polyfillNode: {},
