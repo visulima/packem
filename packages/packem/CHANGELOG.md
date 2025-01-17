@@ -1,3 +1,9 @@
+## @visulima/packem [1.13.0](https://github.com/visulima/packem/compare/@visulima/packem@1.12.1...@visulima/packem@1.13.0) (2025-01-17)
+
+### Features
+
+* experimental oxc resolver plugin to replace rollup node-resolve… ([#101](https://github.com/visulima/packem/issues/101)) ([013e52b](https://github.com/visulima/packem/commit/013e52b8f3a996f412cdbcebade7ca0da5ec3348))
+
 ## @visulima/packem [1.12.1](https://github.com/visulima/packem/compare/@visulima/packem@1.12.0...@visulima/packem@1.12.1) (2025-01-17)
 
 ### Bug Fixes
