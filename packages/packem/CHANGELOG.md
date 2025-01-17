@@ -1,3 +1,13 @@
+## @visulima/packem [1.12.0](https://github.com/visulima/packem/compare/@visulima/packem@1.11.2...@visulima/packem@1.12.0) (2025-01-17)
+
+### Features
+
+* added new runtime option to switch between browser and node, node is the default. ([59332b7](https://github.com/visulima/packem/commit/59332b7170033de1653d3ff29ce05d083721c28a))
+
+### Bug Fixes
+
+* fixed check for with and assert based on the node version, now all future node versions are supported ([ac63669](https://github.com/visulima/packem/commit/ac6366983dacf67b1919beb64aaa8d15504f0aee))
+
 ## @visulima/packem [1.11.2](https://github.com/visulima/packem/compare/@visulima/packem@1.11.1...@visulima/packem@1.11.2) (2025-01-16)
 
 ### Bug Fixes
