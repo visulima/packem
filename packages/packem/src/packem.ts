@@ -191,6 +191,63 @@ const generateOptions = (
                 // Optionally preserve symbol names during minification
                 tsconfigRaw: tsconfig?.config,
             },
+            experimental: {
+                /**
+                 * Some default options copy from
+                 * https://github.com/import-js/eslint-import-resolver-typescript/blob/master/src/index.ts
+                 * https://github.com/rolldown/rolldown/blob/main/crates/rolldown_resolver/src/resolver.rs
+                 */
+                resolve: {
+                    aliasFields: [["browser"]],
+                    // Following option must be *false* for polyfill to work
+                    builtinModules: false,
+                    conditionNames: [
+                        "default",
+                        "types",
+
+                        "import",
+                        "require",
+                        "module-sync",
+
+                        "node",
+                        "node-addons",
+                        "browser",
+
+                        // APF: https://angular.io/guide/angular-package-format
+                        "esm2020",
+                        "es2020",
+                        "es2015",
+                    ],
+                    extensionAlias: {
+                        ".cjs": [".cts", ".d.cts", ".cjs"],
+                        ".js": [
+                            ".ts",
+                            // `.tsx` can also be compiled as `.js`
+                            ".tsx",
+                            ".d.ts",
+                            ".js",
+                        ],
+                        ".jsx": [".tsx", ".d.ts", ".jsx"],
+                        ".mjs": [".mts", ".d.mts", ".mjs"],
+                    },
+                    extensions: [".ts", ".tsx", ".d.ts", ".js", ".jsx", ".json", ".node"],
+                    mainFields: [
+                        "types",
+                        "typings",
+
+                        // APF: https://angular.io/guide/angular-package-format
+                        "fesm2020",
+                        "fesm2015",
+                        "esm2020",
+                        "es2020",
+
+                        "main",
+                        "module",
+                        "browser",
+                        "jsnext:main",
+                    ],
+                },
+            },
             // https://github.com/microsoft/TypeScript/issues/58944
             isolatedDeclarations: {
                 exclude: EXCLUDE_REGEXP,

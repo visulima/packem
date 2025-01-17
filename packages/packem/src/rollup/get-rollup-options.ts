@@ -33,6 +33,7 @@ import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
 import { license as licensePlugin } from "./plugins/license";
 import metafilePlugin from "./plugins/metafile";
 import { node10CompatibilityPlugin } from "./plugins/node10-compatibility-plugin";
+import { oxcResolvePlugin } from "./plugins/oxc/oxc-resolve";
 import cachingPlugin from "./plugins/plugin-cache";
 import preserveDirectivesPlugin from "./plugins/preserve-directives";
 import { rawPlugin } from "./plugins/raw";
@@ -574,10 +575,12 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
 
     let nodeResolver;
 
-    if (context.options.rollup.resolve) {
+    if (context.options.rollup.resolve && context.options.experimental?.oxcResolve !== true) {
         nodeResolver = nodeResolvePlugin({
             ...context.options.rollup.resolve,
         });
+    } else if (context.options.experimental?.oxcResolve && context.options.rollup.experimental?.resolve) {
+        nodeResolver = oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, context.logger, context.tsconfig?.path);
     }
 
     // Each process should be unique

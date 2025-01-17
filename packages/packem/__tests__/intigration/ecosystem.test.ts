@@ -56,4 +56,42 @@ describe("packem ecosystem", () => {
 
         expect(distributionFiles).toMatchSnapshot();
     });
+
+    it.each(ecosystemSuites)("should work with provided '%s' ecosystem suite and oxc resolver", async (suite) => {
+        const fullSuitePath = join(ecosystemPath, suite);
+
+        await createPackemConfig(fullSuitePath, {
+            experimental: {
+                oxcResolve: true,
+            },
+            isolatedDeclarationTransformer: "typescript",
+            transformer: "esbuild"
+        });
+
+        const packageJson = (await readJson(join(fullSuitePath, "package.json"))) as PackageJson;
+
+        if (!packageJson.devDependencies) {
+            packageJson.devDependencies = {};
+        }
+
+        packageJson.devDependencies.esbuild = "*";
+
+        await writeJson(join(fullSuitePath, "package.json"), packageJson);
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: fullSuitePath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const distributionFiles = readdirSync(join(fullSuitePath, "dist"), {
+            recursive: true,
+            withFileTypes: true,
+        })
+            .filter((dirent) => dirent.isFile())
+            .map((dirent) => readFileSync(join(dirent.parentPath, dirent.name)));
+
+        expect(distributionFiles).toMatchSnapshot();
+    });
 });
