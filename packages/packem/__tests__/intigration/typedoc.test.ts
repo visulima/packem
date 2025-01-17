@@ -53,7 +53,7 @@ export const factorial = (n: number): number => {
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",

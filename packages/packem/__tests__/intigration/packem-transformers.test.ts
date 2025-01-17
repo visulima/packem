@@ -72,7 +72,7 @@ export { index as default };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(
             temporaryDirectoryPath,
             {

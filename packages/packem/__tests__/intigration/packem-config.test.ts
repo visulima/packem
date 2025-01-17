@@ -24,7 +24,7 @@ describe("packem config", () => {
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",

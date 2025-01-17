@@ -11,8 +11,6 @@ describe("packem preserve-directives", () => {
 
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
-
-        await createPackemConfig(temporaryDirectoryPath);
     });
 
     afterEach(async () => {
@@ -39,6 +37,7 @@ console.log("Hello, world!");`,
             types: "./dist/index.d.ts",
         });
         await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createPackemConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -78,6 +77,7 @@ console.log("Hello, world!");
             types: "./dist/index.d.ts",
         });
         await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createPackemConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -132,6 +132,9 @@ export default Tr;`,
                 jsx: "react-jsx",
                 moduleResolution: "bundler",
             },
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            runtime: "browser",
         });
 
         await installPackage(temporaryDirectoryPath, "typescript");
@@ -216,6 +219,7 @@ console.log("Hello, cli!");`,
             types: "./dist/index.d.ts",
         });
         await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createPackemConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -287,6 +291,7 @@ export const baz = 'baz';`,
             types: "./dist/index.d.ts",
         });
         await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createPackemConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,

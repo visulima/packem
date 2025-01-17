@@ -103,6 +103,7 @@ export default log();`,
                     "@test2/abc": resolve(temporaryDirectoryPath, "src", "test2", "foo"),
                 },
             },
+            runtime: "browser",
         });
 
         const binProcess = await execPackemSync("build", [], {

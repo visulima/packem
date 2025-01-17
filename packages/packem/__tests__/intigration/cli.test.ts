@@ -83,7 +83,7 @@ export { A as default };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -123,7 +123,7 @@ export { a };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = process.env.NODE_ENV;`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -162,7 +162,7 @@ export { a };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -200,7 +200,7 @@ export { a };
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
         writeFileSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`, `dot do it`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -239,7 +239,7 @@ export { a };
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
         writeFileSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`, `dot do it`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -277,7 +277,7 @@ export { a };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -322,7 +322,7 @@ export { a };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -359,7 +359,7 @@ export { a };
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",
@@ -409,7 +409,7 @@ export function barFunction() {
   return bar
 }`);
 
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
                 typescript: "*",

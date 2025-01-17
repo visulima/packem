@@ -47,7 +47,9 @@ export default Tr;`,
                 moduleResolution: "bundler",
             },
         });
-        await createPackemConfig(temporaryDirectoryPath);
+        await createPackemConfig(temporaryDirectoryPath, {
+            runtime: "browser",
+        });
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "react");
@@ -135,7 +137,9 @@ export default Tr;`,
                 moduleResolution: "bundler",
             },
         });
-        await createPackemConfig(temporaryDirectoryPath);
+        await createPackemConfig(temporaryDirectoryPath, {
+            runtime: "browser",
+        });
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "react");
@@ -327,6 +331,7 @@ export default Tr;`,
                     },
                 },
             },
+            runtime: "browser",
         });
 
         await installPackage(temporaryDirectoryPath, "typescript");

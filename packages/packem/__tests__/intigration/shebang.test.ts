@@ -39,7 +39,7 @@ console.log('Hello, world!');
             module: "./dist/index.mjs",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -90,7 +90,7 @@ console.log('Hello, world!');
                 },
             },
         });
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -137,7 +137,7 @@ export { getNodeSheBang };
             module: "./dist/index.mjs",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -184,7 +184,7 @@ export { getNodeSheBang };
             module: "./dist/index.mjs",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
@@ -222,7 +222,7 @@ for (let i = 0; i < 10; i++) { console.log('🦄');}`,
             module: "./dist/index.mjs",
         });
         await createPackemConfig(temporaryDirectoryPath);
-        await createTsConfig(temporaryDirectoryPath, {});
+        await createTsConfig(temporaryDirectoryPath);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
