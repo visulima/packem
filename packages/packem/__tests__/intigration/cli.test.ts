@@ -398,7 +398,9 @@ export { a };
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `import { __TEST_EXPECTED_STRING__ } from '@test/shouldbeexternal'
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `import { __TEST_EXPECTED_STRING__ } from '@test/shouldbeexternal'
 import bar from 'bar-package'
 
 export function baz() {
@@ -407,7 +409,8 @@ export function baz() {
 
 export function barFunction() {
   return bar
-}`);
+}`,
+        );
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {

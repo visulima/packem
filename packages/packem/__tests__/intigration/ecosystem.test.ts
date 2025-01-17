@@ -65,7 +65,7 @@ describe("packem ecosystem", () => {
                 oxcResolve: true,
             },
             isolatedDeclarationTransformer: "typescript",
-            transformer: "esbuild"
+            transformer: "esbuild",
         });
 
         const packageJson = (await readJson(join(fullSuitePath, "package.json"))) as PackageJson;

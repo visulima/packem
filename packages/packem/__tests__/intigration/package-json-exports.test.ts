@@ -247,7 +247,7 @@ export { IString };`,
         await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath, {
-            runtime: "browser"
+            runtime: "browser",
         });
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
@@ -855,7 +855,7 @@ export type Shared = string;
         await createTsConfig(temporaryDirectoryPath);
 
         await createPackemConfig(temporaryDirectoryPath, {
-            runtime: "browser"
+            runtime: "browser",
         });
         await createPackageJson(temporaryDirectoryPath, {
             devDependencies: {
@@ -1049,7 +1049,7 @@ export function Client() {
         );
 
         await createPackemConfig(temporaryDirectoryPath, {
-            runtime: "browser"
+            runtime: "browser",
         });
         await createPackageJson(temporaryDirectoryPath, {
             exports: {

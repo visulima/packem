@@ -62,7 +62,7 @@ export function foo() {
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 cjsInterop: true,
-            }
+            },
         });
 
         const binProcess = await execPackemSync("build", [], {

@@ -1100,7 +1100,7 @@ export const AppContext = React.createContext(null)`,
             },
         });
         await createPackemConfig(temporaryDirectoryPath, {
-            runtime: "browser"
+            runtime: "browser",
         });
 
         const binProcess = await execPackemSync("build", [], {
