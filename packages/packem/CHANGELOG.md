@@ -1,3 +1,13 @@
+## @visulima/packem [1.12.1](https://github.com/visulima/packem/compare/@visulima/packem@1.12.0...@visulima/packem@1.12.1) (2025-01-17)
+
+### Bug Fixes
+
+* removed file cache from resolveExternalsPlugin, removed resolveTypescriptMjsCtsPlugin from builds config, added first ecosystem test ([33a3a26](https://github.com/visulima/packem/commit/33a3a26c219939f5abeec3b0152db9b49f4669c8))
+
+### Tests
+
+* improved tests, added runtime to all test with react ([741a1dd](https://github.com/visulima/packem/commit/741a1dd0913641adf9daf3917b025e708eb04e70))
+
 ## @visulima/packem [1.12.0](https://github.com/visulima/packem/compare/@visulima/packem@1.11.2...@visulima/packem@1.12.0) (2025-01-17)
 
 ### Features
