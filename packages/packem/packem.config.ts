@@ -16,5 +16,6 @@ export default defineConfig({
             writeToPackageJson: true,
         },
     },
+    runtime: "node",
     transformer,
 });

@@ -69,7 +69,7 @@ const generateOptions = (
     preset: BuildPreset,
     packageJson: PackageJson,
     tsconfig: TsConfigResult | undefined,
-    nodeVersion: string,
+    runtimeVersion: string,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): InternalBuildOptions => {
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
@@ -215,7 +215,7 @@ const generateOptions = (
             },
             node10Compatibility: {},
             output: {
-                importAttributesKey: nodeVersion.startsWith("22") ? "with" : "assert",
+                importAttributesKey: runtimeVersion.startsWith("22") ? "with" : "assert",
             },
             patchTypes: {},
             polyfillNode: {},
@@ -354,8 +354,9 @@ const generateOptions = (
         sourcemap: false,
         transformerName: undefined,
         typedoc: {
-            githubPages: false,
             excludePrivate: true,
+            format: "inline",
+            githubPages: false,
             // Sorts the main index for a namespace / module; not the sidebar tab.
             groupOrder: [
                 "Classes",
@@ -401,15 +402,20 @@ const generateOptions = (
             pretty: true,
             readme: "none",
             showConfig: debug,
-            format: "inline",
             tsconfig: tsconfig?.path,
         },
     }) as InternalBuildOptions;
 
+    if (options.runtime === undefined) {
+        logger.warn("No runtime specified, defaulting to 'node'. This will change in packem v2 to 'browser', please add 'runtime: node' to your packem config or command call");
+
+        options.runtime = "node";
+    }
+
+    let version = "0.0.0";
+
     if (!options.transformerName) {
         const dependencies = new Map([...Object.entries(packageJson.dependencies ?? {}), ...Object.entries(packageJson.devDependencies ?? {})]);
-
-        let version = "0.0.0";
 
         if (dependencies.has("esbuild")) {
             options.transformerName = "esbuild";
@@ -426,25 +432,36 @@ const generateOptions = (
         } else {
             throw new Error("Unknown transformer, check your transformer options or install one of the supported transformers: esbuild, swc, sucrase");
         }
-
-        logger.info("Using " + cyan("rollup ") + VERSION);
-        logger.info({
-            message: "Using " + cyan("node ") + nodeVersion,
-            prefix: "system",
-        });
-        logger.info({
-            message: "Using " + cyan(options.transformerName) + " " + version,
-            prefix: "transformer",
-        });
     }
 
-    if (options.rollup.resolve && options.rollup.resolve.preferBuiltins === true) {
-        options.rollup.polyfillNode = false;
+    logger.info({
+        message: "Using " + cyan("node ") + runtimeVersion,
+        prefix: "system",
+    });
+    logger.info({
+        message: "Using " + cyan("rollup ") + VERSION + " with " + cyan(options.runtime as string) + " build runtime",
+        prefix: "bundler",
+    });
+    logger.info({
+        message: "Using " + cyan(options.transformerName) + " " + version,
+        prefix: "transformer",
+    });
 
-        logger.debug("Disabling polyfillNode because preferBuiltins is set to true");
+    if (options.rollup.resolve) {
+        options.rollup.resolve.preferBuiltins = options.runtime === "node";
+
+        if (options.rollup.resolve.preferBuiltins) {
+            options.rollup.polyfillNode = false;
+
+            logger.debug("Disabling polyfillNode because preferBuiltins is set to true");
+        }
     }
 
-    if (options.browserTargets && options.browserTargets.length > 0) {
+    if (options.runtime === "node") {
+        options.browserTargets = [];
+    }
+
+    if (options.runtime === "browser" && options.browserTargets && options.browserTargets.length > 0) {
         logger.debug("Using browser targets: " + options.browserTargets.join(", "));
     }
 

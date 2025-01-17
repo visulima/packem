@@ -15,7 +15,7 @@ import polyfillPlugin from "rollup-plugin-polyfill-node";
 import { visualizer as visualizerPlugin } from "rollup-plugin-visualizer";
 import { minVersion } from "semver";
 
-import type { BuildContext, InternalBuildOptions, RollupPlugins } from "../types";
+import type { BuildContext, InternalBuildOptions } from "../types";
 import arrayify from "../utils/arrayify";
 import type FileCache from "../utils/file-cache";
 import memoizeByKey from "../utils/memoize";
@@ -52,35 +52,8 @@ import createSplitChunks from "./utils/chunks/create-split-chunks";
 import getChunkFilename from "./utils/get-chunk-filename";
 import getEntryFileNames from "./utils/get-entry-file-names";
 import resolveAliases from "./utils/resolve-aliases";
+import sortUserPlugins from "./utils/sort-user-plugins";
 
-const sortUserPlugins = (plugins: RollupPlugins | undefined, type: "build" | "dts"): [Plugin[], Plugin[], Plugin[]] => {
-    const prePlugins: Plugin[] = [];
-    const postPlugins: Plugin[] = [];
-    const normalPlugins: Plugin[] = [];
-
-    if (plugins) {
-        plugins
-            .filter(Boolean)
-            .filter((p) => {
-                if (p.type === type) {
-                    return true;
-                }
-
-                return type === "build" && p.type === undefined;
-            })
-            .forEach((p) => {
-                if (p.enforce === "pre") {
-                    prePlugins.push(p.plugin);
-                } else if (p.enforce === "post") {
-                    postPlugins.push(p.plugin);
-                } else {
-                    normalPlugins.push(p.plugin);
-                }
-            });
-    }
-
-    return [prePlugins, normalPlugins, postPlugins];
-};
 
 const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],

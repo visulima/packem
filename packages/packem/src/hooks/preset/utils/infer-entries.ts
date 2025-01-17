@@ -32,7 +32,7 @@ const createOrUpdateEntry = (
 ): void => {
     const entryEnvironment = getEnvironment(output, context.environment);
 
-    let runtime: Runtime = "node";
+    let runtime: Runtime = context.options.runtime as Runtime;
 
     for (const runtimeExportConvention of RUNTIME_EXPORT_CONVENTIONS) {
         if (output.file.includes("." + runtimeExportConvention + ".") || output.subKey === runtimeExportConvention) {

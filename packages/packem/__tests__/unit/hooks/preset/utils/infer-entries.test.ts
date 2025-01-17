@@ -35,6 +35,7 @@ describe("inferEntries", () => {
                 declaration: false,
                 outDir: "dist",
                 rootDir: temporaryDirectoryPath,
+                runtime: "node",
                 sourceDir: "src",
             },
             pkg: {

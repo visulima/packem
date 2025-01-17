@@ -145,7 +145,7 @@ export type TypeDocumentOptions = {
     jsonFileName?: string;
 } & Partial<Omit<BaseTypeDocumentOptions, "entryPoints" | "out" | "hideGenerator" | "watch" | "preserveWatchOutput">>;
 
-export type Runtime = "react-server" | "react-native" | "edge-light" | "node";
+export type Runtime = "react-server" | "react-native" | "edge-light" | "node" | "browser";
 
 export type BuildEntry = {
     cjs?: boolean;
@@ -204,6 +204,7 @@ export interface BuildOptions {
     outDir: string;
     rollup: RollupBuildOptions;
     rootDir: string;
+    runtime?: "node" | "browser";
     sourceDir: string;
     sourcemap: boolean;
     transformer: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;

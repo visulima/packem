@@ -98,6 +98,17 @@ const createInitCommand = (cli: Cli): void => {
                 }
             }
 
+            if (options.runtime === undefined) {
+                // eslint-disable-next-line no-param-reassign
+                options.runtime = await select({
+                    message: "Pick a build runtime",
+                    options: [
+                        { label: "Node", value: "node" },
+                        { label: "Browser", value: "browser" },
+                    ],
+                });
+            }
+
             if (packages.includes("esbuild")) {
                 // eslint-disable-next-line no-param-reassign
                 options.transformer = "esbuild";
@@ -343,6 +354,7 @@ const createInitCommand = (cli: Cli): void => {
 import transformer from "@visulima/packem/transformer/${options.transformer as string}";
 ${imports}
 export default defineConfig({
+    runtime: ${options.runtime as string},
     transformer${packemConfig}
 });
 `;
@@ -371,6 +383,7 @@ export default defineConfig({
 const transformer = require("@visulima/packem/transformer/${options.transformer as string}");
 ${imports}
 module.exports = defineConfig({
+    runtime: ${options.runtime as string},
     transformer${packemConfig}
 });
 `;
@@ -436,6 +449,18 @@ module.exports = defineConfig({
                 Description: "Use TypeScript",
                 name: "typescript",
                 type: Boolean,
+            },
+            {
+                // defaultValue: "browser",
+                description: "Specify the build runtime (nodejs, browser).",
+                name: "runtime",
+                type: (input: string) => {
+                    if (input === "node" || input === "browser") {
+                        return input;
+                    }
+
+                    throw new Error("Invalid runtime. Use 'node' or 'browser'.");
+                },
             },
         ],
     });

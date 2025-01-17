@@ -3452,21 +3452,12 @@ const injectCss = /* @__PURE__ */ __name2((css, options) => {
   }
 }, "default");
 
-var css$1 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
-var injected$1 = false;
-var modules_5a199c00 = {get "primary"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "#BF4040"; },
-get "secondary"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "#1F4F7F"; },
-get "module"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module_ea61eaf4"; },
-get "module2"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"; },
-inject: function inject() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } },};
-
 var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
 var injected = false;
 var modules_354770d7 = {get "compositioned"() { if (!injected) { injected = true; injectCss(css,{}); } return "composition2_compositioned_33aa26b9"; },
 inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
 
-if (modules_354770d7.inject) modules_354770d7.inject();
-else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+modules_354770d7.inject();
 "
 `;
 
@@ -3520,21 +3511,12 @@ const injectCss = /* @__PURE__ */ __name2((css, options) => {
   }
 }, "default");
 
-var css$1 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
-var injected$1 = false;
-var modules_5a199c00 = {get "primary"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "#BF4040"; },
-get "secondary"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "#1F4F7F"; },
-get "module"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module_ea61eaf4"; },
-get "module2"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"; },
-inject: function inject() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } },};
-
 var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
 var injected = false;
 var modules_354770d7 = {get "compositioned"() { if (!injected) { injected = true; injectCss(css,{}); } return "composition2_compositioned_33aa26b9"; },
 inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
 
-if (modules_354770d7.inject) modules_354770d7.inject();
-else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+modules_354770d7.inject();
 "
 `;
 

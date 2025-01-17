@@ -44,8 +44,8 @@ const createBuildCommand = (cli: Cli): void => {
             const externals: string[] = [];
 
             if (options.external) {
-                for (const ext of options.external) {
-                    externals.push(ext.split(","));
+                for (const extension of options.external) {
+                    externals.push(extension.split(","));
                 }
             }
 
@@ -57,10 +57,10 @@ const createBuildCommand = (cli: Cli): void => {
                     configPath: options.config ?? undefined,
                     debug: options.debug,
                     dtsOnly: options.dtsOnly,
+                    externals,
                     killSignal: options.killSignal,
                     minify: options.minify === undefined ? nodeEnvironment === PRODUCTION_ENV : options.minify,
                     onSuccess: options.onSuccess,
-                    externals: externals,
                     rollup: {
                         esbuild: {
                             target: options.target,
@@ -77,11 +77,12 @@ const createBuildCommand = (cli: Cli): void => {
                                   builtins: false,
                                   deps: false,
                                   devDeps: false,
-                                  peerDeps: false,
                                   optDeps: false,
+                                  peerDeps: false,
                               }
                             : {},
                     },
+                    runtime: options.runtime,
                     sourcemap: options.metafile || options.analyze || options.sourcemap,
                     tsconfigPath: options.tsconfig ?? undefined,
                     validation:
@@ -244,8 +245,8 @@ const createBuildCommand = (cli: Cli): void => {
             },
             {
                 description: "Specify an external dependency, separate by comma (eg. --external lodash,react,react-dom)",
-                name: "external",
                 multiple: true,
+                name: "external",
                 typeLabel: "string[]",
             },
             {
@@ -253,6 +254,18 @@ const createBuildCommand = (cli: Cli): void => {
                 name: "no-external",
                 type: Boolean,
             },
+            {
+                // defaultValue: "browser",
+                description: "Specify the build runtime (nodejs, browser).",
+                name: "runtime",
+                type: (input: string) => {
+                    if (input === "node" || input === "browser") {
+                        return input;
+                    }
+
+                    throw new Error("Invalid runtime. Use 'node' or 'browser'.");
+                },
+            }
         ],
     });
 };
