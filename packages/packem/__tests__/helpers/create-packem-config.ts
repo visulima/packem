@@ -14,6 +14,7 @@ export type PackemConfigProperties = {
     config?: BuildConfig | string | undefined;
     cssLoader?: ("postcss" | "less" | "stylus" | "sass" | "sourcemap" | "lightningcss")[];
     cssOptions?: StyleOptions | string | undefined;
+    experimental?: Record<string, boolean>;
     isolatedDeclarationTransformer?: "swc" | "typescript" | "oxc" | undefined;
     minimizer?: "cssnano" | "lightningcss" | undefined;
     plugins?: {
@@ -33,6 +34,7 @@ export const createPackemConfig = async (
         config = undefined,
         cssLoader = [],
         cssOptions = undefined,
+        experimental = {},
         isolatedDeclarationTransformer = undefined,
         minimizer = undefined,
         plugins = [],
@@ -110,6 +112,7 @@ ${minimizer ? `import ${minimizer} from "${distributionPath}/rollup/plugins/css/
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
     runtime: "${runtime}",
+    experimental: ${JSON.stringify(experimental, null, 4)},
     transformer,${isolatedDeclarationTransformer ? `\n    isolatedDeclarationTransformer,` : ""}${config as string}${rollupConfig}
 });
 `,
