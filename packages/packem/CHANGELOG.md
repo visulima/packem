@@ -1,3 +1,9 @@
+## @visulima/packem [1.15.0](https://github.com/visulima/packem/compare/@visulima/packem@1.14.1...@visulima/packem@1.15.0) (2025-01-18)
+
+### Features
+
+* improved the build size information, added brotli and gzip infos, fixed wrong chunks sum on files, removed duplicates ([5f9703c](https://github.com/visulima/packem/commit/5f9703c44f74fc82ec7830fe7ca21871c3f17410))
+
 ## @visulima/packem [1.14.1](https://github.com/visulima/packem/compare/@visulima/packem@1.14.0...@visulima/packem@1.14.1) (2025-01-18)
 
 ### Bug Fixes
