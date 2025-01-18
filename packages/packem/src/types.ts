@@ -264,7 +264,11 @@ export interface BuildHooks {
 }
 
 export type BuildContextBuildEntry = {
-    bytes?: number;
+    size?: {
+        bytes?: number;
+        brotli?: number;
+        gzip?: number;
+    };
     chunk?: boolean;
     chunks?: string[];
     exports?: string[];
@@ -274,7 +278,11 @@ export type BuildContextBuildEntry = {
 };
 
 export type BuildContextBuildAssetAndChunk = {
-    bytes?: number;
+    size?: {
+        bytes?: number;
+        brotli?: number;
+        gzip?: number;
+    };
     chunk?: boolean;
     chunks?: string[];
     exports?: string[];

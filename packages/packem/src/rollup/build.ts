@@ -19,6 +19,7 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
 
     let loadCache = true;
 
+    // TODO: find a way to remove this hack
     // This is a hack to prevent caching when using isolated declarations or css loaders
     if (context.options.rollup.isolatedDeclarations || context.options.isolatedDeclarationTransformer || context.options.rollup.css) {
         loadCache = false;
@@ -53,7 +54,6 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
 
             if (entry.isEntry) {
                 context.buildEntries.push({
-                    bytes: Buffer.byteLength(entry.code, "utf8"),
                     chunks: entry.imports.filter((index) => outputChunks.find((c) => c.fileName === index)),
                     exports: entry.exports,
                     modules: Object.entries(entry.modules).map(([id, module_]) => {
@@ -63,6 +63,9 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
                         };
                     }),
                     path: entry.fileName,
+                    size: {
+                        bytes: Buffer.byteLength(entry.code, "utf8"),
+                    },
                     type: "entry",
                 });
             }
@@ -77,8 +80,10 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
             }
 
             assets.set(entry.fileName, {
-                bytes: Buffer.byteLength(entry.source, "utf8"),
                 path: entry.fileName,
+                size: {
+                    bytes: Buffer.byteLength(entry.source, "utf8"),
+                },
                 type: "asset",
             });
         }

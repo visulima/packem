@@ -9,31 +9,39 @@ import { join, relative, resolve } from "@visulima/path";
 import rollupBuild from "./rollup/build";
 import rollupBuildTypes from "./rollup/build-types";
 import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry, BuildEntry } from "./types";
+import brotliSize from "./utils/brotli-size";
 import type FileCache from "./utils/file-cache";
 import groupByKeys from "./utils/group-by-keys";
+import gzipSize from "./utils/gzip-size";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
     const rPath = (p: string) => relative(context.options.rootDir, resolve(context.options.outDir, p));
 
     let loggedEntries = false;
-    const foundDtsEntries: string[] = [];
 
+    const foundDtsEntries: string[] = [];
     const entries = context.buildEntries.filter((bEntry) => bEntry.type === "entry");
 
     if (entries.length > 0) {
         logger.raw("Entries:\n");
 
         for (const entry of entries) {
-            let totalBytes = entry.bytes ?? 0;
+            let totalBytes = entry.size?.bytes ?? 0;
+            let chunkBytes = 0;
 
             for (const chunk of entry.chunks ?? []) {
-                totalBytes += context.buildEntries.find((bEntry) => bEntry.path === chunk)?.bytes ?? 0;
+                const bytes = context.buildEntries.find((bEntry) => bEntry.path.endsWith(chunk))?.size?.bytes ?? 0;
+
+                totalBytes += bytes;
+                chunkBytes += bytes;
             }
 
             let line = `  ${bold(rPath(entry.path))} (${[
                 "total size: " + cyan(formatBytes(totalBytes)),
-                entry.bytes && "chunk size: " + cyan(formatBytes(entry.bytes)),
+                entry.size?.brotli && "brotli size: " + cyan(formatBytes(entry.size.brotli)),
+                entry.size?.gzip && "gzip size: " + cyan(formatBytes(entry.size.gzip)),
+                chunkBytes !== 0 && "chunk size: " + cyan(formatBytes(chunkBytes)),
             ]
                 .filter(Boolean)
                 .join(", ")})`;
@@ -94,10 +102,10 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
                                   [foundDts, foundCompatibleDts]
                                       .map(
                                           (value: BuildContextBuildEntry | BuildContextBuildAssetAndChunk) =>
-                                              gray("  └─ ") + bold(rPath(value.path)) + " (total size: " + cyan(formatBytes(value.bytes ?? 0)) + ")",
+                                              gray("  └─ ") + bold(rPath(value.path)) + " (total size: " + cyan(formatBytes(value.size?.bytes ?? 0)) + ")",
                                       )
                                       .join("\n")
-                                : "\n  types: " + bold(rPath(foundDts.path)) + " (total size: " + cyan(formatBytes(foundDts.bytes ?? 0)) + ")";
+                                : "\n  types: " + bold(rPath(foundDts.path)) + " (total size: " + cyan(formatBytes(foundDts.size?.bytes ?? 0)) + ")";
                     }
                 }
             }
@@ -115,13 +123,8 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
     if (assets.length > 0) {
         let line = "Assets:";
 
-        for (const asset of context.buildEntries.filter((bEntry) => bEntry.type === "asset")) {
-            if (foundDtsEntries.includes(asset.path)) {
-                // eslint-disable-next-line no-continue
-                continue;
-            }
-
-            line += gray("\n  └─ ") + bold(rPath(asset.path)) + " (total size: " + cyan(formatBytes(asset.bytes ?? 0)) + ")";
+        for (const asset of context.buildEntries.filter((bEntry) => bEntry.type === "asset" && !foundDtsEntries.includes(bEntry.path))) {
+            line += gray("\n  └─ ") + bold(rPath(asset.path)) + " (total size: " + cyan(formatBytes(asset.size?.bytes ?? 0)) + ")";
         }
 
         line += "\n\n";
@@ -134,7 +137,7 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
             "Σ Total dist size (byte size):",
             cyan(
                 formatBytes(
-                    context.buildEntries.reduce((index, entry) => index + (entry.bytes ?? 0), 0),
+                    context.buildEntries.reduce((index, entry) => index + (entry.size?.bytes ?? 0), 0),
                     {
                         decimals: 2,
                     },
@@ -427,9 +430,17 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<boole
 
     context.logger.success(green(context.options.name ? "Build succeeded for " + context.options.name : "Build succeeded"));
 
+    // Remove duplicated build entries
+    context.buildEntries = context.buildEntries.filter((entry, index, self) => self.findIndex((bEntry) => bEntry.path === entry.path) === index);
+
     // Find all dist files and add missing entries as chunks
-    for await (const file of walk(join(context.options.rootDir, context.options.outDir))) {
-        let entry = context.buildEntries.find((bEntry) => join(context.options.rootDir, context.options.outDir, bEntry.path) === file.path);
+    for await (const file of walk(join(context.options.rootDir, context.options.outDir), {
+        includeDirs: false,
+        includeFiles: true,
+    })) {
+        const distributionPath = join(context.options.rootDir, context.options.outDir);
+
+        let entry = context.buildEntries.find((bEntry) => join(distributionPath, bEntry.path) === file.path);
 
         if (!entry) {
             entry = {
@@ -440,11 +451,25 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<boole
             context.buildEntries.push(entry);
         }
 
-        if (!entry.bytes) {
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
-            const awaitedStat = await stat(resolve(context.options.rootDir, context.options.outDir, file.path));
+        if (entry.size === undefined) {
+            entry.size = {};
+        }
 
-            entry.bytes = awaitedStat.size;
+        const filePath = resolve(distributionPath, file.path);
+
+        if (!entry.size.bytes) {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename
+            const awaitedStat = await stat(filePath);
+
+            entry.size.bytes = awaitedStat.size;
+        }
+
+        if (!entry.size.brotli) {
+            entry.size.brotli = await brotliSize(filePath);
+        }
+
+        if (!entry.size.gzip) {
+            entry.size.gzip = await gzipSize(filePath);
         }
     }
 
