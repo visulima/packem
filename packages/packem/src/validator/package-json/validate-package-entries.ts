@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import { cyan, grey } from "@visulima/colorize";
 import { relative, resolve } from "@visulima/path";
 
-import type { BuildContext } from "../../types";
+import type { BuildContext, PackageJsonValidationOptions } from "../../types";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
 import levenstein from "../../utils/levenstein";
 import warn from "../../utils/warn";
@@ -11,27 +11,25 @@ import warn from "../../utils/warn";
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const validatePackageEntries = (context: BuildContext): void => {
     const { options } = context;
+    const validation = options.validation as PackageJsonValidationOptions;
 
-    if (options.validation?.packageJson?.exports === false) {
+    if (validation.packageJson?.exports === false) {
         return;
     }
 
-    const packageJson = options.validation?.packageJson;
-
     const filenames = new Set(
         [
-            options.declaration && packageJson?.types ? context.pkg.types : "",
-            options.declaration && packageJson?.types ? context.pkg.typings : "",
-            ...(options.dtsOnly || packageJson?.bin === false
+            options.declaration && validation.packageJson?.types ? context.pkg.types : "",
+            options.declaration && validation.packageJson?.types ? context.pkg.typings : "",
+            ...(options.dtsOnly || validation.packageJson?.bin === false
                 ? [""]
                 : typeof context.pkg.bin === "string"
                   ? [context.pkg.bin]
                   : Object.values(context.pkg.bin ?? {})),
-            options.dtsOnly && packageJson?.main === false ? "" : context.pkg.main,
-            options.dtsOnly && packageJson?.module === false ? "" : context.pkg.module,
-            ...(packageJson?.exports === false
-                ? []
-                : extractExportFilenames(context.pkg.exports, context.pkg.type === "module" ? "esm" : "cjs", options.declaration).map((outputDescriptor) => {
+            options.dtsOnly && validation.packageJson?.main === false ? "" : context.pkg.main,
+            options.dtsOnly && validation.packageJson?.module === false ? "" : context.pkg.module,
+            ...(validation.packageJson?.exports
+                ? extractExportFilenames(context.pkg.exports, context.pkg.type === "module" ? "esm" : "cjs", options.declaration).map((outputDescriptor) => {
                       if (options.dtsOnly) {
                           if (outputDescriptor.subKey === "types") {
                               return outputDescriptor.file;
@@ -41,7 +39,8 @@ const validatePackageEntries = (context: BuildContext): void => {
                       }
 
                       return outputDescriptor.file;
-                  })),
+                  })
+                : []),
         ]
             .filter(Boolean)
             .map(

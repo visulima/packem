@@ -2,13 +2,13 @@ import Module from "node:module";
 
 import { cyan } from "@visulima/colorize";
 
-import type { BuildContext } from "../../types";
+import type { BuildContext, PackageJsonValidationOptions } from "../../types";
 import arrayIncludes from "../../utils/array-includes";
 import getPackageName from "../../utils/get-package-name";
 import warn from "../../utils/warn";
 
 const validateDependencies = (context: BuildContext): void => {
-    if (context.options.validation?.packageJson?.dependencies === false) {
+    if ((context.options.validation as PackageJsonValidationOptions)?.packageJson?.dependencies === false) {
         return;
     }
 

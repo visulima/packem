@@ -119,7 +119,7 @@ export interface RollupBuildOptions {
     resolveExternals?: ResolveExternalsPluginOptions;
     experimental?: {
         resolve?: OxcResolveOptions | false;
-    }
+    };
 }
 
 export type TypeDocumentOptions = {
@@ -164,6 +164,20 @@ export type BuildEntry = {
     name?: string;
     outDir?: string;
     runtime?: Runtime;
+};
+
+export type PackageJsonValidationOptions = {
+    packageJson?: {
+        bin?: boolean;
+        dependencies?: boolean;
+        exports?: boolean;
+        files?: boolean;
+        main?: boolean;
+        module?: boolean;
+        name?: boolean;
+        types?: boolean;
+        typesVersions?: boolean;
+    };
 };
 
 export interface BuildOptions {
@@ -219,19 +233,7 @@ export interface BuildOptions {
     sourcemap: boolean;
     transformer: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
     typedoc: TypeDocumentOptions | false;
-    validation?: {
-        packageJson?: {
-            bin?: boolean;
-            dependencies?: boolean;
-            exports?: boolean;
-            files?: boolean;
-            main?: boolean;
-            module?: boolean;
-            name?: boolean;
-            types?: boolean;
-            typesVersions?: boolean;
-        };
-    };
+    validation?: false | PackageJsonValidationOptions;
 }
 
 export interface BuildHooks {
@@ -324,7 +326,7 @@ export type IsolatedDeclarationsTransformer = (code: string, id: string, sourceM
 export interface IsolatedDeclarationsResult {
     errors: string[];
     sourceText: string;
-    map?: string
+    map?: string;
 }
 
 // eslint-disable-next-line import/no-unused-modules

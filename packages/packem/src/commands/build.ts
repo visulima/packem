@@ -85,22 +85,7 @@ const createBuildCommand = (cli: Cli): void => {
                     runtime: options.runtime,
                     sourcemap: options.metafile || options.analyze || options.sourcemap,
                     tsconfigPath: options.tsconfig ?? undefined,
-                    validation:
-                        options.validation === false
-                            ? {
-                                  packageJson: {
-                                      bin: false,
-                                      dependencies: false,
-                                      exports: false,
-                                      files: false,
-                                      main: false,
-                                      module: false,
-                                      name: false,
-                                      types: false,
-                                      typesVersions: false,
-                                  },
-                              }
-                            : {},
+                    validation: options.validation,
                     ...(options.typedoc
                         ? {
                               typedoc: {
