@@ -43,6 +43,8 @@ const logExternalMessage = (originalId: string, logger: Pail): void => {
     calledImplicitExternals.set(originalId, true);
 };
 
+const prefixedBuiltins = new Set(["node:test", "node:sqlite"]);
+
 export type ResolveExternalsPluginOptions = {
     /**
      * Mark node built-in modules like `path`, `fs`... as external.
@@ -148,7 +150,7 @@ export const resolveExternalsPlugin = (
 
     if (tsconfig) {
         tsconfigPathPatterns = Object.entries(tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) =>
-            (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
+            key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`),
         );
     }
 
@@ -186,7 +188,7 @@ export const resolveExternalsPlugin = (
                         return false;
                     }
 
-                    if (isBuiltin(id)) {
+                    if (isBuiltin(id) || prefixedBuiltins.has(id)) {
                         let result = options.builtins;
 
                         if (result === undefined && specifier) {
@@ -276,6 +278,14 @@ export const resolveExternalsPlugin = (
                 }
 
                 // Handle node builtins.
+                if (prefixedBuiltins.has(specifier)) {
+                    return {
+                        external: true,
+                        id: specifier,
+                        moduleSideEffects: false,
+                    };
+                }
+
                 if (isBuiltin(specifier)) {
                     const stripped = specifier.replace(/^node:/, "");
 

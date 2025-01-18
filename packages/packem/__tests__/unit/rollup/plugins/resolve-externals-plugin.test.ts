@@ -78,6 +78,8 @@ describe("resolve-externals-plugin", () => {
     // eslint-disable-next-line sonarjs/cognitive-complexity
     describe("buildins", () => {
         it("should mark Node builtins external by default", async () => {
+            expect.assertions(2);
+
             const context = getMockPluginContext({});
 
             const rollupInputConfig: InputOptions = {};
@@ -90,6 +92,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should NOT mark Node builtins external when builtins=false", async () => {
+            expect.assertions(2);
+
             const context = getMockPluginContext({ options: { builtins: false } });
 
             const rollupInputConfig: InputOptions = {};
@@ -102,6 +106,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should NOT mark Node builtins external when implicitely excluded", async () => {
+            expect.assertions(2);
+
             const context = getMockPluginContext({ options: { exclude: ["path", "node:fs"] } });
 
             const rollupInputConfig: InputOptions = {};
@@ -114,6 +120,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should mark Node builtins external when builtins=false and implicitly included", async () => {
+            expect.assertions(2);
+
             const context = getMockPluginContext({ buildOptions: { externals: ["path", "node:fs"] } as InternalBuildOptions, options: { builtins: false } });
 
             const rollupInputConfig: InputOptions = {};
@@ -126,6 +134,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should add 'node:' prefix to builtins by default", async () => {
+            expect.assertions(2);
+
             const context = getMockPluginContext({});
 
             for await (const builtin of ["node:path", "path"]) {
@@ -136,6 +146,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should remove 'node:' prefix when using builtinsPrefix='strip'", async () => {
+            expect.assertions(2);
+
             const context = getMockPluginContext({ options: { builtinsPrefix: "strip" } });
 
             for await (const builtin of ["node:path", "path"]) {
@@ -145,14 +157,16 @@ describe("resolve-externals-plugin", () => {
             }
         });
 
-        it("should NOT remove 'node:test' prefix even with builtinsPrefix='add'", async () => {
+        it("should NOT remove 'node:test' and 'node:sqlite' prefix even with builtinsPrefix='add'", async () => {
+            expect.assertions(2);
+
             const context = getMockPluginContext({ options: { builtinsPrefix: "strip" } });
 
             const rollupInputConfig: InputOptions = {};
 
             context.options(rollupInputConfig);
 
-            for await (const builtin of ["node:test"]) {
+            for await (const builtin of ["node:test", "node:sqlite"]) {
                 await expect(context.resolveId(builtin, "index.js")).resolves.toMatchObject({
                     id: builtin,
                 });
@@ -160,6 +174,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should ignore 'node:' prefix when using builtinsPrefix='ignore'", async () => {
+            expect.assertions(2);
+
             const context = getMockPluginContext({ options: { builtinsPrefix: "ignore" } });
 
             const rollupInputConfig: InputOptions = {};
@@ -174,6 +190,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should not recognize 'test' as a Node builtin", async () => {
+            expect.assertions(2);
+
             const context = getMockPluginContext({});
 
             const rollupInputConfig: InputOptions = {};
@@ -182,6 +200,19 @@ describe("resolve-externals-plugin", () => {
 
             await expect(context.resolveId("node", "index.js")).resolves.toBeNull();
             expect((rollupInputConfig as ExternalRollupInputOptions).external("node", "index.js", false)).toBeFalsy();
+        });
+
+        it("should resolve prefixed builtins", async () => {
+            expect.assertions(2);
+
+            const context = getMockPluginContext({});
+
+            await expect(context.resolveId("node:test", "index.js")).resolves.toMatchObject({
+                id: "node:test",
+            });
+            await expect(context.resolveId("node:sqlite", "index.js")).resolves.toMatchObject({
+                id: "node:sqlite",
+            });
         });
     });
 
@@ -196,6 +227,8 @@ describe("resolve-externals-plugin", () => {
         };
 
         it("should always ignores bundle entry point", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({});
 
             const rollupInputConfig: InputOptions = {};
@@ -206,6 +239,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should always ignores virtual modules from other plugins", async () => {
+            expect.assertions(2);
+
             const context = getMockPluginContext({});
 
             const rollupInputConfig: InputOptions = {};
@@ -255,6 +290,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should always ignores bare specifiers that are not dependencies", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({ options: { deps: true, devDeps: true, optDeps: true, peerDeps: true } });
 
             const rollupInputConfig: InputOptions = {};
@@ -265,6 +302,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should mark package.json dependencies external by default", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({});
 
             const rollupInputConfig: InputOptions = {};
@@ -275,6 +314,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should NOT mark package.json dependencies external when deps=false", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({ options: { deps: false } });
 
             const rollupInputConfig: InputOptions = {};
@@ -285,6 +326,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should NOT mark excluded dependencies external", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({ options: { exclude: ["test-dep"] } });
 
             const rollupInputConfig: InputOptions = {};
@@ -295,6 +338,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should mark peerDependencies external by default", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({});
 
             const rollupInputConfig: InputOptions = {};
@@ -305,6 +350,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should NOT mark peerDependencies external when peerDeps=false", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({ options: { peerDeps: false } });
 
             const rollupInputConfig: InputOptions = {};
@@ -315,6 +362,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should NOT mark excluded peerDependencies external", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({ options: { exclude: ["test-peer-dep"] } });
 
             const rollupInputConfig: InputOptions = {};
@@ -325,6 +374,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should mark optionalDependencies external by default", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({});
 
             const rollupInputConfig: InputOptions = {};
@@ -335,6 +386,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should NOT mark optionalDependencies external when optDeps=false", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({ options: { optDeps: false } });
 
             const rollupInputConfig: InputOptions = {};
@@ -345,6 +398,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should NOT mark excluded optionalDependencies external", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({ options: { exclude: ["test-opt-dep"] } });
 
             const rollupInputConfig: InputOptions = {};
@@ -355,6 +410,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should NOT mark devDependencies external by default", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({});
 
             const rollupInputConfig: InputOptions = {};
@@ -365,6 +422,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should mark devDependencies external when devDeps=true", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({ options: { devDeps: true } });
 
             const rollupInputConfig: InputOptions = {};
@@ -375,6 +434,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should mark included devDependencies external", async () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({ buildOptions: { externals: ["test-dev-dep"] } });
 
             const rollupInputConfig: InputOptions = {};
@@ -385,6 +446,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should mark dependencies/peerDependencies/optionalDependencies subpath imports external", async () => {
+            expect.assertions(3);
+
             const context = getMockPluginContext({});
 
             const rollupInputConfig: InputOptions = {};
@@ -397,6 +460,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should mark sub path imports external (with regexes)", async () => {
+            expect.assertions(2);
+
             const context = getMockPluginContext({ buildOptions: { externals: [/^test-dev-dep/] } });
 
             const rollupInputConfig: InputOptions = {};
@@ -408,6 +473,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should mark sub path of a package.json dependencies as external", () => {
+            expect.assertions(1);
+
             const context = getMockPluginContext({
                 packageJson: {
                     dependencies: {
@@ -430,6 +497,8 @@ describe("resolve-externals-plugin", () => {
     });
 
     it("should mark absolute path as internal", async () => {
+        expect.assertions(1);
+
         const context = getMockPluginContext({});
 
         const rollupInputConfig: InputOptions = {};
@@ -440,13 +509,15 @@ describe("resolve-externals-plugin", () => {
     });
 
     it("should resolve alias to external id", async () => {
+        expect.assertions(1);
+
         const context = getMockPluginContext({
             buildOptions: {
                 alias: {
                     "alias-test": "@test/foo",
                 },
                 externals: ["alias-test"],
-            }
+            },
         });
 
         const rollupInputConfig: InputOptions = {};
