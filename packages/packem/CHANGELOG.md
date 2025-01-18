@@ -1,3 +1,13 @@
+## @visulima/packem [1.14.0](https://github.com/visulima/packem/compare/@visulima/packem@1.13.0...@visulima/packem@1.14.0) (2025-01-18)
+
+### Features
+
+* added the possibility to set false on the validation option to disable the package.json validation ([c814f6e](https://github.com/visulima/packem/commit/c814f6e38474cbe02c4b6033629d8b0375644e46))
+
+### Styles
+
+* cs fixes ([7eeca97](https://github.com/visulima/packem/commit/7eeca97eea1133f87280496ac4c3c1e63eac704d))
+
 ## @visulima/packem [1.13.0](https://github.com/visulima/packem/compare/@visulima/packem@1.12.1...@visulima/packem@1.13.0) (2025-01-17)
 
 ### Features
