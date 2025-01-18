@@ -1,3 +1,9 @@
+## @visulima/packem [1.14.1](https://github.com/visulima/packem/compare/@visulima/packem@1.14.0...@visulima/packem@1.14.1) (2025-01-18)
+
+### Bug Fixes
+
+* added node:sqlite as prefixed builtin module ([08af477](https://github.com/visulima/packem/commit/08af477e86be64343a4e2467582d2fef1a2b160a))
+
 ## @visulima/packem [1.14.0](https://github.com/visulima/packem/compare/@visulima/packem@1.13.0...@visulima/packem@1.14.0) (2025-01-18)
 
 ### Features
