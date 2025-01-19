@@ -39,6 +39,7 @@ import prepareEntries from "./utils/prepare-entries";
 import removeOldCacheFolders from "./utils/remove-old-cache-folders";
 import packageJsonValidator from "./validator/package-json";
 import validateAliasEntries from "./validator/validate-alias-entries";
+import validateBundleSize from "./validator/validate-bundle-size";
 
 const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX): "automatic" | "preserve" | "transform" | undefined => {
     switch (jsx) {
@@ -874,6 +875,7 @@ const packem = async (
             await context.hooks.callHook("validate:before", context);
 
             packageJsonValidator(context);
+            validateBundleSize(context, logged);
 
             await context.hooks.callHook("validate:done", context);
 

@@ -166,7 +166,7 @@ export type BuildEntry = {
     runtime?: Runtime;
 };
 
-export type PackageJsonValidationOptions = {
+export type ValidationOptions = {
     packageJson?: {
         bin?: boolean;
         dependencies?: boolean;
@@ -177,6 +177,11 @@ export type PackageJsonValidationOptions = {
         name?: boolean;
         types?: boolean;
         typesVersions?: boolean;
+    };
+    bundleLimit?: {
+        // Allow the build to succeed even if limits are exceeded
+        allowFail?: boolean;
+        limits?: Record<string, string | number>;
     };
 };
 
@@ -233,7 +238,7 @@ export interface BuildOptions {
     sourcemap: boolean;
     transformer: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
     typedoc: TypeDocumentOptions | false;
-    validation?: false | PackageJsonValidationOptions;
+    validation?: false | ValidationOptions;
 }
 
 export interface BuildHooks {

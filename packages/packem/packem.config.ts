@@ -8,7 +8,6 @@ export default defineConfig({
     experimental: {
         oxcResolve: true,
     },
-    fileCache: true,
     isolatedDeclarationTransformer,
     rollup: {
         license: {
