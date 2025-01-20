@@ -7,7 +7,7 @@ import type { TransformerFn as TransformerFunction } from "../../../types";
 import resolvedIdCache from "../../utils/resolved-id-cache";
 import type { SucrasePluginConfig } from "./types";
 
-const sucrasePlugin: TransformerFunction = ({ exclude, extensions = DEFAULT_EXTENSIONS, include, ...transformOptions }: SucrasePluginConfig): Plugin => {
+const sucrasePlugin = ({ exclude, extensions = DEFAULT_EXTENSIONS, include, ...transformOptions }: SucrasePluginConfig): Plugin => {
     const filter = createFilter(include, exclude ?? EXCLUDE_REGEXP);
 
     // Initialize own resolution cache.
@@ -40,4 +40,4 @@ const sucrasePlugin: TransformerFunction = ({ exclude, extensions = DEFAULT_EXTE
 sucrasePlugin.NAME = "sucrase";
 
 // eslint-disable-next-line import/no-unused-modules
-export default sucrasePlugin;
+export default sucrasePlugin as TransformerFunction;

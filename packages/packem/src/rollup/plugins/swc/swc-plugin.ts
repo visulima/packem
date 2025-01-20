@@ -7,7 +7,7 @@ import resolvedIdCache from "../../utils/resolved-id-cache";
 import type { SwcPluginConfig } from "./types";
 import type { TransformerFn as TransformerFunction } from "../../../types";
 
-const swcPlugin: TransformerFunction = ({ exclude, extensions = DEFAULT_EXTENSIONS, include, ...transformOptions }: SwcPluginConfig): Plugin => {
+const swcPlugin = ({ exclude, extensions = DEFAULT_EXTENSIONS, include, ...transformOptions }: SwcPluginConfig): Plugin => {
     const filter = createFilter(include, exclude ?? EXCLUDE_REGEXP);
 
     // Initialize own resolution cache.
@@ -42,4 +42,4 @@ const swcPlugin: TransformerFunction = ({ exclude, extensions = DEFAULT_EXTENSIO
 swcPlugin.NAME = "swc";
 
 // eslint-disable-next-line import/no-unused-modules
-export default swcPlugin;
+export default swcPlugin as TransformerFunction;

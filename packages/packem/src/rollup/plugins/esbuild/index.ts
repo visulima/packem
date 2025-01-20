@@ -19,7 +19,7 @@ import doOptimizeDeps from "./optmize-deps";
 import type { EsbuildPluginConfig, OptimizeDepsResult } from "./types";
 import warn from "./warn";
 
-const esbuildTransformer: TransformerFunction = ({
+const esbuildTransformer = ({
     exclude,
     include,
     loaders: _loaders,
@@ -143,4 +143,4 @@ const esbuildTransformer: TransformerFunction = ({
 
 esbuildTransformer.NAME = "esbuild";
 
-export default esbuildTransformer;
+export default esbuildTransformer as TransformerFunction;

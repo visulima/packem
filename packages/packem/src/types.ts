@@ -196,7 +196,7 @@ export type ValidationOptions = {
     };
 };
 
-export type TransformerFn = (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin & { NAME?: TransformerName };
+export type TransformerFn = ((config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin) & { NAME?: TransformerName };
 
 export interface BuildOptions {
     alias: Record<string, string>;
