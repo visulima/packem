@@ -1,5 +1,5 @@
 import { defineConfig } from "./src/config";
-import transformer from "./src/rollup/plugins/esbuild";
+import transformer from "./src/rollup/plugins/oxc/oxc-transformer";
 import isolatedDeclarationTransformer from "./src/rollup/plugins/typescript/isolated-declarations-typescript-transformer";
 
 // eslint-disable-next-line import/no-unused-modules

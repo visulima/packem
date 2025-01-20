@@ -304,6 +304,32 @@ const generateOptions = (
             output: {
                 importAttributesKey: Number(splitRuntimeVersion[0] as string) >= 22 ? "with" : "assert",
             },
+            oxc: {
+                jsx:
+                    jsxRuntime === "preserve"
+                        ? "preserve"
+                        : {
+                              development: environment !== "production",
+                              pragma: tsconfig?.config.compilerOptions?.jsxFactory,
+                              pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
+                              pure: true,
+                              runtime: jsxRuntime === "transform" || jsxRuntime === "automatic" ? "automatic" : "classic",
+                              useBuiltIns: true,
+                              useSpread: true,
+                          },
+                typescript: tsconfig?.config
+                    ? {
+                          jsxPragma: tsconfig.config.compilerOptions?.jsxFactory,
+                          jsxPragmaFrag: tsconfig.config.compilerOptions?.jsxFragmentFactory,
+                          // onlyRemoveTypeImports?: boolean
+                          // allowNamespaces?: boolean
+                          // allowDeclareFields?: boolean
+                          //
+                          // declaration?: IsolatedDeclarationsOptions
+                          // rewriteImportExtensions?: 'rewrite' | 'remove' | boolean
+                      }
+                    : undefined,
+            },
             patchTypes: {},
             polyfillNode: {},
             preserveDirectives: {

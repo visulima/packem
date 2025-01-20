@@ -34,6 +34,7 @@ import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
 import { license as licensePlugin } from "./plugins/license";
 import metafilePlugin from "./plugins/metafile";
 import { oxcResolvePlugin } from "./plugins/oxc/oxc-resolve";
+import type { InternalOXCTransformPluginConfig } from "./plugins/oxc/types";
 import cachingPlugin from "./plugins/plugin-cache";
 import preserveDirectivesPlugin from "./plugins/preserve-directives";
 import { rawPlugin } from "./plugins/raw";
@@ -59,7 +60,7 @@ const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],
     context: BuildContext,
     // eslint-disable-next-line sonarjs/cognitive-complexity
-): SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig => {
+): SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig | InternalOXCTransformPluginConfig => {
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     let nodeTarget = "node" + versions.node.split(".")[0];
 
@@ -163,6 +164,47 @@ const getTransformerConfig = (
         }
 
         return context.options.rollup.sucrase satisfies SucrasePluginConfig;
+    }
+
+    if (name === "oxc") {
+        if (!context.options.rollup.oxc) {
+            throw new Error("No oxc options found in your configuration.");
+        }
+
+        context.options.rollup.oxc = {
+            ...context.options.rollup.oxc,
+            cwd: context.options.rootDir,
+            jsx:
+                typeof context.options.rollup.oxc.jsx === "string"
+                    ? context.options.rollup.oxc.jsx
+                    : {
+                          ...context.options.rollup.oxc.jsx,
+                          // This is not needed in a library.
+                          refresh: false,
+                      },
+            sourcemap: context.options.sourcemap,
+            typescript: {
+                ...context.options.rollup.oxc.typescript,
+                declaration: undefined,
+                // Our declaration is handled by the isolated declaration transformer
+                rewriteImportExtensions: false,
+            },
+        } satisfies InternalOXCTransformPluginConfig;
+
+        // Add targets to oxc target
+        if (context.options.rollup.oxc.target) {
+            const targets = arrayify(context.options.rollup.oxc.target);
+
+            if (context.options.runtime === "node") {
+                context.options.rollup.oxc.target = [...new Set([nodeTarget, ...targets])];
+            } else if (context.options.runtime === "browser") {
+                context.options.rollup.oxc.target = [...new Set([...(context.options.browserTargets as string[]), ...targets])];
+            }
+        } else {
+            context.options.rollup.oxc.target = context.options.runtime === "node" ? [nodeTarget] : context.options.browserTargets;
+        }
+
+        return context.options.rollup.oxc;
     }
 
     throw new Error(`A Unknown transformer was provided`);
