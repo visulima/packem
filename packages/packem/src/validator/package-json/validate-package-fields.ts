@@ -1,12 +1,10 @@
-import type { BuildContext } from "../../types";
+import type { BuildContext, ValidationOptions } from "../../types";
 import warn from "../../utils/warn";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const validatePackageFields = (context: BuildContext): void => {
-    const {
-        options: { validation },
-        pkg,
-    } = context;
+    const validation = context.options.validation as ValidationOptions;
+    const { pkg } = context;
 
     if (pkg.name === undefined && validation?.packageJson?.name !== false) {
         warn(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");

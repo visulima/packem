@@ -46,8 +46,10 @@ It uses the `exports` configuration in `package.json` and recognizes entry file 
 -   ✅ TypeScript support + .d.ts bundling
 -   ✅ Watch mode
 -   ✅ CLI outputs (auto hashbang insertion)
--   ✅ Validates package.json and checks if all fields that are needed to publish your package are configured correctly
--   ✅ Supports multiple runtimes (default, react-server, edge-light)
+-   ✅ Validator
+    - Validates package.json and checks if all fields that are needed to publish your package are configured correctly
+    - Bundle size validation
+-   ✅ Supports multiple runtimes (default, react-server, edge-light, browser and node)
 -   ✅ Supports react server and client components
 -   ✅ Supports shared modules
 -   ✅ Supports dynamic import
@@ -493,12 +495,38 @@ This will replace all instances of `process.env.NODE_ENV` with `'production'` an
 packem build --env.NODE_ENV=production
 ```
 
-## Validating
+## Validators
 
+### Package.json Validation
 `Packem` validates your `package.json` file and checks if all fields are configured correctly, that are needed to publish your package.
 
 > [!NOTE]
 > To have a full validation checkup, visit [publint](https://github.com/bluwy/publint) and [are the types wrong](https://github.com/arethetypeswrong/arethetypeswrong.github.io).
+
+### Bundle Size Validation
+
+`Packem` validates the bundle size and checks if the bundle size is within the limit you set in the configuration file.
+
+```ts
+import { defineConfig } from "@visulima/packem/config";
+
+export default defineConfig({
+    // ...
+    validator: {
+        bundleSize: {
+            limit: 1024 * 1024, // 1MB
+            // or / and limits per file
+            limits: {
+                "index.cjs": 1024 * 1024, // 1MB
+                "test.mjs": "1MB",
+                // Glob pattern
+                "**/*.mjs": "1MB",
+            },
+        },
+    },
+    // ...
+});
+```
 
 ## Experimental Features
 

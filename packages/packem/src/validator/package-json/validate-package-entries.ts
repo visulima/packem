@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import { cyan, grey } from "@visulima/colorize";
 import { relative, resolve } from "@visulima/path";
 
-import type { BuildContext, PackageJsonValidationOptions } from "../../types";
+import type { BuildContext, ValidationOptions } from "../../types";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
 import levenstein from "../../utils/levenstein";
 import warn from "../../utils/warn";
@@ -11,7 +11,7 @@ import warn from "../../utils/warn";
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const validatePackageEntries = (context: BuildContext): void => {
     const { options } = context;
-    const validation = options.validation as PackageJsonValidationOptions;
+    const validation = options.validation as ValidationOptions;
 
     if (validation.packageJson?.exports === false) {
         return;

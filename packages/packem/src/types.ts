@@ -166,7 +166,7 @@ export type BuildEntry = {
     runtime?: Runtime;
 };
 
-export type PackageJsonValidationOptions = {
+export type ValidationOptions = {
     packageJson?: {
         bin?: boolean;
         dependencies?: boolean;
@@ -177,6 +177,20 @@ export type PackageJsonValidationOptions = {
         name?: boolean;
         types?: boolean;
         typesVersions?: boolean;
+    };
+    bundleLimit?: {
+        // Allow the build to succeed even if limits are exceeded
+        allowFail?: boolean;
+        /**
+         * Bundle size limit in bytes, or string with unit (e.g., "1MB", "500KB")
+         * @example
+         * - "1MB"
+         * - "500KB"
+         * - 1048576 // 1MB in bytes
+         */
+        limit?: number | `${number}${'B'|'KB'|'MB'|'GB'|'TB'}`;
+        // Size limits for specific files or globs
+        limits?: Record<string, number | `${number}${'B'|'KB'|'MB'|'GB'|'TB'}`>;
     };
 };
 
@@ -233,7 +247,7 @@ export interface BuildOptions {
     sourcemap: boolean;
     transformer: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
     typedoc: TypeDocumentOptions | false;
-    validation?: false | PackageJsonValidationOptions;
+    validation?: false | ValidationOptions;
 }
 
 export interface BuildHooks {

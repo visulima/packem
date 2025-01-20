@@ -587,13 +587,13 @@ export { index as default };
         expect(binProcess.stderr).toBe("");
 
         expect(binProcess.stdout).toContain("Build succeeded for output-app");
-        expect(binProcess.stdout).toContain("dist/index.react-server.cjs (total size: 149 Bytes, brotli size: 110 Bytes, gzip size: 142 Bytes)");
+        expect(binProcess.stdout).toContain("dist/index.react-server.cjs (total size: 149.00 Bytes, brotli size: 110.00 Bytes, gzip size: 142.00 Bytes)");
         expect(binProcess.stdout).toContain("exports: index");
-        expect(binProcess.stdout).toContain("dist/foo.cjs (total size: 128 Bytes, brotli size: 108 Bytes, gzip size: 132 Bytes)");
+        expect(binProcess.stdout).toContain("dist/foo.cjs (total size: 128.00 Bytes, brotli size: 108.00 Bytes, gzip size: 132.00 Bytes)");
         expect(binProcess.stdout).toContain("exports: foo");
-        expect(binProcess.stdout).toContain("dist/bin/cli.cjs (total size: 148 Bytes, brotli size: 112 Bytes, gzip size: 146 Bytes)");
+        expect(binProcess.stdout).toContain("dist/bin/cli.cjs (total size: 148.00 Bytes, brotli size: 112.00 Bytes, gzip size: 146.00 Bytes)");
         expect(binProcess.stdout).toContain("exports: cli");
-        expect(binProcess.stdout).toContain("dist/index.cjs (total size: 136 Bytes, brotli size: 96 Bytes, gzip size: 134 Bytes)");
+        expect(binProcess.stdout).toContain("dist/index.cjs (total size: 136.00 Bytes, brotli size: 96.00 Bytes, gzip size: 134.00 Bytes)");
         expect(binProcess.stdout).toContain("exports: index");
         expect(binProcess.stdout).toContain("Σ Total dist size (byte size):");
 

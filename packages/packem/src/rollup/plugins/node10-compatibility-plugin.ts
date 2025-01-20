@@ -32,7 +32,7 @@ export const node10CompatibilityPlugin = (
             if (!logDisplayed) {
                 logger.info({
                     message: "Declaration node10 compatibility mode is enabled.",
-                    prefix: "plugin:node10-compatibility",
+                    prefix: "plugin:packem:node10-compatibility",
                 });
 
                 logDisplayed = true;
@@ -73,12 +73,12 @@ export const node10CompatibilityPlugin = (
 
                 logger.info({
                     message: `Your package.json "typesVersions" field has been updated.`,
-                    prefix: "plugin:node10-compatibility",
+                    prefix: "plugin:packem:node10-compatibility",
                 });
             } else if (Object.keys(typesVersions).length > 0) {
                 logger.info({
                     message: `Please add the following field into your package.json to enable node 10 compatibility:\n\n${JSON.stringify({ typesVersions: { "*": typesVersions } }, null, 4)}\n`,
-                    prefix: "plugin:node10-compatibility",
+                    prefix: "plugin:packem:node10-compatibility",
                 });
             }
         },

@@ -38,10 +38,33 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
             }
 
             let line = `  ${bold(rPath(entry.path))} (${[
-                "total size: " + cyan(formatBytes(totalBytes)),
-                entry.size?.brotli && "brotli size: " + cyan(formatBytes(entry.size.brotli)),
-                entry.size?.gzip && "gzip size: " + cyan(formatBytes(entry.size.gzip)),
-                chunkBytes !== 0 && "chunk size: " + cyan(formatBytes(chunkBytes)),
+                "total size: " +
+                    cyan(
+                        formatBytes(totalBytes, {
+                            decimals: 2,
+                        }),
+                    ),
+                entry.size?.brotli &&
+                    "brotli size: " +
+                        cyan(
+                            formatBytes(entry.size.brotli, {
+                                decimals: 2,
+                            }),
+                        ),
+                entry.size?.gzip &&
+                    "gzip size: " +
+                        cyan(
+                            formatBytes(entry.size.gzip, {
+                                decimals: 2,
+                            }),
+                        ),
+                chunkBytes !== 0 &&
+                    "chunk size: " +
+                        cyan(
+                            formatBytes(chunkBytes, {
+                                decimals: 2,
+                            }),
+                        ),
             ]
                 .filter(Boolean)
                 .join(", ")})`;
@@ -54,7 +77,19 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const chunk = context.buildEntries.find((buildEntry) => buildEntry.path === p) ?? ({} as any);
 
-                        return gray("  └─ " + rPath(p) + bold(chunk.bytes ? " (" + formatBytes(chunk?.bytes) + ")" : ""));
+                        return gray(
+                            "  └─ " +
+                                rPath(p) +
+                                bold(
+                                    chunk.bytes
+                                        ? " (" +
+                                              formatBytes(chunk?.bytes, {
+                                                  decimals: 2,
+                                              }) +
+                                              ")"
+                                        : "",
+                                ),
+                        );
                     })
                     .join("\n")}`;
             }
@@ -63,7 +98,21 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
                 const moduleList = entry.modules
                     .filter((m) => m.id.includes("node_modules"))
                     .sort((a, b) => (b.bytes || 0) - (a.bytes || 0))
-                    .map((m) => gray("  📦 " + rPath(m.id) + bold(m.bytes ? " (" + formatBytes(m.bytes) + ")" : "")))
+                    .map((m) =>
+                        gray(
+                            "  📦 " +
+                                rPath(m.id) +
+                                bold(
+                                    m.bytes
+                                        ? " (" +
+                                              formatBytes(m.bytes, {
+                                                  decimals: 2,
+                                              }) +
+                                              ")"
+                                        : "",
+                                ),
+                        ),
+                    )
                     .join("\n");
 
                 line += moduleList.length > 0 ? "\n  inlined modules:\n" + moduleList : "";
@@ -102,10 +151,26 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
                                   [foundDts, foundCompatibleDts]
                                       .map(
                                           (value: BuildContextBuildEntry | BuildContextBuildAssetAndChunk) =>
-                                              gray("  └─ ") + bold(rPath(value.path)) + " (total size: " + cyan(formatBytes(value.size?.bytes ?? 0)) + ")",
+                                              gray("  └─ ") +
+                                              bold(rPath(value.path)) +
+                                              " (total size: " +
+                                              cyan(
+                                                  formatBytes(value.size?.bytes ?? 0, {
+                                                      decimals: 2,
+                                                  }),
+                                              ) +
+                                              ")",
                                       )
                                       .join("\n")
-                                : "\n  types: " + bold(rPath(foundDts.path)) + " (total size: " + cyan(formatBytes(foundDts.size?.bytes ?? 0)) + ")";
+                                : "\n  types: " +
+                                  bold(rPath(foundDts.path)) +
+                                  " (total size: " +
+                                  cyan(
+                                      formatBytes(foundDts.size?.bytes ?? 0, {
+                                          decimals: 2,
+                                      }),
+                                  ) +
+                                  ")";
                     }
                 }
             }
@@ -124,7 +189,16 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
         let line = "Assets:";
 
         for (const asset of context.buildEntries.filter((bEntry) => bEntry.type === "asset" && !foundDtsEntries.includes(bEntry.path))) {
-            line += gray("\n  └─ ") + bold(rPath(asset.path)) + " (total size: " + cyan(formatBytes(asset.size?.bytes ?? 0)) + ")";
+            line +=
+                gray("\n  └─ ") +
+                bold(rPath(asset.path)) +
+                " (total size: " +
+                cyan(
+                    formatBytes(asset.size?.bytes ?? 0, {
+                        decimals: 2,
+                    }),
+                ) +
+                ")";
         }
 
         line += "\n\n";
