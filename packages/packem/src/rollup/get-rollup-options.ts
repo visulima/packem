@@ -198,13 +198,14 @@ const getTransformerConfig = (
             if (context.options.runtime === "node") {
                 context.options.rollup.oxc.target = [...new Set([nodeTarget, ...targets])];
             } else if (context.options.runtime === "browser") {
-                context.options.rollup.oxc.target = [...new Set([...(context.options.browserTargets as string[]), ...targets])];
+                context.options.rollup.oxc.target = [...new Set([...browserslistToEsbuild(context.options.browserTargets ?? []), ...targets])];
             }
         } else {
-            context.options.rollup.oxc.target = context.options.runtime === "node" ? [nodeTarget] : context.options.browserTargets;
+            context.options.rollup.oxc.target = context.options.runtime === "node" ? [nodeTarget] : browserslistToEsbuild(context.options.browserTargets ?? []);
         }
 
-        return context.options.rollup.oxc;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return context.options.rollup.oxc satisfies InternalOXCTransformPluginConfig;
     }
 
     throw new Error(`A Unknown transformer was provided`);
