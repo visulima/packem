@@ -181,6 +181,10 @@ export type ValidationOptions = {
     bundleLimit?: {
         // Allow the build to succeed even if limits are exceeded
         allowFail?: boolean;
+        // TODO: improve this type to only allow number string with unit
+        // Bundle size limit in bytes, or string with unit
+        limit?: string | number;
+        // Size limits for specific files or globs
         limits?: Record<string, string | number>;
     };
 };

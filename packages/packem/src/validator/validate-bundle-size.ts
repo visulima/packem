@@ -9,7 +9,7 @@ import warn from "../utils/warn";
 const validateBundleSize = (context: BuildContext, logged: boolean): void => {
     const validation = context.options.validation as ValidationOptions;
 
-    const { allowFail = false, limits = {} } = validation.bundleLimit ?? {};
+    const { allowFail = false, limit: totalLimit, limits = {} } = validation.bundleLimit ?? {};
 
     // eslint-disable-next-line prefer-const
     for (let [path, limit] of Object.entries(limits)) {
@@ -54,6 +54,30 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
 
             if (allowFail) {
                 if (logged) {
+                    context.logger.raw("\n");
+                }
+
+                context.logger.warn({
+                    message,
+                    prefix: "validation:file-size",
+                });
+            } else {
+                warn(context, message);
+            }
+        }
+    }
+
+    if (totalLimit) {
+        const totalSize = context.buildEntries.reduce((accumulator, entry) => accumulator + (entry.size?.bytes as number), 0);
+        const maxLimit = typeof totalLimit === "string" ? parseBytes(totalLimit) : totalLimit;
+
+        if (totalSize > maxLimit) {
+            const message = `Total file size exceeds the limit: ${formatBytes(totalSize)} / ${formatBytes(maxLimit, {
+                decimals: 2,
+            })}`;
+
+            if (allowFail) {
+                if (logged && limits.length === 0) {
                     context.logger.raw("\n");
                 }
 
