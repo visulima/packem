@@ -24,6 +24,7 @@ import { cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
 import cssPlugin from "./plugins/css";
 import cssModulesTypesPlugin from "./plugins/css-modules-types";
+import browserslistToEsbuild from "./plugins/esbuild/browserslist-to-esbuild";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
 import { esmShimCjsSyntaxPlugin } from "./plugins/esm-shim-cjs-syntax";
 import fixDynamicImportExtension from "./plugins/fix-dynamic-import-extension";
@@ -96,10 +97,11 @@ const getTransformerConfig = (
             if (context.options.runtime === "node") {
                 context.options.rollup.esbuild.target = [...new Set([nodeTarget, ...targets])];
             } else if (context.options.runtime === "browser") {
-                context.options.rollup.esbuild.target = [...new Set([...(context.options.browserTargets as string[]), ...targets])];
+                context.options.rollup.esbuild.target = [...new Set([...browserslistToEsbuild(context.options.browserTargets ?? []), ...targets])];
             }
         } else {
-            context.options.rollup.esbuild.target = context.options.runtime === "node" ? [nodeTarget] : context.options.browserTargets;
+            context.options.rollup.esbuild.target =
+                context.options.runtime === "node" ? [nodeTarget] : browserslistToEsbuild(context.options.browserTargets ?? []);
         }
 
         if (context.tsconfig?.config.compilerOptions?.target === "es5") {
