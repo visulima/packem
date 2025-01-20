@@ -77,6 +77,8 @@ export type RollupPlugins = {
     type?: "build" | "dts";
 }[];
 
+export type TransformerName = "esbuild" | "sucrase" | "swc" | "oxc";
+
 export interface RollupBuildOptions {
     alias: RollupAliasOptions | false;
     cjsInterop?: CJSInteropOptions;
@@ -85,7 +87,7 @@ export interface RollupBuildOptions {
     css?: StyleOptions | false;
     dts: RollupDtsOptions;
     dynamicVars?: RollupDynamicImportVariablesOptions | false;
-    esbuild: EsbuildOptions | false;
+    esbuild?: EsbuildOptions | false;
     isolatedDeclarations?: IsolatedDeclarationsOptions;
     json: RollupJsonOptions | false;
     jsxRemoveAttributes?: JSXRemoveAttributesPlugin | false;
@@ -188,11 +190,13 @@ export type ValidationOptions = {
          * - "500KB"
          * - 1048576 // 1MB in bytes
          */
-        limit?: number | `${number}${'B'|'KB'|'MB'|'GB'|'TB'}`;
+        limit?: number | `${number}${"B" | "KB" | "MB" | "GB" | "TB"}`;
         // Size limits for specific files or globs
-        limits?: Record<string, number | `${number}${'B'|'KB'|'MB'|'GB'|'TB'}`>;
+        limits?: Record<string, number | `${number}${"B" | "KB" | "MB" | "GB" | "TB"}`>;
     };
 };
+
+export type TransformerFn = (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin & { NAME?: TransformerName };
 
 export interface BuildOptions {
     alias: Record<string, string>;
@@ -245,7 +249,7 @@ export interface BuildOptions {
     runtime?: "node" | "browser";
     sourceDir: string;
     sourcemap: boolean;
-    transformer: (config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin;
+    transformer: TransformerFn;
     typedoc: TypeDocumentOptions | false;
     validation?: false | ValidationOptions;
 }
@@ -306,7 +310,7 @@ export type BuildContextBuildAssetAndChunk = {
 };
 
 export interface InternalBuildOptions extends BuildOptions {
-    transformerName: "esbuild" | "sucrase" | "swc" | undefined;
+    transformerName: TransformerName | undefined;
 }
 
 export interface BuildContext {

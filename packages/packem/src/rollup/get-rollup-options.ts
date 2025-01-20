@@ -60,6 +60,18 @@ const getTransformerConfig = (
     context: BuildContext,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig => {
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    let nodeTarget = "node" + versions.node.split(".")[0];
+
+    if (context.pkg.engines?.node) {
+        const minNodeVersion = minVersion(context.pkg.engines.node);
+
+        if (minNodeVersion) {
+            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+            nodeTarget = "node" + minNodeVersion.major;
+        }
+    }
+
     if (name === "esbuild") {
         if (!context.options.rollup.esbuild) {
             throw new Error("No esbuild options found in your configuration.");
@@ -77,27 +89,17 @@ const getTransformerConfig = (
             context.options.rollup.esbuild.target = "es5";
         }
 
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        let nodeTarget = "node" + versions.node.split(".")[0];
-
-        if (context.pkg.engines?.node) {
-            const minNodeVersion = minVersion(context.pkg.engines.node);
-
-            if (minNodeVersion) {
-                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                nodeTarget = "node" + minNodeVersion.major;
-            }
-        }
-
-        // Add node target to esbuild target
+        // Add targets to esbuild target
         if (context.options.rollup.esbuild.target) {
             const targets = arrayify(context.options.rollup.esbuild.target);
 
-            if (!targets.some((t) => t.startsWith("node"))) {
-                context.options.rollup.esbuild.target = [...new Set([...arrayify(nodeTarget), ...targets])];
+            if (context.options.runtime === "node") {
+                context.options.rollup.esbuild.target = [...new Set([nodeTarget, ...targets])];
+            } else if (context.options.runtime === "browser") {
+                context.options.rollup.esbuild.target = [...new Set([...(context.options.browserTargets as string[]), ...targets])];
             }
         } else {
-            context.options.rollup.esbuild.target = arrayify(nodeTarget);
+            context.options.rollup.esbuild.target = context.options.runtime === "node" ? [nodeTarget] : context.options.browserTargets;
         }
 
         if (context.tsconfig?.config.compilerOptions?.target === "es5") {
@@ -270,7 +272,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
     const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "build");
 
     // Add esm mark and interop helper if esm export is detected
-    const useEsModuleMark = context.tsconfig?.config?.compilerOptions?.esModuleInterop;
+    const useEsModuleMark = context.tsconfig?.config.compilerOptions?.esModuleInterop;
 
     return (<RollupOptions>{
         ...baseRollupOptions(context, "build"),
