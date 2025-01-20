@@ -14,11 +14,12 @@ const resolvedIdCache = async (
     if (!importer || isEntry || !filter(id) || id.startsWith("\0")) {
         return null;
     }
+    const hashKey = `${importer}:${id}`;
 
     // Some plugins sometimes cause the resolver to be called multiple times for the same id,
     // so we cache our results for faster response when this happens.
     // (undefined = not seen before, null = not handled by us, string = resolved)
-    const resolvedId = resolveIdCache.get(id);
+    const resolvedId = resolveIdCache.get(hashKey);
 
     if (resolvedId !== undefined) {
         return resolvedId as string | null;
@@ -47,7 +48,7 @@ const resolvedIdCache = async (
         }
     }
 
-    resolveIdCache.set(id, null);
+    resolveIdCache.set(hashKey, null);
 
     return null;
 };
