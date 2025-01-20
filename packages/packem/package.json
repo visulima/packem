@@ -485,7 +485,7 @@
         "lightningcss": ">=1.27.0",
         "node-sass": ">=9.0.0",
         "oxc-transform": ">=0.20.0",
-        "postcss": ">=8.4.47",
+        "postcss": ">=8.4.49",
         "postcss-load-config": ">=6.0.1",
         "postcss-modules-extract-imports": ">=3.1.0",
         "postcss-modules-local-by-default": ">=4.0.5",
