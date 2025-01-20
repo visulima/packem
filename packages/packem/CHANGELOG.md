@@ -1,3 +1,17 @@
+## @visulima/packem [1.17.0](https://github.com/visulima/packem/compare/@visulima/packem@1.16.0...@visulima/packem@1.17.0) (2025-01-20)
+
+### Features
+
+* added browser runtime support to esbuild, added NAME variable to ([#103](https://github.com/visulima/packem/issues/103)) ([c0cf7d7](https://github.com/visulima/packem/commit/c0cf7d7938a7a42a50a72f205bf3d910fa9b34a1))
+
+### Bug Fixes
+
+* removed dead code ([88ca10d](https://github.com/visulima/packem/commit/88ca10d7ff304d3c7c54167193077d7bf2004144))
+
+### Miscellaneous Chores
+
+* update lock, added lint:dedupe command ([776935a](https://github.com/visulima/packem/commit/776935ae1b7ea3a52d5fb0be63c18588ed47e094))
+
 ## @visulima/packem [1.16.0](https://github.com/visulima/packem/compare/@visulima/packem@1.15.0...@visulima/packem@1.16.0) (2025-01-20)
 
 ### Features
