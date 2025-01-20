@@ -475,7 +475,11 @@ const generateOptions = (
 
     let version = "0.0.0";
 
-    if (!options.transformerName) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (options.transformer?.NAME !== undefined) {
+        options.transformerName = options.transformer.NAME;
+        // TODO: Remove this in v2, and a throw error if transformer.NAME is not set
+    } else if (!options.transformerName) {
         const dependencies = new Map([...Object.entries(packageJson.dependencies ?? {}), ...Object.entries(packageJson.devDependencies ?? {})]);
 
         if (dependencies.has("esbuild")) {
@@ -650,8 +654,12 @@ const getMode = (mode: Mode): string => {
         case "tsdoc": {
             return "Generating TSDoc";
         }
-        default: {
+        case "build": {
             return "Building";
+        }
+        default: {
+            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+            throw new Error("Unknown mode: " + mode);
         }
     }
 };
@@ -721,6 +729,7 @@ const packem = async (
         const packemConfigFilePath = await findPackemFile(rootDirectory, configPath ?? "");
         const jiti = createJiti(rootDirectory, { debug });
 
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         let buildConfig = ((await jiti.import(packemConfigFilePath, { default: true, try: true })) || {}) as BuildConfig | BuildConfigFunction;
 
         if (typeof buildConfig === "function") {

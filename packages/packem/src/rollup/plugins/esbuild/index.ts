@@ -5,23 +5,30 @@
  *
  * Copyright (c) 2020 EGOIST
  */
-import { existsSync, statSync } from "node:fs";
-
 import { createFilter } from "@rollup/pluginutils";
-import { dirname, extname, resolve } from "@visulima/path";
+import { extname } from "@visulima/path";
 import type { Loader } from "esbuild";
 import { transform } from "esbuild";
 import type { Plugin as RollupPlugin } from "rollup";
 
 import { DEFAULT_LOADERS } from "../../../constants";
-import resolveFile from "../../utils/resolve-file";
+import type { TransformerFn as TransformerFunction } from "../../../types";
+import resolvedIdCache from "../../utils/resolved-id-cache";
 import getRenderChunk from "./get-render-chunk";
 import doOptimizeDeps from "./optmize-deps";
 import type { EsbuildPluginConfig, OptimizeDepsResult } from "./types";
 import warn from "./warn";
 
+const esbuildTransformer = ({
+    exclude,
+    include,
+    loaders: _loaders,
+    logger,
+    optimizeDeps,
+    sourceMap,
+    ...esbuildOptions
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sourceMap = true, ...esbuildOptions }: EsbuildPluginConfig): RollupPlugin => {
+}: EsbuildPluginConfig): RollupPlugin => {
     const loaders = DEFAULT_LOADERS;
 
     if (_loaders !== undefined) {
@@ -50,7 +57,7 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
     let cwd = process.cwd();
 
     // Initialize own resolution cache.
-    const resolveIdCache = new Map();
+    const resolveIdCache = new Map<string, string | null>();
 
     return {
         async buildStart() {
@@ -60,7 +67,7 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
 
             optimizeDepsResult = await doOptimizeDeps({
                 cwd,
-                sourceMap,
+                sourceMap: sourceMap ?? false,
                 ...optimizeDeps,
             });
 
@@ -83,10 +90,6 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
         }),
 
         async resolveId(id, importer, { isEntry }): Promise<string | null> {
-            if (!importer || isEntry || !filter(id) || id.startsWith("\0")) {
-                return null;
-            }
-
             if (optimizeDepsResult?.optimized.has(id)) {
                 const m = optimizeDepsResult.optimized.get(id);
 
@@ -97,41 +100,7 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
                 }
             }
 
-            // Some plugins sometimes cause the resolver to be called multiple times for the same id,
-            // so we cache our results for faster response when this happens.
-            // (undefined = not seen before, null = not handled by us, string = resolved)
-            const resolvedId = resolveIdCache.get(id);
-
-            if (resolvedId !== undefined) {
-                return resolvedId as string | null;
-            }
-
-            if (importer && id.startsWith(".")) {
-                const resolved = resolve(importer ? dirname(importer) : process.cwd(), id);
-
-                let file = resolveFile(extensions, resolved);
-
-                if (file) {
-                    resolveIdCache.set(id, file);
-
-                    return file as string;
-                }
-
-                // eslint-disable-next-line security/detect-non-literal-fs-filename
-                if (!file && existsSync(resolved) && statSync(resolved).isDirectory()) {
-                    file = resolveFile(extensions, resolved, true);
-
-                    if (file) {
-                        resolveIdCache.set(id, file);
-
-                        return file as string;
-                    }
-                }
-            }
-
-            resolveIdCache.set(id, null);
-
-            return null;
+            return await resolvedIdCache(resolveIdCache, { filter, id, importer, isEntry }, extensions);
         },
 
         async transform(code, id) {
@@ -171,3 +140,7 @@ export default ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sou
         },
     };
 };
+
+esbuildTransformer.NAME = "esbuild";
+
+export default esbuildTransformer as TransformerFunction;
