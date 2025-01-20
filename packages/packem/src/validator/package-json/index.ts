@@ -5,10 +5,6 @@ import validatePackageEntries from "./validate-package-entries";
 import validatePackageFields from "./validate-package-fields";
 
 const validator = (context: BuildContext): void => {
-    if (context.options.validation === false) {
-        return;
-    }
-
     const { packageJson } = loadPackageJson(context.options.rootDir);
 
     context.pkg = packageJson;

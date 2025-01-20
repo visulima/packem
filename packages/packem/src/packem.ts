@@ -466,7 +466,9 @@ const generateOptions = (
     }) as InternalBuildOptions;
 
     if (options.runtime === undefined) {
-        logger.warn("No runtime specified, defaulting to 'node'. This will change in packem v2 to 'browser', please add 'runtime: node' to your packem config or command call");
+        logger.warn(
+            "No runtime specified, defaulting to 'node'. This will change in packem v2 to 'browser', please add 'runtime: node' to your packem config or command call",
+        );
 
         options.runtime = "node";
     }
@@ -874,8 +876,11 @@ const packem = async (
 
             await context.hooks.callHook("validate:before", context);
 
-            packageJsonValidator(context);
-            validateBundleSize(context, logged);
+            // TODO: Add a validation handler, to add custom validation checks
+            if (context.options.validation !== false) {
+                packageJsonValidator(context);
+                validateBundleSize(context, logged);
+            }
 
             await context.hooks.callHook("validate:done", context);
 
