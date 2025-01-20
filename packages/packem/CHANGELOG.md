@@ -1,3 +1,13 @@
+## @visulima/packem [1.16.0](https://github.com/visulima/packem/compare/@visulima/packem@1.15.0...@visulima/packem@1.16.0) (2025-01-20)
+
+### Features
+
+* added bundle limit validation ([#102](https://github.com/visulima/packem/issues/102)) ([75d2a07](https://github.com/visulima/packem/commit/75d2a07440604d1b1a91cac17be937363dd074a3))
+
+### Bug Fixes
+
+* updated rollup to v4.31.0, oxc-parser to v0.47.1, @visulima/humanizer to 1.1.0 ([3b0eca8](https://github.com/visulima/packem/commit/3b0eca821101a011a36a1452f2cec7f400c9b280))
+
 ## @visulima/packem [1.15.0](https://github.com/visulima/packem/compare/@visulima/packem@1.14.1...@visulima/packem@1.15.0) (2025-01-18)
 
 ### Features
