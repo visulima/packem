@@ -181,11 +181,16 @@ export type ValidationOptions = {
     bundleLimit?: {
         // Allow the build to succeed even if limits are exceeded
         allowFail?: boolean;
-        // TODO: improve this type to only allow number string with unit
-        // Bundle size limit in bytes, or string with unit
-        limit?: string | number;
+        /**
+         * Bundle size limit in bytes, or string with unit (e.g., "1MB", "500KB")
+         * @example
+         * - "1MB"
+         * - "500KB"
+         * - 1048576 // 1MB in bytes
+         */
+        limit?: number | `${number}${'B'|'KB'|'MB'|'GB'|'TB'}`;
         // Size limits for specific files or globs
-        limits?: Record<string, string | number>;
+        limits?: Record<string, number | `${number}${'B'|'KB'|'MB'|'GB'|'TB'}`>;
     };
 };
 

@@ -514,7 +514,7 @@ export default defineConfig({
     // ...
     validator: {
         bundleSize: {
-            Limit: 1024 * 1024, // 1MB
+            limit: 1024 * 1024, // 1MB
             // or / and limits per file
             limits: {
                 "index.cjs": 1024 * 1024, // 1MB

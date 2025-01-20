@@ -11,40 +11,35 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
 
     const { allowFail = false, limit: totalLimit, limits = {} } = validation.bundleLimit ?? {};
 
-    // eslint-disable-next-line prefer-const
-    for (let [path, limit] of Object.entries(limits)) {
+    for (const [path, rawLimit] of Object.entries(limits)) {
+        const limit = typeof rawLimit === "string" ? parseBytes(rawLimit) : rawLimit;
+        
+        if (!Number.isFinite(limit) || limit <= 0) {
+            context.logger.debug({
+                message: `Invalid limit for ${path}: ${rawLimit}`,
+                prefix: "Validation: File Size",
+            });
+            continue;
+        }
+
         const foundEntry = context.buildEntries.find(
-            (entry) => entry.path.endsWith(path.replace("./" + context.options.outDir, "")) || picomatch(path)(entry.path),
+            (entry) => {
+                const normalizedPath = path.replace(new RegExp(`^\.?/?${context.options.outDir}/?`), "");
+                return entry.path.endsWith(normalizedPath) || picomatch(path)(entry.path);
+            }
         );
 
-        if (!foundEntry) {
+        if (!foundEntry?.size?.bytes) {
             context.logger.debug({
-                message: `Entry file not found: ${path}, please check your configuration.`,
+                message: foundEntry 
+                    ? `Entry file has no size information: ${path}.`
+                    : `Entry file not found: ${path}, please check your configuration.`,
                 prefix: "Validation: File Size",
             });
-
-            // eslint-disable-next-line no-continue
             continue;
         }
 
-        if (foundEntry.size === undefined) {
-            context.logger.debug({
-                message: `Entry file has no size information: ${path}.`,
-                prefix: "Validation: File Size",
-            });
-
-            // eslint-disable-next-line no-continue
-            continue;
-        }
-
-        if (typeof limit === "string") {
-            limit = parseBytes(limit);
-        }
-
-        if (!Number.isFinite(limit) || limit <= 0 || (foundEntry.size.bytes as number) <= limit) {
-            // eslint-disable-next-line no-continue
-            continue;
-        } else {
+        if (foundEntry.size.bytes > limit) {
             const message = `File size exceeds the limit: ${join(context.options.outDir, foundEntry.path)} (${formatBytes(foundEntry.size.bytes as number)} / ${formatBytes(
                 limit,
                 {
@@ -56,7 +51,6 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
                 if (logged) {
                     context.logger.raw("\n");
                 }
-
                 context.logger.warn({
                     message,
                     prefix: "validation:file-size",
@@ -68,8 +62,20 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
     }
 
     if (totalLimit) {
-        const totalSize = context.buildEntries.reduce((accumulator, entry) => accumulator + (entry.size?.bytes as number), 0);
+        const totalSize = context.buildEntries.reduce((accumulator, entry) => {
+            const bytes = entry.size?.bytes;
+            return accumulator + (typeof bytes === "number" ? bytes : 0);
+        }, 0);
+        
         const maxLimit = typeof totalLimit === "string" ? parseBytes(totalLimit) : totalLimit;
+        
+        if (!Number.isFinite(maxLimit) || maxLimit <= 0) {
+            context.logger.debug({
+                message: `Invalid total limit: ${totalLimit}`,
+                prefix: "Validation: File Size",
+            });
+            return;
+        }
 
         if (totalSize > maxLimit) {
             const message = `Total file size exceeds the limit: ${formatBytes(totalSize)} / ${formatBytes(maxLimit, {
@@ -77,10 +83,9 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
             })}`;
 
             if (allowFail) {
-                if (logged && limits.length === 0) {
+                if (logged && Object.keys(limits).length === 0) {
                     context.logger.raw("\n");
                 }
-
                 context.logger.warn({
                     message,
                     prefix: "validation:file-size",
