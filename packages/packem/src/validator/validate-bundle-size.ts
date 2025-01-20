@@ -13,29 +13,29 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
 
     for (const [path, rawLimit] of Object.entries(limits)) {
         const limit = typeof rawLimit === "string" ? parseBytes(rawLimit) : rawLimit;
-        
+
         if (!Number.isFinite(limit) || limit <= 0) {
             context.logger.debug({
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 message: `Invalid limit for ${path}: ${rawLimit}`,
                 prefix: "Validation: File Size",
             });
+            // eslint-disable-next-line no-continue
             continue;
         }
 
-        const foundEntry = context.buildEntries.find(
-            (entry) => {
-                const normalizedPath = path.replace(new RegExp(`^\.?/?${context.options.outDir}/?`), "");
-                return entry.path.endsWith(normalizedPath) || picomatch(path)(entry.path);
-            }
-        );
+        const foundEntry = context.buildEntries.find((entry) => {
+            const normalizedPath = path.replace(new RegExp(`^.?/?${context.options.outDir}/?`), "");
+
+            return entry.path.endsWith(normalizedPath) || picomatch(path)(entry.path);
+        });
 
         if (!foundEntry?.size?.bytes) {
             context.logger.debug({
-                message: foundEntry 
-                    ? `Entry file has no size information: ${path}.`
-                    : `Entry file not found: ${path}, please check your configuration.`,
+                message: foundEntry ? `Entry file has no size information: ${path}.` : `Entry file not found: ${path}, please check your configuration.`,
                 prefix: "Validation: File Size",
             });
+            // eslint-disable-next-line no-continue
             continue;
         }
 
@@ -62,15 +62,17 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
     }
 
     if (totalLimit) {
+        // eslint-disable-next-line unicorn/no-array-reduce
         const totalSize = context.buildEntries.reduce((accumulator, entry) => {
             const bytes = entry.size?.bytes;
             return accumulator + (typeof bytes === "number" ? bytes : 0);
         }, 0);
-        
+
         const maxLimit = typeof totalLimit === "string" ? parseBytes(totalLimit) : totalLimit;
-        
+
         if (!Number.isFinite(maxLimit) || maxLimit <= 0) {
             context.logger.debug({
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 message: `Invalid total limit: ${totalLimit}`,
                 prefix: "Validation: File Size",
             });
