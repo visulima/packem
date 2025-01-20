@@ -154,17 +154,16 @@ function stripInternalTypes(this: PluginContext, code: string, chunk: RenderedCh
     return code;
 }
 
-export interface PatchTypesOptions {
+export type PatchTypesOptions = {
     identifierReplacements?: Record<string, Record<string, string>>;
 }
 
 /**
  * Patch the types files before passing to dts plugin
- * 1. Resolve `types/*` imports
- * 2. Validate unallowed dependency imports
- * 3. Replace confusing type names
- * 4. Strip leftover internal types
- * 5. Clean unnecessary comments
+ * 1. Validate unallowed dependency imports
+ * 2. Replace confusing type names
+ * 3. Strip leftover internal types
+ * 4. Clean unnecessary comments
  */
 export const patchTypescriptTypes = (options: PatchTypesOptions, logger: Pail): Plugin => {
     return {
@@ -178,17 +177,6 @@ export const patchTypescriptTypes = (options: PatchTypesOptions, logger: Pail): 
             code = cleanUnnecessaryComments(code);
 
             return code;
-        },
-        resolveId(id) {
-            // Ambient types are unbundled and externalized
-            if (id.startsWith("types/")) {
-                return {
-                    external: true,
-                    id: "../../" + (id.endsWith(".js") ? id : id + ".js"),
-                };
-            }
-
-            return null;
         },
     };
 };
