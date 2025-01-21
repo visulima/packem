@@ -204,7 +204,6 @@ const getTransformerConfig = (
             context.options.rollup.oxc.target = context.options.runtime === "node" ? [nodeTarget] : browserslistToEsbuild(context.options.browserTargets ?? []);
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return context.options.rollup.oxc satisfies InternalOXCTransformPluginConfig;
     }
 
