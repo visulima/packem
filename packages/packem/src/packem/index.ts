@@ -319,14 +319,11 @@ const generateOptions = (
                           },
                 typescript: tsconfig?.config
                     ? {
+                          allowDeclareFields: true,
+                          allowNamespaces: true,
                           jsxPragma: tsconfig.config.compilerOptions?.jsxFactory,
                           jsxPragmaFrag: tsconfig.config.compilerOptions?.jsxFragmentFactory,
-                          // onlyRemoveTypeImports?: boolean
-                          // allowNamespaces?: boolean
-                          // allowDeclareFields?: boolean
-                          //
-                          // declaration?: IsolatedDeclarationsOptions
-                          // rewriteImportExtensions?: 'rewrite' | 'remove' | boolean
+                          onlyRemoveTypeImports: true,
                       }
                     : undefined,
             },
