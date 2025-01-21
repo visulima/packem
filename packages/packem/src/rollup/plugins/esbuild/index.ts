@@ -13,7 +13,6 @@ import type { Plugin as RollupPlugin } from "rollup";
 
 import { DEFAULT_LOADERS } from "../../../constants";
 import type { TransformerFn as TransformerFunction } from "../../../types";
-import resolvedIdCache from "../../utils/resolved-id-cache";
 import getRenderChunk from "./get-render-chunk";
 import doOptimizeDeps from "./optmize-deps";
 import type { EsbuildPluginConfig, OptimizeDepsResult } from "./types";
@@ -56,9 +55,6 @@ const esbuildTransformer = ({
     let optimizeDepsResult: OptimizeDepsResult | undefined;
     let cwd = process.cwd();
 
-    // Initialize own resolution cache.
-    const resolveIdCache = new Map<string, string | null>();
-
     return {
         async buildStart() {
             if (!optimizeDeps || optimizeDepsResult) {
@@ -89,7 +85,7 @@ const esbuildTransformer = ({
             sourceMap,
         }),
 
-        async resolveId(id, importer, { isEntry }): Promise<string | null> {
+        async resolveId(id): Promise<string | null> {
             if (optimizeDepsResult?.optimized.has(id)) {
                 const m = optimizeDepsResult.optimized.get(id);
 
@@ -100,7 +96,7 @@ const esbuildTransformer = ({
                 }
             }
 
-            return await resolvedIdCache(resolveIdCache, { filter, id, importer, isEntry }, extensions);
+            return null;
         },
 
         async transform(code, id) {

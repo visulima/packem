@@ -46,6 +46,7 @@ export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: stri
                             },
                         ],
                     });
+
                     return null;
                 }
 
