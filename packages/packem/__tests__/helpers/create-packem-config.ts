@@ -25,7 +25,7 @@ export type PackemConfigProperties = {
         when: "after" | "before";
     }[];
     runtime?: "browser" | "node";
-    transformer?: "esbuild" | "swc" | "sucrase";
+    transformer?: "esbuild" | "swc" | "sucrase" | "oxc";
 };
 
 export const createPackemConfig = async (
@@ -43,7 +43,7 @@ export const createPackemConfig = async (
     }: PackemConfigProperties = {},
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
-    await installPackage(fixturePath, transformer === "swc" ? "@swc" : transformer);
+    await installPackage(fixturePath, transformer === "swc" ? "@swc" : transformer === "oxc" ? "oxc-transform" : transformer);
 
     let rollupConfig = "";
 
@@ -105,7 +105,7 @@ export const createPackemConfig = async (
     await writeFile(
         join(fixturePath, "packem.config.ts"),
         `import { defineConfig } from "${distributionPath}/config";
-import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : "index"}";
+import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : transformer === "oxc" ? "oxc-transformer" : "index"}";
 ${isolatedDeclarationTransformer ? `import isolatedDeclarationTransformer from "${distributionPath}/rollup/plugins/${isolatedDeclarationTransformer}/isolated-declarations-${isolatedDeclarationTransformer}-transformer";` : ""}
 ${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/rollup/plugins/css/loaders/${loader}";`).join("\n")}
 ${minimizer ? `import ${minimizer} from "${distributionPath}/rollup/plugins/css/minifiers/${minimizer}";` : ""}${pluginImports.join("\n")}

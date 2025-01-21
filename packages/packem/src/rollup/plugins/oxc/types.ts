@@ -3,13 +3,11 @@ import type { JsxOptions, TransformOptions, TypeScriptOptions } from "oxc-transf
 
 export type InternalOXCTransformPluginConfig = {
     exclude?: FilterPattern;
-    extensions?: string[];
     include?: FilterPattern;
 } & TransformOptions;
 
 export type OXCTransformPluginConfig = {
     exclude?: FilterPattern;
-    extensions?: string[];
     include?: FilterPattern;
     /** Configure how TSX and JSX are transformed. */
     jsx?: "preserve" | Omit<JsxOptions, "refresh">;

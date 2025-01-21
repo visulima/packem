@@ -65,6 +65,19 @@ module.exports = index;
 export { index as default };
 `,
         ],
+        [
+            "oxc",
+            `'use strict';
+
+const index = () => "index";
+
+module.exports = index;
+`,
+            `const index = () => "index";
+
+export { index as default };
+`,
+        ],
     ])("should transfrom the file with the '%s' transformer", async (transformer, expectedCjs, expectedMjs) => {
         expect.assertions(6);
 
@@ -84,9 +97,11 @@ export { index as default };
             },
             transformer as "esbuild" | "swc" | "sucrase",
         );
-        await createPackemConfig(temporaryDirectoryPath, { transformer: transformer as "esbuild" | "swc" | "sucrase" });
+        await createPackemConfig(temporaryDirectoryPath, { transformer: transformer as "esbuild" | "swc" | "sucrase" | "oxc" });
 
-        expect(readFileSync(`${temporaryDirectoryPath}/packem.config.ts`)).toContain(transformer === "swc" ? "swc/swc-plugin" : `${transformer}/index`);
+        expect(readFileSync(`${temporaryDirectoryPath}/packem.config.ts`)).toContain(
+            transformer === "swc" ? "swc/swc-plugin" : transformer === "oxc" ? `${transformer}/oxc-transformer` : `${transformer}/index`,
+        );
 
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
