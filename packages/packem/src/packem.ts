@@ -4,7 +4,8 @@ import { bold, cyan } from "@visulima/colorize";
 import { findCacheDirSync } from "@visulima/find-cache-dir";
 import { ensureDirSync, isAccessible } from "@visulima/fs";
 import { duration } from "@visulima/humanizer";
-import type { PackageJson } from "@visulima/package";
+import type { NormalizedPackageJson, PackageJson } from "@visulima/package";
+import { hasPackageJsonAnyDependency } from "@visulima/package";
 import type { Pail } from "@visulima/pail";
 import { join, resolve } from "@visulima/path";
 import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
@@ -41,6 +42,14 @@ import packageJsonValidator from "./validator/package-json";
 import validateAliasEntries from "./validator/validate-alias-entries";
 import validateBundleSize from "./validator/validate-bundle-size";
 
+/**
+ * Resolves TSConfig JSX option to a standardized JSX runtime value.
+ *
+ * @param jsx - The JSX option from TSConfig
+ * @returns Standardized JSX runtime value ('automatic', 'preserve', or 'transform')
+ *
+ * @internal
+ */
 const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX): "automatic" | "preserve" | "transform" | undefined => {
     switch (jsx) {
         case "preserve":
@@ -60,6 +69,24 @@ const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX):
     }
 };
 
+/**
+ * Generates build options by combining and processing various configuration sources.
+ *
+ * @param logger - Logger instance for output
+ * @param rootDirectory - Root directory of the project
+ * @param environment - Build environment (development/production)
+ * @param debug - Enable debug mode
+ * @param inputConfig - User provided build configuration
+ * @param buildConfig - Resolved build configuration
+ * @param preset - Build preset configuration
+ * @param packageJson - Package.json contents
+ * @param tsconfig - TypeScript configuration
+ * @param runtimeVersion - Node.js runtime version
+ *
+ * @returns Processed internal build options
+ *
+ * @internal
+ */
 const generateOptions = (
     logger: Pail,
     rootDirectory: string,
@@ -539,6 +566,25 @@ const generateOptions = (
     return options;
 };
 
+/**
+ * Creates a build context with all necessary configuration and environment information.
+ *
+ * @param logger - Logger instance for output
+ * @param rootDirectory - Root directory of the project
+ * @param mode - Build mode (build/watch)
+ * @param environment - Build environment (development/production)
+ * @param debug - Enable debug mode
+ * @param inputConfig - User provided build configuration
+ * @param buildConfig - Resolved build configuration
+ * @param packageJson - Package.json contents
+ * @param tsconfig - TypeScript configuration
+ * @param jiti - Jiti instance for module loading
+ * @param nodeVersion - Node.js version
+ *
+ * @returns Promise resolving to the build context
+ *
+ * @internal
+ */
 const createContext = async (
     logger: Pail,
     rootDirectory: string,
@@ -604,7 +650,7 @@ const createContext = async (
         context.logger.info("Minification is enabled, the output will be minified");
     }
 
-    const hasTypescript = packageJson.dependencies?.typescript !== undefined || packageJson.devDependencies?.typescript !== undefined;
+    const hasTypescript = hasPackageJsonAnyDependency(packageJson as NormalizedPackageJson, ["typescript"]);
 
     if (context.options.declaration && context.tsconfig === undefined && hasTypescript) {
         throw new Error("Cannot build declaration files without a tsconfig.json");
@@ -643,6 +689,14 @@ const createContext = async (
     return context;
 };
 
+/**
+ * Gets a human-readable string representation of the build mode.
+ *
+ * @param mode - Build mode (build/watch)
+ * @returns String representation of the mode
+ *
+ * @internal
+ */
 const getMode = (mode: Mode): string => {
     switch (mode) {
         case "jit": {
@@ -664,6 +718,30 @@ const getMode = (mode: Mode): string => {
     }
 };
 
+/**
+ * Main entry point for the Packem bundler.
+ * Handles the complete build process including configuration loading, validation,
+ * and execution of the build/watch process.
+ *
+ * @param rootDirectory - Root directory of the project
+ * @param mode - Build mode (build/watch)
+ * @param environment - Build environment (development/production)
+ * @param logger - Logger instance for output
+ * @param inputConfig - User provided build configuration and options
+ *
+ * @example
+ * ```typescript
+ * import packem from 'packem';
+ *
+ * await packem('/path/to/project', 'build', 'production', logger, {
+ *   debug: true,
+ *   configPath: './packem.config.js'
+ * });
+ * ```
+ *
+ * @throws {Error} If configuration validation fails or build process encounters errors
+ * @public
+ */
 const packem = async (
     rootDirectory: string,
     mode: Mode,
@@ -706,7 +784,7 @@ const packem = async (
         };
 
         logger.info("Using tsconfig settings at", rootTsconfigPath);
-    } else if (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript) {
+    } else if (hasPackageJsonAnyDependency(packageJson as NormalizedPackageJson, ["typescript"])) {
         try {
             tsconfig = await findTsConfig(rootDirectory);
 

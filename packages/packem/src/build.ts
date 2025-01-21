@@ -14,6 +14,16 @@ import type FileCache from "./utils/file-cache";
 import groupByKeys from "./utils/group-by-keys";
 import gzipSize from "./utils/gzip-size";
 
+/**
+ * Displays size information for build outputs including entries, chunks, and assets.
+ * Provides detailed size metrics including total size, brotli size, and gzip size.
+ *
+ * @param logger - Logger instance for output
+ * @param context - Build context containing build configuration and state
+ * @returns Boolean indicating whether any entries were logged
+ *
+ * @internal
+ */
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
     const rPath = (p: string) => relative(context.options.rootDir, resolve(context.options.outDir, p));
@@ -224,12 +234,30 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
     return loggedEntries;
 };
 
-type BuilderProperties = {
+/**
+ * Properties required for building a package or type definitions.
+ *
+ * @interface
+ * @property {BuildContext} context - Build context containing configuration and state
+ * @property {FileCache} fileCache - Cache instance for file operations
+ * @property {string} subDirectory - Subdirectory for output files
+ */
+interface BuilderProperties {
     context: BuildContext;
     fileCache: FileCache;
     subDirectory: string;
-};
+}
 
+/**
+ * Prepares Rollup configuration for both JavaScript/TypeScript builds and type definition builds.
+ * Processes entries and generates appropriate builder configurations.
+ *
+ * @param context - Build context containing configuration and state
+ * @param fileCache - Cache instance for file operations
+ * @returns Object containing sets of builders for both source and type definitions
+ *
+ * @internal
+ */
 const prepareRollupConfig = (
     context: BuildContext,
     fileCache: FileCache,
@@ -490,6 +518,25 @@ const prepareRollupConfig = (
     return { builders, typeBuilders };
 };
 
+/**
+ * Main build function that orchestrates the entire build process.
+ * Handles both JavaScript/TypeScript compilation and type definition generation.
+ *
+ * @param context - Build context containing configuration and state
+ * @param fileCache - Cache instance for file operations
+ * @returns Promise resolving to a boolean indicating build success
+ *
+ * @example
+ * ```typescript
+ * const success = await build(buildContext, new FileCache());
+ * if (success) {
+ *   console.log('Build completed successfully');
+ * }
+ * ```
+ *
+ * @throws {Error} If the build process encounters critical errors
+ * @public
+ */
 const build = async (context: BuildContext, fileCache: FileCache): Promise<boolean> => {
     await context.hooks.callHook("build:before", context);
 

@@ -7,7 +7,14 @@ import createAddCommand from "./commands/add";
 import createBuildCommand from "./commands/build";
 import createInitCommand from "./commands/init";
 
-// We need to load v8-compile-cache.js separately in order to have effect
+/**
+ * Attempts to load and enable V8 compile cache for better performance.
+ * Falls back to v8-compile-cache module if Node.js native compile cache is not available.
+ *
+ * @remarks
+ * This is a performance optimization that helps reduce startup time by caching
+ * compiled JavaScript code.
+ */
 try {
     // Use node.js 22 new API for better performance.
     // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require,unicorn/prefer-module
@@ -20,9 +27,19 @@ try {
 }
 
 /**
- * Create a new instance of the packem CLI.
+ * Creates and configures the main CLI instance for Packem.
+ * Sets up logging, error reporting, and registers available commands.
  *
- * @type {Cli}
+ * @remarks
+ * The CLI is built using the @visulima/cerebro framework and configured with
+ * a SimpleReporter for error handling and output formatting.
+ *
+ * @example
+ * ```typescript
+ * // The CLI can be used in scripts as follows:
+ * import cli from './cli';
+ * await cli.run(['build', '--watch']);
+ * ```
  */
 const cli = new Cli("packem", {
     logger: {
@@ -41,10 +58,12 @@ const cli = new Cli("packem", {
     packageVersion: version,
 });
 
+// Register available commands
 createInitCommand(cli);
 createBuildCommand(cli);
 createAddCommand(cli);
 
+// Run the CLI without exiting the process
 // eslint-disable-next-line no-void
 void cli.run({
     shouldExitProcess: false,

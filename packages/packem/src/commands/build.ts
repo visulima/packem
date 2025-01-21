@@ -6,6 +6,27 @@ import { DEVELOPMENT_ENV, PRODUCTION_ENV } from "../constants";
 import packem from "../packem";
 import type { Environment, Mode } from "../types";
 
+/**
+ * Creates and registers the build command with the CLI.
+ * Handles various build modes, environment variables, and build configurations.
+ *
+ * @param cli - CLI instance to register the command with
+ *
+ * @example
+ * ```typescript
+ * // Usage from command line:
+ * // Build for production:
+ * // packem build --production
+ *
+ * // Watch mode with development environment:
+ * // packem build --watch --development
+ *
+ * // With custom environment variables:
+ * // packem build --env.API_URL=http://api.example.com
+ * ```
+ *
+ * @internal
+ */
 const createBuildCommand = (cli: Cli): void => {
     cli.addCommand({
         description: "Demonstrate options required",
@@ -22,6 +43,7 @@ const createBuildCommand = (cli: Cli): void => {
             const environments: Record<string, string> = {};
             let nodeEnvironment: string | undefined;
 
+            // Process environment variables
             if (options.env) {
                 for (const environment of options.env) {
                     if (environment.key === "NODE_ENV") {
@@ -33,6 +55,7 @@ const createBuildCommand = (cli: Cli): void => {
                 }
             }
 
+            // Determine NODE_ENV if not explicitly set
             if (nodeEnvironment === undefined) {
                 if (options.production) {
                     nodeEnvironment = PRODUCTION_ENV;
@@ -43,6 +66,7 @@ const createBuildCommand = (cli: Cli): void => {
 
             const externals: string[] = [];
 
+            // Process external dependencies
             if (options.external) {
                 for (const extension of options.external) {
                     externals.push(extension.split(","));
