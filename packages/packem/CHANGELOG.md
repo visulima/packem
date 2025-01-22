@@ -1,3 +1,9 @@
+## @visulima/packem [1.17.5](https://github.com/visulima/packem/compare/@visulima/packem@1.17.4...@visulima/packem@1.17.5) (2025-01-22)
+
+### Bug Fixes
+
+* fixed types export ([0c50405](https://github.com/visulima/packem/commit/0c50405de1c013cc6f5f5ed8ecc7d874fb9f386c))
+
 ## @visulima/packem [1.17.4](https://github.com/visulima/packem/compare/@visulima/packem@1.17.3...@visulima/packem@1.17.4) (2025-01-22)
 
 ### Bug Fixes
