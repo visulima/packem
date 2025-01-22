@@ -1,5 +1,5 @@
 import type { FilterPattern } from "@rollup/pluginutils";
-import type { JsxOptions, TransformOptions, TypeScriptOptions } from "oxc-transform";
+import type { JsxOptions, TransformOptions } from "oxc-transform";
 
 export type InternalOXCTransformPluginConfig = {
     exclude?: FilterPattern;
