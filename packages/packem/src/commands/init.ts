@@ -128,10 +128,11 @@ const createInitCommand = (cli: Cli): void => {
                         { label: "esbuild", value: "esbuild" },
                         { label: "swc", value: "swc" },
                         { label: "Sucrase", value: "sucrase" },
+                        { label: "OXC", value: "oxc" },
                     ],
                 });
 
-                if (options.transformer && !packages.includes(options.transformer as string)) {
+                if (options.transformer && options.transformer !== "oxc" && !packages.includes(options.transformer as string)) {
                     const shouldInstall = await confirm({
                         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
                         message: "Do you want to install " + options.transformer + "?",
@@ -354,7 +355,7 @@ const createInitCommand = (cli: Cli): void => {
 import transformer from "@visulima/packem/transformer/${options.transformer as string}";
 ${imports}
 export default defineConfig({
-    runtime: ${options.runtime as string},
+    runtime: "${options.runtime as string}",
     transformer${packemConfig}
 });
 `;

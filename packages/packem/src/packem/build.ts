@@ -6,11 +6,11 @@ import { formatBytes } from "@visulima/humanizer";
 import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
 
-import rollupBuild from "./rollup/build";
-import rollupBuildTypes from "./rollup/build-types";
-import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry, BuildEntry } from "./types";
+import rollupBuild from "../rollup/build";
+import rollupBuildTypes from "../rollup/build-types";
+import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry, BuildEntry } from "../types";
 import brotliSize from "./utils/brotli-size";
-import type FileCache from "./utils/file-cache";
+import type FileCache from "../utils/file-cache";
 import groupByKeys from "./utils/group-by-keys";
 import gzipSize from "./utils/gzip-size";
 

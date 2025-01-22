@@ -19,7 +19,7 @@ import { VERSION } from "rollup";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
 
-import build from "../build";
+import build from "./build";
 import type { BuildConfigFunction } from "../config";
 import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "../constants";
 import resolvePreset from "../hooks/preset/utils/resolve-preset";
@@ -101,6 +101,7 @@ const generateOptions = (
     runtimeVersion: string,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): InternalBuildOptions => {
+    // eslint-disable-next-line etc/no-internal
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
     const splitRuntimeVersion = runtimeVersion.split(".");
 
@@ -303,6 +304,20 @@ const generateOptions = (
             node10Compatibility: {},
             output: {
                 importAttributesKey: Number(splitRuntimeVersion[0] as string) >= 22 ? "with" : "assert",
+            },
+            oxc: {
+                jsx:
+                    jsxRuntime === "preserve"
+                        ? "preserve"
+                        : {
+                              development: environment !== "production",
+                              pragma: tsconfig?.config.compilerOptions?.jsxFactory,
+                              pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
+                              pure: true,
+                              runtime: jsxRuntime === "transform" || jsxRuntime === "automatic" ? "automatic" : "classic",
+                              useBuiltIns: true,
+                              useSpread: true,
+                          },
             },
             patchTypes: {},
             polyfillNode: {},
@@ -602,6 +617,7 @@ const createContext = async (
 ): Promise<BuildContext> => {
     const preset = await resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", jiti);
 
+    // eslint-disable-next-line etc/no-internal
     const options = generateOptions(logger, rootDirectory, environment, debug, inputConfig, buildConfig, preset, packageJson, tsconfig, nodeVersion);
 
     ensureDirSync(join(options.rootDir, options.outDir));

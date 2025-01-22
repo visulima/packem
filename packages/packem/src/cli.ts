@@ -60,6 +60,7 @@ const cli = new Cli("packem", {
 
 // Register available commands
 createInitCommand(cli);
+// eslint-disable-next-line etc/no-internal
 createBuildCommand(cli);
 createAddCommand(cli);
 

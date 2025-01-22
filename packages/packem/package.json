@@ -150,6 +150,16 @@
                 "default": "./dist/rollup/plugins/sucrase/index.cjs"
             }
         },
+        "./transformer/oxc": {
+            "import": {
+                "types": "./dist/rollup/plugins/oxc/oxc-transformer.d.mts",
+                "default": "./dist/rollup/plugins/oxc/oxc-transformer.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/oxc/oxc-transformer.d.cts",
+                "default": "./dist/rollup/plugins/oxc/oxc-transformer.cjs"
+            }
+        },
         "./builder/typedoc": {
             "import": {
                 "types": "./dist/builder/typedoc/index.d.mts",
@@ -283,6 +293,9 @@
             ],
             "transformer/sucrase": [
                 "./dist/rollup/plugins/sucrase/index.d.ts"
+            ],
+            "transformer/oxc": [
+                "./dist/rollup/plugins/oxc/oxc-transformer.d.ts"
             ],
             "builder/typedoc": [
                 "./dist/builder/typedoc/index.d.ts"

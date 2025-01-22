@@ -36,6 +36,7 @@ import type { ResolveExternalsPluginOptions } from "./rollup/plugins/resolve-ext
 import type { TsconfigPathsPluginOptions } from "./rollup/plugins/typescript/resolve-tsconfig-paths-plugin";
 import type { OxcResolveOptions } from "./rollup/plugins/oxc/oxc-resolve";
 import type { Node10CompatibilityOptions } from "./packem/node10-compatibility";
+import type { InternalOXCTransformPluginConfig, OXCTransformPluginConfig } from "./rollup/plugins/oxc/types";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -88,6 +89,7 @@ export interface RollupBuildOptions {
     dts: RollupDtsOptions;
     dynamicVars?: RollupDynamicImportVariablesOptions | false;
     esbuild?: EsbuildOptions | false;
+    oxc?: Omit<OXCTransformPluginConfig, "cwd" | "sourcemap" | "target"> | false;
     isolatedDeclarations?: IsolatedDeclarationsOptions;
     json: RollupJsonOptions | false;
     jsxRemoveAttributes?: JSXRemoveAttributesPlugin | false;
@@ -197,7 +199,7 @@ export type ValidationOptions = {
     };
 };
 
-export type TransformerFn = ((config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig) => Plugin) & { NAME?: TransformerName };
+export type TransformerFn = ((config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig | InternalOXCTransformPluginConfig) => Plugin) & { NAME?: TransformerName };
 
 export interface BuildOptions {
     alias: Record<string, string>;
@@ -312,6 +314,7 @@ export type BuildContextBuildAssetAndChunk = {
 
 export interface InternalBuildOptions extends BuildOptions {
     transformerName: TransformerName | undefined;
+    rollup: Omit<BuildOptions["rollup"], "oxc"> & { oxc?: InternalOXCTransformPluginConfig | false };
 }
 
 export interface BuildContext {
