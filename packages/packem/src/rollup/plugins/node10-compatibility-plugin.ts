@@ -1,4 +1,4 @@
-import { readJsonSync, writeJsonSync } from "@visulima/fs";
+import { readJson, writeJson } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { dirname, join } from "@visulima/path";
 import type { Plugin } from "rollup";
@@ -12,6 +12,8 @@ export type Node10CompatibilityOptions = {
     typeScriptVersion?: string;
     writeToPackageJson?: boolean;
 };
+
+const typesVersions: Record<string, string[]> = {};
 
 export const node10CompatibilityPlugin = (
     logger: BuildContext["logger"],
@@ -28,7 +30,7 @@ export const node10CompatibilityPlugin = (
 
     return {
         name: "packem:node10-compatibility",
-        writeBundle() {
+        writeBundle: async (): Promise<void> => {
             if (!logDisplayed) {
                 logger.info({
                     message: "Declaration node10 compatibility mode is enabled.",
@@ -37,8 +39,6 @@ export const node10CompatibilityPlugin = (
 
                 logDisplayed = true;
             }
-
-            const typesVersions: Record<string, string[]> = {};
 
             for (const entry of entries) {
                 for (const exportKey of entry.exportKey as Set<string>) {
@@ -54,10 +54,10 @@ export const node10CompatibilityPlugin = (
             }
 
             const rootPackageJsonPath = join(rootDirectory, "package.json");
-            const packageJson = readJsonSync(rootPackageJsonPath) as PackageJson;
+            const packageJson = await readJson(rootPackageJsonPath) as PackageJson;
 
             if (mode === "file" && Object.keys(typesVersions).length > 0) {
-                writeJsonSync(
+                await writeJson(
                     rootPackageJsonPath,
                     {
                         ...packageJson,

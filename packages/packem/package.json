@@ -261,57 +261,75 @@
     "typesVersions": {
         ">=5.5": {
             ".": [
+                "./dist/packem.d.ts",
                 "./dist/packem.d.ts"
             ],
             "config": [
+                "./dist/config/index.d.ts",
                 "./dist/config/index.d.ts"
             ],
             "transformer/esbuild": [
+                "./dist/rollup/plugins/esbuild/index.d.ts",
                 "./dist/rollup/plugins/esbuild/index.d.ts"
             ],
             "transformer/swc": [
+                "./dist/rollup/plugins/swc/swc-plugin.d.ts",
                 "./dist/rollup/plugins/swc/swc-plugin.d.ts"
             ],
             "dts/isolated/transformer/swc": [
+                "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.ts",
                 "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.ts"
             ],
             "dts/isolated/transformer/oxc": [
+                "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.ts",
                 "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.ts"
             ],
             "dts/isolated/transformer/typescript": [
+                "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.ts",
                 "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.ts"
             ],
             "transformer/sucrase": [
+                "./dist/rollup/plugins/sucrase/index.d.ts",
                 "./dist/rollup/plugins/sucrase/index.d.ts"
             ],
             "builder/typedoc": [
+                "./dist/builder/typedoc/index.d.ts",
                 "./dist/builder/typedoc/index.d.ts"
             ],
             "runtime/inject-css": [
+                "./dist/rollup/plugins/css/runtime/inject-css.d.ts",
                 "./dist/rollup/plugins/css/runtime/inject-css.d.ts"
             ],
             "css/loader/sourcemap": [
+                "./dist/rollup/plugins/css/loaders/sourcemap.d.ts",
                 "./dist/rollup/plugins/css/loaders/sourcemap.d.ts"
             ],
             "css/loader/less": [
+                "./dist/rollup/plugins/css/loaders/less/index.d.ts",
                 "./dist/rollup/plugins/css/loaders/less/index.d.ts"
             ],
             "css/loader/postcss": [
+                "./dist/rollup/plugins/css/loaders/postcss/index.d.ts",
                 "./dist/rollup/plugins/css/loaders/postcss/index.d.ts"
             ],
             "css/loader/sass": [
+                "./dist/rollup/plugins/css/loaders/sass/index.d.ts",
                 "./dist/rollup/plugins/css/loaders/sass/index.d.ts"
             ],
             "css/loader/stylus": [
+                "./dist/rollup/plugins/css/loaders/stylus/index.d.ts",
                 "./dist/rollup/plugins/css/loaders/stylus/index.d.ts"
             ],
             "css/loader/lightningcss": [
+                "./dist/rollup/plugins/css/loaders/lightningcss.d.ts",
                 "./dist/rollup/plugins/css/loaders/lightningcss.d.ts"
             ],
             "css/minifier/cssnano": [
+                "./dist/rollup/plugins/css/minifiers/cssnano.d.ts",
                 "./dist/rollup/plugins/css/minifiers/cssnano.d.ts"
             ],
             "css/minifier/lightningcss": [
+                "./dist/rollup/plugins/css/minifiers/lightningcss.d.ts",
                 "./dist/rollup/plugins/css/minifiers/lightningcss.d.ts"
             ]
         }

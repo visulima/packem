@@ -2637,6 +2637,114 @@ export const test = "this should be in final bundle, test2 string";`,
     }
 }`);
         });
+
+        it("should generate a node10 typesVersions field on console with complex exports 2", async () => {
+            expect.assertions(4);
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+
+            await writeFile(`${temporaryDirectoryPath}/src/is-color-supported.edge-light.ts`, `export const browser = "edge-light";`);
+            await writeFile(`${temporaryDirectoryPath}/src/is-color-supported.browser.ts`, `export const browser = "browser";`);
+            await writeFile(`${temporaryDirectoryPath}/src/is-color-supported.server.ts`, `export const server = "server";`);
+
+            await createTsConfig(temporaryDirectoryPath);
+            /* eslint-disable perfectionist/sort-objects */
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
+                },
+                exports: {
+                    ".": {
+                        "edge-light": {
+                            types: "./dist/is-color-supported.edge-light.d.mts",
+                            default: "./dist/is-color-supported.edge-light.mjs",
+                        },
+                        browser: {
+                            types: "./dist/is-color-supported.browser.d.mts",
+                            default: "./dist/is-color-supported.browser.mjs",
+                        },
+                        require: {
+                            types: "./dist/is-color-supported.server.d.cts",
+                            default: "./dist/is-color-supported.server.cjs",
+                        },
+                        import: {
+                            types: "./dist/is-color-supported.server.d.mts",
+                            default: "./dist/is-color-supported.server.mjs",
+                        },
+                    },
+                    "./server": {
+                        require: {
+                            types: "./dist/is-color-supported.server.d.cts",
+                            default: "./dist/is-color-supported.server.cjs",
+                        },
+                        import: {
+                            types: "./dist/is-color-supported.server.d.mts",
+                            default: "./dist/is-color-supported.server.mjs",
+                        },
+                    },
+                    "./browser": {
+                        require: {
+                            types: "./dist/is-color-supported.browser.d.cts",
+                            default: "./dist/is-color-supported.browser.cjs",
+                        },
+                        import: {
+                            types: "./dist/is-color-supported.browser.d.mts",
+                            default: "./dist/is-color-supported.browser.mjs",
+                        },
+                    },
+                    "./edge-light": {
+                        require: {
+                            types: "./dist/is-color-supported.edge-light.d.cts",
+                            default: "./dist/is-color-supported.edge-light.cjs",
+                        },
+                        import: {
+                            types: "./dist/is-color-supported.edge-light.d.mts",
+                            default: "./dist/is-color-supported.edge-light.mjs",
+                        },
+                    },
+                    "./package.json": "./package.json",
+                },
+                main: "dist/is-color-supported.server.cjs",
+                module: "dist/is-color-supported.server.mjs",
+                browser: "./dist/is-color-supported.browser.mjs",
+                types: "dist/is-color-supported.server.d.ts",
+            });
+            /* eslint-enable perfectionist/sort-objects */
+            await createPackemConfig(temporaryDirectoryPath, {
+                config: {
+                    cjsInterop: true,
+                },
+            });
+
+            const binProcess = await execPackemSync("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Declaration node10 compatibility mode is enabled.");
+            expect(binProcess.stdout).toContain(`{
+    "typesVersions": {
+        "*": {
+            ".": [
+                "./dist/is-color-supported.edge-light.d.ts",
+                "./dist/is-color-supported.browser.d.ts",
+                "./dist/is-color-supported.server.d.ts"
+            ],
+            "edge-light": [
+                "./dist/is-color-supported.edge-light.d.ts"
+            ],
+            "browser": [
+                "./dist/is-color-supported.browser.d.ts"
+            ],
+            "server": [
+                "./dist/is-color-supported.server.d.ts"
+            ]
+        }
+    }
+}`);
+        });
     });
 
     it("should use the exports key from package.json if declaration are off", async () => {
