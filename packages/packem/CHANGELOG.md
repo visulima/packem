@@ -1,3 +1,17 @@
+## @visulima/packem [1.17.1](https://github.com/visulima/packem/compare/@visulima/packem@1.17.0...@visulima/packem@1.17.1) (2025-01-22)
+
+### Bug Fixes
+
+* added better hash key to resolvedIdCache function ([e9d08a8](https://github.com/visulima/packem/commit/e9d08a81ed5f80887088664706b9fd126f25d2f8))
+* added missing TypeDoc's ([65890c0](https://github.com/visulima/packem/commit/65890c0b1ba09c4ddde41ee5b1dd7cf31897e012))
+* removed resolvedIdCache, our internal node resolve handles all cases ([09de68f](https://github.com/visulima/packem/commit/09de68f9b588a6c3b05837170837a4ad3d1ce5c3))
+* updated @visulima/tsconfig to v1.1.9, oxc-resolver to v4.0.0 and dev deps ([c46b389](https://github.com/visulima/packem/commit/c46b389566ad8bbda62134445e1e1013d758392d))
+
+### Miscellaneous Chores
+
+* updated package version to 0.0.0, because semantic-release does update it ([fc3cf0e](https://github.com/visulima/packem/commit/fc3cf0ead7852d1a8d42a0e2079562e34695363d))
+* updated version in package.json ([6d1839f](https://github.com/visulima/packem/commit/6d1839fba1c5dac46e807184a9b146e93fc6f4bc))
+
 ## @visulima/packem [1.17.0](https://github.com/visulima/packem/compare/@visulima/packem@1.16.0...@visulima/packem@1.17.0) (2025-01-20)
 
 ### Features
