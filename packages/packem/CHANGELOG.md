@@ -1,3 +1,13 @@
+## @visulima/packem [1.18.0](https://github.com/visulima/packem/compare/@visulima/packem@1.17.5...@visulima/packem@1.18.0) (2025-01-22)
+
+### Features
+
+* added oxc transformer ([#104](https://github.com/visulima/packem/issues/104)) ([3402b4f](https://github.com/visulima/packem/commit/3402b4fd43451adf5abfcfc16e8a5a2bd1354306))
+
+### Miscellaneous Chores
+
+* added OXC to the readme ([9ad3749](https://github.com/visulima/packem/commit/9ad37492a22c428735f75c1d18d59cec9a94dd48))
+
 ## @visulima/packem [1.17.5](https://github.com/visulima/packem/compare/@visulima/packem@1.17.4...@visulima/packem@1.17.5) (2025-01-22)
 
 ### Bug Fixes
