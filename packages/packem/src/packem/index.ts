@@ -1039,4 +1039,4 @@ export type {
     Mode,
     RollupBuildOptions,
     Runtime,
-} from "./types";
+} from "../types";
