@@ -1,3 +1,9 @@
+## @visulima/packem [1.17.3](https://github.com/visulima/packem/compare/@visulima/packem@1.17.2...@visulima/packem@1.17.3) (2025-01-22)
+
+### Bug Fixes
+
+* the node10-compatibility-plugin needs to call the write json as sync, otherwise it can throw a error that the .tmp file does not exits ([51bdebc](https://github.com/visulima/packem/commit/51bdebc27fb886eccc2c6df03b7fbc092d22c2f0))
+
 ## @visulima/packem [1.17.2](https://github.com/visulima/packem/compare/@visulima/packem@1.17.1...@visulima/packem@1.17.2) (2025-01-22)
 
 ### Bug Fixes
