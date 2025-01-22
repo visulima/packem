@@ -4,7 +4,7 @@
   <p>
   A fast and modern bundler for Node.js and TypeScript.
 <br /> Supports multiple runtimes, shared modules, server components, dynamic import, wasm, css, and more.
-<br /> Built on top of Rollup, combined with your preferred transformer like esbuild, swc, or sucrase.
+<br /> Built on top of Rollup, combined with your preferred transformer like esbuild, swc, OXC, or sucrase.
   </p>
 </div>
 
@@ -30,7 +30,7 @@
 
 ## Overview
 
-`Visulima Packem` is built on top of Rollup, combined with your preferred transformer like `esbuild`, `swc`, or `sucrase`.
+`Visulima Packem` is built on top of Rollup, combined with your preferred transformer like `esbuild`, `swc`, `OXC`, or `sucrase`.
 It enables you to generate multiple bundles (CommonJS or ESModule) simultaneously while adhering to Node.js’ native file type support.
 
 It uses the `exports` configuration in `package.json` and recognizes entry file conventions to match your exports and build them into bundles.
@@ -928,6 +928,7 @@ You choose which one of the three supported transformer to use.
 -   [esbuild](https://github.com/evanw/esbuild)
 -   [@swc/core](https://github.com/swc-project/swc)
 -   [sucrase](https://github.com/alangpierce/sucrase)
+-   [OXC](https://www.npmjs.com/package/oxc-transform)
 
 ### File types
 
