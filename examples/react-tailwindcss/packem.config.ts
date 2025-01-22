@@ -5,6 +5,7 @@ import cssnano from "@visulima/packem/css/minifier/cssnano";
 
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
+    runtime: "browser",
     transformer,
     rollup: {
         css: {

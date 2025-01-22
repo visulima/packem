@@ -19,7 +19,7 @@ import { VERSION } from "rollup";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
 
-import build from "../build";
+import build from "./build";
 import type { BuildConfigFunction } from "../config";
 import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "../constants";
 import resolvePreset from "../hooks/preset/utils/resolve-preset";

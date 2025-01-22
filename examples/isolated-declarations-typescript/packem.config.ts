@@ -4,6 +4,7 @@ import isolatedDeclarationTransformer from "@visulima/packem/dts/isolated/transf
 
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
+    runtime: "node",
     fileCache: false,
     transformer,
     isolatedDeclarationTransformer,
