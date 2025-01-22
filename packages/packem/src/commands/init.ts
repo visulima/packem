@@ -128,6 +128,7 @@ const createInitCommand = (cli: Cli): void => {
                         { label: "esbuild", value: "esbuild" },
                         { label: "swc", value: "swc" },
                         { label: "Sucrase", value: "sucrase" },
+                        { label: "OXC", value: "oxc" },
                     ],
                 });
 
