@@ -33,7 +33,6 @@ import JSONPlugin from "./plugins/json";
 import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
 import { license as licensePlugin } from "./plugins/license";
 import metafilePlugin from "./plugins/metafile";
-import { node10CompatibilityPlugin } from "./plugins/node10-compatibility-plugin";
 import { oxcResolvePlugin } from "./plugins/oxc/oxc-resolve";
 import cachingPlugin from "./plugins/plugin-cache";
 import preserveDirectivesPlugin from "./plugins/preserve-directives";
@@ -520,19 +519,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                     mode: "dependencies",
                     packageName: context.pkg.name,
                 }),
-
-            context.options.emitCJS &&
-                context.mode === "build" &&
-                context.options.declaration === "compatible" &&
-                context.options.rollup.node10Compatibility &&
-                node10CompatibilityPlugin(
-                    context.logger,
-                    context.options.entries,
-                    context.options.outDir,
-                    context.options.rootDir,
-                    context.options.rollup.node10Compatibility.writeToPackageJson ? "file" : "console",
-                    context.options.rollup.node10Compatibility.typeScriptVersion ?? "*",
-                ),
 
             context.options.analyze &&
                 context.options.rollup.visualizer !== false &&

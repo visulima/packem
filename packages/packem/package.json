@@ -72,12 +72,12 @@
     "exports": {
         ".": {
             "import": {
-                "types": "./dist/packem.d.mts",
-                "default": "./dist/packem.mjs"
+                "types": "./dist/packem/index.d.mts",
+                "default": "./dist/packem/index.mjs"
             },
             "require": {
-                "types": "./dist/packem.d.cts",
-                "default": "./dist/packem.cjs"
+                "types": "./dist/packem/index.d.cts",
+                "default": "./dist/packem/index.cjs"
             }
         },
         "./config": {
@@ -255,13 +255,13 @@
         },
         "./package.json": "./package.json"
     },
-    "main": "dist/packem.cjs",
-    "module": "dist/packem.mjs",
-    "types": "dist/packem.d.ts",
+    "main": "dist/packem/index.cjs",
+    "module": "dist/packem/index.mjs",
+    "types": "dist/packem/index.d.ts",
     "typesVersions": {
         ">=5.5": {
             ".": [
-                "./dist/packem.d.ts"
+                "./dist/packem/index.d.ts"
             ],
             "config": [
                 "./dist/config/index.d.ts"

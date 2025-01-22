@@ -24,7 +24,6 @@ import type { EsmShimCjsSyntaxOptions } from "./rollup/plugins/esm-shim-cjs-synt
 import type { IsolatedDeclarationsOptions } from "./rollup/plugins/isolated-declarations";
 import type { JSXRemoveAttributesPlugin } from "./rollup/plugins/jsx-remove-attributes";
 import type { LicenseOptions } from "./rollup/plugins/license";
-import type { Node10CompatibilityOptions } from "./rollup/plugins/node10-compatibility-plugin";
 import type { RawLoaderOptions } from "./rollup/plugins/raw";
 import type { ShebangOptions } from "./rollup/plugins/shebang";
 import type { SucrasePluginConfig } from "./rollup/plugins/sucrase/types";
@@ -36,6 +35,7 @@ import type { SourcemapsPluginOptions } from "./rollup/plugins/source-maps";
 import type { ResolveExternalsPluginOptions } from "./rollup/plugins/resolve-externals-plugin";
 import type { TsconfigPathsPluginOptions } from "./rollup/plugins/typescript/resolve-tsconfig-paths-plugin";
 import type { OxcResolveOptions } from "./rollup/plugins/oxc/oxc-resolve";
+import type { Node10CompatibilityOptions } from "./packem/node10-compatibility";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -93,6 +93,7 @@ export interface RollupBuildOptions {
     jsxRemoveAttributes?: JSXRemoveAttributesPlugin | false;
     license?: LicenseOptions | false;
     metafile?: boolean;
+    // TODO: Move this out of the `RollupBuildOptions` type
     node10Compatibility?: Node10CompatibilityOptions | false;
     output?: OutputOptions;
     patchTypes: PatchTypesOptions | false;

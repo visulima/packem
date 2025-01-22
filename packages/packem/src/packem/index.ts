@@ -19,28 +19,29 @@ import { VERSION } from "rollup";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
 
-import build from "./build";
-import type { BuildConfigFunction } from "./config";
-import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "./constants";
-import resolvePreset from "./hooks/preset/utils/resolve-preset";
-import createStub from "./jit/create-stub";
-import getHash from "./rollup/utils/get-hash";
-import rollupWatch from "./rollup/watch";
-import type { BuildConfig, BuildContext, BuildOptions, BuildPreset, Environment, InternalBuildOptions, Mode } from "./types";
-import cleanDistributionDirectories from "./utils/clean-distribution-directories";
-import createOrUpdateKeyStorage from "./utils/create-or-update-key-storage";
-import enhanceRollupError from "./utils/enhance-rollup-error";
-import FileCache from "./utils/file-cache";
-import findPackemFile from "./utils/find-packem-file";
-import getPackageSideEffect from "./utils/get-package-side-effect";
-import killProcess from "./utils/kill-process";
-import loadPackageJson from "./utils/load-package-json";
-import logBuildErrors from "./utils/log-build-errors";
-import prepareEntries from "./utils/prepare-entries";
-import removeOldCacheFolders from "./utils/remove-old-cache-folders";
-import packageJsonValidator from "./validator/package-json";
-import validateAliasEntries from "./validator/validate-alias-entries";
-import validateBundleSize from "./validator/validate-bundle-size";
+import build from "../build";
+import type { BuildConfigFunction } from "../config";
+import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "../constants";
+import resolvePreset from "../hooks/preset/utils/resolve-preset";
+import createStub from "../jit/create-stub";
+import getHash from "../rollup/utils/get-hash";
+import rollupWatch from "../rollup/watch";
+import type { BuildConfig, BuildContext, BuildOptions, BuildPreset, Environment, InternalBuildOptions, Mode } from "../types";
+import cleanDistributionDirectories from "../utils/clean-distribution-directories";
+import createOrUpdateKeyStorage from "../utils/create-or-update-key-storage";
+import enhanceRollupError from "../utils/enhance-rollup-error";
+import FileCache from "../utils/file-cache";
+import findPackemFile from "../utils/find-packem-file";
+import getPackageSideEffect from "../utils/get-package-side-effect";
+import killProcess from "../utils/kill-process";
+import loadPackageJson from "../utils/load-package-json";
+import logBuildErrors from "../utils/log-build-errors";
+import prepareEntries from "../utils/prepare-entries";
+import removeOldCacheFolders from "../utils/remove-old-cache-folders";
+import packageJsonValidator from "../validator/package-json";
+import validateAliasEntries from "../validator/validate-alias-entries";
+import validateBundleSize from "../validator/validate-bundle-size";
+import { node10Compatibility } from "./node10-compatibility";
 
 /**
  * Resolves TSConfig JSX option to a standardized JSX runtime value.
@@ -841,6 +842,7 @@ const packem = async (
 
         const fileCache = new FileCache(rootDirectory, cachePath, cacheKey, logger);
 
+        // eslint-disable-next-line etc/no-internal
         const context = await createContext(
             logger,
             rootDirectory,
@@ -857,6 +859,7 @@ const packem = async (
 
         fileCache.isEnabled = context.options.fileCache as boolean;
 
+        // eslint-disable-next-line etc/no-internal
         context.logger.info(cyan(getMode(mode) + " " + context.options.name));
 
         context.logger.debug({
@@ -960,6 +963,23 @@ const packem = async (
             await context.hooks.callHook("build:done", context);
         } else {
             logged = await build(context, fileCache);
+
+            if (context.options.emitCJS && context.options.declaration === "compatible" && context.options.rollup.node10Compatibility) {
+                if (logged) {
+                    context.logger.raw("\n");
+
+                    logged = false;
+                }
+
+                await node10Compatibility(
+                    context.logger,
+                    context.options.entries,
+                    context.options.outDir,
+                    context.options.rootDir,
+                    context.options.rollup.node10Compatibility.writeToPackageJson ? "file" : "console",
+                    context.options.rollup.node10Compatibility.typeScriptVersion ?? "*",
+                );
+            }
 
             await context.hooks.callHook("validate:before", context);
 
