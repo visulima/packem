@@ -1,0 +1,45 @@
+{
+    "name": "examples_packem_transformer_esbuild",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.cjs"
+            }
+        }
+    },
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "typesVersions": {
+        "*": {
+            ".": [
+                "./dist/index.d.ts"
+            ]
+        }
+    },
+    "files": [
+        "./dist"
+    ],
+    "scripts": {
+        "build": "packem build",
+        "clean": "rimraf node_modules dist"
+    },
+    "dependencies": {
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1"
+    },
+    "devDependencies": {
+        "@types/react": "^18.3.12",
+        "@types/react-dom": "^18.3.1",
+        "@visulima/packem": "workspace:*",
+        "typescript": "^5.7.3"
+    }
+}
