@@ -11,10 +11,11 @@ const extractStack = (error: RollupError): string | undefined => {
 
     // If we don't have a stack, not much we can do.
     if (!stack) {
-        return stack;
+        return undefined;
     }
 
     const expectedPrefix = `${name}: ${message}\n`;
+
     if (stack.startsWith(expectedPrefix)) {
         return stack.slice(expectedPrefix.length);
     }

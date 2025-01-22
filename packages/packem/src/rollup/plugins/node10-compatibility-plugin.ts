@@ -1,4 +1,4 @@
-import { readJson, writeJson } from "@visulima/fs";
+import { readJson, writeJsonSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { dirname, join } from "@visulima/path";
 import type { Plugin } from "rollup";
@@ -81,10 +81,11 @@ export const node10CompatibilityPlugin = (
             }
 
             const rootPackageJsonPath = join(rootDirectory, "package.json");
-            const packageJson = (await readJson(rootPackageJsonPath)) as PackageJson;
+            const packageJson = await readJson<PackageJson>(rootPackageJsonPath);
 
             if (mode === "file" && Object.keys(typesVersions).length > 0) {
-                await writeJson(
+                // This needs to be done in a synchronous manner
+                writeJsonSync(
                     rootPackageJsonPath,
                     {
                         ...packageJson,
