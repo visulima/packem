@@ -8,12 +8,39 @@ import type { BuildContext } from "../../types";
 
 let logDisplayed = false;
 
+const typesVersions: Record<string, string[]> = {};
+
+/**
+ * Makes all string arrays unique in a nested object structure.
+ *
+ * @param object - The nested object containing string arrays
+ * @returns A new object with unique values in all string arrays
+ */
+const uniqueNestedValues = (object: Partial<Record<string, Partial<Record<string, string[]>>>>): Partial<Record<string, Partial<Record<string, string[]>>>> =>
+    Object.fromEntries(
+        Object.entries(object).map(([key, value]) => {
+            if (!value) {
+                return [key, {}];
+            }
+
+            const innerObject = Object.fromEntries(
+                Object.entries(value).map(([innerKey, array]) => {
+                    if (!Array.isArray(array)) {
+                        return [innerKey, []];
+                    }
+
+                    return [innerKey, [...new Set(array)]];
+                }),
+            );
+
+            return [key, innerObject];
+        }),
+    );
+
 export type Node10CompatibilityOptions = {
     typeScriptVersion?: string;
     writeToPackageJson?: boolean;
 };
-
-const typesVersions: Record<string, string[]> = {};
 
 export const node10CompatibilityPlugin = (
     logger: BuildContext["logger"],
@@ -54,17 +81,17 @@ export const node10CompatibilityPlugin = (
             }
 
             const rootPackageJsonPath = join(rootDirectory, "package.json");
-            const packageJson = await readJson(rootPackageJsonPath) as PackageJson;
+            const packageJson = (await readJson(rootPackageJsonPath)) as PackageJson;
 
             if (mode === "file" && Object.keys(typesVersions).length > 0) {
                 await writeJson(
                     rootPackageJsonPath,
                     {
                         ...packageJson,
-                        typesVersions: {
+                        typesVersions: uniqueNestedValues({
                             ...packageJson.typesVersions,
                             [typeScriptVersion]: typesVersions,
-                        },
+                        }),
                     },
                     {
                         detectIndent: true,
