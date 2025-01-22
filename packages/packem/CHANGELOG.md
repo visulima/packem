@@ -1,3 +1,10 @@
+## @visulima/packem [1.17.2](https://github.com/visulima/packem/compare/@visulima/packem@1.17.1...@visulima/packem@1.17.2) (2025-01-22)
+
+### Bug Fixes
+
+* fixed typesVersions generation for different runtimes ([f7334a9](https://github.com/visulima/packem/commit/f7334a992e4c8793331372c2642396d6af1d4b90))
+* fixed typesVersions rollup plugin to generate only unique values ([5d8986c](https://github.com/visulima/packem/commit/5d8986cfcbc84d64186762f26c76148fed2d4235))
+
 ## @visulima/packem [1.17.1](https://github.com/visulima/packem/compare/@visulima/packem@1.17.0...@visulima/packem@1.17.1) (2025-01-22)
 
 ### Bug Fixes
