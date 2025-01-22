@@ -1,3 +1,9 @@
+## @visulima/packem [1.17.4](https://github.com/visulima/packem/compare/@visulima/packem@1.17.3...@visulima/packem@1.17.4) (2025-01-22)
+
+### Bug Fixes
+
+* improved the node10-compatibility typesVersions generation, this is not more a rollup plugin, but a handler after the build process ([8ae1433](https://github.com/visulima/packem/commit/8ae1433106269fbc1a8d64820109286beb6eaee3))
+
 ## @visulima/packem [1.17.3](https://github.com/visulima/packem/compare/@visulima/packem@1.17.2...@visulima/packem@1.17.3) (2025-01-22)
 
 ### Bug Fixes
