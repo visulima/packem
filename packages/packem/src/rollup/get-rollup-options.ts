@@ -183,12 +183,18 @@ const getTransformerConfig = (
                           refresh: false,
                       },
             sourcemap: context.options.sourcemap,
-            typescript: {
-                ...context.options.rollup.oxc.typescript,
-                declaration: undefined,
-                // Our declaration is handled by the isolated declaration transformer
-                rewriteImportExtensions: false,
-            },
+            typescript: context.tsconfig?.config
+                ? {
+                      allowDeclareFields: true,
+                      allowNamespaces: true,
+                      declaration: undefined,
+                      jsxPragma: context.tsconfig.config.compilerOptions?.jsxFactory,
+                      jsxPragmaFrag: context.tsconfig.config.compilerOptions?.jsxFragmentFactory,
+                      onlyRemoveTypeImports: true,
+                      // Our declaration is handled by the isolated declaration transformer
+                      rewriteImportExtensions: false,
+                  }
+                : undefined,
         } satisfies InternalOXCTransformPluginConfig;
 
         // Add targets to oxc target

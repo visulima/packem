@@ -101,6 +101,7 @@ const generateOptions = (
     runtimeVersion: string,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): InternalBuildOptions => {
+    // eslint-disable-next-line etc/no-internal
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
     const splitRuntimeVersion = runtimeVersion.split(".");
 
@@ -317,15 +318,6 @@ const generateOptions = (
                               useBuiltIns: true,
                               useSpread: true,
                           },
-                typescript: tsconfig?.config
-                    ? {
-                          allowDeclareFields: true,
-                          allowNamespaces: true,
-                          jsxPragma: tsconfig.config.compilerOptions?.jsxFactory,
-                          jsxPragmaFrag: tsconfig.config.compilerOptions?.jsxFragmentFactory,
-                          onlyRemoveTypeImports: true,
-                      }
-                    : undefined,
             },
             patchTypes: {},
             polyfillNode: {},
@@ -625,6 +617,7 @@ const createContext = async (
 ): Promise<BuildContext> => {
     const preset = await resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", jiti);
 
+    // eslint-disable-next-line etc/no-internal
     const options = generateOptions(logger, rootDirectory, environment, debug, inputConfig, buildConfig, preset, packageJson, tsconfig, nodeVersion);
 
     ensureDirSync(join(options.rootDir, options.outDir));

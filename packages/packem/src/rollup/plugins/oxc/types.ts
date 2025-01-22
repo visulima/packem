@@ -11,6 +11,4 @@ export type OXCTransformPluginConfig = {
     include?: FilterPattern;
     /** Configure how TSX and JSX are transformed. */
     jsx?: "preserve" | Omit<JsxOptions, "refresh">;
-    /** Configure how TypeScript is transformed. */
-    typescript?: Omit<TypeScriptOptions, "declaration" | "rewriteImportExtensions">;
 } & Omit<TransformOptions, "cwd" | "sourcemap" | "target" | "typescript">;
