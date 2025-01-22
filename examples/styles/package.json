@@ -21,7 +21,7 @@
         "cssnano": "7.0.6",
         "esbuild": "^0.24.2",
         "icss-utils": "^5.1.0",
-        "less": "^4.2.1",
+        "less": "^4.2.2",
         "postcss": "^8.5.1",
         "postcss-load-config": "^6.0.1",
         "postcss-modules": "6.0.1",
