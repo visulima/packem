@@ -142,6 +142,7 @@ const getTransformerConfig = (
                 minify: {
                     compress: {
                         directives: false,
+                        passes: 2,
                     },
                     format: {
                         comments: "some",

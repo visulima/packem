@@ -983,8 +983,6 @@ const packem = async (
             if (context.options.emitCJS && context.options.declaration === "compatible" && context.options.rollup.node10Compatibility) {
                 if (logged) {
                     context.logger.raw("\n");
-
-                    logged = false;
                 }
 
                 await node10Compatibility(
