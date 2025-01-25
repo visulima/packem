@@ -3,7 +3,14 @@
     "include": ["src/**/*", "*.d.ts"],
     "compilerOptions": {
         "baseUrl": ".",
+        "target": "es2020",
+        "module": "esnext",
         "jsx": "react-jsx",
-        "moduleResolution": "bundler",
+        "strict": true,
+        "declaration": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "moduleResolution": "bundler"
     }
 }

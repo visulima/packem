@@ -33,16 +33,22 @@
         "clean": "rimraf node_modules dist"
     },
     "dependencies": {
-        "react": "^18.3.1",
-        "react-dom": "^18.3.1"
+        "@radix-ui/react-tooltip": "^1.1.7",
+        "clsx": "^2.1.1",
+        "tailwind-merge": "^2.6.0"
     },
     "devDependencies": {
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
         "@types/react": "^18.3.12",
         "@types/react-dom": "^18.3.1",
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.24.2",
         "rimraf": "^6.0.1",
-        "typescript": "^5.7.3",
-        "vite": "6.0.11"
+        "typescript": "^5.7.3"
+    },
+    "peerDependencies": {
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1"
     }
 }
