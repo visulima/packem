@@ -1,3 +1,9 @@
+## @visulima/packem [1.18.1](https://github.com/visulima/packem/compare/@visulima/packem@1.18.0...@visulima/packem@1.18.1) (2025-01-25)
+
+### Bug Fixes
+
+* smaller minification size when swc is used, changed minimizer passes to 2, fixed log output ([c13af8a](https://github.com/visulima/packem/commit/c13af8a7c2e8a4aa958d7db27a6bc0fe83214284))
+
 ## @visulima/packem [1.18.0](https://github.com/visulima/packem/compare/@visulima/packem@1.17.5...@visulima/packem@1.18.0) (2025-01-22)
 
 ### Features
