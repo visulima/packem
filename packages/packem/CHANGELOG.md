@@ -1,3 +1,9 @@
+## @visulima/packem [1.18.2](https://github.com/visulima/packem/compare/@visulima/packem@1.18.1...@visulima/packem@1.18.2) (2025-01-25)
+
+### Bug Fixes
+
+* updated all @visulima/* packages, rollup to v4.32.0, oxc-parser to 0.48 ([e92a921](https://github.com/visulima/packem/commit/e92a921196da4ffc8ffaab0098ef630f0ff84559))
+
 ## @visulima/packem [1.18.1](https://github.com/visulima/packem/compare/@visulima/packem@1.18.0...@visulima/packem@1.18.1) (2025-01-25)
 
 ### Bug Fixes
