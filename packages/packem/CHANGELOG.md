@@ -1,3 +1,9 @@
+## @visulima/packem [1.18.3](https://github.com/visulima/packem/compare/@visulima/packem@1.18.2...@visulima/packem@1.18.3) (2025-01-25)
+
+### Bug Fixes
+
+* added exclude rule for node_modules and dist to the auto preset ([84ad8ae](https://github.com/visulima/packem/commit/84ad8ae276118f06ed606e69189829dc905e7eb5))
+
 ## @visulima/packem [1.18.2](https://github.com/visulima/packem/compare/@visulima/packem@1.18.1...@visulima/packem@1.18.2) (2025-01-25)
 
 ### Bug Fixes
