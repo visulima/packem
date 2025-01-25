@@ -1,7 +1,8 @@
 import { defineConfig } from "@visulima/packem/config";
 import transformer from "@visulima/packem/transformer/esbuild";
 import postcssLoader from "@visulima/packem/css/loader/postcss";
-import cssnano from "@visulima/packem/css/minifier/cssnano";
+import sourceMapLoader from "@visulima/packem/css/loader/sourcemap";
+import cssnanoMinifier from "@visulima/packem/css/minifier/cssnano";
 
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
@@ -10,8 +11,8 @@ export default defineConfig({
     rollup: {
         css: {
             mode: "extract",
-            loaders: [postcssLoader],
-            minifier: cssnano()
+            loaders: [postcssLoader, sourceMapLoader],
+            minifier: cssnanoMinifier
         },
     },
     declaration: "node16"

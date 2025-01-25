@@ -391,16 +391,6 @@ export default async (
                 return null;
             }
 
-            // Check if file was already processed into JS
-            // by other instance(s) of this or other plugin(s)
-            try {
-                this.parse(code, {}); // If it doesn't throw...
-                this.warn(`Skipping processed file ${relative(cwd, transformId)}`);
-                return null;
-            } catch {
-                // Was not already processed, continuing
-            }
-
             if (typeof options.onImport === "function") {
                 options.onImport(code, transformId);
             }

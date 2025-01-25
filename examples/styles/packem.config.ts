@@ -12,7 +12,7 @@ export default defineConfig({
     rollup: {
         css: {
             mode: "extract",
-            loaders: [postcssLoader, stylusLoader, lessLoader, sassLoader, sourceMapLoader,],
+            loaders: [postcssLoader, stylusLoader, lessLoader, sassLoader, sourceMapLoader],
             minifier: cssnanoMinifier,
         }
     }
