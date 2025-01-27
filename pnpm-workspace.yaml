@@ -7,3 +7,4 @@ packages:
     - "packages/packem/__fixtures__/ecosystem/**"
     - "packages/**"
     - "examples/**"
+    - "benchmarks/**"
