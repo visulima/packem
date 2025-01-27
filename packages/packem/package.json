@@ -265,9 +265,9 @@
         },
         "./package.json": "./package.json"
     },
-    "main": "dist/packem/index.cjs",
-    "module": "dist/packem/index.mjs",
-    "types": "dist/packem/index.d.ts",
+    "main": "dist/index.cjs",
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.ts",
     "typesVersions": {
         ">=5.5": {
             ".": [
