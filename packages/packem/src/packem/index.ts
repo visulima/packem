@@ -12,11 +12,14 @@ import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
 import browserslist from "browserslist";
 import { defu } from "defu";
 import { createHooks } from "hookable";
+import { createJiti } from "jiti";
 import { VERSION } from "rollup";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
 
-import build from "./build";
+import loadPackageJson from "../config/utils/load-package-json";
+import loadTsconfig from "../config/utils/load-tsconfig";
+import prepareEntries from "../config/utils/prepare-entries";
 import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "../constants";
 import createStub from "../jit/create-stub";
 import getHash from "../rollup/utils/get-hash";
@@ -28,16 +31,13 @@ import enhanceRollupError from "../utils/enhance-rollup-error";
 import FileCache from "../utils/file-cache";
 import getPackageSideEffect from "../utils/get-package-side-effect";
 import killProcess from "../utils/kill-process";
-import loadPackageJson from "../config/utils/load-package-json";
 import logBuildErrors from "../utils/log-build-errors";
-import prepareEntries from "../utils/prepare-entries";
 import removeOldCacheFolders from "../utils/remove-old-cache-folders";
 import packageJsonValidator from "../validator/package-json";
 import validateAliasEntries from "../validator/validate-alias-entries";
 import validateBundleSize from "../validator/validate-bundle-size";
+import build from "./build";
 import { node10Compatibility } from "./node10-compatibility";
-import loadTsconfig from "../config/utils/load-tsconfig";
-import { createJiti } from "jiti";
 
 /**
  * Resolves TSConfig JSX option to a standardized JSX runtime value.
@@ -445,19 +445,6 @@ const generateOptions = (
                 exclude: EXCLUDE_REGEXP,
             },
         },
-        validation: {
-            packageJson: {
-                bin: true,
-                dependencies: true,
-                exports: true,
-                files: true,
-                main: true,
-                module: true,
-                name: true,
-                types: true,
-                typesVersions: true,
-            },
-        },
         rootDir: rootDirectory,
         sourceDir: "src",
         sourcemap: false,
@@ -512,6 +499,19 @@ const generateOptions = (
             readme: "none",
             showConfig: debug,
             tsconfig: tsconfig?.path,
+        },
+        validation: {
+            packageJson: {
+                bin: true,
+                dependencies: true,
+                exports: true,
+                files: true,
+                main: true,
+                module: true,
+                name: true,
+                types: true,
+                typesVersions: true,
+            },
         },
     }) as InternalBuildOptions;
 
@@ -576,8 +576,14 @@ const generateOptions = (
         options.browserTargets = [];
     }
 
-    if (options.runtime === "browser" && options.browserTargets && options.browserTargets.length > 0) {
-        logger.debug("Using browser targets: " + options.browserTargets.join(", "));
+    if (options.runtime === "browser") {
+        if (options.rollup.resolve && options.rollup.resolve.browser === undefined) {
+            options.rollup.resolve.browser = true;
+        }
+
+        if (options.browserTargets && options.browserTargets.length > 0) {
+            logger.debug("Using browser targets: " + options.browserTargets.join(", "));
+        }
     }
 
     validateAliasEntries(options.alias);

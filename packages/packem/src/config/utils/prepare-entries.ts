@@ -4,8 +4,8 @@ import { isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 import { globSync, isDynamicPattern } from "tinyglobby";
 
-import { ENDING_RE } from "../constants";
-import type { BuildContext, BuildEntry } from "../types";
+import { ENDING_RE } from "../../constants";
+import type { BuildContext, BuildEntry } from "../../types";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<void> => {
