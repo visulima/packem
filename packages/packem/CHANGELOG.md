@@ -1,3 +1,14 @@
+## @visulima/packem [1.18.4](https://github.com/visulima/packem/compare/@visulima/packem@1.18.3...@visulima/packem@1.18.4) (2025-01-27)
+
+### Bug Fixes
+
+* **packem:** major codebase restructuring and improvements ([f71710e](https://github.com/visulima/packem/commit/f71710eb9b11ab1fc480bffa7db9a4f7e9487cb7))
+
+### Miscellaneous Chores
+
+* fixed package.json exports ([c585ff5](https://github.com/visulima/packem/commit/c585ff54733564726617d80afabdeea595524155))
+* fixed test, after pnpm audit fix ([a659751](https://github.com/visulima/packem/commit/a659751324028856634d56629b4fa8d8612b60cf))
+
 ## @visulima/packem [1.18.3](https://github.com/visulima/packem/compare/@visulima/packem@1.18.2...@visulima/packem@1.18.3) (2025-01-25)
 
 ### Bug Fixes
