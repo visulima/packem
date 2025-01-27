@@ -3,9 +3,9 @@
  *
  * The MIT License (MIT)
  *
- * Copyright © 2024-PRESENT 三咲智子 (https://github.com/sxzz)
+ * Copyright 2024-PRESENT 三咲智子 (https://github.com/sxzz)
  */
-import { dirname, toNamespacedPath } from "@visulima/path";
+import { dirname, sep, toNamespacedPath } from "@visulima/path";
 
 const lowestCommonAncestor = (...filepaths: string[]): string => {
     if (filepaths.length === 0) {
@@ -16,8 +16,9 @@ const lowestCommonAncestor = (...filepaths: string[]): string => {
         return dirname(filepaths[0] as string);
     }
 
+    // Normalize paths to use forward slashes
     // eslint-disable-next-line no-param-reassign
-    filepaths = filepaths.map((p) => toNamespacedPath(p));
+    filepaths = filepaths.map((p) => toNamespacedPath(p).split(sep).join("/"));
 
     const [first, ...rest] = filepaths;
 
@@ -41,7 +42,9 @@ const lowestCommonAncestor = (...filepaths: string[]): string => {
         ancestor = ancestor.slice(0, index);
     }
 
-    return ancestor.length <= 1 && ancestor[0] === "" ? `/${ancestor[0]}` : ancestor.join("/");
+    // Convert back to platform-specific separator
+    const result = ancestor.length <= 1 && ancestor[0] === "" ? `/${ancestor[0]}` : ancestor.join("/");
+    return result.split("/").join(sep);
 };
 
 export default lowestCommonAncestor;

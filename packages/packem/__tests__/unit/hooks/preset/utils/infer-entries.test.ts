@@ -5,7 +5,7 @@ import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import inferEntries from "../../../../../src/hooks/preset/utils/infer-entries";
+import inferEntries from "../../../../../src/config/preset/utils/infer-entries";
 import type { BuildContext, InferEntriesResult } from "../../../../../src/types";
 
 const createFiles = (files: string[], directory: string) => {

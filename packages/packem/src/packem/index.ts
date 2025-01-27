@@ -2,39 +2,33 @@ import process from "node:process";
 
 import { bold, cyan } from "@visulima/colorize";
 import { findCacheDirSync } from "@visulima/find-cache-dir";
-import { ensureDirSync, isAccessible } from "@visulima/fs";
+import { ensureDirSync } from "@visulima/fs";
 import { duration } from "@visulima/humanizer";
 import type { NormalizedPackageJson, PackageJson } from "@visulima/package";
 import { hasPackageJsonAnyDependency } from "@visulima/package";
 import type { Pail } from "@visulima/pail";
 import { join, resolve } from "@visulima/path";
 import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
-import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
 import browserslist from "browserslist";
 import { defu } from "defu";
 import { createHooks } from "hookable";
-import type { Jiti } from "jiti";
-import { createJiti } from "jiti";
 import { VERSION } from "rollup";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
 
 import build from "./build";
-import type { BuildConfigFunction } from "../config";
 import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "../constants";
-import resolvePreset from "../hooks/preset/utils/resolve-preset";
 import createStub from "../jit/create-stub";
 import getHash from "../rollup/utils/get-hash";
 import rollupWatch from "../rollup/watch";
-import type { BuildConfig, BuildContext, BuildOptions, BuildPreset, Environment, InternalBuildOptions, Mode } from "../types";
+import type { BuildConfig, BuildContext, BuildOptions, Environment, InternalBuildOptions, Mode } from "../types";
 import cleanDistributionDirectories from "../utils/clean-distribution-directories";
 import createOrUpdateKeyStorage from "../utils/create-or-update-key-storage";
 import enhanceRollupError from "../utils/enhance-rollup-error";
 import FileCache from "../utils/file-cache";
-import findPackemFile from "../utils/find-packem-file";
 import getPackageSideEffect from "../utils/get-package-side-effect";
 import killProcess from "../utils/kill-process";
-import loadPackageJson from "../utils/load-package-json";
+import loadPackageJson from "../config/utils/load-package-json";
 import logBuildErrors from "../utils/log-build-errors";
 import prepareEntries from "../utils/prepare-entries";
 import removeOldCacheFolders from "../utils/remove-old-cache-folders";
@@ -42,6 +36,8 @@ import packageJsonValidator from "../validator/package-json";
 import validateAliasEntries from "../validator/validate-alias-entries";
 import validateBundleSize from "../validator/validate-bundle-size";
 import { node10Compatibility } from "./node10-compatibility";
+import loadTsconfig from "../config/utils/load-tsconfig";
+import { createJiti } from "jiti";
 
 /**
  * Resolves TSConfig JSX option to a standardized JSX runtime value.
@@ -93,9 +89,7 @@ const generateOptions = (
     rootDirectory: string,
     environment: Environment,
     debug: boolean,
-    inputConfig: BuildConfig,
     buildConfig: BuildConfig,
-    preset: BuildPreset,
     packageJson: PackageJson,
     tsconfig: TsConfigResult | undefined,
     runtimeVersion: string,
@@ -107,7 +101,7 @@ const generateOptions = (
 
     // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error,@typescript-eslint/ban-ts-comment
     // @ts-ignore TS2589 is just deeply nested and this is needed for typedoc
-    const options = defu(buildConfig, inputConfig, preset, <Partial<BuildOptions>>{
+    const options = defu(buildConfig, <Partial<BuildOptions>>{
         alias: {},
         browserTargets: browserslist(),
         cjsInterop: false,
@@ -590,11 +584,9 @@ const generateOptions = (
  * @param mode - Build mode (build/watch)
  * @param environment - Build environment (development/production)
  * @param debug - Enable debug mode
- * @param inputConfig - User provided build configuration
  * @param buildConfig - Resolved build configuration
  * @param packageJson - Package.json contents
  * @param tsconfig - TypeScript configuration
- * @param jiti - Jiti instance for module loading
  * @param nodeVersion - Node.js version
  *
  * @returns Promise resolving to the build context
@@ -607,18 +599,13 @@ const createContext = async (
     mode: Mode,
     environment: Environment,
     debug: boolean,
-    inputConfig: BuildConfig,
     buildConfig: BuildConfig,
     packageJson: PackageJson,
     tsconfig: TsConfigResult | undefined,
-    jiti: Jiti,
     nodeVersion: string,
-    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<BuildContext> => {
-    const preset = await resolvePreset(buildConfig.preset ?? inputConfig.preset ?? "auto", jiti);
-
     // eslint-disable-next-line etc/no-internal
-    const options = generateOptions(logger, rootDirectory, environment, debug, inputConfig, buildConfig, preset, packageJson, tsconfig, nodeVersion);
+    const options = generateOptions(logger, rootDirectory, environment, debug, buildConfig, packageJson, tsconfig, nodeVersion);
 
     ensureDirSync(join(options.rootDir, options.outDir));
 
@@ -638,15 +625,6 @@ const createContext = async (
         usedImports: new Set(),
         warnings: new Set(),
     };
-
-    // Register hooks
-    if (preset.hooks) {
-        context.hooks.addHooks(preset.hooks);
-    }
-
-    if (inputConfig.hooks) {
-        context.hooks.addHooks(inputConfig.hooks);
-    }
 
     if (buildConfig.hooks) {
         context.hooks.addHooks(buildConfig.hooks);
@@ -722,9 +700,6 @@ const getMode = (mode: Mode): string => {
         case "watch": {
             return "Watching";
         }
-        case "tsdoc": {
-            return "Generating TSDoc";
-        }
         case "build": {
             return "Building";
         }
@@ -764,14 +739,11 @@ const packem = async (
     mode: Mode,
     environment: Environment,
     logger: Pail,
-    inputConfig: {
-        configPath?: string;
-        debug?: boolean;
-        tsconfigPath?: string;
-    } & BuildConfig = {},
+    debug: boolean,
+    config: BuildConfig,
+    tsconfigPath?: string,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
-    const { configPath, debug, tsconfigPath, ...otherInputConfig } = inputConfig;
     const nodeVersion = process.version.slice(1);
 
     logger.wrapAll();
@@ -786,30 +758,7 @@ const packem = async (
 
     logger.debug("Using package.json found at", packageJsonPath);
 
-    let tsconfig: TsConfigResult | undefined;
-
-    if (tsconfigPath) {
-        const rootTsconfigPath = join(rootDirectory, tsconfigPath);
-
-        if (!(await isAccessible(rootTsconfigPath))) {
-            throw new Error("tsconfig.json not found at " + rootTsconfigPath);
-        }
-
-        tsconfig = {
-            config: readTsConfig(rootTsconfigPath),
-            path: rootTsconfigPath,
-        };
-
-        logger.info("Using tsconfig settings at", rootTsconfigPath);
-    } else if (hasPackageJsonAnyDependency(packageJson as NormalizedPackageJson, ["typescript"])) {
-        try {
-            tsconfig = await findTsConfig(rootDirectory);
-
-            logger.debug("Using tsconfig settings found at", tsconfig.path);
-        } catch {
-            logger.info("No tsconfig.json or jsconfig.json found.");
-        }
-    }
+    const tsconfig = await loadTsconfig(rootDirectory, packageJson, logger, tsconfigPath);
 
     const cachePath = findCacheDirSync("@visulima/packem", {
         cwd: rootDirectory,
@@ -820,58 +769,34 @@ const packem = async (
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type,@typescript-eslint/no-explicit-any
     let onSuccessCleanup: (() => any) | undefined | void;
 
+    const cacheKey =
+        getHash(
+            JSON.stringify({
+                version: packageJson.version,
+                ...packageJson.dependencies,
+                ...packageJson.devDependencies,
+                ...packageJson.peerDependencies,
+                ...packageJson.peerDependenciesMeta,
+                browser: packageJson.browser,
+                eNode: packageJson.engines?.node,
+                exports: packageJson.exports,
+                main: packageJson.main,
+                module: packageJson.module,
+                nodeVersion,
+                type: packageJson.type,
+                types: packageJson.types,
+            }),
+        ) + getHash(JSON.stringify(config));
+
+    if (cachePath) {
+        createOrUpdateKeyStorage(cacheKey, cachePath as string, logger);
+    }
+
+    const fileCache = new FileCache(rootDirectory, cachePath, cacheKey, logger);
+
     try {
-        const packemConfigFilePath = await findPackemFile(rootDirectory, configPath ?? "");
-        const jiti = createJiti(rootDirectory, { debug });
-
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        let buildConfig = ((await jiti.import(packemConfigFilePath, { default: true, try: true })) || {}) as BuildConfig | BuildConfigFunction;
-
-        if (typeof buildConfig === "function") {
-            buildConfig = await buildConfig(environment, mode);
-        }
-
-        logger.debug("Using packem config found at", join(rootDirectory, packemConfigFilePath));
-
-        const cacheKey =
-            getHash(
-                JSON.stringify({
-                    version: packageJson.version,
-                    ...packageJson.dependencies,
-                    ...packageJson.devDependencies,
-                    ...packageJson.peerDependencies,
-                    ...packageJson.peerDependenciesMeta,
-                    browser: packageJson.browser,
-                    eNode: packageJson.engines?.node,
-                    exports: packageJson.exports,
-                    main: packageJson.main,
-                    module: packageJson.module,
-                    nodeVersion,
-                    type: packageJson.type,
-                    types: packageJson.types,
-                }),
-            ) + getHash(JSON.stringify(buildConfig));
-
-        if (cachePath) {
-            createOrUpdateKeyStorage(cacheKey, cachePath as string, logger);
-        }
-
-        const fileCache = new FileCache(rootDirectory, cachePath, cacheKey, logger);
-
         // eslint-disable-next-line etc/no-internal
-        const context = await createContext(
-            logger,
-            rootDirectory,
-            mode,
-            environment,
-            debug ?? false,
-            otherInputConfig,
-            buildConfig,
-            packageJson,
-            tsconfig,
-            jiti,
-            nodeVersion,
-        );
+        const context = await createContext(logger, rootDirectory, mode, environment, debug, config, packageJson, tsconfig, nodeVersion);
 
         fileCache.isEnabled = context.options.fileCache as boolean;
 
@@ -912,7 +837,7 @@ const packem = async (
             if (onSuccessProcess !== undefined) {
                 await killProcess({
                     pid: onSuccessProcess.pid as number,
-                    signal: otherInputConfig.killSignal ?? buildConfig.killSignal ?? "SIGTERM",
+                    signal: config.killSignal ?? "SIGTERM",
                 });
             } else if (onSuccessCleanup !== undefined) {
                 try {
@@ -963,7 +888,7 @@ const packem = async (
 
         if (mode === "watch") {
             if (context.options.rollup.watch === false) {
-                throw new Error("Rollup watch is disabled. You should check your packem.config file.");
+                throw new Error("Rollup watch is disabled. You should check your packem config.");
             }
 
             await rollupWatch(context, fileCache, runBuilder, runOnsuccess, doOnSuccessCleanup);
@@ -1039,18 +964,3 @@ const packem = async (
 };
 
 export default packem;
-
-export type {
-    BuildConfig,
-    BuildContext,
-    BuildContextBuildAssetAndChunk,
-    BuildContextBuildEntry,
-    BuildEntry,
-    BuildHooks,
-    BuildOptions,
-    BuildPreset,
-    Environment,
-    Mode,
-    RollupBuildOptions,
-    Runtime,
-} from "../types";

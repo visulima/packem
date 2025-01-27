@@ -1,19 +1,7 @@
-import type { BuildConfig, BuildPreset, Environment, Mode } from "../types";
-
-/**
- * Function type for dynamic build configuration.
- * Allows configuration to be generated based on environment and mode.
- *
- * @param environment - The build environment (development/production)
- * @param mode - The build mode (build/watch)
- * @returns Build configuration object or Promise resolving to one
- *
- * @public
- */
-export type BuildConfigFunction = (environment: Environment, mode: Mode) => BuildConfig | Promise<BuildConfig>;
+import type { BuildConfig, BuildConfigFunction, BuildPreset } from "../types";
 
 // eslint-disable-next-line import/no-unused-modules
-export type { BuildConfig, BuildHooks, BuildPreset } from "../types";
+export type { BuildConfig, BuildConfigFunction, BuildHooks, BuildPreset } from "../types";
 
 /**
  * Defines a build configuration for Packem.

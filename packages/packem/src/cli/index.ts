@@ -2,7 +2,7 @@
 import Cli from "@visulima/cerebro";
 import { SimpleReporter } from "@visulima/pail/reporter";
 
-import { name, version } from "../package.json";
+import { name, version } from "../../package.json";
 import createAddCommand from "./commands/add";
 import createBuildCommand from "./commands/build";
 import createInitCommand from "./commands/init";
@@ -41,7 +41,7 @@ try {
  * await cli.run(['build', '--watch']);
  * ```
  */
-const cli = new Cli("packem", {
+const index = new Cli("packem", {
     logger: {
         reporters: [
             new SimpleReporter({
@@ -59,13 +59,13 @@ const cli = new Cli("packem", {
 });
 
 // Register available commands
-createInitCommand(cli);
+createInitCommand(index);
 // eslint-disable-next-line etc/no-internal
-createBuildCommand(cli);
-createAddCommand(cli);
+createBuildCommand(index);
+createAddCommand(index);
 
 // Run the CLI without exiting the process
 // eslint-disable-next-line no-void
-void cli.run({
+void index.run({
     shouldExitProcess: false,
 });

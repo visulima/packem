@@ -15,6 +15,7 @@ const execPackemSync = async (command: "build" | "init", flags: string[] = [], o
     }
 
     if (flags.includes("--no-environment")) {
+        // eslint-disable-next-line no-param-reassign
         flags = flags.filter((flag) => flag !== "--no-environment");
     }
 
@@ -22,7 +23,7 @@ const execPackemSync = async (command: "build" | "init", flags: string[] = [], o
         flags.push("--no-validation");
     }
 
-    return await execaNode(join(distributionPath, "cli.mjs"), [command, environmentFlag, ...flags].filter(Boolean) as string[], {
+    return await execaNode(join(distributionPath, "cli/index.mjs"), [command, environmentFlag, ...flags].filter(Boolean) as string[], {
         cleanup: true,
         ...options,
     });

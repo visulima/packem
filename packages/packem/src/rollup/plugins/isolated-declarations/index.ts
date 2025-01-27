@@ -10,7 +10,7 @@ import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { readFile } from "@visulima/fs";
 import type { Pail } from "@visulima/pail";
-import { basename, dirname, extname, join, relative } from "@visulima/path";
+import { basename, dirname, extname, join, relative, toNamespacedPath } from "@visulima/path";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import { parseAsync } from "oxc-parser";
 import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginContext, PreRenderedChunk } from "rollup";
@@ -250,7 +250,7 @@ export const isolatedDeclarationsPlugin = (
                         prefix: "packem:isolated-declarations",
                     });
 
-                    const emitName = entryFileName.replace("[name]", relative(inputBase, filename)).replace(".cts", ".ts");
+                    const emitName = entryFileName.replace("[name]", toNamespacedPath(filename).replace(sourceDirectory + "/", "")).replace(".cts", ".ts");
 
                     let compatibleSource = source;
 
@@ -283,7 +283,7 @@ export const isolatedDeclarationsPlugin = (
                     prefix: "packem:isolated-declarations",
                 });
 
-                const emitName = entryFileName.replace("[name]", relative(inputBase, filename));
+                const emitName = entryFileName.replace("[name]", toNamespacedPath(filename).replace(sourceDirectory + "/", ""));
 
                 if (sourceMap && map) {
                     source = appendMapUrl(source.trim(), emitName);

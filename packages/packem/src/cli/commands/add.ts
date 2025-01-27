@@ -7,7 +7,7 @@ import { readFile, writeFile } from "@visulima/fs";
 import { resolve } from "@visulima/path";
 import MagicString from "magic-string";
 
-import findPackemFile from "../utils/find-packem-file";
+import findPackemFile from "../../config/utils/find-packem-file";
 import cssLoaderDependencies from "./utils/css-loader-dependencies";
 
 const typedocPackages = ["typedoc", "typedoc-plugin-markdown", "typedoc-plugin-rename-defaults"];

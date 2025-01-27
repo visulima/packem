@@ -1,7 +1,7 @@
 import type { NormalizedPackageJson } from "@visulima/package";
 import { describe, expect, it } from "vitest";
 
-import overwriteWithPublishConfig from "../../../src/hooks/preset/utils/overwrite-with-publish-config";
+import overwriteWithPublishConfig from "../../../src/config/preset/utils/overwrite-with-publish-config";
 
 describe("overwriteWithPublishConfig", () => {
     it("should correctly overwrite package.json properties with publishConfig properties when they exist", () => {

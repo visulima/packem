@@ -344,12 +344,24 @@ export interface BuildConfig extends DeepPartial<Omit<BuildOptions, "entries">> 
     preset?: BuildPreset | "auto" | "none" | (NonNullable<unknown> & string);
 }
 
+/**
+ * Function type for dynamic build configuration.
+ * Allows configuration to be generated based on environment and mode.
+ *
+ * @param environment - The build environment (development/production)
+ * @param mode - The build mode (build/watch)
+ * @returns Build configuration object or Promise resolving to one
+ *
+ * @public
+ */
+export type BuildConfigFunction = (environment: Environment, mode: Mode) => BuildConfig | Promise<BuildConfig>;
+
 export type InferEntriesResult = {
     entries: BuildEntry[];
     warnings: string[];
 };
 
-export type Mode = "build" | "jit" | "watch" | "tsdoc";
+export type Mode = "build" | "jit" | "watch";
 
 export type IsolatedDeclarationsTransformer = (code: string, id: string, sourceMap?: boolean) => Promise<IsolatedDeclarationsResult>;
 

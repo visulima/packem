@@ -1,10 +1,15 @@
-import { exit } from "node:process";
+import { cwd, exit } from "node:process";
 
 import type { Cli } from "@visulima/cerebro";
+import { resolve } from "@visulima/path";
+import { defu } from "defu";
+import { createJiti } from "jiti";
 
-import { DEVELOPMENT_ENV, PRODUCTION_ENV } from "../constants";
-import packem from "../packem";
-import type { Environment, Mode } from "../types";
+import { DEVELOPMENT_ENV, PRODUCTION_ENV } from "../../constants";
+import packem from "../../packem";
+import type { BuildConfig, Environment, Mode } from "../../types";
+import loadPackemConfig from "../../config/utils/load-packem-config";
+import loadPreset from "../../config/utils/load-preset";
 
 /**
  * Creates and registers the build command with the CLI.
@@ -73,51 +78,71 @@ const createBuildCommand = (cli: Cli): void => {
                 }
             }
 
+            const rootPath = resolve(cwd(), options.dir ?? ".");
+
+            const jiti = createJiti(rootPath, { debug: options.debug });
+            const { config: buildConfig, path: buildConfigPath } = await loadPackemConfig(
+                jiti,
+                rootPath,
+                nodeEnvironment as Environment,
+                mode,
+                options.config ?? undefined,
+            );
+
+            logger.debug("Using packem config found at", buildConfigPath);
+
+            const preset = await loadPreset(buildConfig.preset ?? "auto", jiti);
+
             try {
-                await packem(options.dir, mode, nodeEnvironment as Environment, logger, {
-                    analyze: options.analyze,
-                    cjsInterop: options.cjsInterop,
-                    clean: options.clean,
-                    configPath: options.config ?? undefined,
-                    debug: options.debug,
-                    dtsOnly: options.dtsOnly,
-                    externals,
-                    killSignal: options.killSignal,
-                    minify: options.minify === undefined ? nodeEnvironment === PRODUCTION_ENV : options.minify,
-                    onSuccess: options.onSuccess,
-                    rollup: {
-                        esbuild: {
-                            target: options.target,
+                await packem(
+                    rootPath,
+                    mode,
+                    nodeEnvironment as Environment,
+                    logger,
+                    options.debug,
+                    defu<BuildConfig, BuildConfig[]>(buildConfig, preset, {
+                        analyze: options.analyze,
+                        cjsInterop: options.cjsInterop,
+                        clean: options.clean,
+                        dtsOnly: options.dtsOnly,
+                        externals,
+                        killSignal: options.killSignal,
+                        minify: options.minify === undefined ? nodeEnvironment === PRODUCTION_ENV : options.minify,
+                        onSuccess: options.onSuccess,
+                        rollup: {
+                            esbuild: {
+                                target: options.target,
+                            },
+                            license: {
+                                path: options.license,
+                            },
+                            metafile: options.metafile,
+                            replace: {
+                                values: environments,
+                            },
+                            resolveExternals: options.noExternal
+                                ? {
+                                      builtins: false,
+                                      deps: false,
+                                      devDeps: false,
+                                      optDeps: false,
+                                      peerDeps: false,
+                                  }
+                                : {},
                         },
-                        license: {
-                            path: options.license,
-                        },
-                        metafile: options.metafile,
-                        replace: {
-                            values: environments,
-                        },
-                        resolveExternals: options.noExternal
+                        runtime: options.runtime,
+                        sourcemap: options.metafile || options.analyze || options.sourcemap,
+                        validation: options.validation,
+                        ...(options.typedoc
                             ? {
-                                  builtins: false,
-                                  deps: false,
-                                  devDeps: false,
-                                  optDeps: false,
-                                  peerDeps: false,
+                                  typedoc: {
+                                      format: "html",
+                                  },
                               }
-                            : {},
-                    },
-                    runtime: options.runtime,
-                    sourcemap: options.metafile || options.analyze || options.sourcemap,
-                    tsconfigPath: options.tsconfig ?? undefined,
-                    validation: options.validation,
-                    ...(options.typedoc
-                        ? {
-                              typedoc: {
-                                  format: "html",
-                              },
-                          }
-                        : {}),
-                });
+                            : {}),
+                    }),
+                    options.tsconfig ?? undefined,
+                );
             } catch (error) {
                 logger.error(error);
 
@@ -274,7 +299,7 @@ const createBuildCommand = (cli: Cli): void => {
 
                     throw new Error("Invalid runtime. Use 'node' or 'browser'.");
                 },
-            }
+            },
         ],
     });
 };

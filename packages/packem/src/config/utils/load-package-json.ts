@@ -1,12 +1,12 @@
 import { isAccessibleSync } from "@visulima/fs";
-import type { PackageJson } from "@visulima/package";
+import type { NormalizedPackageJson } from "@visulima/package";
 import { parsePackageJson } from "@visulima/package/package-json";
 import { join } from "@visulima/path";
 
 const loadPackageJson = (
     rootDirectory: string,
 ): {
-    packageJson: PackageJson;
+    packageJson: NormalizedPackageJson;
     packageJsonPath: string;
 } => {
     const packageJsonPath = join(rootDirectory, "package.json");

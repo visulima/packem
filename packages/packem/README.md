@@ -495,6 +495,45 @@ This will replace all instances of `process.env.NODE_ENV` with `'production'` an
 packem build --env.NODE_ENV=production
 ```
 
+## Programmatic Usage
+
+You can use Packem programmatically in your Node.js applications without the CLI:
+
+```typescript
+import { packem } from '@visulima/packem';
+
+// Basic usage
+await packem('./src', {
+    mode: 'build',
+    environment: 'production'
+});
+
+// With custom options
+await packem('./src', {
+    mode: 'build',
+    environment: 'development',
+    declaration: true,
+    minify: true,
+    sourcemap: true,
+    logger: {
+        // Custom logger options
+        level: 'debug'
+    }
+});
+```
+
+The `packem` function accepts the following parameters:
+- `rootDirectory` (string): The root directory of your project to bundle
+- `options` (PackemOptions): Configuration options that extend the BuildConfig interface
+  - `mode`: The build mode ('build' | 'watch')
+  - `environment`: The target environment ('development' | 'production')
+  - `declaration`: Enable/disable TypeScript declaration file generation
+  - `minify`: Enable/disable code minification
+  - `sourcemap`: Enable/disable source map generation
+  - `logger`: Logger configuration options
+
+For more detailed configuration options, refer to the [Configuration](#configuration) section.
+
 ## Validators
 
 ### Package.json Validation

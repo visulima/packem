@@ -540,6 +540,7 @@ const prepareRollupConfig = (
 const build = async (context: BuildContext, fileCache: FileCache): Promise<boolean> => {
     await context.hooks.callHook("build:before", context);
 
+    // eslint-disable-next-line etc/no-internal
     const { builders, typeBuilders } = prepareRollupConfig(context, fileCache);
 
     await Promise.all(
@@ -596,6 +597,7 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<boole
 
     await context.hooks.callHook("build:done", context);
 
+    // eslint-disable-next-line etc/no-internal
     return showSizeInformation(context.logger, context);
 };
 

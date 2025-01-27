@@ -1,9 +1,9 @@
 import type { Jiti } from "jiti";
 
-import type { BuildConfig, BuildPreset } from "../../../types";
-import autoPreset from "../auto";
+import type { BuildConfig, BuildPreset } from "../../types";
+import autoPreset from "../preset/auto";
 
-const resolvePreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<BuildConfig> => {
+const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<BuildConfig> => {
     if (preset === "auto") {
         // eslint-disable-next-line no-param-reassign
         preset = autoPreset;
@@ -22,4 +22,4 @@ const resolvePreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<
     return preset as BuildConfig;
 };
 
-export default resolvePreset;
+export default loadPreset;
