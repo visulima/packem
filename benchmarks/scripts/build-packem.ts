@@ -1,4 +1,4 @@
-import packem from "@visulima/packem";
+import { packem } from "@visulima/packem";
 import { errorToString, getArguments, getMetrics } from "./utils";
 import { rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
