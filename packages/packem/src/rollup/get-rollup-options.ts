@@ -306,10 +306,12 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
     let nodeResolver;
 
-    if (context.options.rollup.resolve) {
+    if (context.options.rollup.resolve && context.options.experimental?.oxcResolve !== true) {
         nodeResolver = nodeResolvePlugin({
             ...context.options.rollup.resolve,
         });
+    } else if (context.options.experimental?.oxcResolve && context.options.rollup.experimental?.resolve) {
+        nodeResolver = oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, context.logger, context.tsconfig?.path);
     }
 
     const chunking = context.options.rollup.output?.preserveModules

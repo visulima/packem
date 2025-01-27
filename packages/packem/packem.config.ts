@@ -5,9 +5,6 @@ import isolatedDeclarationTransformer from "./src/rollup/plugins/typescript/isol
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
     cjsInterop: true,
-    experimental: {
-        oxcResolve: true,
-    },
     isolatedDeclarationTransformer,
     rollup: {
         license: {
