@@ -43,12 +43,14 @@ const isSupportedPreset = (preset: unknown): preset is SupportedPreset => {
 
         const startTime = Date.now();
 
-        await packem(`./projects/${project}`, {
+        await packem(`.`, {
             runtime: "browser",
             outDir: buildPaths.appBuild,
             transformer,
             clean: false,
-            debug: true,
+            emitCJS: true,
+            entries: [buildPaths.appEntrypoint],
+            validation: false,
         });
 
         console.log("\n");
