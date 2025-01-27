@@ -1,0 +1,31 @@
+{
+  "name": "test-project",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
+    "check-types": "tsc --noEmit",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "eslint-config-prettier": "^8.10.0",
+    "prettier": "^3.3.3",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ]
+}
