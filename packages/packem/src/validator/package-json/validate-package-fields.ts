@@ -6,13 +6,13 @@ const validatePackageFields = (context: BuildContext): void => {
     const validation = context.options.validation as ValidationOptions;
     const { pkg } = context;
 
-    if (pkg.name === undefined && validation?.packageJson?.name !== false) {
+    if (pkg.name === undefined && validation.packageJson?.name !== false) {
         warn(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
     }
 
     // Omitting the field will make it default to ["*"], which means it will include all files.
     // @see {@link https://docs.npmjs.com/cli/v11/configuring-npm/package-json#files}
-    if (validation?.packageJson?.files !== false && Array.isArray(pkg.files) && !pkg.files.includes("*")) {
+    if (validation.packageJson?.files !== false && Array.isArray(pkg.files) && !pkg.files.includes("*")) {
         if (pkg.files.length === 0) {
             warn(context, "The 'files' field in your package.json is empty. Please specify the files to be included in the package.");
         } else if (!pkg.files.some((file) => file.includes(context.options.outDir))) {
@@ -27,7 +27,7 @@ const validatePackageFields = (context: BuildContext): void => {
     const isEsm = pkg.type === "module";
 
     if (isCjs) {
-        if (validation?.packageJson?.main !== false) {
+        if (validation.packageJson?.main !== false) {
             if (pkg.main === undefined) {
                 warn(context, "The 'main' field is missing in your package.json. This field should point to your main entry file.");
             }
@@ -37,7 +37,7 @@ const validatePackageFields = (context: BuildContext): void => {
             }
         }
 
-        if (validation?.packageJson?.module !== false) {
+        if (validation.packageJson?.module !== false) {
             if (pkg.module === undefined && context.options.emitESM) {
                 warn(context, "The 'module' field is missing in your package.json, but you are emitting ES modules.");
             }
@@ -55,15 +55,15 @@ const validatePackageFields = (context: BuildContext): void => {
         }
     } else if (isEsm) {
         if (pkg.exports === undefined && !context.options.emitCJS) {
-            if (validation?.packageJson?.exports !== false) {
+            if (validation.packageJson?.exports !== false) {
                 warn(context, "The 'exports' field is missing in your package.json. Define module exports explicitly.");
             }
         } else if (context.options.emitCJS) {
-            if (validation?.packageJson?.main !== false && pkg.main === undefined) {
+            if (validation.packageJson?.main !== false && pkg.main === undefined) {
                 warn(context, "The 'main' field is missing in your package.json. This field is needed when emitting CommonJS modules.");
             }
 
-            if (validation?.packageJson?.module !== false) {
+            if (validation.packageJson?.module !== false) {
                 if (pkg.module === undefined) {
                     warn(context, "The 'module' field is missing in your package.json. This field is necessary when emitting ES modules.");
                 }
@@ -80,7 +80,7 @@ const validatePackageFields = (context: BuildContext): void => {
                 }
             }
 
-            if (validation?.packageJson?.exports !== false && pkg.exports === undefined) {
+            if (validation.packageJson?.exports !== false && pkg.exports === undefined) {
                 warn(context, "The 'exports' field is missing in your package.json. This field is required for defining explicit exports.");
             }
         }
@@ -90,7 +90,7 @@ const validatePackageFields = (context: BuildContext): void => {
         // @TODO: add validation for exports
     }
 
-    if (validation?.packageJson?.bin !== false) {
+    if (validation.packageJson?.bin !== false) {
         if (typeof pkg.bin === "string" && pkg.bin.includes(isCjs ? ".mjs" : ".cjs")) {
             warn(
                 context,
@@ -115,14 +115,14 @@ const validatePackageFields = (context: BuildContext): void => {
             showWarning = Boolean(pkg.main?.endsWith(".cjs"));
         }
 
-        if (pkg.types === undefined && pkg.typings === undefined && showWarning && validation?.packageJson?.types !== false) {
+        if (pkg.types === undefined && pkg.typings === undefined && showWarning && validation.packageJson?.types !== false) {
             warn(context, "The 'types' field is missing in your package.json. This field should point to your type definitions file.");
         }
 
         if (
             (context.options.declaration === true || context.options.declaration === "compatible") &&
             showWarning &&
-            validation?.packageJson?.typesVersions !== false &&
+            validation.packageJson?.typesVersions !== false &&
             (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
         ) {
             warn(

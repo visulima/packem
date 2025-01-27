@@ -132,7 +132,8 @@ const createBuildCommand = (cli: Cli): void => {
                         },
                         runtime: options.runtime,
                         sourcemap: options.metafile || options.analyze || options.sourcemap,
-                        validation: options.validation,
+                        // validation will take the default values
+                        validation: options.validation === false ? false : {},
                         ...(options.typedoc
                             ? {
                                   typedoc: {

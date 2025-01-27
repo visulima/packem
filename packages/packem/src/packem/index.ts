@@ -445,6 +445,19 @@ const generateOptions = (
                 exclude: EXCLUDE_REGEXP,
             },
         },
+        validation: {
+            packageJson: {
+                bin: true,
+                dependencies: true,
+                exports: true,
+                files: true,
+                main: true,
+                module: true,
+                name: true,
+                types: true,
+                typesVersions: true,
+            },
+        },
         rootDir: rootDirectory,
         sourceDir: "src",
         sourcemap: false,
@@ -923,9 +936,14 @@ const packem = async (
             await context.hooks.callHook("validate:before", context);
 
             // TODO: Add a validation handler, to add custom validation checks
-            if (context.options.validation !== false) {
-                packageJsonValidator(context);
-                validateBundleSize(context, logged);
+            if (typeof context.options.validation === "object") {
+                if (context.options.validation.packageJson) {
+                    packageJsonValidator(context);
+                }
+
+                if (context.options.validation.bundleLimit) {
+                    validateBundleSize(context, logged);
+                }
             }
 
             await context.hooks.callHook("validate:done", context);
