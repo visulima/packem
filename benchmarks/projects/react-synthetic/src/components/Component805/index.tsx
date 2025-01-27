@@ -1,11 +1,11 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useState } from "react";
 
 export default function Component805() {
-  const [textValue, setTextValue] = useState("");
+    const [textValue, setTextValue] = useState("");
 
-  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setTextValue(event.target.value);
-  };
+    const onChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setTextValue(event.target.value);
+    };
 
-  return <input type="text" onChange={onChange} value={textValue} />;
+    return <input type="text" onChange={onChange} value={textValue} />;
 }

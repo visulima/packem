@@ -10,6 +10,8 @@
     "scripts": {
         "build:bun": "cross-env BUN_ENV=production bun run ./scripts/build-bun.ts",
         "build:esbuild": "jiti ./scripts/build-esbuild.ts",
+        "build:tsup": "jiti ./scripts/build-tsup.ts",
+        "build:bunchee": "jiti ./scripts/build-bunchee.ts",
         "build:parcel": "jiti ./scripts/build-parcel.ts",
         "build:rollup": "jiti ./scripts/build-rollup.ts",
         "build:packem": "jiti ./scripts/build-packem.ts",
@@ -55,6 +57,8 @@
         "esbuild-loader": "^4.2.2",
         "@visulima/fs": "^3.0.1",
         "prettier": "3.4.2",
+        "tsup": "^8.3.6",
+        "bunchee": "^6.3.2",
         "rollup": "^4.32.0",
         "rollup-plugin-esbuild": "^6.1.1",
         "rollup-plugin-swc3": "^0.12.1",
