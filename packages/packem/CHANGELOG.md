@@ -1,3 +1,14 @@
+## @visulima/packem [1.18.5](https://github.com/visulima/packem/compare/@visulima/packem@1.18.4...@visulima/packem@1.18.5) (2025-01-27)
+
+### Bug Fixes
+
+* fixed validation handling if the value is undefined, improved check on the object values ([1727fc7](https://github.com/visulima/packem/commit/1727fc7743171016d28bc053ba3487ddf4ba234c))
+* if the browser runtime is select, set true for browser on the node-resolve plugin ([e650ab5](https://github.com/visulima/packem/commit/e650ab5780728e6c3a64ad31ed77580b24e1f655))
+
+### Miscellaneous Chores
+
+* fixed test, where validation was missing ([1911794](https://github.com/visulima/packem/commit/19117949900fac12589a48aafe820167f3b4643f))
+
 ## @visulima/packem [1.18.4](https://github.com/visulima/packem/compare/@visulima/packem@1.18.3...@visulima/packem@1.18.4) (2025-01-27)
 
 ### Bug Fixes
