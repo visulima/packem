@@ -125,7 +125,7 @@ describe("validatePackageFields", () => {
         expect.assertions(1);
 
         const context = {
-            options: { declaration: true, outDir: "dist" },
+            options: { declaration: true, outDir: "dist", validation: false },
             pkg: {
                 exports: {
                     ".": {
