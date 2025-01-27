@@ -2,8 +2,10 @@ import { packem } from "@visulima/packem";
 import { errorToString, getArguments, getMetrics } from "./utils";
 import { rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import transformer from "@visulima/packem/transformer/esbuild";
-import * as console from "node:console";
+import esbuildTransformer from "@visulima/packem/transformer/esbuild";
+import swcTransformer from "@visulima/packem/transformer/swc";
+import sucraseTransformer from "@visulima/packem/transformer/sucrase";
+import oxcTransformer from "@visulima/packem/transformer/oxc";
 
 const SUPPORTED_PRESETS = {
     // babel: "babel",
@@ -32,7 +34,7 @@ const isSupportedPreset = (preset: unknown): preset is SupportedPreset => {
         }
 
         const buildPaths = {
-            appEntrypoint: `./projects/${project}/${entrypoint}`,
+            appEntrypoint: `./${entrypoint}`,
             appBuild: "./builds/build-packem",
         };
 
@@ -43,14 +45,37 @@ const isSupportedPreset = (preset: unknown): preset is SupportedPreset => {
 
         const startTime = Date.now();
 
-        await packem(`.`, {
+        let transformer;
+
+        if (preset === SUPPORTED_PRESETS.esbuild) {
+            transformer = esbuildTransformer;
+        } else if (preset === SUPPORTED_PRESETS.swc) {
+            transformer = swcTransformer;
+        } else if (preset === SUPPORTED_PRESETS.oxc) {
+            transformer = oxcTransformer;
+        } else if (preset === SUPPORTED_PRESETS.sucrase) {
+            transformer = sucraseTransformer;
+        }
+
+        await packem(`./projects/${project}/`, {
             runtime: "browser",
-            outDir: buildPaths.appBuild,
+            environment: "production",
+            outDir: "../../" + buildPaths.appBuild,
             transformer,
             clean: false,
             emitCJS: true,
             entries: [buildPaths.appEntrypoint],
             validation: false,
+            rollup: {
+                resolveExternals: {
+                    deps: false,
+                },
+                replace: {
+                    values: {
+                        "process.env.NODE_ENV": JSON.stringify("production"),
+                    },
+                }
+            }
         });
 
         console.log("\n");

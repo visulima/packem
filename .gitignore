@@ -68,3 +68,10 @@ dist
 .nx/cache
 
 packages/packem/__fixtures__/ecosystem/**/packem.config.ts
+
+/benchmarks/builds
+/benchmarks/projects/**/.babelrc
+/benchmarks/projects/**/.parcelrc
+/benchmarks/projects/**/.terserrc
+/benchmarks/projects/**/.parcel-cache/data.mdb
+/benchmarks/projects/**/.parcel-cache/lock.mdb
