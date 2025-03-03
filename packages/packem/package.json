@@ -435,7 +435,7 @@
         "@types/semver": "^7.5.8",
         "@types/stylus": "^0.48.43",
         "@types/uglifycss": "^0.0.11",
-        "@vitest/coverage-v8": "^3.0.4",
+        "@vitest/coverage-v8": "^3.0.7",
         "@vitest/ui": "^3.0.4",
         "conventional-changelog-conventionalcommits": "8.0.0",
         "cross-env": "^7.0.3",
