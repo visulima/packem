@@ -2914,4 +2914,89 @@ export { type DeeksOptions as DeepKeysOptions, deepKeys, deepKeysFromList };
 
         expect(mtsContent).toMatchSnapshot("mjs content");
     });
+
+    it("should compile only a type file", async () => {
+        expect.assertions(3);
+
+        await writeFile(`${temporaryDirectoryPath}/src/native-string-types.d.ts`, `
+declare global {
+    interface String {
+
+    }
+}
+`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                "./native-string-types": {
+                    types: "./native-string-types.d.ts",
+                },
+            },
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/native-string-types.d.ts`);
+
+        expect(dTsContent).toMatchSnapshot(".d.ts type code output");
+    });
+
+    it("should compile a .d.ts file into .d.cts and .d.mts", async () => {
+        expect.assertions(4);
+
+        await writeFile(`${temporaryDirectoryPath}/src/native-string-types.d.ts`, `
+declare global {
+    interface String {
+
+    }
+}
+
+export type NativeStringTypes = string;
+`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                "./native-string-types": {
+                    import: {
+                        types: "./native-string-types.d.mts",
+                    },
+                    require: {
+                        types: "./native-string-types.d.cts",
+                    },
+                },
+            },
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+console.log(binProcess.stdout);
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/native-string-types.d.cts`);
+
+        expect(dCtsContent).toMatchSnapshot(".d.cts type code output");
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/native-string-types.d.mts`);
+
+        expect(dMtsContent).toMatchSnapshot(".d.mts type code output");
+    });
 });

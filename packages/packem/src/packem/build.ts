@@ -330,9 +330,12 @@ const prepareRollupConfig = (
             const esmEntries: BuildEntry[] = [];
             const cjsEntries: BuildEntry[] = [];
             const dtsEntries: BuildEntry[] = [];
+            const dtsOnlyEntries: BuildEntry[] = [];
 
             for (const entry of entries) {
-                if (entry.cjs && entry.esm) {
+                if (/\.d\.[cm]?ts$/.test(entry.input)) {
+                    dtsOnlyEntries.push(entry);
+                } else if (entry.cjs && entry.esm) {
                     esmAndCjsEntries.push(entry);
                 } else if (entry.cjs) {
                     cjsEntries.push(entry);
@@ -493,6 +496,33 @@ const prepareRollupConfig = (
                             emitCJS: false,
                             emitESM: false,
                             entries: dtsEntries,
+                            minify,
+                            rollup: {
+                                ...environmentRuntimeContext.options.rollup,
+                                replace: environmentRuntimeContext.options.rollup.replace
+                                    ? {
+                                          ...environmentRuntimeContext.options.rollup.replace,
+                                          values: {
+                                              ...environmentRuntimeContext.options.rollup.replace.values,
+                                              ...replaceValues,
+                                          },
+                                      }
+                                    : false,
+                            },
+                        },
+                    },
+                    fileCache,
+                    subDirectory,
+                });
+            }
+
+            if (environmentRuntimeContext.options.declaration && dtsOnlyEntries.length > 0) {
+                typeBuilders.add({
+                    context: {
+                        ...environmentRuntimeContext,
+                        options: {
+                            ...environmentRuntimeContext.options,
+                            entries: dtsOnlyEntries,
                             minify,
                             rollup: {
                                 ...environmentRuntimeContext.options.rollup,

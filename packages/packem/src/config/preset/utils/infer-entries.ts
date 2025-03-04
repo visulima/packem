@@ -210,7 +210,7 @@ const inferEntries = (
         const sourceSlug = outputSlug.replace(new RegExp("(./)?" + context.options.outDir), context.options.sourceDir).replace("./", "");
 
         const beforeSourceRegex = "(?<=/|$)";
-        const fileExtensionRegex = isDirectory ? "" : "(\\.[cm]?[tj]sx?)$";
+        const fileExtensionRegex = isDirectory ? "" : "(\\.d\\.[cm]?ts|(\\.[cm]?[tj]sx?))$";
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if (output.file.includes("/*") && output.key === "exports") {

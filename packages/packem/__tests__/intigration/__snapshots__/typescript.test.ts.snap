@@ -414,6 +414,41 @@ exports.deepKeysFromList = deeksExports.deepKeysFromList;
 "
 `;
 
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts > .d.cts type code output 1`] = `
+"declare global {
+    interface String {
+
+    }
+}
+
+type NativeStringTypes = string;
+
+export type { NativeStringTypes };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts > .d.mts type code output 1`] = `
+"declare global {
+    interface String {
+
+    }
+}
+
+type NativeStringTypes = string;
+
+export type { NativeStringTypes };
+"
+`;
+
+exports[`packem typescript > should compile only a type file > .d.ts type code output 1`] = `
+"declare global {
+    interface String {
+
+    }
+}
+"
+`;
+
 exports[`packem typescript > should support typescript decorator > cjs code output 1`] = `
 "'use strict';
 

@@ -363,6 +363,109 @@ describe("inferEntries", () => {
         } satisfies InferEntriesResult);
     });
 
+    it("should handle types only within exports`", () => {
+        expect.assertions(3);
+
+        createFiles(["src/test.d.ts"], temporaryDirectoryPath);
+
+        const result = inferEntries(
+            {
+                exports: {
+                    import: {
+                        types: "dist/test.d.mts",
+                    },
+                    require: {
+                        types: "dist/test.d.cts",
+                    },
+                },
+            },
+            ["src/", "src/test.d.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            {
+                environment: defaultContext.environment,
+                options: { ...defaultContext.options, declaration: true },
+                pkg: defaultContext.pkg,
+            } as unknown as BuildContext,
+        );
+        expect(result).toStrictEqual({
+            entries: [
+                {
+                    cjs: true,
+                    declaration: true,
+                    environment: "development",
+                    esm: true,
+                    exportKey: new Set<string>(["import", "require"]),
+                    input: join(temporaryDirectoryPath, "src/test.d.ts"),
+                    runtime: "node",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+
+        const result2 = inferEntries(
+            {
+                exports: {
+                    "./test": {
+                        import: {
+                            types: "dist/test.d.mts",
+                        },
+                        require: {
+                            types: "dist/test.d.cts",
+                        },
+                    },
+                },
+            },
+            ["src/", "src/test.d.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            {
+                environment: defaultContext.environment,
+                options: { ...defaultContext.options, declaration: true },
+                pkg: defaultContext.pkg,
+            } as unknown as BuildContext,
+        );
+        expect(result2).toStrictEqual({
+            entries: [
+                {
+                    cjs: true,
+                    declaration: true,
+                    environment: "development",
+                    esm: true,
+                    exportKey: new Set<string>(["test"]),
+                    input: join(temporaryDirectoryPath, "src/test.d.ts"),
+                    runtime: "node",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+
+        const result3 = inferEntries(
+            {
+                exports: {
+                    "./test": {
+                        types: "dist/test.d.ts",
+                    },
+                },
+            },
+            ["src/", "src/test.d.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            {
+                environment: defaultContext.environment,
+                options: { ...defaultContext.options, declaration: true },
+                pkg: defaultContext.pkg,
+            } as unknown as BuildContext,
+        );
+        expect(result3).toStrictEqual({
+            entries: [
+                {
+                    cjs: true,
+                    declaration: true,
+                    environment: "development",
+                    exportKey: new Set<string>(["test"]),
+                    input: join(temporaryDirectoryPath, "src/test.d.ts"),
+                    runtime: "node",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+    });
+
     it("should gracefully handles unknown entries", () => {
         expect.assertions(1);
 
