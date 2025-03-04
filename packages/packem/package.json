@@ -613,5 +613,10 @@
             "info_on_disabling_jsonc_sort_keys_rule": false,
             "info_on_disabling_etc_no_deprecated": false
         }
+    },
+    "pnpm": {
+        "overrides": {
+            "@octokit/request-error@>=6.0.0 <6.1.7": ">=6.1.7"
+        }
     }
 }
