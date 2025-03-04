@@ -1,15 +1,61 @@
-import path from "path";
-import zlib from "zlib";
-import { readdirSync, readFileSync, lstatSync } from "node:fs";
+import { gzipSync, brotliCompressSync } from "node:zlib";
+import { table } from "table";
+import { bold, cyan, green, magenta, yellow } from "@visulima/colorize";
+import { formatBytes, duration } from "@visulima/humanizer";
+import { readFile, isAccessible, walk } from "@visulima/fs";
+
+interface BenchmarkResult {
+    builderName: string;
+    project?: string;
+    runtime: number;
+    sourceFile: string;
+    originalSize: number;
+    gzipSize: number;
+    brotliSize: number;
+}
 
 const KEY_REGEX = /^--(.*)/;
-const SIZE_UNITS = ["B", "KiB", "MiB"];
 
-const formatTime = (ms: number) => `${(ms / 1000).toFixed(3)} sec`;
+/**
+ * Format and display benchmark results
+ * @param results - Array of benchmark results to display
+ */
+export const displayBenchmarkResults = (results: BenchmarkResult[]): void => {
+    const data = [
+        [bold("Builder"), bold("Project"), bold("Runtime"), bold("Source Files"), bold("Original Size"), bold("Gzip Size"), bold("Brotli Size")],
+        ...results.map((result) => [
+            cyan(result.builderName),
+            cyan(result.project || "-"),
+            yellow(duration(result.runtime, { units: ["m", "s", "ms"], round: true })),
+            green(result.sourceFile),
+            magenta(formatBytes(result.originalSize, { decimals: 2 })),
+            magenta(formatBytes(result.gzipSize, { decimals: 2 })),
+            magenta(formatBytes(result.brotliSize, { decimals: 2 })),
+        ]),
+    ];
 
-const formatSize = (bytes: number) => {
-    const index = Math.floor(Math.log(bytes) / Math.log(1024));
-    return `${(bytes / Math.pow(1024, index)).toFixed(2)} ${SIZE_UNITS[index]}`;
+    const config = {
+        border: {
+            topBody: "─",
+            topJoin: "┬",
+            topLeft: "┌",
+            topRight: "┐",
+            bottomBody: "─",
+            bottomJoin: "┴",
+            bottomLeft: "└",
+            bottomRight: "┘",
+            bodyLeft: "│",
+            bodyRight: "│",
+            bodyJoin: "│",
+            joinBody: "─",
+            joinLeft: "├",
+            joinRight: "┤",
+            joinJoin: "┼",
+        },
+    };
+
+    console.log("\nBenchmark Results:");
+    console.log(table(data, config));
 };
 
 export const getArguments = (): Record<string, boolean | string> => {
@@ -26,30 +72,41 @@ export const getArguments = (): Record<string, boolean | string> => {
     }, {});
 };
 
-export const getMetrics = (startTime: number, buildPath: string) => {
-    const elapsedTime = Date.now() - startTime;
+export const getFileMetrics = async (buildPath: string): Promise<{ size: number; sizeGzip: number; sizeBrotli: number }> => {
+    if (!(await isAccessible(buildPath))) {
+        return { size: 0, sizeGzip: 0, sizeBrotli: 0 };
+    }
 
-    const { size, sizeGzip } = readdirSync(buildPath).reduce(
-        (acc, filePath) => {
-            const fullPath = path.join(buildPath, filePath);
+    const metrics = { size: 0, sizeGzip: 0, sizeBrotli: 0 };
 
-            if (lstatSync(fullPath).isFile()) {
-                const contents = readFileSync(fullPath);
+    // Use walk to recursively process all files
+    for await (const entry of walk(buildPath, { followSymlinks: false })) {
+        if (entry.isFile()) {
+            const contents = await readFile(entry.path);
 
-                return {
-                    size: acc.size + Buffer.byteLength(contents),
-                    sizeGzip: acc.sizeGzip + zlib.gzipSync(contents).length,
-                };
-            }
+            metrics.size += Buffer.byteLength(contents);
+            metrics.sizeGzip += gzipSync(contents).length;
+            metrics.sizeBrotli += brotliCompressSync(contents).length;
+        }
+    }
 
-            return acc;
+    return metrics;
+};
+
+export const getMetrics = async (builderName: string, runtime: number, buildPath: string, project?: string): Promise<void> => {
+    const { size, sizeGzip, sizeBrotli } = await getFileMetrics(buildPath);
+
+    displayBenchmarkResults([
+        {
+            builderName,
+            project,
+            runtime,
+            sourceFile: buildPath,
+            originalSize: size,
+            gzipSize: sizeGzip,
+            brotliSize: sizeBrotli,
         },
-        { size: 0, sizeGzip: 0 },
-    );
-
-    const lines = [`elapsed time: ${formatTime(elapsedTime)}`, `size: ${formatSize(size)}`, `size gzip: ${formatSize(sizeGzip)}`];
-
-    return lines.join(", ");
+    ]);
 };
 
 export const errorToString = (error: unknown) => {

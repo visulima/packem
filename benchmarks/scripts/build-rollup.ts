@@ -1,129 +1,33 @@
-import { rollup } from "rollup";
-import babel from "@rollup/plugin-babel";
-import commonjs from "@rollup/plugin-commonjs";
-import esbuild from "rollup-plugin-esbuild";
-import replace from "@rollup/plugin-replace";
-import resolve from "@rollup/plugin-node-resolve";
-import swc from "rollup-plugin-swc3";
-import terser from "@rollup/plugin-terser";
 import { errorToString, getArguments, getMetrics } from "./utils";
-import { rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { join } from "node:path";
-
-const SUPPORTED_PRESETS = {
-    babel: "babel",
-    esbuild: "esbuild",
-    swc: "swc",
-} as const;
-
-type SupportedPreset = keyof typeof SUPPORTED_PRESETS;
-
-const isSupportedPreset = (preset: unknown): preset is SupportedPreset => {
-    return typeof preset === "string" && Object.values<string>(SUPPORTED_PRESETS).includes(preset);
-};
-
-const resolvePlugins = (preset: SupportedPreset) => {
-    switch (preset) {
-        case SUPPORTED_PRESETS.babel:
-            return [
-                babel({
-                    babelHelpers: "bundled",
-                    exclude: /node_modules/,
-                    extensions: [".jsx", ".ts", ".tsx"],
-                    presets: [["@babel/preset-react", { runtime: "automatic" }], "@babel/preset-typescript"],
-                }),
-                terser({
-                    format: {
-                        comments: false,
-                    },
-                }),
-            ];
-        case SUPPORTED_PRESETS.esbuild:
-            return [
-                esbuild({
-                    exclude: /node_modules/,
-                    minify: true,
-                    target: ["es2015"],
-                    jsx: "automatic",
-                }),
-            ];
-        case SUPPORTED_PRESETS.swc:
-            return [
-                swc({
-                    exclude: /node_modules/,
-                    minify: true,
-                    jsc: {
-                        target: "es2015",
-                        parser: {
-                            syntax: "typescript",
-                            tsx: true,
-                        },
-                        transform: {
-                            react: {
-                                runtime: "automatic",
-                            },
-                        },
-                    },
-                }),
-            ];
-    }
-};
+import { rollupBuilder } from "../builders/rollup";
+import { performance } from "node:perf_hooks";
 
 (async () => {
     try {
-        const { project, preset = SUPPORTED_PRESETS.babel, entrypoint = "src/index.tsx" } = getArguments();
+        const { project, preset = "babel", entrypoint = "src/index.tsx" } = getArguments();
 
         if (!project || !existsSync(`./projects/${project}`)) {
             throw new Error("Invalid project");
-        } else if (!isSupportedPreset(preset)) {
+        } else if (!rollupBuilder.supportedPresets?.includes(preset)) {
             throw new Error("Unsupported preset");
         } else if (!existsSync(`./projects/${project}/${entrypoint}`)) {
             throw new Error(`Invalid entrypoint ${entrypoint}`);
         }
 
-        const buildPaths = {
-            appEntrypoint: `./projects/${project}/${entrypoint}`,
-            appBuild: "./builds/build-rollup",
+        const options = {
+            project,
+            entrypoint,
+            preset,
         };
 
-        await rm(buildPaths.appBuild, {
-            recursive: true,
-            force: true,
-        });
+        await rollupBuilder.cleanup?.(options);
 
-        const startTime = Date.now();
+        const start = performance.now();
+        const buildPath = await rollupBuilder.build(options);
+        const end = performance.now();
 
-        const bundler = await rollup({
-            input: buildPaths.appEntrypoint,
-            output: {
-                file: join(buildPaths.appBuild, "index.js"),
-                format: "commonjs",
-            },
-            plugins: [
-                commonjs({
-                    include: /node_modules/,
-                    extensions: [".js"],
-                }),
-                resolve({
-                    preferBuiltins: true,
-                    browser: true,
-                    extensions: [".js", ".jsx", ".ts", ".tsx"],
-                }),
-                ...resolvePlugins(preset),
-                replace({
-                    preventAssignment: true,
-                    values: {
-                        "process.env.NODE_ENV": JSON.stringify("production"),
-                    },
-                }),
-            ],
-            onwarn: () => {},
-        });
-
-        await bundler.write({ dir: buildPaths.appBuild });
-
-        console.log(getMetrics(startTime, buildPaths.appBuild));
+        await getMetrics(`${rollupBuilder.name}-${preset}`, end - start, buildPath, project);
         process.exit(0);
     } catch (error) {
         console.error(errorToString(error));

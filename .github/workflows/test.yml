@@ -138,6 +138,16 @@ jobs:
                       pnpm run test:affected --files=${files//\\/\/}
                   fi
 
+            - name: "Run benchmarks"
+              uses: "CodSpeedHQ/action@v3"
+              if: "matrix.os == 'ubuntu-latest' && matrix.node_version == 18"
+              with:
+                  token: ${{ secrets.CODSPEED_TOKEN }}
+                  run: |
+                      files="${{ steps.files.outputs.all_changed_files }}";
+
+                      pnpm run test:affected:bench --files=${files//\\/\/}
+
             - name: "Prepare nx cache"
               shell: "bash"
               run: "tar -cf - .nx/cache | lz4 > /tmp/nx_cache.tar.lz4" # compress nx cache

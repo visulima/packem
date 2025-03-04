@@ -1,20 +1,7 @@
-import { rspack, Compiler } from "@rspack/core";
 import { errorToString, getArguments, getMetrics } from "./utils";
 import { existsSync } from "node:fs";
-import { rm } from "node:fs/promises";
-import { resolve } from "node:path";
-
-const performBuild = (compiler: Compiler) => {
-    return new Promise((resolve, reject) => {
-        compiler.run((err, stats) => {
-            if (err) {
-                return reject(err);
-            }
-
-            return resolve(stats);
-        });
-    });
-};
+import { rspackBuilder } from "../builders/rspack";
+import { performance } from "node:perf_hooks";
 
 (async () => {
     try {
@@ -28,63 +15,19 @@ const performBuild = (compiler: Compiler) => {
             throw new Error(`Invalid entrypoint ${entrypoint}`);
         }
 
-        const buildPaths = {
-            appEntrypoint: `./projects/${project}/${entrypoint}`,
-            appBuild: "./builds/build-rspack",
+        const options = {
+            project,
+            entrypoint,
         };
 
-        await rm(buildPaths.appBuild, {
-            recursive: true,
-            force: true,
-        });
+        await rspackBuilder.cleanup?.(options);
 
-        const startTime = Date.now();
+        const start = performance.now();
+        const buildPath = await rspackBuilder.build(options);
+        const end = performance.now();
 
-        const compiler = rspack({
-            mode: "production",
-            entry: {
-                index: buildPaths.appEntrypoint,
-            },
-            output: {
-                path: resolve(buildPaths.appBuild),
-                filename: "[name].js",
-            },
-            resolve: {
-                modules: ["node_modules"],
-                extensions: [".js", ".jsx", ".ts", ".tsx"],
-            },
-            module: {
-                rules: [
-                    {
-                        test: /\.(js|jsx|ts|tsx)$/,
-                        exclude: /node_modules/,
-                        loader: "builtin:swc-loader",
-                        options: {
-                            jsc: {
-                                target: "es2015",
-                                parser: {
-                                    syntax: "typescript",
-                                    tsx: true,
-                                },
-                                transform: {
-                                    react: {
-                                        runtime: "automatic",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                ],
-            },
-            optimization: {
-                minimize: true,
-                minimizer: [new rspack.SwcJsMinimizerRspackPlugin()],
-            },
-        });
+        await getMetrics(rspackBuilder.name, end - start, buildPath, project);
 
-        await performBuild(compiler);
-
-        console.log(getMetrics(startTime, buildPaths.appBuild));
         process.exit(0);
     } catch (error) {
         console.error(errorToString(error));

@@ -3,6 +3,11 @@
     "version": "0.1.0",
     "private": true,
     "main": "./dist/index.production.js",
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not op_mini all"
+    ],
     "dependencies": {
         "@emotion/react": "^11.13.0",
         "@emotion/styled": "^11.13.0",
@@ -13,10 +18,5 @@
         "@types/react": "^18.3.3",
         "@types/react-dom": "^18.3.0",
         "typescript": "^4.9.5"
-    },
-    "browserslist": [
-        ">0.2%",
-        "not dead",
-        "not op_mini all"
-    ]
+    }
 }

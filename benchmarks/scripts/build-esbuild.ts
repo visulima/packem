@@ -1,7 +1,7 @@
-import { build } from "esbuild";
 import { errorToString, getArguments, getMetrics } from "./utils";
-import { rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { esbuildBuilder } from "../builders/esbuild";
+import { performance } from "node:perf_hooks";
 
 (async () => {
     try {
@@ -15,29 +15,19 @@ import { existsSync } from "node:fs";
             throw new Error(`Invalid entrypoint ${entrypoint}`);
         }
 
-        const buildPaths = {
-            appEntrypoint: `./projects/${project}/${entrypoint}`,
-            appBuild: "./builds/build-esbuild",
+        const options = {
+            project,
+            entrypoint,
         };
 
-        await rm(buildPaths.appBuild, {
-            force: true,
-            recursive: true,
-        });
+        await esbuildBuilder.cleanup?.(options);
 
-        const startTime = Date.now();
+        const start = performance.now();
+        const buildPath = await esbuildBuilder.build(options);
+        const end = performance.now();
 
-        await build({
-            entryPoints: [buildPaths.appEntrypoint],
-            outdir: buildPaths.appBuild,
-            entryNames: "[name]",
-            bundle: true,
-            minify: true,
-            target: ["es2015"],
-            jsx: "automatic",
-        });
+        await getMetrics(esbuildBuilder.name, end - start, buildPath, project);
 
-        console.log(getMetrics(startTime, buildPaths.appBuild));
         process.exit(0);
     } catch (error) {
         console.error(errorToString(error));

@@ -1,10 +1,10 @@
 import { errorToString, getArguments, getMetrics } from "./utils";
 import { existsSync } from "node:fs";
-import { rm } from "node:fs/promises";
+import { bunBuilder } from "../builders/bun";
 
 (async () => {
     try {
-        const { project, preset, entrypoint = "src/index.tsx" } = getArguments();
+        const { project, preset, entrypoint } = getArguments();
 
         if (!project || !existsSync(`./projects/${project}`)) {
             throw new Error("Invalid project");
@@ -14,29 +14,17 @@ import { rm } from "node:fs/promises";
             throw new Error(`Invalid entrypoint ${entrypoint}`);
         }
 
-        const buildPaths = {
-            appEntrypoint: `./projects/${project}/${entrypoint}`,
-            appBuild: "./builds/build-bun",
+        const options = {
+            project,
+            entrypoint,
         };
 
-        await rm(buildPaths.appBuild, {
-            force: true,
-            recursive: true,
-        });
+        await bunBuilder.cleanup?.(options);
 
-        const startTime = Date.now();
+        const buildPath = await bunBuilder.build(options);
 
-        await Bun.build({
-            entrypoints: [buildPaths.appEntrypoint],
-            outdir: buildPaths.appBuild,
-            naming: "[name].[ext]",
-            minify: true,
-            define: {
-                "process.env.NODE_ENV": JSON.stringify("production"),
-            },
-        });
+        await getMetrics(bunBuilder.name, end - start, buildPath, project);
 
-        console.log(getMetrics(startTime, buildPaths.appBuild));
         process.exit(0);
     } catch (error) {
         console.error(errorToString(error));

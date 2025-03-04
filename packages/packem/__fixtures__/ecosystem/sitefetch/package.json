@@ -2,26 +2,26 @@
 	"name": "sitefetch",
 	"version": "0.0.16",
 	"description": "Fetch an entire site and save it as a text file",
-	"bin": "./dist/cli.js",
+	"keywords": [],
+	"license": "MIT",
+	"author": "EGOIST <hi@egoist.dev>",
+	"type": "module",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
+	"bin": "./dist/cli.js",
 	"files": [
 		"dist"
 	],
-	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
-	"keywords": [],
-	"author": "EGOIST <hi@egoist.dev>",
-	"license": "MIT",
 	"dependencies": {
-		"happy-dom": "^16.7.2",
 		"cheerio": "^1.0.0",
 		"gpt-tokenizer": "^2.8.1",
+		"happy-dom": "^16.7.2",
+		"micromatch": "^4.0.8",
 		"turndown": "^7.2.0",
-		"turndown-plugin-gfm": "^1.0.2",
-		"micromatch": "^4.0.8"
+		"turndown-plugin-gfm": "^1.0.2"
 	},
 	"devDependencies": {
 		"@mozilla/readability": "^0.5.0",
@@ -29,9 +29,9 @@
 		"@types/micromatch": "^4.0.9",
 		"@types/turndown": "^5.0.5",
 		"cac": "^6.7.14",
+		"esbuild": "*",
 		"p-queue": "^8.0.1",
 		"picocolors": "^1.1.1",
-		"typescript": "^5.7.3",
-		"esbuild": "*"
+		"typescript": "^5.7.3"
 	}
 }

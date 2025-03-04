@@ -75,3 +75,8 @@ packages/packem/__fixtures__/ecosystem/**/packem.config.ts
 /benchmarks/projects/**/.terserrc
 /benchmarks/projects/**/.parcel-cache/data.mdb
 /benchmarks/projects/**/.parcel-cache/lock.mdb
+
+# Ignore Windsurf Rules
+# Usage: "Follow the protocol in your .windsurfrules"
+.windsurfrules
+memory-bank/

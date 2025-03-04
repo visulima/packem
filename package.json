@@ -41,10 +41,12 @@
         "nx": "nx",
         "plop": "plop",
         "prepare": "is-ci || husky || exit 0",
-        "sort-package-json": "sort-package-json packages/**/package.json examples/**/package.json ./package.json",
+        "sort-package-json": "sort-package-json packages/**/package.json examples/**/package.json benchmarks/package.json ./package.json",
         "test": "nx run-many --target=test --all --parallel",
         "test:affected": "nx affected --target=test --parallel --exclude=*-bench,docs,examples_* --nxBail",
+        "test:affected:bench": "nx affected --target=test:bench --parallel --exclude=*-bench,docs,examples_* --nxBail",
         "test:affected:coverage": "nx affected --target=test:coverage --parallel --exclude=*-bench,docs,examples_* --nxBail",
+        "test:bench": "nx run-many --target=test:bench --all --parallel",
         "test:coverage": "nx run-many --target=test:coverage --all --parallel --exclude=*-bench,docs,examples_* --nxBail",
         "update:deps": "taze"
     },
@@ -92,8 +94,8 @@
             "chrono-node@<2.2.4": ">=2.7.7",
             "cross-spawn@>=7.0.0 <7.0.5": ">=7.0.5",
             "micromatch@<4.0.8": ">=4.0.8",
-            "vite@>=5.3.0 <=5.3.5": ">=5.3.6",
-            "undici@>=6.0.0 <6.21.1": ">=6.21.1"
+            "undici@>=6.0.0 <6.21.1": ">=6.21.1",
+            "vite@>=5.3.0 <=5.3.5": ">=5.3.6"
         }
     }
 }
