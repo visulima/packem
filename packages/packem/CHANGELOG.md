@@ -1,3 +1,10 @@
+## @visulima/packem [1.18.6](https://github.com/visulima/packem/compare/@visulima/packem@1.18.5...@visulima/packem@1.18.6) (2025-03-04)
+
+### Bug Fixes
+
+* added missing experimental oxc resolve to build step ([e73e7ac](https://github.com/visulima/packem/commit/e73e7ac746786bdfda9fb6ba64eabeddaa4d4286))
+* update @visulima/* deps to the latest version, oxc-parser to v0.54.0, oxc-resolver to v4.2.0, rollup to v4.34.9, all dev deps ([c7d63fc](https://github.com/visulima/packem/commit/c7d63fc6ced6492a0e4105bc9ea16b672c7dc022))
+
 ## @visulima/packem [1.18.5](https://github.com/visulima/packem/compare/@visulima/packem@1.18.4...@visulima/packem@1.18.5) (2025-01-27)
 
 ### Bug Fixes
