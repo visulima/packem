@@ -57,7 +57,7 @@ function makeIndentsMap(string, ignoreSingleSpaces) {
         key = encodeIndentsKey(indentType, absoluteIndentDifference);
       }
       entry = indents.get(key);
-      entry = entry === undefined ? [1, 0] : [entry[0] + use, entry[1] + weight];
+      entry = entry === void 0 ? [1, 0] : [entry[0] + use, entry[1] + weight];
       indents.set(key, entry);
     }
   }
@@ -107,7 +107,7 @@ function detectIndent(string) {
   let type;
   let amount = 0;
   let indent = "";
-  if (keyOfMostUsedIndent !== undefined) {
+  if (keyOfMostUsedIndent !== void 0) {
     ({ type, amount } = decodeIndentsKey(keyOfMostUsedIndent));
     indent = makeIndentString(type, amount);
   }
@@ -186,7 +186,7 @@ function makeIndentsMap(string, ignoreSingleSpaces) {
         key = encodeIndentsKey(indentType, absoluteIndentDifference);
       }
       entry = indents.get(key);
-      entry = entry === undefined ? [1, 0] : [entry[0] + use, entry[1] + weight];
+      entry = entry === void 0 ? [1, 0] : [entry[0] + use, entry[1] + weight];
       indents.set(key, entry);
     }
   }
@@ -236,7 +236,7 @@ function detectIndent(string) {
   let type;
   let amount = 0;
   let indent = "";
-  if (keyOfMostUsedIndent !== undefined) {
+  if (keyOfMostUsedIndent !== void 0) {
     ({ type, amount } = decodeIndentsKey(keyOfMostUsedIndent));
     indent = makeIndentString(type, amount);
   }

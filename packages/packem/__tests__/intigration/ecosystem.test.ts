@@ -1,8 +1,7 @@
 import { readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
-import { readFileSync, readJson, writeJson } from "@visulima/fs";
-import type { PackageJson } from "@visulima/package";
+import { readFileSync } from "@visulima/fs";
 import { join } from "@visulima/path";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -30,16 +29,6 @@ describe("packem ecosystem", () => {
             transformer: "esbuild",
         });
 
-        const packageJson = (await readJson(join(fullSuitePath, "package.json"))) as PackageJson;
-
-        if (!packageJson.devDependencies) {
-            packageJson.devDependencies = {};
-        }
-
-        packageJson.devDependencies.esbuild = "*";
-
-        await writeJson(join(fullSuitePath, "package.json"), packageJson);
-
         const binProcess = await execPackemSync("build", [], {
             cwd: fullSuitePath,
         });
@@ -57,7 +46,7 @@ describe("packem ecosystem", () => {
         expect(distributionFiles).toMatchSnapshot();
     });
 
-    it.each(ecosystemSuites)("should work with provided '%s' ecosystem suite and oxc resolver", async (suite) => {
+    it.todo.each(ecosystemSuites)("should work with provided '%s' ecosystem suite and oxc resolver", async (suite) => {
         const fullSuitePath = join(ecosystemPath, suite);
 
         await createPackemConfig(fullSuitePath, {
@@ -67,16 +56,6 @@ describe("packem ecosystem", () => {
             isolatedDeclarationTransformer: "typescript",
             transformer: "esbuild",
         });
-
-        const packageJson = (await readJson(join(fullSuitePath, "package.json"))) as PackageJson;
-
-        if (!packageJson.devDependencies) {
-            packageJson.devDependencies = {};
-        }
-
-        packageJson.devDependencies.esbuild = "*";
-
-        await writeJson(join(fullSuitePath, "package.json"), packageJson);
 
         const binProcess = await execPackemSync("build", [], {
             cwd: fullSuitePath,

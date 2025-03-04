@@ -75,7 +75,7 @@ function requireUtils () {
 	var __defProp = Object.defineProperty;
 	var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 	Object.defineProperty(utils, "__esModule", { value: true });
-	utils.isDocumentToRecurOn = utils.flatten = utils.unique = undefined;
+	utils.isDocumentToRecurOn = utils.flatten = utils.unique = void 0;
 	function unique(array) {
 	  return [...new Set(array)];
 	}
@@ -113,8 +113,8 @@ function requireDeeks () {
 	(function (exports) {
 		var __defProp = Object.defineProperty;
 		var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-		var __createBinding = deeks.__createBinding || (Object.create ? function(o, m, k, k2) {
-		  if (k2 === undefined) k2 = k;
+		var __createBinding = deeks && deeks.__createBinding || (Object.create ? function(o, m, k, k2) {
+		  if (k2 === void 0) k2 = k;
 		  var desc = Object.getOwnPropertyDescriptor(m, k);
 		  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
 		    desc = { enumerable: true, get: /* @__PURE__ */ __name(function() {
@@ -123,15 +123,15 @@ function requireDeeks () {
 		  }
 		  Object.defineProperty(o, k2, desc);
 		} : function(o, m, k, k2) {
-		  if (k2 === undefined) k2 = k;
+		  if (k2 === void 0) k2 = k;
 		  o[k2] = m[k];
 		});
-		var __setModuleDefault = deeks.__setModuleDefault || (Object.create ? function(o, v) {
+		var __setModuleDefault = deeks && deeks.__setModuleDefault || (Object.create ? function(o, v) {
 		  Object.defineProperty(o, "default", { enumerable: true, value: v });
 		} : function(o, v) {
 		  o["default"] = v;
 		});
-		var __importStar = deeks.__importStar || function(mod) {
+		var __importStar = deeks && deeks.__importStar || function(mod) {
 		  if (mod && mod.__esModule) return mod;
 		  var result = {};
 		  if (mod != null) {
@@ -140,11 +140,11 @@ function requireDeeks () {
 		  __setModuleDefault(result, mod);
 		  return result;
 		};
-		var __exportStar = deeks.__exportStar || function(m, exports2) {
+		var __exportStar = deeks && deeks.__exportStar || function(m, exports2) {
 		  for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p)) __createBinding(exports2, m, p);
 		};
 		Object.defineProperty(exports, "__esModule", { value: true });
-		exports.deepKeysFromList = exports.deepKeys = undefined;
+		exports.deepKeysFromList = exports.deepKeys = void 0;
 		const utils = __importStar(requireUtils());
 		__exportStar(requireTypes(), exports);
 		function deepKeys(object, options) {
@@ -253,7 +253,7 @@ function requireUtils () {
 	var __defProp = Object.defineProperty;
 	var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 	Object.defineProperty(utils, "__esModule", { value: true });
-	utils.isDocumentToRecurOn = utils.flatten = utils.unique = undefined;
+	utils.isDocumentToRecurOn = utils.flatten = utils.unique = void 0;
 	function unique(array) {
 	  return [...new Set(array)];
 	}
@@ -291,8 +291,8 @@ function requireDeeks () {
 	(function (exports) {
 		var __defProp = Object.defineProperty;
 		var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-		var __createBinding = deeks.__createBinding || (Object.create ? function(o, m, k, k2) {
-		  if (k2 === undefined) k2 = k;
+		var __createBinding = deeks && deeks.__createBinding || (Object.create ? function(o, m, k, k2) {
+		  if (k2 === void 0) k2 = k;
 		  var desc = Object.getOwnPropertyDescriptor(m, k);
 		  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
 		    desc = { enumerable: true, get: /* @__PURE__ */ __name(function() {
@@ -301,15 +301,15 @@ function requireDeeks () {
 		  }
 		  Object.defineProperty(o, k2, desc);
 		} : function(o, m, k, k2) {
-		  if (k2 === undefined) k2 = k;
+		  if (k2 === void 0) k2 = k;
 		  o[k2] = m[k];
 		});
-		var __setModuleDefault = deeks.__setModuleDefault || (Object.create ? function(o, v) {
+		var __setModuleDefault = deeks && deeks.__setModuleDefault || (Object.create ? function(o, v) {
 		  Object.defineProperty(o, "default", { enumerable: true, value: v });
 		} : function(o, v) {
 		  o["default"] = v;
 		});
-		var __importStar = deeks.__importStar || function(mod) {
+		var __importStar = deeks && deeks.__importStar || function(mod) {
 		  if (mod && mod.__esModule) return mod;
 		  var result = {};
 		  if (mod != null) {
@@ -318,11 +318,11 @@ function requireDeeks () {
 		  __setModuleDefault(result, mod);
 		  return result;
 		};
-		var __exportStar = deeks.__exportStar || function(m, exports2) {
+		var __exportStar = deeks && deeks.__exportStar || function(m, exports2) {
 		  for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p)) __createBinding(exports2, m, p);
 		};
 		Object.defineProperty(exports, "__esModule", { value: true });
-		exports.deepKeysFromList = exports.deepKeys = undefined;
+		exports.deepKeysFromList = exports.deepKeys = void 0;
 		const utils = __importStar(requireUtils());
 		__exportStar(requireTypes(), exports);
 		function deepKeys(object, options) {
@@ -422,7 +422,7 @@ Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 var __decorateClass = (decorators, target, key, kind) => {
-  var result = undefined ;
+  var result = void 0 ;
   for (var i = decorators.length - 1, decorator; i >= 0; i--)
     if (decorator = decorators[i])
       result = (decorator(target, key, result) ) || result;
@@ -454,7 +454,7 @@ exports[`packem typescript > should support typescript decorator > mjs code outp
 "var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 var __decorateClass = (decorators, target, key, kind) => {
-  var result = undefined ;
+  var result = void 0 ;
   for (var i = decorators.length - 1, decorator; i >= 0; i--)
     if (decorator = decorators[i])
       result = (decorator(target, key, result) ) || result;

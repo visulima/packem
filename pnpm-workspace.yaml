@@ -1,9 +1,22 @@
 packages:
-    - "!**/__test__/**"
-    - "!**/__tests__/**"
-    - "!packages/packem/__fixtures__/css/**"
-    - "!packages/packem/__fixtures__/package/**"
-    - "!packages/packem/__fixtures__/url/**"
-    - "packages/packem/__fixtures__/ecosystem/**"
-    - "packages/**"
-    - "examples/**"
+  - '!**/__test__/**'
+  - '!**/__tests__/**'
+  - '!packages/packem/__fixtures__/css/**'
+  - '!packages/packem/__fixtures__/package/**'
+  - '!packages/packem/__fixtures__/url/**'
+  - packages/packem/__fixtures__/ecosystem/**
+  - packages/**
+  - examples/**
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - '@swc/core'
+  - esbuild
+  - node-sass
+  - nodehun
+  - nx
+ignoredBuiltDependencies:
+  - '@anolilab/commitlint-config'
+  - '@anolilab/eslint-config'
+  - '@anolilab/lint-staged-config'
+  - '@anolilab/prettier-config'
+  - '@anolilab/textlint-config'

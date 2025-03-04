@@ -26,9 +26,9 @@
         "@types/react-dom": "^18.3.1",
         "@visulima/packem": "workspace:*",
         "cssnano": "7.0.6",
-        "esbuild": "^0.24.2",
+        "esbuild": "^0.25.0",
         "icss-utils": "^5.1.0",
-        "postcss": "^8.5.1",
+        "postcss": "^8.5.3",
         "postcss-load-config": "^6.0.1",
         "postcss-modules": "6.0.1",
         "postcss-modules-extract-imports": "^3.1.0",
@@ -37,6 +37,6 @@
         "postcss-modules-values": "^4.0.0",
         "postcss-value-parser": "^4.2.0",
         "rimraf": "^6.0.1",
-        "typescript": "^5.7.3"
+        "typescript": "^5.8.2"
     }
 }

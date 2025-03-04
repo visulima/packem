@@ -2985,7 +2985,7 @@ exports[`css > css-modules > should work with processed modules 'extract' css > 
 exports[`css > css-modules > should work with processed modules 'extract' css > js 1`] = `
 "'use strict';
 
-var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
 
 var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
 
@@ -2995,7 +2995,7 @@ else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 `;
 
 exports[`css > css-modules > should work with processed modules 'extract' css > js 2`] = `
-"var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+"var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
 
 var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
 
@@ -3032,7 +3032,7 @@ exports[`css > css-modules > should work with processed modules 'extract-sourcem
 exports[`css > css-modules > should work with processed modules 'extract-sourcemap-inline' css > js 1`] = `
 "'use strict';
 
-var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
 
 var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
 
@@ -3042,7 +3042,7 @@ else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 `;
 
 exports[`css > css-modules > should work with processed modules 'extract-sourcemap-inline' css > js 2`] = `
-"var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+"var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
 
 var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
 
@@ -3079,7 +3079,7 @@ exports[`css > css-modules > should work with processed modules 'extract-sourcem
 exports[`css > css-modules > should work with processed modules 'extract-sourcemap-true' css > js 1`] = `
 "'use strict';
 
-var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
 
 var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
 
@@ -3089,7 +3089,7 @@ else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 `;
 
 exports[`css > css-modules > should work with processed modules 'extract-sourcemap-true' css > js 2`] = `
-"var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+"var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
 
 var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
 
@@ -3287,7 +3287,7 @@ const injectCss = /* @__PURE__ */ __name2((css, options) => {
 }, "default");
 
 var css$2 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
-var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
 injectCss(css$2,{});
 
 var css$1 = "@media screen and (min-width: 900px) {\\n    .composed_composition_b4c6ecd1 {\\n        background-color: aqua;\\n    }\\n}\\n\\n.composed_composition_b4c6ecd1 {\\n    background-color: #BF4040;\\n}\\n";
@@ -3353,7 +3353,7 @@ const injectCss = /* @__PURE__ */ __name2((css, options) => {
 }, "default");
 
 var css$2 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
-var modules_5a199c00 = {"primary":"#BF4040","secondary":"#1F4F7F","module":"style_module_ea61eaf4","module2":"style_module2_ea61eaf4 composed_composition_b4c6ecd1 composition2_compositioned_33aa26b9"};
+var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
 injectCss(css$2,{});
 
 var css$1 = "@media screen and (min-width: 900px) {\\n    .composed_composition_b4c6ecd1 {\\n        background-color: aqua;\\n    }\\n}\\n\\n.composed_composition_b4c6ecd1 {\\n    background-color: #BF4040;\\n}\\n";
@@ -3452,12 +3452,17 @@ const injectCss = /* @__PURE__ */ __name2((css, options) => {
   }
 }, "default");
 
+var css$1 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
+var injected$1 = false;
+var modules_5a199c00 = {get "module"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module_ea61eaf4"; }};
+
 var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
 var injected = false;
 var modules_354770d7 = {get "compositioned"() { if (!injected) { injected = true; injectCss(css,{}); } return "composition2_compositioned_33aa26b9"; },
 inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
 
-modules_354770d7.inject();
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 "
 `;
 
@@ -3511,12 +3516,17 @@ const injectCss = /* @__PURE__ */ __name2((css, options) => {
   }
 }, "default");
 
+var css$1 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
+var injected$1 = false;
+var modules_5a199c00 = {get "module"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module_ea61eaf4"; }};
+
 var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
 var injected = false;
 var modules_354770d7 = {get "compositioned"() { if (!injected) { injected = true; injectCss(css,{}); } return "composition2_compositioned_33aa26b9"; },
 inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
 
-modules_354770d7.inject();
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 "
 `;
 

@@ -513,22 +513,8 @@ export { version };
 
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(dCtsContent).toBe(`const devDependencies = {
-	esbuild: "*",
-	typescript: "*"
-};
-const exports = {
-	".": {
-		"default": "./dist/index.mjs",
-		types: "./dist/index.d.mts"
-	}
-};
-const type = "module";
-const version$1 = "0.0.1";
+        expect(dCtsContent).toBe(`const version$1 = "0.0.1";
 const pkgJson = {
-	devDependencies: devDependencies,
-	exports: exports,
-	type: type,
 	version: version$1
 };
 
