@@ -1,3 +1,14 @@
+## @visulima/packem [1.19.0](https://github.com/visulima/packem/compare/@visulima/packem@1.18.6...@visulima/packem@1.19.0) (2025-03-04)
+
+### Features
+
+* extended the bundler to compiling TypeScript declaration files only, now you can compile and .d.ts, .d.cts and .d.mts file without a .ts file ([88c6447](https://github.com/visulima/packem/commit/88c64475bfcae7d9264d4127481af27bf50f3873))
+
+### Miscellaneous Chores
+
+* update [@octokit](https://github.com/octokit) dependencies to latest versions in package.json and pnpm-lock.yaml ([7ccd07b](https://github.com/visulima/packem/commit/7ccd07b5b91e3785534a7294828c2b600f8af0ca))
+* update Node.js engine compatibility and refine package overrides in package.json and pnpm-lock.yaml ([c06cfd9](https://github.com/visulima/packem/commit/c06cfd99fd0cc195d774c0b6a99afc174781386f))
+
 ## @visulima/packem [1.18.6](https://github.com/visulima/packem/compare/@visulima/packem@1.18.5...@visulima/packem@1.18.6) (2025-03-04)
 
 ### Bug Fixes
