@@ -1,3 +1,9 @@
+## @visulima/packem [1.19.1](https://github.com/visulima/packem/compare/@visulima/packem@1.19.0...@visulima/packem@1.19.1) (2025-03-05)
+
+### Bug Fixes
+
+* fixed dts only out generation, fixed compatibility mode if the value is true ([a22c132](https://github.com/visulima/packem/commit/a22c1325bfffb6b3d17d745a1cc53c4d9559f04c))
+
 ## @visulima/packem [1.19.0](https://github.com/visulima/packem/compare/@visulima/packem@1.18.6...@visulima/packem@1.19.0) (2025-03-04)
 
 ### Features
