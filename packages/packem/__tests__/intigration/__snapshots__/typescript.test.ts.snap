@@ -440,6 +440,119 @@ export type { NativeStringTypes };
 "
 `;
 
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts > .d.ts type code output 1`] = `
+"declare global {
+    interface String {
+
+    }
+}
+
+type NativeStringTypes = string;
+
+export type { NativeStringTypes };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > .d.cts type code output 1`] = `
+"declare global {
+    interface String {
+
+    }
+}
+
+type NativeStringTypes = string;
+
+export type { NativeStringTypes };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > .d.mts type code output 1`] = `
+"declare global {
+    interface String {
+
+    }
+}
+
+type NativeStringTypes = string;
+
+export type { NativeStringTypes };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > .d.ts type code output 1`] = `
+"declare global {
+    interface String {
+
+    }
+}
+
+type NativeStringTypes = string;
+
+export type { NativeStringTypes };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > cjs content 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const isUpperCode = new Uint8Array(128);
+const isLowerCode = new Uint8Array(128);
+const isDigitCode = new Uint8Array(128);
+for (let index = 0; index < 128; index++) {
+  isUpperCode[index] = index >= 65 && index <= 90 ? 1 : 0;
+  isLowerCode[index] = index >= 97 && index <= 122 ? 1 : 0;
+  isDigitCode[index] = index >= 48 && index <= 57 ? 1 : 0;
+}
+
+exports.isDigitCode = isDigitCode;
+exports.isLowerCode = isLowerCode;
+exports.isUpperCode = isUpperCode;
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > d.cts content 1`] = `
+"declare const isUpperCode: Uint8Array<ArrayBuffer>;
+declare const isLowerCode: Uint8Array<ArrayBuffer>;
+declare const isDigitCode: Uint8Array<ArrayBuffer>;
+
+export { isDigitCode, isLowerCode, isUpperCode };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > d.mts content 1`] = `
+"declare const isUpperCode: Uint8Array<ArrayBuffer>;
+declare const isLowerCode: Uint8Array<ArrayBuffer>;
+declare const isDigitCode: Uint8Array<ArrayBuffer>;
+
+export { isDigitCode, isLowerCode, isUpperCode };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > d.ts content 1`] = `
+"declare const isUpperCode: Uint8Array<ArrayBuffer>;
+declare const isLowerCode: Uint8Array<ArrayBuffer>;
+declare const isDigitCode: Uint8Array<ArrayBuffer>;
+
+export { isDigitCode, isLowerCode, isUpperCode };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > mjs content 1`] = `
+"const isUpperCode = new Uint8Array(128);
+const isLowerCode = new Uint8Array(128);
+const isDigitCode = new Uint8Array(128);
+for (let index = 0; index < 128; index++) {
+  isUpperCode[index] = index >= 65 && index <= 90 ? 1 : 0;
+  isLowerCode[index] = index >= 97 && index <= 122 ? 1 : 0;
+  isDigitCode[index] = index >= 48 && index <= 57 ? 1 : 0;
+}
+
+export { isDigitCode, isLowerCode, isUpperCode };
+"
+`;
+
 exports[`packem typescript > should compile only a type file > .d.ts type code output 1`] = `
 "declare global {
     interface String {

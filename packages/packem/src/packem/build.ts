@@ -248,6 +248,8 @@ interface BuilderProperties {
     subDirectory: string;
 }
 
+const DTS_REGEX = /\.d\.[mc]?ts$/;
+
 /**
  * Prepares Rollup configuration for both JavaScript/TypeScript builds and type definition builds.
  * Processes entries and generates appropriate builder configurations.
@@ -330,12 +332,9 @@ const prepareRollupConfig = (
             const esmEntries: BuildEntry[] = [];
             const cjsEntries: BuildEntry[] = [];
             const dtsEntries: BuildEntry[] = [];
-            const dtsOnlyEntries: BuildEntry[] = [];
 
             for (const entry of entries) {
-                if (/\.d\.[cm]?ts$/.test(entry.input)) {
-                    dtsOnlyEntries.push(entry);
-                } else if (entry.cjs && entry.esm) {
+                if (entry.cjs && entry.esm) {
                     esmAndCjsEntries.push(entry);
                 } else if (entry.cjs) {
                     cjsEntries.push(entry);
@@ -353,7 +352,7 @@ const prepareRollupConfig = (
                         ...environmentRuntimeContext.options,
                         emitCJS: true,
                         emitESM: true,
-                        entries: esmAndCjsEntries,
+                        entries: [...esmAndCjsEntries].filter((entry) => !DTS_REGEX.test(entry.input)),
                         minify,
                         rollup: {
                             ...environmentRuntimeContext.options.rollup,
@@ -375,7 +374,7 @@ const prepareRollupConfig = (
                 }
 
                 if (context.options.declaration) {
-                    const typedEntries = adjustedEsmAndCjsContext.options.entries.filter((entry) => entry.declaration);
+                    const typedEntries = [...esmAndCjsEntries].filter((entry) => entry.declaration);
 
                     if (typedEntries.length > 0) {
                         typeBuilders.add({
@@ -400,7 +399,7 @@ const prepareRollupConfig = (
                         ...environmentRuntimeContext.options,
                         emitCJS: false,
                         emitESM: true,
-                        entries: esmEntries,
+                        entries: [...esmEntries].filter((entry) => !DTS_REGEX.test(entry.input)),
                         minify,
                         rollup: {
                             ...environmentRuntimeContext.options.rollup,
@@ -422,7 +421,7 @@ const prepareRollupConfig = (
                 }
 
                 if (context.options.declaration) {
-                    const typedEntries = adjustedEsmContext.options.entries.filter((entry) => entry.declaration);
+                    const typedEntries = [...esmEntries].filter((entry) => entry.declaration);
 
                     if (typedEntries.length > 0) {
                         typeBuilders.add({
@@ -447,7 +446,7 @@ const prepareRollupConfig = (
                         ...environmentRuntimeContext.options,
                         emitCJS: true,
                         emitESM: false,
-                        entries: cjsEntries,
+                        entries: [...cjsEntries].filter((entry) => !DTS_REGEX.test(entry.input)),
                         minify,
                         rollup: {
                             ...environmentRuntimeContext.options.rollup,
@@ -469,7 +468,7 @@ const prepareRollupConfig = (
                 }
 
                 if (context.options.declaration) {
-                    const typedEntries = adjustedCjsContext.options.entries.filter((entry) => entry.declaration);
+                    const typedEntries = [...cjsEntries].filter((entry) => entry.declaration);
 
                     if (typedEntries.length > 0) {
                         typeBuilders.add({
@@ -496,33 +495,6 @@ const prepareRollupConfig = (
                             emitCJS: false,
                             emitESM: false,
                             entries: dtsEntries,
-                            minify,
-                            rollup: {
-                                ...environmentRuntimeContext.options.rollup,
-                                replace: environmentRuntimeContext.options.rollup.replace
-                                    ? {
-                                          ...environmentRuntimeContext.options.rollup.replace,
-                                          values: {
-                                              ...environmentRuntimeContext.options.rollup.replace.values,
-                                              ...replaceValues,
-                                          },
-                                      }
-                                    : false,
-                            },
-                        },
-                    },
-                    fileCache,
-                    subDirectory,
-                });
-            }
-
-            if (environmentRuntimeContext.options.declaration && dtsOnlyEntries.length > 0) {
-                typeBuilders.add({
-                    context: {
-                        ...environmentRuntimeContext,
-                        options: {
-                            ...environmentRuntimeContext.options,
-                            entries: dtsOnlyEntries,
                             minify,
                             rollup: {
                                 ...environmentRuntimeContext.options.rollup,

@@ -2953,7 +2953,7 @@ declare global {
     });
 
     it("should compile a .d.ts file into .d.cts and .d.mts", async () => {
-        expect.assertions(4);
+        expect.assertions(5);
 
         await writeFile(`${temporaryDirectoryPath}/src/native-string-types.d.ts`, `
 declare global {
@@ -2987,7 +2987,7 @@ export type NativeStringTypes = string;
         const binProcess = await execPackemSync("build", [], {
             cwd: temporaryDirectoryPath,
         });
-console.log(binProcess.stdout);
+
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
@@ -2998,5 +2998,105 @@ console.log(binProcess.stdout);
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/native-string-types.d.mts`);
 
         expect(dMtsContent).toMatchSnapshot(".d.mts type code output");
+
+        const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/native-string-types.d.ts`);
+
+        expect(dTsContent).toMatchSnapshot(".d.ts type code output");
+    });
+
+    it("should compile a .d.ts file into .d.cts and .d.mts, with other exports", async () => {
+        expect.assertions(10);
+
+        await writeFile(`${temporaryDirectoryPath}/src/native-string-types.d.ts`, `
+declare global {
+    interface String {
+
+    }
+}
+
+export type NativeStringTypes = string;
+`);
+        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, `// Fast lookup tables for performance optimization
+const isUpperCode = new Uint8Array(128);
+const isLowerCode = new Uint8Array(128);
+const isDigitCode = new Uint8Array(128);
+
+// Initialize lookup tables once
+for (let index = 0; index < 128; index++) {
+    isUpperCode[index] = index >= 65 && index <= 90 ? 1 : 0; // A-Z
+    isLowerCode[index] = index >= 97 && index <= 122 ? 1 : 0; // a-z
+    isDigitCode[index] = index >= 48 && index <= 57 ? 1 : 0; // 0-9
+}
+
+export { isUpperCode, isLowerCode, isDigitCode };
+`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                "./index": {
+                    import: {
+                        default: "./index.mjs",
+                        types: "./index.d.mts",
+                    },
+                    require: {
+                        default: "./index.cjs",
+                        types: "./index.d.cts",
+                    },
+                },
+                "./native-string-types": {
+                    import: {
+                        types: "./native-string-types.d.mts",
+                    },
+                    require: {
+                        types: "./native-string-types.d.cts",
+                    },
+                }
+            },
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackemSync("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/native-string-types.d.cts`);
+
+        expect(dCtsContent).toMatchSnapshot(".d.cts type code output");
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/native-string-types.d.mts`);
+
+        expect(dMtsContent).toMatchSnapshot(".d.mts type code output");
+
+        const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/native-string-types.d.ts`);
+
+        expect(dTsContent).toMatchSnapshot(".d.ts type code output");
+
+        const cjsIndexContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsIndexContent).toMatchSnapshot("cjs content");
+
+        const mjsIndexContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsIndexContent).toMatchSnapshot("mjs content");
+
+        const dTsIndexContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dTsIndexContent).toMatchSnapshot("d.ts content");
+
+        const dCtsIndexContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(dCtsIndexContent).toMatchSnapshot("d.cts content");
+
+        const dMtsIndexContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(dMtsIndexContent).toMatchSnapshot("d.mts content");
     });
 });
