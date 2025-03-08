@@ -494,7 +494,7 @@
         "cssnano": ">=7.0.6",
         "esbuild": ">=0.20.2",
         "icss-utils": ">=5.1.0",
-        "less": ">=4.2.0",
+        "less": ">=4.2.2",
         "lightningcss": ">=1.27.0",
         "node-sass": ">=9.0.0",
         "oxc-transform": ">=0.20.0",
