@@ -950,8 +950,8 @@ importers:
         specifier: ^0.0.11
         version: 0.0.11
       '@vitest/coverage-v8':
-        specifier: ^3.0.7
-        version: 3.0.7(vitest@3.0.7)
+        specifier: ^3.0.9
+        version: 3.1.1(vitest@3.0.7)
       '@vitest/ui':
         specifier: ^3.0.7
         version: 3.0.7(vitest@3.0.7)
@@ -1310,6 +1310,7 @@ packages:
   '@anolilab/package-json-utils@3.0.9':
     resolution: {integrity: sha512-CYwpW2hlsOSdwtksYG5vH7Y48X7qwSnvk4yTsplce/FZFZLKRxuCbwlUqgTEYUng3nZ55A+5EC3rEttgor7e9w==}
     engines: {node: '>=18.* <=21.*'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   '@anolilab/prettier-config@5.0.14':
     resolution: {integrity: sha512-P7nVwARFM0SKQ0j8Q2y6Q3acHaPNtXOKEX9lgZcf5veFdvNjzK79iZcFdpQikyix4VQBs8x6wBPAD0yDfpC6pQ==}
@@ -1451,10 +1452,6 @@ packages:
 
   '@babel/traverse@7.26.9':
     resolution: {integrity: sha512-ZYW7L+pL8ahU5fXmNbPF+iZFHCv5scFak7MZ9bwaRPLUhHh7QQEMjZUg0HevihoqCM5iSYHN61EyCoZvqC+bxg==}
-    engines: {node: '>=6.9.0'}
-
-  '@babel/types@7.26.7':
-    resolution: {integrity: sha512-t8kDRGrKXyp6+tjUh7hw2RLyclsW4TRoRvRHtSyAX9Bb5ldlFh+90YAYY6awRXrlB4G5G2izNeGySpATlFzmOg==}
     engines: {node: '>=6.9.0'}
 
   '@babel/types@7.26.9':
@@ -3792,11 +3789,11 @@ packages:
     resolution: {integrity: sha512-Yi4Pd0YDL9loDxKn0QYakiblL/SnjB3foMHa3RlDfZjBi4OtUakZDNYDLWtOMnRDSLLW7BTgiXj8pHGdmmNP+A==}
     engines: {node: '>=18.0.0 <=23.x'}
 
-  '@vitest/coverage-v8@3.0.7':
-    resolution: {integrity: sha512-Av8WgBJLTrfLOer0uy3CxjlVuWK4CzcLBndW1Nm2vI+3hZ2ozHututkfc7Blu1u6waeQ7J8gzPK/AsBRnWA5mQ==}
+  '@vitest/coverage-v8@3.1.1':
+    resolution: {integrity: sha512-MgV6D2dhpD6Hp/uroUoAIvFqA8AuvXEFBC2eepG3WFc1pxTfdk1LEqqkWoWhjz+rytoqrnUUCdf6Lzco3iHkLQ==}
     peerDependencies:
-      '@vitest/browser': 3.0.7
-      vitest: 3.0.7
+      '@vitest/browser': 3.1.1
+      vitest: 3.1.1
     peerDependenciesMeta:
       '@vitest/browser':
         optional: true
@@ -5079,6 +5076,7 @@ packages:
   eslint-define-config@1.24.1:
     resolution: {integrity: sha512-o36vBhPSWyIQlHoMqGhhcGmOOm2A2ccBVIdLTG/AWdm9YmjpsLpf+5ntf9LlHR6dduLREgxtGwvwPwSt7vnXJg==}
     engines: {node: '>=18.0.0', npm: '>=9.0.0', pnpm: '>= 8.6.0'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   eslint-etc@5.2.1:
     resolution: {integrity: sha512-lFJBSiIURdqQKq9xJhvSJFyPA+VeTh5xvk24e8pxVL7bwLBtGF60C/KRkLTMrvCZ6DA3kbPuYhLWY0TZMlqTsg==}
@@ -5187,6 +5185,7 @@ packages:
   eslint-plugin-i@2.29.1:
     resolution: {integrity: sha512-ORizX37MelIWLbMyqI7hi8VJMf7A0CskMmYkB+lkCX3aF4pkGV7kwx5bSEb4qx7Yce2rAf9s34HqDRPjGRZPNQ==}
     engines: {node: '>=12'}
+    deprecated: Please migrate to the brand new `eslint-plugin-import-x` instead
     peerDependencies:
       eslint: ^7.2.0 || ^8
 
@@ -9517,6 +9516,9 @@ packages:
   std-env@3.8.0:
     resolution: {integrity: sha512-Bc3YwwCB+OzldMxOXJIIvC6cPRWr/LxOp48CdQTOkPyk/t4JWWJbrilwBd7RJzKV8QW7tJkcgAmeuLLJugl5/w==}
 
+  std-env@3.9.0:
+    resolution: {integrity: sha512-UGvjygr6F6tpH7o2qyqR6QYpwraIjKSdtzyBdyytFOHmPZY917kwdwLG0RbOjWOnKmnm3PeHjaoLLMie7kPLQw==}
+
   stdin-discarder@0.2.2:
     resolution: {integrity: sha512-UhDfHmA92YAlNnCfhmq0VeNL5bDbiZGg7sZ2IvPsXubGkiNa9EC+tUTsjBRsYUAz87btI6/1wf4XoVvQ3uRnmQ==}
     engines: {node: '>=18'}
@@ -11013,11 +11015,6 @@ snapshots:
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
-
-  '@babel/types@7.26.7':
-    dependencies:
-      '@babel/helper-string-parser': 7.25.9
-      '@babel/helper-validator-identifier': 7.25.9
 
   '@babel/types@7.26.9':
     dependencies:
@@ -13537,7 +13534,7 @@ snapshots:
     transitivePeerDependencies:
       - yaml
 
-  '@vitest/coverage-v8@3.0.7(vitest@3.0.7)':
+  '@vitest/coverage-v8@3.1.1(vitest@3.0.7)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -13548,7 +13545,7 @@ snapshots:
       istanbul-reports: 3.1.7
       magic-string: 0.30.17
       magicast: 0.3.5
-      std-env: 3.8.0
+      std-env: 3.9.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
       vitest: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(@vitest/ui@3.0.7)(happy-dom@17.1.9)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(sass-embedded@1.85.1)(sass@1.85.1)(stylus@0.64.0)(sugarss@5.0.0(postcss@8.5.3))(yaml@2.7.0)
@@ -17065,7 +17062,7 @@ snapshots:
   magicast@0.3.5:
     dependencies:
       '@babel/parser': 7.26.9
-      '@babel/types': 7.26.7
+      '@babel/types': 7.26.9
       source-map-js: 1.2.1
 
   make-dir@2.1.0:
@@ -20393,6 +20390,8 @@ snapshots:
   stackback@0.0.2: {}
 
   std-env@3.8.0: {}
+
+  std-env@3.9.0: {}
 
   stdin-discarder@0.2.2: {}
 
