@@ -4,7 +4,7 @@ import { isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 import { globSync, isDynamicPattern } from "tinyglobby";
 
-import { ENDING_RE } from "../../constants";
+import { ENDING_REGEX } from "../../constants";
 import type { BuildContext, BuildEntry } from "../../types";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -17,7 +17,7 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<vo
         }
 
         // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp,no-param-reassign
-        entry.name = relativeInput.replace(new RegExp(`^${context.options.sourceDir}/`), "").replace(ENDING_RE, "");
+        entry.name = relativeInput.replace(new RegExp(`^${context.options.sourceDir}/`), "").replace(ENDING_REGEX, "");
     }
 
     if (!entry.input) {

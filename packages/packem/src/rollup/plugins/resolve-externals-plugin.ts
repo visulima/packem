@@ -9,7 +9,7 @@ import { resolveAlias } from "@visulima/path/utils";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { InputOptions, Plugin, ResolveIdResult } from "rollup";
 
-import { ENDING_RE } from "../../constants";
+import { ENDING_REGEX } from "../../constants";
 import type { InternalBuildOptions } from "../../types";
 import resolveAliases from "../utils/resolve-aliases";
 
@@ -23,7 +23,7 @@ const getRegExps = (data: MaybeFalsy<string | RegExp>[], type: "include" | "excl
         } else if (typeof entry === "string" && entry.length > 0) {
             result.push(new RegExp("^" + entry.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$"));
         } else {
-             
+
             logger.warn(`Ignoring wrong entry type #${index} in '${type}' option: ${JSON.stringify(entry)}`);
         }
 
@@ -237,7 +237,7 @@ export const resolveExternalsPlugin = (
                                 }
 
                                 for (const file of files) {
-                                    if (file.replace(ENDING_RE, "") === id.replace(ENDING_RE, "").replace("#", "")) {
+                                    if (file.replace(ENDING_REGEX, "") === id.replace(ENDING_REGEX, "").replace("#", "")) {
                                         cacheResolved.set(id, false);
 
                                         return false;

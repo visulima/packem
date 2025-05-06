@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { dirname, relative, resolve } from "@visulima/path";
 import { fileURLToPath, resolveModuleExportNames, resolvePath } from "mlly";
 
-import { DEFAULT_EXTENSIONS, ENDING_RE } from "../constants";
+import { DEFAULT_EXTENSIONS, ENDING_REGEX } from "../constants";
 import { getShebang, makeExecutable } from "../rollup/plugins/shebang";
 import resolveAliases from "../rollup/utils/resolve-aliases";
 import type { BuildContext } from "../types";
@@ -43,13 +43,13 @@ const createStub = async (context: BuildContext): Promise<void> => {
 
                               importedBabelPlugins.push(name as string);
 
-                               
+
                               return "[" + ["plugin" + index, ...arguments_.map((value) => JSON.stringify(value))].join(", ") + "]";
                           }
 
                           importedBabelPlugins.push(plugin as string);
 
-                           
+
                           return "plugin" + index;
                       })
                       .join(",") +
@@ -61,7 +61,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
         const output = resolve(context.options.rootDir, context.options.outDir, entry.name as string);
 
         const resolvedEntry = fileURLToPath(context.jiti.esmResolve(entry.input, { try: true }) ?? entry.input);
-        const resolvedEntryWithoutExtension = resolvedEntry.replace(ENDING_RE, "");
+        const resolvedEntryWithoutExtension = resolvedEntry.replace(ENDING_REGEX, "");
         const code = readFileSync(resolvedEntry) as unknown as string;
         const shebang = getShebang(code);
 
@@ -76,7 +76,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
             });
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-             
+
             warn(context, `Cannot analyze ${resolvedEntry} for exports: ${error.toString()}`);
 
             return;
@@ -101,7 +101,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
                 shebang +
                     [
                         'import { createJiti } from "' + jitiESMPath + '";',
-                         
+
                         ...importedBabelPlugins.map((plugin, index) => "import plugin" + index + ' from "' + plugin + '";'),
                         "",
                         "const jiti = createJiti(import.meta.url, " + serializedJitiOptions + ");",
@@ -141,7 +141,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
                 shebang +
                     [
                         'const { createJiti } = require("' + jitiCJSPath + '");',
-                         
+
                         ...importedBabelPlugins.map((plugin, index) => "const plugin" + index + " = require(" + JSON.stringify(plugin) + ")"),
                         "",
                         "const jiti = createJiti(__filename, " + serializedJitiOptions + ");",

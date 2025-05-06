@@ -1,6 +1,6 @@
 import type { OutputBundle, OutputOptions, Plugin } from "rollup";
 
-import { ENDING_RE } from "../../constants";
+import { ENDING_REGEX } from "../../constants";
 
 interface MetaInfo {
     source: string;
@@ -32,8 +32,8 @@ const metafilePlugin = (): Plugin =>
             const outputBundleKeys = Object.keys(outputBundle);
 
             this.emitFile({
-                 
-                fileName: `metafile-${(outputBundleKeys[0] as string).replace(ENDING_RE, "")}-${outputOptions.format}.json`,
+
+                fileName: `metafile-${(outputBundleKeys[0] as string).replace(ENDING_REGEX, "")}-${outputOptions.format}.json`,
                 source: JSON.stringify(deps, null, 2),
                 type: "asset",
             });

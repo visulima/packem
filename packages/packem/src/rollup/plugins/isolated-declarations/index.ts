@@ -15,7 +15,7 @@ import type { TsConfigResult } from "@visulima/tsconfig";
 import { parseAsync } from "oxc-parser";
 import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginContext, PreRenderedChunk } from "rollup";
 
-import { ENDING_RE } from "../../../constants";
+import { ENDING_REGEX } from "../../../constants";
 import type { IsolatedDeclarationsTransformer } from "../../../types";
 import patchCjsDefaultExport from "../typescript/utils/patch-cjs-default-export";
 import extendString from "./utils/extend-string";
@@ -60,7 +60,7 @@ export const isolatedDeclarationsPlugin = (
     let outputFiles: Record<string, { ext: string; map?: string; source: string }> = Object.create(null);
 
     const addOutput = (filename: string, output: { map?: string; source: string }) => {
-        outputFiles[filename.replace(ENDING_RE, "")] = { ...output, ext: extname(filename) };
+        outputFiles[filename.replace(ENDING_REGEX, "")] = { ...output, ext: extname(filename) };
     };
 
     let tsconfigPathPatterns: RegExp[] = [];
@@ -196,7 +196,7 @@ export const isolatedDeclarationsPlugin = (
 
             const resolvedId = resolved.id;
 
-            if (filter(resolvedId) && !outputFiles[resolvedId.replace(ENDING_RE, "")]) {
+            if (filter(resolvedId) && !outputFiles[resolvedId.replace(ENDING_REGEX, "")]) {
                 try {
                     const source = await readFile(resolvedId);
 
@@ -228,7 +228,7 @@ export const isolatedDeclarationsPlugin = (
                 outputOptions.entryFileNames = outputOptions.entryFileNames({ name: outputOptions.name } as unknown as PreRenderedChunk);
             }
 
-             
+
             const entryFileName = outputOptions.entryFileNames.replace(/\.(.)?[jt]sx?$/, (_, s) => `.d.${s || ""}ts`);
 
             // eslint-disable-next-line prefer-const
@@ -271,7 +271,7 @@ export const isolatedDeclarationsPlugin = (
                         source: compatibleSource.replaceAll(
                             // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
                             /(from\s)['|"]((.*)\..+|['|"].*)['|"];?/g,
-                             
+
                             (_, group1, group2, group3) => group1 + quote + (group3 || group2) + ".d.ts" + quote + ";",
                         ),
                         type: "asset",
@@ -303,7 +303,7 @@ export const isolatedDeclarationsPlugin = (
                         // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
                         /(from\s)['|"]((.*)\..+|['|"].*)['|"];?/g,
                         (_, group1, group2, group3) =>
-                             
+
                             group1 + quote + (group3 || group2) + (outputOptions.format === "cjs" ? ".d.cts" : ".d.mts") + quote + ";",
                     ),
                     type: "asset",
