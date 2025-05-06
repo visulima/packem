@@ -2,6 +2,7 @@ import type { InputOptions, NormalizedInputOptions, NullValue, Plugin, PluginCon
 
 class MockPluginContext {
     public readonly warnings: string[];
+
     public readonly meta: PluginContextMeta;
 
     private readonly oPlugin: Plugin;

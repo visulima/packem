@@ -43,13 +43,13 @@ const createStub = async (context: BuildContext): Promise<void> => {
 
                               importedBabelPlugins.push(name as string);
 
-                              // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                               
                               return "[" + ["plugin" + index, ...arguments_.map((value) => JSON.stringify(value))].join(", ") + "]";
                           }
 
                           importedBabelPlugins.push(plugin as string);
 
-                          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                           
                           return "plugin" + index;
                       })
                       .join(",") +
@@ -76,7 +76,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
             });
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+             
             warn(context, `Cannot analyze ${resolvedEntry} for exports: ${error.toString()}`);
 
             return;
@@ -101,7 +101,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
                 shebang +
                     [
                         'import { createJiti } from "' + jitiESMPath + '";',
-                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                         
                         ...importedBabelPlugins.map((plugin, index) => "import plugin" + index + ' from "' + plugin + '";'),
                         "",
                         "const jiti = createJiti(import.meta.url, " + serializedJitiOptions + ");",
@@ -141,7 +141,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
                 shebang +
                     [
                         'const { createJiti } = require("' + jitiCJSPath + '");',
-                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                         
                         ...importedBabelPlugins.map((plugin, index) => "const plugin" + index + " = require(" + JSON.stringify(plugin) + ")"),
                         "",
                         "const jiti = createJiti(__filename, " + serializedJitiOptions + ");",

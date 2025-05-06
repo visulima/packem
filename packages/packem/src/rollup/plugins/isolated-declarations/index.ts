@@ -67,7 +67,7 @@ export const isolatedDeclarationsPlugin = (
 
     if (tsconfig?.config.compilerOptions) {
         tsconfigPathPatterns = Object.entries(tsconfig.config.compilerOptions.paths ?? {}).map(([key]) =>
-            key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`),
+            (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
         );
     }
 
@@ -228,7 +228,7 @@ export const isolatedDeclarationsPlugin = (
                 outputOptions.entryFileNames = outputOptions.entryFileNames({ name: outputOptions.name } as unknown as PreRenderedChunk);
             }
 
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+             
             const entryFileName = outputOptions.entryFileNames.replace(/\.(.)?[jt]sx?$/, (_, s) => `.d.${s || ""}ts`);
 
             // eslint-disable-next-line prefer-const
@@ -271,7 +271,7 @@ export const isolatedDeclarationsPlugin = (
                         source: compatibleSource.replaceAll(
                             // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
                             /(from\s)['|"]((.*)\..+|['|"].*)['|"];?/g,
-                            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                             
                             (_, group1, group2, group3) => group1 + quote + (group3 || group2) + ".d.ts" + quote + ";",
                         ),
                         type: "asset",
@@ -303,7 +303,7 @@ export const isolatedDeclarationsPlugin = (
                         // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
                         /(from\s)['|"]((.*)\..+|['|"].*)['|"];?/g,
                         (_, group1, group2, group3) =>
-                            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                             
                             group1 + quote + (group3 || group2) + (outputOptions.format === "cjs" ? ".d.cts" : ".d.mts") + quote + ";",
                     ),
                     type: "asset",

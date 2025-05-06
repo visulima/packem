@@ -22,7 +22,12 @@ const autoPreset: BuildPreset = {
                 throw new Error("No 'src' directory found. Please provide entries manually.");
             }
 
-            const sourceFiles = collectSync(sourceDirectory, { extensions: [], includeDirs: false, includeSymlinks: false, skip: [/.*\/node_modules\/.*/, /.*\/dist\/.*/] });
+            const sourceFiles = collectSync(sourceDirectory, {
+                extensions: [],
+                includeDirs: false,
+                includeSymlinks: false,
+                skip: [/.*\/node_modules\/.*/, /.*\/dist\/.*/],
+            });
 
             if (sourceFiles.length === 0) {
                 throw new Error("No source files found in 'src' directory. Please provide entries manually.");

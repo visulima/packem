@@ -81,7 +81,7 @@ export default (
     }
 
     if (styleTag.styleSheet) {
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+         
         styleTag.styleSheet.cssText += css;
     } else {
         styleTag.append(document.createTextNode(css));

@@ -55,6 +55,7 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
             if (entry.isEntry) {
                 context.buildEntries.push({
                     chunks: entry.imports.filter((index) => outputChunks.find((c) => c.fileName === index)),
+                    dynamicImports: entry.dynamicImports,
                     exports: entry.exports,
                     modules: Object.entries(entry.modules).map(([id, module_]) => {
                         return {

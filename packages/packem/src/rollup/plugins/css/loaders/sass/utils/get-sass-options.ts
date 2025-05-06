@@ -36,7 +36,7 @@ const getSassOptions = async (
         const formatSpan = (span: SourceSpan) =>
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             `Warning on line ${span.start.line}, column ${span.start.column} of ${span.url ?? "-"}:${span.start.line}:${span.start.column}:\n`;
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+         
         const formatDebugSpan = (span: SourceSpan) => `[debug:${span.start.line}:${span.start.column}] `;
 
         (sassOptions as StringOptions<"async">).logger = {
@@ -66,7 +66,7 @@ const getSassOptions = async (
                 builtMessage += message;
 
                 if (loggerOptions.span?.context) {
-                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                     
                     builtMessage += `\n\n${loggerOptions.span.start.line} | ${loggerOptions.span.context}`;
                 }
 

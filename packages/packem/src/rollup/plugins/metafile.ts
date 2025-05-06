@@ -32,7 +32,7 @@ const metafilePlugin = (): Plugin =>
             const outputBundleKeys = Object.keys(outputBundle);
 
             this.emitFile({
-                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                 
                 fileName: `metafile-${(outputBundleKeys[0] as string).replace(ENDING_RE, "")}-${outputOptions.format}.json`,
                 source: JSON.stringify(deps, null, 2),
                 type: "asset",

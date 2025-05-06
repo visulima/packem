@@ -14,7 +14,7 @@ const brotliSize = async (path: string): Promise<number> =>
         );
         pipe.on("error", reject);
         pipe.on("data", (buf) => {
-            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+             
             size += buf.length;
         });
         pipe.on("end", () => {

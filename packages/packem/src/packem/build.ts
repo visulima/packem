@@ -9,8 +9,8 @@ import { join, relative, resolve } from "@visulima/path";
 import rollupBuild from "../rollup/build";
 import rollupBuildTypes from "../rollup/build-types";
 import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry, BuildEntry } from "../types";
-import brotliSize from "./utils/brotli-size";
 import type FileCache from "../utils/file-cache";
+import brotliSize from "./utils/brotli-size";
 import groupByKeys from "./utils/group-by-keys";
 import gzipSize from "./utils/gzip-size";
 
@@ -102,6 +102,11 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
                         );
                     })
                     .join("\n")}`;
+            }
+
+            if (entry.dynamicImports && entry.dynamicImports.length > 0) {
+                line += "\n  dynamic imports:";
+                line += `\n${entry.dynamicImports.map((p) => gray("  └─ " + rPath(p))).join("\n")}`;
             }
 
             if (entry.modules && entry.modules.length > 0) {

@@ -38,7 +38,7 @@ const enhanceRollupError = (error: RollupError): void => {
     let message = (error.plugin ? `[${error.plugin}] ` : "") + error.message;
 
     if (error.id) {
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+         
         message += `\nfile: ${cyan(error.id + (error.loc ? ":" + error.loc.line + ":" + error.loc.column : ""))}`;
     }
 

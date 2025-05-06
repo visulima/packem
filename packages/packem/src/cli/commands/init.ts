@@ -55,7 +55,7 @@ const createInitCommand = (cli: Cli): void => {
                 }
             } else {
                 log.message(
-                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands,no-unsafe-optional-chaining
+                    // eslint-disable-next-line no-unsafe-optional-chaining
                     "TypeScript version " + (packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript) + " is already installed",
                 );
             }
@@ -134,7 +134,7 @@ const createInitCommand = (cli: Cli): void => {
 
                 if (options.transformer && options.transformer !== "oxc" && !packages.includes(options.transformer as string)) {
                     const shouldInstall = await confirm({
-                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                         
                         message: "Do you want to install " + options.transformer + "?",
                     });
 
@@ -143,7 +143,7 @@ const createInitCommand = (cli: Cli): void => {
                     }
                 }
             } else {
-                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                 
                 log.message("Transformer " + options.transformer + " is already installed.");
             }
 

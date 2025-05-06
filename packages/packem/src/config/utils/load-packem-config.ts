@@ -1,8 +1,15 @@
-import findPackemFile from "./find-packem-file";
-import type { BuildConfigFunction, BuildConfig, Environment, Mode } from "../../types";
 import type { Jiti } from "jiti";
 
-const loadPackemConfig = async (jiti: Jiti, rootDirectory: string, environment: Environment, mode: Mode, configPath?: string): Promise<{
+import type { BuildConfig, BuildConfigFunction, Environment, Mode } from "../../types";
+import findPackemFile from "./find-packem-file";
+
+const loadPackemConfig = async (
+    jiti: Jiti,
+    rootDirectory: string,
+    environment: Environment,
+    mode: Mode,
+    configPath?: string,
+): Promise<{
     config: BuildConfig;
     path: string;
 }> => {

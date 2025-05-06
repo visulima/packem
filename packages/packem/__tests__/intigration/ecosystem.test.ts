@@ -15,7 +15,7 @@ const ecosystemSuites = readdirSync(ecosystemPath, { withFileTypes: true })
 
 describe("packem ecosystem", () => {
     afterEach(async () => {
-        // eslint-disable-next-line @typescript-eslint/await-thenable
+         
         for await (const suite of ecosystemSuites) {
             await rm(join(ecosystemPath, suite, "dist"), { force: true, recursive: true });
         }

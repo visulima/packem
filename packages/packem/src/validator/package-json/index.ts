@@ -1,5 +1,5 @@
-import type { BuildContext } from "../../types";
 import loadPackageJson from "../../config/utils/load-package-json";
+import type { BuildContext } from "../../types";
 import validateDependencies from "./validate-dependencies";
 import validatePackageEntries from "./validate-package-entries";
 import validatePackageFields from "./validate-package-fields";

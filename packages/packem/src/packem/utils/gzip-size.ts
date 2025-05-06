@@ -7,7 +7,7 @@ const gzipSize = async (path: string): Promise<number> =>
         const pipe = createReadStream(path).pipe(createGzip({ level: 9 }));
         pipe.on("error", reject);
         pipe.on("data", (buf) => {
-            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+             
             size += buf.length;
         });
         pipe.on("end", () => {

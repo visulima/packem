@@ -14,7 +14,7 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
         return;
     }
 
-    const { format, marker, output, plugin, readmePath, jsonFileName, ...typedocOptions } = options;
+    const { format, jsonFileName, marker, output, plugin, readmePath, ...typedocOptions } = options;
 
     if (format === "inline" && readmePath === undefined) {
         throw new Error("The `readmePath` option is required when using the `inline` format.");
@@ -30,7 +30,7 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
     if (format === "json") {
         if (jsonFileName === undefined) {
             throw new Error("The `jsonFileName` option is required when using the `json` format.");
-        } else if (jsonFileName.endsWith(".json") === false) {
+        } else if (!jsonFileName.endsWith(".json")) {
             throw new Error("The `jsonFileName` option must end with `.json`.");
         }
     }
@@ -72,8 +72,8 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
             },
             entryPoints,
             hideGenerator: true,
-            plugin: plugins,
             out: outputDirectory,
+            plugin: plugins,
             ...(format === "inline"
                 ? {
                       hideBreadcrumbs: true,

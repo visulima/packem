@@ -35,7 +35,7 @@ const browserslistToEsbuild = (browserList: string[]): string[] => {
     // only get the oldest version, assuming that the older version is the last one in the array:
     listOfBrowsers = Object.entries(Object.fromEntries(listOfBrowsers));
 
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+     
     return listOfBrowsers.map(([browserName, version]) => `${browserName}${version}`);
 };
 

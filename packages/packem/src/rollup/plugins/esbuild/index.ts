@@ -26,7 +26,7 @@ const esbuildTransformer = ({
     optimizeDeps,
     sourceMap,
     ...esbuildOptions
-// eslint-disable-next-line sonarjs/cognitive-complexity
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 }: EsbuildPluginConfig): RollupPlugin => {
     const loaders = DEFAULT_LOADERS;
 

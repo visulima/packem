@@ -184,10 +184,6 @@ const generateOptions = (
             dynamicVars: {
                 errorWhenNoFilesFound: true,
                 exclude: EXCLUDE_REGEXP,
-                // fast path to check if source contains a dynamic import. we check for a
-                // trailing slash too as a dynamic import statement can have comments between
-                // the `import` and the `(`.
-                include: /\bimport\s*[(/]/,
             },
             esbuild: {
                 charset: "utf8",
@@ -863,7 +859,7 @@ const packem = async (
                     await onSuccessCleanup();
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (error: any) {
-                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                     
                     throw new Error("onSuccess function cleanup failed: " + error.message, { cause: error });
                 }
             }
@@ -879,7 +875,7 @@ const packem = async (
                     onSuccessCleanup = await context.options.onSuccess();
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (error: any) {
-                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                     
                     throw new Error("onSuccess function failed: " + error.message, { cause: error });
                 }
             } else if (typeof context.options.onSuccess === "string") {
@@ -896,7 +892,7 @@ const packem = async (
                 await onSuccessProcess;
 
                 if (onSuccessProcess.exitCode && onSuccessProcess.exitCode !== 0) {
-                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                     
                     throw new Error("onSuccess script failed with exit code " + onSuccessProcess.exitCode + ". Check the output above for details.");
                 }
             }

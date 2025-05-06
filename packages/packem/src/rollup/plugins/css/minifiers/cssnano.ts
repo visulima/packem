@@ -29,7 +29,7 @@ const cssnanoMinifier: Minifier<Options> = {
             };
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+             
             throw new Error(`CSS minification failed for ${data.name}: ${error.message}`, {
                 cause: error,
             });

@@ -92,10 +92,10 @@ export type {
     BuildHooks,
     BuildOptions,
     Environment,
+    IsolatedDeclarationsTransformer,
     Mode,
     RollupBuildOptions,
     Runtime,
-    TransformerName,
     TransformerFn,
-    IsolatedDeclarationsTransformer,
+    TransformerName,
 } from "./types";

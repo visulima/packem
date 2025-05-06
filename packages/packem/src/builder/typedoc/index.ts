@@ -34,12 +34,10 @@ const builder = async (context: BuildContext, cachePath: string | undefined, _: 
 
         if (context.options.typedoc.output) {
             outputDirectory = context.options.typedoc.output;
-        } else {
-            if (context.options.typedoc.format === "inline" && cachePath) {
-                outputDirectory = join(cachePath, "typedoc");
-            } else if (context.options.typedoc.format !== "json") {
-                outputDirectory = join(outputDirectory, "api-docs");
-            }
+        } else if (context.options.typedoc.format === "inline" && cachePath) {
+            outputDirectory = join(cachePath, "typedoc");
+        } else if (context.options.typedoc.format !== "json") {
+            outputDirectory = join(outputDirectory, "api-docs");
         }
 
         await generateReferenceDocumentation(context.options.typedoc, context.options.entries, outputDirectory, context.logger);

@@ -156,7 +156,7 @@ function stripInternalTypes(this: PluginContext, code: string, chunk: RenderedCh
 
 export type PatchTypesOptions = {
     identifierReplacements?: Record<string, Record<string, string>>;
-}
+};
 
 /**
  * Patch the types files before passing to dts plugin

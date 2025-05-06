@@ -107,7 +107,7 @@ const createSplitChunks = (
             }
 
             const chunkName = basename(id, extname(id));
-            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+             
             const chunkGroup = chunkName + "-" + moduleLayer;
 
             splitChunksGroupMap.set(id, chunkGroup);

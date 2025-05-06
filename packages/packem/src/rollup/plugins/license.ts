@@ -62,7 +62,7 @@ export const license = ({
                 // eslint-disable-next-line etc/no-assign-mutated-array
                 .sort(({ name: nameA }, { name: nameB }) => ((nameA || 0) > (nameB || 0) ? 1 : (nameB || 0) > (nameA || 0) ? -1 : 0))
                 .map(({ author, contributors, license: dependencyLicense, licenseText, maintainers, name, repository }) => {
-                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                     
                     let text = "## " + name + "\n";
 
                     if (dependencyLicense) {

@@ -222,9 +222,9 @@ const parseStylesheet = (result: Result, styles: Root | Document, importingNode:
             if (stylesheet.charset && subStylesheet.charset && stylesheet.charset.params.toLowerCase() !== subStylesheet.charset.params.toLowerCase()) {
                 throw subStylesheet.charset.error(
                     "Incompatible @charset statements:\n" +
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                         
                         `  ${subStylesheet.charset.params} specified in ${subStylesheet.charset.source?.input.file}\n` +
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                         
                         `  ${stylesheet.charset.params} specified in ${stylesheet.charset.source?.input.file}`,
                 );
             } else if (!stylesheet.charset && !!subStylesheet.charset) {

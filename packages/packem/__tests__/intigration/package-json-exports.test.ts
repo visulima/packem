@@ -10,7 +10,7 @@ import { assertContainFiles, createPackageJson, createPackemConfig, createTsConf
 
 const splitedNodeJsVersion = process.versions.node.split(".");
 
-// eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+ 
 const NODE_JS_VERSION = splitedNodeJsVersion[0] + "." + splitedNodeJsVersion[1];
 
 describe("packem package.json exports", () => {
@@ -1317,7 +1317,7 @@ exports.Client = Client;
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
         Array.from({ length: 10 }).forEach((_, index) => {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+             
             writeFileSync(`${temporaryDirectoryPath}/src/deep/index-${index}.js`, `export default 'index-${index}'`);
         });
 

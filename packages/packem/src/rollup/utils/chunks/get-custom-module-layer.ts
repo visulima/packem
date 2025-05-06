@@ -20,7 +20,7 @@ const getCustomModuleLayer = (moduleId: string): string | undefined => {
         const layer = match?.[1];
 
         if (DEFAULT_EXTENSIONS.includes(extension as string) && layer && layer.length > 0) {
-            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+             
             return baseName + "-" + layer;
         }
     }

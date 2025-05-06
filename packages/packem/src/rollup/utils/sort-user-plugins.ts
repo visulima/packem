@@ -1,4 +1,5 @@
 import type { Plugin } from "rollup";
+
 import type { RollupPlugins } from "../../types";
 
 const sortUserPlugins = (plugins: RollupPlugins | undefined, type: "build" | "dts"): [Plugin[], Plugin[], Plugin[]] => {

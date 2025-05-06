@@ -844,7 +844,7 @@ export { getOne };
     });
 
     it("should automatically convert dynamic imports with .ts extension to cjs or mjs", async () => {
-        expect.assertions(6);
+        expect.assertions(9);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -889,13 +889,28 @@ export { getOne };
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
+        expect(binProcess.stdout).toContain("dynamic imports:");
+        expect(binProcess.stdout).toContain("└─ dist/packem_chunks/one.mjs");
+        expect(binProcess.stdout).toContain("└─ dist/packem_chunks/one.cjs");
+
         const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
+        expect(mjsContent).toBe(`function __variableDynamicImportRuntime0__(path) {
+  switch (path) {
+    case './utils/one.ts': return import('./packem_chunks/one.mjs');
+    default: return new Promise(function(resolve, reject) {
+      (typeof queueMicrotask === 'function' ? queueMicrotask : setTimeout)(
+        reject.bind(null, new Error("Unknown variable dynamic import: " + path))
+      );
+    })
+   }
+ }
+
+var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 async function getOne() {
   const path = "one";
-  return await import(\`./utils/\${path}.mjs\`).then((m) => m.one);
+  return await __variableDynamicImportRuntime0__(\`./utils/\${path}.ts\`).then((m) => m.one);
 }
 __name(getOne, "getOne");
 
@@ -915,11 +930,22 @@ export { getOne };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
+function __variableDynamicImportRuntime0__(path) {
+  switch (path) {
+    case './utils/one.ts': return import('./packem_chunks/one.cjs');
+    default: return new Promise(function(resolve, reject) {
+      (typeof queueMicrotask === 'function' ? queueMicrotask : setTimeout)(
+        reject.bind(null, new Error("Unknown variable dynamic import: " + path))
+      );
+    })
+   }
+ }
+
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 async function getOne() {
   const path = "one";
-  return await import(\`./utils/\${path}.cjs\`).then((m) => m.one);
+  return await __variableDynamicImportRuntime0__(\`./utils/\${path}.ts\`).then((m) => m.one);
 }
 __name(getOne, "getOne");
 
@@ -2920,13 +2946,16 @@ export type { DeeksOptions as DeepKeysOptions };
     it("should compile only a type file", async () => {
         expect.assertions(3);
 
-        await writeFile(`${temporaryDirectoryPath}/src/native-string-types.d.ts`, `
+        await writeFile(
+            `${temporaryDirectoryPath}/src/native-string-types.d.ts`,
+            `
 declare global {
     interface String {
 
     }
 }
-`);
+`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -2957,7 +2986,9 @@ declare global {
     it("should compile a .d.ts file into .d.cts and .d.mts", async () => {
         expect.assertions(5);
 
-        await writeFile(`${temporaryDirectoryPath}/src/native-string-types.d.ts`, `
+        await writeFile(
+            `${temporaryDirectoryPath}/src/native-string-types.d.ts`,
+            `
 declare global {
     interface String {
 
@@ -2965,7 +2996,8 @@ declare global {
 }
 
 export type NativeStringTypes = string;
-`);
+`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -3009,7 +3041,9 @@ export type NativeStringTypes = string;
     it("should compile a .d.ts file into .d.cts and .d.mts, with other exports", async () => {
         expect.assertions(10);
 
-        await writeFile(`${temporaryDirectoryPath}/src/native-string-types.d.ts`, `
+        await writeFile(
+            `${temporaryDirectoryPath}/src/native-string-types.d.ts`,
+            `
 declare global {
     interface String {
 
@@ -3017,8 +3051,11 @@ declare global {
 }
 
 export type NativeStringTypes = string;
-`);
-        await writeFile(`${temporaryDirectoryPath}/src/index.ts`, `// Fast lookup tables for performance optimization
+`,
+        );
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `// Fast lookup tables for performance optimization
 const isUpperCode = new Uint8Array(128);
 const isLowerCode = new Uint8Array(128);
 const isDigitCode = new Uint8Array(128);
@@ -3031,7 +3068,8 @@ for (let index = 0; index < 128; index++) {
 }
 
 export { isUpperCode, isLowerCode, isDigitCode };
-`);
+`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -3057,7 +3095,7 @@ export { isUpperCode, isLowerCode, isDigitCode };
                     require: {
                         types: "./native-string-types.d.cts",
                     },
-                }
+                },
             },
         });
         await createPackemConfig(temporaryDirectoryPath);

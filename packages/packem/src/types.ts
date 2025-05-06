@@ -199,7 +199,9 @@ export type ValidationOptions = {
     };
 };
 
-export type TransformerFn = ((config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig | InternalOXCTransformPluginConfig) => Plugin) & { NAME?: TransformerName };
+export type TransformerFn = ((config: SwcPluginConfig | SucrasePluginConfig | EsbuildPluginConfig | InternalOXCTransformPluginConfig) => Plugin) & {
+    NAME?: TransformerName;
+};
 
 export interface BuildOptions {
     alias: Record<string, string>;
@@ -292,6 +294,7 @@ export type BuildContextBuildEntry = {
     };
     chunk?: boolean;
     chunks?: string[];
+    dynamicImports?: string[];
     exports?: string[];
     modules?: { bytes: number; id: string }[];
     path: string;
@@ -306,6 +309,7 @@ export type BuildContextBuildAssetAndChunk = {
     };
     chunk?: boolean;
     chunks?: string[];
+    dynamicImports?: string[];
     exports?: string[];
     modules?: { bytes: number; id: string }[];
     path: string;

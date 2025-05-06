@@ -37,28 +37,28 @@ It uses the `exports` configuration in `package.json` and recognizes entry file 
 
 ## Features
 
--   ✅ package.json#exports, package.json#main, package.json#module to define entry-points
--   ✅ package.json#bin to define executables
--   ✅ package.json#types to define types
--   ✅ Generates package.json#typeVersions to support node 10
--   ✅ Dependency externalization
--   ✅ Minification
--   ✅ TypeScript support + .d.ts bundling
--   ✅ Watch mode
--   ✅ CLI outputs (auto hashbang insertion)
--   ✅ Validator
+- ✅ package.json#exports, package.json#main, package.json#module to define entry-points
+- ✅ package.json#bin to define executables
+- ✅ package.json#types to define types
+- ✅ Generates package.json#typeVersions to support node 10
+- ✅ Dependency externalization
+- ✅ Minification
+- ✅ TypeScript support + .d.ts bundling
+- ✅ Watch mode
+- ✅ CLI outputs (auto hashbang insertion)
+- ✅ Validator
     - Validates package.json and checks if all fields that are needed to publish your package are configured correctly
     - Bundle size validation
--   ✅ Supports multiple runtimes (default, react-server, edge-light, browser and node)
--   ✅ Supports react server and client components
--   ✅ Supports shared modules
--   ✅ Supports dynamic import
--   ✅ Supports `tsconfig.json` paths and `package.json` imports resolution
--   ✅ ESM ⇄ CJS interoperability
--   ✅ Supports isolated declaration types (experimental) (Typescript version 5.5 or higher)
--   ✅ Supports wasm [WebAssembly modules](http://webassembly.org)
--   ✅ Supports css, [sass](https://github.com/sass/sass), [less](https://github.com/less/less.js), [stylus](https://github.com/stylus/stylus) and Up-to-date [CSS Modules](https://github.com/css-modules/css-modules) (experimental)
--   ✅ [TypeDoc](https://github.com/TypeStrong/TypeDoc) documentation generation
+- ✅ Supports multiple runtimes (default, react-server, edge-light, browser and node)
+- ✅ Supports react server and client components
+- ✅ Supports shared modules
+- ✅ Supports dynamic import
+- ✅ Supports `tsconfig.json` paths and `package.json` imports resolution
+- ✅ ESM ⇄ CJS interoperability
+- ✅ Supports isolated declaration types (experimental) (Typescript version 5.5 or higher)
+- ✅ Supports wasm [WebAssembly modules](http://webassembly.org)
+- ✅ Supports css, [sass](https://github.com/sass/sass), [less](https://github.com/less/less.js), [stylus](https://github.com/stylus/stylus) and Up-to-date [CSS Modules](https://github.com/css-modules/css-modules) (experimental)
+- ✅ [TypeDoc](https://github.com/TypeStrong/TypeDoc) documentation generation
 
 And more...
 
@@ -181,7 +181,7 @@ You can validate your package.json exports configuration with [are the types wro
 
 Links:
 
--   https://github.com/frehner/modern-guide-to-packaging-js-library#set-the-main-field
+- https://github.com/frehner/modern-guide-to-packaging-js-library#set-the-main-field
 
 ## Usage
 
@@ -213,8 +213,8 @@ For example: `src/index.ts` will match the exports name `"."` or the only main e
 Now just run `npm run build` or `pnpm build` / `yarn build` if you're using these package managers, `packem` will find the entry files and build them.
 The output format will be based on the exports condition and also the file extension. Given an example:
 
--   It's CommonJS for `require` and ESM for `import` based on the exports condition.
--   It's CommonJS for `.cjs` and ESM for `.mjs` based on the extension regardless the exports condition. Then for export condition like "node" you could choose the format with your extension.
+- It's CommonJS for `require` and ESM for `import` based on the exports condition.
+- It's CommonJS for `.cjs` and ESM for `.mjs` based on the extension regardless the exports condition. Then for export condition like "node" you could choose the format with your extension.
 
 > [!NOTE]
 > All the `dependencies` and `peerDependencies` will be marked as external automatically and not included in the bundle. If you want to include them in the bundle, you can use the `--no-external` option.
@@ -248,8 +248,8 @@ For instance:
 
 If you need to separate the `production` and `development` exports condition, `packem` provides `process.env.NODE_ENV` injected by default if present that you don't need to manually inject yourself.
 
--   When the `production` exports condition is defined and the file ends with `*.production.*` in the package.json, the bundle will be minified.
--   When the `development` exports condition is defined and the file ends with `*.development.*` in the package.json, the bundle will not be minified.
+- When the `production` exports condition is defined and the file ends with `*.production.*` in the package.json, the bundle will be minified.
+- When the `development` exports condition is defined and the file ends with `*.development.*` in the package.json, the bundle will not be minified.
 
 ```json
 {
@@ -411,13 +411,13 @@ The value of `type` can be either `"build"` or `"dts"`, where `"build"` is the d
 
 The resolved plugins will be in the following order:
 
--   Alias
--   User plugins with enforce: 'pre'
--   Rollup core plugins
--   User plugins without enforce value
--   Rollup build plugins
--   User plugins with enforce: 'post'
--   Rollup post build plugins (minify, manifest, copy, reporting)
+- Alias
+- User plugins with enforce: 'pre'
+- Rollup core plugins
+- User plugins without enforce value
+- Rollup build plugins
+- User plugins with enforce: 'post'
+- Rollup post build plugins (minify, manifest, copy, reporting)
 
 ```typescript
 import { defineConfig } from "@visulima/packem/config";
@@ -500,43 +500,45 @@ packem build --env.NODE_ENV=production
 You can use Packem programmatically in your Node.js applications without the CLI:
 
 ```typescript
-import { packem } from '@visulima/packem';
+import { packem } from "@visulima/packem";
 
 // Basic usage
-await packem('./src', {
-    mode: 'build',
-    environment: 'production'
+await packem("./src", {
+    mode: "build",
+    environment: "production",
 });
 
 // With custom options
-await packem('./src', {
-    mode: 'build',
-    environment: 'development',
+await packem("./src", {
+    mode: "build",
+    environment: "development",
     declaration: true,
     minify: true,
     sourcemap: true,
     logger: {
         // Custom logger options
-        level: 'debug'
-    }
+        level: "debug",
+    },
 });
 ```
 
 The `packem` function accepts the following parameters:
+
 - `rootDirectory` (string): The root directory of your project to bundle
 - `options` (PackemOptions): Configuration options that extend the BuildConfig interface
-  - `mode`: The build mode ('build' | 'watch')
-  - `environment`: The target environment ('development' | 'production')
-  - `declaration`: Enable/disable TypeScript declaration file generation
-  - `minify`: Enable/disable code minification
-  - `sourcemap`: Enable/disable source map generation
-  - `logger`: Logger configuration options
+    - `mode`: The build mode ('build' | 'watch')
+    - `environment`: The target environment ('development' | 'production')
+    - `declaration`: Enable/disable TypeScript declaration file generation
+    - `minify`: Enable/disable code minification
+    - `sourcemap`: Enable/disable source map generation
+    - `logger`: Logger configuration options
 
 For more detailed configuration options, refer to the [Configuration](#configuration) section.
 
 ## Validators
 
 ### Package.json Validation
+
 `Packem` validates your `package.json` file and checks if all fields are configured correctly, that are needed to publish your package.
 
 > [!NOTE]
@@ -634,9 +636,9 @@ export default defineConfig({
 
 You need to choose of the supported transformer to use isolated declaration types.
 
--   [oxc](https://github.com/oxc-project/oxc)
--   [@swc/core](https://github.com/swc-project/swc)
--   [typescript](https://github.com/microsoft/TypeScript)
+- [oxc](https://github.com/oxc-project/oxc)
+- [@swc/core](https://github.com/swc-project/swc)
+- [typescript](https://github.com/microsoft/TypeScript)
 
 Default is `typescript`.
 
@@ -658,22 +660,22 @@ export default defineConfig({
 
 `packem` supports:
 
--   [PostCSS](https://github.com/postcss/postcss)
--   [Sass](https://github.com/sass/sass)
--   [Less](https://github.com/less/less.js)
--   [Stylus](https://github.com/stylus/stylus)
--   Up-to-date [CSS Modules](https://github.com/css-modules/css-modules) implementation
--   URL resolving/rewriting with asset handling
--   Ability to use `@import` statements inside regular CSS
--   Built-in assets handler
--   Ability to emit pure CSS for other plugins
--   Complete code splitting support, with respect for multiple entries, `preserveModules` and `manualChunks`
--   Multiple instances support, with check for already processed files
--   Proper sourcemaps, with included sources content by default
--   Respects `assetFileNames` for CSS file names
--   Respects sourcemaps from loaded files
--   Support for implementation forcing for Sass
--   Support for partials and `~` in Less import statements
+- [PostCSS](https://github.com/postcss/postcss)
+- [Sass](https://github.com/sass/sass)
+- [Less](https://github.com/less/less.js)
+- [Stylus](https://github.com/stylus/stylus)
+- Up-to-date [CSS Modules](https://github.com/css-modules/css-modules) implementation
+- URL resolving/rewriting with asset handling
+- Ability to use `@import` statements inside regular CSS
+- Built-in assets handler
+- Ability to emit pure CSS for other plugins
+- Complete code splitting support, with respect for multiple entries, `preserveModules` and `manualChunks`
+- Multiple instances support, with check for already processed files
+- Proper sourcemaps, with included sources content by default
+- Respects `assetFileNames` for CSS file names
+- Respects sourcemaps from loaded files
+- Support for implementation forcing for Sass
+- Support for partials and `~` in Less import statements
 
 ### PostCSS
 
@@ -964,10 +966,10 @@ The packem configuration file is a JavaScript file that exports an object with t
 
 You choose which one of the three supported transformer to use.
 
--   [esbuild](https://github.com/evanw/esbuild)
--   [@swc/core](https://github.com/swc-project/swc)
--   [sucrase](https://github.com/alangpierce/sucrase)
--   [OXC](https://www.npmjs.com/package/oxc-transform)
+- [esbuild](https://github.com/evanw/esbuild)
+- [@swc/core](https://github.com/swc-project/swc)
+- [sucrase](https://github.com/alangpierce/sucrase)
+- [OXC](https://www.npmjs.com/package/oxc-transform)
 
 ### File types
 
@@ -998,10 +1000,11 @@ This will provide the following type shims:
 > To override the default typing, add a type definition file that contains your typings. Then, add the type reference before `@visulima/packem/files`.
 >
 > packem-env-override.d.ts (the file that contains your typings):
+>
 > ```ts
-> declare module '*.svg' {
->  const content: React.FC<React.SVGProps<SVGElement>>
->  export default content
+> declare module "*.svg" {
+>     const content: React.FC<React.SVGProps<SVGElement>>;
+>     export default content;
 > }
 > ```
 >
@@ -1014,12 +1017,12 @@ This will provide the following type shims:
 
 ## Related
 
--   [bunchee](https://github.com/huozhi/bunchee) - Zero config bundler for ECMAScript and TypeScript packages
--   [unbuild](https://github.com/unjs/unbuild) - 📦 An unified javascript build system
--   [pkgroll](https://github.com/privatenumber/pkgroll) - 📦 Zero-config package bundler for Node.js + TypeScript
--   [siroc](https://github.com/danielroe/siroc) - Zero-config build tooling for Node
--   [tsup](https://github.com/egoist/tsup) - The simplest and fastest way to bundle your TypeScript libraries
--   [microbundle](https://github.com/developit/microbundle) - Zero-configuration bundler for tiny JS libs, powered by Rollup.
+- [bunchee](https://github.com/huozhi/bunchee) - Zero config bundler for ECMAScript and TypeScript packages
+- [unbuild](https://github.com/unjs/unbuild) - 📦 An unified javascript build system
+- [pkgroll](https://github.com/privatenumber/pkgroll) - 📦 Zero-config package bundler for Node.js + TypeScript
+- [siroc](https://github.com/danielroe/siroc) - Zero-config build tooling for Node
+- [tsup](https://github.com/egoist/tsup) - The simplest and fastest way to bundle your TypeScript libraries
+- [microbundle](https://github.com/developit/microbundle) - Zero-configuration bundler for tiny JS libs, powered by Rollup.
 
 ## Supported Node.js Versions
 
@@ -1034,8 +1037,8 @@ If you would like to help take a look at the [list of issues](https://github.com
 
 ## Credits
 
--   [Daniel Bannert](https://github.com/prisis)
--   [All Contributors](https://github.com/visulima/visulima/graphs/contributors)
+- [Daniel Bannert](https://github.com/prisis)
+- [All Contributors](https://github.com/visulima/visulima/graphs/contributors)
 
 ## License
 

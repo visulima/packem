@@ -34,25 +34,29 @@ export const resolve = (ids: string[], userOptions: ResolveOptions): string => {
                 if (error) {
                     // eslint-disable-next-line no-console
                     console.debug(error, {
-                        context: [{
-                            basedir,
-                            caller: userOptions.caller,
-                            extensions: userOptions.extensions,
-                            id,
-                        }],
+                        context: [
+                            {
+                                basedir,
+                                caller: userOptions.caller,
+                                extensions: userOptions.extensions,
+                                id,
+                            },
+                        ],
                     });
                 }
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
                 // eslint-disable-next-line no-console
                 console.debug(error.message, {
-                    context: [{
-                        basedir,
-                        caller: userOptions.caller,
-                        error,
-                        extensions: userOptions.extensions,
-                        id,
-                    }],
+                    context: [
+                        {
+                            basedir,
+                            caller: userOptions.caller,
+                            error,
+                            extensions: userOptions.extensions,
+                            id,
+                        },
+                    ],
                 });
             }
         }

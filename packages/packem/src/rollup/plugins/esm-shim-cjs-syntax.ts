@@ -9,8 +9,7 @@ import type { Plugin } from "rollup";
 import { minVersion } from "semver";
 
 // eslint-disable-next-line import/exports-last,@typescript-eslint/no-inferrable-types
-export const GLOBAL_REQUIRE_REGEX: RegExp =
-  /(?:^|[^.\w'"`])require(\.resolve)?\(\s*([\w'"`])/
+export const GLOBAL_REQUIRE_REGEX: RegExp = /(?:^|[^.\w'"`])require(\.resolve)?\(\s*([\w'"`])/;
 
 // Shim __dirname, __filename and require
 const CJSToESM = (code: string, shim: (hasFilename: boolean, hasDirname: boolean, hasGlobalRequire: boolean) => string) => {

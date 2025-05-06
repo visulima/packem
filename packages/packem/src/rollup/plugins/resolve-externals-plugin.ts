@@ -23,7 +23,7 @@ const getRegExps = (data: MaybeFalsy<string | RegExp>[], type: "include" | "excl
         } else if (typeof entry === "string" && entry.length > 0) {
             result.push(new RegExp("^" + entry.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$"));
         } else {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+             
             logger.warn(`Ignoring wrong entry type #${index} in '${type}' option: ${JSON.stringify(entry)}`);
         }
 
@@ -150,7 +150,7 @@ export const resolveExternalsPlugin = (
 
     if (tsconfig) {
         tsconfigPathPatterns = Object.entries(tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) =>
-            key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`),
+            (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
         );
     }
 
