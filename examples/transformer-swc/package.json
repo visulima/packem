@@ -37,11 +37,11 @@
         "react-dom": "^18.3.1"
     },
     "devDependencies": {
-        "@swc/core": "^1.11.6",
-        "@swc/helpers": "^0.5.15",
+        "@swc/core": "^1.11.24",
+        "@swc/helpers": "^0.5.17",
         "@types/react": "^18.3.12",
         "@types/react-dom": "^18.3.1",
         "@visulima/packem": "workspace:*",
-        "typescript": "^5.8.2"
+        "typescript": "^5.8.3"
     }
 }

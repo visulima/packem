@@ -9,7 +9,7 @@ describe("browserslist-to-esbuild", () => {
 
         const target = browserslistToEsbuild(browserslist([">0.2%", "not dead", "not op_mini all"]));
 
-        expect(target).toStrictEqual(["chrome109", "edge130", "firefox115", "ios11", "opera114", "safari16.6"]);
+        expect(target).toStrictEqual(["chrome109", "edge133", "firefox115", "ios15.6", "opera116", "safari17.6"]);
     });
 
     it("works by passing browsers as string", () => {
@@ -17,7 +17,7 @@ describe("browserslist-to-esbuild", () => {
 
         const target = browserslistToEsbuild(browserslist("last 2 versions"));
 
-        expect(target).toStrictEqual(["chrome130", "edge130", "firefox132", "ie10", "ios18.1", "opera113", "safari18.1"]);
+        expect(target).toStrictEqual(["chrome135", "edge134", "firefox137", "ie10", "ios18.3", "opera116", "safari18.3"]);
     });
 
     it("should work with ios", () => {
@@ -33,7 +33,7 @@ describe("browserslist-to-esbuild", () => {
 
         const target = browserslistToEsbuild(browserslist("ios >= 11, android >= 5"));
 
-        expect(target).toStrictEqual(["chrome131", "ios11"]);
+        expect(target).toStrictEqual(["chrome135", "ios11"]);
     });
 
     it("should no support android 4", () => {
@@ -41,6 +41,6 @@ describe("browserslist-to-esbuild", () => {
 
         const target = browserslistToEsbuild(browserslist("android >= 4"));
 
-        expect(target).toStrictEqual(["chrome131"]);
+        expect(target).toStrictEqual(["chrome135"]);
     });
 });

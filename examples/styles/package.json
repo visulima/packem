@@ -18,10 +18,10 @@
     },
     "devDependencies": {
         "@visulima/packem": "workspace:*",
-        "cssnano": "7.0.6",
-        "esbuild": "^0.25.0",
+        "cssnano": "7.0.7",
+        "esbuild": "^0.25.4",
         "icss-utils": "^5.1.0",
-        "less": "^4.2.2",
+        "less": "^4.3.0",
         "postcss": "^8.5.3",
         "postcss-load-config": "^6.0.1",
         "postcss-modules": "6.0.1",
@@ -31,8 +31,8 @@
         "postcss-modules-values": "^4.0.0",
         "postcss-value-parser": "^4.2.0",
         "rimraf": "^6.0.1",
-        "sass-embedded": "^1.85.1",
+        "sass-embedded": "^1.87.0",
         "stylus": "^0.64.0",
-        "typescript": "^5.8.2"
+        "typescript": "^5.8.3"
     }
 }

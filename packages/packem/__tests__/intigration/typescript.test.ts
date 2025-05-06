@@ -2868,7 +2868,8 @@ declare function deepKeys(object: object, options?: DeeksOptions): string[];
  */
 declare function deepKeysFromList(list: object[], options?: DeeksOptions): string[][];
 
-export { type DeeksOptions as DeepKeysOptions, deepKeys, deepKeysFromList };
+export { deepKeys, deepKeysFromList };
+export type { DeeksOptions as DeepKeysOptions };
 `);
 
         const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
@@ -2903,7 +2904,8 @@ declare function deepKeys(object: object, options?: DeeksOptions): string[];
  */
 declare function deepKeysFromList(list: object[], options?: DeeksOptions): string[][];
 
-export { type DeeksOptions as DeepKeysOptions, deepKeys, deepKeysFromList };
+export { deepKeys, deepKeysFromList };
+export type { DeeksOptions as DeepKeysOptions };
 `);
 
         const ctsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);

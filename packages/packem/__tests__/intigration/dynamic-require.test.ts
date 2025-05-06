@@ -78,7 +78,7 @@ export function foo() {
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`function getAugmentedNamespace(n) {
-  if (n.__esModule) return n;
+  if (Object.prototype.hasOwnProperty.call(n, '__esModule')) return n;
   var f = n.default;
 	if (typeof f == "function") {
 		var a = function a () {
@@ -133,7 +133,7 @@ export { index };
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 function getAugmentedNamespace(n) {
-  if (n.__esModule) return n;
+  if (Object.prototype.hasOwnProperty.call(n, '__esModule')) return n;
   var f = n.default;
 	if (typeof f == "function") {
 		var a = function a () {
