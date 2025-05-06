@@ -4,6 +4,7 @@ import { isAccessible, readJson } from "@visulima/fs";
 import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail, logged: boolean): Promise<void> => {
     if (!cachePath) {
         return;
