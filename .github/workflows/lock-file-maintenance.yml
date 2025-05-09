@@ -21,7 +21,7 @@ jobs:
 
         steps:
             - name: "Harden Runner"
-              uses: "step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f" # v2.10.2
+              uses: "step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0" # v2.12.0
               with:
                   egress-policy: "audit"
 
@@ -48,7 +48,7 @@ jobs:
 
             - name: "Commit lock file"
               if: "success()"
-              uses: "stefanzweifel/git-auto-commit-action@8621497c8c39c72f3e2a999a26b4ca1b5058a842" # v5.0.1
+              uses: "stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403" # v5.2.0
               with:
                   file_pattern: "pnpm-lock.yaml"
                   commit_message: "chore: updated lock file [ci skip]"
