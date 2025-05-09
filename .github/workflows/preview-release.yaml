@@ -26,7 +26,7 @@ jobs:
 
         steps:
             - name: "Harden Runner"
-              uses: "step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f" # v2.10.2
+              uses: "step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0" # v2.12.0
               with:
                   egress-policy: "audit"
 
@@ -43,7 +43,7 @@ jobs:
 
             - name: "Derive appropriate SHAs for base and head for `nx affected` commands"
               id: "setSHAs"
-              uses: "nrwl/nx-set-shas@e2e6dc8bce4b0387a05eb687735c39c41580b792" # v4
+              uses: "nrwl/nx-set-shas@dbe0650947e5f2c81f59190a38512cf49126fe6b" # v4
 
             - name: "Setup resources and environment"
               id: "setup"
@@ -55,7 +55,7 @@ jobs:
             # Temporary solution until Nx solve this https://github.com/nrwl/nx/issues/22259
             - name: "Get changed files"
               id: "files"
-              uses: "tj-actions/changed-files@bab30c2299617f6615ec02a68b9a40d10bd21366" # v45.0.5
+              uses: "tj-actions/changed-files@a284dc1814e3fd07f2e34267fc8f81227ed29fb8" # v45.0.9
               with:
                   files_ignore_from_source_file: ".github/ignore-files-for-nx-affected.yml"
                   base_sha: "${{ steps.setSHAs.outputs.base }}"
