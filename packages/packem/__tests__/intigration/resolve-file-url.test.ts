@@ -11,8 +11,6 @@ describe("packem resolve-file-url", () => {
 
     beforeEach(async () => {
         temporaryDirectoryPath = temporaryDirectory();
-
-        await createPackemConfig(temporaryDirectoryPath);
     });
 
     afterEach(async () => {
@@ -31,6 +29,8 @@ describe("packem resolve-file-url", () => {
 export default log`,
         );
         writeFileSync(`${temporaryDirectoryPath}/src/importer.mjs`, `export { default as effect } from "file://${temporaryDirectoryPath}/src/importee.mjs"`);
+
+        await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             main: "./dist/importer.cjs",
             module: "./dist/importer.mjs",
