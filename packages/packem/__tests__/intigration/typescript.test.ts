@@ -25,7 +25,7 @@ describe("packem typescript", () => {
         ["cts", "cjs"],
         ["mts", "mjs"],
         ["ts", "cjs"],
-    ])("should throw a error if export match a ts file and typescript is missing", async (tsExtension, jsExtension) => {
+    ])("should throw an error when .%s -> .%s file is used without typescript dependency", async (tsExtension, jsExtension) => {
         expect.assertions(2);
 
         await writeFile(`${temporaryDirectoryPath}/src/index.${tsExtension}`, `export default () => 'index';`);
