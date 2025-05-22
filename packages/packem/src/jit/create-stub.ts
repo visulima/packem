@@ -43,12 +43,10 @@ const createStub = async (context: BuildContext): Promise<void> => {
 
                               importedBabelPlugins.push(name as string);
 
-
                               return "[" + ["plugin" + index, ...arguments_.map((value) => JSON.stringify(value))].join(", ") + "]";
                           }
 
                           importedBabelPlugins.push(plugin as string);
-
 
                           return "plugin" + index;
                       })
@@ -76,7 +74,6 @@ const createStub = async (context: BuildContext): Promise<void> => {
             });
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-
             warn(context, `Cannot analyze ${resolvedEntry} for exports: ${error.toString()}`);
 
             return;

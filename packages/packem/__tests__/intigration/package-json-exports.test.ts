@@ -10,7 +10,6 @@ import { assertContainFiles, createPackageJson, createPackemConfig, createTsConf
 
 const splitedNodeJsVersion = process.versions.node.split(".");
 
- 
 const NODE_JS_VERSION = splitedNodeJsVersion[0] + "." + splitedNodeJsVersion[1];
 
 describe("packem package.json exports", () => {
@@ -1317,7 +1316,6 @@ exports.Client = Client;
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
         Array.from({ length: 10 }).forEach((_, index) => {
-             
             writeFileSync(`${temporaryDirectoryPath}/src/deep/index-${index}.js`, `export default 'index-${index}'`);
         });
 

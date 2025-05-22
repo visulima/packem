@@ -8,7 +8,7 @@ describe("splitTsconfigPathKey", () => {
 
         const result = splitTsconfigPathKey("src/utils/*");
 
-        expect(result).toEqual(["src", "utils", "*"]);
+        expect(result).toStrictEqual(["src", "utils", "*"]);
     });
 
     it("should split a namespaced path", () => {
@@ -16,7 +16,7 @@ describe("splitTsconfigPathKey", () => {
 
         const result = splitTsconfigPathKey("@namespace:module/utils/*");
 
-        expect(result).toEqual(["@namespace:module", "utils", "*"]);
+        expect(result).toStrictEqual(["@namespace:module", "utils", "*"]);
     });
 
     it("should handle a wildcard-only path", () => {
@@ -24,7 +24,7 @@ describe("splitTsconfigPathKey", () => {
 
         const result = splitTsconfigPathKey("*");
 
-        expect(result).toEqual(["*"]);
+        expect(result).toStrictEqual(["*"]);
     });
 
     it("should handle a namespaced path without wildcard", () => {
@@ -32,7 +32,7 @@ describe("splitTsconfigPathKey", () => {
 
         const result = splitTsconfigPathKey("@namespace:module/utils");
 
-        expect(result).toEqual(["@namespace:module", "utils"]);
+        expect(result).toStrictEqual(["@namespace:module", "utils"]);
     });
 
     it("should throw an error for invalid input", () => {

@@ -16,6 +16,7 @@ describe("esm-shim-cjs-syntax", () => {
         [`require.resolve(impl)`, true],
         [`\nrequire.resolve(impl)`, true],
     ])("should match require regex with %s", (code, expected) => {
+        expect.assertions(1);
         expect(match(code)).toBe(expected);
     });
 });

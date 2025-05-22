@@ -32,7 +32,6 @@ const metafilePlugin = (): Plugin =>
             const outputBundleKeys = Object.keys(outputBundle);
 
             this.emitFile({
-
                 fileName: `metafile-${(outputBundleKeys[0] as string).replace(ENDING_REGEX, "")}-${outputOptions.format}.json`,
                 source: JSON.stringify(deps, null, 2),
                 type: "asset",

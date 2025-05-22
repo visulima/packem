@@ -222,9 +222,7 @@ const parseStylesheet = (result: Result, styles: Root | Document, importingNode:
             if (stylesheet.charset && subStylesheet.charset && stylesheet.charset.params.toLowerCase() !== subStylesheet.charset.params.toLowerCase()) {
                 throw subStylesheet.charset.error(
                     "Incompatible @charset statements:\n" +
-                         
                         `  ${subStylesheet.charset.params} specified in ${subStylesheet.charset.source?.input.file}\n` +
-                         
                         `  ${stylesheet.charset.params} specified in ${stylesheet.charset.source?.input.file}`,
                 );
             } else if (!stylesheet.charset && !!subStylesheet.charset) {

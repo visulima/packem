@@ -16,7 +16,6 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
 
         if (!Number.isFinite(limit) || limit <= 0) {
             context.logger.debug({
-                 
                 message: `Invalid limit for ${path}: ${rawLimit}`,
                 prefix: "Validation: File Size",
             });
@@ -72,7 +71,6 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
 
         if (!Number.isFinite(maxLimit) || maxLimit <= 0) {
             context.logger.debug({
-                 
                 message: `Invalid total limit: ${totalLimit}`,
                 prefix: "Validation: File Size",
             });

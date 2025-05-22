@@ -228,7 +228,6 @@ export const isolatedDeclarationsPlugin = (
                 outputOptions.entryFileNames = outputOptions.entryFileNames({ name: outputOptions.name } as unknown as PreRenderedChunk);
             }
 
-
             const entryFileName = outputOptions.entryFileNames.replace(/\.(.)?[jt]sx?$/, (_, s) => `.d.${s || ""}ts`);
 
             // eslint-disable-next-line prefer-const
@@ -303,7 +302,6 @@ export const isolatedDeclarationsPlugin = (
                         // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
                         /(from\s)['|"]((.*)\..+|['|"].*)['|"];?/g,
                         (_, group1, group2, group3) =>
-
                             group1 + quote + (group3 || group2) + (outputOptions.format === "cjs" ? ".d.cts" : ".d.mts") + quote + ";",
                     ),
                     type: "asset",

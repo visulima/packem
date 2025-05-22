@@ -23,7 +23,6 @@ const getRegExps = (data: MaybeFalsy<string | RegExp>[], type: "include" | "excl
         } else if (typeof entry === "string" && entry.length > 0) {
             result.push(new RegExp("^" + entry.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$"));
         } else {
-
             logger.warn(`Ignoring wrong entry type #${index} in '${type}' option: ${JSON.stringify(entry)}`);
         }
 

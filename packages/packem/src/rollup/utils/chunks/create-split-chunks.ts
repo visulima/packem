@@ -107,7 +107,7 @@ const createSplitChunks = (
             }
 
             const chunkName = basename(id, extname(id));
-             
+
             const chunkGroup = chunkName + "-" + moduleLayer;
 
             splitChunksGroupMap.set(id, chunkGroup);

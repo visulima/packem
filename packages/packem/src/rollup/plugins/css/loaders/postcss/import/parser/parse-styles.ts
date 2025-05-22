@@ -232,9 +232,7 @@ const parseStyles = async (
             if (charset && stmt.stylesheet.charset && charset.params.toLowerCase() !== stmt.stylesheet.charset.params.toLowerCase()) {
                 throw stmt.stylesheet.charset.error(
                     "Incompatible @charset statements:\n" +
-                         
                         `  ${stmt.stylesheet.charset.params} specified in ${stmt.stylesheet.charset.source?.input.file}\n` +
-                         
                         `  ${charset.params} specified in ${charset.source?.input.file}`,
                 );
             } else if (!charset && !!stmt.stylesheet.charset) {

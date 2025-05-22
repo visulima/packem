@@ -75,7 +75,6 @@ const watchHandler = ({
                     fileCache.set(mode === "bundle" ? WATCH_CACHE_KEY : "dts-" + WATCH_CACHE_KEY, event.result.cache);
                 }
 
-                 
                 context.logger.raw("\n⚡️ Build run in " + event.duration + "ms\n\n");
 
                 await runBuilder?.(true);

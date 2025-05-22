@@ -134,7 +134,6 @@ const createInitCommand = (cli: Cli): void => {
 
                 if (options.transformer && options.transformer !== "oxc" && !packages.includes(options.transformer as string)) {
                     const shouldInstall = await confirm({
-                         
                         message: "Do you want to install " + options.transformer + "?",
                     });
 
@@ -143,7 +142,6 @@ const createInitCommand = (cli: Cli): void => {
                     }
                 }
             } else {
-                 
                 log.message("Transformer " + options.transformer + " is already installed.");
             }
 

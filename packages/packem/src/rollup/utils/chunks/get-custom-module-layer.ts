@@ -20,7 +20,6 @@ const getCustomModuleLayer = (moduleId: string): string | undefined => {
         const layer = match?.[1];
 
         if (DEFAULT_EXTENSIONS.includes(extension as string) && layer && layer.length > 0) {
-             
             return baseName + "-" + layer;
         }
     }

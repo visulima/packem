@@ -859,7 +859,6 @@ const packem = async (
                     await onSuccessCleanup();
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (error: any) {
-                     
                     throw new Error("onSuccess function cleanup failed: " + error.message, { cause: error });
                 }
             }
@@ -875,7 +874,6 @@ const packem = async (
                     onSuccessCleanup = await context.options.onSuccess();
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (error: any) {
-                     
                     throw new Error("onSuccess function failed: " + error.message, { cause: error });
                 }
             } else if (typeof context.options.onSuccess === "string") {
@@ -892,7 +890,6 @@ const packem = async (
                 await onSuccessProcess;
 
                 if (onSuccessProcess.exitCode && onSuccessProcess.exitCode !== 0) {
-                     
                     throw new Error("onSuccess script failed with exit code " + onSuccessProcess.exitCode + ". Check the output above for details.");
                 }
             }

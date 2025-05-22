@@ -54,7 +54,6 @@ const createBuildCommand = (cli: Cli): void => {
                     if (environment.key === "NODE_ENV") {
                         nodeEnvironment = environment.value;
                     } else {
-                         
                         environments["process.env." + environment.key] = JSON.stringify(environment.value);
                     }
                 }
@@ -305,4 +304,5 @@ const createBuildCommand = (cli: Cli): void => {
     });
 };
 
+// eslint-disable-next-line etc/no-internal
 export default createBuildCommand;

@@ -252,6 +252,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should always ignores absolute specifiers", async () => {
+            expect.assertions(2);
+
             const context = getMockPluginContext({});
 
             const rollupInputConfig: InputOptions = {};
@@ -271,6 +273,8 @@ describe("resolve-externals-plugin", () => {
         });
 
         it("should always ignores relative specifiers", async () => {
+            expect.assertions(4);
+
             const context = getMockPluginContext({ buildOptions: { externals: specifiers.relative } });
 
             const rollupInputConfig: InputOptions = {};

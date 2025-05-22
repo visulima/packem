@@ -7,6 +7,7 @@ import { execaNode } from "execa";
 
 const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../dist");
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const execPackemSync = async (command: "build" | "init", flags: string[] = [], options: Options = {}) => {
     let environmentFlag: string | undefined = "--development";
 

@@ -35,7 +35,6 @@ const browserslistToEsbuild = (browserList: string[]): string[] => {
     // only get the oldest version, assuming that the older version is the last one in the array:
     listOfBrowsers = Object.entries(Object.fromEntries(listOfBrowsers));
 
-     
     return listOfBrowsers.map(([browserName, version]) => `${browserName}${version}`);
 };
 

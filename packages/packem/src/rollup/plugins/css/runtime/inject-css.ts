@@ -81,7 +81,6 @@ export default (
     }
 
     if (styleTag.styleSheet) {
-         
         styleTag.styleSheet.cssText += css;
     } else {
         styleTag.append(document.createTextNode(css));
