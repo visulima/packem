@@ -16,6 +16,8 @@ import { basename, dirname, extname, join, relative } from "@visulima/path";
 import mime from "mime";
 import type { Plugin } from "rollup";
 
+import svgEncoder from "../utils/svg-encoder";
+
 export interface UrlOptions {
     /**
      * The destination dir to copy assets, usually used to rebase the assets according to HTML files.
@@ -108,22 +110,6 @@ const copy = async (source: string, destination: string): Promise<void> => {
     });
 };
 
-const encodeSVG = (buffer: Buffer): string => {
-    let svgString = buffer
-        .toString("utf8")
-        .replaceAll(/[\n\r]/g, "")
-        .replaceAll("\t", " ");
-    let previous;
-
-    do {
-        previous = svgString;
-        // eslint-disable-next-line regexp/no-unused-capturing-group
-        svgString = svgString.replaceAll(/<!--(.*(?=-->))-->/g, "");
-    } while (svgString !== previous);
-
-    return encodeURIComponent(svgString.replaceAll("'", "\\i")).replaceAll("(", "%28").replaceAll(")", "%29");
-};
-
 export const urlPlugin = ({
     destDir: destinationDirectory,
     emitFiles,
@@ -157,7 +143,7 @@ export const urlPlugin = ({
                 }),
             );
         },
-        // eslint-disable-next-line sonarjs/cognitive-complexity
+
         async load(id: string) {
             if (!filter(id)) {
                 return null;
@@ -193,11 +179,9 @@ export const urlPlugin = ({
 
                 const isSVG = mimetype === "image/svg+xml";
 
-                data = isSVG ? encodeSVG(buffer) : buffer.toString("base64");
+                data = isSVG ? svgEncoder(buffer) : buffer.toString("base64");
 
-                const encoding = isSVG ? "" : ";base64";
-
-                data = `data:${mimetype}${encoding},${data}`;
+                data = `data:${mimetype};base64,${data}`;
             }
 
             return `export default "${data}"`;

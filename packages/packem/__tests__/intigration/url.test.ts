@@ -77,7 +77,7 @@ describe("url", () => {
             // eslint-disable-next-line deprecation/deprecation
             .map((dirent) => join(dirent.path, dirent.name));
 
-        expect(files).toEqual(generatedFiles);
+        expect(files).toStrictEqual(generatedFiles);
     };
 
     it("should inline png files", async () => {
