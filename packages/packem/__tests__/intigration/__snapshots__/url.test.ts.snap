@@ -131,14 +131,14 @@ export { png as default };
 exports[`url > should import images from the node_modules > cjs 1`] = `
 "'use strict';
 
-const svg = "data:image/svg+xml,%3Csvg%3E%3Cpath%20d%3D%22%22%2F%3E%3C%2Fsvg%3E";
+const svg = "data:image/svg+xml;base64,PHN2Zz48cGF0aCBkPSIiLz48L3N2Zz4=";
 
 module.exports = svg;
 "
 `;
 
 exports[`url > should import images from the node_modules > mjs 1`] = `
-"const svg = "data:image/svg+xml,%3Csvg%3E%3Cpath%20d%3D%22%22%2F%3E%3C%2Fsvg%3E";
+"const svg = "data:image/svg+xml;base64,PHN2Zz48cGF0aCBkPSIiLz48L3N2Zz4=";
 
 export { svg as default };
 "
@@ -211,14 +211,14 @@ export { png as default };
 exports[`url > should inline text files > cjs 1`] = `
 "'use strict';
 
-const svg = "data:image/svg+xml,%3Csvg%3E%3Cpath%20d%3D%22%22%2F%3E%3C%2Fsvg%3E";
+const svg = "data:image/svg+xml;base64,PHN2Zz48cGF0aCBkPSIiLz48L3N2Zz4=";
 
 module.exports = svg;
 "
 `;
 
 exports[`url > should inline text files > mjs 1`] = `
-"const svg = "data:image/svg+xml,%3Csvg%3E%3Cpath%20d%3D%22%22%2F%3E%3C%2Fsvg%3E";
+"const svg = "data:image/svg+xml;base64,PHN2Zz48cGF0aCBkPSIiLz48L3N2Zz4=";
 
 export { svg as default };
 "
