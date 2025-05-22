@@ -35,8 +35,8 @@
         "postcss-modules-values": "^4.0.0",
         "postcss-value-parser": "^4.2.0",
         "rimraf": "^6.0.1",
-        "tailwindcss": "^4.1.5",
-        "@tailwindcss/postcss": "^4.1.5",
+        "tailwindcss": "^4.1.7",
+        "@tailwindcss/postcss": "^4.1.7",
         "typescript": "^5.8.3"
     }
 }
