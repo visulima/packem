@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 // eslint-disable-next-line vitest/no-disabled-tests
 describe.skip("packem typedoc", () => {
@@ -72,7 +72,7 @@ export const factorial = (n: number): number => {
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

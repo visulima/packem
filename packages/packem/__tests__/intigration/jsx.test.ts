@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem jsx", () => {
     let temporaryDirectoryPath: string;
@@ -55,7 +55,7 @@ export default Tr;`,
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -145,7 +145,7 @@ export default Tr;`,
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -241,7 +241,7 @@ export default Tr;`,
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -338,7 +338,7 @@ export default Tr;`,
         await installPackage(temporaryDirectoryPath, "react");
         await installPackage(temporaryDirectoryPath, "react-dom");
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

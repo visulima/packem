@@ -5,7 +5,7 @@ import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem cli", () => {
     let temporaryDirectoryPath: string;
@@ -40,7 +40,7 @@ describe("packem cli", () => {
         await createPackemConfig(temporaryDirectoryPath);
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        const binProcessEs2018 = await execPackemSync("build", ["--tsconfig=tsconfig.build.json"], {
+        const binProcessEs2018 = await execPackem("build", ["--tsconfig=tsconfig.build.json"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -94,7 +94,7 @@ export { A as default };
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", ["--development"], {
+        const binProcess = await execPackem("build", ["--development"], {
             cwd: temporaryDirectoryPath,
             env: {},
         });
@@ -134,7 +134,7 @@ export { a };
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", ["--no-environment"], {
+        const binProcess = await execPackem("build", ["--no-environment"], {
             cwd: temporaryDirectoryPath,
             env: {},
         });
@@ -173,7 +173,7 @@ export { a };
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", ["--production"], {
+        const binProcess = await execPackem("build", ["--production"], {
             cwd: temporaryDirectoryPath,
             env: {},
         });
@@ -211,7 +211,7 @@ export { a };
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", ["--no-clean"], {
+        const binProcess = await execPackem("build", ["--no-clean"], {
             cwd: temporaryDirectoryPath,
             env: {},
         });
@@ -250,7 +250,7 @@ export { a };
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             env: {},
         });
@@ -300,7 +300,7 @@ export { a };
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", ["--dts-only"], {
+        const binProcess = await execPackem("build", ["--dts-only"], {
             cwd: temporaryDirectoryPath,
             env: {},
         });
@@ -333,7 +333,7 @@ export { a };
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", ["--onSuccess=echo hello && echo world"], {
+        const binProcess = await execPackem("build", ["--onSuccess=echo hello && echo world"], {
             cwd: temporaryDirectoryPath,
             env: {},
         });
@@ -374,7 +374,7 @@ export { a };
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             env: {},
         });
@@ -422,7 +422,7 @@ export function barFunction() {
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", ["--external=@test/shouldbeexternal"], {
+        const binProcess = await execPackem("build", ["--external=@test/shouldbeexternal"], {
             cwd: temporaryDirectoryPath,
             env: {},
         });

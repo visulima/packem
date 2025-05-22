@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem-transformers", () => {
     let temporaryDirectoryPath: string;
@@ -103,7 +103,7 @@ export { index as default };
             transformer === "swc" ? "swc/swc-plugin" : transformer === "oxc" ? `${transformer}/oxc-transformer` : `${transformer}/index`,
         );
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

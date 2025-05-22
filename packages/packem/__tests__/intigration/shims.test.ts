@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, execPackemSync } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 
 describe("packem shims", () => {
     let temporaryDirectoryPath: string;
@@ -84,7 +84,7 @@ export const a = 1`,
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -263,7 +263,7 @@ export function esmImport() {
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -384,7 +384,7 @@ exports.getRequireModule = getRequireModule;
             type: "module",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -421,7 +421,7 @@ export { getFilename } from "./filename.js";`,
             type: "module",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -483,7 +483,7 @@ export { getFilename } from "./level2/filename.js";`,
             type: "module",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

@@ -6,7 +6,7 @@ import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { assertContainFiles, createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import { assertContainFiles, createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 const splitedNodeJsVersion = process.versions.node.split(".");
 
@@ -49,7 +49,7 @@ export function method() {
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -82,7 +82,7 @@ export function method() {
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -125,7 +125,7 @@ export function method() {
             },
         });
 
-        const binProcess = await execPackemSync("build", ["--no-environment"], {
+        const binProcess = await execPackem("build", ["--no-environment"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -193,7 +193,7 @@ export function method() {
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -267,7 +267,7 @@ export { IString };`,
             },
         });
 
-        const binProcess = await execPackemSync("build", ["--no-environment"], {
+        const binProcess = await execPackem("build", ["--no-environment"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -301,7 +301,7 @@ export { IString };`,
             type: "module",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -333,7 +333,7 @@ export { value };
             type: "module",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -377,7 +377,7 @@ export { value };
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -411,7 +411,7 @@ export { value };
             type: "module",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -479,7 +479,7 @@ export { index as default };
             type: "module",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -528,7 +528,7 @@ export { config as default };
             type: "commonjs",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -579,7 +579,7 @@ export { index as default };
             name: "@scope/output-app",
         });
 
-        const binProcess = await execPackemSync("build", ["--no-color"], {
+        const binProcess = await execPackem("build", ["--no-color"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -649,7 +649,7 @@ export { index as default };
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -735,7 +735,7 @@ export { render };
             exports: "./dist/index.mjs",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });
@@ -758,7 +758,7 @@ export { render };
             type: "module",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });
@@ -784,7 +784,7 @@ export { render };
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -888,7 +888,7 @@ export type Shared = string;
             version: "0.0.0",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -950,7 +950,7 @@ module.exports = client;
             types: "./dist/index.d.ts",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -999,7 +999,7 @@ exports.index = index;
             type: "module",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -1064,7 +1064,7 @@ export function Client() {
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -1217,7 +1217,7 @@ export const asset = "asset-module";
             type: "module",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -1351,7 +1351,7 @@ exports.Client = Client;
         });
         await createTsConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -1405,7 +1405,7 @@ exports.Client = Client;
 
         await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -1503,7 +1503,7 @@ export type { Colorize } from "./types";`,
 
         await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -1600,7 +1600,7 @@ module.exports = result;
             types: "dist/index.d.ts",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -1705,7 +1705,7 @@ console.log('require-module-import', require('require-module-import').resolved);
             });
         }
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             nodeOptions: ["--experimental-require-module"],
             reject: false,
@@ -1821,7 +1821,7 @@ console.log('require-module-import', require('require-module-import').resolved);
             });
         }
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             nodeOptions: ["--experimental-require-module"],
         });

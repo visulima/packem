@@ -6,7 +6,7 @@ import { resolvePath } from "mlly";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem build --jit", () => {
     let temporaryDirectoryPath: string;
@@ -47,7 +47,7 @@ describe("packem build --jit", () => {
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", ["--jit"], {
+        const binProcess = await execPackem("build", ["--jit"], {
             cwd: temporaryDirectoryPath,
         });
 

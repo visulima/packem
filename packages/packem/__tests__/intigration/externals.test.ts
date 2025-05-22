@@ -4,7 +4,7 @@ import { readFile, writeFile } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem externals", () => {
     let temporaryDirectoryPath: string;
@@ -53,7 +53,7 @@ export default a + b
         await createPackemConfig(temporaryDirectoryPath);
         await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -102,7 +102,7 @@ export const indent = dIndent;
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -170,7 +170,7 @@ export const indent = dIndent;
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -236,7 +236,7 @@ export const transform = svgrTransform;
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

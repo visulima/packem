@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem generate-license", () => {
     let temporaryDirectoryPath: string;
@@ -69,7 +69,7 @@ export const data = { dep, devDep };`,
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -147,7 +147,7 @@ export const data = { dep, devDep };`,
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -172,7 +172,7 @@ The published  artifact additionally contains code with the following licenses:
 <!-- TYPE_DEPENDENCIES -->
 <!-- /TYPE_DEPENDENCIES -->`);
 
-        const binProcess2 = await execPackemSync("build", [], {
+        const binProcess2 = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -267,7 +267,7 @@ export const data = { dep, devDep };`,
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -301,7 +301,7 @@ The published  artifact additionally contains code with the following licenses:
 <!-- TYPE_DEPENDENCIES -->
 <!-- /TYPE_DEPENDENCIES -->`);
 
-        const binProcess2 = await execPackemSync("build", [], {
+        const binProcess2 = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

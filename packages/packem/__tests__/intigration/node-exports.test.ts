@@ -4,7 +4,7 @@ import { readFileSync, writeFile } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem node exports", () => {
     let temporaryDirectoryPath: string;
@@ -36,7 +36,7 @@ describe("packem node exports", () => {
             await createPackemConfig(temporaryDirectoryPath);
             await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
+            const binProcess = await execPackem("build", ["--env NODE_ENV=development", "--cjsInterop"], {
                 cwd: temporaryDirectoryPath,
             });
 
@@ -110,7 +110,7 @@ export { test2, test as default };`,
             await createPackemConfig(temporaryDirectoryPath);
             await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
+            const binProcess = await execPackem("build", ["--env NODE_ENV=development", "--cjsInterop"], {
                 cwd: temporaryDirectoryPath,
             });
 
@@ -167,7 +167,7 @@ export { test2, test3, test4, test5, test as default };`,
             await createPackemConfig(temporaryDirectoryPath);
             await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-            const binProcess = await execPackemSync("build", ["--env NODE_ENV=development", "--cjsInterop"], {
+            const binProcess = await execPackem("build", ["--env NODE_ENV=development", "--cjsInterop"], {
                 cwd: temporaryDirectoryPath,
             });
 
@@ -214,7 +214,7 @@ export { test2, test3, test4, test5, test as default };`,
         await createPackemConfig(temporaryDirectoryPath);
         await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -276,7 +276,7 @@ export { test as default };
         await createPackemConfig(temporaryDirectoryPath);
         await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -339,7 +339,7 @@ export const value = dep
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -400,7 +400,7 @@ export class Child extends Parent {
         await createPackemConfig(temporaryDirectoryPath);
         await createTsConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -467,7 +467,7 @@ export class Child extends Parent {
         await createPackemConfig(temporaryDirectoryPath);
         await createTsConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", ["--env NODE_ENV=production", "--minify"], {
+        const binProcess = await execPackem("build", ["--env NODE_ENV=production", "--minify"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -527,7 +527,7 @@ export class Child extends Parent {
         await createPackemConfig(temporaryDirectoryPath);
         await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -609,7 +609,7 @@ export default test;`,
         });
         await createTsConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -675,7 +675,7 @@ export default test;`,
         });
         await createTsConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

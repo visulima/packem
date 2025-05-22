@@ -5,7 +5,7 @@ import { writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, execPackemSync } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 
 describe("packem error cases", () => {
     let temporaryDirectoryPath: string;
@@ -23,7 +23,7 @@ describe("packem error cases", () => {
     it("should throw a error if no package.json was found", async () => {
         expect.assertions(2);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });
@@ -37,7 +37,7 @@ describe("packem error cases", () => {
 
         writeFileSync(`${temporaryDirectoryPath}/package.json`, "{");
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });
@@ -56,7 +56,7 @@ describe("packem error cases", () => {
             name: "pkg",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });
@@ -75,7 +75,7 @@ describe("packem error cases", () => {
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         mkdirSync(`${temporaryDirectoryPath}/src`);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });
@@ -93,7 +93,7 @@ describe("packem error cases", () => {
         });
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "");
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });
@@ -114,7 +114,7 @@ describe("packem error cases", () => {
         });
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, "");
 
-        const binProcess = await execPackemSync("build", ["--validation"], {
+        const binProcess = await execPackem("build", ["--validation"], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });
@@ -144,7 +144,7 @@ describe("packem error cases", () => {
             module: "./dist/index.mjs",
         });
 
-        const binProcess = await execPackemSync("build", ["--validation"], {
+        const binProcess = await execPackem("build", ["--validation"], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });
@@ -174,7 +174,7 @@ describe("packem error cases", () => {
             module: "./dist/index.cjs",
         });
 
-        const binProcess = await execPackemSync("build", ["--validation"], {
+        const binProcess = await execPackem("build", ["--validation"], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });

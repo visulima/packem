@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, execPackemSync } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 
 describe("packem resolve-file-url", () => {
     let temporaryDirectoryPath: string;
@@ -37,7 +37,7 @@ export default log`,
             type: "commonjs",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

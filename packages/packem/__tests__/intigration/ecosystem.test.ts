@@ -5,7 +5,7 @@ import { readFileSync } from "@visulima/fs";
 import { join } from "@visulima/path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createPackemConfig, execPackemSync } from "../helpers";
+import { createPackemConfig, execPackem } from "../helpers";
 
 const ecosystemPath = join(__dirname, "../..", "__fixtures__", "ecosystem");
 
@@ -31,7 +31,7 @@ describe("packem ecosystem", () => {
             transformer: "esbuild",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: fullSuitePath,
         });
 
@@ -61,7 +61,7 @@ describe("packem ecosystem", () => {
             transformer: "esbuild",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: fullSuitePath,
         });
 

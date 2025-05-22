@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, execPackemSync } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 import getFileNamesFromDirectory from "../helpers/get-file-names-from-directory";
 
 describe("packem dynamic require", () => {
@@ -65,7 +65,7 @@ export function foo() {
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });

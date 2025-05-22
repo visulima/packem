@@ -5,7 +5,7 @@ import { writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, execPackemSync } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 
 describe("packem copy", () => {
     let temporaryDirectoryPath: string;
@@ -38,7 +38,7 @@ describe("packem copy", () => {
             },
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

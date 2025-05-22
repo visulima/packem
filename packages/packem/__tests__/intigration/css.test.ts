@@ -13,7 +13,7 @@ import type { LESSLoaderOptions } from "../../src/rollup/plugins/css/loaders/les
 import type { StyleOptions } from "../../src/rollup/plugins/css/types";
 import { inferModeOption, inferSourceMapOption } from "../../src/rollup/plugins/css/utils/options";
 import type { PackemConfigProperties } from "../helpers";
-import { createPackageJson, createPackemConfig, execPackemSync, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackem, installPackage } from "../helpers";
 
 const fixturePath = join(__dirname, "../..", "__fixtures__", "css");
 
@@ -107,7 +107,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             }),
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });

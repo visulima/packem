@@ -8,7 +8,7 @@ import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import type { UrlOptions } from "../../src/rollup/plugins/url";
-import { createPackageJson, createPackemConfig, execPackemSync } from "../helpers";
+import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 
 const fixturePath = join(__dirname, "../..", "__fixtures__", "url");
 
@@ -46,7 +46,7 @@ describe("url", () => {
             transformer: "esbuild",
         });
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });
@@ -352,7 +352,7 @@ export default svg;`,
 
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
             reject: false,
         });

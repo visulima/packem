@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackemSync, installPackage } from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("shebang", () => {
     let temporaryDirectoryPath: string;
@@ -41,7 +41,7 @@ console.log('Hello, world!');
         await createPackemConfig(temporaryDirectoryPath);
         await createTsConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -92,7 +92,7 @@ console.log('Hello, world!');
         });
         await createTsConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -139,7 +139,7 @@ export { getNodeSheBang };
         await createPackemConfig(temporaryDirectoryPath);
         await createTsConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -186,7 +186,7 @@ export { getNodeSheBang };
         await createPackemConfig(temporaryDirectoryPath);
         await createTsConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -224,7 +224,7 @@ for (let i = 0; i < 10; i++) { console.log('🦄');}`,
         await createPackemConfig(temporaryDirectoryPath);
         await createTsConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackemSync("build", [], {
+        const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
 

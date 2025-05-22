@@ -4,5 +4,5 @@ export type { PackemConfigProperties } from "./create-packem-config";
 export { createPackemConfig } from "./create-packem-config";
 export { default as MockPluginContext } from "./create-plugin-context";
 export { default as createTsConfig } from "./create-ts-config";
-export { default as execPackemSync } from "./exec-packem-sync";
+export { default as execPackem } from "./exec-packem-sync";
 export { default as installPackage } from "./install-package";
