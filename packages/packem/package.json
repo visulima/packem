@@ -491,7 +491,7 @@
     },
     "peerDependencies": {
         "@swc/core": ">=1.5.7",
-        "cssnano": ">=7.0.6",
+        "cssnano": ">=7.0.7",
         "esbuild": ">=0.20.2",
         "icss-utils": ">=5.1.0",
         "less": ">=4.2.0",
@@ -510,8 +510,8 @@
         "stylus": ">=0.63.0",
         "sucrase": ">=3.35.0",
         "typedoc": ">=0.26.0",
-        "typedoc-plugin-markdown": ">=4.2.0",
-        "typedoc-plugin-rename-defaults": ">=0.7.0",
+        "typedoc-plugin-markdown": ">=4.2.10",
+        "typedoc-plugin-rename-defaults": ">=0.7.3",
         "typescript": ">=4.5 || >=5.0"
     },
     "peerDependenciesMeta": {
