@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import findAlternatives from "../../../src/utils/levenstein";
+import findAlternatives from "../../../src/utils/find-alternatives";
 
 describe(findAlternatives, () => {
     it("should return an array of similar strings when input string has similar strings in the input array", () => {

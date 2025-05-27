@@ -25,7 +25,7 @@ const loadModule = async (moduleId: string, cwd: string): Promise<any> => {
     };
 
     try {
-        // eslint-disable-next-line import/no-dynamic-require,@typescript-eslint/no-require-imports,global-require,unicorn/prefer-module
+        // eslint-disable-next-line import/no-dynamic-require,@typescript-eslint/no-require-imports,global-require
         loaded[moduleId] = require(resolve([moduleId, `./${moduleId}`], options));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

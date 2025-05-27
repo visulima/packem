@@ -10,7 +10,6 @@ export const getDefaultSassImplementation = (): "node-sass" | "sass-embedded" | 
 
     for (const impl of implementations) {
         try {
-            // eslint-disable-next-line unicorn/prefer-module
             require.resolve(impl);
 
             return impl as "node-sass" | "sass-embedded" | "sass";
@@ -28,7 +27,7 @@ export const getSassImplementation = (
     let resolvedImplementation = implementation;
 
     if (typeof resolvedImplementation === "string") {
-        // eslint-disable-next-line import/no-dynamic-require,global-require,@typescript-eslint/no-require-imports,unicorn/prefer-module
+        // eslint-disable-next-line import/no-dynamic-require,global-require,@typescript-eslint/no-require-imports
         resolvedImplementation = require(resolvedImplementation);
     }
 

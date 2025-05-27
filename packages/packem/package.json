@@ -404,7 +404,7 @@
         "tinyglobby": "0.2.14"
     },
     "devDependencies": {
-        "@anolilab/eslint-config": "^16.2.1",
+        "@anolilab/eslint-config": "^16.2.2",
         "@anolilab/semantic-release-pnpm": "^1.1.11",
         "@anolilab/semantic-release-preset": "^10.0.5",
         "@arethetypeswrong/cli": "^0.18.1",
@@ -421,7 +421,7 @@
         "@types/icss-utils": "^5.1.2",
         "@types/is-glob": "^4.0.4",
         "@types/less": "3.0.8",
-        "@types/node": "22.15.21",
+        "@types/node": "22.15.23",
         "@types/node-sass": "^4.11.8",
         "@types/picomatch": "^4.0.0",
         "@types/postcss-modules-local-by-default": "^4.0.2",

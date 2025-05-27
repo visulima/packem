@@ -155,13 +155,15 @@ const watch = async (
 
     await context.hooks.callHook("rollup:watch", context, watcher);
 
-    const inputs: string[] = [
-        ...Array.isArray(rollupOptions.input)
-            ? rollupOptions.input
-            : (typeof rollupOptions.input === "string"
-              ? [rollupOptions.input]
-              : Object.keys(rollupOptions.input ?? {})),
-    ];
+    const inputs: string[] = [];
+
+    if (Array.isArray(rollupOptions.input)) {
+        inputs.push(...rollupOptions.input);
+    } else if (typeof rollupOptions.input === "string") {
+        inputs.push(rollupOptions.input);
+    } else {
+        inputs.push(...Object.keys(rollupOptions.input ?? {}));
+    }
 
     let infoMessage = `Starting watcher for entries:`;
 

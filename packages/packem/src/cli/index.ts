@@ -15,9 +15,9 @@ import createInitCommand from "./commands/init";
  */
 try {
     // Use node.js 22 new API for better performance.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require,unicorn/prefer-module
+    // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require
     if (!require("node:module")?.enableCompileCache?.()) {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require,unicorn/prefer-module
+        // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require
         require("v8-compile-cache");
     }
 } catch {

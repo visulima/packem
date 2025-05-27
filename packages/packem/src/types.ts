@@ -38,6 +38,39 @@ import type { TsconfigPathsPluginOptions } from "./rollup/plugins/typescript/res
 import type { UrlOptions } from "./rollup/plugins/url";
 import type FileCache from "./utils/file-cache";
 
+type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
+
+interface RollupDynamicImportVariablesOptions {
+    /**
+     * By default, the plugin will not throw errors when target files are not found.
+     * Setting this option to true will result in errors thrown when encountering files which don't exist.
+     * @default false
+     */
+    errorWhenNoFilesFound?: boolean;
+
+    /**
+     * A picomatch pattern, or array of patterns, which specifies the files in the build the plugin
+     * should _ignore_.
+     *
+     * By default, no files are ignored.
+     */
+    exclude?: FilterPattern;
+
+    /**
+     * A picomatch pattern, or array of patterns, which specifies the files in the build the plugin
+     * should operate on.
+     * By default, all files are targeted.
+     */
+    include?: FilterPattern;
+
+    /**
+     * By default, the plugin quits the build process when it encounters an error.
+     * If you set this option to true, it will throw a warning instead and leave the code untouched.
+     * @default false
+     */
+    warnOnError?: boolean;
+}
+
 /**
  * In addition to basic `entries`, `presets`, and `hooks`,
  * there are also all the properties of `BuildOptions` except for BuildOption's `entries`.
@@ -349,39 +382,6 @@ export type ValidationOptions = {
         typesVersions?: boolean;
     };
 };
-
-type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
-
-interface RollupDynamicImportVariablesOptions {
-    /**
-     * By default, the plugin will not throw errors when target files are not found.
-     * Setting this option to true will result in errors thrown when encountering files which don't exist.
-     * @default false
-     */
-    errorWhenNoFilesFound?: boolean;
-
-    /**
-     * A picomatch pattern, or array of patterns, which specifies the files in the build the plugin
-     * should _ignore_.
-     *
-     * By default, no files are ignored.
-     */
-    exclude?: FilterPattern;
-
-    /**
-     * A picomatch pattern, or array of patterns, which specifies the files in the build the plugin
-     * should operate on.
-     * By default, all files are targeted.
-     */
-    include?: FilterPattern;
-
-    /**
-     * By default, the plugin quits the build process when it encounters an error.
-     * If you set this option to true, it will throw a warning instead and leave the code untouched.
-     * @default false
-     */
-    warnOnError?: boolean;
-}
 
 export type { PostCSSMeta } from "./rollup/plugins/css/loaders/types";
 export type { InjectOptions, StyleOptions } from "./rollup/plugins/css/types";

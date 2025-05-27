@@ -18,7 +18,7 @@ import { minVersion } from "semver";
 import type { BuildContext, InternalBuildOptions } from "../types";
 import arrayify from "../utils/arrayify";
 import type FileCache from "../utils/file-cache";
-import memoizeByKey from "../utils/memoize";
+import memoizeByKey from "../utils/memoize-by-key";
 import chunkSplitter from "./plugins/chunk-splitter";
 import { cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
@@ -586,7 +586,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 };
 
 const createDtsPlugin = async (context: BuildContext): Promise<Plugin> => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require,unicorn/prefer-module
+    // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require
     const { dts } = require("rollup-plugin-dts") as typeof import("rollup-plugin-dts");
 
     return dts({

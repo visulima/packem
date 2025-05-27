@@ -5,7 +5,7 @@ import { relative, resolve } from "@visulima/path";
 
 import type { BuildContext, ValidationOptions } from "../../types";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
-import levenstein from "../../utils/levenstein";
+import levenstein from "../../utils/find-alternatives";
 import warn from "../../utils/warn";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -17,19 +17,27 @@ const validatePackageEntries = (context: BuildContext): void => {
         return;
     }
 
+    let bin: string[] = [];
+
+    if (options.dtsOnly || validation.packageJson?.bin === false) {
+        bin = [""];
+    } else if (typeof context.pkg.bin === "string") {
+        bin = [context.pkg.bin];
+    } else if (typeof context.pkg.bin === "object") {
+        bin = Object.values(context.pkg.bin as object);
+    }
+
+    const packageType = context.pkg.type === "module" ? "esm" : "cjs";
+
     const filenames = new Set(
         [
             options.declaration && validation.packageJson?.types ? context.pkg.types : "",
             options.declaration && validation.packageJson?.types ? context.pkg.typings : "",
-            ...options.dtsOnly || validation.packageJson?.bin === false
-                ? [""]
-                : typeof context.pkg.bin === "string"
-                  ? [context.pkg.bin]
-                  : Object.values(context.pkg.bin ?? {}),
+            ...bin,
             options.dtsOnly && validation.packageJson?.main === false ? "" : context.pkg.main,
             options.dtsOnly && validation.packageJson?.module === false ? "" : context.pkg.module,
             ...validation.packageJson?.exports
-                ? extractExportFilenames(context.pkg.exports, context.pkg.type === "module" ? "esm" : "cjs", options.declaration).map((outputDescriptor) => {
+                ? extractExportFilenames(context.pkg.exports, packageType, options.declaration).map((outputDescriptor) => {
                     if (options.dtsOnly) {
                         if (outputDescriptor.subKey === "types") {
                             return outputDescriptor.file;

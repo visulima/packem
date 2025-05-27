@@ -8,6 +8,7 @@ const getEntryFileNames = (chunkInfo: PreRenderedAsset, extension: "cjs" | "mjs"
     // @see https://github.com/rollup/rollup/pull/5686#issuecomment-2418464909 -> should be most of the time only one entry
     for (let name of Array.isArray(chunkInfo.names) ? chunkInfo.names : []) {
         if (name.includes(`node_modules${pathSeparator}.pnpm`)) {
+            // eslint-disable-next-line sonarjs/updated-loop-counter
             name = `${name.replace(`node_modules${pathSeparator}.pnpm`, "external")}.${extension}`;
 
             return name.replace(`node_modules${pathSeparator}`, "");
