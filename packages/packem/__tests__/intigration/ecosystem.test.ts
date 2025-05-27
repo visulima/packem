@@ -49,6 +49,8 @@ describe("packem ecosystem", () => {
     });
 
     it.todo.each(ecosystemSuites)("should work with provided '%s' ecosystem suite and oxc resolver", async (suite) => {
+        expect.assertions(3);
+
         const fullSuitePath = join(ecosystemPath, suite);
 
         await createPackemConfig(fullSuitePath, {

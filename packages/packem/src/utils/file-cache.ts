@@ -47,6 +47,10 @@ class FileCache {
         this.#isEnabled = value;
     }
 
+    public get isEnabled(): boolean {
+        return this.#isEnabled;
+    }
+
     public has(name: string, subDirectory?: string): boolean {
         if (!this.#isEnabled) {
             return false;

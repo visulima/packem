@@ -50,6 +50,7 @@ describe("fileCache", () => {
         const fileCache = new FileCache(temporaryDirectoryPath, cacheDirectoryPath, "hash123", hoisted.logger);
 
         fileCache.isEnabled = false;
+        console.log(fileCache);
 
         expect(fileCache.isEnabled).toBe(false);
     });
@@ -94,7 +95,7 @@ describe("fileCache", () => {
     it("should handle undefined cache path gracefully in constructor", () => {
         expect.assertions(1);
 
-        // eslint-disable-next-line no-new
+        // eslint-disable-next-line no-new, sonarjs/constructor-for-side-effects
         new FileCache(temporaryDirectoryPath, undefined, "hash123", hoisted.logger);
 
         expect(hoisted.logger.debug).toHaveBeenCalledWith({
