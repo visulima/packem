@@ -77,6 +77,7 @@ export function foo() {
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
+        // eslint-disable-next-line no-secrets/no-secrets
         expect(mjsContent).toBe(`function getAugmentedNamespace(n) {
   if (Object.prototype.hasOwnProperty.call(n, '__esModule')) return n;
   var f = n.default;
@@ -128,6 +129,7 @@ export { index };
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
+        // eslint-disable-next-line no-secrets/no-secrets
         expect(cjsContent).toBe(`'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });

@@ -39,7 +39,7 @@ const getClassNameDefault = (name: string): string => {
 
 type PostCSSOptions = InternalStyleOptions["postcss"] & Pick<Required<ProcessOptions>, "from" | "map" | "to">;
 
-const loader: Loader<Nonundefinedable<InternalStyleOptions["postcss"]>> = {
+const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
     alwaysProcess: true,
     name: "postcss",
     // eslint-disable-next-line sonarjs/cognitive-complexity

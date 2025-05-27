@@ -31,7 +31,7 @@ export type OutputDescriptor = {
     file: string;
     isExecutable?: true;
     key: "bin" | "exports" | "main" | "module" | "types";
-    subKey?: typeof runtimeExportConventions | (Nonundefinedable<unknown> & string);
+    subKey?: typeof runtimeExportConventions | (NonNullable<unknown> & string);
     type?: "cjs" | "esm";
 };
 
@@ -84,7 +84,7 @@ export const extractExportFilenames = (
                     type: inferExportType(exportKey, conditions, packageType, packageExport),
                 } as OutputDescriptor);
             } else if (typeof packageExport === "object" && packageExport !== undefined) {
-                for (const [condition, entryExport] of Object.entries(packageExport)) {
+                for (const [condition, entryExport] of Object.entries(packageExport as Record<string, string[] | string | null>)) {
                     if (declaration === false && condition === "types") {
                         continue;
                     }

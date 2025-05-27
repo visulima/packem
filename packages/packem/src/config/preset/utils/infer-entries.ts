@@ -10,11 +10,11 @@ import { inferExportTypeFromFileName } from "../../../utils/infer-export-type";
 
 const getEnvironment = (output: OutputDescriptor, environment: Environment): Environment => {
     if (output.key === "exports" && output.subKey === PRODUCTION_ENV) {
-        return PRODUCTION_ENV;
+        return PRODUCTION_ENV as Environment;
     }
 
     if (output.key === "exports" && output.subKey === DEVELOPMENT_ENV) {
-        return DEVELOPMENT_ENV;
+        return DEVELOPMENT_ENV as Environment;
     }
 
     return environment;

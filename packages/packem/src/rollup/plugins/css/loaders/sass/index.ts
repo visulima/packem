@@ -77,9 +77,7 @@ const loader: Loader<SassLoaderOptions> = {
             // Modern API
             if (error.span && error.span.url !== undefined) {
                 this.deps.add(fileURLToPath(error.span.url));
-            }
-            // Legacy API
-            else if (error.file !== undefined) {
+            } else if (error.file) { // Legacy API
                 // `node-sass` returns POSIX paths
                 this.deps.add(normalize(error.file));
             }
@@ -100,7 +98,7 @@ const loader: Loader<SassLoaderOptions> = {
 
         // Modern API
 
-        if ((result as CompileResult).loadedUrls !== undefined) {
+        if ((result as CompileResult).loadedUrls) {
             (result as CompileResult).loadedUrls.filter((loadedUrl) => loadedUrl.protocol === "file:").forEach((includedFile) => {
                 const normalizedIncludedFile = fileURLToPath(includedFile);
 
@@ -109,10 +107,7 @@ const loader: Loader<SassLoaderOptions> = {
                     this.deps.add(normalizedIncludedFile);
                 }
             });
-        }
-        // Legacy API
-
-        else if ((result as NodeSassResult).stats.includedFiles !== undefined) {
+        } else if ((result as NodeSassResult).stats.includedFiles) { // Legacy API
             (result as NodeSassResult).stats.includedFiles.forEach((includedFile: string) => {
                 const normalizedIncludedFile = normalize(includedFile);
 

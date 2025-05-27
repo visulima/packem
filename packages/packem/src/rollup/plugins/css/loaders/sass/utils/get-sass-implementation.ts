@@ -28,7 +28,7 @@ export const getSassImplementation = (
     let resolvedImplementation = implementation;
 
     if (typeof resolvedImplementation === "string") {
-        // eslint-disable-next-line import/no-dynamic-require,global-require,@typescript-eslint/no-require-imports,unicorn/prefer-module,security/detect-non-literal-require
+        // eslint-disable-next-line import/no-dynamic-require,global-require,@typescript-eslint/no-require-imports,unicorn/prefer-module
         resolvedImplementation = require(resolvedImplementation);
     }
 

@@ -1,7 +1,7 @@
 import type { PackageJson } from "@visulima/package";
 import type { Pail } from "@visulima/pail";
 import type { TsConfigResult } from "@visulima/tsconfig";
-import type { InputOptions, undefinedValue } from "rollup";
+import type { InputOptions, NullValue } from "rollup";
 import { describe, expect, it, vi } from "vitest";
 
 import type { ResolveExternalsPluginOptions } from "../../../../src/rollup/plugins/resolve-externals-plugin";
@@ -26,7 +26,7 @@ const defaultPluginConfig: ResolveExternalsPluginOptions = {
     peerDeps: true,
 };
 
-type ExternalRollupInputOptions = InputOptions & { external: (source: string, importer: string | undefined, isResolved: boolean) => undefinedValue | boolean };
+type ExternalRollupInputOptions = InputOptions & { external: (source: string, importer: string | undefined, isResolved: boolean) => NullValue | boolean };
 
 describe("resolve-externals-plugin", () => {
     const getMockPluginContext = ({
@@ -197,7 +197,7 @@ describe("resolve-externals-plugin", () => {
 
             context.options(rollupInputConfig);
 
-            await expect(context.resolveId("node", "index.js")).resolves.toBeundefined();
+            await expect(context.resolveId("node", "index.js")).resolves.toBeUndefined();
             expect((rollupInputConfig as ExternalRollupInputOptions).external("node", "index.js", false)).toBe(false);
         });
 
@@ -234,7 +234,7 @@ describe("resolve-externals-plugin", () => {
 
             context.options(rollupInputConfig);
 
-            await expect(context.resolveId("./path/to/entry.js", undefined)).resolves.toBeundefined();
+            await expect(context.resolveId("./path/to/entry.js", undefined)).resolves.toBeUndefined();
         });
 
         it("should always ignores virtual modules from other plugins", async () => {

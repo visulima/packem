@@ -898,12 +898,13 @@ export { getOne };
 
         const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
+        // eslint-disable-next-line no-secrets/no-secrets
         expect(mjsContent).toBe(`function __variableDynamicImportRuntime0__(path) {
   switch (path) {
     case './utils/one.ts': return import('./packem_chunks/one.mjs');
     default: return new Promise(function(resolve, reject) {
       (typeof queueMicrotask === 'function' ? queueMicrotask : setTimeout)(
-        reject.bind(undefined, new Error("Unknown variable dynamic import: " + path))
+        reject.bind(null, new Error("Unknown variable dynamic import: " + path))
       );
     })
    }
@@ -929,6 +930,7 @@ export { getOne };
 
         const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
 
+        // eslint-disable-next-line no-secrets/no-secrets
         expect(cjsContent).toBe(`'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
@@ -938,7 +940,7 @@ function __variableDynamicImportRuntime0__(path) {
     case './utils/one.ts': return import('./packem_chunks/one.cjs');
     default: return new Promise(function(resolve, reject) {
       (typeof queueMicrotask === 'function' ? queueMicrotask : setTimeout)(
-        reject.bind(undefined, new Error("Unknown variable dynamic import: " + path))
+        reject.bind(null, new Error("Unknown variable dynamic import: " + path))
       );
     })
    }
@@ -1077,7 +1079,7 @@ export { AppContext } from './lib/app-context.shared-runtime'
 
 import React from 'react'
 
-export const AppContext = React.createContext(undefined)`,
+export const AppContext = React.createContext(void 0)`,
         );
         await writeFile(
             `${temporaryDirectoryPath}/src/lib/util.shared-runtime.ts`,
@@ -1154,7 +1156,7 @@ export { sharedApi };
         expect(mjsChunk2Content).toBe(`'use client';
 import React from 'react';
 
-const AppContext = React.createContext(undefined);
+const AppContext = React.createContext(void 0);
 
 export { AppContext };
 `);
@@ -1208,7 +1210,7 @@ const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e 
 
 const React__default = /*#__PURE__*/_interopDefaultCompat(React);
 
-const AppContext = React__default.createContext(undefined);
+const AppContext = React__default.createContext(void 0);
 
 exports.AppContext = AppContext;
 `);

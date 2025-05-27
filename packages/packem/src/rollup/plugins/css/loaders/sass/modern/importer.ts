@@ -14,7 +14,7 @@ const mainFields = ["sass", "style"];
 
 const importer = (resourcePath: string, debug: boolean): Importer<"sync"> => {
     return {
-        canonicalize(originalUrl: string, context: CanonicalizeContext): URL | undefined {
+        canonicalize(originalUrl: string, context: CanonicalizeContext): URL | null {
             const previous = context.containingUrl ? fileURLToPath(context.containingUrl.toString()) : resourcePath;
 
             let result;
@@ -30,13 +30,14 @@ const importer = (resourcePath: string, debug: boolean): Importer<"sync"> => {
                     mainFields,
                 });
             } catch {
-                // If no stylesheets are found, the importer should return undefined.
-                return undefined;
+                // If no stylesheets are found, the importer should return null.
+                // eslint-disable-next-line unicorn/no-null
+                return null;
             }
 
             return new URL(pathToFileURL(result));
         },
-        load(canonicalUrl: URL): ImporterResult | undefined {
+        load(canonicalUrl: URL): ImporterResult | null {
             const extension = extname(canonicalUrl.pathname);
 
             const syntax: Syntax = extension ? resolveSyntax(extension.toLowerCase()) ?? "scss" : "scss"; // Default syntax
@@ -50,7 +51,8 @@ const importer = (resourcePath: string, debug: boolean): Importer<"sync"> => {
 
                 return { contents: contents as string, sourceMapUrl: canonicalUrl, syntax };
             } catch {
-                return undefined;
+                // eslint-disable-next-line unicorn/no-null
+                return null;
             }
         },
     };

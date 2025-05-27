@@ -33,7 +33,7 @@ export default async (
     const isIncluded = createFilter(options.include, options.exclude);
 
     const sourceMap = inferSourceMapOption(options.sourceMap);
-    const loaderOptions: Nonundefinedable<InternalStyleOptions> = {
+    const loaderOptions: NonNullable<InternalStyleOptions> = {
         ...inferModeOption(options.mode),
         autoModules: options.autoModules ?? false,
         dts: options.dts as boolean,

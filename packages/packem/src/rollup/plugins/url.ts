@@ -13,10 +13,26 @@ import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { ensureDir } from "@visulima/fs";
 import { basename, dirname, extname, join, relative } from "@visulima/path";
+// eslint-disable-next-line import/no-extraneous-dependencies
 import mime from "mime";
 import type { Plugin } from "rollup";
 
 import svgEncoder from "../utils/svg-encoder";
+
+const copy = async (source: string, destination: string): Promise<void> => {
+    await new Promise((resolve, reject) => {
+        const read = createReadStream(source);
+
+        read.on("error", reject);
+
+        const write = createWriteStream(destination);
+
+        write.on("error", reject);
+        write.on("finish", () => resolve(undefined));
+
+        read.pipe(write);
+    });
+};
 
 export interface UrlOptions {
     /**
@@ -88,21 +104,6 @@ export interface UrlOptions {
      */
     sourceDir?: string;
 }
-
-const copy = async (source: string, destination: string): Promise<void> => {
-    await new Promise((resolve, reject) => {
-        const read = createReadStream(source);
-
-        read.on("error", reject);
-
-        const write = createWriteStream(destination);
-
-        write.on("error", reject);
-        write.on("finish", resolve);
-
-        read.pipe(write);
-    });
-};
 
 export const urlPlugin = ({
     destDir: destinationDirectory,

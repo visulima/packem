@@ -45,7 +45,7 @@ import type FileCache from "./utils/file-cache";
 export interface BuildConfig extends DeepPartial<Omit<BuildOptions, "entries">> {
     entries?: (BuildEntry | string)[];
     hooks?: Partial<BuildHooks>;
-    preset?: BuildPreset | "auto" | "none" | (Nonundefinedable<unknown> & string);
+    preset?: BuildPreset | "auto" | "none" | (NonNullable<unknown> & string);
 }
 
 /**

@@ -2,6 +2,7 @@ import type { Alias } from "@rollup/plugin-alias";
 import { isAccessibleSync } from "@visulima/fs";
 import { resolve } from "@visulima/path";
 
+// eslint-disable-next-line sonarjs/anchor-precedence
 const invalidAliasPattern = /^[^a-z_@#~]|[^\w/@#~-]|@\/|#\/|~\//i;
 const reservedKeywords = new Set([
     "abstract",
@@ -42,7 +43,7 @@ const reservedKeywords = new Set([
     "long",
     "native",
     "new",
-    "undefined",
+    "null",
     "package",
     "private",
     "protected",
@@ -60,6 +61,7 @@ const reservedKeywords = new Set([
     "true",
     "try",
     "typeof",
+    "undefined",
     "var",
     "void",
     "volatile",

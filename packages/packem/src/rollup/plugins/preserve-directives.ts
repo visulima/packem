@@ -151,7 +151,7 @@ const preserveDirectives = ({
             /**
              * rollup's built-in parser returns an extended version of ESTree Node.
              */
-            let ast: Node | undefined = undefined;
+            let ast: Node | undefined;
 
             try {
                 ast = this.parse(magicString.toString(), { allowReturnOutsideFunction: true }) as Node;
@@ -178,7 +178,7 @@ const preserveDirectives = ({
                     break;
                 }
 
-                let directive: string | undefined = undefined;
+                let directive: string | undefined;
 
                 /**
                  * rollup and estree defines `directive` field on the `ExpressionStatement` node:

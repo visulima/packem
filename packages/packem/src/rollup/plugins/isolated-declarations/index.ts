@@ -57,7 +57,7 @@ export const isolatedDeclarationsPlugin = (
 ): Plugin => {
     const filter = createFilter(options.include, options.exclude);
 
-    let outputFiles: Record<string, { ext: string; map?: string; source: string }> = Object.create(undefined);
+    let outputFiles: Record<string, { ext: string; map?: string; source: string }> = Object.create(null);
 
     const addOutput = (filename: string, output: { map?: string; source: string }) => {
         outputFiles[filename.replace(ENDING_REGEX, "")] = { ...output, ext: extname(filename) };
@@ -207,11 +207,12 @@ export const isolatedDeclarationsPlugin = (
 
     return <Plugin>{
         buildStart() {
-            outputFiles = Object.create(undefined);
+            outputFiles = Object.create(null);
         },
 
         name: "packem:isolated-declarations",
 
+        // eslint-disable-next-line sonarjs/cognitive-complexity
         async renderStart(outputOptions: NormalizedOutputOptions, { input }: NormalizedInputOptions): Promise<void> {
             const inputBase = lowestCommonAncestor(...Array.isArray(input) ? input : Object.values(input));
 

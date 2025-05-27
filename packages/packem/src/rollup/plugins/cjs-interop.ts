@@ -33,7 +33,7 @@ export const cjsInteropPlugin = ({
             if (options.format === "cjs" && options.exports === "auto") {
                 const matches = /(exports(?:\['default'\]|\.default)) = (.*);/i.exec(code);
 
-                if (matches === undefined || matches.length < 3) {
+                if (matches === null || matches.length < 3) {
                     return undefined;
                 }
 

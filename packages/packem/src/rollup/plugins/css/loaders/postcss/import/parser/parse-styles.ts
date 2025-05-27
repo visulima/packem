@@ -187,7 +187,7 @@ const parseStyles = async (
     result: Result,
     styles: Document | Root,
     state: State,
-    importingNode: AtRule | null,
+    importingNode: AtRule | undefined,
     conditions: Condition[],
     from: string[],
     postcss: Postcss,

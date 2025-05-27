@@ -1,3 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`css Sourcemap Utilities > should correctly handle file-based sourcemaps 1`] = `[Error: Extracted map detected, but no ID is provided]`;
+
 exports[`sourcemap > file map 1`] = `[Error: Extracted map detected, but no ID is provided]`;

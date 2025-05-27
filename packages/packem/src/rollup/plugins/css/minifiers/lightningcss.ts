@@ -4,11 +4,11 @@ import type { LoaderContext } from "../loaders/types";
 import type { ExtractedData, InternalStyleOptions } from "../types";
 import type { Minifier } from "./types";
 
-const lightningcssMinifier: Minifier<Nonundefinedable<InternalStyleOptions["lightningcss"]>> = {
+const lightningcssMinifier: Minifier<NonNullable<InternalStyleOptions["lightningcss"]>> = {
     async handler(
         data: ExtractedData,
         sourceMap: LoaderContext["sourceMap"],
-        options: Nonundefinedable<InternalStyleOptions["lightningcss"]>,
+        options: NonNullable<InternalStyleOptions["lightningcss"]>,
     ): Promise<ExtractedData> {
         const result = transform({
             ...options,

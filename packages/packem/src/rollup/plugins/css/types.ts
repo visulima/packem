@@ -65,7 +65,7 @@ export interface InjectOptions {
 export interface InternalStyleOptions extends StyleOptions {
     /** @see {@link StyleOptions.mode} */
     emit: boolean;
-    extensions: Nonundefinedable<StyleOptions["extensions"]>;
+    extensions: NonNullable<StyleOptions["extensions"]>;
 
     /** @see {@link StyleOptions.mode} */
     extract: boolean | string;

@@ -58,7 +58,8 @@ const getCompileFunction = async (
             async () =>
                 await new Promise<nodeSass.Result>((resolve, reject) => {
                     (implementation as typeof nodeSass).render.bind(implementation)(
-                        sassOptions,
+                        sassOptions as nodeSass.Options,
+                        // eslint-disable-next-line sonarjs/no-nested-functions
                         (error: nodeSass.SassError | undefined, result: nodeSass.Result) => {
                             if (error) {
                                 reject(error);

@@ -127,7 +127,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             const regex = /: Unresolved URL.*/g;
 
             // eslint-disable-next-line no-cond-assign
-            while ((match = regex.exec(content)) !== undefined) {
+            while ((match = regex.exec(content)) !== null) {
                 // This is necessary to avoid infinite loops with zero-width matches
                 if (match.index === regex.lastIndex) {
                     // eslint-disable-next-line no-plusplus

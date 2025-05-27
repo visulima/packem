@@ -41,7 +41,7 @@ export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesP
             /**
              * rollup's built-in parser returns an extended version of ESTree Node.
              */
-            let ast: Node | undefined = undefined;
+            let ast: Node | undefined;
 
             try {
                 ast = this.parse(code, { allowReturnOutsideFunction: true }) as Node;

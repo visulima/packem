@@ -50,6 +50,7 @@ const importer: (url: string, previousImporter: string) => ImporterReturnType | 
     try {
         return finalize(importerImpl(url, previousImporter, resolve));
     } catch {
+        // eslint-disable-next-line unicorn/no-null
         return null;
     }
 };

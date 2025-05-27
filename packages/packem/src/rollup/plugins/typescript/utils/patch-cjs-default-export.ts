@@ -8,12 +8,12 @@ const patchCjsDefaultExport = (
 ): {
     code: string;
     map: SourceMap;
-} | null => {
+} | undefined => {
     // will match `export { ... }` statement
     const matches: string[] = getRegexMatches(/export\s(\{\s(.*)\s\}|default\s.*);/g, source);
 
     if (matches.length === 0) {
-        return null;
+        return undefined;
     }
 
     // we need the last match
@@ -54,7 +54,7 @@ const patchCjsDefaultExport = (
         };
     }
 
-    return null;
+    return undefined;
 };
 
 export default patchCjsDefaultExport;
