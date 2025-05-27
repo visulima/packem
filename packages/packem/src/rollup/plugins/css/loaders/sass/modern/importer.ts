@@ -14,7 +14,7 @@ const mainFields = ["sass", "style"];
 
 const importer = (resourcePath: string, debug: boolean): Importer<"sync"> => {
     return {
-        canonicalize(originalUrl: string, context: CanonicalizeContext): URL | null {
+        canonicalize(originalUrl: string, context: CanonicalizeContext): URL | undefined {
             const previous = context.containingUrl ? fileURLToPath(context.containingUrl.toString()) : resourcePath;
 
             let result;
@@ -30,27 +30,27 @@ const importer = (resourcePath: string, debug: boolean): Importer<"sync"> => {
                     mainFields,
                 });
             } catch {
-                // If no stylesheets are found, the importer should return null.
-                return null;
+                // If no stylesheets are found, the importer should return undefined.
+                return undefined;
             }
 
             return new URL(pathToFileURL(result));
         },
-        load(canonicalUrl: URL): ImporterResult | null {
+        load(canonicalUrl: URL): ImporterResult | undefined {
             const extension = extname(canonicalUrl.pathname);
 
-            const syntax: Syntax = extension ? (resolveSyntax(extension.toLowerCase()) ?? "scss") : "scss"; // Default syntax
+            const syntax: Syntax = extension ? resolveSyntax(extension.toLowerCase()) ?? "scss" : "scss"; // Default syntax
 
             try {
                 let contents = readFileSync(canonicalUrl);
 
                 if (debug) {
-                    contents = "/* " + canonicalUrl.pathname + " */\n" + contents;
+                    contents = `/* ${canonicalUrl.pathname} */\n${contents}`;
                 }
 
                 return { contents: contents as string, sourceMapUrl: canonicalUrl, syntax };
             } catch {
-                return null;
+                return undefined;
             }
         },
     };

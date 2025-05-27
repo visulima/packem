@@ -10,14 +10,14 @@ import { findStaticImports } from "mlly";
 import type { Plugin, PluginContext, RenderedChunk } from "rollup";
 
 // Taken from https://stackoverflow.com/a/36328890
-// eslint-disable-next-line security/detect-unsafe-regex
+
 const multilineCommentsRE = /\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\//g;
 const licenseCommentsRE = /MIT License|MIT license|BSD license/;
 const consecutiveNewlinesRE = /\n{2,}/g;
 const identifierWithTrailingDollarRE = /\b(\w+)\$\d+\b/g;
 
 const escapeRegexRE = /[-/\\^$*+?.()|[\]{}]/g;
-const escapeRegex = (string_: string): string => string_.replaceAll(escapeRegexRE, "\\$&");
+const escapeRegex = (string_: string): string => string_.replaceAll(escapeRegexRE, String.raw`\$&`);
 
 const unique = <T>(array: T[]): T[] => [...new Set(array)];
 
@@ -45,11 +45,9 @@ function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: Ren
 
             process.exitCode = 1;
 
-            // eslint-disable-next-line no-continue
             continue;
         }
 
-        // eslint-disable-next-line security/detect-object-injection
         const replacements = identifierReplacements[moduleName];
 
         // eslint-disable-next-line guard-for-in
@@ -59,7 +57,6 @@ function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: Ren
                 throw new Error(`${chunk.fileName} does not import "${id}" from "${moduleName}" for replacement`);
             }
 
-            // eslint-disable-next-line security/detect-object-injection
             const betterId = replacements[id] as string;
             const regexEscapedId = escapeRegex(id);
 
@@ -67,11 +64,11 @@ function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: Ren
             // named import cannot be replaced with `Foo as Namespace.Foo`, so we
             // pre-emptively remove the whole named import
             if (betterId.includes(".")) {
-                // eslint-disable-next-line no-param-reassign,@rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+                // eslint-disable-next-line no-param-reassign
                 code = code.replace(new RegExp(`\\b\\w+\\b as ${regexEscapedId},?\\s?`), "");
             }
 
-            // eslint-disable-next-line no-param-reassign,@rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+            // eslint-disable-next-line no-param-reassign
             code = code.replaceAll(new RegExp(`\\b${regexEscapedId}\\b`, "g"), betterId);
         }
     }
@@ -103,7 +100,7 @@ function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: Ren
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const removeInternal = (s: MagicString, node: any): boolean => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-return
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (node.leadingComments?.some((c: any) => c.type === "CommentBlock" && c.value.includes("@internal"))) {
         // Examples:
         // function a(foo: string, /* @internal */ bar: number)
@@ -117,6 +114,10 @@ const removeInternal = (s: MagicString, node: any): boolean => {
     }
 
     return false;
+};
+
+export type PatchTypesOptions = {
+    identifierReplacements?: Record<string, Record<string, string>>;
 };
 
 /**
@@ -153,10 +154,6 @@ function stripInternalTypes(this: PluginContext, code: string, chunk: RenderedCh
 
     return code;
 }
-
-export type PatchTypesOptions = {
-    identifierReplacements?: Record<string, Record<string, string>>;
-};
 
 /**
  * Patch the types files before passing to dts plugin

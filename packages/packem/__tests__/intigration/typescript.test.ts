@@ -14,7 +14,9 @@ describe("packem typescript", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
-        temporaryDirectoryPath = temporaryDirectory();
+        temporaryDirectoryPath = temporaryDirectory({
+            prefix: "packem-typescript",
+        });
     });
 
     afterEach(async () => {
@@ -106,7 +108,7 @@ describe("packem typescript", () => {
         it("should resolve .jsx -> .tsx", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.jsx";');
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import \"./file.jsx\";");
             await writeFile(`${temporaryDirectoryPath}/src/file.tsx`, "console.log(1);");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -135,7 +137,7 @@ describe("packem typescript", () => {
         it("should resolve .jsx -> .js", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.js`, 'import "./file.jsx";');
+            await writeFile(`${temporaryDirectoryPath}/src/index.js`, "import \"./file.jsx\";");
             await writeFile(`${temporaryDirectoryPath}/src/file.jsx`, "console.log(1);");
 
             await createPackageJson(temporaryDirectoryPath, {
@@ -159,7 +161,7 @@ describe("packem typescript", () => {
         it("should resolve .mjs -> .ts", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.mjs";');
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import \"./file.mjs\";");
             await writeFile(`${temporaryDirectoryPath}/src/file.mjs`, "console.log(1);");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -188,7 +190,7 @@ describe("packem typescript", () => {
         it("should resolve .cjs -> .ts", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.cjs";');
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import \"./file.cjs\";");
             await writeFile(`${temporaryDirectoryPath}/src/file.cjs`, "console.log(1);");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -223,7 +225,7 @@ describe("packem typescript", () => {
 
             await writeFile(
                 `${temporaryDirectoryPath}/src/index.ts`,
-                'import "components:Test";\n import { test2 } from "components:Test2";\n\nconsole.log(test2);',
+                "import \"components:Test\";\n import { test2 } from \"components:Test2\";\n\nconsole.log(test2);",
             );
             await writeFile(`${temporaryDirectoryPath}/src/components/Test.ts`, "console.log(1);");
             await writeFile(`${temporaryDirectoryPath}/src/components/Test2.ts`, "export const test2 = 'test'");
@@ -255,9 +257,11 @@ describe("packem typescript", () => {
             expect(binProcess.stdout).not.toContain("If this is incorrect, add it to the");
 
             const cjs = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
+
             expect(cjs).toMatchSnapshot("cjs code output");
 
             const mjs = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+
             expect(mjs).toMatchSnapshot("mjs code output");
         });
 
@@ -325,9 +329,9 @@ console.log(1);
 
             await installPackage(temporaryDirectoryPath, "typescript");
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { b } from "./bb";\n\nconsole.log(b);');
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { b } from \"./bb\";\n\nconsole.log(b);");
             await writeFile(`${temporaryDirectoryPath}/tt/a/aa.ts`, "export const a = 1;");
-            await writeFile(`${temporaryDirectoryPath}/tt/b/bb.ts`, 'import { a } from "./aa";\nnconsole.log(a);\n\nexport const b = 2;');
+            await writeFile(`${temporaryDirectoryPath}/tt/b/bb.ts`, "import { a } from \"./aa\";\nnconsole.log(a);\n\nexport const b = 2;");
 
             await createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: {
@@ -418,13 +422,15 @@ export class ExampleClass {
         expect(binProcess.exitCode).toBe(0);
 
         const mjs = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+
         expect(mjs).toMatchSnapshot("mjs code output");
 
         const cjs = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
+
         expect(cjs).toMatchSnapshot("cjs code output");
     });
 
-    it('should allow support for "allowJs" and generate proper assets', async () => {
+    it("should allow support for \"allowJs\" and generate proper assets", async () => {
         expect.assertions(5);
 
         await writeFile(`${temporaryDirectoryPath}/src/index.js`, `export default () => 'index';`);
@@ -573,8 +579,7 @@ const index = /* @__PURE__ */ __name(() => "index", "default");
 export { index as default };
 `);
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        expect(existsSync(join(temporaryDirectoryPath, ".tsbuildinfo"))).toBeFalsy();
+        expect(existsSync(join(temporaryDirectoryPath, ".tsbuildinfo"))).toBe(false);
     });
 
     it("should work with tsconfig 'incremental' and 'tsBuildInfoFile' option", async () => {
@@ -626,8 +631,7 @@ const index = /* @__PURE__ */ __name(() => "index", "default");
 export { index as default };
 `);
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        expect(existsSync(join(temporaryDirectoryPath, ".tsbuildinfo"))).toBeFalsy();
+        expect(existsSync(join(temporaryDirectoryPath, ".tsbuildinfo"))).toBe(false);
     });
 
     it("should work with tsconfig 'noEmit' option", async () => {
@@ -708,7 +712,6 @@ export declare function fn(a: data): data;
         await writeJson(join(temporaryDirectoryPath, "node_modules", "dep-a", "package.json"), { main: "index.js", name: "dep-a" });
         await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-a", "index.js"), "console.log('dep-a');");
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         symlinkSync(depAIndexDtsPath, join(temporaryDirectoryPath, "node_modules", "dep-a", "index.d.ts"));
 
         await createPackageJson(temporaryDirectoryPath, {
@@ -900,7 +903,7 @@ export { getOne };
     case './utils/one.ts': return import('./packem_chunks/one.mjs');
     default: return new Promise(function(resolve, reject) {
       (typeof queueMicrotask === 'function' ? queueMicrotask : setTimeout)(
-        reject.bind(null, new Error("Unknown variable dynamic import: " + path))
+        reject.bind(undefined, new Error("Unknown variable dynamic import: " + path))
       );
     })
    }
@@ -935,7 +938,7 @@ function __variableDynamicImportRuntime0__(path) {
     case './utils/one.ts': return import('./packem_chunks/one.cjs');
     default: return new Promise(function(resolve, reject) {
       (typeof queueMicrotask === 'function' ? queueMicrotask : setTimeout)(
-        reject.bind(null, new Error("Unknown variable dynamic import: " + path))
+        reject.bind(undefined, new Error("Unknown variable dynamic import: " + path))
       );
     })
    }
@@ -1074,7 +1077,7 @@ export { AppContext } from './lib/app-context.shared-runtime'
 
 import React from 'react'
 
-export const AppContext = React.createContext(null)`,
+export const AppContext = React.createContext(undefined)`,
         );
         await writeFile(
             `${temporaryDirectoryPath}/src/lib/util.shared-runtime.ts`,
@@ -1151,7 +1154,7 @@ export { sharedApi };
         expect(mjsChunk2Content).toBe(`'use client';
 import React from 'react';
 
-const AppContext = React.createContext(null);
+const AppContext = React.createContext(undefined);
 
 export { AppContext };
 `);
@@ -1205,7 +1208,7 @@ const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e 
 
 const React__default = /*#__PURE__*/_interopDefaultCompat(React);
 
-const AppContext = React__default.createContext(null);
+const AppContext = React__default.createContext(undefined);
 
 exports.AppContext = AppContext;
 `);
@@ -1244,14 +1247,13 @@ export { AppContext, index };
 `);
     });
 
-    // eslint-disable-next-line sonarjs/cognitive-complexity
     describe("isolated declarations", () => {
         it.each(["typescript", "oxc", "swc"])(
             "should work with '%s' isolated declarations transformer and commonjs package",
             async (isolatedDeclarationTransformer) => {
                 expect.assertions(7);
 
-                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : '"';
+                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : "\"";
 
                 await writeFile(
                     `${temporaryDirectoryPath}/src/index.ts`,
@@ -1297,7 +1299,7 @@ export type Num2 = number`,
                     },
                 });
                 await createPackemConfig(temporaryDirectoryPath, {
-                    isolatedDeclarationTransformer: isolatedDeclarationTransformer as "swc" | "typescript" | "oxc" | undefined,
+                    isolatedDeclarationTransformer: isolatedDeclarationTransformer as "oxc" | "swc" | "typescript" | undefined,
                     transformer: "esbuild",
                 });
                 await createTsConfig(temporaryDirectoryPath, {
@@ -1381,7 +1383,7 @@ export const test = "test";`,
                     },
                 });
                 await createPackemConfig(temporaryDirectoryPath, {
-                    isolatedDeclarationTransformer: isolatedDeclarationTransformer as "swc" | "typescript" | "oxc" | undefined,
+                    isolatedDeclarationTransformer: isolatedDeclarationTransformer as "oxc" | "swc" | "typescript" | undefined,
                     transformer: "esbuild",
                 });
                 await createTsConfig(temporaryDirectoryPath, {
@@ -1441,7 +1443,7 @@ export declare const test = "test";
             async (isolatedDeclarationTransformer) => {
                 expect.assertions(11);
 
-                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : '"';
+                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : "\"";
 
                 await writeFile(
                     `${temporaryDirectoryPath}/src/index.ts`,
@@ -1490,7 +1492,7 @@ export type Num2 = number`,
                     config: {
                         sourcemap: true,
                     },
-                    isolatedDeclarationTransformer: isolatedDeclarationTransformer as "swc" | "typescript" | "oxc" | undefined,
+                    isolatedDeclarationTransformer: isolatedDeclarationTransformer as "oxc" | "swc" | "typescript" | undefined,
                     transformer: "esbuild",
                 });
                 await createTsConfig(temporaryDirectoryPath, {
@@ -1521,9 +1523,9 @@ export declare let num: Num;
                 const dCtsMapContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts.map`);
 
                 switch (isolatedDeclarationTransformer) {
-                    case "typescript": {
+                    case "oxc": {
                         expect(dCtsMapContent).toBe(
-                            `{"file":"index.d.cts","mappings":"AAAA,OAAO,EAAE,KAAK,GAAG,EAAE,MAAM,SAAS,CAAA;AAClC,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA;AAExB,wBAAgB,KAAK,CAAC,CAAC,EAAE,GAAG,GAAG,GAAG,CAEjC;AAED,eAAO,IAAI,GAAG,EAAE,GAAO,CAAA","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
+                            `{"file":"index.d.cts","mappings":"AAAA,cAAc,WAAW,SAAS;AAClC,YAAY;AAEZ,OAAO,iBAAS,MAAMA,GAAG,MAAM;AAI/B,OAAO,YAAIC,KAAK","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
 
                         break;
@@ -1535,9 +1537,9 @@ export declare let num: Num;
 
                         break;
                     }
-                    case "oxc": {
+                    case "typescript": {
                         expect(dCtsMapContent).toBe(
-                            `{"file":"index.d.cts","mappings":"AAAA,cAAc,WAAW,SAAS;AAClC,YAAY;AAEZ,OAAO,iBAAS,MAAMA,GAAG,MAAM;AAI/B,OAAO,YAAIC,KAAK","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
+                            `{"file":"index.d.cts","mappings":"AAAA,OAAO,EAAE,KAAK,GAAG,EAAE,MAAM,SAAS,CAAA;AAClC,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA;AAExB,wBAAgB,KAAK,CAAC,CAAC,EAAE,GAAG,GAAG,GAAG,CAEjC;AAED,eAAO,IAAI,GAAG,EAAE,GAAO,CAAA","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
 
                         break;
@@ -1558,9 +1560,9 @@ export declare let num: Num;
 
                 // eslint-disable-next-line default-case
                 switch (isolatedDeclarationTransformer) {
-                    case "typescript": {
+                    case "oxc": {
                         expect(dtsMapContent).toBe(
-                            `{"file":"index.d.ts","mappings":"AAAA,OAAO,EAAE,KAAK,GAAG,EAAE,MAAM,SAAS,CAAA;AAClC,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA;AAExB,wBAAgB,KAAK,CAAC,CAAC,EAAE,GAAG,GAAG,GAAG,CAEjC;AAED,eAAO,IAAI,GAAG,EAAE,GAAO,CAAA","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
+                            `{"file":"index.d.ts","mappings":"AAAA,cAAc,WAAW,SAAS;AAClC,YAAY;AAEZ,OAAO,iBAAS,MAAMA,GAAG,MAAM;AAI/B,OAAO,YAAIC,KAAK","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
 
                         break;
@@ -1572,9 +1574,9 @@ export declare let num: Num;
 
                         break;
                     }
-                    case "oxc": {
+                    case "typescript": {
                         expect(dtsMapContent).toBe(
-                            `{"file":"index.d.ts","mappings":"AAAA,cAAc,WAAW,SAAS;AAClC,YAAY;AAEZ,OAAO,iBAAS,MAAMA,GAAG,MAAM;AAI/B,OAAO,YAAIC,KAAK","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
+                            `{"file":"index.d.ts","mappings":"AAAA,OAAO,EAAE,KAAK,GAAG,EAAE,MAAM,SAAS,CAAA;AAClC,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA;AAExB,wBAAgB,KAAK,CAAC,CAAC,EAAE,GAAG,GAAG,GAAG,CAEjC;AAED,eAAO,IAAI,GAAG,EAAE,GAAO,CAAA","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
 
                         break;
@@ -1592,9 +1594,9 @@ export declare let num: Num;
 
                 // eslint-disable-next-line default-case
                 switch (isolatedDeclarationTransformer) {
-                    case "typescript": {
+                    case "oxc": {
                         expect(dCtsTypesMapContent).toBe(
-                            `{"file":"types.d.cts","mappings":"AACA,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
+                            `{"file":"types.d.cts","mappings":"AACA,YAAY","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
                         );
 
                         break;
@@ -1606,9 +1608,9 @@ export declare let num: Num;
 
                         break;
                     }
-                    case "oxc": {
+                    case "typescript": {
                         expect(dCtsTypesMapContent).toBe(
-                            `{"file":"types.d.cts","mappings":"AACA,YAAY","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
+                            `{"file":"types.d.cts","mappings":"AACA,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
                         );
 
                         break;
@@ -1626,9 +1628,9 @@ export declare let num: Num;
 
                 // eslint-disable-next-line default-case
                 switch (isolatedDeclarationTransformer) {
-                    case "typescript": {
+                    case "oxc": {
                         expect(dtsTypesMapContent).toBe(
-                            `{"file":"types.d.ts","mappings":"AACA,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
+                            `{"file":"types.d.ts","mappings":"AACA,YAAY","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
                         );
 
                         break;
@@ -1640,9 +1642,9 @@ export declare let num: Num;
 
                         break;
                     }
-                    case "oxc": {
+                    case "typescript": {
                         expect(dtsTypesMapContent).toBe(
-                            `{"file":"types.d.ts","mappings":"AACA,YAAY","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
+                            `{"file":"types.d.ts","mappings":"AACA,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
                         );
 
                         break;
@@ -1657,7 +1659,7 @@ export declare let num: Num;
             async (isolatedDeclarationTransformer) => {
                 expect.assertions(5);
 
-                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : '"';
+                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : "\"";
 
                 await writeFile(
                     `${temporaryDirectoryPath}/src/index.ts`,
@@ -1704,7 +1706,7 @@ export type Num2 = number`,
                     type: "module",
                 });
                 await createPackemConfig(temporaryDirectoryPath, {
-                    isolatedDeclarationTransformer: isolatedDeclarationTransformer as "swc" | "typescript" | "oxc" | undefined,
+                    isolatedDeclarationTransformer: isolatedDeclarationTransformer as "oxc" | "swc" | "typescript" | undefined,
                     transformer: "esbuild",
                 });
                 await createTsConfig(temporaryDirectoryPath, {
@@ -1784,7 +1786,7 @@ export default test;
                     config: {
                         cjsInterop: true,
                     },
-                    isolatedDeclarationTransformer: isolatedDeclarationTransformer as "swc" | "typescript" | "oxc" | undefined,
+                    isolatedDeclarationTransformer: isolatedDeclarationTransformer as "oxc" | "swc" | "typescript" | undefined,
                     transformer: "esbuild",
                 });
                 await createTsConfig(temporaryDirectoryPath, {
@@ -1828,7 +1830,7 @@ export default test;
         it.each(["typescript", "oxc", "swc"])("should resolve aliases with '%s' isolated declarations transformer", async (isolatedDeclarationTransformer) => {
             expect.assertions(9);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { a } from "utils/a";\nexport default a;');
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { a } from \"utils/a\";\nexport default a;");
             await writeFile(`${temporaryDirectoryPath}/src/utils/a.ts`, "export const a: number = 1;");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -1862,7 +1864,7 @@ export default test;
                 config: {
                     cjsInterop: true,
                 },
-                isolatedDeclarationTransformer: isolatedDeclarationTransformer as "swc" | "typescript" | "oxc" | undefined,
+                isolatedDeclarationTransformer: isolatedDeclarationTransformer as "oxc" | "swc" | "typescript" | undefined,
                 transformer: "esbuild",
             });
             await createTsConfig(temporaryDirectoryPath, {
@@ -1891,7 +1893,7 @@ export default test;
 
 
 export = a;`);
-            expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/utils/a.d.cts`)).toBeTruthy();
+            expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/utils/a.d.cts`)).toBe(true);
 
             const dtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
@@ -1899,14 +1901,14 @@ export = a;`);
 
 
 export = a;`);
-            expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/utils/a.d.ts`)).toBeTruthy();
+            expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/utils/a.d.ts`)).toBe(true);
 
             const dCtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
             expect(dCtsTypesContent).toBe(`import { a } from "./utils/a.d.mts";
 export default a;
 `);
-            expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/utils/a.d.mts`)).toBeTruthy();
+            expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/utils/a.d.mts`)).toBe(true);
         });
     });
 
@@ -2016,6 +2018,7 @@ const test2 = "this should be in final bundle, test2 string";
 module.exports = test;
 module.exports.test2 = test2;
 `);
+
         const cDtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(cDtsContent).toBe(`declare const test: () => string;
@@ -2107,6 +2110,7 @@ const test2 = "this should be in final bundle, test2 string";
 module.exports = test;
 module.exports.test2 = test2;
 `);
+
         const cDtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(cDtsContent).toBe(`declare const test: () => string;
@@ -2191,6 +2195,7 @@ const test = /* @__PURE__ */ __name(() => {
 
 module.exports = test;
 `);
+
         const cDtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(cDtsContent).toBe(`declare const test: () => string;

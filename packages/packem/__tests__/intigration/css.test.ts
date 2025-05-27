@@ -23,7 +23,7 @@ type BaseWriteData = {
     dependencies?: Record<string, string>;
     errorMessage?: string;
     files?: string[];
-    input: string | string[];
+    input: string[] | string;
     minimizer?: "cssnano" | "lightningcss" | undefined;
     outDir?: string;
     outputOpts?: OutputOptions;
@@ -32,17 +32,21 @@ type BaseWriteData = {
     title?: string;
 };
 
-type StringWriteData = {
+type StringWriteData = BaseWriteData & {
     mode: StyleOptions["mode"];
     sourceMap?: StyleOptions["sourceMap"];
     styleOptions?: string;
-} & BaseWriteData;
+};
 
 type WriteData =
-    | ({
-          styleOptions?: StyleOptions;
-      } & BaseWriteData)
-    | StringWriteData;
+    StringWriteData | BaseWriteData & {
+        styleOptions?: StyleOptions;
+    };
+
+interface WriteFailResult {
+    exitCode: number;
+    stderr: string;
+}
 
 interface WriteResult {
     css: () => string[];
@@ -51,11 +55,6 @@ interface WriteResult {
     isMap: () => boolean;
     js: () => string[];
     map: () => string[];
-}
-
-interface WriteFailResult {
-    exitCode: number;
-    stderr: string;
 }
 
 describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
@@ -69,8 +68,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    // eslint-disable-next-line sonarjs/cognitive-complexity
-    const build = async (data: WriteData): Promise<WriteResult | WriteFailResult> => {
+    const build = async (data: WriteData): Promise<WriteFailResult | WriteResult> => {
         const input = Array.isArray(data.input) ? data.input : [data.input];
 
         // copy fixtures to temporary directory
@@ -83,12 +81,12 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         await createPackemConfig(temporaryDirectoryPath, {
             config: data.outputOpts
                 ? {
-                      rollup: {
-                          output: {
-                              ...data.outputOpts,
-                          },
-                      },
-                  }
+                    rollup: {
+                        output: {
+                            ...data.outputOpts,
+                        },
+                    },
+                }
                 : undefined,
             cssLoader: loaders ?? ["postcss", "less", "stylus", "sass", "sourcemap"],
             cssOptions: typeof data.styleOptions === "string" ? data.styleOptions : otherOptions,
@@ -129,7 +127,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             const regex = /: Unresolved URL.*/g;
 
             // eslint-disable-next-line no-cond-assign
-            while ((match = regex.exec(content)) !== null) {
+            while ((match = regex.exec(content)) !== undefined) {
                 // This is necessary to avoid infinite loops with zero-width matches
                 if (match.index === regex.lastIndex) {
                     // eslint-disable-next-line no-plusplus
@@ -148,7 +146,6 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
 
         const distributionPath = join(temporaryDirectoryPath, "dist");
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         const foundFiles: Dirent[] = await readdir(distributionPath, {
             recursive: true,
             withFileTypes: true,
@@ -212,13 +209,13 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         }
 
         const optionMode: StyleOptions["mode"] = typeof data.styleOptions === "object" ? data.styleOptions.mode : (data as StringWriteData).mode;
-        const optionSourceMap: StyleOptions["sourceMap"] =
-            typeof data.styleOptions === "object" ? data.styleOptions.sourceMap : (data as StringWriteData).sourceMap;
+        const optionSourceMap: StyleOptions["sourceMap"]
+            = typeof data.styleOptions === "object" ? data.styleOptions.sourceMap : (data as StringWriteData).sourceMap;
 
         const mode = inferModeOption(optionMode ?? "inject");
 
         if (mode.extract) {
-            expect(result.isCss()).toBeTruthy();
+            expect(result.isCss()).toBe(true);
 
             for (const f of result.css()) {
                 expect(f).toMatchSnapshot("css");
@@ -234,11 +231,11 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 expect(f).toMatchSnapshot("map");
             }
         } else {
-            expect(result.isMap()).toBeFalsy();
+            expect(result.isMap()).toBe(false);
         }
 
         for (const file of data.files ?? []) {
-            expect(result.isFile(file)).toBeTruthy();
+            expect(result.isFile(file)).toBe(true);
         }
     };
 
@@ -404,7 +401,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             if (data.styleOptions && (data.styleOptions as StyleOptions).alias) {
                 for (const [key, value] of Object.entries((data.styleOptions as StyleOptions).alias as Record<string, string>)) {
                     // this is needed because of the temporary directory path, that is generated on every test run
-                    // eslint-disable-next-line no-param-reassign,security/detect-object-injection
+                    // eslint-disable-next-line no-param-reassign
                     ((data.styleOptions as StyleOptions).alias as Record<string, string>)[key] = value.replace("__REPLACE__", temporaryDirectoryPath);
                 }
             }
@@ -633,7 +630,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 input: "simple/index.js",
                 styleOptions:
                     // eslint-disable-next-line no-template-curly-in-string
-                    'mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(id.replace("__REPLACE__", ""))})`],',
+                    "mode: [\"inject\", (varname, id) => `console.log(${varname},${JSON.stringify(id.replace(\"__REPLACE__\", \"\"))})`],",
                 title: "function",
             },
         ] as WriteData[])("should work with injected processed $title css", async ({ title, ...data }: WriteData) => {
@@ -788,15 +785,15 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 title: "paths",
             },
         ] as WriteData[])("should work with less processed $title css", async ({ title, ...data }: WriteData) => {
-            // eslint-disable-next-line vitest/no-conditional-in-test,@typescript-eslint/no-unnecessary-condition
+            // eslint-disable-next-line vitest/no-conditional-in-test
             if ((data.styleOptions as StyleOptions)?.less?.paths) {
                 // eslint-disable-next-line no-plusplus
                 for (let index = 0; index < (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[]).length; index++) {
                     // this is needed because of the temporary directory path, that is generated on every test run
-                    // eslint-disable-next-line no-param-reassign,security/detect-object-injection
-                    (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] =
-                        // eslint-disable-next-line security/detect-object-injection
-                        ((((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] as string).replace(
+                    // eslint-disable-next-line no-param-reassign
+                    (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index]
+
+                        = ((((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] as string).replace(
                             "__REPLACE__",
                             temporaryDirectoryPath,
                         );
@@ -1057,8 +1054,8 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             expect(f).toMatchSnapshot("js");
         }
 
-        expect(result.isCss()).toBeFalsy();
-        expect(result.isMap()).toBeFalsy();
+        expect(result.isCss()).toBe(false);
+        expect(result.isMap()).toBe(false);
     });
 
     describe("emit", () => {

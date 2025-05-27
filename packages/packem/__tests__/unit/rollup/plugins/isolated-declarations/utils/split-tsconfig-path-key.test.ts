@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import splitTsconfigPathKey from "../../../../../../src/rollup/plugins/isolated-declarations/utils/split-tsconfig-path-key";
 
-describe("splitTsconfigPathKey", () => {
+describe(splitTsconfigPathKey, () => {
     it("should split a simple path", () => {
         expect.assertions(1);
 
@@ -39,7 +39,7 @@ describe("splitTsconfigPathKey", () => {
         expect.assertions(3);
 
         expect(() => splitTsconfigPathKey("")).toThrow("Invalid key: Key must be a non-empty string.");
-        expect(() => splitTsconfigPathKey(null as any)).toThrow("Invalid key: Key must be a non-empty string.");
+        expect(() => splitTsconfigPathKey(undefined as any)).toThrow("Invalid key: Key must be a non-empty string.");
         expect(() => splitTsconfigPathKey(undefined as any)).toThrow("Invalid key: Key must be a non-empty string.");
     });
 });

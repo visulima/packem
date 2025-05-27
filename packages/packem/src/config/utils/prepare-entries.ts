@@ -16,7 +16,7 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<vo
             relativeInput = relativeInput.slice(2);
         }
 
-        // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp,no-param-reassign
+        // eslint-disable-next-line no-param-reassign
         entry.name = relativeInput.replace(new RegExp(`^${context.options.sourceDir}/`), "").replace(ENDING_REGEX, "");
     }
 
@@ -101,7 +101,7 @@ const prepareEntries = async (context: BuildContext): Promise<void> => {
         });
 
         if (files.length === 0) {
-            throw new NotFoundError("No files found in the glob pattern: " + cyan(join(context.options.rootDir, entryWithoutGlob.input)));
+            throw new NotFoundError(`No files found in the glob pattern: ${cyan(join(context.options.rootDir, entryWithoutGlob.input))}`);
         }
 
         for (const file of files) {

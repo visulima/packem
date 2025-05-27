@@ -35,5 +35,4 @@ const isolatedDeclarationsSwcTransformer = async (id: string, code: string, sour
     }
 };
 
-// eslint-disable-next-line import/no-unused-modules
 export default isolatedDeclarationsSwcTransformer;

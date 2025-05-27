@@ -12,9 +12,7 @@ const createOrUpdateKeyStorage = (hashKey: string, storePath: string, logger: Pa
             keyStore = readJsonSync(keyStorePath);
         }
 
-        // eslint-disable-next-line security/detect-object-injection
         if (keyStore[hashKey] === undefined) {
-            // eslint-disable-next-line security/detect-object-injection
             keyStore[hashKey] = new Date().toISOString();
         }
 

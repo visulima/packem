@@ -19,13 +19,11 @@ import { isTokenIdent, isTokenOpenParen, isTokenString, isTokenURL, tokenize, To
 import { IS_LAYER_REGEX, IS_SCOPE_REGEX, IS_SUPPORTS_REGEX, IS_URL_REGEX } from "../constants";
 
 const wrapInParenthesisIfNeeded = (componentValues: ComponentValue[]): ComponentValue[] => {
-    // eslint-disable-next-line @typescript-eslint/prefer-for-of,no-plusplus
+    // eslint-disable-next-line no-plusplus
     for (let index = 0; index < componentValues.length; index++) {
-        // eslint-disable-next-line security/detect-object-injection
         const componentValue = componentValues[index];
 
         if (isWhiteSpaceOrCommentNode(componentValue)) {
-            // eslint-disable-next-line no-continue
             continue;
         }
 
@@ -41,12 +39,14 @@ const stripHash = (string_: string): string => {
     if (string_.startsWith("#")) {
         return "";
     }
+
     if (!string_.includes("#")) {
         return string_;
     }
 
     try {
         const url = new URL(string_, "http://example.com");
+
         if (!url.hash) {
             return string_;
         }
@@ -88,11 +88,9 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
 
     // eslint-disable-next-line no-plusplus
     for (let index = 0; index < componentValues.length; index++) {
-        // eslint-disable-next-line security/detect-object-injection
         const componentValue = componentValues[index];
 
         if (isWhiteSpaceOrCommentNode(componentValue)) {
-            // eslint-disable-next-line no-continue
             continue;
         }
 
@@ -104,7 +102,7 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
             uri = componentValue.value[4].value;
             // eslint-disable-next-line prefer-destructuring
             fullUri = componentValue.value[1];
-            // eslint-disable-next-line no-continue
+
             continue;
         }
 
@@ -113,26 +111,24 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
                 return false;
             }
 
-            // eslint-disable-next-line @typescript-eslint/prefer-for-of,no-plusplus
+            // eslint-disable-next-line no-plusplus
             for (let cVIndex = 0; cVIndex < componentValue.value.length; cVIndex++) {
-                // eslint-disable-next-line security/detect-object-injection
                 const childComponentValue = componentValue.value[cVIndex];
+
                 if (isWhiteSpaceOrCommentNode(childComponentValue)) {
-                    // eslint-disable-next-line no-continue
                     continue;
                 }
 
                 if (!uri && isTokenNode(childComponentValue) && isTokenString(childComponentValue.value)) {
                     uri = childComponentValue.value[4].value;
                     fullUri = stringify([[componentValue]]);
-                    // eslint-disable-next-line no-continue
+
                     continue;
                 }
 
                 return false;
             }
 
-            // eslint-disable-next-line no-continue
             continue;
         }
 
@@ -146,7 +142,7 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
             }
 
             layer = "";
-            // eslint-disable-next-line no-continue
+
             continue;
         }
 
@@ -156,7 +152,7 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
             }
 
             layer = stringify([componentValue.value]);
-            // eslint-disable-next-line no-continue
+
             continue;
         }
 
@@ -166,7 +162,7 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
             }
 
             supports = stringify([componentValue.value]);
-            // eslint-disable-next-line no-continue
+
             continue;
         }
 
@@ -176,7 +172,7 @@ const parseAtImport = (parameters: string): false | { fullUri: string; layer?: s
             }
 
             scope = stringify([wrapInParenthesisIfNeeded(componentValue.value)]);
-            // eslint-disable-next-line no-continue
+
             continue;
         }
 

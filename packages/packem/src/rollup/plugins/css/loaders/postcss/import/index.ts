@@ -17,7 +17,7 @@ import loadContent from "./utils/load-content";
 const name = "css-import";
 const extensionsDefault = [".css", ".pcss", ".postcss", ".sss"];
 
-const plugin: PluginCreator<Partial<{ root: string } & ImportOptions>> = (options) => {
+const plugin: PluginCreator<Partial<ImportOptions & { root: string }>> = (options) => {
     const config: ImportOptions = {
         alias: options?.alias ?? {},
         extensions: options?.extensions ?? extensionsDefault,
@@ -43,7 +43,7 @@ const plugin: PluginCreator<Partial<{ root: string } & ImportOptions>> = (option
                 throw new TypeError("plugins option must be an array");
             }
 
-            const bundle = await parseStyles(config as { root: string } & ImportOptions, result, styles, state, null, [], [], postcss);
+            const bundle = await parseStyles(config as ImportOptions & { root: string }, result, styles, state, undefined, [], [], postcss);
 
             applyRaws(bundle);
             applyConditions(bundle, atRule);

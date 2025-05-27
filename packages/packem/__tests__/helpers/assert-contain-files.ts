@@ -8,7 +8,6 @@ const assertContainFiles = (directory: string, filePaths: string[]): void => {
 
     for (const filePath of filePaths) {
         const fullPath = resolve(directory, filePath);
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         const existed = existsSync(fullPath);
 
         if (existed) {

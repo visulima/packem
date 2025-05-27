@@ -12,7 +12,7 @@ const loadPackageJson = (
     const packageJsonPath = join(rootDirectory, "package.json");
 
     if (!isAccessibleSync(packageJsonPath)) {
-        throw new Error("package.json not found at " + packageJsonPath);
+        throw new Error(`package.json not found at ${packageJsonPath}`);
     }
 
     const packageJson = parsePackageJson(packageJsonPath);

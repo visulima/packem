@@ -5,10 +5,10 @@ import getRegexMatches from "../../../../utils/get-regex-matches";
 
 const patchCjsDefaultExport = (
     source: string,
-): null | {
+): {
     code: string;
     map: SourceMap;
-} => {
+} | null => {
     // will match `export { ... }` statement
     const matches: string[] = getRegexMatches(/export\s(\{\s(.*)\s\}|default\s.*);/g, source);
 
@@ -23,7 +23,6 @@ const patchCjsDefaultExport = (
 
     for (const match of splitMatches) {
         if (match.includes("type")) {
-            // eslint-disable-next-line no-continue
             continue;
         }
 
@@ -43,11 +42,10 @@ const patchCjsDefaultExport = (
     if (defaultKey !== "") {
         const dtsTransformed = new MagicString(source);
 
-        // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
         dtsTransformed.replace(new RegExp(`(,s)?${defaultKey} as default(,)?`), "");
-        // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+
         dtsTransformed.replace(new RegExp(`export default ${defaultKey};\n?`), "");
-        dtsTransformed.append("\n\nexport = " + defaultKey + ";");
+        dtsTransformed.append(`\n\nexport = ${defaultKey};`);
 
         return {
             // replace a empty export statement

@@ -15,8 +15,7 @@ const loadPackemConfig = async (
 }> => {
     const packemConfigFilePath = await findPackemFile(rootDirectory, configPath);
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    let buildConfig = ((await jiti.import(packemConfigFilePath, { default: true, try: true })) || {}) as BuildConfig | BuildConfigFunction;
+    let buildConfig = (await jiti.import(packemConfigFilePath, { default: true, try: true }) || {}) as BuildConfig | BuildConfigFunction;
 
     if (typeof buildConfig === "function") {
         buildConfig = await buildConfig(environment, mode);

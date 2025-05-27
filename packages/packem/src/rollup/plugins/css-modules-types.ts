@@ -16,9 +16,8 @@ const dtsComment = `
  */
 `.trim();
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 const cssModulesTypes = (options: StyleOptions, rootDirectory: string, logger: Pail): Plugin => {
-    let optionSupportModules: undefined | boolean;
+    let optionSupportModules: boolean | undefined;
 
     if (options.postcss && typeof options.postcss.modules === "boolean") {
         optionSupportModules = options.postcss.modules;
@@ -41,27 +40,27 @@ const cssModulesTypes = (options: StyleOptions, rootDirectory: string, logger: P
             }
 
             if (!supportModules) {
-                return null;
+                return undefined;
             }
 
             const { types } = this.getModuleInfo(id)?.meta.styles ?? {};
 
             if (types === undefined) {
-                return null;
+                return undefined;
             }
 
             if (await isAccessible(id)) {
-                await writeFile(id + ".d.ts", `${dtsComment}\n${types as string}`);
+                await writeFile(`${id}.d.ts`, `${dtsComment}\n${types as string}`);
 
                 logger.info({
-                    message: `Generated types for ${normalize(id).replace(rootDirectory + "/", "")}`,
+                    message: `Generated types for ${normalize(id).replace(`${rootDirectory}/`, "")}`,
                     prefix: "dts:css-modules",
                 });
 
-                this.addWatchFile(id + ".d.ts");
+                this.addWatchFile(`${id}.d.ts`);
             }
 
-            return null;
+            return undefined;
         },
     };
 };

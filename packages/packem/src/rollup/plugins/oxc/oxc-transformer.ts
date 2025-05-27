@@ -14,7 +14,7 @@ const oxcTransformPlugin: TransformerFunction = ({ exclude, include, ...transfor
 
         async transform(sourcecode, id) {
             if (!filter(id)) {
-                return null;
+                return undefined;
             }
 
             const { code, errors, map } = transform(id, sourcecode, {
@@ -39,5 +39,4 @@ const oxcTransformPlugin: TransformerFunction = ({ exclude, include, ...transfor
 
 oxcTransformPlugin.NAME = "oxc";
 
-// eslint-disable-next-line import/no-unused-modules
 export default oxcTransformPlugin;

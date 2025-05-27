@@ -11,7 +11,6 @@ import base64EncodedConditionalImport from "./utils/base64-encoded-import";
 import { isImportStatement, isPreImportStatement, isWarning } from "./utils/statement";
 
 const applyConditions = (stylesheet: Stylesheet, atRule: (defaults?: AtRuleProps) => AtRule): void => {
-    // eslint-disable-next-line sonarjs/cognitive-complexity
     stylesheet.statements.forEach((stmt, index) => {
         if (isWarning(stmt) || isPreImportStatement(stmt) || stmt.conditions.length === 0) {
             return;
@@ -63,7 +62,7 @@ const applyConditions = (stylesheet: Stylesheet, atRule: (defaults?: AtRuleProps
             if (condition.supports !== undefined) {
                 const supportsNode = atRule({
                     name: "supports",
-                    params: "(" + condition.supports + ")",
+                    params: `(${condition.supports})`,
                     source: stmt.importingNode?.source ?? parent.source,
                 });
 
@@ -90,7 +89,6 @@ const applyConditions = (stylesheet: Stylesheet, atRule: (defaults?: AtRuleProps
 
         // eslint-disable-next-line no-plusplus
         for (let atRulesIndex = 0; atRulesIndex < atRules.length - 1; atRulesIndex++) {
-            // eslint-disable-next-line security/detect-object-injection
             (atRules[atRulesIndex] as AtRule).append(atRules[atRulesIndex + 1]);
         }
 
@@ -107,7 +105,7 @@ const applyConditions = (stylesheet: Stylesheet, atRule: (defaults?: AtRuleProps
         // wrap new rules with media query and/or layer at rule
         innerAtRule.append(nodes);
 
-        // eslint-disable-next-line no-param-reassign,security/detect-object-injection
+        // eslint-disable-next-line no-param-reassign
         stylesheet.statements[index] = {
             conditions: stmt.conditions,
             from: stmt.from,

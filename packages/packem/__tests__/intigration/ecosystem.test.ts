@@ -9,7 +9,6 @@ import { createPackemConfig, execPackem } from "../helpers";
 
 const ecosystemPath = join(__dirname, "../..", "__fixtures__", "ecosystem");
 
-// eslint-disable-next-line security/detect-non-literal-fs-filename
 const ecosystemSuites = readdirSync(ecosystemPath, { withFileTypes: true })
     .filter((dirent) => dirent.isDirectory())
     .map((dirent) => dirent.name);
@@ -38,7 +37,6 @@ describe("packem ecosystem", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         const distributionFiles = readdirSync(join(fullSuitePath, "dist"), {
             recursive: true,
             withFileTypes: true,

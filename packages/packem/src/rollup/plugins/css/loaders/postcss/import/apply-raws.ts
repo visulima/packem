@@ -9,7 +9,7 @@ const applyRaws = (stylesheet: Stylesheet): void => {
             return;
         }
 
-        if ((stmt as ImportStatement | PreImportStatement | NodesStatement).parent !== undefined) {
+        if ((stmt as ImportStatement | NodesStatement | PreImportStatement).parent !== undefined) {
             const { before } = ((stmt as ImportStatement | PreImportStatement).parent as ImportStatement | PreImportStatement).node.raws;
 
             if (isNodesStatement(stmt)) {

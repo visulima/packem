@@ -39,7 +39,7 @@ const getClassNameDefault = (name: string): string => {
 
 type PostCSSOptions = InternalStyleOptions["postcss"] & Pick<Required<ProcessOptions>, "from" | "map" | "to">;
 
-const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
+const loader: Loader<Nonundefinedable<InternalStyleOptions["postcss"]>> = {
     alwaysProcess: true,
     name: "postcss",
     // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -130,8 +130,13 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
         for (const message of result.messages) {
             // eslint-disable-next-line default-case
             switch (message.type) {
-                case "warning": {
-                    this.warn({ message: message.text as string, plugin: message.plugin });
+                case "asset": {
+                    this.assets.set(message.to as string, message.source as Uint8Array);
+                    break;
+                }
+
+                case "dependency": {
+                    this.deps.add(normalize(message.file as string));
                     break;
                 }
 
@@ -145,13 +150,8 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
                     break;
                 }
 
-                case "dependency": {
-                    this.deps.add(normalize(message.file as string));
-                    break;
-                }
-
-                case "asset": {
-                    this.assets.set(message.to as string, message.source as Uint8Array);
+                case "warning": {
+                    this.warn({ message: message.text as string, plugin: message.plugin });
                     break;
                 }
             }
@@ -200,7 +200,6 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
                     this.warn(`Exported \`${name}\` as \`${newName}\` in ${relative(this.cwd as string, this.id)}`);
                 }
 
-                // eslint-disable-next-line security/detect-object-injection
                 const fmt = JSON.stringify(modulesExports[name]);
 
                 output.push(`var ${newName} = ${fmt};`);
@@ -252,6 +251,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
                     for (const [k, v] of Object.entries(modulesExports)) {
                         const name = JSON.stringify(k);
                         const value = JSON.stringify(v);
+
                         getters += `get ${name}() { ${injectorCallOnce} return ${value}; },\n`;
                     }
 
@@ -315,5 +315,4 @@ ${Object.keys(modulesExports)
     },
 };
 
-// eslint-disable-next-line import/no-unused-modules
 export default loader;

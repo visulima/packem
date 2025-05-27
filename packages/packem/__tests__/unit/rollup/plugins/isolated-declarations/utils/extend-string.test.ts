@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import extendString from "../../../../../../src/rollup/plugins/isolated-declarations/utils/extend-string";
 
-describe("extendString", () => {
+describe(extendString, () => {
     it.each([
         ["./rollup/plugins/esm-shim-cjs-syntax", "rollup/plugins/esm-shim-cjs-syntax.ts", "./rollup/plugins/esm-shim-cjs-syntax.ts"],
         ["./rollup/plugins/esm-shim-cjs-syntax.ts", "rollup/plugins/esm-shim-cjs-syntax.ts", "./rollup/plugins/esm-shim-cjs-syntax.ts"],

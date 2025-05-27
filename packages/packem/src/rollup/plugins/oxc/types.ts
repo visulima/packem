@@ -1,14 +1,15 @@
 import type { FilterPattern } from "@rollup/pluginutils";
 import type { JsxOptions, TransformOptions } from "oxc-transform";
 
-export type InternalOXCTransformPluginConfig = {
+export type InternalOXCTransformPluginConfig = TransformOptions & {
     exclude?: FilterPattern;
     include?: FilterPattern;
-} & TransformOptions;
+};
 
-export type OXCTransformPluginConfig = {
+export type OXCTransformPluginConfig = Omit<TransformOptions, "cwd" | "sourcemap" | "target" | "typescript"> & {
     exclude?: FilterPattern;
     include?: FilterPattern;
+
     /** Configure how TSX and JSX are transformed. */
-    jsx?: "preserve" | Omit<JsxOptions, "refresh">;
-} & Omit<TransformOptions, "cwd" | "sourcemap" | "target" | "typescript">;
+    jsx?: Omit<JsxOptions, "refresh"> | "preserve";
+};

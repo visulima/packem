@@ -17,8 +17,8 @@ const loadTsconfig = async (
     if (tsconfigPath) {
         const rootTsconfigPath = join(rootDirectory, tsconfigPath);
 
-        if (!(await isAccessible(rootTsconfigPath))) {
-            throw new Error("tsconfig.json not found at " + rootTsconfigPath);
+        if (!await isAccessible(rootTsconfigPath)) {
+            throw new Error(`tsconfig.json not found at ${rootTsconfigPath}`);
         }
 
         tsconfig = {

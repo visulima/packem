@@ -13,7 +13,6 @@ const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail
     if (await isAccessible(join(cachePath, "keystore.json"))) {
         const keyStore: Record<string, string> = await readJson(join(cachePath, "keystore.json"));
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         let cacheDirectories = await readdir(cachePath, {
             withFileTypes: true,
         });
@@ -36,7 +35,6 @@ const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail
                         prefix: "file-cache",
                     });
 
-                    // eslint-disable-next-line no-continue
                     continue;
                 }
 
@@ -45,7 +43,7 @@ const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail
                 }
 
                 logger.info({
-                    message: "Removing " + dirent.name + " file cache, the cache key is not used anymore.",
+                    message: `Removing ${dirent.name} file cache, the cache key is not used anymore.`,
                     prefix: "file-cache",
                 });
 

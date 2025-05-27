@@ -14,9 +14,3 @@ onlyBuiltDependencies:
   - node-sass
   - nodehun
   - nx
-ignoredBuiltDependencies:
-  - '@anolilab/commitlint-config'
-  - '@anolilab/eslint-config'
-  - '@anolilab/lint-staged-config'
-  - '@anolilab/prettier-config'
-  - '@anolilab/textlint-config'

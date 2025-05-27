@@ -227,8 +227,8 @@ export { a };
 
 export { a };
 `);
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        expect(existsSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`)).toBeTruthy();
+
+        expect(existsSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`)).toBe(true);
     });
 
     it("should clean the dist directory before building, when no --no-clean option was given", async () => {
@@ -266,8 +266,8 @@ export { a };
 
 export { a };
 `);
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        expect(existsSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`)).toBeFalsy();
+
+        expect(existsSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`)).toBe(false);
     });
 
     it("should generate only d.ts files when --dts-only option was given", async () => {
@@ -308,11 +308,11 @@ export { a };
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBeFalsy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.cjs`)).toBeFalsy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.mts`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.cts`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.ts`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(false);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.cjs`)).toBe(false);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.mts`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.cts`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.ts`)).toBe(true);
     });
 
     it("should run 'onSuccess' when option was given", async () => {

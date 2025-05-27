@@ -10,7 +10,9 @@ describe("packem resolve-file-url", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
-        temporaryDirectoryPath = temporaryDirectory();
+        temporaryDirectoryPath = temporaryDirectory({
+            prefix: "packem-resolve-file-url",
+        });
     });
 
     afterEach(async () => {

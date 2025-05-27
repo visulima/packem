@@ -1,7 +1,6 @@
 // eslint-disable-next-line import/no-namespace
 import type * as nodeSass from "node-sass";
 import type PQueue from "p-queue";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import PQueueClass from "p-queue";
 // eslint-disable-next-line import/no-namespace
 import type * as sass from "sass";
@@ -16,19 +15,14 @@ let workQueue: PQueue | undefined;
  * Verifies that the implementation and version of Sass is supported by this loader.
  */
 const getCompileFunction = async (
-    implementation: typeof sass | typeof sassEmbedded | typeof nodeSass,
+    implementation: typeof nodeSass | typeof sass | typeof sassEmbedded,
     apiType: SassApiType,
 ): Promise<
-    | ((sassOptions: nodeSass.SyncOptions) => nodeSass.Result)
-    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-    | ((sassOptions: nodeSass.SyncOptions) => Promise<void | nodeSass.Result>)
-    | ((sassOptions: { data: string } & sass.StringOptions<"sync">) => sass.CompileResult)
-    | ((sassOptions: { data: string } & sassEmbedded.StringOptions<"sync">) => sassEmbedded.CompileResult)
+    ((sassOptions: nodeSass.SyncOptions) => nodeSass.Result) | ((sassOptions: nodeSass.SyncOptions) => Promise<nodeSass.Result | void>) | ((sassOptions: sass.StringOptions<"sync"> & { data: string }) => sass.CompileResult) | ((sassOptions: sassEmbedded.StringOptions<"sync"> & { data: string }) => sassEmbedded.CompileResult)
 > => {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if ((implementation as typeof sass | typeof sassEmbedded).compileString !== undefined) {
         if (apiType === "modern") {
-            return (sassOptions: { data: string } & sass.StringOptions<"sync">) => {
+            return (sassOptions: sass.StringOptions<"sync"> & { data: string }) => {
                 const { data, ...rest } = sassOptions;
 
                 return (implementation as typeof sass).compileString(data as string, rest);
@@ -36,7 +30,7 @@ const getCompileFunction = async (
         }
 
         if (apiType === "modern-compiler") {
-            return (sassOptions: { data: string } & sassEmbedded.StringOptions<"sync">) => {
+            return (sassOptions: sassEmbedded.StringOptions<"sync"> & { data: string }) => {
                 const { data, ...rest } = sassOptions;
 
                 return (implementation as typeof sassEmbedded).compileString(data as string, rest);

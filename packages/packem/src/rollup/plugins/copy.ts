@@ -9,34 +9,32 @@ import { glob } from "tinyglobby";
 
 import arrayify from "../../utils/arrayify";
 
-type SingleTargetDesc = {
-    dest?: string;
-    exclude?: string[] | string;
-    src: string[] | string;
-};
-
-type MultipleTargetsDesc = SingleTargetDesc | SingleTargetDesc[] | string[] | string;
-
-type FileDesc = { copied: string[]; dest: string[]; timestamp: number; transform?: (content: Buffer, filename: string) => Buffer | string };
-
 export type CopyPluginOptions = {
     /**
      * Copy items once. Useful in watch mode.
-     *
      * @default false
      */
     copyOnce?: boolean;
     exactFileNames?: boolean;
+
     /**
      * Remove the directory structure of copied files.
-     *
      * @default true
      */
     flatten?: boolean;
     targets: MultipleTargetsDesc;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
+type FileDesc = { copied: string[]; dest: string[]; timestamp: number; transform?: (content: Buffer, filename: string) => Buffer | string };
+
+type MultipleTargetsDesc = SingleTargetDesc | SingleTargetDesc[] | string[] | string;
+
+type SingleTargetDesc = {
+    dest?: string;
+    exclude?: string[] | string;
+    src: string[] | string;
+};
+
 export const copyPlugin = (options: CopyPluginOptions, logger: Pail): Plugin => {
     const files = new Map<string, FileDesc>();
     const config = {
@@ -73,11 +71,11 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail): Plugin => 
                     .flatMap((target) =>
                         (Array.isArray(target.src)
                             ? target.src.map((itemSource) => {
-                                  return {
-                                      ...target,
-                                      src: itemSource,
-                                  };
-                              })
+                                return {
+                                    ...target,
+                                    src: itemSource,
+                                };
+                            })
                             : target),
                     )
                     .map(
@@ -127,7 +125,6 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail): Plugin => 
                     let source: Uint8Array | undefined;
 
                     try {
-                        // eslint-disable-next-line security/detect-non-literal-fs-filename
                         const fileStat = await stat(fileName);
 
                         if (!fileStat.isFile()) {
@@ -158,7 +155,6 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail): Plugin => 
 
                     for (const destination of fileDesc.dest) {
                         if (config.copyOnce && fileDesc.copied.includes(destination)) {
-                            // eslint-disable-next-line no-continue
                             continue;
                         }
 

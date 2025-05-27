@@ -3,7 +3,7 @@ import type { Node } from "postcss";
 
 import { resolve } from "../../../utils/resolve";
 
-export type ImportResolve = (url: string, basedir: string, extensions: string[], atRule: Node) => string | Promise<string>;
+export type ImportResolve = (url: string, basedir: string, extensions: string[], atRule: Node) => Promise<string> | string;
 
 export const importResolve: ImportResolve = (inputUrl: string, basedir: string, extensions: string[]): string => {
     const options = { baseDirs: [basedir], caller: "@import resolver", extensions };
@@ -13,7 +13,7 @@ export const importResolve: ImportResolve = (inputUrl: string, basedir: string, 
     const paths = [url];
 
     if (isRelative(url) || url.startsWith("/")) {
-        paths.push("." + url);
+        paths.push(`.${url}`);
     }
 
     if (url.startsWith("/")) {

@@ -148,7 +148,7 @@ export default log();`,
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 alias: {
-                    [alias + "/"]: resolve(temporaryDirectoryPath, "src"),
+                    [`${alias}/`]: resolve(temporaryDirectoryPath, "src"),
                 },
             },
         });

@@ -17,7 +17,7 @@ const memoize = <T extends (...arguments_: any[]) => any>(
     const cache: Map<string, ReturnType<T>> = cacheArgument ?? new Map<string, ReturnType<T>>();
 
     return ((...arguments_: Parameters<T>) => {
-        const key = cacheKey ? (typeof cacheKey === "function" ? cacheKey(...arguments_) : cacheKey) : JSON.stringify({ args: arguments_ });
+        const key = cacheKey ? typeof cacheKey === "function" ? cacheKey(...arguments_) : cacheKey : JSON.stringify({ args: arguments_ });
         const existing = cache.get(key);
 
         if (existing !== undefined) {
@@ -28,7 +28,6 @@ const memoize = <T extends (...arguments_: any[]) => any>(
 
         cache.set(key, result);
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return result;
     }) as T;
 };

@@ -15,12 +15,12 @@ vi.mock("../../../../src/utils/warn", () => {
     };
 });
 
-describe("validatePackageFields", () => {
+describe(validatePackageFields, () => {
     beforeEach(() => {
         warn.mockClear();
     });
 
-    it('should not warn if "files" field is missing in package.json when validation is enabled', () => {
+    it("should not warn if \"files\" field is missing in package.json when validation is enabled", () => {
         expect.assertions(1);
 
         const context = {
@@ -33,7 +33,7 @@ describe("validatePackageFields", () => {
         expect(warn).not.toHaveBeenCalledWith(context, "The 'files' field is missing in your package.json. Add the files to be included in the package.");
     });
 
-    it('should warn if "main" field is missing in package.json for CJS packages', () => {
+    it("should warn if \"main\" field is missing in package.json for CJS packages", () => {
         expect.assertions(1);
 
         const context = {
@@ -46,7 +46,7 @@ describe("validatePackageFields", () => {
         expect(warn).toHaveBeenCalledWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
     });
 
-    it('should warn if "exports" field is missing in package.json for ESM packages when emitCJS is false', () => {
+    it("should warn if \"exports\" field is missing in package.json for ESM packages when emitCJS is false", () => {
         expect.assertions(1);
 
         const context = {
@@ -59,7 +59,7 @@ describe("validatePackageFields", () => {
         expect(warn).toHaveBeenCalledWith(context, "The 'exports' field is missing in your package.json. Define module exports explicitly.");
     });
 
-    it('should warn if "types" field is missing in package.json when declaration is enabled', () => {
+    it("should warn if \"types\" field is missing in package.json when declaration is enabled", () => {
         expect.assertions(1);
 
         const context = {
@@ -76,7 +76,7 @@ describe("validatePackageFields", () => {
         expect(warn).toHaveBeenCalledWith(context, "The 'types' field is missing in your package.json. This field should point to your type definitions file.");
     });
 
-    it('should handle empty "files" array in package.json', () => {
+    it("should handle empty \"files\" array in package.json", () => {
         expect.assertions(1);
 
         const context = {
@@ -89,7 +89,7 @@ describe("validatePackageFields", () => {
         expect(warn).toHaveBeenCalledWith(context, "The 'files' field in your package.json is empty. Please specify the files to be included in the package.");
     });
 
-    it('should handle "bin" field as both string and object in package.json', () => {
+    it("should handle \"bin\" field as both string and object in package.json", () => {
         expect.assertions(2);
 
         const contextStringBin = {
@@ -102,9 +102,11 @@ describe("validatePackageFields", () => {
         };
 
         validatePackageFields(contextStringBin as BuildContext);
+
         expect(warn).toHaveBeenCalledWith(contextStringBin, "The 'bin' field in your package.json should not use a .mjs extension for CommonJS binaries.");
 
         validatePackageFields(contextObjectBin as unknown as BuildContext);
+
         expect(warn).toHaveBeenCalledWith(contextObjectBin, "The 'bin.cli1' field in your package.json should not use a .mjs extension for CommonJS binaries.");
     });
 

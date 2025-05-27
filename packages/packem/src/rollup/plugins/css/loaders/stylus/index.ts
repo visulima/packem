@@ -10,7 +10,6 @@ import type { Loader } from "../types";
 import type { StylusLoaderOptions } from "./types";
 
 const populateSourcemapContent = async (sourcemap: RawSourceMap, basePath: string): Promise<string[] | undefined> => {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!sourcemap.sources || sourcemap.sourcesContent) {
         return undefined;
     }
@@ -22,7 +21,6 @@ const populateSourcemapContent = async (sourcemap: RawSourceMap, basePath: strin
             .map(async (source) => {
                 const file = normalize(join(basePath, source));
 
-                // eslint-disable-next-line security/detect-non-literal-fs-filename
                 if (!existsSync(file)) {
                     return undefined;
                 }
@@ -36,7 +34,7 @@ const populateSourcemapContent = async (sourcemap: RawSourceMap, basePath: strin
 interface StylusInstance {
     deps: (filename?: string) => string[];
     filename: string;
-    render: (callback: (error: Error | null, css: string) => void) => void;
+    render: (callback: (error: Error | undefined, css: string) => void) => void;
     sourcemap: RawSourceMap;
 }
 
@@ -70,7 +68,6 @@ const loader: Loader<StylusLoaderOptions> = {
             this.deps.add(normalize(dep));
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (style.sourcemap) {
             style.sourcemap.sourcesContent = await populateSourcemapContent(style.sourcemap, basePath);
         }
@@ -80,5 +77,4 @@ const loader: Loader<StylusLoaderOptions> = {
     test: /\.(styl|stylus)$/i,
 };
 
-// eslint-disable-next-line import/no-unused-modules
 export default loader;

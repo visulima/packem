@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import lowestCommonAncestor from "../../../../../../src/rollup/plugins/isolated-declarations/utils/lowest-common-ancestor";
 
-describe("lowestCommonAncestor", () => {
+describe(lowestCommonAncestor, () => {
     it("should return the lowest common ancestor", () => {
         expect.assertions(3);
 

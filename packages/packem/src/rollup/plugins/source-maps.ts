@@ -4,7 +4,6 @@ import { readFile } from "@visulima/fs";
 import { loadSourceMap } from "@visulima/source-map";
 import type { ExistingRawSourceMap, Plugin, PluginContext } from "rollup";
 
-// eslint-disable-next-line import/no-unused-modules
 export interface SourcemapsPluginOptions {
     exclude?: FilterPattern;
     include?: FilterPattern;
@@ -17,7 +16,7 @@ export const sourcemapsPlugin = ({ exclude, include }: SourcemapsPluginOptions =
     return {
         async load(this: PluginContext, id: string) {
             if (!filter(id)) {
-                return null;
+                return undefined;
             }
 
             let code: string;
@@ -37,7 +36,7 @@ export const sourcemapsPlugin = ({ exclude, include }: SourcemapsPluginOptions =
                 } catch {
                     this.warn("Failed reading file");
 
-                    return null;
+                    return undefined;
                 }
             }
 

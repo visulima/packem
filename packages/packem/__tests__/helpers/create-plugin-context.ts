@@ -1,4 +1,4 @@
-import type { InputOptions, NormalizedInputOptions, NullValue, Plugin, PluginContextMeta, ResolveIdResult, RollupError } from "rollup";
+import type { InputOptions, NormalizedInputOptions, undefinedValue, Plugin, PluginContextMeta, ResolveIdResult, RollupError } from "rollup";
 
 class MockPluginContext {
     public readonly warnings: string[];
@@ -17,12 +17,12 @@ class MockPluginContext {
         };
     }
 
-    public options(option: InputOptions): InputOptions | NullValue {
+    public options(option: InputOptions): InputOptions | undefinedValue {
         const { options } = this.oPlugin;
 
         if (typeof options === "function") {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return options.call(this as any, option) as InputOptions | NullValue;
+            return options.call(this as any, option) as InputOptions | undefinedValue;
         }
 
         throw new Error("Ooops");
@@ -64,7 +64,7 @@ class MockPluginContext {
     }
 
     // eslint-disable-next-line class-methods-use-this
-    public error(error: string | RollupError): never {
+    public error(error: RollupError | string): never {
         const message: string = typeof error === "string" ? error : error.message;
 
         throw new Error(message);

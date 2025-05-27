@@ -55,8 +55,8 @@ const createInitCommand = (cli: Cli): void => {
                 }
             } else {
                 log.message(
-                    // eslint-disable-next-line no-unsafe-optional-chaining
-                    "TypeScript version " + (packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript) + " is already installed",
+
+                    `TypeScript version ${packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript} is already installed`,
                 );
             }
 
@@ -72,7 +72,7 @@ const createInitCommand = (cli: Cli): void => {
                     const s = spinner();
 
                     s.start("Generating tsconfig.json");
-                    // eslint-disable-next-line eslint-comments/disable-enable-pair
+
                     /* eslint-disable perfectionist/sort-objects */
                     writeJsonSync(join(rootDirectory, "tsconfig.json"), {
                         compilerOptions: {
@@ -134,7 +134,7 @@ const createInitCommand = (cli: Cli): void => {
 
                 if (options.transformer && options.transformer !== "oxc" && !packages.includes(options.transformer as string)) {
                     const shouldInstall = await confirm({
-                        message: "Do you want to install " + options.transformer + "?",
+                        message: `Do you want to install ${options.transformer}?`,
                     });
 
                     if (shouldInstall) {
@@ -142,7 +142,7 @@ const createInitCommand = (cli: Cli): void => {
                     }
                 }
             } else {
-                log.message("Transformer " + options.transformer + " is already installed.");
+                log.message(`Transformer ${options.transformer} is already installed.`);
             }
 
             if (options.isolatedDeclarationTransformer === undefined) {
@@ -161,16 +161,16 @@ const createInitCommand = (cli: Cli): void => {
                         { label: "Typescript", value: "typescript" },
                         { label: "swc", value: "swc" },
                         { label: "OXC", value: "oxc" },
-                        { label: "None", value: null },
+                        { label: "None", value: undefined },
                     ],
                 });
 
-                if (options.isolatedDeclarationTransformer !== null) {
+                if (options.isolatedDeclarationTransformer !== undefined) {
                     let packageName: string | undefined;
 
                     switch (options.isolatedDeclarationTransformer) {
-                        case "typescript": {
-                            packageName = "typescript";
+                        case "oxc": {
+                            packageName = "oxc-transform";
 
                             break;
                         }
@@ -179,8 +179,8 @@ const createInitCommand = (cli: Cli): void => {
 
                             break;
                         }
-                        case "oxc": {
-                            packageName = "oxc-transform";
+                        case "typescript": {
+                            packageName = "typescript";
 
                             break;
                         }
@@ -191,7 +191,7 @@ const createInitCommand = (cli: Cli): void => {
 
                     if (packageName !== undefined && !packages.includes(packageName as string)) {
                         const shouldInstall = await confirm({
-                            message: "Do you want to install " + packageName + "?",
+                            message: `Do you want to install ${packageName}?`,
                         });
 
                         if (shouldInstall) {
@@ -252,7 +252,7 @@ const createInitCommand = (cli: Cli): void => {
                 cssLoaders.push(...extraCssLoaders);
 
                 const shouldInstall = await confirm({
-                    message: 'Do you want to install "' + cssLoaders.join('", "') + '"?',
+                    message: `Do you want to install "${cssLoaders.join("\", \"")}"?`,
                 });
 
                 if (shouldInstall) {
@@ -285,7 +285,7 @@ const createInitCommand = (cli: Cli): void => {
 
                 if (!cssLoaders.includes("lightningcss")) {
                     const shouldInstall = await confirm({
-                        message: 'Do you want to install "' + cssMinifier + '"?',
+                        message: `Do you want to install "${cssMinifier}"?`,
                     });
 
                     if (shouldInstall) {
@@ -321,7 +321,7 @@ const createInitCommand = (cli: Cli): void => {
             }
 
             if (options.cssMinifier && cssMinifier) {
-                packemConfig += "\n            minifier: " + cssMinifier + "Minifier,";
+                packemConfig += `\n            minifier: ${cssMinifier}Minifier,`;
             }
 
             if (options.css || options.cssMinifier) {
@@ -398,9 +398,9 @@ module.exports = defineConfig({
                 s.stop("Installed packages");
             }
 
-            s.start("Creating packem.config." + extension);
-            writeFileSync(join(rootDirectory, "packem.config." + extension), template);
-            s.stop("Created packem.config." + extension);
+            s.start(`Creating packem.config.${extension}`);
+            writeFileSync(join(rootDirectory, `packem.config.${extension}`), template);
+            s.stop(`Created packem.config.${extension}`);
 
             outro("Now you can run `packem build` to build your project");
         },

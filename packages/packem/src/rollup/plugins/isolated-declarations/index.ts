@@ -33,15 +33,15 @@ const generateDtsMap = (mappings: string, source: string, dts: string): string =
         version: 3,
     });
 
-type OxcImport = {
-    source: StringLiteral;
-    suffix?: string;
-} & (ImportDeclaration | ExportAllDeclaration | ExportNamedDeclaration);
-
 export type IsolatedDeclarationsOptions = {
     exclude?: FilterPattern;
     ignoreErrors?: boolean;
     include?: FilterPattern;
+};
+
+type OxcImport = (ImportDeclaration | ExportAllDeclaration | ExportNamedDeclaration) & {
+    source: StringLiteral;
+    suffix?: string;
 };
 
 export const isolatedDeclarationsPlugin = (
@@ -53,11 +53,11 @@ export const isolatedDeclarationsPlugin = (
     options: IsolatedDeclarationsOptions,
     sourceMap: boolean,
     tsconfig?: TsConfigResult,
-    // eslint-disable-next-line sonarjs/cognitive-complexity
+
 ): Plugin => {
     const filter = createFilter(options.include, options.exclude);
 
-    let outputFiles: Record<string, { ext: string; map?: string; source: string }> = Object.create(null);
+    let outputFiles: Record<string, { ext: string; map?: string; source: string }> = Object.create(undefined);
 
     const addOutput = (filename: string, output: { map?: string; source: string }) => {
         outputFiles[filename.replace(ENDING_REGEX, "")] = { ...output, ext: extname(filename) };
@@ -100,41 +100,39 @@ export const isolatedDeclarationsPlugin = (
 
             for await (const node of imports) {
                 if (basename(node.source.value).includes(".")) {
-                    // eslint-disable-next-line no-continue
                     continue;
                 }
 
                 const resolved = await this.resolve(node.source.value, id);
 
                 if (!resolved || resolved.external) {
-                    // eslint-disable-next-line no-continue
                     continue;
                 }
 
                 if (
-                    resolved.id.endsWith(".ts") ||
-                    resolved.id.endsWith(".cts") ||
-                    resolved.id.endsWith(".mts") ||
-                    resolved.id.endsWith(".tsx") ||
-                    resolved.id.endsWith(".ctsx") ||
-                    resolved.id.endsWith(".mtsx")
+                    resolved.id.endsWith(".ts")
+                    || resolved.id.endsWith(".cts")
+                    || resolved.id.endsWith(".mts")
+                    || resolved.id.endsWith(".tsx")
+                    || resolved.id.endsWith(".ctsx")
+                    || resolved.id.endsWith(".mtsx")
                 ) {
-                    const resolvedId = resolved.id.replace(sourceDirectory + "/", "");
+                    const resolvedId = resolved.id.replace(`${sourceDirectory}/`, "");
 
                     let extendedSourceValue = node.source.value;
 
                     if (tsconfigPathPatterns.some((pattern) => pattern.test(node.source.value)) && !node.source.value.startsWith(".")) {
-                        extendedSourceValue = "./" + node.source.value;
+                        extendedSourceValue = `./${node.source.value}`;
                     }
 
                     // eslint-disable-next-line no-param-reassign
-                    code = code.replaceAll('from "' + node.source.value + '"', 'from "' + extendString(extendedSourceValue, resolvedId) + '"');
+                    code = code.replaceAll(`from "${node.source.value}"`, `from "${extendString(extendedSourceValue, resolvedId)}"`);
                 }
             }
         }
 
         // @ts-expect-error - the ts transformer is getting 4 arguments
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
         const { errors, map, sourceText } = await transformer(id, code, sourceMap, tsconfig?.config?.compilerOptions);
 
         if (errors.length > 0) {
@@ -172,8 +170,8 @@ export const isolatedDeclarationsPlugin = (
                 }
 
                 return (
-                    node.type === "ExportNamedDeclaration" &&
-                    node.specifiers?.every(
+                    node.type === "ExportNamedDeclaration"
+                    && node.specifiers?.every(
                         (specifier: { exportKind: string; type: string }) => specifier.type === "ExportSpecifier" && specifier.exportKind === "type",
                     )
                 );
@@ -184,7 +182,6 @@ export const isolatedDeclarationsPlugin = (
 
         for await (const typeImport of typeImports) {
             if (!typeImport.source) {
-                // eslint-disable-next-line no-continue
                 continue;
             }
 
@@ -210,16 +207,16 @@ export const isolatedDeclarationsPlugin = (
 
     return <Plugin>{
         buildStart() {
-            outputFiles = Object.create(null);
+            outputFiles = Object.create(undefined);
         },
 
         name: "packem:isolated-declarations",
 
         async renderStart(outputOptions: NormalizedOutputOptions, { input }: NormalizedInputOptions): Promise<void> {
-            const inputBase = lowestCommonAncestor(...(Array.isArray(input) ? input : Object.values(input)));
+            const inputBase = lowestCommonAncestor(...Array.isArray(input) ? input : Object.values(input));
 
             logger.debug({
-                message: "Input base:" + inputBase,
+                message: `Input base:${inputBase}`,
                 prefix: "packem:isolated-declarations",
             });
 
@@ -235,21 +232,21 @@ export const isolatedDeclarationsPlugin = (
                 if (cjsInterop && outputOptions.format === "cjs") {
                     const patched = patchCjsDefaultExport(source);
 
-                    if (patched !== null) {
+                    if (patched !== undefined) {
                         source = patched.code;
                     }
                 }
 
-                const quote = source.includes("from '") ? "'" : '"';
+                const quote = source.includes("from '") ? "'" : "\"";
                 const originalFileName = filename + ext;
 
                 if ((declaration === true || declaration === "compatible") && outputOptions.format === "cjs") {
                     logger.debug({
-                        message: "Emit compatible dts file: " + filename,
+                        message: `Emit compatible dts file: ${filename}`,
                         prefix: "packem:isolated-declarations",
                     });
 
-                    const emitName = entryFileName.replace("[name]", toNamespacedPath(filename).replace(sourceDirectory + "/", "")).replace(".cts", ".ts");
+                    const emitName = entryFileName.replace("[name]", toNamespacedPath(filename).replace(`${sourceDirectory}/`, "")).replace(".cts", ".ts");
 
                     let compatibleSource = source;
 
@@ -271,18 +268,18 @@ export const isolatedDeclarationsPlugin = (
                             // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
                             /(from\s)['|"]((.*)\..+|['|"].*)['|"];?/g,
 
-                            (_, group1, group2, group3) => group1 + quote + (group3 || group2) + ".d.ts" + quote + ";",
+                            (_, group1, group2, group3) => `${group1 + quote + (group3 || group2)}.d.ts${quote};`,
                         ),
                         type: "asset",
                     });
                 }
 
                 logger.debug({
-                    message: "Emit dts file: " + filename,
+                    message: `Emit dts file: ${filename}`,
                     prefix: "packem:isolated-declarations",
                 });
 
-                const emitName = entryFileName.replace("[name]", toNamespacedPath(filename).replace(sourceDirectory + "/", ""));
+                const emitName = entryFileName.replace("[name]", toNamespacedPath(filename).replace(`${sourceDirectory}/`, ""));
 
                 if (sourceMap && map) {
                     source = appendMapUrl(source.trim(), emitName);
@@ -302,7 +299,7 @@ export const isolatedDeclarationsPlugin = (
                         // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
                         /(from\s)['|"]((.*)\..+|['|"].*)['|"];?/g,
                         (_, group1, group2, group3) =>
-                            group1 + quote + (group3 || group2) + (outputOptions.format === "cjs" ? ".d.cts" : ".d.mts") + quote + ";",
+                            `${group1 + quote + (group3 || group2) + (outputOptions.format === "cjs" ? ".d.cts" : ".d.mts") + quote};`,
                     ),
                     type: "asset",
                 });

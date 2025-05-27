@@ -32,7 +32,7 @@ describe("url resolver", () => {
         expect.assertions(1);
 
         const warning = await validateUrl(".foo{background:url(bg.png)}", {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-return
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             resolve: () => "lol" as any,
         });
 

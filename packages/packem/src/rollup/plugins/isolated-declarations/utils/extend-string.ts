@@ -22,7 +22,6 @@ const extendString = (baseString: string, referenceString: string): string => {
     let baseIndex = baseParts.length - 1;
     let referenceIndex = referenceParts.length - 1;
 
-    // eslint-disable-next-line security/detect-object-injection
     while (baseIndex >= 0 && referenceIndex >= 0 && baseParts[baseIndex] === referenceParts[referenceIndex]) {
         // eslint-disable-next-line no-plusplus
         baseIndex--;
@@ -34,10 +33,10 @@ const extendString = (baseString: string, referenceString: string): string => {
     const missingPart = referenceParts.slice(referenceIndex).join("/");
 
     if (!commonBase.startsWith(".") || commonBase === "") {
-        commonBase = "./" + commonBase;
+        commonBase = `./${commonBase}`;
     }
 
-    return commonBase + (missingPart ? "/" + missingPart : "");
+    return commonBase + (missingPart ? `/${missingPart}` : "");
 };
 
 export default extendString;

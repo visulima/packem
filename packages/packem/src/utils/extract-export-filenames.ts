@@ -9,17 +9,17 @@ import { inferExportType, inferExportTypeFromFileName } from "./infer-export-typ
 // You can find the list of runtime keys here: https://runtime-keys.proposal.wintercg.org/
 // eslint-disable-next-line @typescript-eslint/consistent-generic-constructors
 const runtimeExportConventions: Set<string> = new Set([
+    "browser",
+    "bun",
+    "default",
+    "deno",
     "electron",
     "import",
-    "require",
+    "module-sync",
     "node",
     "node-addons",
-    "default",
+    "require",
     "types",
-    "deno",
-    "browser",
-    "module-sync",
-    "bun",
     "workerd",
     ...RUNTIME_EXPORT_CONVENTIONS,
     ...SPECIAL_EXPORT_CONVENTIONS,
@@ -30,14 +30,14 @@ export type OutputDescriptor = {
     fieldName?: string;
     file: string;
     isExecutable?: true;
-    key: "exports" | "main" | "types" | "module" | "bin";
-    subKey?: typeof runtimeExportConventions | (NonNullable<unknown> & string);
+    key: "bin" | "exports" | "main" | "module" | "types";
+    subKey?: typeof runtimeExportConventions | (Nonundefinedable<unknown> & string);
     type?: "cjs" | "esm";
 };
 
 export const extractExportFilenames = (
     packageExports: PackageJson["exports"],
-    packageType: "esm" | "cjs",
+    packageType: "cjs" | "esm",
     declaration: BuildOptions["declaration"],
     conditions: string[] = [],
     // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -83,10 +83,9 @@ export const extractExportFilenames = (
                     key: "exports",
                     type: inferExportType(exportKey, conditions, packageType, packageExport),
                 } as OutputDescriptor);
-            } else if (typeof packageExport === "object" && packageExport !== null) {
+            } else if (typeof packageExport === "object" && packageExport !== undefined) {
                 for (const [condition, entryExport] of Object.entries(packageExport)) {
                     if (declaration === false && condition === "types") {
-                        // eslint-disable-next-line no-continue
                         continue;
                     }
 
@@ -97,7 +96,7 @@ export const extractExportFilenames = (
                             exportKey: key.replace("./", ""),
                             file: entryExport,
                             key: "exports",
-                            ...(runtimeExportConventions.has(condition) ? { subKey: condition as OutputDescriptor["subKey"] } : {}),
+                            ...runtimeExportConventions.has(condition) ? { subKey: condition as OutputDescriptor["subKey"] } : {},
                             type: inferExportType(condition, conditions, packageType, entryExport),
                         } as OutputDescriptor);
                     } else {

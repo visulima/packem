@@ -11,9 +11,8 @@ let cachedResolver: ResolverFactory | undefined;
 
 const packageJsonCache: FindPackageJsonCache = new Map();
 
-export type OxcResolveOptions = { ignoreSideEffectsForRoot?: boolean } & Omit<NapiResolveOptions, "tsconfig">;
+export type OxcResolveOptions = Omit<NapiResolveOptions, "tsconfig"> & { ignoreSideEffectsForRoot?: boolean };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: string, logger: Pail, tsconfigPath?: string): Plugin => {
     const { ignoreSideEffectsForRoot, ...userOptions } = options;
 
@@ -23,7 +22,7 @@ export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: stri
         // eslint-disable-next-line no-multi-assign
         resolver = cachedResolver = new ResolverFactory({
             ...userOptions,
-            roots: [...(userOptions.roots ?? []), rootDirectory],
+            roots: [...userOptions.roots ?? [], rootDirectory],
             tsconfig: tsconfigPath ? { configFile: tsconfigPath, references: "auto" } : undefined,
         });
     }
@@ -47,7 +46,7 @@ export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: stri
                         ],
                     });
 
-                    return null;
+                    return undefined;
                 }
 
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -74,10 +73,11 @@ export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: stri
                                 if (sideEffect.includes("/")) {
                                     return sideEffect;
                                 }
+
                                 return `**/${sideEffect}`;
                             });
 
-                            hasModuleSideEffects = createFilter(finalPackageSideEffects, null, {
+                            hasModuleSideEffects = createFilter(finalPackageSideEffects, undefined, {
                                 resolve: packageRoot,
                             });
                         }
@@ -116,7 +116,7 @@ export const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: stri
                     return { id, meta: rollupResolvedResult.meta, moduleSideEffects: hasModuleSideEffects(id) };
                 }
 
-                return null;
+                return undefined;
             },
             order: "post",
         },

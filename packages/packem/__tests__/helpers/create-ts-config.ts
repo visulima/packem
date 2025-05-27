@@ -3,7 +3,7 @@ import type { TsConfigJson } from "@visulima/tsconfig";
 
 const createTsConfig = async (fixturePath: string, config: TsConfigJson = {}, name = ""): Promise<void> => {
     await writeJson(
-        fixturePath + "/tsconfig" + name + ".json",
+        `${fixturePath}/tsconfig${name}.json`,
         {
             ...config,
             compilerOptions: {

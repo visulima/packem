@@ -1,15 +1,12 @@
 import type { BuildConfig, BuildConfigFunction, BuildPreset } from "../types";
 
-// eslint-disable-next-line import/no-unused-modules
 export type { BuildConfig, BuildConfigFunction, BuildHooks, BuildPreset } from "../types";
 
 /**
  * Defines a build configuration for Packem.
  * Supports both static configuration objects and dynamic configuration functions.
- *
- * @param config - Static build configuration object or function returning configuration
+ * @param config Static build configuration object or function returning configuration
  * @returns The provided configuration
- *
  * @example
  * ```typescript
  * // Static configuration
@@ -24,7 +21,6 @@ export type { BuildConfig, BuildConfigFunction, BuildHooks, BuildPreset } from "
  *   outDir: env === 'production' ? './dist' : './dev'
  * }));
  * ```
- *
  * @public
  */
 export const defineConfig = (config: BuildConfig | BuildConfigFunction): BuildConfig | BuildConfigFunction => config;
@@ -32,10 +28,8 @@ export const defineConfig = (config: BuildConfig | BuildConfigFunction): BuildCo
 /**
  * Defines a build preset for Packem.
  * Build presets provide reusable configuration templates that can be shared across projects.
- *
- * @param preset - Build preset configuration
+ * @param preset Build preset configuration
  * @returns The provided preset configuration
- *
  * @example
  * ```typescript
  * export default definePreset({
@@ -51,8 +45,7 @@ export const defineConfig = (config: BuildConfig | BuildConfigFunction): BuildCo
  *   }
  * });
  * ```
- *
  * @public
  */
-// eslint-disable-next-line import/no-unused-modules
+
 export const definePreset = (preset: BuildPreset): BuildPreset => preset;

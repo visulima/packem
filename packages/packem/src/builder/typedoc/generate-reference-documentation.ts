@@ -74,15 +74,15 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
             hideGenerator: true,
             out: outputDirectory,
             plugin: plugins,
-            ...(format === "inline"
+            ...format === "inline"
                 ? {
-                      hideBreadcrumbs: true,
-                      hidePageHeader: true,
-                      navigation: false,
-                      outputFileStrategy: "modules",
-                      useCodeBlocks: true,
-                  }
-                : {}),
+                    hideBreadcrumbs: true,
+                    hidePageHeader: true,
+                    navigation: false,
+                    outputFileStrategy: "modules",
+                    useCodeBlocks: true,
+                }
+                : {},
             // we dont need the default loader
         },
         [],
@@ -103,7 +103,6 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
                     throw new Error("The `marker` option is required when using the `inline` format.");
                 }
 
-                // eslint-disable-next-line security/detect-non-literal-fs-filename
                 const markdownPathsList = readdirSync(outputDirectory, {
                     withFileTypes: true,
                 }).filter((item) => item.isFile());
@@ -112,7 +111,6 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
 
                 for (const item of markdownPathsList) {
                     if (item.name === "README.md" && entries.length > 1) {
-                        // eslint-disable-next-line no-continue
                         continue;
                     }
 
@@ -124,7 +122,7 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
 
                 if (markdownContent !== "") {
                     const readmeContent = readFileSync(readmePath as string) as unknown as string;
-                    const updatedReadmeContent = replaceContentWithinMarker(readmeContent, marker, "\n" + markdownContent);
+                    const updatedReadmeContent = replaceContentWithinMarker(readmeContent, marker, `\n${markdownContent}`);
 
                     if (!updatedReadmeContent) {
                         logger.error({

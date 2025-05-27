@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import validateAliasEntries from "../../../src/validator/validate-alias-entries";
 
-describe("validateAliasEntries", () => {
+describe(validateAliasEntries, () => {
     it("should accept valid alias names and process them correctly", () => {
         expect.assertions(1);
 
-        const entries = { "#": __dirname, "@": __dirname, "@components": __dirname, "@components/test": __dirname, "~": __dirname, validAlias: __dirname };
+        const entries = { "#": __dirname, "@": __dirname, "@components": __dirname, "@components/test": __dirname, validAlias: __dirname, "~": __dirname };
 
         expect(() => validateAliasEntries(entries)).not.toThrow();
     });
@@ -48,7 +48,7 @@ describe("validateAliasEntries", () => {
 
         const entries = { "": "/valid/path" };
 
-        expect(() => validateAliasEntries(entries)).toThrow('Alias name "" is invalid. Alias names should be non-empty strings.');
+        expect(() => validateAliasEntries(entries)).toThrow("Alias name \"\" is invalid. Alias names should be non-empty strings.");
     });
 
     it("should throw an error for alias names starting with invalid characters", () => {
@@ -57,7 +57,7 @@ describe("validateAliasEntries", () => {
         const entries = { "1invalid": "/valid/path" };
 
         expect(() => validateAliasEntries(entries)).toThrow(
-            'Alias name "1invalid" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.',
+            "Alias name \"1invalid\" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.",
         );
     });
 
@@ -67,7 +67,7 @@ describe("validateAliasEntries", () => {
         const entries = { "invalid!alias": "/valid/path" };
 
         expect(() => validateAliasEntries(entries)).toThrow(
-            'Alias name "invalid!alias" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.',
+            "Alias name \"invalid!alias\" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.",
         );
     });
 
@@ -76,7 +76,7 @@ describe("validateAliasEntries", () => {
 
         const entries = { class: "/valid/path" };
 
-        expect(() => validateAliasEntries(entries)).toThrow('Alias name "class" is a reserved keyword and cannot be used.');
+        expect(() => validateAliasEntries(entries)).toThrow("Alias name \"class\" is a reserved keyword and cannot be used.");
     });
 
     it("should throw an error for target paths that do not exist", () => {
@@ -84,7 +84,7 @@ describe("validateAliasEntries", () => {
 
         const entries = { validAlias: "/invalid/path" };
 
-        expect(() => validateAliasEntries(entries)).toThrow('Target path "/invalid/path" for alias "validAlias" does not exist.');
+        expect(() => validateAliasEntries(entries)).toThrow("Target path \"/invalid/path\" for alias \"validAlias\" does not exist.");
     });
 
     it("should throw an error if the entries object contains @/ or ~/", () => {
@@ -93,13 +93,13 @@ describe("validateAliasEntries", () => {
         const entries = { "@/validAlias": "/valid/path" };
 
         expect(() => validateAliasEntries(entries)).toThrow(
-            'Alias name "@/validAlias" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.',
+            "Alias name \"@/validAlias\" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.",
         );
 
         const entries2 = { "~/validAlias": "/valid/path" };
 
         expect(() => validateAliasEntries(entries2)).toThrow(
-            'Alias name "~/validAlias" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.',
+            "Alias name \"~/validAlias\" is invalid. Alias names should start with a letter or underscore and only contain letters, numbers, underscores, and dashes.",
         );
     });
 });

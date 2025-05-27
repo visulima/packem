@@ -5,14 +5,15 @@ import type * as sass from "sass";
 // eslint-disable-next-line import/no-namespace
 import type * as sassEmbedded from "sass-embedded";
 
-export const getDefaultSassImplementation = (): "sass-embedded" | "sass" | "node-sass" => {
+export const getDefaultSassImplementation = (): "node-sass" | "sass-embedded" | "sass" => {
     const implementations = ["sass-embedded", "sass", "node-sass"];
 
     for (const impl of implementations) {
         try {
             // eslint-disable-next-line unicorn/prefer-module
             require.resolve(impl);
-            return impl as "sass-embedded" | "sass" | "node-sass";
+
+            return impl as "node-sass" | "sass-embedded" | "sass";
         } catch {
             // Continue to the next implementation
         }
@@ -22,14 +23,15 @@ export const getDefaultSassImplementation = (): "sass-embedded" | "sass" | "node
 };
 
 export const getSassImplementation = (
-    implementation: string | typeof sass | typeof sassEmbedded | typeof nodeSass,
-): typeof sass | typeof sassEmbedded | typeof nodeSass => {
+    implementation: string | typeof nodeSass | typeof sass | typeof sassEmbedded,
+): typeof nodeSass | typeof sass | typeof sassEmbedded => {
     let resolvedImplementation = implementation;
 
     if (typeof resolvedImplementation === "string") {
         // eslint-disable-next-line import/no-dynamic-require,global-require,@typescript-eslint/no-require-imports,unicorn/prefer-module,security/detect-non-literal-require
         resolvedImplementation = require(resolvedImplementation);
     }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { info = undefined } = resolvedImplementation as Record<string, any>;
 

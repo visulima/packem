@@ -92,7 +92,6 @@ export const ensurePCSSPlugins = async (plugins: PostCSSOptions["plugins"], cwd:
         if (!Array.isArray(plugin)) {
             ps.push(await ensurePCSSOption(plugin, "plugin", cwd));
 
-            // eslint-disable-next-line no-continue
             continue;
         }
 

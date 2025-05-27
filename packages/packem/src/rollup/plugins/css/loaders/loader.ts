@@ -1,6 +1,5 @@
 import type { Pail } from "@visulima/pail";
 import type PQueue from "p-queue";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import PQueueClass from "p-queue";
 
 import type { InternalStyleOptions, StyleOptions } from "../types";
@@ -18,6 +17,7 @@ const threadPoolSize = process.env.UV_THREADPOOL_SIZE ? Number.parseInt(process.
 interface LoadersOptions {
     /** @see {@link Options.extensions} */
     extensions: string[];
+
     /** @see {@link Options.loaders} */
     loaders: Loader[];
     logger: Pail;
@@ -49,7 +49,6 @@ export default class LoaderManager {
     public add<T extends Record<string, unknown>>(...loaders: Loader<T>[]): void {
         for (const loader of loaders) {
             if (this.loaders.has(loader.name)) {
-                // eslint-disable-next-line no-continue
                 continue;
             }
 
@@ -79,7 +78,7 @@ export default class LoaderManager {
         for await (const [name, loader] of this.loaders) {
             const loaderContext: LoaderContext = {
                 ...context,
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
                 options: (this.options[name as keyof StyleOptions] as Record<string, unknown>) ?? {},
             };
 

@@ -13,15 +13,15 @@ import { ENDING_REGEX } from "../../constants";
 import type { InternalBuildOptions } from "../../types";
 import resolveAliases from "../utils/resolve-aliases";
 
-type MaybeFalsy<T> = T | undefined | null | false;
+type MaybeFalsy<T> = T | false | undefined | undefined;
 
-const getRegExps = (data: MaybeFalsy<string | RegExp>[], type: "include" | "exclude", logger: Pail): RegExp[] =>
+const getRegExps = (data: MaybeFalsy<RegExp | string>[], type: "exclude" | "include", logger: Pail): RegExp[] =>
     // eslint-disable-next-line unicorn/no-array-reduce
     data.reduce<RegExp[]>((result, entry, index) => {
         if (entry instanceof RegExp) {
             result.push(entry);
         } else if (typeof entry === "string" && entry.length > 0) {
-            result.push(new RegExp("^" + entry.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$"));
+            result.push(new RegExp(`^${entry.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)}$`));
         } else {
             logger.warn(`Ignoring wrong entry type #${index} in '${type}' option: ${JSON.stringify(entry)}`);
         }
@@ -34,7 +34,7 @@ const calledImplicitExternals = new Map<string, boolean>();
 const logExternalMessage = (originalId: string, logger: Pail): void => {
     if (!calledImplicitExternals.has(originalId)) {
         logger.info({
-            message: 'Inlined implicit external "' + cyan(originalId) + '". If this is incorrect, add it to the "externals" option.',
+            message: `Inlined implicit external "${cyan(originalId)}". If this is incorrect, add it to the "externals" option.`,
             prefix: "plugin:packem:resolve-externals",
         });
     }
@@ -42,7 +42,7 @@ const logExternalMessage = (originalId: string, logger: Pail): void => {
     calledImplicitExternals.set(originalId, true);
 };
 
-const prefixedBuiltins = new Set(["node:test", "node:sqlite"]);
+const prefixedBuiltins = new Set(["node:sqlite", "node:test"]);
 
 export type ResolveExternalsPluginOptions = {
     /**
@@ -56,43 +56,47 @@ export type ResolveExternalsPluginOptions = {
      * ignore will simply leave all builtins imports as written in your code.
      *
      * Note that scheme handling is always applied, regardless of the builtins options being enabled or not.
-     *
      * @default true
      */
     builtins?: boolean;
+
     /**
      * node: prefix handing for importing Node builtins:
      * - `'add'`    turns `'path'` to `'node:path'`
      * - `'strip'`  turns `'node:path'` to `'path'`
      * - `'ignore'` leaves Node builtin names as-is
-     *
      * @default "add"
      */
-    builtinsPrefix?: "add" | "strip" | "ignore";
+    builtinsPrefix?: "add" | "ignore" | "strip";
+
     /**
      * Mark dependencies as external.
      *
      * Defaults to `true`.
      */
     deps?: boolean;
+
     /**
      * Mark devDependencies as external.
      *
      * Defaults to `false`.
      */
     devDeps?: boolean;
+
     /**
      * Force exclude these deps from the list of externals, regardless of other settings.
      *
      * Defaults to `[]` (force exclude nothing).
      */
-    exclude?: MaybeFalsy<string | RegExp>[];
+    exclude?: MaybeFalsy<RegExp | string>[];
+
     /**
      * Mark optionalDependencies as external.
      *
      * Defaults to `true`.
      */
     optDeps?: boolean;
+
     /**
      * Mark peerDependencies as external.
      *
@@ -107,14 +111,14 @@ export const resolveExternalsPlugin = (
     buildOptions: InternalBuildOptions,
     logger: Pail,
     options: ResolveExternalsPluginOptions,
-    // eslint-disable-next-line sonarjs/cognitive-complexity
+
 ): Plugin => {
     const cachedGlobFiles = new Map<string, string[]>();
     const cacheResolved = new Map<string, boolean>();
 
     // Map the include and exclude options to arrays of regexes.
     const include = new Set(getRegExps([...buildOptions.externals], "include", logger));
-    const exclude = new Set(getRegExps([...(options.exclude ?? [])], "exclude", logger));
+    const exclude = new Set(getRegExps([...options.exclude ?? []], "exclude", logger));
 
     const dependencies: Record<string, string> = {};
 
@@ -131,7 +135,7 @@ export const resolveExternalsPlugin = (
 
     if (names.length > 0) {
         // eslint-disable-next-line regexp/no-empty-group
-        include.add(new RegExp("^(?:" + names.join("|") + ")(?:/.+)?$"));
+        include.add(new RegExp(`^(?:${names.join("|")})(?:/.+)?$`));
     }
 
     if (packageJson.peerDependenciesMeta) {
@@ -177,10 +181,10 @@ export const resolveExternalsPlugin = (
 
                 for (const id of [originalId, resolvedId].filter(Boolean)) {
                     if (
-                        /^(?:\0|\.{1,2}\/)/.test(id) || // Ignore virtual modules and relative imports
-                        isAbsolute(id) || // Ignore already resolved ids
-                        new RegExp(`${buildOptions.sourceDir}[/.*|\\.*]`).test(id) || // Ignore source files
-                        (packageJson.name && id.startsWith(packageJson.name)) // Ignore self import
+                        /^(?:\0|\.{1,2}\/)/.test(id) // Ignore virtual modules and relative imports
+                        || isAbsolute(id) // Ignore already resolved ids
+                        || new RegExp(`${buildOptions.sourceDir}[/.*|\\.*]`).test(id) // Ignore source files
+                        || (packageJson.name && id.startsWith(packageJson.name)) // Ignore self import
                     ) {
                         cacheResolved.set(id, false);
 
@@ -200,17 +204,15 @@ export const resolveExternalsPlugin = (
                     }
 
                     // package.json imports are not externals
-                    // eslint-disable-next-line @typescript-eslint/prefer-string-starts-ends-with
+
                     if (id[0] === "#" && packageJson.imports) {
                         for (const [key, value] of Object.entries(packageJson.imports)) {
-                            // eslint-disable-next-line @typescript-eslint/prefer-string-starts-ends-with
                             if (key[0] !== "#") {
                                 logger.debug({
-                                    message: 'Ignoring package.json import "' + cyan(key) + '" because it does not start with "#".',
+                                    message: `Ignoring package.json import "${cyan(key)}" because it does not start with "#".`,
                                     prefix: "plugin:packem:resolve-externals",
                                 });
 
-                                // eslint-disable-next-line no-continue
                                 continue;
                             }
 
@@ -227,7 +229,6 @@ export const resolveExternalsPlugin = (
                                 if (cachedGlobFiles.has(key)) {
                                     files = cachedGlobFiles.get(key) as string[];
                                 } else {
-                                    // eslint-disable-next-line security/detect-non-literal-fs-filename
                                     files = readdirSync(join(buildOptions.rootDir, (value as string).replace("/*", "")), { withFileTypes: true })
                                         .filter((dirent) => dirent.isFile())
                                         .map((dirent) => dirent.name);
@@ -273,7 +274,7 @@ export const resolveExternalsPlugin = (
             async handler(specifier: string, _, { isEntry }): Promise<ResolveIdResult> {
                 // Ignore entry points (they should always be resolved)
                 if (isEntry) {
-                    return null;
+                    return undefined;
                 }
 
                 // Handle node builtins.
@@ -293,14 +294,14 @@ export const resolveExternalsPlugin = (
                         id:
                             options.builtinsPrefix === "ignore"
                                 ? specifier
-                                : options.builtinsPrefix === "add" || !isBuiltin(stripped)
+                                : (options.builtinsPrefix === "add" || !isBuiltin(stripped)
                                   ? "node:" + stripped
-                                  : stripped,
+                                  : stripped),
                         moduleSideEffects: false,
                     };
                 }
 
-                return null;
+                return undefined;
             },
             order: "pre",
         },

@@ -18,7 +18,6 @@ const JSONPlugin = (options: RollupJsonOptions): Plugin => {
                 result.code = result.code.replace(EXPORT_DEFAULT, "module.exports = ");
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return result;
         },
     };

@@ -4,11 +4,11 @@ import { describe, expect, it } from "vitest";
 import type { OutputDescriptor } from "../../../src/utils/extract-export-filenames";
 import { extractExportFilenames } from "../../../src/utils/extract-export-filenames";
 
-describe("extractExportFilenames", () => {
+describe(extractExportFilenames, () => {
     it("should return an empty array when packageExports is falsy", () => {
         expect.assertions(1);
 
-        const packageExports = null;
+        const packageExports = undefined;
         const type = "esm";
 
         const result = extractExportFilenames(packageExports, type, false);
@@ -81,7 +81,7 @@ describe("extractExportFilenames", () => {
         ]);
     });
 
-    it('should infer the export type as "esm" when condition is "import"', () => {
+    it("should infer the export type as \"esm\" when condition is \"import\"", () => {
         expect.assertions(1);
 
         const packageExports = {
@@ -114,7 +114,7 @@ describe("extractExportFilenames", () => {
         ]);
     });
 
-    it('should infer the export type as "esm" when condition is "import" and "cjs" when condition is "require"', () => {
+    it("should infer the export type as \"esm\" when condition is \"import\" and \"cjs\" when condition is \"require\"", () => {
         expect.assertions(1);
 
         const packageExports = {
@@ -163,7 +163,7 @@ describe("extractExportFilenames", () => {
         ]);
     });
 
-    it('should throw an error and exit with code 1 when inferredType does not match the package.json "type" field', () => {
+    it("should throw an error and exit with code 1 when inferredType does not match the package.json \"type\" field", () => {
         expect.assertions(1);
 
         const packageExports = "./src/index.cjs";
@@ -171,7 +171,7 @@ describe("extractExportFilenames", () => {
 
         expect(() => {
             extractExportFilenames(packageExports, type, false);
-        }).toThrow('Exported file "./src/index.cjs" has an extension that does not match the package.json type "module".');
+        }).toThrow("Exported file \"./src/index.cjs\" has an extension that does not match the package.json type \"module\".");
     });
 
     it.each([

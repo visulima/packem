@@ -24,7 +24,7 @@ const cssnanoMinifier: Minifier<Options> = {
             return {
                 ...data,
                 css: resultMinified.css,
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
                 map: resultMinified.map ? resultMinified.map.toString() : undefined,
             };
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,5 +37,4 @@ const cssnanoMinifier: Minifier<Options> = {
     name: "cssnano",
 };
 
-// eslint-disable-next-line import/no-unused-modules
 export default cssnanoMinifier;

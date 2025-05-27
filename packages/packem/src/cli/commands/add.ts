@@ -72,7 +72,7 @@ const createAddCommand = (cli: Cli): void => {
                     // add typedoc to the builder key
                     magic.replace("builder: {", `builder: {\n        typedoc: typedocBuilder,\n    `);
                 } else {
-                    magic.replace(transformerSearchKey, transformerReplaceKey + "\n    builder: {\n        typedoc: typedocBuilder,\n    },");
+                    magic.replace(transformerSearchKey, `${transformerReplaceKey}\n    builder: {\n        typedoc: typedocBuilder,\n    },`);
                 }
 
                 logger.info("Adding typedoc dependencies...");
@@ -91,7 +91,6 @@ const createAddCommand = (cli: Cli): void => {
                     return;
                 }
 
-                // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
                 const cssLoaders: (keyof typeof cssLoaderDependencies | "sourceMap")[] = [];
 
                 const mainCssLoader = (await select({
@@ -201,8 +200,8 @@ const createAddCommand = (cli: Cli): void => {
                 } else {
                     magic.replace(
                         transformerSearchKey,
-                        transformerReplaceKey +
-                            `\n    rollup: {\n        css: {${cssMinifier ? `\n            minifier: ${cssMinifier as string}Minifier,` : ""}\n            loaders: [${stringCssLoaders}],\n        },\n    },`,
+                        `${transformerReplaceKey
+                        }\n    rollup: {\n        css: {${cssMinifier ? `\n            minifier: ${cssMinifier as string}Minifier,` : ""}\n            loaders: [${stringCssLoaders}],\n        },\n    },`,
                     );
                 }
 

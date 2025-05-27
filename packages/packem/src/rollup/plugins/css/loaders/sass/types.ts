@@ -11,7 +11,7 @@ import type { StringOptions as SassEmbeddedStringOptions } from "sass-embedded";
 
 import type { Environment } from "../../../../../types";
 
-export type SassApiType = "legacy" | "modern" | "modern-compiler";
+export type SassApiType = "legacy" | "modern-compiler" | "modern";
 
 export type SassLoaderContext = {
     environment: Environment;
@@ -21,13 +21,7 @@ export type SassLoaderContext = {
 
 export type SassLoaderOptions = {
     additionalData:
-        | string
-        | ((content: string | Buffer, loaderContext: SassLoaderContext) => string)
-        | ((content: string | Buffer, loaderContext: SassLoaderContext) => Promise<string>);
-    implementation?: "sass-embedded" | "sass" | "node-sass";
+        string | ((content: string | Buffer, loaderContext: SassLoaderContext) => Promise<string>) | ((content: string | Buffer, loaderContext: SassLoaderContext) => string);
+    implementation?: "node-sass" | "sass-embedded" | "sass";
     warnRuleAsWarning?: boolean;
-} & (
-    | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">
-    | Omit<SassEmbeddedStringOptions<"sync">, "charset" | "indentedSyntax">
-    | Omit<NodeSassSyncOptions, "data" | "sourceMapContents" | "sourceMapEmbed" | "sourceMapRoot" | "outFile">
-);
+} & (Omit<NodeSassSyncOptions, "data" | "sourceMapContents" | "sourceMapEmbed" | "sourceMapRoot" | "outFile"> | Omit<SassEmbeddedStringOptions<"sync">, "charset" | "indentedSyntax"> | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">);

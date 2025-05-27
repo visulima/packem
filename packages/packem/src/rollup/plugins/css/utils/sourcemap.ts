@@ -39,7 +39,6 @@ class MapModifier {
             return this;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (this.map.sources) {
             this.map.sources = this.map.sources.map((s) => op(s));
         }

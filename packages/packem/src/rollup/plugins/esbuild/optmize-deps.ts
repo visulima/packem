@@ -16,7 +16,6 @@ import type { Optimized, OptimizeDepsOptions, OptimizeDepsResult } from "./types
 
 const slash = (p: string) => p.replaceAll("\\", "/");
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsResult> => {
     // eslint-disable-next-line unicorn/prevent-abbreviations
     const cacheDir = findCacheDirSync("@visulima/packem/optimize-deps", {
@@ -25,7 +24,7 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
     });
 
     if (!cacheDir) {
-        throw new Error('[packem:optimize-deps]: failed to find or create cache directory "node_modules/.cache/packem/optimize_deps".');
+        throw new Error("[packem:optimize-deps]: failed to find or create cache directory \"node_modules/.cache/packem/optimize_deps\".");
     }
 
     await init;
@@ -44,7 +43,7 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
             {
                 name: "optimize-deps",
                 async setup(build) {
-                    build.onResolve({ filter: /.*/ }, async (arguments_: OnResolveArgs): Promise<OnResolveResult | null | undefined> => {
+                    build.onResolve({ filter: /.*/ }, async (arguments_: OnResolveArgs): Promise<OnResolveResult | undefined | undefined> => {
                         if (options.exclude?.includes(arguments_.path)) {
                             return {
                                 external: true,
@@ -52,7 +51,7 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
                         }
 
                         if (arguments_.pluginData?.__resolving_dep_path__) {
-                            return null; // use default resolve algorithm
+                            return undefined; // use default resolve algorithm
                         }
 
                         if (options.include.includes(arguments_.path)) {
@@ -76,7 +75,7 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
                             };
                         }
 
-                        return null;
+                        return undefined;
                     });
 
                     build.onLoad({ filter: /.*/, namespace: "optimize-deps" }, async (arguments_) => {
@@ -90,7 +89,7 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
                     });
                 },
             },
-            ...(options.esbuildOptions?.plugins ?? []),
+            ...options.esbuildOptions?.plugins ?? [],
         ],
     });
 

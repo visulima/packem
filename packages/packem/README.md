@@ -328,6 +328,9 @@ There are always cases that you need to share code among bundles, but they don't
 
 ```js
 // src/util.shared-runtime.js
+/**
+ *
+ */
 export function sharedUtil() {
     /* ... */
 }
@@ -337,12 +340,12 @@ Then you can use them in different entry files:
 
 ```js
 // src/index.js
-import { sharedUtil } from "./util.shared-runtime";
+import { sharedUtil as sharedUtility } from "./util.shared-runtime";
 ```
 
 ```js
 // src/lite.js
-import { sharedUtil } from "./util.shared-runtime";
+import { sharedUtil as sharedUtility } from "./util.shared-runtime";
 ```
 
 `packem` will bundle the shared module into a separate **layer** which matches the file name convention, in the above case it's "shared", and that bundle will be referenced by the different entry bundles.
@@ -356,8 +359,9 @@ With multiple runtime bundles, such as having `default` and `react-server` toget
 
 ```js
 "use client";
+
 // src/app-context.shared-runtime.js
-export const AppContext = React.createContext(null);
+export const AppContext = React.createContext(undefined);
 ```
 
 Then you can use them in different entry files:
@@ -396,7 +400,7 @@ Use the `--visualize` flag to generate a `packem-bundle-analyze.html` file at bu
 `packem` supports building module workers with the `--workers` flag, which are a special type of bundle that can be used to run code in a web worker.
 
 ```js
-worker = new Worker(new URL("./worker.js", import.meta.url), { type: "module" });
+worker = new Worker(new URL("worker.js", import.meta.url), { type: "module" });
 // or simply:
 worker = new Worker("./worker.js", { type: "module" });
 ```
@@ -420,8 +424,8 @@ The resolved plugins will be in the following order:
 - Rollup post build plugins (minify, manifest, copy, reporting)
 
 ```typescript
-import { defineConfig } from "@visulima/packem/config";
 import { optimizeLodashImports } from "@optimize-lodash/rollup-plugin";
+import { defineConfig } from "@visulima/packem/config";
 
 export default defineConfig({
     // ...
@@ -450,13 +454,13 @@ Native Node.js import mapping supports conditional imports (eg. resolving differ
 {
     // ...
 
-    imports: {
+    "imports": {
         // Mapping '~utils' to './src/utils.js'
         "~utils": "./src/utils.js",
 
         // Native Node.js import mapping (can't reference ./src)
-        "#internal-package": "./vendors/package/index.js",
-    },
+        "#internal-package": "./vendors/package/index.js"
+    }
 }
 ```
 
@@ -504,21 +508,21 @@ import { packem } from "@visulima/packem";
 
 // Basic usage
 await packem("./src", {
-    mode: "build",
     environment: "production",
+    mode: "build",
 });
 
 // With custom options
 await packem("./src", {
-    mode: "build",
-    environment: "development",
     declaration: true,
-    minify: true,
-    sourcemap: true,
+    environment: "development",
     logger: {
         // Custom logger options
         level: "debug",
     },
+    minify: true,
+    mode: "build",
+    sourcemap: true,
 });
 ```
 
@@ -558,10 +562,10 @@ export default defineConfig({
             limit: 1024 * 1024, // 1MB
             // or / and limits per file
             limits: {
-                "index.cjs": 1024 * 1024, // 1MB
-                "test.mjs": "1MB",
                 // Glob pattern
                 "**/*.mjs": "1MB",
+                "index.cjs": 1024 * 1024, // 1MB
+                "test.mjs": "1MB",
             },
         },
     },
@@ -644,13 +648,12 @@ Default is `typescript`.
 
 ```ts
 import { defineConfig } from "@visulima/packem/config";
-import transformer from "@visulima/packem/transformer/esbuild";
 import isolatedDeclarationTransformer from "@visulima/packem/dts/isolated/transformer/typescript";
+import transformer from "@visulima/packem/transformer/esbuild";
 
-// eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
-    transformer,
     isolatedDeclarationTransformer,
+    transformer,
 });
 ```
 
@@ -700,17 +703,17 @@ Add the loader to your `packem.config.ts`:
 
 ```typescript
 import { defineConfig } from "@visulima/packem/config";
-import transformer from "@visulima/packem/transformer/esbuild";
 import postcssLoader from "@visulima/packem/css/loader/postcss";
 import sourceMapLoader from "@visulima/packem/css/loader/sourcemap";
+import transformer from "@visulima/packem/transformer/esbuild";
 
 export default defineConfig({
-    transformer,
     rollup: {
         css: {
             loaders: [postcssLoader, sourceMapLoader],
         },
     },
+    transformer,
 });
 ```
 
@@ -746,18 +749,18 @@ Add the loader to your `packem.config.ts`:
 
 ```typescript
 import { defineConfig } from "@visulima/packem/config";
-import transformer from "@visulima/packem/transformer/esbuild";
 import postcssLoader from "@visulima/packem/css/loader/postcss";
 import sassLoader from "@visulima/packem/css/loader/sass";
 import sourceMapLoader from "@visulima/packem/css/loader/sourcemap";
+import transformer from "@visulima/packem/transformer/esbuild";
 
 export default defineConfig({
-    transformer,
     rollup: {
         css: {
             loaders: [postcssLoader, sassLoader, sourceMapLoader],
         },
     },
+    transformer,
 });
 ```
 
@@ -781,18 +784,18 @@ Add the loader to your `packem.config.ts`:
 
 ```typescript
 import { defineConfig } from "@visulima/packem/config";
-import transformer from "@visulima/packem/transformer/esbuild";
-import postcssLoader from "@visulima/packem/css/loader/postcss";
 import lessLoader from "@visulima/packem/css/loader/less";
+import postcssLoader from "@visulima/packem/css/loader/postcss";
 import sourceMapLoader from "@visulima/packem/css/loader/sourcemap";
+import transformer from "@visulima/packem/transformer/esbuild";
 
 export default defineConfig({
-    transformer,
     rollup: {
         css: {
             loaders: [postcssLoader, lessLoader, sourceMapLoader],
         },
     },
+    transformer,
 });
 ```
 
@@ -816,18 +819,18 @@ Add the loader to your `packem.config.ts`:
 
 ```typescript
 import { defineConfig } from "@visulima/packem/config";
-import transformer from "@visulima/packem/transformer/esbuild";
 import postcssLoader from "@visulima/packem/css/loader/postcss";
-import stylusLoader from "@visulima/packem/css/loader/stylus";
 import sourceMapLoader from "@visulima/packem/css/loader/sourcemap";
+import stylusLoader from "@visulima/packem/css/loader/stylus";
+import transformer from "@visulima/packem/transformer/esbuild";
 
 export default defineConfig({
-    transformer,
     rollup: {
         css: {
             loaders: [postcssLoader, stylusLoader, sourceMapLoader],
         },
     },
+    transformer,
 });
 ```
 
@@ -892,7 +895,7 @@ Will look for `_custom` first (_with the appropriate extension(s)_), and then fo
 styles({
     mode: "inject", // Unnecessary, set by default
     // ...or with custom options for injector
-    mode: ["inject", { container: "body", singleTag: true, prepend: true, attributes: { id: "global" } }],
+    mode: ["inject", { attributes: { id: "global" }, container: "body", prepend: true, singleTag: true }],
     // ...or with custom injector
     mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(id)})`],
 });
@@ -945,10 +948,12 @@ import { defineConfig } from "@visulima/packem/config";
 export default defineConfig({
     // ...
     onSuccess() {
-        const server = http.createServer((req, res) => {
+        const server = http.createServer((request, res) => {
             res.end("Hello World!");
         });
+
         server.listen(3000);
+
         return () => {
             server.close();
         };
@@ -1004,6 +1009,7 @@ This will provide the following type shims:
 > ```ts
 > declare module "*.svg" {
 >     const content: React.FC<React.SVGProps<SVGElement>>;
+>
 >     export default content;
 > }
 > ```

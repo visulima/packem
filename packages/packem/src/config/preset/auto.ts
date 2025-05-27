@@ -37,9 +37,9 @@ const autoPreset: BuildPreset = {
 
             if (packageJson.publishConfig) {
                 context.logger.info(
-                    'Using publishConfig found in package.json, to override the default key-value pairs of "' +
-                        Object.keys(packageJson.publishConfig).join(", ") +
-                        '".',
+                    `Using publishConfig found in package.json, to override the default key-value pairs of "${
+                        Object.keys(packageJson.publishConfig).join(", ")
+                    }".`,
                 );
                 context.logger.debug(packageJson.publishConfig);
 
@@ -65,9 +65,9 @@ const autoPreset: BuildPreset = {
                             .map((buildEntry) => {
                                 if (buildEntry.fileAlias) {
                                     return (
-                                        bold(buildEntry.fileAlias) +
-                                        " => " +
-                                        bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*"))
+                                        `${bold(buildEntry.fileAlias)
+                                        } => ${
+                                            bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*"))}`
                                     );
                                 }
 

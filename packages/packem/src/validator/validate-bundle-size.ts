@@ -19,7 +19,7 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
                 message: `Invalid limit for ${path}: ${rawLimit}`,
                 prefix: "Validation: File Size",
             });
-            // eslint-disable-next-line no-continue
+
             continue;
         }
 
@@ -34,7 +34,7 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
                 message: foundEntry ? `Entry file has no size information: ${path}.` : `Entry file not found: ${path}, please check your configuration.`,
                 prefix: "Validation: File Size",
             });
-            // eslint-disable-next-line no-continue
+
             continue;
         }
 
@@ -50,6 +50,7 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
                 if (logged) {
                     context.logger.raw("\n");
                 }
+
                 context.logger.warn({
                     message,
                     prefix: "validation:file-size",
@@ -64,6 +65,7 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
         // eslint-disable-next-line unicorn/no-array-reduce
         const totalSize = context.buildEntries.reduce((accumulator, entry) => {
             const bytes = entry.size?.bytes;
+
             return accumulator + (typeof bytes === "number" ? bytes : 0);
         }, 0);
 
@@ -74,6 +76,7 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
                 message: `Invalid total limit: ${totalLimit}`,
                 prefix: "Validation: File Size",
             });
+
             return;
         }
 
@@ -86,6 +89,7 @@ const validateBundleSize = (context: BuildContext, logged: boolean): void => {
                 if (logged && Object.keys(limits).length === 0) {
                     context.logger.raw("\n");
                 }
+
                 context.logger.warn({
                     message,
                     prefix: "validation:file-size",

@@ -4,16 +4,15 @@ import type { ObjectHook, Plugin } from "rollup";
 import type FileCache from "../../utils/file-cache";
 import getHash from "../utils/get-hash";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-redundant-type-constituents
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getHandler = (plugin: ObjectHook<any> | ((...arguments_: any[]) => any)): ((...arguments_: any[]) => any) => plugin.handler || plugin;
 
 /**
  * Wrap a Rollup plugin to add caching to various hooks.
- *
- * @param {Plugin} plugin
- * @param {FileCache} cache
- * @param {string} subDirectory
- * @returns {Plugin}
+ * @param plugin
+ * @param cache
+ * @param subDirectory
+ * @returns
  */
 const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugin =>
     <Plugin>{
@@ -33,7 +32,7 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
 
         async load(id) {
             if (!plugin.load) {
-                return null;
+                return undefined;
             }
 
             const pluginPath = join(subDirectory, plugin.name);
@@ -47,7 +46,6 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
 
             cache.set(cacheKey, result, pluginPath);
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return result;
         },
 
@@ -55,7 +53,7 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
 
         async resolveId(id, importer, options) {
             if (!plugin.resolveId) {
-                return null;
+                return undefined;
             }
 
             const pluginPath = join(subDirectory, plugin.name);
@@ -69,13 +67,12 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
 
             cache.set(cacheKey, result, pluginPath);
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return result;
         },
 
         async transform(code, id) {
             if (!plugin.transform) {
-                return null;
+                return undefined;
             }
 
             const pluginPath = join(subDirectory, plugin.name);
@@ -89,7 +86,6 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
 
             cache.set(cacheKey, result, pluginPath);
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return result;
         },
     };

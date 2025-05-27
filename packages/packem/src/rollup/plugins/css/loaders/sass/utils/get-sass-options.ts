@@ -25,16 +25,16 @@ const getSassOptions = async (
     const sassOptions = {
         ...otherOptions,
         data: options.additionalData
-            ? typeof options.additionalData === "function"
+            ? (typeof options.additionalData === "function"
                 ? await options.additionalData(content, loaderContext)
-                : `${options.additionalData}\n${content}`
+                : `${options.additionalData}\n${content}`)
             : content,
     };
 
     if (!(sassOptions as StringOptions<"async">).logger) {
         const needEmitWarning = warnRuleAsWarning !== false;
         const formatSpan = (span: SourceSpan) =>
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+
             `Warning on line ${span.start.line}, column ${span.start.column} of ${span.url ?? "-"}:${span.start.line}:${span.start.column}:\n`;
 
         const formatDebugSpan = (span: SourceSpan) => `[debug:${span.start.line}:${span.start.column}] `;
@@ -43,7 +43,6 @@ const getSassOptions = async (
             debug(message, loggerOptions) {
                 let builtMessage = "";
 
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                 if (loggerOptions.span) {
                     builtMessage = formatDebugSpan(loggerOptions.span);
                 }
@@ -69,7 +68,7 @@ const getSassOptions = async (
                     builtMessage += `\n\n${loggerOptions.span.start.line} | ${loggerOptions.span.context}`;
                 }
 
-                if (loggerOptions.stack && loggerOptions.stack !== "null") {
+                if (loggerOptions.stack && loggerOptions.stack !== "undefined") {
                     builtMessage += `\n\n${loggerOptions.stack}`;
                 }
 
@@ -110,13 +109,13 @@ const getSassOptions = async (
             ...((sassOptions as StringOptions<"async">).loadPaths ? [...((sassOptions as StringOptions<"async">).loadPaths as string[])] : []).map(
                 (includePath: string) => (isAbsolute(includePath) ? includePath : join(process.cwd(), includePath)),
             ),
-            ...(process.env.SASS_PATH ? process.env.SASS_PATH.split(process.platform === "win32" ? ";" : ":") : []),
+            ...process.env.SASS_PATH ? process.env.SASS_PATH.split(process.platform === "win32" ? ";" : ":") : [],
         ];
 
         (sassOptions as StringOptions<"async">).importers = (sassOptions as StringOptions<"async">).importers
-            ? Array.isArray((sassOptions as StringOptions<"async">).importers)
+            ? (Array.isArray((sassOptions as StringOptions<"async">).importers)
                 ? [...((sassOptions as StringOptions<"async">).importers as Importer[])]
-                : (sassOptions as StringOptions<"async">).importers
+                : (sassOptions as StringOptions<"async">).importers)
             : [];
     } else {
         (sassOptions as NodeSassOptions).file = resourcePath;
@@ -138,16 +137,16 @@ const getSassOptions = async (
         const extension = extname(resourcePath);
 
         // If we are compiling sass and indentedSyntax isn't set, automatically set it.
-        (sassOptions as NodeSassOptions).indentedSyntax =
-            extension && extension.toLowerCase() === ".sass" && (sassOptions as NodeSassOptions).indentedSyntax === undefined
+        (sassOptions as NodeSassOptions).indentedSyntax
+            = extension && extension.toLowerCase() === ".sass" && (sassOptions as NodeSassOptions).indentedSyntax === undefined
                 ? true
                 : Boolean((sassOptions as NodeSassOptions).indentedSyntax);
 
         // Allow passing custom importers to `sass`/`node-sass`. Accepts `Function` or an array of `Function`s.
         (sassOptions as NodeSassOptions).importer = (sassOptions as NodeSassOptions).importer
-            ? Array.isArray((sassOptions as NodeSassOptions).importer)
+            ? (Array.isArray((sassOptions as NodeSassOptions).importer)
                 ? [...((sassOptions as NodeSassOptions).importer as unknown as NodeSassImporter[])]
-                : [(sassOptions as NodeSassOptions).importer as NodeSassImporter]
+                : [(sassOptions as NodeSassOptions).importer as NodeSassImporter])
             : [];
 
         // Regression on the `sass-embedded` side
@@ -160,7 +159,7 @@ const getSassOptions = async (
             ...((sassOptions as NodeSassOptions).includePaths ? [...((sassOptions as NodeSassOptions).includePaths as string[])] : []).map(
                 (includePath: string) => (isAbsolute(includePath) ? includePath : join(process.cwd(), includePath)),
             ),
-            ...(process.env.SASS_PATH ? process.env.SASS_PATH.split(process.platform === "win32" ? ";" : ":") : []),
+            ...process.env.SASS_PATH ? process.env.SASS_PATH.split(process.platform === "win32" ? ";" : ":") : [],
         ];
 
         if ((sassOptions as NodeSassOptions).charset === undefined) {

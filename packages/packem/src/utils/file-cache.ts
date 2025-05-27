@@ -15,7 +15,7 @@ const isJson = (value: string): boolean => {
 class FileCache {
     readonly #cwd: string;
 
-    readonly #cachePath: undefined | string;
+    readonly #cachePath: string | undefined;
 
     readonly #hashKey: string;
 
@@ -37,7 +37,7 @@ class FileCache {
             this.#cachePath = cachePath;
 
             logger.debug({
-                message: "Cache path is: " + this.#cachePath,
+                message: `Cache path is: ${this.#cachePath}`,
                 prefix: "file-cache",
             });
         }
@@ -59,7 +59,6 @@ class FileCache {
         return isAccessibleSync(this.getFilePath(name, subDirectory));
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
     public get<R>(name: string, subDirectory?: string): R | undefined {
         if (!this.#isEnabled) {
             return undefined;
@@ -94,7 +93,7 @@ class FileCache {
         return fileData as unknown as R;
     }
 
-    public set(name: string, data: object | ArrayBuffer | ArrayBufferView | string | undefined | number | null | boolean, subDirectory?: string): void {
+    public set(name: string, data: ArrayBuffer | ArrayBufferView | boolean | number | object | string | null | undefined, subDirectory?: string): void {
         if (!this.#isEnabled) {
             return;
         }

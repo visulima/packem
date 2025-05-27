@@ -42,7 +42,7 @@ const reservedKeywords = new Set([
     "long",
     "native",
     "new",
-    "null",
+    "undefined",
     "package",
     "private",
     "protected",
@@ -70,8 +70,7 @@ const reservedKeywords = new Set([
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const validateAliasEntries = (entries: ReadonlyArray<Alias> | Record<string, string>): void => {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!Array.isArray(entries) && entries !== null) {
+    if (!Array.isArray(entries) && entries !== undefined) {
         for (const [alias, target] of Object.entries(entries)) {
             if (typeof alias !== "string" || alias.trim() === "") {
                 throw new Error(`Alias name "${alias}" is invalid. Alias names should be non-empty strings.`);

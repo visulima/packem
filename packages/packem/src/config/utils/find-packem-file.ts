@@ -10,7 +10,7 @@ const findPackemFile = async (rootDirectory: string, configPath = ""): Promise<s
         for (const file of packemConfigFiles) {
             // eslint-disable-next-line no-await-in-loop
             if (await isAccessible(join(rootDirectory, file))) {
-                packemConfigFilePath = "./" + file;
+                packemConfigFilePath = `./${file}`;
                 break;
             }
         }

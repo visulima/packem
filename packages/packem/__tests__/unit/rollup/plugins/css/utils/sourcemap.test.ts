@@ -9,14 +9,17 @@ describe("sourcemap", () => {
     it("inline map", async () => {
         expect.assertions(3);
 
-        const code =
-            '.foo {color: red;background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEXMzMyWlpacnJy+vr6jo6PFxcW3t7eqqqqxsbHbm8QuAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAiklEQVRYhe3QMQ6EIBAF0C+GSInF9mYTs+1ewRsQbmBlayysKefYO2asXbbYxvxHQj6ECQMAEREREf2NQ/fCtp5Zky6vtRMkSJEzhyISynWJnzH6Z8oQlzS7lEc/fLmmQUSvc16OrCPqRl1JePxQYo1ZSWVj9nxrrOb5esw+eXdvzTWfTERERHRXH4tWFZGswQ2yAAAAAElFTkSuQmCC");}';
+        const code
+            = ".foo {color: red;background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEXMzMyWlpacnJy+vr6jo6PFxcW3t7eqqqqxsbHbm8QuAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAiklEQVRYhe3QMQ6EIBAF0C+GSInF9mYTs+1ewRsQbmBlayysKefYO2asXbbYxvxHQj6ECQMAEREREf2NQ/fCtp5Zky6vtRMkSJEzhyISynWJnzH6Z8oQlzS7lEc/fLmmQUSvc16OrCPqRl1JePxQYo1ZSWVj9nxrrOb5esw+eXdvzTWfTERERHRXH4tWFZGswQ2yAAAAAElFTkSuQmCC\");}";
+
         await expect(getMap(code)).resolves.toBeUndefined();
 
         const withBlock = `${code}/*# sourceMappingURL=data:application/json;base64,e1RISVM6SVNBU09VUkNFTUFQU0lNVUxBVElPTn0= */`;
+
         await expect(getMap(withBlock)).resolves.toBe("{THIS:ISASOURCEMAPSIMULATION}");
 
         const withInline = `${code}//# sourceMappingURL=data:application/json;base64,e1RISVM6SVNBU09VUkNFTUFQU0lNVUxBVElPTn0=`;
+
         await expect(getMap(withInline)).resolves.toBe("{THIS:ISASOURCEMAPSIMULATION}");
     });
 
@@ -39,6 +42,7 @@ describe("sourcemap", () => {
         expect(stripMap(withBlock)).toBe(".foo {color: red;}");
 
         const withInline = `${code}//# sourceMappingURL=fixture.css.map`;
+
         expect(stripMap(withInline)).toBe(".foo {color: red;}");
     });
 

@@ -7,7 +7,7 @@ import type { RawSourceMap } from "source-map-js";
 const IS_NATIVE_WIN32_PATH = /^[a-z]:[/\\]|^\\\\/i;
 const ABSOLUTE_SCHEME = /^[A-Z0-9+\-.]+:/i;
 
-const getURLType = (source: string): "absolute" | "scheme-relative" | "path-absolute" | "path-relative" => {
+const getURLType = (source: string): "absolute" | "path-absolute" | "path-relative" | "scheme-relative" => {
     if (source.startsWith("/")) {
         if (source.length > 1 && source[1] === "/") {
             return "scheme-relative";
@@ -46,6 +46,7 @@ const normalizeSourceMap = (map: RawSourceMap, rootContext: string): RawSourceMa
         if (sourceType === "absolute" && /^file:/i.test(source)) {
             return fileURLToPath(source);
         }
+
         if (sourceType === "path-relative") {
             return resolve(rootContext, normalize(source));
         }

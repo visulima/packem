@@ -30,7 +30,6 @@ const lowestCommonAncestor = (...filepaths: string[]): string => {
         let index = 0;
 
         for (const directory of directories) {
-            // eslint-disable-next-line security/detect-object-injection
             if (directory === ancestor[index]) {
                 index += 1;
             } else {
@@ -44,6 +43,7 @@ const lowestCommonAncestor = (...filepaths: string[]): string => {
 
     // Convert back to platform-specific separator
     const result = ancestor.length <= 1 && ancestor[0] === "" ? `/${ancestor[0]}` : ancestor.join("/");
+
     return result.split("/").join(sep);
 };
 

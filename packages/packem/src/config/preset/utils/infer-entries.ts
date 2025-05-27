@@ -35,7 +35,7 @@ const createOrUpdateEntry = (
     let runtime: Runtime = context.options.runtime as Runtime;
 
     for (const runtimeExportConvention of RUNTIME_EXPORT_CONVENTIONS) {
-        if (output.file.includes("." + runtimeExportConvention + ".") || output.subKey === runtimeExportConvention) {
+        if (output.file.includes(`.${runtimeExportConvention}.`) || output.subKey === runtimeExportConvention) {
             runtime = runtimeExportConvention as Runtime;
 
             break;
@@ -82,7 +82,6 @@ const createOrUpdateEntry = (
         }
     }
 
-    // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
     const aliasName = output.file.replace(extname(output.file), "").replace(new RegExp(`^./${context.options.outDir.replace(/^\.\//, "")}/`), "");
 
     if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && !input.includes(aliasName)) {
@@ -93,7 +92,6 @@ const createOrUpdateEntry = (
 let privateSubfolderWarningShown = false;
 
 const validateIfTypescriptIsInstalled = (context: BuildContext): void => {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (context.pkg?.dependencies?.typescript === undefined && context.pkg?.devDependencies?.typescript === undefined) {
         // @TODO: Add command to install typescript
         throw new Error("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");
@@ -102,11 +100,10 @@ const validateIfTypescriptIsInstalled = (context: BuildContext): void => {
 
 /**
  * Infer entries from package files.
- *
- * @param {PackageJson} packageJson
- * @param {string[]} sourceFiles A list of source files to use for inferring entries.
- * @param {BuildContext} context
- * @returns {InferEntriesResult}
+ * @param packageJson
+ * @param sourceFiles A list of source files to use for inferring entries.
+ * @param context
+ * @returns
  */
 const inferEntries = (
     packageJson: PackageJson,
@@ -179,7 +176,6 @@ const inferEntries = (
 
         // Only javascript files are supported
         if (outputExtension !== "" && !DEFAULT_EXTENSIONS.includes(outputExtension)) {
-            // eslint-disable-next-line no-continue
             continue;
         }
 
@@ -202,15 +198,13 @@ const inferEntries = (
 
         // Skip top level directory
         if (isDirectory && ["./", "/"].includes(outputSlug)) {
-            // eslint-disable-next-line no-continue
             continue;
         }
 
-        // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
-        const sourceSlug = outputSlug.replace(new RegExp("(./)?" + context.options.outDir), context.options.sourceDir).replace("./", "");
+        const sourceSlug = outputSlug.replace(new RegExp(`(./)?${context.options.outDir}`), context.options.sourceDir).replace("./", "");
 
         const beforeSourceRegex = "(?<=/|$)";
-        const fileExtensionRegex = isDirectory ? "" : "(\\.d\\.[cm]?ts|(\\.[cm]?[tj]sx?))$";
+        const fileExtensionRegex = isDirectory ? "" : String.raw`(\.d\.[cm]?ts|(\.[cm]?[tj]sx?))$`;
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if (output.file.includes("/*") && output.key === "exports") {
@@ -222,9 +216,8 @@ const inferEntries = (
 
             const inputs: string[] = [];
 
-            // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
             const SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace("*", "(.*)") + fileExtensionRegex);
-            // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+
             const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace(/(.*)\.[^.]*$/, "$1").replace("*", "(.*)") + fileExtensionRegex);
 
             for (const source of sourceFiles) {
@@ -236,7 +229,6 @@ const inferEntries = (
             if (inputs.length === 0) {
                 warnings.push(`Could not find entrypoint for \`${output.file}\``);
 
-                // eslint-disable-next-line no-continue
                 continue;
             }
 
@@ -244,17 +236,14 @@ const inferEntries = (
                 createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context, true);
             }
 
-            // eslint-disable-next-line no-continue
             continue;
         }
 
-        // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
         const SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug + fileExtensionRegex);
 
         let input = sourceFiles.find((index) => SOURCE_RE.test(index));
 
         if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && input === undefined) {
-            // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
             const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace(/(.*)\.[^.]*$/, "$1") + fileExtensionRegex);
 
             input = sourceFiles.find((index) => SPECIAL_SOURCE_RE.test(index));
@@ -265,7 +254,6 @@ const inferEntries = (
                 warnings.push(`Could not find entrypoint for \`${output.file}\``);
             }
 
-            // eslint-disable-next-line no-continue
             continue;
         }
 
@@ -275,9 +263,9 @@ const inferEntries = (
 
         const inputWithoutExtension = toNamespacedPath(input.replace(ENDING_REGEX, ""));
 
-        if (isAccessibleSync(inputWithoutExtension + ".cts") && isAccessibleSync(inputWithoutExtension + ".mts")) {
-            createOrUpdateEntry(entries, inputWithoutExtension + ".cts", isDirectory, outputSlug, { ...output, type: "cjs" }, context, false);
-            createOrUpdateEntry(entries, inputWithoutExtension + ".mts", isDirectory, outputSlug, { ...output, type: "esm" }, context, false);
+        if (isAccessibleSync(`${inputWithoutExtension}.cts`) && isAccessibleSync(`${inputWithoutExtension}.mts`)) {
+            createOrUpdateEntry(entries, `${inputWithoutExtension}.cts`, isDirectory, outputSlug, { ...output, type: "cjs" }, context, false);
+            createOrUpdateEntry(entries, `${inputWithoutExtension}.mts`, isDirectory, outputSlug, { ...output, type: "esm" }, context, false);
         } else {
             createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context, false);
         }

@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unused-modules,import/no-named-as-default
 import Cli from "@visulima/cerebro";
 import { SimpleReporter } from "@visulima/pail/reporter";
 
@@ -10,7 +9,6 @@ import createInitCommand from "./commands/init";
 /**
  * Attempts to load and enable V8 compile cache for better performance.
  * Falls back to v8-compile-cache module if Node.js native compile cache is not available.
- *
  * @remarks
  * This is a performance optimization that helps reduce startup time by caching
  * compiled JavaScript code.
@@ -29,11 +27,9 @@ try {
 /**
  * Creates and configures the main CLI instance for Packem.
  * Sets up logging, error reporting, and registers available commands.
- *
  * @remarks
  * The CLI is built using the @visulima/cerebro framework and configured with
  * a SimpleReporter for error handling and output formatting.
- *
  * @example
  * ```typescript
  * // The CLI can be used in scripts as follows:

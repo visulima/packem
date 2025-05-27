@@ -62,6 +62,7 @@ const test = /* @__PURE__ */ __name(() => "this should be in final bundle", "tes
 
 module.exports = test;
 `);
+
             const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
             expect(dCtsContent).toBe(`declare const test: () => string;
@@ -298,6 +299,7 @@ const test = "this should be in final bundle";
 
 module.exports = test;
 `);
+
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare const test = "this should be in final bundle";

@@ -26,7 +26,7 @@ const esbuildTransformer = ({
     optimizeDeps,
     sourceMap,
     ...esbuildOptions
-    // eslint-disable-next-line sonarjs/cognitive-complexity
+
 }: EsbuildPluginConfig): RollupPlugin => {
     const loaders = DEFAULT_LOADERS;
 
@@ -36,18 +36,16 @@ const esbuildTransformer = ({
             key = key.startsWith(".") ? key : `.${key}`;
 
             if (typeof value === "string") {
-                // eslint-disable-next-line security/detect-object-injection
                 loaders[key] = value;
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             } else if (!value) {
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete,security/detect-object-injection
+                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete loaders[key];
             }
         }
     }
 
     const extensions: string[] = Object.keys(loaders);
-    // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+
     const INCLUDE_REGEXP = new RegExp(`\\.(${extensions.map((extension) => extension.slice(1)).join("|")})$`);
 
     const filter = createFilter(include ?? INCLUDE_REGEXP, exclude);
@@ -105,7 +103,7 @@ const esbuildTransformer = ({
             }
 
             const extension = extname(id);
-            // eslint-disable-next-line security/detect-object-injection
+
             const loader = loaders[extension];
 
             logger.debug("transforming %s with %s loader", id, loader);

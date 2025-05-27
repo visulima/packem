@@ -8,19 +8,19 @@ import { findStaticImports } from "mlly";
 import type { Plugin } from "rollup";
 import { minVersion } from "semver";
 
-// eslint-disable-next-line import/exports-last,@typescript-eslint/no-inferrable-types
+// eslint-disable-next-line import/exports-last
 export const GLOBAL_REQUIRE_REGEX: RegExp = /(?:^|[^.\w'"`])require(\.resolve)?\(\s*([\w'"`])/;
 
 // Shim __dirname, __filename and require
 const CJSToESM = (code: string, shim: (hasFilename: boolean, hasDirname: boolean, hasGlobalRequire: boolean) => string) => {
     // INTERNAL_PACKEM_BUILD is set to "1" when building packem itself
     if (
-        env.INTERNAL_PACKEM_BUILD !== "1" &&
-        (code.includes("// -- packem CommonJS __filename shim") ||
-            code.includes("// -- packem CommonJS __dirname shim") ||
-            code.includes("// -- packem CommonJS require shim"))
+        env.INTERNAL_PACKEM_BUILD !== "1"
+        && (code.includes("// -- packem CommonJS __filename shim")
+            || code.includes("// -- packem CommonJS __dirname shim")
+            || code.includes("// -- packem CommonJS require shim"))
     ) {
-        return null;
+        return undefined;
     }
 
     let hasFilename = false;
@@ -40,7 +40,7 @@ const CJSToESM = (code: string, shim: (hasFilename: boolean, hasDirname: boolean
     }
 
     if (!hasFilename && !hasDirname && !hasGlobalRequire) {
-        return null;
+        return undefined;
     }
 
     const lastESMImport = findStaticImports(code).pop();
@@ -133,7 +133,7 @@ export const esmShimCjsSyntaxPlugin = (packageJson: PackageJson, options: EsmShi
                 return CJSToESM(code, shim);
             }
 
-            return null;
+            return undefined;
         },
     } as Plugin;
 };

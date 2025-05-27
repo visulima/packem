@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-secrets/no-secrets
 /**
  * Modified copy of https://github.com/huozhi/bunchee/blob/3cb85160bbad3af229654cc09d6fcd67120fe8bd/src/lib/split-chunk.ts
  *
