@@ -13,7 +13,7 @@ const loadModule = async (moduleId: string, cwd: string): Promise<any> => {
         return loaded[moduleId];
     }
 
-    if (loaded[moduleId] === undefined) {
+    if (loaded[moduleId] === null) {
         return undefined;
     }
 
@@ -36,7 +36,8 @@ const loadModule = async (moduleId: string, cwd: string): Promise<any> => {
                 // continue
             }
         } else {
-            loaded[moduleId] = undefined;
+            // eslint-disable-next-line unicorn/no-null
+            loaded[moduleId] = null;
 
             return undefined;
         }

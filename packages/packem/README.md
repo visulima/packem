@@ -361,7 +361,7 @@ With multiple runtime bundles, such as having `default` and `react-server` toget
 "use client";
 
 // src/app-context.shared-runtime.js
-export const AppContext = React.createContext(undefined);
+export const AppContext = React.createContext(null);
 ```
 
 Then you can use them in different entry files:

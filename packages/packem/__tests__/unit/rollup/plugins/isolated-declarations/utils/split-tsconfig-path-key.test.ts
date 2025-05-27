@@ -39,7 +39,9 @@ describe(splitTsconfigPathKey, () => {
         expect.assertions(3);
 
         expect(() => splitTsconfigPathKey("")).toThrow("Invalid key: Key must be a non-empty string.");
-        expect(() => splitTsconfigPathKey(undefined as any)).toThrow("Invalid key: Key must be a non-empty string.");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, unicorn/no-null
+        expect(() => splitTsconfigPathKey(null as any)).toThrow("Invalid key: Key must be a non-empty string.");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         expect(() => splitTsconfigPathKey(undefined as any)).toThrow("Invalid key: Key must be a non-empty string.");
     });
 });

@@ -20,10 +20,11 @@ describe(arrayify, () => {
         expect(result).toBe(input);
     });
 
-    it("should return an empty array if the input is undefined", () => {
+    it("should return an empty array if the input is null", () => {
         expect.assertions(1);
 
-        const result = arrayify(undefined);
+        // eslint-disable-next-line unicorn/no-null
+        const result = arrayify(null);
 
         expect(result).toStrictEqual([]);
     });
