@@ -14,7 +14,6 @@ const load: Load = async (url, file, extensions, processor, options) => {
 
     for (const message of messages) {
         if (message.type !== "icss") {
-            // eslint-disable-next-line no-continue
             continue;
         }
 

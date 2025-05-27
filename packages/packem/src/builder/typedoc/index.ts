@@ -24,7 +24,7 @@ const builder = async (context: BuildContext, cachePath: string | undefined, _: 
         }
 
         context.logger.info({
-            message: "Using " + cyan("typedoc") + " " + typedocVersion + " to generate reference documentation",
+            message: `Using ${cyan("typedoc")} ${typedocVersion} to generate reference documentation`,
             prefix: "typedoc",
         });
 
@@ -46,5 +46,4 @@ const builder = async (context: BuildContext, cachePath: string | undefined, _: 
     }
 };
 
-// eslint-disable-next-line import/no-unused-modules
 export default builder;

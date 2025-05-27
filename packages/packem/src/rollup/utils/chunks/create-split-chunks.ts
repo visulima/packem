@@ -1,4 +1,5 @@
-// eslint-disable-next-line no-secrets/no-secrets
+/* eslint-disable no-secrets/no-secrets */
+
 /**
  * Modified copy of https://github.com/huozhi/bunchee/blob/3cb85160bbad3af229654cc09d6fcd67120fe8bd/src/lib/split-chunk.ts
  *
@@ -15,7 +16,7 @@ import getModuleLayer from "./get-module-layer";
 
 const createSplitChunks = (
     dependencyGraphMap: Map<string, Set<[string, string]>>,
-    entryFiles: (BuildContextBuildEntry | BuildContextBuildAssetAndChunk)[],
+    entryFiles: (BuildContextBuildAssetAndChunk | BuildContextBuildEntry)[],
 ): GetManualChunk => {
     // If there's existing chunk being separated, and contains a layer { <id>: <chunkGroup> }
     const splitChunksGroupMap = new Map<string, string>();
@@ -54,8 +55,8 @@ const createSplitChunks = (
 
             for (const subId of subModuleIds) {
                 const subModuleInfo = context.getModuleInfo(subId);
+
                 if (!subModuleInfo) {
-                    // eslint-disable-next-line no-continue
                     continue;
                 }
 
@@ -73,11 +74,11 @@ const createSplitChunks = (
 
         // If current module has a layer, and it's not an entry
         if (
-            moduleLayer &&
-            !isEntry && // If the module is imported by the entry:
+            moduleLayer
+            && !isEntry // If the module is imported by the entry:
             // when the module layer is same as entry layer, keep it as part of entry and don't split it;
             // when the module layer is different from entry layer, split the module into a separate chunk as a separate boundary.
-            dependencyGraphMap.has(id)
+            && dependencyGraphMap.has(id)
         ) {
             const parentModuleIds = [...(dependencyGraphMap.get(id) as Set<[string, string]>)];
             const isImportFromOtherEntry = parentModuleIds.some(([pid]) => {
@@ -108,7 +109,7 @@ const createSplitChunks = (
 
             const chunkName = basename(id, extname(id));
 
-            const chunkGroup = chunkName + "-" + moduleLayer;
+            const chunkGroup = `${chunkName}-${moduleLayer}`;
 
             splitChunksGroupMap.set(id, chunkGroup);
 

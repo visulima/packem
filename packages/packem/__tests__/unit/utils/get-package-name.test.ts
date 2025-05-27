@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import getPackageName from "../../../src/utils/get-package-name";
 
-describe("getPackageName", () => {
+describe(getPackageName, () => {
     it("should return the package name for a valid scoped package id", () => {
         expect.assertions(1);
 

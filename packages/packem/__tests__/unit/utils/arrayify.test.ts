@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import arrayify from "../../../src/utils/arrayify";
 
-describe("arrayify", () => {
+describe(arrayify, () => {
     it("should convert a single value to an array containing that value", () => {
         expect.assertions(1);
 
@@ -20,18 +20,19 @@ describe("arrayify", () => {
         expect(result).toBe(input);
     });
 
-    it("should return an empty array if the input is undefined", () => {
+    it("should return an empty array if the input is null", () => {
         expect.assertions(1);
 
-        const result = arrayify(undefined);
+        // eslint-disable-next-line unicorn/no-null
+        const result = arrayify(null);
 
         expect(result).toStrictEqual([]);
     });
 
-    it("should return an empty array if the input is null", () => {
+    it("should return an empty array if the input is undefined", () => {
         expect.assertions(1);
 
-        const result = arrayify(null);
+        const result = arrayify(undefined);
 
         expect(result).toStrictEqual([]);
     });

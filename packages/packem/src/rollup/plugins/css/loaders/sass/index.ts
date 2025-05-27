@@ -60,8 +60,7 @@ const loader: Loader<SassLoaderOptions> = {
                 (options as NodeSassSyncOptions).importer = [(options as NodeSassSyncOptions).importer as NodeSassSyncImporter];
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            (options as NodeSassSyncOptions).importer = [...(((options as NodeSassSyncOptions).importer as NodeSassSyncImporter[]) ?? []), legacyImporter];
+            (options as NodeSassSyncOptions).importer = [...((options as NodeSassSyncOptions).importer as NodeSassSyncImporter[]) ?? [], legacyImporter];
         }
 
         const compile = await getCompileFunction(implementation, apiType);
@@ -78,9 +77,7 @@ const loader: Loader<SassLoaderOptions> = {
             // Modern API
             if (error.span && error.span.url !== undefined) {
                 this.deps.add(fileURLToPath(error.span.url));
-            }
-            // Legacy API
-            else if (error.file !== undefined) {
+            } else if (error.file) { // Legacy API
                 // `node-sass` returns POSIX paths
                 this.deps.add(normalize(error.file));
             }
@@ -88,11 +85,11 @@ const loader: Loader<SassLoaderOptions> = {
             throw errorFactory(error, this.id);
         }
 
-        let resultMap: RawSourceMap | undefined =
+        let resultMap: RawSourceMap | undefined
             // Modern API, then legacy API
-            (result as CompileResult).sourceMap ??
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            ((result as NodeSassResult).map ? (JSON.parse((result as NodeSassResult).map.toString()) as RawSourceMap) : undefined);
+            = (result as CompileResult).sourceMap
+
+                ?? ((result as NodeSassResult).map ? (JSON.parse((result as NodeSassResult).map.toString()) as RawSourceMap) : undefined);
 
         // Modify source paths only for webpack, otherwise we do nothing
         if (resultMap && this.useSourcemap) {
@@ -100,22 +97,17 @@ const loader: Loader<SassLoaderOptions> = {
         }
 
         // Modern API
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if ((result as CompileResult).loadedUrls !== undefined) {
-            (result as CompileResult).loadedUrls
-                .filter((loadedUrl) => loadedUrl.protocol === "file:")
-                .forEach((includedFile) => {
-                    const normalizedIncludedFile = fileURLToPath(includedFile);
 
-                    // Custom `importer` can return only `contents` so includedFile will be relative
-                    if (isAbsolute(normalizedIncludedFile)) {
-                        this.deps.add(normalizedIncludedFile);
-                    }
-                });
-        }
-        // Legacy API
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        else if ((result as NodeSassResult).stats.includedFiles !== undefined) {
+        if ((result as CompileResult).loadedUrls) {
+            (result as CompileResult).loadedUrls.filter((loadedUrl) => loadedUrl.protocol === "file:").forEach((includedFile) => {
+                const normalizedIncludedFile = fileURLToPath(includedFile);
+
+                // Custom `importer` can return only `contents` so includedFile will be relative
+                if (isAbsolute(normalizedIncludedFile)) {
+                    this.deps.add(normalizedIncludedFile);
+                }
+            });
+        } else if ((result as NodeSassResult).stats.includedFiles) { // Legacy API
             (result as NodeSassResult).stats.includedFiles.forEach((includedFile: string) => {
                 const normalizedIncludedFile = normalize(includedFile);
 
@@ -134,5 +126,4 @@ const loader: Loader<SassLoaderOptions> = {
     test: /\.(sass|scss)$/i,
 };
 
-// eslint-disable-next-line import/no-unused-modules
 export default loader;

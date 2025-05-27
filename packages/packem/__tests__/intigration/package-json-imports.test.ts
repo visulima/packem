@@ -17,7 +17,7 @@ describe("packem package.json imports", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it.each(["esbuild", "swc", "sucrase", "oxc"] as ("esbuild" | "swc" | "sucrase" | "oxc")[])(
+    it.each(["esbuild", "swc", "sucrase", "oxc"] as ("esbuild" | "oxc" | "sucrase" | "swc")[])(
         "should resolve package.json imports with a * and %s transformer",
         async (transformer) => {
             expect.assertions(5);

@@ -4,21 +4,21 @@ import { join, resolve } from "@visulima/path";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { Plugin } from "rollup";
 
-const getRootDirectories = (cwd: string, tsconfig?: TsConfigResult): string[] | null => {
+const getRootDirectories = (cwd: string, tsconfig?: TsConfigResult): string[] | undefined => {
     if (!tsconfig) {
-        return null;
+        return undefined;
     }
 
     const { config, path: tsConfigPath } = tsconfig;
 
     if (!config.compilerOptions) {
-        return null;
+        return undefined;
     }
 
     const { rootDirs } = config.compilerOptions;
 
     if (!rootDirs) {
-        return null;
+        return undefined;
     }
 
     const mappedRootDirectories: string[] = [];
@@ -42,7 +42,6 @@ const getRootDirectories = (cwd: string, tsconfig?: TsConfigResult): string[] | 
  * This plugin resolves module paths using the rootDirs configuration from the tsconfig.json file.
  *
  * Consider the following example configuration:
- *
  * @example
  * ```json
  * {
@@ -65,8 +64,8 @@ const resolveTsconfigRootDirectories = (cwd: string, logger: Pail, tsconfig: TsC
     return {
         name: "packem:resolve-tsconfig-root-dirs",
         async resolveId(id, importer, options) {
-            if (rootDirectories === null || rootDirectories.length === 0) {
-                return null;
+            if (rootDirectories === undefined || rootDirectories.length === 0) {
+                return undefined;
             }
 
             if (id.startsWith(".")) {
@@ -87,7 +86,7 @@ const resolveTsconfigRootDirectories = (cwd: string, logger: Pail, tsconfig: TsC
                 }
             }
 
-            return null;
+            return undefined;
         },
     };
 };

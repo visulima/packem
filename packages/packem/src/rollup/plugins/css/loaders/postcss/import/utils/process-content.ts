@@ -23,7 +23,7 @@ const runPostcss = async (
     return await postcss(plugins)
         .process(content, {
             from: filename,
-            // eslint-disable-next-line security/detect-object-injection
+
             parser: parsers[index],
         })
         .catch(async (error: unknown) => {

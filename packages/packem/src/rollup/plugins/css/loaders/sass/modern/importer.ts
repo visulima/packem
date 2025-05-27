@@ -31,6 +31,7 @@ const importer = (resourcePath: string, debug: boolean): Importer<"sync"> => {
                 });
             } catch {
                 // If no stylesheets are found, the importer should return null.
+                // eslint-disable-next-line unicorn/no-null
                 return null;
             }
 
@@ -39,17 +40,18 @@ const importer = (resourcePath: string, debug: boolean): Importer<"sync"> => {
         load(canonicalUrl: URL): ImporterResult | null {
             const extension = extname(canonicalUrl.pathname);
 
-            const syntax: Syntax = extension ? (resolveSyntax(extension.toLowerCase()) ?? "scss") : "scss"; // Default syntax
+            const syntax: Syntax = extension ? resolveSyntax(extension.toLowerCase()) ?? "scss" : "scss"; // Default syntax
 
             try {
                 let contents = readFileSync(canonicalUrl);
 
                 if (debug) {
-                    contents = "/* " + canonicalUrl.pathname + " */\n" + contents;
+                    contents = `/* ${canonicalUrl.pathname} */\n${contents}`;
                 }
 
                 return { contents: contents as string, sourceMapUrl: canonicalUrl, syntax };
             } catch {
+                // eslint-disable-next-line unicorn/no-null
                 return null;
             }
         },

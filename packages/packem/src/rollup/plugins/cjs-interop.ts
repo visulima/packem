@@ -12,10 +12,10 @@ export const cjsInteropPlugin = ({
     addDefaultProperty = false,
     logger,
     type,
-}: {
+}: CJSInteropOptions & {
     logger: Pail;
     type: "commonjs" | "module";
-} & CJSInteropOptions): Plugin => {
+}): Plugin => {
     return {
         name: "packem:cjs-interop",
         renderChunk: async (
@@ -25,17 +25,16 @@ export const cjsInteropPlugin = ({
         ): Promise<{
             code: string;
             map: SourceMapInput;
-        } | null> => {
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        } | undefined> => {
             if (chunk.type !== "chunk" || !chunk.isEntry) {
-                return null;
+                return undefined;
             }
 
             if (options.format === "cjs" && options.exports === "auto") {
                 const matches = /(exports(?:\['default'\]|\.default)) = (.*);/i.exec(code);
 
                 if (matches === null || matches.length < 3) {
-                    return null;
+                    return undefined;
                 }
 
                 const transformed = new MagicString(code);
@@ -47,16 +46,17 @@ export const cjsInteropPlugin = ({
 
                 if (addDefaultProperty) {
                     // add `module.exports.default = module.exports;`
-                    transformed.append("\nmodule.exports.default = " + (matches[2] as string) + ";");
+                    transformed.append(`\nmodule.exports.default = ${matches[2] as string};`);
                 }
 
                 let newCode = transformed.toString();
+
                 // @see https://github.com/Rich-Harris/magic-string/issues/208 why this is needed
                 // replace `exports.default = ...; or exports['default'] = ...;` with `module.exports = ...;`
                 newCode = newCode.replace(/(?:module\.)?exports(?:\['default'\]|\.default)/i, "module.exports");
 
                 logger.debug({
-                    message: "Applied CommonJS interop to entry chunk " + chunk.fileName + ".",
+                    message: `Applied CommonJS interop to entry chunk ${chunk.fileName}.`,
                     prefix: "plugin:cjs-interop",
                 });
 
@@ -71,18 +71,17 @@ export const cjsInteropPlugin = ({
              * module.exports = x     export = x
              * exports.default = x;   exports.__esModule = true	export default x
              * export default x       export default x
-             *
              * @see https://github.com/arethetypeswrong/arethetypeswrong.github.io/blob/main/docs/problems/FalseExportDefault.md
              */
             if (options.format === "es" && /\.d\.(?:ts|cts)$/.test(chunk.fileName)) {
                 if (type !== "commonjs" && chunk.fileName.endsWith(".d.mts")) {
-                    return null;
+                    return undefined;
                 }
 
                 return patchCjsDefaultExport(code);
             }
 
-            return null;
+            return undefined;
         },
     };
 };

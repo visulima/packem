@@ -28,7 +28,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stderr).toContain("package.json not found at " + temporaryDirectoryPath);
+        expect(binProcess.stderr).toContain(`package.json not found at ${temporaryDirectoryPath}`);
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -72,7 +72,7 @@ describe("packem error cases", () => {
             dependencies: {},
             name: "pkg",
         });
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
+
         mkdirSync(`${temporaryDirectoryPath}/src`);
 
         const binProcess = await execPackem("build", [], {

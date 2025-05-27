@@ -9,7 +9,7 @@ import type { Document, Root } from "postcss";
 import type { Stylesheet } from "./types";
 import { isImportStatement, isNodesStatement } from "./utils/statement";
 
-const applyStyles = (stylesheet: Stylesheet, styles: Root | Document): void => {
+const applyStyles = (stylesheet: Stylesheet, styles: Document | Root): void => {
     // eslint-disable-next-line no-param-reassign
     styles.nodes = [];
 

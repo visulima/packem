@@ -6,7 +6,7 @@ const getFileNamesFromDirectory = async (directory: string): Promise<string[]> =
         cwd: directory,
     });
 
-    // eslint-disable-next-line etc/no-assign-mutated-array,@typescript-eslint/require-array-sort-compare
+    // eslint-disable-next-line etc/no-assign-mutated-array
     return files.sort().map((file) => normalizePath(file));
 };
 

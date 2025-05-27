@@ -14,7 +14,7 @@ const swcPlugin = ({ exclude, include, ...transformOptions }: SwcPluginConfig): 
 
         async transform(sourcecode, id) {
             if (!filter(id)) {
-                return null;
+                return undefined;
             }
 
             const { code, map } = await swcTransform(sourcecode, {
@@ -34,5 +34,4 @@ const swcPlugin = ({ exclude, include, ...transformOptions }: SwcPluginConfig): 
 
 swcPlugin.NAME = "swc";
 
-// eslint-disable-next-line import/no-unused-modules
 export default swcPlugin as TransformerFunction;

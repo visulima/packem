@@ -36,20 +36,18 @@ const preserveDirectives = ({
                 return false;
             }
 
-            return null;
+            return undefined;
         },
 
         renderChunk: {
             handler(code, chunk, { sourcemap }) {
                 const outputDirectives = chunk.moduleIds
                     .map((id) => {
-                        // eslint-disable-next-line security/detect-object-injection
                         if (directives[id]) {
-                            // eslint-disable-next-line security/detect-object-injection
                             return directives[id];
                         }
 
-                        return null;
+                        return undefined;
                     })
                     // eslint-disable-next-line unicorn/no-array-reduce
                     .reduce<Set<string>>((accumulator, currentDirectives) => {
@@ -90,21 +88,21 @@ const preserveDirectives = ({
 
                 // Neither outputDirectives is present, no change is needed
                 if (outputDirectives.size === 0 && shebang === undefined) {
-                    return null;
+                    return undefined;
                 }
 
                 return {
                     code: magicString.toString(),
-                    map: sourcemap ? magicString.generateMap({ hires: true }) : null,
+                    map: sourcemap ? magicString.generateMap({ hires: true }) : undefined,
                 };
             },
             order: "post",
         },
 
         // eslint-disable-next-line sonarjs/cognitive-complexity
-        transform(code, id): null | { code: string; map: SourceMap | null; meta: { preserveDirectives: { directives: string[]; shebang: string | null } } } {
+        transform(code, id): { code: string; map: SourceMap | undefined; meta: { preserveDirectives: { directives: string[]; shebang: string | undefined } } } | undefined {
             if (!filter(id)) {
-                return null;
+                return undefined;
             }
 
             // MagicString's `hasChanged()` is slow, so we track the change manually
@@ -112,7 +110,6 @@ const preserveDirectives = ({
 
             const magicString: MagicString = new MagicString(code);
 
-            // eslint-disable-next-line no-secrets/no-secrets
             /**
              * Here we are making 3 assumptions:
              * - shebang can only be at the first line of the file, otherwise it will not be recognized
@@ -139,7 +136,6 @@ const preserveDirectives = ({
                 }
 
                 if (firstNewLineIndex) {
-                    // eslint-disable-next-line security/detect-object-injection
                     shebangs[id] = code.slice(0, firstNewLineIndex);
 
                     magicString.remove(0, firstNewLineIndex + 1);
@@ -155,7 +151,7 @@ const preserveDirectives = ({
             /**
              * rollup's built-in parser returns an extended version of ESTree Node.
              */
-            let ast: Node | null = null;
+            let ast: Node | undefined;
 
             try {
                 ast = this.parse(magicString.toString(), { allowReturnOutsideFunction: true }) as Node;
@@ -168,12 +164,12 @@ const preserveDirectives = ({
 
                 logger.warn(error);
 
-                return null;
+                return undefined;
             }
 
             // Exit if the root of the AST is not a Program
             if (ast.type !== "Program") {
-                return null;
+                return undefined;
             }
 
             for (const node of ast.body.filter(Boolean)) {
@@ -182,9 +178,8 @@ const preserveDirectives = ({
                     break;
                 }
 
-                let directive: string | null = null;
+                let directive: string | undefined;
 
-                // eslint-disable-next-line no-secrets/no-secrets
                 /**
                  * rollup and estree defines `directive` field on the `ExpressionStatement` node:
                  * https://github.com/rollup/rollup/blob/fecf0cfe14a9d79bb0eff4ad475174ce72775ead/src/ast/nodes/ExpressionStatement.ts#L10
@@ -196,17 +191,14 @@ const preserveDirectives = ({
                 }
 
                 if (directive === "use strict") {
-                    // eslint-disable-next-line no-continue
                     continue;
                 }
 
                 if (directive) {
-                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition,security/detect-object-injection
                     directives[id] ||= new Set<string>();
-                    // eslint-disable-next-line security/detect-object-injection
+
                     (directives[id] as Set<string>).add(directive);
 
-                    // eslint-disable-next-line no-secrets/no-secrets
                     /**
                      * rollup has extended acorn node with the `start` and the `end` field
                      * https://github.com/rollup/rollup/blob/fecf0cfe14a9d79bb0eff4ad475174ce72775ead/src/ast/nodes/shared/Node.ts#L33
@@ -229,7 +221,7 @@ const preserveDirectives = ({
 
             if (!hasChanged) {
                 // If nothing has changed, we can avoid the expensive `toString()` and `generateMap()` calls
-                return null;
+                return undefined;
             }
 
             return {
@@ -237,10 +229,10 @@ const preserveDirectives = ({
                 map: magicString.generateMap({ hires: true }),
                 meta: {
                     preserveDirectives: {
-                        // eslint-disable-next-line security/detect-object-injection
-                        directives: [...(directives[id] ?? [])],
-                        // eslint-disable-next-line security/detect-object-injection
-                        shebang: shebangs[id] ?? null,
+
+                        directives: [...directives[id] ?? []],
+
+                        shebang: shebangs[id] ?? undefined,
                     },
                 },
             };

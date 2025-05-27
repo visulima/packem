@@ -31,7 +31,7 @@ const lightningCSSLoader: Loader<LightningCSSOptions> = {
         });
 
         if (result.warnings.length > 0) {
-            this.warn("warnings when transforming css:\n" + result.warnings.map((w) => w.message).join("\n"));
+            this.warn(`warnings when transforming css:\n${result.warnings.map((w) => w.message).join("\n")}`);
         }
 
         // /**
@@ -41,7 +41,7 @@ const lightningCSSLoader: Loader<LightningCSSOptions> = {
         // const exports = Object.fromEntries(
         //     Object.entries(
         //         // `exports` is defined if cssModules is true
-        //         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        //         // eslint-disable-next-line @typescript-eslint/no-non-undefined-assertion
         //         result.exports!,
         //     ).sort(
         //         // Cheap alphabetical sort (localCompare is expensive)
@@ -58,5 +58,4 @@ const lightningCSSLoader: Loader<LightningCSSOptions> = {
     test: /\.css$/i,
 };
 
-// eslint-disable-next-line import/no-unused-modules
 export default lightningCSSLoader;

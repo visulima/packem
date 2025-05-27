@@ -5,7 +5,6 @@ const brotliSize = async (path: string): Promise<number> =>
     await new Promise((resolve, reject) => {
         let size = 0;
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         const pipe = createReadStream(path).pipe(
             createBrotliCompress({
                 params: {
@@ -13,6 +12,7 @@ const brotliSize = async (path: string): Promise<number> =>
                 },
             }),
         );
+
         pipe.on("error", reject);
         pipe.on("data", (buf) => {
             size += buf.length;

@@ -17,7 +17,7 @@ const createFiles = (files: string[], directory: string) => {
     }
 };
 
-describe("inferEntries", () => {
+describe(inferEntries, () => {
     let temporaryDirectoryPath: string;
     let defaultContext: BuildContext;
 
@@ -347,6 +347,7 @@ describe("inferEntries", () => {
                 pkg: defaultContext.pkg,
             } as unknown as BuildContext,
         );
+
         expect(result).toStrictEqual({
             entries: [
                 {
@@ -386,6 +387,7 @@ describe("inferEntries", () => {
                 pkg: defaultContext.pkg,
             } as unknown as BuildContext,
         );
+
         expect(result).toStrictEqual({
             entries: [
                 {
@@ -421,6 +423,7 @@ describe("inferEntries", () => {
                 pkg: defaultContext.pkg,
             } as unknown as BuildContext,
         );
+
         expect(result2).toStrictEqual({
             entries: [
                 {
@@ -451,6 +454,7 @@ describe("inferEntries", () => {
                 pkg: defaultContext.pkg,
             } as unknown as BuildContext,
         );
+
         expect(result3).toStrictEqual({
             entries: [
                 {
@@ -747,6 +751,7 @@ describe("inferEntries", () => {
                 pkg: defaultContext.pkg,
             } as unknown as BuildContext,
         );
+
         expect(result).toStrictEqual({
             entries: [
                 {
@@ -804,6 +809,7 @@ describe("inferEntries", () => {
                 pkg: defaultContext.pkg,
             } as unknown as BuildContext,
         );
+
         expect(result).toStrictEqual({
             entries: [
                 {

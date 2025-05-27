@@ -21,18 +21,15 @@ const concat = async (extracted: Extracted[]): Promise<Concatenated> => {
         const data = mapModifier.toObject();
 
         if (!data) {
-            // eslint-disable-next-line no-continue
             continue;
         }
 
         const consumer = mapModifier.toConsumer();
 
         if (!consumer) {
-            // eslint-disable-next-line no-continue
             continue;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-loop-func
         consumer.eachMapping((item) => {
             sm.addMapping({
                 generated: { column: item.generatedColumn, line: offset + item.generatedLine },

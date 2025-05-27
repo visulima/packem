@@ -15,7 +15,7 @@ const metafilePlugin = (): Plugin =>
             for (const id of this.getModuleIds()) {
                 const moduleInfo = this.getModuleInfo(id);
 
-                if (moduleInfo != null && !moduleInfo.isExternal) {
+                if (moduleInfo != undefined && !moduleInfo.isExternal) {
                     for (const target of moduleInfo.importedIds) {
                         deps.push({
                             source: id,
@@ -33,7 +33,7 @@ const metafilePlugin = (): Plugin =>
 
             this.emitFile({
                 fileName: `metafile-${(outputBundleKeys[0] as string).replace(ENDING_REGEX, "")}-${outputOptions.format}.json`,
-                source: JSON.stringify(deps, null, 2),
+                source: JSON.stringify(deps, undefined, 2),
                 type: "asset",
             });
         },

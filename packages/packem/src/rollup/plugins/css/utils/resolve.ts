@@ -68,6 +68,7 @@ export const resolve = (ids: string[], userOptions: ResolveOptions): string => {
 export interface ResolveOptions extends NapiResolveOptions {
     /** directories to begin resolving from (defaults to `[__dirname]`) */
     baseDirs?: string[];
+
     /** name of the caller for error message (default to `Resolver`) */
     caller?: string;
 }

@@ -17,7 +17,6 @@ const placeholderNoHashDefault = "assets/[name][extname]";
 const defaultPublicPath = "./assets/";
 const defaultAssetDirectory = ".";
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 const plugin: PluginCreator<UrlOptions> = (userOptions) => {
     const options = {
         alias: {},
@@ -26,7 +25,7 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
         resolve: urlResolve,
         ...userOptions,
     };
-    const placeholder = (options.hash ?? true) ? (typeof options.hash === "string" ? options.hash : placeholderHashDefault) : placeholderNoHashDefault;
+    const placeholder = options.hash ?? true ? typeof options.hash === "string" ? options.hash : placeholderHashDefault : placeholderNoHashDefault;
 
     return {
         async Once(css, { result }) {
@@ -36,7 +35,6 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
 
             const { file } = css.source.input;
 
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             const map = mm(css.source.input.map?.text ?? undefined)
                 .resolve(dirname(file))
                 .toConsumer();
@@ -62,7 +60,6 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
                     // Resolve aliases
                     for (const [from, to] of Object.entries(options.alias)) {
                         if (url !== from && !url.startsWith(`${from}/`)) {
-                            // eslint-disable-next-line no-continue
                             continue;
                         }
 
@@ -73,6 +70,7 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
                     // Empty URL
                     if (!node || url.length === 0) {
                         decl.warn(result, `Empty URL in \`${decl.toString()}\``);
+
                         return;
                     }
 
@@ -133,7 +131,7 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
 
                 if (!resolved) {
                     decl.warn(result, `Unresolved URL \`${url}\` in \`${decl.toString()}\``);
-                    // eslint-disable-next-line no-continue
+
                     continue;
                 }
 
@@ -141,7 +139,7 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
 
                 if (!(source instanceof Uint8Array) || typeof from !== "string") {
                     decl.warn(result, `Incorrectly resolved URL \`${url}\` in \`${decl.toString()}\``);
-                    // eslint-disable-next-line no-continue
+
                     continue;
                 }
 
@@ -164,8 +162,8 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
 
                     usedNames.set(to, from);
 
-                    const resolvedPublicPath =
-                        typeof options.publicPath === "string"
+                    const resolvedPublicPath
+                        = typeof options.publicPath === "string"
                             ? options.publicPath + (/[/\\]$/.test(options.publicPath) ? "" : "/") + basename(to)
                             : `${defaultPublicPath}${basename(to)}`;
 
@@ -185,7 +183,6 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
                     result.messages.push({ plugin: name, source, to, type: "asset" });
                 }
 
-                // eslint-disable-next-line @typescript-eslint/no-base-to-string
                 decl.value = parsed.toString();
             }
         },
@@ -203,34 +200,39 @@ export interface UrlOptions {
      * - ex.: `{"foo":"bar"}`
      */
     alias?: Record<string, string>;
+
     /**
      * Directory path for outputted CSS assets,
      * which is not included into resulting URL
      * @default "."
      */
     assetDir?: string | ((original: string, resolved: string, file: string) => string);
+
     /**
      * Enable/disable name generation with hash for outputted CSS assets
      * or provide your own placeholder with the following blocks:
      * - `[extname]`: The file extension of the asset including a leading dot, e.g. `.png`.
      * - `[ext]`: The file extension without a leading dot, e.g. `png`.
-     * - `[hash(:<num>)]`: A hash based on the name and content of the asset (with optional length).
+     * - `[hash(:&lt;num>)]`: A hash based on the name and content of the asset (with optional length).
      * - `[name]`: The file name of the asset excluding any extension.
      *
      * Forward slashes / can be used to place files in sub-directories.
      * @default "assets/[name]-[hash][extname]" ("assets/[name][extname]" if false)
      */
     hash?: boolean | string;
+
     /**
      * Inline files instead of copying
      * @default true for `inject` mode, otherwise false
      */
     inline?: boolean;
+
     /**
      * Public Path for URLs in CSS files
      * @default "./"
      */
     publicPath?: string | ((original: string, resolved: string, file: string) => string);
+
     /**
      * Provide custom resolver for URLs
      * in place of the default one

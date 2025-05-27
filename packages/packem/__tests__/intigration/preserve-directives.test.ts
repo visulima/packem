@@ -173,6 +173,7 @@ const Tr = /* @__PURE__ */ __name(() => jsxRuntime.jsx("tr", { className: "m-0 b
 
 module.exports = Tr;
 `);
+
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare const Tr: () => any;

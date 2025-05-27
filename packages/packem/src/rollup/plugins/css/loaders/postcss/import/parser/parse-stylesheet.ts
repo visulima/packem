@@ -10,7 +10,7 @@ import { IS_CHARSET_REGEX, IS_IMPORT_REGEX, IS_LAYER_REGEX } from "../constants"
 import type { Condition, ImportStatement, Statement, Stylesheet } from "../types";
 import parseAtImport from "./parse-at-import";
 
-const consumeComments = (nodes: ChildNode[], cursor: number, importingNode: AtRule | null, from: string[]): [number, Statement] => {
+const consumeComments = (nodes: ChildNode[], cursor: number, importingNode: AtRule | undefined, from: string[]): [number, Statement] => {
     const comments: ChildNode[] = [];
 
     let index = cursor;
@@ -19,7 +19,6 @@ const consumeComments = (nodes: ChildNode[], cursor: number, importingNode: AtRu
 
     // eslint-disable-next-line no-plusplus
     for (index; index < l; index++) {
-        // eslint-disable-next-line security/detect-object-injection
         const node = nodes[index] as ChildNode;
 
         comments.push(node);
@@ -27,7 +26,6 @@ const consumeComments = (nodes: ChildNode[], cursor: number, importingNode: AtRu
         const next = nodes[index + 1];
 
         if (next?.type === "comment") {
-            // eslint-disable-next-line no-continue
             continue;
         }
 
@@ -45,7 +43,7 @@ const consumeComments = (nodes: ChildNode[], cursor: number, importingNode: AtRu
         },
     ];
 };
-const parseImport = (result: Result, atRule: AtRule, importingNode: AtRule | null, conditions: Condition[], from: string[]): Warning | ImportStatement => {
+const parseImport = (result: Result, atRule: AtRule, importingNode: AtRule | undefined, conditions: Condition[], from: string[]): ImportStatement | Warning => {
     const parsed = parseAtImport(atRule.params);
 
     if (!parsed) {
@@ -81,7 +79,7 @@ const consumeImports = (
     nodes: ChildNode[],
     conditions: Condition[],
     cursor: number,
-    importingNode: AtRule | null,
+    importingNode: AtRule | undefined,
     from: string[],
 ): [number, Statement[]] => {
     const statements: Statement[] = [];
@@ -92,21 +90,21 @@ const consumeImports = (
 
     // eslint-disable-next-line no-plusplus
     for (index; index < l; index++) {
-        // eslint-disable-next-line security/detect-object-injection
         const node = nodes[index] as ChildNode;
 
         if (node.type === "comment") {
             const [consumeIndex, commentsStmt] = consumeComments(nodes, index, importingNode, from);
+
             statements.push(commentsStmt);
 
             index = consumeIndex;
-            // eslint-disable-next-line no-continue
+
             continue;
         }
 
         if (node.type === "atrule" && IS_IMPORT_REGEX.test(node.name)) {
             statements.push(parseImport(result, node, importingNode, conditions, from));
-            // eslint-disable-next-line no-continue
+
             continue;
         }
 
@@ -116,7 +114,7 @@ const consumeImports = (
     return [index - 1, statements];
 };
 
-const consumeLayers = (nodes: ChildNode[], conditions: Condition[], cursor: number, importingNode: AtRule | null, from: string[]): [number, Statement] => {
+const consumeLayers = (nodes: ChildNode[], conditions: Condition[], cursor: number, importingNode: AtRule | undefined, from: string[]): [number, Statement] => {
     const layers: ChildNode[] = [];
 
     let index = cursor;
@@ -124,7 +122,6 @@ const consumeLayers = (nodes: ChildNode[], conditions: Condition[], cursor: numb
 
     // eslint-disable-next-line no-plusplus
     for (index; index < l; index++) {
-        // eslint-disable-next-line security/detect-object-injection
         const node = nodes[index] as ChildNode;
 
         layers.push(node);
@@ -132,7 +129,6 @@ const consumeLayers = (nodes: ChildNode[], conditions: Condition[], cursor: numb
         const next = nodes[index + 1];
 
         if (next && next.type === "atrule" && IS_LAYER_REGEX.test(next.name) && !next.nodes) {
-            // eslint-disable-next-line no-continue
             continue;
         }
 
@@ -155,7 +151,7 @@ const consumeBeforeImports = (
     nodes: ChildNode[],
     conditions: Condition[],
     cursor: number,
-    importingNode: AtRule | null,
+    importingNode: AtRule | undefined,
     from: string[],
 ): [number, Statement[]] => {
     const statements: Statement[] = [];
@@ -166,7 +162,6 @@ const consumeBeforeImports = (
 
     // eslint-disable-next-line no-plusplus
     for (index; index < l; index++) {
-        // eslint-disable-next-line security/detect-object-injection
         const node = nodes[index] as ChildNode;
 
         if (node.type === "comment") {
@@ -176,7 +171,6 @@ const consumeBeforeImports = (
 
             index = consumeIndex;
 
-            // eslint-disable-next-line no-continue
             continue;
         }
 
@@ -190,7 +184,6 @@ const consumeBeforeImports = (
                     type: "pre-import",
                 });
 
-                // eslint-disable-next-line no-continue
                 continue;
             } else {
                 const [consumeIndex, layerStmt] = consumeLayers(nodes, conditions, index, importingNode, from);
@@ -198,7 +191,7 @@ const consumeBeforeImports = (
                 statements.push(layerStmt);
 
                 index = consumeIndex;
-                // eslint-disable-next-line no-continue
+
                 continue;
             }
         }
@@ -209,8 +202,7 @@ const consumeBeforeImports = (
     return [index - 1, statements];
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
-const parseStylesheet = (result: Result, styles: Root | Document, importingNode: AtRule | null, conditions: Condition[], from: string[]): Stylesheet => {
+const parseStylesheet = (result: Result, styles: Document | Root, importingNode: AtRule | undefined, conditions: Condition[], from: string[]): Stylesheet => {
     const stylesheet: Stylesheet = {
         statements: [],
     };
@@ -221,9 +213,9 @@ const parseStylesheet = (result: Result, styles: Root | Document, importingNode:
 
             if (stylesheet.charset && subStylesheet.charset && stylesheet.charset.params.toLowerCase() !== subStylesheet.charset.params.toLowerCase()) {
                 throw subStylesheet.charset.error(
-                    "Incompatible @charset statements:\n" +
-                        `  ${subStylesheet.charset.params} specified in ${subStylesheet.charset.source?.input.file}\n` +
-                        `  ${stylesheet.charset.params} specified in ${stylesheet.charset.source?.input.file}`,
+                    "Incompatible @charset statements:\n"
+                    + `  ${subStylesheet.charset.params} specified in ${subStylesheet.charset.source?.input.file}\n`
+                    + `  ${stylesheet.charset.params} specified in ${stylesheet.charset.source?.input.file}`,
                 );
             } else if (!stylesheet.charset && !!subStylesheet.charset) {
                 stylesheet.charset = subStylesheet.charset;
@@ -242,25 +234,23 @@ const parseStylesheet = (result: Result, styles: Root | Document, importingNode:
 
     // eslint-disable-next-line no-plusplus
     for (let index = 0; index < styles.nodes.length; index++) {
-        // eslint-disable-next-line security/detect-object-injection
         const node = styles.nodes[index] as ChildNode;
 
         if (index === 0 && node.type === "atrule" && IS_CHARSET_REGEX.test(node.name)) {
             charset = node;
 
-            // eslint-disable-next-line no-continue
             continue;
         }
 
         if (imports.length === 0 && (node.type === "comment" || (node.type === "atrule" && IS_LAYER_REGEX.test(node.name) && !node.nodes))) {
             [index, beforeImports] = consumeBeforeImports(styles.nodes, conditions, index, importingNode, from);
-            // eslint-disable-next-line no-continue
+
             continue;
         }
 
         if (imports.length === 0 && node.type === "atrule" && IS_IMPORT_REGEX.test(node.name)) {
             [index, imports] = consumeImports(result, styles.nodes, conditions, index, importingNode, from);
-            // eslint-disable-next-line no-continue
+
             continue;
         }
 

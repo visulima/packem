@@ -15,7 +15,7 @@ const exportName = function* (statement: ExportNamedDeclaration): Generator<stri
         case "FunctionDeclaration": {
             const { id } = statement.declaration;
 
-            assert(id, `Expected class/function to have a name`);
+            assert.ok(id, `Expected class/function to have a name`);
 
             yield id.name;
 
@@ -28,6 +28,7 @@ const exportName = function* (statement: ExportNamedDeclaration): Generator<stri
                     yield name;
                 }
             }
+
             break;
         }
 
@@ -85,7 +86,7 @@ const parseExportDefault = function* (): Generator<ParsedExportInfo> {
 };
 
 const parseExports = function* (context: PluginContext, module_: ModuleInfo): Generator<ParsedExportInfo> {
-    assert(module_.code != null, `Module ${module_.id} doesn't have associated code`);
+    assert.ok(module_.code != undefined, `Module ${module_.id} doesn't have associated code`);
     const node = context.parse(module_.code);
 
     for (const statement of node.body) {

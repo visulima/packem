@@ -1,4 +1,4 @@
-const SUPPORTED_ESBUILD_TARGETS = new Set(["es", "chrome", "edge", "firefox", "ios", "node", "safari", "opera", "ie"]);
+const SUPPORTED_ESBUILD_TARGETS = new Set(["chrome", "edge", "es", "firefox", "ie", "ios", "node", "opera", "safari"]);
 
 // https://github.com/eBay/browserslist-config/issues/16#issuecomment-863870093
 const UNSUPPORTED = ["android 4"];

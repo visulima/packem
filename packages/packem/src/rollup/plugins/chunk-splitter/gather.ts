@@ -17,21 +17,22 @@ interface ExportInfo {
 const getImportedModule = async function (context: PluginContext, source: string, importer: ModuleInfo) {
     const importedId = await context.resolve(source, importer.id);
 
-    assert(importedId, `Rollup can't resolve ${source} from ${importer.id}`);
+    assert.ok(importedId, `Rollup can't resolve ${source} from ${importer.id}`);
 
     if (importedId.external) {
-        return null;
+        return undefined;
     }
 
     const importedModule = await context.load(importedId);
 
-    assert(importedModule, `Rollup doesn't have a module for id ${importedId.id}`);
+    assert.ok(importedModule, `Rollup doesn't have a module for id ${importedId.id}`);
 
     return importedModule;
 };
 
 const gatherBarrelReExports = async function* (context: PluginContext, reexported: BarrelReExport, module_: ModuleInfo): AsyncGenerator<ExportInfo> {
     const importedModule = await getImportedModule(context, reexported.source, module_);
+
     if (!importedModule) {
         return;
     }
@@ -42,6 +43,7 @@ const gatherBarrelReExports = async function* (context: PluginContext, reexporte
 
 const gatherNamedReExports = async function* (context: PluginContext, reexported: NamedReExport, module_: ModuleInfo): AsyncGenerator<ExportInfo> {
     const importedModule = await getImportedModule(context, reexported.source, module_);
+
     if (!importedModule) {
         return;
     }
@@ -53,7 +55,6 @@ const gatherNamedReExports = async function* (context: PluginContext, reexported
         const binding = bindingsByImportedName.get(exportInfo.exportedName);
 
         if (!binding) {
-            // eslint-disable-next-line no-continue
             continue;
         }
 

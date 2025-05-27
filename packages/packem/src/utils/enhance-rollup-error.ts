@@ -22,6 +22,7 @@ const extractStack = (error: RollupError): string | undefined => {
 
     return stack;
 };
+
 /**
  * Esbuild code frames have newlines at the start and end of the frame, rollup doesn't
  * This function normalizes the frame to match the esbuild format which has more pleasing padding
@@ -38,11 +39,11 @@ const enhanceRollupError = (error: RollupError): void => {
     let message = (error.plugin ? `[${error.plugin}] ` : "") + error.message;
 
     if (error.id) {
-        message += `\nfile: ${cyan(error.id + (error.loc ? ":" + error.loc.line + ":" + error.loc.column : ""))}`;
+        message += `\nfile: ${cyan(error.id + (error.loc ? `:${error.loc.line}:${error.loc.column}` : ""))}`;
     }
 
     if (error.frame) {
-        message += `\n` + yellow(normalizeCodeFrame(error.frame));
+        message += `\n${yellow(normalizeCodeFrame(error.frame))}`;
     }
 
     // eslint-disable-next-line no-param-reassign

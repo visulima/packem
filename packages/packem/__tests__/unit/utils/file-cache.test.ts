@@ -35,11 +35,11 @@ describe("fileCache", () => {
     it("should initialize cache path and log appropriately when constructed", () => {
         expect.assertions(1);
 
-        // eslint-disable-next-line no-new
+        // eslint-disable-next-line no-new, sonarjs/constructor-for-side-effects
         new FileCache(temporaryDirectoryPath, cacheDirectoryPath, "hash123", hoisted.logger);
 
         expect(hoisted.logger.debug).toHaveBeenCalledWith({
-            message: "Cache path is: " + cacheDirectoryPath,
+            message: `Cache path is: ${cacheDirectoryPath}`,
             prefix: "file-cache",
         });
     });
@@ -50,8 +50,9 @@ describe("fileCache", () => {
         const fileCache = new FileCache(temporaryDirectoryPath, cacheDirectoryPath, "hash123", hoisted.logger);
 
         fileCache.isEnabled = false;
+        console.log(fileCache);
 
-        expect(fileCache.isEnabled).toBeFalsy();
+        expect(fileCache.isEnabled).toBe(false);
     });
 
     it("should return true if file is accessible in the cache", () => {
@@ -61,7 +62,7 @@ describe("fileCache", () => {
 
         const fileCache = new FileCache(temporaryDirectoryPath, cacheDirectoryPath, "hash123", hoisted.logger);
 
-        expect(fileCache.has("testFile")).toBeTruthy();
+        expect(fileCache.has("testFile")).toBe(true);
     });
 
     it("should retrieve data from memory cache if available", () => {
@@ -94,7 +95,7 @@ describe("fileCache", () => {
     it("should handle undefined cache path gracefully in constructor", () => {
         expect.assertions(1);
 
-        // eslint-disable-next-line no-new
+        // eslint-disable-next-line no-new, sonarjs/constructor-for-side-effects
         new FileCache(temporaryDirectoryPath, undefined, "hash123", hoisted.logger);
 
         expect(hoisted.logger.debug).toHaveBeenCalledWith({
@@ -120,6 +121,7 @@ describe("fileCache", () => {
         expect.assertions(1);
 
         const fileCache = new FileCache(temporaryDirectoryPath, cacheDirectoryPath, "hash123", hoisted.logger);
+
         expect(() => fileCache.set("testFile", undefined)).not.toThrow();
     });
 
@@ -127,15 +129,19 @@ describe("fileCache", () => {
         expect.assertions(1);
 
         const fileCache = new FileCache(temporaryDirectoryPath, cacheDirectoryPath, "hash123", hoisted.logger);
+
         fileCache.isEnabled = false;
-        expect(fileCache.has("testFile")).toBeFalsy();
+
+        expect(fileCache.has("testFile")).toBe(false);
     });
 
     it("should return undefined if cache is disabled in get method", () => {
         expect.assertions(1);
 
         const fileCache = new FileCache(temporaryDirectoryPath, cacheDirectoryPath, "hash123", hoisted.logger);
+
         fileCache.isEnabled = false;
+
         expect(fileCache.get("testFile")).toBeUndefined();
     });
 });

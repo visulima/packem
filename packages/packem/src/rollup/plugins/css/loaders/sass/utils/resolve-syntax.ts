@@ -1,13 +1,13 @@
-const resolveSyntax = (extension: string): "scss" | "indented" | "css" | undefined => {
+const resolveSyntax = (extension: string): "css" | "indented" | "scss" | undefined => {
     switch (extension.toLowerCase()) {
-        case ".scss": {
-            return "scss";
+        case ".css": {
+            return "css";
         }
         case ".sass": {
             return "indented";
         }
-        case ".css": {
-            return "css";
+        case ".scss": {
+            return "scss";
         }
         default: {
             return undefined;

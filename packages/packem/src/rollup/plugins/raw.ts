@@ -18,12 +18,12 @@ export const rawPlugin = (options: RawLoaderOptions): Plugin => {
                 });
             }
 
-            return null;
+            return undefined;
         },
         name: "packem:raw",
         transform(code, id) {
             if (!filter(id) && !id.includes("?raw")) {
-                return null;
+                return undefined;
             }
 
             if (!id.includes("?raw")) {

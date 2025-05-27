@@ -13,7 +13,6 @@ export type ShebangOptions = {
 };
 
 export const makeExecutable = async (filePath: string): Promise<void> => {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await chmod(filePath, 0o755 /* rwx r-x r-x */).catch(() => {});
 };
 
@@ -24,10 +23,9 @@ export const shebangPlugin = (executablePaths: string[], options: ShebangOptions
         renderChunk: {
             handler(code, chunk, outputOptions) {
                 if (!chunk.isEntry || !chunk.facadeModuleId) {
-                    return null;
+                    return undefined;
                 }
 
-                // eslint-disable-next-line no-secrets/no-secrets
                 /**
                  * Here we are making 3 assumptions:
                  * - shebang can only be at the first line of the file, otherwise it will not be recognized
@@ -43,18 +41,18 @@ export const shebangPlugin = (executablePaths: string[], options: ShebangOptions
                 const hasShebang = code.startsWith("#") && code[1] === "!";
 
                 if (hasShebang && options.replace) {
-                    return code.replace(SHEBANG_RE, options.shebang + "\n");
+                    return code.replace(SHEBANG_RE, `${options.shebang}\n`);
                 }
 
                 // preserve of the shebang is handled by the `preserve-directives` plugin
                 if (hasShebang) {
-                    return null;
+                    return undefined;
                 }
 
                 if (executablePaths.includes(chunk.name)) {
                     const transformed = new MagicString(code);
 
-                    transformed.prepend(options.shebang + "\n");
+                    transformed.prepend(`${options.shebang}\n`);
 
                     return {
                         code: transformed.toString(),
@@ -62,7 +60,7 @@ export const shebangPlugin = (executablePaths: string[], options: ShebangOptions
                     };
                 }
 
-                return null;
+                return undefined;
             },
             order: "post",
         },
@@ -70,7 +68,6 @@ export const shebangPlugin = (executablePaths: string[], options: ShebangOptions
         async writeBundle(bundleOptions, bundle) {
             for (const [fileName, output] of Object.entries(bundle)) {
                 if (output.type !== "chunk") {
-                    // eslint-disable-next-line no-continue
                     continue;
                 }
 
@@ -97,6 +94,5 @@ export const removeShebangPlugin = (): Plugin => {
 export const getShebang = (code: string, append = "\n"): string => {
     const m = SHEBANG_RE.exec(code);
 
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     return m ? m + append : "";
 };

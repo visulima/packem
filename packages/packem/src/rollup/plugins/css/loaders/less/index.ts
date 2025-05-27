@@ -14,7 +14,6 @@ const loader: Loader<LESSLoaderOptions> = {
             plugins.push(...this.options.plugins);
         }
 
-        // eslint-disable-next-line @typescript-eslint/unbound-method
         const render = less.render as (input: string, options: Less.Options) => Promise<Less.RenderOutput>;
 
         const result: Less.RenderOutput = await render(code, {
@@ -30,11 +29,9 @@ const loader: Loader<LESSLoaderOptions> = {
             this.deps.add(normalize(dep));
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         return { code: result.css, map: result.map ?? map };
     },
     test: /\.less$/i,
 };
 
-// eslint-disable-next-line import/no-unused-modules
 export default loader;

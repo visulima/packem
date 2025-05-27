@@ -28,7 +28,7 @@ export const walkUrls = (parsed: ParsedValue, callback: (url: string, node?: Nod
             for (const nNode of node.nodes) {
                 if (nNode.type === "string") {
                     callback(nNode.value.replaceAll(/^\s+|\s+$/g, ""), nNode);
-                    // eslint-disable-next-line no-continue
+
                     continue;
                 }
 

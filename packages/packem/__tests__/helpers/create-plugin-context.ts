@@ -64,7 +64,7 @@ class MockPluginContext {
     }
 
     // eslint-disable-next-line class-methods-use-this
-    public error(error: string | RollupError): never {
+    public error(error: RollupError | string): never {
         const message: string = typeof error === "string" ? error : error.message;
 
         throw new Error(message);

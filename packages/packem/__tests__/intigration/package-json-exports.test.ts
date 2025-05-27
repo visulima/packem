@@ -10,7 +10,7 @@ import { assertContainFiles, createPackageJson, createPackemConfig, createTsConf
 
 const splitedNodeJsVersion = process.versions.node.split(".");
 
-const NODE_JS_VERSION = splitedNodeJsVersion[0] + "." + splitedNodeJsVersion[1];
+const NODE_JS_VERSION = `${splitedNodeJsVersion[0]}.${splitedNodeJsVersion[1]}`;
 
 describe("packem package.json exports", () => {
     let temporaryDirectoryPath: string;
@@ -90,8 +90,7 @@ export function method() {
         expect(binProcess.exitCode).toBe(0);
 
         for (const file of ["index.cjs", "index.mjs"]) {
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
-            expect(existsSync(`${temporaryDirectoryPath}/dist/${file}`)).toBeTruthy();
+            expect(existsSync(`${temporaryDirectoryPath}/dist/${file}`)).toBe(true);
         }
     });
 
@@ -384,7 +383,6 @@ export { value };
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         const files = readdirSync(join(temporaryDirectoryPath, "dist"));
 
         expect(files).toHaveLength(5);
@@ -682,6 +680,7 @@ __name(render, "render");
 
 exports.render = render;
 `);
+
         const mjsPageA = readFileSync(`${temporaryDirectoryPath}/dist/pages/a.mjs`);
 
         expect(mjsPageA).toBe(`var __defProp = Object.defineProperty;
@@ -709,6 +708,7 @@ __name(render, "render");
 
 exports.render = render;
 `);
+
         const mjsPageB = readFileSync(`${temporaryDirectoryPath}/dist/pages/b.mjs`);
 
         expect(mjsPageB).toBe(`var __defProp = Object.defineProperty;
@@ -1358,27 +1358,27 @@ exports.Client = Client;
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-0.mjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-1.mjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-2.mjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-3.mjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-4.mjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-5.mjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-6.mjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-7.mjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-8.mjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-9.mjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-0.mjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-1.mjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-2.mjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-3.mjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-4.mjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-5.mjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-6.mjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-7.mjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-8.mjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-9.mjs`)).toBe(true);
 
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-0.cjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-1.cjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-2.cjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-3.cjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-4.cjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-5.cjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-6.cjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-7.cjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-8.cjs`)).toBeTruthy();
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-9.cjs`)).toBeTruthy();
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-0.cjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-1.cjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-2.cjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-3.cjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-4.cjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-5.cjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-6.cjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-7.cjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-8.cjs`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-9.cjs`)).toBe(true);
     });
 
     it("should generate different files, if file with same name, cts and mts ending was found", async () => {
@@ -1622,7 +1622,6 @@ module.exports = result;
             "index.edge-light.d.mts",
         ];
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         const files = readdirSync(join(temporaryDirectoryPath, "dist"));
 
         expect(files).toHaveLength(14);
@@ -1696,7 +1695,7 @@ console.log('require-module-import', require('require-module-import').resolved);
         });
 
         const fixturePath = join(__dirname, "../../__fixtures__/module-conditions");
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
+
         const moduleConditionsFixture = readdirSync(fixturePath);
 
         for (const file of moduleConditionsFixture) {
@@ -1812,7 +1811,7 @@ console.log('require-module-import', require('require-module-import').resolved);
         });
 
         const fixturePath = join(__dirname, "../../__fixtures__/module-conditions");
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
+
         const moduleConditionsFixture = readdirSync(fixturePath);
 
         for (const file of moduleConditionsFixture) {

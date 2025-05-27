@@ -24,7 +24,7 @@ const sortLicenses = (licenses: Set<string>) => {
         }
     });
 
-    // eslint-disable-next-line @typescript-eslint/require-array-sort-compare,etc/no-assign-mutated-array
+    // eslint-disable-next-line etc/no-assign-mutated-array
     return [...noParenthesis.sort(), ...withParenthesis.sort()];
 };
 
@@ -54,15 +54,15 @@ export const license = ({
     packageName: string | undefined;
 }): Plugin =>
     licensePlugin({
-        // eslint-disable-next-line sonarjs/cognitive-complexity
+
         thirdParty(dependencies) {
             const licenses = new Set<string>();
 
             const dependencyLicenseTexts = dependencies
                 // eslint-disable-next-line etc/no-assign-mutated-array
-                .sort(({ name: nameA }, { name: nameB }) => ((nameA || 0) > (nameB || 0) ? 1 : (nameB || 0) > (nameA || 0) ? -1 : 0))
+                .sort(({ name: nameA }, { name: nameB }) => ((nameA || 0) > (nameB || 0) ? 1 : ((nameB || 0) > (nameA || 0) ? -1 : 0)))
                 .map(({ author, contributors, license: dependencyLicense, licenseText, maintainers, name, repository }) => {
-                    let text = "## " + name + "\n";
+                    let text = `## ${name}\n`;
 
                     if (dependencyLicense) {
                         text += `License: ${dependencyLicense}\n`;
@@ -87,26 +87,26 @@ export const license = ({
                     }
 
                     if (licenseText) {
-                        text +=
-                            "\n" +
-                            licenseText
-                                .trim()
-                                .replaceAll(/\r\n|\r/g, "\n")
-                                .replaceAll(`<!-- ${marker} -->`, "")
-                                .replaceAll(dtsMarker ? `<!-- ${dtsMarker} -->` : "", "")
-                                .replaceAll(`<!-- /${marker} -->`, "")
-                                .replaceAll(dtsMarker ? `<!-- /${dtsMarker} -->` : "", "")
-                                .trim()
-                                .split("\n")
-                                .map((line) => {
-                                    if (!line) {
-                                        return ">";
-                                    }
+                        text
+                            += `\n${
+                                licenseText
+                                    .trim()
+                                    .replaceAll(/\r\n|\r/g, "\n")
+                                    .replaceAll(`<!-- ${marker} -->`, "")
+                                    .replaceAll(dtsMarker ? `<!-- ${dtsMarker} -->` : "", "")
+                                    .replaceAll(`<!-- /${marker} -->`, "")
+                                    .replaceAll(dtsMarker ? `<!-- /${dtsMarker} -->` : "", "")
+                                    .trim()
+                                    .split("\n")
+                                    .map((line) => {
+                                        if (!line) {
+                                            return ">";
+                                        }
 
-                                    return `> ${line}`;
-                                })
-                                .join("\n") +
-                            "\n";
+                                        return `> ${line}`;
+                                    })
+                                    .join("\n")
+                            }\n`;
                     }
 
                     if (dependencyLicense) {
@@ -120,7 +120,7 @@ export const license = ({
             if (dependencyLicenseTexts === "") {
                 logger.info({
                     message: "No dependencies license information found.",
-                    prefix: "plugin:license:" + mode,
+                    prefix: `plugin:license:${mode}`,
                 });
 
                 return;
@@ -135,7 +135,7 @@ export const license = ({
                 if (!content) {
                     logger.error({
                         message: `Could not find the license marker: <!-- ${marker} --><!-- /${marker} --> in ${licenseFilePath}`,
-                        prefix: "plugin:license:" + mode,
+                        prefix: `plugin:license:${mode}`,
                     });
 
                     return;
@@ -146,7 +146,7 @@ export const license = ({
 
                     logger.info({
                         message: `${licenseFilePath} updated.`,
-                        prefix: "plugin:license:" + mode,
+                        prefix: `plugin:license:${mode}`,
                     });
                 }
             } catch (error) {

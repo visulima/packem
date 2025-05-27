@@ -41,10 +41,8 @@ import { node10Compatibility } from "./node10-compatibility";
 
 /**
  * Resolves TSConfig JSX option to a standardized JSX runtime value.
- *
- * @param jsx - The JSX option from TSConfig
+ * @param jsx The JSX option from TSConfig
  * @returns Standardized JSX runtime value ('automatic', 'preserve', or 'transform')
- *
  * @internal
  */
 const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX): "automatic" | "preserve" | "transform" | undefined => {
@@ -68,20 +66,17 @@ const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX):
 
 /**
  * Generates build options by combining and processing various configuration sources.
- *
- * @param logger - Logger instance for output
- * @param rootDirectory - Root directory of the project
- * @param environment - Build environment (development/production)
- * @param debug - Enable debug mode
- * @param inputConfig - User provided build configuration
- * @param buildConfig - Resolved build configuration
- * @param preset - Build preset configuration
- * @param packageJson - Package.json contents
- * @param tsconfig - TypeScript configuration
- * @param runtimeVersion - Node.js runtime version
- *
+ * @param logger Logger instance for output
+ * @param rootDirectory Root directory of the project
+ * @param environment Build environment (development/production)
+ * @param debug Enable debug mode
+ * @param inputConfig User provided build configuration
+ * @param buildConfig Resolved build configuration
+ * @param preset Build preset configuration
+ * @param packageJson Package.json contents
+ * @param tsconfig TypeScript configuration
+ * @param runtimeVersion Node.js runtime version
  * @returns Processed internal build options
- *
  * @internal
  */
 const generateOptions = (
@@ -99,7 +94,6 @@ const generateOptions = (
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
     const splitRuntimeVersion = runtimeVersion.split(".");
 
-    // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error,@typescript-eslint/ban-ts-comment
     // @ts-ignore TS2589 is just deeply nested and this is needed for typedoc
     const options = defu(buildConfig, <Partial<BuildOptions>>{
         alias: {},
@@ -146,6 +140,7 @@ const generateOptions = (
                     baseUrl: tsconfig?.config.compilerOptions?.baseUrl ?? ".",
                     // Avoid extra work
                     checkJs: false,
+
                     /**
                      * https://github.com/privatenumber/pkgroll/pull/54
                      *
@@ -193,12 +188,13 @@ const generateOptions = (
                 jsxFragment: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
                 jsxImportSource: tsconfig?.config.compilerOptions?.jsxImportSource,
                 jsxSideEffects: true,
-                // eslint-disable-next-line no-secrets/no-secrets
+
                 /**
                  * esbuild renames variables even if minification is not enabled
                  * https://esbuild.github.io/try/#dAAwLjE5LjUAAGNvbnN0IGEgPSAxOwooZnVuY3Rpb24gYSgpIHt9KTs
                  */
                 keepNames: true,
+
                 /**
                  * Improve performance by generating smaller source maps
                  * that doesn't include the original source code
@@ -279,17 +275,17 @@ const generateOptions = (
             },
             license: {
                 dependenciesTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
-                    `\n# Licenses of bundled dependencies\n` +
-                    `The published ${pName} artifact additionally contains code with the following licenses:\n` +
-                    (licenses.length > 0 ? `${licenses.join(", ")}\n\n` : "\n") +
-                    `# Bundled dependencies:\n` +
-                    dependencyLicenseTexts,
+                    `\n# Licenses of bundled dependencies\n`
+                    + `The published ${pName} artifact additionally contains code with the following licenses:\n${
+                        licenses.length > 0 ? `${licenses.join(", ")}\n\n` : "\n"
+                    }# Bundled dependencies:\n${
+                        dependencyLicenseTexts}`,
                 dtsTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
-                    `\n# Licenses of bundled types\n` +
-                    `The published ${pName} artifact additionally contains code with the following licenses:\n` +
-                    (licenses.length > 0 ? `${licenses.join(", ")}\n\n` : "\n") +
-                    `# Bundled types:\n` +
-                    dependencyLicenseTexts,
+                    `\n# Licenses of bundled types\n`
+                    + `The published ${pName} artifact additionally contains code with the following licenses:\n${
+                        licenses.length > 0 ? `${licenses.join(", ")}\n\n` : "\n"
+                    }# Bundled types:\n${
+                        dependencyLicenseTexts}`,
             },
             node10Compatibility: {},
             output: {
@@ -300,14 +296,14 @@ const generateOptions = (
                     jsxRuntime === "preserve"
                         ? "preserve"
                         : {
-                              development: environment !== "production",
-                              pragma: tsconfig?.config.compilerOptions?.jsxFactory,
-                              pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
-                              pure: true,
-                              runtime: jsxRuntime === "transform" || jsxRuntime === "automatic" ? "automatic" : "classic",
-                              useBuiltIns: true,
-                              useSpread: true,
-                          },
+                            development: environment !== "production",
+                            pragma: tsconfig?.config.compilerOptions?.jsxFactory,
+                            pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
+                            pure: true,
+                            runtime: jsxRuntime === "transform" || jsxRuntime === "automatic" ? "automatic" : "classic",
+                            useBuiltIns: true,
+                            useSpread: true,
+                        },
             },
             patchTypes: {},
             polyfillNode: {},
@@ -362,17 +358,17 @@ const generateOptions = (
                 injectCreateRequireForImportRequire: false,
                 preserveDynamicImport: true,
                 production: environment === PRODUCTION_ENV,
-                ...(tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
+                ...tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
                     ? {
-                          jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
-                          jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
-                          jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
-                          jsxRuntime,
-                          transforms: ["typescript", "jsx", ...(tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : [])],
-                      }
+                        jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
+                        jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
+                        jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
+                        jsxRuntime,
+                        transforms: ["typescript", "jsx", ...tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : []],
+                    }
                     : {
-                          transforms: ["typescript", ...(tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : [])],
-                      }),
+                        transforms: ["typescript", ...tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : []],
+                    },
             },
             swc: {
                 include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
@@ -521,7 +517,6 @@ const generateOptions = (
 
     let version = "0.0.0";
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (options.transformer?.NAME !== undefined) {
         options.transformerName = options.transformer.NAME;
         // TODO: Remove this in v2, and a throw error if transformer.NAME is not set
@@ -546,15 +541,15 @@ const generateOptions = (
     }
 
     logger.info({
-        message: "Using " + cyan("node ") + runtimeVersion,
+        message: `Using ${cyan("node ")}${runtimeVersion}`,
         prefix: "system",
     });
     logger.info({
-        message: "Using " + cyan("rollup ") + VERSION + " with " + cyan(options.runtime as string) + " build runtime",
+        message: `Using ${cyan("rollup ")}${VERSION} with ${cyan(options.runtime as string)} build runtime`,
         prefix: "bundler",
     });
     logger.info({
-        message: "Using " + cyan(options.transformerName) + " " + version,
+        message: `Using ${cyan(options.transformerName)} ${version}`,
         prefix: "transformer",
     });
 
@@ -578,7 +573,7 @@ const generateOptions = (
         }
 
         if (options.browserTargets && options.browserTargets.length > 0) {
-            logger.debug("Using browser targets: " + options.browserTargets.join(", "));
+            logger.debug(`Using browser targets: ${options.browserTargets.join(", ")}`);
         }
     }
 
@@ -593,19 +588,16 @@ const generateOptions = (
 
 /**
  * Creates a build context with all necessary configuration and environment information.
- *
- * @param logger - Logger instance for output
- * @param rootDirectory - Root directory of the project
- * @param mode - Build mode (build/watch)
- * @param environment - Build environment (development/production)
- * @param debug - Enable debug mode
- * @param buildConfig - Resolved build configuration
- * @param packageJson - Package.json contents
- * @param tsconfig - TypeScript configuration
- * @param nodeVersion - Node.js version
- *
+ * @param logger Logger instance for output
+ * @param rootDirectory Root directory of the project
+ * @param mode Build mode (build/watch)
+ * @param environment Build environment (development/production)
+ * @param debug Enable debug mode
+ * @param buildConfig Resolved build configuration
+ * @param packageJson Package.json contents
+ * @param tsconfig TypeScript configuration
+ * @param nodeVersion Node.js version
  * @returns Promise resolving to the build context
- *
  * @internal
  */
 const createContext = async (
@@ -681,13 +673,13 @@ const createContext = async (
     }
 
     if (context.options.declaration) {
-        context.logger.info("Using typescript version: " + cyan(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript ?? "unknown"));
+        context.logger.info(`Using typescript version: ${cyan(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript ?? "unknown")}`);
     }
 
     if (
-        context.options.declaration &&
-        (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript) &&
-        !context.tsconfig?.config.compilerOptions?.isolatedModules
+        context.options.declaration
+        && (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript)
+        && !context.tsconfig?.config.compilerOptions?.isolatedModules
     ) {
         context.logger.warn(
             `'compilerOptions.isolatedModules' is not enabled in tsconfig.\nBecause none of the third-party transpiler, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.\nTo mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.`,
@@ -701,26 +693,23 @@ const createContext = async (
 
 /**
  * Gets a human-readable string representation of the build mode.
- *
- * @param mode - Build mode (build/watch)
+ * @param mode Build mode (build/watch)
  * @returns String representation of the mode
- *
  * @internal
  */
 const getMode = (mode: Mode): string => {
     switch (mode) {
+        case "build": {
+            return "Building";
+        }
         case "jit": {
             return "Stubbing";
         }
         case "watch": {
             return "Watching";
         }
-        case "build": {
-            return "Building";
-        }
         default: {
-            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-            throw new Error("Unknown mode: " + mode);
+            throw new Error(`Unknown mode: ${mode}`);
         }
     }
 };
@@ -729,13 +718,11 @@ const getMode = (mode: Mode): string => {
  * Main entry point for the Packem bundler.
  * Handles the complete build process including configuration loading, validation,
  * and execution of the build/watch process.
- *
- * @param rootDirectory - Root directory of the project
- * @param mode - Build mode (build/watch)
- * @param environment - Build environment (development/production)
- * @param logger - Logger instance for output
- * @param inputConfig - User provided build configuration and options
- *
+ * @param rootDirectory Root directory of the project
+ * @param mode Build mode (build/watch)
+ * @param environment Build environment (development/production)
+ * @param logger Logger instance for output
+ * @param inputConfig User provided build configuration and options
  * @example
  * ```typescript
  * import packem from 'packem';
@@ -745,7 +732,6 @@ const getMode = (mode: Mode): string => {
  *   configPath: './packem.config.js'
  * });
  * ```
- *
  * @throws {Error} If configuration validation fails or build process encounters errors
  * @public
  */
@@ -784,8 +770,8 @@ const packem = async (
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type,@typescript-eslint/no-explicit-any
     let onSuccessCleanup: (() => any) | undefined | void;
 
-    const cacheKey =
-        getHash(
+    const cacheKey
+        = getHash(
             JSON.stringify({
                 version: packageJson.version,
                 ...packageJson.dependencies,
@@ -816,7 +802,7 @@ const packem = async (
         fileCache.isEnabled = context.options.fileCache as boolean;
 
         // eslint-disable-next-line etc/no-internal
-        context.logger.info(cyan(getMode(mode) + " " + context.options.name));
+        context.logger.info(cyan(`${getMode(mode)} ${context.options.name}`));
 
         context.logger.debug({
             context: context.options.entries,
@@ -840,7 +826,7 @@ const packem = async (
 
                 await context.hooks.callHook("builder:done", name, context);
 
-                context.logger.raw("\n⚡️ " + name + " run in " + getBuilderDuration());
+                context.logger.raw(`\n⚡️ ${name} run in ${getBuilderDuration()}`);
 
                 if (watchMode) {
                     context.logger.raw("\n\n");
@@ -859,7 +845,7 @@ const packem = async (
                     await onSuccessCleanup();
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (error: any) {
-                    throw new Error("onSuccess function cleanup failed: " + error.message, { cause: error });
+                    throw new Error(`onSuccess function cleanup failed: ${error.message}`, { cause: error });
                 }
             }
 
@@ -874,7 +860,7 @@ const packem = async (
                     onSuccessCleanup = await context.options.onSuccess();
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (error: any) {
-                    throw new Error("onSuccess function failed: " + error.message, { cause: error });
+                    throw new Error(`onSuccess function failed: ${error.message}`, { cause: error });
                 }
             } else if (typeof context.options.onSuccess === "string") {
                 const timeout = context.options.onSuccessTimeout ?? 30_000; // 30 seconds default
@@ -890,7 +876,7 @@ const packem = async (
                 await onSuccessProcess;
 
                 if (onSuccessProcess.exitCode && onSuccessProcess.exitCode !== 0) {
-                    throw new Error("onSuccess script failed with exit code " + onSuccessProcess.exitCode + ". Check the output above for details.");
+                    throw new Error(`onSuccess script failed with exit code ${onSuccessProcess.exitCode}. Check the output above for details.`);
                 }
             }
         };
@@ -950,18 +936,16 @@ const packem = async (
             logBuildErrors(context, logged);
         }
 
-        context.logger.raw("\n⚡️ Build run in " + getDuration());
+        context.logger.raw(`\n⚡️ Build run in ${getDuration()}`);
 
         await runBuilder();
 
         await runOnsuccess();
 
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         process.on("SIGINT", async () => {
             await doOnSuccessCleanup();
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         process.on("SIGTERM", async () => {
             await doOnSuccessCleanup();
         });

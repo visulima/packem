@@ -1,10 +1,7 @@
-/**
- * Modified copy of https://github.com/cprecioso/rollup-plugin-chunk-per-export/blob/main/src/parse/types.ts
- */
-export interface NamedSelfExport {
-    exportedName: string;
-    from: "self";
-    type: "named";
+export interface BarrelReExport {
+    from: "other";
+    source: string;
+    type: "barrel";
 }
 
 export interface ExportBinding {
@@ -19,10 +16,13 @@ export interface NamedReExport {
     type: "named";
 }
 
-export interface BarrelReExport {
-    from: "other";
-    source: string;
-    type: "barrel";
+/**
+ * Modified copy of https://github.com/cprecioso/rollup-plugin-chunk-per-export/blob/main/src/parse/types.ts
+ */
+export interface NamedSelfExport {
+    exportedName: string;
+    from: "self";
+    type: "named";
 }
 
-export type ParsedExportInfo = NamedSelfExport | NamedReExport | BarrelReExport;
+export type ParsedExportInfo = BarrelReExport | NamedReExport | NamedSelfExport;

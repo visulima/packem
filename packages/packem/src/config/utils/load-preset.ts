@@ -11,7 +11,7 @@ const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<Bui
         return {};
     } else if (typeof preset === "string") {
         // eslint-disable-next-line no-param-reassign
-        preset = (await jiti.import(preset)) || {};
+        preset = await jiti.import(preset) || {};
     }
 
     if (typeof preset === "function") {

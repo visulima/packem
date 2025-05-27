@@ -29,7 +29,7 @@ const watchHandler = ({
     useCache: boolean;
     watcher: RollupWatcher;
 }): void => {
-    const prefix = "watcher:" + mode;
+    const prefix = `watcher:${mode}`;
 
     watcher.on("change", async (id, { event }) => {
         await doOnSuccessCleanup?.();
@@ -48,15 +48,18 @@ const watchHandler = ({
     });
 
     watcher.on("event", async (event: RollupWatcherEvent) => {
-        // eslint-disable-next-line default-case,@typescript-eslint/switch-exhaustiveness-check
+        // eslint-disable-next-line default-case
         switch (event.code) {
-            case "END": {
-                context.logger.success({
-                    message: "Rebuild finished",
-                    prefix,
-                });
+            case "BUNDLE_END": {
+                await event.result.close();
 
-                await runOnsuccess?.();
+                if (useCache) {
+                    fileCache.set(mode === "bundle" ? WATCH_CACHE_KEY : `dts-${WATCH_CACHE_KEY}`, event.result.cache);
+                }
+
+                context.logger.raw(`\n⚡️ Build run in ${event.duration}ms\n\n`);
+
+                await runBuilder?.(true);
 
                 break;
             }
@@ -68,16 +71,13 @@ const watchHandler = ({
 
                 break;
             }
-            case "BUNDLE_END": {
-                await event.result.close();
+            case "END": {
+                context.logger.success({
+                    message: "Rebuild finished",
+                    prefix,
+                });
 
-                if (useCache) {
-                    fileCache.set(mode === "bundle" ? WATCH_CACHE_KEY : "dts-" + WATCH_CACHE_KEY, event.result.cache);
-                }
-
-                context.logger.raw("\n⚡️ Build run in " + event.duration + "ms\n\n");
-
-                await runBuilder?.(true);
+                await runOnsuccess?.();
 
                 break;
             }
@@ -86,7 +86,7 @@ const watchHandler = ({
 
                 context.logger.error({
                     context: [event.error],
-                    message: "Rebuild failed: " + event.error.message,
+                    message: `Rebuild failed: ${event.error.message}`,
                     prefix,
                 });
 
@@ -108,6 +108,7 @@ const watch = async (
     const rollupOptions = await getRollupOptions(context, fileCache);
 
     await context.hooks.callHook("rollup:options", context, rollupOptions);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (Object.keys(rollupOptions.input as any).length === 0) {
         return;
@@ -145,7 +146,7 @@ const watch = async (
                 "**/.git/**",
                 "**/node_modules/**",
                 "**/test-results/**", // Playwright
-                ...(rollupOptions.watch.chokidar?.ignored ?? []),
+                ...rollupOptions.watch.chokidar?.ignored ?? [],
             ],
         };
     }
@@ -154,13 +155,15 @@ const watch = async (
 
     await context.hooks.callHook("rollup:watch", context, watcher);
 
-    const inputs: string[] = [
-        ...(Array.isArray(rollupOptions.input)
-            ? rollupOptions.input
-            : typeof rollupOptions.input === "string"
-              ? [rollupOptions.input]
-              : Object.keys(rollupOptions.input ?? {})),
-    ];
+    const inputs: string[] = [];
+
+    if (Array.isArray(rollupOptions.input)) {
+        inputs.push(...rollupOptions.input);
+    } else if (typeof rollupOptions.input === "string") {
+        inputs.push(rollupOptions.input);
+    } else {
+        inputs.push(...Object.keys(rollupOptions.input ?? {}));
+    }
 
     let infoMessage = `Starting watcher for entries:`;
 
@@ -190,7 +193,7 @@ const watch = async (
         const rollupDtsOptions = await getRollupDtsOptions(context, fileCache);
 
         if (useCache) {
-            rollupDtsOptions.cache = fileCache.get("dts-" + WATCH_CACHE_KEY);
+            rollupDtsOptions.cache = fileCache.get(`dts-${WATCH_CACHE_KEY}`);
         }
 
         await context.hooks.callHook("rollup:dts:options", context, rollupDtsOptions);

@@ -1,9 +1,9 @@
 {
     "$schema": "https://json.schemastore.org/tsconfig",
     "extends": "../../tsconfig.base.json",
-    "include": ["src/**/*", "*.d.ts", "./packem.config.ts"],
     "compilerOptions": {
-        "moduleResolution": "Bundler",
-        "lib": ["ES2023", "DOM"]
-    }
+        "lib": ["ES2023", "DOM"],
+        "moduleResolution": "Bundler"
+    },
+    "include": ["src/**/*", "*.d.ts", "./packem.config.ts"]
 }

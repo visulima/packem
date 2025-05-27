@@ -22,7 +22,7 @@ const lightningcssMinifier: Minifier<NonNullable<InternalStyleOptions["lightning
         });
 
         if (result.warnings.length > 0) {
-            this.warn("warnings when minifying css:\n" + result.warnings.map((w) => w.message).join("\n"));
+            this.warn(`warnings when minifying css:\n${result.warnings.map((w) => w.message).join("\n")}`);
         }
 
         return {
@@ -34,5 +34,4 @@ const lightningcssMinifier: Minifier<NonNullable<InternalStyleOptions["lightning
     name: "lightningcss",
 };
 
-// eslint-disable-next-line import/no-unused-modules
 export default lightningcssMinifier;

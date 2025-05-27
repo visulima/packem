@@ -39,12 +39,12 @@ const isolatedDeclarationsTypescriptTransformer = async (
 
     const errors = diagnostics?.length
         ? [
-              formatDiagnostics(diagnostics, {
-                  getCanonicalFileName: (fileName) => (sys.useCaseSensitiveFileNames ? fileName : fileName.toLowerCase()),
-                  getCurrentDirectory: () => sys.getCurrentDirectory(),
-                  getNewLine: () => sys.newLine,
-              }),
-          ]
+            formatDiagnostics(diagnostics, {
+                getCanonicalFileName: (fileName) => (sys.useCaseSensitiveFileNames ? fileName : fileName.toLowerCase()),
+                getCurrentDirectory: () => sys.getCurrentDirectory(),
+                getNewLine: () => sys.newLine,
+            }),
+        ]
         : [];
 
     if (sourceMapText) {

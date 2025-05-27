@@ -14,7 +14,7 @@ const sucrasePlugin = ({ exclude, include, ...transformOptions }: SucrasePluginC
 
         async transform(sourcecode, id) {
             if (!filter(id)) {
-                return null;
+                return undefined;
             }
 
             const { code, sourceMap: map } = sucraseTransform(sourcecode, {
@@ -32,5 +32,4 @@ const sucrasePlugin = ({ exclude, include, ...transformOptions }: SucrasePluginC
 
 sucrasePlugin.NAME = "sucrase";
 
-// eslint-disable-next-line import/no-unused-modules
 export default sucrasePlugin as TransformerFunction;

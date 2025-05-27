@@ -13,23 +13,36 @@ import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { ensureDir } from "@visulima/fs";
 import { basename, dirname, extname, join, relative } from "@visulima/path";
+// eslint-disable-next-line import/no-extraneous-dependencies
 import mime from "mime";
 import type { Plugin } from "rollup";
 
 import svgEncoder from "../utils/svg-encoder";
 
+const copy = async (source: string, destination: string): Promise<void> => {
+    await new Promise((resolve, reject) => {
+        const read = createReadStream(source);
+
+        read.on("error", reject);
+
+        const write = createWriteStream(destination);
+
+        write.on("error", reject);
+        write.on("finish", () => resolve(undefined));
+
+        read.pipe(write);
+    });
+};
+
 export interface UrlOptions {
     /**
      * The destination dir to copy assets, usually used to rebase the assets according to HTML files.
-     *
      * @type {string}
      */
     destDir?: string;
     /**
      * If false, will prevent files being emitted by this plugin. This is useful for when you are using Rollup to emit both a client-side and server-side bundle.
-     *
      * @type {boolean}
-     *
      * @default true
      */
     emitFiles: boolean;
@@ -38,17 +51,15 @@ export interface UrlOptions {
      * should _ignore_.
      *
      * By default, no files are ignored.
-     *
      * @type {FilterPattern}
      */
     exclude?: FilterPattern;
     /**
      * If emitFiles is true, this option can be used to rename the emitted files. It accepts the following string replacements:
-     *   [hash] - The hash value of the file's contents
-     *   [name] - The name of the imported file (without its file extension)
-     *   [extname] - The extension of the imported file (including the leading .)
-     *   [dirname] - The parent directory name of the imported file (including trailing /)
-     *
+     * [hash] - The hash value of the file's contents
+     * [name] - The name of the imported file (without its file extension)
+     * [extname] - The extension of the imported file (including the leading .)
+     * [dirname] - The parent directory name of the imported file (including trailing /)
      * @type {string}
      * @default [hash][extname]
      */
@@ -57,7 +68,6 @@ export interface UrlOptions {
      * A picomatch pattern, or array of patterns, which specifies the files in the build the plugin
      * should operate on.
      * By default, the png,jpg,jpeg,gif,svg,webp files are targeted.
-     *
      * @type {FilterPattern}
      */
     include?: FilterPattern;
@@ -65,18 +75,16 @@ export interface UrlOptions {
      * The file size limit for inline files.
      * If a file exceeds this limit, it will be copied to the destination folder and the hashed filename will be provided instead.
      * If limit is set to 0 all files will be copied.
-     *
      * @type {number}
-     *
      * @default 14336 (14kb)
      */
     limit: number;
     /**
      * A string which will be added in front of filenames when they are not inlined but are copied.
-     *
      * @type {string}
      */
     publicPath?: string;
+
     /**
      * When using the [dirname] replacement in fileName, use this directory as the source directory from which to create the file path rather than the parent directory of the imported file. For example:
      * @example
@@ -96,19 +104,6 @@ export interface UrlOptions {
      */
     sourceDir?: string;
 }
-
-const copy = async (source: string, destination: string): Promise<void> => {
-    await new Promise((resolve, reject) => {
-        const read = createReadStream(source);
-        read.on("error", reject);
-
-        const write = createWriteStream(destination);
-        write.on("error", reject);
-        write.on("finish", resolve);
-
-        read.pipe(write);
-    });
-};
 
 export const urlPlugin = ({
     destDir: destinationDirectory,
@@ -146,7 +141,7 @@ export const urlPlugin = ({
 
         async load(id: string) {
             if (!filter(id)) {
-                return null;
+                return undefined;
             }
 
             this.addWatchFile(id);
@@ -173,7 +168,7 @@ export const urlPlugin = ({
             } else {
                 const mimetype = mime.getType(id);
 
-                if (mimetype === null) {
+                if (mimetype === undefined) {
                     throw new Error(`Could not determine mimetype for ${id}`);
                 }
 

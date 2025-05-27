@@ -12,6 +12,7 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
     const rollupOptions = await getRollupOptions(context, fileCache);
 
     await context.hooks.callHook("rollup:options", context, rollupOptions);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (Object.keys(rollupOptions.input as any).length === 0) {
         return;
@@ -37,7 +38,7 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
 
     await context.hooks.callHook("rollup:build", context, buildResult);
 
-    const assets = new Map<string, BuildContextBuildEntry | BuildContextBuildAssetAndChunk>();
+    const assets = new Map<string, BuildContextBuildAssetAndChunk | BuildContextBuildEntry>();
 
     for (const outputOptions of rollupOptions.output as OutputOptions[]) {
         // eslint-disable-next-line no-await-in-loop
@@ -76,7 +77,6 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
 
         for (const entry of outputAssets) {
             if (assets.has(entry.fileName)) {
-                // eslint-disable-next-line no-continue
                 continue;
             }
 

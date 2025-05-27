@@ -116,7 +116,6 @@ export default async (
 
                 for (const id of current) {
                     if (traversed.has(id)) {
-                        // eslint-disable-next-line no-continue
                         continue;
                     }
 
@@ -125,7 +124,6 @@ export default async (
                             imports.push(id);
                         }
 
-                        // eslint-disable-next-line no-continue
                         continue;
                     }
 
@@ -143,13 +141,14 @@ export default async (
 
             ids.push(...current);
         }
+
         return ids;
     };
 
     return <Plugin>{
         augmentChunkHash(chunk) {
             if (extracted.length === 0) {
-                return null;
+                return undefined;
             }
 
             const ids = traverseImportedModules(chunk.modules, this.getModuleInfo);
@@ -160,7 +159,7 @@ export default async (
                 .map((extract) => `${basename(extract.id)}:${extract.css}`);
 
             if (hashable.length === 0) {
-                return null;
+                return undefined;
             }
 
             return hashable.join(":");
@@ -179,8 +178,8 @@ export default async (
             const emittedList: [string, string[]][] = [];
 
             const getExtractedData = async (name: string, ids: string[]): Promise<ExtractedData> => {
-                const fileName =
-                    typeof loaderOptions.extract === "string" ? normalize(loaderOptions.extract).replace(/^\.[/\\]/, "") : normalize(`${name}.css`);
+                const fileName
+                    = typeof loaderOptions.extract === "string" ? normalize(loaderOptions.extract).replace(/^\.[/\\]/, "") : normalize(`${name}.css`);
 
                 if (isAbsolute(fileName)) {
                     this.error(["Extraction path must be relative to the output directory,", `which is ${relative(cwd, directory)}`].join("\n"));
@@ -250,7 +249,6 @@ export default async (
                     const ids = traverseImportedModules(chunk.modules, this.getModuleInfo);
 
                     if (ids.length === 0) {
-                        // eslint-disable-next-line no-continue
                         continue;
                     }
 
@@ -265,7 +263,6 @@ export default async (
                     const ids = traverseImportedModules(chunk.modules, this.getModuleInfo).filter((id) => !moved.includes(id));
 
                     if (ids.length === 0) {
-                        // eslint-disable-next-line no-continue
                         continue;
                     }
 
@@ -282,7 +279,6 @@ export default async (
                     const shouldExtract = options.onExtract(extractedData);
 
                     if (!shouldExtract) {
-                        // eslint-disable-next-line no-continue
                         continue;
                     }
                 }
@@ -300,7 +296,7 @@ export default async (
                     })(
                         extractedData,
                         sourceMap,
-                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition,@typescript-eslint/no-explicit-any
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         (options[options.minifier.name as keyof StyleOptions] as Record<string, any>) ?? {},
                     );
 
@@ -323,12 +319,12 @@ export default async (
                 if (extractedData.map && sourceMap) {
                     const fileName = this.getFileName(cssFileId);
 
-                    const assetDirectory =
-                        typeof outputOptions.assetFileNames === "string"
+                    const assetDirectory
+                        = typeof outputOptions.assetFileNames === "string"
                             ? normalize(dirname(outputOptions.assetFileNames))
-                            : typeof outputOptions.assetFileNames === "function"
+                            : (typeof outputOptions.assetFileNames === "function"
                               ? normalize(dirname(outputOptions.assetFileNames(cssFile)))
-                              : "assets";
+                              : "assets");
 
                     const map = mm(extractedData.map)
                         .modify((m) => {
@@ -363,7 +359,7 @@ export default async (
                     if (sourceMap.inline) {
                         map.modify((m) => sourceMap.transform?.(m, normalize(join(directory, fileName))));
 
-                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands,no-param-reassign,security/detect-object-injection
+                        // eslint-disable-next-line no-param-reassign
                         (bundle[fileName] as OutputAsset).source += map.toCommentData();
                     } else {
                         const mapFileName = `${fileName}.map`;
@@ -374,7 +370,7 @@ export default async (
 
                         const { base } = parse(mapFileName);
 
-                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands,no-param-reassign,security/detect-object-injection
+                        // eslint-disable-next-line no-param-reassign
                         (bundle[fileName] as OutputAsset).source += map.toCommentFile(base);
                     }
                 }
@@ -383,12 +379,12 @@ export default async (
         name: "packem:css",
         async transform(code, transformId) {
             if (!isIncluded(transformId) || !loaders.isSupported(transformId)) {
-                return null;
+                return undefined;
             }
 
             // Skip empty files
             if (code.replaceAll(/\s/g, "") === "") {
-                return null;
+                return undefined;
             }
 
             if (typeof options.onImport === "function") {
@@ -443,7 +439,7 @@ export default async (
                 meta: {
                     styles: result.meta,
                 },
-                moduleSideEffects: result.extracted ? true : null,
+                moduleSideEffects: result.extracted ? true : undefined,
             };
         },
     };

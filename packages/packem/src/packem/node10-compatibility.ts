@@ -7,8 +7,7 @@ import type { BuildContext } from "../types";
 
 /**
  * Makes all string arrays unique in a nested object structure.
- *
- * @param object - The nested object containing string arrays
+ * @param object The nested object containing string arrays
  * @returns A new object with unique values in all string arrays
  */
 const uniqueNestedValues = (object: Partial<Record<string, Partial<Record<string, string[]>>>>): Partial<Record<string, Partial<Record<string, string[]>>>> =>
@@ -45,7 +44,7 @@ export const node10Compatibility = async (
     mode: "console" | "file",
     typeScriptVersion: string,
 ): Promise<void> => {
-    if (typeScriptVersion !== "*" && valid(coerce(typeScriptVersion)) === null) {
+    if (typeScriptVersion !== "*" && valid(coerce(typeScriptVersion)) === undefined) {
         throw new Error("Invalid typeScriptVersion option. It must be a valid semver range.");
     }
 
@@ -59,11 +58,11 @@ export const node10Compatibility = async (
     for (const entry of entries) {
         for (const exportKey of entry.exportKey as Set<string>) {
             if (exportKey.includes("/*")) {
-                typesVersions[exportKey as string] = ["./" + join(outDirectory, dirname(entry.name as string), "*.d.ts")];
+                typesVersions[exportKey as string] = [`./${join(outDirectory, dirname(entry.name as string), "*.d.ts")}`];
             } else {
                 typesVersions[exportKey as string] = [
-                    ...(typesVersions[exportKey as string] ?? []),
-                    "./" + join(outDirectory, (entry.name as string) + ".d.ts"),
+                    ...typesVersions[exportKey as string] ?? [],
+                    `./${join(outDirectory, `${entry.name as string}.d.ts`)}`,
                 ];
             }
         }
@@ -94,7 +93,7 @@ export const node10Compatibility = async (
         });
     } else if (Object.keys(typesVersions).length > 0) {
         logger.info({
-            message: `Please add the following field into your package.json to enable node 10 compatibility:\n\n${JSON.stringify({ typesVersions: { "*": typesVersions } }, null, 4)}\n`,
+            message: `Please add the following field into your package.json to enable node 10 compatibility:\n\n${JSON.stringify({ typesVersions: { "*": typesVersions } }, undefined, 4)}\n`,
             prefix: "plugin:packem:node10-compatibility",
         });
     }

@@ -45,9 +45,8 @@ describe("packem copy", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        expect(existsSync(`${temporaryDirectoryPath}/dist/style.css`)).toBeTruthy();
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        expect(existsSync(`${temporaryDirectoryPath}/dist/data.csv`)).toBeTruthy();
+        expect(existsSync(`${temporaryDirectoryPath}/dist/style.css`)).toBe(true);
+
+        expect(existsSync(`${temporaryDirectoryPath}/dist/data.csv`)).toBe(true);
     });
 });

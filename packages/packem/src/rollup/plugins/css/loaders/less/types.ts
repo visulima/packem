@@ -1,1 +1,1 @@
-export interface LESSLoaderOptions extends Record<string, unknown>, Less.Options {}
+export interface LESSLoaderOptions extends Less.Options, Record<string, unknown> {}

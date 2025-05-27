@@ -15,7 +15,6 @@ const chunkSplitter = (): Plugin => {
 
                 for await (const exported of gatherExports(this, info)) {
                     if (exported.id === info.id) {
-                        // eslint-disable-next-line no-continue
                         continue;
                     }
 

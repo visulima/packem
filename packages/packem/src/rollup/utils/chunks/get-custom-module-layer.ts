@@ -1,4 +1,5 @@
-// eslint-disable-next-line no-secrets/no-secrets
+/* eslint-disable no-secrets/no-secrets */
+
 /**
  * Modified copy of https://github.com/huozhi/bunchee/blob/3cb85160bbad3af229654cc09d6fcd67120fe8bd/src/lib/split-chunk.ts
  *
@@ -20,7 +21,7 @@ const getCustomModuleLayer = (moduleId: string): string | undefined => {
         const layer = match?.[1];
 
         if (DEFAULT_EXTENSIONS.includes(extension as string) && layer && layer.length > 0) {
-            return baseName + "-" + layer;
+            return `${baseName}-${layer}`;
         }
     }
 

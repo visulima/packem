@@ -14,9 +14,7 @@ import type { BuildConfig, Environment, Mode } from "../../types";
 /**
  * Creates and registers the build command with the CLI.
  * Handles various build modes, environment variables, and build configurations.
- *
- * @param cli - CLI instance to register the command with
- *
+ * @param cli CLI instance to register the command with
  * @example
  * ```typescript
  * // Usage from command line:
@@ -29,7 +27,6 @@ import type { BuildConfig, Environment, Mode } from "../../types";
  * // With custom environment variables:
  * // packem build --env.API_URL=http://api.example.com
  * ```
- *
  * @internal
  */
 const createBuildCommand = (cli: Cli): void => {
@@ -54,7 +51,7 @@ const createBuildCommand = (cli: Cli): void => {
                     if (environment.key === "NODE_ENV") {
                         nodeEnvironment = environment.value;
                     } else {
-                        environments["process.env." + environment.key] = JSON.stringify(environment.value);
+                        environments[`process.env.${environment.key}`] = JSON.stringify(environment.value);
                     }
                 }
             }
@@ -121,25 +118,25 @@ const createBuildCommand = (cli: Cli): void => {
                             },
                             resolveExternals: options.noExternal
                                 ? {
-                                      builtins: false,
-                                      deps: false,
-                                      devDeps: false,
-                                      optDeps: false,
-                                      peerDeps: false,
-                                  }
+                                    builtins: false,
+                                    deps: false,
+                                    devDeps: false,
+                                    optDeps: false,
+                                    peerDeps: false,
+                                }
                                 : {},
                         },
                         runtime: options.runtime,
                         sourcemap: options.metafile || options.analyze || options.sourcemap,
                         // validation will take the default values
                         validation: options.validation === false ? false : {},
-                        ...(options.typedoc
+                        ...options.typedoc
                             ? {
-                                  typedoc: {
-                                      format: "html",
-                                  },
-                              }
-                            : {}),
+                                typedoc: {
+                                    format: "html",
+                                },
+                            }
+                            : {},
                     }),
                     options.tsconfig ?? undefined,
                 );
@@ -267,7 +264,7 @@ const createBuildCommand = (cli: Cli): void => {
                 type: String,
             },
             {
-                description: 'Signal to kill child process, "SIGTERM" or "SIGKILL"',
+                description: "Signal to kill child process, \"SIGTERM\" or \"SIGKILL\"",
                 name: "killSignal",
                 type: (input: string) => {
                     if (input === "SIGTERM" || input === "SIGKILL") {

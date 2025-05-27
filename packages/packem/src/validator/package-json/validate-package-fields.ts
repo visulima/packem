@@ -120,10 +120,10 @@ const validatePackageFields = (context: BuildContext): void => {
         }
 
         if (
-            (context.options.declaration === true || context.options.declaration === "compatible") &&
-            showWarning &&
-            validation.packageJson?.typesVersions !== false &&
-            (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
+            (context.options.declaration === true || context.options.declaration === "compatible")
+            && showWarning
+            && validation.packageJson?.typesVersions !== false
+            && (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
         ) {
             warn(
                 context,

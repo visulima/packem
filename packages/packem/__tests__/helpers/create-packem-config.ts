@@ -12,10 +12,10 @@ const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../di
 
 export type PackemConfigProperties = {
     config?: BuildConfig | string | undefined;
-    cssLoader?: ("postcss" | "less" | "stylus" | "sass" | "sourcemap" | "lightningcss")[];
+    cssLoader?: ("less" | "lightningcss" | "postcss" | "sass" | "sourcemap" | "stylus")[];
     cssOptions?: StyleOptions | string | undefined;
     experimental?: Record<string, boolean>;
-    isolatedDeclarationTransformer?: "swc" | "typescript" | "oxc" | undefined;
+    isolatedDeclarationTransformer?: "oxc" | "swc" | "typescript" | undefined;
     minimizer?: "cssnano" | "lightningcss" | undefined;
     plugins?: {
         code: string;
@@ -25,7 +25,7 @@ export type PackemConfigProperties = {
         when: "after" | "before";
     }[];
     runtime?: "browser" | "node";
-    transformer?: "esbuild" | "swc" | "sucrase" | "oxc";
+    transformer?: "esbuild" | "oxc" | "sucrase" | "swc";
 };
 
 export const createPackemConfig = async (
@@ -43,7 +43,7 @@ export const createPackemConfig = async (
     }: PackemConfigProperties = {},
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
-    await installPackage(fixturePath, transformer === "swc" ? "@swc" : transformer === "oxc" ? "oxc-transform" : transformer);
+    await installPackage(fixturePath, transformer === "swc" ? "@swc" : (transformer === "oxc" ? "oxc-transform" : transformer));
 
     let rollupConfig = "";
 
@@ -62,12 +62,12 @@ export const createPackemConfig = async (
         }
 
         if (rollup) {
-            rollupConfig += JSON.stringify(rollup, null, 4).slice(1, -1) + ",\n";
+            rollupConfig += `${JSON.stringify(rollup, undefined, 4).slice(1, -1)},\n`;
         }
 
         if (typeof rest === "object") {
             // eslint-disable-next-line no-param-reassign
-            config = JSON.stringify(rest, null, 4).slice(1, -1);
+            config = JSON.stringify(rest, undefined, 4).slice(1, -1);
 
             if (config !== "") {
                 // eslint-disable-next-line no-param-reassign
@@ -77,7 +77,7 @@ export const createPackemConfig = async (
     }
 
     if (cssLoader.length > 0) {
-        rollupConfig += `        css: {\n        loaders: [${cssLoader.map((loader) => `${loader}Loader`).join(", ")}],${minimizer ? `\n        minifier: ${minimizer},` : ""}${typeof cssOptions === "string" ? cssOptions : typeof cssOptions === "object" ? JSON.stringify(cssOptions, null, 4).slice(1, -1) : ""}
+        rollupConfig += `        css: {\n        loaders: [${cssLoader.map((loader) => `${loader}Loader`).join(", ")}],${minimizer ? `\n        minifier: ${minimizer},` : ""}${typeof cssOptions === "string" ? cssOptions : (typeof cssOptions === "object" ? JSON.stringify(cssOptions, undefined, 4).slice(1, -1) : "")}
     },`;
     }
 
@@ -87,7 +87,7 @@ export const createPackemConfig = async (
     for (const plugin of plugins) {
         if (plugin.namedExport !== undefined && plugin.importName && plugin.from) {
             pluginImports.push(
-                `import ${plugin.namedExport ? "{" + plugin.importName + "}" : plugin.importName} from "${plugin.from.replace("__dist__", distributionPath)}";`,
+                `import ${plugin.namedExport ? `{${plugin.importName}}` : plugin.importName} from "${plugin.from.replace("__dist__", distributionPath)}";`,
             );
         }
 
@@ -105,14 +105,14 @@ export const createPackemConfig = async (
     await writeFile(
         join(fixturePath, "packem.config.ts"),
         `import { defineConfig } from "${distributionPath}/config";
-import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : transformer === "oxc" ? "oxc-transformer" : "index"}";
+import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : (transformer === "oxc" ? "oxc-transformer" : "index")}";
 ${isolatedDeclarationTransformer ? `import isolatedDeclarationTransformer from "${distributionPath}/rollup/plugins/${isolatedDeclarationTransformer}/isolated-declarations-${isolatedDeclarationTransformer}-transformer";` : ""}
 ${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/rollup/plugins/css/loaders/${loader}";`).join("\n")}
 ${minimizer ? `import ${minimizer} from "${distributionPath}/rollup/plugins/css/minifiers/${minimizer}";` : ""}${pluginImports.join("\n")}
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
     runtime: "${runtime}",
-    experimental: ${JSON.stringify(experimental, null, 4)},
+    experimental: ${JSON.stringify(experimental, undefined, 4)},
     transformer,${isolatedDeclarationTransformer ? `\n    isolatedDeclarationTransformer,` : ""}${config as string}${rollupConfig}
 });
 `,

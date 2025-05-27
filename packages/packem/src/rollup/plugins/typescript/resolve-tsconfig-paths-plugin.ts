@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-secrets/no-secrets
 /**
  * This webpack resolver is largely based on TypeScript's "paths" handling
  * The TypeScript license can be found here:
@@ -15,7 +14,7 @@ interface Pattern {
     suffix: string;
 }
 
-const asterisk = 0x2a;
+const asterisk = 0x2A;
 
 const hasZeroOrOneAsteriskCharacter = (string_: string): boolean => {
     let seenAsterisk = false;
@@ -27,6 +26,7 @@ const hasZeroOrOneAsteriskCharacter = (string_: string): boolean => {
                 // have already seen asterisk
                 return false;
             }
+
             seenAsterisk = true;
         }
     }
@@ -41,9 +41,9 @@ const tryParsePattern = (pattern: string): Pattern | undefined => {
     return indexOfStar === -1
         ? undefined
         : {
-              prefix: pattern.slice(0, indexOfStar),
-              suffix: pattern.slice(indexOfStar + 1),
-          };
+            prefix: pattern.slice(0, indexOfStar),
+            suffix: pattern.slice(indexOfStar + 1),
+        };
 };
 
 const isPatternMatch = ({ prefix, suffix }: Pattern, candidate: string) =>
@@ -74,12 +74,11 @@ const findBestPatternMatch = <T>(values: ReadonlyArray<T>, getPattern: (value: T
  * These are verified by verifyCompilerOptions to have 0 or 1 "*" characters.
  * @see https://github.com/microsoft/TypeScript/blob/main/src/compiler/program.ts#L4332-L4365
  */
-const matchPatternOrExact = (patternStrings: ReadonlyArray<string>, candidate: string): string | Pattern | undefined => {
+const matchPatternOrExact = (patternStrings: ReadonlyArray<string>, candidate: string): Pattern | string | undefined => {
     const patterns: Pattern[] = [];
 
     for (const patternString of patternStrings) {
         if (!hasZeroOrOneAsteriskCharacter(patternString)) {
-            // eslint-disable-next-line no-continue
             continue;
         }
 
@@ -144,7 +143,6 @@ export type TsconfigPathsPluginOptions = {
     resolveAbsolutePath?: boolean;
 };
 
-// eslint-disable-next-line no-secrets/no-secrets
 /**
  * Handles tsconfig.json or jsconfig.js "paths" option for webpack
  * Largely based on how the TypeScript compiler handles it:
@@ -164,7 +162,7 @@ export const resolveTsconfigPathsPlugin = (
         // eslint-disable-next-line sonarjs/cognitive-complexity
         async resolveId(id, importer, options) {
             if (pathsKeys.length === 0) {
-                return null;
+                return undefined;
             }
 
             if (id.includes("\0")) {
@@ -173,7 +171,7 @@ export const resolveTsconfigPathsPlugin = (
                     prefix: "plugin:packem:resolve-tsconfig-paths",
                 });
 
-                return null;
+                return undefined;
             }
 
             // Exclude node_modules from paths support (speeds up resolving)
@@ -183,7 +181,7 @@ export const resolveTsconfigPathsPlugin = (
                     prefix: "plugin:packem:resolve-tsconfig-paths",
                 });
 
-                return null;
+                return undefined;
             }
 
             if (!pluginOptions.resolveAbsolutePath && isAbsolute(id)) {
@@ -192,7 +190,7 @@ export const resolveTsconfigPathsPlugin = (
                     prefix: "plugin:packem:resolve-tsconfig-paths",
                 });
 
-                return null;
+                return undefined;
             }
 
             if (isRelative(id)) {
@@ -201,8 +199,9 @@ export const resolveTsconfigPathsPlugin = (
                     prefix: "plugin:packem:resolve-tsconfig-paths",
                 });
 
-                return null;
+                return undefined;
             }
+
             // If the module name does not match any of the patterns in `paths` we hand off resolving to webpack
             const matchedPattern = matchPatternOrExact(pathsKeys, id);
 
@@ -212,7 +211,7 @@ export const resolveTsconfigPathsPlugin = (
                     prefix: "plugin:packem:resolve-tsconfig-paths",
                 });
 
-                return null;
+                return undefined;
             }
 
             const matchedStar = typeof matchedPattern === "string" ? undefined : matchedText(matchedPattern, id);
@@ -223,7 +222,6 @@ export const resolveTsconfigPathsPlugin = (
 
                 // Ensure .d.ts is not matched
                 if (currentPath.endsWith(".d.ts") || currentPath.endsWith(".d.cts") || currentPath.endsWith(".d.mts")) {
-                    // eslint-disable-next-line no-continue
                     continue;
                 }
 
@@ -244,7 +242,7 @@ export const resolveTsconfigPathsPlugin = (
                 }
             }
 
-            return null;
+            return undefined;
         },
     };
 };

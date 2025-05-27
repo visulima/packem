@@ -3,9 +3,8 @@ import { isRelative } from "@visulima/path/utils";
 
 /**
  * Checks if the URL starts with a tilde followed by a digit, '@', or a letter (case-insensitive)
- *
- * @param {string} url
- * @returns {boolean}
+ * @param url
+ * @returns
  */
 export const hasModuleSpecifier = (url: string): boolean => /^~[\d@A-Z]/i.test(url);
 
@@ -26,5 +25,5 @@ export const normalizeUrl = (url: string): string => {
         return normalize(url);
     }
 
-    return "./" + normalize(url);
+    return `./${normalize(url)}`;
 };

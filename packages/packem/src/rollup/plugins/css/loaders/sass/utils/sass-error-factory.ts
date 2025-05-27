@@ -1,8 +1,8 @@
-type SassError = { column?: number; id: string; line?: number } & Error;
+type SassError = Error & { column?: number; id: string; line?: number };
 
-const errorFactory = (error: { formatted?: string; span?: { start: { column: number; line: number } } } & Error, file: string): SassError => {
+const errorFactory = (error: Error & { formatted?: string; span?: { start: { column: number; line: number } } }, file: string): SassError => {
     // Keep original error if `sassError.formatted` is unavailable
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
     const rawMessage = error.formatted ?? error.message ?? String(error);
     const message = rawMessage.replace(/^.*?Error:\s*/i, "");
 

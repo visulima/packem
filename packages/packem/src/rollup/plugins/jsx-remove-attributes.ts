@@ -6,6 +6,10 @@ import { walk } from "estree-walker";
 import MagicString from "magic-string";
 import type { Plugin } from "rollup";
 
+export type JSXRemoveAttributesPlugin = {
+    attributes: string[];
+};
+
 interface PropertyLiteralValue extends Property {
     end: number;
     key: {
@@ -20,12 +24,7 @@ interface PropertyLiteralValue extends Property {
     };
 }
 
-export type JSXRemoveAttributesPlugin = {
-    attributes: string[];
-};
-
-// eslint-disable-next-line sonarjs/cognitive-complexity
-export const jsxRemoveAttributes = ({ attributes, logger }: { logger: Pail } & JSXRemoveAttributesPlugin): Plugin => {
+export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesPlugin & { logger: Pail }): Plugin => {
     const filter = createFilter([/\.[tj]sx$/], /node_modules/);
 
     if (!Array.isArray(attributes) || attributes.length === 0) {
@@ -36,13 +35,13 @@ export const jsxRemoveAttributes = ({ attributes, logger }: { logger: Pail } & J
         name: "packem:jsx-remove-attributes",
         transform(code: string, id: string) {
             if (!filter(id)) {
-                return null;
+                return undefined;
             }
 
             /**
              * rollup's built-in parser returns an extended version of ESTree Node.
              */
-            let ast: Node | null = null;
+            let ast: Node | undefined;
 
             try {
                 ast = this.parse(code, { allowReturnOutsideFunction: true }) as Node;
@@ -55,7 +54,7 @@ export const jsxRemoveAttributes = ({ attributes, logger }: { logger: Pail } & J
 
                 logger.warn(error);
 
-                return null;
+                return undefined;
             }
 
             // MagicString's `hasChanged()` is slow, so we track the change manually
@@ -73,10 +72,10 @@ export const jsxRemoveAttributes = ({ attributes, logger }: { logger: Pail } & J
                         for (const object of filteredArguments) {
                             for (const property of object.properties) {
                                 if (
-                                    property.type === "Property" &&
-                                    property.key.type === "Literal" &&
-                                    property.value.type === "Literal" &&
-                                    attributes.includes(property.key.value as string)
+                                    property.type === "Property"
+                                    && property.key.type === "Literal"
+                                    && property.value.type === "Literal"
+                                    && attributes.includes(property.key.value as string)
                                 ) {
                                     // -2 to remove the comma and the space before the property
                                     magicString.overwrite((property as PropertyLiteralValue).start - 2, (property as PropertyLiteralValue).end, "");
@@ -88,9 +87,8 @@ export const jsxRemoveAttributes = ({ attributes, logger }: { logger: Pail } & J
                 },
             });
 
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (!hasChanged) {
-                return null;
+                return undefined;
             }
 
             return { code: magicString.toString(), map: magicString.generateMap({ hires: true }) };

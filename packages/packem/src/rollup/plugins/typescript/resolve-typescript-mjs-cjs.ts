@@ -3,7 +3,7 @@
  *
  * MIT License
  *
- * Copyright (c) Hiroki Osame <hiroki.osame@gmail.com>
+ * Copyright (c) Hiroki Osame &lt;hiroki.osame@gmail.com>
  */
 import type { Plugin } from "rollup";
 
@@ -17,7 +17,7 @@ const resolveTypescriptMjsCts = (): Plugin => {
                 return await this.resolve(id.replace(/js(x?)$/, "ts$1"), importer, options);
             }
 
-            return null;
+            return undefined;
         },
     };
 };

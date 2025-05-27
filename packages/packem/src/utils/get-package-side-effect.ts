@@ -1,19 +1,19 @@
 import { createFilter as _createFilter } from "@rollup/pluginutils";
 import type { PackageJson } from "@visulima/package";
 
-type FilterPattern = ReadonlyArray<RegExp | string> | RegExp | string | null;
+type FilterPattern = ReadonlyArray<RegExp | string> | RegExp | string | undefined;
 
 const createFilter = _createFilter as (
     include?: FilterPattern,
     exclude?: FilterPattern,
-    options?: { resolve?: string | false | null },
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    options?: { resolve?: string | false | undefined },
+
 ) => (id: string | unknown) => boolean;
 
-const getPackageSideEffect = (cwd: string, packageJson: PackageJson): ((id: string) => boolean | null) => {
+const getPackageSideEffect = (cwd: string, packageJson: PackageJson): ((id: string) => boolean | undefined) => {
     const { sideEffects } = packageJson;
 
-    let hasSideEffects: (id: string) => boolean | null;
+    let hasSideEffects: (id: string) => boolean | undefined;
 
     if (typeof sideEffects === "boolean") {
         hasSideEffects = () => sideEffects;
@@ -36,12 +36,12 @@ const getPackageSideEffect = (cwd: string, packageJson: PackageJson): ((id: stri
                 return `**/${sideEffect}`;
             });
 
-            hasSideEffects = createFilter(finalPackageSideEffects, null, {
+            hasSideEffects = createFilter(finalPackageSideEffects, undefined, {
                 resolve: cwd,
             });
         }
     } else {
-        hasSideEffects = () => null;
+        hasSideEffects = () => undefined;
     }
 
     return hasSideEffects;

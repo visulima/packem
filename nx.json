@@ -25,14 +25,6 @@
             "dependsOn": ["default"],
             "cache": true
         },
-        "lint:prettier": {
-            "dependsOn": ["default", "^public"],
-            "cache": true
-        },
-        "lint:prettier:fix": {
-            "dependsOn": ["default", "^public"],
-            "cache": true
-        },
         "lint:types": {
             "dependsOn": ["default", "^public"],
             "cache": true

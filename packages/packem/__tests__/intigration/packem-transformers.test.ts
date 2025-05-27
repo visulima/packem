@@ -95,12 +95,12 @@ export { index as default };
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
             },
-            transformer as "esbuild" | "swc" | "sucrase",
+            transformer as "esbuild" | "sucrase" | "swc",
         );
-        await createPackemConfig(temporaryDirectoryPath, { transformer: transformer as "esbuild" | "swc" | "sucrase" | "oxc" });
+        await createPackemConfig(temporaryDirectoryPath, { transformer: transformer as "esbuild" | "oxc" | "sucrase" | "swc" });
 
         expect(readFileSync(`${temporaryDirectoryPath}/packem.config.ts`)).toContain(
-            transformer === "swc" ? "swc/swc-plugin" : transformer === "oxc" ? `${transformer}/oxc-transformer` : `${transformer}/index`,
+            transformer === "swc" ? "swc/swc-plugin" : (transformer === "oxc" ? `${transformer}/oxc-transformer` : `${transformer}/index`),
         );
 
         const binProcess = await execPackem("build", [], {

@@ -17,11 +17,9 @@ import gzipSize from "./utils/gzip-size";
 /**
  * Displays size information for build outputs including entries, chunks, and assets.
  * Provides detailed size metrics including total size, brotli size, and gzip size.
- *
- * @param logger - Logger instance for output
- * @param context - Build context containing build configuration and state
+ * @param logger Logger instance for output
+ * @param context Build context containing build configuration and state
  * @returns Boolean indicating whether any entries were logged
- *
  * @internal
  */
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -48,38 +46,38 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
             }
 
             let line = `  ${bold(rPath(entry.path))} (${[
-                "total size: " +
+                `total size: ${
                     cyan(
                         formatBytes(totalBytes, {
                             decimals: 2,
                         }),
-                    ),
-                entry.size?.brotli &&
-                    "brotli size: " +
-                        cyan(
-                            formatBytes(entry.size.brotli, {
-                                decimals: 2,
-                            }),
-                        ),
-                entry.size?.gzip &&
-                    "gzip size: " +
-                        cyan(
-                            formatBytes(entry.size.gzip, {
-                                decimals: 2,
-                            }),
-                        ),
-                chunkBytes !== 0 &&
-                    "chunk size: " +
-                        cyan(
-                            formatBytes(chunkBytes, {
-                                decimals: 2,
-                            }),
-                        ),
+                    )}`,
+                entry.size?.brotli
+                && `brotli size: ${
+                    cyan(
+                        formatBytes(entry.size.brotli, {
+                            decimals: 2,
+                        }),
+                    )}`,
+                entry.size?.gzip
+                && `gzip size: ${
+                    cyan(
+                        formatBytes(entry.size.gzip, {
+                            decimals: 2,
+                        }),
+                    )}`,
+                chunkBytes !== 0
+                && `chunk size: ${
+                    cyan(
+                        formatBytes(chunkBytes, {
+                            decimals: 2,
+                        }),
+                    )}`,
             ]
                 .filter(Boolean)
                 .join(", ")})`;
 
-            line += entry.exports?.length ? "\n  exports: " + gray(entry.exports.join(", ")) : "";
+            line += entry.exports?.length ? `\n  exports: ${gray(entry.exports.join(", "))}` : "";
 
             if (entry.chunks?.length) {
                 line += `\n${entry.chunks
@@ -88,17 +86,17 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
                         const chunk = context.buildEntries.find((buildEntry) => buildEntry.path === p) ?? ({} as any);
 
                         return gray(
-                            "  └─ " +
-                                rPath(p) +
-                                bold(
-                                    chunk.bytes
-                                        ? " (" +
-                                              formatBytes(chunk?.bytes, {
-                                                  decimals: 2,
-                                              }) +
-                                              ")"
-                                        : "",
-                                ),
+                            `  └─ ${
+                                rPath(p)
+                            }${bold(
+                                chunk.bytes
+                                    ? ` (${
+                                        formatBytes(chunk?.bytes, {
+                                            decimals: 2,
+                                        })
+                                    })`
+                                    : "",
+                            )}`,
                         );
                     })
                     .join("\n")}`;
@@ -106,7 +104,7 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
 
             if (entry.dynamicImports && entry.dynamicImports.length > 0) {
                 line += "\n  dynamic imports:";
-                line += `\n${entry.dynamicImports.map((p) => gray("  └─ " + rPath(p))).join("\n")}`;
+                line += `\n${entry.dynamicImports.map((p) => gray(`  └─ ${rPath(p)}`)).join("\n")}`;
             }
 
             if (entry.modules && entry.modules.length > 0) {
@@ -115,22 +113,22 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
                     .sort((a, b) => (b.bytes || 0) - (a.bytes || 0))
                     .map((m) =>
                         gray(
-                            "  📦 " +
-                                rPath(m.id) +
-                                bold(
-                                    m.bytes
-                                        ? " (" +
-                                              formatBytes(m.bytes, {
-                                                  decimals: 2,
-                                              }) +
-                                              ")"
-                                        : "",
-                                ),
+                            `  📦 ${
+                                rPath(m.id)
+                            }${bold(
+                                m.bytes
+                                    ? ` (${
+                                        formatBytes(m.bytes, {
+                                            decimals: 2,
+                                        })
+                                    })`
+                                    : "",
+                            )}`,
                         ),
                     )
                     .join("\n");
 
-                line += moduleList.length > 0 ? "\n  inlined modules:\n" + moduleList : "";
+                line += moduleList.length > 0 ? `\n  inlined modules:\n${moduleList}` : "";
             }
 
             if (context.options.declaration) {
@@ -149,7 +147,7 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
                 if (foundDts) {
                     foundDtsEntries.push(foundDts.path);
 
-                    let foundCompatibleDts: BuildContextBuildEntry | BuildContextBuildAssetAndChunk | undefined;
+                    let foundCompatibleDts: BuildContextBuildAssetAndChunk | BuildContextBuildEntry | undefined;
 
                     if (!dtsPath.includes(".d.ts")) {
                         dtsPath = (dtsPath as string).replace(".d.c", ".d.");
@@ -160,32 +158,32 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
                     if (foundCompatibleDts) {
                         foundDtsEntries.push(foundCompatibleDts.path);
 
-                        line +=
-                            type === "commonjs"
-                                ? "\n  types:\n" +
-                                  [foundDts, foundCompatibleDts]
-                                      .map(
-                                          (value: BuildContextBuildEntry | BuildContextBuildAssetAndChunk) =>
-                                              gray("  └─ ") +
-                                              bold(rPath(value.path)) +
-                                              " (total size: " +
-                                              cyan(
-                                                  formatBytes(value.size?.bytes ?? 0, {
-                                                      decimals: 2,
-                                                  }),
-                                              ) +
-                                              ")",
-                                      )
-                                      .join("\n")
-                                : "\n  types: " +
-                                  bold(rPath(foundDts.path)) +
-                                  " (total size: " +
-                                  cyan(
-                                      formatBytes(foundDts.size?.bytes ?? 0, {
-                                          decimals: 2,
-                                      }),
-                                  ) +
-                                  ")";
+                        line
+                            += type === "commonjs"
+                                ? `\n  types:\n${
+                                    [foundDts, foundCompatibleDts]
+                                        .map(
+                                            (value: BuildContextBuildAssetAndChunk | BuildContextBuildEntry) =>
+                                                `${gray("  └─ ")
+                                                + bold(rPath(value.path))
+                                                } (total size: ${
+                                                    cyan(
+                                                        formatBytes(value.size?.bytes ?? 0, {
+                                                            decimals: 2,
+                                                        }),
+                                                    )
+                                                })`,
+                                        )
+                                        .join("\n")}`
+                                : `\n  types: ${
+                                    bold(rPath(foundDts.path))
+                                } (total size: ${
+                                    cyan(
+                                        formatBytes(foundDts.size?.bytes ?? 0, {
+                                            decimals: 2,
+                                        }),
+                                    )
+                                })`;
                     }
                 }
             }
@@ -204,16 +202,16 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
         let line = "Assets:";
 
         for (const asset of context.buildEntries.filter((bEntry) => bEntry.type === "asset" && !foundDtsEntries.includes(bEntry.path))) {
-            line +=
-                gray("\n  └─ ") +
-                bold(rPath(asset.path)) +
-                " (total size: " +
-                cyan(
-                    formatBytes(asset.size?.bytes ?? 0, {
-                        decimals: 2,
-                    }),
-                ) +
-                ")";
+            line
+                += `${gray("\n  └─ ")
+                + bold(rPath(asset.path))
+                } (total size: ${
+                    cyan(
+                        formatBytes(asset.size?.bytes ?? 0, {
+                            decimals: 2,
+                        }),
+                    )
+                })`;
         }
 
         line += "\n\n";
@@ -241,7 +239,6 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
 
 /**
  * Properties required for building a package or type definitions.
- *
  * @interface
  * @property {BuildContext} context - Build context containing configuration and state
  * @property {FileCache} fileCache - Cache instance for file operations
@@ -258,11 +255,9 @@ const DTS_REGEX = /\.d\.[mc]?ts$/;
 /**
  * Prepares Rollup configuration for both JavaScript/TypeScript builds and type definition builds.
  * Processes entries and generates appropriate builder configurations.
- *
- * @param context - Build context containing configuration and state
- * @param fileCache - Cache instance for file operations
+ * @param context Build context containing configuration and state
+ * @param fileCache Cache instance for file operations
  * @returns Object containing sets of builders for both source and type definitions
- *
  * @internal
  */
 const prepareRollupConfig = (
@@ -286,9 +281,9 @@ const prepareRollupConfig = (
 
             if (!context.options.dtsOnly && (environment !== "undefined" || runtime !== "undefined")) {
                 context.logger.info(
-                    "Preparing build for " +
-                        (environment === "undefined" ? "" : cyan(environment) + " environment" + (runtime === "undefined" ? "" : " with ")) +
-                        (runtime === "undefined" ? "" : cyan(runtime) + " runtime"),
+                    `Preparing build for ${
+                        environment === "undefined" ? "" : `${cyan(environment)} environment${runtime === "undefined" ? "" : " with "}`
+                    }${runtime === "undefined" ? "" : `${cyan(runtime)} runtime`}`,
                 );
             }
 
@@ -314,11 +309,11 @@ const prepareRollupConfig = (
             let subDirectory = "";
 
             if (environment !== "undefined") {
-                subDirectory += environment + "/";
+                subDirectory += `${environment}/`;
             }
 
             if (runtime !== "undefined") {
-                subDirectory += runtime + "/";
+                subDirectory += `${runtime}/`;
             }
 
             let minify = false;
@@ -363,12 +358,12 @@ const prepareRollupConfig = (
                             ...environmentRuntimeContext.options.rollup,
                             replace: environmentRuntimeContext.options.rollup.replace
                                 ? {
-                                      ...environmentRuntimeContext.options.rollup.replace,
-                                      values: {
-                                          ...environmentRuntimeContext.options.rollup.replace.values,
-                                          ...replaceValues,
-                                      },
-                                  }
+                                    ...environmentRuntimeContext.options.rollup.replace,
+                                    values: {
+                                        ...environmentRuntimeContext.options.rollup.replace.values,
+                                        ...replaceValues,
+                                    },
+                                }
                                 : false,
                         },
                     },
@@ -410,12 +405,12 @@ const prepareRollupConfig = (
                             ...environmentRuntimeContext.options.rollup,
                             replace: environmentRuntimeContext.options.rollup.replace
                                 ? {
-                                      ...environmentRuntimeContext.options.rollup.replace,
-                                      values: {
-                                          ...environmentRuntimeContext.options.rollup.replace.values,
-                                          ...replaceValues,
-                                      },
-                                  }
+                                    ...environmentRuntimeContext.options.rollup.replace,
+                                    values: {
+                                        ...environmentRuntimeContext.options.rollup.replace.values,
+                                        ...replaceValues,
+                                    },
+                                }
                                 : false,
                         },
                     },
@@ -457,12 +452,12 @@ const prepareRollupConfig = (
                             ...environmentRuntimeContext.options.rollup,
                             replace: environmentRuntimeContext.options.rollup.replace
                                 ? {
-                                      ...environmentRuntimeContext.options.rollup.replace,
-                                      values: {
-                                          ...environmentRuntimeContext.options.rollup.replace.values,
-                                          ...replaceValues,
-                                      },
-                                  }
+                                    ...environmentRuntimeContext.options.rollup.replace,
+                                    values: {
+                                        ...environmentRuntimeContext.options.rollup.replace.values,
+                                        ...replaceValues,
+                                    },
+                                }
                                 : false,
                         },
                     },
@@ -505,12 +500,12 @@ const prepareRollupConfig = (
                                 ...environmentRuntimeContext.options.rollup,
                                 replace: environmentRuntimeContext.options.rollup.replace
                                     ? {
-                                          ...environmentRuntimeContext.options.rollup.replace,
-                                          values: {
-                                              ...environmentRuntimeContext.options.rollup.replace.values,
-                                              ...replaceValues,
-                                          },
-                                      }
+                                        ...environmentRuntimeContext.options.rollup.replace,
+                                        values: {
+                                            ...environmentRuntimeContext.options.rollup.replace.values,
+                                            ...replaceValues,
+                                        },
+                                    }
                                     : false,
                             },
                         },
@@ -528,11 +523,9 @@ const prepareRollupConfig = (
 /**
  * Main build function that orchestrates the entire build process.
  * Handles both JavaScript/TypeScript compilation and type definition generation.
- *
- * @param context - Build context containing configuration and state
- * @param fileCache - Cache instance for file operations
+ * @param context Build context containing configuration and state
+ * @param fileCache Cache instance for file operations
  * @returns Promise resolving to a boolean indicating build success
- *
  * @example
  * ```typescript
  * const success = await build(buildContext, new FileCache());
@@ -540,7 +533,6 @@ const prepareRollupConfig = (
  *   console.log('Build completed successfully');
  * }
  * ```
- *
  * @throws {Error} If the build process encounters critical errors
  * @public
  */
@@ -557,7 +549,7 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<boole
         [...typeBuilders].map(async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuildTypes(rollupContext, cache, subDirectory)),
     );
 
-    context.logger.success(green(context.options.name ? "Build succeeded for " + context.options.name : "Build succeeded"));
+    context.logger.success(green(context.options.name ? `Build succeeded for ${context.options.name}` : "Build succeeded"));
 
     // Remove duplicated build entries
     context.buildEntries = context.buildEntries.filter((entry, index, self) => self.findIndex((bEntry) => bEntry.path === entry.path) === index);
@@ -587,7 +579,6 @@ const build = async (context: BuildContext, fileCache: FileCache): Promise<boole
         const filePath = resolve(distributionPath, file.path);
 
         if (!entry.size.bytes) {
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
             const awaitedStat = await stat(filePath);
 
             entry.size.bytes = awaitedStat.size;

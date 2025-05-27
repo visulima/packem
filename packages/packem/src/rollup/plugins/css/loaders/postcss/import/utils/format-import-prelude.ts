@@ -5,18 +5,18 @@ const formatImportPrelude = (layer: string | undefined, media: string | undefine
         let layerParameters = "layer";
 
         if (layer) {
-            layerParameters = "layer(" + layer + ")";
+            layerParameters = `layer(${layer})`;
         }
 
         parts.push(layerParameters);
     }
 
     if (supports !== undefined) {
-        parts.push("supports(" + supports + ")");
+        parts.push(`supports(${supports})`);
     }
 
     if (scope !== undefined) {
-        parts.push("scope(" + scope + ")");
+        parts.push(`scope(${scope})`);
     }
 
     if (media !== undefined) {

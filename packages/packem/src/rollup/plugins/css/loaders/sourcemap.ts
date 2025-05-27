@@ -5,9 +5,8 @@ const loader: Loader = {
     alwaysProcess: true,
     name: "sourcemap",
     async process({ code, map }) {
-        return { code: stripMap(code), map: (await getMap(code, this.id)) ?? map };
+        return { code: stripMap(code), map: await getMap(code, this.id) ?? map };
     },
 };
 
-// eslint-disable-next-line import/no-unused-modules
 export default loader;
