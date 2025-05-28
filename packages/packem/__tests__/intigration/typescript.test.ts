@@ -1764,7 +1764,7 @@ export declare let num: Num;
         );
 
         it.each(["typescript", "oxc", "swc"])("should resolve aliases with '%s' isolated declarations transformer", async (isolatedDeclarationTransformer) => {
-            expect.assertions(9);
+            expect.assertions(10);
 
             await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { a } from \"utils/a\";\nexport default a;");
             await writeFile(`${temporaryDirectoryPath}/src/utils/a.ts`, "export const a: number = 1;");
@@ -1820,7 +1820,7 @@ export declare let num: Num;
                 cwd: temporaryDirectoryPath,
                 reject: false,
             });
-            console.log(binProcess.stdout);
+
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
             expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
@@ -1837,17 +1837,15 @@ module.exports = a;
             const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
             expect(dCtsContent).toBe(`import { a } from "./utils/a.d.cts";
-
-
-export = a;`);
+export = a;
+`);
             expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/utils/a.d.cts`)).toBe(true);
 
             const dtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
             expect(dtsContent).toBe(`import { a } from "./utils/a.d.ts";
-
-
-export = a;`);
+export = a;
+`);
             expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/utils/a.d.ts`)).toBe(true);
 
             const dCtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);

@@ -17,6 +17,7 @@ import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginCon
 
 import { ENDING_REGEX } from "../../../constants";
 import type { IsolatedDeclarationsTransformer } from "../../../types";
+import { fixDefaultCJSExports } from "../typescript/fix-dts-default-cjs-exports";
 import extendString from "./utils/extend-string";
 import lowestCommonAncestor from "./utils/lowest-common-ancestor";
 
@@ -47,6 +48,7 @@ export const isolatedDeclarationsPlugin = (
     sourceDirectory: string,
     transformer: IsolatedDeclarationsTransformer,
     declaration: boolean | "compatible" | "node16" | undefined,
+    cjsInterop: boolean,
     logger: Pail,
     options: IsolatedDeclarationsOptions,
     sourceMap: boolean,
@@ -227,6 +229,15 @@ export const isolatedDeclarationsPlugin = (
 
             // eslint-disable-next-line prefer-const
             for await (let [filename, { ext, map, source }] of Object.entries(outputFiles)) {
+                if (cjsInterop && outputOptions.format === "cjs") {
+                    const fixedSource = fixDefaultCJSExports(source, { fileName: filename, imports: [] }, { warn: this.warn });
+
+                    if (fixedSource) {
+                        source = fixedSource.code;
+                        map = fixedSource.map;
+                    }
+                }
+
                 const quote = source.includes("from '") ? "'" : "\"";
                 const originalFileName = filename + ext;
 

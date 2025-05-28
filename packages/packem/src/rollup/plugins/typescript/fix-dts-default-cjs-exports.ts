@@ -399,17 +399,13 @@ const handleDefaultCJSExportAsDefault = (
         // Logic for when defaultImport IS present
         let replacementCode = "";
 
-        replacementCode = exportList.length === 0 ? `export = ${defaultImport.defaultImport}` : `// @ts-ignore\nexport = ${defaultImport.defaultImport};\nexport { ${exportList.join(", ")} } from '${defaultExport.specifier}'`;
+        replacementCode = exportList.length === 0 ? `export = ${defaultImport.defaultImport};` : `// @ts-ignore\nexport = ${defaultImport.defaultImport};\nexport { ${exportList.join(", ")} } from '${defaultExport.specifier}'`;
+
         const codeWithoutOriginalExportSemi = code.replace(defaultExport.code.replace(/;$/, ""), replacementCode.replace(/;$/, ""));
-        let finalCode = codeWithoutOriginalExportSemi.endsWith(";") ? codeWithoutOriginalExportSemi : `${codeWithoutOriginalExportSemi};`;
 
-        finalCode = finalCode.replaceAll(";;", ";"); // Safeguard
-
-        return finalCode;
+        return codeWithoutOriginalExportSemi.endsWith(";") ? codeWithoutOriginalExportSemi : `${codeWithoutOriginalExportSemi};`;
     }
 
-    // ---- Default import is NOT present, needs to be added. ----
-    // Step 1: Add the new import to the original code string
     const newImportLine = `import _default from '${defaultExport.specifier}';`; // Includes semicolon
 
     const ms = new MagicString(code);
@@ -486,8 +482,6 @@ const handleDefaultNamedCJSExport = (
                 simplifiedOtherExports,
             ).toString();
 
-            // console.log(\`DEBUG: handleDefaultNamedCJSExport (existing import) calling createCjsNamespace with preamble: \${preambleForNamespace}\`);
-
             return createCjsNamespace(
                 code, // Original code for AST parsing
                 preambleForNamespace,
@@ -530,8 +524,6 @@ const handleDefaultNamedCJSExport = (
             simplifiedOtherExports,
         ).toString();
 
-        // console.log(\`DEBUG: handleDefaultNamedCJSExport (no defaultImport branch) calling createCjsNamespace with preamble: \${namespacePreamble}\`);
-
         return createCjsNamespace(
             code, // Original code for AST parsing (important for declaration finding)
             namespacePreamble,
@@ -565,7 +557,6 @@ const handleNoSpecifierDefaultCJSExport = (
     { defaultAlias, defaultExport, exports: exportList }: ParsedExports,
     options: Options,
 ): string | undefined => {
-    // console.log(\`DEBUG: handleNoSpecifierDefaultCJSExport called. DefaultAlias: \${defaultAlias}, Code: \${code.substring(0, 50)}...\`);
     const typeExports = exportList.filter((exp) => /^type\s+/.test(exp));
     const valueExports = exportList.filter((exp) => !/^type\s+/.test(exp));
 
@@ -620,7 +611,7 @@ const handleNoSpecifierDefaultCJSExport = (
         // Fallback for cases like `export { MyClass as default };`
         // `defaultExport.code` (e.g., `export { MyClass as default };`) is replaced.
         // The template here should not add a semicolon.
-        const fallbackResult = code.replace(defaultExport.code, `export = ${defaultAlias}`);
+        const fallbackResult = code.replace(defaultExport.code, `export = ${defaultAlias};`);
 
         // Apply user's safeguard for double semicolons from any source
         return fallbackResult.replace(";;", ";");
@@ -638,7 +629,7 @@ const MLLE_DEFAULT_FROM_RE = /^export\s+default\s+from\s+['"]([^'"]+)['"];?$/m;
  * @param options Plugin options, including the warning function.
  * @returns An object with the transformed code and a null map, or undefined if no transformation occurs or an error happens.
  */
-const internalFixDefaultCJSExports = (
+export const fixDefaultCJSExports = (
     code: string,
     info: CodeInfo,
     options: Options,
@@ -778,7 +769,7 @@ export const fixDtsDefaultCjsExportsPlugin = (
 ): Plugin => {
     const {
         matcher = (info: RenderedChunk) =>
-            info.type === "chunk"
+            (info.type === "chunk" || info.type === "asset")
             && info.exports?.length > 0
             // We should process the file if it's a d.ts entry,
             // and allow the main plugin logic to decide if default exports need fixing
@@ -790,9 +781,9 @@ export const fixDtsDefaultCjsExportsPlugin = (
         name: "packem:fix-dts-default-cjs-exports-plugin",
         renderChunk(this: PluginContext, code: string, chunkInfo: RenderedChunk) {
             // eslint-disable-next-line no-secrets/no-secrets
-            // Renamed `info` to `chunkInfo` to avoid confusion with the `info` object passed to internalFixDefaultCJSExports
+            // Renamed `info` to `chunkInfo` to avoid confusion with the `info` object passed to fixDefaultCJSExports
             return matcher(chunkInfo) // Use chunkInfo with the matcher
-                ? internalFixDefaultCJSExports(
+                ? fixDefaultCJSExports(
                     code,
                     { fileName: chunkInfo.fileName, imports: chunkInfo.imports },
                     { warn: this.warn },
