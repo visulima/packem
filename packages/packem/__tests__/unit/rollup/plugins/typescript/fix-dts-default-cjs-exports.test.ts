@@ -2,16 +2,15 @@ import type { NormalizedOutputOptions, PluginContext, RenderedChunk } from "roll
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { fixDtsDefaultCjsExportsPlugin } from "../../../../../src/rollup/plugins/typescript/fix-dts-default-cjs-exports";
-import type { Plugin } from "rollup";
 
 const mockWarn = vi.fn();
 
-const getCode = (result: any): string | undefined => {
+const getCode = (result: string | { code: string } | null | undefined): string | undefined => {
     if (typeof result === "string") {
         return result;
     }
 
-    if (typeof result === "object" && typeof result.code === "string") {
+    if (result && typeof result === "object" && typeof result.code === "string") {
         return result.code;
     }
 
@@ -41,8 +40,6 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             const pluginInstance = fixDtsDefaultCjsExportsPlugin();
             const rollupContext = { warn: mockWarn } as unknown as PluginContext;
 
-            // We know our plugin defines renderChunk as a direct function.
-            // Cast to avoid issues with ObjectHook type from the general Plugin interface.
             const directRenderChunk = pluginInstance.renderChunk as unknown as (
                 this: PluginContext,
                 code: string,
@@ -52,8 +49,9 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             ) => string | { code: string; map?: unknown } | null | undefined;
 
             if (typeof directRenderChunk !== "function") {
-                throw new Error("fixDtsDefaultCjsExportsPlugin.renderChunk is not a function");
+                throw new TypeError("fixDtsDefaultCjsExportsPlugin.renderChunk is not a function");
             }
+
             renderChunk = (code, chunk, options, meta) =>
                 directRenderChunk.call(rollupContext, code, chunk as RenderedChunk, options, meta);
         });
@@ -297,7 +295,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 type: "chunk",
             };
             const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
-            const expectedCode = `import _default from 'some-module';\n// @ts-ignore\nexport = _default;\nexport { namedExport } from 'some-module'`;
+            const expectedCode = `import _default from 'some-module';\n// @ts-ignore\nexport = _default;\nexport { namedExport } from 'some-module';`;
 
             expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expectedCode.trim().replaceAll("\r\n", "\n"));
             expect(mockWarn).not.toHaveBeenCalled();
@@ -352,17 +350,17 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             };
             const plugin = fixDtsDefaultCjsExportsPlugin();
             const mockContext = { warn: vi.fn() } as unknown as PluginContext;
-            let result;
 
-            if (typeof plugin.renderChunk === "function") {
-                result = plugin.renderChunk.call(
+            const result = typeof plugin.renderChunk === "function"
+                ? plugin.renderChunk.call(
                     mockContext,
                     code,
                     chunkInfo as RenderedChunk,
                     {} as NormalizedOutputOptions,
-                    { chunks: {} } as any,
-                );
-            }
+                    { chunks: {} } as { chunks: Record<string, RenderedChunk> },
+                )
+                : undefined;
+
             expect(result).toBeUndefined();
         });
 
@@ -379,17 +377,17 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             };
             const plugin = fixDtsDefaultCjsExportsPlugin();
             const mockContext = { warn: vi.fn() } as unknown as PluginContext;
-            let result;
 
-            if (typeof plugin.renderChunk === "function") {
-                result = plugin.renderChunk.call(
+            const result = typeof plugin.renderChunk === "function"
+                ? plugin.renderChunk.call(
                     mockContext,
                     code,
                     chunkInfo as RenderedChunk,
                     {} as NormalizedOutputOptions,
-                    { chunks: {} } as any,
-                );
-            }
+                    { chunks: {} } as { chunks: Record<string, RenderedChunk> },
+                )
+                : undefined;
+
             expect(result).toBeUndefined();
         });
 
@@ -423,12 +421,320 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 type: "chunk",
             };
             const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
-            // Based on how `import { NamedImport } from 'some-module'; export { NamedImport as default };` is handled,
-            // this should become `import { a } from "utils/a"; export = a;`
-            // The original `export default a` is equivalent to `export { a as default }` in this context.
             const expectedCode = `import { a } from "utils/a";\nexport = a;`;
 
             expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expectedCode.trim().replaceAll("\r\n", "\n"));
+            expect(mockWarn).not.toHaveBeenCalled();
+        });
+
+        it("should handle TSModuleDeclaration and TSImportEqualsDeclaration processed by createCjsNamespace (L272-273, L280-281 coverage)", () => {
+            expect.assertions(2);
+
+            const code = `declare module "my-module" {}\nimport fs = require("fs");\ndeclare const anotherVal: number;\nexport { fs as default, anotherVal };`;
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default", "anotherVal"],
+                fileName: "test.d.ts",
+                imports: [],
+                isEntry: true,
+                type: "chunk",
+            };
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+            const resultOutput = getCode(result)?.trim().replaceAll("\r\n", "\n");
+
+            const expectedPreamble = `// @ts-ignore\nfs;\nexport { anotherVal };`;
+
+            expect(resultOutput).toBe(expectedPreamble.trim());
+            expect(mockWarn).toHaveBeenCalledWith(
+                "Cannot infer default export from the file: test.d.ts. Declaration for 'fs' not found.",
+            );
+        });
+
+        it("should return transformedCode if no defaultExport and transformedCode does not start with 'export type' (L325-328)", () => {
+            expect.assertions(2);
+
+            const code = `export {}; // Empty export, no default`;
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default"],
+                fileName: "test.d.ts",
+                isEntry: true,
+                type: "chunk",
+            };
+
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+
+            expect(result).toBeUndefined();
+            expect(mockWarn).not.toHaveBeenCalled();
+        });
+
+        it("should warn if defaultLocalExport is not found (L327-330)", () => {
+            expect.assertions(1);
+
+            const codeWithMissingDeclAndType = `declare interface AnotherType {}; export { MissingVar as default, type AnotherType };`;
+            const chunkInfoWithMissingDeclAndType: Partial<RenderedChunk> = {
+                exports: ["default", "AnotherType"],
+                fileName: "test.d.ts",
+                isEntry: true,
+                type: "chunk",
+            };
+
+            renderChunk(codeWithMissingDeclAndType, chunkInfoWithMissingDeclAndType, {} as NormalizedOutputOptions, { chunks: {} });
+
+            expect(mockWarn).toHaveBeenCalledWith(
+                expect.stringContaining("Cannot infer default export from the file: test.d.ts. Declaration for 'MissingVar' not found."),
+            );
+        });
+
+        it("should correctly create namespace with multiple declarations (L340-359)", () => {
+            expect.assertions(2);
+
+            const code = `declare class MyClass { constructor(); }\ndeclare function myFunction(): void;\nexport { MyClass as default, myFunction };`;
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default", "myFunction"],
+                fileName: "test.d.ts",
+                isEntry: true,
+                type: "chunk",
+            };
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+            const output = getCode(result)?.trim().replaceAll("\r\n", "\n");
+            const expectedNamespace = `\n// @ts-ignore\nMyClass;\nexport { myFunction };\ndeclare namespace MyClass {\n    export class MyClass { constructor(); }\n    export function myFunction(): void;\n    import _default = MyClass;\n    export { _default as default };\n}\nexport = MyClass;`;
+
+            expect(output).toBe(expectedNamespace.trim());
+            expect(mockWarn).not.toHaveBeenCalled();
+        });
+
+        it("should handle decl.declare true/false for namespacing (L352-355)", () => {
+            expect.assertions(2);
+
+            const code = `declare class MyClass { constructor(); }\nconst myVar = 42;\nexport { MyClass as default, myVar };`;
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default", "myVar"],
+                fileName: "test.d.ts",
+                isEntry: true,
+                type: "chunk",
+            };
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+            const output = getCode(result)?.trim().replaceAll("\r\n", "\n");
+            const expectedNamespace = `\n// @ts-ignore\nMyClass;\nexport { myVar };\ndeclare namespace MyClass {\n    export class MyClass { constructor(); }\n    export const myVar = 42;\n    import _default = MyClass;\n    export { _default as default };\n}\nexport = MyClass;`;
+
+            expect(output).toBe(expectedNamespace.trim());
+            expect(mockWarn).not.toHaveBeenCalled();
+        });
+
+        it("handleDefaultCJSExportAsDefault: should prepend import if no existing imports (L388-406)", () => {
+            expect.assertions(2);
+
+            const code = `export { default } from 'some-module';`;
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default"],
+                fileName: "test.d.ts",
+                imports: [],
+                isEntry: true,
+                type: "chunk",
+            };
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+            const expected = `import _default from 'some-module';\nexport = _default;`;
+
+            expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expected.trim());
+            expect(mockWarn).not.toHaveBeenCalled();
+        });
+
+        it("handleDefaultCJSExportAsDefault: should append import if existing imports (L388-406)", () => {
+            expect.assertions(2);
+
+            const code = `import "./another";\nexport { default } from 'some-module';`;
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default"],
+                fileName: "test.d.ts",
+                imports: ["./another"],
+                isEntry: true,
+                type: "chunk",
+            };
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+            const expected = `import "./another";\nimport _default from 'some-module';\nexport = _default;`;
+
+            expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expected.trim());
+            expect(mockWarn).not.toHaveBeenCalled();
+        });
+
+        it("handleDefaultCJSExportAsDefault: should create namespace if exportList has items (L393, L403)", () => {
+            expect.assertions(2);
+
+            const code = `import "./another";\nexport { default, anotherExport } from 'some-module';`;
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default", "anotherExport"],
+                fileName: "test.d.ts",
+                imports: ["./another", "some-module"],
+                isEntry: true,
+                type: "chunk",
+            };
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+            const output = getCode(result)?.trim().replaceAll("\r\n", "\n");
+            const expectedOutput = `import "./another";\nimport _default from 'some-module';\n// @ts-ignore\nexport = _default;\nexport { anotherExport } from 'some-module';`;
+
+            expect(output).toBe(expectedOutput.trim());
+            expect(mockWarn).not.toHaveBeenCalled();
+        });
+
+        it("handleNoSpecifierDefaultCJSExport: should create namespace for local default and named value export", () => {
+            expect.assertions(2);
+
+            const code = `import { MyNamedImport } from 'some-module';
+declare class MyNamedImport { constructor(); }
+declare const anotherValue: number;
+export { MyNamedImport as default, anotherValue };`;
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default", "anotherValue"],
+                fileName: "test.d.ts",
+                imports: ["some-module"], // This import is in the code, but the export is local (no 'from')
+                isEntry: true,
+                type: "chunk",
+            };
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+            const output = getCode(result)?.trim().replaceAll("\r\n", "\n");
+            // This test, despite its old name, currently tests handleNoSpecifierDefaultCJSExport
+            // due to its input code `export { MyNamedImport as default, anotherValue };` (no 'from ...')
+            const expected = `// @ts-ignore
+MyNamedImport;
+export { anotherValue };
+declare namespace MyNamedImport {
+    export class MyNamedImport { constructor(); }
+    export const anotherValue: number;
+    import _default = MyNamedImport;
+    export { _default as default };
+}
+export = MyNamedImport;`;
+
+            expect(output).toBe(expected.trim());
+            expect(mockWarn).not.toHaveBeenCalled();
+        });
+
+        it("handleDefaultNamedCJSExport: should warn if import exists but does not provide alias", () => {
+            expect.assertions(2);
+
+            const code = `import { SomethingElse } from 'some-module';
+export { MyNamedImport as default } from 'some-module';`;
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default"],
+                fileName: "test.d.ts",
+                imports: ["some-module"], // Crucial: import exists
+                isEntry: true,
+                type: "chunk",
+            };
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+
+            expect(result).toBeUndefined();
+            expect(mockWarn).toHaveBeenCalledWith(
+                `Cannot parse "MyNamedImport" named export from some-module import at test.d.ts!.`,
+            );
+        });
+
+        it("handleDefaultNamedCJSExport: re-export with alias and others, existing import provides alias", () => {
+            expect.assertions(2);
+
+            const code = `import { N, X } from 'mod'; // N is aliased default, X is other member of mod
+declare class N { constructor(val: number); }
+declare const X: number;
+declare const Y: string; // Y will be re-exported by name from mod
+export { N as default, Y } from 'mod';`;
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default", "Y"],
+                fileName: "test.d.ts",
+                imports: ["mod"], // Crucial: import from 'mod' exists
+                isEntry: true,
+                type: "chunk",
+            };
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+            const output = getCode(result)?.trim().replaceAll("\r\n", "\n");
+            const expected = `import { N, X } from 'mod'; // N is aliased default, X is other member of mod
+declare class N { constructor(val: number); }
+declare const X: number;
+declare const Y: string; // Y will be re-exported by name from mod
+export { Y } from 'mod';
+declare namespace N {
+    export class N { constructor(val: number); }
+    export const X: number;
+    export const Y: string;
+    import _default = N;
+    export { _default as default };
+}
+export = N;`;
+
+            expect(output).toBe(expected.trim());
+            expect(mockWarn).not.toHaveBeenCalled();
+        });
+
+        it("handleDefaultNamedCJSExport: re-export with alias and others, NO existing import for module", () => {
+            expect.assertions(2);
+
+            const code = `declare class N { constructor(val: number); }
+declare const Y: string;
+export { N as default, Y } from 'mod';`; // N and Y re-exported, no import from 'mod'
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default", "Y"],
+                fileName: "test.d.ts",
+                imports: [], // Crucial: no import from 'mod' initially
+                isEntry: true,
+                type: "chunk",
+            };
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+            const output = getCode(result)?.trim().replaceAll("\r\n", "\n");
+            const expected = `import { N } from 'mod';
+declare class N { constructor(val: number); }
+declare const Y: string;
+export { Y } from 'mod';
+declare namespace N {
+    export class N { constructor(val: number); }
+    export const Y: string;
+    import _default = N;
+    export { _default as default };
+}
+export = N;`;
+
+            expect(output).toBe(expected.trim());
+            expect(mockWarn).not.toHaveBeenCalled();
+        });
+
+        it("handleDefaultCJSExportAsDefault: existing import, no other exports in list", () => {
+            expect.assertions(2);
+
+            const code = `import ActualDefaultName from 'some-module';
+export { default } from 'some-module';`;
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default"],
+                fileName: "test.d.ts",
+                imports: ["some-module"], // Indicates an import from 'some-module' exists
+                isEntry: true,
+                type: "chunk",
+            };
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+            const output = getCode(result)?.trim().replaceAll("\r\n", "\n");
+            const expected = `import ActualDefaultName from 'some-module';
+export = ActualDefaultName;`;
+
+            expect(output).toBe(expected.trim());
+            expect(mockWarn).not.toHaveBeenCalled();
+        });
+
+        it("handleDefaultCJSExportAsDefault: existing import, with other exports in list", () => {
+            expect.assertions(2);
+
+            const code = `import ActualDefaultName from 'some-module';
+export { default, namedItem } from 'some-module';`;
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default", "namedItem"],
+                fileName: "test.d.ts",
+                imports: ["some-module"], // Indicates an import from 'some-module' exists
+                isEntry: true,
+                type: "chunk",
+            };
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+            const output = getCode(result)?.trim().replaceAll("\r\n", "\n");
+            const expected = `import ActualDefaultName from 'some-module';
+// @ts-ignore
+export = ActualDefaultName;
+export { namedItem } from 'some-module';`;
+
+            expect(output).toBe(expected.trim());
             expect(mockWarn).not.toHaveBeenCalled();
         });
     });

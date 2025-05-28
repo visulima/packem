@@ -32,11 +32,10 @@ const generateDtsMap = (mappings: string, source: string, dts: string): string =
         version: 3,
     });
 
-
-type OxcImport = {
+type OxcImport = (ExportAllDeclaration | ExportNamedDeclaration | ImportDeclaration) & {
     source: StringLiteral;
     suffix?: string;
-} & (ExportAllDeclaration | ExportNamedDeclaration | ImportDeclaration);
+};
 
 export type IsolatedDeclarationsOptions = {
     exclude?: FilterPattern;
@@ -130,7 +129,6 @@ export const isolatedDeclarationsPlugin = (
         }
 
         // @ts-expect-error - the ts transformer is getting 4 arguments
-
         const { errors, map, sourceText } = await transformer(id, code, sourceMap, tsconfig?.config?.compilerOptions);
 
         if (errors.length > 0) {
@@ -150,32 +148,34 @@ export const isolatedDeclarationsPlugin = (
             return;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const typeImports = program.body.filter((node: any) => {
-            if (node.type === "ImportDeclaration") {
-                if (node.importKind === "type") {
-                    return true;
-                }
-
-                return node.specifiers?.every(
-                    (specifier: { importKind: string; type: string }) => specifier.type === "ImportSpecifier" && specifier.importKind === "type",
-                );
+        const typeImports = program.body.filter((node): node is OxcImport => {
+            if (!("source" in node) || !node.source) {
+                return false;
             }
 
-            if (node.type === "ExportNamedDeclaration" || node.type === "ExportAllDeclaration") {
-                if (node.exportKind === "type") {
-                    return true;
-                }
+            if ("importKind" in node && node.importKind === "type") {
+                return true;
+            }
 
+            if ("exportKind" in node && node.exportKind === "type") {
+                return true;
+            }
+
+            if (node.type === "ImportDeclaration") {
                 return (
-                    node.type === "ExportNamedDeclaration"
-                    && node.specifiers?.every(
-                        (specifier: { exportKind: string; type: string }) => specifier.type === "ExportSpecifier" && specifier.exportKind === "type",
+                    !!node.specifiers
+                    && node.specifiers.every(
+                        (spec) =>
+                            spec.type === "ImportSpecifier" && spec.importKind === "type",
                     )
                 );
             }
 
-            return false;
+            return (
+                node.type === "ExportNamedDeclaration"
+                && node.specifiers
+                && node.specifiers.every((spec) => spec.exportKind === "type")
+            );
         });
 
         for await (const typeImport of typeImports) {

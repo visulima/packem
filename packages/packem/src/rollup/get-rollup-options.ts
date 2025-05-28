@@ -492,7 +492,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                         context.options.sourcemap,
                         context.tsconfig,
                     ),
-                    fixDtsDefaultCjsExportsPlugin(),
                 ]
                 : [],
 
@@ -553,6 +552,8 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 }),
                 fileCache,
             ),
+
+            fixDtsDefaultCjsExportsPlugin(),
 
             ...postPlugins,
 

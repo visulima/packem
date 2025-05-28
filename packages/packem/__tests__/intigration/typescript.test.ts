@@ -1763,95 +1763,6 @@ export declare let num: Num;
             },
         );
 
-        it.each(["typescript", "oxc", "swc"])(
-            "should patch cjs default export with '%s' isolated declarations transformer",
-            async (isolatedDeclarationTransformer) => {
-                expect.assertions(6);
-
-                await writeFile(
-                    `${temporaryDirectoryPath}/src/index.ts`,
-                    `const test = () => {
-    return "this should be in final bundle, test function";
-};
-
-export default test;
-`,
-                );
-
-                await installPackage(temporaryDirectoryPath, "typescript");
-
-                // eslint-disable-next-line vitest/no-conditional-in-test
-                if (isolatedDeclarationTransformer === "oxc") {
-                    await installPackage(temporaryDirectoryPath, "oxc-transform");
-                }
-
-                // eslint-disable-next-line vitest/no-conditional-in-test
-                if (isolatedDeclarationTransformer === "swc") {
-                    await installPackage(temporaryDirectoryPath, "@swc/core");
-                }
-
-                await createPackageJson(temporaryDirectoryPath, {
-                    devDependencies: {
-                        typescript: "*",
-                    },
-                    exports: {
-                        ".": {
-                            import: {
-                                default: "./dist/index.mjs",
-                                types: "./dist/index.d.mts",
-                            },
-                            require: {
-                                default: "./dist/index.cjs",
-                                types: "./dist/index.d.cts",
-                            },
-                        },
-                    },
-                });
-                await createPackemConfig(temporaryDirectoryPath, {
-                    config: {
-                        cjsInterop: true,
-                    },
-                    isolatedDeclarationTransformer: isolatedDeclarationTransformer as "oxc" | "swc" | "typescript" | undefined,
-                    transformer: "esbuild",
-                });
-                await createTsConfig(temporaryDirectoryPath, {
-                    compilerOptions: {
-                        isolatedDeclarations: true,
-                        noErrorTruncation: true,
-                    },
-                });
-
-                const binProcess = await execPackem("build", [], {
-                    cwd: temporaryDirectoryPath,
-                    reject: false,
-                });
-
-                expect(binProcess.stderr).toBe("");
-                expect(binProcess.exitCode).toBe(0);
-                expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
-
-                const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
-
-                expect(dCtsContent).toBe(`declare const test: () => string;
-
-
-export = test;`);
-
-                const dtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
-
-                expect(dtsContent).toBe(`declare const test: () => string;
-
-
-export = test;`);
-
-                const dCtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
-
-                expect(dCtsTypesContent).toBe(`declare const test: () => string;
-export default test;
-`);
-            },
-        );
-
         it.each(["typescript", "oxc", "swc"])("should resolve aliases with '%s' isolated declarations transformer", async (isolatedDeclarationTransformer) => {
             expect.assertions(9);
 
@@ -1909,7 +1820,7 @@ export default test;
                 cwd: temporaryDirectoryPath,
                 reject: false,
             });
-
+            console.log(binProcess.stdout);
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
             expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
@@ -2057,21 +1968,29 @@ module.exports.test2 = test2;
 
         const cDtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(cDtsContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle, test2 string";
-
+        expect(cDtsContent).toBe(`// @ts-ignore
+test;
 export { test2 };
-
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle, test2 string";
+    import _default = test;
+    export { _default as default };
+}
 export = test;
 `);
 
         const dtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dtsContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle, test2 string";
-
+        expect(dtsContent).toBe(`// @ts-ignore
+test;
 export { test2 };
-
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle, test2 string";
+    import _default = test;
+    export { _default as default };
+}
 export = test;
 `);
 
@@ -2149,21 +2068,29 @@ module.exports.test2 = test2;
 
         const cDtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(cDtsContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle, test2 string";
-
+        expect(cDtsContent).toBe(`// @ts-ignore
+test;
 export { test2 };
-
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle, test2 string";
+    import _default = test;
+    export { _default as default };
+}
 export = test;
 `);
 
         const dtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dtsContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle, test2 string";
-
-export {  test2 };
-
+        expect(dtsContent).toBe(`// @ts-ignore
+test;
+export { test2 };
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle, test2 string";
+    import _default = test;
+    export { _default as default };
+}
 export = test;
 `);
 

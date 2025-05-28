@@ -116,6 +116,7 @@ const watch = async (
 
     let useCache = true;
 
+    // TODO: find a way to remove this hack
     // This is a hack to prevent caching when using isolated declarations or css loaders
     if (context.options.rollup.isolatedDeclarations || context.options.isolatedDeclarationTransformer || context.options.rollup.css) {
         useCache = false;

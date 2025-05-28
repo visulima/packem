@@ -277,7 +277,7 @@ export { IString };`,
             ["./index.mjs", /const shared = true/],
             ["./index.react-server.mjs", /"react-server"/],
             ["./index.react-native.cjs", /"react-native"/],
-            ["./index.d.ts", /declare const shared = true/],
+            ["./index.d.ts", /export const shared = true;/],
             ["./api/index.cjs", /"api:"/],
             ["./api/index.mjs", /"api:"/],
         ]) {

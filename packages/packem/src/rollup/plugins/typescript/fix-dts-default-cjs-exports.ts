@@ -111,6 +111,7 @@ const extractExports = (
             continue;
         }
 
+        // eslint-disable-next-line security/detect-unsafe-regex
         const m = exp.match(/\s*as\s+default\s*/);
 
         if (m) {
@@ -179,7 +180,7 @@ const prepareDeclaration = (
     decls: Map<string, Decl>,
     decl: Declaration,
     unnamed: () => string,
-) => {
+): void => {
     // VariableDeclaration
     if ("declarations" in decl && decl.declarations.length > 0) {
         const variableDeclarator = decl.declarations[0];
@@ -225,7 +226,6 @@ const prepareDeclaration = (
  * @param options Plugin options.
  * @returns The transformed code with the CJS namespace.
  */
-
 const createCjsNamespace = (
     code: string,
     transformedCode: string,
@@ -240,7 +240,12 @@ const createCjsNamespace = (
     });
 
     let defaultExport: DefaultExport | undefined;
-    let unnamed = 0;
+    let unnamedCounter = 0;
+    const generateUnnamed = () => {
+        unnamedCounter += 1;
+
+        return `__unnamed_${unnamedCounter}$$`;
+    };
 
     const declarations = new Map<string, Decl>();
     const exportsMap = new Map<string, Export>();
@@ -259,6 +264,10 @@ const createCjsNamespace = (
                     }
                 }
             }
+        } else if (node.type === "ImportDeclaration") {
+            // Imports should remain top-level and are not part of the namespace content.
+            // Do not add them to the declarations map.
+            continue; // Skip to the next node
         } else {
             // eslint-disable-next-line default-case
             switch (node.type) {
@@ -271,14 +280,14 @@ const createCjsNamespace = (
                 case "TSInterfaceDeclaration":
                 case "TSTypeAliasDeclaration":
                 case "VariableDeclaration": {
-                    prepareDeclaration(declarations, node, () => `__unnamed_${unnamed++}$$`);
+                    prepareDeclaration(declarations, node, generateUnnamed);
                     break;
                 }
-                case "ImportDeclaration":
-                // eslint-disable-next-line no-secrets/no-secrets, no-fallthrough
+                // case "ImportDeclaration": // Already handled above
+                // eslint-disable-next-line no-secrets/no-secrets
                 case "TSImportEqualsDeclaration":
                 case "TSModuleDeclaration": {
-                    declarations.set(`__unnamed_${unnamed++}$$`, {
+                    declarations.set(generateUnnamed(), {
                         declare: false,
                         end: node.end,
                         start: node.start,
@@ -324,7 +333,7 @@ const createCjsNamespace = (
     if (!defaultLocalExport) {
         options.warn?.(`Cannot infer default export from the file: ${info.fileName}. Declaration for '${defaultExport.local}' not found.`);
 
-        return code; // This might be a source of issues if caller expects namespacing
+        return transformedCode;
     }
 
     const finalPreamble = transformedCode;
@@ -367,10 +376,10 @@ const createCjsNamespace = (
 /**
  * Handles the transformation for `export { default } from '...'` or `import X from '...'; export { X as default }`.
  * @param code The original code.
- * @param parsedExports Parsed export information.
- * @param parsedExports.defaultExport The mlly ESMExport object for the default export.
- * @param parsedExports.exports A list of other named exports.
- * @param imports A list of parsed static imports in the file.
+ * @param parsedExportsInfo Parsed export information.
+ * @param parsedExportsInfo.defaultExport The mlly ESMExport object for the default export.
+ * @param parsedExportsInfo.exports A list of other named exports.
+ * @param originalStaticImports A list of all parsed static imports in the file (used for positioning new imports).
  * @param info Information about the file.
  * @param options Plugin options.
  * @param defaultImport The parsed static import corresponding to the default export, if it exists.
@@ -378,64 +387,69 @@ const createCjsNamespace = (
  */
 const handleDefaultCJSExportAsDefault = (
     code: string,
-    { defaultExport, exports: exportList }: ParsedExports,
-    imports: ParsedStaticImport[],
+    parsedExportsInfo: ParsedExports,
+    originalStaticImports: ParsedStaticImport[],
     info: CodeInfo,
     options: Options,
     defaultImport?: ParsedStaticImport,
 ): string | undefined => {
+    const { defaultExport, exports: exportList } = parsedExportsInfo;
+
     if (defaultImport) {
-        if (exportList.length === 0) {
-            return code.replace(
-                defaultExport.code,
-                `export = ${defaultImport.defaultImport}`,
-            );
-        }
+        // Logic for when defaultImport IS present
+        let replacementCode = "";
 
-        return createCjsNamespace(
-            code,
-            code.replace(
-                defaultExport.code,
-                `// @ts-ignore
-export = ${defaultImport.defaultImport};
-export { ${exportList.join(", ")} } from '${defaultExport.specifier}'`,
-            ),
-            info,
-            options,
-        );
+        replacementCode = exportList.length === 0 ? `export = ${defaultImport.defaultImport}` : `// @ts-ignore\nexport = ${defaultImport.defaultImport};\nexport { ${exportList.join(", ")} } from '${defaultExport.specifier}'`;
+        const codeWithoutOriginalExportSemi = code.replace(defaultExport.code.replace(/;$/, ""), replacementCode.replace(/;$/, ""));
+        let finalCode = codeWithoutOriginalExportSemi.endsWith(";") ? codeWithoutOriginalExportSemi : `${codeWithoutOriginalExportSemi};`;
+
+        finalCode = finalCode.replaceAll(";;", ";"); // Safeguard
+
+        return finalCode;
     }
 
-    const magicString = new MagicString(code);
-    // add the import after last import in the code
-    const lastImportPosition
-            = imports.length > 0 ? imports.at(-1)?.end || 0 : 0;
+    // ---- Default import is NOT present, needs to be added. ----
+    // Step 1: Add the new import to the original code string
+    const newImportLine = `import _default from '${defaultExport.specifier}';`; // Includes semicolon
 
-    if (lastImportPosition > 0) {
-        magicString.appendRight(
-            lastImportPosition,
-            `\nimport _default from '${defaultExport.specifier}';\n`,
-        );
+    const ms = new MagicString(code);
+    const existingImports = findStaticImports(code); // Find imports in the *original* code
+    const lastExistingImport = existingImports.length > 0 ? existingImports.at(-1) : undefined;
+
+    if (lastExistingImport?.end !== undefined && lastExistingImport.end > 0) {
+        // Append after the last existing import.
+        // Add a newline before the new import.
+        // The new import line itself provides its semicolon.
+        // Add a newline after the new import line to separate it from what follows.
+        ms.appendRight(lastExistingImport.end, `\n${newImportLine}\n`);
     } else {
-        magicString.prepend(
-            `import _default from '${defaultExport.specifier}';\n`,
-        );
+        // Prepend to the start of the code.
+        // The new import line provides its semicolon.
+        // Add a newline after the new import line.
+        ms.prepend(`${newImportLine}\n`);
     }
 
-    return exportList.length > 0
-        ? createCjsNamespace(
-            code,
-            magicString
-                .replace(
-                    defaultExport.code,
-                    `// @ts-ignore
-export = _default;
-export { ${exportList.join(", ")} } from '${defaultExport.specifier}'`,
-                )
-                .toString(),
-            info,
-            options,
-        )
-        : magicString.replace(defaultExport.code, "export = _default").toString();
+    let codeWithNewImport = ms.toString();
+
+    // Normalize multiple newlines (possibly from original code + added newlines) to a single newline between statements
+    codeWithNewImport = codeWithNewImport.replaceAll(/(\r?\n\s*){2,}/g, "\n");
+
+    // Step 2: Replace the original export statement in the `codeWithNewImport`
+    let finalCodeResult: string;
+
+    if (exportList.length === 0) {
+        const replacement = "export = _default"; // No semicolon here, will be added
+
+        finalCodeResult = codeWithNewImport.replace(defaultExport.code.replace(/;$/, ""), replacement);
+    } else {
+        // exportList > 0
+        // Ensure the replacement itself ends with a semicolon.
+        const replacement = `// @ts-ignore\nexport = _default;\nexport { ${exportList.join(", ")} } from '${defaultExport.specifier}';`;
+
+        finalCodeResult = codeWithNewImport.replace(defaultExport.code.replace(/;$/, ""), replacement);
+    }
+
+    return finalCodeResult.replaceAll(";;", ";"); // Final safeguard
 };
 
 /**
@@ -443,7 +457,7 @@ export { ${exportList.join(", ")} } from '${defaultExport.specifier}'`,
  * @param code The original code.
  * @param info Information about the file.
  * @param parsedExports Parsed export information.
- * @param imports A list of parsed static imports in the file.
+ * @param originalStaticImports A list of all parsed static imports in the file (used for positioning new imports).
  * @param options Plugin options.
  * @param defaultImport The parsed static import corresponding to the default export's source module, if it exists.
  * @returns The transformed code string, or undefined if transformation fails.
@@ -452,30 +466,11 @@ const handleDefaultNamedCJSExport = (
     code: string,
     info: CodeInfo,
     parsedExports: ParsedExports,
-    imports: ParsedStaticImport[],
+    originalStaticImports: ParsedStaticImport[],
     options: Options,
     defaultImport?: ParsedStaticImport | undefined,
 ): string | undefined => {
     const { defaultAlias, defaultExport, exports: exportList } = parsedExports;
-
-    if (defaultAlias === "default") {
-        if (defaultImport && !defaultImport.defaultImport) {
-            options.warn?.(
-                `Cannot parse default export name from ${defaultImport.specifier} import at ${info.fileName}!. The module might not have a default export, or it's aliased as 'default'.`,
-            );
-
-            return undefined;
-        }
-
-        return handleDefaultCJSExportAsDefault(
-            code,
-            parsedExports,
-            imports,
-            info,
-            options,
-            defaultImport,
-        );
-    }
 
     if (defaultImport) {
         const namedExports = defaultImport.namedImports;
@@ -485,12 +480,17 @@ const handleDefaultNamedCJSExport = (
                 return code.replace(defaultExport.code, `export = ${defaultAlias}`);
             }
 
+            const simplifiedOtherExports = `export { ${exportList.join(", ")} } from '${defaultExport.specifier}'`; // No semicolon here
+            const preambleForNamespace = new MagicString(code).replace(
+                defaultExport.code,
+                simplifiedOtherExports,
+            ).toString();
+
+            // console.log(\`DEBUG: handleDefaultNamedCJSExport (existing import) calling createCjsNamespace with preamble: \${preambleForNamespace}\`);
+
             return createCjsNamespace(
-                code,
-                code.replace(
-                    defaultExport.code,
-                    `// @ts-ignore\nexport = ${defaultAlias};\nexport { ${exportList.join(", ")} }`,
-                ),
+                code, // Original code for AST parsing
+                preambleForNamespace,
                 info,
                 options,
             );
@@ -507,8 +507,7 @@ const handleDefaultNamedCJSExport = (
     const importStatement = `import { ${defaultAlias} } from '${defaultExport.specifier}';\n`;
     let modifiedCode = code;
 
-    const staticImports = findStaticImports(modifiedCode);
-    const lastExistingImportEnd = staticImports.length > 0 ? staticImports.at(-1)?.end ?? 0 : 0;
+    const lastExistingImportEnd = originalStaticImports.length > 0 ? originalStaticImports.at(-1)?.end ?? 0 : 0;
 
     const ms = new MagicString(modifiedCode);
 
@@ -518,22 +517,30 @@ const handleDefaultNamedCJSExport = (
         ms.prepend(importStatement);
     }
 
-    modifiedCode = ms.toString();
+    modifiedCode = ms.toString(); // Now modifiedCode contains the new import
 
     if (exportList.length > 0) {
+        // Prepare a preamble where the original complex export is simplified
+        // to only re-export other named items from the MODIFIED code (with new import).
+        // The default export (defaultAlias) will be handled by createCjsNamespace.
+        const simplifiedOtherExports = `export { ${exportList.join(", ")} } from '${defaultExport.specifier}'`; // No semicolon here
+
         const namespacePreamble = new MagicString(modifiedCode).replace(
-            defaultExport.code,
-            `// @ts-ignore\nexport = ${defaultAlias};\nexport { ${exportList.join(", ")} } from '${defaultExport.specifier}'`,
+            defaultExport.code, // This is the original export pattern string
+            simplifiedOtherExports,
         ).toString();
 
+        // console.log(\`DEBUG: handleDefaultNamedCJSExport (no defaultImport branch) calling createCjsNamespace with preamble: \${namespacePreamble}\`);
+
         return createCjsNamespace(
-            code, // Original code for AST parsing
+            code, // Original code for AST parsing (important for declaration finding)
             namespacePreamble,
             info,
             options,
         );
     }
 
+    // If exportList is empty, just replace the default export part in the MODIFIED code
     const finalResult = new MagicString(modifiedCode).replace(defaultExport.code, `export = ${defaultAlias}`);
 
     return finalResult.toString();
@@ -558,6 +565,7 @@ const handleNoSpecifierDefaultCJSExport = (
     { defaultAlias, defaultExport, exports: exportList }: ParsedExports,
     options: Options,
 ): string | undefined => {
+    // console.log(\`DEBUG: handleNoSpecifierDefaultCJSExport called. DefaultAlias: \${defaultAlias}, Code: \${code.substring(0, 50)}...\`);
     const typeExports = exportList.filter((exp) => /^type\s+/.test(exp));
     const valueExports = exportList.filter((exp) => !/^type\s+/.test(exp));
 
@@ -595,7 +603,7 @@ const handleNoSpecifierDefaultCJSExport = (
 
     // Case 3: Only default export (no other type/value exports)
     if (defaultAlias && valueExports.length === 0 && typeExports.length === 0) {
-        const directExportDefaultRegex = new RegExp(`^export\\s+default\\s+${defaultAlias};`, "m");
+        const directExportDefaultRegex = new RegExp(`^export\s+default\s+${defaultAlias};`, "m");
 
         const match = code.match(directExportDefaultRegex);
 
@@ -652,24 +660,23 @@ const internalFixDefaultCJSExports = (
 
         if (parsedExports.defaultExport.specifier) {
             const { specifier } = parsedExports.defaultExport;
-            const imports: ParsedStaticImport[] = findStaticImports(code)
+            const allStaticImports: ParsedStaticImport[] = findStaticImports(code);
+            const parsedImports: ParsedStaticImport[] = allStaticImports
                 .filter((imp) => imp.imports)
                 .map((imp) => parseStaticImport(imp));
-            const defaultImport = imports.find((index) => index.specifier === specifier);
+            const defaultImport = parsedImports.find((index) => index.specifier === specifier);
 
             const { defaultAlias, defaultExport, exports: exportList } = parsedExports;
             const defaultExportNodeExports = (defaultExport as { exports?: string }).exports;
 
             // Case 1: export { default, namedExport, ... } from 'some-module';
-            if (defaultAlias === "default" && defaultExport.specifier && exportList.length > 0) { // Ensure specifier exists for re-export
-                let out = `import _default from '${defaultExport.specifier}';\n// @ts-ignore\nexport = _default;`;
-
-                out += `\nexport { ${exportList.join(", ")} } from '${defaultExport.specifier}'`;
-                resultString = out;
+            if (defaultAlias === "default" && defaultExport.specifier && exportList.length > 0) {
+                // This input type should also go through the full handling to preserve other imports etc.
+                resultString = handleDefaultCJSExportAsDefault(code, parsedExports, allStaticImports, info, options, defaultImport);
             } else if (defaultAlias === "default" && defaultExport.specifier && exportList.length === 0 && defaultExportNodeExports && /\bas\s+default\b/.test(defaultExportNodeExports)) {
                 // Case 2: export { default as default } from 'some-module'; (Warning case)
-                if (imports.find((imp) => imp.specifier === defaultExport.specifier)?.defaultImport) {
-                    resultString = handleDefaultCJSExportAsDefault(code, parsedExports, imports, info, options, defaultImport);
+                if (parsedImports.find((imp) => imp.specifier === defaultExport.specifier)?.defaultImport) {
+                    resultString = handleDefaultCJSExportAsDefault(code, parsedExports, allStaticImports, info, options, defaultImport);
                 } else {
                     options.warn?.(
                         `Cannot parse default export name from ${defaultExport.specifier} import at ${info.fileName}!. The module might not have a default export, or it's aliased as 'default'.`,
@@ -678,19 +685,30 @@ const internalFixDefaultCJSExports = (
                 }
             } else if (defaultAlias === "default" && defaultExport.specifier && exportList.length === 0) {
                 // Case 3: export { default } from 'some-module'; (No other named exports, not aliased to default from itself)
-                resultString = handleDefaultCJSExportAsDefault(code, parsedExports, imports, info, options, defaultImport);
+                resultString = handleDefaultCJSExportAsDefault(code, parsedExports, allStaticImports, info, options, defaultImport);
             } else if (defaultExport.specifier && defaultAlias !== "default") {
                 // Case 4: export { someName as default } from 'some-module';
-                resultString = handleDefaultNamedCJSExport(code, info, parsedExports, imports, options, defaultImport);
-            }
+                resultString = handleDefaultNamedCJSExport(code, info, parsedExports, allStaticImports, options, defaultImport);
 
-            // Fallback if none of the above specific specifier cases match, or if they returned undefined.
-            if (resultString === undefined && !(defaultAlias === "default" && exportList.length === 0 && defaultExportNodeExports && /\bas\s+default\b/.test(defaultExportNodeExports))) {
-                // Avoid re-processing the explicit warning case that sets resultString to undefined.
-                const fallbackResult = handleNoSpecifierDefaultCJSExport(code, info, parsedExports, options);
+                // eslint-disable-next-line no-secrets/no-secrets
+                // If handleDefaultNamedCJSExport warned and returned undefined because the specific named import was missing,
+                // we should honor that and not proceed to the general noSpecifier fallback.
+                const wasSpecificNamedExportWarning = defaultImport // An import for the module existed
+                    && parsedExports.defaultExport.specifier // It was a re-export
+                    && defaultAlias !== "default" // It was a named alias to default
+                    && (!defaultImport.namedImports || defaultImport.namedImports[defaultAlias] !== defaultAlias); // And the specific alias wasn't found in the import
 
-                if (fallbackResult) {
-                    resultString = fallbackResult;
+                if (resultString === undefined && wasSpecificNamedExportWarning) {
+                    // Do nothing here. resultString is already undefined, and we want to propagate that.
+                    // This prevents the generic fallback below from kicking in for this specific warning scenario.
+                } else if (resultString === undefined && !(defaultAlias === "default" && exportList.length === 0 && defaultExportNodeExports && /\bas\s+default\b/.test(defaultExportNodeExports))) {
+                    // Fallback if none of the above specific specifier cases match, or if they returned undefined (and it wasn't the specific named export warning case).
+                    // Avoid re-processing the explicit warning case that sets resultString to undefined.
+                    const fallbackResult = handleNoSpecifierDefaultCJSExport(code, info, parsedExports, options);
+
+                    if (fallbackResult) {
+                        resultString = fallbackResult;
+                    }
                 }
             }
         } else {
@@ -701,7 +719,7 @@ const internalFixDefaultCJSExports = (
         return resultString ? { code: resultString, map: undefined } : undefined;
     }
 
-    // No 'default' keyword. Pure type-only export handling.
+    // No 'default' keyword. Pure type-export handling.
     const ast = parseSync(info.fileName, code, { astType: "ts", lang: "ts", sourceType: "module" });
     let typeExportNames: string[] = [];
     let isPureTypeExportBlock = false;
@@ -776,7 +794,7 @@ export const fixDtsDefaultCjsExportsPlugin = (
             return matcher(chunkInfo) // Use chunkInfo with the matcher
                 ? internalFixDefaultCJSExports(
                     code,
-                    { fileName: chunkInfo.fileName, imports: chunkInfo.imports }, // Pass chunkInfo properties
+                    { fileName: chunkInfo.fileName, imports: chunkInfo.imports },
                     { warn: this.warn },
                 )
                 : undefined;

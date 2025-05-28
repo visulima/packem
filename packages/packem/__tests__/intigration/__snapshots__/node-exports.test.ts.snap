@@ -1,14 +1,18 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > cjs dts output 1`] = `
-"declare const test: () => string;
-declare const test2 = "this should be in final bundle";
-declare const test3 = "this should be in final bundle";
-declare const test4 = "this should be in final bundle";
-declare const test5 = "this should be in final bundle";
-
-export {  test2, test3, test4, test5 };
-
+"// @ts-ignore
+test;
+export { test2, test3, test4, test5 };
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle";
+    export const test3 = "this should be in final bundle";
+    export const test4 = "this should be in final bundle";
+    export const test5 = "this should be in final bundle";
+    import _default = test;
+    export { _default as default };
+}
 export = test;
 "
 `;
@@ -37,14 +41,18 @@ module.exports.test5 = test5;
 `;
 
 exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > dts output 1`] = `
-"declare const test: () => string;
-declare const test2 = "this should be in final bundle";
-declare const test3 = "this should be in final bundle";
-declare const test4 = "this should be in final bundle";
-declare const test5 = "this should be in final bundle";
-
-export {  test2, test3, test4, test5 };
-
+"// @ts-ignore
+test;
+export { test2, test3, test4, test5 };
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle";
+    export const test3 = "this should be in final bundle";
+    export const test4 = "this should be in final bundle";
+    export const test5 = "this should be in final bundle";
+    import _default = test;
+    export { _default as default };
+}
 export = test;
 "
 `;
@@ -76,11 +84,15 @@ export { test as default, test2, test3, test4, test5 };
 `;
 
 exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > cjs dts output 1`] = `
-"declare const test: () => string;
-declare const test2 = "this should be in final bundle";
-
-export {  test2 };
-
+"// @ts-ignore
+test;
+export { test2 };
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle";
+    import _default = test;
+    export { _default as default };
+}
 export = test;
 "
 `;
@@ -103,11 +115,15 @@ module.exports.test2 = test2;
 `;
 
 exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > dts output 1`] = `
-"declare const test: () => string;
-declare const test2 = "this should be in final bundle";
-
-export {  test2 };
-
+"// @ts-ignore
+test;
+export { test2 };
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle";
+    import _default = test;
+    export { _default as default };
+}
 export = test;
 "
 `;
