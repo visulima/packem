@@ -116,10 +116,6 @@ const removeInternal = (s: MagicString, node: any): boolean => {
     return false;
 };
 
-export type PatchTypesOptions = {
-    identifierReplacements?: Record<string, Record<string, string>>;
-};
-
 /**
  * While we already enable `compilerOptions.stripInternal`, some internal comments
  * like internal parameters are still not stripped by TypeScript, so we run another
@@ -155,8 +151,13 @@ function stripInternalTypes(this: PluginContext, code: string, chunk: RenderedCh
     return code;
 }
 
+export type PatchTypesOptions = {
+    identifierReplacements?: Record<string, Record<string, string>>;
+};
+
 /**
  * Patch the types files before passing to dts plugin
+ *
  * 1. Validate unallowed dependency imports
  * 2. Replace confusing type names
  * 3. Strip leftover internal types

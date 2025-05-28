@@ -17,7 +17,6 @@ import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginCon
 
 import { ENDING_REGEX } from "../../../constants";
 import type { IsolatedDeclarationsTransformer } from "../../../types";
-import patchCjsDefaultExport from "../typescript/utils/patch-cjs-default-export";
 import extendString from "./utils/extend-string";
 import lowestCommonAncestor from "./utils/lowest-common-ancestor";
 
@@ -230,13 +229,6 @@ export const isolatedDeclarationsPlugin = (
 
             // eslint-disable-next-line prefer-const
             for await (let [filename, { ext, map, source }] of Object.entries(outputFiles)) {
-                if (cjsInterop && outputOptions.format === "cjs") {
-                    const patched = patchCjsDefaultExport(source);
-
-                    if (patched !== undefined) {
-                        source = patched.code;
-                    }
-                }
 
                 const quote = source.includes("from '") ? "'" : "\"";
                 const originalFileName = filename + ext;

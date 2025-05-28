@@ -45,6 +45,7 @@ import { removeShebangPlugin, shebangPlugin } from "./plugins/shebang";
 import { sourcemapsPlugin } from "./plugins/source-maps";
 import type { SucrasePluginConfig } from "./plugins/sucrase/types";
 import type { SwcPluginConfig } from "./plugins/swc/types";
+import { fixDtsDefaultCjsExportsPlugin } from "./plugins/typescript/fix-dts-default-cjs-exports";
 import { patchTypescriptTypes as patchTypescriptTypesPlugin } from "./plugins/typescript/patch-typescript-types";
 import { resolveTsconfigPathsPlugin } from "./plugins/typescript/resolve-tsconfig-paths-plugin";
 import resolveTsconfigRootDirectoriesPlugin from "./plugins/typescript/resolve-tsconfig-root-dirs";
@@ -478,19 +479,23 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             ...normalPlugins,
 
-            context.options.declaration
+            ...context.options.declaration
             && context.options.rollup.isolatedDeclarations
             && context.options.isolatedDeclarationTransformer
-            && isolatedDeclarationsPlugin(
-                join(context.options.rootDir, context.options.sourceDir),
-                context.options.isolatedDeclarationTransformer,
-                context.options.declaration,
-                Boolean(context.options.rollup.cjsInterop),
-                context.logger,
-                context.options.rollup.isolatedDeclarations,
-                context.options.sourcemap,
-                context.tsconfig,
-            ),
+                ? [
+                    isolatedDeclarationsPlugin(
+                        join(context.options.rootDir, context.options.sourceDir),
+                        context.options.isolatedDeclarationTransformer,
+                        context.options.declaration,
+                        Boolean(context.options.rollup.cjsInterop),
+                        context.logger,
+                        context.options.rollup.isolatedDeclarations,
+                        context.options.sourcemap,
+                        context.tsconfig,
+                    ),
+                    fixDtsDefaultCjsExportsPlugin(),
+                ]
+                : [],
 
             context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
 
@@ -517,7 +522,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             && cjsInteropPlugin({
                 ...context.options.rollup.cjsInterop,
                 logger: context.logger,
-                type: context.pkg.type ?? "commonjs",
             }),
 
             context.options.rollup.dynamicVars && fixDynamicImportExtension(),
@@ -731,12 +735,13 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
 
             await memoizeDtsPluginByKey(uniqueProcessId)(context),
 
+            fixDtsDefaultCjsExportsPlugin(),
+
             context.options.cjsInterop
             && context.options.emitCJS
             && cjsInteropPlugin({
                 ...context.options.rollup.cjsInterop,
                 logger: context.logger,
-                type: context.pkg.type ?? "commonjs",
             }),
 
             context.options.rollup.patchTypes && cachingPlugin(patchTypescriptTypesPlugin(context.options.rollup.patchTypes, context.logger), fileCache),

@@ -2,8 +2,6 @@ import type { Pail } from "@visulima/pail";
 import MagicString from "magic-string";
 import type { NormalizedOutputOptions, Plugin, RenderedChunk, SourceMapInput } from "rollup";
 
-import patchCjsDefaultExport from "./typescript/utils/patch-cjs-default-export";
-
 export interface CJSInteropOptions {
     addDefaultProperty?: boolean;
 }
@@ -11,10 +9,8 @@ export interface CJSInteropOptions {
 export const cjsInteropPlugin = ({
     addDefaultProperty = false,
     logger,
-    type,
 }: CJSInteropOptions & {
     logger: Pail;
-    type: "commonjs" | "module";
 }): Plugin => {
     return {
         name: "packem:cjs-interop",
@@ -64,21 +60,6 @@ export const cjsInteropPlugin = ({
                     code: newCode,
                     map: transformed.generateMap({ hires: true }),
                 };
-            }
-
-            /**
-             * JavaScript syntax      Type declaration syntax
-             * module.exports = x     export = x
-             * exports.default = x;   exports.__esModule = true	export default x
-             * export default x       export default x
-             * @see https://github.com/arethetypeswrong/arethetypeswrong.github.io/blob/main/docs/problems/FalseExportDefault.md
-             */
-            if (options.format === "es" && /\.d\.(?:ts|cts)$/.test(chunk.fileName)) {
-                if (type !== "commonjs" && chunk.fileName.endsWith(".d.mts")) {
-                    return undefined;
-                }
-
-                return patchCjsDefaultExport(code);
             }
 
             return undefined;
