@@ -1,3 +1,34 @@
+## @visulima/packem [1.19.2](https://github.com/visulima/packem/compare/@visulima/packem@1.19.1...@visulima/packem@1.19.2) (2025-05-28)
+
+### Bug Fixes
+
+* added a new test file for the fixDynamicImportExtension plugin to ensure correct functionality. ([ef9e2da](https://github.com/visulima/packem/commit/ef9e2da28a96d035041604d8b959e2f01a811430))
+* fixed dynamic imports ([1fc3676](https://github.com/visulima/packem/commit/1fc3676039da0d116419e3babd3abd7a687fcf53))
+* **packem:** update rollup to v4.41 ([d5ddfe1](https://github.com/visulima/packem/commit/d5ddfe1a4bb464e5b7de618fd32a1b038c63f4b2))
+* **svg-encoder:** implement SVG encoding utility and update URL plugin ([407bc3e](https://github.com/visulima/packem/commit/407bc3e8f03d1f26c7e9ef1e6f6bd25eda38b3d7))
+* **tests:** enhance assertions in fixDynamicImportExtension test ([1d122ac](https://github.com/visulima/packem/commit/1d122acd288d752ab3f7ca9c4508cb6c43ba3fce))
+* **tests:** improve integration tests for file URL resolution and TypeScript error handling ([cb19cc3](https://github.com/visulima/packem/commit/cb19cc344acdbe6132b716c0290a625b9ad322c6))
+* **tests:** update SVG data URIs to Base64 format in snapshots ([11a84c0](https://github.com/visulima/packem/commit/11a84c002fd07cc5976b2a2ad917900db194bad8))
+* update dependencies and improve compatibility ([1c3b34a](https://github.com/visulima/packem/commit/1c3b34ab8d1aa3d6eff631cba468daefaf9df312))
+
+### Styles
+
+* cs fixes ([b67ff06](https://github.com/visulima/packem/commit/b67ff065b1d4012333ed860afe7c628e413f9e29))
+* cs fixes ([d604e41](https://github.com/visulima/packem/commit/d604e413d5c8da285e8a0ddb82924483bf35cfbc))
+
+### Miscellaneous Chores
+
+* upgraded eslint to v9, removed prettier ([#147](https://github.com/visulima/packem/issues/147)) ([6b5b991](https://github.com/visulima/packem/commit/6b5b991589797b861eee370550bae73e8471cbf2))
+
+### Code Refactoring
+
+* **tests:** improve test assertions and add svg encoder utility ([0123f5c](https://github.com/visulima/packem/commit/0123f5c20b42e4aed2434fe7d32001f20d113e07))
+* **tests:** rename execPackemSync to execPackem in test files ([ed33237](https://github.com/visulima/packem/commit/ed3323722d3141e11c4c4594ebb00a78e08c7ee0))
+
+### Continuous Integration
+
+* update configuration and test setup ([#146](https://github.com/visulima/packem/issues/146)) ([2c07594](https://github.com/visulima/packem/commit/2c07594b70b2a2db992d31c895b5a32feaccb0fa))
+
 ## @visulima/packem [1.19.1](https://github.com/visulima/packem/compare/@visulima/packem@1.19.0...@visulima/packem@1.19.1) (2025-03-05)
 
 ### Bug Fixes
