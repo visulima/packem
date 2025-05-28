@@ -43,13 +43,14 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
             {
                 name: "optimize-deps",
                 async setup(build) {
-                    build.onResolve({ filter: /.*/ }, async (arguments_: OnResolveArgs): Promise<OnResolveResult | undefined | undefined> => {
+                    build.onResolve({ filter: /.*/ }, async (arguments_: OnResolveArgs): Promise<OnResolveResult | null | undefined> => {
                         if (options.exclude?.includes(arguments_.path)) {
                             return {
                                 external: true,
                             };
                         }
 
+                        // eslint-disable-next-line no-underscore-dangle
                         if (arguments_.pluginData?.__resolving_dep_path__) {
                             return undefined; // use default resolve algorithm
                         }

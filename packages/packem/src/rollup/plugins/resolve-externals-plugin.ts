@@ -13,7 +13,7 @@ import { ENDING_REGEX } from "../../constants";
 import type { InternalBuildOptions } from "../../types";
 import resolveAliases from "../utils/resolve-aliases";
 
-type MaybeFalsy<T> = T | false | undefined | undefined;
+type MaybeFalsy<T> = T | false | null | undefined;
 
 const getRegExps = (data: MaybeFalsy<RegExp | string>[], type: "exclude" | "include", logger: Pail): RegExp[] =>
     // eslint-disable-next-line unicorn/no-array-reduce
@@ -294,9 +294,9 @@ export const resolveExternalsPlugin = (
                         id:
                             options.builtinsPrefix === "ignore"
                                 ? specifier
-                                : (options.builtinsPrefix === "add" || !isBuiltin(stripped)
+                                : options.builtinsPrefix === "add" || !isBuiltin(stripped)
                                   ? "node:" + stripped
-                                  : stripped),
+                                  : stripped,
                         moduleSideEffects: false,
                     };
                 }

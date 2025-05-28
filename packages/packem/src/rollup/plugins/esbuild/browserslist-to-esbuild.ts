@@ -28,7 +28,7 @@ const browserslistToEsbuild = (browserList: string[]): string[] => {
         // removes invalid versions that will break esbuild
         // eslint-disable-next-line no-secrets/no-secrets
         // https://github.com/evanw/esbuild/blob/35c0d65b9d4f29a26176404d2890d1b499634e9f/compat-table/src/caniuse.ts#L119-L122
-        .filter(([, version]) => /^\d+(\.\d+)*$/.test(version as string))
+        .filter(([, version]) => /^\d+(?:\.\d+)*$/.test(version as string))
         // only get the targets supported by esbuild
         .filter(([browserName]) => SUPPORTED_ESBUILD_TARGETS.has(browserName as string));
 

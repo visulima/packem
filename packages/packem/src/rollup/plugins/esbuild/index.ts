@@ -33,13 +33,13 @@ const esbuildTransformer = ({
     if (_loaders !== undefined) {
         // eslint-disable-next-line prefer-const
         for (let [key, value] of Object.entries(_loaders)) {
-            key = key.startsWith(".") ? key : `.${key}`;
+            const newKey = key.startsWith(".") ? key : `.${key}`;
 
             if (typeof value === "string") {
-                loaders[key] = value;
+                loaders[newKey] = value;
             } else if (!value) {
                 // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                delete loaders[key];
+                delete loaders[newKey];
             }
         }
     }
@@ -75,7 +75,7 @@ const esbuildTransformer = ({
                 cwd = context;
             }
 
-            return null;
+            return undefined;
         },
 
         renderChunk: getRenderChunk({
@@ -83,7 +83,7 @@ const esbuildTransformer = ({
             sourceMap,
         }),
 
-        async resolveId(id): Promise<string | null> {
+        async resolveId(id): Promise<string | undefined> {
             if (optimizeDepsResult?.optimized.has(id)) {
                 const m = optimizeDepsResult.optimized.get(id);
 
@@ -94,12 +94,12 @@ const esbuildTransformer = ({
                 }
             }
 
-            return null;
+            return undefined;
         },
 
         async transform(code, id) {
             if (!filter(id) || optimizeDepsResult?.optimized.has(id)) {
-                return null;
+                return undefined;
             }
 
             const extension = extname(id);
@@ -109,7 +109,7 @@ const esbuildTransformer = ({
             logger.debug("transforming %s with %s loader", id, loader);
 
             if (!loader) {
-                return null;
+                return undefined;
             }
 
             const result = await transform(code, {
@@ -126,11 +126,11 @@ const esbuildTransformer = ({
             if (result.code) {
                 return {
                     code: result.code,
-                    map: result.map || null,
+                    map: result.map || undefined,
                 };
             }
 
-            return null;
+            return undefined;
         },
     };
 };
