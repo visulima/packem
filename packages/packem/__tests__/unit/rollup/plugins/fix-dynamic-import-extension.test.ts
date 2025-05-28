@@ -78,17 +78,17 @@ describe(fixDynamicImportExtension, () => {
         });
 
         it("should not replace .ts in non-import contexts", () => {
-            expect.assertions(1);
+            expect.assertions(2);
 
             const code = "const a = 'some/path/to/a/file.ts'; const b = { path: \"another.ts\" };";
             const result = renderChunk(code, {}, { format: "es" });
 
             expect(result?.code).toBe("const a = 'some/path/to/a/file.ts'; const b = { path: \"another.ts\" };");
 
-            const code2 = "if ((input.endsWith(".ts") || input.endsWith(".cts") || input.endsWith(".mts")) && isAccessibleSync(input)) {";
-            const result2 = renderChunk(code, {}, { format: "es" });
+            const code2 = `if ((input.endsWith(".ts") || input.endsWith(".cts") || input.endsWith(".mts")) && isAccessibleSync(input)) {`;
+            const result2 = renderChunk(code2, {}, { format: "es" });
 
-            expect(result2?.code).toBe("if ((input.endsWith(".ts") || input.endsWith(".cts") || input.endsWith(".mts")) && isAccessibleSync(input)) {");
+            expect(result2?.code).toBe(code2);
         });
     });
 });
