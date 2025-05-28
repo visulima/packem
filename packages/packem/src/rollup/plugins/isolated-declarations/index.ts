@@ -32,27 +32,26 @@ const generateDtsMap = (mappings: string, source: string, dts: string): string =
         version: 3,
     });
 
+
+type OxcImport = {
+    source: StringLiteral;
+    suffix?: string;
+} & (ExportAllDeclaration | ExportNamedDeclaration | ImportDeclaration);
+
 export type IsolatedDeclarationsOptions = {
     exclude?: FilterPattern;
     ignoreErrors?: boolean;
     include?: FilterPattern;
 };
 
-type OxcImport = (ImportDeclaration | ExportAllDeclaration | ExportNamedDeclaration) & {
-    source: StringLiteral;
-    suffix?: string;
-};
-
 export const isolatedDeclarationsPlugin = (
     sourceDirectory: string,
     transformer: IsolatedDeclarationsTransformer,
     declaration: boolean | "compatible" | "node16" | undefined,
-    cjsInterop: boolean,
     logger: Pail,
     options: IsolatedDeclarationsOptions,
     sourceMap: boolean,
     tsconfig?: TsConfigResult,
-
 ): Plugin => {
     const filter = createFilter(options.include, options.exclude);
 
@@ -70,7 +69,7 @@ export const isolatedDeclarationsPlugin = (
         );
     }
 
-    // eslint-disable-next-line func-style
+    // eslint-disable-next-line func-style, sonarjs/cognitive-complexity
     async function transform(this: PluginContext, code: string, id: string): Promise<undefined> {
         if (!filter(id)) {
             return;
@@ -211,7 +210,6 @@ export const isolatedDeclarationsPlugin = (
 
         name: "packem:isolated-declarations",
 
-        // eslint-disable-next-line sonarjs/cognitive-complexity
         async renderStart(outputOptions: NormalizedOutputOptions, { input }: NormalizedInputOptions): Promise<void> {
             const inputBase = lowestCommonAncestor(...Array.isArray(input) ? input : Object.values(input));
 
@@ -229,7 +227,6 @@ export const isolatedDeclarationsPlugin = (
 
             // eslint-disable-next-line prefer-const
             for await (let [filename, { ext, map, source }] of Object.entries(outputFiles)) {
-
                 const quote = source.includes("from '") ? "'" : "\"";
                 const originalFileName = filename + ext;
 

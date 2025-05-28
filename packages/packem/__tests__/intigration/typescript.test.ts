@@ -1914,6 +1914,15 @@ export default test;
             expect(binProcess.exitCode).toBe(0);
             expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
 
+            const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+            expect(cjsContent).toBe(`'use strict';
+
+const a = 1;
+
+module.exports = a;
+`);
+
             const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
             expect(dCtsContent).toBe(`import { a } from "./utils/a.d.cts";

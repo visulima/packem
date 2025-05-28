@@ -2,6 +2,7 @@ import type { NormalizedOutputOptions, PluginContext, RenderedChunk } from "roll
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { fixDtsDefaultCjsExportsPlugin } from "../../../../../src/rollup/plugins/typescript/fix-dts-default-cjs-exports";
+import type { Plugin } from "rollup";
 
 const mockWarn = vi.fn();
 
@@ -33,14 +34,28 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             code: string,
             chunk: Partial<RenderedChunk>,
             options: NormalizedOutputOptions,
-            meta: any
+            meta: { chunks: Record<string, RenderedChunk> }
         ) => string | { code: string; map?: unknown } | null | undefined;
 
         beforeEach(() => {
-            const plugin = fixDtsDefaultCjsExportsPlugin();
+            const pluginInstance = fixDtsDefaultCjsExportsPlugin();
             const rollupContext = { warn: mockWarn } as unknown as PluginContext;
 
-            renderChunk = plugin.renderChunk.bind(rollupContext);
+            // We know our plugin defines renderChunk as a direct function.
+            // Cast to avoid issues with ObjectHook type from the general Plugin interface.
+            const directRenderChunk = pluginInstance.renderChunk as unknown as (
+                this: PluginContext,
+                code: string,
+                chunk: RenderedChunk,
+                options: NormalizedOutputOptions,
+                meta: { chunks: Record<string, RenderedChunk> }
+            ) => string | { code: string; map?: unknown } | null | undefined;
+
+            if (typeof directRenderChunk !== "function") {
+                throw new Error("fixDtsDefaultCjsExportsPlugin.renderChunk is not a function");
+            }
+            renderChunk = (code, chunk, options, meta) =>
+                directRenderChunk.call(rollupContext, code, chunk as RenderedChunk, options, meta);
         });
 
         afterEach(() => {
@@ -70,9 +85,9 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 type: "chunk",
             };
 
-            expect(renderChunk(code, chunkInfoJs, {} as NormalizedOutputOptions, {})).toBeUndefined();
-            expect(renderChunk(code, chunkInfoTs, {} as NormalizedOutputOptions, {})).toBeUndefined();
-            expect(renderChunk(code, chunkInfoOther, {} as NormalizedOutputOptions, {})).toBeUndefined();
+            expect(renderChunk(code, chunkInfoJs, {} as NormalizedOutputOptions, { chunks: {} })).toBeUndefined();
+            expect(renderChunk(code, chunkInfoTs, {} as NormalizedOutputOptions, { chunks: {} })).toBeUndefined();
+            expect(renderChunk(code, chunkInfoOther, {} as NormalizedOutputOptions, { chunks: {} })).toBeUndefined();
             expect(mockWarn).not.toHaveBeenCalled();
         });
 
@@ -86,7 +101,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: false,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
 
             expect(result).toBeUndefined();
             expect(mockWarn).not.toHaveBeenCalled();
@@ -102,7 +117,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
 
             expect(result).toBeUndefined();
             expect(mockWarn).not.toHaveBeenCalled();
@@ -119,7 +134,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
             const expectedCode = `declare class MyClass {\n    constructor();\n}\nexport = MyClass;`;
 
             expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expectedCode.trim().replaceAll("\r\n", "\n"));
@@ -137,7 +152,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
             const expectedCode = `// @ts-ignore\nMyClass;\nexport type { AnotherType };\ndeclare namespace MyClass {\n    export class MyClass { constructor(); }\n    import _default = MyClass;\n    export { _default as default };\n}\nexport = MyClass;`;
 
             expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expectedCode.trim().replaceAll("\r\n", "\n"));
@@ -155,7 +170,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
             const expectedCode = `import _default from 'some-module';\nexport = _default;`;
 
             expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expectedCode.trim().replaceAll("\r\n", "\n"));
@@ -173,7 +188,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
             const expectedCode = `import _default from 'some-module';\nexport = _default;`;
 
             expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expectedCode.trim().replaceAll("\r\n", "\n"));
@@ -191,7 +206,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
             const expectedCode = `import { originalName } from 'some-module';\nexport = originalName;`;
 
             expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expectedCode.trim().replaceAll("\r\n", "\n"));
@@ -209,7 +224,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
             const expectedCode = `import _default from 'some-module';\nexport = _default;`;
 
             expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expectedCode.trim().replaceAll("\r\n", "\n"));
@@ -227,7 +242,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
             const expectedCode = `import MyDefaultImport from 'some-module';\nexport = MyDefaultImport;`;
 
             expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expectedCode.trim().replaceAll("\r\n", "\n"));
@@ -245,7 +260,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
             const expectedCode = `import { NamedImport } from 'some-module';\nexport = NamedImport;`;
 
             expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expectedCode.trim().replaceAll("\r\n", "\n"));
@@ -263,7 +278,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
             const expectedCode = `// @ts-ignore\nMyClass;\nexport type { AnotherType };\nexport { anotherVar };\ndeclare namespace MyClass {\n    export class MyClass { constructor(); }\n    export const anotherVar: number;\n    import _default = MyClass;\n    export { _default as default };\n}\nexport = MyClass;`;
 
             expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expectedCode.trim().replaceAll("\r\n", "\n"));
@@ -281,7 +296,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
             const expectedCode = `import _default from 'some-module';\n// @ts-ignore\nexport = _default;\nexport { namedExport } from 'some-module'`;
 
             expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expectedCode.trim().replaceAll("\r\n", "\n"));
@@ -298,10 +313,10 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
 
             expect(mockWarn).toHaveBeenCalledWith(
-                `Cannot parse default export name from some-module import at test.d.ts!.`,
+                `Cannot parse default export name from some-module import at test.d.ts!. The module might not have a default export, or it's aliased as 'default'.`,
             );
             expect(result).toBeUndefined();
         });
@@ -317,10 +332,11 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
 
-            // Should include a namespace and type exports
-            expect(getCode(result)).toBe("export type { Foo, Bar }");
+            // The plugin should identify this as a pure type export case and return just the type exports.
+            // It internally calls createCjsNamespace which should return the preamble directly.
+            expect(getCode(result)?.trim()).toBe("export type { Foo, Bar };");
         });
 
         it("should return undefined if matcher returns false (not a .d.ts file)", () => {
@@ -335,8 +351,18 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 type: "chunk",
             };
             const plugin = fixDtsDefaultCjsExportsPlugin();
-            const result = plugin.renderChunk?.(code, chunkInfo as any);
+            const mockContext = { warn: vi.fn() } as unknown as PluginContext;
+            let result;
 
+            if (typeof plugin.renderChunk === "function") {
+                result = plugin.renderChunk.call(
+                    mockContext,
+                    code,
+                    chunkInfo as RenderedChunk,
+                    {} as NormalizedOutputOptions,
+                    { chunks: {} } as any,
+                );
+            }
             expect(result).toBeUndefined();
         });
 
@@ -352,8 +378,18 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 type: "chunk",
             };
             const plugin = fixDtsDefaultCjsExportsPlugin();
-            const result = plugin.renderChunk?.(code, chunkInfo as any);
+            const mockContext = { warn: vi.fn() } as unknown as PluginContext;
+            let result;
 
+            if (typeof plugin.renderChunk === "function") {
+                result = plugin.renderChunk.call(
+                    mockContext,
+                    code,
+                    chunkInfo as RenderedChunk,
+                    {} as NormalizedOutputOptions,
+                    { chunks: {} } as any,
+                );
+            }
             expect(result).toBeUndefined();
         });
 
@@ -368,11 +404,32 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 isEntry: true,
                 type: "chunk",
             };
-            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, {});
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
             const output = getCode(result);
 
             expect(output).toContain("export { test2 }");
             expect(output).toContain("export = test");
+        });
+
+        it("should transform 'import { a } from \"utils/a\"; export default a;'", () => {
+            expect.assertions(2);
+
+            const code = `import { a } from "utils/a";\nexport default a;`;
+            const chunkInfo: Partial<RenderedChunk> = {
+                exports: ["default"],
+                fileName: "test.d.ts",
+                imports: ["utils/a"],
+                isEntry: true,
+                type: "chunk",
+            };
+            const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
+            // Based on how `import { NamedImport } from 'some-module'; export { NamedImport as default };` is handled,
+            // this should become `import { a } from "utils/a"; export = a;`
+            // The original `export default a` is equivalent to `export { a as default }` in this context.
+            const expectedCode = `import { a } from "utils/a";\nexport = a;`;
+
+            expect(getCode(result)?.trim().replaceAll("\r\n", "\n")).toBe(expectedCode.trim().replaceAll("\r\n", "\n"));
+            expect(mockWarn).not.toHaveBeenCalled();
         });
     });
 });
