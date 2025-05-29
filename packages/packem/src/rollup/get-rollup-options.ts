@@ -479,23 +479,18 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             ...normalPlugins,
 
-            ...context.options.declaration
+            context.options.declaration
             && context.options.rollup.isolatedDeclarations
-            && context.options.isolatedDeclarationTransformer
-                ? [
-                    isolatedDeclarationsPlugin(
-                        join(context.options.rootDir, context.options.sourceDir),
-                        context.options.isolatedDeclarationTransformer,
-                        context.options.declaration,
-                        Boolean(context.options.rollup.cjsInterop),
-                        context.logger,
-                        context.options.rollup.isolatedDeclarations,
-                        context.options.sourcemap,
-                        context.tsconfig,
-                    ),
-                    fixDtsDefaultCjsExportsPlugin(),
-                ]
-                : [],
+            && context.options.isolatedDeclarationTransformer && isolatedDeclarationsPlugin(
+                join(context.options.rootDir, context.options.sourceDir),
+                context.options.isolatedDeclarationTransformer,
+                context.options.declaration,
+                Boolean(context.options.rollup.cjsInterop),
+                context.logger,
+                context.options.rollup.isolatedDeclarations,
+                context.options.sourcemap,
+                context.tsconfig,
+            ),
 
             context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
 
