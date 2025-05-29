@@ -17,8 +17,8 @@ import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginCon
 
 import { ENDING_REGEX } from "../../../constants";
 import type { IsolatedDeclarationsTransformer } from "../../../types";
-import { fixDefaultCJSExports } from "../typescript/fix-dts-default-cjs-exports";
 import extendString from "./utils/extend-string";
+import fixDtsDefaultCJSExports from "./utils/fix-dts-default-cjs-exports";
 import lowestCommonAncestor from "./utils/lowest-common-ancestor";
 
 const appendMapUrl = (map: string, filename: string) => `${map}\n//# sourceMappingURL=${basename(filename)}.map\n`;
@@ -212,6 +212,7 @@ export const isolatedDeclarationsPlugin = (
 
         name: "packem:isolated-declarations",
 
+        // eslint-disable-next-line sonarjs/cognitive-complexity
         async renderStart(outputOptions: NormalizedOutputOptions, { input }: NormalizedInputOptions): Promise<void> {
             const inputBase = lowestCommonAncestor(...Array.isArray(input) ? input : Object.values(input));
 
@@ -230,7 +231,7 @@ export const isolatedDeclarationsPlugin = (
             // eslint-disable-next-line prefer-const
             for await (let [filename, { ext, map, source }] of Object.entries(outputFiles)) {
                 if (cjsInterop && outputOptions.format === "cjs") {
-                    const fixedSource = fixDefaultCJSExports(source, { fileName: filename, imports: [] }, { warn: this.warn });
+                    const fixedSource = fixDtsDefaultCJSExports(source, { fileName: filename, imports: [] }, { warn: this.warn });
 
                     if (fixedSource) {
                         // eslint-disable-next-line sonarjs/updated-loop-counter
@@ -283,6 +284,7 @@ export const isolatedDeclarationsPlugin = (
                 const emitName = entryFileName.replace("[name]", toNamespacedPath(filename).replace(`${sourceDirectory}/`, ""));
 
                 if (sourceMap && map) {
+                    // eslint-disable-next-line sonarjs/updated-loop-counter
                     source = appendMapUrl(source.trim(), emitName);
 
                     this.emitFile({

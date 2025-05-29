@@ -1,7 +1,7 @@
 import type { NormalizedOutputOptions, PluginContext, RenderedChunk } from "rollup";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { fixDtsDefaultCjsExportsPlugin } from "../../../../../src/rollup/plugins/typescript/fix-dts-default-cjs-exports";
+import { fixDtsDefaultCjsExportsPlugin } from "../../../../src/rollup/plugins/fix-dts-default-cjs-exports-plugin";
 
 const mockWarn = vi.fn();
 
@@ -17,6 +17,7 @@ const getCode = (result: string | { code: string } | null | undefined): string |
     return undefined;
 };
 
+// TODO: Refactor this test to use the new fixDtsDefaultCJSExports function, when work starts on packem v2
 describe(fixDtsDefaultCjsExportsPlugin, () => {
     it("should return a plugin object", () => {
         expect.assertions(3);
