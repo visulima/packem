@@ -261,7 +261,12 @@
             }
         },
         "./files": {
-            "types": "./files.d.ts"
+            "import": {
+                "types": "./files.d.ts"
+            },
+            "require": {
+                "types": "./files.d.ts"
+            }
         },
         "./package.json": "./package.json"
     },
