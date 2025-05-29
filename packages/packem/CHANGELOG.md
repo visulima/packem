@@ -1,3 +1,9 @@
+## @visulima/packem [1.19.3](https://github.com/visulima/packem/compare/@visulima/packem@1.19.2...@visulima/packem@1.19.3) (2025-05-29)
+
+### Bug Fixes
+
+* improved the .cts exports ([#148](https://github.com/visulima/packem/issues/148)) ([26bdb75](https://github.com/visulima/packem/commit/26bdb756bda95ed5ef0b0735e699dc876666e696))
+
 ## @visulima/packem [1.19.2](https://github.com/visulima/packem/compare/@visulima/packem@1.19.1...@visulima/packem@1.19.2) (2025-05-28)
 
 ### Bug Fixes
