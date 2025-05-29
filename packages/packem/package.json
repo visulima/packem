@@ -484,7 +484,7 @@
         "vitest": "^3.1.4"
     },
     "peerDependencies": {
-        "@swc/core": ">=1.5.7",
+        "@swc/core": ">=1.11.29",
         "cssnano": ">=7.0.6",
         "esbuild": ">=0.20.2",
         "icss-utils": ">=5.1.0",
