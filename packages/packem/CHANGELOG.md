@@ -1,3 +1,9 @@
+## @visulima/packem [1.19.4](https://github.com/visulima/packem/compare/@visulima/packem@1.19.3...@visulima/packem@1.19.4) (2025-05-29)
+
+### Bug Fixes
+
+* **deps:** update dependency @swc/core to >=1.11.29 ([#149](https://github.com/visulima/packem/issues/149)) ([1b399bb](https://github.com/visulima/packem/commit/1b399bb24148cd5808cc9547f29dfcdb3c3d48b3))
+
 ## @visulima/packem [1.19.3](https://github.com/visulima/packem/compare/@visulima/packem@1.19.2...@visulima/packem@1.19.3) (2025-05-29)
 
 ### Bug Fixes
