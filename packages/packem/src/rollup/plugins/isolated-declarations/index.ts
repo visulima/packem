@@ -167,7 +167,7 @@ export const isolatedDeclarationsPlugin = (
                 return (
                     !!node.specifiers
                     && node.specifiers.every(
-                        (spec) =>
+                        (spec: { importKind: string; type: string }) =>
                             spec.type === "ImportSpecifier" && spec.importKind === "type",
                     )
                 );
@@ -176,7 +176,7 @@ export const isolatedDeclarationsPlugin = (
             return (
                 node.type === "ExportNamedDeclaration"
                 && node.specifiers
-                && node.specifiers.every((spec) => spec.exportKind === "type")
+                && node.specifiers.every((spec: { exportKind: string; type: string }) => spec.exportKind === "type")
             );
         });
 
@@ -233,8 +233,8 @@ export const isolatedDeclarationsPlugin = (
                     const fixedSource = fixDefaultCJSExports(source, { fileName: filename, imports: [] }, { warn: this.warn });
 
                     if (fixedSource) {
+                        // eslint-disable-next-line sonarjs/updated-loop-counter
                         source = fixedSource.code;
-                        map = fixedSource.map;
                     }
                 }
 

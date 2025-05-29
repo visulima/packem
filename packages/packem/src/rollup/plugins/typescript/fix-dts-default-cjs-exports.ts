@@ -388,9 +388,6 @@ const createCjsNamespace = (
 const handleDefaultCJSExportAsDefault = (
     code: string,
     parsedExportsInfo: ParsedExports,
-    originalStaticImports: ParsedStaticImport[],
-    info: CodeInfo,
-    options: Options,
     defaultImport?: ParsedStaticImport,
 ): string | undefined => {
     const { defaultExport, exports: exportList } = parsedExportsInfo;
@@ -663,11 +660,11 @@ export const fixDefaultCJSExports = (
             // Case 1: export { default, namedExport, ... } from 'some-module';
             if (defaultAlias === "default" && defaultExport.specifier && exportList.length > 0) {
                 // This input type should also go through the full handling to preserve other imports etc.
-                resultString = handleDefaultCJSExportAsDefault(code, parsedExports, allStaticImports, info, options, defaultImport);
+                resultString = handleDefaultCJSExportAsDefault(code, parsedExports, defaultImport);
             } else if (defaultAlias === "default" && defaultExport.specifier && exportList.length === 0 && defaultExportNodeExports && /\bas\s+default\b/.test(defaultExportNodeExports)) {
                 // Case 2: export { default as default } from 'some-module'; (Warning case)
                 if (parsedImports.find((imp) => imp.specifier === defaultExport.specifier)?.defaultImport) {
-                    resultString = handleDefaultCJSExportAsDefault(code, parsedExports, allStaticImports, info, options, defaultImport);
+                    resultString = handleDefaultCJSExportAsDefault(code, parsedExports, defaultImport);
                 } else {
                     options.warn?.(
                         `Cannot parse default export name from ${defaultExport.specifier} import at ${info.fileName}!. The module might not have a default export, or it's aliased as 'default'.`,
@@ -676,7 +673,7 @@ export const fixDefaultCJSExports = (
                 }
             } else if (defaultAlias === "default" && defaultExport.specifier && exportList.length === 0) {
                 // Case 3: export { default } from 'some-module'; (No other named exports, not aliased to default from itself)
-                resultString = handleDefaultCJSExportAsDefault(code, parsedExports, allStaticImports, info, options, defaultImport);
+                resultString = handleDefaultCJSExportAsDefault(code, parsedExports, defaultImport);
             } else if (defaultExport.specifier && defaultAlias !== "default") {
                 // Case 4: export { someName as default } from 'some-module';
                 resultString = handleDefaultNamedCJSExport(code, info, parsedExports, allStaticImports, options, defaultImport);
