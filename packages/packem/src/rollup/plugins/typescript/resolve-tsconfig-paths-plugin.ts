@@ -1,3 +1,5 @@
+/* eslint-disable no-secrets/no-secrets */
+
 /**
  * This webpack resolver is largely based on TypeScript's "paths" handling
  * The TypeScript license can be found here:

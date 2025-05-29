@@ -60,7 +60,7 @@ export { A as default };
         expect(dTsContentEs2018).toBe(`declare class A {
 }
 
-export { A as default };
+export = A;
 `);
 
         const mtsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);

@@ -19,9 +19,9 @@ export type SassLoaderContext = {
     rootContext: string;
 };
 
-export type SassLoaderOptions = {
+export type SassLoaderOptions = (Omit<NodeSassSyncOptions, "data" | "sourceMapContents" | "sourceMapEmbed" | "sourceMapRoot" | "outFile"> | Omit<SassEmbeddedStringOptions<"sync">, "charset" | "indentedSyntax"> | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">) & {
     additionalData:
         string | ((content: string | Buffer, loaderContext: SassLoaderContext) => Promise<string>) | ((content: string | Buffer, loaderContext: SassLoaderContext) => string);
     implementation?: "node-sass" | "sass-embedded" | "sass";
     warnRuleAsWarning?: boolean;
-} & (Omit<NodeSassSyncOptions, "data" | "sourceMapContents" | "sourceMapEmbed" | "sourceMapRoot" | "outFile"> | Omit<SassEmbeddedStringOptions<"sync">, "charset" | "indentedSyntax"> | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">);
+};

@@ -242,7 +242,7 @@ module.exports = test;
 
         expect(dCtsContent).toBe(`declare const test = "this should be in final bundle";
 
-export { test as default };
+export = test;
 `);
 
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
@@ -256,7 +256,7 @@ export { test as default };
 
         expect(dContent).toBe(`declare const test = "this should be in final bundle";
 
-export { test as default };
+export = test;
 `);
     });
 
@@ -304,7 +304,7 @@ module.exports = test;
 
         expect(dCtsContent).toBe(`declare const test = "this should be in final bundle";
 
-export { test as default };
+export = test;
 `);
 
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.d.mts`);
@@ -318,7 +318,7 @@ export { test as default };
 
         expect(dContent).toBe(`declare const test = "this should be in final bundle";
 
-export { test as default };
+export = test;
 `);
     });
 

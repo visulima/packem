@@ -567,7 +567,7 @@ export { _default as default };
 
         expect(dTsContent).toBe(`declare const _default: () => string;
 
-export { _default as default };
+export = _default;
 `);
 
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
@@ -619,7 +619,7 @@ export { _default as default };
 
         expect(dTsContent).toBe(`declare const _default: () => string;
 
-export { _default as default };
+export = _default;
 `);
 
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
@@ -754,7 +754,7 @@ export { _default as default };
 
 declare const _default: dep_a.data;
 
-export { _default as default };
+export = _default;
 `);
     });
 
@@ -1281,10 +1281,12 @@ export type Num2 = number`,
 
                 await installPackage(temporaryDirectoryPath, "typescript");
 
+                // eslint-disable-next-line vitest/no-conditional-in-test
                 if (isolatedDeclarationTransformer === "oxc") {
                     await installPackage(temporaryDirectoryPath, "oxc-transform");
                 }
 
+                // eslint-disable-next-line vitest/no-conditional-in-test
                 if (isolatedDeclarationTransformer === "swc") {
                     await installPackage(temporaryDirectoryPath, "@swc/core");
                 }
@@ -1365,10 +1367,12 @@ export const test = "test";`,
 
                 await installPackage(temporaryDirectoryPath, "typescript");
 
+                // eslint-disable-next-line vitest/no-conditional-in-test
                 if (isolatedDeclarationTransformer === "oxc") {
                     await installPackage(temporaryDirectoryPath, "oxc-transform");
                 }
 
+                // eslint-disable-next-line vitest/no-conditional-in-test
                 if (isolatedDeclarationTransformer === "swc") {
                     await installPackage(temporaryDirectoryPath, "@swc/core");
                 }
@@ -1471,10 +1475,12 @@ export type Num2 = number`,
 
                 await installPackage(temporaryDirectoryPath, "typescript");
 
+                // eslint-disable-next-line vitest/no-conditional-in-test
                 if (isolatedDeclarationTransformer === "oxc") {
                     await installPackage(temporaryDirectoryPath, "oxc-transform");
                 }
 
+                // eslint-disable-next-line vitest/no-conditional-in-test
                 if (isolatedDeclarationTransformer === "swc") {
                     await installPackage(temporaryDirectoryPath, "@swc/core");
                 }
@@ -1524,8 +1530,10 @@ export declare let num: Num;
 
                 const dCtsMapContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts.map`);
 
+                // eslint-disable-next-line default-case
                 switch (isolatedDeclarationTransformer) {
                     case "oxc": {
+                        // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsMapContent).toBe(
                             `{"file":"index.d.cts","mappings":"AAAA,cAAc,WAAW,SAAS;AAClC,YAAY;AAEZ,OAAO,iBAAS,MAAMA,GAAG,MAAM;AAI/B,OAAO,YAAIC,KAAK","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
@@ -1533,6 +1541,7 @@ export declare let num: Num;
                         break;
                     }
                     case "swc": {
+                        // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsMapContent).toBe(
                             `{"file":"index.d.cts","mappings":"AAGA,OAAO,SAASA,MAAMC,CAAM;IAC1B,OAAO,UAAUA;AACnB;AAEA,OAAO,IAAIC,MAAW,EAAC","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
@@ -1540,6 +1549,7 @@ export declare let num: Num;
                         break;
                     }
                     case "typescript": {
+                        // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsMapContent).toBe(
                             `{"file":"index.d.cts","mappings":"AAAA,OAAO,EAAE,KAAK,GAAG,EAAE,MAAM,SAAS,CAAA;AAClC,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA;AAExB,wBAAgB,KAAK,CAAC,CAAC,EAAE,GAAG,GAAG,GAAG,CAEjC;AAED,eAAO,IAAI,GAAG,EAAE,GAAO,CAAA","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
@@ -1563,6 +1573,7 @@ export declare let num: Num;
                 // eslint-disable-next-line default-case
                 switch (isolatedDeclarationTransformer) {
                     case "oxc": {
+                        // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dtsMapContent).toBe(
                             `{"file":"index.d.ts","mappings":"AAAA,cAAc,WAAW,SAAS;AAClC,YAAY;AAEZ,OAAO,iBAAS,MAAMA,GAAG,MAAM;AAI/B,OAAO,YAAIC,KAAK","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
@@ -1570,6 +1581,7 @@ export declare let num: Num;
                         break;
                     }
                     case "swc": {
+                        // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dtsMapContent).toBe(
                             `{"file":"index.d.ts","mappings":"AAGA,OAAO,SAASA,MAAMC,CAAM;IAC1B,OAAO,UAAUA;AACnB;AAEA,OAAO,IAAIC,MAAW,EAAC","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
@@ -1577,6 +1589,7 @@ export declare let num: Num;
                         break;
                     }
                     case "typescript": {
+                        // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dtsMapContent).toBe(
                             `{"file":"index.d.ts","mappings":"AAAA,OAAO,EAAE,KAAK,GAAG,EAAE,MAAM,SAAS,CAAA;AAClC,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA;AAExB,wBAAgB,KAAK,CAAC,CAAC,EAAE,GAAG,GAAG,GAAG,CAEjC;AAED,eAAO,IAAI,GAAG,EAAE,GAAO,CAAA","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
@@ -1597,6 +1610,7 @@ export declare let num: Num;
                 // eslint-disable-next-line default-case
                 switch (isolatedDeclarationTransformer) {
                     case "oxc": {
+                        // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsTypesMapContent).toBe(
                             `{"file":"types.d.cts","mappings":"AACA,YAAY","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
                         );
@@ -1604,6 +1618,7 @@ export declare let num: Num;
                         break;
                     }
                     case "swc": {
+                        // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsTypesMapContent).toBe(
                             `{"file":"types.d.cts","mappings":"AACA,WAAwB","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
                         );
@@ -1611,6 +1626,7 @@ export declare let num: Num;
                         break;
                     }
                     case "typescript": {
+                        // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsTypesMapContent).toBe(
                             `{"file":"types.d.cts","mappings":"AACA,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
                         );
@@ -1631,6 +1647,7 @@ export declare let num: Num;
                 // eslint-disable-next-line default-case
                 switch (isolatedDeclarationTransformer) {
                     case "oxc": {
+                        // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dtsTypesMapContent).toBe(
                             `{"file":"types.d.ts","mappings":"AACA,YAAY","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
                         );
@@ -1638,6 +1655,7 @@ export declare let num: Num;
                         break;
                     }
                     case "swc": {
+                        // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dtsTypesMapContent).toBe(
                             `{"file":"types.d.ts","mappings":"AACA,WAAwB","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
                         );
@@ -1645,6 +1663,7 @@ export declare let num: Num;
                         break;
                     }
                     case "typescript": {
+                        // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dtsTypesMapContent).toBe(
                             `{"file":"types.d.ts","mappings":"AACA,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
                         );
@@ -1687,10 +1706,12 @@ export type Num2 = number`,
 
                 await installPackage(temporaryDirectoryPath, "typescript");
 
+                // eslint-disable-next-line vitest/no-conditional-in-test
                 if (isolatedDeclarationTransformer === "oxc") {
                     await installPackage(temporaryDirectoryPath, "oxc-transform");
                 }
 
+                // eslint-disable-next-line vitest/no-conditional-in-test
                 if (isolatedDeclarationTransformer === "swc") {
                     await installPackage(temporaryDirectoryPath, "@swc/core");
                 }
@@ -1742,105 +1763,20 @@ export declare let num: Num;
             },
         );
 
-        it.each(["typescript", "oxc", "swc"])(
-            "should patch cjs default export with '%s' isolated declarations transformer",
-            async (isolatedDeclarationTransformer) => {
-                expect.assertions(6);
-
-                await writeFile(
-                    `${temporaryDirectoryPath}/src/index.ts`,
-                    `const test = () => {
-    return "this should be in final bundle, test function";
-};
-
-export default test;
-`,
-                );
-
-                await installPackage(temporaryDirectoryPath, "typescript");
-
-                if (isolatedDeclarationTransformer === "oxc") {
-                    await installPackage(temporaryDirectoryPath, "oxc-transform");
-                }
-
-                if (isolatedDeclarationTransformer === "swc") {
-                    await installPackage(temporaryDirectoryPath, "@swc/core");
-                }
-
-                await createPackageJson(temporaryDirectoryPath, {
-                    devDependencies: {
-                        typescript: "*",
-                    },
-                    exports: {
-                        ".": {
-                            import: {
-                                default: "./dist/index.mjs",
-                                types: "./dist/index.d.mts",
-                            },
-                            require: {
-                                default: "./dist/index.cjs",
-                                types: "./dist/index.d.cts",
-                            },
-                        },
-                    },
-                });
-                await createPackemConfig(temporaryDirectoryPath, {
-                    config: {
-                        cjsInterop: true,
-                    },
-                    isolatedDeclarationTransformer: isolatedDeclarationTransformer as "oxc" | "swc" | "typescript" | undefined,
-                    transformer: "esbuild",
-                });
-                await createTsConfig(temporaryDirectoryPath, {
-                    compilerOptions: {
-                        isolatedDeclarations: true,
-                        noErrorTruncation: true,
-                    },
-                });
-
-                const binProcess = await execPackem("build", [], {
-                    cwd: temporaryDirectoryPath,
-                    reject: false,
-                });
-
-                expect(binProcess.stderr).toBe("");
-                expect(binProcess.exitCode).toBe(0);
-                expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
-
-                const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
-
-                expect(dCtsContent).toBe(`declare const test: () => string;
-
-
-export = test;`);
-
-                const dtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
-
-                expect(dtsContent).toBe(`declare const test: () => string;
-
-
-export = test;`);
-
-                const dCtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
-
-                expect(dCtsTypesContent).toBe(`declare const test: () => string;
-export default test;
-`);
-            },
-        );
-
         it.each(["typescript", "oxc", "swc"])("should resolve aliases with '%s' isolated declarations transformer", async (isolatedDeclarationTransformer) => {
-            expect.assertions(9);
+            expect.assertions(10);
 
             await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { a } from \"utils/a\";\nexport default a;");
             await writeFile(`${temporaryDirectoryPath}/src/utils/a.ts`, "export const a: number = 1;");
 
             await installPackage(temporaryDirectoryPath, "typescript");
 
+            // eslint-disable-next-line vitest/no-conditional-in-test
             if (isolatedDeclarationTransformer === "oxc") {
                 await installPackage(temporaryDirectoryPath, "oxc-transform");
             }
 
+            // eslint-disable-next-line vitest/no-conditional-in-test
             if (isolatedDeclarationTransformer === "swc") {
                 await installPackage(temporaryDirectoryPath, "@swc/core");
             }
@@ -1889,20 +1825,27 @@ export default test;
             expect(binProcess.exitCode).toBe(0);
             expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
 
+            const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+            expect(cjsContent).toBe(`'use strict';
+
+const a = 1;
+
+module.exports = a;
+`);
+
             const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
             expect(dCtsContent).toBe(`import { a } from "./utils/a.d.cts";
-
-
-export = a;`);
+export = a;
+`);
             expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/utils/a.d.cts`)).toBe(true);
 
             const dtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
             expect(dtsContent).toBe(`import { a } from "./utils/a.d.ts";
-
-
-export = a;`);
+export = a;
+`);
             expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/utils/a.d.ts`)).toBe(true);
 
             const dCtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
@@ -2023,21 +1966,29 @@ module.exports.test2 = test2;
 
         const cDtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(cDtsContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle, test2 string";
-
-export {  test2 };
-
+        expect(cDtsContent).toBe(`// @ts-ignore
+test;
+export { test2 };
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle, test2 string";
+    import _default = test;
+    export { _default as default };
+}
 export = test;
 `);
 
         const dtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dtsContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle, test2 string";
-
-export {  test2 };
-
+        expect(dtsContent).toBe(`// @ts-ignore
+test;
+export { test2 };
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle, test2 string";
+    import _default = test;
+    export { _default as default };
+}
 export = test;
 `);
 
@@ -2115,21 +2066,29 @@ module.exports.test2 = test2;
 
         const cDtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(cDtsContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle, test2 string";
-
-export {  test2 };
-
+        expect(cDtsContent).toBe(`// @ts-ignore
+test;
+export { test2 };
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle, test2 string";
+    import _default = test;
+    export { _default as default };
+}
 export = test;
 `);
 
         const dtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dtsContent).toBe(`declare const test: () => string;
-declare const test2 = "this should be in final bundle, test2 string";
-
-export {  test2 };
-
+        expect(dtsContent).toBe(`// @ts-ignore
+test;
+export { test2 };
+declare namespace test {
+    export const test: () => string;
+    export const test2 = "this should be in final bundle, test2 string";
+    import _default = test;
+    export { _default as default };
+}
 export = test;
 `);
 
@@ -2288,6 +2247,7 @@ export { test as default };
 }`);
         });
 
+        // eslint-disable-next-line no-secrets/no-secrets
         it("should generate a node10 typesVersions field in package.json when rollup.node10Compatibility.writeToPackageJson is true", async () => {
             expect.assertions(5);
 

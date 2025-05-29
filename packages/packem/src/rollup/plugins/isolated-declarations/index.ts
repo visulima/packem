@@ -17,8 +17,8 @@ import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginCon
 
 import { ENDING_REGEX } from "../../../constants";
 import type { IsolatedDeclarationsTransformer } from "../../../types";
-import patchCjsDefaultExport from "../typescript/utils/patch-cjs-default-export";
 import extendString from "./utils/extend-string";
+import fixDtsDefaultCJSExports from "./utils/fix-dts-default-cjs-exports";
 import lowestCommonAncestor from "./utils/lowest-common-ancestor";
 
 const appendMapUrl = (map: string, filename: string) => `${map}\n//# sourceMappingURL=${basename(filename)}.map\n`;
@@ -33,15 +33,15 @@ const generateDtsMap = (mappings: string, source: string, dts: string): string =
         version: 3,
     });
 
+type OxcImport = (ExportAllDeclaration | ExportNamedDeclaration | ImportDeclaration) & {
+    source: StringLiteral;
+    suffix?: string;
+};
+
 export type IsolatedDeclarationsOptions = {
     exclude?: FilterPattern;
     ignoreErrors?: boolean;
     include?: FilterPattern;
-};
-
-type OxcImport = (ImportDeclaration | ExportAllDeclaration | ExportNamedDeclaration) & {
-    source: StringLiteral;
-    suffix?: string;
 };
 
 export const isolatedDeclarationsPlugin = (
@@ -53,7 +53,6 @@ export const isolatedDeclarationsPlugin = (
     options: IsolatedDeclarationsOptions,
     sourceMap: boolean,
     tsconfig?: TsConfigResult,
-
 ): Plugin => {
     const filter = createFilter(options.include, options.exclude);
 
@@ -71,7 +70,7 @@ export const isolatedDeclarationsPlugin = (
         );
     }
 
-    // eslint-disable-next-line func-style
+    // eslint-disable-next-line func-style, sonarjs/cognitive-complexity
     async function transform(this: PluginContext, code: string, id: string): Promise<undefined> {
         if (!filter(id)) {
             return;
@@ -132,7 +131,6 @@ export const isolatedDeclarationsPlugin = (
         }
 
         // @ts-expect-error - the ts transformer is getting 4 arguments
-
         const { errors, map, sourceText } = await transformer(id, code, sourceMap, tsconfig?.config?.compilerOptions);
 
         if (errors.length > 0) {
@@ -152,32 +150,34 @@ export const isolatedDeclarationsPlugin = (
             return;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const typeImports = program.body.filter((node: any) => {
-            if (node.type === "ImportDeclaration") {
-                if (node.importKind === "type") {
-                    return true;
-                }
-
-                return node.specifiers?.every(
-                    (specifier: { importKind: string; type: string }) => specifier.type === "ImportSpecifier" && specifier.importKind === "type",
-                );
+        const typeImports = program.body.filter((node): node is OxcImport => {
+            if (!("source" in node) || !node.source) {
+                return false;
             }
 
-            if (node.type === "ExportNamedDeclaration" || node.type === "ExportAllDeclaration") {
-                if (node.exportKind === "type") {
-                    return true;
-                }
+            if ("importKind" in node && node.importKind === "type") {
+                return true;
+            }
 
+            if ("exportKind" in node && node.exportKind === "type") {
+                return true;
+            }
+
+            if (node.type === "ImportDeclaration") {
                 return (
-                    node.type === "ExportNamedDeclaration"
-                    && node.specifiers?.every(
-                        (specifier: { exportKind: string; type: string }) => specifier.type === "ExportSpecifier" && specifier.exportKind === "type",
+                    !!node.specifiers
+                    && node.specifiers.every(
+                        (spec: { importKind: string; type: string }) =>
+                            spec.type === "ImportSpecifier" && spec.importKind === "type",
                     )
                 );
             }
 
-            return false;
+            return (
+                node.type === "ExportNamedDeclaration"
+                && node.specifiers
+                && node.specifiers.every((spec: { exportKind: string; type: string }) => spec.exportKind === "type")
+            );
         });
 
         for await (const typeImport of typeImports) {
@@ -231,10 +231,11 @@ export const isolatedDeclarationsPlugin = (
             // eslint-disable-next-line prefer-const
             for await (let [filename, { ext, map, source }] of Object.entries(outputFiles)) {
                 if (cjsInterop && outputOptions.format === "cjs") {
-                    const patched = patchCjsDefaultExport(source);
+                    const fixedSource = fixDtsDefaultCJSExports(source, { fileName: filename, imports: [] }, { warn: this.warn });
 
-                    if (patched !== undefined) {
-                        source = patched.code;
+                    if (fixedSource) {
+                        // eslint-disable-next-line sonarjs/updated-loop-counter
+                        source = fixedSource.code;
                     }
                 }
 
@@ -283,6 +284,7 @@ export const isolatedDeclarationsPlugin = (
                 const emitName = entryFileName.replace("[name]", toNamespacedPath(filename).replace(`${sourceDirectory}/`, ""));
 
                 if (sourceMap && map) {
+                    // eslint-disable-next-line sonarjs/updated-loop-counter
                     source = appendMapUrl(source.trim(), emitName);
 
                     this.emitFile({

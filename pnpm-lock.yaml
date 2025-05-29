@@ -873,8 +873,8 @@ importers:
         version: 0.2.14
     devDependencies:
       '@anolilab/eslint-config':
-        specifier: ^16.2.3
-        version: 16.2.3(@babel/core@7.27.3)(@types/node@22.15.23)(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3)(vitest@3.1.4)(yaml@2.8.0)
+        specifier: ^16.2.4
+        version: 16.2.4(@babel/core@7.27.3)(@types/node@22.15.23)(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3)(vitest@3.1.4)(yaml@2.8.0)
       '@anolilab/semantic-release-pnpm':
         specifier: ^1.1.11
         version: 1.1.11(@types/node@22.15.23)(yaml@2.8.0)
@@ -1164,8 +1164,8 @@ packages:
     peerDependencies:
       '@commitlint/cli': ^17.6.5 || ^18.x || ^19.x
 
-  '@anolilab/eslint-config@16.2.3':
-    resolution: {integrity: sha512-xd3V0ss3wgWUEPNtL8R/mLiquB4qswZuz6dkmwGC8FTRvffyvQWFdJ3hTsC44TjoaQYJsFfnSqBsk4AkRF62/A==}
+  '@anolilab/eslint-config@16.2.4':
+    resolution: {integrity: sha512-itXVsyBVdlRYkeZkmV00xd33skWNwPP2z+VSOLM0jgUzZFxtCePNoSu8NObT8xWAYTQQF2omdE8W1L/htxZB1g==}
     engines: {node: '>=20.18.* <=24.*'}
     peerDependencies:
       '@babel/core': ^7.22.20
@@ -10691,7 +10691,7 @@ snapshots:
       - '@types/node'
       - typescript
 
-  '@anolilab/eslint-config@16.2.3(@babel/core@7.27.3)(@types/node@22.15.23)(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3)(vitest@3.1.4)(yaml@2.8.0)':
+  '@anolilab/eslint-config@16.2.4(@babel/core@7.27.3)(@types/node@22.15.23)(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3)(vitest@3.1.4)(yaml@2.8.0)':
     dependencies:
       '@babel/core': 7.27.3
       '@eslint-community/eslint-plugin-eslint-comments': 4.5.0(eslint@9.27.0(jiti@2.4.2))

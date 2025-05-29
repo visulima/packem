@@ -27,6 +27,7 @@ import cssModulesTypesPlugin from "./plugins/css-modules-types";
 import browserslistToEsbuild from "./plugins/esbuild/browserslist-to-esbuild";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
 import { esmShimCjsSyntaxPlugin } from "./plugins/esm-shim-cjs-syntax";
+import { fixDtsDefaultCjsExportsPlugin } from "./plugins/fix-dts-default-cjs-exports-plugin";
 import fixDynamicImportExtension from "./plugins/fix-dynamic-import-extension";
 import { isolatedDeclarationsPlugin } from "./plugins/isolated-declarations";
 import JSONPlugin from "./plugins/json";
@@ -480,8 +481,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
 
             context.options.declaration
             && context.options.rollup.isolatedDeclarations
-            && context.options.isolatedDeclarationTransformer
-            && isolatedDeclarationsPlugin(
+            && context.options.isolatedDeclarationTransformer && isolatedDeclarationsPlugin(
                 join(context.options.rootDir, context.options.sourceDir),
                 context.options.isolatedDeclarationTransformer,
                 context.options.declaration,
@@ -517,7 +517,6 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             && cjsInteropPlugin({
                 ...context.options.rollup.cjsInterop,
                 logger: context.logger,
-                type: context.pkg.type ?? "commonjs",
             }),
 
             context.options.rollup.dynamicVars && fixDynamicImportExtension(),
@@ -731,12 +730,13 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
 
             await memoizeDtsPluginByKey(uniqueProcessId)(context),
 
+            fixDtsDefaultCjsExportsPlugin(),
+
             context.options.cjsInterop
             && context.options.emitCJS
             && cjsInteropPlugin({
                 ...context.options.rollup.cjsInterop,
                 logger: context.logger,
-                type: context.pkg.type ?? "commonjs",
             }),
 
             context.options.rollup.patchTypes && cachingPlugin(patchTypescriptTypesPlugin(context.options.rollup.patchTypes, context.logger), fileCache),
