@@ -52,7 +52,7 @@
         "@anolilab/lint-staged-config": "^3.0.6",
         "@anolilab/multi-semantic-release": "^1.1.11",
         "@anolilab/textlint-config": "^9.0.0",
-        "@babel/core": "^7.27.3",
+        "@babel/core": "^7.27.4",
         "@commitlint/cli": "^19.8.1",
         "@commitlint/config-conventional": "^19.8.1",
         "@secretlint/secretlint-rule-preset-recommend": "^9.3.3",
