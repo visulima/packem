@@ -362,7 +362,7 @@
     },
     "dependencies": {
         "@antfu/install-pkg": "1.1.0",
-        "@babel/parser": "7.27.3",
+        "@babel/parser": "7.27.5",
         "@clack/prompts": "0.11.0",
         "@csstools/css-parser-algorithms": "3.0.5",
         "@csstools/css-tokenizer": "3.0.4",
@@ -413,7 +413,7 @@
         "@anolilab/semantic-release-pnpm": "^1.1.11",
         "@anolilab/semantic-release-preset": "^10.0.5",
         "@arethetypeswrong/cli": "^0.18.1",
-        "@babel/core": "^7.27.3",
+        "@babel/core": "^7.27.4",
         "@oxc-project/types": "0.72.1",
         "@secretlint/secretlint-rule-preset-recommend": "^9.3.3",
         "@svgr/core": "^8.1.0",
