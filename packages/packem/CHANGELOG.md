@@ -1,3 +1,10 @@
+## @visulima/packem [1.19.5](https://github.com/visulima/packem/compare/@visulima/packem@1.19.4...@visulima/packem@1.19.5) (2025-06-20)
+
+### Bug Fixes
+
+* **deps:** downgrade oxc-parser to 0.72.1 and update related dependencies ([e88d3dc](https://github.com/visulima/packem/commit/e88d3dcc35ee25c926b04857671fa04e32ddb073))
+* update dependencies and improve scripts ([2ff10ed](https://github.com/visulima/packem/commit/2ff10ed1b69601dc5772d454f818dee1cb2eb275))
+
 ## @visulima/packem [1.19.4](https://github.com/visulima/packem/compare/@visulima/packem@1.19.3...@visulima/packem@1.19.4) (2025-05-29)
 
 ### Bug Fixes
