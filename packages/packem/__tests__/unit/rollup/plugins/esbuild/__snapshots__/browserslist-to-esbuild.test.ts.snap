@@ -1,0 +1,42 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`browserslist-to-esbuild > should no support android 4 1`] = `
+[
+  "chrome137",
+]
+`;
+
+exports[`browserslist-to-esbuild > should work with android and ios 1`] = `
+[
+  "chrome137",
+  "ios11",
+]
+`;
+
+exports[`browserslist-to-esbuild > should work with ios 1`] = `
+[
+  "ios9",
+]
+`;
+
+exports[`browserslist-to-esbuild > works by passing browsers as array 1`] = `
+[
+  "chrome109",
+  "edge135",
+  "firefox138",
+  "ios11",
+  "safari17.6",
+]
+`;
+
+exports[`browserslist-to-esbuild > works by passing browsers as string 1`] = `
+[
+  "chrome136",
+  "edge136",
+  "firefox138",
+  "ie10",
+  "ios18.4",
+  "opera116",
+  "safari18.4",
+]
+`;
