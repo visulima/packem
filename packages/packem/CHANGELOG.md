@@ -1,3 +1,9 @@
+## @visulima/packem [1.20.0](https://github.com/visulima/packem/compare/@visulima/packem@1.19.5...@visulima/packem@1.20.0) (2025-06-20)
+
+### Features
+
+* adding outputExtensionMap to overwrite output extensions ([#155](https://github.com/visulima/packem/issues/155)) ([1486eb6](https://github.com/visulima/packem/commit/1486eb632513697dd3f314cb8ec3e7814d6f35e9))
+
 ## @visulima/packem [1.19.5](https://github.com/visulima/packem/compare/@visulima/packem@1.19.4...@visulima/packem@1.19.5) (2025-06-20)
 
 ### Bug Fixes
