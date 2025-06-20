@@ -5,6 +5,8 @@ import warn from "../../utils/warn";
 const validatePackageFields = (context: BuildContext): void => {
     const validation = context.options.validation as ValidationOptions;
     const { pkg } = context;
+    const cjsJSExtension = context.options.outputExtensionMap?.cjs ?? "cjs";
+    const esmJSExtension = context.options.outputExtensionMap?.esm ?? "mjs";
 
     if (pkg.name === undefined && validation.packageJson?.name !== false) {
         warn(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
@@ -32,8 +34,8 @@ const validatePackageFields = (context: BuildContext): void => {
                 warn(context, "The 'main' field is missing in your package.json. This field should point to your main entry file.");
             }
 
-            if (pkg.main?.includes(".mjs")) {
-                warn(context, "The 'main' field in your package.json should not use a '.mjs' extension for CommonJS modules.");
+            if (pkg.main?.endsWith(`.${esmJSExtension}`)) {
+                warn(context, `The 'main' field in your package.json should not use a '.${esmJSExtension}' extension for CommonJS modules.`);
             }
         }
 
@@ -49,8 +51,8 @@ const validatePackageFields = (context: BuildContext): void => {
                 );
             }
 
-            if (context.options.emitESM && pkg.module?.includes(".cjs")) {
-                warn(context, "The 'module' field in your package.json should not use a '.cjs' extension for ES modules.");
+            if (context.options.emitESM && pkg.module?.endsWith(`.${cjsJSExtension}`)) {
+                warn(context, `The 'module' field in your package.json should not use a '.${cjsJSExtension}' extension for ES modules.`);
             }
         }
     } else if (isEsm) {
@@ -68,8 +70,8 @@ const validatePackageFields = (context: BuildContext): void => {
                     warn(context, "The 'module' field is missing in your package.json. This field is necessary when emitting ES modules.");
                 }
 
-                if (pkg.module?.includes(".cjs")) {
-                    warn(context, "The 'module' field should not use a '.cjs' extension for ES modules.");
+                if (pkg.module?.endsWith(`.${cjsJSExtension}`)) {
+                    warn(context, `The 'module' field should not use a '.${cjsJSExtension}' extension for ES modules.`);
                 }
 
                 if (pkg.module && pkg.main && pkg.module === pkg.main) {
@@ -91,17 +93,19 @@ const validatePackageFields = (context: BuildContext): void => {
     }
 
     if (validation.packageJson?.bin !== false) {
-        if (typeof pkg.bin === "string" && pkg.bin.includes(isCjs ? ".mjs" : ".cjs")) {
+        const forbiddenExtension = isCjs ? esmJSExtension : cjsJSExtension;
+
+        if (typeof pkg.bin === "string" && pkg.bin.endsWith(`.${forbiddenExtension}`)) {
             warn(
                 context,
-                `The 'bin' field in your package.json should not use a ${isCjs ? ".mjs" : ".cjs"} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
+                `The 'bin' field in your package.json should not use a .${forbiddenExtension} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
             );
         } else if (typeof pkg.bin === "object") {
             for (const [bin, binPath] of Object.entries(pkg.bin)) {
-                if (binPath && (binPath as string).includes(isCjs ? ".mjs" : ".cjs")) {
+                if (binPath && (binPath as string).endsWith(`.${forbiddenExtension}`)) {
                     warn(
                         context,
-                        `The 'bin.${bin}' field in your package.json should not use a ${isCjs ? ".mjs" : ".cjs"} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
+                        `The 'bin.${bin}' field in your package.json should not use a .${forbiddenExtension} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
                     );
                 }
             }
@@ -112,7 +116,7 @@ const validatePackageFields = (context: BuildContext): void => {
         let showWarning = true;
 
         if (pkg.type === "module") {
-            showWarning = Boolean(pkg.main?.endsWith(".cjs"));
+            showWarning = Boolean(pkg.main?.endsWith(`.${cjsJSExtension}`));
         }
 
         if (pkg.types === undefined && pkg.typings === undefined && showWarning && validation.packageJson?.types !== false) {

@@ -1,7 +1,8 @@
 import { createConfig } from "@anolilab/eslint-config";
 
 export default createConfig({
-    ignores: ["**/__fixtures__"],
+    css: false,
+    ignores: ["dist", "node_modules", "coverage", "__fixtures__", "__docs__", "examples", "vitest.config.ts", "packem.config.ts", ".secretlintrc.cjs", "tsconfig.eslint.json", "README.md"],
     jsx: false,
     react: false,
     // Enable this after the lint errors are fixed.

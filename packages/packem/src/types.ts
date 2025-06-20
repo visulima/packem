@@ -232,13 +232,7 @@ export interface BuildOptions {
     onSuccess?: string | (() => Promise<(() => Promise<void> | void) | undefined | void>);
     onSuccessTimeout?: number;
     outDir: string;
-    outputExtensionMap?: Record<
-        Format,
-        {
-            dts?: string;
-            js?: string;
-        }
-    >;
+    outputExtensionMap?: Record<Format, string>;
     rollup: RollupBuildOptions;
     rootDir: string;
     runtime?: "browser" | "node";
@@ -250,8 +244,6 @@ export interface BuildOptions {
 }
 
 export type BuildPreset = BuildConfig | (() => BuildConfig);
-
-export type Environment = "development" | "production" | undefined;
 
 export type InferEntriesResult = {
     entries: BuildEntry[];

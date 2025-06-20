@@ -1865,4 +1865,68 @@ console.log("module-require-import", resolved$1);
 console.log("require-module-import", resolved);
 `);
     });
+
+    it("should generate proper assets with custom extensions from outputExtensionMap", async () => {
+        expect.assertions(7);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = 'index';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                outputExtensionMap: {
+                    cjs: "c.js",
+                    esm: "m.js",
+                },
+            },
+        });
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: {
+                        default: "./dist/index.m.js",
+                        types: "./dist/index.d.mts",
+                    },
+                    require: {
+                        default: "./dist/index.c.js",
+                        types: "./dist/index.d.cts",
+                    },
+                },
+            },
+            main: "./dist/index.c.js",
+            module: "./dist/index.m.js",
+            types: "./dist/index.d.ts",
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const files = readdirSync(join(temporaryDirectoryPath, "dist"));
+
+        expect(files).toHaveLength(5);
+
+        assertContainFiles(join(temporaryDirectoryPath, "dist"), ["index.c.js", "index.m.js", "index.d.cts", "index.d.mts", "index.d.ts"]);
+
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.c.js`);
+
+        expect(cjsContent).toMatchSnapshot("cjs output");
+
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.m.js`);
+
+        expect(mjsContent).toMatchSnapshot("mjs output");
+
+        const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dtsContent).toMatchSnapshot("dts output");
+    });
 });

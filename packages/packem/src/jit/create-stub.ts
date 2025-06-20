@@ -94,7 +94,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
             const typePath = `${resolvedEntryWithoutExtension}.d.mts`;
 
             writeFileSync(
-                `${output}.mjs`,
+                `${output}.${context.options.outputExtensionMap?.esm ?? "mjs"}`,
                 shebang
                 + [
                     `import { createJiti } from "${jitiESMPath}";`,
@@ -134,7 +134,7 @@ const createStub = async (context: BuildContext): Promise<void> => {
             const typePath = `${resolvedEntryWithoutExtension}.d.cts`;
 
             writeFileSync(
-                `${output}.cjs`,
+                `${output}.${context.options.outputExtensionMap?.cjs ?? "cjs"}`,
                 shebang
                 + [
                     `const { createJiti } = require("${jitiCJSPath}");`,
@@ -160,9 +160,9 @@ const createStub = async (context: BuildContext): Promise<void> => {
 
         if (shebang) {
             // eslint-disable-next-line no-await-in-loop
-            await makeExecutable(`${output}.cjs`);
+            await makeExecutable(`${output}.${context.options.outputExtensionMap?.cjs ?? "cjs"}`);
             // eslint-disable-next-line no-await-in-loop
-            await makeExecutable(`${output}.mjs`);
+            await makeExecutable(`${output}.${context.options.outputExtensionMap?.esm ?? "mjs"}`);
         }
     }
 
