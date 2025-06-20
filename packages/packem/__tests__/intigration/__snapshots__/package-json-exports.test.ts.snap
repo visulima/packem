@@ -45,6 +45,31 @@ exports.cli = cli;
 "
 `;
 
+exports[`packem package.json exports > should generate proper assets with custom extensions from outputExtensionMap > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const value = "index";
+
+exports.value = value;
+"
+`;
+
+exports[`packem package.json exports > should generate proper assets with custom extensions from outputExtensionMap > dts output 1`] = `
+"declare const value = "index";
+
+export { value };
+"
+`;
+
+exports[`packem package.json exports > should generate proper assets with custom extensions from outputExtensionMap > mjs output 1`] = `
+"const value = "index";
+
+export { value };
+"
+`;
+
 exports[`packem package.json exports > should generate proper assets with js based on the package.json exports default > cjs output 1`] = `
 "'use strict';
 

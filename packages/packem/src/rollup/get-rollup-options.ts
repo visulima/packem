@@ -337,10 +337,10 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "cjs"),
+                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, context.options.outputExtensionMap?.cjs ?? "cjs"),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "cjs"),
+                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, context.options.outputExtensionMap?.cjs ?? "cjs"),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 // turn off live bindings support (exports.* getters for re-exports)
@@ -371,10 +371,10 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "mjs"),
+                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, context.options.outputExtensionMap?.esm ?? "mjs"),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, "mjs"),
+                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, context.options.outputExtensionMap?.esm ?? "mjs"),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 // turn off live bindings support (exports.* getters for re-exports)

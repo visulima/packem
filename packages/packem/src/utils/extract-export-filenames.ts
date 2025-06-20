@@ -1,7 +1,7 @@
 import type { PackageJson } from "@visulima/package";
 
 import { RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "../constants";
-import type { BuildOptions } from "../types";
+import type { BuildOptions, Format } from "../types";
 import { inferExportType, inferExportTypeFromFileName } from "./infer-export-type";
 
 // This Set contains keys representing various JavaScript runtime environments and module systems.
@@ -32,7 +32,7 @@ export type OutputDescriptor = {
     isExecutable?: true;
     key: "bin" | "exports" | "main" | "module" | "types";
     subKey?: typeof runtimeExportConventions | (NonNullable<unknown> & string);
-    type?: "cjs" | "esm";
+    type?: Format;
 };
 
 export const extractExportFilenames = (

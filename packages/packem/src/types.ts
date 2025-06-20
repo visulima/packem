@@ -71,6 +71,10 @@ interface RollupDynamicImportVariablesOptions {
     warnOnError?: boolean;
 }
 
+export type Format = "cjs" | "esm";
+
+export type Environment = "production" | "development" | undefined;
+
 /**
  * In addition to basic `entries`, `presets`, and `hooks`,
  * there are also all the properties of `BuildOptions` except for BuildOption's `entries`.
@@ -228,6 +232,7 @@ export interface BuildOptions {
     onSuccess?: string | (() => Promise<(() => Promise<void> | void) | undefined | void>);
     onSuccessTimeout?: number;
     outDir: string;
+    outputExtensionMap?: Record<Format, string>;
     rollup: RollupBuildOptions;
     rootDir: string;
     runtime?: "browser" | "node";
@@ -239,8 +244,6 @@ export interface BuildOptions {
 }
 
 export type BuildPreset = BuildConfig | (() => BuildConfig);
-
-export type Environment = "development" | "production" | undefined;
 
 export type InferEntriesResult = {
     entries: BuildEntry[];

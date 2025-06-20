@@ -113,6 +113,9 @@ const inferEntries = (
 ): InferEntriesResult => {
     const warnings: string[] = [];
 
+    const cjsJSExtension = (context.options.outputExtensionMap?.cjs ?? "cjs").replaceAll(".", String.raw`\.`);
+    const esmJSExtension = (context.options.outputExtensionMap?.esm ?? "mjs").replaceAll(".", String.raw`\.`);
+
     // Sort files so least-nested files are first
     sourceFiles.sort((a, b) => a.split("/").length - b.split("/").length);
 
@@ -191,9 +194,13 @@ const inferEntries = (
             context.options.emitESM = true;
         }
 
-        // Supported output file extensions are `.d.ts`, `.cjs` and `.mjs`
+        // Supported output file extensions are `.d.ts`, `.d.cts`, `.d.mts`, `.js`, `.cjs` and `.mjs`
         // But we support any file extension here in case user has extended rollup options
-        const outputSlug = output.file.replace(/(?:\*[^/\\]|\.d\.[mc]?ts|\.\w+)$/, "");
+        const outputSlug = output.file.replace(new RegExp(String.raw`(?:\*[^/\\]|\.d\.[mc]?ts|\.\w+|${[
+            `\\.${cjsJSExtension}`,
+            `\\.${esmJSExtension}`,
+        ].join("|")})$`), "");
+
         const isDirectory = outputSlug.endsWith("/");
 
         // Skip top level directory
@@ -204,7 +211,12 @@ const inferEntries = (
         const sourceSlug = outputSlug.replace(new RegExp(`(./)?${context.options.outDir}`), context.options.sourceDir).replace("./", "");
 
         const beforeSourceRegex = "(?<=/|$)";
-        const fileExtensionRegex = isDirectory ? "" : String.raw`(\.d\.[cm]?ts|(\.[cm]?[tj]sx?))$`;
+        const fileExtensionRegex = isDirectory
+            ? ""
+            : String.raw`(\.d\.[cm]?ts|(\.[cm]?[tj]sx?)|${[
+                `\\.${cjsJSExtension}`,
+                `\\.${esmJSExtension}`,
+            ].join("|")})$`;
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if (output.file.includes("/*") && output.key === "exports") {
@@ -217,7 +229,6 @@ const inferEntries = (
             const inputs: string[] = [];
 
             const SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace("*", "(.*)") + fileExtensionRegex);
-
             const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace(/(.*)\.[^.]*$/, "$1").replace("*", "(.*)") + fileExtensionRegex);
 
             for (const source of sourceFiles) {

@@ -583,6 +583,23 @@ const generateOptions = (
         validateAliasEntries(options.rollup.alias.entries);
     }
 
+    // Validate outputExtensionMap if it contains invalid extensions
+    if (options.outputExtensionMap) {
+        for (const [key, value] of Object.entries(options.outputExtensionMap)) {
+            if (!["cjs", "esm"].includes(key)) {
+                throw new Error(`Invalid output extension map: ${key} must be "cjs" or "esm"`);
+            }
+
+            if (typeof value !== "string") {
+                throw new TypeError(`Invalid output extension map: ${key} must be a string`);
+            }
+
+            if (value.startsWith(".")) {
+                throw new Error(`Invalid output extension map: ${key} must not start with a dot. Example: "cjs": "c.js", "esm": "m.js"`);
+            }
+        }
+    }
+
     return options;
 };
 

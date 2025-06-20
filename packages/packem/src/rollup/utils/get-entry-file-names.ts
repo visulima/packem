@@ -2,7 +2,7 @@ import type { PreRenderedAsset } from "rollup";
 
 const isWindows = process.platform === "win32";
 
-const getEntryFileNames = (chunkInfo: PreRenderedAsset, extension: "cjs" | "mjs"): string => {
+const getEntryFileNames = (chunkInfo: PreRenderedAsset, extension: string): string => {
     const pathSeparator = isWindows ? "\\" : "/";
 
     // @see https://github.com/rollup/rollup/pull/5686#issuecomment-2418464909 -> should be most of the time only one entry

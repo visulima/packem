@@ -132,14 +132,17 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
             }
 
             if (context.options.declaration) {
+                const cjsJSExtension = context.options.outputExtensionMap?.cjs ?? "cjs";
+                const esmJSExtension = context.options.outputExtensionMap?.esm ?? "mjs";
+
                 let dtsPath = entry.path.replace(/\.js$/, ".d.ts");
                 let type = "commonjs";
 
-                if (entry.path.endsWith(".cjs")) {
-                    dtsPath = entry.path.replace(/\.cjs$/, ".d.cts");
-                } else if (entry.path.endsWith(".mjs")) {
+                if (entry.path.endsWith(`.${cjsJSExtension}`)) {
+                    dtsPath = entry.path.replace(new RegExp(`\\.${cjsJSExtension}$`), ".d.cts");
+                } else if (entry.path.endsWith(`.${esmJSExtension}`)) {
                     type = "module";
-                    dtsPath = entry.path.replace(/\.mjs$/, ".d.mts");
+                    dtsPath = entry.path.replace(new RegExp(`\\.${esmJSExtension}$`), ".d.mts");
                 }
 
                 const foundDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
@@ -150,7 +153,7 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
                     let foundCompatibleDts: BuildContextBuildAssetAndChunk | BuildContextBuildEntry | undefined;
 
                     if (!dtsPath.includes(".d.ts")) {
-                        dtsPath = (dtsPath as string).replace(".d.c", ".d.");
+                        dtsPath = (dtsPath as string).replace(new RegExp(`\\.d.mts$`), `.d.cts`);
 
                         foundCompatibleDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
                     }
@@ -158,32 +161,33 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
                     if (foundCompatibleDts) {
                         foundDtsEntries.push(foundCompatibleDts.path);
 
-                        line
-                            += type === "commonjs"
-                                ? `\n  types:\n${
-                                    [foundDts, foundCompatibleDts]
-                                        .map(
-                                            (value: BuildContextBuildAssetAndChunk | BuildContextBuildEntry) =>
-                                                `${gray("  └─ ")
-                                                + bold(rPath(value.path))
-                                                } (total size: ${
-                                                    cyan(
-                                                        formatBytes(value.size?.bytes ?? 0, {
-                                                            decimals: 2,
-                                                        }),
-                                                    )
-                                                })`,
-                                        )
-                                        .join("\n")}`
-                                : `\n  types: ${
-                                    bold(rPath(foundDts.path))
-                                } (total size: ${
-                                    cyan(
-                                        formatBytes(foundDts.size?.bytes ?? 0, {
-                                            decimals: 2,
-                                        }),
+                        if (type === "commonjs") {
+                            line += `\n  types:\n${
+                                [foundDts, foundCompatibleDts]
+                                    .map(
+                                        (value: BuildContextBuildAssetAndChunk | BuildContextBuildEntry) =>
+                                            `${gray("  └─ ")
+                                            + bold(rPath(value.path))
+                                            } (total size: ${
+                                                cyan(
+                                                    formatBytes(value.size?.bytes ?? 0, {
+                                                        decimals: 2,
+                                                    }),
+                                                )
+                                            })`,
                                     )
-                                })`;
+                                    .join("\n")}`;
+                        } else {
+                            line += `\n  types: ${
+                                bold(rPath(foundDts.path))
+                            } (total size: ${
+                                cyan(
+                                    formatBytes(foundDts.size?.bytes ?? 0, {
+                                        decimals: 2,
+                                    }),
+                                )
+                            })`;
+                        }
                     }
                 }
             }
