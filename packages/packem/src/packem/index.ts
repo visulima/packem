@@ -593,6 +593,10 @@ const generateOptions = (
             if (typeof value !== "string") {
                 throw new TypeError(`Invalid output extension map: ${key} must be a string`);
             }
+
+            if (value.startsWith(".")) {
+                throw new Error(`Invalid output extension map: ${key} must not start with a dot. Example: "cjs": "c.js", "esm": "m.js"`);
+            }
         }
     }
 

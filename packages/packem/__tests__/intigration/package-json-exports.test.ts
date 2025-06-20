@@ -1929,4 +1929,102 @@ console.log("require-module-import", resolved);
 
         expect(dtsContent).toMatchSnapshot("dts output");
     });
+
+    it("should throw an error for invalid key in outputExtensionMap", async () => {
+        expect.assertions(2);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export default 'test'");
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: "./dist/index.cjs",
+        });
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                outputExtensionMap: {
+                    // @ts-expect-error - invalid key
+                    foo: "bar",
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.exitCode).toBe(1);
+        expect(binProcess.stderr).toContain('Invalid output extension map: foo must be "cjs" or "esm"');
+    });
+
+    it("should throw a TypeError for non-string value in outputExtensionMap", async () => {
+        expect.assertions(2);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export default 'test'");
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: "./dist/index.cjs",
+        });
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                outputExtensionMap: {
+                    // @ts-expect-error - invalid value type
+                    cjs: { js: "c.js" },
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.exitCode).toBe(1);
+        expect(binProcess.stderr).toContain("Invalid output extension map: cjs must be a string");
+    });
+
+    it("should throw an error for value starting with a dot in outputExtensionMap", async () => {
+        expect.assertions(2);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export default 'test'");
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: "./dist/index.cjs",
+        });
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                outputExtensionMap: {
+                    cjs: ".cjs",
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.exitCode).toBe(1);
+        expect(binProcess.stderr).toContain("Invalid output extension map: cjs must not start with a dot.");
+    });
 });
