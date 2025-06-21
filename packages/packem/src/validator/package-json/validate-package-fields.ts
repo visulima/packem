@@ -1,5 +1,226 @@
+import { VALID_EXPORT_EXTENSIONS } from "../../constants";
 import type { BuildContext, ValidationOptions } from "../../types";
 import warn from "../../utils/warn";
+
+/**
+ * Validates the exports field according to Node.js specification.
+ * @param context The build context containing validation options
+ * @param exports The exports field value to validate
+ * @see https://nodejs.org/api/packages.html#exports Node.js Package exports
+ * @see https://nodejs.org/api/packages.html#conditional-exports Conditional exports
+ * @see https://nodejs.org/api/packages.html#subpath-exports Subpath exports
+ * @see https://nodejs.org/api/packages.html#exports-sugar Exports sugar syntax
+ */
+const validateExports = (context: BuildContext, exports: unknown): void => {
+    const validation = context.options.validation as ValidationOptions;
+
+    if (validation.packageJson?.exports === false) {
+        return;
+    }
+
+    // Node.js standard conditions ordered by priority
+    // @see https://nodejs.org/api/packages.html#conditional-exports
+    // @see https://nodejs.org/api/packages.html#community-conditions-definitions
+    const STANDARD_CONDITIONS = new Set([
+        "default", // @see https://nodejs.org/api/packages.html#default
+        "import", // @see https://nodejs.org/api/packages.html#import
+        "module-sync", // @see https://nodejs.org/api/packages.html#module-sync
+        "node", // @see https://nodejs.org/api/packages.html#node
+        "node-addons", // @see https://nodejs.org/api/packages.html#node-addons
+        "require", // @see https://nodejs.org/api/packages.html#require
+    ]);
+
+    // Community conditions widely supported
+    // @see https://nodejs.org/api/packages.html#community-conditions-definitions
+    // @see https://webpack.js.org/guides/package-exports/
+    // @see https://esbuild.github.io/api/#conditions
+    const COMMUNITY_CONDITIONS = new Set([
+        "browser", // @see https://github.com/defunctzombie/package-browser-field-spec
+        "bun", // @see https://bun.sh/docs/bundler/vs-webpack#conditions
+        "deno", // @see https://deno.land/manual/node/package_json#conditional-exports
+        "development", // @see https://nodejs.org/api/packages.html#community-conditions-definitions
+        "edge-light", // @see https://vercel.com/docs/functions/edge-functions/edge-runtime#compatible-node.js-apis
+        "electron", // @see https://www.electronjs.org/docs/latest/tutorial/esm#conditional-exports
+        "production", // @see https://nodejs.org/api/packages.html#community-conditions-definitions
+        "react-native", // @see https://reactnative.dev/docs/metro#package-exports-support
+        "react-server", // @see https://github.com/reactjs/rfcs/blob/main/text/0227-server-module-conventions.md
+        "types", // @see https://www.typescriptlang.org/docs/handbook/esm-node.html#packagejson-exports-imports-and-self-referencing
+        "workerd", // @see https://developers.cloudflare.com/workers/runtime-apis/nodejs/
+    ]);
+
+    const ALL_CONDITIONS = new Set([...COMMUNITY_CONDITIONS, ...STANDARD_CONDITIONS]);
+
+    // eslint-disable-next-line sonarjs/cognitive-complexity
+    const validateExportsValue = (value: unknown, path: string): void => {
+        if (value === null) {
+            // null is allowed to block access to subpaths
+            return;
+        }
+
+        if (typeof value === "string") {
+            // Must be a relative path starting with "./"
+            if (!value.startsWith("./")) {
+                warn(context, `Invalid exports path "${value}" at ${path}. Export paths must start with "./"`);
+
+                return;
+            }
+
+            // Should not contain ".." to prevent directory traversal
+            if (value.includes("../")) {
+                warn(context, `Invalid exports path "${value}" at ${path}. Export paths should not contain "../" for security reasons`);
+
+                return;
+            }
+
+            // Check for valid file extensions
+            const hasValidExtension = VALID_EXPORT_EXTENSIONS.some((extension) => value.endsWith(extension));
+
+            if (!hasValidExtension) {
+                warn(context, `Export path "${value}" at ${path} should have a valid file extension (${VALID_EXPORT_EXTENSIONS.join(", ")})`);
+            }
+
+            return;
+        }
+
+        if (Array.isArray(value)) {
+            // Fallback arrays are supported but should contain valid values
+            if (value.length === 0) {
+                warn(context, `Empty fallback array at ${path}. Fallback arrays should contain at least one entry`);
+
+                return;
+            }
+
+            value.forEach((item, index) => {
+                validateExportsValue(item, `${path}[${index}]`);
+            });
+
+            return;
+        }
+
+        if (typeof value === "object" && value !== null) {
+            // Conditional exports object
+            const conditions = Object.keys(value);
+
+            if (conditions.length === 0) {
+                warn(context, `Empty conditions object at ${path}. Conditional exports should define at least one condition`);
+
+                return;
+            }
+
+            // Check for unknown conditions
+            const unknownConditions = conditions.filter((condition) => !ALL_CONDITIONS.has(condition));
+
+            if (unknownConditions.length > 0) {
+                warn(context, `Unknown export conditions [${unknownConditions.join(", ")}] at ${path}. Consider using standard conditions: ${[...STANDARD_CONDITIONS].join(", ")}`);
+            }
+
+            // Validate condition priority order
+            const standardConditionsPresent = conditions.filter((c) => STANDARD_CONDITIONS.has(c));
+
+            if (standardConditionsPresent.length > 1) {
+                const expectedOrder = ["node-addons", "node", "import", "require", "module-sync", "default"];
+                const actualOrder = standardConditionsPresent;
+                const correctOrder = expectedOrder.filter((c) => actualOrder.includes(c));
+
+                if (JSON.stringify(actualOrder) !== JSON.stringify(correctOrder)) {
+                    warn(context, `Incorrect condition order at ${path}. Standard conditions should be ordered: ${correctOrder.join(" > ")}`);
+                }
+            }
+
+            // Validate mutually exclusive conditions
+            if (conditions.includes("import") && conditions.includes("require")) {
+                // This is actually valid they are mutually exclusive by nature
+            }
+
+            if (conditions.includes("development") && conditions.includes("production")) {
+                warn(context, `Conflicting conditions "development" and "production" at ${path}. These conditions are mutually exclusive`);
+            }
+
+            // Recursively validate condition values
+            conditions.forEach((condition) => {
+                validateExportsValue(value[condition as keyof typeof value], `${path}.${condition}`);
+            });
+
+            return;
+        }
+
+        warn(context, `Invalid exports value type at ${path}. Expected string, array, object, or null`);
+    };
+
+    const validateExportsObject = (exportsObject: unknown): void => {
+        if (typeof exportsObject === "string") {
+            validateExportsValue(exportsObject, "exports");
+
+            return;
+        }
+
+        if (Array.isArray(exportsObject)) {
+            exportsObject.forEach((item, index) => {
+                validateExportsValue(item, `exports[${index}]`);
+            });
+
+            return;
+        }
+
+        if (typeof exportsObject === "object" && exportsObject !== null) {
+            const keys = Object.keys(exportsObject);
+
+            if (keys.length === 0) {
+                warn(context, "Empty exports object. Define at least one export entry");
+
+                return;
+            }
+
+            // Check if it's a subpaths object (keys start with ".") or conditions object
+            const subpathKeys = keys.filter((key) => key.startsWith("."));
+            const conditionKeys = keys.filter((key) => !key.startsWith("."));
+
+            if (subpathKeys.length > 0 && conditionKeys.length > 0) {
+                warn(context, "Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with \".\") or conditions, not both");
+
+                return;
+            }
+
+            if (subpathKeys.length > 0) {
+                // Subpaths exports
+                if (!keys.includes(".")) {
+                    warn(context, "Missing main export \".\". Subpaths exports should include a main export entry");
+                }
+
+                // Validate subpath patterns
+                keys.forEach((key) => {
+                    if (key.startsWith("./")) {
+                        // Valid subpath
+                    } else if (key === ".") {
+                        // Valid main export
+                    } else if (key.startsWith(".") && !key.startsWith("./")) {
+                        warn(context, `Invalid subpath "${key}". Subpaths should start with "./" or be exactly "."`);
+                    }
+
+                    // Check for wildcard patterns
+                    if (key.includes("*")) {
+                        const asteriskCount = (key.match(/\*/g) || []).length;
+
+                        if (asteriskCount > 1) {
+                            warn(context, `Invalid subpath pattern "${key}". Only one "*" wildcard is allowed per subpath`);
+                        }
+                    }
+
+                    validateExportsValue(exportsObject[key as keyof typeof exportsObject], `exports["${key}"]`);
+                });
+            } else {
+                // Conditions object at root level
+                validateExportsValue(exportsObject, "exports");
+            }
+
+            return;
+        }
+
+        warn(context, "Invalid exports field type. Expected string, array, or object");
+    };
+
+    validateExportsObject(exports);
+};
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const validatePackageFields = (context: BuildContext): void => {
@@ -88,8 +309,8 @@ const validatePackageFields = (context: BuildContext): void => {
         }
     }
 
-    if (typeof pkg.exports === "object") {
-        // @TODO: add validation for exports
+    if (pkg.exports !== undefined) {
+        validateExports(context, pkg.exports);
     }
 
     if (validation.packageJson?.bin !== false) {

@@ -1,3 +1,4 @@
+/* eslint-disable perfectionist/sort-objects */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { BuildContext } from "../../../../src/types";
@@ -28,7 +29,7 @@ describe(validatePackageFields, () => {
             pkg: {},
         };
 
-        validatePackageFields(context as BuildContext);
+        validatePackageFields(context as unknown as BuildContext);
 
         expect(warn).not.toHaveBeenCalledWith(context, "The 'files' field is missing in your package.json. Add the files to be included in the package.");
     });
@@ -41,7 +42,7 @@ describe(validatePackageFields, () => {
             pkg: { type: "commonjs" },
         };
 
-        validatePackageFields(context as BuildContext);
+        validatePackageFields(context as unknown as BuildContext);
 
         expect(warn).toHaveBeenCalledWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
     });
@@ -54,7 +55,7 @@ describe(validatePackageFields, () => {
             pkg: { type: "module" },
         };
 
-        validatePackageFields(context as BuildContext);
+        validatePackageFields(context as unknown as BuildContext);
 
         expect(warn).toHaveBeenCalledWith(context, "The 'exports' field is missing in your package.json. Define module exports explicitly.");
     });
@@ -71,7 +72,7 @@ describe(validatePackageFields, () => {
             },
         };
 
-        validatePackageFields(context as BuildContext);
+        validatePackageFields(context as unknown as BuildContext);
 
         expect(warn).toHaveBeenCalledWith(context, "The 'types' field is missing in your package.json. This field should point to your type definitions file.");
     });
@@ -118,7 +119,7 @@ describe(validatePackageFields, () => {
             pkg: {},
         };
 
-        validatePackageFields(context as BuildContext);
+        validatePackageFields(context as unknown as BuildContext);
 
         expect(warn).toHaveBeenCalledWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
     });
@@ -144,5 +145,451 @@ describe(validatePackageFields, () => {
         validatePackageFields(context as unknown as BuildContext);
 
         expect(warn).not.toHaveBeenCalled();
+    });
+
+    // New tests for exports validation
+    describe("exports validation", () => {
+        it("should accept valid string exports", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: { exports: "./dist/index.js" },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should warn on invalid exports path not starting with './'", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true } } },
+                pkg: { exports: "dist/index.js" },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Invalid exports path \"dist/index.js\" at exports. Export paths must start with \"./\"");
+        });
+
+        it("should warn on exports path containing '../'", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true } } },
+                pkg: { exports: "./../unsafe/path.js" },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Invalid exports path \"./../unsafe/path.js\" at exports. Export paths should not contain \"../\" for security reasons");
+        });
+
+        it("should warn on exports path with invalid file extension", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true } } },
+                pkg: { exports: "./dist/index.xyz" },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Export path \"./dist/index.xyz\" at exports should have a valid file extension (.js, .mjs, .cjs, .ts, .mts, .cts, .d.ts, .d.mts, .d.cts, .jsx, .tsx, .json, .node)");
+        });
+
+        it("should accept exports path with .node extension", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: { exports: "./dist/native.node" },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should accept exports path with .jsx extension", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: { exports: "./dist/component.jsx" },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should accept exports path with .tsx extension", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: { exports: "./dist/component.tsx" },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should accept valid conditional exports", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: {
+                    exports: {
+                        import: "./dist/index.mjs",
+                        require: "./dist/index.cjs",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should accept valid subpath exports", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: {
+                    exports: {
+                        ".": "./dist/index.js",
+                        "./utils": "./dist/utils.js",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should warn on empty exports object", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true } } },
+                pkg: { exports: {} },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Empty exports object. Define at least one export entry");
+        });
+
+        it("should warn on mixed subpaths and conditions", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true } } },
+                pkg: {
+                    exports: {
+                        ".": "./dist/index.js",
+                        import: "./dist/index.mjs",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with \".\") or conditions, not both");
+        });
+
+        it("should warn on missing main export in subpaths", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true } } },
+                pkg: {
+                    exports: {
+                        "./utils": "./dist/utils.js",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Missing main export \".\". Subpaths exports should include a main export entry");
+        });
+
+        it("should warn on invalid subpath format", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true } } },
+                pkg: {
+                    exports: {
+                        ".invalid": "./dist/invalid.js",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Invalid subpath \".invalid\". Subpaths should start with \"./\" or be exactly \".\"");
+        });
+
+        it("should warn on multiple wildcards in subpath pattern", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true } } },
+                pkg: {
+                    exports: {
+                        ".": "./dist/index.js",
+                        "./*/*.js": "./dist/*/*.js",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Invalid subpath pattern \"./*/*.js\". Only one \"*\" wildcard is allowed per subpath");
+        });
+
+        it("should warn on unknown export conditions", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true } } },
+                pkg: {
+                    exports: {
+                        "custom-unknown": "./dist/custom.js",
+                        default: "./dist/index.js",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Unknown export conditions [custom-unknown] at exports. Consider using standard conditions: default, import, module-sync, node, node-addons, require");
+        });
+
+        it("should warn on conflicting development and production conditions", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true } } },
+                pkg: {
+                    exports: {
+                        development: "./dist/dev.js",
+                        production: "./dist/prod.js",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Conflicting conditions \"development\" and \"production\" at exports. These conditions are mutually exclusive");
+        });
+
+        it("should accept null values to block subpaths", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: {
+                    exports: {
+                        ".": "./dist/index.js",
+                        // eslint-disable-next-line unicorn/no-null
+                        "./internal": null,
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should handle fallback arrays", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: {
+                    exports: ["./dist/modern.js", "./dist/fallback.js"],
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should warn on empty fallback arrays", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: {
+                    exports: {
+                        ".": [],
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Empty fallback array at exports[\".\"]. Fallback arrays should contain at least one entry");
+        });
+
+        it("should warn on empty conditions object", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: {
+                    exports: {
+                        ".": {},
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Empty conditions object at exports[\".\"]. Conditional exports should define at least one condition");
+        });
+
+        it("should warn on invalid exports value type", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: {
+                    exports: {
+                        ".": 123,
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Invalid exports value type at exports[\".\"]. Expected string, array, object, or null");
+        });
+
+        it("should accept all standard Node.js conditions", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: {
+                    exports: {
+                        "node-addons": "./dist/addons.js",
+                        node: "./dist/node.js",
+                        import: "./dist/esm.mjs",
+                        require: "./dist/cjs.cjs",
+                        "module-sync": "./dist/sync.js",
+                        default: "./dist/default.js",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should accept all community conditions", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: {
+                    exports: {
+                        browser: "./dist/browser.js",
+                        bun: "./dist/bun.js",
+                        default: "./dist/default.js",
+                        deno: "./dist/deno.js",
+                        development: "./dist/dev.js",
+                        "edge-light": "./dist/edge.js",
+                        electron: "./dist/electron.js",
+                        "react-native": "./dist/rn.js",
+                        "react-server": "./dist/server.js",
+                        types: "./dist/index.d.ts",
+                        workerd: "./dist/workerd.js",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should skip validation when exports validation is disabled", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: false, main: false, name: false } } },
+                pkg: { exports: "invalid-path" },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should handle nested conditional exports", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: {
+                    exports: {
+                        ".": {
+                            node: {
+                                import: "./dist/node.mjs",
+                                require: "./dist/node.cjs",
+                            },
+                            default: "./dist/default.js",
+                        },
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should validate complex real-world exports configuration", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: {
+                    exports: {
+                        ".": {
+                            import: "./dist/index.mjs",
+                            require: "./dist/index.cjs",
+                            types: "./dist/index.d.ts",
+                        },
+                        "./package.json": "./package.json",
+                        "./utils": {
+                            import: "./dist/utils.mjs",
+                            require: "./dist/utils.cjs",
+                            types: "./dist/utils.d.ts",
+                        },
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
     });
 });

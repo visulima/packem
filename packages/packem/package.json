@@ -181,83 +181,83 @@
             }
         },
         "./css/loader/sourcemap": {
-            "require": {
-                "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.cts",
-                "default": "./dist/rollup/plugins/css/loaders/sourcemap.cjs"
-            },
             "import": {
                 "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.mts",
                 "default": "./dist/rollup/plugins/css/loaders/sourcemap.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/sourcemap.cjs"
             }
         },
         "./css/loader/less": {
-            "require": {
-                "types": "./dist/rollup/plugins/css/loaders/less/index.d.cts",
-                "default": "./dist/rollup/plugins/css/loaders/less/index.cjs"
-            },
             "import": {
                 "types": "./dist/rollup/plugins/css/loaders/less/index.d.mts",
                 "default": "./dist/rollup/plugins/css/loaders/less/index.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/less/index.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/less/index.cjs"
             }
         },
         "./css/loader/postcss": {
-            "require": {
-                "types": "./dist/rollup/plugins/css/loaders/postcss/index.d.cts",
-                "default": "./dist/rollup/plugins/css/loaders/postcss/index.cjs"
-            },
             "import": {
                 "types": "./dist/rollup/plugins/css/loaders/postcss/index.d.mts",
                 "default": "./dist/rollup/plugins/css/loaders/postcss/index.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/postcss/index.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/postcss/index.cjs"
             }
         },
         "./css/loader/sass": {
-            "require": {
-                "types": "./dist/rollup/plugins/css/loaders/sass/index.d.cts",
-                "default": "./dist/rollup/plugins/css/loaders/sass/index.cjs"
-            },
             "import": {
                 "types": "./dist/rollup/plugins/css/loaders/sass/index.d.mts",
                 "default": "./dist/rollup/plugins/css/loaders/sass/index.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/sass/index.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/sass/index.cjs"
             }
         },
         "./css/loader/stylus": {
-            "require": {
-                "types": "./dist/rollup/plugins/css/loaders/stylus/index.d.cts",
-                "default": "./dist/rollup/plugins/css/loaders/stylus/index.cjs"
-            },
             "import": {
                 "types": "./dist/rollup/plugins/css/loaders/stylus/index.d.mts",
                 "default": "./dist/rollup/plugins/css/loaders/stylus/index.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/stylus/index.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/stylus/index.cjs"
             }
         },
         "./css/loader/lightningcss": {
-            "require": {
-                "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.cts",
-                "default": "./dist/rollup/plugins/css/loaders/lightningcss.cjs"
-            },
             "import": {
                 "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.mts",
                 "default": "./dist/rollup/plugins/css/loaders/lightningcss.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.cts",
+                "default": "./dist/rollup/plugins/css/loaders/lightningcss.cjs"
             }
         },
         "./css/minifier/cssnano": {
-            "require": {
-                "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.cts",
-                "default": "./dist/rollup/plugins/css/minifiers/cssnano.cjs"
-            },
             "import": {
                 "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.mts",
                 "default": "./dist/rollup/plugins/css/minifiers/cssnano.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.cts",
+                "default": "./dist/rollup/plugins/css/minifiers/cssnano.cjs"
             }
         },
         "./css/minifier/lightningcss": {
-            "require": {
-                "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.cts",
-                "default": "./dist/rollup/plugins/css/minifiers/lightningcss.cjs"
-            },
             "import": {
                 "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.mts",
                 "default": "./dist/rollup/plugins/css/minifiers/lightningcss.mjs"
+            },
+            "require": {
+                "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.cts",
+                "default": "./dist/rollup/plugins/css/minifiers/lightningcss.cjs"
             }
         },
         "./files": {

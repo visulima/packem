@@ -1,4 +1,34 @@
+/* eslint-disable no-secrets/no-secrets */
 import type { Loader } from "esbuild";
+
+/**
+ * Valid file extensions for package.json exports field.
+ * These extensions are considered valid for export paths in package.json.
+ * @remarks
+ * Includes all supported module formats and declaration files:
+ * - JavaScript modules (.js, .mjs, .cjs)
+ * - TypeScript modules (.ts, .mts, .cts)
+ * - TypeScript declarations (.d.ts, .d.mts, .d.cts)
+ * - JSX/TSX files (.jsx, .tsx) - React components
+ * - JSON modules (.json)
+ * - Native Node.js modules (.node) - compiled C++ addons
+ * @see https://nodejs.org/api/packages.html#exports
+ */
+export const VALID_EXPORT_EXTENSIONS: ReadonlyArray<string> = [
+    ".js",
+    ".mjs",
+    ".cjs", // JavaScript modules
+    ".ts",
+    ".mts",
+    ".cts", // TypeScript modules
+    ".d.ts",
+    ".d.mts",
+    ".d.cts", // TypeScript declarations
+    ".jsx",
+    ".tsx", // JSX/TSX files
+    ".json", // JSON modules
+    ".node", // Native Node.js modules (compiled C++ addons)
+] as const;
 
 /**
  * Default file extensions that Packem will process.
@@ -14,7 +44,11 @@ import type { Loader } from "esbuild";
  * // - utils.cts
  * ```
  */
-export const DEFAULT_EXTENSIONS: string[] = [".mjs", ".js", ".json", ".node", ".cjs", ".ts", ".cts", ".mts", ".tsx", ".ctsx", ".mtsx", ".jsx"];
+export const DEFAULT_EXTENSIONS: string[] = [
+    ...VALID_EXPORT_EXTENSIONS, // Base extensions for all module types
+    ".ctsx",
+    ".mtsx", // Additional JSX/TSX variants (not standard for exports but processable)
+];
 
 /**
  * Default esbuild loaders configuration for different file extensions.
@@ -138,5 +172,5 @@ export const SHARED_PACKEM_FOLDER: string = "packem_shared";
  * const canTransform = ALLOWED_TRANSFORM_EXTENSIONS_REGEX.test("file.css"); // false
  * ```
  */
-
+// eslint-disable-next-line sonarjs/single-character-alternation
 export const ALLOWED_TRANSFORM_EXTENSIONS_REGEX: RegExp = /\.(?:m|c)?(?:j|t)sx?$/;

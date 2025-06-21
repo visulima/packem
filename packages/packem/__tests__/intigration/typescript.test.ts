@@ -1248,7 +1248,7 @@ declare const index = "index";
 export { AppContext, index };
 `);
     }, {
-        retry: 3
+        retry: 3,
     });
 
     describe("isolated declarations", () => {
