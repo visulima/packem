@@ -390,6 +390,7 @@ class Child extends Parent {
 }
 
 exports.Child = Child;
+//# sourceMappingURL=index.cjs.map
 "
 `;
 
@@ -455,5 +456,6 @@ class Child extends Parent {
 }
 
 export { Child };
+//# sourceMappingURL=index.mjs.map
 "
 `;

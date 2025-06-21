@@ -454,4 +454,45 @@ __name(barFunction, "barFunction");
 export { barFunction, baz };
 `);
     });
+
+    it("should be able to opt out sourcemap when minify", async () => {
+        expect.assertions(6);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const someFunction = () => {
+  const data = { message: "Hello World" };
+  return data.message;
+};`);
+
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "dist/index.mjs",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                sourcemap: false,
+            },
+        });
+
+        const binProcess = await execPackem("build", ["--production"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).toContain("Preparing build for");
+        expect(binProcess.stdout).toContain("production");
+        expect(binProcess.stdout).toContain("Minification is enabled, the output will be minified");
+
+        // Verify that no sourcemap files are generated
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.mjs.map`)).toBe(false);
+    });
 });

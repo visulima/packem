@@ -89,6 +89,12 @@ const createBuildCommand = (cli: Cli): void => {
 
             const preset = await loadPreset(buildConfig.preset ?? "auto", jiti);
 
+            // When minify is enabled, sourcemap should be enabled by default, unless explicitly opted out
+            if (options.minify && options.sourcemap === undefined) {
+                // eslint-disable-next-line no-param-reassign
+                options.sourcemap = true;
+            }
+
             try {
                 await packem(
                     rootPath,
@@ -301,5 +307,4 @@ const createBuildCommand = (cli: Cli): void => {
     });
 };
 
-// eslint-disable-next-line etc/no-internal
 export default createBuildCommand;
