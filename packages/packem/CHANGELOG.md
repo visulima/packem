@@ -1,3 +1,9 @@
+## @visulima/packem [1.25.0](https://github.com/visulima/packem/compare/@visulima/packem@1.24.1...@visulima/packem@1.25.0) (2025-06-21)
+
+### Features
+
+* enhance package.json exports validation ([becfebf](https://github.com/visulima/packem/commit/becfebf9d6111424b46681a67bd7f6c95b1f7cb3))
+
 ## @visulima/packem [1.24.1](https://github.com/visulima/packem/compare/@visulima/packem@1.24.0...@visulima/packem@1.24.1) (2025-06-21)
 
 ### Bug Fixes
