@@ -1,3 +1,9 @@
+## @visulima/packem [1.24.0](https://github.com/visulima/packem/compare/@visulima/packem@1.23.1...@visulima/packem@1.24.0) (2025-06-21)
+
+### Features
+
+* enabled SWC externalHelpers functionality ([09a4c58](https://github.com/visulima/packem/commit/09a4c585165e171ea8035a1c79b5342b61254483))
+
 ## @visulima/packem [1.23.1](https://github.com/visulima/packem/compare/@visulima/packem@1.23.0...@visulima/packem@1.23.1) (2025-06-21)
 
 ### Bug Fixes
