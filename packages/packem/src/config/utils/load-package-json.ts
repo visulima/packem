@@ -17,6 +17,10 @@ const loadPackageJson = (
 
     const packageJson = parsePackageJson(packageJsonPath);
 
+    if (packageJson.publishConfig) {
+        Object.assign(packageJson, packageJson.publishConfig);
+    }
+
     return {
         packageJson,
         packageJsonPath,
