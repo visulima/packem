@@ -11,8 +11,21 @@ import { basename, extname } from "@visulima/path";
 import type { GetManualChunk } from "rollup";
 
 import type { BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "../../../types";
+import { memoize } from "../../../utils/memoize";
 import getCustomModuleLayer from "./get-custom-module-layer";
 import getModuleLayer from "./get-module-layer";
+
+const hashTo3Char = memoize((input: string): string => {
+    let hash = 0;
+
+    for (let index = 0; index < input.length; index += 1) {
+        // eslint-disable-next-line no-bitwise
+        hash = (hash << 5) - hash + (input.codePointAt(index) as number); // Simple hash shift
+    }
+
+    // eslint-disable-next-line no-bitwise
+    return (hash >>> 0).toString(36).slice(0, 3); // Base36 + trim to 3 chars
+});
 
 const createSplitChunks = (
     dependencyGraphMap: Map<string, Set<[string, string]>>,
@@ -23,6 +36,10 @@ const createSplitChunks = (
 
     // eslint-disable-next-line sonarjs/cognitive-complexity
     return function splitChunks(id, context) {
+        if (/[\\/]node_modules[\\/]@swc[\\/]helper/.test(id)) {
+            return "cc"; // common chunk
+        }
+
         const moduleInfo = context.getModuleInfo(id);
 
         if (!moduleInfo) {
@@ -31,7 +48,11 @@ const createSplitChunks = (
 
         const { isEntry } = moduleInfo;
         const moduleMeta = moduleInfo.meta;
-        const moduleLayer = getModuleLayer(moduleMeta);
+        let moduleLayer = getModuleLayer(moduleMeta);
+
+        if (moduleLayer) {
+            moduleLayer = hashTo3Char(moduleLayer);
+        }
 
         if (!isEntry) {
             const cachedCustomModuleLayer = splitChunksGroupMap.get(id);
@@ -108,8 +129,8 @@ const createSplitChunks = (
             }
 
             const chunkName = basename(id, extname(id));
-
-            const chunkGroup = `${chunkName}-${moduleLayer}`;
+            const layerSuffix = hashTo3Char(moduleLayer);
+            const chunkGroup = `${chunkName}-${layerSuffix}`;
 
             splitChunksGroupMap.set(id, chunkGroup);
 

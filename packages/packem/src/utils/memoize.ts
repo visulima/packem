@@ -9,15 +9,16 @@
 type CacheKeyResolver = string | ((...arguments_: any[]) => string);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const memoize = <T extends (...arguments_: any[]) => any>(
+export const memoize = <T extends (...arguments_: any[]) => any>(
     function_: T,
     cacheKey?: CacheKeyResolver, // if you need specify a cache key
     cacheArgument?: Map<string, ReturnType<T>>,
-) => {
+): T => {
     const cache: Map<string, ReturnType<T>> = cacheArgument ?? new Map<string, ReturnType<T>>();
 
     return ((...arguments_: Parameters<T>) => {
-        const key = cacheKey ? typeof cacheKey === "function" ? cacheKey(...arguments_) : cacheKey : JSON.stringify({ args: arguments_ });
+        // eslint-disable-next-line sonarjs/no-nested-conditional
+        const key = cacheKey ? (typeof cacheKey === "function" ? cacheKey(...arguments_) : cacheKey) : JSON.stringify({ args: arguments_ });
         const existing = cache.get(key);
 
         if (existing !== undefined) {
@@ -33,10 +34,8 @@ const memoize = <T extends (...arguments_: any[]) => any>(
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const memoizeByKey = <T extends (...arguments_: any[]) => any>(function_: T): ((cacheKey?: CacheKeyResolver) => T) => {
+export const memoizeByKey = <T extends (...arguments_: any[]) => any>(function_: T): ((cacheKey?: CacheKeyResolver) => T) => {
     const cache = new Map<string, ReturnType<T>>();
 
     return (cacheKey?: CacheKeyResolver) => memoize(function_, cacheKey, cache);
 };
-
-export default memoizeByKey;

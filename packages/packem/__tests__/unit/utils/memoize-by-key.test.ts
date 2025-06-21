@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import memoizeByKey from "../../../src/utils/memoize-by-key";
+import { memoizeByKey } from "../../../src/utils/memoize";
 
 describe("memoize", () => {
     it("should memoize the function by default based on arg", () => {

@@ -379,7 +379,7 @@ const generateOptions = (
                     experimental: {
                         keepImportAttributes: true,
                     },
-                    externalHelpers: false,
+                    externalHelpers: true,
                     keepClassNames: true,
                     loose: true, // Use loose mode
                     parser: {

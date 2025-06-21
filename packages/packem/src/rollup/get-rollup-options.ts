@@ -18,7 +18,7 @@ import { minVersion } from "semver";
 import type { BuildContext, InternalBuildOptions } from "../types";
 import arrayify from "../utils/arrayify";
 import type FileCache from "../utils/file-cache";
-import memoizeByKey from "../utils/memoize-by-key";
+import { memoizeByKey } from "../utils/memoize";
 import chunkSplitter from "./plugins/chunk-splitter";
 import { cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
