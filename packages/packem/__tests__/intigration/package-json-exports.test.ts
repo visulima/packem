@@ -1960,7 +1960,7 @@ console.log("require-module-import", resolved);
         });
 
         expect(binProcess.exitCode).toBe(1);
-        expect(binProcess.stderr).toContain('Invalid output extension map: foo must be "cjs" or "esm"');
+        expect(binProcess.stderr).toContain("Invalid output extension map: foo must be \"cjs\" or \"esm\"");
     });
 
     it("should throw a TypeError for non-string value in outputExtensionMap", async () => {
@@ -2026,5 +2026,38 @@ console.log("require-module-import", resolved);
 
         expect(binProcess.exitCode).toBe(1);
         expect(binProcess.stderr).toContain("Invalid output extension map: cjs must not start with a dot.");
+    });
+
+    it("should throw an error when outputExtensionMap values are the same", async () => {
+        expect.assertions(2);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export default 'test'");
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: "./dist/index.cjs",
+        });
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                outputExtensionMap: {
+                    cjs: "same.js",
+                    esm: "same.js", // Same value as cjs
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.exitCode).toBe(1);
+        expect(binProcess.stderr).toContain("Invalid output extension map: esm must be different from the other key");
     });
 });
