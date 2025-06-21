@@ -162,7 +162,8 @@ export const used = "only this should remain";`,
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // Should contain pure annotations for Object utility methods
-        expect(mjsContent).toContain("/* @__PURE__ */");
+        expect(mjsContent).toContain("/* @__PURE__
+            */");
     });
 
     it("should work when pluginPure is disabled", async () => {
