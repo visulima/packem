@@ -8,6 +8,8 @@ import resolveAliases from "../rollup/utils/resolve-aliases";
 import type { BuildContext } from "../types";
 import warn from "../utils/warn";
 
+const IDENTIFIER_REGEX = /^[_$a-z\u00A0-\uFFFF][\w$\u00A0-\uFFFF]*$/iu;
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const createStub = async (context: BuildContext): Promise<void> => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -106,8 +108,20 @@ const createStub = async (context: BuildContext): Promise<void> => {
                     `/** @type {import("${typePath}")} */`,
 
                     `const _module = await jiti.import("${resolvedEntry}");`,
-                    hasDefaultExport ? "\nexport default _module?.default ?? _module;" : "",
-                    ...namedExports.filter((name) => name !== "default").map((name) => `export const ${name} = _module.${name};`),
+                    ...hasDefaultExport ? [`export default _module?.default ?? _module;`] : [],
+                    ...namedExports
+                        .filter((name) => name !== "default")
+                        .map((name, index) => {
+                            if (IDENTIFIER_REGEX.test(name)) {
+                                return `export const ${name} = _module.${name};`;
+                            }
+
+                            // For arbitrary module namespace identifiers (non-identifier strings),
+                            // we need to use a temporary variable and then export with the string literal
+                            const temporaryVariable = `__packem_export_${index}`;
+
+                            return `const ${temporaryVariable} = _module[${JSON.stringify(name)}];\nexport { ${temporaryVariable} as ${JSON.stringify(name)} };`;
+                        }),
                 ].join("\n"),
             );
 
