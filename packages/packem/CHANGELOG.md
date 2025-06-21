@@ -1,3 +1,10 @@
+## @visulima/packem [1.23.1](https://github.com/visulima/packem/compare/@visulima/packem@1.23.0...@visulima/packem@1.23.1) (2025-06-21)
+
+### Bug Fixes
+
+* dont clean the dist folder on watch mode ([7402d80](https://github.com/visulima/packem/commit/7402d80880d6a751f7d6cdcd77ccafd6ea1c5aa8))
+* iife invalid name rollup error ([96f7e91](https://github.com/visulima/packem/commit/96f7e9124beca2a428952a757166028f17be9a5d))
+
 ## @visulima/packem [1.23.0](https://github.com/visulima/packem/compare/@visulima/packem@1.22.1...@visulima/packem@1.23.0) (2025-06-21)
 
 ### Features
