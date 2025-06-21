@@ -1,3 +1,17 @@
+## @visulima/packem [1.21.0](https://github.com/visulima/packem/compare/@visulima/packem@1.20.1...@visulima/packem@1.21.0) (2025-06-21)
+
+### Features
+
+* add validation for Node.js engine requirements in package.json ([2a84901](https://github.com/visulima/packem/commit/2a84901b6ec9de7dfd69886796dbc70316a0b142))
+
+### Code Refactoring
+
+* improve unit tests for validateEngines function ([71cff61](https://github.com/visulima/packem/commit/71cff615086b8dca74b2b7bd8bbaf2f22981dcb9))
+
+### Tests
+
+* add packageJson engines validation to integration tests ([70426e4](https://github.com/visulima/packem/commit/70426e4846fbb97e944f7dd7659e9590fffb81aa))
+
 ## @visulima/packem [1.20.1](https://github.com/visulima/packem/compare/@visulima/packem@1.20.0...@visulima/packem@1.20.1) (2025-06-21)
 
 ### Bug Fixes
