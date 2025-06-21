@@ -76,6 +76,9 @@ describe("packem validation", () => {
                                 "index.mjs": 1,
                             },
                         },
+                        packageJson: {
+                            engines: false,
+                        },
                     },
                 },
             });
@@ -143,6 +146,9 @@ describe("packem validation", () => {
                         bundleLimit: {
                             allowFail: true,
                             limit: 1,
+                        },
+                        packageJson: {
+                            engines: false,
                         },
                     },
                 },
