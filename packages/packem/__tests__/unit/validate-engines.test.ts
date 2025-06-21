@@ -1,24 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { BuildContext } from "../../src/types";
-import validateEngines from "../../src/validator/package-json/validate-engines";
 import warn from "../../src/utils/warn";
+import validateEngines from "../../src/validator/package-json/validate-engines";
 
 // Mock the warn function
-vi.mock("../../src/utils/warn", () => ({
-    default: vi.fn(),
-}));
+vi.mock("../../src/utils/warn", () => {
+    return {
+        default: vi.fn(),
+    };
+});
 
 const mockWarn = vi.mocked(warn);
 
-describe("validateEngines", () => {
-    const createMockContext = (pkg: any, validation: any = {}): BuildContext => ({
+describe(validateEngines, () => {
+    const createMockContext = (package_: any, validation: any = {}): BuildContext => ({
         options: {
             validation: {
                 packageJson: validation,
             },
         },
-        pkg,
+        pkg: package_,
     } as BuildContext);
 
     beforeEach(() => {
@@ -26,6 +28,8 @@ describe("validateEngines", () => {
     });
 
     it("should warn when engines.node is missing", () => {
+        expect.assertions(1);
+
         const context = createMockContext({
             name: "test-package",
         });
@@ -39,11 +43,13 @@ describe("validateEngines", () => {
     });
 
     it("should not warn when engines.node is present and valid", () => {
+        expect.assertions(1);
+
         const context = createMockContext({
-            name: "test-package",
             engines: {
                 node: ">=18.0.0",
             },
+            name: "test-package",
         });
 
         validateEngines(context);
@@ -52,11 +58,13 @@ describe("validateEngines", () => {
     });
 
     it("should warn when engines.node has invalid semver range", () => {
+        expect.assertions(1);
+
         const context = createMockContext({
-            name: "test-package",
             engines: {
                 node: "invalid-version-range",
             },
+            name: "test-package",
         });
 
         validateEngines(context);
@@ -68,24 +76,28 @@ describe("validateEngines", () => {
     });
 
     it("should throw error when current Node.js version does not satisfy engines.node requirement", () => {
+        expect.assertions(1);
+
         const context = createMockContext({
-            name: "test-package",
             engines: {
                 node: ">=99.0.0", // This should not satisfy any current Node.js version
             },
+            name: "test-package",
         });
 
         expect(() => validateEngines(context)).toThrow(
-            "Node.js version mismatch: Current version v18.20.0 does not satisfy the required range \">=99.0.0\" specified in package.json engines.node field.",
+            `Node.js version mismatch: Current version ${process.version} does not satisfy the required range \">=99.0.0\" specified in package.json engines.node field.`,
         );
     });
 
     it("should work with complex semver ranges", () => {
+        expect.assertions(1);
+
         const context = createMockContext({
-            name: "test-package",
             engines: {
                 node: "^18.0.0 || ^20.0.0", // This should satisfy Node.js 18.x
             },
+            name: "test-package",
         });
 
         validateEngines(context);
@@ -94,6 +106,8 @@ describe("validateEngines", () => {
     });
 
     it("should skip validation when engines validation is disabled", () => {
+        expect.assertions(1);
+
         const context = createMockContext(
             {
                 name: "test-package",
@@ -107,6 +121,8 @@ describe("validateEngines", () => {
     });
 
     it("should use default version range when engines.node is missing", () => {
+        expect.assertions(1);
+
         const context = createMockContext({
             name: "test-package",
         });
