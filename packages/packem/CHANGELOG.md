@@ -1,3 +1,9 @@
+## @visulima/packem [1.22.0](https://github.com/visulima/packem/compare/@visulima/packem@1.21.0...@visulima/packem@1.22.0) (2025-06-21)
+
+### Features
+
+* prefer publishConfig from package.json when defined ([df55b81](https://github.com/visulima/packem/commit/df55b81defaa1a125210dfb198e84f5259c412f8))
+
 ## @visulima/packem [1.21.0](https://github.com/visulima/packem/compare/@visulima/packem@1.20.1...@visulima/packem@1.21.0) (2025-06-21)
 
 ### Features
