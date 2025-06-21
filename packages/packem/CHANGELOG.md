@@ -1,3 +1,9 @@
+## @visulima/packem [1.24.1](https://github.com/visulima/packem/compare/@visulima/packem@1.24.0...@visulima/packem@1.24.1) (2025-06-21)
+
+### Bug Fixes
+
+*  enable sourcemap when minify by default ([dccf21b](https://github.com/visulima/packem/commit/dccf21b8c10c8a010bb1eb30ed8f81fc725086bd))
+
 ## @visulima/packem [1.24.0](https://github.com/visulima/packem/compare/@visulima/packem@1.23.1...@visulima/packem@1.24.0) (2025-06-21)
 
 ### Features
