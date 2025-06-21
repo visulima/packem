@@ -1,6 +1,7 @@
 import loadPackageJson from "../../config/utils/load-package-json";
 import type { BuildContext } from "../../types";
 import validateDependencies from "./validate-dependencies";
+import validateEngines from "./validate-engines";
 import validatePackageEntries from "./validate-package-entries";
 import validatePackageFields from "./validate-package-fields";
 
@@ -10,6 +11,7 @@ const validator = (context: BuildContext): void => {
     context.pkg = packageJson;
 
     validateDependencies(context);
+    validateEngines(context);
     validatePackageFields(context);
     validatePackageEntries(context);
 };

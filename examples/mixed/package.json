@@ -57,13 +57,20 @@
     "typesVersions": {
         "*": {
             ".": [
-                "./dist/index.production.d.ts"
+                "./dist/index.react-server.d.ts",
+                "./dist/index.d.ts",
+                "./dist/index.production.d.ts",
+                "./dist/index.development.d.ts"
             ],
             "core": [
-                "./dist/core/index.production.d.ts"
+                "./dist/core/index.d.ts",
+                "./dist/core/index.production.d.ts",
+                "./dist/core/index.development.d.ts"
             ],
             "react": [
-                "./dist/react/index.production.d.ts"
+                "./dist/react/index.d.ts",
+                "./dist/react/index.production.d.ts",
+                "./dist/react/index.development.d.ts"
             ]
         }
     },

@@ -376,6 +376,7 @@ export type ValidationOptions = {
     packageJson?: {
         bin?: boolean;
         dependencies?: boolean;
+        engines?: boolean;
         exports?: boolean;
         files?: boolean;
         main?: boolean;
