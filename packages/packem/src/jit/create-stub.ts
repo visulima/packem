@@ -120,7 +120,13 @@ const createStub = async (context: BuildContext): Promise<void> => {
                             // we need to use a temporary variable and then export with the string literal
                             const temporaryVariable = `__packem_export_${index}`;
 
-                            return `const ${temporaryVariable} = _module[${JSON.stringify(name)}];\nexport { ${temporaryVariable} as ${JSON.stringify(name)} };`;
+                            // If the name is already quoted (starts and ends with quotes), use it directly
+                            // Otherwise, wrap it in JSON.stringify
+                            const propertyAccess = name.startsWith("'") && name.endsWith("'")
+                                ? `_module[${name}]`
+                                : `_module[${JSON.stringify(name)}]`;
+
+                            return `const ${temporaryVariable} = ${propertyAccess};\nexport { ${temporaryVariable} as ${JSON.stringify(name)} };`;
                         }),
                 ].join("\n"),
             );
