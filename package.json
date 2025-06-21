@@ -81,21 +81,21 @@
         "node": ">=18.* <=24.*"
     },
     "pnpm": {
-        "overrides": {
-            "chrono-node@<2.2.4": ">=2.2.4",
-            "@octokit/request@>=1.0.0 <9.2.1": ">=9.2.1",
-            "@octokit/plugin-paginate-rest@>=1.0.0 <11.4.1": ">=11.4.1",
-            "undici@>=6.0.0 <6.21.2": ">=6.21.2",
-            "brace-expansion@>=1.0.0 <=1.1.11": ">=1.1.12"
-        },
         "onlyBuiltDependencies": [
             "@parcel/watcher",
             "@swc/core",
-            "@tailwindcss/oxide",
             "esbuild",
             "node-sass",
             "nodehun",
-            "nx"
-        ]
+            "nx",
+            "unrs-resolver"
+        ],
+        "overrides": {
+            "@octokit/plugin-paginate-rest@>=1.0.0 <11.4.1": ">=11.4.1",
+            "@octokit/request@>=1.0.0 <9.2.1": ">=9.2.1",
+            "brace-expansion@>=1.0.0 <=1.1.11": ">=1.1.12",
+            "chrono-node@<2.2.4": ">=2.2.4",
+            "undici@>=6.0.0 <6.21.2": ">=6.21.2"
+        }
     }
 }

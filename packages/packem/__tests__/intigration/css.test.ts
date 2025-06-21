@@ -154,7 +154,6 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         const files: string[] = foundFiles
             .filter((dirent) => dirent.isFile())
             // @TODO: Change this readdir to @visulima/fs readdir
-            // eslint-disable-next-line deprecation/deprecation
             .map((dirent) => join(dirent.path, dirent.name));
 
         const css = files.filter((file) => file.endsWith(".css"));

@@ -24,7 +24,7 @@ interface LoadersOptions {
     options: InternalStyleOptions;
 }
 
-export default class LoaderManager {
+class LoaderManager {
     private readonly test: (file: string) => boolean;
 
     private readonly loaders = new Map<string, Loader>();
@@ -97,3 +97,5 @@ export default class LoaderManager {
         return payload;
     }
 }
+
+export default LoaderManager;

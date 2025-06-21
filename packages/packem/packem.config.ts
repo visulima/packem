@@ -5,7 +5,6 @@ import isolatedDeclarationTransformer from "./src/rollup/plugins/typescript/isol
 export default defineConfig({
     cjsInterop: true,
     isolatedDeclarationTransformer,
-    minify: false,
     rollup: {
         license: {
             path: "./LICENSE.md",
@@ -17,4 +16,14 @@ export default defineConfig({
     },
     runtime: "node",
     transformer,
+    validation: {
+        dependencies: {
+            hoisted: {
+                exclude: ["estree"],
+            },
+            unused: {
+                exclude: ["@rollup/plugin-inject"],
+            },
+        },
+    },
 });

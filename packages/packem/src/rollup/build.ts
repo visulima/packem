@@ -7,7 +7,6 @@ import { getRollupOptions } from "./get-rollup-options";
 
 const BUNDLE_CACHE_KEY = "rollup-build.json";
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 const build = async (context: BuildContext, fileCache: FileCache, subDirectory: string): Promise<void> => {
     const rollupOptions = await getRollupOptions(context, fileCache);
 
@@ -43,34 +42,25 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
     for (const outputOptions of rollupOptions.output as OutputOptions[]) {
         // eslint-disable-next-line no-await-in-loop
         const { output } = await buildResult.write(outputOptions);
-        const chunkFileNames = new Set<string>();
-        const outputChunks = output.filter((fOutput) => fOutput.type === "chunk") as OutputChunk[];
+        const outputChunks = output.filter((fOutput) => fOutput.type === "chunk" && fOutput.isEntry) as OutputChunk[];
 
         for (const entry of outputChunks) {
-            chunkFileNames.add(entry.fileName);
-
-            for (const id of entry.imports) {
-                context.usedImports.add(id);
-            }
-
-            if (entry.isEntry) {
-                context.buildEntries.push({
-                    chunks: entry.imports.filter((index) => outputChunks.find((c) => c.fileName === index)),
-                    dynamicImports: entry.dynamicImports,
-                    exports: entry.exports,
-                    modules: Object.entries(entry.modules).map(([id, module_]) => {
-                        return {
-                            bytes: module_.renderedLength,
-                            id,
-                        };
-                    }),
-                    path: entry.fileName,
-                    size: {
-                        bytes: Buffer.byteLength(entry.code, "utf8"),
-                    },
-                    type: "entry",
-                });
-            }
+            context.buildEntries.push({
+                chunks: entry.imports.filter((index) => outputChunks.find((c) => c.fileName === index)),
+                dynamicImports: entry.dynamicImports,
+                exports: entry.exports,
+                modules: Object.entries(entry.modules).map(([id, module_]) => {
+                    return {
+                        bytes: module_.renderedLength,
+                        id,
+                    };
+                }),
+                path: entry.fileName,
+                size: {
+                    bytes: Buffer.byteLength(entry.code, "utf8"),
+                },
+                type: "entry",
+            });
         }
 
         const outputAssets = output.filter((fOutput) => fOutput.type === "asset") as OutputAsset[];
@@ -87,10 +77,6 @@ const build = async (context: BuildContext, fileCache: FileCache, subDirectory: 
                 },
                 type: "asset",
             });
-        }
-
-        for (const chunkFileName of chunkFileNames) {
-            context.usedImports.delete(chunkFileName);
         }
     }
 

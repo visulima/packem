@@ -39,7 +39,7 @@ const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail
                 }
 
                 if (hasLogged) {
-                    logger.raw("\n\n");
+                    logger.raw("\n");
                 }
 
                 logger.info({

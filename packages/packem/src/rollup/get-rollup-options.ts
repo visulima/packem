@@ -413,7 +413,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 fileCache,
             ),
 
-            resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}),
+            resolveExternalsPlugin(context),
 
             context.options.rollup.replace
             && replacePlugin({
@@ -837,7 +837,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
                 fileCache,
             ),
 
-            resolveExternalsPlugin(context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}),
+            resolveExternalsPlugin(context),
 
             context.options.rollup.replace
             && replacePlugin({

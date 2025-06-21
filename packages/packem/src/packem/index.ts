@@ -494,6 +494,14 @@ const generateOptions = (
             tsconfig: tsconfig?.path,
         },
         validation: {
+            dependencies: {
+                hoisted: {
+                    exclude: [],
+                },
+                unused: {
+                    exclude: [],
+                },
+            },
             packageJson: {
                 bin: true,
                 dependencies: true,
@@ -651,7 +659,9 @@ const createContext = async (
         buildEntries: [],
         dependencyGraphMap: new Map<string, Set<[string, string]>>(),
         environment,
+        hoistedDependencies: new Set(),
         hooks: createHooks(),
+        implicitDependencies: new Set(),
         // Create shared jiti instance for context
         jiti: createJiti(options.rootDir, options.jiti),
         logger,
@@ -659,7 +669,7 @@ const createContext = async (
         options,
         pkg: packageJson,
         tsconfig,
-        usedImports: new Set(),
+        usedDependencies: new Set(),
         warnings: new Set(),
     };
 
@@ -964,7 +974,7 @@ const packem = async (
             logBuildErrors(context, logged);
         }
 
-        context.logger.raw(`\n⚡️ Build run in ${getDuration()}`);
+        context.logger.raw(`\n⚡️ Build run in ${getDuration()}\n`);
 
         await runBuilder();
 

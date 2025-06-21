@@ -100,14 +100,16 @@ export interface BuildContext {
     buildEntries: (BuildContextBuildAssetAndChunk | BuildContextBuildEntry)[];
     dependencyGraphMap: Map<string, Set<[string, string]>>;
     environment: Environment;
+    hoistedDependencies: Set<string>;
     hooks: Hookable<BuildHooks>;
+    implicitDependencies: Set<string>;
     jiti: Jiti;
     logger: Pail;
     mode: Mode;
     options: InternalBuildOptions;
     pkg: PackageJson;
     tsconfig?: TsConfigResult;
-    usedImports: Set<string>;
+    usedDependencies: Set<string>;
     warnings: Set<string>;
 }
 
@@ -375,6 +377,10 @@ export type ValidationOptions = {
         // Size limits for specific files or globs
         limits?: Record<string, number | `${number}${"B" | "GB" | "KB" | "MB" | "TB"}`>;
     };
+    dependencies: {
+        hoisted: { exclude: string[] } | false;
+        unused: { exclude: string[] } | false;
+    } | false;
     packageJson?: {
         bin?: boolean;
         dependencies?: boolean;

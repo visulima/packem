@@ -56,23 +56,24 @@ describe("resolve-externals-plugin", () => {
         tsconfig?: TsConfigResult;
     }) =>
         new MockPluginContext(
-            resolveExternalsPlugin(
-                {
-                    name: "externals",
-                    ...packageJson,
-                } as PackageJson,
-                tsconfig,
-                {
-                    alias: {},
-                    externals: [],
-                    // @ts-expect-error - mocked config
-                    rollup: {},
-                    rootDir: "/",
-                    ...buildOptions,
-                },
+            resolveExternalsPlugin({
+                externals: [],
+                hoistedDependencies: new Set(),
+                implicitDependencies: new Set(),
                 logger,
-                { ...defaultPluginConfig, ...options },
-            ),
+                options: {
+                    ...buildOptions,
+                    alias: {},
+                    rollup: {
+                        resolveExternals: { ...defaultPluginConfig, ...options },
+                        ...buildOptions?.rollup,
+                    },
+                    rootDir: "/",
+                },
+                pkg: { name: "externals", ...packageJson } as PackageJson,
+                tsconfig,
+                usedDependencies: new Set(),
+            }),
         );
 
     describe("buildins", () => {

@@ -1,16 +1,15 @@
 import { readdirSync } from "node:fs";
-import { isBuiltin } from "node:module";
 
 import { cyan } from "@visulima/colorize";
-import type { PackageJson } from "@visulima/package";
 import type { Pail } from "@visulima/pail";
 import { isAbsolute, join } from "@visulima/path";
 import { resolveAlias } from "@visulima/path/utils";
-import type { TsConfigResult } from "@visulima/tsconfig";
+import { isNodeBuiltin, parseNodeModulePath } from "mlly";
 import type { InputOptions, Plugin, ResolveIdResult } from "rollup";
 
 import { ENDING_REGEX } from "../../constants";
-import type { InternalBuildOptions } from "../../types";
+import type { BuildContext } from "../../types";
+import getPackageName from "../../utils/get-package-name";
 import resolveAliases from "../utils/resolve-aliases";
 
 type MaybeFalsy<T> = T | false | null | undefined;
@@ -104,30 +103,26 @@ export type ResolveExternalsPluginOptions = {
      */
     peerDeps?: boolean;
 };
-
+//  context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}
 export const resolveExternalsPlugin = (
-    packageJson: PackageJson,
-    tsconfig: TsConfigResult | undefined,
-    buildOptions: InternalBuildOptions,
-    logger: Pail,
-    options: ResolveExternalsPluginOptions,
-
+    context: BuildContext,
 ): Plugin => {
     const cachedGlobFiles = new Map<string, string[]>();
     const cacheResolved = new Map<string, boolean>();
+    const resolvedExternalsOptions = context.options?.rollup?.resolveExternals ?? {};
 
     // Map the include and exclude options to arrays of regexes.
-    const include = new Set(getRegExps([...buildOptions.externals], "include", logger));
-    const exclude = new Set(getRegExps([...options.exclude ?? []], "exclude", logger));
+    const include = new Set(getRegExps([...context.options?.externals ?? []], "include", context.logger));
+    const exclude = new Set(getRegExps([...resolvedExternalsOptions.exclude ?? []], "exclude", context.logger));
 
     const dependencies: Record<string, string> = {};
 
     Object.assign(
         dependencies,
-        options.deps ? packageJson.dependencies : undefined,
-        options.devDeps ? packageJson.devDependencies : undefined,
-        options.peerDeps ? packageJson.peerDependencies : undefined,
-        options.optDeps ? packageJson.optionalDependencies : undefined,
+        resolvedExternalsOptions.deps ? context.pkg.dependencies ?? {} : undefined,
+        resolvedExternalsOptions.devDeps ? context.pkg.devDependencies ?? {} : undefined,
+        resolvedExternalsOptions.peerDeps ? context.pkg.peerDependencies ?? {} : undefined,
+        resolvedExternalsOptions.optDeps ? context.pkg.optionalDependencies ?? {} : undefined,
     );
 
     // Add all dependencies as an include RegEx.
@@ -138,8 +133,8 @@ export const resolveExternalsPlugin = (
         include.add(new RegExp(`^(?:${names.join("|")})(?:/.+)?$`));
     }
 
-    if (packageJson.peerDependenciesMeta) {
-        for (const [key, value] of Object.entries(packageJson.peerDependenciesMeta)) {
+    if (context.pkg?.peerDependenciesMeta) {
+        for (const [key, value] of Object.entries(context.pkg.peerDependenciesMeta)) {
             if (value?.optional) {
                 include.add(new RegExp(`^${key}(?:/.+)?$`));
             }
@@ -151,20 +146,20 @@ export const resolveExternalsPlugin = (
 
     let tsconfigPathPatterns: RegExp[] = [];
 
-    if (tsconfig) {
-        tsconfigPathPatterns = Object.entries(tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) =>
+    if (context.tsconfig) {
+        tsconfigPathPatterns = Object.entries(context.tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) =>
             (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
         );
     }
 
-    const resolvedAliases = resolveAliases(packageJson, buildOptions);
+    const resolvedAliases = resolveAliases(context.pkg, context.options);
 
     return <Plugin>{
         name: "packem:resolve-externals",
         options: (rollupOptions: InputOptions) => {
             // This function takes an id and returns true (external) or false (not external),
-            // eslint-disable-next-line no-param-reassign
-            rollupOptions.external = (originalId: string, specifier) => {
+            // eslint-disable-next-line no-param-reassign, sonarjs/cognitive-complexity
+            rollupOptions.external = (originalId: string, importer) => {
                 if (cacheResolved.has(originalId)) {
                     return cacheResolved.get(originalId);
                 }
@@ -179,23 +174,47 @@ export const resolveExternalsPlugin = (
                     }
                 }
 
+                // Try to guess package name of id
+                const packageName
+                    = (resolvedId && parseNodeModulePath(resolvedId)?.name)
+                        || parseNodeModulePath(originalId)?.name
+                        || getPackageName(originalId);
+
+                if (packageName && !packageName.startsWith(".") && !isNodeBuiltin(packageName)) {
+                    context.usedDependencies.add(packageName);
+
+                    if (
+                    // Only treat as hoisted if the importer is source
+                        (!importer || !importer.includes("/node_modules/"))
+                        && !Object.keys(context.pkg.dependencies ?? {}).includes(packageName)
+                        && !Object.keys(context.pkg.devDependencies ?? {}).includes(packageName)
+                        && !Object.keys(context.pkg.peerDependencies ?? {}).includes(packageName)
+                        && !Object.keys(context.pkg.optionalDependencies ?? {}).includes(packageName)
+                        && context.options.validation
+                        && context.options.validation.dependencies !== false
+                        && context.options.validation.dependencies.hoisted !== false
+                        && !context.options.validation.dependencies.hoisted?.exclude.includes(packageName)) {
+                        context.hoistedDependencies.add(packageName);
+                    }
+                }
+
                 for (const id of [originalId, resolvedId].filter(Boolean)) {
                     if (
                         /^(?:\0|\.{1,2}\/)/.test(id) // Ignore virtual modules and relative imports
                         || isAbsolute(id) // Ignore already resolved ids
-                        || new RegExp(`${buildOptions.sourceDir}[/.*|\\.*]`).test(id) // Ignore source files
-                        || (packageJson.name && id.startsWith(packageJson.name)) // Ignore self import
+                        || new RegExp(`${context.options?.sourceDir}[/.*|\\.*]`).test(id) // Ignore source files
+                        || (context.pkg.name && id.startsWith(context.pkg.name)) // Ignore self import
                     ) {
                         cacheResolved.set(id, false);
 
                         return false;
                     }
 
-                    if (isBuiltin(id) || prefixedBuiltins.has(id)) {
-                        let result = options.builtins;
+                    if (isNodeBuiltin(id) || prefixedBuiltins.has(id)) {
+                        let result = resolvedExternalsOptions.builtins;
 
-                        if (result === undefined && specifier) {
-                            result = isIncluded(specifier) && !isExcluded(specifier);
+                        if (result === undefined && importer) {
+                            result = isIncluded(importer) && !isExcluded(importer);
                         }
 
                         cacheResolved.set(id, result as boolean);
@@ -204,11 +223,10 @@ export const resolveExternalsPlugin = (
                     }
 
                     // package.json imports are not externals
-
-                    if (id[0] === "#" && packageJson.imports) {
-                        for (const [key, value] of Object.entries(packageJson.imports)) {
+                    if (id[0] === "#" && context.pkg.imports) {
+                        for (const [key, value] of Object.entries(context.pkg.imports)) {
                             if (key[0] !== "#") {
-                                logger.debug({
+                                context.logger.debug({
                                     message: `Ignoring package.json import "${cyan(key)}" because it does not start with "#".`,
                                     prefix: "plugin:packem:resolve-externals",
                                 });
@@ -229,7 +247,7 @@ export const resolveExternalsPlugin = (
                                 if (cachedGlobFiles.has(key)) {
                                     files = cachedGlobFiles.get(key) as string[];
                                 } else {
-                                    files = readdirSync(join(buildOptions.rootDir, (value as string).replace("/*", "")), { withFileTypes: true })
+                                    files = readdirSync(join(context.options.rootDir, (value as string).replace("/*", "")), { withFileTypes: true })
                                         .filter((dirent) => dirent.isFile())
                                         .map((dirent) => dirent.name);
 
@@ -265,7 +283,9 @@ export const resolveExternalsPlugin = (
                     }
                 }
 
-                logExternalMessage(originalId, logger);
+                context.implicitDependencies.add(originalId);
+
+                logExternalMessage(originalId, context.logger);
 
                 return false;
             };
@@ -286,17 +306,20 @@ export const resolveExternalsPlugin = (
                     };
                 }
 
-                if (isBuiltin(specifier)) {
+                if (isNodeBuiltin(specifier)) {
                     const stripped = specifier.replace(/^node:/, "");
+                    let prefixId: string = stripped;
+
+                    if (resolvedExternalsOptions.builtinsPrefix === "add" || !isNodeBuiltin(stripped)) {
+                        prefixId = `node:${stripped}`;
+                    }
 
                     return {
-                        external: (options.builtins || isIncluded(specifier)) && !isExcluded(specifier),
+                        external: (resolvedExternalsOptions.builtins || isIncluded(specifier)) && !isExcluded(specifier),
                         id:
-                            options.builtinsPrefix === "ignore"
+                            resolvedExternalsOptions.builtinsPrefix === "ignore"
                                 ? specifier
-                                : options.builtinsPrefix === "add" || !isBuiltin(stripped)
-                                  ? "node:" + stripped
-                                  : stripped,
+                                : prefixId,
                         moduleSideEffects: false,
                     };
                 }
