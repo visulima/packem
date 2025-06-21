@@ -1,3 +1,17 @@
+## @visulima/packem [1.26.0](https://github.com/visulima/packem/compare/@visulima/packem@1.25.0...@visulima/packem@1.26.0) (2025-06-21)
+
+### Features
+
+* add rollup-plugin-pure integration ([4f3133c](https://github.com/visulima/packem/commit/4f3133cc21e1b2b8b0e77e8b74ba8f9f3fc51832))
+
+### Bug Fixes
+
+* correct formatting of pure annotations in test output ([c5bebb2](https://github.com/visulima/packem/commit/c5bebb2bedb2ab191050e53ee72eee861d9223c0))
+
+### Styles
+
+* cs fix ([3dcc699](https://github.com/visulima/packem/commit/3dcc699b59d8dc37a52f0b2e0c28c6f08dbd7fcb))
+
 ## @visulima/packem [1.25.0](https://github.com/visulima/packem/compare/@visulima/packem@1.24.1...@visulima/packem@1.25.0) (2025-06-21)
 
 ### Features
