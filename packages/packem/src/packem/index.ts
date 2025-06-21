@@ -839,9 +839,6 @@ const packem = async (
             message: `${bold("Root dir:")} ${context.options.rootDir}\n  ${bold("Entries:")}`,
         });
 
-        // Clean dist dirs
-        await cleanDistributionDirectories(context);
-
         const runBuilder = async (watchMode?: true) => {
             for await (const [name, builder] of Object.entries(context.options.builder ?? {})) {
                 context.logger.raw("\n");
@@ -925,6 +922,9 @@ const packem = async (
 
             return;
         }
+
+        // Clean dist dirs
+        await cleanDistributionDirectories(context);
 
         if (mode === "jit") {
             await createStub(context);
