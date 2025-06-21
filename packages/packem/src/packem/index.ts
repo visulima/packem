@@ -607,6 +607,12 @@ const generateOptions = (
         }
     }
 
+    if (tsconfig?.config.compilerOptions?.declarationMap === true) {
+        options.sourcemap = true;
+
+        logger.info("Enabling sourcemap because declarationMap is enabled in tsconfig.json");
+    }
+
     return options;
 };
 
