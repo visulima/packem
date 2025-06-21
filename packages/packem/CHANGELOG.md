@@ -1,3 +1,10 @@
+## @visulima/packem [1.20.1](https://github.com/visulima/packem/compare/@visulima/packem@1.20.0...@visulima/packem@1.20.1) (2025-06-21)
+
+### Bug Fixes
+
+* enhance JIT integration tests and improve export handling for module namespace identifiers ([83e3726](https://github.com/visulima/packem/commit/83e3726403582a2c19130222568cdd7b1bae569e))
+* enhance JIT integration tests and support for arbitrary module namespace identifiers ([9cfd159](https://github.com/visulima/packem/commit/9cfd159b6b2f2b90ced9354dd68e3cff1980d083))
+
 ## @visulima/packem [1.20.0](https://github.com/visulima/packem/compare/@visulima/packem@1.19.5...@visulima/packem@1.20.0) (2025-06-20)
 
 ### Features
