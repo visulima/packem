@@ -1,3 +1,9 @@
+## @visulima/packem [1.23.0](https://github.com/visulima/packem/compare/@visulima/packem@1.22.1...@visulima/packem@1.23.0) (2025-06-21)
+
+### Features
+
+* enable sourcemap when declarationMap is set in tsconfig ([7d677b6](https://github.com/visulima/packem/commit/7d677b63fba822d97be9b79d19f3dcee9a5111e2))
+
 ## @visulima/packem [1.22.1](https://github.com/visulima/packem/compare/@visulima/packem@1.22.0...@visulima/packem@1.22.1) (2025-06-21)
 
 ### Bug Fixes
