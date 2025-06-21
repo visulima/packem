@@ -1,3 +1,9 @@
+## @visulima/packem [1.22.1](https://github.com/visulima/packem/compare/@visulima/packem@1.22.0...@visulima/packem@1.22.1) (2025-06-21)
+
+### Bug Fixes
+
+* add validation for duplicate values in outputExtensionMap ([fd5a772](https://github.com/visulima/packem/commit/fd5a77203cd1921791c1651ae22ae12c74401f10))
+
 ## @visulima/packem [1.22.0](https://github.com/visulima/packem/compare/@visulima/packem@1.21.0...@visulima/packem@1.22.0) (2025-06-21)
 
 ### Features
