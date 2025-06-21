@@ -857,6 +857,9 @@ importers:
       rollup-plugin-polyfill-node:
         specifier: 0.13.0
         version: 0.13.0(rollup@4.44.0)
+      rollup-plugin-pure:
+        specifier: ^0.4.0
+        version: 0.4.0(rollup@4.44.0)
       rollup-plugin-visualizer:
         specifier: 6.0.3
         version: 6.0.3(rollup@4.44.0)
@@ -9034,6 +9037,11 @@ packages:
     peerDependencies:
       rollup: ^1.20.0 || ^2.0.0 || ^3.0.0 || ^4.0.0
 
+  rollup-plugin-pure@0.4.0:
+    resolution: {integrity: sha512-m5hnihG13c4JJ+OlBkbkxmQdmDfXyqsf3LuYa3O7YhtZ3/8OdRfTuxySSJ+wJ9qFUWJ0T6ApqEwTgYNQKVBcFg==}
+    peerDependencies:
+      rollup: ^3.0.0 || ^4.0.0
+
   rollup-plugin-visualizer@6.0.3:
     resolution: {integrity: sha512-ZU41GwrkDcCpVoffviuM9Clwjy5fcUxlz0oMoTXTYsK+tcIFzbdacnrr2n8TXcHxbGKKXtOdjxM2HUS4HjkwIw==}
     engines: {node: '>=18'}
@@ -10287,6 +10295,10 @@ packages:
   unpipe@1.0.0:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
+
+  unplugin-utils@0.2.4:
+    resolution: {integrity: sha512-8U/MtpkPkkk3Atewj1+RcKIjb5WBimZ/WSLhhR3w6SsIj8XJuKTacSP8g+2JhfSGw0Cb125Y+2zA/IzJZDVbhA==}
+    engines: {node: '>=18.12.0'}
 
   unrs-resolver@1.9.0:
     resolution: {integrity: sha512-wqaRu4UnzBD2ABTC1kLfBjAqIDZ5YUTr/MLGa7By47JV1bJDSW7jq/ZSLigB7enLe7ubNaJhtnBXgrc/50cEhg==}
@@ -19653,6 +19665,13 @@ snapshots:
       '@rollup/plugin-inject': 5.0.5(rollup@4.44.0)
       rollup: 4.44.0
 
+  rollup-plugin-pure@0.4.0(rollup@4.44.0):
+    dependencies:
+      estree-walker: 3.0.3
+      magic-string: 0.30.17
+      rollup: 4.44.0
+      unplugin-utils: 0.2.4
+
   rollup-plugin-visualizer@6.0.3(rollup@4.44.0):
     dependencies:
       open: 8.4.2
@@ -21159,6 +21178,11 @@ snapshots:
   universalify@2.0.1: {}
 
   unpipe@1.0.0: {}
+
+  unplugin-utils@0.2.4:
+    dependencies:
+      pathe: 2.0.3
+      picomatch: 4.0.2
 
   unrs-resolver@1.9.0:
     dependencies:

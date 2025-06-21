@@ -361,6 +361,7 @@
         "test:watch": "vitest"
     },
     "dependencies": {
+        "rollup-plugin-pure": "^0.4.0",
         "@antfu/install-pkg": "1.1.0",
         "@babel/parser": "7.27.5",
         "@clack/prompts": "0.11.0",

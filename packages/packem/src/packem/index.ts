@@ -306,6 +306,7 @@ const generateOptions = (
                         },
             },
             patchTypes: {},
+            pluginPure: {},
             polyfillNode: {},
             preserveDirectives: {
                 include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
@@ -641,7 +642,6 @@ const createContext = async (
     tsconfig: TsConfigResult | undefined,
     nodeVersion: string,
 ): Promise<BuildContext> => {
-    // eslint-disable-next-line etc/no-internal
     const options = generateOptions(logger, rootDirectory, environment, debug, buildConfig, packageJson, tsconfig, nodeVersion);
 
     ensureDirSync(join(options.rootDir, options.outDir));
@@ -826,12 +826,10 @@ const packem = async (
     const fileCache = new FileCache(rootDirectory, cachePath, cacheKey, logger);
 
     try {
-        // eslint-disable-next-line etc/no-internal
         const context = await createContext(logger, rootDirectory, mode, environment, debug, config, packageJson, tsconfig, nodeVersion);
 
         fileCache.isEnabled = context.options.fileCache as boolean;
 
-        // eslint-disable-next-line etc/no-internal
         context.logger.info(cyan(`${getMode(mode)} ${context.options.name}`));
 
         context.logger.debug({

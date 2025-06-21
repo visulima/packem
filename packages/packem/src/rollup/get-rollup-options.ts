@@ -12,6 +12,7 @@ import { join, relative, resolve } from "@visulima/path";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
 import polyfillPlugin from "rollup-plugin-polyfill-node";
+import { PluginPure } from "rollup-plugin-pure";
 import { visualizer as visualizerPlugin } from "rollup-plugin-visualizer";
 import { minVersion } from "semver";
 
@@ -495,6 +496,134 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             ),
 
             context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
+
+            context.options.rollup.pluginPure && PluginPure({
+                ...context.options.rollup.pluginPure,
+                functions: [
+                    // Common utility functions
+                    "Object.defineProperty",
+                    "Object.assign",
+                    "Object.create",
+                    "Object.freeze",
+                    "Object.seal",
+                    "Object.setPrototypeOf",
+                    "Object.getOwnPropertyDescriptor",
+                    "Object.getOwnPropertyDescriptors",
+                    "Object.getPrototypeOf",
+                    "Object.hasOwnProperty",
+                    "Object.isExtensible",
+                    "Object.isFrozen",
+                    "Object.isSealed",
+
+                    // Symbol functions - commonly used in libraries but safe to tree-shake when unused
+                    "Symbol",
+                    "Symbol.for",
+                    "Symbol.keyFor",
+                    "Symbol.iterator",
+                    "Symbol.asyncIterator",
+                    "Symbol.hasInstance",
+                    "Symbol.isConcatSpreadable",
+                    "Symbol.species",
+                    "Symbol.toPrimitive",
+                    "Symbol.toStringTag",
+
+                    // Proxy constructor - safe when unused
+                    "Proxy",
+
+                    // Reflect methods - typically pure
+                    "Reflect.apply",
+                    "Reflect.construct",
+                    "Reflect.defineProperty",
+                    "Reflect.deleteProperty",
+                    "Reflect.get",
+                    "Reflect.getOwnPropertyDescriptor",
+                    "Reflect.getPrototypeOf",
+                    "Reflect.has",
+                    "Reflect.isExtensible",
+                    "Reflect.ownKeys",
+                    "Reflect.preventExtensions",
+                    "Reflect.set",
+                    "Reflect.setPrototypeOf",
+
+                    // WeakMap/WeakSet constructors - safe when unused
+                    "WeakMap",
+                    "WeakSet",
+                    "WeakRef",
+
+                    // Array methods that don't mutate
+                    "Array.from",
+                    "Array.of",
+                    "Array.isArray",
+
+                    // Number methods
+                    "Number.isFinite",
+                    "Number.isInteger",
+                    "Number.isNaN",
+                    "Number.isSafeInteger",
+                    "Number.parseFloat",
+                    "Number.parseInt",
+
+                    // String methods
+                    "String.fromCharCode",
+                    "String.fromCodePoint",
+                    "String.raw",
+
+                    // Date constructor when used for static methods
+                    "Date.now",
+                    "Date.parse",
+                    "Date.UTC",
+
+                    // Math methods (all are pure)
+                    "Math.abs",
+                    "Math.acos",
+                    "Math.acosh",
+                    "Math.asin",
+                    "Math.asinh",
+                    "Math.atan",
+                    "Math.atan2",
+                    "Math.atanh",
+                    "Math.cbrt",
+                    "Math.ceil",
+                    "Math.clz32",
+                    "Math.cos",
+                    "Math.cosh",
+                    "Math.exp",
+                    "Math.expm1",
+                    "Math.floor",
+                    "Math.fround",
+                    "Math.hypot",
+                    "Math.imul",
+                    "Math.log",
+                    "Math.log10",
+                    "Math.log1p",
+                    "Math.log2",
+                    "Math.max",
+                    "Math.min",
+                    "Math.pow",
+                    "Math.random",
+                    "Math.round",
+                    "Math.sign",
+                    "Math.sin",
+                    "Math.sinh",
+                    "Math.sqrt",
+                    "Math.tan",
+                    "Math.tanh",
+                    "Math.trunc",
+
+                    // JSON methods
+                    "JSON.parse",
+                    "JSON.stringify",
+
+                    // Common library patterns
+                    "require.resolve",
+                    "Buffer.from",
+                    "Buffer.alloc",
+                    "Buffer.allocUnsafe",
+                    "Buffer.isBuffer",
+                    ...context.options.rollup.pluginPure?.functions ?? [],
+                ],
+                sourcemap: context.options.sourcemap,
+            }),
 
             cachingPlugin(
                 preserveDirectivesPlugin({

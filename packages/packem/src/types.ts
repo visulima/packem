@@ -13,6 +13,7 @@ import type { Jiti, JitiOptions } from "jiti";
 import type { OutputOptions, Plugin, RollupBuild, RollupOptions, RollupWatcher } from "rollup";
 import type { Options as RollupDtsOptions } from "rollup-plugin-dts";
 import type { NodePolyfillsOptions } from "rollup-plugin-polyfill-node";
+import type { PureAnnotationsOptions } from "rollup-plugin-pure";
 import type { PluginVisualizerOptions } from "rollup-plugin-visualizer";
 import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
@@ -289,6 +290,7 @@ export interface RollupBuildOptions {
     output?: OutputOptions;
     oxc?: Omit<OXCTransformPluginConfig, "cwd" | "sourcemap" | "target"> | false;
     patchTypes: PatchTypesOptions | false;
+    pluginPure?: Omit<PureAnnotationsOptions, "sourcemap"> | false;
     plugins?: RollupPlugins;
     polyfillNode?: NodePolyfillsOptions | false;
     preserveDirectives?: {
