@@ -343,6 +343,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, context.options.outputExtensionMap?.cjs ?? "cjs"),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
+                extend: true,
                 // turn off live bindings support (exports.* getters for re-exports)
                 externalLiveBindings: false,
                 format: "cjs",
@@ -377,6 +378,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
                 entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, context.options.outputExtensionMap?.esm ?? "mjs"),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
+                extend: true,
                 // turn off live bindings support (exports.* getters for re-exports)
                 externalLiveBindings: false,
                 format: "esm",
