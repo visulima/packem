@@ -891,6 +891,9 @@ importers:
       '@babel/core':
         specifier: ^7.27.4
         version: 7.27.4
+      '@oxc-parser/binding-linux-x64-gnu':
+        specifier: 0.73.2
+        version: 0.73.2
       '@oxc-project/types':
         specifier: 0.73.2
         version: 0.73.2
@@ -11715,8 +11718,7 @@ snapshots:
   '@oxc-parser/binding-linux-s390x-gnu@0.73.2':
     optional: true
 
-  '@oxc-parser/binding-linux-x64-gnu@0.73.2':
-    optional: true
+  '@oxc-parser/binding-linux-x64-gnu@0.73.2': {}
 
   '@oxc-parser/binding-linux-x64-musl@0.73.2':
     optional: true
