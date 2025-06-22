@@ -1,3 +1,13 @@
+## @visulima/packem [1.27.0](https://github.com/visulima/packem/compare/@visulima/packem@1.26.0...@visulima/packem@1.27.0) (2025-06-22)
+
+### Features
+
+* Added "shamefully hoisted dependencies", "unused dependencies" validation ([59c50d5](https://github.com/visulima/packem/commit/59c50d53658ec4acb2fd3d09a3e2a1cef98ef741))
+
+### Miscellaneous Chores
+
+* add @oxc-parser/binding-linux-x64-gnu as dev dep ([34bff1b](https://github.com/visulima/packem/commit/34bff1b741bcf31a39c743255978e07463fc02d0))
+
 ## @visulima/packem [1.26.0](https://github.com/visulima/packem/compare/@visulima/packem@1.25.0...@visulima/packem@1.26.0) (2025-06-21)
 
 ### Features
