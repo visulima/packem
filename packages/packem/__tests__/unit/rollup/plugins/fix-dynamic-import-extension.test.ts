@@ -90,5 +90,24 @@ describe(fixDynamicImportExtension, () => {
 
             expect(result2?.code).toBe(code2);
         });
+
+        it("should not replace .d.ts extensions", () => {
+            expect.assertions(3);
+
+            const code1 = "import('./types.d.ts')";
+            const result1 = renderChunk(code1, {}, { format: "es" });
+
+            expect(result1?.code).toBe("import('./types.d.ts')");
+
+            const code2 = "import('./types.d.ts')";
+            const result2 = renderChunk(code2, {}, { format: "cjs" });
+
+            expect(result2?.code).toBe("import('./types.d.ts')");
+
+            const code3 = "import('./module.ts'); import('./types.d.ts'); import('./utils.ts');";
+            const result3 = renderChunk(code3, {}, { format: "es" });
+
+            expect(result3?.code).toBe("import('./module.mjs'); import('./types.d.ts'); import('./utils.mjs');");
+        });
     });
 });
