@@ -1,3 +1,9 @@
+## @visulima/packem [1.28.0](https://github.com/visulima/packem/compare/@visulima/packem@1.27.0...@visulima/packem@1.28.0) (2025-06-23)
+
+### Features
+
+* add extraConditions to the packageJson validation, to add custom conditions ([953b9d3](https://github.com/visulima/packem/commit/953b9d39ff5b8c11869da63275acc6ad0dfc6a68))
+
 ## @visulima/packem [1.27.0](https://github.com/visulima/packem/compare/@visulima/packem@1.26.0...@visulima/packem@1.27.0) (2025-06-22)
 
 ### Features
