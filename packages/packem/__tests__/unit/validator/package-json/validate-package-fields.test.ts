@@ -363,7 +363,7 @@ describe(validatePackageFields, () => {
             expect.assertions(1);
 
             const context = {
-                options: { validation: { packageJson: { exports: true } } },
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
                 pkg: {
                     exports: {
                         "custom-unknown": "./dist/custom.js",
@@ -374,14 +374,14 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(warn).toHaveBeenCalledWith(context, "Unknown export conditions [custom-unknown] at exports. Consider using standard conditions: default, import, module-sync, node, node-addons, require");
+            expect(warn).toHaveBeenCalledWith(context, "Unknown export conditions [custom-unknown] at exports. Consider using standard conditions (default, import, module-sync, node, node-addons, require) or add custom conditions using the 'extraConditions' option in your validation config.");
         });
 
         it("should warn on conflicting development and production conditions", () => {
             expect.assertions(1);
 
             const context = {
-                options: { validation: { packageJson: { exports: true } } },
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
                 pkg: {
                     exports: {
                         development: "./dist/dev.js",
@@ -590,6 +590,113 @@ describe(validatePackageFields, () => {
             validatePackageFields(context as unknown as BuildContext);
 
             expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should accept custom conditions when included in extraConditions", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: {
+                    validation: {
+                        packageJson: {
+                            exports: true,
+                            main: false,
+                            name: false,
+                            extraConditions: ["custom-bundler", "my-framework"],
+                        },
+                    },
+                },
+                pkg: {
+                    exports: {
+                        "custom-bundler": "./dist/custom.js",
+                        "my-framework": "./dist/framework.js",
+                        default: "./dist/index.js",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should warn on unknown conditions even when extraConditions is provided", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: {
+                    validation: {
+                        packageJson: {
+                            exports: true,
+                            extraConditions: ["known-custom"],
+                        },
+                    },
+                },
+                pkg: {
+                    exports: {
+                        "known-custom": "./dist/known.js",
+                        "unknown-custom": "./dist/unknown.js",
+                        default: "./dist/index.js",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Unknown export conditions [unknown-custom] at exports. Consider using standard conditions (default, import, module-sync, node, node-addons, require) or add custom conditions to 'validation.packageJson.extraConditions' in your packem config.");
+        });
+
+        it("should handle empty extraConditions array", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: {
+                    validation: {
+                        packageJson: {
+                            exports: true,
+                            main: false,
+                            name: false,
+                            extraConditions: [],
+                        },
+                    },
+                },
+                pkg: {
+                    exports: {
+                        import: "./dist/index.mjs",
+                        require: "./dist/index.cjs",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).not.toHaveBeenCalled();
+        });
+
+        it("should provide helpful message about extraConditions when no extraConditions are configured", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: {
+                    validation: {
+                        packageJson: {
+                            exports: true,
+                            main: false,
+                            name: false,
+                        },
+                    },
+                },
+                pkg: {
+                    exports: {
+                        "custom-condition": "./dist/custom.js",
+                        default: "./dist/index.js",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(warn).toHaveBeenCalledWith(context, "Unknown export conditions [custom-condition] at exports. Consider using standard conditions (default, import, module-sync, node, node-addons, require) or add custom conditions using the 'extraConditions' option in your validation config.");
         });
     });
 });

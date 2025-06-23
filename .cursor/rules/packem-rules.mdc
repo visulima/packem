@@ -1,0 +1,133 @@
+# Visulima Packem - Project Intelligence
+
+## Project Overview
+This is a modern bundler for Node.js and TypeScript built on Rollup with support for multiple transformers (esbuild, SWC, OXC, Sucrase). It's designed for zero-configuration bundling with comprehensive package.json validation.
+
+## Key Development Patterns
+
+### Architecture Patterns
+- **Plugin-based architecture**: Built on Rollup's plugin system
+- **Configuration-driven**: Uses package.json exports for entry point detection
+- **Transformer abstraction**: Unified interface for different transformers
+- **Validation-first approach**: Validates before building
+
+### File Structure Patterns
+- **Monorepo with Nx**: Uses Nx workspace for build orchestration
+- **Package-centric**: Main logic in `packages/packem/src/`
+- **Examples-driven**: Extensive examples in `examples/` directory
+- **Fixture-based testing**: Real-world test scenarios in `__fixtures__/`
+
+### Code Organization
+- **CLI in `src/cli/`**: Command-line interface
+- **Config in `src/config/`**: Configuration handling
+- **Rollup integration in `src/rollup/`**: Core bundling logic
+- **Validation in `src/validator/`**: Package.json validation
+- **Utils in `src/utils/`**: Shared utilities
+
+## Critical Implementation Paths
+
+### Adding New Validation Features
+1. **Types**: Add to `src/types.ts` with JSDoc
+2. **Validator**: Implement in `src/validator/package-json/`
+3. **Tests**: Add unit tests in `__tests__/unit/validator/`
+4. **Integration**: Update validation chain
+5. **Documentation**: Add examples and usage docs
+
+### Adding New Transformer Support
+1. **Plugin**: Create in `src/rollup/plugins/[transformer]/`
+2. **Types**: Add transformer interface
+3. **Factory**: Update transformer factory
+4. **Tests**: Add transformer-specific tests
+5. **Examples**: Create example project
+
+### Package.json Exports Handling
+- **Detection**: Automatic entry point detection from exports field
+- **Validation**: Comprehensive condition validation
+- **Generation**: Multi-format output (CJS/ESM) based on exports
+- **Types**: Proper .d.ts generation with correct extensions
+
+## Development Workflow
+
+### Testing Strategy
+- **Unit tests**: Core logic with Vitest
+- **Integration tests**: End-to-end scenarios
+- **Fixture tests**: Real-world examples
+- **Snapshot tests**: Output consistency
+
+### Build Process
+- **Nx orchestration**: Parallel builds and caching
+- **TypeScript compilation**: Strict mode compliance
+- **ESLint**: Comprehensive linting rules
+- **Multi-format output**: CJS and ESM simultaneously
+
+### Quality Gates
+- **Type checking**: TypeScript strict mode
+- **Linting**: ESLint with custom rules
+- **Testing**: Comprehensive test coverage
+- **Documentation**: JSDoc for all public APIs
+
+## Known Challenges
+
+### Dependency Management
+- **Optional transformers**: Peer dependencies for transformers
+- **OXC integration**: Experimental transformer with potential issues
+- **CSS processors**: Optional preprocessor dependencies
+
+### Performance Considerations
+- **Large projects**: Memory usage optimization needed
+- **Build speed**: Rollup slower than esbuild but more reliable
+- **Caching**: Multi-level caching strategy
+
+### Compatibility
+- **Node.js versions**: Support 18-24
+- **TypeScript versions**: 5.0+ minimum, 5.8+ recommended
+- **Package.json**: Modern exports field usage
+
+## Recent Changes Context
+
+### Extra Conditions Feature (Recently Implemented)
+- **Purpose**: Allow custom export conditions in validation
+- **Location**: `ValidationOptions.packageJson.extraConditions`
+- **Usage**: For custom bundlers, frameworks, tooling conditions
+- **Implementation**: Set-based validation with existing condition sets
+
+### Current Issues
+- **Integration tests**: Some failures due to `oxc-walker` dependency
+- **Non-blocking**: Core functionality works fine
+- **Resolution needed**: Dependency or import path issues
+
+## User Experience Patterns
+
+### Zero Configuration
+- **Convention over configuration**: Smart defaults from package.json
+- **Gradual complexity**: Optional config file for advanced cases
+- **Validation feedback**: Early error detection and helpful messages
+
+### Multi-format Support
+- **Automatic detection**: Infers formats from package.json exports
+- **Simultaneous generation**: CJS and ESM in single build
+- **Type declarations**: Proper .d.ts with matching extensions
+
+## Common Tasks
+
+### Adding New Configuration Options
+1. Add to types with JSDoc documentation
+2. Update configuration parser/validator
+3. Implement feature logic
+4. Add comprehensive tests
+5. Update documentation with examples
+
+### Debugging Build Issues
+1. Check package.json exports configuration
+2. Verify transformer compatibility
+3. Review validation warnings/errors
+4. Test with minimal reproduction case
+5. Check Rollup plugin chain
+
+### Performance Optimization
+1. Profile build times with different transformers
+2. Check memory usage patterns
+3. Optimize plugin chain order
+4. Leverage Nx caching effectively
+
+This project emphasizes reliability, comprehensive validation, and excellent developer experience over raw performance, making it ideal for library authors who need robust, well-validated builds.

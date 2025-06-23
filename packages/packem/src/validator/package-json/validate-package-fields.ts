@@ -6,10 +6,10 @@ import warn from "../../utils/warn";
  * Validates the exports field according to Node.js specification.
  * @param context The build context containing validation options
  * @param exports The exports field value to validate
- * @see https://nodejs.org/api/packages.html#exports Node.js Package exports
- * @see https://nodejs.org/api/packages.html#conditional-exports Conditional exports
- * @see https://nodejs.org/api/packages.html#subpath-exports Subpath exports
- * @see https://nodejs.org/api/packages.html#exports-sugar Exports sugar syntax
+ * @see https://nodejs.org/api/packages.html#exports Official Node.js documentation for package exports
+ * @see https://nodejs.org/api/packages.html#conditional-exports Guide to conditional exports in Node.js
+ * @see https://nodejs.org/api/packages.html#subpath-exports Documentation for subpath exports patterns
+ * @see https://nodejs.org/api/packages.html#exports-sugar Simplified syntax for exports field
  */
 const validateExports = (context: BuildContext, exports: unknown): void => {
     const validation = context.options.validation as ValidationOptions;
@@ -48,7 +48,11 @@ const validateExports = (context: BuildContext, exports: unknown): void => {
         "workerd", // @see https://developers.cloudflare.com/workers/runtime-apis/nodejs/
     ]);
 
-    const ALL_CONDITIONS = new Set([...COMMUNITY_CONDITIONS, ...STANDARD_CONDITIONS]);
+    // Add extra conditions from validation options
+    const extraConditions = validation.packageJson?.extraConditions || [];
+    const EXTRA_CONDITIONS = new Set(extraConditions);
+
+    const ALL_CONDITIONS = new Set([...COMMUNITY_CONDITIONS, ...EXTRA_CONDITIONS, ...STANDARD_CONDITIONS]);
 
     // eslint-disable-next-line sonarjs/cognitive-complexity
     const validateExportsValue = (value: unknown, path: string): void => {
@@ -111,7 +115,14 @@ const validateExports = (context: BuildContext, exports: unknown): void => {
             const unknownConditions = conditions.filter((condition) => !ALL_CONDITIONS.has(condition));
 
             if (unknownConditions.length > 0) {
-                warn(context, `Unknown export conditions [${unknownConditions.join(", ")}] at ${path}. Consider using standard conditions: ${[...STANDARD_CONDITIONS].join(", ")}`);
+                const hasExtraConditions = extraConditions.length > 0;
+                const standardConditionsList = [...STANDARD_CONDITIONS].join(", ");
+
+                if (hasExtraConditions) {
+                    warn(context, `Unknown export conditions [${unknownConditions.join(", ")}] at ${path}. Consider using standard conditions (${standardConditionsList}) or add custom conditions to 'validation.packageJson.extraConditions' in your packem config.`);
+                } else {
+                    warn(context, `Unknown export conditions [${unknownConditions.join(", ")}] at ${path}. Consider using standard conditions (${standardConditionsList}) or add custom conditions using the 'extraConditions' option in your validation config.`);
+                }
             }
 
             // Validate condition priority order

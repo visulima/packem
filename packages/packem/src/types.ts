@@ -386,6 +386,12 @@ export type ValidationOptions = {
         dependencies?: boolean;
         engines?: boolean;
         exports?: boolean;
+        /**
+         * Additional custom conditions to consider valid in exports field validation.
+         * These will be added to the standard and community conditions.
+         * @example ["custom", "my-bundler"]
+         */
+        extraConditions?: string[];
         files?: boolean;
         main?: boolean;
         module?: boolean;
