@@ -1,3 +1,18 @@
+## @visulima/packem [1.28.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.0...@visulima/packem@1.28.1) (2025-06-24)
+
+### Bug Fixes
+
+* enhance build command options and improve regex safety in inferEntries ([db07209](https://github.com/visulima/packem/commit/db0720941f80dd7080f700bd2fdbfb44c5314178))
+* resolve sourcemap generation issues in dynamic import extension plugin ([7838a26](https://github.com/visulima/packem/commit/7838a2607c1bdb2bfc5f7f48f075edf83c39aa75))
+
+### Miscellaneous Chores
+
+* update dependencies in package.json and pnpm-lock.yaml ([c3dbf1c](https://github.com/visulima/packem/commit/c3dbf1c10eb3f948df1b5c079e4bb064aefc6e8f))
+
+### Tests
+
+* enhance inferEntries tests with custom logger context ([e370625](https://github.com/visulima/packem/commit/e370625d11c9536242e1cef134ed4bd87632a4bf))
+
 ## @visulima/packem [1.28.0](https://github.com/visulima/packem/compare/@visulima/packem@1.27.0...@visulima/packem@1.28.0) (2025-06-23)
 
 ### Features
