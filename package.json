@@ -64,19 +64,19 @@
         "is-ci": "^4.1.0",
         "lint-staged": "^16.1.2",
         "nx": "^21.2.1",
-        "pkg-pr-new": "^0.0.51",
+        "pkg-pr-new": "^0.0.53",
         "plop": "^4.0.1",
         "publint": "^0.3.12",
         "rimraf": "6.0.1",
         "secretlint": "10.1.0",
         "semantic-release": "^24.2.5",
-        "sort-package-json": "^3.2.1",
+        "sort-package-json": "^3.3.0",
         "taze": "^19.1.0",
-        "textlint": "^14.8.4",
+        "textlint": "^15.0.1",
         "typescript": "^5.8.3",
         "vitest": "^3.2.4"
     },
-    "packageManager": "pnpm@10.12.1",
+    "packageManager": "pnpm@10.12.2",
     "engines": {
         "node": ">=18.* <=24.*"
     },
@@ -84,11 +84,11 @@
         "onlyBuiltDependencies": [
             "@parcel/watcher",
             "@swc/core",
+            "@tailwindcss/oxide",
             "esbuild",
             "node-sass",
             "nodehun",
-            "nx",
-            "unrs-resolver"
+            "nx"
         ],
         "overrides": {
             "@octokit/plugin-paginate-rest@>=1.0.0 <11.4.1": ">=11.4.1",
