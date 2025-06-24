@@ -255,7 +255,9 @@ const inferEntries = (
         let input = sourceFiles.find((index) => SOURCE_RE.test(index));
 
         if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && input === undefined) {
-            const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace(/(.*)\.[^.]*$/, "$1") + fileExtensionRegex);
+            // Use a safer regex pattern to avoid backtracking issues
+            const sourceSlugWithoutExtension = sourceSlug.replace(/^(.+?)\.[^.]*$/, "$1");
+            const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlugWithoutExtension + fileExtensionRegex);
 
             input = sourceFiles.find((index) => SPECIAL_SOURCE_RE.test(index));
         }
@@ -268,7 +270,7 @@ const inferEntries = (
             continue;
         }
 
-        if ((input.endsWith(".ts") || input.endsWith(".cts") || input.endsWith(".mts")) && isAccessibleSync(input)) {
+        if (isAccessibleSync(input) && /\.[cm]?tsx?$/.test(input)) {
             validateIfTypescriptIsInstalled(context);
         }
 

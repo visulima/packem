@@ -23,7 +23,7 @@ describe("packem typescript", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it.sequential.each([
+    it.each([
         ["cts", "cjs"],
         ["mts", "mjs"],
         ["ts", "cjs"],

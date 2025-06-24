@@ -255,8 +255,13 @@ const createBuildCommand = (cli: Cli): void => {
                 type: Boolean,
             },
             {
-                description: "Enable or disable the output validation",
+                description: "Disable the output validation",
                 name: "no-validation",
+                type: Boolean,
+            },
+            {
+                description: "Disable the cache",
+                name: "no-cache",
                 type: Boolean,
             },
             {
