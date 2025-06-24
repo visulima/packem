@@ -1,3 +1,9 @@
+## @visulima/packem [1.28.2](https://github.com/visulima/packem/compare/@visulima/packem@1.28.1...@visulima/packem@1.28.2) (2025-06-24)
+
+### Bug Fixes
+
+* update transformer version retrieval logic in generateOptions ([d8a460a](https://github.com/visulima/packem/commit/d8a460a48c82c8a7d30d06190e5c52d138c2200a))
+
 ## @visulima/packem [1.28.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.0...@visulima/packem@1.28.1) (2025-06-24)
 
 ### Bug Fixes
