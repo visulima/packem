@@ -525,25 +525,34 @@ const generateOptions = (
     }
 
     let version = "0.0.0";
+    const dependencies = new Map([...Object.entries(packageJson.dependencies ?? {}), ...Object.entries(packageJson.devDependencies ?? {})]);
 
     if (options.transformer?.NAME !== undefined) {
         options.transformerName = options.transformer.NAME;
+
+        let dependencyName: string = options.transformerName;
+
+        if (options.transformerName === "oxc") {
+            dependencyName = "oxc-transform";
+        } else if (options.transformerName === "swc") {
+            dependencyName = "@swc/core";
+        }
+
+        version = dependencies.get(dependencyName) ?? "0.0.0";
         // TODO: Remove this in v2, and a throw error if transformer.NAME is not set
     } else if (!options.transformerName) {
-        const dependencies = new Map([...Object.entries(packageJson.dependencies ?? {}), ...Object.entries(packageJson.devDependencies ?? {})]);
-
         if (dependencies.has("esbuild")) {
             options.transformerName = "esbuild";
-
             version = dependencies.get("esbuild") as string;
         } else if (dependencies.has("@swc/core")) {
             options.transformerName = "swc";
-
             version = dependencies.get("@swc/core") as string;
         } else if (dependencies.has("sucrase")) {
             options.transformerName = "sucrase";
-
             version = dependencies.get("sucrase") as string;
+        } else if (dependencies.has("oxc-transform")) {
+            options.transformerName = "oxc";
+            version = dependencies.get("oxc-transform") as string;
         } else {
             throw new Error("Unknown transformer, check your transformer options or install one of the supported transformers: esbuild, swc, sucrase");
         }
