@@ -492,11 +492,18 @@ describe(inferEntries, () => {
 
         createFiles(["src/gather.ts"], temporaryDirectoryPath);
 
+        const context = {
+            ...defaultContext,
+            logger: {
+                debug: vi.fn(),
+            },
+        } as unknown as BuildContext;
+
         expect(
             inferEntries(
                 { exports: { "./*": "./*" } },
                 ["src/", "src/", "src/gather.ts"].map((file) => join(temporaryDirectoryPath, file)),
-                defaultContext,
+                context,
             ),
         ).toStrictEqual({
             entries: [
@@ -511,7 +518,7 @@ describe(inferEntries, () => {
             ],
             warnings: [],
         } satisfies InferEntriesResult);
-        expect(defaultContext.logger.debug).toHaveBeenCalledTimes(1);
+        expect(context.logger.debug).toHaveBeenCalledTimes(1);
     });
 
     it("should handle multiple entries", () => {
