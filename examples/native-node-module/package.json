@@ -18,5 +18,8 @@
         "nodehun": "^3.0.2",
         "rimraf": "^6.0.1",
         "typescript": "^5.8.3"
+    },
+    "engines": {
+        "node": ">=18"
     }
 }

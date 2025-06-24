@@ -22,5 +22,8 @@
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.25.5",
         "rimraf": "^6.0.1"
+    },
+    "engines": {
+        "node": ">=18"
     }
 }

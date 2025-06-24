@@ -32,5 +32,8 @@
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.25.5",
         "typescript": "^5.8.3"
+    },
+    "engines": {
+        "node": ">=18"
     }
 }

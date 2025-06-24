@@ -42,5 +42,8 @@
         "@visulima/packem": "workspace:*",
         "sucrase": "^3.35.0",
         "typescript": "^5.8.3"
+    },
+    "engines": {
+        "node": ">=18"
     }
 }

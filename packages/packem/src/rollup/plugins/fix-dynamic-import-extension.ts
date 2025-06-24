@@ -1,13 +1,13 @@
 import MagicString from "magic-string";
-import type { Plugin } from "rollup";
+import type { Plugin, NormalizedOutputOptions, RenderedChunk } from "rollup";
 
 const fixDynamicImportExtension = (): Plugin =>
     ({
         name: "packem:fix-dynamic-import-extension",
-        renderChunk(code, _chunk, options) {
-            if (options.format === "es" || options.format === "cjs") {
+        renderChunk(code: string, _chunk: RenderedChunk, outputOptions: NormalizedOutputOptions) {
+            if (outputOptions.format === "es" || outputOptions.format === "cjs") {
                 const magicString = new MagicString(code);
-                const extension = options.format === "es" ? "mjs" : "cjs";
+                const extension = outputOptions.format === "es" ? "mjs" : "cjs";
                 // Match .ts extensions but exclude .d.ts (negative lookbehind)
                 const regex = /(import\(.*?)(?<!\.d)(\.ts)(?=['´"`]\))/g;
 
@@ -27,10 +27,12 @@ const fixDynamicImportExtension = (): Plugin =>
                     }
                 }
 
-                return {
-                    code: hasChanged ? magicString.toString() : code,
-                    map: hasChanged ? magicString.generateMap({ hires: true }) : undefined,
-                };
+                if (hasChanged) {
+                    return {
+                        code: magicString.toString(),
+                        map: outputOptions.sourcemap ? magicString.generateMap({ hires: true }) : undefined,
+                    };
+                }
             }
 
             return undefined;
