@@ -4,7 +4,7 @@ import { isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 import { globSync, isDynamicPattern } from "tinyglobby";
 
-import { ENDING_REGEX } from "../../constants";
+import { ENDING_REGEX } from "@visulima/packem-share/constants"
 import type { BuildContext, BuildEntry } from "../../types";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity

@@ -1,9 +1,2 @@
-const arrayify = <T>(x: T | T[]): T[] => {
-    if (x === undefined || x === null) {
-        return [] as T[];
-    }
-
-    return Array.isArray(x) ? x : ([x] as T[]);
-};
-
-export default arrayify;
+// Re-export from shared package
+export { arrayify as default } from "@visulima/packem-share";

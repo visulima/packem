@@ -1,6 +1,6 @@
 import type { OutputBundle, OutputOptions, Plugin } from "rollup";
 
-import { ENDING_REGEX } from "../../constants";
+import { ENDING_REGEX } from "@visulima/packem-share/constants"
 
 interface MetaInfo {
     source: string;

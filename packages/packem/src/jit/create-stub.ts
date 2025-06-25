@@ -1,12 +1,11 @@
 import { readFileSync, writeFileSync } from "@visulima/fs";
+import { DEFAULT_EXTENSIONS, ENDING_REGEX } from "@visulima/packem-share/constants";
+import { resolveAliases, warn } from "@visulima/packem-share/utils";
 import { dirname, relative, resolve } from "@visulima/path";
 import { fileURLToPath, resolveModuleExportNames, resolvePath } from "mlly";
 
-import { DEFAULT_EXTENSIONS, ENDING_REGEX } from "../constants";
 import { getShebang, makeExecutable } from "../rollup/plugins/shebang";
-import resolveAliases from "../rollup/utils/resolve-aliases";
 import type { BuildContext } from "../types";
-import warn from "../utils/warn";
 
 const IDENTIFIER_REGEX = /^[_$a-z\u00A0-\uFFFF][\w$\u00A0-\uFFFF]*$/iu;
 

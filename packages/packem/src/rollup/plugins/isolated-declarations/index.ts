@@ -15,7 +15,7 @@ import type { TsConfigResult } from "@visulima/tsconfig";
 import { parseAsync } from "oxc-parser";
 import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginContext, PreRenderedChunk } from "rollup";
 
-import { ENDING_REGEX } from "../../../constants";
+import { ENDING_REGEX } from "@visulima/packem-share/constants";
 import type { IsolatedDeclarationsTransformer } from "../../../types";
 import extendString from "./utils/extend-string";
 import fixDtsDefaultCJSExports from "./utils/fix-dts-default-cjs-exports";

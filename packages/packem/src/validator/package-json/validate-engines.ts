@@ -1,7 +1,7 @@
 import { satisfies, validRange } from "semver";
 
 import type { BuildContext, ValidationOptions } from "../../types";
-import warn from "../../utils/warn";
+import { warn } from "@visulima/packem-share/utils"
 
 /**
  * Default Node.js version range that provides a sensible baseline

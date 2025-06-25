@@ -8,6 +8,7 @@ import { nodeResolve as nodeResolvePlugin } from "@rollup/plugin-node-resolve";
 import replacePlugin from "@rollup/plugin-replace";
 import { wasm as wasmPlugin } from "@rollup/plugin-wasm";
 import { cyan } from "@visulima/colorize";
+import { getChunkFilename, getEntryFileNames, resolveAliases, sortUserPlugins } from "@visulima/packem-share/utils";
 import { join, relative, resolve } from "@visulima/path";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
@@ -23,8 +24,7 @@ import { memoizeByKey } from "../utils/memoize";
 import chunkSplitter from "./plugins/chunk-splitter";
 import { cjsInteropPlugin } from "./plugins/cjs-interop";
 import { copyPlugin } from "./plugins/copy";
-import cssPlugin from "./plugins/css";
-import cssModulesTypesPlugin from "./plugins/css-modules-types";
+import { rollupCssPlugin, cssModulesTypesPlugin } from "@visulima/rollup-css-plugin";
 import browserslistToEsbuild from "./plugins/esbuild/browserslist-to-esbuild";
 import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
 import { esmShimCjsSyntaxPlugin } from "./plugins/esm-shim-cjs-syntax";
@@ -53,10 +53,6 @@ import resolveTsconfigRootDirectoriesPlugin from "./plugins/typescript/resolve-t
 import resolveTypescriptMjsCtsPlugin from "./plugins/typescript/resolve-typescript-mjs-cjs";
 import { urlPlugin } from "./plugins/url";
 import createSplitChunks from "./utils/chunks/create-split-chunks";
-import getChunkFilename from "./utils/get-chunk-filename";
-import getEntryFileNames from "./utils/get-entry-file-names";
-import resolveAliases from "./utils/resolve-aliases";
-import sortUserPlugins from "./utils/sort-user-plugins";
 
 const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],
@@ -453,7 +449,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             context.options.rollup.css
             && context.options.rollup.css.loaders
             && context.options.rollup.css.loaders.length > 0
-            && await cssPlugin(
+            && await rollupCssPlugin(
                 {
                     dts: Boolean(context.options.declaration) || context.options.isolatedDeclarationTransformer !== undefined,
                     sourceMap: context.options.sourcemap,

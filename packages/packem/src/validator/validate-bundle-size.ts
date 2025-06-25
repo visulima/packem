@@ -1,9 +1,9 @@
 import { formatBytes, parseBytes } from "@visulima/humanizer";
+import { warn } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
 import picomatch from "picomatch";
 
 import type { BuildContext, ValidationOptions } from "../types";
-import warn from "../utils/warn";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const validateBundleSize = (context: BuildContext, logged: boolean): void => {

@@ -7,9 +7,8 @@
  *
  * Copyright (c) 2018 these people -> https://github.com/huozhi/bunchee/graphs/contributors
  */
+import { DEFAULT_EXTENSIONS } from "@visulima/packem-share/constants";
 import { basename } from "@visulima/path";
-
-import { DEFAULT_EXTENSIONS } from "../../../constants";
 
 const getCustomModuleLayer = (moduleId: string): string | undefined => {
     const segments = basename(moduleId).split(".");

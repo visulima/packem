@@ -6,7 +6,7 @@ import { relative, resolve } from "@visulima/path";
 import type { BuildContext, ValidationOptions } from "../../types";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
 import levenstein from "../../utils/find-alternatives";
-import warn from "../../utils/warn";
+import { warn } from "@visulima/packem-share/utils"
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const validatePackageEntries = (context: BuildContext): void => {

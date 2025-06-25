@@ -67,4 +67,4 @@ describe(findAlternatives, () => {
 
         expect(result).toStrictEqual([]);
     });
-});
+}); 

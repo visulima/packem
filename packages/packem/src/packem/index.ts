@@ -6,6 +6,8 @@ import { ensureDirSync } from "@visulima/fs";
 import { duration } from "@visulima/humanizer";
 import type { NormalizedPackageJson, PackageJson } from "@visulima/package";
 import { hasPackageJsonAnyDependency } from "@visulima/package";
+import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "@visulima/packem-share/constants";
+import { getHash } from "@visulima/packem-share/utils";
 import type { Pail } from "@visulima/pail";
 import { join, resolve } from "@visulima/path";
 import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
@@ -20,9 +22,7 @@ import { exec } from "tinyexec";
 import loadPackageJson from "../config/utils/load-package-json";
 import loadTsconfig from "../config/utils/load-tsconfig";
 import prepareEntries from "../config/utils/prepare-entries";
-import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "../constants";
 import createStub from "../jit/create-stub";
-import getHash from "../rollup/utils/get-hash";
 import rollupWatch from "../rollup/watch";
 import type { BuildConfig, BuildContext, BuildOptions, Environment, InternalBuildOptions, Mode } from "../types";
 import cleanDistributionDirectories from "../utils/clean-distribution-directories";
@@ -90,7 +90,6 @@ const generateOptions = (
     runtimeVersion: string,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): InternalBuildOptions => {
-    // eslint-disable-next-line etc/no-internal
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
     const splitRuntimeVersion = runtimeVersion.split(".");
 

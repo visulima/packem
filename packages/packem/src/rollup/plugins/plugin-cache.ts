@@ -1,8 +1,8 @@
+import { getHash } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
 import type { ObjectHook, Plugin } from "rollup";
 
 import type FileCache from "../../utils/file-cache";
-import getHash from "../utils/get-hash";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getHandler = (plugin: ObjectHook<any> | ((...arguments_: any[]) => any)): ((...arguments_: any[]) => any) => plugin.handler || plugin;

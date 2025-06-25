@@ -1,3 +1,4 @@
+import { getChunkFilename } from "@visulima/packem-share/utils";
 import { resolve } from "@visulima/path";
 import type { RollupCache } from "rollup";
 import { rollup } from "rollup";
@@ -5,7 +6,6 @@ import { rollup } from "rollup";
 import type { BuildContext } from "../types";
 import type FileCache from "../utils/file-cache";
 import { getRollupDtsOptions } from "./get-rollup-options";
-import getChunkFilename from "./utils/get-chunk-filename";
 
 const DTS_CACHE_KEY = "rollup-dts.json";
 

@@ -1,16 +1,15 @@
 import { readdirSync } from "node:fs";
 
 import { cyan } from "@visulima/colorize";
+import { ENDING_REGEX } from "@visulima/packem-share/constants";
+import { getPackageName, resolveAliases } from "@visulima/packem-share/utils";
 import type { Pail } from "@visulima/pail";
 import { isAbsolute, join } from "@visulima/path";
 import { resolveAlias } from "@visulima/path/utils";
 import { isNodeBuiltin, parseNodeModulePath } from "mlly";
 import type { InputOptions, Plugin, ResolveIdResult } from "rollup";
 
-import { ENDING_REGEX } from "../../constants";
 import type { BuildContext } from "../../types";
-import getPackageName from "../../utils/get-package-name";
-import resolveAliases from "../utils/resolve-aliases";
 
 type MaybeFalsy<T> = T | false | null | undefined;
 

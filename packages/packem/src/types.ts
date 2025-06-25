@@ -6,6 +6,7 @@ import type { RollupReplaceOptions } from "@rollup/plugin-replace";
 import type { RollupWasmOptions } from "@rollup/plugin-wasm";
 import type { FilterPattern } from "@rollup/pluginutils";
 import type { PackageJson } from "@visulima/package";
+import type { Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
 import type { Pail } from "@visulima/pail";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { Hookable } from "hookable";
@@ -20,7 +21,7 @@ import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 import type { Node10CompatibilityOptions } from "./packem/node10-compatibility";
 import type { CJSInteropOptions } from "./rollup/plugins/cjs-interop";
 import type { CopyPluginOptions } from "./rollup/plugins/copy";
-import type { StyleOptions } from "./rollup/plugins/css/types";
+import type { StyleOptions } from "@visulima/rollup-css-plugin";
 import type { EsbuildPluginConfig, Options as EsbuildOptions } from "./rollup/plugins/esbuild/types";
 import type { EsmShimCjsSyntaxOptions } from "./rollup/plugins/esm-shim-cjs-syntax";
 import type { IsolatedDeclarationsOptions } from "./rollup/plugins/isolated-declarations";
@@ -71,10 +72,6 @@ interface RollupDynamicImportVariablesOptions {
      */
     warnOnError?: boolean;
 }
-
-export type Format = "cjs" | "esm";
-
-export type Environment = "production" | "development" | undefined;
 
 /**
  * In addition to basic `entries`, `presets`, and `hooks`,
@@ -268,8 +265,6 @@ export type IsolatedDeclarationsTransformer = (code: string, id: string, sourceM
 
 export type KillSignal = "SIGKILL" | "SIGTERM";
 
-export type Mode = "build" | "jit" | "watch";
-
 export interface RollupBuildOptions {
     alias: RollupAliasOptions | false;
     cjsInterop?: CJSInteropOptions;
@@ -323,8 +318,6 @@ export type RollupPlugins = {
     plugin: Plugin;
     type?: "build" | "dts";
 }[];
-
-export type Runtime = "browser" | "edge-light" | "node" | "react-native" | "react-server";
 
 export type TransformerFn = ((config: EsbuildPluginConfig | InternalOXCTransformPluginConfig | SucrasePluginConfig | SwcPluginConfig) => Plugin) & {
     NAME?: TransformerName;
@@ -386,6 +379,7 @@ export type ValidationOptions = {
         dependencies?: boolean;
         engines?: boolean;
         exports?: boolean;
+
         /**
          * Additional custom conditions to consider valid in exports field validation.
          * These will be added to the standard and community conditions.
@@ -401,5 +395,5 @@ export type ValidationOptions = {
     };
 };
 
-export type { PostCSSMeta } from "./rollup/plugins/css/loaders/types";
-export type { InjectOptions, StyleOptions } from "./rollup/plugins/css/types";
+export type { PostCSSMeta, InjectOptions, StyleOptions } from "@visulima/rollup-css-plugin";
+export type { Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";

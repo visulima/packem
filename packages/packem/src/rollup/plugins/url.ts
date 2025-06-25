@@ -12,12 +12,11 @@ import { readFile, stat } from "node:fs/promises";
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { ensureDir } from "@visulima/fs";
+import { svgEncoder } from "@visulima/packem-share/utils";
 import { basename, dirname, extname, join, relative } from "@visulima/path";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mime from "mime";
 import type { Plugin } from "rollup";
-
-import svgEncoder from "../utils/svg-encoder";
 
 const copy = async (source: string, destination: string): Promise<void> => {
     await new Promise((resolve, reject) => {

@@ -2,7 +2,7 @@ import { createFilter } from "@rollup/pluginutils";
 import type { Plugin } from "rollup";
 import { transform as sucraseTransform } from "sucrase";
 
-import { EXCLUDE_REGEXP } from "../../../constants";
+import { EXCLUDE_REGEXP } from "@visulima/packem-share/constants";
 import type { TransformerFn as TransformerFunction } from "../../../types";
 import type { SucrasePluginConfig } from "./types";
 
