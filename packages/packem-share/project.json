@@ -1,0 +1,8 @@
+{
+    "name": "packem-share",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/packem-share/src",
+    "projectType": "library",
+    "tags": ["packem-share", "type:package"],
+    "implicitDependencies": []
+}
