@@ -1,34 +1,19 @@
+import type {
+    IsolatedDeclarationsTransformer,
+    PackemRollupOptions,
+    TransformerFn,
+    TransformerName,
+} from "@visulima/packem-rollup";
+import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
 import type { BuildContext, BuildHooks, Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
+import type { FileCache } from "@visulima/packem-share/utils";
+import type { StyleOptions } from "@visulima/rollup-css-plugin";
 import type { JitiOptions } from "jiti";
 import type { Plugin } from "rollup";
 import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
 import type { Node10CompatibilityOptions } from "./packem/node10-compatibility";
 import type { ResolveExternalsPluginOptions } from "./rollup/plugins/resolve-externals-plugin";
-import type { StyleOptions } from "@visulima/rollup-css-plugin";
-import type { FileCache } from "@visulima/packem-share/utils";
-// Import all plugin types from packem-rollup
-import type {
-    CJSInteropOptions,
-    CopyPluginOptions,
-    EsbuildPluginConfig,
-    EsmShimCjsSyntaxOptions,
-    InternalOXCTransformPluginConfig,
-    IsolatedDeclarationsOptions,
-    JSXRemoveAttributesPlugin,
-    LicenseOptions,
-    Options as EsbuildOptions,
-    OxcResolveOptions,
-    OXCTransformPluginConfig,
-    PatchTypesOptions,
-    RawLoaderOptions,
-    ShebangOptions,
-    SourcemapsPluginOptions,
-    SucrasePluginConfig,
-    SwcPluginConfig,
-    TsconfigPathsPluginOptions,
-    UrlOptions,
-} from "@visulima/packem-rollup";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -120,6 +105,7 @@ export interface BuildOptions {
     killSignal?: KillSignal;
     minify?: boolean | undefined;
     name: string;
+    node10Compatibility?: Node10CompatibilityOptions | false;
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
     onSuccess?: string | (() => Promise<(() => Promise<void> | void) | undefined | void>);
     onSuccessTimeout?: number;
@@ -135,7 +121,7 @@ export interface BuildOptions {
     validation?: ValidationOptions | false;
 }
 export interface InternalBuildOptions extends BuildOptions {
-    rollup: Omit<BuildOptions["rollup"], "oxc"> & { oxc?: InternalOXCTransformPluginConfig | false };
+    rollup: Omit<BuildOptions["rollup"], "oxc"> & { oxc?: InternalOXCTransformPluginConfig };
     transformerName: TransformerName | undefined;
 }
 
@@ -143,6 +129,9 @@ export type KillSignal = "SIGKILL" | "SIGTERM";
 
 export interface RollupBuildOptions extends PackemRollupOptions {
     css?: StyleOptions | false;
+    // TODO: Move this out of the `RollupBuildOptions` type
+    // @deprecated Use `node10Compatibility` in the main config instead
+    node10Compatibility?: Node10CompatibilityOptions | false;
     resolveExternals?: ResolveExternalsPluginOptions;
 }
 
@@ -222,5 +211,5 @@ export type ValidationOptions = {
     };
 };
 
-export type { PostCSSMeta, InjectOptions, StyleOptions } from "@visulima/rollup-css-plugin";
 export type { Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
+export type { InjectOptions, PostCSSMeta, StyleOptions } from "@visulima/rollup-css-plugin";

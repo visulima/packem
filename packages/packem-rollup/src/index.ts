@@ -1,4 +1,3 @@
-// Export plugins except transformer plugins (esbuild, oxc, sucrase, swc, typescript)
 export { default as chunkSplitter } from "./plugins/chunk-splitter";
 export type { CJSInteropOptions } from "./plugins/cjs-interop";
 export { cjsInteropPlugin } from "./plugins/cjs-interop";
@@ -28,7 +27,6 @@ export type { SourcemapsPluginOptions } from "./plugins/source-maps";
 export { sourcemapsPlugin } from "./plugins/source-maps";
 export type { UrlOptions } from "./plugins/url";
 export { urlPlugin } from "./plugins/url";
-// Re-export colorize utility
 export type {
     IsolatedDeclarationsResult,
     IsolatedDeclarationsTransformer,
@@ -40,13 +38,13 @@ export type {
 export { default as createSplitChunks } from "./utils/chunks/create-split-chunks";
 export { default as getCustomModuleLayer } from "./utils/chunks/get-custom-module-layer";
 export { default as getModuleLayer } from "./utils/chunks/get-module-layer";
-export { default as alias } from "@rollup/plugin-alias";
-export { default as commonjs } from "@rollup/plugin-commonjs";
-export { default as dynamicImportVars } from "@rollup/plugin-dynamic-import-vars";
-export { default as inject } from "@rollup/plugin-inject";
-export { default as nodeResolve } from "@rollup/plugin-node-resolve";
-export { default as replace } from "@rollup/plugin-replace";
-export { default as wasm } from "@rollup/plugin-wasm";
-export { default as polyfillNode } from "rollup-plugin-polyfill-node";
-export { PluginPure as pure } from "rollup-plugin-pure";
-export { default as visualizer } from "rollup-plugin-visualizer";
+export { type Alias, default as alias, type ResolverObject as AliasResolverObject, type ResolvedAlias, type RollupAliasOptions } from "@rollup/plugin-alias";
+export { default as commonjs, type RollupCommonJSOptions } from "@rollup/plugin-commonjs";
+export { default as dynamicImportVars, type RollupDynamicImportVariablesOptions } from "@rollup/plugin-dynamic-import-vars";
+export { default as inject, type RollupInjectOptions } from "@rollup/plugin-inject";
+export { default as nodeResolve, type RollupNodeResolveOptions } from "@rollup/plugin-node-resolve";
+export { default as replace, type RollupReplaceOptions } from "@rollup/plugin-replace";
+export { type RollupWasmOptions, default as wasm } from "@rollup/plugin-wasm";
+export { default as polyfillNode, type NodePolyfillsOptions as RollupNodePolyfillsOptions } from "rollup-plugin-polyfill-node";
+export { PluginPure as pure, type PureAnnotationsOptions as RollupPureAnnotationsOptions } from "rollup-plugin-pure";
+export { type PluginVisualizerOptions as RollupPluginVisualizerOptions, default as visualizer } from "rollup-plugin-visualizer";

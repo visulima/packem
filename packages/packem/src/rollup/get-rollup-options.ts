@@ -1,57 +1,30 @@
 import { versions } from "node:process";
 
-import type { ResolverObject } from "@rollup/plugin-alias";
 import { cyan } from "@visulima/colorize";
-import type { ShebangOptions } from "@visulima/packem-rollup";
-import { oxcResolvePlugin, patchTypescriptTypesPlugin, resolveTsconfigPathsPlugin, resolveTsconfigRootDirectoriesPlugin, resolveTypescriptMjsCtsPlugin,
-    alias as aliasPlugin,
-    browserslistToEsbuild,
-    cachingPlugin,
-    chunkSplitter,
-    cjsInteropPlugin,
-    commonjs as commonjsPlugin,
-    copyPlugin,
-    createSplitChunks,
-    dynamicImportVars as dynamicImportVarsPlugin,
-    esmShimCjsSyntaxPlugin,
-    fixDtsDefaultCjsExportsPlugin,
-    fixDynamicImportExtension,
-    isolatedDeclarationsPlugin,
-    jsonPlugin as JSONPlugin,
-    jsxRemoveAttributes,
-    licensePlugin,
-    metafilePlugin,
-    nodeResolve as nodeResolvePlugin,
-    polyfillNode as polyfillPlugin,
-    preserveDirectivesPlugin,
-    pure as PluginPure,
-    rawPlugin,
-    removeShebangPlugin,
-    replace as replacePlugin,
-    resolveFileUrl as resolveFileUrlPlugin,
-    shebangPlugin,
-    sourcemapsPlugin,
-    urlPlugin,
-    visualizer as visualizerPlugin,
-    wasm as wasmPlugin,
-} from "@visulima/packem-rollup";
+import type { AliasResolverObject, ShebangOptions } from "@visulima/packem-rollup";
+import { alias as aliasPlugin, browserslistToEsbuild, cachingPlugin, chunkSplitter, cjsInteropPlugin, commonjs as commonjsPlugin, copyPlugin, createSplitChunks, dynamicImportVars as dynamicImportVariablesPlugin, esmShimCjsSyntaxPlugin, fixDtsDefaultCjsExportsPlugin, fixDynamicImportExtension, isolatedDeclarationsPlugin, jsonPlugin as JSONPlugin, jsxRemoveAttributes, licensePlugin, metafilePlugin, nodeResolve as nodeResolvePlugin, oxcResolvePlugin, patchTypescriptTypesPlugin, polyfillNode as polyfillPlugin, preserveDirectivesPlugin, pure as PluginPure, rawPlugin, removeShebangPlugin, replace as replacePlugin, resolveFileUrl as resolveFileUrlPlugin, shebangPlugin, sourcemapsPlugin, urlPlugin, visualizer as visualizerPlugin, wasm as wasmPlugin } from "@visulima/packem-rollup";
+import type { EsbuildPluginConfig } from "@visulima/packem-rollup/esbuild";
+import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
+import type { SucrasePluginConfig } from "@visulima/packem-rollup/sucrase";
+import type { SwcPluginConfig } from "@visulima/packem-rollup/swc";
+import { resolveTsconfigPathsPlugin, resolveTsconfigRootDirectoriesPlugin, resolveTypescriptMjsCtsPlugin } from "@visulima/packem-rollup/typescript";
+import type { BuildContext } from "@visulima/packem-share";
+import { arrayify, memoizeByKey } from "@visulima/packem-share";
 import { getChunkFilename, getEntryFileNames, sortUserPlugins } from "@visulima/packem-share/utils";
-import resolveAliases from "./utils/resolve-aliases";
 import { join, relative, resolve } from "@visulima/path";
-// Import CSS plugins
 import { cssModulesTypesPlugin, rollupCssPlugin } from "@visulima/rollup-css-plugin";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
 import { minVersion } from "semver";
 
-import type { BuildContext, InternalBuildOptions } from "../types";
+import type { InternalBuildOptions } from "../types";
 import type FileCache from "../utils/file-cache";
-import { memoizeByKey, arrayify } from "@visulima/packem-share";
 import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
+import resolveAliases from "./utils/resolve-aliases";
 
 const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],
-    context: BuildContext,
+    context: BuildContext<InternalBuildOptions>,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): EsbuildPluginConfig | InternalOXCTransformPluginConfig | SucrasePluginConfig | SwcPluginConfig => {
     let nodeTarget = `node${versions.node.split(".")[0]}`;
@@ -208,7 +181,7 @@ const getTransformerConfig = (
     throw new Error(`A Unknown transformer was provided`);
 };
 
-const sharedOnWarn = (warning: RollupLog, context: BuildContext): boolean => {
+const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalBuildOptions>): boolean => {
     // If the circular dependency warning is from node_modules, ignore it
     if (warning.code === "CIRCULAR_DEPENDENCY" && /Circular dependency:[\s\S]*node_modules/.test(warning.message)) {
         return true;
@@ -232,7 +205,7 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext): boolean => {
     return warning.code === "MIXED_EXPORTS" && context.options.cjsInterop === true;
 };
 
-const baseRollupOptions = (context: BuildContext, type: "build" | "dts"): RollupOptions =>
+const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "build" | "dts"): RollupOptions =>
     <RollupOptions>{
         input: Object.fromEntries(context.options.entries.map((entry) => [entry.name, resolve(context.options.rootDir, entry.input)])),
 
@@ -293,7 +266,7 @@ const baseRollupOptions = (context: BuildContext, type: "build" | "dts"): Rollup
     };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity,import/exports-last
-export const getRollupOptions = async (context: BuildContext, fileCache: FileCache): Promise<RollupOptions> => {
+export const getRollupOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
 
     let nodeResolver;
@@ -415,7 +388,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             context.options.rollup.alias
             && aliasPlugin({
                 // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                customResolver: nodeResolver as ResolverObject,
+                customResolver: nodeResolver as AliasResolverObject,
                 ...context.options.rollup.alias,
                 entries: resolvedAliases,
             }),
@@ -642,7 +615,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             }),
 
             context.options.rollup.dynamicVars && fixDynamicImportExtension(),
-            context.options.rollup.dynamicVars && dynamicImportVarsPlugin(context.options.rollup.dynamicVars),
+            context.options.rollup.dynamicVars && dynamicImportVariablesPlugin(context.options.rollup.dynamicVars),
 
             context.options.rollup.commonjs
             && cachingPlugin(
@@ -706,7 +679,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
     }) as RollupOptions;
 };
 
-const createDtsPlugin = async (context: BuildContext): Promise<Plugin> => {
+const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>): Promise<Plugin> => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require
     const { dts } = require("rollup-plugin-dts") as typeof import("rollup-plugin-dts");
 
@@ -727,7 +700,7 @@ const createDtsPlugin = async (context: BuildContext): Promise<Plugin> => {
 // This will avoid memory leak and performance issue.
 const memoizeDtsPluginByKey = memoizeByKey<typeof createDtsPlugin>(createDtsPlugin);
 
-export const getRollupDtsOptions = async (context: BuildContext, fileCache: FileCache): Promise<RollupOptions> => {
+export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
     const compilerOptions = context.tsconfig?.config.compilerOptions;
 
@@ -839,7 +812,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             context.options.rollup.alias
             && aliasPlugin({
                 // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                customResolver: nodeResolver as ResolverObject,
+                customResolver: nodeResolver as AliasResolverObject,
                 ...context.options.rollup.alias,
                 entries: resolvedAliases,
             }),

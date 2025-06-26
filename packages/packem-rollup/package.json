@@ -43,7 +43,7 @@
                 "default": "./dist/index.cjs"
             }
         },
-        "./transformer/esbuild": {
+        "./esbuild": {
             "import": {
                 "types": "./dist/plugins/esbuild/index.d.mts",
                 "default": "./dist/plugins/esbuild/index.mjs"
@@ -53,47 +53,37 @@
                 "default": "./dist/plugins/esbuild/index.cjs"
             }
         },
-        "./transformer/swc": {
+        "./swc": {
             "import": {
-                "types": "./dist/plugins/swc/swc-plugin.d.mts",
-                "default": "./dist/plugins/swc/swc-plugin.mjs"
+                "types": "./dist/plugins/swc/index.d.mts",
+                "default": "./dist/plugins/swc/index.mjs"
             },
             "require": {
-                "types": "./dist/plugins/swc/swc-plugin.d.cts",
-                "default": "./dist/plugins/swc/swc-plugin.cjs"
+                "types": "./dist/plugins/swc/index.d.cts",
+                "default": "./dist/plugins/swc/index.cjs"
             }
         },
-        "./dts/isolated/transformer/swc": {
+        "./typescript": {
             "import": {
-                "types": "./dist/plugins/swc/isolated-declarations-swc-transformer.d.mts",
-                "default": "./dist/plugins/swc/isolated-declarations-swc-transformer.mjs"
+                "types": "./dist/plugins/typescript/index.d.mts",
+                "default": "./dist/plugins/typescript/index.mjs"
             },
             "require": {
-                "types": "./dist/plugins/swc/isolated-declarations-swc-transformer.d.cts",
-                "default": "./dist/plugins/swc/isolated-declarations-swc-transformer.cjs"
+                "types": "./dist/plugins/typescript/index.d.cts",
+                "default": "./dist/plugins/typescript/index.cjs"
             }
         },
-        "./dts/isolated/transformer/oxc": {
+        "./oxc": {
             "import": {
-                "types": "./dist/plugins/oxc/isolated-declarations-oxc-transformer.d.mts",
-                "default": "./dist/plugins/oxc/isolated-declarations-oxc-transformer.mjs"
+                "types": "./dist/plugins/oxc/index.d.mts",
+                "default": "./dist/plugins/oxc/index.mjs"
             },
             "require": {
-                "types": "./dist/plugins/oxc/isolated-declarations-oxc-transformer.d.cts",
-                "default": "./dist/plugins/oxc/isolated-declarations-oxc-transformer.cjs"
+                "types": "./dist/plugins/oxc/index.d.cts",
+                "default": "./dist/plugins/oxc/index.cjs"
             }
         },
-        "./dts/isolated/transformer/typescript": {
-            "import": {
-                "types": "./dist/plugins/typescript/isolated-declarations-typescript-transformer.d.mts",
-                "default": "./dist/plugins/typescript/isolated-declarations-typescript-transformer.mjs"
-            },
-            "require": {
-                "types": "./dist/plugins/typescript/isolated-declarations-typescript-transformer.d.cts",
-                "default": "./dist/plugins/typescript/isolated-declarations-typescript-transformer.cjs"
-            }
-        },
-        "./transformer/sucrase": {
+        "./sucrase": {
             "import": {
                 "types": "./dist/plugins/sucrase/index.d.mts",
                 "default": "./dist/plugins/sucrase/index.mjs"
@@ -101,16 +91,6 @@
             "require": {
                 "types": "./dist/plugins/sucrase/index.d.cts",
                 "default": "./dist/plugins/sucrase/index.cjs"
-            }
-        },
-        "./transformer/oxc": {
-            "import": {
-                "types": "./dist/plugins/oxc/oxc-transformer-plugin.d.mts",
-                "default": "./dist/plugins/oxc/oxc-transformer-plugin.mjs"
-            },
-            "require": {
-                "types": "./dist/plugins/oxc/oxc-transformer-plugin.d.cts",
-                "default": "./dist/plugins/oxc/oxc-transformer-plugin.cjs"
             }
         },
         "./package.json": "./package.json"
@@ -124,26 +104,20 @@
             ".": [
                 "./dist/index.d.ts"
             ],
-            "transformer/esbuild": [
+            "esbuild": [
                 "./dist/plugins/esbuild/index.d.ts"
             ],
-            "transformer/swc": [
-                "./dist/plugins/swc/swc-plugin.d.ts"
+            "swc": [
+                "./dist/plugins/swc/index.d.ts"
             ],
-            "dts/isolated/transformer/swc": [
-                "./dist/plugins/swc/isolated-declarations-swc-transformer.d.ts"
+            "typescript": [
+                "./dist/plugins/typescript/index.d.ts"
             ],
-            "dts/isolated/transformer/oxc": [
-                "./dist/plugins/oxc/isolated-declarations-oxc-transformer.d.ts"
+            "oxc": [
+                "./dist/plugins/oxc/index.d.ts"
             ],
-            "dts/isolated/transformer/typescript": [
-                "./dist/plugins/typescript/isolated-declarations-typescript-transformer.d.ts"
-            ],
-            "transformer/sucrase": [
+            "sucrase": [
                 "./dist/plugins/sucrase/index.d.ts"
-            ],
-            "transformer/oxc": [
-                "./dist/plugins/oxc/oxc-transformer-plugin.d.ts"
             ]
         }
     },
@@ -188,10 +162,10 @@
         "oxc-parser": "0.75.0",
         "oxc-resolver": "11.3.0",
         "rollup-plugin-dts": "6.2.1",
+        "rollup-plugin-license": "3.6.0",
         "rollup-plugin-polyfill-node": "0.13.0",
         "rollup-plugin-pure": "^0.4.0",
         "rollup-plugin-visualizer": "6.0.3",
-        "rollup-plugin-license": "3.6.0",
         "semver": "7.7.2",
         "tinyglobby": "0.2.14"
     },
@@ -208,6 +182,7 @@
         "@swc/core": "^1.12.7",
         "@swc/types": "0.1.23",
         "@total-typescript/ts-reset": "^0.6.1",
+        "@types/estree": "^1.0.8",
         "@types/glob-parent": "^5.1.3",
         "@types/is-glob": "^4.0.4",
         "@types/node": "24.0.4",
@@ -216,7 +191,6 @@
         "@visulima/pail": "2.1.25",
         "@visulima/tsconfig": "^1.1.19",
         "@vitest/coverage-v8": "^3.2.4",
-        "rollup": "4.44.1",
         "@vitest/ui": "^3.2.4",
         "conventional-changelog-conventionalcommits": "9.0.0",
         "esbuild": "^0.25.5",
@@ -228,6 +202,7 @@
         "oxc-transform": "^0.75.0",
         "p-queue": "^8.1.0",
         "rimraf": "^6.0.1",
+        "rollup": "4.44.1",
         "secretlint": "10.1.1",
         "semantic-release": "^24.2.5",
         "sucrase": "^3.35.0",

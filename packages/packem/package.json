@@ -284,7 +284,6 @@
         "@swc/core": "^1.12.7",
         "@swc/types": "0.1.23",
         "@total-typescript/ts-reset": "^0.6.1",
-        "@types/estree": "^1.0.8",
         "@types/node": "24.0.4",
         "@types/react": "^19.1.8",
         "@types/react-dom": "^19.1.6",

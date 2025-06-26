@@ -22,7 +22,7 @@ import type { InternalOXCTransformPluginConfig, OxcResolveOptions, OXCTransformP
 import type { RawLoaderOptions } from "./plugins/raw";
 import type { ShebangOptions } from "./plugins/shebang";
 import type { SourcemapsPluginOptions } from "./plugins/source-maps";
-import type { SucrasePluginConfig } from "./plugins/sucrase/types";
+import type { SucrasePluginConfig } from "./plugins/sucrase";
 import type { SwcPluginConfig } from "./plugins/swc/types";
 import type { PatchTypesOptions } from "./plugins/typescript/patch-typescript-types";
 import type { TsconfigPathsPluginOptions } from "./plugins/typescript/resolve-tsconfig-paths-plugin";

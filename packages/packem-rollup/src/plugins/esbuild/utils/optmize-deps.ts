@@ -12,7 +12,7 @@ import { init, parse } from "es-module-lexer";
 import type { OnResolveArgs, OnResolveResult } from "esbuild";
 import { build as esbuildBuild } from "esbuild";
 
-import type { Optimized, OptimizeDepsOptions, OptimizeDepsResult } from "./types";
+import type { Optimized, OptimizeDepsOptions, OptimizeDepsResult } from "../types";
 
 const slash = (p: string) => p.replaceAll("\\", "/");
 

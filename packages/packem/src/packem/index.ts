@@ -7,6 +7,7 @@ import { duration } from "@visulima/humanizer";
 import type { NormalizedPackageJson, PackageJson } from "@visulima/package";
 import { hasPackageJsonAnyDependency } from "@visulima/package";
 import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "@visulima/packem-share/constants";
+import type { BuildContext } from "@visulima/packem-share/types";
 import { getHash } from "@visulima/packem-share/utils";
 import type { Pail } from "@visulima/pail";
 import { join, resolve } from "@visulima/path";
@@ -24,7 +25,7 @@ import loadTsconfig from "../config/utils/load-tsconfig";
 import prepareEntries from "../config/utils/prepare-entries";
 import createStub from "../jit/create-stub";
 import rollupWatch from "../rollup/watch";
-import type { BuildConfig, BuildContext, BuildOptions, Environment, InternalBuildOptions, Mode } from "../types";
+import type { BuildConfig, BuildOptions, Environment, InternalBuildOptions, Mode } from "../types";
 import cleanDistributionDirectories from "../utils/clean-distribution-directories";
 import createOrUpdateKeyStorage from "../utils/create-or-update-key-storage";
 import enhanceRollupError from "../utils/enhance-rollup-error";
@@ -657,13 +658,13 @@ const createContext = async (
     packageJson: PackageJson,
     tsconfig: TsConfigResult | undefined,
     nodeVersion: string,
-): Promise<BuildContext> => {
+): Promise<BuildContext<InternalBuildOptions>> => {
     const options = generateOptions(logger, rootDirectory, environment, debug, buildConfig, packageJson, tsconfig, nodeVersion);
 
     ensureDirSync(join(options.rootDir, options.outDir));
 
     // Build context
-    const context: BuildContext = {
+    const context: BuildContext<InternalBuildOptions> = {
         buildEntries: [],
         dependencyGraphMap: new Map<string, Set<[string, string]>>(),
         environment,
@@ -949,18 +950,20 @@ const packem = async (
         } else {
             logged = await build(context, fileCache);
 
-            if (context.options.emitCJS && context.options.declaration === "compatible" && context.options.rollup.node10Compatibility) {
+            if (context.options.emitCJS && context.options.declaration === "compatible" && (context.options.node10Compatibility || context.options.rollup.node10Compatibility)) {
                 if (logged) {
                     context.logger.raw("\n");
                 }
+
+                const node10CompatibilityOptions = context.options.node10Compatibility ?? context.options.rollup.node10Compatibility;
 
                 await node10Compatibility(
                     context.logger,
                     context.options.entries,
                     context.options.outDir,
                     context.options.rootDir,
-                    context.options.rollup.node10Compatibility.writeToPackageJson ? "file" : "console",
-                    context.options.rollup.node10Compatibility.typeScriptVersion ?? "*",
+                    node10CompatibilityOptions.writeToPackageJson ? "file" : "console",
+                    node10CompatibilityOptions.typeScriptVersion ?? "*",
                 );
             }
 

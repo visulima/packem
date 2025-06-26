@@ -1,12 +1,13 @@
+import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
+import { EXCLUDE_REGEXP } from "@visulima/packem-share/constants";
 import type { Plugin } from "rollup";
+import type { Options } from "sucrase";
 import { transform as sucraseTransform } from "sucrase";
 
-import { EXCLUDE_REGEXP } from "@visulima/packem-share/constants";
 import type { TransformerFn as TransformerFunction } from "../../types";
-import type { SucrasePluginConfig } from "./types";
 
-const sucrasePlugin = ({ exclude, include, ...transformOptions }: SucrasePluginConfig): Plugin => {
+const sucraseTransformPlugin = ({ exclude, include, ...transformOptions }: SucrasePluginConfig): Plugin => {
     const filter = createFilter(include, exclude ?? EXCLUDE_REGEXP);
 
     return <Plugin>{
@@ -30,6 +31,11 @@ const sucrasePlugin = ({ exclude, include, ...transformOptions }: SucrasePluginC
     };
 };
 
-sucrasePlugin.NAME = "sucrase";
+sucraseTransformPlugin.NAME = "sucrase";
 
-export default sucrasePlugin as TransformerFunction;
+export interface SucrasePluginConfig extends Options {
+    exclude?: FilterPattern;
+    include?: FilterPattern;
+}
+
+export const sucrasePlugin = sucraseTransformPlugin as TransformerFunction;

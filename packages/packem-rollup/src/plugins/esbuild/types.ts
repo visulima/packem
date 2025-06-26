@@ -9,6 +9,8 @@ import type { FilterPattern } from "@rollup/pluginutils";
 import type { Pail } from "@visulima/pail";
 import type { BuildOptions as EsbuildOptions, Loader, TransformOptions } from "esbuild";
 
+type MarkOptional<Type, Keys extends keyof Type> = Type extends Type ? Omit<Type, Keys> & Partial<Pick<Type, Keys>> : never;
+
 export type EsbuildPluginConfig = Options & {
     logger: Pail;
 };
@@ -41,5 +43,3 @@ export type Options = Omit<TransformOptions, "loader" | "sourcemap"> & {
     optimizeDeps?: MarkOptional<OptimizeDepsOptions, "cwd" | "sourceMap">;
     sourceMap?: boolean;
 };
-
-type MarkOptional<Type, Keys extends keyof Type> = Type extends Type ? Omit<Type, Keys> & Partial<Pick<Type, Keys>> : never;
