@@ -141,7 +141,7 @@
         "hookable": "5.5.3",
         "jiti": "2.4.2",
         "rimraf": "^6.0.1",
-        "rollup": "^4.44.0",
+        "rollup": "^4.44.1",
         "secretlint": "10.1.1",
         "semantic-release": "^24.2.5",
         "tempy": "^3.1.0",

@@ -4,5 +4,5 @@
     "sourceRoot": "packages/packem-rollup/src",
     "projectType": "library",
     "tags": ["packem-rollup", "type:package"],
-    "implicitDependencies": []
+    "implicitDependencies": ["packem-share", "!packem"]
 }
