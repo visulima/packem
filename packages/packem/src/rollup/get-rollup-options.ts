@@ -8,8 +8,40 @@ import { nodeResolve as nodeResolvePlugin } from "@rollup/plugin-node-resolve";
 import replacePlugin from "@rollup/plugin-replace";
 import { wasm as wasmPlugin } from "@rollup/plugin-wasm";
 import { cyan } from "@visulima/colorize";
+import type { EsbuildPluginConfig, InternalOXCTransformPluginConfig, ShebangOptions, SucrasePluginConfig, SwcPluginConfig } from "@visulima/packem-rollup";
+// Import all plugins and utilities from packem-rollup
+import {
+    browserslistToEsbuild,
+    cachingPlugin,
+    chunkSplitter,
+    cjsInteropPlugin,
+    copyPlugin,
+    createSplitChunks,
+    esmShimCjsSyntaxPlugin,
+    fixDtsDefaultCjsExportsPlugin,
+    fixDynamicImportExtension,
+    isolatedDeclarationsPlugin,
+    JSONPlugin,
+    jsxRemoveAttributes,
+    licensePlugin,
+    metafilePlugin,
+    oxcResolvePlugin,
+    patchTypescriptTypesPlugin,
+    preserveDirectivesPlugin,
+    rawPlugin,
+    removeShebangPlugin,
+    resolveFileUrl as resolveFileUrlPlugin,
+    resolveTsconfigPathsPlugin,
+    resolveTsconfigRootDirectoriesPlugin,
+    resolveTypescriptMjsCtsPlugin,
+    shebangPlugin,
+    sourcemapsPlugin,
+    urlPlugin,
+} from "@visulima/packem-rollup";
 import { getChunkFilename, getEntryFileNames, resolveAliases, sortUserPlugins } from "@visulima/packem-share/utils";
 import { join, relative, resolve } from "@visulima/path";
+// Import CSS plugins
+import { cssModulesTypesPlugin, rollupCssPlugin } from "@visulima/rollup-css-plugin";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
 import polyfillPlugin from "rollup-plugin-polyfill-node";
@@ -21,38 +53,7 @@ import type { BuildContext, InternalBuildOptions } from "../types";
 import arrayify from "../utils/arrayify";
 import type FileCache from "../utils/file-cache";
 import { memoizeByKey } from "../utils/memoize";
-import chunkSplitter from "./plugins/chunk-splitter";
-import { cjsInteropPlugin } from "./plugins/cjs-interop";
-import { copyPlugin } from "./plugins/copy";
-import { rollupCssPlugin, cssModulesTypesPlugin } from "@visulima/rollup-css-plugin";
-import browserslistToEsbuild from "./plugins/esbuild/browserslist-to-esbuild";
-import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
-import { esmShimCjsSyntaxPlugin } from "./plugins/esm-shim-cjs-syntax";
-import { fixDtsDefaultCjsExportsPlugin } from "./plugins/fix-dts-default-cjs-exports-plugin";
-import fixDynamicImportExtension from "./plugins/fix-dynamic-import-extension";
-import { isolatedDeclarationsPlugin } from "./plugins/isolated-declarations";
-import JSONPlugin from "./plugins/json";
-import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
-import { license as licensePlugin } from "./plugins/license";
-import metafilePlugin from "./plugins/metafile";
-import { oxcResolvePlugin } from "./plugins/oxc/oxc-resolve";
-import type { InternalOXCTransformPluginConfig } from "./plugins/oxc/types";
-import cachingPlugin from "./plugins/plugin-cache";
-import preserveDirectivesPlugin from "./plugins/preserve-directives";
-import { rawPlugin } from "./plugins/raw";
 import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
-import resolveFileUrlPlugin from "./plugins/resolve-file-url";
-import type { ShebangOptions } from "./plugins/shebang";
-import { removeShebangPlugin, shebangPlugin } from "./plugins/shebang";
-import { sourcemapsPlugin } from "./plugins/source-maps";
-import type { SucrasePluginConfig } from "./plugins/sucrase/types";
-import type { SwcPluginConfig } from "./plugins/swc/types";
-import { patchTypescriptTypes as patchTypescriptTypesPlugin } from "./plugins/typescript/patch-typescript-types";
-import { resolveTsconfigPathsPlugin } from "./plugins/typescript/resolve-tsconfig-paths-plugin";
-import resolveTsconfigRootDirectoriesPlugin from "./plugins/typescript/resolve-tsconfig-root-dirs";
-import resolveTypescriptMjsCtsPlugin from "./plugins/typescript/resolve-typescript-mjs-cjs";
-import { urlPlugin } from "./plugins/url";
-import createSplitChunks from "./utils/chunks/create-split-chunks";
 
 const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],

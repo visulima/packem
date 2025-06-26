@@ -1,0 +1,303 @@
+{
+    "name": "@visulima/packem-rollup",
+    "version": "0.0.0",
+    "description": "Rollup plugins for packem",
+    "keywords": [
+        "visulima",
+        "packem-rollup"
+    ],
+    "homepage": "https://github.com/visulima/packem/tree/main/packages/packem-rollup",
+    "bugs": {
+        "url": "https://github.com/visulima/packem/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/visulima/packem.git",
+        "directory": "packages/packem-rollup"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/prisis"
+        },
+        {
+            "type": "consulting",
+            "url": "https://anolilab.com/support"
+        }
+    ],
+    "license": "MIT",
+    "author": {
+        "name": "Daniel Bannert",
+        "email": "d.bannert@anolilab.de"
+    },
+    "sideEffects": false,
+    "type": "module",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/index.d.mts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "types": "./dist/index.d.cts",
+                "default": "./dist/index.cjs"
+            }
+        },
+        "./transformer/esbuild": {
+            "import": {
+                "types": "./dist/plugins/esbuild/index.d.mts",
+                "default": "./dist/plugins/esbuild/index.mjs"
+            },
+            "require": {
+                "types": "./dist/plugins/esbuild/index.d.cts",
+                "default": "./dist/plugins/esbuild/index.cjs"
+            }
+        },
+        "./transformer/swc": {
+            "import": {
+                "types": "./dist/plugins/swc/swc-plugin.d.mts",
+                "default": "./dist/plugins/swc/swc-plugin.mjs"
+            },
+            "require": {
+                "types": "./dist/plugins/swc/swc-plugin.d.cts",
+                "default": "./dist/plugins/swc/swc-plugin.cjs"
+            }
+        },
+        "./dts/isolated/transformer/swc": {
+            "import": {
+                "types": "./dist/plugins/swc/isolated-declarations-swc-transformer.d.mts",
+                "default": "./dist/plugins/swc/isolated-declarations-swc-transformer.mjs"
+            },
+            "require": {
+                "types": "./dist/plugins/swc/isolated-declarations-swc-transformer.d.cts",
+                "default": "./dist/plugins/swc/isolated-declarations-swc-transformer.cjs"
+            }
+        },
+        "./dts/isolated/transformer/oxc": {
+            "import": {
+                "types": "./dist/plugins/oxc/isolated-declarations-oxc-transformer.d.mts",
+                "default": "./dist/plugins/oxc/isolated-declarations-oxc-transformer.mjs"
+            },
+            "require": {
+                "types": "./dist/plugins/oxc/isolated-declarations-oxc-transformer.d.cts",
+                "default": "./dist/plugins/oxc/isolated-declarations-oxc-transformer.cjs"
+            }
+        },
+        "./dts/isolated/transformer/typescript": {
+            "import": {
+                "types": "./dist/plugins/typescript/isolated-declarations-typescript-transformer.d.mts",
+                "default": "./dist/plugins/typescript/isolated-declarations-typescript-transformer.mjs"
+            },
+            "require": {
+                "types": "./dist/plugins/typescript/isolated-declarations-typescript-transformer.d.cts",
+                "default": "./dist/plugins/typescript/isolated-declarations-typescript-transformer.cjs"
+            }
+        },
+        "./transformer/sucrase": {
+            "import": {
+                "types": "./dist/plugins/sucrase/index.d.mts",
+                "default": "./dist/plugins/sucrase/index.mjs"
+            },
+            "require": {
+                "types": "./dist/plugins/sucrase/index.d.cts",
+                "default": "./dist/plugins/sucrase/index.cjs"
+            }
+        },
+        "./transformer/oxc": {
+            "import": {
+                "types": "./dist/plugins/oxc/oxc-transformer-plugin.d.mts",
+                "default": "./dist/plugins/oxc/oxc-transformer-plugin.mjs"
+            },
+            "require": {
+                "types": "./dist/plugins/oxc/oxc-transformer-plugin.d.cts",
+                "default": "./dist/plugins/oxc/oxc-transformer-plugin.cjs"
+            }
+        },
+        "./package.json": "./package.json"
+    },
+    "main": "dist/index.cjs",
+    "module": "dist/index.mjs",
+    "browser": "./dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "typesVersions": {
+        ">=5.0": {
+            ".": [
+                "./dist/index.d.ts"
+            ],
+            "transformer/esbuild": [
+                "./dist/plugins/esbuild/index.d.ts"
+            ],
+            "transformer/swc": [
+                "./dist/plugins/swc/swc-plugin.d.ts"
+            ],
+            "dts/isolated/transformer/swc": [
+                "./dist/plugins/swc/isolated-declarations-swc-transformer.d.ts"
+            ],
+            "dts/isolated/transformer/oxc": [
+                "./dist/plugins/oxc/isolated-declarations-oxc-transformer.d.ts"
+            ],
+            "dts/isolated/transformer/typescript": [
+                "./dist/plugins/typescript/isolated-declarations-typescript-transformer.d.ts"
+            ],
+            "transformer/sucrase": [
+                "./dist/plugins/sucrase/index.d.ts"
+            ],
+            "transformer/oxc": [
+                "./dist/plugins/oxc/oxc-transformer-plugin.d.ts"
+            ]
+        }
+    },
+    "files": [
+        "CHANGELOG.md",
+        "README.md",
+        "dist"
+    ],
+    "scripts": {
+        "build": "packem build --development",
+        "build:prod": "packem build --production",
+        "clean": "rimraf node_modules dist .eslintcache",
+        "dev": "pnpm run build --watch",
+        "lint:eslint": "eslint . --ext js,cjs,mjs,jsx,ts,tsx,json,yaml,yml,md,mdx --max-warnings=0 --config .eslintrc.cjs",
+        "lint:eslint:fix": "eslint . --ext js,cjs,mjs,jsx,ts,tsx,json,yaml,yml,md,mdx --max-warnings=0 --config .eslintrc.cjs --fix",
+        "lint:package-json": "publint --strict",
+        "lint:types": "tsc --noEmit",
+        "test": "vitest run",
+        "test:coverage": "vitest run --coverage",
+        "test:ui": "vitest --ui --coverage.enabled=true",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "@babel/parser": "7.27.5",
+        "@rollup/plugin-alias": "5.1.1",
+        "@rollup/plugin-commonjs": "28.0.6",
+        "@rollup/plugin-dynamic-import-vars": "2.1.5",
+        "@rollup/plugin-inject": "5.0.5",
+        "@rollup/plugin-json": "6.1.0",
+        "@rollup/plugin-node-resolve": "16.0.1",
+        "@rollup/plugin-replace": "6.0.2",
+        "@rollup/plugin-wasm": "6.2.2",
+        "@rollup/pluginutils": "5.2.0",
+        "@visulima/colorize": "1.4.23",
+        "@visulima/fs": "3.1.5",
+        "@visulima/package": "3.5.8",
+        "@visulima/packem-share": "workspace:*",
+        "@visulima/path": "1.4.0",
+        "@visulima/source-map": "1.0.20",
+        "glob-parent": "6.0.2",
+        "magic-string": "0.30.17",
+        "mlly": "1.7.4",
+        "oxc-parser": "0.75.0",
+        "oxc-resolver": "11.2.1",
+        "rollup-plugin-dts": "6.2.1",
+        "rollup-plugin-polyfill-node": "0.13.0",
+        "rollup-plugin-pure": "^0.4.0",
+        "rollup-plugin-visualizer": "6.0.3",
+        "rollup-plugin-license": "3.6.0",
+        "semver": "7.7.2",
+        "tinyglobby": "0.2.14"
+    },
+    "devDependencies": {
+        "@anolilab/eslint-config": "^16.2.13",
+        "@anolilab/semantic-release-pnpm": "^2.0.0",
+        "@anolilab/semantic-release-preset": "^11.0.0",
+        "@babel/core": "^7.27.4",
+        "@oxc-parser/binding-linux-x64-gnu": "0.75.0",
+        "@oxc-project/types": "0.75.0",
+        "@oxc-resolver/binding-linux-x64-gnu": "11.2.1",
+        "@rushstack/eslint-plugin-security": "^0.10.0",
+        "@secretlint/secretlint-rule-preset-recommend": "^10.1.1",
+        "@swc/core": "^1.12.6",
+        "@swc/types": "0.1.23",
+        "@total-typescript/ts-reset": "^0.6.1",
+        "@types/glob-parent": "^5.1.3",
+        "@types/is-glob": "^4.0.4",
+        "@types/node": "24.0.4",
+        "@types/semver": "^7.7.0",
+        "@visulima/packem": "^1.28.2",
+        "@visulima/pail": "2.1.25",
+        "@visulima/tsconfig": "^1.1.19",
+        "@vitest/coverage-v8": "^3.2.4",
+        "rollup": "4.44.0",
+        "@vitest/ui": "^3.2.4",
+        "conventional-changelog-conventionalcommits": "9.0.0",
+        "esbuild": "^0.25.5",
+        "eslint": "^9.29.0",
+        "estree-walker": "^3.0.3",
+        "hookable": "5.5.3",
+        "jiti": "2.4.2",
+        "mime": "4.0.7",
+        "oxc-transform": "^0.75.0",
+        "p-queue": "^8.1.0",
+        "rimraf": "^6.0.1",
+        "secretlint": "10.1.1",
+        "semantic-release": "^24.2.5",
+        "sucrase": "^3.35.0",
+        "typescript": "^5.8.3",
+        "vitest": "^3.2.4"
+    },
+    "peerDependencies": {
+        "@swc/core": "*",
+        "@visulima/find-cache-dir": "*",
+        "@visulima/pail": "*",
+        "@visulima/tsconfig": "*",
+        "es-module-lexer": "*",
+        "esbuild": "*",
+        "estree-walker": "*",
+        "hookable": "*",
+        "jiti": "*",
+        "mime": "*",
+        "oxc-transform": "*",
+        "p-queue": "*",
+        "rollup": ">=4",
+        "sucrase": "*",
+        "typescript": "*"
+    },
+    "peerDependenciesMeta": {
+        "@swc/core": {
+            "optional": true
+        },
+        "@visulima/find-cache-dir": {
+            "optional": true
+        },
+        "@visulima/tsconfig": {
+            "optional": true
+        },
+        "es-module-lexer": {
+            "optional": true
+        },
+        "esbuild": {
+            "optional": true
+        },
+        "estree-walker": {
+            "optional": true
+        },
+        "hookable": {
+            "optional": true
+        },
+        "jiti": {
+            "optional": true
+        },
+        "mime": {
+            "optional": true
+        },
+        "oxc-transform": {
+            "optional": true
+        },
+        "p-queue": {
+            "optional": true
+        },
+        "sucrase": {
+            "optional": true
+        },
+        "typescript": {
+            "optional": true
+        }
+    },
+    "engines": {
+        "node": ">=18.* <=24.*"
+    },
+    "publishConfig": {
+        "access": "public",
+        "provenance": true
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "name": "packem-rollup",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/packem-rollup/src",
+    "projectType": "library",
+    "tags": ["packem-rollup", "type:package"],
+    "implicitDependencies": []
+}

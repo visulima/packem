@@ -1,6 +1,6 @@
 import { defineConfig } from "./src/config";
-import transformer from "./src/rollup/plugins/esbuild";
-import isolatedDeclarationTransformer from "./src/rollup/plugins/typescript/isolated-declarations-typescript-transformer";
+import { esbuildPlugin as transformer } from "@visulima/packem-rollup";
+import isolatedDeclarationTransformer from "@visulima/packem-rollup/dts/isolated/transformer/typescript";
 
 export default defineConfig({
     cjsInterop: true,

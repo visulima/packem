@@ -4,7 +4,7 @@ import { resolveAliases, warn } from "@visulima/packem-share/utils";
 import { dirname, relative, resolve } from "@visulima/path";
 import { fileURLToPath, resolveModuleExportNames, resolvePath } from "mlly";
 
-import { getShebang, makeExecutable } from "../rollup/plugins/shebang";
+import { getShebang, makeExecutable } from "@visulima/packem-rollup";
 import type { BuildContext } from "../types";
 
 const IDENTIFIER_REGEX = /^[_$a-z\u00A0-\uFFFF][\w$\u00A0-\uFFFF]*$/iu;

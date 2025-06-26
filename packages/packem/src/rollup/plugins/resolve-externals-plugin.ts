@@ -1,6 +1,7 @@
 import { readdirSync } from "node:fs";
 
 import { cyan } from "@visulima/colorize";
+import type { BuildContext } from "@visulima/packem-share/types";
 import { ENDING_REGEX } from "@visulima/packem-share/constants";
 import { getPackageName, resolveAliases } from "@visulima/packem-share/utils";
 import type { Pail } from "@visulima/pail";
@@ -9,7 +10,7 @@ import { resolveAlias } from "@visulima/path/utils";
 import { isNodeBuiltin, parseNodeModulePath } from "mlly";
 import type { InputOptions, Plugin, ResolveIdResult } from "rollup";
 
-import type { BuildContext } from "../../types";
+import type { InternalBuildOptions } from "../../types";
 
 type MaybeFalsy<T> = T | false | null | undefined;
 
@@ -102,9 +103,9 @@ export type ResolveExternalsPluginOptions = {
      */
     peerDeps?: boolean;
 };
-//  context.pkg, context.tsconfig, context.options, context.logger, context.options.rollup.resolveExternals ?? {}
+
 export const resolveExternalsPlugin = (
-    context: BuildContext,
+    context: BuildContext<InternalBuildOptions>,
 ): Plugin => {
     const cachedGlobFiles = new Map<string, string[]>();
     const cacheResolved = new Map<string, boolean>();
@@ -134,7 +135,7 @@ export const resolveExternalsPlugin = (
 
     if (context.pkg?.peerDependenciesMeta) {
         for (const [key, value] of Object.entries(context.pkg.peerDependenciesMeta)) {
-            if (value?.optional) {
+            if (value && typeof value === "object" && "optional" in value && value.optional) {
                 include.add(new RegExp(`^${key}(?:/.+)?$`));
             }
         }
@@ -328,4 +329,4 @@ export const resolveExternalsPlugin = (
             order: "pre",
         },
     };
-};
+}; 
