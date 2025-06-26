@@ -15,7 +15,6 @@ export { default as getRegexMatches } from "./get-regex-matches";
 export { memoize, memoizeByKey } from "./memoize";
 export { default as replaceContentWithinMarker } from "./replace-content-within-marker";
 export { default as replaceContentWithinMarkerDefault } from "./replace-content-within-marker";
-export { default as resolveAliases } from "./resolve-aliases";
 export { default as sortUserPlugins } from "./sort-user-plugins";
 export { default as svgEncoder } from "./svg-encoder";
 export { default as warn } from "./warn";

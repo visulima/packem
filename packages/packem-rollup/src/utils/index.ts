@@ -16,7 +16,6 @@ export {
     memoize,
     memoizeByKey,
     replaceContentWithinMarker,
-    resolveAliases,
     sortUserPlugins,
     svgEncoder,
 } from "@visulima/packem-share/utils";

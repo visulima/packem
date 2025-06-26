@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "@visulima/fs";
 import { DEFAULT_EXTENSIONS, ENDING_REGEX } from "@visulima/packem-share/constants";
-import { resolveAliases, warn } from "@visulima/packem-share/utils";
+import { warn } from "@visulima/packem-share/utils";
+import resolveAliases from "../rollup/utils/resolve-aliases";
 import { dirname, relative, resolve } from "@visulima/path";
 import { fileURLToPath, resolveModuleExportNames, resolvePath } from "mlly";
 

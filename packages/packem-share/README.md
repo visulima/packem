@@ -201,15 +201,11 @@ const keyMemoized = memoizeByKey(expensiveFunction)("cache-key");
 ```typescript
 import { 
   enhanceRollupError,
-  resolveAliases,
   sortUserPlugins 
 } from "@visulima/packem-share";
 
 // Error enhancement
 const enhanced = enhanceRollupError(error, context);
-
-// Alias resolution
-const aliases = resolveAliases(pkg, options);
 
 // Plugin sorting
 const [pre, normal, post] = sortUserPlugins(plugins, hookName);

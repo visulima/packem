@@ -1,10 +1,9 @@
 import type { Alias } from "@rollup/plugin-alias";
 import type { PackageJson } from "@visulima/package";
 
-// Note: InternalBuildOptions type will be imported from the consuming packages
-// to avoid circular dependencies in the shared package
+import type { InternalBuildOptions } from "../../types";
 
-const resolveAliases = (packageJson: PackageJson, options: any): Record<string, string> => {
+const resolveAliases = (packageJson: PackageJson, options: InternalBuildOptions): Record<string, string> => {
     let aliases: Record<string, string> = {};
 
     if (packageJson.name) {
@@ -27,4 +26,4 @@ const resolveAliases = (packageJson: PackageJson, options: any): Record<string, 
     return aliases;
 };
 
-export default resolveAliases;
+export default resolveAliases; 

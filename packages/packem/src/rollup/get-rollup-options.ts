@@ -1,58 +1,52 @@
 import { versions } from "node:process";
 
 import type { ResolverObject } from "@rollup/plugin-alias";
-import aliasPlugin from "@rollup/plugin-alias";
-import commonjsPlugin from "@rollup/plugin-commonjs";
-import dynamicImportVarsPlugin from "@rollup/plugin-dynamic-import-vars";
-import { nodeResolve as nodeResolvePlugin } from "@rollup/plugin-node-resolve";
-import replacePlugin from "@rollup/plugin-replace";
-import { wasm as wasmPlugin } from "@rollup/plugin-wasm";
 import { cyan } from "@visulima/colorize";
-import type { EsbuildPluginConfig, InternalOXCTransformPluginConfig, ShebangOptions, SucrasePluginConfig, SwcPluginConfig } from "@visulima/packem-rollup";
-// Import all plugins and utilities from packem-rollup
-import {
+import type { ShebangOptions } from "@visulima/packem-rollup";
+import { oxcResolvePlugin, patchTypescriptTypesPlugin, resolveTsconfigPathsPlugin, resolveTsconfigRootDirectoriesPlugin, resolveTypescriptMjsCtsPlugin,
+    alias as aliasPlugin,
     browserslistToEsbuild,
     cachingPlugin,
     chunkSplitter,
     cjsInteropPlugin,
+    commonjs as commonjsPlugin,
     copyPlugin,
     createSplitChunks,
+    dynamicImportVars as dynamicImportVarsPlugin,
     esmShimCjsSyntaxPlugin,
     fixDtsDefaultCjsExportsPlugin,
     fixDynamicImportExtension,
     isolatedDeclarationsPlugin,
-    JSONPlugin,
+    jsonPlugin as JSONPlugin,
     jsxRemoveAttributes,
     licensePlugin,
     metafilePlugin,
-    oxcResolvePlugin,
-    patchTypescriptTypesPlugin,
+    nodeResolve as nodeResolvePlugin,
+    polyfillNode as polyfillPlugin,
     preserveDirectivesPlugin,
+    pure as PluginPure,
     rawPlugin,
     removeShebangPlugin,
+    replace as replacePlugin,
     resolveFileUrl as resolveFileUrlPlugin,
-    resolveTsconfigPathsPlugin,
-    resolveTsconfigRootDirectoriesPlugin,
-    resolveTypescriptMjsCtsPlugin,
     shebangPlugin,
     sourcemapsPlugin,
     urlPlugin,
+    visualizer as visualizerPlugin,
+    wasm as wasmPlugin,
 } from "@visulima/packem-rollup";
-import { getChunkFilename, getEntryFileNames, resolveAliases, sortUserPlugins } from "@visulima/packem-share/utils";
+import { getChunkFilename, getEntryFileNames, sortUserPlugins } from "@visulima/packem-share/utils";
+import resolveAliases from "./utils/resolve-aliases";
 import { join, relative, resolve } from "@visulima/path";
 // Import CSS plugins
 import { cssModulesTypesPlugin, rollupCssPlugin } from "@visulima/rollup-css-plugin";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
-import polyfillPlugin from "rollup-plugin-polyfill-node";
-import { PluginPure } from "rollup-plugin-pure";
-import { visualizer as visualizerPlugin } from "rollup-plugin-visualizer";
 import { minVersion } from "semver";
 
 import type { BuildContext, InternalBuildOptions } from "../types";
-import arrayify from "../utils/arrayify";
 import type FileCache from "../utils/file-cache";
-import { memoizeByKey } from "../utils/memoize";
+import { memoizeByKey, arrayify } from "@visulima/packem-share";
 import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
 
 const getTransformerConfig = (
