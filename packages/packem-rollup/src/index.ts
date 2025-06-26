@@ -38,7 +38,8 @@ export type {
 export { default as createSplitChunks } from "./utils/chunks/create-split-chunks";
 export { default as getCustomModuleLayer } from "./utils/chunks/get-custom-module-layer";
 export { default as getModuleLayer } from "./utils/chunks/get-module-layer";
-export { type Alias, default as alias, type ResolverObject as AliasResolverObject, type ResolvedAlias, type RollupAliasOptions } from "@rollup/plugin-alias";
+export type { Alias, ResolverObject as AliasResolverObject, ResolvedAlias, RollupAliasOptions } from "@rollup/plugin-alias";
+export { default as alias } from "@rollup/plugin-alias";
 export { default as commonjs, type RollupCommonJSOptions } from "@rollup/plugin-commonjs";
 export { default as dynamicImportVars, type RollupDynamicImportVariablesOptions } from "@rollup/plugin-dynamic-import-vars";
 export { default as inject, type RollupInjectOptions } from "@rollup/plugin-inject";

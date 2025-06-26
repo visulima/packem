@@ -2,12 +2,12 @@ import { versions } from "node:process";
 
 import { cyan } from "@visulima/colorize";
 import type { AliasResolverObject, ShebangOptions } from "@visulima/packem-rollup";
-import { alias as aliasPlugin, browserslistToEsbuild, cachingPlugin, chunkSplitter, cjsInteropPlugin, commonjs as commonjsPlugin, copyPlugin, createSplitChunks, dynamicImportVars as dynamicImportVariablesPlugin, esmShimCjsSyntaxPlugin, fixDtsDefaultCjsExportsPlugin, fixDynamicImportExtension, isolatedDeclarationsPlugin, jsonPlugin as JSONPlugin, jsxRemoveAttributes, licensePlugin, metafilePlugin, nodeResolve as nodeResolvePlugin, oxcResolvePlugin, patchTypescriptTypesPlugin, polyfillNode as polyfillPlugin, preserveDirectivesPlugin, pure as PluginPure, rawPlugin, removeShebangPlugin, replace as replacePlugin, resolveFileUrl as resolveFileUrlPlugin, shebangPlugin, sourcemapsPlugin, urlPlugin, visualizer as visualizerPlugin, wasm as wasmPlugin } from "@visulima/packem-rollup";
+import { alias as aliasPlugin, browserslistToEsbuild, cachingPlugin, chunkSplitter, cjsInteropPlugin, commonjs as commonjsPlugin, copyPlugin, createSplitChunks, dynamicImportVars as dynamicImportVariablesPlugin, esmShimCjsSyntaxPlugin, fixDtsDefaultCjsExportsPlugin, fixDynamicImportExtension, isolatedDeclarationsPlugin, jsonPlugin as JSONPlugin, jsxRemoveAttributes, licensePlugin, metafilePlugin, nodeResolve as nodeResolvePlugin, polyfillNode as polyfillPlugin, preserveDirectivesPlugin, pure as PluginPure, rawPlugin, removeShebangPlugin, replace as replacePlugin, resolveFileUrl as resolveFileUrlPlugin, shebangPlugin, sourcemapsPlugin, urlPlugin, visualizer as visualizerPlugin, wasm as wasmPlugin } from "@visulima/packem-rollup";
 import type { EsbuildPluginConfig } from "@visulima/packem-rollup/esbuild";
-import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
+import { oxcResolvePlugin, type InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
 import type { SucrasePluginConfig } from "@visulima/packem-rollup/sucrase";
 import type { SwcPluginConfig } from "@visulima/packem-rollup/swc";
-import { resolveTsconfigPathsPlugin, resolveTsconfigRootDirectoriesPlugin, resolveTypescriptMjsCtsPlugin } from "@visulima/packem-rollup/typescript";
+import { patchTypescriptTypesPlugin, resolveTsconfigPathsPlugin, resolveTsconfigRootDirectoriesPlugin, resolveTypescriptMjsCtsPlugin } from "@visulima/packem-rollup/typescript";
 import type { BuildContext } from "@visulima/packem-share";
 import { arrayify, memoizeByKey } from "@visulima/packem-share";
 import { getChunkFilename, getEntryFileNames, sortUserPlugins } from "@visulima/packem-share/utils";

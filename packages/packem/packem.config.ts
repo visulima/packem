@@ -5,6 +5,31 @@ import { isolatedDeclarationsTypescriptTransformer as isolatedDeclarationTransfo
 export default defineConfig({
     cjsInterop: true,
     isolatedDeclarationTransformer,
+    externals: [
+        "@babel/parser",
+        "@rollup/plugin-alias",
+        "@rollup/plugin-commonjs",
+        "@rollup/plugin-dynamic-import-vars",
+        "@rollup/plugin-inject",
+        "@rollup/plugin-json",
+        "@rollup/plugin-node-resolve",
+        "@rollup/plugin-replace",
+        "@rollup/plugin-wasm",
+        "@rollup/pluginutils",
+        "@visulima/fs",
+        "@visulima/package",
+        "@visulima/path",
+        "@visulima/source-map",
+        "es-module-lexer",
+        "glob-parent",
+        "oxc-parser",
+        "oxc-resolver",
+        "rollup-plugin-dts",
+        "rollup-plugin-license",
+        "rollup-plugin-polyfill-node",
+        "rollup-plugin-pure",
+        "rollup-plugin-visualizer"
+    ],
     rollup: {
         license: {
             path: "./LICENSE.md",
