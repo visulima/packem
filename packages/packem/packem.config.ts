@@ -4,7 +4,7 @@ import { isolatedDeclarationsTypescriptTransformer as isolatedDeclarationTransfo
 
 export default defineConfig({
     cjsInterop: true,
-    isolatedDeclarationTransformer,
+    // isolatedDeclarationTransformer, // Temporarily disabled for local development
     externals: [
         "@babel/parser",
         "@rollup/plugin-alias",
@@ -18,6 +18,7 @@ export default defineConfig({
         "@rollup/pluginutils",
         "@visulima/fs",
         "@visulima/package",
+        /@visulima\/packem-rollup(\/.*)?$/,
         "@visulima/path",
         "@visulima/source-map",
         "es-module-lexer",
@@ -31,6 +32,9 @@ export default defineConfig({
         "rollup-plugin-visualizer"
     ],
     rollup: {
+        isolatedDeclarations: {
+            exclude: ["src/rollup/plugins/**/*"],
+        },
         license: {
             path: "./LICENSE.md",
         },
