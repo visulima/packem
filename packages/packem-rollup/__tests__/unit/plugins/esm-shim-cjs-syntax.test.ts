@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { GLOBAL_REQUIRE_REGEX } from "../../../../src/rollup/plugins/esm-shim-cjs-syntax";
+import { GLOBAL_REQUIRE_REGEX } from "../../../src/plugins/esm-shim-cjs-syntax";
 
 describe("esm-shim-cjs-syntax", () => {
     const match = (code: string) => GLOBAL_REQUIRE_REGEX.test(code);

@@ -23,7 +23,7 @@ type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
  */
 export interface BuildConfig extends DeepPartial<Omit<BuildOptions, "entries">> {
     entries?: (BuildEntry | string)[];
-    hooks?: Partial<BuildHooks<BuildOptions>>;
+    hooks?: Partial<BuildHooks<InternalBuildOptions>>;
     preset?: BuildPreset | "auto" | "none" | (NonNullable<unknown> & string);
 }
 

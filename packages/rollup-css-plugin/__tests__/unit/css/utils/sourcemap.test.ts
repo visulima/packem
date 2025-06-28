@@ -1,9 +1,9 @@
 import { join } from "@visulima/path";
 import { describe, expect, it } from "vitest";
 
-import { getMap, mm, stripMap } from "../../../../../../src/rollup/plugins/css/utils/sourcemap";
+import { getMap, mm, stripMap } from "../../../../src/utils/sourcemap";
 
-const fixturePath = join(new URL(".", import.meta.url).pathname, "../../../../../../", "__fixtures__", "css");
+const fixturePath = join(new URL(".", import.meta.url).pathname, "../../../../__fixtures__", "css");
 
 describe("css Sourcemap Utilities", () => {
     it("should correctly handle inline sourcemaps", async () => {

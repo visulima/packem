@@ -7,7 +7,7 @@ import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import getRegexMatches from "../../src/utils/get-regex-matches";
+import { getRegexMatches } from "@visulima/packem-share/utils";
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem typescript", () => {

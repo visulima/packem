@@ -1,8 +1,8 @@
 import postcss from "postcss";
 import { describe, expect, it } from "vitest";
 
-import type { UrlOptions } from "../../../../../../../src/rollup/plugins/css/loaders/postcss/url";
-import urlResolver from "../../../../../../../src/rollup/plugins/css/loaders/postcss/url";
+import type { UrlOptions } from "../../../../../src/loaders/postcss/url";
+import urlResolver from "../../../../../src/loaders/postcss/url";
 
 const validateUrl = async (css: string, options: UrlOptions = {}, from = "dummy"): Promise<string> => {
     const data = await postcss(urlResolver(options)).process(css, { from });

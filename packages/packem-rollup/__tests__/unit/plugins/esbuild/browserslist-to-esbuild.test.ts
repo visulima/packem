@@ -1,7 +1,7 @@
 import browserslist from "browserslist";
 import { describe, expect, it } from "vitest";
 
-import browserslistToEsbuild from "../../../../../src/rollup/plugins/esbuild/browserslist-to-esbuild";
+import browserslistToEsbuild from "../../../../src/plugins/esbuild/browserslist-to-esbuild";
 
 describe("browserslist-to-esbuild", () => {
     it("works by passing browsers as array", () => {

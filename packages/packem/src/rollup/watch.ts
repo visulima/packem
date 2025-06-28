@@ -3,9 +3,10 @@ import { join, relative } from "@visulima/path";
 import type { RollupCache, RollupWatcher, RollupWatcherEvent } from "rollup";
 import { watch as rollupWatch } from "rollup";
 
-import type { BuildContext } from "../types";
-import enhanceRollupError from "../utils/enhance-rollup-error";
-import type FileCache from "../utils/file-cache";
+import type { BuildContext } from "@visulima/packem-share/types";
+import type { InternalBuildOptions } from "../types";
+import { enhanceRollupError } from "@visulima/packem-share";
+import type { FileCache } from "@visulima/packem-share";
 import { getRollupDtsOptions, getRollupOptions } from "./get-rollup-options";
 
 const WATCH_CACHE_KEY = "rollup-watch.json";
@@ -20,7 +21,7 @@ const watchHandler = ({
     useCache,
     watcher,
 }: {
-    context: BuildContext;
+    context: BuildContext<InternalBuildOptions>;
     doOnSuccessCleanup?: () => Promise<void>;
     fileCache: FileCache;
     mode: "bundle" | "types";
@@ -98,7 +99,7 @@ const watchHandler = ({
 };
 
 const watch = async (
-    context: BuildContext,
+    context: BuildContext<InternalBuildOptions>,
     fileCache: FileCache,
     runBuilder: () => Promise<void>,
     runOnsuccess: () => Promise<void>,

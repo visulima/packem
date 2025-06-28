@@ -89,9 +89,6 @@
         "test:watch": "vitest"
     },
     "dependencies": {
-        "@csstools/css-parser-algorithms": "3.0.5",
-        "@csstools/css-tokenizer": "3.0.4",
-        "@csstools/postcss-slow-plugins": "^2.0.0",
         "@rollup/pluginutils": "^5.2.0",
         "@visulima/fs": "^3.1.5",
         "@visulima/packem-share": "workspace:*",
@@ -102,16 +99,19 @@
         "source-map-js": "^1.2.1"
     },
     "devDependencies": {
+        "@csstools/css-parser-algorithms": "3.0.5",
+        "@csstools/css-tokenizer": "3.0.4",
+        "@csstools/postcss-slow-plugins": "^2.0.0",
         "@anolilab/eslint-config": "^16.2.13",
         "@anolilab/semantic-release-pnpm": "2.0.0",
         "@anolilab/semantic-release-preset": "^11.0.0",
-        "@babel/core": "^7.27.4",
-        "@rushstack/eslint-plugin-security": "^0.10.0",
+        "@babel/core": "^7.27.7",
+        "@rushstack/eslint-plugin-security": "^0.11.0",
         "@secretlint/secretlint-rule-preset-recommend": "^10.1.1",
         "@total-typescript/ts-reset": "^0.6.1",
         "@types/icss-utils": "^5.1.2",
         "@types/less": "3.0.8",
-        "@types/node": "24.0.4",
+        "@types/node": "24.0.6",
         "@types/node-sass": "^4.11.8",
         "@types/postcss-modules-local-by-default": "^4.0.2",
         "@types/postcss-modules-scope": "^3.0.4",
@@ -124,7 +124,7 @@
         "conventional-changelog-conventionalcommits": "9.0.0",
         "cssnano": "^7.0.7",
         "esbuild": "^0.25.5",
-        "eslint": "^9.29.0",
+        "eslint": "^9.30.0",
         "less": "^4.3.0",
         "lightningcss": "^1.30.1",
         "node-sass": ">=9.0.0",
@@ -161,7 +161,10 @@
         "rollup": "^4.21.2",
         "sass": "^1.0.0",
         "sass-embedded": ">=1.79.4",
-        "stylus": "^0.60.0"
+        "stylus": "^0.60.0",
+        "@csstools/css-parser-algorithms": "3.0.5",
+        "@csstools/css-tokenizer": "3.0.4",
+        "@csstools/postcss-slow-plugins": "^2.0.0"
     },
     "peerDependenciesMeta": {
         "cssnano": {
@@ -207,6 +210,15 @@
             "optional": true
         },
         "stylus": {
+            "optional": true
+        },
+        "@csstools/css-parser-algorithms": {
+            "optional": true
+        },
+        "@csstools/css-tokenizer": {
+            "optional": true
+        },
+        "@csstools/postcss-slow-plugins": {
             "optional": true
         }
     },

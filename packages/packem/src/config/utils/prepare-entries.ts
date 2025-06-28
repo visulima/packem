@@ -5,10 +5,11 @@ import { isRelative } from "@visulima/path/utils";
 import { globSync, isDynamicPattern } from "tinyglobby";
 
 import { ENDING_REGEX } from "@visulima/packem-share/constants"
-import type { BuildContext, BuildEntry } from "../../types";
+import type { BuildContext } from "@visulima/packem-share/types";
+import type { BuildEntry, InternalBuildOptions } from "../../types";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<void> => {
+const extendEntry = async (entry: BuildEntry, context: BuildContext<InternalBuildOptions>): Promise<void> => {
     if (typeof entry.name !== "string") {
         let relativeInput = isAbsolute(entry.input) ? relative(context.options.rootDir, entry.input) : normalize(entry.input);
 
@@ -64,7 +65,7 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext): Promise<vo
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const prepareEntries = async (context: BuildContext): Promise<void> => {
+const prepareEntries = async (context: BuildContext<InternalBuildOptions>): Promise<void> => {
     context.options.entries = context.options.entries.map((entry) =>
         (typeof entry === "string"
             ? { input: entry, isGlob: isDynamicPattern(entry) }

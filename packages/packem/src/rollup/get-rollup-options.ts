@@ -18,7 +18,7 @@ import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupL
 import { minVersion } from "semver";
 
 import type { InternalBuildOptions } from "../types";
-import type FileCache from "../utils/file-cache";
+import type { FileCache } from "@visulima/packem-share";
 import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
 import resolveAliases from "./utils/resolve-aliases";
 

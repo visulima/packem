@@ -1,11 +1,12 @@
 import { yellow } from "@visulima/colorize";
 
-import type { BuildContext, ValidationOptions } from "../../types";
+import type { BuildContext } from "@visulima/packem-share/types";
+import type { InternalBuildOptions, ValidationOptions } from "../../types";
 import { warn } from "@visulima/packem-share/utils"
 
 const joinWarnings = (warnings: Set<string> | string[]): string => [...warnings].map((id) => yellow(id)).join(", ");
 
-const validateDependencies = (context: BuildContext): void => {
+const validateDependencies = (context: BuildContext<InternalBuildOptions>): void => {
     if (context.hoistedDependencies.size > 0) {
         const message = `These dependencies are shamefully hoisted: ${joinWarnings(context.hoistedDependencies)}`;
 

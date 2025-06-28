@@ -7,7 +7,7 @@ import { duration } from "@visulima/humanizer";
 import type { NormalizedPackageJson, PackageJson } from "@visulima/package";
 import { hasPackageJsonAnyDependency } from "@visulima/package";
 import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "@visulima/packem-share/constants";
-import type { BuildContext } from "@visulima/packem-share/types";
+import type { BuildContext, BuildHooks } from "@visulima/packem-share/types";
 import { getHash } from "@visulima/packem-share/utils";
 import type { Pail } from "@visulima/pail";
 import { join, resolve } from "@visulima/path";
@@ -28,8 +28,8 @@ import rollupWatch from "../rollup/watch";
 import type { BuildConfig, BuildOptions, Environment, InternalBuildOptions, Mode } from "../types";
 import cleanDistributionDirectories from "../utils/clean-distribution-directories";
 import createOrUpdateKeyStorage from "../utils/create-or-update-key-storage";
-import enhanceRollupError from "../utils/enhance-rollup-error";
-import FileCache from "../utils/file-cache";
+import { enhanceRollupError } from "@visulima/packem-share";
+import { FileCache } from "@visulima/packem-share";
 import getPackageSideEffect from "../utils/get-package-side-effect";
 import killProcess from "../utils/kill-process";
 import logBuildErrors from "../utils/log-build-errors";
@@ -38,7 +38,7 @@ import packageJsonValidator from "../validator/package-json";
 import validateAliasEntries from "../validator/validate-alias-entries";
 import validateBundleSize from "../validator/validate-bundle-size";
 import build from "./build";
-import { node10Compatibility } from "./node10-compatibility";
+import { node10Compatibility, type Node10CompatibilityOptions } from "./node10-compatibility";
 
 /**
  * Resolves TSConfig JSX option to a standardized JSX runtime value.
@@ -669,7 +669,7 @@ const createContext = async (
         dependencyGraphMap: new Map<string, Set<[string, string]>>(),
         environment,
         hoistedDependencies: new Set(),
-        hooks: createHooks(),
+        hooks: createHooks<InternalBuildOptions>(),
         implicitDependencies: new Set(),
         // Create shared jiti instance for context
         jiti: createJiti(options.rootDir, options.jiti),
@@ -955,7 +955,7 @@ const packem = async (
                     context.logger.raw("\n");
                 }
 
-                const node10CompatibilityOptions = context.options.node10Compatibility ?? context.options.rollup.node10Compatibility;
+                const node10CompatibilityOptions = (context.options.node10Compatibility ?? context.options.rollup.node10Compatibility) as Node10CompatibilityOptions;
 
                 await node10Compatibility(
                     context.logger,

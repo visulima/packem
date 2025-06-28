@@ -1,7 +1,7 @@
 import { pail } from "@visulima/pail";
 import { describe, expect, it, vi } from "vitest";
 
-import LoaderManager from "../../../../../../src/rollup/plugins/css/loaders/loader";
+import LoaderManager from "../../../../src/loaders/loader";
 
 vi.mock("@visulima/pail", () => {
     return {

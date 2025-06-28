@@ -1,6 +1,7 @@
-import type { BuildContext } from "../types";
+import type { BuildContext } from "@visulima/packem-share/types";
+import type { InternalBuildOptions } from "../types";
 
-const logBuildErrors = (context: BuildContext, hasOtherLogs: boolean): void => {
+const logBuildErrors = (context: BuildContext<InternalBuildOptions>, hasOtherLogs: boolean): void => {
     if (context.warnings.size > 0) {
         if (hasOtherLogs) {
             context.logger.raw("\n");

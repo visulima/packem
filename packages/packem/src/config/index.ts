@@ -1,6 +1,10 @@
 import type { BuildConfig, BuildConfigFunction, BuildPreset } from "../types";
 
-export type { BuildConfig, BuildConfigFunction, BuildHooks, BuildPreset } from "../types";
+export type { BuildConfig, BuildConfigFunction, BuildPreset } from "../types";
+
+export type {
+    BuildHooks,
+} from "@visulima/packem-share/types";
 
 /**
  * Defines a build configuration for Packem.

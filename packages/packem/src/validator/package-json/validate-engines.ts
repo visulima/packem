@@ -1,6 +1,7 @@
 import { satisfies, validRange } from "semver";
 
-import type { BuildContext, ValidationOptions } from "../../types";
+import type { BuildContext } from "@visulima/packem-share/types";
+import type { InternalBuildOptions, ValidationOptions } from "../../types";
 import { warn } from "@visulima/packem-share/utils"
 
 /**
@@ -9,7 +10,7 @@ import { warn } from "@visulima/packem-share/utils"
  */
 const DEFAULT_NODE_VERSION = ">=18.0.0";
 
-const validateEngines = (context: BuildContext): void => {
+const validateEngines = (context: BuildContext<InternalBuildOptions>): void => {
     const validation = context.options.validation as ValidationOptions;
     const { pkg } = context;
 

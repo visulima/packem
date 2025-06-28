@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { NormalizedOutputOptions, RenderedChunk } from "rollup";
 
-import fixDynamicImportExtension from "../../../../src/rollup/plugins/fix-dynamic-import-extension";
+import fixDynamicImportExtension from "../../../src/plugins/fix-dynamic-import-extension";
 
 describe(fixDynamicImportExtension, () => {
     it("should return a plugin object", () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import extendString from "../../../../../../src/rollup/plugins/isolated-declarations/utils/extend-string";
+import extendString from "../../../../../src/plugins/isolated-declarations/utils/extend-string";
 
 describe(extendString, () => {
     it.each([

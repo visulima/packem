@@ -18,7 +18,7 @@ export default defineConfig({
         "@rollup/pluginutils",
         "@visulima/fs",
         "@visulima/package",
-        /@visulima\/packem-rollup(\/.*)?$/,
+        "@visulima/packem-rollup",
         "@visulima/path",
         "@visulima/source-map",
         "es-module-lexer",
@@ -29,7 +29,11 @@ export default defineConfig({
         "rollup-plugin-license",
         "rollup-plugin-polyfill-node",
         "rollup-plugin-pure",
-        "rollup-plugin-visualizer"
+        "rollup-plugin-visualizer",
+        "@babel/parser", "oxc-resolver", "es-module-lexer", "@rollup/plugin-alias", 
+"@rollup/plugin-commonjs", "@rollup/plugin-dynamic-import-vars", "@rollup/plugin-inject", "@rollup/plugin-node-resolve", 
+"@rollup/plugin-replace", "@rollup/plugin-wasm", "rollup-plugin-polyfill-node", "rollup-plugin-pure", "rollup-plugin-visualizer", "oxc-parser", 
+"@rollup/plugin-json", "glob-parent", "rollup-plugin-license", "@visulima/source-map", "rollup-plugin-dts"
     ],
     rollup: {
         isolatedDeclarations: {

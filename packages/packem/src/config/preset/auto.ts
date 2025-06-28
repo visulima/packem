@@ -4,13 +4,14 @@ import type { NormalizedPackageJson } from "@visulima/package";
 import { warn } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
 
-import type { BuildContext, BuildPreset } from "../../types";
+import type { BuildContext } from "@visulima/packem-share/types";
+import type { BuildPreset, InternalBuildOptions } from "../../types";
 import inferEntries from "./utils/infer-entries";
 import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";
 
 const autoPreset: BuildPreset = {
     hooks: {
-        "build:prepare": function (context: BuildContext) {
+        "build:prepare": function (context: BuildContext<InternalBuildOptions>) {
             // Disable auto if entries already provided of pkg not available
             if (context.options.entries.length > 0) {
                 return;
@@ -61,7 +62,6 @@ const autoPreset: BuildPreset = {
                     "Automatically detected entries:",
                     cyan(
                         context.options.entries
-
                             .map((buildEntry) => {
                                 if (buildEntry.fileAlias) {
                                     return (

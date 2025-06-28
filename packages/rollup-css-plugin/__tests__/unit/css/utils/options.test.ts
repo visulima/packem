@@ -1,6 +1,6 @@
 import { afterAll, describe, expect, it, vi } from "vitest";
 
-import { ensurePCSSOption } from "../../../../../../src/rollup/plugins/css/utils/options";
+import { ensurePCSSOption } from "../../../../src/utils/options";
 
 describe("option", () => {
     const consoleDebugMock = vi.spyOn(console, "debug").mockImplementation(() => undefined);

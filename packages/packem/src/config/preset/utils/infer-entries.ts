@@ -3,7 +3,8 @@ import type { PackageJson } from "@visulima/package";
 import { DEFAULT_EXTENSIONS, DEVELOPMENT_ENV, ENDING_REGEX, PRODUCTION_ENV, RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "@visulima/packem-share/constants";
 import { extname, resolve, toNamespacedPath } from "@visulima/path";
 
-import type { BuildContext, BuildEntry, Environment, InferEntriesResult, Runtime } from "../../../types";
+import type { BuildContext } from "@visulima/packem-share/types";
+import type { BuildEntry, Environment, InferEntriesResult, InternalBuildOptions, Runtime } from "../../../types";
 import type { OutputDescriptor } from "../../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../../utils/extract-export-filenames";
 import { inferExportTypeFromFileName } from "../../../utils/infer-export-type";
@@ -26,7 +27,7 @@ const createOrUpdateEntry = (
     isDirectory: boolean,
     outputSlug: string,
     output: OutputDescriptor,
-    context: BuildContext,
+    context: BuildContext<InternalBuildOptions>,
     isGlob: boolean,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): void => {
@@ -91,7 +92,7 @@ const createOrUpdateEntry = (
 
 let privateSubfolderWarningShown = false;
 
-const validateIfTypescriptIsInstalled = (context: BuildContext): void => {
+const validateIfTypescriptIsInstalled = (context: BuildContext<InternalBuildOptions>): void => {
     if (context.pkg?.dependencies?.typescript === undefined && context.pkg?.devDependencies?.typescript === undefined) {
         // @TODO: Add command to install typescript
         throw new Error("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");
@@ -108,7 +109,7 @@ const validateIfTypescriptIsInstalled = (context: BuildContext): void => {
 const inferEntries = (
     packageJson: PackageJson,
     sourceFiles: string[],
-    context: BuildContext,
+    context: BuildContext<InternalBuildOptions>,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): InferEntriesResult => {
     const warnings: string[] = [];

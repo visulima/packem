@@ -1,11 +1,12 @@
 import { cyan } from "@visulima/colorize";
 import { join } from "@visulima/path";
 
-import type { BuildContext } from "../../types";
+import type { BuildContext } from "@visulima/packem-share/types";
 import createOrUpdateKeyStorage from "../../utils/create-or-update-key-storage";
 import generateReferenceDocumentation from "./generate-reference-documentation";
+import type { InternalBuildOptions } from "../../types";
 
-const builder = async (context: BuildContext, cachePath: string | undefined, _: never, logged: boolean): Promise<void> => {
+const builder = async (context: BuildContext<InternalBuildOptions>, cachePath: string | undefined, _: never, logged: boolean): Promise<void> => {
     if (context.options.typedoc && context.options.typedoc.format !== undefined) {
         let typedocVersion = "unknown";
 
