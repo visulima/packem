@@ -1,10 +1,10 @@
 import { createFilter } from "@rollup/pluginutils";
+import type { Environment } from "@visulima/packem-share/types";
 import type { Pail } from "@visulima/pail";
 import { basename, dirname, isAbsolute, join, normalize, parse, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 import type { GetModuleInfo, OutputAsset, OutputChunk, Plugin } from "rollup";
 
-import type { Environment } from "@visulima/packem-share/types";
 import LoaderManager from "./loaders/loader";
 import type { Extracted, Loader, LoaderContext } from "./loaders/types";
 import type { ExtractedData, InternalStyleOptions, StyleOptions } from "./types";
@@ -15,7 +15,7 @@ import { mm } from "./utils/sourcemap";
 const sortByNameOrder = async (objectsArray: Loader[], nameOrder: string[]): Promise<Loader[]> =>
     objectsArray.sort((a, b) => nameOrder.indexOf(a.name) - nameOrder.indexOf(b.name));
 
-export default async (
+const cssPlugin = async (
     options: StyleOptions,
     logger: Pail,
     browserTargets: string[],
@@ -321,9 +321,9 @@ export default async (
                     const assetDirectory
                         = typeof outputOptions.assetFileNames === "string"
                             ? normalize(dirname(outputOptions.assetFileNames))
-                            : (typeof outputOptions.assetFileNames === "function"
+                            : typeof outputOptions.assetFileNames === "function"
                               ? normalize(dirname(outputOptions.assetFileNames(cssFile)))
-                              : "assets");
+                              : "assets";
 
                     const map = mm(extractedData.map)
                         .modify((m) => {
@@ -443,3 +443,5 @@ export default async (
         },
     };
 };
+
+export default cssPlugin;

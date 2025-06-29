@@ -9,12 +9,6 @@ export default defineConfig({
         license: {
             path: "./LICENSE.md",
         },
-        node10Compatibility: {
-            writeToPackageJson: true,
-            typeScriptVersion: ">=5.0",
-        },
     },
     transformer,
-    cjsInterop: true,
-    failOnWarn: false,
 }) as BuildConfig;

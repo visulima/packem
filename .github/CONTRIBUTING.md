@@ -529,7 +529,7 @@ chore: add naming convention rule
 docs: remove unused playground
 test: validate @see contents
 ci: allow breaking change commits
-build: add node v18 support
+build: add node v20 support
 infra: rework bug-report template
 revert: add more arabic names dataset (#362)
 

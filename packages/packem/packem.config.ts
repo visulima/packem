@@ -41,11 +41,7 @@ export default defineConfig({
         },
         license: {
             path: "./LICENSE.md",
-        },
-        node10Compatibility: {
-            typeScriptVersion: ">=5.5",
-            writeToPackageJson: true,
-        },
+        }
     },
     runtime: "node",
     transformer,

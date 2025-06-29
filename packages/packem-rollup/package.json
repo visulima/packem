@@ -34,91 +34,30 @@
     "type": "module",
     "exports": {
         ".": {
-            "import": {
-                "types": "./dist/index.d.mts",
-                "default": "./dist/index.mjs"
-            },
-            "require": {
-                "types": "./dist/index.d.cts",
-                "default": "./dist/index.cjs"
-            }
+            "types": "./dist/index.d.mts",
+            "default": "./dist/index.mjs"
         },
         "./esbuild": {
-            "import": {
-                "types": "./dist/plugins/esbuild/index.d.mts",
-                "default": "./dist/plugins/esbuild/index.mjs"
-            },
-            "require": {
-                "types": "./dist/plugins/esbuild/index.d.cts",
-                "default": "./dist/plugins/esbuild/index.cjs"
-            }
+            "types": "./dist/plugins/esbuild/index.d.mts",
+            "default": "./dist/plugins/esbuild/index.mjs"
         },
         "./swc": {
-            "import": {
-                "types": "./dist/plugins/swc/index.d.mts",
-                "default": "./dist/plugins/swc/index.mjs"
-            },
-            "require": {
-                "types": "./dist/plugins/swc/index.d.cts",
-                "default": "./dist/plugins/swc/index.cjs"
-            }
+            "types": "./dist/plugins/swc/index.d.mts",
+            "default": "./dist/plugins/swc/index.mjs"
         },
         "./typescript": {
-            "import": {
-                "types": "./dist/plugins/typescript/index.d.mts",
-                "default": "./dist/plugins/typescript/index.mjs"
-            },
-            "require": {
-                "types": "./dist/plugins/typescript/index.d.cts",
-                "default": "./dist/plugins/typescript/index.cjs"
-            }
+            "types": "./dist/plugins/typescript/index.d.mts",
+            "default": "./dist/plugins/typescript/index.mjs"
         },
         "./oxc": {
-            "import": {
-                "types": "./dist/plugins/oxc/index.d.mts",
-                "default": "./dist/plugins/oxc/index.mjs"
-            },
-            "require": {
-                "types": "./dist/plugins/oxc/index.d.cts",
-                "default": "./dist/plugins/oxc/index.cjs"
-            }
+            "types": "./dist/plugins/oxc/index.d.mts",
+            "default": "./dist/plugins/oxc/index.mjs"
         },
         "./sucrase": {
-            "import": {
-                "types": "./dist/plugins/sucrase/index.d.mts",
-                "default": "./dist/plugins/sucrase/index.mjs"
-            },
-            "require": {
-                "types": "./dist/plugins/sucrase/index.d.cts",
-                "default": "./dist/plugins/sucrase/index.cjs"
-            }
+            "types": "./dist/plugins/sucrase/index.d.mts",
+            "default": "./dist/plugins/sucrase/index.mjs"
         },
         "./package.json": "./package.json"
-    },
-    "main": "dist/index.cjs",
-    "module": "dist/index.mjs",
-    "types": "dist/index.d.ts",
-    "typesVersions": {
-        ">=5.0": {
-            ".": [
-                "./dist/index.d.ts"
-            ],
-            "esbuild": [
-                "./dist/plugins/esbuild/index.d.ts"
-            ],
-            "swc": [
-                "./dist/plugins/swc/index.d.ts"
-            ],
-            "typescript": [
-                "./dist/plugins/typescript/index.d.ts"
-            ],
-            "oxc": [
-                "./dist/plugins/oxc/index.d.ts"
-            ],
-            "sucrase": [
-                "./dist/plugins/sucrase/index.d.ts"
-            ]
-        }
     },
     "files": [
         "CHANGELOG.md",
@@ -156,7 +95,6 @@
         "@visulima/packem-share": "workspace:*",
         "@visulima/path": "1.4.0",
         "@visulima/source-map": "1.0.20",
-        "@visulima/tsconfig": "^1.1.19",
         "es-module-lexer": "1.7.0",
         "glob-parent": "6.0.2",
         "magic-string": "0.30.17",
@@ -169,10 +107,10 @@
         "rollup-plugin-pure": "^0.4.0",
         "rollup-plugin-visualizer": "6.0.3",
         "semver": "7.7.2",
-        "tinyglobby": "0.2.14",
-        "browserslist": "4.25.1"
+        "tinyglobby": "0.2.14"
     },
     "devDependencies": {
+        "@visulima/tsconfig": "^1.1.19",
         "@anolilab/eslint-config": "^16.2.13",
         "@anolilab/semantic-release-pnpm": "^2.0.0",
         "@anolilab/semantic-release-preset": "^11.0.0",
@@ -188,7 +126,7 @@
         "@types/estree": "^1.0.8",
         "@types/glob-parent": "^5.1.3",
         "@types/is-glob": "^4.0.4",
-        "@types/node": "24.0.6",
+        "@types/node": "24.0.7",
         "@types/semver": "^7.7.0",
         "@visulima/packem": "^1.28.2",
         "@visulima/pail": "2.1.25",
@@ -206,7 +144,7 @@
         "rimraf": "^6.0.1",
         "rollup": "4.44.1",
         "secretlint": "10.1.1",
-        "semantic-release": "^24.2.5",
+        "semantic-release": "^24.2.6",
         "sucrase": "^3.35.0",
         "typescript": "^5.8.3",
         "vitest": "^3.2.4"

@@ -1,17 +1,20 @@
+import type { BuildContext } from "@visulima/packem-share/types";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { BuildContext } from "../../src/types";
-import warn from "../../src/utils/warn";
 import validateEngines from "../../src/validator/package-json/validate-engines";
 
-// Mock the warn function
-vi.mock("../../src/utils/warn", () => {
+const { mockedWarn } = vi.hoisted(() => {
     return {
-        default: vi.fn(),
+        mockedWarn: vi.fn(),
     };
 });
 
-const mockWarn = vi.mocked(warn);
+// Mock the warn function
+vi.mock("@visulima/packem-share/utils", () => {
+    return {
+        warn: mockedWarn,
+    };
+});
 
 describe(validateEngines, () => {
     const createMockContext = (package_: any, validation: any = {}): BuildContext => ({
@@ -24,7 +27,7 @@ describe(validateEngines, () => {
     } as BuildContext);
 
     beforeEach(() => {
-        mockWarn.mockClear();
+        vi.resetAllMocks();
     });
 
     it("should warn when engines.node is missing", () => {
@@ -36,7 +39,7 @@ describe(validateEngines, () => {
 
         validateEngines(context);
 
-        expect(mockWarn).toHaveBeenCalledWith(
+        expect(mockedWarn).toHaveBeenCalledWith(
             context,
             "The 'engines.node' field is missing in your package.json. Consider adding \"engines\": { \"node\": \">=18.0.0\" } to specify Node.js version requirements.",
         );
@@ -54,7 +57,7 @@ describe(validateEngines, () => {
 
         validateEngines(context);
 
-        expect(mockWarn).not.toHaveBeenCalled();
+        expect(mockedWarn).not.toHaveBeenCalled();
     });
 
     it("should warn when engines.node has invalid semver range", () => {
@@ -69,7 +72,7 @@ describe(validateEngines, () => {
 
         validateEngines(context);
 
-        expect(mockWarn).toHaveBeenCalledWith(
+        expect(mockedWarn).toHaveBeenCalledWith(
             context,
             "Invalid Node.js version range \"invalid-version-range\" in engines.node field. Please use a valid semver range like \">=18.0.0\".",
         );
@@ -95,14 +98,14 @@ describe(validateEngines, () => {
 
         const context = createMockContext({
             engines: {
-                node: "^18.0.0 || ^20.0.0", // This should satisfy Node.js 18.x
+                node: "^20.0.0 || ^21.0.0", // This should satisfy Node.js 20.x
             },
             name: "test-package",
         });
 
         validateEngines(context);
 
-        expect(mockWarn).not.toHaveBeenCalled();
+        expect(mockedWarn).not.toHaveBeenCalled();
     });
 
     it("should skip validation when engines validation is disabled", () => {
@@ -117,7 +120,7 @@ describe(validateEngines, () => {
 
         validateEngines(context);
 
-        expect(mockWarn).not.toHaveBeenCalled();
+        expect(mockedWarn).not.toHaveBeenCalled();
     });
 
     it("should use default version range when engines.node is missing", () => {
@@ -129,7 +132,7 @@ describe(validateEngines, () => {
 
         validateEngines(context);
 
-        expect(mockWarn).toHaveBeenCalledWith(
+        expect(mockedWarn).toHaveBeenCalledWith(
             context,
             expect.stringContaining(">=18.0.0"),
         );

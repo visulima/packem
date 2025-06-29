@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import svgEncoder from "../../../../src/rollup/utils/svg-encoder";
+import svgEncoder from "../../../src/utils/svg-encoder";
 
 describe(svgEncoder, () => {
     it("should correctly encode a simple SVG string to Base64", () => {

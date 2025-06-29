@@ -8,11 +8,7 @@ export default defineConfig({
     rollup: {
         license: {
             path: "./LICENSE.md",
-        },
-        node10Compatibility: {
-            writeToPackageJson: true,
-            typeScriptVersion: ">=5.0",
-        },
+        }
     },
     validation: {
         dependencies: {
@@ -22,6 +18,4 @@ export default defineConfig({
         }
     },
     transformer,
-    cjsInterop: true,
-    failOnWarn: false,
 }) as BuildConfig;
