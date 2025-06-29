@@ -23,7 +23,7 @@ const getURLType = (source: string): "absolute" | "path-absolute" | "path-relati
     return ABSOLUTE_SCHEME.test(source) ? "absolute" : "path-relative";
 };
 
-const normalizeSourceMap = (map: RawSourceMap, rootContext: string): RawSourceMap => {
+const normalizeSourceMap = (map: RawSourceMap): RawSourceMap => {
     const newMap = map;
 
     // result.map.file is an optional property that provides the output filename.
@@ -34,25 +34,6 @@ const normalizeSourceMap = (map: RawSourceMap, rootContext: string): RawSourceMa
     }
 
     newMap.sourceRoot = "";
-
-    // node-sass returns POSIX paths, that's why we need to transform them back to native paths.
-    // This fixes an error on windows where the source-map module cannot resolve the source maps.
-    // @see https://github.com/webpack-contrib/sass-loader/issues/366#issuecomment-279460722
-
-    newMap.sources = newMap.sources.map((source: string) => {
-        const sourceType = getURLType(source);
-
-        // Do no touch `scheme-relative`, `path-absolute` and `absolute` types (except `file:`)
-        if (sourceType === "absolute" && /^file:/i.test(source)) {
-            return fileURLToPath(source);
-        }
-
-        if (sourceType === "path-relative") {
-            return resolve(rootContext, normalize(source));
-        }
-
-        return source;
-    });
 
     return newMap;
 };

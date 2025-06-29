@@ -79,44 +79,36 @@
             "default": "./dist/config/index.mjs"
         },
         "./css/loader/sourcemap": {
-                "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.mts",
-                "default": "./dist/rollup/plugins/css/loaders/sourcemap.mjs"
-            
+            "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.mts",
+            "default": "./dist/rollup/plugins/css/loaders/sourcemap.mjs"
         },
         "./css/loader/less": {
-                "types": "./dist/rollup/plugins/css/loaders/less.d.mts",
-                "default": "./dist/rollup/plugins/css/loaders/less.mjs"
-           
+            "types": "./dist/rollup/plugins/css/loaders/less.d.mts",
+            "default": "./dist/rollup/plugins/css/loaders/less.mjs"
         },
         "./css/loader/postcss": {
-                "types": "./dist/rollup/plugins/css/loaders/postcss.d.mts",
-                "default": "./dist/rollup/plugins/css/loaders/postcss.mjs"
-            
+            "types": "./dist/rollup/plugins/css/loaders/postcss.d.mts",
+            "default": "./dist/rollup/plugins/css/loaders/postcss.mjs"
         },
         "./css/loader/sass": {
-                "types": "./dist/rollup/plugins/css/loaders/sass.d.mts",
-                "default": "./dist/rollup/plugins/css/loaders/sass.mjs"
-
+            "types": "./dist/rollup/plugins/css/loaders/sass.d.mts",
+            "default": "./dist/rollup/plugins/css/loaders/sass.mjs"
         },
         "./css/loader/stylus": {
-                "types": "./dist/rollup/plugins/css/loaders/stylus.d.mts",
-                "default": "./dist/rollup/plugins/css/loaders/stylus.mjs"
-
+            "types": "./dist/rollup/plugins/css/loaders/stylus.d.mts",
+            "default": "./dist/rollup/plugins/css/loaders/stylus.mjs"
         },
         "./css/loader/lightningcss": {
-                "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.mts",
-                "default": "./dist/rollup/plugins/css/loaders/lightningcss.mjs"
-
+            "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.mts",
+            "default": "./dist/rollup/plugins/css/loaders/lightningcss.mjs"
         },
         "./css/minifier/cssnano": {
-                "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.mts",
-                "default": "./dist/rollup/plugins/css/minifiers/cssnano.mjs"
-
+            "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.mts",
+            "default": "./dist/rollup/plugins/css/minifiers/cssnano.mjs"
         },
         "./css/minifier/lightningcss": {
-                "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.mts",
-                "default": "./dist/rollup/plugins/css/minifiers/lightningcss.mjs"
-
+            "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.mts",
+            "default": "./dist/rollup/plugins/css/minifiers/lightningcss.mjs"
         },
         "./transformer/esbuild": {
             "types": "./dist/rollup/plugins/esbuild/index.d.mts",
@@ -255,7 +247,6 @@
         "less": "^4.3.0",
         "lightningcss": "1.30.1",
         "minireset.css": "0.0.7",
-        "node-sass": "^9.0.0",
         "oxc-parser": "0.75.0",
         "oxc-resolver": "11.3.0",
         "oxc-transform": "^0.75.0",
@@ -299,7 +290,6 @@
         "icss-utils": ">=5.1.0",
         "less": ">=4.2.0",
         "lightningcss": ">=1.27.0",
-        "node-sass": ">=9.0.0",
         "oxc-transform": ">=0.20.0",
         "postcss": ">=8.4.47",
         "postcss-load-config": ">=6.0.1",
@@ -337,9 +327,6 @@
             "optional": true
         },
         "lightningcss": {
-            "optional": true
-        },
-        "node-sass": {
             "optional": true
         },
         "oxc-transform": {

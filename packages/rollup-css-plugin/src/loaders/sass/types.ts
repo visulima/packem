@@ -5,13 +5,12 @@
  *
  * Copyright JS Foundation and other contributors
  */
-import type { SyncOptions as NodeSassSyncOptions } from "node-sass";
 import type { StringOptions as SassStringOptions } from "sass";
 import type { StringOptions as SassEmbeddedStringOptions } from "sass-embedded";
 
 import type { Environment } from "@visulima/packem-share/types";
 
-export type SassApiType = "legacy" | "modern-compiler" | "modern";
+export type SassApiType = "modern-compiler" | "modern";
 
 export type SassLoaderContext = {
     environment: Environment;
@@ -19,9 +18,9 @@ export type SassLoaderContext = {
     rootContext: string;
 };
 
-export type SassLoaderOptions = (Omit<NodeSassSyncOptions, "data" | "sourceMapContents" | "sourceMapEmbed" | "sourceMapRoot" | "outFile"> | Omit<SassEmbeddedStringOptions<"sync">, "charset" | "indentedSyntax"> | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">) & {
+export type SassLoaderOptions = (Omit<SassEmbeddedStringOptions<"sync">, "charset" | "indentedSyntax"> | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">) & {
     additionalData:
         string | ((content: string | Buffer, loaderContext: SassLoaderContext) => Promise<string>) | ((content: string | Buffer, loaderContext: SassLoaderContext) => string);
-    implementation?: "node-sass" | "sass-embedded" | "sass";
+    implementation?: "sass-embedded" | "sass";
     warnRuleAsWarning?: boolean;
 };

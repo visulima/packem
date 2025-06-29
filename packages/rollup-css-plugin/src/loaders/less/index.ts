@@ -35,3 +35,4 @@ const loader: Loader<LESSLoaderOptions> = {
 };
 
 export default loader;
+export type { LESSLoaderOptions } from "./types";

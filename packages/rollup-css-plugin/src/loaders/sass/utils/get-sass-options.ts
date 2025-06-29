@@ -1,7 +1,6 @@
 import type { Pail } from "@visulima/pail";
 import { extname, isAbsolute, join } from "@visulima/path";
 import { pathToFileURL } from "mlly";
-import type { Importer as NodeSassImporter, Options as NodeSassOptions } from "node-sass";
 import type { PluginContext } from "rollup";
 import type { Importer, SourceSpan, StringOptions } from "sass";
 
@@ -18,7 +17,6 @@ const getSassOptions = async (
     options: SassLoaderOptions,
     content: string,
     useSourceMap: boolean,
-    apiType: SassApiType,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<SassLoaderOptions> => {
     const { warnRuleAsWarning, ...otherOptions } = options;
@@ -86,86 +84,35 @@ const getSassOptions = async (
         };
     }
 
-    const isModernAPI = apiType === "modern" || apiType === "modern-compiler";
     const { resourcePath } = loaderContext;
 
-    if (isModernAPI) {
-        (sassOptions as StringOptions<"async">).url = new URL(pathToFileURL(resourcePath));
+    (sassOptions as StringOptions<"async">).url = new URL(pathToFileURL(resourcePath));
 
-        if (useSourceMap) {
-            (sassOptions as StringOptions<"async">).sourceMap = true;
-        }
+    if (useSourceMap) {
+        (sassOptions as StringOptions<"async">).sourceMap = true;
+    }
 
-        // If we are compiling sass and indentedSyntax isn't set, automatically set it.
-        if ((sassOptions as StringOptions<"async">).syntax === undefined) {
-            const extension = extname(resourcePath);
-
-            if (extension) {
-                (sassOptions as StringOptions<"async">).syntax = resolveSyntax(extension.toLowerCase());
-            }
-        }
-
-        (sassOptions as StringOptions<"async">).loadPaths = [
-            ...((sassOptions as StringOptions<"async">).loadPaths ? [...((sassOptions as StringOptions<"async">).loadPaths as string[])] : []).map(
-                (includePath: string) => (isAbsolute(includePath) ? includePath : join(process.cwd(), includePath)),
-            ),
-            ...process.env.SASS_PATH ? process.env.SASS_PATH.split(process.platform === "win32" ? ";" : ":") : [],
-        ];
-
-        (sassOptions as StringOptions<"async">).importers = (sassOptions as StringOptions<"async">).importers
-            ? (Array.isArray((sassOptions as StringOptions<"async">).importers)
-                ? [...((sassOptions as StringOptions<"async">).importers as Importer[])]
-                : (sassOptions as StringOptions<"async">).importers)
-            : [];
-    } else {
-        (sassOptions as NodeSassOptions).file = resourcePath;
-
-        if (useSourceMap) {
-            // Deliberately overriding the sourceMap option here.
-            // node-sass won't produce source maps if the data option is used and options.sourceMap is not a string.
-            // In case it is a string, options.sourceMap should be a path where the source map is written.
-            // But since we're using the data option, the source map will not actually be written, but
-            // all paths in sourceMap.sources will be relative to that path.
-            // Pretty complicated... :(
-            (sassOptions as NodeSassOptions).sourceMap = true;
-            (sassOptions as NodeSassOptions).outFile = join(loaderContext.rootContext, "style.css.map");
-            (sassOptions as NodeSassOptions).sourceMapContents = true;
-            (sassOptions as NodeSassOptions).omitSourceMapUrl = true;
-            (sassOptions as NodeSassOptions).sourceMapEmbed = false;
-        }
-
+    // If we are compiling sass and indentedSyntax isn't set, automatically set it.
+    if ((sassOptions as StringOptions<"async">).syntax === undefined) {
         const extension = extname(resourcePath);
 
-        // If we are compiling sass and indentedSyntax isn't set, automatically set it.
-        (sassOptions as NodeSassOptions).indentedSyntax
-            = extension && extension.toLowerCase() === ".sass" && (sassOptions as NodeSassOptions).indentedSyntax === undefined
-                ? true
-                : Boolean((sassOptions as NodeSassOptions).indentedSyntax);
-
-        // Allow passing custom importers to `sass`/`node-sass`. Accepts `Function` or an array of `Function`s.
-        (sassOptions as NodeSassOptions).importer = (sassOptions as NodeSassOptions).importer
-            ? (Array.isArray((sassOptions as NodeSassOptions).importer)
-                ? [...((sassOptions as NodeSassOptions).importer as unknown as NodeSassImporter[])]
-                : [(sassOptions as NodeSassOptions).importer as NodeSassImporter])
-            : [];
-
-        // Regression on the `sass-embedded` side
-        if (((sassOptions as NodeSassOptions).importer as unknown as NodeSassImporter[]).length === 0) {
-            (sassOptions as NodeSassOptions).importer = undefined;
-        }
-
-        (sassOptions as NodeSassOptions).includePaths = [
-            ...[process.cwd()].flat(),
-            ...((sassOptions as NodeSassOptions).includePaths ? [...((sassOptions as NodeSassOptions).includePaths as string[])] : []).map(
-                (includePath: string) => (isAbsolute(includePath) ? includePath : join(process.cwd(), includePath)),
-            ),
-            ...process.env.SASS_PATH ? process.env.SASS_PATH.split(process.platform === "win32" ? ";" : ":") : [],
-        ];
-
-        if ((sassOptions as NodeSassOptions).charset === undefined) {
-            (sassOptions as NodeSassOptions).charset = true;
+        if (extension) {
+            (sassOptions as StringOptions<"async">).syntax = resolveSyntax(extension.toLowerCase());
         }
     }
+
+    (sassOptions as StringOptions<"async">).loadPaths = [
+        ...((sassOptions as StringOptions<"async">).loadPaths ? [...((sassOptions as StringOptions<"async">).loadPaths as string[])] : []).map(
+            (includePath: string) => (isAbsolute(includePath) ? includePath : join(process.cwd(), includePath)),
+        ),
+        ...process.env.SASS_PATH ? process.env.SASS_PATH.split(process.platform === "win32" ? ";" : ":") : [],
+    ];
+
+    (sassOptions as StringOptions<"async">).importers = (sassOptions as StringOptions<"async">).importers
+        ? (Array.isArray((sassOptions as StringOptions<"async">).importers)
+            ? [...((sassOptions as StringOptions<"async">).importers as Importer[])]
+            : (sassOptions as StringOptions<"async">).importers)
+        : [];
 
     return sassOptions;
 };

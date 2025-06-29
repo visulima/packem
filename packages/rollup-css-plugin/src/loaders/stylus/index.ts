@@ -78,3 +78,4 @@ const loader: Loader<StylusLoaderOptions> = {
 };
 
 export default loader;
+export type { StylusLoaderOptions } from "./types";
