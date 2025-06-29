@@ -5,10 +5,9 @@
  *
  * Copyright JS Foundation and other contributors
  */
+import type { Environment } from "@visulima/packem-share/types";
 import type { StringOptions as SassStringOptions } from "sass";
 import type { StringOptions as SassEmbeddedStringOptions } from "sass-embedded";
-
-import type { Environment } from "@visulima/packem-share/types";
 
 export type SassApiType = "modern-compiler" | "modern";
 

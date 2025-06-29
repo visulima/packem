@@ -1,9 +1,9 @@
 import { findMonorepoRoot, findPackageRoot } from "@visulima/package";
+import type { Environment } from "@visulima/packem-share/types";
 import { parse, resolve } from "@visulima/path";
 import type { Result } from "postcss-load-config";
 import postcssrc from "postcss-load-config";
 
-import type { Environment } from "@visulima/packem-share/types";
 import type { PostCSSConfigLoaderOptions } from "../../types";
 import { ensurePCSSOption, ensurePCSSPlugins } from "../../utils/options";
 

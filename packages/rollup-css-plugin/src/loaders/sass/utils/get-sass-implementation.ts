@@ -3,54 +3,38 @@ import type * as sass from "sass";
 // eslint-disable-next-line import/no-namespace
 import type * as sassEmbedded from "sass-embedded";
 
-export const getDefaultSassImplementation = (): "sass-embedded" | "sass" => {
-    const implementations = ["sass-embedded", "sass"];
+const getSassCompiler = async (
+    implementation: "sass-embedded" | "sass" | undefined,
+): Promise<
+((sassOptions: sass.StringOptions<"sync"> & { data: string }) => sass.CompileResult) | ((sassOptions: sassEmbedded.StringOptions<"sync"> & { data: string }) => sassEmbedded.CompileResult)
+> => {
+    let resolvedCompiler: typeof sass.compileString | typeof sassEmbedded.compileString | undefined;
 
-    for (const impl of implementations) {
+    if (implementation === undefined || implementation === "sass-embedded") {
         try {
-            require.resolve(impl);
-
-            return impl as "sass-embedded" | "sass";
+            resolvedCompiler = await import("sass-embedded").then((d) => d.compileString) as typeof sassEmbedded;
         } catch {
             // Continue to the next implementation
         }
     }
 
-    throw new Error("No supported Sass implementation found. Please install 'sass-embedded' or 'sass'.");
+    if (resolvedCompiler === undefined && (implementation === undefined || implementation === "sass")) {
+        try {
+            resolvedCompiler = await import("sass").then((d) => d.compileString) as typeof sass;
+        } catch {
+            // Continue to the next implementation
+        }
+    }
+
+    if (resolvedCompiler === undefined) {
+        throw new Error("No supported Sass implementation found. Please install 'sass-embedded' or 'sass'.");
+    }
+
+    return (sassOptions: (sass.StringOptions<"sync"> | sassEmbedded.StringOptions<"sync">) & { data: string }) => {
+        const { data, ...rest } = sassOptions;
+
+        return resolvedCompiler(data as string, rest);
+    };
 };
 
-export const getSassImplementation = (
-    implementation: string | typeof sass | typeof sassEmbedded,
-): typeof sass | typeof sassEmbedded => {
-    let resolvedImplementation = implementation;
-
-    if (typeof resolvedImplementation === "string") {
-        // eslint-disable-next-line import/no-dynamic-require,global-require,@typescript-eslint/no-require-imports
-        resolvedImplementation = require(resolvedImplementation);
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { info = undefined } = resolvedImplementation as Record<string, any>;
-
-    if (!info) {
-        throw new Error(`Sass implementation is missing 'info' property. Implementation: ${JSON.stringify(resolvedImplementation)}`);
-    }
-
-    const infoParts = info.split("\t");
-
-    if (infoParts.length < 2) {
-        throw new Error(`Invalid Sass implementation info format. Expected at least 2 parts, got: "${info as string}".`);
-    }
-
-    const [implementationName] = infoParts;
-
-    if (implementationName === "dart-sass") {
-        return resolvedImplementation as typeof sass;
-    }
-
-    if (implementationName === "sass-embedded") {
-        return resolvedImplementation as typeof sassEmbedded;
-    }
-
-    throw new Error(`Unsupported Sass implementation: "${implementationName as string}". Supported implementations are: dart-sass, sass-embedded.`);
-};
+export default getSassCompiler;

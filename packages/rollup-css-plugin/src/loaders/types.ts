@@ -1,8 +1,8 @@
+import type { Environment } from "@visulima/packem-share/types";
 import type { Pail } from "@visulima/pail";
 import type { CustomPluginOptions, PluginContext } from "rollup";
 import type { RawSourceMap } from "source-map-js";
 
-import type { Environment } from "@visulima/packem-share/types";
 import type { InternalStyleOptions } from "../types";
 
 export interface Extracted {

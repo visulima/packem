@@ -15,24 +15,17 @@ import type { Loader } from "../types";
 import modernImporter from "./modern/importer";
 import type { SassApiType, SassLoaderOptions } from "./types";
 import getCompileFunction from "./utils/get-compile-function";
-import { getDefaultSassImplementation, getSassImplementation } from "./utils/get-sass-implementation";
+import getSassImplementation from "./utils/get-sass-implementation";
 import getSassOptions from "./utils/get-sass-options";
 import normalizeSourceMap from "./utils/normalize-source-map";
 import errorFactory from "./utils/sass-error-factory";
 
 const loader: Loader<SassLoaderOptions> = {
     name: "sass",
-    // eslint-disable-next-line sonarjs/cognitive-complexity
+
     async process({ code, map }) {
-        let apiType: SassApiType = "modern-compiler";
-
-        const foundSassPackage = this.options.implementation ?? getDefaultSassImplementation();
-
-        if (foundSassPackage === "sass") {
-            apiType = "modern";
-        }
-
-        const implementation = getSassImplementation(foundSassPackage);
+        const foundSassPackage = this.options.implementation;
+        const compile = await getSassImplementation(foundSassPackage);
 
         const options = await getSassOptions(
             {
@@ -48,8 +41,6 @@ const loader: Loader<SassLoaderOptions> = {
         );
 
         options.importers.push(modernImporter(this.id, this.debug ?? false));
-
-        const compile = await getCompileFunction(implementation, apiType);
 
         let result;
 
@@ -95,4 +86,4 @@ const loader: Loader<SassLoaderOptions> = {
 };
 
 export default loader;
-export type { SassApiType, SassLoaderContext, SassLoaderOptions } from "./types";
+export type { SassLoaderContext, SassLoaderOptions } from "./types";

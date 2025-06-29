@@ -1,1 +1,1 @@
-export { default } from "@visulima/rollup-css-plugin/minifiers/cssnano";
+export { default } from "@visulima/rollup-css-plugin/minifier/cssnano";

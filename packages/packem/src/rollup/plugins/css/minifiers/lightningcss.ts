@@ -1,1 +1,1 @@
-export { default } from "@visulima/rollup-css-plugin/minifiers/lightningcss";
+export { default } from "@visulima/rollup-css-plugin/minifier/lightningcss";

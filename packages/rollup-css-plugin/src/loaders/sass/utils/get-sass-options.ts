@@ -1,10 +1,11 @@
 import type { Pail } from "@visulima/pail";
 import { extname, isAbsolute, join } from "@visulima/path";
+import { isWindows } from "@visulima/path/utils";
 import { pathToFileURL } from "mlly";
 import type { PluginContext } from "rollup";
 import type { Importer, SourceSpan, StringOptions } from "sass";
 
-import type { SassApiType, SassLoaderContext, SassLoaderOptions } from "../types";
+import type { SassLoaderContext, SassLoaderOptions } from "../types";
 import resolveSyntax from "./resolve-syntax";
 
 /**
@@ -17,15 +18,15 @@ const getSassOptions = async (
     options: SassLoaderOptions,
     content: string,
     useSourceMap: boolean,
-    // eslint-disable-next-line sonarjs/cognitive-complexity
+
 ): Promise<SassLoaderOptions> => {
     const { warnRuleAsWarning, ...otherOptions } = options;
     const sassOptions = {
         ...otherOptions,
         data: options.additionalData
-            ? (typeof options.additionalData === "function"
+            ? typeof options.additionalData === "function"
                 ? await options.additionalData(content, loaderContext)
-                : `${options.additionalData}\n${content}`)
+                : `${options.additionalData}\n${content}`
             : content,
     };
 
@@ -105,13 +106,13 @@ const getSassOptions = async (
         ...((sassOptions as StringOptions<"async">).loadPaths ? [...((sassOptions as StringOptions<"async">).loadPaths as string[])] : []).map(
             (includePath: string) => (isAbsolute(includePath) ? includePath : join(process.cwd(), includePath)),
         ),
-        ...process.env.SASS_PATH ? process.env.SASS_PATH.split(process.platform === "win32" ? ";" : ":") : [],
+        ...process.env.SASS_PATH ? process.env.SASS_PATH.split(isWindows() ? ";" : ":") : [],
     ];
 
     (sassOptions as StringOptions<"async">).importers = (sassOptions as StringOptions<"async">).importers
-        ? (Array.isArray((sassOptions as StringOptions<"async">).importers)
+        ? Array.isArray((sassOptions as StringOptions<"async">).importers)
             ? [...((sassOptions as StringOptions<"async">).importers as Importer[])]
-            : (sassOptions as StringOptions<"async">).importers)
+            : (sassOptions as StringOptions<"async">).importers
         : [];
 
     return sassOptions;

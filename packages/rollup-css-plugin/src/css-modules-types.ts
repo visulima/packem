@@ -66,4 +66,4 @@ const cssModulesTypes = (options: StyleOptions, rootDirectory: string, logger: P
     };
 };
 
-export default cssModulesTypes; 
+export default cssModulesTypes;
