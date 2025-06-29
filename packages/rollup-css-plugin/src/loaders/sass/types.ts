@@ -9,8 +9,6 @@ import type { Environment } from "@visulima/packem-share/types";
 import type { StringOptions as SassStringOptions } from "sass";
 import type { StringOptions as SassEmbeddedStringOptions } from "sass-embedded";
 
-export type SassApiType = "modern-compiler" | "modern";
-
 export type SassLoaderContext = {
     environment: Environment;
     resourcePath: string;

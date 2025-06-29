@@ -121,6 +121,7 @@
         "@csstools/css-parser-algorithms": "3.0.5",
         "@csstools/css-tokenizer": "3.0.4",
         "@csstools/postcss-slow-plugins": "^2.0.0",
+        "@rollup/plugin-inject": "5.0.5",
         "@rushstack/eslint-plugin-security": "^0.11.0",
         "@secretlint/secretlint-rule-preset-recommend": "^10.1.1",
         "@total-typescript/ts-reset": "^0.6.1",
@@ -157,6 +158,7 @@
         "secretlint": "^10.1.1",
         "semantic-release": "^24.2.6",
         "stylus": "^0.64.0",
+        "sugarss": "5.0.0",
         "typescript": "^5.8.3",
         "vitest": "^3.2.4"
     },

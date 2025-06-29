@@ -13,9 +13,8 @@ import type { RawSourceMap } from "source-map-js";
 
 import type { Loader } from "../types";
 import modernImporter from "./modern/importer";
-import type { SassApiType, SassLoaderOptions } from "./types";
-import getCompileFunction from "./utils/get-compile-function";
-import getSassImplementation from "./utils/get-sass-implementation";
+import type { SassLoaderOptions } from "./types";
+import getSassImplementation from "./utils/get-sass-compiler";
 import getSassOptions from "./utils/get-sass-options";
 import normalizeSourceMap from "./utils/normalize-source-map";
 import errorFactory from "./utils/sass-error-factory";
