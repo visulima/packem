@@ -3,81 +3,109 @@ title: Configuration Options
 description: Complete reference for all Packen configuration options
 ---
 
+import { FeatureCard } from '../../components/FeatureCard'
+
 # Configuration Options
 
-Packen provides a comprehensive set of configuration options to customize your build process. These options can be configured through the CLI, configuration file, or programmatically.
+Packen provides extensive configuration options to customize your build process. All options can be configured through the `packem.config.ts` file or passed via CLI arguments.
 
 ## Quick Navigation
 
-### Core Options
-- [**Entry**](/docs/options/entry) - Define entry points for your build
-- [**Config File**](/docs/options/config-file) - Configuration file setup and usage
-- [**Output Format**](/docs/options/output-format) - Control output formats (ESM, CJS, IIFE)
-- [**Output Directory**](/docs/options/output-directory) - Configure output directory and file naming
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+  <FeatureCard
+    title="Entry Points"
+    description="Configure entry points and automatic detection"
+    href="/docs/options/entry"
+    icon="📂"
+  />
+  
+  <FeatureCard
+    title="Config File"
+    description="Setup and structure of configuration files"
+    href="/docs/options/config-file"
+    icon="⚙️"
+  />
+  
+  <FeatureCard
+    title="Declaration Files"
+    description="TypeScript declaration generation and options"
+    href="/docs/options/declaration-files"
+    icon="📝"
+  />
+  
+  <FeatureCard
+    title="Output Format"
+    description="Configure ESM, CJS, IIFE, and UMD formats"
+    href="/docs/options/output-format"
+    icon="📦"
+  />
+  
+  <FeatureCard
+    title="Output Directory"
+    description="Control where files are written and organized"
+    href="/docs/options/output-directory"
+    icon="📁"
+  />
+  
+  <FeatureCard
+    title="Target"
+    description="JavaScript compilation targets and environments"
+    href="/docs/options/target"
+    icon="🎯"
+  />
+  
+  <FeatureCard
+    title="Externals"
+    description="Configure external dependencies"
+    href="/docs/options/externals"
+    icon="🔗"
+  />
+  
+  <FeatureCard
+    title="Watch Mode"
+    description="File watching for development builds"
+    href="/docs/options/watch"
+    icon="👀"
+  />
+  
+  <FeatureCard
+    title="Source Maps"
+    description="Debug information and source map generation"
+    href="/docs/options/source-maps"
+    icon="🗺️"
+  />
+  
+  <FeatureCard
+    title="Minification"
+    description="Code minification for production builds"
+    href="/docs/options/minify"
+    icon="🗜️"
+  />
+  
+  <FeatureCard
+    title="Plugins"
+    description="Extend functionality with Rollup plugins"
+    href="/docs/options/plugins"
+    icon="🔌"
+  />
+  
+  <FeatureCard
+    title="Hooks"
+    description="Build lifecycle hooks and custom logic"
+    href="/docs/options/hooks"
+    icon="🪝"
+  />
+</div>
 
-### TypeScript Options
-- [**Declaration Files**](/docs/options/declaration-files) - TypeScript declaration generation
-- [**Isolated Declarations**](/docs/options/isolated-declarations) - Fast type generation
-- [**TSConfig**](/docs/options/tsconfig) - TypeScript configuration integration
-
-### Build Options
-- [**Transformers**](/docs/options/transformers) - Choose and configure transformers
-- [**Target**](/docs/options/target) - JavaScript compilation targets
-- [**Platform**](/docs/options/platform) - Target runtime platforms
-- [**Minification**](/docs/options/minification) - Code minification options
-- [**Source Maps**](/docs/options/source-maps) - Source map generation
-
-### Development Options
-- [**Watch Mode**](/docs/options/watch-mode) - File watching and development workflow
-- [**Cleaning**](/docs/options/cleaning) - Clean output directory before build
-- [**Silent Mode**](/docs/options/silent-mode) - Control logging and output verbosity
-
-### Advanced Options
-- [**Dependencies**](/docs/options/dependencies) - External dependency handling
-- [**Tree Shaking**](/docs/options/tree-shaking) - Dead code elimination
-- [**Shims**](/docs/options/shims) - ESM/CJS interoperability
-- [**Package Exports**](/docs/options/package-exports) - Automatic package.json exports
-- [**Unbundle**](/docs/options/unbundle) - Preserve file structure mode
-
-### CSS Options
-- [**CSS Processing**](/docs/options/css) - CSS, Sass, Less, Stylus configuration
-- [**CSS Modules**](/docs/options/css-modules) - Scoped CSS configuration
-- [**PostCSS**](/docs/options/postcss) - PostCSS plugins and configuration
-
-### Plugin Options
-- [**Plugins**](/docs/options/plugins) - Rollup plugin integration
-- [**Hooks**](/docs/options/hooks) - Build lifecycle hooks
-
-## Configuration Methods
-
-### CLI Options
-
-Configure Packen directly from the command line:
-
-```bash
-# Basic build with options
-packem build --minify --sourcemap
-
-# Watch mode with custom output
-packem build --watch --outDir dist
-
-# Production build with all optimizations
-packem build --minify --clean --target es2020
-```
-
-### Configuration File
-
-Use `packem.config.ts` for complex configurations:
+## Configuration Structure
 
 ```typescript
-import { defineConfig } from '@visulima/packem/config'
+// packem.config.ts
+import { defineConfig } from '@visulima/packem'
 
 export default defineConfig({
   // Entry points
-  entry: 'src/index.ts',
-  
-  // Transformer selection
-  transformer: 'esbuild',
+  entry: './src/index.ts',
   
   // Output configuration
   rollup: {
@@ -87,99 +115,227 @@ export default defineConfig({
     }
   },
   
-  // CSS processing
-  css: {
-    extract: true,
-    modules: true
+  // Build options
+  target: 'es2020',
+  minify: true,
+  sourcemap: true,
+  
+  // Development
+  watch: true,
+  
+  // Lifecycle hooks
+  hooks: {
+    'build:before': async () => {
+      console.log('Starting build...')
+    }
   }
 })
 ```
 
-### Programmatic API
+## Core Options
 
-Configure Packen in your Node.js scripts:
+### Entry and Output
+- **[Entry](/docs/options/entry)** - Configure entry points and automatic detection
+- **[Output Format](/docs/options/output-format)** - ESM, CJS, IIFE, UMD output formats
+- **[Output Directory](/docs/options/output-directory)** - File organization and directory structure
 
-```typescript
-import { packem } from '@visulima/packem'
+### Build Configuration
+- **[Config File](/docs/options/config-file)** - Configuration file setup and structure
+- **[Target](/docs/options/target)** - JavaScript compilation targets and environments
+- **[Declaration Files](/docs/options/declaration-files)** - TypeScript declaration generation
 
-await packem('./src', {
-  mode: 'build',
-  environment: 'production',
-  minify: true,
-  sourcemap: true
-})
-```
+### Dependencies and Externals
+- **[Externals](/docs/options/externals)** - Configure external dependencies that shouldn't be bundled
+
+### Development and Debugging
+- **[Watch Mode](/docs/options/watch)** - File watching for development builds
+- **[Source Maps](/docs/options/source-maps)** - Debug information and source map generation
+
+### Optimization
+- **[Minification](/docs/options/minify)** - Code minification with multiple engines
+
+### Extensibility
+- **[Plugins](/docs/options/plugins)** - Extend functionality with Rollup plugins
+- **[Hooks](/docs/options/hooks)** - Build lifecycle hooks and custom logic
 
 ## Option Categories
 
-### Build Configuration
-Options that control the core build process and output generation.
+### Input/Output Options
+Configure what files to process and where to output the results.
 
-### Development Workflow
-Options that enhance the development experience with features like watch mode and hot reloading.
+```typescript
+export default defineConfig({
+  entry: ['src/index.ts', 'src/cli.ts'],
+  
+  rollup: {
+    output: [
+      { format: 'esm', dir: 'dist/esm' },
+      { format: 'cjs', dir: 'dist/cjs' }
+    ]
+  }
+})
+```
 
-### Optimization
-Options for optimizing bundle size, performance, and compatibility.
+### Transformation Options
+Control how your code is transformed and optimized.
 
-### Integration
-Options for integrating with external tools, frameworks, and build systems.
+```typescript
+export default defineConfig({
+  transformer: 'esbuild',
+  target: 'es2020',
+  minify: true,
+  
+  esbuild: {
+    jsx: 'automatic',
+    platform: 'node'
+  }
+})
+```
 
-## Default Values
+### Development Options
+Configure the development workflow and debugging experience.
 
-Packen provides sensible defaults for most options:
+```typescript
+export default defineConfig({
+  watch: true,
+  sourcemap: true,
+  
+  server: {
+    port: 3000,
+    hmr: true
+  }
+})
+```
 
-- **Entry**: Automatically detected from `package.json` exports
-- **Output Format**: ESM for modern packages, CJS for compatibility
-- **Transformer**: esbuild for optimal performance
-- **Target**: Determined from `package.json` engines field
-- **Source Maps**: Enabled in development, disabled in production
-- **Minification**: Disabled by default, enabled for production builds
+### Advanced Options
+Fine-tune the build process with advanced configuration.
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react', 'react-dom'],
+    plugins: [
+      // Custom plugins
+    ]
+  },
+  
+  hooks: {
+    'build:before': async () => {
+      // Custom build logic
+    }
+  }
+})
+```
 
 ## Environment-Specific Configuration
 
-Configure different options for different environments:
+### Development vs Production
 
 ```typescript
 export default defineConfig({
-  transformer: process.env.NODE_ENV === 'development' ? 'esbuild' : 'swc',
+  minify: process.env.NODE_ENV === 'production',
+  sourcemap: process.env.NODE_ENV === 'development',
   
   rollup: {
-    sourcemap: process.env.NODE_ENV === 'development',
-    minify: process.env.NODE_ENV === 'production'
+    output: {
+      format: process.env.TARGET_FORMAT || 'esm'
+    }
   }
 })
 ```
 
-## Validation and Type Safety
-
-All configuration options are fully typed and validated:
+### Conditional Configuration
 
 ```typescript
-// TypeScript will provide autocomplete and type checking
 export default defineConfig({
-  transformer: 'esbuild', // ✅ Valid
-  transformer: 'invalid', // ❌ TypeScript error
+  ...(process.env.BUILD_LIB && {
+    entry: 'src/lib.ts',
+    rollup: {
+      external: ['react', 'react-dom']
+    }
+  }),
   
-  rollup: {
-    format: 'esm' // ✅ Valid
-    format: 'invalid' // ❌ TypeScript error
-  }
+  ...(process.env.BUILD_APP && {
+    entry: 'src/app.ts',
+    minify: true
+  })
 })
 ```
 
-## Migration from Other Tools
+## Configuration Validation
 
-Packen provides migration utilities for popular bundlers:
+Packen automatically validates your configuration and provides helpful error messages for common issues:
 
-- [From tsup](/docs/guide/migration/tsup)
-- [From Rollup](/docs/guide/migration/rollup)
-- [From Webpack](/docs/guide/migration/webpack)
-- [From unbuild](/docs/guide/migration/unbuild)
+- **Missing entry points** - Warns if specified entry files don't exist
+- **Invalid output formats** - Validates format compatibility
+- **Plugin conflicts** - Detects conflicting plugin configurations
+- **Type mismatches** - TypeScript integration for type-safe configuration
+
+## Configuration Examples
+
+### Library Build
+
+```typescript
+export default defineConfig({
+  entry: 'src/index.ts',
+  
+  rollup: {
+    external: ['react', 'react-dom'],
+    output: [
+      { format: 'esm', file: 'dist/index.mjs' },
+      { format: 'cjs', file: 'dist/index.cjs' }
+    ]
+  },
+  
+  declaration: true,
+  minify: true
+})
+```
+
+### Application Build
+
+```typescript
+export default defineConfig({
+  entry: 'src/main.ts',
+  
+  rollup: {
+    output: {
+      format: 'iife',
+      file: 'dist/app.js',
+      name: 'MyApp'
+    }
+  },
+  
+  minify: true,
+  sourcemap: false
+})
+```
+
+### Multi-Package Monorepo
+
+```typescript
+export default defineConfig({
+  entry: {
+    core: 'packages/core/src/index.ts',
+    utils: 'packages/utils/src/index.ts',
+    ui: 'packages/ui/src/index.ts'
+  },
+  
+  rollup: {
+    output: {
+      format: 'esm',
+      dir: 'dist',
+      entryFileNames: '[name]/index.mjs'
+    }
+  }
+})
+```
 
 ---
 
-## Need Help?
+## Next Steps
 
-- Check the [troubleshooting guide](/docs/guide/troubleshooting) for common configuration issues
-- See [examples](/docs/examples) for real-world configuration patterns
-- [Open an issue](https://github.com/visulima/packem/issues) if you need help with specific configurations
+- **[Getting Started](/docs/guide/getting-started)** - Basic setup and first build
+- **[Transformers](/docs/guide/transformers)** - Choose the right transformer
+- **[CSS Processing](/docs/guide/css)** - Handle styles and preprocessors
+- **[Examples](/docs/examples)** - Real-world configuration examples
