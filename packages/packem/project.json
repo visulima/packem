@@ -4,5 +4,5 @@
     "sourceRoot": "packages/packem/src",
     "projectType": "library",
     "tags": ["type:package", "packem"],
-    "implicitDependencies": ["rollup-css-plugin", "packem-share", "packem-rollup"]
+    "implicitDependencies": ["css-style-inject", "rollup-css-plugin", "packem-share", "packem-rollup"]
 }

@@ -1,10 +1,10 @@
 {
-    "name": "@visulima/{{packageName}}",
+    "name": "@visulima/css-style-inject",
     "version": "0.0.0",
-    "description": "{{description}}",
+    "description": "Inject style tag to document head.",
     "keywords": [
         "visulima",
-        "{{packageName}}"
+        "css-style-inject"
     ],
     "author": {
         "name": "Daniel Bannert",
@@ -20,27 +20,17 @@
             "url": "https://anolilab.com/support"
         }
     ],
-    "homepage": "https://github.com/visulima/packem/tree/main/packages/{{packageName}}",
+    "homepage": "https://github.com/visulima/packem/tree/main/packages/css-style-inject",
     "license": "MIT",
     "sideEffects": false,
     "type": "module",
     "exports": {
         ".": {
-            "import": {
-                "types": "./dist/index.d.mts",
-                "default": "./dist/index.mjs"
-            },
-            "require": {
-                "types": "./dist/index.d.cts",
-                "default": "./dist/index.cjs"
-            }
+            "types": "./dist/index.d.mts",
+            "default": "./dist/index.mjs"
         },
         "./package.json": "./package.json"
     },
-    "main": "dist/index.cjs",
-    "module": "dist/index.mjs",
-    "browser": "./dist/index.mjs",
-    "types": "dist/index.d.ts",
     "files": [
         "dist",
         "README.md",
@@ -49,7 +39,7 @@
     "repository": {
         "type": "git",
         "url": "git+https://github.com/visulima/packem.git",
-        "directory": "packages/{{packageName}}"
+        "directory": "packages/css-style-inject"
     },
     "bugs": {
         "url": "https://github.com/visulima/packem/issues"
@@ -79,7 +69,7 @@
         "@anolilab/eslint-config": "^16.2.13",
         "@anolilab/semantic-release-pnpm": "2.0.0",
         "@anolilab/semantic-release-preset": "^11.0.0",
-        "@secretlint/secretlint-rule-preset-recommend": "^10.1.1",
+        "@rushstack/eslint-plugin-security": "^0.11.0",
         "@total-typescript/ts-reset": "^0.6.1",
         "@types/node": "24.0.7",
         "@visulima/packem": "^1.28.2",

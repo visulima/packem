@@ -1,10 +1,9 @@
 import { readdirSync } from "node:fs";
 
 import { cyan } from "@visulima/colorize";
-import type { BuildContext } from "@visulima/packem-share/types";
 import { ENDING_REGEX } from "@visulima/packem-share/constants";
+import type { BuildContext } from "@visulima/packem-share/types";
 import { getPackageName } from "@visulima/packem-share/utils";
-import resolveAliases from "../utils/resolve-aliases";
 import type { Pail } from "@visulima/pail";
 import { isAbsolute, join } from "@visulima/path";
 import { resolveAlias } from "@visulima/path/utils";
@@ -12,6 +11,7 @@ import { isNodeBuiltin, parseNodeModulePath } from "mlly";
 import type { InputOptions, Plugin, ResolveIdResult } from "rollup";
 
 import type { InternalBuildOptions } from "../../types";
+import resolveAliases from "../utils/resolve-aliases";
 
 type MaybeFalsy<T> = T | false | null | undefined;
 
@@ -330,4 +330,4 @@ export const resolveExternalsPlugin = (
             order: "pre",
         },
     };
-}; 
+};

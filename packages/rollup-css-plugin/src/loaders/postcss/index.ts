@@ -20,10 +20,6 @@ import postcssModules from "./modules";
 import postcssNoop from "./noop";
 import postcssUrl from "./url";
 
-const baseDirectory = dirname(fileURLToPath(import.meta.url));
-
-let injectorId: string;
-
 const cssVariableName = "css";
 const reservedWords = new Set([cssVariableName]);
 
@@ -226,12 +222,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
                 const injectorName = saferId("injector");
                 const injectorCall = `${injectorName}(${cssVariableName},${JSON.stringify(injectorOptions)});`;
 
-                if (!injectorId) {
-                    injectorId = resolve(["./runtime/inject-css"], { baseDirs: [join(baseDirectory, "..", "..")] });
-                    injectorId = `"${normalize(injectorId)}"`;
-                }
-
-                output.unshift(`import ${injectorName} from ${injectorId};`);
+                output.unshift(`import { cssStyleInject as ${injectorName} } from "@visulima/css-style-inject";`);
 
                 if (!treeshakeable) {
                     output.push(`var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`, injectorCall);

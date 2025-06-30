@@ -203,6 +203,7 @@
         "tinyglobby": "0.2.14"
     },
     "devDependencies": {
+        "@visulima/css-style-inject": "workspace:*",
         "@anolilab/eslint-config": "^16.2.13",
         "@anolilab/semantic-release-pnpm": "^2.0.0",
         "@anolilab/semantic-release-preset": "^11.0.0",

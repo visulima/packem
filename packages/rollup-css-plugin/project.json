@@ -4,5 +4,5 @@
     "sourceRoot": "packages/rollup-css-plugin/src",
     "projectType": "library",
     "tags": ["rollup-css-plugin", "css", "postcss", "sass", "less", "stylus", "type:package"],
-    "implicitDependencies": ["packem-share", "!packem"]
+    "implicitDependencies": ["packem-share", "css-style-inject", "!packem"]
 }
