@@ -73,11 +73,26 @@ describe(cssStyleInject, () => {
     });
 
     describe("sSR functionality", () => {
-        it("should be tested in integration tests", () => {
-            expect.assertions(1);
+        it("should store CSS in global when document is undefined", () => {
+            expect.assertions(2);
 
-            // SSR functionality requires a different test environment
-            // and is better tested in actual SSR integration tests
+            // Mock SSR environment
+            Object.defineProperty(globalThis, "document", {
+                value: undefined,
+                writable: true,
+            });
+
+            const css = "body { margin: 0; }";
+            const id = "test-style";
+
+            cssStyleInject(css, { id });
+
+            expect(globalThis[SSR_INJECT_ID]).toBeDefined();
+            expect(globalThis[SSR_INJECT_ID]).toStrictEqual([{ css, id }]);
+        });
+
+        it("should verify SSR_INJECT_ID constant", () => {
+            expect.assertions(1);
             expect(SSR_INJECT_ID).toBe("__styleInject_SSR_MODULES");
         });
     });

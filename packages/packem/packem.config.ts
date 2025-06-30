@@ -24,12 +24,7 @@ export default defineConfig({
         "es-module-lexer",
         "glob-parent",
         "oxc-parser",
-        "oxc-resolver",
-        "es-module-lexer",
-        "glob-parent",
-        "@babel/parser",
-        "oxc-resolver",
-        "es-module-lexer",
+        "oxc-resolver"
     ],
     rollup: {
         license: {

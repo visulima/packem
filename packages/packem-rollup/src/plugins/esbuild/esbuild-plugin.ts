@@ -15,7 +15,7 @@ import type { Plugin as RollupPlugin } from "rollup";
 import type { TransformerFn as TransformerFunction } from "../../types";
 import type { EsbuildPluginConfig, OptimizeDepsResult } from "./types";
 import getRenderChunk from "./utils/get-render-chunk";
-import doOptimizeDeps from "./utils/optmize-deps";
+import doOptimizeDeps from "./utils/optimize-deps";
 import warn from "./utils/warn";
 
 const esbuildTransformer = ({

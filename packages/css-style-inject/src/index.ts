@@ -92,7 +92,7 @@ export const cssStyleInject = (
         } else if (typeof insertAt === "number") {
             // Insert at specific index
             const children = [...container.children];
-            const index = insertAt < 0 ? children.length + insertAt + 1 : insertAt;
+            const index = insertAt < 0 ? Math.max(0, children.length + insertAt + 1) : insertAt;
 
             if (index <= 0) {
                 container.prepend(styleTag);
@@ -143,7 +143,7 @@ export const cssStyleInject = (
         styleTag.setAttribute("nonce", options.nonce);
     }
 
-    if (styleTag.styleSheet) {
+    if (styleTag.styleSheet && typeof styleTag.styleSheet.cssText === "string") {
         styleTag.styleSheet.cssText += css;
     } else {
         styleTag.append(document.createTextNode(css));
