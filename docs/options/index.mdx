@@ -1,0 +1,185 @@
+---
+title: Configuration Options
+description: Complete reference for all Packen configuration options
+---
+
+# Configuration Options
+
+Packen provides a comprehensive set of configuration options to customize your build process. These options can be configured through the CLI, configuration file, or programmatically.
+
+## Quick Navigation
+
+### Core Options
+- [**Entry**](/docs/options/entry) - Define entry points for your build
+- [**Config File**](/docs/options/config-file) - Configuration file setup and usage
+- [**Output Format**](/docs/options/output-format) - Control output formats (ESM, CJS, IIFE)
+- [**Output Directory**](/docs/options/output-directory) - Configure output directory and file naming
+
+### TypeScript Options
+- [**Declaration Files**](/docs/options/declaration-files) - TypeScript declaration generation
+- [**Isolated Declarations**](/docs/options/isolated-declarations) - Fast type generation
+- [**TSConfig**](/docs/options/tsconfig) - TypeScript configuration integration
+
+### Build Options
+- [**Transformers**](/docs/options/transformers) - Choose and configure transformers
+- [**Target**](/docs/options/target) - JavaScript compilation targets
+- [**Platform**](/docs/options/platform) - Target runtime platforms
+- [**Minification**](/docs/options/minification) - Code minification options
+- [**Source Maps**](/docs/options/source-maps) - Source map generation
+
+### Development Options
+- [**Watch Mode**](/docs/options/watch-mode) - File watching and development workflow
+- [**Cleaning**](/docs/options/cleaning) - Clean output directory before build
+- [**Silent Mode**](/docs/options/silent-mode) - Control logging and output verbosity
+
+### Advanced Options
+- [**Dependencies**](/docs/options/dependencies) - External dependency handling
+- [**Tree Shaking**](/docs/options/tree-shaking) - Dead code elimination
+- [**Shims**](/docs/options/shims) - ESM/CJS interoperability
+- [**Package Exports**](/docs/options/package-exports) - Automatic package.json exports
+- [**Unbundle**](/docs/options/unbundle) - Preserve file structure mode
+
+### CSS Options
+- [**CSS Processing**](/docs/options/css) - CSS, Sass, Less, Stylus configuration
+- [**CSS Modules**](/docs/options/css-modules) - Scoped CSS configuration
+- [**PostCSS**](/docs/options/postcss) - PostCSS plugins and configuration
+
+### Plugin Options
+- [**Plugins**](/docs/options/plugins) - Rollup plugin integration
+- [**Hooks**](/docs/options/hooks) - Build lifecycle hooks
+
+## Configuration Methods
+
+### CLI Options
+
+Configure Packen directly from the command line:
+
+```bash
+# Basic build with options
+packem build --minify --sourcemap
+
+# Watch mode with custom output
+packem build --watch --outDir dist
+
+# Production build with all optimizations
+packem build --minify --clean --target es2020
+```
+
+### Configuration File
+
+Use `packem.config.ts` for complex configurations:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  // Entry points
+  entry: 'src/index.ts',
+  
+  // Transformer selection
+  transformer: 'esbuild',
+  
+  // Output configuration
+  rollup: {
+    output: {
+      format: 'esm',
+      dir: 'dist'
+    }
+  },
+  
+  // CSS processing
+  css: {
+    extract: true,
+    modules: true
+  }
+})
+```
+
+### Programmatic API
+
+Configure Packen in your Node.js scripts:
+
+```typescript
+import { packem } from '@visulima/packem'
+
+await packem('./src', {
+  mode: 'build',
+  environment: 'production',
+  minify: true,
+  sourcemap: true
+})
+```
+
+## Option Categories
+
+### Build Configuration
+Options that control the core build process and output generation.
+
+### Development Workflow
+Options that enhance the development experience with features like watch mode and hot reloading.
+
+### Optimization
+Options for optimizing bundle size, performance, and compatibility.
+
+### Integration
+Options for integrating with external tools, frameworks, and build systems.
+
+## Default Values
+
+Packen provides sensible defaults for most options:
+
+- **Entry**: Automatically detected from `package.json` exports
+- **Output Format**: ESM for modern packages, CJS for compatibility
+- **Transformer**: esbuild for optimal performance
+- **Target**: Determined from `package.json` engines field
+- **Source Maps**: Enabled in development, disabled in production
+- **Minification**: Disabled by default, enabled for production builds
+
+## Environment-Specific Configuration
+
+Configure different options for different environments:
+
+```typescript
+export default defineConfig({
+  transformer: process.env.NODE_ENV === 'development' ? 'esbuild' : 'swc',
+  
+  rollup: {
+    sourcemap: process.env.NODE_ENV === 'development',
+    minify: process.env.NODE_ENV === 'production'
+  }
+})
+```
+
+## Validation and Type Safety
+
+All configuration options are fully typed and validated:
+
+```typescript
+// TypeScript will provide autocomplete and type checking
+export default defineConfig({
+  transformer: 'esbuild', // ✅ Valid
+  transformer: 'invalid', // ❌ TypeScript error
+  
+  rollup: {
+    format: 'esm' // ✅ Valid
+    format: 'invalid' // ❌ TypeScript error
+  }
+})
+```
+
+## Migration from Other Tools
+
+Packen provides migration utilities for popular bundlers:
+
+- [From tsup](/docs/guide/migration/tsup)
+- [From Rollup](/docs/guide/migration/rollup)
+- [From Webpack](/docs/guide/migration/webpack)
+- [From unbuild](/docs/guide/migration/unbuild)
+
+---
+
+## Need Help?
+
+- Check the [troubleshooting guide](/docs/guide/troubleshooting) for common configuration issues
+- See [examples](/docs/examples) for real-world configuration patterns
+- [Open an issue](https://github.com/visulima/packem/issues) if you need help with specific configurations

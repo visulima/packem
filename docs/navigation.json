@@ -26,9 +26,14 @@
       "title": "Guide",
       "items": [
         {
-          "title": "Overview",
-          "href": "/docs/guide/",
-          "description": "Complete guide to using Packen"
+          "title": "Introduction",
+          "href": "/docs/guide/introduction",
+          "description": "Overview of Packen and its features"
+        },
+        {
+          "title": "Getting Started",
+          "href": "/docs/guide/getting-started",
+          "description": "Install and set up Packen in your project"
         },
         {
           "title": "Configuration",
@@ -84,6 +89,116 @@
           "title": "CLI Reference",
           "href": "/docs/guide/cli",
           "description": "Complete command-line interface documentation"
+        }
+      ]
+    },
+    {
+      "title": "Options",
+      "items": [
+        {
+          "title": "Overview",
+          "href": "/docs/options/",
+          "description": "Complete reference for all configuration options"
+        },
+        {
+          "title": "Entry",
+          "href": "/docs/options/entry",
+          "description": "Configure entry points for your build"
+        },
+        {
+          "title": "Config File",
+          "href": "/docs/options/config-file",
+          "description": "Configuration file setup and usage"
+        },
+        {
+          "title": "Declaration Files",
+          "href": "/docs/options/declaration-files",
+          "description": "TypeScript declaration generation"
+        },
+        {
+          "title": "Output Format",
+          "href": "/docs/options/output-format",
+          "description": "Control output formats (ESM, CJS, IIFE)"
+        },
+        {
+          "title": "Output Directory",
+          "href": "/docs/options/output-directory",
+          "description": "Configure output directory and file naming"
+        },
+        {
+          "title": "Transformers",
+          "href": "/docs/options/transformers",
+          "description": "Choose and configure transformers"
+        },
+        {
+          "title": "Target",
+          "href": "/docs/options/target",
+          "description": "JavaScript compilation targets"
+        },
+        {
+          "title": "Platform",
+          "href": "/docs/options/platform",
+          "description": "Target runtime platforms"
+        },
+        {
+          "title": "Watch Mode",
+          "href": "/docs/options/watch-mode",
+          "description": "File watching and development workflow"
+        },
+        {
+          "title": "Cleaning",
+          "href": "/docs/options/cleaning",
+          "description": "Clean output directory before build"
+        },
+        {
+          "title": "Dependencies",
+          "href": "/docs/options/dependencies",
+          "description": "External dependency handling"
+        },
+        {
+          "title": "Tree Shaking",
+          "href": "/docs/options/tree-shaking",
+          "description": "Dead code elimination"
+        },
+        {
+          "title": "Source Maps",
+          "href": "/docs/options/source-maps",
+          "description": "Source map generation"
+        },
+        {
+          "title": "Minification",
+          "href": "/docs/options/minification",
+          "description": "Code minification options"
+        },
+        {
+          "title": "Silent Mode",
+          "href": "/docs/options/silent-mode",
+          "description": "Control logging and output verbosity"
+        },
+        {
+          "title": "Shims",
+          "href": "/docs/options/shims",
+          "description": "ESM/CJS interoperability"
+        },
+        {
+          "title": "Package Exports",
+          "href": "/docs/options/package-exports",
+          "description": "Automatic package.json exports"
+        },
+        {
+          "title": "Unbundle",
+          "href": "/docs/options/unbundle",
+          "description": "Preserve file structure mode"
+        },
+        {
+          "title": "Plugins",
+          "href": "/docs/options/plugins",
+          "description": "Rollup plugin integration"
+        },
+        {
+          "title": "Hooks",
+          "href": "/docs/options/hooks",
+          "description": "Build lifecycle hooks"
         }
       ]
     },

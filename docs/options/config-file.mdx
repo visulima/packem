@@ -1,0 +1,536 @@
+---
+title: Config File
+description: Set up and configure Packen using configuration files
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+
+# Config File
+
+Packen supports configuration files to customize your build process. While many options can be set via CLI flags, configuration files provide a more maintainable and powerful way to configure complex builds.
+
+## Configuration File Discovery
+
+Packen automatically discovers configuration files in the following order:
+
+1. `packem.config.ts`
+2. `packem.config.js`
+3. `packem.config.mjs`
+4. `packem.config.cjs`
+
+<Callout type="tip">
+TypeScript configuration files (`packem.config.ts`) are recommended as they provide type safety and autocomplete support.
+</Callout>
+
+## Basic Configuration
+
+### TypeScript Configuration
+
+```typescript
+// packem.config.ts
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  // Choose your transformer
+  transformer: 'esbuild',
+  
+  // Rollup configuration
+  rollup: {
+    output: {
+      format: 'esm',
+      dir: 'dist'
+    },
+    sourcemap: true
+  }
+})
+```
+
+### JavaScript Configuration
+
+```javascript
+// packem.config.js
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  transformer: 'esbuild',
+  rollup: {
+    output: {
+      format: 'esm',
+      dir: 'dist'
+    }
+  }
+})
+```
+
+### CommonJS Configuration
+
+```javascript
+// packem.config.cjs
+const { defineConfig } = require('@visulima/packem/config')
+
+module.exports = defineConfig({
+  transformer: 'esbuild',
+  rollup: {
+    output: {
+      format: 'cjs',
+      dir: 'dist'
+    }
+  }
+})
+```
+
+## Configuration Schema
+
+The `defineConfig` function provides full TypeScript support and validation:
+
+```typescript
+export default defineConfig({
+  // Entry points (optional - auto-detected from package.json)
+  entry?: string | string[] | Record<string, string>
+  
+  // Transformer selection
+  transformer?: 'esbuild' | 'swc' | 'oxc' | 'sucrase' | 'typescript'
+  
+  // Rollup configuration
+  rollup?: {
+    input?: InputOption
+    output?: OutputOptions | OutputOptions[]
+    plugins?: Plugin[]
+    external?: ExternalOption
+    // ... other Rollup options
+  }
+  
+  // CSS configuration
+  css?: {
+    extract?: boolean
+    modules?: boolean | CssModulesOptions
+    loaders?: CssLoader[]
+    // ... other CSS options
+  }
+  
+  // Transformer-specific options
+  esbuild?: EsbuildOptions
+  swc?: SwcOptions
+  oxc?: OxcOptions
+  sucrase?: SucraseOptions
+  typescript?: TypeScriptOptions
+  
+  // Build hooks
+  hooks?: {
+    'build:before'?: (config) => void | Promise<void>
+    'build:after'?: (result) => void | Promise<void>
+    // ... other hooks
+  }
+})
+```
+
+## Advanced Configuration
+
+### Conditional Configuration
+
+Configure different options based on environment:
+
+```typescript
+export default defineConfig({
+  transformer: process.env.NODE_ENV === 'development' ? 'esbuild' : 'swc',
+  
+  rollup: {
+    output: {
+      format: 'esm',
+      dir: 'dist',
+      sourcemap: process.env.NODE_ENV === 'development'
+    },
+    plugins: [
+      // Development plugins
+      ...(process.env.NODE_ENV === 'development' ? [devPlugin()] : []),
+      // Production plugins
+      ...(process.env.NODE_ENV === 'production' ? [prodPlugin()] : [])
+    ]
+  }
+})
+```
+
+### Function-Based Configuration
+
+Use a function for dynamic configuration:
+
+```typescript
+export default defineConfig((env) => {
+  const isProduction = env === 'production'
+  
+  return {
+    transformer: isProduction ? 'swc' : 'esbuild',
+    
+    rollup: {
+      output: {
+        format: 'esm',
+        dir: 'dist',
+        sourcemap: !isProduction
+      }
+    },
+    
+    css: {
+      extract: isProduction,
+      modules: true
+    }
+  }
+})
+```
+
+### Async Configuration
+
+Load configuration asynchronously:
+
+```typescript
+export default defineConfig(async () => {
+  const packageJson = await import('./package.json')
+  
+  return {
+    transformer: 'esbuild',
+    
+    rollup: {
+      output: {
+        format: packageJson.type === 'module' ? 'esm' : 'cjs',
+        dir: 'dist'
+      }
+    }
+  }
+})
+```
+
+## Multiple Configurations
+
+Export an array of configurations for multiple builds:
+
+```typescript
+export default defineConfig([
+  // ESM build
+  {
+    transformer: 'esbuild',
+    rollup: {
+      output: {
+        format: 'esm',
+        file: 'dist/index.mjs'
+      }
+    }
+  },
+  
+  // CJS build
+  {
+    transformer: 'esbuild',
+    rollup: {
+      output: {
+        format: 'cjs',
+        file: 'dist/index.cjs'
+      }
+    }
+  },
+  
+  // IIFE build for browsers
+  {
+    transformer: 'esbuild',
+    rollup: {
+      output: {
+        format: 'iife',
+        file: 'dist/index.global.js',
+        name: 'MyLibrary'
+      }
+    }
+  }
+])
+```
+
+## Configuration Merging
+
+Packen automatically merges configurations from multiple sources:
+
+1. **Default configuration** - Sensible defaults
+2. **Configuration file** - Your custom configuration
+3. **CLI flags** - Command-line overrides
+
+```typescript
+// packem.config.ts
+export default defineConfig({
+  transformer: 'esbuild',
+  rollup: {
+    output: {
+      dir: 'dist'
+    }
+  }
+})
+```
+
+```bash
+# CLI flags override config file
+packem build --transformer swc --outDir build
+```
+
+## Environment Variables
+
+Access environment variables in your configuration:
+
+```typescript
+export default defineConfig({
+  transformer: process.env.PACKEM_TRANSFORMER || 'esbuild',
+  
+  rollup: {
+    output: {
+      dir: process.env.PACKEM_OUTPUT_DIR || 'dist',
+      sourcemap: process.env.NODE_ENV !== 'production'
+    }
+  },
+  
+  // Custom environment variables
+  define: {
+    'process.env.VERSION': JSON.stringify(process.env.npm_package_version),
+    'process.env.BUILD_TIME': JSON.stringify(new Date().toISOString())
+  }
+})
+```
+
+## Configuration Validation
+
+Packen validates your configuration and provides helpful error messages:
+
+```typescript
+export default defineConfig({
+  transformer: 'invalid', // ❌ TypeScript error
+  
+  rollup: {
+    output: {
+      format: 'unknown' // ❌ TypeScript error
+    }
+  }
+})
+```
+
+## Custom Configuration Location
+
+Specify a custom configuration file location:
+
+<Tabs>
+  <TabItem label="CLI Flag">
+    ```bash
+    packem build --config ./configs/packem.config.ts
+    ```
+  </TabItem>
+  <TabItem label="Environment Variable">
+    ```bash
+    PACKEM_CONFIG=./configs/packem.config.ts packem build
+    ```
+  </TabItem>
+</Tabs>
+
+## Configuration Presets
+
+Create reusable configuration presets:
+
+```typescript
+// configs/presets.ts
+export const libraryPreset = {
+  transformer: 'esbuild' as const,
+  rollup: {
+    output: {
+      format: 'esm' as const,
+      dir: 'dist'
+    },
+    sourcemap: true
+  }
+}
+
+export const cliPreset = {
+  transformer: 'esbuild' as const,
+  rollup: {
+    output: {
+      format: 'cjs' as const,
+      dir: 'bin'
+    }
+  }
+}
+```
+
+```typescript
+// packem.config.ts
+import { defineConfig } from '@visulima/packem/config'
+import { libraryPreset } from './configs/presets'
+
+export default defineConfig({
+  ...libraryPreset,
+  
+  // Override specific options
+  css: {
+    extract: true,
+    modules: true
+  }
+})
+```
+
+## Configuration Composition
+
+Compose configurations from multiple sources:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { mergeConfig } from '@visulima/packem/utils'
+import baseConfig from './base.config'
+import cssConfig from './css.config'
+
+export default defineConfig(
+  mergeConfig(
+    baseConfig,
+    cssConfig,
+    {
+      // Additional overrides
+      transformer: 'swc'
+    }
+  )
+)
+```
+
+## IDE Support
+
+### TypeScript IntelliSense
+
+Get full autocomplete and type checking in your configuration:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  // TypeScript will provide autocomplete here
+  transformer: '|', // Shows: 'esbuild' | 'swc' | 'oxc' | 'sucrase' | 'typescript'
+  
+  rollup: {
+    output: {
+      format: '|' // Shows: 'es' | 'cjs' | 'iife' | 'umd' | 'system'
+    }
+  }
+})
+```
+
+### Configuration Schema
+
+Import types for better IDE support:
+
+```typescript
+import type { PackemConfig } from '@visulima/packem/config'
+
+const config: PackemConfig = {
+  transformer: 'esbuild',
+  rollup: {
+    output: {
+      format: 'esm',
+      dir: 'dist'
+    }
+  }
+}
+
+export default defineConfig(config)
+```
+
+## Debugging Configuration
+
+Enable debug mode to see the resolved configuration:
+
+```bash
+# Debug configuration resolution
+PACKEM_DEBUG=1 packem build
+
+# Debug specific areas
+PACKEM_DEBUG=config,rollup packem build
+```
+
+Or programmatically:
+
+```typescript
+export default defineConfig({
+  debug: true, // Enable debug logging
+  
+  transformer: 'esbuild',
+  // ... rest of config
+})
+```
+
+## Configuration Examples
+
+### React Library
+
+```typescript
+export default defineConfig({
+  transformer: 'esbuild',
+  
+  esbuild: {
+    jsx: 'automatic',
+    jsxImportSource: 'react'
+  },
+  
+  rollup: {
+    external: ['react', 'react-dom'],
+    output: [
+      { format: 'esm', file: 'dist/index.mjs' },
+      { format: 'cjs', file: 'dist/index.cjs' }
+    ]
+  }
+})
+```
+
+### Node.js CLI Tool
+
+```typescript
+export default defineConfig({
+  transformer: 'esbuild',
+  
+  rollup: {
+    output: {
+      format: 'cjs',
+      file: 'bin/cli.js',
+      banner: '#!/usr/bin/env node'
+    }
+  }
+})
+```
+
+### Full-Stack Library
+
+```typescript
+export default defineConfig([
+  // Server build
+  {
+    entry: 'src/server.ts',
+    transformer: 'esbuild',
+    rollup: {
+      output: {
+        format: 'cjs',
+        file: 'dist/server.js'
+      },
+      external: ['express', 'mongoose']
+    }
+  },
+  
+  // Client build
+  {
+    entry: 'src/client.ts',
+    transformer: 'esbuild',
+    rollup: {
+      output: {
+        format: 'esm',
+        file: 'dist/client.mjs'
+      }
+    },
+    css: {
+      extract: true,
+      modules: true
+    }
+  }
+])
+```
+
+---
+
+## Related Options
+
+- [Entry](/docs/options/entry) - Configure entry points
+- [Output Format](/docs/options/output-format) - Control output formats
+- [Transformers](/docs/options/transformers) - Choose and configure transformers
+- [Hooks](/docs/options/hooks) - Build lifecycle hooks

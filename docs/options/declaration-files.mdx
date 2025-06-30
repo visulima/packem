@@ -1,0 +1,498 @@
+---
+title: Declaration Files (dts)
+description: TypeScript declaration file generation and isolated declarations in Packen
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+
+# Declaration Files (dts)
+
+Packen provides comprehensive TypeScript declaration file generation with support for both traditional and isolated declarations. Declaration files (`.d.ts`) are essential for TypeScript libraries to provide type information to consumers.
+
+## Automatic Detection
+
+Packen automatically enables declaration file generation when it detects TypeScript usage in your project:
+
+- TypeScript files (`.ts`, `.tsx`) in your source code
+- `types` or `typings` field in your `package.json`
+- `tsconfig.json` file in your project
+
+```json
+{
+  "name": "my-library",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  }
+}
+```
+
+## Configuration
+
+### Enable/Disable Declaration Generation
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  // Explicitly enable declaration generation
+  declaration: true,
+  
+  transformer: 'esbuild'
+})
+```
+
+### Advanced Declaration Options
+
+```typescript
+export default defineConfig({
+  declaration: {
+    // Generate declaration files
+    enabled: true,
+    
+    // Output directory for declarations
+    outDir: 'types',
+    
+    // Generate declaration maps for better debugging
+    declarationMap: true,
+    
+    // Include comments in declaration files
+    removeComments: false,
+    
+    // Emit declarations only (no JS output)
+    emitDeclarationOnly: false
+  }
+})
+```
+
+## Isolated Declarations
+
+Isolated declarations are a TypeScript 5.5+ feature that dramatically improves declaration generation performance by avoiding expensive type inference.
+
+<Callout type="info">
+Isolated declarations can be 10-100x faster than traditional declaration generation for large projects.
+</Callout>
+
+### Enable Isolated Declarations
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import isolatedDeclarations from '@visulima/packem/dts/isolated/transformer/typescript'
+
+export default defineConfig({
+  isolatedDeclarationTransformer: isolatedDeclarations,
+  transformer: 'esbuild'
+})
+```
+
+### Available Isolated Declaration Transformers
+
+<Tabs>
+  <TabItem label="TypeScript (Recommended)">
+    ```typescript
+    import isolatedDeclarations from '@visulima/packem/dts/isolated/transformer/typescript'
+    
+    export default defineConfig({
+      isolatedDeclarationTransformer: isolatedDeclarations,
+      transformer: 'esbuild'
+    })
+    ```
+  </TabItem>
+  <TabItem label="swc">
+    ```typescript
+    import isolatedDeclarations from '@visulima/packem/dts/isolated/transformer/swc'
+    
+    export default defineConfig({
+      isolatedDeclarationTransformer: isolatedDeclarations,
+      transformer: 'swc'
+    })
+    ```
+  </TabItem>
+  <TabItem label="OXC">
+    ```typescript
+    import isolatedDeclarations from '@visulima/packem/dts/isolated/transformer/oxc'
+    
+    export default defineConfig({
+      isolatedDeclarationTransformer: isolatedDeclarations,
+      transformer: 'oxc'
+    })
+    ```
+  </TabItem>
+</Tabs>
+
+### Isolated Declarations Requirements
+
+For isolated declarations to work, your TypeScript code must follow certain patterns:
+
+```typescript
+// ✅ Good - Explicit return types
+export function greet(name: string): string {
+  return `Hello, ${name}!`
+}
+
+// ✅ Good - Explicit interface
+export interface User {
+  id: number
+  name: string
+}
+
+// ❌ Bad - Inferred return type
+export function greet(name: string) {
+  return `Hello, ${name}!`
+}
+
+// ❌ Bad - Inferred type
+export const config = {
+  apiUrl: 'https://api.example.com'
+}
+
+// ✅ Good - Explicit type
+export const config: { apiUrl: string } = {
+  apiUrl: 'https://api.example.com'
+}
+```
+
+<Callout type="warning">
+Isolated declarations require explicit type annotations on all exported declarations. This is a TypeScript compiler requirement, not a Packen limitation.
+</Callout>
+
+## Declaration File Formats
+
+Packen generates declaration files that match your output formats:
+
+### ESM/CJS Dual Package
+
+```json
+{
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  }
+}
+```
+
+Packen will generate:
+- `dist/index.d.mts` - ESM declaration file
+- `dist/index.d.cts` - CJS declaration file
+
+### Legacy Node.js Compatibility
+
+```typescript
+export default defineConfig({
+  rollup: {
+    node10Compatibility: {
+      typeScriptVersion: '>=5.0',
+      writeToPackageJson: true
+    }
+  }
+})
+```
+
+This generates `typeVersions` in your `package.json` for Node.js 10 compatibility:
+
+```json
+{
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    ">=5.0": {
+      "*": ["./dist/index.d.ts"]
+    }
+  }
+}
+```
+
+## Declaration Bundling
+
+Bundle multiple declaration files into a single file:
+
+```typescript
+export default defineConfig({
+  declaration: {
+    enabled: true,
+    bundle: true, // Bundle all declarations into one file
+    outFile: 'dist/index.d.ts'
+  }
+})
+```
+
+### Declaration Bundling with rollup-plugin-dts
+
+```typescript
+import dts from 'rollup-plugin-dts'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      dts({
+        // Bundle all .d.ts files
+        bundledPackages: ['my-dependency'],
+        // Respect external dependencies
+        respectExternal: true
+      })
+    ]
+  }
+})
+```
+
+## Multiple Entry Points
+
+Generate declarations for multiple entry points:
+
+```typescript
+export default defineConfig({
+  entry: {
+    index: 'src/index.ts',
+    utils: 'src/utils.ts',
+    cli: 'src/cli.ts'
+  },
+  
+  declaration: true
+})
+```
+
+This generates:
+- `dist/index.d.ts`
+- `dist/utils.d.ts`
+- `dist/cli.d.ts`
+
+## Declaration Maps
+
+Enable declaration maps for better IDE support:
+
+```typescript
+export default defineConfig({
+  declaration: {
+    enabled: true,
+    declarationMap: true
+  }
+})
+```
+
+Declaration maps allow IDEs to navigate from compiled declaration files back to the original TypeScript source.
+
+## External Dependencies
+
+Handle external dependencies in declarations:
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react', 'lodash'],
+    
+    // Ensure externals are preserved in declarations
+    dts: {
+      external: ['react', 'lodash']
+    }
+  }
+})
+```
+
+## Path Mapping
+
+Resolve TypeScript path mappings in declarations:
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@utils/*": ["src/utils/*"]
+    }
+  }
+}
+```
+
+```typescript
+// src/index.ts
+import { helper } from '@utils/helper'
+import { Component } from '@/components/Component'
+```
+
+Packen automatically resolves these paths in the generated declarations.
+
+## Validation
+
+Validate your declaration files with external tools:
+
+```typescript
+export default defineConfig({
+  declaration: true,
+  
+  hooks: {
+    'build:after': async () => {
+      // Run attw (Are The Types Wrong?)
+      await import('@arethetypeswrong/core').then(({ analyze }) => {
+        return analyze('./package.json')
+      })
+    }
+  }
+})
+```
+
+## Performance Optimization
+
+### Use Isolated Declarations
+
+For maximum performance, use isolated declarations:
+
+```typescript
+export default defineConfig({
+  // Use isolated declarations for speed
+  isolatedDeclarationTransformer: isolatedDeclarations,
+  
+  // Use fast transformer for JavaScript
+  transformer: 'esbuild'
+})
+```
+
+### Incremental Compilation
+
+Enable TypeScript incremental compilation:
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo"
+  }
+}
+```
+
+### Parallel Processing
+
+Process multiple entry points in parallel:
+
+```typescript
+export default defineConfig({
+  entry: {
+    index: 'src/index.ts',
+    utils: 'src/utils.ts',
+    cli: 'src/cli.ts'
+  },
+  
+  declaration: {
+    enabled: true,
+    parallel: true // Process declarations in parallel
+  }
+})
+```
+
+## Troubleshooting
+
+### Declaration Generation Fails
+
+1. **Check TypeScript version**: Ensure you're using TypeScript 4.5 or later
+2. **Verify tsconfig.json**: Ensure your TypeScript configuration is valid
+3. **Check for type errors**: Fix any TypeScript compilation errors
+4. **Use explicit types**: For isolated declarations, ensure all exports have explicit types
+
+### Missing Types
+
+```typescript
+// Add explicit return type
+export function myFunction(): string {
+  return 'hello'
+}
+
+// Add explicit interface
+export interface MyConfig {
+  apiUrl: string
+}
+```
+
+### Path Resolution Issues
+
+Ensure your `tsconfig.json` paths are correctly configured:
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*"]
+}
+```
+
+### Performance Issues
+
+1. **Use isolated declarations** for large projects
+2. **Enable incremental compilation** in TypeScript
+3. **Exclude test files** from declaration generation
+4. **Use declaration bundling** to reduce file count
+
+## Examples
+
+### Basic Library
+
+```typescript
+export default defineConfig({
+  transformer: 'esbuild',
+  declaration: true
+})
+```
+
+### React Component Library
+
+```typescript
+export default defineConfig({
+  transformer: 'esbuild',
+  
+  esbuild: {
+    jsx: 'automatic',
+    jsxImportSource: 'react'
+  },
+  
+  declaration: {
+    enabled: true,
+    declarationMap: true
+  },
+  
+  rollup: {
+    external: ['react', 'react-dom']
+  }
+})
+```
+
+### High-Performance Library
+
+```typescript
+import isolatedDeclarations from '@visulima/packem/dts/isolated/transformer/typescript'
+
+export default defineConfig({
+  isolatedDeclarationTransformer: isolatedDeclarations,
+  transformer: 'esbuild',
+  
+  declaration: {
+    enabled: true,
+    parallel: true
+  }
+})
+```
+
+---
+
+## Related Options
+
+- [Transformers](/docs/options/transformers) - Choose compatible transformers
+- [Output Format](/docs/options/output-format) - Match declaration formats to output formats
+- [TSConfig](/docs/options/tsconfig) - TypeScript configuration integration
+- [Package Exports](/docs/options/package-exports) - Automatic exports generation

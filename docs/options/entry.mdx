@@ -1,0 +1,326 @@
+---
+title: Entry
+description: Configure entry points for your Packen builds
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+
+# Entry
+
+The entry configuration in Packen determines the starting points for your bundling process. Unlike traditional bundlers that require explicit entry configuration, Packen automatically detects entry points from your `package.json` exports, making the process seamless and maintainable.
+
+## Automatic Entry Detection
+
+Packen automatically detects entry points from your `package.json` configuration:
+
+### From Exports Field
+
+```json
+{
+  "exports": {
+    ".": "./dist/index.js",
+    "./utils": "./dist/utils.js",
+    "./cli": "./dist/cli.js"
+  }
+}
+```
+
+Packen will automatically look for corresponding source files:
+- `src/index.ts` → `./dist/index.js`
+- `src/utils.ts` → `./dist/utils.js`
+- `src/cli.ts` → `./dist/cli.js`
+
+### From Legacy Fields
+
+```json
+{
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts"
+}
+```
+
+Packen will look for `src/index.ts` as the entry point.
+
+### From Bin Field
+
+```json
+{
+  "bin": {
+    "my-cli": "./dist/cli.js",
+    "my-tool": "./dist/tool.js"
+  }
+}
+```
+
+Packen will look for:
+- `src/cli.ts` → `./dist/cli.js`
+- `src/tool.ts` → `./dist/tool.js`
+
+<Callout type="tip">
+Packen automatically adds the shebang (`#!/usr/bin/env node`) to executable files and sets proper permissions.
+</Callout>
+
+## Manual Entry Configuration
+
+You can override automatic detection by specifying entries in your configuration file:
+
+### Single Entry File
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  entry: 'src/index.ts'
+})
+```
+
+### Multiple Entry Files
+
+```typescript
+export default defineConfig({
+  entry: ['src/index.ts', 'src/cli.ts', 'src/utils.ts']
+})
+```
+
+### Entry Files with Aliases
+
+Use an object to define entry files with custom output names:
+
+```typescript
+export default defineConfig({
+  entry: {
+    main: 'src/index.ts',
+    utils: 'src/utilities.ts',
+    cli: 'src/command-line.ts'
+  }
+})
+```
+
+This will create:
+- `dist/main.js` from `src/index.ts`
+- `dist/utils.js` from `src/utilities.ts`
+- `dist/cli.js` from `src/command-line.ts`
+
+## Using Glob Patterns
+
+Packen supports glob patterns for dynamic entry detection:
+
+```typescript
+export default defineConfig({
+  entry: 'src/**/*.ts'
+})
+```
+
+This will include all `.ts` files in the `src` directory and subdirectories as entry points.
+
+### Excluding Files
+
+```typescript
+export default defineConfig({
+  entry: ['src/**/*.ts', '!src/**/*.test.ts', '!src/**/*.spec.ts']
+})
+```
+
+<Callout type="warning">
+Glob patterns are resolved relative to the current working directory. On Windows, you must use forward slashes (`/`) instead of backslashes (`\`) in file paths.
+</Callout>
+
+## CLI Entry Points
+
+You can also specify entry points directly via the CLI:
+
+<Tabs>
+  <TabItem label="Single Entry">
+    ```bash
+    packem build src/index.ts
+    ```
+  </TabItem>
+  <TabItem label="Multiple Entries">
+    ```bash
+    packem build src/index.ts src/cli.ts src/utils.ts
+    ```
+  </TabItem>
+  <TabItem label="Glob Pattern">
+    ```bash
+    packem build "src/**/*.ts"
+    ```
+  </TabItem>
+</Tabs>
+
+## Entry Point Conventions
+
+Packen follows these conventions for automatic entry detection:
+
+### Source Directory
+
+By default, Packen looks for source files in the `src` directory. You can customize this:
+
+```typescript
+export default defineConfig({
+  rollup: {
+    input: {
+      // Custom source directory
+      index: 'lib/index.ts',
+      utils: 'lib/utils.ts'
+    }
+  }
+})
+```
+
+### File Extensions
+
+Packen automatically detects files with these extensions:
+- `.ts` - TypeScript files
+- `.tsx` - TypeScript JSX files
+- `.js` - JavaScript files
+- `.jsx` - JavaScript JSX files
+- `.mts` - TypeScript ES modules
+- `.cts` - TypeScript CommonJS modules
+
+### Fallback Detection
+
+If no explicit entry is found, Packen tries these fallbacks in order:
+1. `src/index.ts`
+2. `src/index.tsx`
+3. `src/index.js`
+4. `src/index.jsx`
+5. `src/main.ts`
+6. `src/main.js`
+
+## Advanced Entry Configuration
+
+### Conditional Entries
+
+Configure different entries for different environments:
+
+```typescript
+export default defineConfig({
+  entry: process.env.NODE_ENV === 'development' 
+    ? 'src/index.dev.ts' 
+    : 'src/index.ts'
+})
+```
+
+### Runtime-Specific Entries
+
+Create different entries for different runtimes:
+
+```typescript
+export default defineConfig({
+  entry: {
+    // Default entry
+    index: 'src/index.ts',
+    // React Server Components
+    'index.react-server': 'src/index.react-server.ts',
+    // Edge runtime
+    'index.edge-light': 'src/index.edge-light.ts',
+    // Browser build
+    'index.browser': 'src/index.browser.ts'
+  }
+})
+```
+
+### Dynamic Entry Generation
+
+Generate entries dynamically based on file system:
+
+```typescript
+import { glob } from 'tinyglobby'
+
+export default defineConfig(async () => {
+  const entries = await glob('src/modules/*.ts')
+  
+  return {
+    entry: entries.reduce((acc, file) => {
+      const name = file.replace('src/modules/', '').replace('.ts', '')
+      acc[name] = file
+      return acc
+    }, {} as Record<string, string>)
+  }
+})
+```
+
+## Package.json Integration
+
+Packen ensures your entries match your package.json exports:
+
+```json
+{
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils.mjs",
+      "require": "./dist/utils.cjs",
+      "types": "./dist/utils.d.ts"
+    }
+  }
+}
+```
+
+With this configuration, Packen will:
+1. Look for `src/index.ts` and `src/utils.ts`
+2. Generate both ESM and CJS outputs
+3. Create TypeScript declaration files
+4. Validate that all exports have corresponding source files
+
+## Troubleshooting
+
+### Entry Not Found
+
+If Packen can't find your entry files:
+
+1. **Check file paths**: Ensure the source files exist in the expected locations
+2. **Verify extensions**: Make sure you're using supported file extensions
+3. **Check package.json**: Ensure your exports configuration is correct
+4. **Use explicit configuration**: Override automatic detection with manual entry configuration
+
+### Multiple Formats
+
+For packages that need multiple output formats:
+
+```typescript
+export default defineConfig({
+  entry: 'src/index.ts',
+  rollup: {
+    output: [
+      { format: 'esm', file: 'dist/index.mjs' },
+      { format: 'cjs', file: 'dist/index.cjs' },
+      { format: 'iife', file: 'dist/index.global.js', name: 'MyLibrary' }
+    ]
+  }
+})
+```
+
+### Source Maps
+
+Enable source maps for better debugging:
+
+```typescript
+export default defineConfig({
+  entry: 'src/index.ts',
+  rollup: {
+    output: {
+      sourcemap: true
+    }
+  }
+})
+```
+
+<Callout type="info">
+Packen automatically maps source files to output files, ensuring your source maps point to the correct locations regardless of your entry configuration.
+</Callout>
+
+---
+
+## Related Options
+
+- [Output Format](/docs/options/output-format) - Configure output formats for your entries
+- [Output Directory](/docs/options/output-directory) - Control where entry outputs are written
+- [Package Exports](/docs/options/package-exports) - Automatic package.json exports generation
+- [Watch Mode](/docs/options/watch-mode) - Watch entry files for changes during development
