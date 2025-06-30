@@ -2,6 +2,7 @@ import type { Options } from "cssnano";
 import type { CustomAtRules, TransformOptions } from "lightningcss";
 import type { AcceptedPlugin, PluginCreator } from "postcss";
 import type { Config as PostCSSConfig } from "postcss-load-config";
+import type { LogLevel, PluginContext } from "rollup";
 
 import type { LESSLoaderOptions } from "./loaders/less/types";
 import type { ImportOptions } from "./loaders/postcss/import/types";

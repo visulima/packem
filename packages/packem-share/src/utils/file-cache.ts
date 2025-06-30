@@ -1,6 +1,7 @@
 import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
-import type { Pail } from "@visulima/pail";
 import { join, toNamespacedPath } from "@visulima/path";
+
+import type { RollupLogger } from "./create-rollup-logger";
 
 const isJson = (value: string): boolean => {
     try {
@@ -24,21 +25,19 @@ class FileCache {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     readonly #memoryCache = new Map<string, any>();
 
-    public constructor(cwd: string, cachePath: string | undefined, hashKey: string, logger: Pail) {
+    public constructor(cwd: string, cachePath: string | undefined, hashKey: string, logger: RollupLogger) {
         this.#cwd = cwd;
         this.#hashKey = hashKey;
 
         if (cachePath === undefined) {
             logger.debug({
                 message: "Could not create cache directory.",
-                prefix: "file-cache",
             });
         } else {
             this.#cachePath = cachePath;
 
             logger.debug({
                 message: `Cache path is: ${this.#cachePath}`,
-                prefix: "file-cache",
             });
         }
     }

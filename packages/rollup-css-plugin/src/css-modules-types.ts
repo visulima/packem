@@ -1,5 +1,4 @@
 import { isAccessible, writeFile } from "@visulima/fs";
-import type { Pail } from "@visulima/pail";
 import { normalize } from "@visulima/path";
 import type { Plugin } from "rollup";
 
@@ -16,7 +15,7 @@ const dtsComment = `
  */
 `.trim();
 
-const cssModulesTypes = (options: StyleOptions, rootDirectory: string, logger: Pail): Plugin => {
+const cssModulesTypes = (options: StyleOptions, rootDirectory: string): Plugin => {
     let optionSupportModules: boolean | undefined;
 
     if (options.postcss && typeof options.postcss.modules === "boolean") {
@@ -53,9 +52,9 @@ const cssModulesTypes = (options: StyleOptions, rootDirectory: string, logger: P
             if (await isAccessible(id)) {
                 await writeFile(`${id}.d.ts`, `${dtsComment}\n${types as string}`);
 
-                logger.info({
+                this.info({
                     message: `Generated types for ${normalize(id).replace(`${rootDirectory}/`, "")}`,
-                    prefix: "dts:css-modules",
+                    plugin: "css-modules-types",
                 });
 
                 this.addWatchFile(`${id}.d.ts`);

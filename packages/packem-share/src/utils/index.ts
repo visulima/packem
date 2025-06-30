@@ -1,5 +1,6 @@
 export { default as arrayIncludes } from "./array-includes";
 export { default as arrayify } from "./arrayify";
+export { createRollupLogger, type RollupLogger } from "./create-rollup-logger";
 export { default as arrayifyDefault } from "./arrayify";
 export { default as enhanceRollupError } from "./enhance-rollup-error";
 export { default as enhanceRollupErrorDefault } from "./enhance-rollup-error";

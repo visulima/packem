@@ -1,17 +1,17 @@
 import { rm } from "node:fs/promises";
 
 import { isAccessibleSync, readFileSync } from "@visulima/fs";
-import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { RollupLogger } from "../../../src/utils/create-rollup-logger";
 import FileCache from "../../../src/utils/file-cache";
 
 const hoisted = vi.hoisted(() => {
     return {
         fs: { isAccessibleSync: vi.fn(), readFileSync: vi.fn(), writeFileSync: vi.fn() },
-        logger: { debug: vi.fn(), warn: vi.fn() } as unknown as Pail,
+        logger: { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() } as unknown as RollupLogger,
     };
 });
 
@@ -40,7 +40,6 @@ describe("fileCache", () => {
 
         expect(hoisted.logger.debug).toHaveBeenCalledWith({
             message: `Cache path is: ${cacheDirectoryPath}`,
-            prefix: "file-cache",
         });
     });
 
@@ -50,7 +49,6 @@ describe("fileCache", () => {
         const fileCache = new FileCache(temporaryDirectoryPath, cacheDirectoryPath, "hash123", hoisted.logger);
 
         fileCache.isEnabled = false;
-        console.log(fileCache);
 
         expect(fileCache.isEnabled).toBe(false);
     });
@@ -100,7 +98,6 @@ describe("fileCache", () => {
 
         expect(hoisted.logger.debug).toHaveBeenCalledWith({
             message: "Could not create cache directory.",
-            prefix: "file-cache",
         });
     });
 

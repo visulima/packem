@@ -1,5 +1,5 @@
 import type { Environment } from "@visulima/packem-share/types";
-import type { Pail } from "@visulima/pail";
+import type { RollupLogger } from "@visulima/packem-share/utils";
 import type { CustomPluginOptions, PluginContext } from "rollup";
 import type { RawSourceMap } from "source-map-js";
 
@@ -74,7 +74,7 @@ export interface LoaderContext<T = Record<string, unknown>> {
 
     /** @see {@link InternalStyleOptions.inject} */
     readonly inject: InternalStyleOptions["inject"];
-    logger: Pail;
+    logger: RollupLogger;
 
     /** @see {@link InternalStyleOptions.namedExports} */
     readonly namedExports: InternalStyleOptions["namedExports"];

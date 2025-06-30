@@ -423,7 +423,6 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                     sourceMap: context.options.sourcemap,
                     ...context.options.rollup.css,
                 },
-                context.logger,
                 context.options.browserTargets as string[],
                 context.options.rootDir,
                 context.options.sourceDir,
@@ -438,7 +437,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             && context.options.rollup.css.loaders
             && context.options.rollup.css.loaders.length > 0
             && context.options.declaration
-            && cssModulesTypesPlugin(context.options.rollup.css, context.options.rootDir, context.logger),
+            && cssModulesTypesPlugin(context.options.rollup.css, context.options.rootDir),
 
             context.options.rollup.raw && cachingPlugin(rawPlugin(context.options.rollup.raw), fileCache),
 

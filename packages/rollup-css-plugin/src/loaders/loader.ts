@@ -1,4 +1,4 @@
-import type { Pail } from "@visulima/pail";
+import type { RollupLogger } from "@visulima/packem-share/utils";
 import type PQueue from "p-queue";
 import PQueueClass from "p-queue";
 
@@ -20,7 +20,7 @@ interface LoadersOptions {
 
     /** @see {@link Options.loaders} */
     loaders: Loader[];
-    logger: Pail;
+    logger: RollupLogger;
     options: InternalStyleOptions;
 }
 
@@ -33,7 +33,7 @@ class LoaderManager {
 
     private workQueue?: PQueue;
 
-    private readonly logger: Pail;
+    private readonly logger: RollupLogger;
 
     public constructor({ extensions, loaders, logger, options }: LoadersOptions) {
         this.test = (file: string): boolean => extensions.some((extension) => file.toLowerCase().endsWith(extension));
@@ -83,13 +83,29 @@ class LoaderManager {
             };
 
             if (loader.alwaysProcess || matchFile(loaderContext.id, loader.test)) {
-                this.logger.debug(`Processing ${name} loader for ${loaderContext.id}`);
+                this.logger.debug({ message: `Processing ${name} loader for ${loaderContext.id}`, plugin: "css" });
 
-                const process = await this.workQueue.add(loader.process.bind(loaderContext, payload));
+                try {
+                    const process = await this.workQueue.add(loader.process.bind(loaderContext, payload));
 
-                if (process) {
-                    // eslint-disable-next-line no-param-reassign
-                    payload = process;
+                    if (process) {
+                        // eslint-disable-next-line no-param-reassign
+                        payload = process;
+
+                        this.logger.debug({
+                            message: `Completed ${name} loader for ${loaderContext.id}`,
+                            outputSize: process.code?.length || 0,
+                            plugin: "css",
+                        });
+                    }
+                } catch (error) {
+                    this.logger.error({
+                        file: loaderContext.id,
+                        loader: name,
+                        message: `Error in ${name} loader for ${loaderContext.id}: ${error instanceof Error ? error.message : String(error)}`,
+                        plugin: "css",
+                    });
+                    throw error;
                 }
             }
         }

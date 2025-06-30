@@ -1,6 +1,7 @@
 import { createFilter } from "@rollup/pluginutils";
 import type { Environment } from "@visulima/packem-share/types";
-import type { Pail } from "@visulima/pail";
+import type { RollupLogger } from "@visulima/packem-share/utils";
+import { createRollupLogger } from "@visulima/packem-share/utils";
 import { basename, dirname, isAbsolute, join, normalize, parse, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 import type { GetModuleInfo, OutputAsset, OutputChunk, Plugin } from "rollup";
@@ -17,7 +18,6 @@ const sortByNameOrder = async (objectsArray: Loader[], nameOrder: string[]): Pro
 
 const cssPlugin = async (
     options: StyleOptions,
-    logger: Pail,
     browserTargets: string[],
     cwd: string,
     sourceDirectory: string,
@@ -40,14 +40,8 @@ const cssPlugin = async (
         namedExports: options.namedExports as boolean,
     };
 
-    if (typeof loaderOptions.inject === "object" && loaderOptions.inject.treeshakeable) {
-        loaderOptions.namedExports = false;
-
-        logger.info({
-            message: "Disabling named exports due to `inject.treeshakeable` option",
-            prefix: "css",
-        });
-    }
+    let logger: RollupLogger;
+    let loaders: LoaderManager;
 
     let hasPostCssLoader = false;
 
@@ -88,17 +82,6 @@ const cssPlugin = async (
             loaderOptions.postcss.plugins = await ensurePCSSPlugins(options.postcss.plugins, cwd);
         }
     }
-
-    const loaders = new LoaderManager({
-        extensions: loaderOptions.extensions,
-        loaders: await sortByNameOrder(options.loaders, ["sourcemap", "stylus", "less", "sass", "postcss"]),
-        logger,
-        options: {
-            ...options,
-            ...loaderOptions,
-            alias: mergedAlias,
-        },
-    });
 
     let extracted: Extracted[] = [];
 
@@ -162,6 +145,42 @@ const cssPlugin = async (
             }
 
             return hashable.join(":");
+        },
+        async buildStart() {
+            // Create logger using Rollup's logging methods
+            logger = createRollupLogger(this, "css");
+
+            // Initialize loaders with logger
+            loaders = new LoaderManager({
+                extensions: loaderOptions.extensions,
+                loaders: await sortByNameOrder(options.loaders || [], ["sourcemap", "stylus", "less", "sass", "postcss"]),
+                logger,
+                options: {
+                    ...options,
+                    ...loaderOptions,
+                    alias: mergedAlias,
+                },
+            });
+
+            // Log plugin configuration
+            logger.info({
+                extract: typeof loaderOptions.extract === "string" ? loaderOptions.extract : "individual",
+                loaders: options.loaders?.map((l) => l.name) || [],
+                message: "CSS plugin initialized",
+                minify: Boolean(minify && options.minifier),
+                namedExports: Boolean(loaderOptions.namedExports),
+                plugin: "css",
+                sourceMap: Boolean(useSourcemap),
+            });
+
+            // Check treeshakeable option
+            if (typeof loaderOptions.inject === "object" && loaderOptions.inject.treeshakeable) {
+                loaderOptions.namedExports = false;
+                logger.info({
+                    message: "Disabling named exports due to `inject.treeshakeable` option",
+                    plugin: "css",
+                });
+            }
         },
         async generateBundle(outputOptions, bundle) {
             if (extracted.length === 0 || !(outputOptions.dir || outputOptions.file)) {
@@ -315,6 +334,14 @@ const cssPlugin = async (
 
                 const cssFileId = this.emitFile(cssFile);
 
+                logger.info({
+                    chunkIds: ids.length,
+                    hasSourceMap: Boolean(extractedData.map && sourceMap),
+                    message: `Emitted CSS file: ${extractedData.name}`,
+                    plugin: "css",
+                    size: extractedData.css.length,
+                });
+
                 if (extractedData.map && sourceMap) {
                     const fileName = this.getFileName(cssFileId);
 
@@ -360,6 +387,11 @@ const cssPlugin = async (
 
                         // eslint-disable-next-line no-param-reassign
                         (bundle[fileName] as OutputAsset).source += map.toCommentData();
+
+                        logger.debug({
+                            message: `Generated inline source map for ${fileName}`,
+                            plugin: "css",
+                        });
                     } else {
                         const mapFileName = `${fileName}.map`;
 
@@ -371,11 +403,27 @@ const cssPlugin = async (
 
                         // eslint-disable-next-line no-param-reassign
                         (bundle[fileName] as OutputAsset).source += map.toCommentFile(base);
+
+                        logger.debug({
+                            message: `Generated external source map: ${mapFileName}`,
+                            plugin: "css",
+                        });
                     }
                 }
             }
+
+            // Log summary
+            if (emittedList.length > 0) {
+                logger.info({
+                    filesEmitted: emittedList.length,
+                    message: `CSS processing complete`,
+                    plugin: "css",
+                    totalExtracted: extracted.length,
+                    totalSize: emittedList.reduce((sum, [, ids]) => sum + ids.length, 0),
+                });
+            }
         },
-        name: "packem:css",
+        name: "rollup-css-plugin",
         async transform(code, transformId) {
             if (!isIncluded(transformId) || !loaders.isSupported(transformId)) {
                 return undefined;
@@ -383,8 +431,12 @@ const cssPlugin = async (
 
             // Skip empty files
             if (code.replaceAll(/\s/g, "") === "") {
+                logger.debug({ message: `Skipping empty file: ${transformId}`, plugin: "css" });
+
                 return undefined;
             }
+
+            logger.info({ message: `Processing CSS file: ${transformId}`, plugin: "css", size: code.length });
 
             if (typeof options.onImport === "function") {
                 options.onImport(code, transformId);
@@ -417,12 +469,23 @@ const cssPlugin = async (
 
             const result = await loaders.process({ code }, context);
 
+            // Log processing results
+            logger.info({
+                assets: context.assets.size,
+                dependencies: context.deps.size,
+                hasExtracted: Boolean(result.extracted),
+                message: `Processed ${transformId}`,
+                outputSize: result.code.length,
+                plugin: "css",
+            });
+
             for (const dep of context.deps) {
                 this.addWatchFile(dep);
             }
 
             for (const [fileName, source] of context.assets) {
                 this.emitFile({ fileName, source, type: "asset" });
+                logger.debug({ message: `Emitted asset: ${fileName}`, plugin: "css", size: source.length });
             }
 
             if (result.extracted) {
@@ -430,6 +493,13 @@ const cssPlugin = async (
 
                 extracted = extracted.filter((extract) => extract.id !== id);
                 extracted.push(result.extracted);
+
+                logger.debug({
+                    cssSize: result.extracted.css.length,
+                    hasSourceMap: Boolean(result.extracted.map),
+                    message: `Extracted CSS from ${id}`,
+                    plugin: "css",
+                });
             }
 
             return {
