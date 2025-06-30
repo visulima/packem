@@ -83,7 +83,11 @@ export type {
     BuildOptions,
     RollupBuildOptions,
 } from "./types";
-
+export type {
+    IsolatedDeclarationsTransformer,
+    TransformerFn,
+    TransformerName,
+} from "@visulima/packem-rollup";
 export type {
     BuildContext,
     BuildContextBuildAssetAndChunk,
@@ -93,9 +97,3 @@ export type {
     Mode,
     Runtime,
 } from "@visulima/packem-share/types";
-
-export type {
-    IsolatedDeclarationsTransformer,
-    TransformerFn,
-    TransformerName,
-} from "@visulima/packem-rollup";

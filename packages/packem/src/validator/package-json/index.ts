@@ -1,5 +1,6 @@
-import loadPackageJson from "../../config/utils/load-package-json";
 import type { BuildContext } from "@visulima/packem-share/types";
+
+import loadPackageJson from "../../config/utils/load-package-json";
 import type { InternalBuildOptions } from "../../types";
 import validateDependencies from "./validate-dependencies";
 import validateEngines from "./validate-engines";

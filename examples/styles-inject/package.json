@@ -17,8 +17,8 @@
         "clean": "rimraf node_modules dist"
     },
     "devDependencies": {
-        "@visulima/packem": "workspace:*",
         "@visulima/css-style-inject": "workspace:*",
+        "@visulima/packem": "workspace:*",
         "cssnano": "7.0.7",
         "esbuild": "^0.25.5",
         "icss-utils": "^5.1.0",

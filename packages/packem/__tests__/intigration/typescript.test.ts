@@ -3,11 +3,11 @@ import { rm } from "node:fs/promises";
 
 import { isAccessibleSync, readFile, writeFile, writeJson } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
+import { getRegexMatches } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { getRegexMatches } from "@visulima/packem-share/utils";
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem typescript", () => {

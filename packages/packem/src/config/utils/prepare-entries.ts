@@ -1,11 +1,11 @@
 import { cyan } from "@visulima/colorize";
 import { NotFoundError } from "@visulima/fs/error";
+import { ENDING_REGEX } from "@visulima/packem-share/constants";
+import type { BuildContext } from "@visulima/packem-share/types";
 import { isAbsolute, join, normalize, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 import { globSync, isDynamicPattern } from "tinyglobby";
 
-import { ENDING_REGEX } from "@visulima/packem-share/constants"
-import type { BuildContext } from "@visulima/packem-share/types";
 import type { BuildEntry, InternalBuildOptions } from "../../types";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity

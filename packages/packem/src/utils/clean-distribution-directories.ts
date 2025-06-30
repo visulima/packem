@@ -1,9 +1,9 @@
 import { emptyDir } from "@visulima/fs";
+import type { BuildContext } from "@visulima/packem-share/types";
 import { relative } from "@visulima/path";
 
-import type { BuildContext } from "@visulima/packem-share/types";
 import type { InternalBuildOptions } from "../types";
-    
+
 const cleanDistributionDirectories = async (context: BuildContext<InternalBuildOptions>): Promise<void> => {
     const cleanedDirectories: string[] = [];
 

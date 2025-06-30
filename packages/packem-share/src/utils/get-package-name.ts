@@ -1,6 +1,6 @@
 /**
  * Extracts the package name from a module path
- * @param id - The module path
+ * @param id The module path
  * @returns The package name
  */
 const getPackageName = (id = ""): string => {

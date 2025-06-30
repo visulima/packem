@@ -50,7 +50,7 @@ export type BuildContext<T> = {
     tsconfig?: TsConfigResult;
     usedDependencies: Set<string>;
     warnings: Set<string>;
-}
+};
 
 export type BuildContextBuildAssetAndChunk = {
     chunk?: boolean;

@@ -1,8 +1,9 @@
 import { readJson, writeJson } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
-import { dirname, join } from "@visulima/path";
 import type { BuildContext } from "@visulima/packem-share/types";
+import { dirname, join } from "@visulima/path";
 import { coerce, valid } from "semver";
+
 import type { InternalBuildOptions } from "../types";
 
 /**

@@ -1,9 +1,9 @@
 import { isAccessibleSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { DEFAULT_EXTENSIONS, DEVELOPMENT_ENV, ENDING_REGEX, PRODUCTION_ENV, RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "@visulima/packem-share/constants";
+import type { BuildContext } from "@visulima/packem-share/types";
 import { extname, resolve, toNamespacedPath } from "@visulima/path";
 
-import type { BuildContext } from "@visulima/packem-share/types";
 import type { BuildEntry, Environment, InferEntriesResult, InternalBuildOptions, Runtime } from "../../../types";
 import type { OutputDescriptor } from "../../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../../utils/extract-export-filenames";

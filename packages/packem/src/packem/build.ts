@@ -3,17 +3,18 @@ import { stat } from "node:fs/promises";
 import { bold, cyan, gray, green } from "@visulima/colorize";
 import { walk } from "@visulima/fs";
 import { formatBytes } from "@visulima/humanizer";
+import type { FileCache } from "@visulima/packem-share";
+import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "@visulima/packem-share/types";
 import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
 
 import rollupBuild from "../rollup/build";
 import rollupBuildTypes from "../rollup/build-types";
 import type { BuildEntry, InternalBuildOptions } from "../types";
-import type { FileCache } from "@visulima/packem-share";
 import brotliSize from "./utils/brotli-size";
 import groupByKeys from "./utils/group-by-keys";
 import gzipSize from "./utils/gzip-size";
-import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "@visulima/packem-share/types";
+
 /**
  * Displays size information for build outputs including entries, chunks, and assets.
  * Provides detailed size metrics including total size, brotli size, and gzip size.

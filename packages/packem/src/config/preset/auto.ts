@@ -1,10 +1,10 @@
 import { bold, cyan, gray } from "@visulima/colorize";
 import { collectSync, isAccessibleSync } from "@visulima/fs";
 import type { NormalizedPackageJson } from "@visulima/package";
+import type { BuildContext } from "@visulima/packem-share/types";
 import { warn } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
 
-import type { BuildContext } from "@visulima/packem-share/types";
 import type { BuildPreset, InternalBuildOptions } from "../../types";
 import inferEntries from "./utils/infer-entries";
 import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";

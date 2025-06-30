@@ -6,6 +6,7 @@ import { ensureDirSync } from "@visulima/fs";
 import { duration } from "@visulima/humanizer";
 import type { NormalizedPackageJson, PackageJson } from "@visulima/package";
 import { hasPackageJsonAnyDependency } from "@visulima/package";
+import { enhanceRollupError, FileCache } from "@visulima/packem-share";
 import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "@visulima/packem-share/constants";
 import type { BuildContext, BuildHooks } from "@visulima/packem-share/types";
 import { getHash } from "@visulima/packem-share/utils";
@@ -28,8 +29,6 @@ import rollupWatch from "../rollup/watch";
 import type { BuildConfig, BuildOptions, Environment, InternalBuildOptions, Mode } from "../types";
 import cleanDistributionDirectories from "../utils/clean-distribution-directories";
 import createOrUpdateKeyStorage from "../utils/create-or-update-key-storage";
-import { enhanceRollupError } from "@visulima/packem-share";
-import { FileCache } from "@visulima/packem-share";
 import getPackageSideEffect from "../utils/get-package-side-effect";
 import killProcess from "../utils/kill-process";
 import logBuildErrors from "../utils/log-build-errors";
@@ -38,7 +37,8 @@ import packageJsonValidator from "../validator/package-json";
 import validateAliasEntries from "../validator/validate-alias-entries";
 import validateBundleSize from "../validator/validate-bundle-size";
 import build from "./build";
-import { node10Compatibility, type Node10CompatibilityOptions } from "./node10-compatibility";
+import type { Node10CompatibilityOptions } from "./node10-compatibility";
+import { node10Compatibility } from "./node10-compatibility";
 
 /**
  * Resolves TSConfig JSX option to a standardized JSX runtime value.

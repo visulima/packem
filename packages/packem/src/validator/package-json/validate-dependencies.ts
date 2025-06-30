@@ -1,8 +1,8 @@
 import { yellow } from "@visulima/colorize";
-
 import type { BuildContext } from "@visulima/packem-share/types";
+import { warn } from "@visulima/packem-share/utils";
+
 import type { InternalBuildOptions, ValidationOptions } from "../../types";
-import { warn } from "@visulima/packem-share/utils"
 
 const joinWarnings = (warnings: Set<string> | string[]): string => [...warnings].map((id) => yellow(id)).join(", ");
 

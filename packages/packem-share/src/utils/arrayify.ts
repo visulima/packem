@@ -1,6 +1,6 @@
 /**
  * Ensures the input is an array. If it's not an array, wraps it in an array.
- * @param x - The input to arrayify
+ * @param x The input to arrayify
  * @returns An array containing the input
  */
 const arrayify = <T>(x: T | T[]): T[] => {
