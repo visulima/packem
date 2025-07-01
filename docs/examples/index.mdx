@@ -1,458 +1,227 @@
 ---
 title: Examples
-description: Practical examples and use cases for all Packen features and packages
+description: Real-world examples and use cases for Packen
 ---
-
-import { ExampleCard } from '../../components/ExampleCard'
-import { Badge } from '../../components/Badge'
 
 # Examples
 
-Explore practical examples and real-world use cases for all Packen features. Each example includes complete source code, configuration, and detailed explanations.
+Learn Packen through practical examples covering common use cases and advanced scenarios.
 
 ## Getting Started Examples
 
-<div className="examples-grid">
-  <ExampleCard
-    title="Basic TypeScript Library"
-    description="Simple TypeScript library with ESM and CJS outputs"
-    href="/docs/examples/basic-typescript"
-    badges={['TypeScript', 'ESM', 'CJS']}
-    difficulty="Beginner"
-  />
+<Cards>
+  <Card href="/docs/examples/basic-library" title="Basic Library">
+    Simple utility library with TypeScript
+  </Card>
   
-  <ExampleCard
-    title="JavaScript Package"
-    description="Modern JavaScript package with zero configuration"
-    href="/docs/examples/basic-javascript"
-    badges={['JavaScript', 'Zero Config']}
-    difficulty="Beginner"
-  />
+  <Card href="/docs/examples/monorepo" title="Monorepo">
+    Multi-package workspace setup
+  </Card>
   
-  <ExampleCard
-    title="CLI Tool"
-    description="Command-line tool with executable binaries"
-    href="/docs/examples/cli-tool"
-    badges={['CLI', 'Executable', 'Node.js']}
-    difficulty="Beginner"
-  />
-  
-  <ExampleCard
-    title="Multiple Exports"
-    description="Package with multiple entry points and exports"
-    href="/docs/examples/multi-exports"
-    badges={['Multi-Export', 'Subpaths']}
-    difficulty="Intermediate"
-  />
-</div>
+  <Card href="/docs/examples/dual-package" title="Dual Package">
+    ESM and CommonJS compatibility
+  </Card>
+</Cards>
 
 ## Transformer Examples
 
-<div className="examples-grid">
-  <ExampleCard
-    title="esbuild Transformer"
-    description="Fast bundling with esbuild transformer"
-    href="/docs/examples/transformers/esbuild"
-    badges={['esbuild', 'Fast', 'JSX']}
-    difficulty="Beginner"
-  />
+<Cards>
+  <Card href="/docs/examples/esbuild" title="esbuild Transformer">
+    Fastest TypeScript/JavaScript compilation
+  </Card>
   
-  <ExampleCard
-    title="swc Transformer"
-    description="Rust-powered compilation with swc"
-    href="/docs/examples/transformers/swc"
-    badges={['swc', 'Rust', 'Performance']}
-    difficulty="Intermediate"
-  />
+  <Card href="/docs/examples/swc" title="SWC Transformer">
+    Rust-powered super fast compilation
+  </Card>
   
-  <ExampleCard
-    title="OXC Transformer"
-    description="Next-generation JavaScript toolchain"
-    href="/docs/examples/transformers/oxc"
-    badges={['OXC', 'Modern', 'Fast']}
-    difficulty="Advanced"
-  />
+  <Card href="/docs/examples/oxc" title="OXC Transformer">
+    Experimental next-generation toolchain
+  </Card>
   
-  <ExampleCard
-    title="sucrase Transformer"
-    description="Simple and fast alternative to Babel"
-    href="/docs/examples/transformers/sucrase"
-    badges={['sucrase', 'Simple', 'Fast']}
-    difficulty="Beginner"
-  />
-  
-  <ExampleCard
-    title="TypeScript Compiler"
-    description="Official TypeScript compiler integration"
-    href="/docs/examples/transformers/typescript"
-    badges={['TypeScript', 'Official', 'Type Checking']}
-    difficulty="Intermediate"
-  />
-</div>
+  <Card href="/docs/examples/typescript" title="TypeScript Compiler">
+    Official TypeScript compiler integration
+  </Card>
+</Cards>
 
-## CSS Examples
+## CSS and Styling Examples
 
-<div className="examples-grid">
-  <ExampleCard
-    title="Basic CSS Processing"
-    description="CSS bundling with PostCSS and optimization"
-    href="/docs/examples/css/basic"
-    badges={['CSS', 'PostCSS', 'Minification']}
-    difficulty="Beginner"
-  />
+<Cards>
+  <Card href="/docs/examples/css-modules" title="CSS Modules">
+    Scoped CSS with automatic class name generation
+  </Card>
   
-  <ExampleCard
-    title="Sass/SCSS Integration"
-    description="Sass preprocessing with variables and mixins"
-    href="/docs/examples/css/sass"
-    badges={['Sass', 'SCSS', 'Variables']}
-    difficulty="Beginner"
-  />
+  <Card href="/docs/examples/sass" title="Sass/SCSS">
+    Advanced CSS preprocessing with Sass
+  </Card>
   
-  <ExampleCard
-    title="Less Preprocessing"
-    description="Less compilation with functions and mixins"
-    href="/docs/examples/css/less"
-    badges={['Less', 'Functions', 'Mixins']}
-    difficulty="Beginner"
-  />
+  <Card href="/docs/examples/postcss" title="PostCSS">
+    Modern CSS transformations and autoprefixing
+  </Card>
   
-  <ExampleCard
-    title="Stylus Processing"
-    description="Stylus with expressive syntax"
-    href="/docs/examples/css/stylus"
-    badges={['Stylus', 'Expressive', 'Clean']}
-    difficulty="Beginner"
-  />
-  
-  <ExampleCard
-    title="CSS Modules"
-    description="Scoped CSS with automatic class names"
-    href="/docs/examples/css/modules"
-    badges={['CSS Modules', 'Scoped', 'TypeScript']}
-    difficulty="Intermediate"
-  />
-  
-  <ExampleCard
-    title="PostCSS Plugins"
-    description="Advanced PostCSS configuration with plugins"
-    href="/docs/examples/css/postcss"
-    badges={['PostCSS', 'Plugins', 'Autoprefixer']}
-    difficulty="Intermediate"
-  />
-  
-  <ExampleCard
-    title="Lightning CSS"
-    description="Fast CSS processing with Lightning CSS"
-    href="/docs/examples/css/lightningcss"
-    badges={['Lightning CSS', 'Fast', 'Modern']}
-    difficulty="Intermediate"
-  />
-</div>
+  <Card href="/docs/examples/styled-components" title="Styled Components">
+    CSS-in-JS library support
+  </Card>
+</Cards>
 
 ## React Examples
 
-<div className="examples-grid">
-  <ExampleCard
-    title="React Library"
-    description="React component library with TypeScript"
-    href="/docs/examples/react/library"
-    badges={['React', 'Components', 'TypeScript']}
-    difficulty="Intermediate"
-  />
+<Cards>
+  <Card href="/docs/examples/react-library" title="React Component Library">
+    Complete React component library with TypeScript
+  </Card>
   
-  <ExampleCard
-    title="React with CSS Modules"
-    description="React components with scoped styling"
-    href="/docs/examples/react/css-modules"
-    badges={['React', 'CSS Modules', 'Styling']}
-    difficulty="Intermediate"
-  />
+  <Card href="/docs/examples/react/css-modules" title="React with CSS Modules">
+    React components with scoped styling
+  </Card>
   
-  <ExampleCard
-    title="React Server Components"
-    description="Server and client components with proper bundling"
-    href="/docs/examples/react/server-components"
-    badges={['React', 'Server Components', 'RSC']}
-    difficulty="Advanced"
-  />
+  <Card href="/docs/examples/react/server-components" title="React Server Components">
+    Next.js App Router compatible components
+  </Card>
   
-  <ExampleCard
-    title="React with Tailwind CSS"
-    description="React components with Tailwind CSS integration"
-    href="/docs/examples/react/tailwind"
-    badges={['React', 'Tailwind', 'Utility CSS']}
-    difficulty="Intermediate"
-  />
-</div>
+  <Card href="/docs/examples/react/tailwind" title="React with Tailwind CSS">
+    React components with Tailwind CSS integration
+  </Card>
+</Cards>
 
 ## TypeScript Examples
 
-<div className="examples-grid">
-  <ExampleCard
-    title="TypeScript Declarations"
-    description="Generate .d.ts files for TypeScript libraries"
-    href="/docs/examples/typescript/declarations"
-    badges={['TypeScript', 'Declarations', '.d.ts']}
-    difficulty="Intermediate"
-  />
+<Cards>
+  <Card href="/docs/examples/typescript/declarations" title="TypeScript Declarations">
+    Generate .d.ts files for TypeScript libraries
+  </Card>
   
-  <ExampleCard
-    title="Isolated Declarations"
-    description="Fast type generation with isolated declarations"
-    href="/docs/examples/typescript/isolated-declarations"
-    badges={['TypeScript', 'Isolated', 'Fast']}
-    difficulty="Advanced"
-  />
+  <Card href="/docs/examples/typescript/isolated-declarations" title="Isolated Declarations">
+    Fast type generation with isolated declarations
+  </Card>
   
-  <ExampleCard
-    title="TSConfig Paths"
-    description="Path mapping and module resolution"
-    href="/docs/examples/typescript/paths"
-    badges={['TypeScript', 'Paths', 'Aliases']}
-    difficulty="Intermediate"
-  />
+  <Card href="/docs/examples/typescript/paths" title="TSConfig Paths">
+    Path mapping and module resolution
+  </Card>
   
-  <ExampleCard
-    title="Mixed JavaScript/TypeScript"
-    description="Gradual TypeScript adoption in JavaScript projects"
-    href="/docs/examples/typescript/mixed"
-    badges={['TypeScript', 'JavaScript', 'Migration']}
-    difficulty="Intermediate"
-  />
-</div>
+  <Card href="/docs/examples/typescript/mixed" title="Mixed JavaScript/TypeScript">
+    Gradual TypeScript adoption in JavaScript projects
+  </Card>
+</Cards>
 
 ## Advanced Examples
 
-<div className="examples-grid">
-  <ExampleCard
-    title="Multi-Runtime Support"
-    description="Target multiple runtimes with conditional exports"
-    href="/docs/examples/advanced/multi-runtime"
-    badges={['Multi-Runtime', 'Edge', 'Node.js']}
-    difficulty="Advanced"
-  />
+<Cards>
+  <Card href="/docs/examples/react-library" title="React Component Library">
+    Complete React component library with TypeScript
+  </Card>
   
-  <ExampleCard
-    title="Dynamic Imports"
-    description="Code splitting with dynamic imports"
-    href="/docs/examples/advanced/dynamic-imports"
-    badges={['Dynamic Imports', 'Code Splitting']}
-    difficulty="Advanced"
-  />
+  <Card href="/docs/examples/webassembly" title="WebAssembly Integration">
+    Bundle and optimize WebAssembly modules
+  </Card>
   
-  <ExampleCard
-    title="Shared Modules"
-    description="Shared code between different bundles"
-    href="/docs/examples/advanced/shared-modules"
-    badges={['Shared Modules', 'Code Sharing']}
-    difficulty="Advanced"
-  />
+  <Card href="/docs/examples/server-components" title="React Server Components">
+    Next.js App Router compatible components
+  </Card>
   
-  <ExampleCard
-    title="WebAssembly Integration"
-    description="Bundle and use WebAssembly modules"
-    href="/docs/examples/advanced/webassembly"
-    badges={['WebAssembly', 'WASM', 'Binary']}
-    difficulty="Advanced"
-  />
-  
-  <ExampleCard
-    title="Custom Plugins"
-    description="Extend Packen with custom Rollup plugins"
-    href="/docs/examples/advanced/custom-plugins"
-    badges={['Plugins', 'Custom', 'Rollup']}
-    difficulty="Advanced"
-  />
-  
-  <ExampleCard
-    title="Bundle Analysis"
-    description="Analyze and optimize bundle size"
-    href="/docs/examples/advanced/bundle-analysis"
-    badges={['Analysis', 'Optimization', 'Performance']}
-    difficulty="Advanced"
-  />
-</div>
+  <Card href="/docs/examples/edge-runtime" title="Edge Runtime">
+    Optimize for Vercel Edge and Cloudflare Workers
+  </Card>
+</Cards>
 
 ## Framework Integration
 
-<div className="examples-grid">
-  <ExampleCard
-    title="Next.js Integration"
-    description="Use Packen-built packages in Next.js applications"
-    href="/docs/examples/frameworks/nextjs"
-    badges={['Next.js', 'React', 'SSR']}
-    difficulty="Intermediate"
-  />
+<Cards>
+  <Card href="/docs/examples/nextjs" title="Next.js Plugin">
+    Integrate Packen with Next.js projects
+  </Card>
   
-  <ExampleCard
-    title="Vue.js Library"
-    description="Vue component library with TypeScript"
-    href="/docs/examples/frameworks/vue"
-    badges={['Vue.js', 'Components', 'TypeScript']}
-    difficulty="Intermediate"
-  />
+  <Card href="/docs/examples/vite" title="Vite Integration">
+    Use Packen alongside Vite for library builds
+  </Card>
   
-  <ExampleCard
-    title="Svelte Components"
-    description="Svelte component library bundling"
-    href="/docs/examples/frameworks/svelte"
-    badges={['Svelte', 'Components', 'Compiler']}
-    difficulty="Intermediate"
-  />
+  <Card href="/docs/examples/rollup" title="Custom Rollup Plugins">
+    Extend functionality with custom plugins
+  </Card>
   
-  <ExampleCard
-    title="Node.js Modules"
-    description="Native Node.js modules and ESM/CJS compatibility"
-    href="/docs/examples/frameworks/nodejs"
-    badges={['Node.js', 'ESM', 'CJS']}
-    difficulty="Intermediate"
-  />
-</div>
+  <Card href="/docs/examples/webpack" title="Webpack Migration">
+    Migrate from Webpack to Packen
+  </Card>
+</Cards>
 
 ## Development Workflow
 
-<div className="examples-grid">
-  <ExampleCard
-    title="Watch Mode"
-    description="Development workflow with file watching"
-    href="/docs/examples/workflow/watch-mode"
-    badges={['Watch Mode', 'Development', 'HMR']}
-    difficulty="Beginner"
-  />
+<Cards>
+  <Card href="/docs/examples/workflow/watch-mode" title="Watch Mode">
+    Development workflow with file watching
+  </Card>
   
-  <ExampleCard
-    title="Environment Variables"
-    description="Handle environment-specific builds"
-    href="/docs/examples/workflow/environment-variables"
-    badges={['Environment', 'Variables', 'Config']}
-    difficulty="Beginner"
-  />
+  <Card href="/docs/examples/workflow/environment-variables" title="Environment Variables">
+    Handle environment-specific builds
+  </Card>
   
-  <ExampleCard
-    title="CI/CD Integration"
-    description="Continuous integration and deployment setup"
-    href="/docs/examples/workflow/cicd"
-    badges={['CI/CD', 'GitHub Actions', 'Automation']}
-    difficulty="Intermediate"
-  />
+  <Card href="/docs/examples/workflow/cicd" title="CI/CD Integration">
+    Continuous integration and deployment setup
+  </Card>
   
-  <ExampleCard
-    title="Monorepo Setup"
-    description="Multi-package monorepo with shared configuration"
-    href="/docs/examples/workflow/monorepo"
-    badges={['Monorepo', 'Workspace', 'Shared']}
-    difficulty="Advanced"
-  />
-</div>
+  <Card href="/docs/examples/workflow/monorepo" title="Monorepo Setup">
+    Multi-package monorepo with shared configuration
+  </Card>
+</Cards>
 
 ## Migration Examples
 
-<div className="examples-grid">
-  <ExampleCard
-    title="From tsup"
-    description="Step-by-step migration from tsup to Packen"
-    href="/docs/examples/migration/from-tsup"
-    badges={['Migration', 'tsup', 'Guide']}
-    difficulty="Beginner"
-  />
+<Cards>
+  <Card href="/docs/examples/migration/from-tsup" title="From tsup">
+    Step-by-step migration from tsup to Packen
+  </Card>
   
-  <ExampleCard
-    title="From Rollup"
-    description="Migrate from plain Rollup configuration"
-    href="/docs/examples/migration/from-rollup"
-    badges={['Migration', 'Rollup', 'Config']}
-    difficulty="Intermediate"
-  />
+  <Card href="/docs/examples/migration/from-rollup" title="From Rollup">
+    Migrate from plain Rollup configuration
+  </Card>
   
-  <ExampleCard
-    title="From Webpack"
-    description="Migrate from Webpack to Packen"
-    href="/docs/examples/migration/from-webpack"
-    badges={['Migration', 'Webpack', 'Bundle']}
-    difficulty="Advanced"
-  />
+  <Card href="/docs/examples/migration/from-webpack" title="From Webpack">
+    Migrate from Webpack to Packen
+  </Card>
   
-  <ExampleCard
-    title="From unbuild"
-    description="Migrate from unbuild to Packen"
-    href="/docs/examples/migration/from-unbuild"
-    badges={['Migration', 'unbuild', 'Unjs']}
-    difficulty="Intermediate"
-  />
-</div>
+  <Card href="/docs/examples/migration/from-unbuild" title="From unbuild">
+    Migrate from unbuild to Packen
+  </Card>
+</Cards>
 
 ## Performance Examples
 
-<div className="examples-grid">
-  <ExampleCard
-    title="Optimization Techniques"
-    description="Bundle size optimization and performance tips"
-    href="/docs/examples/performance/optimization"
-    badges={['Performance', 'Optimization', 'Size']}
-    difficulty="Advanced"
-  />
+<Cards>
+  <Card href="/docs/examples/performance/optimization" title="Optimization Techniques">
+    Bundle size optimization and performance tips
+  </Card>
   
-  <ExampleCard
-    title="Tree Shaking"
-    description="Dead code elimination and tree shaking"
-    href="/docs/examples/performance/tree-shaking"
-    badges={['Tree Shaking', 'Dead Code', 'Optimization']}
-    difficulty="Intermediate"
-  />
+  <Card href="/docs/examples/performance/tree-shaking" title="Tree Shaking">
+    Dead code elimination and tree shaking
+  </Card>
   
-  <ExampleCard
-    title="Code Splitting"
-    description="Dynamic imports and chunk splitting strategies"
-    href="/docs/examples/performance/code-splitting"
-    badges={['Code Splitting', 'Chunks', 'Lazy Loading']}
-    difficulty="Advanced"
-  />
+  <Card href="/docs/examples/performance/code-splitting" title="Code Splitting">
+    Dynamic imports and chunk splitting strategies
+  </Card>
   
-  <ExampleCard
-    title="Caching Strategies"
-    description="Build caching and incremental compilation"
-    href="/docs/examples/performance/caching"
-    badges={['Caching', 'Incremental', 'Build']}
-    difficulty="Advanced"
-  />
-</div>
+  <Card href="/docs/examples/performance/caching" title="Caching Strategies">
+    Build caching and incremental compilation
+  </Card>
+</Cards>
 
 ## Real-World Projects
 
-<div className="examples-grid">
-  <ExampleCard
-    title="UI Component Library"
-    description="Complete UI library with documentation"
-    href="/docs/examples/projects/ui-library"
-    badges={['UI Library', 'Components', 'Storybook']}
-    difficulty="Advanced"
-  />
+<Cards>
+  <Card href="/docs/examples/projects/ui-library" title="UI Component Library">
+    Complete UI library with documentation
+  </Card>
   
-  <ExampleCard
-    title="Utility Library"
-    description="JavaScript utility functions package"
-    href="/docs/examples/projects/utility-library"
-    badges={['Utilities', 'Functions', 'Tree Shakable']}
-    difficulty="Intermediate"
-  />
+  <Card href="/docs/examples/projects/utility-library" title="Utility Library">
+    JavaScript utility functions package
+  </Card>
   
-  <ExampleCard
-    title="Node.js SDK"
-    description="SDK for API integration with TypeScript"
-    href="/docs/examples/projects/nodejs-sdk"
-    badges={['SDK', 'API', 'TypeScript']}
-    difficulty="Advanced"
-  />
+  <Card href="/docs/examples/projects/nodejs-sdk" title="Node.js SDK">
+    SDK for API integration with TypeScript
+  </Card>
   
-  <ExampleCard
-    title="Design System"
-    description="Complete design system with tokens and components"
-    href="/docs/examples/projects/design-system"
-    badges={['Design System', 'Tokens', 'Components']}
-    difficulty="Advanced"
-  />
-</div>
+  <Card href="/docs/examples/projects/design-system" title="Design System">
+    Complete design system with tokens and components
+  </Card>
+</Cards>
 
 ## Quick Start Templates
 

@@ -3,10 +3,6 @@ title: Getting Started
 description: Install Packen and create your first bundle in minutes
 ---
 
-import { Callout } from '../../components/Callout'
-import { CodeBlock } from '../../components/CodeBlock'
-import { Tabs, TabItem } from '../../components/Tabs'
-
 # Getting Started
 
 Get up and running with Packen in just a few minutes. This guide will walk you through installation, basic configuration, and your first build.
@@ -15,23 +11,9 @@ Get up and running with Packen in just a few minutes. This guide will walk you t
 
 Install Packen as a development dependency in your project:
 
-<Tabs>
-  <TabItem label="npm">
-    ```bash
-    npm install --save-dev @visulima/packem
-    ```
-  </TabItem>
-  <TabItem label="yarn">
-    ```bash
-    yarn add -D @visulima/packem
-    ```
-  </TabItem>
-  <TabItem label="pnpm">
-    ```bash
-    pnpm add -D @visulima/packem
-    ```
-  </TabItem>
-</Tabs>
+```npm
+npm install --save-dev @visulima/packem
+```
 
 ## Quick Setup
 
@@ -264,27 +246,23 @@ my-utils/
 
 Congratulations! You've successfully set up Packen and created your first bundle. Here's what to explore next:
 
-<div className="next-steps-grid">
-  <a href="/docs/guide/configuration" className="next-step">
-    <h3>⚙️ Configuration</h3>
-    <p>Learn about advanced configuration options</p>
-  </a>
+<Cards>
+  <Card href="/docs/guide/configuration" title="Configuration">
+    Learn about advanced configuration options
+  </Card>
   
-  <a href="/docs/guide/transformers" className="next-step">
-    <h3>🔄 Transformers</h3>
-    <p>Choose the right transformer for your needs</p>
-  </a>
+  <Card href="/docs/guide/transformers" title="Transformers">
+    Choose the right transformer for your needs
+  </Card>
   
-  <a href="/docs/guide/typescript" className="next-step">
-    <h3>📘 TypeScript</h3>
-    <p>Advanced TypeScript features and configuration</p>
-  </a>
+  <Card href="/docs/guide/typescript" title="TypeScript">
+    Advanced TypeScript features and configuration
+  </Card>
   
-  <a href="/docs/guide/css" className="next-step">
-    <h3>🎨 CSS Processing</h3>
-    <p>Add CSS, Sass, and styling to your builds</p>
-  </a>
-</div>
+  <Card href="/docs/guide/css" title="CSS Processing">
+    Add CSS, Sass, and styling to your builds
+  </Card>
+</Cards>
 
 ## Common Issues
 
@@ -309,7 +287,7 @@ Check that:
 - Your transformer is properly configured
 - There are no syntax errors in your source files
 
-<Callout type="tip">
+<Callout type="info">
 Use `packem build --verbose` to get detailed build information and error messages.
 </Callout>
 
