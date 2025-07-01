@@ -1,0 +1,706 @@
+---
+title: Dual Package (ESM + CJS)
+description: Create packages that work in both ESM and CommonJS environments
+---
+
+# Dual Package (ESM + CJS)
+
+Learn how to create packages that work seamlessly in both ESM (import) and CommonJS (require) environments, ensuring maximum compatibility across the JavaScript ecosystem.
+
+## Overview
+
+This example demonstrates:
+- Dual package configuration
+- ESM and CJS output generation
+- Conditional exports setup
+- Runtime detection and compatibility
+- Testing both environments
+- Best practices for cross-compatibility
+
+## Project Setup
+
+### Directory Structure
+
+```
+dual-package-example/
+├── src/
+│   ├── index.ts
+│   ├── utils.ts
+│   └── constants.ts
+├── test/
+│   ├── esm.test.mjs
+│   └── cjs.test.cjs
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+## Source Code
+
+### Main Entry Point
+
+**src/index.ts**
+```typescript
+// Core exports that work in both environments
+export { createLogger, Logger } from './logger'
+export { formatMessage, MessageFormatter } from './formatter'
+export { ValidationError, validate } from './validator'
+
+// Utility exports
+export * from './utils'
+export * from './constants'
+
+// Default export for convenience
+import { createLogger } from './logger'
+import { formatMessage } from './formatter'
+import { validate } from './validator'
+
+const utils = {
+  createLogger,
+  formatMessage,
+  validate
+}
+
+export default utils
+```
+
+### Logger Implementation
+
+**src/logger.ts**
+```typescript
+export interface LoggerOptions {
+  level?: 'debug' | 'info' | 'warn' | 'error'
+  timestamp?: boolean
+  prefix?: string
+}
+
+export class Logger {
+  private options: Required<LoggerOptions>
+
+  constructor(options: LoggerOptions = {}) {
+    this.options = {
+      level: 'info',
+      timestamp: true,
+      prefix: '',
+      ...options
+    }
+  }
+
+  private shouldLog(level: string): boolean {
+    const levels = ['debug', 'info', 'warn', 'error']
+    const currentIndex = levels.indexOf(this.options.level)
+    const messageIndex = levels.indexOf(level)
+    return messageIndex >= currentIndex
+  }
+
+  private formatMessage(level: string, message: string): string {
+    const parts: string[] = []
+    
+    if (this.options.timestamp) {
+      parts.push(new Date().toISOString())
+    }
+    
+    if (this.options.prefix) {
+      parts.push(`[${this.options.prefix}]`)
+    }
+    
+    parts.push(`[${level.toUpperCase()}]`)
+    parts.push(message)
+    
+    return parts.join(' ')
+  }
+
+  debug(message: string): void {
+    if (this.shouldLog('debug')) {
+      console.debug(this.formatMessage('debug', message))
+    }
+  }
+
+  info(message: string): void {
+    if (this.shouldLog('info')) {
+      console.info(this.formatMessage('info', message))
+    }
+  }
+
+  warn(message: string): void {
+    if (this.shouldLog('warn')) {
+      console.warn(this.formatMessage('warn', message))
+    }
+  }
+
+  error(message: string): void {
+    if (this.shouldLog('error')) {
+      console.error(this.formatMessage('error', message))
+    }
+  }
+}
+
+export function createLogger(options?: LoggerOptions): Logger {
+  return new Logger(options)
+}
+```
+
+### Message Formatter
+
+**src/formatter.ts**
+```typescript
+export interface FormatOptions {
+  uppercase?: boolean
+  trim?: boolean
+  maxLength?: number
+}
+
+export class MessageFormatter {
+  static format(message: string, options: FormatOptions = {}): string {
+    let result = message
+
+    if (options.trim) {
+      result = result.trim()
+    }
+
+    if (options.uppercase) {
+      result = result.toUpperCase()
+    }
+
+    if (options.maxLength && result.length > options.maxLength) {
+      result = result.substring(0, options.maxLength - 3) + '...'
+    }
+
+    return result
+  }
+}
+
+export function formatMessage(message: string, options?: FormatOptions): string {
+  return MessageFormatter.format(message, options)
+}
+```
+
+### Validator
+
+**src/validator.ts**
+```typescript
+export class ValidationError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ValidationError'
+  }
+}
+
+export interface ValidationRule {
+  required?: boolean
+  minLength?: number
+  maxLength?: number
+  pattern?: RegExp
+}
+
+export function validate(value: string, rules: ValidationRule): boolean {
+  if (rules.required && (!value || value.trim() === '')) {
+    throw new ValidationError('Value is required')
+  }
+
+  if (rules.minLength && value.length < rules.minLength) {
+    throw new ValidationError(`Value must be at least ${rules.minLength} characters`)
+  }
+
+  if (rules.maxLength && value.length > rules.maxLength) {
+    throw new ValidationError(`Value must be no more than ${rules.maxLength} characters`)
+  }
+
+  if (rules.pattern && !rules.pattern.test(value)) {
+    throw new ValidationError('Value does not match required pattern')
+  }
+
+  return true
+}
+```
+
+### Utilities
+
+**src/utils.ts**
+```typescript
+/**
+ * Check if code is running in Node.js environment
+ */
+export function isNode(): boolean {
+  return typeof process !== 'undefined' && 
+         process.versions != null && 
+         process.versions.node != null
+}
+
+/**
+ * Check if code is running in browser environment
+ */
+export function isBrowser(): boolean {
+  return typeof window !== 'undefined' && 
+         typeof document !== 'undefined'
+}
+
+/**
+ * Get current environment type
+ */
+export function getEnvironment(): 'node' | 'browser' | 'unknown' {
+  if (isNode()) return 'node'
+  if (isBrowser()) return 'browser'
+  return 'unknown'
+}
+
+/**
+ * Delay execution for specified milliseconds
+ */
+export function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+/**
+ * Create a simple UUID v4
+ */
+export function createId(): string {
+  if (isNode()) {
+    // Use crypto module in Node.js
+    const crypto = require('crypto')
+    return crypto.randomUUID()
+  } else if (isBrowser() && 'crypto' in window && 'randomUUID' in window.crypto) {
+    // Use Web Crypto API in browsers
+    return window.crypto.randomUUID()
+  } else {
+    // Fallback implementation
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0
+      const v = c === 'x' ? r : (r & 0x3 | 0x8)
+      return v.toString(16)
+    })
+  }
+}
+```
+
+### Constants
+
+**src/constants.ts**
+```typescript
+export const VERSION = '1.0.0'
+
+export const LOG_LEVELS = {
+  DEBUG: 0,
+  INFO: 1,
+  WARN: 2,
+  ERROR: 3
+} as const
+
+export const DEFAULT_CONFIG = {
+  logLevel: 'info',
+  maxRetries: 3,
+  timeout: 5000
+} as const
+
+export const FORMATS = {
+  JSON: 'json',
+  TEXT: 'text',
+  XML: 'xml'
+} as const
+```
+
+## Package Configuration
+
+### package.json
+
+```json
+{
+  "name": "@myorg/dual-package",
+  "version": "1.0.0",
+  "description": "Example dual package supporting both ESM and CommonJS",
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./logger": {
+      "types": "./dist/logger.d.ts",
+      "import": "./dist/logger.js",
+      "require": "./dist/logger.cjs"
+    },
+    "./utils": {
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.js",
+      "require": "./dist/utils.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch",
+    "clean": "rm -rf dist",
+    "test": "npm run test:esm && npm run test:cjs",
+    "test:esm": "node test/esm.test.mjs",
+    "test:cjs": "node test/cjs.test.cjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "dual-package",
+    "esm",
+    "commonjs",
+    "typescript",
+    "utilities"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "@visulima/packem": "^1.28.2",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+### Build Configuration
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  sourcemap: true,
+  declaration: true,
+  rollup: {
+    watch: {
+      include: 'src/**'
+    }
+  }
+})
+```
+
+### TypeScript Configuration
+
+**tsconfig.json**
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test"]
+}
+```
+
+## Testing Both Environments
+
+### ESM Test
+
+**test/esm.test.mjs**
+```javascript
+// Test ESM imports
+import utils, { createLogger, formatMessage, validate, isNode } from '../dist/index.js'
+
+console.log('🧪 Testing ESM imports...')
+
+// Test named imports
+const logger = createLogger({ prefix: 'TEST', level: 'debug' })
+logger.info('ESM import test successful')
+
+// Test formatMessage
+const formatted = formatMessage('  hello world  ', { trim: true, uppercase: true })
+console.log('Formatted message:', formatted)
+
+// Test validation
+try {
+  validate('test', { required: true, minLength: 2 })
+  console.log('✅ Validation passed')
+} catch (error) {
+  console.error('❌ Validation failed:', error.message)
+}
+
+// Test environment detection
+console.log('Environment detected as:', isNode() ? 'Node.js' : 'Browser')
+
+// Test default export
+console.log('Default export available:', typeof utils === 'object')
+
+console.log('✅ All ESM tests passed!')
+```
+
+### CommonJS Test
+
+**test/cjs.test.cjs**
+```javascript
+// Test CommonJS require
+const utils = require('../dist/index.cjs')
+const { createLogger, formatMessage, validate, isNode } = utils
+
+console.log('🧪 Testing CommonJS require...')
+
+// Test named imports
+const logger = createLogger({ prefix: 'TEST', level: 'debug' })
+logger.info('CommonJS require test successful')
+
+// Test formatMessage
+const formatted = formatMessage('  hello world  ', { trim: true, uppercase: true })
+console.log('Formatted message:', formatted)
+
+// Test validation
+try {
+  validate('test', { required: true, minLength: 2 })
+  console.log('✅ Validation passed')
+} catch (error) {
+  console.error('❌ Validation failed:', error.message)
+}
+
+// Test environment detection
+console.log('Environment detected as:', isNode() ? 'Node.js' : 'Browser')
+
+// Test default export
+console.log('Default export available:', typeof utils === 'object')
+
+console.log('✅ All CommonJS tests passed!')
+```
+
+## Build and Test
+
+### Build the Package
+
+```npm
+npm run build
+```
+
+### Output Structure
+
+After building, you'll have:
+
+```
+dist/
+├── index.js          # ESM main entry
+├── index.cjs         # CJS main entry
+├── index.d.ts        # TypeScript declarations
+├── logger.js         # ESM logger module
+├── logger.cjs        # CJS logger module
+├── logger.d.ts       # Logger type declarations
+├── utils.js          # ESM utils module
+├── utils.cjs         # CJS utils module
+├── utils.d.ts        # Utils type declarations
+└── ...
+```
+
+### Test Both Environments
+
+```bash
+# Test ESM support
+npm run test:esm
+
+# Test CommonJS support  
+npm run test:cjs
+
+# Test both
+npm test
+```
+
+## Usage Examples
+
+### ESM Usage
+
+```typescript
+// Named imports
+import { createLogger, formatMessage } from '@myorg/dual-package'
+
+// Default import
+import utils from '@myorg/dual-package'
+
+// Subpath imports
+import { createLogger } from '@myorg/dual-package/logger'
+import { isNode, delay } from '@myorg/dual-package/utils'
+
+const logger = createLogger({ level: 'debug' })
+logger.info('Hello from ESM!')
+```
+
+### CommonJS Usage
+
+```javascript
+// Full require
+const utils = require('@myorg/dual-package')
+const { createLogger, formatMessage } = utils
+
+// Destructured require
+const { createLogger, formatMessage } = require('@myorg/dual-package')
+
+// Subpath requires
+const { createLogger } = require('@myorg/dual-package/logger')
+const { isNode, delay } = require('@myorg/dual-package/utils')
+
+const logger = createLogger({ level: 'debug' })
+logger.info('Hello from CommonJS!')
+```
+
+### Browser Usage
+
+```html
+<!-- ESM in browser -->
+<script type="module">
+  import { createLogger } from './node_modules/@myorg/dual-package/dist/index.js'
+  
+  const logger = createLogger()
+  logger.info('Hello from browser!')
+</script>
+
+<!-- Or with bundler -->
+<script>
+  import { createLogger } from '@myorg/dual-package'
+  // Bundler will resolve the correct format
+</script>
+```
+
+## Key Features
+
+### Automatic Format Detection
+
+The package automatically provides the correct format based on how it's imported:
+
+```javascript
+// ESM - gets dist/index.js
+import utils from '@myorg/dual-package'
+
+// CommonJS - gets dist/index.cjs
+const utils = require('@myorg/dual-package')
+```
+
+### Conditional Exports
+
+The `exports` field in package.json ensures correct resolution:
+
+```json
+{
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  }
+}
+```
+
+### Runtime Compatibility
+
+Code works identically in both environments:
+
+```typescript
+// Same API in both ESM and CJS
+const logger = createLogger()
+logger.info('This works everywhere!')
+```
+
+## Best Practices
+
+### 1. Test Both Environments
+
+Always test both ESM and CommonJS to ensure compatibility:
+
+```bash
+npm run test:esm  # Test import syntax
+npm run test:cjs  # Test require syntax
+```
+
+### 2. Use Conditional Exports
+
+Properly configure package.json exports:
+
+```json
+{
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  }
+}
+```
+
+### 3. Avoid Environment-Specific Code
+
+Write code that works in both environments:
+
+```typescript
+// ✅ Good - works everywhere
+export function createId(): string {
+  return Math.random().toString(36)
+}
+
+// ❌ Bad - Node.js specific
+export function createId(): string {
+  return require('crypto').randomUUID()
+}
+```
+
+### 4. Handle Dependencies Carefully
+
+Use appropriate external declarations:
+
+```typescript
+// Use dynamic imports for environment-specific features
+export async function getNodeVersion(): Promise<string> {
+  if (typeof process !== 'undefined') {
+    return process.version
+  }
+  throw new Error('Not in Node.js environment')
+}
+```
+
+<Callout type="info">
+Dual packages ensure maximum compatibility across the JavaScript ecosystem, making your library accessible to the widest possible audience.
+</Callout>
+
+## Common Issues
+
+### Module Resolution Errors
+
+Ensure your tsconfig.json has proper module resolution:
+
+```json
+{
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  }
+}
+```
+
+### Import/Require Mixing
+
+Don't mix import and require in the same file:
+
+```javascript
+// ❌ Don't do this
+import { createLogger } from '@myorg/dual-package'
+const utils = require('@myorg/dual-package')
+
+// ✅ Choose one approach per file
+import { createLogger } from '@myorg/dual-package'
+import utils from '@myorg/dual-package'
+```
+
+This dual package example provides a robust foundation for creating libraries that work seamlessly in both ESM and CommonJS environments.

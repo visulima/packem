@@ -1,0 +1,754 @@
+---
+title: React Component Library
+description: Build a modern React component library with TypeScript and CSS Modules
+---
+
+# React Component Library
+
+Create a production-ready React component library with TypeScript, CSS Modules, and optimized bundling for both server and client components.
+
+## Overview
+
+This example demonstrates:
+- React component library setup
+- TypeScript with React types
+- CSS Modules for scoped styling
+- Server and Client component separation
+- Tree-shakable exports
+- Storybook integration ready
+- Proper peer dependencies
+
+## Project Structure
+
+```
+react-ui-lib/
+├── src/
+│   ├── components/
+│   │   ├── Button/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Button.module.css
+│   │   │   └── index.ts
+│   │   ├── Card/
+│   │   │   ├── Card.tsx
+│   │   │   ├── Card.module.css
+│   │   │   └── index.ts
+│   │   └── index.ts
+│   ├── hooks/
+│   │   ├── useLocalStorage.ts
+│   │   └── index.ts
+│   ├── utils/
+│   │   ├── cn.ts
+│   │   └── index.ts
+│   ├── types/
+│   │   └── index.ts
+│   └── index.ts
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+## Component Implementation
+
+### Button Component
+
+**src/components/Button/Button.tsx**
+```typescript
+'use client'
+
+import React from 'react'
+import { cn } from '../../utils/cn'
+import styles from './Button.module.css'
+
+export interface ButtonProps 
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost'
+  size?: 'sm' | 'md' | 'lg'
+  loading?: boolean
+  children: React.ReactNode
+}
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ 
+    className, 
+    variant = 'primary', 
+    size = 'md', 
+    loading = false,
+    disabled,
+    children,
+    ...props 
+  }, ref) => {
+    return (
+      <button
+        className={cn(
+          styles.button,
+          styles[variant],
+          styles[size],
+          loading && styles.loading,
+          className
+        )}
+        disabled={disabled || loading}
+        ref={ref}
+        {...props}
+      >
+        {loading && <span className={styles.spinner} />}
+        <span className={loading ? styles.content : undefined}>
+          {children}
+        </span>
+      </button>
+    )
+  }
+)
+
+Button.displayName = 'Button'
+```
+
+**src/components/Button/Button.module.css**
+```css
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  position: relative;
+  outline: none;
+}
+
+.button:focus-visible {
+  ring: 2px solid #3b82f6;
+  ring-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Variants */
+.primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.primary:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.secondary {
+  background-color: #6b7280;
+  color: white;
+}
+
+.secondary:hover:not(:disabled) {
+  background-color: #4b5563;
+}
+
+.outline {
+  background-color: transparent;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.outline:hover:not(:disabled) {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.ghost {
+  background-color: transparent;
+  color: #374151;
+}
+
+.ghost:hover:not(:disabled) {
+  background-color: #f3f4f6;
+}
+
+/* Sizes */
+.sm {
+  height: 2rem;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+}
+
+.md {
+  height: 2.5rem;
+  padding: 0 1rem;
+  font-size: 0.875rem;
+}
+
+.lg {
+  height: 3rem;
+  padding: 0 1.5rem;
+  font-size: 1rem;
+}
+
+/* Loading state */
+.loading {
+  cursor: not-allowed;
+}
+
+.content {
+  opacity: 0;
+}
+
+.spinner {
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+```
+
+**src/components/Button/index.ts**
+```typescript
+export { Button } from './Button'
+export type { ButtonProps } from './Button'
+```
+
+### Card Component
+
+**src/components/Card/Card.tsx**
+```typescript
+import React from 'react'
+import { cn } from '../../utils/cn'
+import styles from './Card.module.css'
+
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
+  padding?: 'none' | 'sm' | 'md' | 'lg'
+  shadow?: 'none' | 'sm' | 'md' | 'lg'
+}
+
+export const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, children, padding = 'md', shadow = 'md', ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          styles.card,
+          styles[`padding-${padding}`],
+          styles[`shadow-${shadow}`],
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
+)
+
+Card.displayName = 'Card'
+
+export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
+}
+
+export const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(styles.header, className)}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
+)
+
+CardHeader.displayName = 'CardHeader'
+
+export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
+}
+
+export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(styles.content, className)}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
+)
+
+CardContent.displayName = 'CardContent'
+```
+
+**src/components/Card/Card.module.css**
+```css
+.card {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+/* Padding variants */
+.padding-none {
+  padding: 0;
+}
+
+.padding-sm {
+  padding: 0.75rem;
+}
+
+.padding-md {
+  padding: 1.5rem;
+}
+
+.padding-lg {
+  padding: 2rem;
+}
+
+/* Shadow variants */
+.shadow-none {
+  box-shadow: none;
+}
+
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.header {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 1rem;
+}
+
+.content {
+  /* Content styles */
+}
+```
+
+**src/components/Card/index.ts**
+```typescript
+export { Card, CardHeader, CardContent } from './Card'
+export type { CardProps, CardHeaderProps, CardContentProps } from './Card'
+```
+
+### Utility Functions
+
+**src/utils/cn.ts**
+```typescript
+/**
+ * Utility function to combine class names
+ */
+export function cn(...classes: (string | undefined | null | false)[]): string {
+  return classes.filter(Boolean).join(' ')
+}
+```
+
+**src/utils/index.ts**
+```typescript
+export { cn } from './cn'
+```
+
+### Custom Hooks
+
+**src/hooks/useLocalStorage.ts**
+```typescript
+'use client'
+
+import { useState, useEffect } from 'react'
+
+export function useLocalStorage<T>(
+  key: string,
+  initialValue: T
+): [T, (value: T | ((val: T) => T)) => void] {
+  // State to store our value
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === "undefined") {
+      return initialValue
+    }
+    
+    try {
+      const item = window.localStorage.getItem(key)
+      return item ? JSON.parse(item) : initialValue
+    } catch (error) {
+      console.error(`Error reading localStorage key "${key}":`, error)
+      return initialValue
+    }
+  })
+
+  // Return a wrapped version of useState's setter function that persists the new value to localStorage
+  const setValue = (value: T | ((val: T) => T)) => {
+    try {
+      // Allow value to be a function so we have the same API as useState
+      const valueToStore = value instanceof Function ? value(storedValue) : value
+      setStoredValue(valueToStore)
+      
+      // Save to localStorage
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(key, JSON.stringify(valueToStore))
+      }
+    } catch (error) {
+      console.error(`Error setting localStorage key "${key}":`, error)
+    }
+  }
+
+  return [storedValue, setValue]
+}
+```
+
+**src/hooks/index.ts**
+```typescript
+export { useLocalStorage } from './useLocalStorage'
+```
+
+### Type Definitions
+
+**src/types/index.ts**
+```typescript
+export interface BaseProps {
+  className?: string
+  children?: React.ReactNode
+}
+
+export type Size = 'sm' | 'md' | 'lg'
+export type Variant = 'primary' | 'secondary' | 'outline' | 'ghost'
+```
+
+### Main Exports
+
+**src/components/index.ts**
+```typescript
+// Components
+export * from './Button'
+export * from './Card'
+```
+
+**src/index.ts**
+```typescript
+// Components
+export * from './components'
+
+// Hooks
+export * from './hooks'
+
+// Utils
+export * from './utils'
+
+// Types
+export * from './types'
+```
+
+## Configuration
+
+### package.json
+
+```json
+{
+  "name": "@myorg/react-ui",
+  "version": "1.0.0",
+  "description": "Modern React component library",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.js",
+      "require": "./dist/components/index.cjs"
+    },
+    "./hooks": {
+      "types": "./dist/hooks/index.d.ts",
+      "import": "./dist/hooks/index.js",
+      "require": "./dist/hooks/index.cjs"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js",
+      "require": "./dist/utils/index.cjs"
+    }
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "react",
+    "components",
+    "ui",
+    "typescript",
+    "library"
+  ],
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^1.28.2",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+### Packen Configuration
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  sourcemap: true,
+  declaration: true,
+  rollup: {
+    external: ['react', 'react-dom'],
+    css: {
+      modules: {
+        generateScopedName: '[name]__[local]___[hash:base64:5]'
+      }
+    },
+    watch: {
+      include: 'src/**'
+    }
+  }
+})
+```
+
+### TypeScript Configuration
+
+**tsconfig.json**
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+## Usage Examples
+
+### Basic Usage
+
+```typescript
+import { Button, Card, CardHeader, CardContent } from '@myorg/react-ui'
+
+function App() {
+  return (
+    <Card>
+      <CardHeader>
+        <h2>Welcome</h2>
+      </CardHeader>
+      <CardContent>
+        <p>This is a sample card with a button.</p>
+        <Button variant="primary" onClick={() => alert('Clicked!')}>
+          Click me
+        </Button>
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+### With Hooks
+
+```typescript
+import { Button, useLocalStorage } from '@myorg/react-ui'
+
+function Counter() {
+  const [count, setCount] = useLocalStorage('counter', 0)
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <Button onClick={() => setCount(count + 1)}>
+        Increment
+      </Button>
+    </div>
+  )
+}
+```
+
+### Tree-shakable Imports
+
+```typescript
+// Only import what you need
+import { Button } from '@myorg/react-ui/components'
+import { useLocalStorage } from '@myorg/react-ui/hooks'
+import { cn } from '@myorg/react-ui/utils'
+```
+
+## Building and Testing
+
+Build the library:
+
+```npm
+npm run build
+```
+
+### Output Structure
+
+```
+dist/
+├── index.js              # ESM main entry
+├── index.cjs             # CJS main entry
+├── index.d.ts            # TypeScript declarations
+├── components/
+│   ├── index.js
+│   ├── index.cjs
+│   ├── index.d.ts
+│   ├── Button/
+│   │   ├── index.js
+│   │   ├── index.cjs
+│   │   ├── index.d.ts
+│   │   └── Button.module.css
+│   └── Card/
+│       ├── index.js
+│       ├── index.cjs
+│       ├── index.d.ts
+│       └── Card.module.css
+├── hooks/
+└── utils/
+```
+
+## Key Features
+
+### CSS Modules Support
+
+CSS is automatically processed and scoped:
+
+```typescript
+// Styles are automatically imported and scoped
+import styles from './Button.module.css'
+
+// Generated class names: Button__button___a1b2c
+<button className={styles.button}>Click me</button>
+```
+
+### Server Components Ready
+
+Components work in both server and client environments:
+
+```typescript
+'use client' // Only when needed for interactivity
+
+export const Button = () => {
+  // This works in Next.js App Router
+}
+```
+
+### Type Safety
+
+Full TypeScript support with proper component props:
+
+```typescript
+<Button
+  variant="primary"    // ✅ Valid variant
+  size="lg"           // ✅ Valid size
+  loading={true}      // ✅ Boolean prop
+  onClick={handleClick} // ✅ Event handler
+/>
+```
+
+### External Dependencies
+
+React and React DOM are properly externalized and won't be bundled.
+
+## Advanced Usage
+
+### Custom Styling
+
+```typescript
+import { Button } from '@myorg/react-ui'
+
+// Override styles with custom classes
+<Button className="my-custom-button" variant="primary">
+  Custom Button
+</Button>
+```
+
+### Compound Components
+
+```typescript
+import { Card, CardHeader, CardContent } from '@myorg/react-ui'
+
+<Card padding="lg" shadow="lg">
+  <CardHeader>
+    <h3>Card Title</h3>
+  </CardHeader>
+  <CardContent>
+    <p>Card content goes here</p>
+  </CardContent>
+</Card>
+```
+
+<Callout type="info">
+This example provides a solid foundation for React component libraries with modern tooling, proper TypeScript support, and CSS Modules for styling.
+</Callout>
+
+## Next Steps
+
+- Add Storybook for component documentation
+- Set up Jest and React Testing Library for testing
+- Add accessibility (a11y) features and testing
+- Implement dark mode support
+- Add more complex components (Modal, Dropdown, etc.)
+- Set up automated visual regression testing
