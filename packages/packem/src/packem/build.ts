@@ -11,6 +11,7 @@ import { join, relative, resolve } from "@visulima/path";
 import rollupBuild from "../rollup/build";
 import rollupBuildTypes from "../rollup/build-types";
 import type { BuildEntry, InternalBuildOptions } from "../types";
+import { getDtsExtension, getOutputExtension } from "../utils/get-file-extensions";
 import brotliSize from "./utils/brotli-size";
 import groupByKeys from "./utils/group-by-keys";
 import gzipSize from "./utils/gzip-size";
@@ -133,17 +134,19 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
             }
 
             if (context.options.declaration) {
-                const cjsJSExtension = context.options.outputExtensionMap?.cjs ?? "cjs";
-                const esmJSExtension = context.options.outputExtensionMap?.esm ?? "mjs";
+                const cjsJSExtension = getOutputExtension(context, "cjs");
+                const esmJSExtension = getOutputExtension(context, "esm");
+                const cjsDTSExtension = getDtsExtension(context, "cjs");
+                const esmDTSExtension = getDtsExtension(context, "esm");
 
                 let dtsPath = entry.path.replace(/\.js$/, ".d.ts");
                 let type = "commonjs";
 
                 if (entry.path.endsWith(`.${cjsJSExtension}`)) {
-                    dtsPath = entry.path.replace(new RegExp(`\\.${cjsJSExtension}$`), ".d.cts");
+                    dtsPath = entry.path.replace(new RegExp(`\\.${cjsJSExtension}$`), `.${cjsDTSExtension}`);
                 } else if (entry.path.endsWith(`.${esmJSExtension}`)) {
                     type = "module";
-                    dtsPath = entry.path.replace(new RegExp(`\\.${esmJSExtension}$`), ".d.mts");
+                    dtsPath = entry.path.replace(new RegExp(`\\.${esmJSExtension}$`), `.${esmDTSExtension}`);
                 }
 
                 const foundDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
@@ -154,7 +157,7 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
                     let foundCompatibleDts: BuildContextBuildAssetAndChunk | BuildContextBuildEntry | undefined;
 
                     if (!dtsPath.includes(".d.ts")) {
-                        dtsPath = (dtsPath as string).replace(new RegExp(`\\.d.mts$`), `.d.cts`);
+                        dtsPath = (dtsPath as string).replace(/\.d\.mts$/, `.${cjsDTSExtension}`);
 
                         foundCompatibleDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
                     }

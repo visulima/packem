@@ -19,6 +19,7 @@ import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupL
 import { minVersion } from "semver";
 
 import type { InternalBuildOptions } from "../types";
+import { getDtsExtension, getOutputExtension } from "../utils/get-file-extensions";
 import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
 import resolveAliases from "./utils/resolve-aliases";
 
@@ -302,10 +303,10 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, context.options.outputExtensionMap?.cjs ?? "cjs"),
+                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "cjs")),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, context.options.outputExtensionMap?.cjs ?? "cjs"),
+                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "cjs")),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 extend: true,
@@ -337,10 +338,10 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, context.options.outputExtensionMap?.esm ?? "mjs"),
+                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "esm")),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, context.options.outputExtensionMap?.esm ?? "mjs"),
+                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "esm")),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 extend: true,
@@ -741,20 +742,20 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
         output: [
             context.options.emitCJS
             && <OutputOptions>{
-                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "d.cts"),
+                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getDtsExtension(context, "cjs")),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: "[name].d.cts",
+                entryFileNames: `[name].${getDtsExtension(context, "cjs")}`,
                 format: "cjs",
                 sourcemap: context.options.sourcemap,
                 ...context.options.rollup.output,
             },
             context.options.emitESM
             && <OutputOptions>{
-                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "d.mts"),
+                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getDtsExtension(context, "esm")),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: "[name].d.mts",
+                entryFileNames: `[name].${getDtsExtension(context, "esm")}`,
                 format: "esm",
                 sourcemap: context.options.sourcemap,
                 ...context.options.rollup.output,

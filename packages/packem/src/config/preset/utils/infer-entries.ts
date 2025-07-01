@@ -8,6 +8,7 @@ import type { BuildEntry, Environment, InferEntriesResult, InternalBuildOptions,
 import type { OutputDescriptor } from "../../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../../utils/extract-export-filenames";
 import { inferExportTypeFromFileName } from "../../../utils/infer-export-type";
+import { getOutputExtension } from "../../../utils/get-file-extensions";
 
 const getEnvironment = (output: OutputDescriptor, environment: Environment): Environment => {
     if (output.key === "exports" && output.subKey === PRODUCTION_ENV) {
@@ -114,8 +115,8 @@ const inferEntries = (
 ): InferEntriesResult => {
     const warnings: string[] = [];
 
-    const cjsJSExtension = (context.options.outputExtensionMap?.cjs ?? "cjs").replaceAll(".", String.raw`\.`);
-    const esmJSExtension = (context.options.outputExtensionMap?.esm ?? "mjs").replaceAll(".", String.raw`\.`);
+    const cjsJSExtension = getOutputExtension(context, "cjs").replaceAll(".", String.raw`\.`);
+    const esmJSExtension = getOutputExtension(context, "esm").replaceAll(".", String.raw`\.`);
 
     // Sort files so least-nested files are first
     sourceFiles.sort((a, b) => a.split("/").length - b.split("/").length);

@@ -2,6 +2,7 @@ import { VALID_EXPORT_EXTENSIONS } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { warn } from "@visulima/packem-share/utils";
 
+import { getOutputExtension } from "../../utils/get-file-extensions";
 import type { InternalBuildOptions, ValidationOptions } from "../../types";
 
 /**
@@ -239,8 +240,8 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
 const validatePackageFields = (context: BuildContext): void => {
     const validation = context.options.validation as ValidationOptions;
     const { pkg } = context;
-    const cjsJSExtension = context.options.outputExtensionMap?.cjs ?? "cjs";
-    const esmJSExtension = context.options.outputExtensionMap?.esm ?? "mjs";
+    const cjsJSExtension = getOutputExtension(context, "cjs");
+    const esmJSExtension = getOutputExtension(context, "esm");
 
     if (pkg.name === undefined && validation.packageJson?.name !== false) {
         warn(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");

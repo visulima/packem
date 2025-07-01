@@ -7,6 +7,7 @@ import { dirname, relative, resolve } from "@visulima/path";
 import { fileURLToPath, resolveModuleExportNames, resolvePath } from "mlly";
 
 import resolveAliases from "../rollup/utils/resolve-aliases";
+import { getDtsExtension, getOutputExtension } from "../utils/get-file-extensions";
 import type { InternalBuildOptions } from "../types";
 
 const IDENTIFIER_REGEX = /^[_$a-z\u00A0-\uFFFF][\w$\u00A0-\uFFFF]*$/iu;
@@ -97,7 +98,7 @@ const createStub = async (context: BuildContext<InternalBuildOptions>): Promise<
             const typePath = `${resolvedEntryWithoutExtension}.d.mts`;
 
             writeFileSync(
-                `${output}.${context.options.outputExtensionMap?.esm ?? "mjs"}`,
+                `${output}.${getOutputExtension(context, "esm")}`,
                 shebang
                 + [
                     `import { createJiti } from "${jitiESMPath}";`,
@@ -135,7 +136,7 @@ const createStub = async (context: BuildContext<InternalBuildOptions>): Promise<
             // DTS Stub
             if (context.options.declaration) {
                 writeFileSync(
-                    `${output}.d.mts`,
+                    `${output}.${getDtsExtension(context, "esm")}`,
                     `export * from "${typePath}";\n${hasDefaultExport ? `export { default } from "${typePath}";` : ""}`,
                 );
             }
@@ -155,7 +156,7 @@ const createStub = async (context: BuildContext<InternalBuildOptions>): Promise<
             const typePath = `${resolvedEntryWithoutExtension}.d.cts`;
 
             writeFileSync(
-                `${output}.${context.options.outputExtensionMap?.cjs ?? "cjs"}`,
+                `${output}.${getOutputExtension(context, "cjs")}`,
                 shebang
                 + [
                     `const { createJiti } = require("${jitiCJSPath}");`,
@@ -173,7 +174,7 @@ const createStub = async (context: BuildContext<InternalBuildOptions>): Promise<
             // DTS Stub
             if (context.options.declaration) {
                 writeFileSync(
-                    `${output}.d.cts`,
+                    `${output}.${getDtsExtension(context, "cjs")}`,
                     `export * from "${typePath}";\n${hasDefaultExport ? `export { default } from "${typePath}";` : ""}`,
                 );
             }
@@ -181,9 +182,9 @@ const createStub = async (context: BuildContext<InternalBuildOptions>): Promise<
 
         if (shebang) {
             // eslint-disable-next-line no-await-in-loop
-            await makeExecutable(`${output}.${context.options.outputExtensionMap?.cjs ?? "cjs"}`);
+            await makeExecutable(`${output}.${getOutputExtension(context, "cjs")}`);
             // eslint-disable-next-line no-await-in-loop
-            await makeExecutable(`${output}.${context.options.outputExtensionMap?.esm ?? "mjs"}`);
+            await makeExecutable(`${output}.${getOutputExtension(context, "esm")}`);
         }
     }
 
