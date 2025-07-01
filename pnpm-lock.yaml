@@ -1318,6 +1318,9 @@ importers:
       '@vitest/ui':
         specifier: ^3.2.4
         version: 3.2.4(vitest@3.2.4)
+      browserslist:
+        specifier: 4.25.1
+        version: 4.25.1
       conventional-changelog-conventionalcommits:
         specifier: 9.0.0
         version: 9.0.0
