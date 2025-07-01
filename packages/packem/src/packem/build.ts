@@ -3,13 +3,14 @@ import { stat } from "node:fs/promises";
 import { bold, cyan, gray, green } from "@visulima/colorize";
 import { walk } from "@visulima/fs";
 import { formatBytes } from "@visulima/humanizer";
+import type { FileCache } from "@visulima/packem-share";
+import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "@visulima/packem-share/types";
 import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
 
 import rollupBuild from "../rollup/build";
 import rollupBuildTypes from "../rollup/build-types";
-import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry, BuildEntry } from "../types";
-import type FileCache from "../utils/file-cache";
+import type { BuildEntry, InternalBuildOptions } from "../types";
 import brotliSize from "./utils/brotli-size";
 import groupByKeys from "./utils/group-by-keys";
 import gzipSize from "./utils/gzip-size";
@@ -23,7 +24,7 @@ import gzipSize from "./utils/gzip-size";
  * @internal
  */
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
+const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOptions>): boolean => {
     const rPath = (p: string) => relative(context.options.rootDir, resolve(context.options.outDir, p));
 
     let loggedEntries = false;
@@ -244,12 +245,12 @@ const showSizeInformation = (logger: Pail, context: BuildContext): boolean => {
 /**
  * Properties required for building a package or type definitions.
  * @interface
- * @property {BuildContext} context - Build context containing configuration and state
+ * @property {BuildContext<InternalBuildOptions>} context - Build context containing configuration and state
  * @property {FileCache} fileCache - Cache instance for file operations
  * @property {string} subDirectory - Subdirectory for output files
  */
 interface BuilderProperties {
-    context: BuildContext;
+    context: BuildContext<InternalBuildOptions>;
     fileCache: FileCache;
     subDirectory: string;
 }
@@ -265,7 +266,7 @@ const DTS_REGEX = /\.d\.[mc]?ts$/;
  * @internal
  */
 const prepareRollupConfig = (
-    context: BuildContext,
+    context: BuildContext<InternalBuildOptions>,
     fileCache: FileCache,
 ): {
     builders: Set<BuilderProperties>;
@@ -350,7 +351,7 @@ const prepareRollupConfig = (
             }
 
             if (esmAndCjsEntries.length > 0) {
-                const adjustedEsmAndCjsContext: BuildContext = {
+                const adjustedEsmAndCjsContext: BuildContext<InternalBuildOptions> = {
                     ...environmentRuntimeContext,
                     options: {
                         ...environmentRuntimeContext.options,
@@ -397,7 +398,7 @@ const prepareRollupConfig = (
             }
 
             if (esmEntries.length > 0) {
-                const adjustedEsmContext: BuildContext = {
+                const adjustedEsmContext: BuildContext<InternalBuildOptions> = {
                     ...environmentRuntimeContext,
                     options: {
                         ...environmentRuntimeContext.options,
@@ -444,7 +445,7 @@ const prepareRollupConfig = (
             }
 
             if (cjsEntries.length > 0) {
-                const adjustedCjsContext: BuildContext = {
+                const adjustedCjsContext: BuildContext<InternalBuildOptions> = {
                     ...environmentRuntimeContext,
                     options: {
                         ...environmentRuntimeContext.options,
@@ -532,7 +533,7 @@ const prepareRollupConfig = (
  * @returns Promise resolving to a boolean indicating build success
  * @example
  * ```typescript
- * const success = await build(buildContext, new FileCache());
+ * const success = await build(BuildContext<InternalBuildOptions>, new FileCache());
  * if (success) {
  *   console.log('Build completed successfully');
  * }
@@ -540,7 +541,7 @@ const prepareRollupConfig = (
  * @throws {Error} If the build process encounters critical errors
  * @public
  */
-const build = async (context: BuildContext, fileCache: FileCache): Promise<boolean> => {
+const build = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<boolean> => {
     await context.hooks.callHook("build:before", context);
 
     // eslint-disable-next-line etc/no-internal

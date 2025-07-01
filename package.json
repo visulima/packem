@@ -84,11 +84,11 @@
         "onlyBuiltDependencies": [
             "@parcel/watcher",
             "@swc/core",
+            "@tailwindcss/oxide",
             "esbuild",
             "node-sass",
             "nodehun",
-            "nx",
-            "unrs-resolver"
+            "nx"
         ],
         "overrides": {
             "@eslint/plugin-kit@<0.3.4": ">=0.3.4",

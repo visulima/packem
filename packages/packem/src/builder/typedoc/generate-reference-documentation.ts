@@ -1,12 +1,12 @@
 import { readdirSync } from "node:fs";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
+import { replaceContentWithinMarker } from "@visulima/packem-share";
 import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
 import { Application } from "typedoc";
 
 import type { BuildEntry, TypeDocumentOptions } from "../../types";
-import replaceContentWithinMarker from "../../utils/replace-content-within-marker";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const generateReferenceDocumentation = async (options: TypeDocumentOptions, entries: BuildEntry[], outputDirectory: string, logger: Pail): Promise<void> => {

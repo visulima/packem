@@ -1,66 +1,30 @@
 import { versions } from "node:process";
 
-import type { ResolverObject } from "@rollup/plugin-alias";
-import aliasPlugin from "@rollup/plugin-alias";
-import commonjsPlugin from "@rollup/plugin-commonjs";
-import dynamicImportVarsPlugin from "@rollup/plugin-dynamic-import-vars";
-import { nodeResolve as nodeResolvePlugin } from "@rollup/plugin-node-resolve";
-import replacePlugin from "@rollup/plugin-replace";
-import { wasm as wasmPlugin } from "@rollup/plugin-wasm";
 import { cyan } from "@visulima/colorize";
+import type { AliasResolverObject, ShebangOptions } from "@visulima/packem-rollup";
+import { alias as aliasPlugin, browserslistToEsbuild, cachingPlugin, chunkSplitter, cjsInteropPlugin, commonjs as commonjsPlugin, copyPlugin, createSplitChunks, dynamicImportVars as dynamicImportVariablesPlugin, esmShimCjsSyntaxPlugin, fixDtsDefaultCjsExportsPlugin, fixDynamicImportExtension, isolatedDeclarationsPlugin, jsonPlugin as JSONPlugin, jsxRemoveAttributes, licensePlugin, metafilePlugin, nodeResolve as nodeResolvePlugin, polyfillNode as polyfillPlugin, preserveDirectivesPlugin, pure as PluginPure, rawPlugin, removeShebangPlugin, replace as replacePlugin, resolveFileUrl as resolveFileUrlPlugin, shebangPlugin, sourcemapsPlugin, urlPlugin, visualizer as visualizerPlugin, wasm as wasmPlugin } from "@visulima/packem-rollup";
+import type { EsbuildPluginConfig } from "@visulima/packem-rollup/esbuild";
+import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
+import { oxcResolvePlugin } from "@visulima/packem-rollup/oxc";
+import type { SucrasePluginConfig } from "@visulima/packem-rollup/sucrase";
+import type { SwcPluginConfig } from "@visulima/packem-rollup/swc";
+import { patchTypescriptTypesPlugin, resolveTsconfigPathsPlugin, resolveTsconfigRootDirectoriesPlugin, resolveTypescriptMjsCtsPlugin } from "@visulima/packem-rollup/typescript";
+import type { BuildContext, FileCache } from "@visulima/packem-share";
+import { arrayify, memoizeByKey } from "@visulima/packem-share";
+import { getChunkFilename, getEntryFileNames, sortUserPlugins } from "@visulima/packem-share/utils";
 import { join, relative, resolve } from "@visulima/path";
+import { cssModulesTypesPlugin, rollupCssPlugin } from "@visulima/rollup-css-plugin";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
-import polyfillPlugin from "rollup-plugin-polyfill-node";
-import { PluginPure } from "rollup-plugin-pure";
-import { visualizer as visualizerPlugin } from "rollup-plugin-visualizer";
 import { minVersion } from "semver";
 
-import type { BuildContext, InternalBuildOptions } from "../types";
-import arrayify from "../utils/arrayify";
-import type FileCache from "../utils/file-cache";
-import { memoizeByKey } from "../utils/memoize";
-import chunkSplitter from "./plugins/chunk-splitter";
-import { cjsInteropPlugin } from "./plugins/cjs-interop";
-import { copyPlugin } from "./plugins/copy";
-import cssPlugin from "./plugins/css";
-import cssModulesTypesPlugin from "./plugins/css-modules-types";
-import browserslistToEsbuild from "./plugins/esbuild/browserslist-to-esbuild";
-import type { EsbuildPluginConfig } from "./plugins/esbuild/types";
-import { esmShimCjsSyntaxPlugin } from "./plugins/esm-shim-cjs-syntax";
-import { fixDtsDefaultCjsExportsPlugin } from "./plugins/fix-dts-default-cjs-exports-plugin";
-import fixDynamicImportExtension from "./plugins/fix-dynamic-import-extension";
-import { isolatedDeclarationsPlugin } from "./plugins/isolated-declarations";
-import JSONPlugin from "./plugins/json";
-import { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
-import { license as licensePlugin } from "./plugins/license";
-import metafilePlugin from "./plugins/metafile";
-import { oxcResolvePlugin } from "./plugins/oxc/oxc-resolve";
-import type { InternalOXCTransformPluginConfig } from "./plugins/oxc/types";
-import cachingPlugin from "./plugins/plugin-cache";
-import preserveDirectivesPlugin from "./plugins/preserve-directives";
-import { rawPlugin } from "./plugins/raw";
+import type { InternalBuildOptions } from "../types";
 import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
-import resolveFileUrlPlugin from "./plugins/resolve-file-url";
-import type { ShebangOptions } from "./plugins/shebang";
-import { removeShebangPlugin, shebangPlugin } from "./plugins/shebang";
-import { sourcemapsPlugin } from "./plugins/source-maps";
-import type { SucrasePluginConfig } from "./plugins/sucrase/types";
-import type { SwcPluginConfig } from "./plugins/swc/types";
-import { patchTypescriptTypes as patchTypescriptTypesPlugin } from "./plugins/typescript/patch-typescript-types";
-import { resolveTsconfigPathsPlugin } from "./plugins/typescript/resolve-tsconfig-paths-plugin";
-import resolveTsconfigRootDirectoriesPlugin from "./plugins/typescript/resolve-tsconfig-root-dirs";
-import resolveTypescriptMjsCtsPlugin from "./plugins/typescript/resolve-typescript-mjs-cjs";
-import { urlPlugin } from "./plugins/url";
-import createSplitChunks from "./utils/chunks/create-split-chunks";
-import getChunkFilename from "./utils/get-chunk-filename";
-import getEntryFileNames from "./utils/get-entry-file-names";
 import resolveAliases from "./utils/resolve-aliases";
-import sortUserPlugins from "./utils/sort-user-plugins";
 
 const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],
-    context: BuildContext,
+    context: BuildContext<InternalBuildOptions>,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): EsbuildPluginConfig | InternalOXCTransformPluginConfig | SucrasePluginConfig | SwcPluginConfig => {
     let nodeTarget = `node${versions.node.split(".")[0]}`;
@@ -217,7 +181,7 @@ const getTransformerConfig = (
     throw new Error(`A Unknown transformer was provided`);
 };
 
-const sharedOnWarn = (warning: RollupLog, context: BuildContext): boolean => {
+const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalBuildOptions>): boolean => {
     // If the circular dependency warning is from node_modules, ignore it
     if (warning.code === "CIRCULAR_DEPENDENCY" && /Circular dependency:[\s\S]*node_modules/.test(warning.message)) {
         return true;
@@ -241,7 +205,7 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext): boolean => {
     return warning.code === "MIXED_EXPORTS" && context.options.cjsInterop === true;
 };
 
-const baseRollupOptions = (context: BuildContext, type: "build" | "dts"): RollupOptions =>
+const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "build" | "dts"): RollupOptions =>
     <RollupOptions>{
         input: Object.fromEntries(context.options.entries.map((entry) => [entry.name, resolve(context.options.rootDir, entry.input)])),
 
@@ -302,7 +266,7 @@ const baseRollupOptions = (context: BuildContext, type: "build" | "dts"): Rollup
     };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity,import/exports-last
-export const getRollupOptions = async (context: BuildContext, fileCache: FileCache): Promise<RollupOptions> => {
+export const getRollupOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
 
     let nodeResolver;
@@ -424,7 +388,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             context.options.rollup.alias
             && aliasPlugin({
                 // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                customResolver: nodeResolver as ResolverObject,
+                customResolver: nodeResolver as AliasResolverObject,
                 ...context.options.rollup.alias,
                 entries: resolvedAliases,
             }),
@@ -453,13 +417,12 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             context.options.rollup.css
             && context.options.rollup.css.loaders
             && context.options.rollup.css.loaders.length > 0
-            && await cssPlugin(
+            && await rollupCssPlugin(
                 {
                     dts: Boolean(context.options.declaration) || context.options.isolatedDeclarationTransformer !== undefined,
                     sourceMap: context.options.sourcemap,
                     ...context.options.rollup.css,
                 },
-                context.logger,
                 context.options.browserTargets as string[],
                 context.options.rootDir,
                 context.options.sourceDir,
@@ -474,7 +437,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             && context.options.rollup.css.loaders
             && context.options.rollup.css.loaders.length > 0
             && context.options.declaration
-            && cssModulesTypesPlugin(context.options.rollup.css, context.options.rootDir, context.logger),
+            && cssModulesTypesPlugin(context.options.rollup.css, context.options.rootDir),
 
             context.options.rollup.raw && cachingPlugin(rawPlugin(context.options.rollup.raw), fileCache),
 
@@ -651,7 +614,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
             }),
 
             context.options.rollup.dynamicVars && fixDynamicImportExtension(),
-            context.options.rollup.dynamicVars && dynamicImportVarsPlugin(context.options.rollup.dynamicVars),
+            context.options.rollup.dynamicVars && dynamicImportVariablesPlugin(context.options.rollup.dynamicVars),
 
             context.options.rollup.commonjs
             && cachingPlugin(
@@ -715,7 +678,7 @@ export const getRollupOptions = async (context: BuildContext, fileCache: FileCac
     }) as RollupOptions;
 };
 
-const createDtsPlugin = async (context: BuildContext): Promise<Plugin> => {
+const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>): Promise<Plugin> => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require
     const { dts } = require("rollup-plugin-dts") as typeof import("rollup-plugin-dts");
 
@@ -736,7 +699,7 @@ const createDtsPlugin = async (context: BuildContext): Promise<Plugin> => {
 // This will avoid memory leak and performance issue.
 const memoizeDtsPluginByKey = memoizeByKey<typeof createDtsPlugin>(createDtsPlugin);
 
-export const getRollupDtsOptions = async (context: BuildContext, fileCache: FileCache): Promise<RollupOptions> => {
+export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
     const compilerOptions = context.tsconfig?.config.compilerOptions;
 
@@ -848,7 +811,7 @@ export const getRollupDtsOptions = async (context: BuildContext, fileCache: File
             context.options.rollup.alias
             && aliasPlugin({
                 // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                customResolver: nodeResolver as ResolverObject,
+                customResolver: nodeResolver as AliasResolverObject,
                 ...context.options.rollup.alias,
                 entries: resolvedAliases,
             }),

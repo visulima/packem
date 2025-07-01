@@ -1,0 +1,10 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "include": ["src/**/*", "*.d.ts"],
+    "compilerOptions": {
+        "baseUrl": ".",
+        "jsx": "react-jsx",
+        "moduleResolution": "bundler",
+        "isolatedModules": true
+    }
+}

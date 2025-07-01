@@ -1,5 +1,5 @@
-import type { Alias } from "@rollup/plugin-alias";
 import type { PackageJson } from "@visulima/package";
+import type { Alias } from "@visulima/packem-rollup";
 
 import type { InternalBuildOptions } from "../../types";
 

@@ -21,6 +21,8 @@ coverage
 
 # Dependency directories
 node_modules/
+!packages/packem/__fixtures__/css/**/node_modules
+!packages/rollup-css-plugin/__fixtures__/css/**/node_modules
 jspm_packages/
 
 # TypeScript v1 declaration files

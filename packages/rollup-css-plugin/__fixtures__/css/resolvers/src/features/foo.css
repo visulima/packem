@@ -1,0 +1,14 @@
+@import "sub/subfoo";
+
+.foo {
+    background-image: url("./bg.png"), url("./bg.testing.regex.png"), url("@/bg.testing.regex.png");
+}
+
+.foo2 {
+    background-image: -webkit-image-set("cat/cat.png" 1x, url("cat/cat-2x.png") 2x, url(cat/cat-print.png) 600dpi);
+    background-image: image-set("cat/cat.png" 1x);
+}
+
+.foo3 {
+    background-image: url("./bg.png?query#hash");
+}

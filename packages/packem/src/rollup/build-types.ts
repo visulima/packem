@@ -1,15 +1,16 @@
+import type { FileCache } from "@visulima/packem-share";
+import type { BuildContext } from "@visulima/packem-share/types";
+import { getChunkFilename } from "@visulima/packem-share/utils";
 import { resolve } from "@visulima/path";
 import type { RollupCache } from "rollup";
 import { rollup } from "rollup";
 
-import type { BuildContext } from "../types";
-import type FileCache from "../utils/file-cache";
+import type { InternalBuildOptions } from "../types";
 import { getRollupDtsOptions } from "./get-rollup-options";
-import getChunkFilename from "./utils/get-chunk-filename";
 
 const DTS_CACHE_KEY = "rollup-dts.json";
 
-const buildTypes = async (context: BuildContext, fileCache: FileCache, subDirectory: string): Promise<void> => {
+const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, subDirectory: string): Promise<void> => {
     if (context.options.declaration && context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer) {
         context.logger.info({
             message: "Using isolated declaration transformer to generate declaration files...",

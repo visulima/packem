@@ -1,12 +1,13 @@
 import { formatBytes, parseBytes } from "@visulima/humanizer";
+import type { BuildContext } from "@visulima/packem-share/types";
+import { warn } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
 import picomatch from "picomatch";
 
-import type { BuildContext, ValidationOptions } from "../types";
-import warn from "../utils/warn";
+import type { InternalBuildOptions, ValidationOptions } from "../types";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const validateBundleSize = (context: BuildContext, logged: boolean): void => {
+const validateBundleSize = (context: BuildContext<InternalBuildOptions>, logged: boolean): void => {
     const validation = context.options.validation as ValidationOptions;
 
     const { allowFail = false, limit: totalLimit, limits = {} } = validation.bundleLimit ?? {};

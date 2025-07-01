@@ -1,6 +1,6 @@
 import type { PackageJson } from "@visulima/package";
+import { RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "@visulima/packem-share/constants";
 
-import { RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "../constants";
 import type { BuildOptions, Format } from "../types";
 import { inferExportType, inferExportTypeFromFileName } from "./infer-export-type";
 

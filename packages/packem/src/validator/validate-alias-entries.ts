@@ -1,5 +1,5 @@
-import type { Alias } from "@rollup/plugin-alias";
 import { isAccessibleSync } from "@visulima/fs";
+import type { Alias } from "@visulima/packem-rollup";
 import { resolve } from "@visulima/path";
 
 // eslint-disable-next-line sonarjs/anchor-precedence
