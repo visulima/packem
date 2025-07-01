@@ -1,9 +1,22 @@
+/* eslint-disable unicorn/no-null */
+/* eslint-disable vitest/require-mock-type-parameters */
+import type { Mock } from "vitest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { cssStyleInject, SSR_INJECT_ID } from "../src/index";
 
 // Mock DOM methods
-const mockElement = {
+const mockElement: {
+    append: Mock;
+    before: Mock;
+    children: Element[];
+    insertAdjacentElement: Mock;
+    prepend: Mock;
+    querySelector: Mock;
+    querySelectorAll: Mock;
+    setAttribute: Mock;
+    styleSheet: CSSStyleSheet | undefined;
+} = {
     append: vi.fn(),
     before: vi.fn(),
     children: [] as Element[],
@@ -12,7 +25,7 @@ const mockElement = {
     querySelector: vi.fn(),
     querySelectorAll: vi.fn(),
     setAttribute: vi.fn(),
-    styleSheet: undefined as any,
+    styleSheet: undefined,
 };
 
 const mockDocument = {
@@ -23,6 +36,7 @@ const mockDocument = {
     querySelectorAll: vi.fn(() => [mockElement]),
 };
 
+// eslint-disable-next-line vitest/require-top-level-describe
 beforeEach(() => {
     vi.clearAllMocks();
     mockElement.children = [];
@@ -36,6 +50,7 @@ beforeEach(() => {
 
     // Reset global SSR storage
     if (globalThis[SSR_INJECT_ID]) {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete globalThis[SSR_INJECT_ID];
     }
 });
@@ -65,8 +80,10 @@ describe(cssStyleInject, () => {
         it("should not inject null/undefined CSS", () => {
             expect.assertions(1);
 
-            cssStyleInject(null as any);
-            cssStyleInject(undefined as any);
+            // @ts-expect-error - test null/undefined
+            cssStyleInject(null);
+            // @ts-expect-error - test null/undefined
+            cssStyleInject(undefined);
 
             expect(mockDocument.createElement).not.toHaveBeenCalled();
         });
@@ -140,9 +157,9 @@ describe(cssStyleInject, () => {
         beforeEach(() => {
             // Mock container with some children
             mockElement.children = [
-                { before: vi.fn() } as any,
-                { before: vi.fn() } as any,
-                { before: vi.fn() } as any,
+                { before: vi.fn() } as unknown as Element,
+                { before: vi.fn() } as unknown as Element,
+                { before: vi.fn() } as unknown as Element,
             ];
         });
 
@@ -175,7 +192,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { insertAt: 1 });
 
-            expect((mockElement.children[1] as any).before).toHaveBeenCalledWith(mockElement);
+            expect((mockElement.children[1] as Element).before).toHaveBeenCalledWith(mockElement);
         });
 
         it("should insert at beginning for index 0", () => {
@@ -314,11 +331,11 @@ describe(cssStyleInject, () => {
 
             const css = "body { margin: 0; }";
 
-            mockElement.styleSheet = { cssText: "" };
+            mockElement.styleSheet = { cssText: "" } as unknown as CSSStyleSheet;
 
             cssStyleInject(css);
 
-            expect(mockElement.styleSheet.cssText).toBe(css);
+            expect((mockElement.styleSheet as CSSStyleSheet).cssText).toBe(css);
         });
 
         it("should append to existing styleSheet.cssText", () => {
@@ -327,11 +344,11 @@ describe(cssStyleInject, () => {
             const existingCss = "h1 { color: red; }";
             const newCss = "body { margin: 0; }";
 
-            mockElement.styleSheet = { cssText: existingCss };
+            mockElement.styleSheet = { cssText: existingCss } as unknown as CSSStyleSheet;
 
             cssStyleInject(newCss);
 
-            expect(mockElement.styleSheet.cssText).toBe(existingCss + newCss);
+            expect((mockElement.styleSheet as CSSStyleSheet).cssText).toBe(existingCss + newCss);
         });
     });
 
@@ -418,8 +435,8 @@ describe(cssStyleInject, () => {
             const customContainer = {
                 ...mockElement,
                 children: [
-                    { before: vi.fn() } as any,
-                    { before: vi.fn() } as any,
+                    { before: vi.fn() },
+                    { before: vi.fn() },
                 ],
             };
 
@@ -435,7 +452,7 @@ describe(cssStyleInject, () => {
             expect(mockElement.setAttribute).toHaveBeenCalledWith("id", "test-style");
             expect(mockElement.setAttribute).toHaveBeenCalledWith("data-test", "value");
             expect(mockElement.setAttribute).toHaveBeenCalledWith("nonce", "abc123");
-            expect(customContainer.children[1].before).toHaveBeenCalledWith(mockElement);
+            expect((customContainer.children[1] as Element).before).toHaveBeenCalledWith(mockElement);
         });
 
         it("should handle empty options object", () => {

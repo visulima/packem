@@ -35,7 +35,7 @@ const createSplitChunks = (
     const splitChunksGroupMap = new Map<string, string>();
 
     // eslint-disable-next-line sonarjs/cognitive-complexity
-    return function splitChunks(id, context) {
+    return function splitChunks(id: string, context: any) {
         if (/[\\/]node_modules[\\/]@swc[\\/]helper/.test(id)) {
             return "cc"; // common chunk
         }
@@ -48,6 +48,7 @@ const createSplitChunks = (
 
         const { isEntry } = moduleInfo;
         const moduleMeta = moduleInfo.meta;
+
         let moduleLayer = getModuleLayer(moduleMeta);
 
         if (moduleLayer) {
@@ -81,7 +82,7 @@ const createSplitChunks = (
                     continue;
                 }
 
-                const subModuleLayer = getModuleLayer(moduleMeta);
+                const subModuleLayer = getModuleLayer(subModuleInfo.meta);
 
                 if (subModuleLayer === moduleLayer) {
                     if (!dependencyGraphMap.has(subId)) {
@@ -129,8 +130,7 @@ const createSplitChunks = (
             }
 
             const chunkName = basename(id, extname(id));
-            const layerSuffix = hashTo3Char(moduleLayer);
-            const chunkGroup = `${chunkName}-${layerSuffix}`;
+            const chunkGroup = `${chunkName}-${hashTo3Char(moduleLayer)}`;
 
             splitChunksGroupMap.set(id, chunkGroup);
 
@@ -141,4 +141,4 @@ const createSplitChunks = (
     };
 };
 
-export default createSplitChunks; 
+export default createSplitChunks;

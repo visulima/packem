@@ -10,19 +10,17 @@ export interface RollupLogger {
 
 /**
  * Creates a Rollup-compatible logger that wraps Rollup's native logging methods.
- * 
+ *
  * This logger automatically adds the plugin name to all log entries and provides
  * a consistent interface for logging across packem plugins.
- * 
- * @param context - Rollup plugin context with logging methods
- * @param pluginName - Name of the plugin for log identification
+ * @param context Rollup plugin context with logging methods
+ * @param pluginName Name of the plugin for log identification
  * @returns RollupLogger instance
- * 
  * @example
  * ```typescript
  * // In a Rollup plugin
  * const logger = createRollupLogger(this, "my-plugin");
- * 
+ *
  * logger.info({ message: "Processing file", file: "example.js" });
  * // Logs: { message: "Processing file", file: "example.js", plugin: "my-plugin" }
  * ```
@@ -50,4 +48,4 @@ export const createRollupLogger = (
             context.warn({ ...log, plugin: pluginName });
         },
     };
-}; 
+};

@@ -4,6 +4,7 @@ interface SSRInjectData {
 }
 
 declare global {
+    // eslint-disable-next-line vars-on-top, no-underscore-dangle, @typescript-eslint/naming-convention
     var __styleInject_SSR_MODULES: SSRInjectData[] | undefined;
 }
 
@@ -34,7 +35,7 @@ export const cssStyleInject = (
         nonce?: string;
         singleTag?: boolean;
     } = {},
-
+// eslint-disable-next-line sonarjs/cognitive-complexity
 ): void => {
     if (!css) {
         return;
@@ -63,6 +64,7 @@ export const cssStyleInject = (
         throw new Error("Unable to find container element");
     }
 
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     const createStyleTag = () => {
         const styleTag = document.createElement("style");
 
