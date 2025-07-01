@@ -1,8 +1,8 @@
 /**
- * Replaces content within markers in a string
+ * Replaces content within markers in a string.
  * @param content The content to modify
- * @param marker The marker to find
- * @param replacement The replacement content
+ * @param marker The marker string to find within the content
+ * @param replacement The replacement content to insert between markers
  * @returns The modified content or undefined if marker not found
  */
 const replaceContentWithinMarker = (content: string, marker: string, replacement: string): string | undefined => {

@@ -1,3 +1,9 @@
+/**
+ * Extracts all matches from a string using the provided regular expression.
+ * @param regex The regular expression to use for matching
+ * @param source The source string to search within
+ * @returns An array of all matched strings, filtered to remove empty matches
+ */
 const getRegexMatches = (regex: RegExp, source: string): string[] => {
     const internalRegex = regex;
     const matches: string[] = [];

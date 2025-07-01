@@ -24,10 +24,13 @@ const extractStack = (error: RollupError): string | undefined => {
 };
 
 /**
- * Esbuild code frames have newlines at the start and end of the frame, rollup doesn't
- * This function normalizes the frame to match the esbuild format which has more pleasing padding
+ * Esbuild code frames have newlines at the start and end of the frame, rollup doesn't.
+ * This function normalizes the frame to match the esbuild format which has more pleasing padding.
+ * @param frame The frame to normalize
+ * @returns The normalized frame
  */
 const normalizeCodeFrame = (frame: string): string => {
+    // eslint-disable-next-line sonarjs/anchor-precedence
     const trimmedPadding = frame.replaceAll(/^\n|\n$/g, "");
 
     return `\n${trimmedPadding}\n`;

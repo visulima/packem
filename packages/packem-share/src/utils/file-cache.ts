@@ -3,6 +3,11 @@ import { join, toNamespacedPath } from "@visulima/path";
 
 import type { RollupLogger } from "./create-rollup-logger";
 
+/**
+ * Checks if a string is valid JSON.
+ * @param value The string to validate
+ * @returns True if the string is valid JSON, false otherwise
+ */
 const isJson = (value: string): boolean => {
     try {
         JSON.parse(value);
@@ -13,6 +18,10 @@ const isJson = (value: string): boolean => {
     return true;
 };
 
+/**
+ * A file-based cache implementation with memory caching for improved performance.
+ * Provides methods to store, retrieve, and check the existence of cached data.
+ */
 class FileCache {
     readonly #cwd: string;
 
@@ -25,6 +34,13 @@ class FileCache {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     readonly #memoryCache = new Map<string, any>();
 
+    /**
+     * Creates a new FileCache instance.
+     * @param cwd The current working directory
+     * @param cachePath The path to the cache directory, can be undefined
+     * @param hashKey A hash key for cache organization
+     * @param logger Logger instance for debug messages
+     */
     public constructor(cwd: string, cachePath: string | undefined, hashKey: string, logger: RollupLogger) {
         this.#cwd = cwd;
         this.#hashKey = hashKey;
@@ -42,14 +58,28 @@ class FileCache {
         }
     }
 
+    /**
+     * Sets whether the cache is enabled.
+     * @param value True to enable cache, false to disable
+     */
     public set isEnabled(value: boolean) {
         this.#isEnabled = value;
     }
 
+    /**
+     * Gets whether the cache is currently enabled.
+     * @returns True if cache is enabled, false otherwise
+     */
     public get isEnabled(): boolean {
         return this.#isEnabled;
     }
 
+    /**
+     * Checks if a cached file exists.
+     * @param name The cache key name
+     * @param subDirectory Optional subdirectory within the cache
+     * @returns True if the cached file exists, false otherwise
+     */
     public has(name: string, subDirectory?: string): boolean {
         if (!this.#isEnabled) {
             return false;
@@ -62,6 +92,12 @@ class FileCache {
         return isAccessibleSync(this.getFilePath(name, subDirectory));
     }
 
+    /**
+     * Retrieves cached data.
+     * @param name The cache key name
+     * @param subDirectory Optional subdirectory within the cache
+     * @returns The cached data or undefined if not found
+     */
     public get<R>(name: string, subDirectory?: string): R | undefined {
         if (!this.#isEnabled) {
             return undefined;
@@ -96,6 +132,12 @@ class FileCache {
         return fileData as unknown as R;
     }
 
+    /**
+     * Stores data in the cache.
+     * @param name The cache key name
+     * @param data The data to cache
+     * @param subDirectory Optional subdirectory within the cache
+     */
     public set(name: string, data: ArrayBuffer | ArrayBufferView | boolean | number | object | string | null | undefined, subDirectory?: string): void {
         if (!this.#isEnabled) {
             return;
@@ -117,6 +159,12 @@ class FileCache {
         });
     }
 
+    /**
+     * Generates the file path for a cache entry.
+     * @param name The cache key name
+     * @param subDirectory Optional subdirectory within the cache
+     * @returns The complete file path for the cache entry
+     */
     private getFilePath(name: string, subDirectory?: string): string {
         let optimizedName = name.replaceAll(toNamespacedPath(this.#cwd), "");
 

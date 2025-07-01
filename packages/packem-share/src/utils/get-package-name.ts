@@ -1,7 +1,7 @@
 /**
- * Extracts the package name from a module path
- * @param id The module path
- * @returns The package name
+ * Extracts the package name from a module path.
+ * @param id The module path or identifier to extract the package name from
+ * @returns The extracted package name
  */
 const getPackageName = (id = ""): string => {
     const s = id.split("/");

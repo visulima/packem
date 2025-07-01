@@ -1,3 +1,4 @@
+/* eslint-disable vitest/require-mock-type-parameters */
 import { rm } from "node:fs/promises";
 
 import { isAccessibleSync, readFileSync } from "@visulima/fs";

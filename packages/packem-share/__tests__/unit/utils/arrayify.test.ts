@@ -85,6 +85,7 @@ describe(arrayify, () => {
     it("should handle input that is a function", () => {
         expect.assertions(1);
 
+        // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/naming-convention
         const function_ = () => {};
         const result = arrayify(function_);
 

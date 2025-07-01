@@ -2,6 +2,12 @@ import type { PreRenderedAsset } from "rollup";
 
 const isWindows = process.platform === "win32";
 
+/**
+ * Generates appropriate file names for entry files, handling special cases for node_modules.
+ * @param chunkInfo The pre-rendered asset information from Rollup
+ * @param extension The file extension to use
+ * @returns The generated filename pattern for the entry file
+ */
 const getEntryFileNames = (chunkInfo: PreRenderedAsset, extension: string): string => {
     const pathSeparator = isWindows ? "\\" : "/";
 

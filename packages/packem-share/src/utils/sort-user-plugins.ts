@@ -1,9 +1,12 @@
 import type { Plugin } from "rollup";
 
-// Note: RollupPlugins type will be imported from the consuming packages
-// to avoid circular dependencies in the shared package
-
-const sortUserPlugins = (plugins: any[] | undefined, type: "build" | "dts"): [Plugin[], Plugin[], Plugin[]] => {
+/**
+ * Sorts user plugins into pre, normal, and post execution order based on their enforcement settings.
+ * @param plugins Array of plugins to sort, can be undefined
+ * @param type The build type to filter plugins for ("build" or "dts")
+ * @returns A tuple containing [prePlugins, normalPlugins, postPlugins] arrays
+ */
+const sortUserPlugins = <T extends { enforce?: "pre" | "post"; plugin: Plugin; type?: string }>(plugins: T[] | undefined, type: "build" | "dts"): [Plugin[], Plugin[], Plugin[]] => {
     const prePlugins: Plugin[] = [];
     const postPlugins: Plugin[] = [];
     const normalPlugins: Plugin[] = [];

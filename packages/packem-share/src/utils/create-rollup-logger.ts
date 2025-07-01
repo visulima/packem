@@ -14,6 +14,10 @@ export interface RollupLogger {
  * This logger automatically adds the plugin name to all log entries and provides
  * a consistent interface for logging across packem plugins.
  * @param context Rollup plugin context with logging methods
+ * @param context.debug Debug logging method from Rollup plugin context
+ * @param context.error Error logging method from Rollup plugin context
+ * @param context.info Info logging method from Rollup plugin context
+ * @param context.warn Warning logging method from Rollup plugin context
  * @param pluginName Name of the plugin for log identification
  * @returns RollupLogger instance
  * @example
