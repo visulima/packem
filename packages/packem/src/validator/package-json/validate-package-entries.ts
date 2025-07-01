@@ -1,15 +1,16 @@
 import { existsSync } from "node:fs";
 
 import { cyan, grey } from "@visulima/colorize";
+import type { BuildContext } from "@visulima/packem-share/types";
+import { warn } from "@visulima/packem-share/utils";
 import { relative, resolve } from "@visulima/path";
 
-import type { BuildContext, ValidationOptions } from "../../types";
+import type { InternalBuildOptions, ValidationOptions } from "../../types";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
 import levenstein from "../../utils/find-alternatives";
-import warn from "../../utils/warn";
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const validatePackageEntries = (context: BuildContext): void => {
+const validatePackageEntries = (context: BuildContext<InternalBuildOptions>): void => {
     const { options } = context;
     const validation = options.validation as ValidationOptions;
 

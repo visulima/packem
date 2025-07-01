@@ -1,17 +1,18 @@
 import { readFileSync, writeFileSync } from "@visulima/fs";
+import { getShebang, makeExecutable } from "@visulima/packem-rollup";
+import { DEFAULT_EXTENSIONS, ENDING_REGEX } from "@visulima/packem-share/constants";
+import type { BuildContext } from "@visulima/packem-share/types";
+import { warn } from "@visulima/packem-share/utils";
 import { dirname, relative, resolve } from "@visulima/path";
 import { fileURLToPath, resolveModuleExportNames, resolvePath } from "mlly";
 
-import { DEFAULT_EXTENSIONS, ENDING_REGEX } from "../constants";
-import { getShebang, makeExecutable } from "../rollup/plugins/shebang";
 import resolveAliases from "../rollup/utils/resolve-aliases";
-import type { BuildContext } from "../types";
-import warn from "../utils/warn";
+import type { InternalBuildOptions } from "../types";
 
 const IDENTIFIER_REGEX = /^[_$a-z\u00A0-\uFFFF][\w$\u00A0-\uFFFF]*$/iu;
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const createStub = async (context: BuildContext): Promise<void> => {
+const createStub = async (context: BuildContext<InternalBuildOptions>): Promise<void> => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const babelPlugins: (any[] | string)[] = context.options.jiti.transformOptions?.babel?.plugins as any;
     const importedBabelPlugins: string[] = [];

@@ -52,7 +52,7 @@
         "@anolilab/lint-staged-config": "^3.0.17",
         "@anolilab/multi-semantic-release": "^2.0.0",
         "@anolilab/textlint-config": "^9.0.1",
-        "@babel/core": "^7.27.4",
+        "@babel/core": "^7.27.7",
         "@commitlint/cli": "^19.8.1",
         "@commitlint/config-conventional": "^19.8.1",
         "@secretlint/secretlint-rule-preset-recommend": "^10.1.1",
@@ -64,19 +64,19 @@
         "is-ci": "^4.1.0",
         "lint-staged": "^16.1.2",
         "nx": "^21.2.1",
-        "pkg-pr-new": "^0.0.53",
+        "pkg-pr-new": "^0.0.54",
         "plop": "^4.0.1",
         "publint": "^0.3.12",
         "rimraf": "6.0.1",
         "secretlint": "10.1.1",
-        "semantic-release": "^24.2.5",
-        "sort-package-json": "^3.3.0",
+        "semantic-release": "^24.2.6",
+        "sort-package-json": "^3.3.1",
         "taze": "^19.1.0",
-        "textlint": "^15.0.1",
+        "textlint": "^15.1.0",
         "typescript": "^5.8.3",
         "vitest": "^3.2.4"
     },
-    "packageManager": "pnpm@10.12.3",
+    "packageManager": "pnpm@10.12.4",
     "engines": {
         "node": ">=18.* <=24.*"
     },
@@ -84,11 +84,11 @@
         "onlyBuiltDependencies": [
             "@parcel/watcher",
             "@swc/core",
+            "@tailwindcss/oxide",
             "esbuild",
             "node-sass",
             "nodehun",
-            "nx",
-            "unrs-resolver"
+            "nx"
         ],
         "overrides": {
             "@octokit/plugin-paginate-rest@>=1.0.0 <11.4.1": ">=11.4.1",

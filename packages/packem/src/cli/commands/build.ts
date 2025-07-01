@@ -1,13 +1,13 @@
 import { cwd, exit } from "node:process";
 
 import type { Cli } from "@visulima/cerebro";
+import { DEVELOPMENT_ENV, PRODUCTION_ENV } from "@visulima/packem-share/constants";
 import { resolve } from "@visulima/path";
 import { defu } from "defu";
 import { createJiti } from "jiti";
 
 import loadPackemConfig from "../../config/utils/load-packem-config";
 import loadPreset from "../../config/utils/load-preset";
-import { DEVELOPMENT_ENV, PRODUCTION_ENV } from "../../constants";
 import packem from "../../packem";
 import type { BuildConfig, Environment, Mode } from "../../types";
 

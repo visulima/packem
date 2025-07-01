@@ -1,9 +1,10 @@
 import { readJson, writeJson } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
+import type { BuildContext } from "@visulima/packem-share/types";
 import { dirname, join } from "@visulima/path";
 import { coerce, valid } from "semver";
 
-import type { BuildContext } from "../types";
+import type { InternalBuildOptions } from "../types";
 
 /**
  * Makes all string arrays unique in a nested object structure.
@@ -37,8 +38,8 @@ export type Node10CompatibilityOptions = {
 };
 
 export const node10Compatibility = async (
-    logger: BuildContext["logger"],
-    entries: BuildContext["options"]["entries"],
+    logger: BuildContext<InternalBuildOptions>["logger"],
+    entries: BuildContext<InternalBuildOptions>["options"]["entries"],
     outDirectory: string,
     rootDirectory: string,
     mode: "console" | "file",

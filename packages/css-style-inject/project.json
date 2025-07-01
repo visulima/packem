@@ -1,0 +1,9 @@
+{
+    "name": "css-style-inject",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/css-style-inject/src",
+    "projectType": "library",
+    "tags": ["css-style-inject", "type:package"],
+    "implicitDependencies": ["!packem"]
+
+}

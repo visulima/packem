@@ -14,336 +14,54 @@ exports[`css > basic > should process 'empty' css > js 2`] = `
 exports[`css > basic > should process 'postcss-config' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = "a {\\n  width: 30%;\\n  color: red\\n}\\n\\n.multiline,\\n.selector {\\n  box-shadow: inset 0 2px 0px #dcffa6,\\n              0 2px 5px #000\\n}\\n";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 "
 `;
 
 exports[`css > basic > should process 'postcss-config' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = "a {\\n  width: 30%;\\n  color: red\\n}\\n\\n.multiline,\\n.selector {\\n  box-shadow: inset 0 2px 0px #dcffa6,\\n              0 2px 5px #000\\n}\\n";
-injectCss(css,{});
+cssStyleInject(css,{});
 "
 `;
 
 exports[`css > basic > should process 'postcss-config-mjs' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = "a {\\n  color: blue\\n}\\n\\n.multiline,\\n.selector {\\n  box-shadow: 1px 0 9px rgba(0, 0, 0, .4),\\n              1px 0 3px rgba(0, 0, 0, .6)\\n}\\n";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 "
 `;
 
 exports[`css > basic > should process 'postcss-config-mjs' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = "a {\\n  color: blue\\n}\\n\\n.multiline,\\n.selector {\\n  box-shadow: 1px 0 9px rgba(0, 0, 0, .4),\\n              1px 0 3px rgba(0, 0, 0, .6)\\n}\\n";
-injectCss(css,{});
+cssStyleInject(css,{});
 "
 `;
 
 exports[`css > basic > should process 'postcss-options' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = ".subpartial {\\n    box-shadow: inset 0 2px 0px #dcffa6,0 2px 5px #000\\n}\\n\\n.partial {\\n    color: red\\n}\\n\\n.prefixed {\\n  display: flex\\n}\\n";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 "
 `;
 
 exports[`css > basic > should process 'postcss-options' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = ".subpartial {\\n    box-shadow: inset 0 2px 0px #dcffa6,0 2px 5px #000\\n}\\n\\n.partial {\\n    color: red\\n}\\n\\n.prefixed {\\n  display: flex\\n}\\n";
-injectCss(css,{});
+cssStyleInject(css,{});
 "
 `;
 
@@ -582,144 +300,50 @@ exports[`css > basic > should process 'resolvers-url-inline' css > js 2`] = `
 exports[`css > basic > should process 'simple' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n";
-injectCss(css$5,{});
+cssStyleInject.cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject.cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n";
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n";
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}";
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
 `;
 
 exports[`css > basic > should process 'simple' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n";
-injectCss(css$5,{});
+cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n";
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n";
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}";
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
@@ -2337,146 +1961,52 @@ exports[`css > code-splitting > should work with processed 'true' css > map 5`] 
 exports[`css > css-modules > should work with processed modules 'auto-modules' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$4 = ".global {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject.cssStyleInject(css$4,{});
 
 var css$3 = ".a_a_69de543e {\\n    color: red;\\n}\\n";
 var modules_bdb828b9 = {"a":"a_a_69de543e"};
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".b_b_cc874d97 {\\n  color: red;\\n}";
 var modules_9fa995d6 = {"b":"b_b_cc874d97"};
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".c_c_4990a2ba {\\n  color: red;\\n}\\n";
 var modules_2b321dac = {"c":"c_c_4990a2ba"};
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".d_d_964cca5f {\\n  color: #f00;\\n}\\n";
 var modules_39901a8c = {"d":"d_d_964cca5f"};
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
 "
 `;
 
 exports[`css > css-modules > should work with processed modules 'auto-modules' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$4 = ".global {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject(css$4,{});
 
 var css$3 = ".a_a_69de543e {\\n    color: red;\\n}\\n";
 var modules_bdb828b9 = {"a":"a_a_69de543e"};
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".b_b_cc874d97 {\\n  color: red;\\n}";
 var modules_9fa995d6 = {"b":"b_b_cc874d97"};
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".c_c_4990a2ba {\\n  color: red;\\n}\\n";
 var modules_2b321dac = {"c":"c_c_4990a2ba"};
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".d_d_964cca5f {\\n  color: #f00;\\n}\\n";
 var modules_39901a8c = {"d":"d_d_964cca5f"};
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
 "
@@ -2485,140 +2015,46 @@ console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a
 exports[`css > css-modules > should work with processed modules 'auto-modules-fn' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$4 = ".global {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject.cssStyleInject(css$4,{});
 
 var css$3 = ".a {\\n    color: red;\\n}\\n";
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".b {\\n  color: red;\\n}";
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".c_c_4990a2ba {\\n  color: red;\\n}\\n";
 var modules_2b321dac = {"c":"c_c_4990a2ba"};
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".d {\\n  color: #f00;\\n}\\n";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css$3, css$2, modules_2b321dac, css);
 "
 `;
 
 exports[`css > css-modules > should work with processed modules 'auto-modules-fn' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$4 = ".global {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject(css$4,{});
 
 var css$3 = ".a {\\n    color: red;\\n}\\n";
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".b {\\n  color: red;\\n}";
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".c_c_4990a2ba {\\n  color: red;\\n}\\n";
 var modules_2b321dac = {"c":"c_c_4990a2ba"};
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".d {\\n  color: #f00;\\n}\\n";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css$3, css$2, modules_2b321dac, css);
 "
@@ -2627,138 +2063,44 @@ console.log(css$3, css$2, modules_2b321dac, css);
 exports[`css > css-modules > should work with processed modules 'auto-modules-off' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$4 = ".global {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject.cssStyleInject(css$4,{});
 
 var css$3 = ".a {\\n    color: red;\\n}\\n";
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".b {\\n  color: red;\\n}";
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".c {\\n  color: red;\\n}\\n";
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".d {\\n  color: #f00;\\n}\\n";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css$3, css$2, css$1, css);
 "
 `;
 
 exports[`css > css-modules > should work with processed modules 'auto-modules-off' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$4 = ".global {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject(css$4,{});
 
 var css$3 = ".a {\\n    color: red;\\n}\\n";
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".b {\\n  color: red;\\n}";
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".c {\\n  color: red;\\n}\\n";
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".d {\\n  color: #f00;\\n}\\n";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css$3, css$2, css$1, css);
 "
@@ -2767,146 +2109,52 @@ console.log(css$3, css$2, css$1, css);
 exports[`css > css-modules > should work with processed modules 'auto-modules-regexp' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$4 = ".global {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject.cssStyleInject(css$4,{});
 
 var css$3 = ".a_a_69de543e {\\n    color: red;\\n}\\n";
 var modules_bdb828b9 = {"a":"a_a_69de543e"};
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".b_b_cc874d97 {\\n  color: red;\\n}";
 var modules_9fa995d6 = {"b":"b_b_cc874d97"};
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".c_c_4990a2ba {\\n  color: red;\\n}\\n";
 var modules_2b321dac = {"c":"c_c_4990a2ba"};
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".d_d_964cca5f {\\n  color: #f00;\\n}\\n";
 var modules_39901a8c = {"d":"d_d_964cca5f"};
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
 "
 `;
 
 exports[`css > css-modules > should work with processed modules 'auto-modules-regexp' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$4 = ".global {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject(css$4,{});
 
 var css$3 = ".a_a_69de543e {\\n    color: red;\\n}\\n";
 var modules_bdb828b9 = {"a":"a_a_69de543e"};
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".b_b_cc874d97 {\\n  color: red;\\n}";
 var modules_9fa995d6 = {"b":"b_b_cc874d97"};
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".c_c_4990a2ba {\\n  color: red;\\n}\\n";
 var modules_2b321dac = {"c":"c_c_4990a2ba"};
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".d_d_964cca5f {\\n  color: #f00;\\n}\\n";
 var modules_39901a8c = {"d":"d_d_964cca5f"};
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
 "
@@ -3103,132 +2351,38 @@ exports[`css > css-modules > should work with processed modules 'extract-sourcem
 exports[`css > css-modules > should work with processed modules 'generate-scoped-name' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$3 = "html {\\n    --color-primary: green;\\n}\\n\\n.primary {\\n    color: green;\\n    color: var(--color-primary);\\n}\\n";
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".test {\\n    content: \\"test\\";\\n}\\n";
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".foo {\\n    composes: test from \\"./shared.css\\";\\n}\\n";
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".bar {\\n    composes: test from \\"./shared.css\\";\\n}\\n";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css$2, css$1, css);
 "
 `;
 
 exports[`css > css-modules > should work with processed modules 'generate-scoped-name' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$3 = "html {\\n    --color-primary: green;\\n}\\n\\n.primary {\\n    color: green;\\n    color: var(--color-primary);\\n}\\n";
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".test {\\n    content: \\"test\\";\\n}\\n";
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".foo {\\n    composes: test from \\"./shared.css\\";\\n}\\n";
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".bar {\\n    composes: test from \\"./shared.css\\";\\n}\\n";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css$2, css$1, css);
 "
@@ -3237,65 +2391,18 @@ console.log(css$2, css$1, css);
 exports[`css > css-modules > should work with processed modules 'inject' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$2 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
 var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = "@media screen and (min-width: 900px) {\\n    .composed_composition_b4c6ecd1 {\\n        background-color: aqua;\\n    }\\n}\\n\\n.composed_composition_b4c6ecd1 {\\n    background-color: #BF4040;\\n}\\n";
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
 var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 if (modules_354770d7.inject) modules_354770d7.inject();
 else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
@@ -3303,65 +2410,18 @@ else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 `;
 
 exports[`css > css-modules > should work with processed modules 'inject' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$2 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
 var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = "@media screen and (min-width: 900px) {\\n    .composed_composition_b4c6ecd1 {\\n        background-color: aqua;\\n    }\\n}\\n\\n.composed_composition_b4c6ecd1 {\\n    background-color: #BF4040;\\n}\\n";
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
 var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
-injectCss(css,{});
+cssStyleInject(css,{});
 
 if (modules_354770d7.inject) modules_354770d7.inject();
 else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
@@ -3403,63 +2463,16 @@ else console.log(css$2.module, css.compositioned);
 exports[`css > css-modules > should work with processed modules 'inject-treeshakeable' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$1 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
 var injected$1 = false;
-var modules_5a199c00 = {get "module"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module_ea61eaf4"; }};
+var modules_5a199c00 = {get "module"() { if (!injected$1) { injected$1 = true; cssStyleInject.cssStyleInject(css$1,{}); } return "style_module_ea61eaf4"; }};
 
 var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
 var injected = false;
-var modules_354770d7 = {get "compositioned"() { if (!injected) { injected = true; injectCss(css,{}); } return "composition2_compositioned_33aa26b9"; },
-inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
+var modules_354770d7 = {get "compositioned"() { if (!injected) { injected = true; cssStyleInject.cssStyleInject(css,{}); } return "composition2_compositioned_33aa26b9"; },
+inject: function inject() { if (!injected) { injected = true; cssStyleInject.cssStyleInject(css,{}); } },};
 
 if (modules_354770d7.inject) modules_354770d7.inject();
 else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
@@ -3467,63 +2480,16 @@ else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 `;
 
 exports[`css > css-modules > should work with processed modules 'inject-treeshakeable' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$1 = ".style_module_ea61eaf4 {\\n    color: #1F4F7F;\\n}\\n\\n.style_module2_ea61eaf4 {\\n}\\n";
 var injected$1 = false;
-var modules_5a199c00 = {get "module"() { if (!injected$1) { injected$1 = true; injectCss(css$1,{}); } return "style_module_ea61eaf4"; }};
+var modules_5a199c00 = {get "module"() { if (!injected$1) { injected$1 = true; cssStyleInject(css$1,{}); } return "style_module_ea61eaf4"; }};
 
 var css = ".composition2_compositioned_33aa26b9 {\\n    width: 30%;\\n}\\n";
 var injected = false;
-var modules_354770d7 = {get "compositioned"() { if (!injected) { injected = true; injectCss(css,{}); } return "composition2_compositioned_33aa26b9"; },
-inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
+var modules_354770d7 = {get "compositioned"() { if (!injected) { injected = true; cssStyleInject(css,{}); } return "composition2_compositioned_33aa26b9"; },
+inject: function inject() { if (!injected) { injected = true; cssStyleInject(css,{}); } },};
 
 if (modules_354770d7.inject) modules_354770d7.inject();
 else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
@@ -3533,57 +2499,10 @@ else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
 exports[`css > css-modules > should work with processed modules 'named-exports' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = ".valid {\\n    color: red;\\n}\\n\\n.new {\\n    color: blue;\\n}\\n\\n.css {\\n    color: green;\\n}\\n";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css);
 for (const name of Object.values(css)) {
@@ -3593,57 +2512,10 @@ for (const name of Object.values(css)) {
 `;
 
 exports[`css > css-modules > should work with processed modules 'named-exports' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = ".valid {\\n    color: red;\\n}\\n\\n.new {\\n    color: blue;\\n}\\n\\n.css {\\n    color: green;\\n}\\n";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css);
 for (const name of Object.values(css)) {
@@ -3655,57 +2527,10 @@ for (const name of Object.values(css)) {
 exports[`css > css-modules > should work with processed modules 'named-exports-custom-class-name' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = ".valid {\\n    color: red;\\n}\\n\\n.new {\\n    color: blue;\\n}\\n\\n.css {\\n    color: green;\\n}\\n";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css);
 for (const name of Object.values(css)) {
@@ -3715,57 +2540,10 @@ for (const name of Object.values(css)) {
 `;
 
 exports[`css > css-modules > should work with processed modules 'named-exports-custom-class-name' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = ".valid {\\n    color: red;\\n}\\n\\n.new {\\n    color: blue;\\n}\\n\\n.css {\\n    color: green;\\n}\\n";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css);
 for (const name of Object.values(css)) {
@@ -3779,8 +2557,8 @@ exports[`css > css-modules > should work with processed modules 'treeshake-modul
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const a = require('./packem_shared/a-DCC2JNxS.cjs');
-const b = require('./packem_shared/b-COzXQGlv.cjs');
+const a = require('./packem_shared/a--muZ_n0k.cjs');
+const b = require('./packem_shared/b-B2KxOR1s.cjs');
 
 
 
@@ -3794,12 +2572,12 @@ exports[`css > css-modules > should work with processed modules 'treeshake-modul
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const injectCss = require('./inject-css-LytPWKz2.cjs');
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = ".a_treeshakeModuleA_a9b36f2f {\\n    color: red;\\n}\\n";
 var injected = false;
-var modules_bdb828b9 = {get "treeshake-module-a"() { if (!injected) { injected = true; injectCss.injectCss(css,{}); } return "a_treeshakeModuleA_a9b36f2f"; },
-inject: function inject() { if (!injected) { injected = true; injectCss.injectCss(css,{}); } },};
+var modules_bdb828b9 = {get "treeshake-module-a"() { if (!injected) { injected = true; cssStyleInject.cssStyleInject(css,{}); } return "a_treeshakeModuleA_a9b36f2f"; },
+inject: function inject() { if (!injected) { injected = true; cssStyleInject.cssStyleInject(css,{}); } },};
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -3817,12 +2595,12 @@ exports[`css > css-modules > should work with processed modules 'treeshake-modul
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const injectCss = require('./inject-css-LytPWKz2.cjs');
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = ".b_treeshakeModuleB_1a2d7396 {\\n    color: red;\\n}\\n";
 var injected = false;
-var modules_af8c69dd = {get "treeshake-module-b"() { if (!injected) { injected = true; injectCss.injectCss(css,{}); } return "b_treeshakeModuleB_1a2d7396"; },
-inject: function inject() { if (!injected) { injected = true; injectCss.injectCss(css,{}); } },};
+var modules_af8c69dd = {get "treeshake-module-b"() { if (!injected) { injected = true; cssStyleInject.cssStyleInject(css,{}); } return "b_treeshakeModuleB_1a2d7396"; },
+inject: function inject() { if (!injected) { injected = true; cssStyleInject.cssStyleInject(css,{}); } },};
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -3836,74 +2614,18 @@ exports.b = b;
 `;
 
 exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 4`] = `
-"'use strict';
-
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
-
-exports.injectCss = injectCss;
+"export { a } from './packem_shared/a-DY5_0sqP.mjs';
+export { b } from './packem_shared/b-X7vdqWcI.mjs';
 "
 `;
 
 exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 5`] = `
-"export { a } from './packem_shared/a-BGe9EmiK.mjs';
-export { b } from './packem_shared/b-B7r_Qs0P.mjs';
-"
-`;
-
-exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 6`] = `
-"import { i as injectCss } from './inject-css-CahStUou.mjs';
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = ".a_treeshakeModuleA_a9b36f2f {\\n    color: red;\\n}\\n";
 var injected = false;
-var modules_bdb828b9 = {get "treeshake-module-a"() { if (!injected) { injected = true; injectCss(css,{}); } return "a_treeshakeModuleA_a9b36f2f"; },
-inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
+var modules_bdb828b9 = {get "treeshake-module-a"() { if (!injected) { injected = true; cssStyleInject(css,{}); } return "a_treeshakeModuleA_a9b36f2f"; },
+inject: function inject() { if (!injected) { injected = true; cssStyleInject(css,{}); } },};
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -3916,13 +2638,32 @@ export { a };
 "
 `;
 
-exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 7`] = `
-"import { i as injectCss } from './inject-css-CahStUou.mjs';
+exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 6`] = `
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = ".b_treeshakeModuleB_1a2d7396 {\\n    color: red;\\n}\\n";
 var injected = false;
-var modules_af8c69dd = {get "treeshake-module-b"() { if (!injected) { injected = true; injectCss(css,{}); } return "b_treeshakeModuleB_1a2d7396"; },
-inject: function inject() { if (!injected) { injected = true; injectCss(css,{}); } },};
+var modules_af8c69dd = {get "treeshake-module-b"() { if (!injected) { injected = true; cssStyleInject(css,{}); } return "b_treeshakeModuleB_1a2d7396"; },
+inject: function inject() { if (!injected) { injected = true; cssStyleInject(css,{}); } },};
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function b() {
+  return modules_af8c69dd;
+}
+__name(b, "b");
+
+export { b };
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 7`] = `
+"import { i as injector_64c8688c__default } from './inject-css-CahStUou.mjs';
+
+var css = ".b_treeshakeModuleB_1a2d7396 {\\n    color: red;\\n}\\n";
+var injected = false;
+var modules_af8c69dd = {get "treeshake-module-b"() { if (!injected) { injected = true; injector_64c8688c__default(css,{}); } return "b_treeshakeModuleB_1a2d7396"; },
+inject: function inject() { if (!injected) { injected = true; injector_64c8688c__default(css,{}); } },};
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -3942,7 +2683,7 @@ var __defProp2 = Object.defineProperty;
 var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
 const containers = [];
 const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
+const injector_64c8688c__default = /* @__PURE__ */ __name2((css, options) => {
   if (!css || typeof document === "undefined") {
     return;
   }
@@ -3985,7 +2726,7 @@ const injectCss = /* @__PURE__ */ __name2((css, options) => {
   }
 }, "default");
 
-export { injectCss as i };
+export { injector_64c8688c__default as i };
 "
 `;
 
@@ -4588,144 +3329,50 @@ console.log(css$5, css$4);
 exports[`css > inject > should work with injected processed 'top' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n";
-injectCss(css$5,{"prepend":true});
+cssStyleInject.cssStyleInject(css$5,{"prepend":true});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n";
-injectCss(css$4,{"prepend":true});
+cssStyleInject.cssStyleInject(css$4,{"prepend":true});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n";
-injectCss(css$3,{"prepend":true});
+cssStyleInject.cssStyleInject(css$3,{"prepend":true});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n";
-injectCss(css$2,{"prepend":true});
+cssStyleInject.cssStyleInject(css$2,{"prepend":true});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}";
-injectCss(css$1,{"prepend":true});
+cssStyleInject.cssStyleInject(css$1,{"prepend":true});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n";
-injectCss(css,{"prepend":true});
+cssStyleInject.cssStyleInject(css,{"prepend":true});
 
 console.log(css$5, css$4);
 "
 `;
 
 exports[`css > inject > should work with injected processed 'top' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n";
-injectCss(css$5,{"prepend":true});
+cssStyleInject(css$5,{"prepend":true});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n";
-injectCss(css$4,{"prepend":true});
+cssStyleInject(css$4,{"prepend":true});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n";
-injectCss(css$3,{"prepend":true});
+cssStyleInject(css$3,{"prepend":true});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n";
-injectCss(css$2,{"prepend":true});
+cssStyleInject(css$2,{"prepend":true});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}";
-injectCss(css$1,{"prepend":true});
+cssStyleInject(css$1,{"prepend":true});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n";
-injectCss(css,{"prepend":true});
+cssStyleInject(css,{"prepend":true});
 
 console.log(css$5, css$4);
 "
@@ -4734,112 +3381,18 @@ console.log(css$5, css$4);
 exports[`css > less > should work with less processed 'paths' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = ".subfile {\\n  color: royalblue;\\n}\\n";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 "
 `;
 
 exports[`css > less > should work with less processed 'paths' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = ".subfile {\\n  color: royalblue;\\n}\\n";
-injectCss(css,{});
+cssStyleInject(css,{});
 "
 `;
 
@@ -5142,144 +3695,50 @@ exports[`css > minify > should minimize processed 'extract-sourcemap-true' css w
 exports[`css > minify > should minimize processed 'inject' css with 'cssnano' > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n";
-injectCss(css$5,{});
+cssStyleInject.cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject.cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n";
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n";
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}";
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
 `;
 
 exports[`css > minify > should minimize processed 'inject' css with 'cssnano' > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n";
-injectCss(css$5,{});
+cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n";
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n";
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}";
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
@@ -5288,144 +3747,50 @@ console.log(css$5, css$4);
 exports[`css > minify > should minimize processed 'inject' css with 'lightningcss' > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n";
-injectCss(css$5,{});
+cssStyleInject.cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject.cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n";
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n";
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}";
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
 `;
 
 exports[`css > minify > should minimize processed 'inject' css with 'lightningcss' > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n";
-injectCss(css$5,{});
+cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n";
-injectCss(css$4,{});
+cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n";
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n";
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}";
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
@@ -5440,7 +3805,7 @@ var __defProp2 = Object.defineProperty;
 var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
 const containers = [];
 const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
+const injector_64c8688c__default = /* @__PURE__ */ __name2((css, options) => {
   if (!css || typeof document === "undefined") {
     return;
   }
@@ -5484,7 +3849,7 @@ const injectCss = /* @__PURE__ */ __name2((css, options) => {
 }, "default");
 
 var css = ".data {\\n  color: red; }\\n";
-injectCss(css,{});
+injector_64c8688c__default(css,{});
 "
 `;
 
@@ -5495,7 +3860,7 @@ var __defProp2 = Object.defineProperty;
 var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
 const containers = [];
 const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
+const injector_64c8688c__default = /* @__PURE__ */ __name2((css, options) => {
   if (!css || typeof document === "undefined") {
     return;
   }
@@ -5539,7 +3904,7 @@ const injectCss = /* @__PURE__ */ __name2((css, options) => {
 }, "default");
 
 var css = ".data {\\n  color: red; }\\n";
-injectCss(css,{});
+injector_64c8688c__default(css,{});
 "
 `;
 
@@ -5552,7 +3917,7 @@ var __defProp2 = Object.defineProperty;
 var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
 const containers = [];
 const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
+const injector_64c8688c__default = /* @__PURE__ */ __name2((css, options) => {
   if (!css || typeof document === "undefined") {
     return;
   }
@@ -5596,7 +3961,7 @@ const injectCss = /* @__PURE__ */ __name2((css, options) => {
 }, "default");
 
 var css = ".style {\\n  width: 30%;\\n  color: red; }\\n";
-injectCss(css,{});
+injector_64c8688c__default(css,{});
 "
 `;
 
@@ -5607,7 +3972,7 @@ var __defProp2 = Object.defineProperty;
 var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
 const containers = [];
 const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
+const injector_64c8688c__default = /* @__PURE__ */ __name2((css, options) => {
   if (!css || typeof document === "undefined") {
     return;
   }
@@ -5651,345 +4016,63 @@ const injectCss = /* @__PURE__ */ __name2((css, options) => {
 }, "default");
 
 var css = ".style {\\n  width: 30%;\\n  color: red; }\\n";
-injectCss(css,{});
+injector_64c8688c__default(css,{});
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass - data' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = ".data {\\n  color: red;\\n}";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass - data' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = ".data {\\n  color: red;\\n}";
-injectCss(css,{});
+cssStyleInject(css,{});
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass - default' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = ".style {\\n  width: 30%;\\n  color: red;\\n}";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass - default' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = ".style {\\n  width: 30%;\\n  color: red;\\n}";
-injectCss(css,{});
+cssStyleInject(css,{});
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass - modules' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = ".some-style {\\n  color: red;\\n}";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css);
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass - modules' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = ".some-style {\\n  color: red;\\n}";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css);
 "
@@ -5998,448 +4081,72 @@ console.log(css);
 exports[`css > sass > should work with sass/scss processed 'sass - sourcemap' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = ".style {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiIsInNvdXJjZXNDb250ZW50IjpbIi5zdHlsZSB7XG4gIHdpZHRoOiAzMCU7XG4gIGNvbG9yOiByZWQ7XG59Il19 */";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass - sourcemap' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = ".style {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiIsInNvdXJjZXNDb250ZW50IjpbIi5zdHlsZSB7XG4gIHdpZHRoOiAzMCU7XG4gIGNvbG9yOiByZWQ7XG59Il19 */";
-injectCss(css,{});
+cssStyleInject(css,{});
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass - use' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = "/*! minireset.css v0.0.7 | MIT License | github.com/jgthms/minireset.css */\\nhtml, body, p, ol, ul, li, dl, dt, dd, blockquote, figure, fieldset, legend, textarea, pre, iframe, hr, h1, h2, h3, h4, h5, h6 {\\n  margin: 0;\\n  padding: 0;\\n}\\nh1, h2, h3, h4, h5, h6 {\\n  font-size: 100%;\\n  font-weight: normal;\\n}\\nul {\\n  list-style: none;\\n}\\nbutton, input, select {\\n  margin: 0;\\n}\\nhtml {\\n  box-sizing: border-box;\\n}\\n*, *::before, *::after {\\n  box-sizing: inherit;\\n}\\nimg, video {\\n  height: auto;\\n  max-width: 100%;\\n}\\niframe {\\n  border: 0;\\n}\\ntable {\\n  border-collapse: collapse;\\n  border-spacing: 0;\\n}\\ntd, th {\\n  padding: 0;\\n}\\n.button {\\n  border-radius: 3px;\\n  padding: 8px;\\n}";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass - use' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = "/*! minireset.css v0.0.7 | MIT License | github.com/jgthms/minireset.css */\\nhtml, body, p, ol, ul, li, dl, dt, dd, blockquote, figure, fieldset, legend, textarea, pre, iframe, hr, h1, h2, h3, h4, h5, h6 {\\n  margin: 0;\\n  padding: 0;\\n}\\nh1, h2, h3, h4, h5, h6 {\\n  font-size: 100%;\\n  font-weight: normal;\\n}\\nul {\\n  list-style: none;\\n}\\nbutton, input, select {\\n  margin: 0;\\n}\\nhtml {\\n  box-sizing: border-box;\\n}\\n*, *::before, *::after {\\n  box-sizing: inherit;\\n}\\nimg, video {\\n  height: auto;\\n  max-width: 100%;\\n}\\niframe {\\n  border: 0;\\n}\\ntable {\\n  border-collapse: collapse;\\n  border-spacing: 0;\\n}\\ntd, th {\\n  padding: 0;\\n}\\n.button {\\n  border-radius: 3px;\\n  padding: 8px;\\n}";
-injectCss(css,{});
+cssStyleInject(css,{});
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass-embedded - data' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = ".data {\\n  color: red;\\n}";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass-embedded - data' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = ".data {\\n  color: red;\\n}";
-injectCss(css,{});
+cssStyleInject(css,{});
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass-embedded - default' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = ".style {\\n  width: 30%;\\n  color: red;\\n}";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 "
 `;
 
 exports[`css > sass > should work with sass/scss processed 'sass-embedded - default' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css = ".style {\\n  width: 30%;\\n  color: red;\\n}";
-injectCss(css,{});
+cssStyleInject(css,{});
 "
 `;
 
@@ -6466,144 +4173,50 @@ console.log(css$1, css);
 exports[`css > sourcemap > should generate sourcemap for processed 'inline' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$5,{});
+cssStyleInject.cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$4,{});
+cssStyleInject.cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zdHlsIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBTztFQUNQLGdCQUFZO0FBQ2QiLCJzb3VyY2VzQ29udGVudCI6WyIuc3R5bHVzXG4gIGNvbG9yOiByZWRcbiAgYmFja2dyb3VuZDogQGNvbG9yXG4iXX0= */";
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5wY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLnBjc3Mge1xuICAgIGNvbG9yOiByZWQ7XG59XG4iXX0= */";
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiIsInNvdXJjZXNDb250ZW50IjpbIi5zYXNzIHtcbiAgd2lkdGg6IDMwJTtcbiAgY29sb3I6IHJlZDtcbn0iXX0= */";
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBO0VBQ0ksY0FBQTtBQUZKIiwic291cmNlc0NvbnRlbnQiOlsiQG5pY2UtYmx1ZTogIzViODNhZDtcbkBsaWdodC1ibHVlOiBAbmljZS1ibHVlICsgIzExMTtcblxuLmxlc3Mge1xuICAgIGNvbG9yOiBAbGlnaHQtYmx1ZTtcbn1cbiJdfQ== */";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
 `;
 
 exports[`css > sourcemap > should generate sourcemap for processed 'inline' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$5,{});
+cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$4,{});
+cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zdHlsIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBTztFQUNQLGdCQUFZO0FBQ2QiLCJzb3VyY2VzQ29udGVudCI6WyIuc3R5bHVzXG4gIGNvbG9yOiByZWRcbiAgYmFja2dyb3VuZDogQGNvbG9yXG4iXX0= */";
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5wY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLnBjc3Mge1xuICAgIGNvbG9yOiByZWQ7XG59XG4iXX0= */";
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiIsInNvdXJjZXNDb250ZW50IjpbIi5zYXNzIHtcbiAgd2lkdGg6IDMwJTtcbiAgY29sb3I6IHJlZDtcbn0iXX0= */";
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBO0VBQ0ksY0FBQTtBQUZKIiwic291cmNlc0NvbnRlbnQiOlsiQG5pY2UtYmx1ZTogIzViODNhZDtcbkBsaWdodC1ibHVlOiBAbmljZS1ibHVlICsgIzExMTtcblxuLmxlc3Mge1xuICAgIGNvbG9yOiBAbGlnaHQtYmx1ZTtcbn1cbiJdfQ== */";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
@@ -6612,144 +4225,50 @@ console.log(css$5, css$4);
 exports[`css > sourcemap > should generate sourcemap for processed 'inline-no-content' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
-injectCss(css$5,{});
+cssStyleInject.cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
-injectCss(css$4,{});
+cssStyleInject.cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zdHlsIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBTztFQUNQLGdCQUFZO0FBQ2QifQ== */";
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5wY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiJ9 */";
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBO0VBQ0ksY0FBQTtBQUZKIn0= */";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
 `;
 
 exports[`css > sourcemap > should generate sourcemap for processed 'inline-no-content' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
-injectCss(css$5,{});
+cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
-injectCss(css$4,{});
+cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zdHlsIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBTztFQUNQLGdCQUFZO0FBQ2QifQ== */";
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5wY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiJ9 */";
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBO0VBQ0ksY0FBQTtBQUZKIn0= */";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
@@ -6758,144 +4277,50 @@ console.log(css$5, css$4);
 exports[`css > sourcemap > should generate sourcemap for processed 'inline-transform' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$5,{});
+cssStyleInject.cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$4,{});
+cssStyleInject.cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zdHlsIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBTztFQUNQLGdCQUFZO0FBQ2QiLCJzb3VyY2VzQ29udGVudCI6WyIuc3R5bHVzXG4gIGNvbG9yOiByZWRcbiAgYmFja2dyb3VuZDogQGNvbG9yXG4iXX0= */";
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5wY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLnBjc3Mge1xuICAgIGNvbG9yOiByZWQ7XG59XG4iXX0= */";
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiIsInNvdXJjZXNDb250ZW50IjpbIi5zYXNzIHtcbiAgd2lkdGg6IDMwJTtcbiAgY29sb3I6IHJlZDtcbn0iXX0= */";
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBO0VBQ0ksY0FBQTtBQUZKIiwic291cmNlc0NvbnRlbnQiOlsiQG5pY2UtYmx1ZTogIzViODNhZDtcbkBsaWdodC1ibHVlOiBAbmljZS1ibHVlICsgIzExMTtcblxuLmxlc3Mge1xuICAgIGNvbG9yOiBAbGlnaHQtYmx1ZTtcbn1cbiJdfQ== */";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
 `;
 
 exports[`css > sourcemap > should generate sourcemap for processed 'inline-transform' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$5,{});
+cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$4,{});
+cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zdHlsIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBTztFQUNQLGdCQUFZO0FBQ2QiLCJzb3VyY2VzQ29udGVudCI6WyIuc3R5bHVzXG4gIGNvbG9yOiByZWRcbiAgYmFja2dyb3VuZDogQGNvbG9yXG4iXX0= */";
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5wY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLnBjc3Mge1xuICAgIGNvbG9yOiByZWQ7XG59XG4iXX0= */";
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiIsInNvdXJjZXNDb250ZW50IjpbIi5zYXNzIHtcbiAgd2lkdGg6IDMwJTtcbiAgY29sb3I6IHJlZDtcbn0iXX0= */";
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBO0VBQ0ksY0FBQTtBQUZKIiwic291cmNlc0NvbnRlbnQiOlsiQG5pY2UtYmx1ZTogIzViODNhZDtcbkBsaWdodC1ibHVlOiBAbmljZS1ibHVlICsgIzExMTtcblxuLmxlc3Mge1xuICAgIGNvbG9yOiBAbGlnaHQtYmx1ZTtcbn1cbiJdfQ== */";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
@@ -6904,144 +4329,50 @@ console.log(css$5, css$4);
 exports[`css > sourcemap > should generate sourcemap for processed 'no-content' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
-injectCss(css$5,{});
+cssStyleInject.cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
-injectCss(css$4,{});
+cssStyleInject.cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zdHlsIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBTztFQUNQLGdCQUFZO0FBQ2QifQ== */";
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5wY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiJ9 */";
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBO0VBQ0ksY0FBQTtBQUZKIn0= */";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
 `;
 
 exports[`css > sourcemap > should generate sourcemap for processed 'no-content' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
-injectCss(css$5,{});
+cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
-injectCss(css$4,{});
+cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zdHlsIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBTztFQUNQLGdCQUFZO0FBQ2QifQ== */";
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5wY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiJ9 */";
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBO0VBQ0ksY0FBQTtBQUZKIn0= */";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
@@ -7050,144 +4381,50 @@ console.log(css$5, css$4);
 exports[`css > sourcemap > should generate sourcemap for processed 'transform' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$5,{});
+cssStyleInject.cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$4,{});
+cssStyleInject.cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zdHlsIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBTztFQUNQLGdCQUFZO0FBQ2QiLCJzb3VyY2VzQ29udGVudCI6WyIuc3R5bHVzXG4gIGNvbG9yOiByZWRcbiAgYmFja2dyb3VuZDogQGNvbG9yXG4iXX0= */";
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5wY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLnBjc3Mge1xuICAgIGNvbG9yOiByZWQ7XG59XG4iXX0= */";
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiIsInNvdXJjZXNDb250ZW50IjpbIi5zYXNzIHtcbiAgd2lkdGg6IDMwJTtcbiAgY29sb3I6IHJlZDtcbn0iXX0= */";
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBO0VBQ0ksY0FBQTtBQUZKIiwic291cmNlc0NvbnRlbnQiOlsiQG5pY2UtYmx1ZTogIzViODNhZDtcbkBsaWdodC1ibHVlOiBAbmljZS1ibHVlICsgIzExMTtcblxuLmxlc3Mge1xuICAgIGNvbG9yOiBAbGlnaHQtYmx1ZTtcbn1cbiJdfQ== */";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
 `;
 
 exports[`css > sourcemap > should generate sourcemap for processed 'transform' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$5,{});
+cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$4,{});
+cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zdHlsIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBTztFQUNQLGdCQUFZO0FBQ2QiLCJzb3VyY2VzQ29udGVudCI6WyIuc3R5bHVzXG4gIGNvbG9yOiByZWRcbiAgYmFja2dyb3VuZDogQGNvbG9yXG4iXX0= */";
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5wY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLnBjc3Mge1xuICAgIGNvbG9yOiByZWQ7XG59XG4iXX0= */";
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiIsInNvdXJjZXNDb250ZW50IjpbIi5zYXNzIHtcbiAgd2lkdGg6IDMwJTtcbiAgY29sb3I6IHJlZDtcbn0iXX0= */";
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBO0VBQ0ksY0FBQTtBQUZKIiwic291cmNlc0NvbnRlbnQiOlsiQG5pY2UtYmx1ZTogIzViODNhZDtcbkBsaWdodC1ibHVlOiBAbmljZS1ibHVlICsgIzExMTtcblxuLmxlc3Mge1xuICAgIGNvbG9yOiBAbGlnaHQtYmx1ZTtcbn1cbiJdfQ== */";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
@@ -7196,144 +4433,50 @@ console.log(css$5, css$4);
 exports[`css > sourcemap > should generate sourcemap for processed 'true' css > js 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+const cssStyleInject = require('@visulima/css-style-inject');
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$5,{});
+cssStyleInject.cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$4,{});
+cssStyleInject.cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zdHlsIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBTztFQUNQLGdCQUFZO0FBQ2QiLCJzb3VyY2VzQ29udGVudCI6WyIuc3R5bHVzXG4gIGNvbG9yOiByZWRcbiAgYmFja2dyb3VuZDogQGNvbG9yXG4iXX0= */";
-injectCss(css$3,{});
+cssStyleInject.cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5wY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLnBjc3Mge1xuICAgIGNvbG9yOiByZWQ7XG59XG4iXX0= */";
-injectCss(css$2,{});
+cssStyleInject.cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiIsInNvdXJjZXNDb250ZW50IjpbIi5zYXNzIHtcbiAgd2lkdGg6IDMwJTtcbiAgY29sb3I6IHJlZDtcbn0iXX0= */";
-injectCss(css$1,{});
+cssStyleInject.cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBO0VBQ0ksY0FBQTtBQUZKIiwic291cmNlc0NvbnRlbnQiOlsiQG5pY2UtYmx1ZTogIzViODNhZDtcbkBsaWdodC1ibHVlOiBAbmljZS1ibHVlICsgIzExMTtcblxuLmxlc3Mge1xuICAgIGNvbG9yOiBAbGlnaHQtYmx1ZTtcbn1cbiJdfQ== */";
-injectCss(css,{});
+cssStyleInject.cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "
 `;
 
 exports[`css > sourcemap > should generate sourcemap for processed 'true' css > js 2`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-var __defProp2 = Object.defineProperty;
-var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-const containers = [];
-const styleTags = [];
-const injectCss = /* @__PURE__ */ __name2((css, options) => {
-  if (!css || typeof document === "undefined") {
-    return;
-  }
-  const position = options.prepend === true ? "prepend" : "append";
-  const singleTag = options.singleTag === true;
-  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
-  if (!container) {
-    throw new Error("Unable to find container element");
-  }
-  const createStyleTag = /* @__PURE__ */ __name2(() => {
-    const styleTag2 = document.createElement("style");
-    styleTag2.setAttribute("type", "text/css");
-    if (options.attributes) {
-      Object.entries(options.attributes).forEach(([key, value]) => {
-        styleTag2.setAttribute(key, value);
-      });
-    }
-    const pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag2);
-    return styleTag2;
-  }, "createStyleTag");
-  let styleTag;
-  if (singleTag) {
-    let id = containers.indexOf(container);
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-    if (!styleTags[id][position]) {
-      styleTags[id][position] = createStyleTag();
-    }
-    styleTag = styleTags[id][position];
-  } else {
-    styleTag = createStyleTag();
-  }
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.append(document.createTextNode(css));
-  }
-}, "default");
+"import { cssStyleInject } from '@visulima/css-style-inject';
 
 var css$5 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$5,{});
+cssStyleInject(css$5,{});
 
 var css$4 = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
-injectCss(css$4,{});
+cssStyleInject(css$4,{});
 
 var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zdHlsIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBTztFQUNQLGdCQUFZO0FBQ2QiLCJzb3VyY2VzQ29udGVudCI6WyIuc3R5bHVzXG4gIGNvbG9yOiByZWRcbiAgYmFja2dyb3VuZDogQGNvbG9yXG4iXX0= */";
-injectCss(css$3,{});
+cssStyleInject(css$3,{});
 
 var css$2 = ".pcss {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5wY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLnBjc3Mge1xuICAgIGNvbG9yOiByZWQ7XG59XG4iXX0= */";
-injectCss(css$2,{});
+cssStyleInject(css$2,{});
 
 var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLFVBQVU7QUFDWiIsInNvdXJjZXNDb250ZW50IjpbIi5zYXNzIHtcbiAgd2lkdGg6IDMwJTtcbiAgY29sb3I6IHJlZDtcbn0iXX0= */";
-injectCss(css$1,{});
+cssStyleInject(css$1,{});
 
 var css = ".less {\\n  color: #6c94be;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zdHlsZS5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBO0VBQ0ksY0FBQTtBQUZKIiwic291cmNlc0NvbnRlbnQiOlsiQG5pY2UtYmx1ZTogIzViODNhZDtcbkBsaWdodC1ibHVlOiBAbmljZS1ibHVlICsgIzExMTtcblxuLmxlc3Mge1xuICAgIGNvbG9yOiBAbGlnaHQtYmx1ZTtcbn1cbiJdfQ== */";
-injectCss(css,{});
+cssStyleInject(css,{});
 
 console.log(css$5, css$4);
 "

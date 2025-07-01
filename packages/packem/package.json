@@ -71,268 +71,81 @@
     "type": "module",
     "exports": {
         ".": {
-            "import": {
-                "types": "./dist/index.d.mts",
-                "default": "./dist/index.mjs"
-            },
-            "require": {
-                "types": "./dist/index.d.cts",
-                "default": "./dist/index.cjs"
-            }
+            "types": "./dist/index.d.mts",
+            "default": "./dist/index.mjs"
         },
         "./config": {
-            "import": {
-                "types": "./dist/config/index.d.mts",
-                "default": "./dist/config/index.mjs"
-            },
-            "require": {
-                "types": "./dist/config/index.d.cts",
-                "default": "./dist/config/index.cjs"
-            }
-        },
-        "./transformer/esbuild": {
-            "import": {
-                "types": "./dist/rollup/plugins/esbuild/index.d.mts",
-                "default": "./dist/rollup/plugins/esbuild/index.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/esbuild/index.d.cts",
-                "default": "./dist/rollup/plugins/esbuild/index.cjs"
-            }
-        },
-        "./transformer/swc": {
-            "import": {
-                "types": "./dist/rollup/plugins/swc/swc-plugin.d.mts",
-                "default": "./dist/rollup/plugins/swc/swc-plugin.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/swc/swc-plugin.d.cts",
-                "default": "./dist/rollup/plugins/swc/swc-plugin.cjs"
-            }
-        },
-        "./dts/isolated/transformer/swc": {
-            "import": {
-                "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.mts",
-                "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.cts",
-                "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.cjs"
-            }
-        },
-        "./dts/isolated/transformer/oxc": {
-            "import": {
-                "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.mts",
-                "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.cts",
-                "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.cjs"
-            }
-        },
-        "./dts/isolated/transformer/typescript": {
-            "import": {
-                "types": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.mts",
-                "default": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.cts",
-                "default": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.cjs"
-            }
-        },
-        "./transformer/sucrase": {
-            "import": {
-                "types": "./dist/rollup/plugins/sucrase/index.d.mts",
-                "default": "./dist/rollup/plugins/sucrase/index.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/sucrase/index.d.cts",
-                "default": "./dist/rollup/plugins/sucrase/index.cjs"
-            }
-        },
-        "./transformer/oxc": {
-            "import": {
-                "types": "./dist/rollup/plugins/oxc/oxc-transformer.d.mts",
-                "default": "./dist/rollup/plugins/oxc/oxc-transformer.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/oxc/oxc-transformer.d.cts",
-                "default": "./dist/rollup/plugins/oxc/oxc-transformer.cjs"
-            }
-        },
-        "./builder/typedoc": {
-            "import": {
-                "types": "./dist/builder/typedoc/index.d.mts",
-                "default": "./dist/builder/typedoc/index.mjs"
-            },
-            "require": {
-                "types": "./dist/builder/typedoc/index.d.cts",
-                "default": "./dist/builder/typedoc/index.cjs"
-            }
-        },
-        "./runtime/inject-css": {
-            "import": {
-                "types": "./dist/rollup/plugins/css/runtime/inject-css.d.mts",
-                "default": "./dist/rollup/plugins/css/runtime/inject-css.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/css/runtime/inject-css.d.cts",
-                "default": "./dist/rollup/plugins/css/runtime/inject-css.cjs"
-            }
+            "types": "./dist/config/index.d.mts",
+            "default": "./dist/config/index.mjs"
         },
         "./css/loader/sourcemap": {
-            "import": {
-                "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.mts",
-                "default": "./dist/rollup/plugins/css/loaders/sourcemap.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.cts",
-                "default": "./dist/rollup/plugins/css/loaders/sourcemap.cjs"
-            }
+            "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.mts",
+            "default": "./dist/rollup/plugins/css/loaders/sourcemap.mjs"
         },
         "./css/loader/less": {
-            "import": {
-                "types": "./dist/rollup/plugins/css/loaders/less/index.d.mts",
-                "default": "./dist/rollup/plugins/css/loaders/less/index.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/css/loaders/less/index.d.cts",
-                "default": "./dist/rollup/plugins/css/loaders/less/index.cjs"
-            }
+            "types": "./dist/rollup/plugins/css/loaders/less.d.mts",
+            "default": "./dist/rollup/plugins/css/loaders/less.mjs"
         },
         "./css/loader/postcss": {
-            "import": {
-                "types": "./dist/rollup/plugins/css/loaders/postcss/index.d.mts",
-                "default": "./dist/rollup/plugins/css/loaders/postcss/index.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/css/loaders/postcss/index.d.cts",
-                "default": "./dist/rollup/plugins/css/loaders/postcss/index.cjs"
-            }
+            "types": "./dist/rollup/plugins/css/loaders/postcss.d.mts",
+            "default": "./dist/rollup/plugins/css/loaders/postcss.mjs"
         },
         "./css/loader/sass": {
-            "import": {
-                "types": "./dist/rollup/plugins/css/loaders/sass/index.d.mts",
-                "default": "./dist/rollup/plugins/css/loaders/sass/index.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/css/loaders/sass/index.d.cts",
-                "default": "./dist/rollup/plugins/css/loaders/sass/index.cjs"
-            }
+            "types": "./dist/rollup/plugins/css/loaders/sass.d.mts",
+            "default": "./dist/rollup/plugins/css/loaders/sass.mjs"
         },
         "./css/loader/stylus": {
-            "import": {
-                "types": "./dist/rollup/plugins/css/loaders/stylus/index.d.mts",
-                "default": "./dist/rollup/plugins/css/loaders/stylus/index.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/css/loaders/stylus/index.d.cts",
-                "default": "./dist/rollup/plugins/css/loaders/stylus/index.cjs"
-            }
+            "types": "./dist/rollup/plugins/css/loaders/stylus.d.mts",
+            "default": "./dist/rollup/plugins/css/loaders/stylus.mjs"
         },
         "./css/loader/lightningcss": {
-            "import": {
-                "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.mts",
-                "default": "./dist/rollup/plugins/css/loaders/lightningcss.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.cts",
-                "default": "./dist/rollup/plugins/css/loaders/lightningcss.cjs"
-            }
+            "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.mts",
+            "default": "./dist/rollup/plugins/css/loaders/lightningcss.mjs"
         },
         "./css/minifier/cssnano": {
-            "import": {
-                "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.mts",
-                "default": "./dist/rollup/plugins/css/minifiers/cssnano.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.cts",
-                "default": "./dist/rollup/plugins/css/minifiers/cssnano.cjs"
-            }
+            "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.mts",
+            "default": "./dist/rollup/plugins/css/minifiers/cssnano.mjs"
         },
         "./css/minifier/lightningcss": {
-            "import": {
-                "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.mts",
-                "default": "./dist/rollup/plugins/css/minifiers/lightningcss.mjs"
-            },
-            "require": {
-                "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.cts",
-                "default": "./dist/rollup/plugins/css/minifiers/lightningcss.cjs"
-            }
+            "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.mts",
+            "default": "./dist/rollup/plugins/css/minifiers/lightningcss.mjs"
+        },
+        "./transformer/esbuild": {
+            "types": "./dist/rollup/plugins/esbuild/index.d.mts",
+            "default": "./dist/rollup/plugins/esbuild/index.mjs"
+        },
+        "./transformer/swc": {
+            "types": "./dist/rollup/plugins/swc/swc-plugin.d.mts",
+            "default": "./dist/rollup/plugins/swc/swc-plugin.mjs"
+        },
+        "./dts/isolated/transformer/swc": {
+            "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.mts",
+            "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.mjs"
+        },
+        "./dts/isolated/transformer/oxc": {
+            "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.mts",
+            "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.mjs"
+        },
+        "./dts/isolated/transformer/typescript": {
+            "types": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.mts",
+            "default": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.mjs"
+        },
+        "./transformer/sucrase": {
+            "types": "./dist/rollup/plugins/sucrase/index.d.mts",
+            "default": "./dist/rollup/plugins/sucrase/index.mjs"
+        },
+        "./transformer/oxc": {
+            "types": "./dist/rollup/plugins/oxc/oxc-transformer.d.mts",
+            "default": "./dist/rollup/plugins/oxc/oxc-transformer.mjs"
+        },
+        "./builder/typedoc": {
+            "types": "./dist/builder/typedoc/index.d.mts",
+            "default": "./dist/builder/typedoc/index.mjs"
         },
         "./files": {
-            "import": {
-                "types": "./files.d.ts"
-            },
-            "require": {
-                "types": "./files.d.ts"
-            }
+            "types": "./files.d.ts"
         },
         "./package.json": "./package.json"
-    },
-    "main": "dist/index.cjs",
-    "module": "dist/index.mjs",
-    "types": "dist/index.d.ts",
-    "typesVersions": {
-        ">=5.5": {
-            ".": [
-                "./dist/index.d.ts"
-            ],
-            "config": [
-                "./dist/config/index.d.ts"
-            ],
-            "transformer/esbuild": [
-                "./dist/rollup/plugins/esbuild/index.d.ts"
-            ],
-            "transformer/swc": [
-                "./dist/rollup/plugins/swc/swc-plugin.d.ts"
-            ],
-            "dts/isolated/transformer/swc": [
-                "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.ts"
-            ],
-            "dts/isolated/transformer/oxc": [
-                "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.ts"
-            ],
-            "dts/isolated/transformer/typescript": [
-                "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.ts"
-            ],
-            "transformer/sucrase": [
-                "./dist/rollup/plugins/sucrase/index.d.ts"
-            ],
-            "transformer/oxc": [
-                "./dist/rollup/plugins/oxc/oxc-transformer.d.ts"
-            ],
-            "builder/typedoc": [
-                "./dist/builder/typedoc/index.d.ts"
-            ],
-            "runtime/inject-css": [
-                "./dist/rollup/plugins/css/runtime/inject-css.d.ts"
-            ],
-            "css/loader/sourcemap": [
-                "./dist/rollup/plugins/css/loaders/sourcemap.d.ts"
-            ],
-            "css/loader/less": [
-                "./dist/rollup/plugins/css/loaders/less/index.d.ts"
-            ],
-            "css/loader/postcss": [
-                "./dist/rollup/plugins/css/loaders/postcss/index.d.ts"
-            ],
-            "css/loader/sass": [
-                "./dist/rollup/plugins/css/loaders/sass/index.d.ts"
-            ],
-            "css/loader/stylus": [
-                "./dist/rollup/plugins/css/loaders/stylus/index.d.ts"
-            ],
-            "css/loader/lightningcss": [
-                "./dist/rollup/plugins/css/loaders/lightningcss.d.ts"
-            ],
-            "css/minifier/cssnano": [
-                "./dist/rollup/plugins/css/minifiers/cssnano.d.ts"
-            ],
-            "css/minifier/lightningcss": [
-                "./dist/rollup/plugins/css/minifiers/lightningcss.d.ts"
-            ]
-        }
     },
     "bin": {
         "packem": "./dist/cli/index.mjs"
@@ -362,8 +175,40 @@
     },
     "dependencies": {
         "@antfu/install-pkg": "1.1.0",
-        "@babel/parser": "7.27.5",
         "@clack/prompts": "0.11.0",
+        "@rollup/pluginutils": "5.2.0",
+        "@visulima/cerebro": "1.1.46",
+        "@visulima/colorize": "1.4.23",
+        "@visulima/find-cache-dir": "1.0.31",
+        "@visulima/fs": "3.1.5",
+        "@visulima/humanizer": "1.2.2",
+        "@visulima/package": "3.5.8",
+        "@visulima/packem-rollup": "workspace:*",
+        "@visulima/packem-share": "workspace:*",
+        "@visulima/pail": "2.1.25",
+        "@visulima/path": "1.4.0",
+        "@visulima/rollup-css-plugin": "workspace:*",
+        "@visulima/source-map": "1.0.20",
+        "@visulima/tsconfig": "1.1.19",
+        "browserslist": "4.25.1",
+        "defu": "6.1.4",
+        "fastest-levenshtein": "1.0.16",
+        "hookable": "5.5.3",
+        "jiti": "2.4.2",
+        "magic-string": "0.30.17",
+        "mlly": "1.7.4",
+        "picomatch": "4.0.2",
+        "rollup": "4.44.1",
+        "semver": "7.7.2",
+        "tinyexec": "1.0.1",
+        "tinyglobby": "0.2.14"
+    },
+    "devDependencies": {
+        "@anolilab/eslint-config": "^16.2.13",
+        "@anolilab/semantic-release-pnpm": "^2.0.0",
+        "@anolilab/semantic-release-preset": "^11.0.0",
+        "@arethetypeswrong/cli": "^0.18.2",
+        "@babel/parser": "7.27.7",
         "@csstools/css-parser-algorithms": "3.0.5",
         "@csstools/css-tokenizer": "3.0.4",
         "@csstools/postcss-slow-plugins": "^2.0.0",
@@ -375,69 +220,16 @@
         "@rollup/plugin-node-resolve": "16.0.1",
         "@rollup/plugin-replace": "6.0.2",
         "@rollup/plugin-wasm": "6.2.2",
-        "@rollup/pluginutils": "5.2.0",
-        "@visulima/cerebro": "1.1.46",
-        "@visulima/colorize": "1.4.23",
-        "@visulima/find-cache-dir": "1.0.31",
-        "@visulima/fs": "3.1.5",
-        "@visulima/humanizer": "1.2.2",
-        "@visulima/package": "3.5.8",
-        "@visulima/pail": "2.1.25",
-        "@visulima/path": "1.4.0",
-        "@visulima/source-map": "1.0.20",
-        "@visulima/tsconfig": "1.1.19",
-        "browserslist": "4.25.0",
-        "defu": "6.1.4",
-        "es-module-lexer": "1.7.0",
-        "fastest-levenshtein": "1.0.16",
-        "glob-parent": "6.0.2",
-        "hookable": "5.5.3",
-        "jiti": "2.4.2",
-        "magic-string": "0.30.17",
-        "mlly": "1.7.4",
-        "oxc-parser": "0.74.0",
-        "oxc-resolver": "11.2.0",
-        "picomatch": "^4.0.2",
-        "rollup": "4.44.0",
-        "rollup-plugin-dts": "6.2.1",
-        "rollup-plugin-license": "3.6.0",
-        "rollup-plugin-polyfill-node": "0.13.0",
-        "rollup-plugin-pure": "^0.4.0",
-        "rollup-plugin-visualizer": "6.0.3",
-        "semver": "7.7.2",
-        "source-map-js": "1.2.1",
-        "tinyexec": "1.0.1",
-        "tinyglobby": "0.2.14"
-    },
-    "devDependencies": {
-        "@anolilab/eslint-config": "^16.2.13",
-        "@anolilab/semantic-release-pnpm": "^2.0.0",
-        "@anolilab/semantic-release-preset": "^11.0.0",
-        "@arethetypeswrong/cli": "^0.18.2",
-        "@babel/core": "^7.27.4",
-        "@oxc-parser/binding-linux-x64-gnu": "0.74.0",
-        "@oxc-project/types": "0.74.0",
         "@secretlint/secretlint-rule-preset-recommend": "^10.1.1",
         "@svgr/core": "^8.1.0",
-        "@swc/core": "^1.12.6",
+        "@swc/core": "^1.12.7",
         "@swc/types": "0.1.23",
         "@total-typescript/ts-reset": "^0.6.1",
-        "@types/estree": "^1.0.8",
-        "@types/glob": "^8.1.0",
-        "@types/glob-parent": "^5.1.3",
-        "@types/icss-utils": "^5.1.2",
-        "@types/is-glob": "^4.0.4",
-        "@types/less": "3.0.8",
-        "@types/node": "24.0.3",
-        "@types/node-sass": "^4.11.8",
+        "@types/node": "24.0.7",
         "@types/picomatch": "^4.0.0",
-        "@types/postcss-modules-local-by-default": "^4.0.2",
-        "@types/postcss-modules-scope": "^3.0.4",
-        "@types/react": "^19.1.8",
         "@types/react-dom": "^19.1.6",
         "@types/semver": "^7.7.0",
-        "@types/stylus": "^0.48.43",
-        "@types/uglifycss": "^0.0.11",
+        "@visulima/css-style-inject": "workspace:*",
         "@vitest/coverage-v8": "^3.2.4",
         "@vitest/ui": "^3.2.4",
         "conventional-changelog-conventionalcommits": "9.0.0",
@@ -445,18 +237,18 @@
         "cssnano": "7.0.7",
         "deeks": "^3.1.1",
         "detect-indent": "^7.0.1",
+        "es-module-lexer": "1.7.0",
         "esbuild": "^0.25.5",
-        "eslint": "9.29.0",
-        "estree-walker": "^3.0.3",
+        "eslint": "9.30.0",
         "execa": "^9.6.0",
+        "glob-parent": "6.0.2",
         "icss-utils": "^5.1.0",
         "less": "^4.3.0",
         "lightningcss": "1.30.1",
-        "mime": "4.0.7",
         "minireset.css": "0.0.7",
-        "node-sass": "^9.0.0",
-        "oxc-transform": "^0.74.0",
-        "p-queue": "^8.1.0",
+        "oxc-parser": "0.75.0",
+        "oxc-resolver": "11.3.0",
+        "oxc-transform": "^0.75.0",
         "postcss": "^8.5.6",
         "postcss-custom-properties": "14.0.6",
         "postcss-load-config": "^6.0.1",
@@ -468,18 +260,23 @@
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
         "rimraf": "^6.0.1",
+        "rollup-plugin-dts": "6.2.1",
+        "rollup-plugin-license": "3.6.0",
         "rollup-plugin-lit-css": "^5.0.2",
+        "rollup-plugin-polyfill-node": "0.13.0",
+        "rollup-plugin-pure": "^0.4.0",
+        "rollup-plugin-visualizer": "6.0.3",
         "sass": "^1.89.2",
         "sass-embedded": "^1.89.2",
         "secretlint": "10.1.1",
-        "semantic-release": "^24.2.5",
-        "sort-package-json": "3.3.0",
+        "semantic-release": "^24.2.6",
+        "sort-package-json": "3.3.1",
         "stylus": "^0.64.0",
         "sucrase": "^3.35.0",
         "sugarss": "5.0.0",
         "tempy": "^3.1.0",
         "tree-kill": "^1.2.2",
-        "typedoc": "0.28.5",
+        "typedoc": "0.28.7",
         "typedoc-plugin-markdown": "4.7.0",
         "typedoc-plugin-rename-defaults": "0.7.3",
         "typescript": "^5.8.3",
@@ -492,7 +289,6 @@
         "icss-utils": ">=5.1.0",
         "less": ">=4.2.0",
         "lightningcss": ">=1.27.0",
-        "node-sass": ">=9.0.0",
         "oxc-transform": ">=0.20.0",
         "postcss": ">=8.4.47",
         "postcss-load-config": ">=6.0.1",
@@ -530,9 +326,6 @@
             "optional": true
         },
         "lightningcss": {
-            "optional": true
-        },
-        "node-sass": {
             "optional": true
         },
         "oxc-transform": {
@@ -585,7 +378,7 @@
         }
     },
     "engines": {
-        "node": ">=18.* <=24.*"
+        "node": ">=20.* <=24.*"
     },
     "publishConfig": {
         "access": "public",

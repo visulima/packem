@@ -4,20 +4,17 @@ import { readdir, rm } from "node:fs/promises";
 
 import { isAccessibleSync, readFileSync } from "@visulima/fs";
 import { dirname, join } from "@visulima/path";
+import type { StyleOptions } from "@visulima/rollup-css-plugin";
+import type { LESSLoaderOptions } from "@visulima/rollup-css-plugin/less";
+import { inferModeOption, inferSourceMapOption } from "@visulima/rollup-css-plugin/utils";
 import type { OutputOptions } from "rollup";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import packageJson from "../../package.json";
-import type { LESSLoaderOptions } from "../../src/rollup/plugins/css/loaders/less/types";
-import type { StyleOptions } from "../../src/rollup/plugins/css/types";
-import { inferModeOption, inferSourceMapOption } from "../../src/rollup/plugins/css/utils/options";
 import type { PackemConfigProperties } from "../helpers";
 import { createPackageJson, createPackemConfig, execPackem, installPackage } from "../helpers";
 
 const fixturePath = join(__dirname, "../..", "__fixtures__", "css");
-
-const splitedNodeJsVersion = process.versions.node.split(".");
 
 type BaseWriteData = {
     dependencies?: Record<string, string>;
@@ -717,31 +714,6 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             //     },
             //     title: "sass - import",
             // },
-        ] as WriteData[])("should work with sass/scss processed $title css", async ({ title, ...data }) => {
-            await validate(data);
-        });
-    });
-
-    // This test will only run if node-sass is installed and node is not higher then v20
-    describe.skipIf(Number(splitedNodeJsVersion[0]) >= 20)("node-sass", () => {
-        // eslint-disable-next-line vitest/prefer-expect-assertions,vitest/expect-expect
-        it.skipIf(!Object.keys(packageJson.devDependencies).includes("node-sass")).each([
-            {
-                input: "sass/index.js",
-                styleOptions: {
-                    sass: {
-                        implementation: "node-sass",
-                    },
-                },
-                title: "node-sass - default",
-            },
-            {
-                input: "sass-data/index.js",
-                styleOptions: {
-                    sass: { additionalData: "@import 'data';", implementation: "node-sass" },
-                },
-                title: "node-sass - data",
-            },
         ] as WriteData[])("should work with sass/scss processed $title css", async ({ title, ...data }) => {
             await validate(data);
         });

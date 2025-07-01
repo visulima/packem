@@ -1,6 +1,8 @@
-import { VALID_EXPORT_EXTENSIONS } from "../../constants";
-import type { BuildContext, ValidationOptions } from "../../types";
-import warn from "../../utils/warn";
+import { VALID_EXPORT_EXTENSIONS } from "@visulima/packem-share/constants";
+import type { BuildContext } from "@visulima/packem-share/types";
+import { warn } from "@visulima/packem-share/utils";
+
+import type { InternalBuildOptions, ValidationOptions } from "../../types";
 
 /**
  * Validates the exports field according to Node.js specification.
@@ -11,7 +13,7 @@ import warn from "../../utils/warn";
  * @see https://nodejs.org/api/packages.html#subpath-exports Documentation for subpath exports patterns
  * @see https://nodejs.org/api/packages.html#exports-sugar Simplified syntax for exports field
  */
-const validateExports = (context: BuildContext, exports: unknown): void => {
+const validateExports = (context: BuildContext<InternalBuildOptions>, exports: unknown): void => {
     const validation = context.options.validation as ValidationOptions;
 
     if (validation.packageJson?.exports === false) {
