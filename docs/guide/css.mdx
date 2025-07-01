@@ -92,38 +92,21 @@ Configure CSS processing in your `packem.config.ts`:
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import lessLoader from '@visulima/packem/css/loader/less'
 
 export default defineConfig({
-  css: {
-    // CSS processing options
-    extract: true,
-    modules: false,
-    minimize: true,
-    
-    // PostCSS configuration
-    postcss: {
-      plugins: [
-        'autoprefixer',
-        'cssnano'
-      ]
-    },
-    
-    // Preprocessor options
-    preprocessors: {
-      sass: {
-        implementation: 'sass',
-        options: {
-          outputStyle: 'compressed'
-        }
-      },
+  transformer,
+  
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [lessLoader],
       less: {
         options: {
-          math: 'parens-division'
-        }
-      },
-      stylus: {
-        options: {
-          compress: true
+          math: 'parens-division',
+          paths: ['node_modules', 'src/styles'],
+          sourceMap: {}
         }
       }
     }
@@ -232,9 +215,17 @@ npm install --save-dev less
 ### Configuration
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import lessLoader from '@visulima/packem/css/loader/less'
+
 export default defineConfig({
-  css: {
-    preprocessors: {
+  transformer,
+  
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [lessLoader],
       less: {
         options: {
           math: 'parens-division',
@@ -282,9 +273,17 @@ button-style(bg-color)
 ### Configuration
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import stylusLoader from '@visulima/packem/css/loader/stylus'
+
 export default defineConfig({
-  css: {
-    preprocessors: {
+  transformer,
+  
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [stylusLoader],
       stylus: {
         options: {
           compress: true,
@@ -327,14 +326,24 @@ module.exports = {
 Or configure directly in Packen:
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+
 export default defineConfig({
-  css: {
-    postcss: {
-      plugins: [
-        'autoprefixer',
-        ['postcss-custom-properties', { preserve: false }],
-        ['cssnano', { preset: 'default' }]
-      ]
+  transformer,
+  
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+      postcss: {
+        plugins: [
+          'autoprefixer',
+          ['postcss-custom-properties', { preserve: false }],
+          ['cssnano', { preset: 'default' }]
+        ]
+      }
     }
   }
 })
@@ -355,15 +364,25 @@ CSS Modules provide locally scoped CSS to avoid naming conflicts.
 ### Enable CSS Modules
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  css: {
-    modules: true,
-    // or with options
-    modules: {
-      scopeBehaviour: 'local',
-      generateScopedName: '[name]__[local]___[hash:base64:5]',
-      hashPrefix: 'prefix',
-      exportGlobals: true
+  transformer,
+  
+  rollup: {
+    css: {
+      mode: 'extract',
+      autoModules: true,
+      // or with options
+      postcss: {
+        modules: {
+          scopeBehaviour: 'local',
+          generateScopedName: '[name]__[local]___[hash:base64:5]',
+          hashPrefix: 'prefix',
+          exportGlobals: true
+        }
+      }
     }
   }
 })

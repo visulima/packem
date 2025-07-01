@@ -101,29 +101,53 @@ Packen provides extensive configuration options to customize your build process.
 
 ```typescript
 // packem.config.ts
-import { defineConfig } from '@visulima/packem'
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
 export default defineConfig({
-  // Entry points
-  entry: './src/index.ts',
+  // Entry points (auto-detected from package.json if not specified)
+  entries: ['./src/index.ts'],
   
-  // Output configuration
+  // Transformer selection
+  transformer,
+  
+  // Build options
+  runtime: 'node', // or 'browser'
+  minify: true,
+  sourcemap: true,
+  declaration: true,
+  clean: true,
+  
+  // Rollup-specific configuration
   rollup: {
+    // Output configuration
     output: {
       format: 'esm',
       dir: 'dist'
+    },
+    
+    // External dependencies
+    external: ['react', 'react-dom'],
+    
+    // Plugins
+    plugins: [
+      // Custom rollup plugins
+    ],
+    
+    // CSS processing
+    css: {
+      mode: 'extract',
+      minifier: true
+    },
+    
+    // Other rollup options
+    treeshake: true,
+    watch: {
+      include: 'src/**'
     }
   },
   
-  // Build options
-  target: 'es2020',
-  minify: true,
-  sourcemap: true,
-  
-  // Development
-  watch: true,
-  
-  // Lifecycle hooks
+  // Build lifecycle hooks
   hooks: {
     'build:before': async () => {
       console.log('Starting build...')
@@ -165,7 +189,7 @@ Configure what files to process and where to output the results.
 
 ```typescript
 export default defineConfig({
-  entry: ['src/index.ts', 'src/cli.ts'],
+  entries: ['src/index.ts', 'src/cli.ts'],
   
   rollup: {
     output: [
@@ -180,14 +204,16 @@ export default defineConfig({
 Control how your code is transformed and optimized.
 
 ```typescript
+import transformer from '@visulima/packem/transformer/esbuild'
+
 export default defineConfig({
-  transformer: 'esbuild',
-  target: 'es2020',
+  transformer,
+  runtime: 'browser',
   minify: true,
   
-  esbuild: {
-    jsx: 'automatic',
-    platform: 'node'
+  rollup: {
+    // Transformer-specific options would go in the transformer import
+    // Most other options go here
   }
 })
 ```
@@ -197,12 +223,12 @@ Configure the development workflow and debugging experience.
 
 ```typescript
 export default defineConfig({
-  watch: true,
   sourcemap: true,
   
-  server: {
-    port: 3000,
-    hmr: true
+  rollup: {
+    watch: {
+      include: 'src/**/*'
+    }
   }
 })
 ```
@@ -216,7 +242,13 @@ export default defineConfig({
     external: ['react', 'react-dom'],
     plugins: [
       // Custom plugins
-    ]
+    ],
+    
+    treeshake: true,
+    
+    css: {
+      mode: 'extract'
+    }
   },
   
   hooks: {
@@ -249,14 +281,14 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   ...(process.env.BUILD_LIB && {
-    entry: 'src/lib.ts',
+    entries: ['src/lib.ts'],
     rollup: {
       external: ['react', 'react-dom']
     }
   }),
   
   ...(process.env.BUILD_APP && {
-    entry: 'src/app.ts',
+    entries: ['src/app.ts'],
     minify: true
   })
 })
@@ -277,7 +309,9 @@ Packen automatically validates your configuration and provides helpful error mes
 
 ```typescript
 export default defineConfig({
-  entry: 'src/index.ts',
+  entries: ['src/index.ts'],
+  declaration: true,
+  minify: true,
   
   rollup: {
     external: ['react', 'react-dom'],
@@ -285,10 +319,7 @@ export default defineConfig({
       { format: 'esm', file: 'dist/index.mjs' },
       { format: 'cjs', file: 'dist/index.cjs' }
     ]
-  },
-  
-  declaration: true,
-  minify: true
+  }
 })
 ```
 
@@ -296,7 +327,9 @@ export default defineConfig({
 
 ```typescript
 export default defineConfig({
-  entry: 'src/main.ts',
+  entries: ['src/main.ts'],
+  minify: true,
+  sourcemap: false,
   
   rollup: {
     output: {
@@ -304,10 +337,7 @@ export default defineConfig({
       file: 'dist/app.js',
       name: 'MyApp'
     }
-  },
-  
-  minify: true,
-  sourcemap: false
+  }
 })
 ```
 
@@ -315,11 +345,11 @@ export default defineConfig({
 
 ```typescript
 export default defineConfig({
-  entry: {
-    core: 'packages/core/src/index.ts',
-    utils: 'packages/utils/src/index.ts',
-    ui: 'packages/ui/src/index.ts'
-  },
+  entries: [
+    { input: 'packages/core/src/index.ts', name: 'core' },
+    { input: 'packages/utils/src/index.ts', name: 'utils' },
+    { input: 'packages/ui/src/index.ts', name: 'ui' }
+  ],
   
   rollup: {
     output: {

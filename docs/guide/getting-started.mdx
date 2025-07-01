@@ -153,14 +153,16 @@ Create a `packem.config.ts` file in your project root:
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
 export default defineConfig({
   // Choose your transformer
-  transformer: 'esbuild', // or 'swc', 'oxc', 'sucrase', 'typescript'
+  transformer, // esbuild, swc, oxc, sucrase, or typescript
   
   // Enable development features
+  sourcemap: true,
+  
   rollup: {
-    sourcemap: true,
     watch: {
       include: 'src/**'
     }
@@ -230,9 +232,16 @@ export default {
 **packem.config.ts**
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
 export default defineConfig({
-  transformer: 'esbuild'
+  transformer,
+  sourcemap: true,
+  rollup: {
+    watch: {
+      include: 'src/**'
+    }
+  }
 })
 ```
 
