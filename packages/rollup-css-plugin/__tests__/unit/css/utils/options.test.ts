@@ -2,6 +2,14 @@ import { afterAll, describe, expect, it, vi } from "vitest";
 
 import { ensurePCSSOption } from "../../../../src/utils/options";
 
+// Mock RollupLogger
+const mockLogger = {
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+};
+
 describe("option", () => {
     const consoleDebugMock = vi.spyOn(console, "debug").mockImplementation(() => undefined);
 
@@ -13,7 +21,7 @@ describe("option", () => {
         expect.assertions(3);
 
         try {
-            await ensurePCSSOption("pumpinizer", "plugin", __dirname);
+            await ensurePCSSOption("pumpinizer", "plugin", __dirname, mockLogger);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             // eslint-disable-next-line vitest/no-conditional-expect
