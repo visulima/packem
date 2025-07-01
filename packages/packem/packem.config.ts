@@ -5,7 +5,6 @@ import { defineConfig } from "./src/config";
 export default defineConfig({
     cjsInterop: true,
     externals: [
-        "@visulima/css-style-inject",
         "@babel/parser",
         "@rollup/plugin-alias",
         "@rollup/plugin-commonjs",
