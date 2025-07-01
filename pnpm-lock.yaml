@@ -1005,9 +1005,6 @@ importers:
       '@types/semver':
         specifier: ^7.7.0
         version: 7.7.0
-      '@visulima/css-style-inject':
-        specifier: workspace:*
-        version: link:../css-style-inject
       '@vitest/coverage-v8':
         specifier: ^3.2.4
         version: 3.2.4(vitest@3.2.4)

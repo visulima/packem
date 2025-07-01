@@ -229,7 +229,6 @@
         "@types/picomatch": "^4.0.0",
         "@types/react-dom": "^19.1.6",
         "@types/semver": "^7.7.0",
-        "@visulima/css-style-inject": "workspace:*",
         "@vitest/coverage-v8": "^3.2.4",
         "@vitest/ui": "^3.2.4",
         "conventional-changelog-conventionalcommits": "9.0.0",
