@@ -33,7 +33,6 @@ const loader: Loader<SassLoaderOptions> = {
                 rootContext: this.cwd as string,
             },
             this.logger,
-            this.warn,
             this.options,
             code,
             this.useSourcemap,

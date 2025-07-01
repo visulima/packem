@@ -97,6 +97,7 @@ const consumeImports = (
 
             statements.push(commentsStmt);
 
+            // eslint-disable-next-line sonarjs/updated-loop-counter
             index = consumeIndex;
 
             continue;
@@ -169,6 +170,7 @@ const consumeBeforeImports = (
 
             statements.push(commentsStmt);
 
+            // eslint-disable-next-line sonarjs/updated-loop-counter
             index = consumeIndex;
 
             continue;
@@ -190,6 +192,7 @@ const consumeBeforeImports = (
 
                 statements.push(layerStmt);
 
+                // eslint-disable-next-line sonarjs/updated-loop-counter
                 index = consumeIndex;
 
                 continue;
@@ -243,12 +246,14 @@ const parseStylesheet = (result: Result, styles: Document | Root, importingNode:
         }
 
         if (imports.length === 0 && (node.type === "comment" || (node.type === "atrule" && IS_LAYER_REGEX.test(node.name) && !node.nodes))) {
+            // eslint-disable-next-line sonarjs/updated-loop-counter
             [index, beforeImports] = consumeBeforeImports(styles.nodes, conditions, index, importingNode, from);
 
             continue;
         }
 
         if (imports.length === 0 && node.type === "atrule" && IS_IMPORT_REGEX.test(node.name)) {
+            // eslint-disable-next-line sonarjs/updated-loop-counter
             [index, imports] = consumeImports(result, styles.nodes, conditions, index, importingNode, from);
 
             continue;

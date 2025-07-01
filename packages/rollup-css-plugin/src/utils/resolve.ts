@@ -8,6 +8,33 @@ import arrayFmt from "./array-fmt";
 
 const baseDirectory = dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Resolves module identifiers using advanced resolution strategies.
+ *
+ * This function implements sophisticated module resolution logic using the OXC resolver,
+ * supporting various resolution strategies and providing detailed error reporting.
+ * It's primarily used for resolving CSS imports, PostCSS plugins, and other dependencies.
+ *
+ * Features:
+ * - Multiple base directory support
+ * - Configurable file extensions
+ * - Symlink resolution
+ * - Detailed error reporting and debugging
+ * - Fallback resolution strategies
+ * @param ids Array of module identifiers to resolve
+ * @param userOptions Resolution configuration options
+ * @returns Absolute path to the resolved module
+ * @throws Error if no module can be resolved
+ * @example
+ * ```typescript
+ * // Resolving a PostCSS plugin
+ * const pluginPath = resolve(['autoprefixer'], {
+ *   caller: 'PostCSS',
+ *   baseDirs: ['/project/node_modules'],
+ *   extensions: ['.js', '.mjs']
+ * });
+ * ```
+ */
 export const resolve = (ids: string[], userOptions: ResolveOptions): string => {
     const options = {
         baseDirs: [baseDirectory],

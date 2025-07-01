@@ -887,6 +887,9 @@ importers:
       '@visulima/rollup-css-plugin':
         specifier: workspace:*
         version: link:../rollup-css-plugin
+      '@visulima/source-map':
+        specifier: 1.0.20
+        version: 1.0.20
       '@visulima/tsconfig':
         specifier: 1.1.19
         version: 1.1.19(yaml@2.8.0)
@@ -1005,9 +1008,6 @@ importers:
       '@visulima/css-style-inject':
         specifier: workspace:*
         version: link:../css-style-inject
-      '@visulima/source-map':
-        specifier: 1.0.20
-        version: 1.0.20
       '@vitest/coverage-v8':
         specifier: ^3.2.4
         version: 3.2.4(vitest@3.2.4)

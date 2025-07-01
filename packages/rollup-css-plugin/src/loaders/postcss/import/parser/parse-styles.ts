@@ -236,8 +236,8 @@ const parseStyles = async (
             }
 
             statements.splice(index, 1, ...stmt.stylesheet.statements);
-            // eslint-disable-next-line no-plusplus
-            index--;
+            // eslint-disable-next-line sonarjs/updated-loop-counter
+            index -= 1;
         }
     }
 

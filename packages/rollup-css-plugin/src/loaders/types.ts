@@ -74,13 +74,15 @@ export interface LoaderContext<T = Record<string, unknown>> {
 
     /** @see {@link InternalStyleOptions.inject} */
     readonly inject: InternalStyleOptions["inject"];
-    logger: RollupLogger;
+
+    /** Rollup-compatible logger for plugin messages */
+    readonly logger: RollupLogger;
 
     /** @see {@link InternalStyleOptions.namedExports} */
     readonly namedExports: InternalStyleOptions["namedExports"];
 
     /**
-     * Loader's options
+     * Type-safe configuration options passed to the loader instance
      * @default {}
      */
     readonly options: T;
@@ -92,9 +94,6 @@ export interface LoaderContext<T = Record<string, unknown>> {
     /** @see {@link InternalStyleOptions.sourceMap} */
     readonly sourceMap: false | (SourceMapOptions & { inline: boolean });
     readonly useSourcemap: boolean;
-
-    /** [Function for emitting a warning](https://rollupjs.org/guide/en/#thiswarnwarning-string--rollupwarning-position-number---column-number-line-number---void) */
-    readonly warn: PluginContext["warn"];
 }
 
 export interface Payload {

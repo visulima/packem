@@ -1,16 +1,15 @@
-import { pail } from "@visulima/pail";
+/* eslint-disable vitest/require-mock-type-parameters */
 import { describe, expect, it, vi } from "vitest";
 
-import LoaderManager from "../../../../src/loaders/loader";
+import LoaderManager from "../../../../src/loaders/loader-manager";
 
-vi.mock("@visulima/pail", () => {
-    return {
-        pail: {
-            log: vi.fn(),
-            warn: vi.fn(),
-        },
-    };
-});
+// Mock rollup logger that matches the RollupLogger interface
+const mockRollupLogger = {
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+};
 
 describe("loader", () => {
     it("should return the same input, when no loader was found", async () => {
@@ -19,7 +18,7 @@ describe("loader", () => {
         const loaders = new LoaderManager({
             extensions: [],
             loaders: [],
-            logger: pail,
+            logger: mockRollupLogger,
             options: {
                 emit: false,
                 extensions: [],

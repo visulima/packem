@@ -1,8 +1,7 @@
-import type { Pail } from "@visulima/pail";
+import type { RollupLogger } from "@visulima/packem-share/utils";
 import { extname, isAbsolute, join } from "@visulima/path";
 import { isWindows } from "@visulima/path/utils";
 import { pathToFileURL } from "mlly";
-import type { PluginContext } from "rollup";
 import type { Importer, SourceSpan, StringOptions } from "sass";
 
 import type { SassLoaderContext, SassLoaderOptions } from "../types";
@@ -13,27 +12,27 @@ import resolveSyntax from "./resolve-syntax";
  */
 const getSassOptions = async (
     loaderContext: SassLoaderContext,
-    logger: Pail,
-    warn: PluginContext["warn"],
+    logger: RollupLogger,
     options: SassLoaderOptions,
     content: string,
     useSourceMap: boolean,
-
+// eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<SassLoaderOptions> => {
     const { warnRuleAsWarning, ...otherOptions } = options;
+    let data = content;
+
+    if (options.additionalData) {
+        data = typeof options.additionalData === "function" ? await options.additionalData(content, loaderContext) : `${options.additionalData}\n${content}`;
+    }
+
     const sassOptions = {
         ...otherOptions,
-        data: options.additionalData
-            ? typeof options.additionalData === "function"
-                ? await options.additionalData(content, loaderContext)
-                : `${options.additionalData}\n${content}`
-            : content,
+        data,
     };
 
     if (!(sassOptions as StringOptions<"async">).logger) {
         const needEmitWarning = warnRuleAsWarning !== false;
         const formatSpan = (span: SourceSpan) =>
-
             `Warning on line ${span.start.line}, column ${span.start.column} of ${span.url ?? "-"}:${span.start.line}:${span.start.column}:\n`;
 
         const formatDebugSpan = (span: SourceSpan) => `[debug:${span.start.line}:${span.start.column}] `;
@@ -48,7 +47,7 @@ const getSassOptions = async (
 
                 builtMessage += message;
 
-                logger.debug(builtMessage);
+                logger.info({ message: builtMessage });
             },
             warn(message: string, loggerOptions) {
                 let builtMessage = "";
@@ -72,14 +71,9 @@ const getSassOptions = async (
                 }
 
                 if (needEmitWarning) {
-                    const warning = new Error(builtMessage);
-
-                    warning.name = "SassWarning";
-                    warning.stack = undefined;
-
-                    warn(warning);
+                    logger.warn({ message: builtMessage, name: "SassWarning" });
                 } else {
-                    logger.warn(builtMessage);
+                    logger.info({ message: builtMessage });
                 }
             },
         };
@@ -102,18 +96,24 @@ const getSassOptions = async (
         }
     }
 
+    const separator = isWindows() ? ";" : ":";
+
     (sassOptions as StringOptions<"async">).loadPaths = [
         ...((sassOptions as StringOptions<"async">).loadPaths ? [...((sassOptions as StringOptions<"async">).loadPaths as string[])] : []).map(
             (includePath: string) => (isAbsolute(includePath) ? includePath : join(process.cwd(), includePath)),
         ),
-        ...process.env.SASS_PATH ? process.env.SASS_PATH.split(isWindows() ? ";" : ":") : [],
+        ...process.env.SASS_PATH ? process.env.SASS_PATH.split(separator) : [],
     ];
 
-    (sassOptions as StringOptions<"async">).importers = (sassOptions as StringOptions<"async">).importers
-        ? Array.isArray((sassOptions as StringOptions<"async">).importers)
-            ? [...((sassOptions as StringOptions<"async">).importers as Importer[])]
-            : (sassOptions as StringOptions<"async">).importers
-        : [];
+    if ((sassOptions as StringOptions<"async">).importers) {
+        if (Array.isArray((sassOptions as StringOptions<"async">).importers)) {
+            (sassOptions as StringOptions<"async">).importers = [...((sassOptions as StringOptions<"async">).importers as Importer[])];
+        } else {
+            (sassOptions as StringOptions<"async">).importers = (sassOptions as StringOptions<"async">).importers;
+        }
+    } else {
+        (sassOptions as StringOptions<"async">).importers = [];
+    }
 
     return sassOptions;
 };

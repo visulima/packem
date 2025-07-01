@@ -2,7 +2,6 @@ import type { Options } from "cssnano";
 import type { CustomAtRules, TransformOptions } from "lightningcss";
 import type { AcceptedPlugin, PluginCreator } from "postcss";
 import type { Config as PostCSSConfig } from "postcss-load-config";
-import type { LogLevel, PluginContext } from "rollup";
 
 import type { LESSLoaderOptions } from "./loaders/less/types";
 import type { ImportOptions } from "./loaders/postcss/import/types";
@@ -92,7 +91,6 @@ export type LightningCSSOptions = Omit<TransformOptions<CustomAtRules>, "code" |
 export interface PostCSSConfigLoaderOptions {
     /**
      * Context object passed to PostCSS config file
-     * @default {}
      */
     ctx?: Record<string, unknown>;
 
@@ -157,7 +155,6 @@ export interface StyleOptions {
     /**
      * Aliases for URL and import paths
      * - ex.: `{"foo":"bar"}`
-     * @default {}
      */
     alias?: Record<string, string>;
 
@@ -173,7 +170,6 @@ export interface StyleOptions {
 
     /**
      * Options for cssnano minifier
-     * @default {}
      */
     cssnano?: Options;
 

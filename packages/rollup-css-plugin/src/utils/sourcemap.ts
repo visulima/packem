@@ -5,9 +5,9 @@ import { SourceMapConsumer } from "source-map-js";
 
 import { DATA_URI_REGEXP } from "../loaders/postcss/constants";
 
-// eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
+// eslint-disable-next-line regexp/no-misleading-capturing-group, regexp/no-super-linear-backtracking, sonarjs/slow-regex
 const mapBlockRe = /(?:\n|\r\n)?\/\*[#*@]+\s*sourceMappingURL\s*=\s*(\S+)\s*\*+\//g;
-const mapLineRe = /(?:\n|\r\n)?\/\/[#@]+\s*sourceMappingURL\s*=\s*(\S+)\s*?$/gm;
+const mapLineRe = /(?:\n|\r\n)?\/\/[#@]+\s*sourceMappingURL\s*=\s*(\S+)\s*/g;
 
 class MapModifier {
     private readonly map?: RawSourceMap;
@@ -140,4 +140,27 @@ export const getMap = async (code: string, id?: string): Promise<string | undefi
 
 export const stripMap = (code: string): string => code.replaceAll(mapBlockRe, "").replaceAll(mapLineRe, "");
 
+/**
+ * Creates a MapModifier instance for source map manipulation.
+ *
+ * This utility function provides a convenient way to create MapModifier instances
+ * for working with source maps in CSS processing pipelines. The MapModifier class
+ * offers comprehensive source map manipulation capabilities including:
+ * - Path resolution and relativization
+ * - Source map merging and modification
+ * - Format conversion (object, string, consumer)
+ * - Comment generation for inline or external maps
+ * @param map Source map input (raw object or JSON string)
+ * @returns MapModifier instance for source map operations
+ * @example
+ * ```typescript
+ * // Working with source map objects
+ * const modifier = mm(rawSourceMap);
+ * modifier.resolve('/project/src').relative('/project');
+ *
+ * // Converting to different formats
+ * const mapString = modifier.toString();
+ * const consumer = modifier.toConsumer();
+ * ```
+ */
 export const mm = (map?: RawSourceMap | string): MapModifier => new MapModifier(map);

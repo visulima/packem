@@ -1,5 +1,6 @@
 import { createRequire } from "node:module";
 
+import type { RollupLogger } from "@visulima/packem-share/utils";
 import { interopDefault, loadModule as mllyLoadModule } from "mlly";
 
 import type { ResolveOptions } from "./resolve";
@@ -30,7 +31,7 @@ const loadModuleFromPath = async (resolvedPath: string, require: NodeRequire): P
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const loadModule = async (moduleId: string, cwd: string): Promise<any> => {
+const loadModule = async (moduleId: string, cwd: string, logger: RollupLogger): Promise<any> => {
     if (loaded[moduleId]) {
         return loaded[moduleId];
     }
@@ -53,7 +54,8 @@ const loadModule = async (moduleId: string, cwd: string): Promise<any> => {
 
         // Skip data URLs as they can't handle relative imports
         if (resolvedPath.startsWith("data:")) {
-            console.warn(`Skipping data URL module: ${moduleId}`);
+            logger.warn({ message: `Skipping data URL module: ${moduleId}`, module: moduleId, plugin: "css" });
+
             // eslint-disable-next-line unicorn/no-null
             loaded[moduleId] = null;
 
@@ -62,7 +64,8 @@ const loadModule = async (moduleId: string, cwd: string): Promise<any> => {
 
         loaded[moduleId] = await loadModuleFromPath(resolvedPath, require);
     } catch (error) {
-        console.warn("Failed to resolve or load module:", error);
+        logger.warn({ message: `Failed to resolve or load module: ${error instanceof Error ? error.message : String(error)}`, module: moduleId, plugin: "css" });
+
         // eslint-disable-next-line unicorn/no-null
         loaded[moduleId] = null;
 

@@ -12,7 +12,7 @@ const getSassCompiler = async (
 
     if (implementation === undefined || implementation === "sass-embedded") {
         try {
-            resolvedCompiler = await import("sass-embedded").then((d) => d.compileString) as typeof sassEmbedded;
+            resolvedCompiler = await import("sass-embedded").then((d) => d.compileString);
         } catch {
             // Continue to the next implementation
         }
@@ -20,7 +20,7 @@ const getSassCompiler = async (
 
     if (resolvedCompiler === undefined && (implementation === undefined || implementation === "sass")) {
         try {
-            resolvedCompiler = await import("sass").then((d) => d.compileString) as typeof sass;
+            resolvedCompiler = await import("sass").then((d) => d.compileString);
         } catch {
             // Continue to the next implementation
         }
@@ -33,7 +33,8 @@ const getSassCompiler = async (
     return (sassOptions: (sass.StringOptions<"sync"> | sassEmbedded.StringOptions<"sync">) & { data: string }) => {
         const { data, ...rest } = sassOptions;
 
-        return resolvedCompiler(data as string, rest);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return resolvedCompiler(data as string, rest as any);
     };
 };
 

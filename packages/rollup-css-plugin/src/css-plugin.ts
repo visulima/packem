@@ -6,16 +6,64 @@ import { basename, dirname, isAbsolute, join, normalize, parse, relative, resolv
 import { isRelative } from "@visulima/path/utils";
 import type { GetModuleInfo, OutputAsset, OutputChunk, Plugin } from "rollup";
 
-import LoaderManager from "./loaders/loader";
+import LoaderManager from "./loaders/loader-manager";
 import type { Extracted, Loader, LoaderContext } from "./loaders/types";
 import type { ExtractedData, InternalStyleOptions, StyleOptions } from "./types";
 import concat from "./utils/concat";
 import { ensurePCSSOption, ensurePCSSPlugins, inferHandlerOption, inferModeOption, inferOption, inferSourceMapOption } from "./utils/options";
 import { mm } from "./utils/sourcemap";
 
+/**
+ * Sorts loaders by their name order according to the specified processing sequence.
+ *
+ * This ensures loaders are executed in the correct order for proper CSS processing.
+ * The typical order is: sourcemap → preprocessors → postcss.
+ * @param objectsArray Array of loader objects to sort
+ * @param nameOrder Desired order of loader names
+ * @returns Promise resolving to sorted loader array
+ */
 const sortByNameOrder = async (objectsArray: Loader[], nameOrder: string[]): Promise<Loader[]> =>
     objectsArray.sort((a, b) => nameOrder.indexOf(a.name) - nameOrder.indexOf(b.name));
 
+/**
+ * Creates the main CSS processing plugin for Rollup.
+ *
+ * This plugin provides comprehensive CSS processing capabilities including:
+ * - Multiple preprocessor support (Sass, Less, Stylus)
+ * - PostCSS processing with plugin ecosystem
+ * - CSS modules with automatic detection
+ * - Source map generation and processing
+ * - CSS injection or extraction modes
+ * - Minification support
+ * - TypeScript declaration generation
+ * - Asset handling and optimization
+ * @param options CSS processing options and loader configurations
+ * @param browserTargets Target browsers for compatibility transformations
+ * @param cwd Current working directory for resolving paths
+ * @param sourceDirectory Source directory for relative path resolution
+ * @param environment Build environment (development/production)
+ * @param useSourcemap Whether to generate source maps
+ * @param debug Enable debug logging and performance monitoring
+ * @param minify Enable CSS minification
+ * @param alias Path aliases for import resolution
+ * @returns Promise resolving to configured Rollup plugin
+ * @example
+ * ```typescript
+ * // Basic usage
+ * const plugin = await cssPlugin({
+ *   mode: 'extract',
+ *   extensions: ['.css', '.scss'],
+ *   postcss: { plugins: [autoprefixer] }
+ * }, ['> 1%'], process.cwd(), 'src', 'development', true, false, false, {});
+ *
+ * // CSS Modules with injection
+ * const plugin = await cssPlugin({
+ *   mode: 'inject',
+ *   autoModules: true,
+ *   namedExports: true
+ * }, ['> 1%'], process.cwd(), 'src', 'production', false, false, true, {});
+ * ```
+ */
 const cssPlugin = async (
     options: StyleOptions,
     browserTargets: string[],
@@ -26,7 +74,7 @@ const cssPlugin = async (
     debug: boolean,
     minify: boolean,
     alias: Record<string, string>,
-    // eslint-disable-next-line sonarjs/cognitive-complexity
+
 ): Promise<Plugin> => {
     const mergedAlias = { ...alias, ...options.alias };
     const isIncluded = createFilter(options.include, options.exclude);
@@ -65,27 +113,21 @@ const cssPlugin = async (
             to: options.postcss?.to,
             url: inferHandlerOption(options.postcss?.url, mergedAlias),
         };
-
-        if (options.postcss?.parser) {
-            loaderOptions.postcss.parser = await ensurePCSSOption(options.postcss.parser, "parser", cwd);
-        }
-
-        if (options.postcss?.syntax) {
-            loaderOptions.postcss.syntax = await ensurePCSSOption(options.postcss.syntax, "syntax", cwd);
-        }
-
-        if (options.postcss?.stringifier) {
-            loaderOptions.postcss.stringifier = await ensurePCSSOption(options.postcss.stringifier, "stringifier", cwd);
-        }
-
-        if (options.postcss?.plugins) {
-            loaderOptions.postcss.plugins = await ensurePCSSPlugins(options.postcss.plugins, cwd);
-        }
     }
 
     let extracted: Extracted[] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    /**
+     * Traverses imported modules to find all CSS dependencies in a chunk.
+     *
+     * This function recursively follows import chains to identify all CSS files
+     * that should be included in a particular chunk for proper extraction and
+     * chunk hash calculation.
+     * @param chunkModules Modules included in the current chunk
+     * @param getModuleInfo Rollup's module info getter function
+     * @returns Array of CSS file IDs that belong to this chunk
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, sonarjs/cognitive-complexity
     const traverseImportedModules = (chunkModules: Record<string, any>, getModuleInfo: GetModuleInfo): string[] => {
         const ids: string[] = [];
 
@@ -128,6 +170,14 @@ const cssPlugin = async (
     };
 
     return <Plugin>{
+        /**
+         * Generates a hash for chunks that include CSS to ensure proper cache invalidation.
+         *
+         * This hook calculates a hash based on the CSS content and order to ensure
+         * that chunks are properly invalidated when CSS changes.
+         * @param chunk The chunk being processed
+         * @returns Hash string for cache invalidation or undefined if no CSS
+         */
         augmentChunkHash(chunk) {
             if (extracted.length === 0) {
                 return undefined;
@@ -146,9 +196,37 @@ const cssPlugin = async (
 
             return hashable.join(":");
         },
+
+        /**
+         * Initializes the CSS plugin at the start of the build process.
+         *
+         * This hook:
+         * - Creates the logger instance
+         * - Initializes the loader manager with configured loaders
+         * - Sets up loader processing order
+         * - Validates configuration options
+         * - Logs plugin initialization information
+         */
         async buildStart() {
-            // Create logger using Rollup's logging methods
             logger = createRollupLogger(this, "css");
+
+            if (hasPostCssLoader && loaderOptions.postcss) {
+                if (options.postcss?.parser) {
+                    loaderOptions.postcss.parser = await ensurePCSSOption(options.postcss.parser, "parser", cwd, logger);
+                }
+
+                if (options.postcss?.syntax) {
+                    loaderOptions.postcss.syntax = await ensurePCSSOption(options.postcss.syntax, "syntax", cwd, logger);
+                }
+
+                if (options.postcss?.stringifier) {
+                    loaderOptions.postcss.stringifier = await ensurePCSSOption(options.postcss.stringifier, "stringifier", cwd, logger);
+                }
+
+                if (options.postcss?.plugins) {
+                    loaderOptions.postcss.plugins = await ensurePCSSPlugins(options.postcss.plugins, cwd, logger);
+                }
+            }
 
             // Initialize loaders with logger
             loaders = new LoaderManager({
@@ -182,6 +260,7 @@ const cssPlugin = async (
                 });
             }
         },
+        // eslint-disable-next-line sonarjs/cognitive-complexity
         async generateBundle(outputOptions, bundle) {
             if (extracted.length === 0 || !(outputOptions.dir || outputOptions.file)) {
                 return;
@@ -310,7 +389,7 @@ const cssPlugin = async (
 
                     const { css: minifiedCss, map: minifiedMap } = await options.minifier.handler.bind({
                         browserTargets,
-                        warn: this.warn.bind(this),
+                        logger,
                     })(
                         extractedData,
                         sourceMap,
@@ -345,12 +424,13 @@ const cssPlugin = async (
                 if (extractedData.map && sourceMap) {
                     const fileName = this.getFileName(cssFileId);
 
-                    const assetDirectory
-                        = typeof outputOptions.assetFileNames === "string"
-                            ? normalize(dirname(outputOptions.assetFileNames))
-                            : typeof outputOptions.assetFileNames === "function"
-                              ? normalize(dirname(outputOptions.assetFileNames(cssFile)))
-                              : "assets";
+                    let assetDirectory = "assert";
+
+                    if (typeof outputOptions.assetFileNames === "string") {
+                        assetDirectory = normalize(dirname(outputOptions.assetFileNames));
+                    } else if (typeof outputOptions.assetFileNames === "function") {
+                        assetDirectory = normalize(dirname(outputOptions.assetFileNames(cssFile)));
+                    }
 
                     const map = mm(extractedData.map)
                         .modify((m) => {
@@ -464,7 +544,6 @@ const cssPlugin = async (
                 sourceDir: sourceDirectory,
                 sourceMap,
                 useSourcemap,
-                warn: this.warn.bind(this),
             };
 
             const result = await loaders.process({ code }, context);

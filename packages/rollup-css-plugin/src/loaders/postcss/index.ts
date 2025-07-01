@@ -17,9 +17,22 @@ import postcssModules from "./modules";
 import postcssNoop from "./noop";
 import postcssUrl from "./url";
 
+/** Variable name used for the exported CSS string */
 const cssVariableName = "css";
+
+/** Set of reserved JavaScript keywords to avoid conflicts */
 const reservedWords = new Set([cssVariableName]);
 
+/**
+ * Converts a CSS class name to a legal JavaScript identifier.
+ * @param name CSS class name to convert
+ * @returns Legal JavaScript identifier, prefixed with underscore if it conflicts with reserved words
+ * @example
+ * ```typescript
+ * getClassNameDefault("my-class") // "my_class"
+ * getClassNameDefault("css") // "_css" (reserved word)
+ * ```
+ */
 const getClassNameDefault = (name: string): string => {
     const id = makeLegalIdentifier(name);
 
@@ -30,31 +43,82 @@ const getClassNameDefault = (name: string): string => {
     return id;
 };
 
+/** PostCSS options combining internal options with required PostCSS properties */
 type PostCSSOptions = InternalStyleOptions["postcss"] & Pick<Required<ProcessOptions>, "from" | "map" | "to">;
 
+/**
+ * PostCSS loader for processing CSS with PostCSS plugins and CSS modules.
+ *
+ * This loader provides comprehensive CSS processing including:
+ * - PostCSS plugin pipeline execution
+ * - CSS modules support with automatic detection
+ * - Import resolution and dependency tracking
+ * - URL processing and asset handling
+ * - Source map generation and transformation
+ * - JavaScript code generation for CSS injection
+ *
+ * The loader always processes files since PostCSS can handle any CSS content
+ * and provides the base transformation layer for other preprocessors.
+ * @example
+ * ```typescript
+ * // CSS Modules processing
+ * // Input: .button { color: red; }
+ * // Output: JavaScript with hashed class names and CSS injection
+ *
+ * // Regular CSS processing
+ * // Input: @import "normalize.css"; .app { color: blue; }
+ * // Output: Resolved imports and processed CSS
+ * ```
+ */
 const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
+    /** Always process files since PostCSS handles all CSS */
     alwaysProcess: true,
     name: "postcss",
+
+    /**
+     * Processes CSS content through the PostCSS pipeline.
+     *
+     * The processing includes:
+     * 1. Loading PostCSS configuration
+     * 2. Determining CSS modules support
+     * 3. Setting up PostCSS plugins (import, url, modules, etc.)
+     * 4. Processing CSS through PostCSS
+     * 5. Handling PostCSS messages (warnings, dependencies, etc.)
+     * 6. Generating JavaScript output for CSS injection
+     * 7. Managing source maps
+     * @param payload The payload containing CSS code and metadata
+     * @param payload.code CSS content to process
+     * @param payload.extracted Existing extracted CSS data
+     * @param payload.map Input source map
+     * @returns Processed payload with transformed CSS and generated JavaScript
+     */
     // eslint-disable-next-line sonarjs/cognitive-complexity
     async process({ code, extracted, map }) {
-        const config = await loadConfig(this.id, this.cwd as string, this.environment, this.options.config);
+        // Load PostCSS configuration from config files
+        const config = await loadConfig(this.id, this.cwd as string, this.environment, this.logger, this.options.config);
         const plugins: AcceptedPlugin[] = [];
 
         let supportModules = false;
 
+        // Determine CSS modules support from various sources
         if (typeof this.options.modules === "boolean") {
             supportModules = this.options.modules;
         } else if (typeof this.options.modules === "object") {
             supportModules = ensureAutoModules(this.options.modules.include, this.id);
         }
 
+        // Check automatic CSS modules detection
         if (this.autoModules && this.options.modules === undefined) {
             supportModules = ensureAutoModules(this.autoModules, this.id);
         }
 
+        /** CSS modules exports mapping class names to hashed names */
         const modulesExports: Record<string, string> = {};
+
+        /** ICSS dependencies for CSS modules */
         const icssDependencies: string[] = [];
 
+        // Configure PostCSS processing options
         const postcssOptions: PostCSSOptions = {
             ...config.options,
             ...this.options,
@@ -69,6 +133,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             to: this.options.to ?? this.id,
         };
 
+        // Add PostCSS Import plugin for @import resolution
         if (this.options.import) {
             plugins.push(
                 postcssImport({
@@ -82,17 +147,21 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             );
         }
 
+        // Add PostCSS URL plugin for url() processing
         if (this.options.url) {
             plugins.push(postcssUrl({ inline: Boolean(this.inject), ...this.options.url }));
         }
 
+        // Add user-configured plugins
         if (this.options.plugins) {
             // @ts-expect-error - @TODO - fix typing
             plugins.push(...this.options.plugins);
         }
 
+        // Add plugins from configuration files
         plugins.push(...config.plugins);
 
+        // Add CSS modules plugins if enabled
         if (supportModules) {
             const modulesOptions = typeof this.options.modules === "object" ? this.options.modules : {};
 
@@ -105,11 +174,12 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             );
         }
 
-        // Avoid PostCSS warning
+        // Ensure at least one plugin is present to avoid PostCSS warnings
         if (plugins.length === 0) {
             plugins.push(postcssNoop);
         }
 
+        // Add performance monitoring in debug mode
         if (this.debug) {
             plugins.push(
                 postcssSlowPlugins({
@@ -118,8 +188,10 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             );
         }
 
+        // Process CSS through PostCSS pipeline
         const result = await postcss(plugins).process(code, postcssOptions as ProcessOptions);
 
+        // Handle PostCSS messages (warnings, dependencies, assets, etc.)
         for (const message of result.messages) {
             // eslint-disable-next-line default-case
             switch (message.type) {
@@ -144,15 +216,17 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
                 }
 
                 case "warning": {
-                    this.warn({ message: message.text as string, plugin: message.plugin });
+                    this.logger.warn({ message: message.text as string, plugin: message.plugin });
                     break;
                 }
             }
         }
 
+        // Process and resolve source maps
         // eslint-disable-next-line no-param-reassign
         map = mm(result.map.toJSON()).resolve(dirname(postcssOptions.to)).toString();
 
+        // Handle source map processing for non-extracted CSS
         if (!this.extract && this.sourceMap) {
             const mapModifier = mm(map)
                 .modify((rawMM) => {
@@ -171,13 +245,16 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             result.css += mapModifier.toCommentData();
         }
 
+        // Generate safe identifiers for JavaScript output
         const saferId = (id: string): string => safeId(id, basename(this.id));
         const modulesVariableName = saferId("modules");
 
+        // Build JavaScript output for CSS injection
         const output = [`var ${cssVariableName} = ${JSON.stringify(result.css)};`];
         const dts = [];
         const outputExports = [cssVariableName];
 
+        // Generate named exports for CSS modules
         if (this.namedExports) {
             if (this.dts) {
                 dts.push(`declare const ${cssVariableName}: string;`);
@@ -190,7 +267,7 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
                 const newName = getClassName(name);
 
                 if (name !== newName) {
-                    this.warn(`Exported \`${name}\` as \`${newName}\` in ${relative(this.cwd as string, this.id)}`);
+                    this.logger.warn({ message: `Exported \`${name}\` as \`${newName}\` in ${relative(this.cwd as string, this.id)}` });
                 }
 
                 const fmt = JSON.stringify(modulesExports[name]);
@@ -205,11 +282,13 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             }
         }
 
+        // Handle CSS extraction for separate CSS files
         if (this.extract) {
             // eslint-disable-next-line no-param-reassign
             extracted = { css: result.css, id: this.id, map };
         }
 
+        // Handle CSS injection for runtime styles
         if (this.inject) {
             if (typeof this.inject === "function") {
                 output.push(this.inject(cssVariableName, this.id, output), `var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`);

@@ -3,7 +3,7 @@ import { basename, parse } from "@visulima/path";
 
 import { HASH_REGEXP } from "../constants";
 
-export default (placeholder: string, file: string, source: Uint8Array): string => {
+const generate = (placeholder: string, file: string, source: Uint8Array): string => {
     const { base, dir, ext, name } = parse(file);
     const hash = getHash(`${base}:${Buffer.from(source).toString()}`);
     const match = HASH_REGEXP.exec(placeholder);
@@ -17,3 +17,5 @@ export default (placeholder: string, file: string, source: Uint8Array): string =
         .replace("[ext]", ext.slice(1))
         .replace(HASH_REGEXP, hashLength ? hash.slice(0, hashLength) : hash.slice(0, 8));
 };
+
+export default generate;

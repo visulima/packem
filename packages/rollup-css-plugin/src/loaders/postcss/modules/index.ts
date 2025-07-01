@@ -8,6 +8,25 @@ import modulesValues from "postcss-modules-values";
 import type { AutoModules } from "../../../types";
 import generateScopedNameDefault from "./generate";
 
+const modules = (options: ModulesOptions): (Plugin | Processor)[] => {
+    const config = {
+        mode: "local" as const,
+        ...options,
+        generateScopedName:
+            typeof options.generateScopedName === "function" ? options.generateScopedName : generateScopedNameDefault(options.generateScopedName),
+    };
+
+    return [
+        modulesValues(),
+        localByDefault({ mode: config.mode }),
+        extractImports({ failOnWrongOrder: config.failOnWrongOrder }),
+        modulesScope({
+            exportGlobals: config.exportGlobals,
+            generateScopedName: config.generateScopedName,
+        }),
+    ];
+};
+
 /** Options for [CSS Modules](https://github.com/css-modules/css-modules) */
 export interface ModulesOptions {
     /** Export global classes */
@@ -43,21 +62,4 @@ export interface ModulesOptions {
     mode?: "global" | "local" | "pure";
 }
 
-export default (options: ModulesOptions): (Plugin | Processor)[] => {
-    const config = {
-        mode: "local" as const,
-        ...options,
-        generateScopedName:
-            typeof options.generateScopedName === "function" ? options.generateScopedName : generateScopedNameDefault(options.generateScopedName),
-    };
-
-    return [
-        modulesValues(),
-        localByDefault({ mode: config.mode }),
-        extractImports({ failOnWrongOrder: config.failOnWrongOrder }),
-        modulesScope({
-            exportGlobals: config.exportGlobals,
-            generateScopedName: config.generateScopedName,
-        }),
-    ];
-};
+export default modules;

@@ -92,9 +92,6 @@ export default {
 
 ```typescript
 import { rollupCssPlugin, cssModulesTypesPlugin } from "@visulima/rollup-css-plugin";
-import { createLogger } from "@visulima/pail";
-
-const logger = createLogger();
 
 export default {
   plugins: [
@@ -147,7 +144,7 @@ export default {
           generateScopedName: "[name]__[local]___[hash:base64:5]",
         },
       },
-    }, process.cwd(), logger)
+    }, process.cwd())
   ]
 };
 ```
@@ -279,9 +276,6 @@ const button = (
 
 ```typescript
 import { cssModulesTypesPlugin } from "@visulima/rollup-css-plugin";
-import { createLogger } from "@visulima/pail";
-
-const logger = createLogger();
 
 export default {
   plugins: [
@@ -308,7 +302,6 @@ export default {
         },
       },
       process.cwd(), // Root directory for relative paths
-      logger        // Logger instance for build messages
     )
   ]
 };

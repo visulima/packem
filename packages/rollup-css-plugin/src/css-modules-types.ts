@@ -5,6 +5,7 @@ import type { Plugin } from "rollup";
 import ensureAutoModules from "./loaders/utils/ensure-auto-modules";
 import type { StyleOptions } from "./types";
 
+/** Header comment for generated TypeScript declaration files */
 const dtsComment = `
 /* eslint-disable */
 /* prettier-ignore */
@@ -15,9 +16,44 @@ const dtsComment = `
  */
 `.trim();
 
-const cssModulesTypes = (options: StyleOptions, rootDirectory: string): Plugin => {
+/**
+ * Creates a Rollup plugin that generates TypeScript declaration files for CSS modules.
+ *
+ * This plugin automatically generates `.d.ts` files alongside CSS module files,
+ * providing type safety for CSS class names in TypeScript projects. The generated
+ * declarations include typed exports for all CSS classes found in the modules.
+ *
+ * The plugin:
+ * - Detects CSS modules based on configuration (autoModules, postcss.modules, etc.)
+ * - Extracts type information from processed CSS modules
+ * - Generates TypeScript declaration files with proper exports
+ * - Adds watch file dependencies for proper rebuilds
+ * - Logs generation progress
+ * @param options Style options containing CSS modules configuration
+ * @param rootDirectory Root directory for relative path logging
+ * @returns Rollup plugin for CSS modules type generation
+ * @example
+ * ```typescript
+ * // Plugin usage
+ * const plugin = cssModulesTypesPlugin({
+ *   autoModules: true,
+ *   postcss: {
+ *     modules: {
+ *       include: /\.module\./
+ *     }
+ *   }
+ * }, process.cwd());
+ *
+ * // Generated .d.ts file for styles.module.css:
+ * // declare const button: string;
+ * // declare const header: string;
+ * // export { button, header };
+ * ```
+ */
+const cssModulesTypesPlugin = (options: StyleOptions, rootDirectory: string): Plugin => {
     let optionSupportModules: boolean | undefined;
 
+    // Determine CSS modules support from PostCSS configuration
     if (options.postcss && typeof options.postcss.modules === "boolean") {
         optionSupportModules = options.postcss.modules;
     } else if (options.lightningcss && typeof options.lightningcss.modules === "boolean") {
@@ -26,29 +62,48 @@ const cssModulesTypes = (options: StyleOptions, rootDirectory: string): Plugin =
 
     return <Plugin>{
         name: "css-modules-types",
+
+        /**
+         * Processes CSS files and generates TypeScript declarations for CSS modules.
+         *
+         * This transform hook:
+         * 1. Determines if the file should be treated as a CSS module
+         * 2. Extracts type information from the module metadata
+         * 3. Generates and writes TypeScript declaration files
+         * 4. Adds the declaration file to Rollup's watch list
+         * 5. Logs the generation process
+         * @param _ Unused code parameter (CSS content)
+         * @param id File identifier being processed
+         * @returns undefined (no code transformation)
+         */
         async transform(_, id: string) {
             let supportModules: boolean | undefined = optionSupportModules;
 
+            // Check object-based CSS modules configuration
             if (options.postcss && typeof options.postcss.modules === "object") {
                 supportModules = ensureAutoModules(options.postcss.modules.include, id);
             } else if (options.lightningcss && typeof options.lightningcss.modules === "object") {
                 supportModules = ensureAutoModules(options.lightningcss.modules.include, id);
             }
 
+            // Check automatic CSS modules detection
             if (options.autoModules && supportModules === undefined) {
                 supportModules = ensureAutoModules(options.autoModules, id);
             }
 
+            // Skip non-CSS-module files
             if (!supportModules) {
                 return undefined;
             }
 
+            // Extract type information from module metadata
             const { types } = this.getModuleInfo(id)?.meta.styles ?? {};
 
             if (types === undefined) {
                 return undefined;
             }
 
+            // Generate and write TypeScript declaration file
             if (await isAccessible(id)) {
                 await writeFile(`${id}.d.ts`, `${dtsComment}\n${types as string}`);
 
@@ -57,6 +112,7 @@ const cssModulesTypes = (options: StyleOptions, rootDirectory: string): Plugin =
                     plugin: "css-modules-types",
                 });
 
+                // Add declaration file to watch list for proper rebuilds
                 this.addWatchFile(`${id}.d.ts`);
             }
 
@@ -65,4 +121,4 @@ const cssModulesTypes = (options: StyleOptions, rootDirectory: string): Plugin =
     };
 };
 
-export default cssModulesTypes;
+export default cssModulesTypesPlugin;

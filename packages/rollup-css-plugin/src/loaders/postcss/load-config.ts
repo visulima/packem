@@ -1,5 +1,6 @@
 import { findMonorepoRoot, findPackageRoot } from "@visulima/package";
 import type { Environment } from "@visulima/packem-share/types";
+import type { RollupLogger } from "@visulima/packem-share/utils";
 import { parse, resolve } from "@visulima/path";
 import type { Result } from "postcss-load-config";
 import postcssrc from "postcss-load-config";
@@ -9,7 +10,7 @@ import { ensurePCSSOption, ensurePCSSPlugins } from "../../utils/options";
 
 let configCache: Result | undefined;
 
-const loadConfig = async (id: string, cwd: string, environment: Environment, options?: PostCSSConfigLoaderOptions | false): Promise<Result> => {
+const loadConfig = async (id: string, cwd: string, environment: Environment, logger: RollupLogger, options?: PostCSSConfigLoaderOptions | false): Promise<Result> => {
     if (!options) {
         return { file: "", options: {}, plugins: [] };
     }
@@ -55,18 +56,18 @@ const loadConfig = async (id: string, cwd: string, environment: Environment, opt
             configCache = postcssConfig;
         }
 
-        const result: Result = { file: postcssConfig.file, options: postcssConfig.options, plugins: await ensurePCSSPlugins(postcssConfig.plugins, cwd) };
+        const result: Result = { file: postcssConfig.file, options: postcssConfig.options, plugins: await ensurePCSSPlugins(postcssConfig.plugins, cwd, logger) };
 
         if (result.options.parser) {
-            result.options.parser = await ensurePCSSOption(result.options.parser, "parser", cwd);
+            result.options.parser = await ensurePCSSOption(result.options.parser, "parser", cwd, logger);
         }
 
         if (result.options.syntax) {
-            result.options.syntax = await ensurePCSSOption(result.options.syntax, "syntax", cwd);
+            result.options.syntax = await ensurePCSSOption(result.options.syntax, "syntax", cwd, logger);
         }
 
         if (result.options.stringifier) {
-            result.options.stringifier = await ensurePCSSOption(result.options.stringifier, "stringifier", cwd);
+            result.options.stringifier = await ensurePCSSOption(result.options.stringifier, "stringifier", cwd, logger);
         }
 
         return result;
