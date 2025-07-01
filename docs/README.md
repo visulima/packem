@@ -2,6 +2,96 @@
 
 Complete MDX documentation for all Packen features, designed for Fumadocs.
 
+## ⚠️ Important: Correct Configuration Structure
+
+Based on analysis of the actual Packen interfaces, the correct configuration structure is:
+
+### Basic Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  // Core options at top level
+  entries: ['src/index.ts'], // NOT 'entry'
+  externals: ['react', 'react-dom'],
+  runtime: 'node', // or 'browser'
+  cjsInterop: true,
+  sourcemap: true,
+  declaration: true,
+  minify: false,
+  // Rollup-specific options under 'rollup' key
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [/* specific loader imports */],
+      minifier: /* specific minifier import */
+    }
+  }
+})
+```
+
+### Available Transformers
+
+✅ **Confirmed transformers:**
+- `@visulima/packem/transformer/esbuild`
+- `@visulima/packem/transformer/swc` 
+- `@visulima/packem/transformer/oxc`
+- `@visulima/packem/transformer/sucrase`
+
+❌ **Not available:**
+- `@visulima/packem/transformer/typescript` (doesn't exist)
+
+### CSS Loader Structure
+
+✅ **Correct CSS configuration:**
+```typescript
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+import sassLoader from '@visulima/packem/css/loader/sass'
+import lessLoader from '@visulima/packem/css/loader/less'
+import stylusLoader from '@visulima/packem/css/loader/stylus'
+import sourceMapLoader from '@visulima/packem/css/loader/sourcemap'
+import cssnanoMinifier from '@visulima/packem/css/minifier/cssnano'
+import lightningcssMinifier from '@visulima/packem/css/minifier/lightningcss'
+
+export default defineConfig({
+  rollup: {
+    css: {
+      mode: 'extract', // or 'inject'
+      loaders: [postcssLoader, sassLoader, lessLoader, stylusLoader, sourceMapLoader],
+      minifier: cssnanoMinifier
+    }
+  }
+})
+```
+
+### BuildConfig Interface
+
+The actual `BuildConfig` interface extends `DeepPartial<Omit<BuildOptions, "entries">>` and includes:
+
+- `entries?: (BuildEntry | string)[]` (array of entries, not single entry)
+- `hooks?: Partial<BuildHooks<InternalBuildOptions>>`
+- `preset?: BuildPreset | "auto" | "none" | string`
+- All `BuildOptions` properties except `entries`
+
+### Key Properties
+
+- `alias: Record<string, string>`
+- `analyze?: boolean`
+- `browserTargets?: string[]`
+- `cjsInterop?: boolean`
+- `clean: boolean`
+- `debug: boolean`
+- `declaration?: boolean | "compatible" | "node16"`
+- `dtsOnly?: boolean`
+- `externals: (RegExp | string)[]`
+- `minify?: boolean`
+- `runtime?: "browser" | "node"`
+- `sourcemap: boolean`
+- `transformer: TransformerFn`
+
 ## Structure
 
 The documentation follows Fumadocs conventions and uses built-in components:
@@ -19,7 +109,7 @@ The documentation follows Fumadocs conventions and uses built-in components:
 1. **Guide** (`/docs/guide/`)
    - Introduction to Packen
    - Getting started tutorial
-   - Transformer comparison
+   - Transformer comparison (4 transformers, not 5)
    - CSS processing guide
 
 2. **Options** (`/docs/options/`)
@@ -88,8 +178,10 @@ console.log('World');
 1. Use built-in Fumadocs components instead of custom ones
 2. Include practical examples in all guides
 3. Provide migration paths from similar tools
-4. Keep configuration examples up-to-date
+4. **Keep configuration examples up-to-date with actual interfaces**
 5. Use correct Packen import paths and syntax
+6. **Only document transformers that actually exist**
+7. **Use correct property names (entries, not entry)**
 
 ## Navigation
 
@@ -98,15 +190,14 @@ Navigation is configured in `navigation.json` for Fumadocs compatibility.
 ## Features Covered
 
 - ✅ Fast bundling with multiple transformer support (esbuild, swc, OXC, sucrase)
-- ✅ TypeScript support with isolated declarations
-- ✅ CSS preprocessing (Sass, Less, Stylus, PostCSS, CSS Modules)
-- ✅ Multiple runtime support (React server components, edge-light, browser, node)
-- ✅ Bundle analysis and visualization
-- ✅ Watch mode and development workflow
-- ✅ TypeDoc integration
-- ✅ ESM ⇄ CJS interoperability
-- ✅ Dynamic imports and shared modules
-- ✅ WebAssembly support
+- ✅ Package.json-driven builds with automatic entry detection  
+- ✅ TypeScript support with declaration generation
+- ✅ Comprehensive CSS processing with specific loaders
+- ✅ React Server Components and Client Components
+- ✅ Multi-runtime targeting (Node.js, browser)
+- ✅ Development workflow with watch mode
+- ✅ Bundle optimization and analysis
+- ✅ Monorepo support and shared configurations
 
 ## Building the Documentation
 

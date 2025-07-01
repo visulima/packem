@@ -540,12 +540,10 @@ export default defineConfig({
   transformer,
   sourcemap: true,
   declaration: true,
+  externals: ['react', 'react-dom'],
   rollup: {
-    external: ['react', 'react-dom'],
     css: {
-      modules: {
-        generateScopedName: '[name]__[local]___[hash:base64:5]'
-      }
+      mode: 'extract'
     },
     watch: {
       include: 'src/**'

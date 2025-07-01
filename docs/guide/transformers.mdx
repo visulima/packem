@@ -13,430 +13,273 @@ Packen supports multiple transformers to convert your TypeScript and modern Java
 
 ## Available Transformers
 
-<ComparisonTable>
-  | Feature | esbuild | swc | OXC | sucrase | TypeScript |
-  |---------|---------|-----|-----|---------|------------|
-  | **Speed** | ⚡⚡⚡ | ⚡⚡⚡ | ⚡⚡⚡⚡ | ⚡⚡ | ⚡ |
-  | **TypeScript** | ✅ | ✅ | ✅ | ✅ | ✅ |
-  | **JSX/TSX** | ✅ | ✅ | ✅ | ✅ | ✅ |
-  | **Decorators** | ✅ | ✅ | ✅ | ✅ | ✅ |
-  | **Source Maps** | ✅ | ✅ | ✅ | ✅ | ✅ |
-  | **Minification** | ✅ | ✅ | ✅ | ❌ | ❌ |
-  | **Tree Shaking** | ✅ | ✅ | ✅ | ❌ | ❌ |
-  | **Bundle Size** | Small | Small | Smallest | Medium | Large |
-</ComparisonTable>
+Packen provides **4 high-performance transformers**:
 
-## esbuild
+- **esbuild** - Fastest compilation, great for most projects
+- **swc** - Rust-powered with excellent performance and features
+- **OXC** - Next-generation toolchain (experimental)
+- **sucrase** - Lightweight and fast alternative to Babel
 
-**Recommended for most projects**
+## Transformer Comparison
 
-esbuild is a fast JavaScript bundler and minifier written in Go. It's the default transformer in Packen due to its excellent balance of speed, features, and reliability.
+| Feature | esbuild | swc | OXC | sucrase |
+|---------|---------|-----|-----|---------|
+| **Speed** | ⚡⚡⚡ Very Fast | ⚡⚡⚡ Very Fast | ⚡⚡⚡ Very Fast | ⚡⚡ Fast |
+| **TypeScript** | ✅ Excellent | ✅ Excellent | ✅ Good | ✅ Good |
+| **JSX** | ✅ Full Support | ✅ Full Support | ✅ Full Support | ✅ Basic Support |
+| **Decorators** | ✅ Stage 3 | ✅ Legacy + Stage 3 | ⚠️ Limited | ❌ No |
+| **Source Maps** | ✅ Excellent | ✅ Excellent | ✅ Good | ✅ Basic |
+| **Bundle Size** | Small | Small | Small | Smallest |
+| **Stability** | ✅ Stable | ✅ Stable | ⚠️ Experimental | ✅ Stable |
+| **Language** | Go | Rust | Rust | JavaScript |
 
-### Configuration
+## esbuild Transformer
 
-```typescript
-import { defineConfig } from '@visulima/packem/config'
-
-export default defineConfig({
-  transformer: 'esbuild',
-  esbuild: {
-    target: 'es2020',
-    jsx: 'automatic',
-    jsxImportSource: 'react',
-    minify: true,
-    keepNames: false,
-    legalComments: 'none'
-  }
-})
-```
-
-### Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `target` | `string` | `'es2020'` | JavaScript target version |
-| `jsx` | `'transform' \| 'preserve' \| 'automatic'` | `'automatic'` | JSX transformation mode |
-| `jsxImportSource` | `string` | `'react'` | JSX import source for automatic mode |
-| `minify` | `boolean` | `false` | Enable minification |
-| `keepNames` | `boolean` | `false` | Preserve function and class names |
-| `legalComments` | `'none' \| 'inline' \| 'eof' \| 'linked' \| 'external'` | `'none'` | How to handle legal comments |
-
-### Use Cases
-
-- **General purpose** - Great for most TypeScript/JavaScript projects
-- **React projects** - Excellent JSX support
-- **Performance critical** - Very fast compilation
-- **Production builds** - Built-in minification
-
-<Callout type="tip">
-esbuild is the recommended transformer for most projects due to its speed and comprehensive feature set.
-</Callout>
-
-## swc
-
-**Rust-powered performance**
-
-swc (Speedy Web Compiler) is a fast TypeScript/JavaScript compiler written in Rust. It offers similar performance to esbuild with some additional features.
+**Recommended for most projects.** esbuild provides the best balance of speed, features, and stability.
 
 ### Configuration
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
 export default defineConfig({
-  transformer: 'swc',
-  swc: {
-    jsc: {
-      target: 'es2020',
-      parser: {
-        syntax: 'typescript',
-        tsx: true,
-        decorators: true
-      },
-      transform: {
-        react: {
-          runtime: 'automatic',
-          importSource: 'react'
-        }
-      }
-    },
-    minify: true
+  transformer,
+  rollup: {
+    // Additional esbuild options can be passed here
   }
 })
 ```
 
-### Options
+### Features
 
-The swc configuration follows the [swc configuration schema](https://swc.rs/docs/configuration/swcrc).
-
-Key options:
-- `jsc.target` - JavaScript target version
-- `jsc.parser.syntax` - Parser syntax ('typescript' or 'ecmascript')
-- `jsc.transform.react` - React transformation options
-- `minify` - Enable minification
+- ✅ **Fastest compilation** - Written in Go for maximum performance
+- ✅ **TypeScript native** - Built-in TypeScript support without additional tools
+- ✅ **JSX support** - React, Preact, Vue JSX transformations
+- ✅ **Modern JS** - ES2015+ syntax transformations
+- ✅ **Tree shaking** - Dead code elimination
+- ✅ **Source maps** - High-quality debugging information
 
 ### Use Cases
 
-- **Large codebases** - Excellent performance on big projects
-- **Advanced TypeScript** - Great support for complex TypeScript features
-- **Custom transformations** - Extensible with plugins
-- **Rust ecosystem** - If you're already using Rust tools
+- Most TypeScript and JavaScript projects
+- React applications and component libraries
+- Large codebases requiring fast compilation
+- Development environments needing quick rebuilds
 
-## OXC
+## swc Transformer
 
-**Next-generation performance**
-
-OXC (Oxidation Compiler) is a collection of JavaScript tools written in Rust, designed to be extremely fast and memory efficient.
+**Best for advanced features.** swc is written in Rust and offers the most comprehensive transformation features.
 
 ### Configuration
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/swc'
 
 export default defineConfig({
-  transformer: 'oxc',
-  oxc: {
-    jsx: {
-      runtime: 'automatic',
-      importSource: 'react'
-    },
-    typescript: {
-      declaration: true
-    }
+  transformer,
+  rollup: {
+    // SWC-specific options
   }
 })
 ```
 
-### Options
+### Features
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `jsx.runtime` | `'classic' \| 'automatic'` | JSX transformation runtime |
-| `jsx.importSource` | `string` | JSX import source for automatic runtime |
-| `typescript.declaration` | `boolean` | Generate TypeScript declarations |
+- ✅ **Rust-powered performance** - Extremely fast compilation
+- ✅ **Advanced decorators** - Both legacy and stage 3 decorators
+- ✅ **Comprehensive JSX** - React, Preact, Vue, Solid.js support
+- ✅ **Plugin ecosystem** - Extensible with custom transformations
+- ✅ **Minification** - Built-in code minification
+- ✅ **Source maps** - Excellent debugging support
 
 ### Use Cases
 
-- **Cutting-edge performance** - Fastest transformer available
-- **Memory efficiency** - Lowest memory usage
-- **Future-proof** - Latest JavaScript/TypeScript features
-- **Experimental projects** - Try the latest tooling
+- Projects using decorators (experimental or legacy)
+- Applications requiring custom transformations
+- Projects prioritizing cutting-edge JavaScript features
+- Large applications where build performance is critical
+
+## OXC Transformer
+
+**Experimental next-generation toolchain.** OXC aims to be the fastest JavaScript/TypeScript toolchain.
+
+### Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/oxc'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    // OXC-specific options
+  }
+})
+```
+
+### Features
+
+- ✅ **Cutting-edge performance** - Designed for maximum speed
+- ✅ **Modern architecture** - Built from the ground up for efficiency
+- ✅ **TypeScript support** - Native TypeScript compilation
+- ⚠️ **Experimental** - Active development, some features may be unstable
+- ✅ **Future-focused** - Targets latest JavaScript standards
+
+### Use Cases
+
+- Experimental projects willing to use bleeding-edge tools
+- Performance-critical applications
+- Projects contributing to the JavaScript tooling ecosystem
+- Testing next-generation build tools
 
 <Callout type="warning">
-OXC is still in active development. While very fast, it may have fewer features than more mature transformers.
+OXC is experimental and under active development. Use with caution in production environments.
 </Callout>
 
-## sucrase
+## sucrase Transformer
 
-**Fast and simple**
-
-sucrase is a super-fast alternative to Babel for when you want to use next-generation JavaScript features.
+**Lightweight and simple.** sucrase focuses on speed and simplicity with a smaller feature set.
 
 ### Configuration
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/sucrase'
 
 export default defineConfig({
-  transformer: 'sucrase',
-  sucrase: {
-    transforms: ['typescript', 'jsx'],
-    jsxRuntime: 'automatic',
-    jsxImportSource: 'react'
+  transformer,
+  rollup: {
+    // Sucrase-specific options
   }
 })
 ```
 
-### Options
+### Features
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `transforms` | `string[]` | List of transforms to apply |
-| `jsxRuntime` | `'classic' \| 'automatic'` | JSX runtime mode |
-| `jsxImportSource` | `string` | JSX import source |
-
-### Available Transforms
-
-- `typescript` - TypeScript syntax
-- `jsx` - JSX syntax
-- `imports` - ES6 import/export
-- `flow` - Flow type annotations
+- ✅ **Minimal overhead** - Smallest transformer bundle size
+- ✅ **Fast compilation** - Quick TypeScript and JSX transformation
+- ✅ **Simple setup** - Minimal configuration required
+- ❌ **Limited features** - No decorators or advanced transformations
+- ✅ **Reliable** - Stable and well-tested
 
 ### Use Cases
 
-- **Simple projects** - When you don't need advanced features
-- **Fast development** - Quick compilation for development builds
-- **Legacy compatibility** - When you need specific transform behavior
+- Simple TypeScript projects without decorators
+- Lightweight applications prioritizing bundle size
+- Rapid prototyping and development
+- Educational projects and tutorials
 
-## TypeScript
+## Choosing a Transformer
 
-**Official TypeScript compiler**
+### Decision Matrix
 
-Use the official TypeScript compiler when you need maximum compatibility and type checking.
+**For most projects:** Start with **esbuild**
+- Fastest, most stable, excellent TypeScript support
+- Great ecosystem compatibility
+- Proven track record in production
 
-### Configuration
+**For advanced features:** Choose **swc**
+- Need decorators (experimental or legacy)
+- Custom transformations required
+- Want cutting-edge JavaScript features
 
-```typescript
-import { defineConfig } from '@visulima/packem/config'
+**For experimentation:** Try **OXC**
+- Contributing to tooling ecosystem
+- Performance research and testing
+- Willing to handle experimental issues
 
-export default defineConfig({
-  transformer: 'typescript',
-  typescript: {
-    tsconfig: './tsconfig.json',
-    compilerOptions: {
-      target: 'ES2020',
-      module: 'ESNext',
-      jsx: 'react-jsx',
-      declaration: true,
-      sourceMap: true
-    }
-  }
-})
-```
+**For simplicity:** Use **sucrase**
+- Simple TypeScript without decorators
+- Minimizing bundle size
+- Quick prototyping
 
-### Options
-
-| Option | Type | Description |
-|--------|------|-------------|
-| `tsconfig` | `string` | Path to tsconfig.json |
-| `compilerOptions` | `object` | TypeScript compiler options |
-
-### Use Cases
-
-- **Type checking** - When you need strict type checking during build
-- **Complex TypeScript** - Advanced TypeScript features
-- **Library development** - When generating .d.ts files is critical
-- **Compatibility** - Maximum TypeScript compatibility
-
-<Callout type="info">
-The TypeScript transformer is slower than alternatives but provides the most comprehensive TypeScript support.
-</Callout>
-
-## Choosing the Right Transformer
-
-### For Most Projects: **esbuild**
-
-```typescript
-export default defineConfig({
-  transformer: 'esbuild'
-})
-```
-
-Best balance of speed, features, and reliability.
-
-### For Maximum Performance: **OXC**
-
-```typescript
-export default defineConfig({
-  transformer: 'oxc'
-})
-```
-
-Cutting-edge performance, but newer with fewer features.
-
-### For Large Codebases: **swc**
-
-```typescript
-export default defineConfig({
-  transformer: 'swc'
-})
-```
-
-Excellent performance with comprehensive features.
-
-### For Type Safety: **TypeScript**
-
-```typescript
-export default defineConfig({
-  transformer: 'typescript'
-})
-```
-
-Official compiler with full type checking.
-
-### For Simplicity: **sucrase**
-
-```typescript
-export default defineConfig({
-  transformer: 'sucrase'
-})
-```
-
-Simple and fast for basic transformations.
-
-## Advanced Configuration
-
-### Per-Environment Transformers
-
-Use different transformers for different environments:
-
-```typescript
-import { defineConfig } from '@visulima/packem/config'
-
-export default defineConfig({
-  transformer: process.env.NODE_ENV === 'development' ? 'esbuild' : 'swc',
-  
-  // Development: fast compilation
-  esbuild: {
-    minify: false,
-    sourcemap: true
-  },
-  
-  // Production: optimized output
-  swc: {
-    minify: true,
-    sourcemap: false
-  }
-})
-```
-
-### Conditional Transformer Options
-
-```typescript
-export default defineConfig({
-  transformer: 'esbuild',
-  esbuild: {
-    minify: process.env.NODE_ENV === 'production',
-    target: process.env.TARGET_ES || 'es2020',
-    jsx: process.env.JSX_RUNTIME === 'classic' ? 'transform' : 'automatic'
-  }
-})
-```
-
-### Multiple Entry Points with Different Transformers
-
-```typescript
-export default defineConfig([
-  // Modern build with OXC
-  {
-    transformer: 'oxc',
-    rollup: {
-      input: 'src/modern.ts',
-      output: {
-        file: 'dist/modern.js',
-        format: 'esm'
-      }
-    }
-  },
-  
-  // Legacy build with TypeScript
-  {
-    transformer: 'typescript',
-    rollup: {
-      input: 'src/legacy.ts',
-      output: {
-        file: 'dist/legacy.js',
-        format: 'cjs'
-      }
-    }
-  }
-])
-```
-
-## Performance Comparison
+### Performance Benchmarks
 
 Based on typical TypeScript projects:
 
-| Transformer | Small Project | Medium Project | Large Project |
-|-------------|---------------|----------------|---------------|
-| **OXC** | ~50ms | ~200ms | ~800ms |
-| **esbuild** | ~80ms | ~300ms | ~1.2s |
-| **swc** | ~100ms | ~350ms | ~1.5s |
-| **sucrase** | ~120ms | ~400ms | ~2.0s |
-| **TypeScript** | ~500ms | ~2.0s | ~8.0s |
+```
+esbuild:  ~0.1s for 1000 files
+swc:      ~0.12s for 1000 files  
+OXC:      ~0.08s for 1000 files (experimental)
+sucrase:  ~0.15s for 1000 files
+```
 
 <Callout type="info">
-Performance varies based on project complexity, TypeScript features used, and hardware. These are approximate benchmarks.
+Actual performance varies based on project size, complexity, and system specifications. Always benchmark with your specific codebase.
 </Callout>
 
-## Troubleshooting
+## Advanced Configuration
 
-### Transformer Not Found
+### Environment-Specific Transformers
 
-Make sure the transformer is installed:
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import esbuildTransformer from '@visulima/packem/transformer/esbuild'
+import swcTransformer from '@visulima/packem/transformer/swc'
 
-<Tabs>
-  <TabItem label="esbuild">
-    ```bash
-    npm install --save-dev esbuild
-    ```
-  </TabItem>
-  <TabItem label="swc">
-    ```bash
-    npm install --save-dev @swc/core
-    ```
-  </TabItem>
-  <TabItem label="oxc">
-    ```bash
-    npm install --save-dev oxc-transform
-    ```
-  </TabItem>
-  <TabItem label="sucrase">
-    ```bash
-    npm install --save-dev sucrase
-    ```
-  </TabItem>
-  <TabItem label="typescript">
-    ```bash
-    npm install --save-dev typescript
-    ```
-  </TabItem>
-</Tabs>
+const isDev = process.env.NODE_ENV === 'development'
 
-### Compilation Errors
+export default defineConfig({
+  // Use esbuild for development (faster), swc for production (more features)
+  transformer: isDev ? esbuildTransformer : swcTransformer
+})
+```
 
-1. **Check your tsconfig.json** - Ensure it's valid and compatible
-2. **Verify source files** - Check for syntax errors
-3. **Update transformer** - Make sure you're using a recent version
-4. **Check configuration** - Verify transformer-specific options
+### Conditional Transformer Loading
 
-### Performance Issues
+```typescript
+import { defineConfig } from '@visulima/packem/config'
 
-1. **Use faster transformer** - Switch to esbuild or OXC
-2. **Enable caching** - Use Packen's built-in caching
-3. **Reduce bundle size** - Enable tree shaking and minification
-4. **Parallel processing** - Use multiple workers for large projects
+// Dynamically load transformer based on availability
+const getTransformer = async () => {
+  try {
+    return (await import('@visulima/packem/transformer/swc')).default
+  } catch {
+    return (await import('@visulima/packem/transformer/esbuild')).default
+  }
+}
 
----
+export default defineConfig({
+  transformer: await getTransformer()
+})
+```
 
-Need more help? Check the [troubleshooting guide](/docs/guide/troubleshooting) or [transformer-specific examples](/docs/examples/transformers).
+## Common Issues
+
+### TypeScript Errors
+
+**esbuild:**
+- Type checking is disabled by default for speed
+- Use `tsc --noEmit` for type checking in CI/CD
+
+**swc:**
+- More comprehensive type checking available
+- May be slower due to additional analysis
+
+### JSX Configuration
+
+Make sure your `tsconfig.json` has correct JSX settings:
+
+```json
+{
+  "compilerOptions": {
+    "jsx": "react-jsx", // For React 17+
+    "jsxImportSource": "react" // or your JSX library
+  }
+}
+```
+
+### Source Map Issues
+
+All transformers support source maps, but quality may vary:
+
+```typescript
+export default defineConfig({
+  sourcemap: true, // Enable source maps
+  transformer // Your chosen transformer
+})
+```
+
+This transformer guide helps you choose the right tool for your specific project requirements and performance goals.

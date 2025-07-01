@@ -42,14 +42,11 @@ import swc from '@visulima/packem/transformer/swc'
 // OXC (experimental)
 import oxc from '@visulima/packem/transformer/oxc'
 
-// TypeScript compiler
-import typescript from '@visulima/packem/transformer/typescript'
-
 // sucrase (lightweight)
 import sucrase from '@visulima/packem/transformer/sucrase'
 
 export default defineConfig({
-  transformer: esbuild // or swc, oxc, typescript, sucrase
+  transformer: esbuild // or swc, oxc, sucrase
 })
 ```
 
@@ -74,9 +71,8 @@ Generate TypeScript declaration files:
 export default defineConfig({
   declaration: true,      // Generate .d.ts files
   declaration: false,     // Skip declaration generation
-  declaration: {
-    isolated: true        // Use isolated declarations (experimental)
-  }
+  declaration: 'compatible', // Generate compatible declarations
+  declaration: 'node16'   // Generate node16 declarations
 })
 ```
 
@@ -88,9 +84,6 @@ Control code minification:
 export default defineConfig({
   minify: true,           // Enable minification
   minify: false,          // Disable minification
-  minify: 'esbuild',      // Use esbuild minifier
-  minify: 'swc',          // Use swc minifier
-  minify: 'terser'        // Use terser minifier
 })
 ```
 
@@ -132,13 +125,11 @@ export default defineConfig({
   entries: [
     {
       input: 'src/index.ts',
-      outDir: 'dist',
-      format: ['esm', 'cjs']
+      outDir: 'dist'
     },
     {
       input: 'src/cli.ts',
-      outDir: 'dist/bin',
-      format: ['cjs']
+      outDir: 'dist/bin'
     }
   ]
 })
@@ -172,41 +163,20 @@ export default defineConfig({
 Configure CSS processing:
 
 ```typescript
-import postcss from '@visulima/packem/loader/postcss'
-import sass from '@visulima/packem/loader/sass'
-import less from '@visulima/packem/loader/less'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+import sassLoader from '@visulima/packem/css/loader/sass'
+import lessLoader from '@visulima/packem/css/loader/less'
+import stylusLoader from '@visulima/packem/css/loader/stylus'
+import sourceMapLoader from '@visulima/packem/css/loader/sourcemap'
+import cssnanoMinifier from '@visulima/packem/css/minifier/cssnano'
+import lightningcssMinifier from '@visulima/packem/css/minifier/lightningcss'
 
 export default defineConfig({
   rollup: {
     css: {
-      // PostCSS configuration
-      postcss: postcss({
-        plugins: [
-          require('autoprefixer'),
-          require('cssnano')
-        ]
-      }),
-      
-      // Sass configuration
-      sass: sass({
-        includePaths: ['node_modules', 'src/styles']
-      }),
-      
-      // Less configuration
-      less: less({
-        paths: ['src/styles']
-      }),
-      
-      // CSS Modules
-      modules: {
-        generateScopedName: '[name]__[local]___[hash:base64:5]'
-      },
-      
-      // Extract CSS to separate files
-      extract: true,
-      
-      // Inject CSS into JavaScript
-      inject: false
+      mode: 'extract', // or 'inject'
+      loaders: [postcssLoader, sassLoader, lessLoader, stylusLoader, sourceMapLoader],
+      minifier: cssnanoMinifier
     }
   }
 })
@@ -216,18 +186,21 @@ export default defineConfig({
 
 ### Multi-Format Builds
 
-Build multiple output formats:
+Build multiple output formats by configuring package.json properly:
 
-```typescript
-export default defineConfig({
-  entries: [
-    {
-      input: 'src/index.ts',
-      format: ['esm', 'cjs', 'iife'],
-      outDir: 'dist'
+```json
+{
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
-  ]
-})
+  }
+}
 ```
 
 ### Environment-Specific Config
@@ -250,16 +223,17 @@ export default defineConfig({
 ### Conditional Configuration
 
 ```typescript
+import esbuildTransformer from '@visulima/packem/transformer/esbuild'
+import swcTransformer from '@visulima/packem/transformer/swc'
+
 export default defineConfig({
   transformer: process.env.TRANSFORMER === 'swc' 
-    ? swc 
-    : esbuild,
+    ? swcTransformer 
+    : esbuildTransformer,
   
-  rollup: {
-    external: process.env.BUNDLE_DEPS 
-      ? [] 
-      : ['react', 'react-dom']
-  }
+  externals: process.env.BUNDLE_DEPS 
+    ? [] 
+    : ['react', 'react-dom']
 })
 ```
 
@@ -275,11 +249,10 @@ export default defineConfig({
   transformer,
   sourcemap: true,
   declaration: true,
+  externals: ['react', 'react-dom'],
   rollup: {
-    external: ['react', 'react-dom'],
     css: {
-      modules: true,
-      extract: true
+      mode: 'extract'
     }
   }
 })
@@ -290,11 +263,8 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   transformer,
-  target: 'node',
-  format: ['cjs', 'esm'],
-  rollup: {
-    external: (id) => !id.startsWith('.') && !id.startsWith('/')
-  }
+  runtime: 'node',
+  externals: (id) => !id.startsWith('.') && !id.startsWith('/')
 })
 ```
 
@@ -305,14 +275,10 @@ export default defineConfig({
   entries: [
     {
       input: 'src/cli.ts',
-      format: ['cjs'],
-      outDir: 'dist',
-      banner: '#!/usr/bin/env node'
+      executable: true
     }
   ],
-  rollup: {
-    external: ['fs', 'path', 'process']
-  }
+  externals: ['fs', 'path', 'process']
 })
 ```
 
@@ -320,14 +286,8 @@ export default defineConfig({
 
 ```typescript
 export default defineConfig({
-  entries: [
-    {
-      input: 'src/index.ts',
-      format: ['esm', 'iife'],
-      globalName: 'MyLibrary'
-    }
-  ],
-  target: 'browser',
+  transformer,
+  runtime: 'browser',
   minify: true
 })
 ```
