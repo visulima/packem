@@ -116,7 +116,7 @@ describe("packem typescript", () => {
                 devDependencies: {
                     typescript: "*",
                 },
-                main: "./dist/index.mjs",
+                main: "./dist/index.js",
                 type: "module",
             });
             await createTsConfig(temporaryDirectoryPath);
@@ -129,7 +129,7 @@ describe("packem typescript", () => {
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            const content = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+            const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
             expect(content).toBe("console.log(1);\n");
         });
@@ -141,7 +141,7 @@ describe("packem typescript", () => {
             await writeFile(`${temporaryDirectoryPath}/src/file.jsx`, "console.log(1);");
 
             await createPackageJson(temporaryDirectoryPath, {
-                main: "./dist/index.mjs",
+                main: "./dist/index.js",
                 type: "module",
             });
             await createPackemConfig(temporaryDirectoryPath);
@@ -153,7 +153,7 @@ describe("packem typescript", () => {
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            const content = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+            const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
             expect(content).toBe("console.log(1);\n");
         });
@@ -169,7 +169,7 @@ describe("packem typescript", () => {
                 devDependencies: {
                     typescript: "*",
                 },
-                main: "./dist/index.mjs",
+                main: "./dist/index.js",
                 type: "module",
             });
             await createTsConfig(temporaryDirectoryPath);
@@ -182,7 +182,7 @@ describe("packem typescript", () => {
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            const content = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+            const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
             expect(content).toBe("console.log(1);\n");
         });
@@ -198,7 +198,7 @@ describe("packem typescript", () => {
                 devDependencies: {
                     typescript: "*",
                 },
-                main: "./dist/index.mjs",
+                main: "./dist/index.js",
                 type: "module",
             });
             await createTsConfig(temporaryDirectoryPath);
@@ -211,7 +211,7 @@ describe("packem typescript", () => {
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            const content = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+            const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
             expect(content).toBe("console.log(1);\n");
         });
@@ -494,8 +494,8 @@ export const version = pkgJson.version;
             },
             exports: {
                 ".": {
-                    default: "./dist/index.mjs",
-                    types: "./dist/index.d.mts",
+                    default: "./dist/index.js",
+                    types: "./dist/index.d.ts",
                 },
             },
             type: "module",
@@ -510,14 +510,14 @@ export const version = pkgJson.version;
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dMtsContent).toBe(`declare const version: string;
 
 export { version };
 `);
 
-        const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(dCtsContent).toBe(`const version$1 = "0.0.1";
 const pkgJson = {
@@ -647,8 +647,8 @@ export { index as default };
             },
             exports: {
                 ".": {
-                    default: "./dist/index.mjs",
-                    types: "./dist/index.d.mts",
+                    default: "./dist/index.js",
+                    types: "./dist/index.d.ts",
                 },
             },
             type: "module",
@@ -667,7 +667,7 @@ export { index as default };
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -676,11 +676,11 @@ const index = /* @__PURE__ */ __name(() => "index", "default");
 export { index as default };
 `);
 
-        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dMtsContent).toBe(`declare const _default: () => string;
 
-export { _default as default };
+export = _default;
 `);
     });
 
@@ -1299,8 +1299,8 @@ export type Num2 = number`,
                     },
                     exports: {
                         ".": {
-                            default: "./dist/index.cjs",
-                            types: "./dist/index.d.cts",
+                            default: "./dist/index.js",
+                            types: "./dist/index.d.ts",
                         },
                     },
                 });
@@ -1324,9 +1324,9 @@ export type Num2 = number`,
                 expect(binProcess.exitCode).toBe(0);
                 expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
 
-                const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
+                const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-                expect(dCtsContent).toBe(`import { type Num } from ${quote}./types.d.cts${quote};
+                expect(dCtsContent).toBe(`import { type Num } from ${quote}./types.d.ts${quote};
 export type Str = string;
 export declare function hello(s: Str): Str;
 export declare let num: Num;
@@ -1340,7 +1340,7 @@ export declare function hello(s: Str): Str;
 export declare let num: Num;
 `);
 
-                const dCtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/types.d.cts`);
+                const dCtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/types.d.ts`);
 
                 expect(dCtsTypesContent).toBe(`export type Num = number;
 `);
@@ -1493,8 +1493,8 @@ export type Num2 = number`,
                     },
                     exports: {
                         ".": {
-                            default: "./dist/index.cjs",
-                            types: "./dist/index.d.cts",
+                            default: "./dist/index.js",
+                            types: "./dist/index.d.ts",
                         },
                     },
                 });
@@ -1521,16 +1521,16 @@ export type Num2 = number`,
                 expect(binProcess.exitCode).toBe(0);
                 expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
 
-                const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
+                const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-                expect(dCtsContent).toBe(`import { type Num } from ${quote}./types.d.cts${quote};
+                expect(dCtsContent).toBe(`import { type Num } from ${quote}./types.d.ts${quote};
 export type Str = string;
 export declare function hello(s: Str): Str;
 export declare let num: Num;
-//# sourceMappingURL=index.d.cts.map
+//# sourceMappingURL=index.d.ts.map
 `);
 
-                const dCtsMapContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts.map`);
+                const dCtsMapContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts.map`);
 
                 // eslint-disable-next-line default-case
                 switch (isolatedDeclarationTransformer) {
@@ -1545,7 +1545,7 @@ export declare let num: Num;
                     case "swc": {
                         // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsMapContent).toBe(
-                            `{"file":"index.d.cts","mappings":"AAGA,OAAO,SAASA,MAAMC,CAAM;IAC1B,OAAO,UAAUA;AACnB;AAEA,OAAO,IAAIC,MAAW,EAAC","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
+                            `{"file":"index.d.ts","mappings":"AAGA,OAAO,SAASA,MAAMC,CAAM;IAC1B,OAAO,UAAUA;AACnB;AAEA,OAAO,IAAIC,MAAW,EAAC","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
 
                         break;
@@ -1553,7 +1553,7 @@ export declare let num: Num;
                     case "typescript": {
                         // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsMapContent).toBe(
-                            `{"file":"index.d.cts","mappings":"AAAA,OAAO,EAAE,KAAK,GAAG,EAAE,MAAM,SAAS,CAAA;AAClC,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA;AAExB,wBAAgB,KAAK,CAAC,CAAC,EAAE,GAAG,GAAG,GAAG,CAEjC;AAED,eAAO,IAAI,GAAG,EAAE,GAAO,CAAA","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
+                            `{"file":"index.d.ts","mappings":"AAAA,OAAO,EAAE,KAAK,GAAG,EAAE,MAAM,SAAS,CAAA;AAClC,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA;AAExB,wBAAgB,KAAK,CAAC,CAAC,EAAE,GAAG,GAAG,GAAG,CAEjC;AAED,eAAO,IAAI,GAAG,EAAE,GAAO,CAAA","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
 
                         break;
@@ -1604,17 +1604,17 @@ export declare let num: Num;
                 const dCtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/types.d.cts`);
 
                 expect(dCtsTypesContent).toBe(`export type Num = number;
-//# sourceMappingURL=types.d.cts.map
+//# sourceMappingURL=types.d.ts.map
 `);
 
-                const dCtsTypesMapContent = await readFile(`${temporaryDirectoryPath}/dist/types.d.cts.map`);
+                const dCtsTypesMapContent = await readFile(`${temporaryDirectoryPath}/dist/types.d.ts.map`);
 
                 // eslint-disable-next-line default-case
                 switch (isolatedDeclarationTransformer) {
                     case "oxc": {
                         // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsTypesMapContent).toBe(
-                            `{"file":"types.d.cts","mappings":"AACA,YAAY","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
+                            `{"file":"types.d.ts","mappings":"AACA,YAAY","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
                         );
 
                         break;
@@ -1622,7 +1622,7 @@ export declare let num: Num;
                     case "swc": {
                         // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsTypesMapContent).toBe(
-                            `{"file":"types.d.cts","mappings":"AACA,WAAwB","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
+                            `{"file":"types.d.ts","mappings":"AACA,WAAwB","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
                         );
 
                         break;
@@ -1630,7 +1630,7 @@ export declare let num: Num;
                     case "typescript": {
                         // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsTypesMapContent).toBe(
-                            `{"file":"types.d.cts","mappings":"AACA,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
+                            `{"file":"types.d.ts","mappings":"AACA,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA","names":[],"sourceRoot":"","sources":["../src/types.ts"],"version":3}`,
                         );
 
                         break;

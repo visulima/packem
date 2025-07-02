@@ -1,6 +1,18 @@
-import type { BuildContext } from "@visulima/packem-share/types";
+import type { BuildContext, Format } from "../types";
 
-import type { InternalBuildOptions } from "../types";
+/**
+ * Options interface for determining file extensions
+ */
+interface FileExtensionOptions {
+    /** Map of format to file extension */
+    outputExtensionMap?: Record<Format, string>;
+    /** Whether to emit CommonJS format */
+    emitCJS?: boolean;
+    /** Whether to emit ESM format */
+    emitESM?: boolean;
+    /** Declaration file generation mode */
+    declaration?: boolean | "compatible" | "node16" | undefined;
+}
 
 /**
  * Maps JavaScript extension to corresponding TypeScript declaration extension.
@@ -25,7 +37,7 @@ const mapJsExtensionToDts = (jsExtension: string): string => {
 /**
  * Determines declaration extension when outputExtensionMap is provided.
  */
-const getDtsExtensionFromMap = (context: BuildContext<InternalBuildOptions>, format: "esm" | "cjs"): string => {
+const getDtsExtensionFromMap = <T extends FileExtensionOptions>(context: BuildContext<T>, format: Format): string => {
     const jsExtension = context.options.outputExtensionMap?.[format];
 
     if (jsExtension) {
@@ -45,11 +57,11 @@ const getDtsExtensionFromMap = (context: BuildContext<InternalBuildOptions>, for
  * - Node.js 10 compatibility is disabled
  *
  * Otherwise returns traditional extensions ('.mjs' for ESM, '.cjs' for CJS).
- * @param context Build context containing configuration
+ * @param context Build context
  * @param format Target format ('esm' or 'cjs')
  * @returns File extension string
  */
-export const getOutputExtension = (context: BuildContext<InternalBuildOptions>, format: "esm" | "cjs"): string => {
+export const getOutputExtension = <T extends FileExtensionOptions>(context: BuildContext<T>, format: Format): string => {
     // If outputExtensionMap is provided, always use it
     if (context.options.outputExtensionMap) {
         return context.options.outputExtensionMap[format] ?? (format === "esm" ? "mjs" : "cjs");
@@ -74,11 +86,11 @@ export const getOutputExtension = (context: BuildContext<InternalBuildOptions>, 
  * - Node.js 10 compatibility is disabled
  *
  * Otherwise returns traditional extensions ('.d.mts' for ESM, '.d.cts' for CJS).
- * @param context Build context containing configuration
+ * @param context Build context
  * @param format Target format ('esm' or 'cjs')
  * @returns Declaration file extension string
  */
-export const getDtsExtension = (context: BuildContext<InternalBuildOptions>, format: "esm" | "cjs"): string => {
+export const getDtsExtension = <T extends FileExtensionOptions>(context: BuildContext<T>, format: Format): string => {
     // If outputExtensionMap is provided, derive DTS extension from it
     if (context.options.outputExtensionMap) {
         return getDtsExtensionFromMap(context, format);
@@ -92,4 +104,4 @@ export const getDtsExtension = (context: BuildContext<InternalBuildOptions>, for
 
     // If only one format is emitted and no special config, use .d.ts
     return "d.ts";
-};
+}; 

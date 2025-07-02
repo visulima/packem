@@ -11,7 +11,7 @@ import type { SwcPluginConfig } from "@visulima/packem-rollup/swc";
 import { patchTypescriptTypesPlugin, resolveTsconfigPathsPlugin, resolveTsconfigRootDirectoriesPlugin, resolveTypescriptMjsCtsPlugin } from "@visulima/packem-rollup/typescript";
 import type { BuildContext, FileCache } from "@visulima/packem-share";
 import { arrayify, memoizeByKey } from "@visulima/packem-share";
-import { getChunkFilename, getEntryFileNames, sortUserPlugins } from "@visulima/packem-share/utils";
+import { getChunkFilename, getEntryFileNames, sortUserPlugins, getDtsExtension, getOutputExtension } from "@visulima/packem-share/utils";
 import { join, relative, resolve } from "@visulima/path";
 import { cssModulesTypesPlugin, rollupCssPlugin } from "@visulima/rollup-css-plugin";
 import type { TsConfigResult } from "@visulima/tsconfig";
@@ -19,7 +19,6 @@ import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupL
 import { minVersion } from "semver";
 
 import type { InternalBuildOptions } from "../types";
-import { getDtsExtension, getOutputExtension } from "../utils/get-file-extensions";
 import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
 import resolveAliases from "./utils/resolve-aliases";
 

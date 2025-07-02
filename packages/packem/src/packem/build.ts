@@ -11,7 +11,7 @@ import { join, relative, resolve } from "@visulima/path";
 import rollupBuild from "../rollup/build";
 import rollupBuildTypes from "../rollup/build-types";
 import type { BuildEntry, InternalBuildOptions } from "../types";
-import { getDtsExtension, getOutputExtension } from "../utils/get-file-extensions";
+import { getDtsExtension, getOutputExtension } from "@visulima/packem-share/utils";
 import brotliSize from "./utils/brotli-size";
 import groupByKeys from "./utils/group-by-keys";
 import gzipSize from "./utils/gzip-size";
