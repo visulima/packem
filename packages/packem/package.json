@@ -71,76 +71,76 @@
     "type": "module",
     "exports": {
         ".": {
-            "types": "./dist/index.d.mts",
-            "default": "./dist/index.mjs"
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
         },
         "./config": {
-            "types": "./dist/config/index.d.mts",
-            "default": "./dist/config/index.mjs"
+            "types": "./dist/config/index.d.ts",
+            "default": "./dist/config/index.js"
         },
         "./css/loader/sourcemap": {
-            "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.mts",
-            "default": "./dist/rollup/plugins/css/loaders/sourcemap.mjs"
+            "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.ts",
+            "default": "./dist/rollup/plugins/css/loaders/sourcemap.js"
         },
         "./css/loader/less": {
-            "types": "./dist/rollup/plugins/css/loaders/less.d.mts",
-            "default": "./dist/rollup/plugins/css/loaders/less.mjs"
+            "types": "./dist/rollup/plugins/css/loaders/less.d.ts",
+            "default": "./dist/rollup/plugins/css/loaders/less.js"
         },
         "./css/loader/postcss": {
-            "types": "./dist/rollup/plugins/css/loaders/postcss.d.mts",
-            "default": "./dist/rollup/plugins/css/loaders/postcss.mjs"
+            "types": "./dist/rollup/plugins/css/loaders/postcss.d.ts",
+            "default": "./dist/rollup/plugins/css/loaders/postcss.js"
         },
         "./css/loader/sass": {
-            "types": "./dist/rollup/plugins/css/loaders/sass.d.mts",
-            "default": "./dist/rollup/plugins/css/loaders/sass.mjs"
+            "types": "./dist/rollup/plugins/css/loaders/sass.d.ts",
+            "default": "./dist/rollup/plugins/css/loaders/sass.js"
         },
         "./css/loader/stylus": {
-            "types": "./dist/rollup/plugins/css/loaders/stylus.d.mts",
-            "default": "./dist/rollup/plugins/css/loaders/stylus.mjs"
+            "types": "./dist/rollup/plugins/css/loaders/stylus.d.ts",
+            "default": "./dist/rollup/plugins/css/loaders/stylus.js"
         },
         "./css/loader/lightningcss": {
-            "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.mts",
-            "default": "./dist/rollup/plugins/css/loaders/lightningcss.mjs"
+            "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.ts",
+            "default": "./dist/rollup/plugins/css/loaders/lightningcss.js"
         },
         "./css/minifier/cssnano": {
-            "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.mts",
-            "default": "./dist/rollup/plugins/css/minifiers/cssnano.mjs"
+            "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.ts",
+            "default": "./dist/rollup/plugins/css/minifiers/cssnano.js"
         },
         "./css/minifier/lightningcss": {
-            "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.mts",
-            "default": "./dist/rollup/plugins/css/minifiers/lightningcss.mjs"
+            "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.ts",
+            "default": "./dist/rollup/plugins/css/minifiers/lightningcss.js"
         },
         "./transformer/esbuild": {
-            "types": "./dist/rollup/plugins/esbuild/index.d.mts",
-            "default": "./dist/rollup/plugins/esbuild/index.mjs"
+            "types": "./dist/rollup/plugins/esbuild/index.d.ts",
+            "default": "./dist/rollup/plugins/esbuild/index.js"
         },
         "./transformer/swc": {
-            "types": "./dist/rollup/plugins/swc/swc-plugin.d.mts",
-            "default": "./dist/rollup/plugins/swc/swc-plugin.mjs"
+            "types": "./dist/rollup/plugins/swc/swc-plugin.d.ts",
+            "default": "./dist/rollup/plugins/swc/swc-plugin.js"
         },
         "./dts/isolated/transformer/swc": {
-            "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.mts",
-            "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.mjs"
+            "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.ts",
+            "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.js"
         },
         "./dts/isolated/transformer/oxc": {
-            "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.mts",
-            "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.mjs"
+            "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.ts",
+            "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.js"
         },
         "./dts/isolated/transformer/typescript": {
-            "types": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.mts",
-            "default": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.mjs"
+            "types": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.ts",
+            "default": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.js"
         },
         "./transformer/sucrase": {
-            "types": "./dist/rollup/plugins/sucrase/index.d.mts",
-            "default": "./dist/rollup/plugins/sucrase/index.mjs"
+            "types": "./dist/rollup/plugins/sucrase/index.d.ts",
+            "default": "./dist/rollup/plugins/sucrase/index.js"
         },
         "./transformer/oxc": {
-            "types": "./dist/rollup/plugins/oxc/oxc-transformer.d.mts",
-            "default": "./dist/rollup/plugins/oxc/oxc-transformer.mjs"
+            "types": "./dist/rollup/plugins/oxc/oxc-transformer.d.ts",
+            "default": "./dist/rollup/plugins/oxc/oxc-transformer.js"
         },
         "./builder/typedoc": {
-            "types": "./dist/builder/typedoc/index.d.mts",
-            "default": "./dist/builder/typedoc/index.mjs"
+            "types": "./dist/builder/typedoc/index.d.ts",
+            "default": "./dist/builder/typedoc/index.js"
         },
         "./files": {
             "types": "./files.d.ts"
@@ -148,7 +148,7 @@
         "./package.json": "./package.json"
     },
     "bin": {
-        "packem": "./dist/cli/index.mjs"
+        "packem": "./dist/cli/index.js"
     },
     "files": [
         "dist",

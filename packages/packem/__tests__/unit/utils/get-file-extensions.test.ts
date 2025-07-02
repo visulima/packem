@@ -10,7 +10,7 @@ const createContext = (options: Partial<InternalBuildOptions>): BuildContext<Int
         // Default options
         emitCJS: true,
         emitESM: true,
-        node10Compatibility: false,
+        declaration: undefined,
         outputExtensionMap: undefined,
         ...options,
     } as InternalBuildOptions,
@@ -61,31 +61,43 @@ describe(getOutputExtension, () => {
         });
     });
 
-    describe("when Node.js 10 compatibility is enabled", () => {
-        it("should use traditional extensions even without outputExtensionMap", () => {
+    describe("when emitCJS and declaration is compatible", () => {
+        it("should use traditional extensions", () => {
             expect.assertions(2);
 
             const context = createContext({
-                emitCJS: false,
+                emitCJS: true,
                 emitESM: true,
-                node10Compatibility: true,
+                declaration: "compatible",
             });
 
             expect(getOutputExtension(context, "esm")).toBe("mjs");
             expect(getOutputExtension(context, "cjs")).toBe("cjs");
         });
 
-        it("should use traditional extensions when node10Compatibility is undefined (default true)", () => {
+        it("should not use traditional extensions when declaration is not compatible", () => {
             expect.assertions(2);
 
             const context = createContext({
-                emitCJS: false,
+                emitCJS: true,
                 emitESM: true,
-                node10Compatibility: undefined,
+                declaration: "node16",
             });
 
             expect(getOutputExtension(context, "esm")).toBe("mjs");
             expect(getOutputExtension(context, "cjs")).toBe("cjs");
+        });
+
+        it("should not use traditional extensions when emitCJS is false", () => {
+            expect.assertions(1);
+
+            const context = createContext({
+                emitCJS: false,
+                emitESM: true,
+                declaration: "compatible",
+            });
+
+            expect(getOutputExtension(context, "esm")).toBe("js");
         });
     });
 
@@ -96,7 +108,7 @@ describe(getOutputExtension, () => {
             const context = createContext({
                 emitCJS: true,
                 emitESM: true,
-                node10Compatibility: false,
+                declaration: undefined,
             });
 
             expect(getOutputExtension(context, "esm")).toBe("mjs");
@@ -111,7 +123,7 @@ describe(getOutputExtension, () => {
             const context = createContext({
                 emitCJS: false,
                 emitESM: true,
-                node10Compatibility: false,
+                declaration: undefined,
             });
 
             expect(getOutputExtension(context, "esm")).toBe("js");
@@ -123,7 +135,7 @@ describe(getOutputExtension, () => {
             const context = createContext({
                 emitCJS: true,
                 emitESM: false,
-                node10Compatibility: false,
+                declaration: undefined,
             });
 
             expect(getOutputExtension(context, "cjs")).toBe("js");
@@ -135,7 +147,7 @@ describe(getOutputExtension, () => {
             const context = createContext({
                 emitCJS: false,
                 emitESM: false,
-                node10Compatibility: false,
+                declaration: undefined,
             });
 
             expect(getOutputExtension(context, "esm")).toBe("js");
@@ -187,15 +199,15 @@ describe(getDtsExtension, () => {
             expect(getDtsExtension(context, "cjs")).toBe("d.cts");
         });
 
-        it("should fallback to traditional extensions for unknown js extension", () => {
+        it("should fallback to .d.ts for unknown js extension", () => {
             expect.assertions(2);
 
             const context = createContext({
                 outputExtensionMap: { cjs: "weird", esm: "unknown" },
             });
 
-            expect(getDtsExtension(context, "esm")).toBe("d.mts");
-            expect(getDtsExtension(context, "cjs")).toBe("d.cts");
+            expect(getDtsExtension(context, "esm")).toBe("d.ts");
+            expect(getDtsExtension(context, "cjs")).toBe("d.ts");
         });
 
         it("should handle empty outputExtensionMap", () => {
@@ -210,31 +222,43 @@ describe(getDtsExtension, () => {
         });
     });
 
-    describe("when Node.js 10 compatibility is enabled", () => {
-        it("should use traditional extensions even without outputExtensionMap", () => {
+    describe("when emitCJS and declaration is compatible", () => {
+        it("should use traditional extensions", () => {
             expect.assertions(2);
 
             const context = createContext({
-                emitCJS: false,
+                emitCJS: true,
                 emitESM: true,
-                node10Compatibility: true,
+                declaration: "compatible",
             });
 
             expect(getDtsExtension(context, "esm")).toBe("d.mts");
             expect(getDtsExtension(context, "cjs")).toBe("d.cts");
         });
 
-        it("should use traditional extensions when node10Compatibility is undefined (default true)", () => {
+        it("should not use traditional extensions when declaration is not compatible", () => {
             expect.assertions(2);
 
             const context = createContext({
-                emitCJS: false,
+                emitCJS: true,
                 emitESM: true,
-                node10Compatibility: undefined,
+                declaration: "node16",
             });
 
             expect(getDtsExtension(context, "esm")).toBe("d.mts");
             expect(getDtsExtension(context, "cjs")).toBe("d.cts");
+        });
+
+        it("should not use traditional extensions when emitCJS is false", () => {
+            expect.assertions(1);
+
+            const context = createContext({
+                emitCJS: false,
+                emitESM: true,
+                declaration: "compatible",
+            });
+
+            expect(getDtsExtension(context, "esm")).toBe("d.ts");
         });
     });
 
@@ -245,7 +269,7 @@ describe(getDtsExtension, () => {
             const context = createContext({
                 emitCJS: true,
                 emitESM: true,
-                node10Compatibility: false,
+                declaration: undefined,
             });
 
             expect(getDtsExtension(context, "esm")).toBe("d.mts");
@@ -260,7 +284,7 @@ describe(getDtsExtension, () => {
             const context = createContext({
                 emitCJS: false,
                 emitESM: true,
-                node10Compatibility: false,
+                declaration: undefined,
             });
 
             expect(getDtsExtension(context, "esm")).toBe("d.ts");
@@ -272,7 +296,7 @@ describe(getDtsExtension, () => {
             const context = createContext({
                 emitCJS: true,
                 emitESM: false,
-                node10Compatibility: false,
+                declaration: undefined,
             });
 
             expect(getDtsExtension(context, "cjs")).toBe("d.ts");
@@ -284,7 +308,7 @@ describe(getDtsExtension, () => {
             const context = createContext({
                 emitCJS: false,
                 emitESM: false,
-                node10Compatibility: false,
+                declaration: undefined,
             });
 
             expect(getDtsExtension(context, "esm")).toBe("d.ts");
@@ -301,7 +325,7 @@ describe("integration scenarios", () => {
             const context = createContext({
                 emitCJS: false,
                 emitESM: true,
-                node10Compatibility: false,
+                declaration: undefined,
                 outputExtensionMap: undefined,
             });
 
@@ -315,7 +339,7 @@ describe("integration scenarios", () => {
             const context = createContext({
                 emitCJS: true,
                 emitESM: false,
-                node10Compatibility: false,
+                declaration: undefined,
                 outputExtensionMap: undefined,
             });
 
@@ -331,7 +355,7 @@ describe("integration scenarios", () => {
             const context = createContext({
                 emitCJS: true,
                 emitESM: true,
-                node10Compatibility: false,
+                declaration: undefined,
                 outputExtensionMap: undefined,
             });
 
@@ -342,14 +366,14 @@ describe("integration scenarios", () => {
         });
     });
 
-    describe("legacy Node.js 10 support", () => {
-        it("should use traditional extensions for legacy support", () => {
+    describe("compatible declaration mode", () => {
+        it("should use traditional extensions when emitCJS and declaration is compatible", () => {
             expect.assertions(2);
 
             const context = createContext({
-                emitCJS: false,
+                emitCJS: true,
                 emitESM: true,
-                node10Compatibility: true,
+                declaration: "compatible",
                 outputExtensionMap: undefined,
             });
 
@@ -365,7 +389,7 @@ describe("integration scenarios", () => {
             const context = createContext({
                 emitCJS: true,
                 emitESM: true,
-                node10Compatibility: false,
+                declaration: undefined,
                 outputExtensionMap: { cjs: "js", esm: "js" },
             });
 
@@ -381,7 +405,7 @@ describe("integration scenarios", () => {
             const context = createContext({
                 emitCJS: true,
                 emitESM: true,
-                node10Compatibility: false,
+                declaration: undefined,
                 outputExtensionMap: { cjs: "cjs", esm: "js" },
             });
 

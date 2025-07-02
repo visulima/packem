@@ -37,7 +37,6 @@ import packageJsonValidator from "../validator/package-json";
 import validateAliasEntries from "../validator/validate-alias-entries";
 import validateBundleSize from "../validator/validate-bundle-size";
 import build from "./build";
-import type { Node10CompatibilityOptions } from "./node10-compatibility";
 import { node10Compatibility } from "./node10-compatibility";
 
 /**

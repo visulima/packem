@@ -3,6 +3,40 @@ import type { BuildContext } from "@visulima/packem-share/types";
 import type { InternalBuildOptions } from "../types";
 
 /**
+ * Maps JavaScript extension to corresponding TypeScript declaration extension.
+ */
+const mapJsExtensionToDts = (jsExtension: string): string => {
+    switch (jsExtension) {
+        case "cjs": {
+            return "d.cts";
+        }
+        case "js": {
+            return "d.ts";
+        }
+        case "mjs": {
+            return "d.mts";
+        }
+        default: {
+            return "d.ts";
+        }
+    }
+};
+
+/**
+ * Determines declaration extension when outputExtensionMap is provided.
+ */
+const getDtsExtensionFromMap = (context: BuildContext<InternalBuildOptions>, format: "esm" | "cjs"): string => {
+    const jsExtension = context.options.outputExtensionMap?.[format];
+
+    if (jsExtension) {
+        return mapJsExtensionToDts(jsExtension);
+    }
+
+    // Fallback to traditional extensions
+    return format === "esm" ? "d.mts" : "d.cts";
+};
+
+/**
  * Determines the appropriate output extension for JavaScript files based on build configuration.
  *
  * Returns '.js' when:
@@ -22,12 +56,8 @@ export const getOutputExtension = (context: BuildContext<InternalBuildOptions>, 
     }
 
     // If Node.js 10 compatibility is enabled, use traditional extensions
-    if (context.options.node10Compatibility !== false) {
-        return format === "esm" ? "mjs" : "cjs";
-    }
-
     // If both ESM and CJS are emitted, use traditional extensions for clarity
-    if (context.options.emitESM && context.options.emitCJS) {
+    if ((context.options.emitCJS && context.options.declaration === "compatible") || (context.options.emitESM && context.options.emitCJS)) {
         return format === "esm" ? "mjs" : "cjs";
     }
 
@@ -51,34 +81,12 @@ export const getOutputExtension = (context: BuildContext<InternalBuildOptions>, 
 export const getDtsExtension = (context: BuildContext<InternalBuildOptions>, format: "esm" | "cjs"): string => {
     // If outputExtensionMap is provided, derive DTS extension from it
     if (context.options.outputExtensionMap) {
-        const jsExtension = context.options.outputExtensionMap[format];
-
-        if (jsExtension) {
-            // Map js extensions to their corresponding .d.ts variants
-            if (jsExtension === "mjs") {
-                return "d.mts";
-            }
-
-            if (jsExtension === "cjs") {
-                return "d.cts";
-            }
-
-            if (jsExtension === "js") {
-                return "d.ts";
-            }
-        }
-
-        // Fallback to traditional extensions
-        return format === "esm" ? "d.mts" : "d.cts";
+        return getDtsExtensionFromMap(context, format);
     }
 
     // If Node.js 10 compatibility is enabled, use traditional extensions
-    if (context.options.node10Compatibility !== false) {
-        return format === "esm" ? "d.mts" : "d.cts";
-    }
-
     // If both ESM and CJS are emitted, use traditional extensions for clarity
-    if (context.options.emitESM && context.options.emitCJS) {
+    if ((context.options.emitCJS && context.options.declaration === "compatible") || (context.options.emitESM && context.options.emitCJS)) {
         return format === "esm" ? "d.mts" : "d.cts";
     }
 
