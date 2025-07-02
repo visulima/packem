@@ -204,11 +204,11 @@
         "tinyglobby": "0.2.14"
     },
     "devDependencies": {
-        "@anolilab/eslint-config": "^16.2.13",
-        "@anolilab/semantic-release-pnpm": "^2.0.0",
-        "@anolilab/semantic-release-preset": "^11.0.0",
+        "@anolilab/eslint-config": "^16.2.15",
+        "@anolilab/semantic-release-pnpm": "^2.0.1",
+        "@anolilab/semantic-release-preset": "^11.0.1",
         "@arethetypeswrong/cli": "^0.18.2",
-        "@babel/parser": "7.27.7",
+        "@babel/parser": "7.28.0",
         "@csstools/css-parser-algorithms": "3.0.5",
         "@csstools/css-tokenizer": "3.0.4",
         "@csstools/postcss-slow-plugins": "^2.0.0",
