@@ -1,3 +1,9 @@
+## @visulima/packem [2.0.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.1...@visulima/packem@2.0.0-alpha.2) (2025-07-02)
+
+### Bug Fixes
+
+* trigger next release ([cda86b2](https://github.com/visulima/packem/commit/cda86b27e898fcea953daa7457696f7c97f85133))
+
 ## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02)
 
 ### ⚠ BREAKING CHANGES
