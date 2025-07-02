@@ -1724,8 +1724,8 @@ export type Num2 = number`,
                     },
                     exports: {
                         ".": {
-                            default: "./dist/index.mjs",
-                            types: "./dist/index.d.mts",
+                            default: "./dist/index.js",
+                            types: "./dist/index.d.ts",
                         },
                     },
                     type: "module",
@@ -1750,15 +1750,15 @@ export type Num2 = number`,
                 expect(binProcess.exitCode).toBe(0);
                 expect(binProcess.stdout).toContain("Using isolated declaration transformer to generate declaration files...");
 
-                const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+                const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-                expect(dMtsContent).toBe(`import { type Num } from ${quote}./types.d.mts${quote};
+                expect(dMtsContent).toBe(`import { type Num } from ${quote}./types.d.ts${quote};
 export type Str = string;
 export declare function hello(s: Str): Str;
 export declare let num: Num;
 `);
 
-                const dMtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/types.d.mts`);
+                const dMtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/types.d.ts`);
 
                 expect(dMtsTypesContent).toBe(`export type Num = number;
 `);

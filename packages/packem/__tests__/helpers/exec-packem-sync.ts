@@ -24,7 +24,7 @@ const execPackem = async (command: "build" | "init", flags: string[] = [], optio
         flags.push("--no-validation");
     }
 
-    return await execaNode(join(distributionPath, "cli/index.mjs"), [command, environmentFlag, ...flags].filter(Boolean) as string[], {
+    return await execaNode(join(distributionPath, "cli/index.js"), [command, environmentFlag, ...flags].filter(Boolean) as string[], {
         cleanup: true,
         ...options,
     });

@@ -95,11 +95,21 @@ describe(validatePackageFields, () => {
         expect.assertions(2);
 
         const contextStringBin = {
-            options: { validation: { packageJson: { bin: true } } },
+            options: { 
+                emitCJS: true, 
+                emitESM: true, 
+                declaration: "compatible" as const,
+                validation: { packageJson: { bin: true } } 
+            },
             pkg: { bin: "bin/index.mjs", type: "commonjs" },
         };
         const contextObjectBin = {
-            options: { validation: { packageJson: { bin: true } } },
+            options: { 
+                emitCJS: true, 
+                emitESM: true, 
+                declaration: "compatible" as const,
+                validation: { packageJson: { bin: true } } 
+            },
             pkg: { bin: { cli1: "bin/cli1.mjs", cli2: "bin/cli2.cjs" }, type: "commonjs" },
         };
 

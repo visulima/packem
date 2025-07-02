@@ -565,14 +565,14 @@ export { index as default };
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             bin: {
-                cli: "./dist/bin/cli.cjs",
+                cli: "./dist/bin/cli.js",
             },
             exports: {
                 ".": {
-                    import: "./dist/index.cjs",
-                    "react-server": "./dist/index.react-server.cjs",
+                    import: "./dist/index.js",
+                    "react-server": "./dist/index.react-server.js",
                 },
-                "./foo": "./dist/foo.cjs",
+                "./foo": "./dist/foo.js",
             },
             name: "@scope/output-app",
         });
@@ -584,29 +584,29 @@ export { index as default };
         expect(binProcess.stderr).toBe("");
 
         expect(binProcess.stdout).toContain("Build succeeded for output-app");
-        expect(binProcess.stdout).toContain("dist/index.react-server.cjs (total size: 149.00 Bytes, brotli size: 110.00 Bytes, gzip size: 142.00 Bytes)");
+        expect(binProcess.stdout).toContain("dist/index.react-server.js (total size: 149.00 Bytes, brotli size: 110.00 Bytes, gzip size: 142.00 Bytes)");
         expect(binProcess.stdout).toContain("exports: index");
-        expect(binProcess.stdout).toContain("dist/foo.cjs (total size: 128.00 Bytes, brotli size: 108.00 Bytes, gzip size: 132.00 Bytes)");
+        expect(binProcess.stdout).toContain("dist/foo.js (total size: 128.00 Bytes, brotli size: 108.00 Bytes, gzip size: 132.00 Bytes)");
         expect(binProcess.stdout).toContain("exports: foo");
-        expect(binProcess.stdout).toContain("dist/bin/cli.cjs (total size: 148.00 Bytes, brotli size: 112.00 Bytes, gzip size: 146.00 Bytes)");
+        expect(binProcess.stdout).toContain("dist/bin/cli.js (total size: 148.00 Bytes, brotli size: 112.00 Bytes, gzip size: 146.00 Bytes)");
         expect(binProcess.stdout).toContain("exports: cli");
-        expect(binProcess.stdout).toContain("dist/index.cjs (total size: 136.00 Bytes, brotli size: 96.00 Bytes, gzip size: 134.00 Bytes)");
+        expect(binProcess.stdout).toContain("dist/index.js (total size: 136.00 Bytes, brotli size: 96.00 Bytes, gzip size: 134.00 Bytes)");
         expect(binProcess.stdout).toContain("exports: index");
         expect(binProcess.stdout).toContain("Σ Total dist size (byte size):");
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
 
-        const cjsReactContent = readFileSync(`${temporaryDirectoryPath}/dist/index.react-server.cjs`);
+        const cjsReactContent = readFileSync(`${temporaryDirectoryPath}/dist/index.react-server.js`);
 
         expect(cjsReactContent).toMatchSnapshot("cjs output");
 
-        const cjsFooContent = readFileSync(`${temporaryDirectoryPath}/dist/foo.cjs`);
+        const cjsFooContent = readFileSync(`${temporaryDirectoryPath}/dist/foo.js`);
 
         expect(cjsFooContent).toMatchSnapshot("cjs output");
 
-        const cjsCliContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/cli.cjs`);
+        const cjsCliContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/cli.js`);
 
         expect(cjsCliContent).toMatchSnapshot("cjs output");
     });

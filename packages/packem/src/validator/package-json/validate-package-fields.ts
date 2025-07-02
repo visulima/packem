@@ -237,7 +237,7 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const validatePackageFields = (context: BuildContext): void => {
+const validatePackageFields = (context: BuildContext<InternalBuildOptions>): void => {
     const validation = context.options.validation as ValidationOptions;
     const { pkg } = context;
     const cjsJSExtension = getOutputExtension(context, "cjs");
@@ -330,18 +330,23 @@ const validatePackageFields = (context: BuildContext): void => {
     if (validation.packageJson?.bin !== false) {
         const forbiddenExtension = isCjs ? esmJSExtension : cjsJSExtension;
 
-        if (typeof pkg.bin === "string" && pkg.bin.endsWith(`.${forbiddenExtension}`)) {
-            warn(
-                context,
-                `The 'bin' field in your package.json should not use a .${forbiddenExtension} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
-            );
-        } else if (typeof pkg.bin === "object") {
-            for (const [bin, binPath] of Object.entries(pkg.bin)) {
-                if (binPath && (binPath as string).endsWith(`.${forbiddenExtension}`)) {
-                    warn(
-                        context,
-                        `The 'bin.${bin}' field in your package.json should not use a .${forbiddenExtension} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
-                    );
+        // If both ESM and CJS use the same extension, then no extension is forbidden
+        const shouldValidateBinExtensions = cjsJSExtension !== esmJSExtension;
+
+        if (shouldValidateBinExtensions) {
+            if (typeof pkg.bin === "string" && pkg.bin.endsWith(`.${forbiddenExtension}`)) {
+                warn(
+                    context,
+                    `The 'bin' field in your package.json should not use a .${forbiddenExtension} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
+                );
+            } else if (typeof pkg.bin === "object") {
+                for (const [bin, binPath] of Object.entries(pkg.bin)) {
+                    if (binPath && (binPath as string).endsWith(`.${forbiddenExtension}`)) {
+                        warn(
+                            context,
+                            `The 'bin.${bin}' field in your package.json should not use a .${forbiddenExtension} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
+                        );
+                    }
                 }
             }
         }
