@@ -35,8 +35,8 @@ type StringWriteData = BaseWriteData & {
     styleOptions?: string;
 };
 
-type WriteData =
-    StringWriteData | BaseWriteData & {
+type WriteData
+    = StringWriteData | BaseWriteData & {
         styleOptions?: StyleOptions;
     };
 

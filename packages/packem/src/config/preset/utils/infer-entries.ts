@@ -7,8 +7,8 @@ import { extname, resolve, toNamespacedPath } from "@visulima/path";
 import type { BuildEntry, Environment, InferEntriesResult, InternalBuildOptions, Runtime } from "../../../types";
 import type { OutputDescriptor } from "../../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../../utils/extract-export-filenames";
-import { inferExportTypeFromFileName } from "../../../utils/infer-export-type";
 import { getOutputExtension } from "../../../utils/get-file-extensions";
+import { inferExportTypeFromFileName } from "../../../utils/infer-export-type";
 
 const getEnvironment = (output: OutputDescriptor, environment: Environment): Environment => {
     if (output.key === "exports" && output.subKey === PRODUCTION_ENV) {

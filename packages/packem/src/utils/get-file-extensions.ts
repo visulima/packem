@@ -55,15 +55,15 @@ export const getDtsExtension = (context: BuildContext<InternalBuildOptions>, for
 
         if (jsExtension) {
             // Map js extensions to their corresponding .d.ts variants
-            if (jsExtension === "mjs") { 
+            if (jsExtension === "mjs") {
                 return "d.mts";
             }
 
-            if (jsExtension === "cjs") { 
+            if (jsExtension === "cjs") {
                 return "d.cts";
             }
 
-            if (jsExtension === "js") { 
+            if (jsExtension === "js") {
                 return "d.ts";
             }
         }
