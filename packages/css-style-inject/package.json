@@ -1,6 +1,6 @@
 {
     "name": "@visulima/css-style-inject",
-    "version": "0.0.0",
+    "version": "1.0.0-alpha.1",
     "description": "Inject style tag to document head.",
     "keywords": [
         "visulima",
