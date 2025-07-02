@@ -1,0 +1,285 @@
+---
+title: Transformers
+description: Choose and configure the right transformer for your TypeScript and JavaScript projects
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+import { ComparisonTable } from '../../components/ComparisonTable'
+
+# Transformers
+
+Packen supports multiple transformers to convert your TypeScript and modern JavaScript into optimized bundles. Each transformer has its own strengths and trade-offs.
+
+## Available Transformers
+
+Packen provides **4 high-performance transformers**:
+
+- **esbuild** - Fastest compilation, great for most projects
+- **swc** - Rust-powered with excellent performance and features
+- **OXC** - Next-generation toolchain (experimental)
+- **sucrase** - Lightweight and fast alternative to Babel
+
+## Transformer Comparison
+
+| Feature | esbuild | swc | OXC | sucrase |
+|---------|---------|-----|-----|---------|
+| **Speed** | ⚡⚡⚡ Very Fast | ⚡⚡⚡ Very Fast | ⚡⚡⚡ Very Fast | ⚡⚡ Fast |
+| **TypeScript** | ✅ Excellent | ✅ Excellent | ✅ Good | ✅ Good |
+| **JSX** | ✅ Full Support | ✅ Full Support | ✅ Full Support | ✅ Basic Support |
+| **Decorators** | ✅ Stage 3 | ✅ Legacy + Stage 3 | ⚠️ Limited | ❌ No |
+| **Source Maps** | ✅ Excellent | ✅ Excellent | ✅ Good | ✅ Basic |
+| **Bundle Size** | Small | Small | Small | Smallest |
+| **Stability** | ✅ Stable | ✅ Stable | ⚠️ Experimental | ✅ Stable |
+| **Language** | Go | Rust | Rust | JavaScript |
+
+## esbuild Transformer
+
+**Recommended for most projects.** esbuild provides the best balance of speed, features, and stability.
+
+### Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    // Additional esbuild options can be passed here
+  }
+})
+```
+
+### Features
+
+- ✅ **Fastest compilation** - Written in Go for maximum performance
+- ✅ **TypeScript native** - Built-in TypeScript support without additional tools
+- ✅ **JSX support** - React, Preact, Vue JSX transformations
+- ✅ **Modern JS** - ES2015+ syntax transformations
+- ✅ **Tree shaking** - Dead code elimination
+- ✅ **Source maps** - High-quality debugging information
+
+### Use Cases
+
+- Most TypeScript and JavaScript projects
+- React applications and component libraries
+- Large codebases requiring fast compilation
+- Development environments needing quick rebuilds
+
+## swc Transformer
+
+**Best for advanced features.** swc is written in Rust and offers the most comprehensive transformation features.
+
+### Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/swc'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    // SWC-specific options
+  }
+})
+```
+
+### Features
+
+- ✅ **Rust-powered performance** - Extremely fast compilation
+- ✅ **Advanced decorators** - Both legacy and stage 3 decorators
+- ✅ **Comprehensive JSX** - React, Preact, Vue, Solid.js support
+- ✅ **Plugin ecosystem** - Extensible with custom transformations
+- ✅ **Minification** - Built-in code minification
+- ✅ **Source maps** - Excellent debugging support
+
+### Use Cases
+
+- Projects using decorators (experimental or legacy)
+- Applications requiring custom transformations
+- Projects prioritizing cutting-edge JavaScript features
+- Large applications where build performance is critical
+
+## OXC Transformer
+
+**Experimental next-generation toolchain.** OXC aims to be the fastest JavaScript/TypeScript toolchain.
+
+### Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/oxc'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    // OXC-specific options
+  }
+})
+```
+
+### Features
+
+- ✅ **Cutting-edge performance** - Designed for maximum speed
+- ✅ **Modern architecture** - Built from the ground up for efficiency
+- ✅ **TypeScript support** - Native TypeScript compilation
+- ⚠️ **Experimental** - Active development, some features may be unstable
+- ✅ **Future-focused** - Targets latest JavaScript standards
+
+### Use Cases
+
+- Experimental projects willing to use bleeding-edge tools
+- Performance-critical applications
+- Projects contributing to the JavaScript tooling ecosystem
+- Testing next-generation build tools
+
+<Callout type="warning">
+OXC is experimental and under active development. Use with caution in production environments.
+</Callout>
+
+## sucrase Transformer
+
+**Lightweight and simple.** sucrase focuses on speed and simplicity with a smaller feature set.
+
+### Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/sucrase'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    // Sucrase-specific options
+  }
+})
+```
+
+### Features
+
+- ✅ **Minimal overhead** - Smallest transformer bundle size
+- ✅ **Fast compilation** - Quick TypeScript and JSX transformation
+- ✅ **Simple setup** - Minimal configuration required
+- ❌ **Limited features** - No decorators or advanced transformations
+- ✅ **Reliable** - Stable and well-tested
+
+### Use Cases
+
+- Simple TypeScript projects without decorators
+- Lightweight applications prioritizing bundle size
+- Rapid prototyping and development
+- Educational projects and tutorials
+
+## Choosing a Transformer
+
+### Decision Matrix
+
+**For most projects:** Start with **esbuild**
+- Fastest, most stable, excellent TypeScript support
+- Great ecosystem compatibility
+- Proven track record in production
+
+**For advanced features:** Choose **swc**
+- Need decorators (experimental or legacy)
+- Custom transformations required
+- Want cutting-edge JavaScript features
+
+**For experimentation:** Try **OXC**
+- Contributing to tooling ecosystem
+- Performance research and testing
+- Willing to handle experimental issues
+
+**For simplicity:** Use **sucrase**
+- Simple TypeScript without decorators
+- Minimizing bundle size
+- Quick prototyping
+
+### Performance Benchmarks
+
+Based on typical TypeScript projects:
+
+```
+esbuild:  ~0.1s for 1000 files
+swc:      ~0.12s for 1000 files  
+OXC:      ~0.08s for 1000 files (experimental)
+sucrase:  ~0.15s for 1000 files
+```
+
+<Callout type="info">
+Actual performance varies based on project size, complexity, and system specifications. Always benchmark with your specific codebase.
+</Callout>
+
+## Advanced Configuration
+
+### Environment-Specific Transformers
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import esbuildTransformer from '@visulima/packem/transformer/esbuild'
+import swcTransformer from '@visulima/packem/transformer/swc'
+
+const isDev = process.env.NODE_ENV === 'development'
+
+export default defineConfig({
+  // Use esbuild for development (faster), swc for production (more features)
+  transformer: isDev ? esbuildTransformer : swcTransformer
+})
+```
+
+### Conditional Transformer Loading
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+// Dynamically load transformer based on availability
+const getTransformer = async () => {
+  try {
+    return (await import('@visulima/packem/transformer/swc')).default
+  } catch {
+    return (await import('@visulima/packem/transformer/esbuild')).default
+  }
+}
+
+export default defineConfig({
+  transformer: await getTransformer()
+})
+```
+
+## Common Issues
+
+### TypeScript Errors
+
+**esbuild:**
+- Type checking is disabled by default for speed
+- Use `tsc --noEmit` for type checking in CI/CD
+
+**swc:**
+- More comprehensive type checking available
+- May be slower due to additional analysis
+
+### JSX Configuration
+
+Make sure your `tsconfig.json` has correct JSX settings:
+
+```json
+{
+  "compilerOptions": {
+    "jsx": "react-jsx", // For React 17+
+    "jsxImportSource": "react" // or your JSX library
+  }
+}
+```
+
+### Source Map Issues
+
+All transformers support source maps, but quality may vary:
+
+```typescript
+export default defineConfig({
+  sourcemap: true, // Enable source maps
+  transformer // Your chosen transformer
+})
+```
+
+This transformer guide helps you choose the right tool for your specific project requirements and performance goals.

@@ -1,0 +1,503 @@
+---
+title: Entry Points
+description: Configure entry points for your Packen builds
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+
+# Entry Points
+
+Entry points define which files Packen should process as the starting points for your build. Packen can automatically detect entry points from your `package.json` or you can configure them explicitly.
+
+## Basic Configuration
+
+### Single Entry Point
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+
+export default defineConfig({
+  entries: ['./src/index.ts']
+})
+```
+
+### Multiple Entry Points
+
+```typescript
+export default defineConfig({
+  entries: [
+    './src/index.ts',
+    './src/cli.ts',
+    './src/worker.ts'
+  ]
+})
+```
+
+### Entry Objects
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './src/index.ts',
+      name: 'main'
+    },
+    {
+      input: './src/cli.ts',
+      name: 'cli',
+      executable: true
+    }
+  ]
+})
+```
+
+## Automatic Detection
+
+### From Package.json Exports
+
+If no entries are specified, Packen automatically detects them from your `package.json`:
+
+```json
+{
+  "exports": {
+    ".": "./src/index.ts",
+    "./utils": "./src/utils.ts",
+    "./cli": "./src/cli.ts"
+  }
+}
+```
+
+This automatically creates entries for all export paths.
+
+### From Package.json Fields
+
+```json
+{
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "bin": {
+    "my-cli": "./src/cli.ts"
+  }
+}
+```
+
+Packen detects entries from:
+- `main` field
+- `module` field  
+- `bin` field (marked as executable)
+- `exports` field
+
+## Entry Configuration Options
+
+### Entry Object Properties
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './src/index.ts',      // Source file path
+      name: 'index',                // Output name
+      outDir: './dist',             // Custom output directory
+      runtime: 'node',              // Target runtime
+      declaration: true,            // Generate .d.ts files
+      executable: true,             // Add shebang for CLI tools
+      cjs: true,                    // Generate CJS output
+      esm: true                     // Generate ESM output
+    }
+  ]
+})
+```
+
+## Manual Entry Configuration
+
+You can override automatic detection by specifying entries in your configuration file:
+
+### Simple String Entries
+
+```typescript
+export default defineConfig({
+  entries: [
+    './src/index.ts',
+    './src/cli.ts'
+  ]
+})
+```
+
+### Object Entries
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './src/index.ts',
+      name: 'main',
+      runtime: 'node'
+    },
+    {
+      input: './src/browser.ts', 
+      name: 'browser',
+      runtime: 'browser'
+    }
+  ]
+})
+```
+
+### Mixed Entries
+
+```typescript
+export default defineConfig({
+  entries: [
+    './src/index.ts',           // Simple string
+    {                           // Object configuration
+      input: './src/cli.ts',
+      name: 'cli',
+      executable: true
+    }
+  ]
+})
+```
+
+## Glob Patterns
+
+Use glob patterns to match multiple files:
+
+```typescript
+export default defineConfig({
+  entries: [
+    './src/components/*.ts',
+    './src/utils/**/*.ts'
+  ]
+})
+```
+
+## Conditional Entries
+
+### Environment-Based
+
+```typescript
+export default defineConfig({
+  entries: [
+    './src/index.ts',
+    ...(process.env.NODE_ENV === 'development' ? ['./src/dev.ts'] : []),
+    ...(process.env.BUILD_CLI === 'true' ? ['./src/cli.ts'] : [])
+  ]
+})
+```
+
+### Feature Flags
+
+```typescript
+export default defineConfig({
+  entries: [
+    './src/index.ts',
+    ...(process.env.ENABLE_WORKER ? [
+      {
+        input: './src/worker.ts',
+        name: 'worker',
+        runtime: 'browser'
+      }
+    ] : [])
+  ]
+})
+```
+
+## Runtime-Specific Entries
+
+### Node.js Entries
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './src/server.ts',
+      name: 'server',
+      runtime: 'node',
+      cjs: true
+    }
+  ]
+})
+```
+
+### Browser Entries
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './src/client.ts',
+      name: 'client', 
+      runtime: 'browser',
+      esm: true
+    }
+  ]
+})
+```
+
+### Universal Entries
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './src/universal.ts',
+      name: 'universal',
+      cjs: true,
+      esm: true
+    }
+  ]
+})
+```
+
+## Output Configuration
+
+### Custom Output Directory
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './src/index.ts',
+      outDir: './build'
+    }
+  ]
+})
+```
+
+### Per-Entry Output
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './src/core.ts',
+      outDir: './dist/core'
+    },
+    {
+      input: './src/utils.ts', 
+      outDir: './dist/utils'
+    }
+  ]
+})
+```
+
+## TypeScript Declaration Files
+
+### Enable Declarations
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './src/index.ts',
+      declaration: true
+    }
+  ]
+})
+```
+
+### Declaration Modes
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './src/index.ts',
+      declaration: 'compatible'  // or 'node16'
+    }
+  ]
+})
+```
+
+## Executable Entries
+
+### CLI Tools
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './src/cli.ts',
+      name: 'cli',
+      executable: true
+    }
+  ]
+})
+```
+
+This automatically:
+- Adds shebang (`#!/usr/bin/env node`)
+- Sets executable permissions
+- Configures for Node.js runtime
+
+## Monorepo Entries
+
+### Workspace Packages
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './packages/core/src/index.ts',
+      name: 'core',
+      outDir: './packages/core/dist'
+    },
+    {
+      input: './packages/utils/src/index.ts',
+      name: 'utils', 
+      outDir: './packages/utils/dist'
+    }
+  ]
+})
+```
+
+### Cross-Package Dependencies
+
+```typescript
+export default defineConfig({
+  entries: [
+    './packages/*/src/index.ts'
+  ],
+  
+  rollup: {
+    external: ['@myorg/core', '@myorg/utils']
+  }
+})
+```
+
+## Advanced Patterns
+
+### Dynamic Entry Generation
+
+```typescript
+import { glob } from 'glob'
+
+const componentEntries = glob.sync('./src/components/*/index.ts').map(file => ({
+  input: file,
+  name: file.split('/').slice(-2, -1)[0]
+}))
+
+export default defineConfig({
+  entries: [
+    './src/index.ts',
+    ...componentEntries
+  ]
+})
+```
+
+### Entry Aliases
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './src/index.ts',
+      fileAlias: 'main'
+    }
+  ]
+})
+```
+
+### Export Key Mapping
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: './src/index.ts',
+      exportKey: new Set(['.', './main'])
+    }
+  ]
+})
+```
+
+## Validation and Debugging
+
+### Entry Validation
+
+Packen automatically validates entries:
+
+- Checks if source files exist
+- Warns about missing files
+- Validates entry configuration
+- Checks for conflicts
+
+### Debug Entry Detection
+
+```typescript
+export default defineConfig({
+  debug: true,  // Shows entry detection process
+  entries: [
+    './src/index.ts'
+  ]
+})
+```
+
+## Troubleshooting
+
+### Entry Not Found
+
+<Callout type="warning">
+If Packen can't find your entry files, check the file paths and ensure they exist.
+</Callout>
+
+```typescript
+// ❌ Wrong - file doesn't exist
+export default defineConfig({
+  entries: ['./src/missing.ts']
+})
+
+// ✅ Correct - file exists
+export default defineConfig({
+  entries: ['./src/index.ts']
+})
+```
+
+### Conflicting Entries
+
+```typescript
+// ❌ Wrong - same output name
+export default defineConfig({
+  entries: [
+    { input: './src/a.ts', name: 'main' },
+    { input: './src/b.ts', name: 'main' }  // Conflict!
+  ]
+})
+
+// ✅ Correct - unique names
+export default defineConfig({
+  entries: [
+    { input: './src/a.ts', name: 'a' },
+    { input: './src/b.ts', name: 'b' }
+  ]
+})
+```
+
+### Missing Package.json Exports
+
+If automatic detection isn't working:
+
+```json
+{
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}
+```
+
+Or specify entries manually:
+
+```typescript
+export default defineConfig({
+  entries: ['./src/index.ts']
+})
+```
+
+---
+
+## Related Options
+
+- [Output Format](/docs/options/output-format) - Configure output formats
+- [Output Directory](/docs/options/output-directory) - Control output locations  
+- [Declaration Files](/docs/options/declaration-files) - TypeScript declarations
+- [Externals](/docs/options/externals) - External dependencies

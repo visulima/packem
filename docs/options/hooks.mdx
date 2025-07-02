@@ -1,0 +1,581 @@
+---
+title: Hooks
+description: Use build lifecycle hooks to extend Packen's functionality
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+
+# Hooks
+
+Hooks allow you to tap into Packen's build lifecycle and execute custom logic at specific points during the build process. This enables advanced customization and integration with external tools.
+
+## Available Hooks
+
+### Build Lifecycle
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': async () => {
+      console.log('Build starting...')
+    },
+    
+    'build:after': async () => {
+      console.log('Build completed!')
+    },
+    
+    'build:error': async (error) => {
+      console.error('Build failed:', error)
+    }
+  }
+})
+```
+
+### File System Hooks
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'file:change': async (file, event) => {
+      console.log(`File ${event}: ${file}`)
+    },
+    
+    'file:add': async (file) => {
+      console.log(`File added: ${file}`)
+    },
+    
+    'file:delete': async (file) => {
+      console.log(`File deleted: ${file}`)
+    }
+  }
+})
+```
+
+### Bundle Hooks
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'bundle:start': async (options) => {
+      console.log('Bundle generation started')
+    },
+    
+    'bundle:end': async (bundle) => {
+      console.log('Bundle generated:', Object.keys(bundle))
+    },
+    
+    'chunk:generated': async (chunk) => {
+      console.log(`Chunk generated: ${chunk.fileName}`)
+    }
+  }
+})
+```
+
+## Common Use Cases
+
+### Code Generation
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': async () => {
+      // Generate types from schema
+      const { generateTypes } = await import('./scripts/generate-types')
+      await generateTypes()
+    }
+  }
+})
+```
+
+### Asset Processing
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:after': async () => {
+      // Optimize images
+      const { optimizeImages } = await import('./scripts/optimize-images')
+      await optimizeImages('dist/assets')
+    }
+  }
+})
+```
+
+### Version Management
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': async () => {
+      // Update version in files
+      const { writeFile } = await import('fs/promises')
+      const version = process.env.npm_package_version
+      
+      await writeFile(
+        'src/version.ts',
+        `export const VERSION = '${version}'`
+      )
+    }
+  }
+})
+```
+
+### Bundle Analysis
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'bundle:end': async (bundle) => {
+      // Analyze bundle size
+      const sizes = Object.entries(bundle).map(([name, chunk]) => ({
+        name,
+        size: chunk.code?.length || 0
+      }))
+      
+      console.table(sizes)
+    }
+  }
+})
+```
+
+## Advanced Patterns
+
+### Conditional Hooks
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:after': async () => {
+      if (process.env.NODE_ENV === 'production') {
+        // Production-only tasks
+        await deployToS3()
+      }
+      
+      if (process.env.ANALYZE_BUNDLE) {
+        // Optional bundle analysis
+        await generateBundleReport()
+      }
+    }
+  }
+})
+```
+
+### Async Hook Chains
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': [
+      async () => {
+        console.log('Step 1: Clean dist')
+        await cleanDist()
+      },
+      
+      async () => {
+        console.log('Step 2: Generate types')
+        await generateTypes()
+      },
+      
+      async () => {
+        console.log('Step 3: Copy assets')
+        await copyAssets()
+      }
+    ]
+  }
+})
+```
+
+### Error Handling
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': async () => {
+      try {
+        await riskyOperation()
+      } catch (error) {
+        console.warn('Optional operation failed:', error.message)
+        // Continue build despite error
+      }
+    },
+    
+    'build:error': async (error) => {
+      // Send error to monitoring service
+      await sendErrorReport(error)
+      
+      // Clean up resources
+      await cleanup()
+    }
+  }
+})
+```
+
+## File System Integration
+
+### Watch Mode Hooks
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'watch:start': async () => {
+      console.log('Watch mode started')
+    },
+    
+    'watch:restart': async () => {
+      console.log('Restarting due to config change')
+    },
+    
+    'watch:close': async () => {
+      console.log('Watch mode stopped')
+      await cleanup()
+    }
+  }
+})
+```
+
+### File Change Reactions
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'file:change': async (file, event) => {
+      // React to specific file changes
+      if (file.endsWith('.graphql')) {
+        await regenerateGraphQLTypes()
+      }
+      
+      if (file.includes('i18n/')) {
+        await updateTranslations()
+      }
+      
+      if (file === 'package.json') {
+        await updateDependencies()
+      }
+    }
+  }
+})
+```
+
+## Testing Integration
+
+### Test Hooks
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:after': async () => {
+      if (process.env.RUN_TESTS) {
+        const { exec } = await import('child_process')
+        const { promisify } = await import('util')
+        const execAsync = promisify(exec)
+        
+        try {
+          await execAsync('npm test')
+          console.log('Tests passed!')
+        } catch (error) {
+          console.error('Tests failed:', error.message)
+          process.exit(1)
+        }
+      }
+    }
+  }
+})
+```
+
+### Coverage Reports
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:after': async () => {
+      if (process.env.GENERATE_COVERAGE) {
+        await generateCoverageReport()
+        await uploadCoverageToService()
+      }
+    }
+  }
+})
+```
+
+## Deployment Hooks
+
+### Automatic Deployment
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:after': async () => {
+      if (process.env.AUTO_DEPLOY === 'true') {
+        console.log('Deploying to production...')
+        
+        // Upload to CDN
+        await uploadToCDN('dist')
+        
+        // Update service
+        await updateService()
+        
+        // Send notification
+        await sendDeploymentNotification()
+      }
+    }
+  }
+})
+```
+
+### Environment-Specific Deployments
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:after': async () => {
+      const env = process.env.DEPLOY_ENV
+      
+      switch (env) {
+        case 'staging':
+          await deployToStaging()
+          break
+        case 'production':
+          await deployToProduction()
+          break
+        default:
+          console.log('No deployment configured')
+      }
+    }
+  }
+})
+```
+
+## Performance Monitoring
+
+### Build Metrics
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': async () => {
+      // Record build start time
+      global.buildStartTime = Date.now()
+    },
+    
+    'build:after': async () => {
+      // Calculate build duration
+      const duration = Date.now() - global.buildStartTime
+      console.log(`Build completed in ${duration}ms`)
+      
+      // Send metrics to monitoring service
+      await sendMetrics({
+        buildDuration: duration,
+        timestamp: Date.now()
+      })
+    }
+  }
+})
+```
+
+### Bundle Size Tracking
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'bundle:end': async (bundle) => {
+      const bundleSizes = Object.entries(bundle).reduce((acc, [name, chunk]) => {
+        acc[name] = chunk.code?.length || 0
+        return acc
+      }, {})
+      
+      // Track bundle size changes
+      await trackBundleSizes(bundleSizes)
+      
+      // Alert if bundle size increased significantly
+      await checkBundleSizeThresholds(bundleSizes)
+    }
+  }
+})
+```
+
+## Custom Hook System
+
+### Hook Registration
+
+```typescript
+class HookManager {
+  private hooks = new Map<string, Function[]>()
+  
+  register(name: string, fn: Function) {
+    if (!this.hooks.has(name)) {
+      this.hooks.set(name, [])
+    }
+    this.hooks.get(name)!.push(fn)
+  }
+  
+  async execute(name: string, ...args: any[]) {
+    const hooks = this.hooks.get(name) || []
+    
+    for (const hook of hooks) {
+      await hook(...args)
+    }
+  }
+}
+
+const hookManager = new HookManager()
+
+export default defineConfig({
+  hooks: {
+    'build:before': async () => {
+      await hookManager.execute('custom:before-build')
+    }
+  }
+})
+```
+
+### Plugin Hook Integration
+
+```typescript
+function customPlugin() {
+  return {
+    name: 'custom-plugin',
+    
+    buildStart() {
+      // Register custom hooks
+      this.emitFile({
+        type: 'asset',
+        fileName: 'custom-hook.js',
+        source: 'console.log("Custom hook executed")'
+      })
+    }
+  }
+}
+
+export default defineConfig({
+  rollup: {
+    plugins: [customPlugin()]
+  },
+  
+  hooks: {
+    'build:after': async () => {
+      // Execute plugin-specific hooks
+      await executePluginHooks()
+    }
+  }
+})
+```
+
+## Debugging Hooks
+
+### Hook Logging
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': async () => {
+      console.log('🚀 Starting build process')
+    },
+    
+    'file:change': async (file, event) => {
+      console.log(`📝 File ${event}: ${file}`)
+    },
+    
+    'bundle:end': async (bundle) => {
+      console.log('📦 Bundle generated:', Object.keys(bundle))
+    },
+    
+    'build:after': async () => {
+      console.log('✅ Build completed successfully')
+    },
+    
+    'build:error': async (error) => {
+      console.error('❌ Build failed:', error.message)
+    }
+  }
+})
+```
+
+### Hook Performance
+
+```typescript
+function withTiming(hookName: string, fn: Function) {
+  return async (...args: any[]) => {
+    const start = Date.now()
+    await fn(...args)
+    const duration = Date.now() - start
+    console.log(`Hook ${hookName} took ${duration}ms`)
+  }
+}
+
+export default defineConfig({
+  hooks: {
+    'build:before': withTiming('build:before', async () => {
+      await heavyOperation()
+    })
+  }
+})
+```
+
+## Troubleshooting
+
+### Hook Errors
+
+<Callout type="warning">
+Hook errors can interrupt the build process. Use proper error handling.
+</Callout>
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': async () => {
+      try {
+        await riskyOperation()
+      } catch (error) {
+        console.error('Hook error:', error)
+        // Decide whether to continue or fail
+        if (error.critical) {
+          throw error // Fail the build
+        }
+        // Otherwise continue
+      }
+    }
+  }
+})
+```
+
+### Async Hook Issues
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': async () => {
+      // Ensure all async operations complete
+      await Promise.all([
+        operation1(),
+        operation2(),
+        operation3()
+      ])
+    }
+  }
+})
+```
+
+### Hook Order Dependencies
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': [
+      // Order matters - dependencies first
+      async () => await setupDependencies(),
+      async () => await configureEnvironment(),
+      async () => await startServices()
+    ]
+  }
+})
+```
+
+---
+
+## Related Options
+
+- [Plugins](/docs/options/plugins) - Rollup plugins
+- [Watch](/docs/options/watch) - File watching
+- [Build](/docs/options/build) - Build configuration
+- [Scripts](/docs/options/scripts) - Custom scripts

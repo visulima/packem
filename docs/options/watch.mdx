@@ -1,0 +1,473 @@
+---
+title: Watch Mode
+description: Configure file watching for development builds
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+
+# Watch Mode
+
+Watch mode automatically rebuilds your project when files change, providing fast feedback during development. Packen's watch mode is optimized for performance and includes smart caching.
+
+## Basic Usage
+
+### Enable Watch Mode
+
+```bash
+# CLI
+packem --watch
+
+# Or short form
+packem -w
+```
+
+```typescript
+// Configuration
+export default defineConfig({
+  watch: true
+})
+```
+
+### Watch Specific Files
+
+```typescript
+export default defineConfig({
+  watch: {
+    include: ['src/**/*'],
+    exclude: ['**/*.test.ts', 'dist/**/*']
+  }
+})
+```
+
+## Configuration Options
+
+### Watch Patterns
+
+```typescript
+export default defineConfig({
+  watch: {
+    // Files to watch
+    include: [
+      'src/**/*.{ts,tsx,js,jsx}',
+      'styles/**/*.{css,scss,sass}',
+      'assets/**/*'
+    ],
+    
+    // Files to ignore
+    exclude: [
+      'node_modules/**/*',
+      'dist/**/*',
+      '**/*.test.{ts,js}',
+      '**/*.spec.{ts,js}'
+    ]
+  }
+})
+```
+
+### Watch Options
+
+```typescript
+export default defineConfig({
+  watch: {
+    // Polling interval (ms)
+    poll: 1000,
+    
+    // Use polling instead of native file events
+    usePolling: false,
+    
+    // Ignore initial build
+    skipWrite: false,
+    
+    // Clear console on rebuild
+    clearScreen: true,
+    
+    // Build delay after file change (ms)
+    buildDelay: 10
+  }
+})
+```
+
+## Development Server Integration
+
+### Built-in Dev Server
+
+```typescript
+export default defineConfig({
+  watch: true,
+  
+  server: {
+    port: 3000,
+    host: 'localhost',
+    open: true,
+    cors: true
+  }
+})
+```
+
+### Hot Module Replacement
+
+```typescript
+export default defineConfig({
+  watch: true,
+  
+  server: {
+    hmr: {
+      port: 24678,
+      host: 'localhost'
+    }
+  }
+})
+```
+
+### Live Reload
+
+```typescript
+export default defineConfig({
+  watch: true,
+  
+  server: {
+    liveReload: true,
+    // Inject live reload script
+    injectLiveReload: true
+  }
+})
+```
+
+## Performance Optimization
+
+### Smart Caching
+
+```typescript
+export default defineConfig({
+  watch: true,
+  
+  cache: {
+    // Enable persistent cache
+    enabled: true,
+    
+    // Cache directory
+    dir: '.packem-cache',
+    
+    // Cache invalidation
+    invalidateOnBuild: false
+  }
+})
+```
+
+### Incremental Builds
+
+```typescript
+export default defineConfig({
+  watch: true,
+  
+  // Only rebuild changed modules
+  incremental: true,
+  
+  rollup: {
+    // Preserve module structure for faster rebuilds
+    output: {
+      preserveModules: true
+    }
+  }
+})
+```
+
+### Parallel Processing
+
+```typescript
+export default defineConfig({
+  watch: true,
+  
+  // Process multiple files in parallel
+  parallel: true,
+  
+  // Maximum parallel workers
+  maxWorkers: 4
+})
+```
+
+## File System Events
+
+### Custom Event Handlers
+
+```typescript
+export default defineConfig({
+  watch: {
+    onFileChange: (file, event) => {
+      console.log(`File ${event}: ${file}`)
+    },
+    
+    onBuildStart: () => {
+      console.log('Build started...')
+    },
+    
+    onBuildEnd: (error) => {
+      if (error) {
+        console.error('Build failed:', error)
+      } else {
+        console.log('Build completed!')
+      }
+    }
+  }
+})
+```
+
+### Debouncing
+
+```typescript
+export default defineConfig({
+  watch: {
+    // Debounce file changes (ms)
+    debounce: 100,
+    
+    // Ignore rapid successive changes
+    ignoreInitial: true,
+    
+    // Atomic writes handling
+    atomic: true
+  }
+})
+```
+
+## Framework Integration
+
+### React Development
+
+```typescript
+export default defineConfig({
+  watch: true,
+  
+  rollup: {
+    plugins: [
+      react({
+        // Fast refresh for React
+        fastRefresh: true,
+        
+        // Development mode
+        development: true
+      })
+    ]
+  }
+})
+```
+
+### Vue Development
+
+```typescript
+export default defineConfig({
+  watch: true,
+  
+  rollup: {
+    plugins: [
+      vue({
+        // Vue dev tools
+        devtools: true,
+        
+        // Hot reload
+        hotReload: true
+      })
+    ]
+  }
+})
+```
+
+### CSS Preprocessing
+
+```typescript
+export default defineConfig({
+  watch: true,
+  
+  css: {
+    // Watch imported CSS files
+    watchDependencies: true,
+    
+    // Inject CSS for development
+    inject: true,
+    
+    // Source maps
+    sourceMap: true
+  }
+})
+```
+
+## Advanced Configuration
+
+### Conditional Watch
+
+```typescript
+export default defineConfig({
+  watch: process.env.NODE_ENV === 'development',
+  
+  // Different config for watch mode
+  ...(process.env.NODE_ENV === 'development' && {
+    sourcemap: true,
+    minify: false
+  })
+})
+```
+
+### Multi-Package Watch
+
+```typescript
+// Monorepo root
+export default defineConfig({
+  watch: {
+    // Watch all packages
+    include: ['packages/*/src/**/*'],
+    
+    // Rebuild dependencies
+    buildDependencies: true
+  }
+})
+```
+
+### Custom File Watcher
+
+```typescript
+import chokidar from 'chokidar'
+
+export default defineConfig({
+  watch: {
+    // Custom watcher implementation
+    watcher: chokidar.watch('src/**/*', {
+      ignored: /node_modules/,
+      persistent: true,
+      ignoreInitial: true
+    })
+  }
+})
+```
+
+## Error Handling
+
+### Build Error Recovery
+
+```typescript
+export default defineConfig({
+  watch: {
+    // Continue watching on build errors
+    continueOnError: true,
+    
+    // Error overlay in browser
+    errorOverlay: true,
+    
+    // Notification on errors
+    notify: true
+  }
+})
+```
+
+### Graceful Shutdown
+
+```typescript
+export default defineConfig({
+  watch: true,
+  
+  hooks: {
+    'watch:close': async () => {
+      console.log('Watch mode stopped')
+      // Cleanup resources
+    }
+  }
+})
+```
+
+## Testing Integration
+
+### Test File Watching
+
+```typescript
+export default defineConfig({
+  watch: {
+    include: ['src/**/*', 'test/**/*'],
+    
+    // Run tests on file change
+    onFileChange: async (file) => {
+      if (file.includes('.test.')) {
+        const { exec } = await import('child_process')
+        exec('npm test')
+      }
+    }
+  }
+})
+```
+
+### Type Checking
+
+```typescript
+export default defineConfig({
+  watch: true,
+  
+  typescript: {
+    // Watch mode type checking
+    watch: true,
+    
+    // Incremental type checking
+    incremental: true
+  }
+})
+```
+
+## Troubleshooting
+
+### High CPU Usage
+
+<Callout type="warning">
+If watch mode causes high CPU usage, try reducing watched files or using polling.
+</Callout>
+
+```typescript
+export default defineConfig({
+  watch: {
+    // Use polling for problematic file systems
+    usePolling: true,
+    poll: 1000,
+    
+    // Reduce watched files
+    exclude: [
+      'node_modules/**/*',
+      'dist/**/*',
+      '.git/**/*',
+      '**/*.log'
+    ]
+  }
+})
+```
+
+### File System Limits
+
+```typescript
+export default defineConfig({
+  watch: {
+    // Increase file descriptor limits
+    maxFiles: 10000,
+    
+    // Use polling for network drives
+    usePolling: process.platform === 'win32'
+  }
+})
+```
+
+### Memory Leaks
+
+```typescript
+export default defineConfig({
+  watch: {
+    // Cleanup watchers
+    cleanup: true,
+    
+    // Limit cache size
+    maxCacheSize: '100MB'
+  }
+})
+```
+
+---
+
+## Related Options
+
+- [Server](/docs/options/server) - Development server configuration
+- [Cache](/docs/options/cache) - Build caching
+- [Incremental](/docs/options/incremental) - Incremental builds
+- [Source Maps](/docs/options/source-maps) - Debug information

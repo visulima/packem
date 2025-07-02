@@ -1,0 +1,177 @@
+---
+title: Packen - Fast and Modern Bundler
+description: A fast and modern bundler for Node.js and TypeScript with multiple transformer support
+---
+
+import { Badge } from '../components/Badge'
+import { FeatureCard } from '../components/FeatureCard'
+
+# Packen
+
+<div className="hero-section">
+  <img src="/assets/packem.png" alt="Packen Logo" width="200" />
+  <h2>The Fast and Modern Bundler</h2>
+  <p>
+    Built on top of Rollup, combined with your preferred transformer like esbuild, swc, OXC, or sucrase.
+    <br />
+    Supports multiple runtimes, shared modules, server components, dynamic import, wasm, css, and more.
+  </p>
+</div>
+
+<div className="badges">
+  <Badge>TypeScript</Badge>
+  <Badge>ESM/CJS</Badge>
+  <Badge>CSS Modules</Badge>
+  <Badge>React Server Components</Badge>
+</div>
+
+## Why Packen?
+
+Packen is designed to be the ultimate bundling solution for modern JavaScript and TypeScript projects. It combines the power of Rollup with cutting-edge transformers to deliver exceptional performance and developer experience.
+
+<div className="features-grid">
+  <FeatureCard 
+    icon="⚡" 
+    title="Blazing Fast"
+    description="Built on top of Rollup with optimized transformers like esbuild, swc, and OXC for maximum performance."
+  />
+  
+  <FeatureCard 
+    icon="🔧" 
+    title="Zero Config"
+    description="Works out of the box with sensible defaults while remaining fully configurable for advanced use cases."
+  />
+  
+  <FeatureCard 
+    icon="🎯" 
+    title="TypeScript First"
+    description="Full TypeScript support with isolated declarations, type bundling, and .d.ts generation."
+  />
+  
+  <FeatureCard 
+    icon="🎨" 
+    title="CSS Everything"
+    description="Support for CSS, Sass, Less, Stylus, PostCSS, and CSS Modules with built-in optimization."
+  />
+  
+  <FeatureCard 
+    icon="⚛️" 
+    title="React Ready"
+    description="Built-in support for React Server Components, client components, and server actions."
+  />
+  
+  <FeatureCard 
+    icon="🌐" 
+    title="Multi-Runtime"
+    description="Target multiple runtimes including Node.js, browser, edge-light, and react-server."
+  />
+</div>
+
+## Quick Start
+
+Get started with Packen in seconds:
+
+```bash
+# Install Packen
+npm install --save-dev @visulima/packem
+
+# Initialize configuration
+npx packem init
+
+# Build your project
+npx packem build
+```
+
+## Key Features
+
+### 🚀 **Performance First**
+- Built on Rollup with optimized plugins
+- Support for multiple high-performance transformers
+- Parallel processing and caching
+- Bundle analysis and visualization
+
+### 📦 **Package.json Exports**
+- Automatic entry point detection from `package.json#exports`
+- Support for `main`, `module`, and `types` fields
+- Multiple export conditions (import/require, development/production)
+- Automatic Node.js 10 compatibility generation
+
+### 🔄 **Multiple Transformers**
+- **esbuild** - Lightning fast JavaScript/TypeScript transformer
+- **swc** - Rust-based super-fast compiler
+- **OXC** - Next-generation JavaScript toolchain
+- **sucrase** - Fast alternative to Babel
+- **TypeScript** - Official TypeScript compiler
+
+### 🎨 **CSS Processing**
+- **Sass** (.scss/.sass files)
+- **Less** (.less files)  
+- **Stylus** (.styl files)
+- **PostCSS** with plugin ecosystem
+- **CSS Modules** with scoped styling
+- **Lightning CSS** for optimization
+- **cssnano** for minification
+
+### ⚛️ **React Integration**
+- Server Components with `"use server"`
+- Client Components with `"use client"`
+- Automatic chunk splitting for boundaries
+- Shared modules across runtimes
+
+### 🔧 **Developer Experience**
+- Watch mode for development
+- Source maps support
+- TypeDoc documentation generation
+- ESM ⇄ CJS interoperability
+- Environment variable injection
+
+## Packages
+
+Packen is built as a collection of focused packages:
+
+| Package | Description |
+|---------|-------------|
+| [`@visulima/packem`](/docs/core/) | Main bundler package with CLI |
+| [`@visulima/packem-rollup`](/docs/rollup/) | Rollup plugins and transformers |
+| [`@visulima/rollup-css-plugin`](/docs/css/) | CSS processing and optimization |
+| [`@visulima/css-style-inject`](/docs/css/style-inject) | Runtime CSS injection utility |
+| [`@visulima/packem-share`](/docs/utils/) | Shared types and utilities |
+
+## What's Next?
+
+<div className="next-steps">
+  <a href="/docs/guide/getting-started" className="next-step-card">
+    <h3>📚 Getting Started</h3>
+    <p>Learn the basics and set up your first project</p>
+  </a>
+  
+  <a href="/docs/guide/configuration" className="next-step-card">
+    <h3>⚙️ Configuration</h3>
+    <p>Customize Packen for your specific needs</p>
+  </a>
+  
+  <a href="/docs/examples/" className="next-step-card">
+    <h3>💡 Examples</h3>
+    <p>Explore real-world usage examples</p>
+  </a>
+  
+  <a href="/docs/api/" className="next-step-card">
+    <h3>📖 API Reference</h3>
+    <p>Detailed API documentation for all packages</p>
+  </a>
+</div>
+
+---
+
+<div className="community-section">
+  <h2>Community & Support</h2>
+  <p>
+    Packen is open source and maintained by <a href="https://github.com/prisis">Daniel Bannert</a> and the community.
+  </p>
+  
+  <div className="community-links">
+    <a href="https://github.com/visulima/packem">GitHub Repository</a>
+    <a href="https://github.com/visulima/packem/issues">Report Issues</a>
+    <a href="https://github.com/sponsors/prisis">Sponsor Development</a>
+  </div>
+</div>

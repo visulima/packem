@@ -1,0 +1,584 @@
+---
+title: Externals
+description: Configure external dependencies that should not be bundled
+---
+
+# Externals
+
+External dependencies are modules that should not be bundled with your library. Instead, they're expected to be provided by the consuming application. This is essential for libraries to avoid bundling large dependencies like React or Node.js built-ins.
+
+## Basic Configuration
+
+### Simple Externals
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react', 'react-dom', 'lodash']
+  }
+})
+```
+
+### Pattern-Based Externals
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: [
+      /^react/, // All React packages
+      /^@babel/, // All Babel packages
+      /^node:/ // Node.js built-ins with node: prefix
+    ]
+  }
+})
+```
+
+### Function-Based Externals
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: (id) => {
+      // Custom logic for determining externals
+      if (id.startsWith('react')) return true
+      if (id.includes('node_modules')) return false
+      return false
+    }
+  }
+})
+```
+
+## Automatic Externals
+
+### Package.json Dependencies
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: (id) => {
+      const pkg = require('./package.json')
+      
+      // All dependencies and peerDependencies are external
+      return [
+        ...Object.keys(pkg.dependencies || {}),
+        ...Object.keys(pkg.peerDependencies || {})
+      ].includes(id)
+    }
+  }
+})
+```
+
+### Node.js Built-ins
+
+```typescript
+import { builtinModules } from 'module'
+
+export default defineConfig({
+  rollup: {
+    external: [
+      ...builtinModules, // fs, path, url, etc.
+      ...builtinModules.map(m => `node:${m}`) // node:fs, node:path, etc.
+    ]
+  }
+})
+```
+
+### Using External Helper
+
+```typescript
+import { external } from '@visulima/packem/external'
+
+export default defineConfig({
+  rollup: {
+    external: external({
+      dependencies: true,    // Include dependencies
+      peerDependencies: true, // Include peerDependencies
+      builtins: true,        // Include Node.js built-ins
+      devDependencies: false // Exclude devDependencies
+    })
+  }
+})
+```
+
+## Framework-Specific Externals
+
+### React Library
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: [
+      'react',
+      'react-dom',
+      'react/jsx-runtime',
+      'react/jsx-dev-runtime'
+    ],
+    
+    output: {
+      globals: {
+        'react': 'React',
+        'react-dom': 'ReactDOM'
+      }
+    }
+  }
+})
+```
+
+### Vue Library
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['vue'],
+    
+    output: {
+      globals: {
+        'vue': 'Vue'
+      }
+    }
+  }
+})
+```
+
+### Angular Library
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: [
+      '@angular/core',
+      '@angular/common',
+      '@angular/platform-browser',
+      /^@angular\//
+    ]
+  }
+})
+```
+
+## Library Types
+
+### Peer Dependencies
+
+```json
+{
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  }
+}
+```
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react', 'react-dom'] // Match peerDependencies
+  }
+})
+```
+
+### Optional Dependencies
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: (id) => {
+      const pkg = require('./package.json')
+      const optionalDeps = Object.keys(pkg.optionalDependencies || {})
+      
+      // Make optional dependencies external
+      return optionalDeps.includes(id)
+    }
+  }
+})
+```
+
+### Scoped Packages
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: [
+      /@babel\//, // All @babel packages
+      /@types\//, // All @types packages
+      /@company\//, // Company-specific packages
+    ]
+  }
+})
+```
+
+## Format-Specific Externals
+
+### Different Externals per Format
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      {
+        format: 'esm',
+        file: 'dist/index.mjs',
+        external: ['react', 'react-dom']
+      },
+      {
+        format: 'iife',
+        file: 'dist/index.global.js',
+        external: [], // Bundle everything for IIFE
+        globals: {
+          'react': 'React',
+          'react-dom': 'ReactDOM'
+        }
+      }
+    ]
+  }
+})
+```
+
+### Platform-Specific Externals
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      {
+        format: 'cjs',
+        file: 'dist/index.node.cjs',
+        external: ['fs', 'path', 'url'] // Node.js built-ins
+      },
+      {
+        format: 'esm',
+        file: 'dist/index.browser.mjs',
+        external: ['react', 'react-dom'] // Browser externals
+      }
+    ]
+  }
+})
+```
+
+## Advanced Patterns
+
+### Conditional Externals
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: (id, parentId, isResolved) => {
+      // Only external if imported from entry point
+      if (parentId === undefined) {
+        return ['react', 'react-dom'].includes(id)
+      }
+      
+      // Bundle if imported from internal modules
+      return false
+    }
+  }
+})
+```
+
+### Dynamic Externals
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: (id) => {
+      // Check if module exists in node_modules
+      try {
+        require.resolve(id)
+        return true // External if found
+      } catch {
+        return false // Bundle if not found
+      }
+    }
+  }
+})
+```
+
+### Size-Based Externals
+
+```typescript
+import { statSync } from 'fs'
+import { resolve } from 'path'
+
+export default defineConfig({
+  rollup: {
+    external: (id) => {
+      try {
+        const modulePath = require.resolve(id)
+        const stats = statSync(modulePath)
+        
+        // External if larger than 100KB
+        return stats.size > 100 * 1024
+      } catch {
+        return false
+      }
+    }
+  }
+})
+```
+
+## Globals Configuration
+
+### UMD/IIFE Globals
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react', 'react-dom', 'lodash'],
+    
+    output: {
+      format: 'umd',
+      globals: {
+        'react': 'React',
+        'react-dom': 'ReactDOM',
+        'lodash': '_'
+      }
+    }
+  }
+})
+```
+
+### CDN Globals
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react', 'react-dom'],
+    
+    output: {
+      format: 'iife',
+      globals: {
+        // Expecting these to be loaded from CDN
+        'react': 'React',
+        'react-dom': 'ReactDOM'
+      }
+    }
+  }
+})
+```
+
+### Nested Globals
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react/jsx-runtime'],
+    
+    output: {
+      format: 'iife',
+      globals: {
+        'react/jsx-runtime': 'React.jsx'
+      }
+    }
+  }
+})
+```
+
+## Monorepo Externals
+
+### Workspace Dependencies
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: (id) => {
+      // External if it's a workspace package
+      return id.startsWith('@mycompany/')
+    }
+  }
+})
+```
+
+### Cross-Package Dependencies
+
+```typescript
+// packages/ui/packem.config.ts
+export default defineConfig({
+  rollup: {
+    external: [
+      '@mycompany/utils', // Other workspace package
+      '@mycompany/theme'
+    ]
+  }
+})
+```
+
+### Shared Externals
+
+```typescript
+// shared-config.ts
+export const sharedExternals = [
+  'react',
+  'react-dom',
+  '@mycompany/shared'
+]
+
+// packages/*/packem.config.ts
+export default defineConfig({
+  rollup: {
+    external: sharedExternals
+  }
+})
+```
+
+## Validation and Testing
+
+### External Validation
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react', 'react-dom']
+  },
+  
+  hooks: {
+    'build:after': async () => {
+      // Validate externals are not bundled
+      const { readFile } = await import('fs/promises')
+      const bundle = await readFile('dist/index.js', 'utf-8')
+      
+      if (bundle.includes('React.createElement')) {
+        throw new Error('React was bundled instead of being external')
+      }
+    }
+  }
+})
+```
+
+### Bundle Analysis
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react', 'react-dom'],
+    
+    plugins: [
+      bundleAnalyzer({
+        // Analyze what's bundled vs external
+        analyzerMode: 'static',
+        openAnalyzer: false
+      })
+    ]
+  }
+})
+```
+
+## Troubleshooting
+
+### Missing Externals
+
+<Callout type="warning">
+If externals are missing at runtime, ensure they're properly installed and imported.
+</Callout>
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react', 'react-dom'],
+    
+    // Warn about missing externals
+    onwarn: (warning, warn) => {
+      if (warning.code === 'UNRESOLVED_IMPORT') {
+        console.warn(`External dependency not found: ${warning.source}`)
+      }
+      warn(warning)
+    }
+  }
+})
+```
+
+### Incorrect Externals
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: (id) => {
+      // Log external decisions for debugging
+      const isExternal = ['react', 'react-dom'].includes(id)
+      console.log(`${id}: ${isExternal ? 'external' : 'bundled'}`)
+      return isExternal
+    }
+  }
+})
+```
+
+### Version Conflicts
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react'],
+    
+    // Check for version compatibility
+    plugins: [
+      {
+        name: 'version-check',
+        buildStart() {
+          const pkg = require('./package.json')
+          const reactVersion = pkg.peerDependencies?.react
+          
+          if (!reactVersion) {
+            this.warn('React version not specified in peerDependencies')
+          }
+        }
+      }
+    ]
+  }
+})
+```
+
+## Performance Considerations
+
+### Bundle Size Impact
+
+```typescript
+export default defineConfig({
+  rollup: {
+    // More externals = smaller bundle
+    external: [
+      'react',
+      'react-dom',
+      'lodash',
+      'moment',
+      'axios'
+    ]
+  }
+})
+```
+
+### Tree Shaking
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['lodash'], // External for better tree shaking
+    
+    // Or bundle specific functions
+    external: (id) => {
+      // Bundle lodash utilities, external lodash core
+      return id === 'lodash' && !id.startsWith('lodash/')
+    }
+  }
+})
+```
+
+### Runtime Performance
+
+```typescript
+export default defineConfig({
+  rollup: {
+    // External heavy dependencies
+    external: (id) => {
+      const heavyDeps = ['three', 'tensorflow', 'opencv']
+      return heavyDeps.some(dep => id.startsWith(dep))
+    }
+  }
+})
+```
+
+---
+
+## Related Options
+
+- [Output Format](/docs/options/output-format) - Configure output formats
+- [Globals](/docs/options/globals) - Global variable mapping
+- [Package Exports](/docs/options/package-exports) - Package.json exports
+- [Peer Dependencies](/docs/options/peer-dependencies) - Peer dependency handling

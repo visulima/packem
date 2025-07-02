@@ -1,0 +1,601 @@
+---
+title: Output Directory
+description: Configure where Packen writes your built files and assets
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+
+# Output Directory
+
+The output directory determines where Packen writes your built files, assets, and generated code. Proper configuration ensures your build artifacts are organized and accessible.
+
+## Basic Configuration
+
+### Default Directory
+
+By default, Packen outputs to the `dist` directory:
+
+```typescript
+export default defineConfig({
+  // Uses 'dist' by default
+})
+```
+
+### Custom Directory
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'build' // Custom output directory
+    }
+  }
+})
+```
+
+### Multiple Directories
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      { format: 'esm', dir: 'dist/esm' },
+      { format: 'cjs', dir: 'dist/cjs' },
+      { format: 'iife', dir: 'dist/browser' }
+    ]
+  }
+})
+```
+
+## Directory Structure
+
+### Flat Structure
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'dist',
+      // All files in root
+      entryFileNames: '[name].js',
+      chunkFileNames: '[name].js',
+      assetFileNames: '[name].[ext]'
+    }
+  }
+})
+```
+
+### Organized Structure
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'dist',
+      // Organized by type
+      entryFileNames: 'js/[name].js',
+      chunkFileNames: 'chunks/[name]-[hash].js',
+      assetFileNames: 'assets/[name]-[hash].[ext]'
+    }
+  }
+})
+```
+
+### Format-Based Structure
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      {
+        format: 'esm',
+        dir: 'dist/esm',
+        entryFileNames: '[name].mjs'
+      },
+      {
+        format: 'cjs',
+        dir: 'dist/cjs',
+        entryFileNames: '[name].cjs'
+      }
+    ]
+  }
+})
+```
+
+## File Naming Patterns
+
+### Entry Files
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'dist',
+      entryFileNames: (chunkInfo) => {
+        // Custom naming logic
+        if (chunkInfo.name === 'index') {
+          return 'main.js'
+        }
+        return '[name]-[hash].js'
+      }
+    }
+  }
+})
+```
+
+### Chunk Files
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'dist',
+      chunkFileNames: 'chunks/[name]-[hash].js'
+    }
+  }
+})
+```
+
+### Asset Files
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'dist',
+      assetFileNames: (assetInfo) => {
+        const extType = assetInfo.name.split('.').pop()
+        
+        if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+          return 'images/[name]-[hash].[ext]'
+        }
+        
+        if (/css|scss|sass|less|styl/i.test(extType)) {
+          return 'styles/[name]-[hash].[ext]'
+        }
+        
+        return 'assets/[name]-[hash].[ext]'
+      }
+    }
+  }
+})
+```
+
+## Package.json Integration
+
+### Automatic Directory Detection
+
+```json
+{
+  "main": "./lib/index.js",
+  "module": "./esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./esm/index.js",
+      "require": "./lib/index.js"
+    }
+  }
+}
+```
+
+```typescript
+export default defineConfig({
+  // Automatically uses 'lib' and 'esm' directories
+  rollup: {
+    output: [
+      { format: 'cjs', dir: 'lib' },
+      { format: 'esm', dir: 'esm' }
+    ]
+  }
+})
+```
+
+### Custom Export Paths
+
+```json
+{
+  "exports": {
+    ".": {
+      "import": "./dist/modern/index.mjs",
+      "require": "./dist/legacy/index.cjs"
+    }
+  }
+}
+```
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      { format: 'esm', dir: 'dist/modern' },
+      { format: 'cjs', dir: 'dist/legacy' }
+    ]
+  }
+})
+```
+
+## Directory Cleaning
+
+### Automatic Cleaning
+
+```typescript
+export default defineConfig({
+  clean: true, // Clean output directory before build
+  
+  rollup: {
+    output: {
+      dir: 'dist'
+    }
+  }
+})
+```
+
+### Selective Cleaning
+
+```typescript
+export default defineConfig({
+  clean: ['dist/**/*.js', 'dist/**/*.css'], // Clean specific patterns
+  
+  rollup: {
+    output: {
+      dir: 'dist'
+    }
+  }
+})
+```
+
+### Custom Cleaning
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': async () => {
+      const { rimraf } = await import('rimraf')
+      await rimraf('dist')
+    }
+  },
+  
+  rollup: {
+    output: {
+      dir: 'dist'
+    }
+  }
+})
+```
+
+## Asset Handling
+
+### Static Assets
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'dist',
+      assetFileNames: 'assets/[name]-[hash].[ext]'
+    },
+    
+    plugins: [
+      // Copy static assets
+      copy({
+        targets: [
+          { src: 'public/*', dest: 'dist' }
+        ]
+      })
+    ]
+  }
+})
+```
+
+### CSS Assets
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'dist',
+      assetFileNames: (assetInfo) => {
+        if (assetInfo.name?.endsWith('.css')) {
+          return 'styles/[name]-[hash].[ext]'
+        }
+        return 'assets/[name]-[hash].[ext]'
+      }
+    }
+  }
+})
+```
+
+### Image Assets
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'dist',
+      assetFileNames: (assetInfo) => {
+        const imageExts = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp']
+        const ext = assetInfo.name?.split('.').pop()?.toLowerCase()
+        
+        if (imageExts.includes(ext)) {
+          return 'images/[name]-[hash].[ext]'
+        }
+        
+        return 'assets/[name]-[hash].[ext]'
+      }
+    }
+  }
+})
+```
+
+## Monorepo Configuration
+
+### Package-Specific Directories
+
+```typescript
+// packages/ui/packem.config.ts
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'dist',
+      entryFileNames: '[name].js'
+    }
+  }
+})
+
+// packages/utils/packem.config.ts
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'lib', // Different directory per package
+      entryFileNames: '[name].js'
+    }
+  }
+})
+```
+
+### Shared Output Directory
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: '../../dist/packages/my-package',
+      entryFileNames: '[name].js'
+    }
+  }
+})
+```
+
+## Development vs Production
+
+### Environment-Specific Directories
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: process.env.NODE_ENV === 'production' ? 'dist' : 'dev',
+      entryFileNames: '[name].js'
+    }
+  }
+})
+```
+
+### Development Server
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'dev',
+      sourcemap: true,
+      entryFileNames: '[name].js'
+    }
+  },
+  
+  server: {
+    static: 'dev' // Serve from output directory
+  }
+})
+```
+
+## Advanced Patterns
+
+### Dynamic Directory Names
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: `dist/${process.env.BUILD_TARGET || 'default'}`,
+      entryFileNames: '[name].js'
+    }
+  }
+})
+```
+
+### Conditional Outputs
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: process.env.DUAL_PACKAGE ? [
+      { format: 'esm', dir: 'dist/esm' },
+      { format: 'cjs', dir: 'dist/cjs' }
+    ] : {
+      format: 'esm',
+      dir: 'dist'
+    }
+  }
+})
+```
+
+### Platform-Specific Directories
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      {
+        format: 'esm',
+        dir: 'dist/node',
+        platform: 'node'
+      },
+      {
+        format: 'esm',
+        dir: 'dist/browser',
+        platform: 'browser'
+      }
+    ]
+  }
+})
+```
+
+## Directory Permissions
+
+### Setting Permissions
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:after': async () => {
+      const { chmod } = await import('fs/promises')
+      await chmod('dist', 0o755)
+    }
+  },
+  
+  rollup: {
+    output: {
+      dir: 'dist'
+    }
+  }
+})
+```
+
+### Ownership
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:after': async () => {
+      const { chown } = await import('fs/promises')
+      const { getuid, getgid } = await import('process')
+      await chown('dist', getuid(), getgid())
+    }
+  }
+})
+```
+
+## Troubleshooting
+
+### Directory Not Found
+
+<Callout type="warning">
+Ensure the output directory exists or can be created.
+</Callout>
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': async () => {
+      const { mkdir } = await import('fs/promises')
+      await mkdir('dist', { recursive: true })
+    }
+  }
+})
+```
+
+### Permission Errors
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': async () => {
+      const { access, constants } = await import('fs/promises')
+      
+      try {
+        await access('dist', constants.W_OK)
+      } catch {
+        throw new Error('Output directory is not writable')
+      }
+    }
+  }
+})
+```
+
+### Path Conflicts
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'dist',
+      // Avoid conflicts with reserved names
+      entryFileNames: (chunkInfo) => {
+        const reserved = ['index', 'main', 'lib']
+        if (reserved.includes(chunkInfo.name)) {
+          return `${chunkInfo.name}-bundle.js`
+        }
+        return '[name].js'
+      }
+    }
+  }
+})
+```
+
+## Performance Considerations
+
+### SSD Optimization
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'dist',
+      // Optimize for SSD performance
+      compact: true,
+      generatedCode: {
+        preset: 'es2015'
+      }
+    }
+  }
+})
+```
+
+### Network Drives
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: process.env.CI ? '/tmp/dist' : 'dist', // Use local storage in CI
+      entryFileNames: '[name].js'
+    }
+  }
+})
+```
+
+### Large Files
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      dir: 'dist',
+      // Split large chunks
+      maxParallelFileOps: 5,
+      chunkFileNames: 'chunks/[name]-[hash].js'
+    }
+  }
+})
+```
+
+---
+
+## Related Options
+
+- [Output Format](/docs/options/output-format) - Configure output formats
+- [Entry](/docs/options/entry) - Configure entry points
+- [Assets](/docs/options/assets) - Handle static assets
+- [Clean](/docs/options/clean) - Clean output directories

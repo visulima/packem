@@ -1,0 +1,870 @@
+---
+title: Monorepo Setup
+description: Build multiple packages in a monorepo with shared configuration
+---
+
+# Monorepo Setup
+
+Learn how to set up a monorepo with multiple packages using Packen, including shared configuration, cross-package dependencies, and coordinated builds.
+
+## Overview
+
+This example demonstrates:
+- Monorepo structure with multiple packages
+- Shared Packen configuration
+- Cross-package dependencies
+- Coordinated build scripts
+- TypeScript project references
+- Package versioning and publishing
+
+## Project Structure
+
+```
+my-monorepo/
+├── packages/
+│   ├── core/                    # Core utilities package
+│   │   ├── src/
+│   │   │   └── index.ts
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   ├── ui/                      # UI components package
+│   │   ├── src/
+│   │   │   └── index.ts
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   ├── cli/                     # CLI tools package
+│   │   ├── src/
+│   │   │   └── index.ts
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   └── shared-config/           # Shared build configuration
+│       ├── packem.config.ts
+│       └── package.json
+├── package.json                 # Root package.json
+├── pnpm-workspace.yaml         # Workspace configuration
+├── tsconfig.json               # Root TypeScript config
+└── turbo.json                  # Turborepo configuration (optional)
+```
+
+## Root Configuration
+
+### package.json
+
+```json
+{
+  "name": "@myorg/monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "pnpm run --recursive --filter='!shared-config' build",
+    "dev": "pnpm run --recursive --filter='!shared-config' dev",
+    "clean": "pnpm run --recursive clean",
+    "typecheck": "tsc --build",
+    "release": "changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.26.0",
+    "@visulima/packem": "^1.28.2",
+    "typescript": "^5.3.0",
+    "turbo": "^1.10.0"
+  },
+  "packageManager": "pnpm@8.0.0"
+}
+```
+
+### Workspace Configuration
+
+**pnpm-workspace.yaml**
+```yaml
+packages:
+  - 'packages/*'
+```
+
+### Root TypeScript Configuration
+
+**tsconfig.json**
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "composite": true
+  },
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/cli" }
+  ],
+  "files": []
+}
+```
+
+## Shared Configuration Package
+
+### packages/shared-config/package.json
+
+```json
+{
+  "name": "@myorg/shared-config",
+  "version": "1.0.0",
+  "private": true,
+  "main": "packem.config.js",
+  "files": [
+    "packem.config.js"
+  ],
+  "dependencies": {
+    "@visulima/packem": "^1.28.2"
+  }
+}
+```
+
+### packages/shared-config/packem.config.ts
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export const createPackemConfig = (options: {
+  external?: string[]
+  css?: boolean
+  react?: boolean
+} = {}) => {
+  const { external = [], css = false, react = false } = options
+
+  return defineConfig({
+    transformer,
+    sourcemap: true,
+    declaration: true,
+    externals: [
+      // Common externals
+      'react',
+      'react-dom',
+      ...external
+    ],
+    rollup: {
+      ...(css && {
+        css: {
+          mode: 'extract'
+        }
+      }),
+      watch: {
+        include: 'src/**'
+      }
+    }
+  })
+}
+
+// Default configuration
+export default createPackemConfig()
+```
+
+## Core Package
+
+### packages/core/package.json
+
+```json
+{
+  "name": "@myorg/core",
+  "version": "1.0.0",
+  "description": "Core utilities and types",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js",
+      "require": "./dist/utils/index.cjs"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js",
+      "require": "./dist/types/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --build"
+  },
+  "devDependencies": {
+    "@myorg/shared-config": "workspace:*",
+    "@visulima/packem": "^1.28.2",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+### packages/core/src/index.ts
+
+```typescript
+// Utils
+export * from './utils'
+
+// Types
+export * from './types'
+
+// Main API
+export interface CoreConfig {
+  debug?: boolean
+  environment?: 'development' | 'production' | 'test'
+}
+
+export class Core {
+  private config: CoreConfig
+
+  constructor(config: CoreConfig = {}) {
+    this.config = {
+      debug: false,
+      environment: 'production',
+      ...config
+    }
+  }
+
+  log(message: string) {
+    if (this.config.debug) {
+      console.log(`[Core] ${message}`)
+    }
+  }
+
+  getConfig() {
+    return { ...this.config }
+  }
+}
+
+export function createCore(config?: CoreConfig) {
+  return new Core(config)
+}
+```
+
+### packages/core/src/utils/index.ts
+
+```typescript
+/**
+ * Utility functions
+ */
+
+export function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+export function isEmpty(value: unknown): boolean {
+  if (value === null || value === undefined) return true
+  if (typeof value === 'string') return value.length === 0
+  if (Array.isArray(value)) return value.length === 0
+  if (isObject(value)) return Object.keys(value).length === 0
+  return false
+}
+
+export function deepMerge<T extends Record<string, any>>(
+  target: T,
+  source: Partial<T>
+): T {
+  const result = { ...target }
+
+  for (const key in source) {
+    const sourceValue = source[key]
+    const targetValue = result[key]
+
+    if (isObject(sourceValue) && isObject(targetValue)) {
+      result[key] = deepMerge(targetValue, sourceValue)
+    } else if (sourceValue !== undefined) {
+      result[key] = sourceValue
+    }
+  }
+
+  return result
+}
+
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): T {
+  let timeout: NodeJS.Timeout | undefined
+
+  return ((...args: Parameters<T>) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
+  }) as T
+}
+```
+
+### packages/core/src/types/index.ts
+
+```typescript
+/**
+ * Shared type definitions
+ */
+
+export interface BaseEntity {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface User extends BaseEntity {
+  email: string
+  name: string
+  role: 'admin' | 'user' | 'guest'
+}
+
+export interface APIResponse<T = unknown> {
+  data: T
+  success: boolean
+  message?: string
+  error?: string
+}
+
+export type Environment = 'development' | 'production' | 'test'
+
+export interface LogLevel {
+  level: 'debug' | 'info' | 'warn' | 'error'
+  timestamp: Date
+  message: string
+  meta?: Record<string, unknown>
+}
+```
+
+### packages/core/tsconfig.json
+
+```json
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+### packages/core/packem.config.ts
+
+```typescript
+import { createPackemConfig } from '@myorg/shared-config'
+
+export default createPackemConfig()
+```
+
+## UI Package
+
+### packages/ui/package.json
+
+```json
+{
+  "name": "@myorg/ui",
+  "version": "1.0.0",
+  "description": "React UI components",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.js",
+      "require": "./dist/components/index.cjs"
+    }
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --build"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "dependencies": {
+    "@myorg/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@myorg/shared-config": "workspace:*",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@visulima/packem": "^1.28.2",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+### packages/ui/src/index.ts
+
+```typescript
+// Re-export core types that UI components need
+export type { User, APIResponse } from '@myorg/core'
+
+// Export components
+export * from './components'
+```
+
+### packages/ui/src/components/index.ts
+
+```typescript
+export { Button } from './Button'
+export { UserCard } from './UserCard'
+
+export type { ButtonProps } from './Button'
+export type { UserCardProps } from './UserCard'
+```
+
+### packages/ui/src/components/Button.tsx
+
+```typescript
+'use client'
+
+import React from 'react'
+
+export interface ButtonProps 
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary'
+  size?: 'sm' | 'md' | 'lg'
+  children: React.ReactNode
+}
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant = 'primary', size = 'md', children, className, ...props }, ref) => {
+    const baseClasses = 'px-4 py-2 rounded font-medium transition-colors'
+    const variantClasses = {
+      primary: 'bg-blue-500 text-white hover:bg-blue-600',
+      secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300'
+    }
+    const sizeClasses = {
+      sm: 'px-2 py-1 text-sm',
+      md: 'px-4 py-2',
+      lg: 'px-6 py-3 text-lg'
+    }
+
+    const finalClassName = [
+      baseClasses,
+      variantClasses[variant],
+      sizeClasses[size],
+      className
+    ].filter(Boolean).join(' ')
+
+    return (
+      <button
+        ref={ref}
+        className={finalClassName}
+        {...props}
+      >
+        {children}
+      </button>
+    )
+  }
+)
+
+Button.displayName = 'Button'
+```
+
+### packages/ui/src/components/UserCard.tsx
+
+```typescript
+import React from 'react'
+import type { User } from '@myorg/core'
+import { Button } from './Button'
+
+export interface UserCardProps {
+  user: User
+  onEdit?: (user: User) => void
+  onDelete?: (user: User) => void
+}
+
+export function UserCard({ user, onEdit, onDelete }: UserCardProps) {
+  return (
+    <div className="border rounded-lg p-4 bg-white shadow-sm">
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="text-lg font-semibold">{user.name}</h3>
+        <span className="text-sm text-gray-500 capitalize">{user.role}</span>
+      </div>
+      
+      <p className="text-gray-600 mb-4">{user.email}</p>
+      
+      <div className="flex gap-2">
+        {onEdit && (
+          <Button 
+            variant="secondary" 
+            size="sm"
+            onClick={() => onEdit(user)}
+          >
+            Edit
+          </Button>
+        )}
+        
+        {onDelete && (
+          <Button 
+            variant="primary" 
+            size="sm"
+            onClick={() => onDelete(user)}
+          >
+            Delete
+          </Button>
+        )}
+      </div>
+    </div>
+  )
+}
+```
+
+### packages/ui/tsconfig.json
+
+```json
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "../core" }
+  ]
+}
+```
+
+### packages/ui/packem.config.ts
+
+```typescript
+import { createPackemConfig } from '@myorg/shared-config'
+
+export default createPackemConfig({
+  external: ['@myorg/core'],
+  css: true,
+  react: true
+})
+```
+
+## CLI Package
+
+### packages/cli/package.json
+
+```json
+{
+  "name": "@myorg/cli",
+  "version": "1.0.0",
+  "description": "Command line tools",
+  "type": "module",
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "myorg": "./bin/myorg.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "packem build && npm run build:bin",
+    "build:bin": "echo '#!/usr/bin/env node\nrequire(\"../dist/cli.cjs\")' > bin/myorg.js && chmod +x bin/myorg.js",
+    "dev": "packem build --watch",
+    "clean": "rm -rf dist bin",
+    "typecheck": "tsc --build"
+  },
+  "dependencies": {
+    "@myorg/core": "workspace:*",
+    "commander": "^11.0.0"
+  },
+  "devDependencies": {
+    "@myorg/shared-config": "workspace:*",
+    "@types/node": "^20.0.0",
+    "@visulima/packem": "^1.28.2",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+### packages/cli/src/index.ts
+
+```typescript
+export { createCLI } from './cli'
+export { runCommand } from './commands'
+```
+
+### packages/cli/src/cli.ts
+
+```typescript
+#!/usr/bin/env node
+
+import { Command } from 'commander'
+import { createCore } from '@myorg/core'
+import { buildCommand } from './commands/build'
+import { devCommand } from './commands/dev'
+
+export function createCLI() {
+  const core = createCore({ debug: true })
+  const program = new Command()
+
+  program
+    .name('@myorg/cli')
+    .description('Monorepo development tools')
+    .version('1.0.0')
+
+  // Build command
+  program
+    .command('build')
+    .description('Build all packages')
+    .option('-w, --watch', 'Watch for changes')
+    .action(buildCommand)
+
+  // Dev command
+  program
+    .command('dev')
+    .description('Start development mode')
+    .action(devCommand)
+
+  return { program, core }
+}
+
+// CLI entry point
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const { program } = createCLI()
+  program.parse()
+}
+```
+
+### packages/cli/src/commands/index.ts
+
+```typescript
+export { buildCommand } from './build'
+export { devCommand } from './dev'
+
+export function runCommand(name: string, ...args: any[]) {
+  console.log(`Running command: ${name}`, args)
+}
+```
+
+### packages/cli/src/commands/build.ts
+
+```typescript
+import { createCore } from '@myorg/core'
+
+export async function buildCommand(options: { watch?: boolean }) {
+  const core = createCore({ debug: true })
+  
+  core.log('Starting build...')
+  
+  if (options.watch) {
+    core.log('Watching for changes...')
+    // Watch mode implementation
+  } else {
+    core.log('Building packages...')
+    // Build implementation
+  }
+  
+  core.log('Build completed!')
+}
+```
+
+### packages/cli/src/commands/dev.ts
+
+```typescript
+import { createCore } from '@myorg/core'
+
+export async function devCommand() {
+  const core = createCore({ debug: true })
+  
+  core.log('Starting development mode...')
+  
+  // Development server implementation
+  
+  core.log('Development server started!')
+}
+```
+
+### packages/cli/tsconfig.json
+
+```json
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "../core" }
+  ]
+}
+```
+
+### packages/cli/packem.config.ts
+
+```typescript
+import { createPackemConfig } from '@myorg/shared-config'
+
+export default createPackemConfig({
+  external: ['@myorg/core', 'commander']
+})
+```
+
+## Build Scripts and Workflows
+
+### Turborepo Configuration (Optional)
+
+**turbo.json**
+```json
+{
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}
+```
+
+## Building the Monorepo
+
+### Install Dependencies
+
+```npm
+pnpm install
+```
+
+### Build All Packages
+
+```bash
+# Build all packages in correct order
+pnpm run build
+
+# Or with Turborepo
+turbo build
+```
+
+### Development Mode
+
+```bash
+# Watch all packages
+pnpm run dev
+
+# Or with Turborepo
+turbo dev
+```
+
+### Clean All Packages
+
+```bash
+pnpm run clean
+```
+
+## Key Benefits
+
+### Shared Configuration
+
+- Single source of truth for build configuration
+- Easy to maintain and update across packages
+- Consistent build output across all packages
+
+### Cross-Package Dependencies
+
+- Type-safe imports between packages
+- Automatic rebuild when dependencies change
+- Proper dependency resolution
+
+### Coordinated Builds
+
+- Build packages in correct dependency order
+- Parallel builds where possible
+- Incremental builds with caching
+
+## Package Publishing
+
+### Using Changesets
+
+```bash
+# Add a changeset
+npx changeset
+
+# Version packages
+npx changeset version
+
+# Publish packages
+npx changeset publish
+```
+
+### Individual Package Publishing
+
+```bash
+# Build and publish specific package
+cd packages/core
+pnpm build
+npm publish
+```
+
+<Callout type="info">
+This monorepo setup provides a scalable foundation for large projects with multiple related packages while maintaining build consistency and developer experience.
+</Callout>
+
+## Next Steps
+
+- Add automated testing across packages
+- Set up GitHub Actions for CI/CD
+- Implement automated dependency updates
+- Add package size tracking and optimization
+- Set up automated changelog generation
+- Configure automated security scanning

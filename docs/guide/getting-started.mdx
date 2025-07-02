@@ -1,0 +1,296 @@
+---
+title: Getting Started
+description: Install Packen and create your first bundle in minutes
+---
+
+# Getting Started
+
+Get up and running with Packen in just a few minutes. This guide will walk you through installation, basic configuration, and your first build.
+
+## Installation
+
+Install Packen as a development dependency in your project:
+
+```npm
+npm install --save-dev @visulima/packem
+```
+
+## Quick Setup
+
+The fastest way to get started is using the interactive setup:
+
+```bash
+npx packem init
+```
+
+This command will:
+- Analyze your project structure
+- Ask about your preferences (transformer, CSS preprocessor, etc.)
+- Generate a `packem.config.ts` file
+- Update your `package.json` with recommended settings
+
+<Callout type="info">
+The init command is smart enough to detect existing configurations and suggest optimal settings for your project.
+</Callout>
+
+## Project Structure
+
+Packen works best with a conventional project structure:
+
+```
+my-package/
+├── src/
+│   ├── index.ts          # Main entry point
+│   ├── cli.ts           # CLI entry (if building a CLI tool)
+│   └── utils/
+│       └── helper.ts
+├── package.json
+├── packem.config.ts     # Packen configuration
+└── tsconfig.json        # TypeScript configuration
+```
+
+## Configure package.json
+
+Packen uses your `package.json` to determine what to build and how. Here's a basic setup:
+
+<Tabs>
+  <TabItem label="ESM Library">
+    ```json
+    {
+      "name": "my-package",
+      "type": "module",
+      "files": ["dist"],
+      "main": "./dist/index.js",
+      "module": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        }
+      },
+      "scripts": {
+        "build": "packem build",
+        "dev": "packem build --watch"
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Dual Package (ESM + CJS)">
+    ```json
+    {
+      "name": "my-package",
+      "files": ["dist"],
+      "main": "./dist/index.cjs",
+      "module": "./dist/index.mjs",
+      "types": "./dist/index.d.ts",
+      "exports": {
+        ".": {
+          "import": {
+            "types": "./dist/index.d.mts",
+            "default": "./dist/index.mjs"
+          },
+          "require": {
+            "types": "./dist/index.d.cts", 
+            "default": "./dist/index.cjs"
+          }
+        }
+      },
+      "scripts": {
+        "build": "packem build",
+        "dev": "packem build --watch"
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="CLI Tool">
+    ```json
+    {
+      "name": "my-cli",
+      "type": "module",
+      "files": ["dist"],
+      "bin": "./dist/cli.js",
+      "exports": {
+        ".": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/index.js"
+        }
+      },
+      "scripts": {
+        "build": "packem build",
+        "dev": "packem build --watch"
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<Callout type="tip">
+Packen automatically detects your entry points from the `exports`, `main`, `module`, and `bin` fields in package.json.
+</Callout>
+
+## Basic Configuration
+
+Create a `packem.config.ts` file in your project root:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  // Choose your transformer
+  transformer, // esbuild, swc, oxc, sucrase, or typescript
+  
+  // Enable development features
+  sourcemap: true,
+  
+  rollup: {
+    watch: {
+      include: 'src/**'
+    }
+  }
+})
+```
+
+## Your First Build
+
+Now you're ready to build your project:
+
+```bash
+# Single build
+npm run build
+
+# Watch mode for development  
+npm run dev
+```
+
+Packen will:
+- Analyze your `package.json` exports
+- Find matching source files in the `src` directory
+- Transform your code using the selected transformer
+- Generate optimized bundles in the `dist` directory
+- Create TypeScript declaration files
+
+## Example: Simple Library
+
+Let's create a simple utility library:
+
+**src/index.ts**
+```typescript
+export function greet(name: string): string {
+  return `Hello, ${name}!`
+}
+
+export function add(a: number, b: number): number {
+  return a + b
+}
+
+export default {
+  greet,
+  add
+}
+```
+
+**package.json**
+```json
+{
+  "name": "my-utils",
+  "type": "module",
+  "files": ["dist"],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "packem build"
+  }
+}
+```
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  sourcemap: true,
+  rollup: {
+    watch: {
+      include: 'src/**'
+    }
+  }
+})
+```
+
+Run the build:
+
+```bash
+npm run build
+```
+
+Output:
+```
+my-utils/
+├── dist/
+│   ├── index.js      # Bundled JavaScript
+│   └── index.d.ts    # TypeScript declarations
+└── ...
+```
+
+## Next Steps
+
+Congratulations! You've successfully set up Packen and created your first bundle. Here's what to explore next:
+
+<Cards>
+  <Card href="/docs/guide/configuration" title="Configuration">
+    Learn about advanced configuration options
+  </Card>
+  
+  <Card href="/docs/guide/transformers" title="Transformers">
+    Choose the right transformer for your needs
+  </Card>
+  
+  <Card href="/docs/guide/typescript" title="TypeScript">
+    Advanced TypeScript features and configuration
+  </Card>
+  
+  <Card href="/docs/guide/css" title="CSS Processing">
+    Add CSS, Sass, and styling to your builds
+  </Card>
+</Cards>
+
+## Common Issues
+
+### Entry Points Not Found
+
+If Packen can't find your entry points, make sure:
+- Your `package.json` has proper `exports`, `main`, or `module` fields
+- The corresponding source files exist in the `src` directory
+- File extensions match (`.ts` for TypeScript, `.js` for JavaScript)
+
+### TypeScript Errors
+
+For TypeScript projects, ensure:
+- You have a valid `tsconfig.json`
+- TypeScript is installed as a dependency
+- Your source files have proper TypeScript syntax
+
+### Build Failing
+
+Check that:
+- All dependencies are installed
+- Your transformer is properly configured
+- There are no syntax errors in your source files
+
+<Callout type="info">
+Use `packem build --verbose` to get detailed build information and error messages.
+</Callout>
+
+---
+
+Need help? Check out our [troubleshooting guide](/docs/guide/troubleshooting) or [open an issue](https://github.com/visulima/packem/issues) on GitHub.

@@ -1,0 +1,603 @@
+---
+title: Target
+description: Configure JavaScript compilation targets and runtime environments
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+
+# Target
+
+The target option determines which JavaScript features and runtime environments your code should support. Packen uses this to configure transformers and polyfills appropriately.
+
+## JavaScript Targets
+
+### ES Version Targets
+
+```typescript
+export default defineConfig({
+  target: 'es2020', // Target ES2020 features
+  
+  // Or specify multiple targets
+  target: ['es2020', 'node18']
+})
+```
+
+### Available ES Targets
+
+- `es5` - ES5 (2009) - Maximum compatibility
+- `es2015` / `es6` - ES2015 (2015) - Classes, arrow functions, let/const
+- `es2016` - ES2016 (2016) - Exponentiation operator
+- `es2017` - ES2017 (2017) - Async/await, Object.entries/values
+- `es2018` - ES2018 (2018) - Rest/spread, async iteration
+- `es2019` - ES2019 (2019) - Optional catch binding, flat/flatMap
+- `es2020` - ES2020 (2020) - Optional chaining, nullish coalescing
+- `es2021` - ES2021 (2021) - Logical assignment, numeric separators
+- `es2022` - ES2022 (2022) - Top-level await, private fields
+- `esnext` - Latest features
+
+### Browser Targets
+
+```typescript
+export default defineConfig({
+  target: [
+    'chrome90',
+    'firefox88',
+    'safari14',
+    'edge90'
+  ]
+})
+```
+
+### Browserslist Integration
+
+```typescript
+export default defineConfig({
+  target: 'browserslist', // Uses .browserslistrc or package.json
+})
+```
+
+```json
+// package.json
+{
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
+```
+
+## Runtime Targets
+
+### Node.js Targets
+
+```typescript
+export default defineConfig({
+  target: 'node18', // Target Node.js 18+
+  
+  // Or specific versions
+  target: ['node16', 'node18', 'node20']
+})
+```
+
+### Browser Targets
+
+```typescript
+export default defineConfig({
+  target: 'browser', // Modern browsers
+  
+  // Or specific compatibility
+  target: 'browser-legacy' // Older browser support
+})
+```
+
+### Edge Runtime
+
+```typescript
+export default defineConfig({
+  target: 'edge-light', // Vercel Edge Runtime
+  
+  rollup: {
+    output: {
+      format: 'esm',
+      generatedCode: {
+        preset: 'es2022'
+      }
+    }
+  }
+})
+```
+
+### React Server Components
+
+```typescript
+export default defineConfig({
+  target: 'react-server', // React Server Components
+  
+  rollup: {
+    external: ['react', 'react-dom'],
+    output: {
+      format: 'esm'
+    }
+  }
+})
+```
+
+## Transformer-Specific Targets
+
+### esbuild Target
+
+```typescript
+export default defineConfig({
+  transformer: 'esbuild',
+  target: 'es2020',
+  
+  esbuild: {
+    target: 'es2020', // Override for esbuild
+    supported: {
+      'dynamic-import': true,
+      'import-meta': true
+    }
+  }
+})
+```
+
+### SWC Target
+
+```typescript
+export default defineConfig({
+  transformer: 'swc',
+  target: 'es2020',
+  
+  swc: {
+    jsc: {
+      target: 'es2020',
+      parser: {
+        syntax: 'typescript',
+        tsx: true
+      }
+    }
+  }
+})
+```
+
+### TypeScript Target
+
+```typescript
+export default defineConfig({
+  transformer: 'typescript',
+  target: 'es2020',
+  
+  typescript: {
+    target: 'ES2020',
+    module: 'ESNext',
+    lib: ['ES2020', 'DOM']
+  }
+})
+```
+
+## Multi-Target Builds
+
+### Different Targets per Format
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      {
+        format: 'esm',
+        file: 'dist/index.modern.mjs',
+        target: 'es2020' // Modern build
+      },
+      {
+        format: 'cjs',
+        file: 'dist/index.legacy.cjs',
+        target: 'es5' // Legacy build
+      }
+    ]
+  }
+})
+```
+
+### Platform-Specific Targets
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      {
+        format: 'esm',
+        file: 'dist/index.node.mjs',
+        target: 'node18',
+        platform: 'node'
+      },
+      {
+        format: 'esm',
+        file: 'dist/index.browser.mjs',
+        target: 'es2020',
+        platform: 'browser'
+      }
+    ]
+  }
+})
+```
+
+## Feature Support
+
+### Optional Features
+
+```typescript
+export default defineConfig({
+  target: 'es2020',
+  
+  esbuild: {
+    supported: {
+      // Enable/disable specific features
+      'optional-chaining': true,
+      'nullish-coalescing': true,
+      'bigint': false, // Disable if not supported
+      'top-level-await': true
+    }
+  }
+})
+```
+
+### Polyfills
+
+```typescript
+export default defineConfig({
+  target: 'es5',
+  
+  rollup: {
+    plugins: [
+      // Add polyfills for older targets
+      polyfill({
+        include: ['core-js/stable', 'regenerator-runtime/runtime']
+      })
+    ]
+  }
+})
+```
+
+### Core-js Integration
+
+```typescript
+export default defineConfig({
+  target: 'es5',
+  
+  babel: {
+    presets: [
+      ['@babel/preset-env', {
+        targets: { ie: '11' },
+        useBuiltIns: 'usage',
+        corejs: 3
+      }]
+    ]
+  }
+})
+```
+
+## Environment-Specific Configuration
+
+### Development vs Production
+
+```typescript
+export default defineConfig({
+  target: process.env.NODE_ENV === 'production' 
+    ? 'es2020'  // Modern target for production
+    : 'esnext', // Latest features for development
+})
+```
+
+### Conditional Targets
+
+```typescript
+export default defineConfig({
+  target: process.env.LEGACY_BUILD ? 'es5' : 'es2020',
+  
+  rollup: {
+    output: {
+      format: process.env.LEGACY_BUILD ? 'umd' : 'esm'
+    }
+  }
+})
+```
+
+## Library Targets
+
+### Universal Library
+
+```typescript
+export default defineConfig({
+  target: 'es5', // Maximum compatibility
+  
+  rollup: {
+    output: [
+      {
+        format: 'umd',
+        file: 'dist/index.umd.js',
+        name: 'MyLibrary'
+      },
+      {
+        format: 'esm',
+        file: 'dist/index.esm.js'
+      }
+    ]
+  }
+})
+```
+
+### Modern Library
+
+```typescript
+export default defineConfig({
+  target: 'es2020', // Modern features
+  
+  rollup: {
+    output: {
+      format: 'esm',
+      file: 'dist/index.mjs'
+    }
+  }
+})
+```
+
+### Node.js Library
+
+```typescript
+export default defineConfig({
+  target: 'node16', // Target Node.js 16+
+  
+  rollup: {
+    output: {
+      format: 'cjs',
+      file: 'dist/index.cjs'
+    },
+    external: ['fs', 'path', 'url'] // Node.js built-ins
+  }
+})
+```
+
+## Framework Targets
+
+### React Library
+
+```typescript
+export default defineConfig({
+  target: 'es2020',
+  
+  rollup: {
+    external: ['react', 'react-dom'],
+    output: {
+      format: 'esm',
+      file: 'dist/index.mjs',
+      globals: {
+        'react': 'React',
+        'react-dom': 'ReactDOM'
+      }
+    }
+  }
+})
+```
+
+### Vue Library
+
+```typescript
+export default defineConfig({
+  target: 'es2020',
+  
+  rollup: {
+    external: ['vue'],
+    output: {
+      format: 'esm',
+      file: 'dist/index.mjs'
+    }
+  }
+})
+```
+
+### Svelte Library
+
+```typescript
+export default defineConfig({
+  target: 'es2020',
+  
+  rollup: {
+    external: ['svelte'],
+    output: {
+      format: 'esm',
+      file: 'dist/index.mjs'
+    }
+  }
+})
+```
+
+## Target Validation
+
+### Compatibility Checking
+
+```typescript
+export default defineConfig({
+  target: 'es2020',
+  
+  hooks: {
+    'build:after': async () => {
+      // Check if output is compatible with target
+      const { checkCompatibility } = await import('@visulima/packem/compat')
+      await checkCompatibility('dist', 'es2020')
+    }
+  }
+})
+```
+
+### Feature Detection
+
+```typescript
+export default defineConfig({
+  target: 'es2020',
+  
+  esbuild: {
+    target: 'es2020',
+    supported: {
+      // Auto-detect based on target
+      'optional-chaining': true,
+      'nullish-coalescing': true
+    }
+  }
+})
+```
+
+## Performance Optimization
+
+### Target-Specific Optimizations
+
+```typescript
+export default defineConfig({
+  target: 'es2020',
+  
+  rollup: {
+    output: {
+      generatedCode: {
+        // Use modern syntax for smaller output
+        preset: 'es2015',
+        arrowFunctions: true,
+        constBindings: true,
+        objectShorthand: true
+      }
+    }
+  }
+})
+```
+
+### Bundle Size Optimization
+
+```typescript
+export default defineConfig({
+  target: 'es2020',
+  
+  rollup: {
+    treeshake: {
+      // Enable aggressive tree shaking for modern targets
+      preset: 'recommended',
+      propertyReadSideEffects: false,
+      unknownGlobalSideEffects: false
+    }
+  }
+})
+```
+
+## Troubleshooting
+
+### Syntax Errors
+
+<Callout type="warning">
+If you encounter syntax errors, your target might be too old for the features you're using.
+</Callout>
+
+```typescript
+export default defineConfig({
+  target: 'es2020', // Increase target version
+  
+  esbuild: {
+    target: 'es2020',
+    supported: {
+      'optional-chaining': true // Ensure feature is supported
+    }
+  }
+})
+```
+
+### Runtime Errors
+
+```typescript
+export default defineConfig({
+  target: 'es5',
+  
+  rollup: {
+    plugins: [
+      // Add necessary polyfills
+      polyfill({
+        include: ['core-js/stable']
+      })
+    ]
+  }
+})
+```
+
+### Browser Compatibility
+
+```typescript
+export default defineConfig({
+  target: [
+    'chrome60', // Specific browser versions
+    'firefox55',
+    'safari12',
+    'edge79'
+  ],
+  
+  // Or use browserslist
+  browserslist: [
+    '> 1%',
+    'last 2 versions',
+    'not dead'
+  ]
+})
+```
+
+## Advanced Configuration
+
+### Custom Target Detection
+
+```typescript
+export default defineConfig({
+  target: (() => {
+    // Dynamic target based on environment
+    if (process.env.TARGET_ENV === 'legacy') {
+      return 'es5'
+    }
+    if (process.env.TARGET_ENV === 'modern') {
+      return 'es2022'
+    }
+    return 'es2020'
+  })()
+})
+```
+
+### Conditional Compilation
+
+```typescript
+export default defineConfig({
+  target: 'es2020',
+  
+  define: {
+    // Conditional compilation based on target
+    '__ES2020__': true,
+    '__LEGACY__': false
+  }
+})
+```
+
+### Target-Specific Plugins
+
+```typescript
+export default defineConfig({
+  target: 'es5',
+  
+  rollup: {
+    plugins: [
+      // Only include polyfill plugin for older targets
+      ...(target === 'es5' ? [polyfill()] : [])
+    ]
+  }
+})
+```
+
+---
+
+## Related Options
+
+- [Transformer](/docs/options/transformer) - Choose JavaScript transformer
+- [Output Format](/docs/options/output-format) - Configure output formats
+- [Browserslist](/docs/options/browserslist) - Browser compatibility
+- [Polyfills](/docs/options/polyfills) - Runtime feature polyfills

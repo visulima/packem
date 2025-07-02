@@ -1,0 +1,538 @@
+---
+title: Source Maps
+description: Configure source map generation for debugging
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+
+# Source Maps
+
+Source maps provide a way to map compiled code back to the original source code, enabling debugging of the original code in browsers and other tools. Packen supports various source map formats and configurations.
+
+## Basic Configuration
+
+### Enable Source Maps
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: true
+    }
+  }
+})
+```
+
+### Source Map Types
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      {
+        format: 'esm',
+        file: 'dist/index.mjs',
+        sourcemap: true // External source map
+      },
+      {
+        format: 'cjs',
+        file: 'dist/index.cjs',
+        sourcemap: 'inline' // Inline source map
+      },
+      {
+        format: 'iife',
+        file: 'dist/index.global.js',
+        sourcemap: 'hidden' // No reference comment
+      }
+    ]
+  }
+})
+```
+
+## Source Map Formats
+
+### External Source Maps
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: true, // Creates .map files
+      sourcemapFile: 'dist/index.js.map'
+    }
+  }
+})
+```
+
+### Inline Source Maps
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: 'inline' // Embedded in the bundle
+    }
+  }
+})
+```
+
+### Hidden Source Maps
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: 'hidden' // Generated but not referenced
+    }
+  }
+})
+```
+
+## Environment-Specific Configuration
+
+### Development vs Production
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: process.env.NODE_ENV === 'development' ? true : false
+    }
+  }
+})
+```
+
+### Conditional Source Maps
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: process.env.GENERATE_SOURCEMAP !== 'false'
+    }
+  }
+})
+```
+
+## Transformer-Specific Source Maps
+
+### esbuild Source Maps
+
+```typescript
+export default defineConfig({
+  transformer: 'esbuild',
+  
+  esbuild: {
+    sourcemap: true,
+    sourcesContent: true
+  },
+  
+  rollup: {
+    output: {
+      sourcemap: true
+    }
+  }
+})
+```
+
+### SWC Source Maps
+
+```typescript
+export default defineConfig({
+  transformer: 'swc',
+  
+  swc: {
+    sourceMaps: true,
+    inlineSourcesContent: true
+  },
+  
+  rollup: {
+    output: {
+      sourcemap: true
+    }
+  }
+})
+```
+
+### TypeScript Source Maps
+
+```typescript
+export default defineConfig({
+  transformer: 'typescript',
+  
+  typescript: {
+    sourceMap: true,
+    inlineSources: true,
+    inlineSourceMap: false
+  }
+})
+```
+
+## CSS Source Maps
+
+### CSS Preprocessing
+
+```typescript
+export default defineConfig({
+  css: {
+    sourceMap: true,
+    
+    preprocessors: {
+      scss: {
+        sourceMap: true,
+        sourceMapContents: true
+      },
+      
+      less: {
+        sourceMap: true
+      }
+    }
+  }
+})
+```
+
+### PostCSS Source Maps
+
+```typescript
+export default defineConfig({
+  css: {
+    postcss: {
+      map: {
+        inline: false,
+        annotation: true,
+        sourcesContent: true
+      }
+    }
+  }
+})
+```
+
+## Advanced Configuration
+
+### Source Map Paths
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: true,
+      sourcemapPathTransform: (relativeSourcePath, sourcemapPath) => {
+        // Transform source paths in source maps
+        return relativeSourcePath.replace('../src/', 'src/')
+      }
+    }
+  }
+})
+```
+
+### Source Content Inclusion
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: true,
+      sourcemapExcludeSources: false, // Include source content
+      sourcemapFile: 'dist/index.js.map'
+    }
+  }
+})
+```
+
+### Base URL Configuration
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: true,
+      sourcemapBaseUrl: 'https://cdn.example.com/src/'
+    }
+  }
+})
+```
+
+## Framework Integration
+
+### React Source Maps
+
+```typescript
+export default defineConfig({
+  rollup: {
+    plugins: [
+      react({
+        // Preserve JSX source locations
+        development: true
+      })
+    ],
+    
+    output: {
+      sourcemap: true
+    }
+  }
+})
+```
+
+### Vue Source Maps
+
+```typescript
+export default defineConfig({
+  rollup: {
+    plugins: [
+      vue({
+        // Include template source maps
+        sourceMap: true
+      })
+    ],
+    
+    output: {
+      sourcemap: true
+    }
+  }
+})
+```
+
+## Debugging Configuration
+
+### Browser DevTools
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: true,
+      // Optimize for browser debugging
+      sourcemapExcludeSources: false
+    }
+  }
+})
+```
+
+### Node.js Debugging
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'cjs',
+      sourcemap: true,
+      // Enable source map support
+      banner: 'require("source-map-support").install();'
+    }
+  }
+})
+```
+
+### VS Code Integration
+
+```json
+// .vscode/launch.json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Bundle",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/dist/index.js",
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+    }
+  ]
+}
+```
+
+## Performance Considerations
+
+### Source Map Size
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      // Smaller source maps
+      sourcemap: process.env.NODE_ENV === 'development' ? true : 'hidden'
+    }
+  }
+})
+```
+
+### Build Performance
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: true,
+      // Exclude sources content for faster builds
+      sourcemapExcludeSources: true
+    }
+  }
+})
+```
+
+### Network Performance
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      // Use hidden source maps for production
+      sourcemap: process.env.NODE_ENV === 'production' ? 'hidden' : true
+    }
+  }
+})
+```
+
+## Source Map Validation
+
+### Verification
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:after': async () => {
+      // Validate source maps
+      const { SourceMapConsumer } = await import('source-map')
+      const fs = await import('fs/promises')
+      
+      const mapContent = await fs.readFile('dist/index.js.map', 'utf-8')
+      const consumer = await new SourceMapConsumer(JSON.parse(mapContent))
+      
+      // Test source map accuracy
+      const originalPosition = consumer.originalPositionFor({
+        line: 1,
+        column: 0
+      })
+      
+      console.log('Source map validation:', originalPosition)
+      consumer.destroy()
+    }
+  }
+})
+```
+
+### Testing Tools
+
+```typescript
+export default defineConfig({
+  rollup: {
+    plugins: [
+      {
+        name: 'sourcemap-test',
+        generateBundle(options, bundle) {
+          // Test source map generation
+          Object.keys(bundle).forEach(fileName => {
+            if (fileName.endsWith('.map')) {
+              const map = JSON.parse(bundle[fileName].source)
+              console.log(`Source map for ${fileName}:`, {
+                version: map.version,
+                sources: map.sources.length,
+                mappings: map.mappings.length
+              })
+            }
+          })
+        }
+      }
+    ]
+  }
+})
+```
+
+## Troubleshooting
+
+### Missing Source Maps
+
+<Callout type="warning">
+If source maps aren't working, ensure all transformers have source map support enabled.
+</Callout>
+
+```typescript
+export default defineConfig({
+  // Enable source maps at all levels
+  rollup: {
+    output: {
+      sourcemap: true
+    }
+  },
+  
+  esbuild: {
+    sourcemap: true
+  },
+  
+  css: {
+    sourceMap: true
+  }
+})
+```
+
+### Incorrect Source Paths
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: true,
+      sourcemapPathTransform: (relativeSourcePath) => {
+        // Fix source paths
+        return relativeSourcePath.replace(/\\/g, '/')
+      }
+    }
+  }
+})
+```
+
+### Large Source Maps
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: true,
+      // Exclude node_modules from source maps
+      sourcemapIgnoreList: (relativeSourcePath) => {
+        return relativeSourcePath.includes('node_modules')
+      }
+    }
+  }
+})
+```
+
+## Security Considerations
+
+### Production Source Maps
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      // Don't expose source maps in production
+      sourcemap: process.env.NODE_ENV === 'development' ? true : false
+    }
+  }
+})
+```
+
+### Source Content Protection
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      sourcemap: true,
+      // Don't include source content in production
+      sourcemapExcludeSources: process.env.NODE_ENV === 'production'
+    }
+  }
+})
+```
+
+---
+
+## Related Options
+
+- [Target](/docs/options/target) - Compilation targets
+- [Minify](/docs/options/minify) - Code minification
+- [Watch](/docs/options/watch) - Development workflow
+- [Debug](/docs/options/debug) - Debugging options

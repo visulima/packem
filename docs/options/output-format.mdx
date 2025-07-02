@@ -1,0 +1,605 @@
+---
+title: Output Format
+description: Configure output formats (ESM, CJS, IIFE) for your Packen builds
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+
+# Output Format
+
+Packen supports multiple output formats to ensure your library works across different JavaScript environments. The output format determines how your bundled code is structured and how it can be consumed by other applications.
+
+## Supported Formats
+
+### ESM (ES Modules)
+Modern standard for JavaScript modules with `import`/`export` syntax.
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'esm',
+      file: 'dist/index.mjs'
+    }
+  }
+})
+```
+
+### CJS (CommonJS)
+Traditional Node.js module format with `require`/`module.exports`.
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'cjs',
+      file: 'dist/index.cjs'
+    }
+  }
+})
+```
+
+### IIFE (Immediately Invoked Function Expression)
+Browser-compatible format that creates a global variable.
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'iife',
+      file: 'dist/index.global.js',
+      name: 'MyLibrary' // Global variable name
+    }
+  }
+})
+```
+
+### UMD (Universal Module Definition)
+Works in both browser and Node.js environments.
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'umd',
+      file: 'dist/index.umd.js',
+      name: 'MyLibrary'
+    }
+  }
+})
+```
+
+## Automatic Format Detection
+
+Packen automatically determines output formats based on your `package.json`:
+
+### From Package Type
+
+```json
+{
+  "type": "module",
+  "main": "./dist/index.js"
+}
+```
+→ Generates ESM format
+
+```json
+{
+  "type": "commonjs",
+  "main": "./dist/index.js"
+}
+```
+→ Generates CJS format
+
+### From Export Conditions
+
+```json
+{
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  }
+}
+```
+→ Generates both ESM and CJS formats
+
+## Multiple Output Formats
+
+Generate multiple formats in a single build:
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      // ESM build
+      {
+        format: 'esm',
+        file: 'dist/index.mjs'
+      },
+      // CJS build
+      {
+        format: 'cjs',
+        file: 'dist/index.cjs'
+      },
+      // Browser build
+      {
+        format: 'iife',
+        file: 'dist/index.global.js',
+        name: 'MyLibrary'
+      }
+    ]
+  }
+})
+```
+
+## Format-Specific Configuration
+
+### ESM Configuration
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'esm',
+      file: 'dist/index.mjs',
+      // ESM-specific options
+      exports: 'named', // or 'default', 'auto'
+      generatedCode: {
+        preset: 'es2015'
+      }
+    }
+  }
+})
+```
+
+### CJS Configuration
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'cjs',
+      file: 'dist/index.cjs',
+      // CJS-specific options
+      exports: 'auto',
+      esModule: false,
+      interop: 'auto'
+    }
+  }
+})
+```
+
+### IIFE Configuration
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'iife',
+      file: 'dist/index.global.js',
+      name: 'MyLibrary',
+      // IIFE-specific options
+      globals: {
+        'react': 'React',
+        'react-dom': 'ReactDOM'
+      },
+      extend: true // Extend existing global
+    }
+  }
+})
+```
+
+## File Extensions
+
+Packen uses appropriate file extensions based on format:
+
+### Automatic Extensions
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      { format: 'esm', dir: 'dist' }, // → .mjs
+      { format: 'cjs', dir: 'dist' }, // → .cjs
+      { format: 'iife', dir: 'dist' } // → .js
+    ]
+  }
+})
+```
+
+### Custom Extensions
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'esm',
+      dir: 'dist',
+      entryFileNames: '[name].esm.js' // Custom extension
+    }
+  }
+})
+```
+
+## Package.json Integration
+
+### Dual Package Setup
+
+```json
+{
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  }
+}
+```
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      { format: 'esm', file: 'dist/index.mjs' },
+      { format: 'cjs', file: 'dist/index.cjs' }
+    ]
+  }
+})
+```
+
+### Conditional Exports
+
+```json
+{
+  "exports": {
+    ".": {
+      "development": "./dist/index.development.js",
+      "production": "./dist/index.production.js",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  }
+}
+```
+
+## Runtime-Specific Formats
+
+### Node.js Optimized
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'cjs',
+      file: 'dist/index.node.js',
+      // Node.js optimizations
+      preferConst: true,
+      compact: true
+    }
+  }
+})
+```
+
+### Browser Optimized
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'iife',
+      file: 'dist/index.browser.js',
+      name: 'MyLibrary',
+      // Browser optimizations
+      sourcemap: true,
+      compact: true
+    }
+  }
+})
+```
+
+### Edge Runtime
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'esm',
+      file: 'dist/index.edge.mjs',
+      // Edge runtime optimizations
+      generatedCode: {
+        preset: 'es2022'
+      }
+    }
+  }
+})
+```
+
+## Advanced Configuration
+
+### Code Splitting
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'esm',
+      dir: 'dist',
+      // Enable code splitting
+      manualChunks: {
+        vendor: ['react', 'react-dom'],
+        utils: ['lodash', 'date-fns']
+      }
+    }
+  }
+})
+```
+
+### Dynamic Imports
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'esm',
+      dir: 'dist',
+      // Configure dynamic import format
+      chunkFileNames: 'chunks/[name]-[hash].js',
+      dynamicImportFunction: 'import'
+    }
+  }
+})
+```
+
+### Tree Shaking
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'esm',
+      file: 'dist/index.mjs',
+      // Preserve modules for better tree shaking
+      preserveModules: true,
+      preserveModulesRoot: 'src'
+    }
+  }
+})
+```
+
+## Format Validation
+
+Validate your output formats:
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      { format: 'esm', file: 'dist/index.mjs' },
+      { format: 'cjs', file: 'dist/index.cjs' }
+    ]
+  },
+  
+  hooks: {
+    'build:after': async () => {
+      // Validate package.json exports
+      const { validatePackage } = await import('@visulima/packem/validator')
+      await validatePackage('./package.json')
+    }
+  }
+})
+```
+
+## Interoperability
+
+### ESM/CJS Interop
+
+```typescript
+export default defineConfig({
+  cjsInterop: true, // Enable automatic interop
+  
+  rollup: {
+    output: [
+      {
+        format: 'esm',
+        file: 'dist/index.mjs',
+        exports: 'named'
+      },
+      {
+        format: 'cjs',
+        file: 'dist/index.cjs',
+        exports: 'auto',
+        interop: 'auto'
+      }
+    ]
+  }
+})
+```
+
+### Default Export Handling
+
+```typescript
+// For libraries with default exports
+export default defineConfig({
+  rollup: {
+    output: [
+      {
+        format: 'esm',
+        file: 'dist/index.mjs',
+        exports: 'default'
+      },
+      {
+        format: 'cjs',
+        file: 'dist/index.cjs',
+        exports: 'default'
+      }
+    ]
+  }
+})
+```
+
+## Framework-Specific Formats
+
+### React Library
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react', 'react-dom'],
+    output: [
+      {
+        format: 'esm',
+        file: 'dist/index.mjs',
+        globals: {
+          'react': 'React',
+          'react-dom': 'ReactDOM'
+        }
+      },
+      {
+        format: 'cjs',
+        file: 'dist/index.cjs'
+      }
+    ]
+  }
+})
+```
+
+### Vue Library
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['vue'],
+    output: [
+      {
+        format: 'esm',
+        file: 'dist/index.mjs'
+      },
+      {
+        format: 'umd',
+        file: 'dist/index.umd.js',
+        name: 'MyVueLibrary',
+        globals: {
+          'vue': 'Vue'
+        }
+      }
+    ]
+  }
+})
+```
+
+## Troubleshooting
+
+### Format Mismatch
+
+<Callout type="warning">
+Ensure your package.json exports match your actual output formats.
+</Callout>
+
+```json
+{
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs", // Must be ESM
+      "require": "./dist/index.cjs"  // Must be CJS
+    }
+  }
+}
+```
+
+### Global Name Conflicts
+
+For IIFE/UMD builds, ensure unique global names:
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'iife',
+      name: 'MyUniqueLibraryName', // Avoid conflicts
+      extend: false // Don't extend existing globals
+    }
+  }
+})
+```
+
+### External Dependencies
+
+Configure externals appropriately for each format:
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: (id) => {
+      // Different externals for different formats
+      if (format === 'iife') {
+        return ['react', 'react-dom'].includes(id)
+      }
+      return !id.startsWith('.') && !id.startsWith('/')
+    }
+  }
+})
+```
+
+## Performance Considerations
+
+### Format-Specific Optimizations
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      // Development build
+      {
+        format: 'esm',
+        file: 'dist/index.development.mjs',
+        sourcemap: true,
+        compact: false
+      },
+      // Production build
+      {
+        format: 'esm',
+        file: 'dist/index.production.mjs',
+        sourcemap: false,
+        compact: true
+      }
+    ]
+  }
+})
+```
+
+### Bundle Size Optimization
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: {
+      format: 'esm',
+      file: 'dist/index.mjs',
+      // Optimize for size
+      compact: true,
+      generatedCode: {
+        preset: 'es2015',
+        arrowFunctions: true,
+        constBindings: true,
+        objectShorthand: true
+      }
+    }
+  }
+})
+```
+
+---
+
+## Related Options
+
+- [Output Directory](/docs/options/output-directory) - Configure where files are written
+- [Entry](/docs/options/entry) - Configure entry points for different formats
+- [Package Exports](/docs/options/package-exports) - Automatic package.json exports
+- [Target](/docs/options/target) - JavaScript compilation targets

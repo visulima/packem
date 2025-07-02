@@ -1,0 +1,555 @@
+---
+title: Minify
+description: Configure code minification for production builds
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+
+# Minify
+
+Code minification reduces bundle size by removing whitespace, shortening variable names, and applying other optimizations. Packen supports multiple minification engines with extensive configuration options.
+
+## Basic Configuration
+
+### Enable Minification
+
+```typescript
+export default defineConfig({
+  minify: true // Use default minifier (esbuild)
+})
+```
+
+### Conditional Minification
+
+```typescript
+export default defineConfig({
+  minify: process.env.NODE_ENV === 'production'
+})
+```
+
+## Minification Engines
+
+### esbuild (Default)
+
+```typescript
+export default defineConfig({
+  minify: 'esbuild', // Fast and efficient
+  
+  esbuild: {
+    minify: true,
+    minifyWhitespace: true,
+    minifyIdentifiers: true,
+    minifySyntax: true
+  }
+})
+```
+
+### Terser
+
+```typescript
+export default defineConfig({
+  minify: 'terser', // More aggressive optimization
+  
+  terser: {
+    compress: {
+      drop_console: true,
+      drop_debugger: true,
+      pure_funcs: ['console.log', 'console.info']
+    },
+    mangle: {
+      properties: {
+        regex: /^_/
+      }
+    }
+  }
+})
+```
+
+### SWC
+
+```typescript
+export default defineConfig({
+  minify: 'swc', // Rust-based minifier
+  
+  swc: {
+    minify: true,
+    compress: {
+      unused: true,
+      dead_code: true
+    },
+    mangle: true
+  }
+})
+```
+
+## Advanced Configuration
+
+### Custom Minification Options
+
+```typescript
+export default defineConfig({
+  minify: {
+    // Minifier selection
+    minifier: 'esbuild',
+    
+    // Global options
+    removeComments: true,
+    removeWhitespace: true,
+    shortenIdentifiers: true,
+    
+    // Format-specific options
+    js: {
+      mangle: true,
+      compress: true
+    },
+    
+    css: {
+      minify: true,
+      removeUnused: true
+    }
+  }
+})
+```
+
+### Selective Minification
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      {
+        format: 'esm',
+        file: 'dist/index.mjs',
+        minify: true // Minified build
+      },
+      {
+        format: 'esm',
+        file: 'dist/index.debug.mjs',
+        minify: false // Debug build
+      }
+    ]
+  }
+})
+```
+
+## JavaScript Minification
+
+### Compression Options
+
+```typescript
+export default defineConfig({
+  minify: 'terser',
+  
+  terser: {
+    compress: {
+      // Remove dead code
+      dead_code: true,
+      
+      // Remove unused variables
+      unused: true,
+      
+      // Inline functions
+      inline: 2,
+      
+      // Remove console statements
+      drop_console: true,
+      drop_debugger: true,
+      
+      // Pure function annotations
+      pure_funcs: [
+        'console.log',
+        'console.info',
+        'console.warn'
+      ],
+      
+      // Evaluate constant expressions
+      evaluate: true,
+      
+      // Join consecutive var statements
+      join_vars: true,
+      
+      // Optimize loops
+      loops: true,
+      
+      // Remove unreachable code
+      unreachable: true
+    }
+  }
+})
+```
+
+### Mangling Options
+
+```typescript
+export default defineConfig({
+  minify: 'terser',
+  
+  terser: {
+    mangle: {
+      // Mangle top-level names
+      toplevel: true,
+      
+      // Keep function names for debugging
+      keep_fnames: false,
+      
+      // Keep class names
+      keep_classnames: false,
+      
+      // Mangle properties
+      properties: {
+        // Only mangle properties starting with _
+        regex: /^_/,
+        
+        // Reserved property names
+        reserved: ['__proto__', 'constructor']
+      },
+      
+      // Safari 10 bug workaround
+      safari10: true
+    }
+  }
+})
+```
+
+### Output Options
+
+```typescript
+export default defineConfig({
+  minify: 'terser',
+  
+  terser: {
+    format: {
+      // Remove comments
+      comments: false,
+      
+      // ASCII output
+      ascii_only: true,
+      
+      // Preserve annotations
+      preserve_annotations: false,
+      
+      // Beautify output (for debugging)
+      beautify: false,
+      
+      // Indent level
+      indent_level: 0,
+      
+      // Quote style
+      quote_style: 1, // 0=auto, 1=single, 2=double, 3=original
+      
+      // Wrap immediately invoked functions
+      wrap_iife: false
+    }
+  }
+})
+```
+
+## CSS Minification
+
+### Basic CSS Minification
+
+```typescript
+export default defineConfig({
+  css: {
+    minify: true,
+    
+    // CSS minification options
+    cssMinify: {
+      // Remove unused CSS
+      removeUnused: true,
+      
+      // Merge identical rules
+      mergeRules: true,
+      
+      // Remove empty rules
+      removeEmpty: true,
+      
+      // Optimize colors
+      colormin: true,
+      
+      // Normalize whitespace
+      normalizeWhitespace: true
+    }
+  }
+})
+```
+
+### PostCSS Minification
+
+```typescript
+export default defineConfig({
+  css: {
+    postcss: {
+      plugins: [
+        require('cssnano')({
+          preset: ['default', {
+            discardComments: {
+              removeAll: true
+            },
+            normalizeWhitespace: true,
+            colormin: true,
+            convertValues: true,
+            mergeRules: true
+          }]
+        })
+      ]
+    }
+  }
+})
+```
+
+## Framework-Specific Minification
+
+### React Minification
+
+```typescript
+export default defineConfig({
+  minify: 'terser',
+  
+  terser: {
+    compress: {
+      // React-specific optimizations
+      pure_funcs: [
+        'React.createElement',
+        'console.log'
+      ],
+      
+      // Remove PropTypes in production
+      drop_console: true,
+      
+      // Inline React constants
+      inline: 2
+    }
+  }
+})
+```
+
+### Vue Minification
+
+```typescript
+export default defineConfig({
+  minify: 'terser',
+  
+  rollup: {
+    plugins: [
+      vue({
+        // Template minification
+        template: {
+          compilerOptions: {
+            whitespace: 'condense'
+          }
+        }
+      })
+    ]
+  }
+})
+```
+
+## Performance Optimization
+
+### Parallel Minification
+
+```typescript
+export default defineConfig({
+  minify: {
+    minifier: 'terser',
+    parallel: true, // Use multiple CPU cores
+    maxWorkers: 4
+  }
+})
+```
+
+### Incremental Minification
+
+```typescript
+export default defineConfig({
+  minify: true,
+  
+  cache: {
+    // Cache minified results
+    enabled: true,
+    
+    // Invalidate on source changes
+    invalidateOnChange: true
+  }
+})
+```
+
+### Size-Based Minification
+
+```typescript
+export default defineConfig({
+  minify: (chunk) => {
+    // Only minify large chunks
+    return chunk.code.length > 10000
+  }
+})
+```
+
+## Development vs Production
+
+### Environment-Specific Settings
+
+```typescript
+export default defineConfig({
+  minify: process.env.NODE_ENV === 'production' ? {
+    minifier: 'terser',
+    compress: {
+      drop_console: true,
+      drop_debugger: true
+    }
+  } : false
+})
+```
+
+### Debug Builds
+
+```typescript
+export default defineConfig({
+  rollup: {
+    output: [
+      // Production build
+      {
+        format: 'esm',
+        file: 'dist/index.min.mjs',
+        minify: true
+      },
+      
+      // Development build
+      {
+        format: 'esm',
+        file: 'dist/index.dev.mjs',
+        minify: false,
+        sourcemap: true
+      }
+    ]
+  }
+})
+```
+
+## Bundle Analysis
+
+### Size Reporting
+
+```typescript
+export default defineConfig({
+  minify: true,
+  
+  hooks: {
+    'build:after': async () => {
+      const { statSync } = await import('fs')
+      
+      const originalSize = statSync('dist/index.js').size
+      const minifiedSize = statSync('dist/index.min.js').size
+      
+      console.log(`Original: ${originalSize} bytes`)
+      console.log(`Minified: ${minifiedSize} bytes`)
+      console.log(`Savings: ${((originalSize - minifiedSize) / originalSize * 100).toFixed(1)}%`)
+    }
+  }
+})
+```
+
+### Compression Analysis
+
+```typescript
+export default defineConfig({
+  minify: true,
+  
+  rollup: {
+    plugins: [
+      bundleAnalyzer({
+        // Analyze bundle composition
+        analyzerMode: 'static',
+        
+        // Compare before/after minification
+        generateStatsFile: true
+      })
+    ]
+  }
+})
+```
+
+## Troubleshooting
+
+### Minification Errors
+
+<Callout type="warning">
+If minification breaks your code, try disabling specific optimizations.
+</Callout>
+
+```typescript
+export default defineConfig({
+  minify: 'terser',
+  
+  terser: {
+    compress: {
+      // Disable problematic optimizations
+      inline: false,
+      pure_funcs: [],
+      
+      // Keep function names for debugging
+      keep_fnames: true
+    }
+  }
+})
+```
+
+### Source Map Integration
+
+```typescript
+export default defineConfig({
+  minify: true,
+  
+  rollup: {
+    output: {
+      sourcemap: true, // Generate source maps for minified code
+      sourcemapExcludeSources: false
+    }
+  }
+})
+```
+
+### Performance Issues
+
+```typescript
+export default defineConfig({
+  minify: {
+    minifier: 'esbuild', // Faster than Terser
+    parallel: false, // Disable if causing memory issues
+    
+    // Reduce optimization level
+    compress: {
+      passes: 1 // Fewer optimization passes
+    }
+  }
+})
+```
+
+### Library Compatibility
+
+```typescript
+export default defineConfig({
+  minify: 'terser',
+  
+  terser: {
+    mangle: {
+      // Preserve specific names for library compatibility
+      reserved: ['$', 'jQuery', 'React', 'Vue'],
+      
+      // Don't mangle properties
+      properties: false
+    }
+  }
+})
+```
+
+---
+
+## Related Options
+
+- [Target](/docs/options/target) - Compilation targets
+- [Source Maps](/docs/options/source-maps) - Debug information
+- [Bundle Analysis](/docs/options/bundle-analysis) - Size optimization
+- [Tree Shaking](/docs/options/tree-shaking) - Dead code elimination

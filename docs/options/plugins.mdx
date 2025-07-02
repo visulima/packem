@@ -1,0 +1,703 @@
+---
+title: Plugins
+description: Configure and extend Packen with Rollup plugins
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+
+# Plugins
+
+Packen leverages Rollup's powerful plugin ecosystem to extend functionality. You can use any Rollup plugin or create custom plugins to handle specific build requirements.
+
+## Basic Plugin Usage
+
+### Adding Plugins
+
+```typescript
+import { defineConfig } from '@visulima/packem'
+import { nodeResolve } from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      nodeResolve(),
+      commonjs()
+    ]
+  }
+})
+```
+
+### Built-in Plugins
+
+Packen includes several plugins by default:
+
+```typescript
+export default defineConfig({
+  // These are enabled automatically
+  autoPlugins: {
+    nodeResolve: true,
+    commonjs: true,
+    json: true,
+    typescript: true // If using TypeScript
+  }
+})
+```
+
+## Common Plugins
+
+### Node Resolution
+
+```typescript
+import { nodeResolve } from '@rollup/plugin-node-resolve'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      nodeResolve({
+        preferBuiltins: true,
+        browser: false,
+        exportConditions: ['node']
+      })
+    ]
+  }
+})
+```
+
+### CommonJS Support
+
+```typescript
+import commonjs from '@rollup/plugin-commonjs'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      commonjs({
+        include: ['node_modules/**'],
+        exclude: ['node_modules/some-esm-package/**']
+      })
+    ]
+  }
+})
+```
+
+### JSON Import
+
+```typescript
+import json from '@rollup/plugin-json'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      json({
+        compact: true,
+        namedExports: true
+      })
+    ]
+  }
+})
+```
+
+### Replace Variables
+
+```typescript
+import replace from '@rollup/plugin-replace'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      replace({
+        'process.env.NODE_ENV': JSON.stringify('production'),
+        '__VERSION__': JSON.stringify(process.env.npm_package_version),
+        preventAssignment: true
+      })
+    ]
+  }
+})
+```
+
+## Framework Plugins
+
+### React
+
+```typescript
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      react({
+        jsxRuntime: 'automatic',
+        fastRefresh: true
+      })
+    ]
+  }
+})
+```
+
+### Vue
+
+```typescript
+import vue from '@vitejs/plugin-vue'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      vue({
+        include: [/\.vue$/],
+        customElement: false
+      })
+    ]
+  }
+})
+```
+
+### Svelte
+
+```typescript
+import { svelte } from '@sveltejs/vite-plugin-svelte'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      svelte({
+        compilerOptions: {
+          hydratable: true
+        }
+      })
+    ]
+  }
+})
+```
+
+## Asset Plugins
+
+### Copy Files
+
+```typescript
+import copy from 'rollup-plugin-copy'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      copy({
+        targets: [
+          { src: 'src/assets/*', dest: 'dist/assets' },
+          { src: 'public/favicon.ico', dest: 'dist' }
+        ]
+      })
+    ]
+  }
+})
+```
+
+### Image Processing
+
+```typescript
+import image from '@rollup/plugin-image'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      image({
+        include: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif'],
+        limit: 8192 // Inline images smaller than 8KB
+      })
+    ]
+  }
+})
+```
+
+### URL Assets
+
+```typescript
+import url from '@rollup/plugin-url'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      url({
+        limit: 10 * 1024, // 10KB
+        include: ['**/*.svg', '**/*.png', '**/*.jpg'],
+        emitFiles: true
+      })
+    ]
+  }
+})
+```
+
+## Development Plugins
+
+### Live Reload
+
+```typescript
+import livereload from 'rollup-plugin-livereload'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      ...(process.env.NODE_ENV === 'development' ? [
+        livereload({
+          watch: 'dist',
+          port: 35729
+        })
+      ] : [])
+    ]
+  }
+})
+```
+
+### Serve Files
+
+```typescript
+import serve from 'rollup-plugin-serve'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      ...(process.env.NODE_ENV === 'development' ? [
+        serve({
+          open: true,
+          contentBase: 'dist',
+          port: 3000
+        })
+      ] : [])
+    ]
+  }
+})
+```
+
+## Analysis Plugins
+
+### Bundle Analyzer
+
+```typescript
+import { visualizer } from 'rollup-plugin-visualizer'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      visualizer({
+        filename: 'dist/stats.html',
+        open: true,
+        gzipSize: true
+      })
+    ]
+  }
+})
+```
+
+### Bundle Size
+
+```typescript
+import bundleSize from 'rollup-plugin-bundle-size'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      bundleSize()
+    ]
+  }
+})
+```
+
+### License Check
+
+```typescript
+import license from 'rollup-plugin-license'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      license({
+        sourcemap: true,
+        banner: {
+          commentStyle: 'regular',
+          content: {
+            file: path.join(__dirname, 'LICENSE')
+          }
+        },
+        thirdParty: {
+          output: path.join(__dirname, 'dist', 'dependencies.txt')
+        }
+      })
+    ]
+  }
+})
+```
+
+## Custom Plugins
+
+### Simple Plugin
+
+```typescript
+function customPlugin() {
+  return {
+    name: 'custom-plugin',
+    
+    buildStart() {
+      console.log('Build started!')
+    },
+    
+    transform(code, id) {
+      if (id.endsWith('.custom')) {
+        return `export default ${JSON.stringify(code)}`
+      }
+      return null
+    },
+    
+    generateBundle() {
+      console.log('Bundle generated!')
+    }
+  }
+}
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      customPlugin()
+    ]
+  }
+})
+```
+
+### Advanced Plugin
+
+```typescript
+function advancedPlugin(options = {}) {
+  const { include = '**/*.js', exclude = 'node_modules/**' } = options
+  
+  return {
+    name: 'advanced-plugin',
+    
+    buildStart(opts) {
+      // Plugin initialization
+      this.addWatchFile('config.json')
+    },
+    
+    resolveId(id, importer) {
+      // Custom module resolution
+      if (id === 'virtual:my-module') {
+        return id
+      }
+      return null
+    },
+    
+    load(id) {
+      // Load custom modules
+      if (id === 'virtual:my-module') {
+        return 'export const msg = "Hello from virtual module"'
+      }
+      return null
+    },
+    
+    transform(code, id) {
+      // Transform code
+      if (include.test && include.test(id) && !exclude.test(id)) {
+        return {
+          code: code.replace(/OLD_SYNTAX/g, 'NEW_SYNTAX'),
+          map: null
+        }
+      }
+      return null
+    }
+  }
+}
+```
+
+## Plugin Configuration
+
+### Conditional Plugins
+
+```typescript
+export default defineConfig({
+  rollup: {
+    plugins: [
+      // Always included
+      nodeResolve(),
+      commonjs(),
+      
+      // Development only
+      ...(process.env.NODE_ENV === 'development' ? [
+        serve({ contentBase: 'dist' }),
+        livereload()
+      ] : []),
+      
+      // Production only
+      ...(process.env.NODE_ENV === 'production' ? [
+        terser(),
+        visualizer()
+      ] : [])
+    ]
+  }
+})
+```
+
+### Plugin Options
+
+```typescript
+export default defineConfig({
+  rollup: {
+    plugins: [
+      nodeResolve({
+        // Prefer built-in Node.js modules
+        preferBuiltins: true,
+        
+        // Include/exclude packages
+        include: ['node_modules/**'],
+        exclude: ['node_modules/problematic-package/**'],
+        
+        // Custom conditions
+        exportConditions: ['node', 'import'],
+        
+        // Browser compatibility
+        browser: false
+      })
+    ]
+  }
+})
+```
+
+### Plugin Ordering
+
+```typescript
+export default defineConfig({
+  rollup: {
+    plugins: [
+      // 1. Module resolution
+      nodeResolve(),
+      
+      // 2. Format conversion
+      commonjs(),
+      
+      // 3. Code transformation
+      typescript(),
+      babel(),
+      
+      // 4. Asset processing
+      postcss(),
+      image(),
+      
+      // 5. Development tools
+      ...(isDev ? [serve(), livereload()] : []),
+      
+      // 6. Production optimization
+      ...(isProd ? [terser(), visualizer()] : [])
+    ]
+  }
+})
+```
+
+## Plugin Ecosystem
+
+### Essential Plugins
+
+```typescript
+import { nodeResolve } from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+import typescript from '@rollup/plugin-typescript'
+import { babel } from '@rollup/plugin-babel'
+import replace from '@rollup/plugin-replace'
+import json from '@rollup/plugin-json'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      nodeResolve(),
+      commonjs(),
+      typescript(),
+      babel({ babelHelpers: 'bundled' }),
+      replace({ preventAssignment: true }),
+      json()
+    ]
+  }
+})
+```
+
+### CSS Plugins
+
+```typescript
+import postcss from 'rollup-plugin-postcss'
+import autoprefixer from 'autoprefixer'
+import cssnano from 'cssnano'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      postcss({
+        extract: true,
+        minimize: true,
+        plugins: [
+          autoprefixer(),
+          cssnano()
+        ]
+      })
+    ]
+  }
+})
+```
+
+### Testing Plugins
+
+```typescript
+import istanbul from 'rollup-plugin-istanbul'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      ...(process.env.NODE_ENV === 'test' ? [
+        istanbul({
+          exclude: ['test/**/*', 'node_modules/**/*']
+        })
+      ] : [])
+    ]
+  }
+})
+```
+
+## Plugin Development
+
+### Plugin Template
+
+```typescript
+interface PluginOptions {
+  include?: string | RegExp | (string | RegExp)[]
+  exclude?: string | RegExp | (string | RegExp)[]
+  [key: string]: any
+}
+
+function myPlugin(options: PluginOptions = {}): Plugin {
+  const filter = createFilter(options.include, options.exclude)
+  
+  return {
+    name: 'my-plugin',
+    
+    buildStart(opts) {
+      // Initialize plugin
+    },
+    
+    resolveId(id, importer) {
+      // Resolve imports
+      return null
+    },
+    
+    load(id) {
+      // Load modules
+      return null
+    },
+    
+    transform(code, id) {
+      if (!filter(id)) return null
+      
+      // Transform code
+      return {
+        code: transformedCode,
+        map: sourceMap
+      }
+    },
+    
+    generateBundle(opts, bundle) {
+      // Process bundle
+    },
+    
+    writeBundle(opts, bundle) {
+      // After bundle written
+    }
+  }
+}
+```
+
+### Plugin Testing
+
+```typescript
+import { rollup } from 'rollup'
+import myPlugin from './my-plugin'
+
+async function testPlugin() {
+  const bundle = await rollup({
+    input: 'test/fixtures/input.js',
+    plugins: [
+      myPlugin({
+        // Test options
+      })
+    ]
+  })
+  
+  const { output } = await bundle.generate({
+    format: 'esm'
+  })
+  
+  console.log(output[0].code)
+}
+```
+
+## Troubleshooting
+
+### Plugin Conflicts
+
+<Callout type="warning">
+Some plugins may conflict with each other. Check plugin documentation for compatibility.
+</Callout>
+
+```typescript
+export default defineConfig({
+  rollup: {
+    plugins: [
+      // Order matters - resolve conflicts by reordering
+      nodeResolve(),
+      commonjs(),
+      
+      // Avoid duplicate functionality
+      // Don't use both @rollup/plugin-typescript and @rollup/plugin-babel
+      // for TypeScript transformation
+    ]
+  }
+})
+```
+
+### Plugin Errors
+
+```typescript
+export default defineConfig({
+  rollup: {
+    onwarn(warning, warn) {
+      // Handle plugin warnings
+      if (warning.plugin === 'problematic-plugin') {
+        return // Ignore warnings from this plugin
+      }
+      warn(warning)
+    }
+  }
+})
+```
+
+### Performance Issues
+
+```typescript
+export default defineConfig({
+  rollup: {
+    plugins: [
+      // Use plugin caching
+      somePlugin({
+        cache: true
+      }),
+      
+      // Limit plugin scope
+      anotherPlugin({
+        include: 'src/**',
+        exclude: 'node_modules/**'
+      })
+    ]
+  }
+})
+```
+
+---
+
+## Related Options
+
+- [Rollup](/docs/options/rollup) - Rollup configuration
+- [Transform](/docs/options/transform) - Code transformation
+- [Assets](/docs/options/assets) - Asset handling
+- [External](/docs/options/external) - External dependencies
