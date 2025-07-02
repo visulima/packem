@@ -24,9 +24,13 @@ Check the README for each configuration within the `packages` directory for spec
 
 ## Featured Packages
 
-| Package                               | Version                                                                                                        | Description                                       |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| [packem](./packages/packem/README.md) | ![npm](https://img.shields.io/npm/v/@visulima/packem?style=flat-square&labelColor=292a44&color=663399) | The main package for the visulima packem project. |
+| Package                                                           | Version                                                                                                                    | Description                                       |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| [packem](./packages/packem/README.md)                             | ![npm](https://img.shields.io/npm/v/@visulima/packem?style=flat-square&labelColor=292a44&color=663399)                   | A fast and modern bundler for Node.js and TypeScript. |
+| [packem-rollup](./packages/packem-rollup/README.md)               | ![npm](https://img.shields.io/npm/v/@visulima/packem-rollup?style=flat-square&labelColor=292a44&color=663399)           | Rollup plugins for packem                        |
+| [packem-share](./packages/packem-share/README.md)                 | ![npm](https://img.shields.io/npm/v/@visulima/packem-share?style=flat-square&labelColor=292a44&color=663399)            | Shared types and helpers for packem.             |
+| [rollup-css-plugin](./packages/rollup-css-plugin/README.md)       | ![npm](https://img.shields.io/npm/v/@visulima/rollup-css-plugin?style=flat-square&labelColor=292a44&color=663399)       | CSS processing plugin for packem                 |
+| [css-style-inject](./packages/css-style-inject/README.md)         | ![npm](https://img.shields.io/npm/v/@visulima/css-style-inject?style=flat-square&labelColor=292a44&color=663399)        | Inject style tag to document head.               |
 
 ## Badge
 
