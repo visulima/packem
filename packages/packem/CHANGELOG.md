@@ -4,6 +4,27 @@
 ### Bug Fixes
 
 * fixed release ([047b530](https://github.com/visulima/packem/commit/047b530ebcd6458f93699fd9d0f819bc7dbf9990))
+* more release test ([155255c](https://github.com/visulima/packem/commit/155255cfa4e077f05afe8fc079197941a752d0eb))
+* **packem:**  changed node10Compatibility to false ([d35e03e](https://github.com/visulima/packem/commit/d35e03e63efad45c32e9eca9831539206e0c4503))
+* style changes to trigger new release ([fbf6b2f](https://github.com/visulima/packem/commit/fbf6b2f9030db0d9fd22ea61f65a2f03457a2a1a))
+* test commit ([4f5bf23](https://github.com/visulima/packem/commit/4f5bf23cf1ab2de74863449920de7eadd85eec25))
+
+
+### Features
+
+* introduce @visulima/packem-share package for shared utilities a… ([#157](https://github.com/visulima/packem/issues/157)) ([99e977a](https://github.com/visulima/packem/commit/99e977a8f62021c9ac286fc0c9b184b96bce88f1))
+
+
+### BREAKING CHANGES
+
+* changed node from 18 to 20, split packem in reusable packages
+
+# @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02)
+
+
+### Bug Fixes
+
+* fixed release ([047b530](https://github.com/visulima/packem/commit/047b530ebcd6458f93699fd9d0f819bc7dbf9990))
 * **packem:**  changed node10Compatibility to false ([d35e03e](https://github.com/visulima/packem/commit/d35e03e63efad45c32e9eca9831539206e0c4503))
 * style changes to trigger new release ([fbf6b2f](https://github.com/visulima/packem/commit/fbf6b2f9030db0d9fd22ea61f65a2f03457a2a1a))
 * test commit ([4f5bf23](https://github.com/visulima/packem/commit/4f5bf23cf1ab2de74863449920de7eadd85eec25))
