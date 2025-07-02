@@ -2250,7 +2250,7 @@ export { test as default };
         });
 
         // eslint-disable-next-line no-secrets/no-secrets
-        it("should generate a node10 typesVersions field in package.json when rollup.node10Compatibility.writeToPackageJson is true", async () => {
+        it("should generate a node10 typesVersions field in package.json when node10Compatibility.writeToPackageJson is true", async () => {
             expect.assertions(5);
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -2292,10 +2292,8 @@ export { test as default };
             await createPackemConfig(temporaryDirectoryPath, {
                 config: {
                     cjsInterop: true,
-                    rollup: {
-                        node10Compatibility: {
-                            writeToPackageJson: true,
-                        },
+                    node10Compatibility: {
+                        writeToPackageJson: true,
                     },
                 },
             });
