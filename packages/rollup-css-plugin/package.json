@@ -110,14 +110,14 @@
         "@visulima/packem-share": "1.0.0-alpha.1",
         "@visulima/path": "^1.4.0",
         "mlly": "^1.7.4",
-        "oxc-resolver": "^11.3.0",
+        "oxc-resolver": "^11.4.0",
         "p-queue": "^8.1.0",
         "source-map-js": "^1.2.1"
     },
     "devDependencies": {
         "@anolilab/eslint-config": "^16.2.15",
-        "@anolilab/semantic-release-pnpm": "2.0.1",
-        "@anolilab/semantic-release-preset": "^11.0.1",
+        "@anolilab/semantic-release-pnpm": "2.0.2",
+        "@anolilab/semantic-release-preset": "^11.0.2",
         "@csstools/css-parser-algorithms": "3.0.5",
         "@csstools/css-tokenizer": "3.0.4",
         "@csstools/postcss-slow-plugins": "^2.0.0",
