@@ -1,0 +1,532 @@
+---
+title: Configuration
+description: Complete guide to configuring Packen for your project needs
+---
+
+# Configuration
+
+Learn how to configure Packen to meet your specific project requirements with detailed examples and best practices.
+
+## Configuration File
+
+Packen uses a `packem.config.ts` file for configuration. This file should be placed in your project root.
+
+### Basic Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  sourcemap: true,
+  declaration: true
+})
+```
+
+## Configuration Options
+
+### Core Options
+
+#### transformer
+
+Specify which transformer to use for code compilation:
+
+```typescript
+// esbuild (default, fastest)
+import esbuild from '@visulima/packem/transformer/esbuild'
+
+// swc (Rust-powered)
+import swc from '@visulima/packem/transformer/swc'
+
+// OXC (experimental)
+import oxc from '@visulima/packem/transformer/oxc'
+
+// sucrase (lightweight)
+import sucrase from '@visulima/packem/transformer/sucrase'
+
+export default defineConfig({
+  transformer: esbuild // or swc, oxc, sucrase
+})
+```
+
+#### sourcemap
+
+Control source map generation:
+
+```typescript
+export default defineConfig({
+  sourcemap: true,        // Generate source maps
+  sourcemap: false,       // No source maps
+  sourcemap: 'inline',    // Inline source maps
+  sourcemap: 'hidden'     // Hidden source maps
+})
+```
+
+#### declaration
+
+Generate TypeScript declaration files:
+
+```typescript
+export default defineConfig({
+  declaration: true,      // Generate .d.ts files
+  declaration: false,     // Skip declaration generation
+  declaration: 'compatible', // Generate compatible declarations
+  declaration: 'node16'   // Generate node16 declarations
+})
+```
+
+#### minify
+
+Control code minification:
+
+```typescript
+export default defineConfig({
+  minify: true,           // Enable minification
+  minify: false,          // Disable minification
+})
+```
+
+### Entry Points
+
+#### Automatic Detection
+
+Packen automatically detects entry points from your `package.json`:
+
+```json
+{
+  "exports": {
+    ".": "./src/index.ts",
+    "./utils": "./src/utils.ts"
+  }
+}
+```
+
+#### Manual Configuration
+
+Override automatic detection:
+
+```typescript
+export default defineConfig({
+  entries: [
+    'src/index.ts',
+    'src/cli.ts',
+    'src/utils.ts'
+  ]
+})
+```
+
+#### Entry Objects
+
+Use objects for more control:
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: 'src/index.ts',
+      outDir: 'dist'
+    },
+    {
+      input: 'src/cli.ts',
+      outDir: 'dist/bin'
+    }
+  ]
+})
+```
+
+### Rollup Configuration
+
+Packen is built on Rollup, so you can use any Rollup options:
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react', 'react-dom'],
+    output: {
+      banner: '/* My Library v1.0.0 */',
+      footer: '/* End of bundle */'
+    },
+    plugins: [
+      // Additional Rollup plugins
+    ],
+    watch: {
+      include: 'src/**',
+      exclude: 'node_modules/**'
+    }
+  }
+})
+```
+
+### CSS Configuration
+
+Configure CSS processing:
+
+```typescript
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+import sassLoader from '@visulima/packem/css/loader/sass'
+import lessLoader from '@visulima/packem/css/loader/less'
+import stylusLoader from '@visulima/packem/css/loader/stylus'
+import sourceMapLoader from '@visulima/packem/css/loader/sourcemap'
+import cssnanoMinifier from '@visulima/packem/css/minifier/cssnano'
+import lightningcssMinifier from '@visulima/packem/css/minifier/lightningcss'
+
+export default defineConfig({
+  rollup: {
+    css: {
+      mode: 'extract', // or 'inject'
+      loaders: [postcssLoader, sassLoader, lessLoader, stylusLoader, sourceMapLoader],
+      minifier: cssnanoMinifier
+    }
+  }
+})
+```
+
+## Advanced Configurations
+
+### Multi-Format Builds
+
+Build multiple output formats by configuring package.json properly:
+
+```json
+{
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  }
+}
+```
+
+### Environment-Specific Config
+
+```typescript
+const isDev = process.env.NODE_ENV === 'development'
+
+export default defineConfig({
+  sourcemap: isDev,
+  minify: !isDev,
+  declaration: !isDev,
+  rollup: {
+    watch: isDev ? {
+      include: 'src/**'
+    } : undefined
+  }
+})
+```
+
+### Conditional Configuration
+
+```typescript
+import esbuildTransformer from '@visulima/packem/transformer/esbuild'
+import swcTransformer from '@visulima/packem/transformer/swc'
+
+export default defineConfig({
+  transformer: process.env.TRANSFORMER === 'swc' 
+    ? swcTransformer 
+    : esbuildTransformer,
+  
+  externals: process.env.BUNDLE_DEPS 
+    ? [] 
+    : ['react', 'react-dom']
+})
+```
+
+### Library-Specific Configurations
+
+#### React Library
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  sourcemap: true,
+  declaration: true,
+  externals: ['react', 'react-dom'],
+  rollup: {
+    css: {
+      mode: 'extract'
+    }
+  }
+})
+```
+
+#### Node.js Library
+
+```typescript
+export default defineConfig({
+  transformer,
+  runtime: 'node',
+  externals: (id) => !id.startsWith('.') && !id.startsWith('/')
+})
+```
+
+#### CLI Tool
+
+```typescript
+export default defineConfig({
+  entries: [
+    {
+      input: 'src/cli.ts',
+      executable: true
+    }
+  ],
+  externals: ['fs', 'path', 'process']
+})
+```
+
+#### Browser Library
+
+```typescript
+export default defineConfig({
+  transformer,
+  runtime: 'browser',
+  minify: true
+})
+```
+
+## Configuration Patterns
+
+### Shared Configuration
+
+Create reusable configuration:
+
+```typescript
+// config/base.ts
+export const baseConfig = {
+  transformer,
+  sourcemap: true,
+  declaration: true
+}
+
+// packem.config.ts
+import { baseConfig } from './config/base'
+
+export default defineConfig({
+  ...baseConfig,
+  // Project-specific overrides
+})
+```
+
+### Factory Functions
+
+```typescript
+// config/factory.ts
+export function createConfig(options: {
+  target: 'node' | 'browser'
+  format: string[]
+}) {
+  return defineConfig({
+    transformer,
+    format: options.format,
+    target: options.target,
+    rollup: {
+      external: options.target === 'node' 
+        ? (id) => !id.startsWith('.') 
+        : []
+    }
+  })
+}
+
+// packem.config.ts
+import { createConfig } from './config/factory'
+
+export default createConfig({
+  target: 'node',
+  format: ['cjs', 'esm']
+})
+```
+
+### Plugin System
+
+```typescript
+// plugins/banner.ts
+export function bannerPlugin(text: string) {
+  return {
+    rollup: {
+      output: {
+        banner: text
+      }
+    }
+  }
+}
+
+// packem.config.ts
+export default defineConfig({
+  transformer,
+  ...bannerPlugin('/* My Library */'),
+})
+```
+
+## TypeScript Integration
+
+### Type Checking
+
+Enable type checking during build:
+
+```typescript
+export default defineConfig({
+  transformer: typescript, // Use TypeScript compiler
+  declaration: true,
+  rollup: {
+    typescript: {
+      check: true,        // Enable type checking
+      verbosity: 2,       // Detailed output
+      clean: true         // Clean previous declarations
+    }
+  }
+})
+```
+
+### Path Mapping
+
+Support TypeScript path mapping:
+
+```typescript
+// tsconfig.json
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@utils/*": ["./src/utils/*"]
+    }
+  }
+}
+
+// packem.config.ts
+export default defineConfig({
+  transformer,
+  rollup: {
+    typescript: {
+      tsconfig: './tsconfig.json'
+    }
+  }
+})
+```
+
+## Debugging Configuration
+
+### Verbose Output
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    verbose: true,
+    logLevel: 'debug'
+  }
+})
+```
+
+### Bundle Analysis
+
+```typescript
+import { visualizer } from 'rollup-plugin-visualizer'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    plugins: [
+      visualizer({
+        filename: 'dist/stats.html',
+        open: true
+      })
+    ]
+  }
+})
+```
+
+## Best Practices
+
+### Performance Optimization
+
+```typescript
+export default defineConfig({
+  transformer: esbuild, // Fastest transformer
+  sourcemap: false,     // Disable in production
+  declaration: {
+    isolated: true      // Faster declarations
+  },
+  rollup: {
+    treeshake: true,    // Enable tree shaking
+    external: [         // Externalize dependencies
+      'react',
+      'react-dom'
+    ]
+  }
+})
+```
+
+### Development Experience
+
+```typescript
+const isDev = process.env.NODE_ENV === 'development'
+
+export default defineConfig({
+  sourcemap: isDev ? true : false,
+  declaration: !isDev,
+  rollup: {
+    watch: isDev ? {
+      include: 'src/**',
+      clearScreen: false
+    } : undefined
+  }
+})
+```
+
+<Callout type="info">
+Always test your configuration with both development and production builds to ensure everything works correctly.
+</Callout>
+
+## Common Issues
+
+### External Dependencies
+
+Make sure to externalize peer dependencies:
+
+```typescript
+export default defineConfig({
+  rollup: {
+    external: ['react', 'react-dom', 'lodash']
+  }
+})
+```
+
+### CSS Processing
+
+Configure CSS loaders properly:
+
+```typescript
+export default defineConfig({
+  rollup: {
+    css: {
+      extract: true,  // Extract CSS to separate files
+      modules: true   // Enable CSS modules
+    }
+  }
+})
+```
+
+### Declaration Generation
+
+Ensure TypeScript configuration is correct:
+
+```typescript
+// tsconfig.json
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist"
+  }
+}
+```
+
+This configuration guide provides a comprehensive foundation for setting up Packen in any project scenario.

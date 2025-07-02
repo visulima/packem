@@ -1,0 +1,192 @@
+---
+title: Guide
+description: Learn how to use Packen effectively
+---
+
+# Packen Guide
+
+Complete guide to mastering Packen, from basic usage to advanced techniques.
+
+## Quick Navigation
+
+<Cards>
+  <Card href="/docs/guide/introduction" title="Introduction">
+    What is Packen and why should you use it?
+  </Card>
+  
+  <Card href="/docs/guide/getting-started" title="Getting Started">
+    Install Packen and build your first bundle
+  </Card>
+  
+  <Card href="/docs/guide/configuration" title="Configuration">
+    Complete guide to configuring Packen for your needs
+  </Card>
+  
+  <Card href="/docs/guide/transformers" title="Transformers">
+    Choose between esbuild, SWC, OXC, Sucrase, and TypeScript
+  </Card>
+  
+  <Card href="/docs/guide/css" title="CSS Processing">
+    Complete guide to CSS, Sass, Less, and PostCSS
+  </Card>
+</Cards>
+
+## What is Packen?
+
+Packen is a fast and modern bundler for Node.js and TypeScript projects. Built on top of Rollup, it combines the power of proven bundling technology with cutting-edge transformers like esbuild, swc, OXC, and sucrase.
+
+### Key Features
+
+- **🚀 Fast Builds**: Multiple high-performance transformers (esbuild, swc, OXC)
+- **📦 Zero Config**: Works out of the box with automatic entry detection
+- **🎯 Modern Output**: ESM, CJS, IIFE, and UMD formats
+- **🎨 CSS Support**: Complete CSS processing pipeline with modules support
+- **⚡ TypeScript**: First-class TypeScript support with declaration generation
+- **🔄 Watch Mode**: Fast rebuilds during development
+- **📊 Bundle Analysis**: Built-in tools for optimizing bundle size
+
+## Getting Started Path
+
+New to Packen? Follow this learning path:
+
+1. **[Introduction](/docs/guide/introduction)** - Learn what Packen is and its core concepts
+2. **[Getting Started](/docs/guide/getting-started)** - Install Packen and create your first bundle
+3. **[Configuration](/docs/guide/configuration)** - Understand configuration options and patterns
+4. **[Transformers](/docs/guide/transformers)** - Choose the right transformer for your project
+5. **[CSS Processing](/docs/guide/css)** - Add styling support to your builds
+
+## Core Concepts
+
+### Package.json Driven
+
+Packen uses your `package.json` as the source of truth for builds:
+
+```json
+{
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js", 
+      "require": "./dist/index.cjs"
+    }
+  }
+}
+```
+
+### Transformer Architecture
+
+Choose from multiple transformers based on your needs:
+
+- **esbuild** - Fastest compilation, great for most projects
+- **swc** - Rust-powered with excellent performance
+- **OXC** - Next-generation toolchain (experimental)
+- **TypeScript** - Official compiler with full type checking
+- **sucrase** - Lightweight and simple
+
+### Modern JavaScript Support
+
+- ES2015+ syntax transformation
+- JSX and TSX support
+- Dynamic imports and code splitting
+- Tree shaking for optimal bundle size
+
+## Use Cases
+
+### Library Development
+
+Perfect for creating npm packages:
+
+```typescript
+// Automatic dual package support
+export function myLibrary() {
+  return 'Hello from my library!'
+}
+```
+
+### Component Libraries
+
+Build React, Vue, or framework-agnostic components:
+
+```typescript
+// React component with CSS modules
+import styles from './Button.module.css'
+
+export function Button({ children, ...props }) {
+  return <button className={styles.button} {...props}>{children}</button>
+}
+```
+
+### CLI Tools
+
+Create command-line tools with proper bundling:
+
+```typescript
+#!/usr/bin/env node
+import { program } from 'commander'
+
+program
+  .command('build')
+  .action(() => {
+    console.log('Building...')
+  })
+```
+
+### Node.js Modules
+
+Build server-side libraries and utilities:
+
+```typescript
+// Server utilities with proper externals
+export { createServer } from './server'
+export { database } from './db'
+```
+
+## Why Choose Packen?
+
+### Performance First
+
+- **Fast Transforms**: Multiple high-performance transformers
+- **Incremental Builds**: Only rebuild what's changed
+- **Parallel Processing**: Leverage all CPU cores
+
+### Developer Experience
+
+- **Zero Configuration**: Works immediately with sensible defaults
+- **Rich Diagnostics**: Clear error messages and warnings
+- **Watch Mode**: Fast rebuilds during development
+
+### Modern Tooling
+
+- **TypeScript Native**: First-class TypeScript support
+- **CSS Pipeline**: Complete styling solution
+- **Tree Shaking**: Automatic dead code elimination
+
+### Ecosystem Integration
+
+- **Rollup Compatible**: Use any Rollup plugin
+- **Framework Agnostic**: Works with React, Vue, Svelte, and more
+- **Monorepo Friendly**: Perfect for multi-package workspaces
+
+## Community and Support
+
+- **Documentation**: Comprehensive guides and examples
+- **GitHub**: [Open source on GitHub](https://github.com/visulima/packem)
+- **Issues**: Report bugs and feature requests
+- **Discussions**: Community help and showcase
+
+<Callout type="info">
+Packen is actively maintained and continuously improved based on community feedback and modern JavaScript ecosystem developments.
+</Callout>
+
+## What's Next?
+
+Ready to start building? Check out:
+
+- **[Getting Started Guide](/docs/guide/getting-started)** - Your first Packen project
+- **[Examples Collection](/docs/examples)** - Real-world usage patterns
+- **[Configuration Reference](/docs/options)** - All configuration options
+- **[API Documentation](/docs/api)** - Programmatic usage

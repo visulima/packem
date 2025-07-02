@@ -1,0 +1,87 @@
+---
+title: Extra Conditions
+description: Configure custom export conditions in package.json validation
+---
+
+# Extra Conditions Example
+
+This example demonstrates how to use the `extraConditions` option in package.json validation to allow custom export conditions.
+
+## Configuration
+
+```typescript
+// packem.config.ts
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+    transformer,
+    entries: [
+        {
+            input: "src/index.ts",
+        },
+    ],
+    validation: {
+        packageJson: {
+            extraConditions: ["custom-bundler", "my-framework", "special-env"]
+        }
+    }
+})
+```
+
+## Package.json Example
+
+```json
+{
+    "name": "my-package",
+    "exports": {
+        ".": {
+            "custom-bundler": "./dist/custom.js",
+            "my-framework": "./dist/framework.js",
+            "special-env": "./dist/special.js",
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.cjs",
+            "default": "./dist/index.js"
+        }
+    }
+}
+```
+
+## What this does
+
+- Without `extraConditions`: Packen would warn about unknown conditions `custom-bundler`, `my-framework`, and `special-env`
+- With `extraConditions`: These custom conditions are recognized as valid and no warnings are generated
+- Unknown conditions not listed in `extraConditions` will still generate warnings
+
+## Use Cases
+
+- Custom bundler-specific conditions
+- Framework-specific export conditions
+- Environment-specific conditions
+- Tool-specific conditions
+- Any custom export condition your package needs to support
+
+## Standard Conditions
+
+Packen already recognizes these standard and community conditions without needing to add them to `extraConditions`:
+
+### Standard Node.js Conditions
+- `import` - ES modules
+- `require` - CommonJS
+- `node` - Node.js environment
+- `default` - Fallback condition
+
+### Community Conditions  
+- `browser` - Browser environment
+- `development` - Development builds
+- `production` - Production builds
+- `types` - TypeScript declarations
+- `react-native` - React Native platform
+- `react-server` - React Server Components
+- `edge-light` - Edge runtime environments
+
+## Related Examples
+
+- [Package.json Validation](/docs/examples/configuration/package-validation) - Complete package.json validation setup
+- [Bundle Size Limits](/docs/examples/configuration/bundle-limits) - Configure bundle size validation
+- [Multi-Runtime Exports](/docs/examples/advanced/multi-runtime) - Target multiple runtimes with conditional exports 

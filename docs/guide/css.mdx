@@ -1,0 +1,709 @@
+---
+title: CSS Processing
+description: Comprehensive CSS, Sass, Less, Stylus, PostCSS, and CSS Modules support in Packen
+---
+
+import { Callout } from '../../components/Callout'
+import { Tabs, TabItem } from '../../components/Tabs'
+import { FeatureGrid } from '../../components/FeatureGrid'
+
+# CSS Processing
+
+Packen provides first-class support for CSS and all major CSS preprocessors. From vanilla CSS to advanced CSS Modules, Packen handles all your styling needs with optimized bundling and processing.
+
+## Supported CSS Technologies
+
+<FeatureGrid>
+  <div className="feature-card">
+    <h3>🎨 CSS</h3>
+    <p>Standard CSS with PostCSS processing and optimization</p>
+  </div>
+  
+  <div className="feature-card">
+    <h3>🔧 Sass/SCSS</h3>
+    <p>Sass and SCSS preprocessing with Dart Sass or Embedded Sass</p>
+  </div>
+  
+  <div className="feature-card">
+    <h3>📦 Less</h3>
+    <p>Less preprocessing with full feature support</p>
+  </div>
+  
+  <div className="feature-card">
+    <h3>🎯 Stylus</h3>
+    <p>Stylus preprocessing with expressive syntax</p>
+  </div>
+  
+  <div className="feature-card">
+    <h3>🔄 PostCSS</h3>
+    <p>PostCSS with autoprefixer and plugin ecosystem</p>
+  </div>
+  
+  <div className="feature-card">
+    <h3>📋 CSS Modules</h3>
+    <p>Scoped CSS with automatic class name generation</p>
+  </div>
+  
+  <div className="feature-card">
+    <h3>⚡ Lightning CSS</h3>
+    <p>Fast CSS parsing, transformation, and minification</p>
+  </div>
+  
+  <div className="feature-card">
+    <h3>🗜️ cssnano</h3>
+    <p>Advanced CSS minification and optimization</p>
+  </div>
+</FeatureGrid>
+
+## Basic CSS Support
+
+Packen automatically processes CSS files imported in your JavaScript/TypeScript code:
+
+```typescript
+// src/index.ts
+import './styles.css'
+
+export function createButton() {
+  const button = document.createElement('button')
+  button.className = 'btn btn-primary'
+  button.textContent = 'Click me'
+  return button
+}
+```
+
+```css
+/* src/styles.css */
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+```
+
+## Configuration
+
+Configure CSS processing in your `packem.config.ts`:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import lessLoader from '@visulima/packem/css/loader/less'
+
+export default defineConfig({
+  transformer,
+  
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [lessLoader],
+      less: {
+        options: {
+          math: 'parens-division',
+          paths: ['node_modules', 'src/styles'],
+          sourceMap: {}
+        }
+      }
+    }
+  }
+})
+```
+
+## Sass/SCSS
+
+Packen supports both Sass and SCSS syntax with Dart Sass or Embedded Sass.
+
+### Installation
+
+<Tabs>
+  <TabItem label="Dart Sass">
+    ```bash
+    npm install --save-dev sass
+    ```
+  </TabItem>
+  <TabItem label="Embedded Sass">
+    ```bash
+    npm install --save-dev sass-embedded
+    ```
+  </TabItem>
+</Tabs>
+
+### Usage
+
+```scss
+// src/styles.scss
+$primary-color: #007bff;
+$border-radius: 0.25rem;
+
+@mixin button-style($bg-color) {
+  background-color: $bg-color;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: $border-radius;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: darken($bg-color, 10%);
+  }
+}
+
+.btn-primary {
+  @include button-style($primary-color);
+}
+```
+
+### Configuration
+
+```typescript
+export default defineConfig({
+  css: {
+    preprocessors: {
+      sass: {
+        implementation: 'sass', // or 'sass-embedded'
+        options: {
+          outputStyle: 'compressed',
+          sourceMap: true,
+          includePaths: ['node_modules', 'src/styles']
+        }
+      }
+    }
+  }
+})
+```
+
+## Less
+
+Less preprocessing with full feature support.
+
+### Installation
+
+```bash
+npm install --save-dev less
+```
+
+### Usage
+
+```less
+// src/styles.less
+@primary-color: #007bff;
+@border-radius: 0.25rem;
+
+.button-style(@bg-color) {
+  background-color: @bg-color;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: @border-radius;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: darken(@bg-color, 10%);
+  }
+}
+
+.btn-primary {
+  .button-style(@primary-color);
+}
+```
+
+### Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import lessLoader from '@visulima/packem/css/loader/less'
+
+export default defineConfig({
+  transformer,
+  
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [lessLoader],
+      less: {
+        options: {
+          math: 'parens-division',
+          paths: ['node_modules', 'src/styles'],
+          sourceMap: {}
+        }
+      }
+    }
+  }
+})
+```
+
+## Stylus
+
+Stylus preprocessing with expressive syntax.
+
+### Installation
+
+```bash
+npm install --save-dev stylus
+```
+
+### Usage
+
+```stylus
+// src/styles.styl
+primary-color = #007bff
+border-radius = 0.25rem
+
+button-style(bg-color)
+  background-color bg-color
+  color white
+  padding 0.5rem 1rem
+  border none
+  border-radius border-radius
+  cursor pointer
+  
+  &:hover
+    background-color darken(bg-color, 10%)
+
+.btn-primary
+  button-style(primary-color)
+```
+
+### Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import stylusLoader from '@visulima/packem/css/loader/stylus'
+
+export default defineConfig({
+  transformer,
+  
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [stylusLoader],
+      stylus: {
+        options: {
+          compress: true,
+          paths: ['node_modules', 'src/styles'],
+          sourcemap: true
+        }
+      }
+    }
+  }
+})
+```
+
+## PostCSS
+
+PostCSS processing with plugin ecosystem support.
+
+### Installation
+
+```bash
+npm install --save-dev postcss postcss-load-config
+```
+
+### Configuration
+
+Create a `postcss.config.js` file:
+
+```javascript
+// postcss.config.js
+module.exports = {
+  plugins: [
+    require('autoprefixer'),
+    require('postcss-custom-properties'),
+    require('cssnano')({
+      preset: 'default'
+    })
+  ]
+}
+```
+
+Or configure directly in Packen:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+
+export default defineConfig({
+  transformer,
+  
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader],
+      postcss: {
+        plugins: [
+          'autoprefixer',
+          ['postcss-custom-properties', { preserve: false }],
+          ['cssnano', { preset: 'default' }]
+        ]
+      }
+    }
+  }
+})
+```
+
+### Popular PostCSS Plugins
+
+- **autoprefixer** - Add vendor prefixes automatically
+- **postcss-custom-properties** - CSS custom properties support
+- **postcss-nested** - Nested CSS rules
+- **postcss-import** - Inline @import rules
+- **tailwindcss** - Utility-first CSS framework
+
+## CSS Modules
+
+CSS Modules provide locally scoped CSS to avoid naming conflicts.
+
+### Enable CSS Modules
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  
+  rollup: {
+    css: {
+      mode: 'extract',
+      autoModules: true,
+      // or with options
+      postcss: {
+        modules: {
+          scopeBehaviour: 'local',
+          generateScopedName: '[name]__[local]___[hash:base64:5]',
+          hashPrefix: 'prefix',
+          exportGlobals: true
+        }
+      }
+    }
+  }
+})
+```
+
+### Usage
+
+```css
+/* src/Button.module.css */
+.button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.secondary {
+  background-color: #6c757d;
+  color: white;
+}
+```
+
+```typescript
+// src/Button.ts
+import styles from './Button.module.css'
+
+export function createButton(variant: 'primary' | 'secondary' = 'primary') {
+  const button = document.createElement('button')
+  button.className = `${styles.button} ${styles[variant]}`
+  button.textContent = 'Click me'
+  return button
+}
+```
+
+### CSS Modules with TypeScript
+
+Generate type definitions for CSS Modules:
+
+```typescript
+// src/Button.module.css.d.ts (auto-generated)
+declare const styles: {
+  readonly button: string
+  readonly primary: string
+  readonly secondary: string
+}
+export default styles
+```
+
+## Lightning CSS
+
+Lightning CSS provides fast CSS parsing, transformation, and minification.
+
+### Installation
+
+```bash
+npm install --save-dev lightningcss
+```
+
+### Configuration
+
+```typescript
+export default defineConfig({
+  css: {
+    transformer: 'lightningcss',
+    lightningcss: {
+      minify: true,
+      targets: {
+        chrome: 80,
+        firefox: 75,
+        safari: 13
+      },
+      drafts: {
+        nesting: true,
+        customMedia: true
+      }
+    }
+  }
+})
+```
+
+### Features
+
+- **Fast parsing** - Written in Rust for maximum performance
+- **Modern CSS** - Support for CSS nesting, custom media queries, etc.
+- **Browser targets** - Automatic feature detection based on targets
+- **Minification** - Built-in CSS minification
+
+## CSS Optimization
+
+### cssnano
+
+Advanced CSS minification and optimization.
+
+```typescript
+export default defineConfig({
+  css: {
+    minimize: true,
+    minimizer: 'cssnano',
+    cssnano: {
+      preset: ['default', {
+        discardComments: { removeAll: true },
+        normalizeWhitespace: true,
+        colormin: true,
+        convertValues: true
+      }]
+    }
+  }
+})
+```
+
+### Bundle Analysis
+
+Analyze your CSS bundle size:
+
+```bash
+packem build --analyze
+```
+
+This generates a report showing:
+- CSS file sizes
+- Unused CSS rules
+- Optimization opportunities
+- Dependency tree
+
+## CSS Injection Strategies
+
+Control how CSS is injected into your application:
+
+### Extract CSS Files
+
+```typescript
+export default defineConfig({
+  css: {
+    extract: true, // Extract CSS to separate files
+    filename: '[name].[contenthash].css'
+  }
+})
+```
+
+### Inline CSS
+
+```typescript
+export default defineConfig({
+  css: {
+    extract: false, // Inline CSS in JavaScript bundles
+    inject: 'style-tag' // or 'css-variables'
+  }
+})
+```
+
+### Runtime Injection
+
+Use the CSS style inject utility:
+
+```typescript
+import { injectStyles } from '@visulima/css-style-inject'
+
+const css = `
+  .dynamic-styles {
+    color: red;
+    font-weight: bold;
+  }
+`
+
+injectStyles(css, {
+  id: 'dynamic-styles',
+  prepend: false
+})
+```
+
+## Advanced Features
+
+### CSS Custom Properties
+
+```css
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --border-radius: 0.25rem;
+}
+
+.btn {
+  background-color: var(--primary-color);
+  border-radius: var(--border-radius);
+}
+```
+
+### CSS Nesting (with PostCSS or Lightning CSS)
+
+```css
+.card {
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  
+  .title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .content {
+    color: #6c757d;
+    
+    p {
+      margin-bottom: 1rem;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+```
+
+### Container Queries
+
+```css
+.card {
+  container-type: inline-size;
+}
+
+@container (min-width: 400px) {
+  .card-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+}
+```
+
+## Framework Integration
+
+### React
+
+```tsx
+// React with CSS Modules
+import styles from './Button.module.css'
+
+interface ButtonProps {
+  variant?: 'primary' | 'secondary'
+  children: React.ReactNode
+}
+
+export function Button({ variant = 'primary', children }: ButtonProps) {
+  return (
+    <button className={`${styles.button} ${styles[variant]}`}>
+      {children}
+    </button>
+  )
+}
+```
+
+### Vue
+
+```vue
+<template>
+  <button :class="[styles.button, styles[variant]]">
+    <slot />
+  </button>
+</template>
+
+<script setup lang="ts">
+import styles from './Button.module.css'
+
+interface Props {
+  variant?: 'primary' | 'secondary'
+}
+
+withDefaults(defineProps<Props>(), {
+  variant: 'primary'
+})
+</script>
+```
+
+## Troubleshooting
+
+### CSS Not Loading
+
+1. **Check imports** - Ensure CSS files are imported in your JavaScript/TypeScript
+2. **Verify file paths** - Check that CSS file paths are correct
+3. **Check configuration** - Verify CSS processing is enabled
+
+### Preprocessor Errors
+
+1. **Install dependencies** - Make sure preprocessor packages are installed
+2. **Check syntax** - Verify preprocessor syntax is correct
+3. **Update paths** - Check include paths and import statements
+
+### CSS Modules Not Working
+
+1. **Enable CSS Modules** - Set `css.modules: true` in configuration
+2. **File naming** - Use `.module.css` suffix for CSS Modules files
+3. **Import syntax** - Use `import styles from './file.module.css'`
+
+### Performance Issues
+
+1. **Enable minification** - Use `css.minimize: true`
+2. **Extract CSS** - Use `css.extract: true` for better caching
+3. **Optimize imports** - Remove unused CSS imports
+4. **Use Lightning CSS** - Switch to Lightning CSS for better performance
+
+<Callout type="tip">
+Use `packem build --verbose` to see detailed CSS processing information and identify issues.
+</Callout>
+
+## Examples
+
+Check out our CSS examples:
+
+- [Basic CSS Processing](/docs/examples/css/basic)
+- [Sass/SCSS Integration](/docs/examples/css/sass)
+- [CSS Modules](/docs/examples/css/modules)
+- [PostCSS Configuration](/docs/examples/css/postcss)
+- [Lightning CSS](/docs/examples/css/lightningcss)
+- [React with CSS Modules](/docs/examples/react/css-modules)
+
+---
+
+Need more help? Check the [CSS troubleshooting guide](/docs/guide/troubleshooting/css) or explore [CSS examples](/docs/examples/css).

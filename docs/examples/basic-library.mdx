@@ -1,0 +1,416 @@
+---
+title: Basic TypeScript Library
+description: Create a simple TypeScript utility library with Packen
+---
+
+# Basic TypeScript Library
+
+Learn how to create a TypeScript utility library with Packen, including TypeScript declarations, ESM/CJS dual support, and proper package.json configuration.
+
+## Overview
+
+This example demonstrates:
+- TypeScript library setup
+- Automatic entry point detection
+- Dual package (ESM + CJS) output
+- TypeScript declaration generation
+- Tree-shakable exports
+
+## Project Setup
+
+Let's create a simple utility library with common functions:
+
+### Directory Structure
+
+```
+my-utils/
+├── src/
+│   ├── index.ts
+│   ├── math.ts
+│   ├── string.ts
+│   └── array.ts
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+### Source Files
+
+**src/math.ts**
+```typescript
+/**
+ * Add two numbers
+ */
+export function add(a: number, b: number): number {
+  return a + b
+}
+
+/**
+ * Subtract two numbers
+ */
+export function subtract(a: number, b: number): number {
+  return a - b
+}
+
+/**
+ * Multiply two numbers
+ */
+export function multiply(a: number, b: number): number {
+  return a * b
+}
+
+/**
+ * Divide two numbers
+ */
+export function divide(a: number, b: number): number {
+  if (b === 0) {
+    throw new Error('Division by zero')
+  }
+  return a / b
+}
+```
+
+**src/string.ts**
+```typescript
+/**
+ * Capitalize the first letter of a string
+ */
+export function capitalize(str: string): string {
+  if (!str) return str
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}
+
+/**
+ * Convert string to camelCase
+ */
+export function camelCase(str: string): string {
+  return str
+    .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => {
+      return index === 0 ? word.toLowerCase() : word.toUpperCase()
+    })
+    .replace(/\s+/g, '')
+}
+
+/**
+ * Convert string to kebab-case
+ */
+export function kebabCase(str: string): string {
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/\s+/g, '-')
+    .toLowerCase()
+}
+```
+
+**src/array.ts**
+```typescript
+/**
+ * Remove duplicates from an array
+ */
+export function unique<T>(array: T[]): T[] {
+  return [...new Set(array)]
+}
+
+/**
+ * Chunk an array into smaller arrays
+ */
+export function chunk<T>(array: T[], size: number): T[][] {
+  const chunks: T[][] = []
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size))
+  }
+  return chunks
+}
+
+/**
+ * Flatten a nested array
+ */
+export function flatten<T>(array: (T | T[])[]): T[] {
+  return array.reduce<T[]>((acc, val) => {
+    return acc.concat(Array.isArray(val) ? flatten(val) : val)
+  }, [])
+}
+```
+
+**src/index.ts**
+```typescript
+// Math utilities
+export { add, subtract, multiply, divide } from './math'
+
+// String utilities  
+export { capitalize, camelCase, kebabCase } from './string'
+
+// Array utilities
+export { unique, chunk, flatten } from './array'
+
+// Default export with all utilities
+export default {
+  // Math
+  add,
+  subtract, 
+  multiply,
+  divide,
+  // String
+  capitalize,
+  camelCase,
+  kebabCase,
+  // Array
+  unique,
+  chunk,
+  flatten
+}
+```
+
+## Configuration
+
+### package.json
+
+```json
+{
+  "name": "@myorg/utils",
+  "version": "1.0.0",
+  "description": "TypeScript utility library",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js", 
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./math": {
+      "types": "./dist/math.d.ts",
+      "import": "./dist/math.js", 
+      "require": "./dist/math.cjs"
+    },
+    "./string": {
+      "types": "./dist/string.d.ts",
+      "import": "./dist/string.js",
+      "require": "./dist/string.cjs"
+    },
+    "./array": {
+      "types": "./dist/array.d.ts", 
+      "import": "./dist/array.js",
+      "require": "./dist/array.cjs"
+    }
+  },
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["utilities", "typescript", "library"],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "@visulima/packem": "^1.28.2",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+### TypeScript Configuration
+
+**tsconfig.json**
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext", 
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "allowJs": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+### Packen Configuration
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  sourcemap: true,
+  declaration: true,
+  rollup: {
+    watch: {
+      include: 'src/**'
+    }
+  }
+})
+```
+
+## Building
+
+Build the library:
+
+```npm
+npm run build
+```
+
+### Output Structure
+
+After building, you'll have:
+
+```
+dist/
+├── index.js          # ESM main entry
+├── index.cjs         # CJS main entry  
+├── index.d.ts        # TypeScript declarations
+├── math.js           # ESM math utilities
+├── math.cjs          # CJS math utilities
+├── math.d.ts         # Math type declarations
+├── string.js         # ESM string utilities
+├── string.cjs        # CJS string utilities
+├── string.d.ts       # String type declarations
+├── array.js          # ESM array utilities
+├── array.cjs         # CJS array utilities
+└── array.d.ts        # Array type declarations
+```
+
+## Usage Examples
+
+### ESM Import (Recommended)
+
+```typescript
+// Full import
+import utils from '@myorg/utils'
+console.log(utils.add(1, 2)) // 3
+
+// Named imports 
+import { add, capitalize, unique } from '@myorg/utils'
+console.log(add(1, 2)) // 3
+console.log(capitalize('hello')) // Hello
+console.log(unique([1, 1, 2, 3])) // [1, 2, 3]
+
+// Subpath imports (tree-shakable)
+import { add, multiply } from '@myorg/utils/math'
+import { camelCase } from '@myorg/utils/string'
+import { chunk } from '@myorg/utils/array'
+```
+
+### CJS Require
+
+```javascript
+// Full require
+const utils = require('@myorg/utils')
+console.log(utils.add(1, 2)) // 3
+
+// Destructured require
+const { add, capitalize, unique } = require('@myorg/utils')
+
+// Subpath requires  
+const { add, multiply } = require('@myorg/utils/math')
+```
+
+## Testing the Library
+
+Create a simple test to verify everything works:
+
+**test.mjs**
+```javascript
+import { add, capitalize, unique } from './dist/index.js'
+
+console.log('Testing add:', add(2, 3)) // 5
+console.log('Testing capitalize:', capitalize('hello world')) // Hello world  
+console.log('Testing unique:', unique([1, 1, 2, 3, 3])) // [1, 2, 3]
+console.log('✅ All tests passed!')
+```
+
+Run the test:
+```bash
+node test.mjs
+```
+
+## Key Features
+
+### Tree Shaking
+
+Users can import only what they need:
+
+```typescript
+// Only imports the add function
+import { add } from '@myorg/utils/math'
+
+// Bundles only include the add function, not the entire library
+```
+
+### Type Safety
+
+Full TypeScript support with proper declarations:
+
+```typescript
+import { add } from '@myorg/utils'
+
+add(1, 2)      // ✅ Valid
+add('1', '2')  // ❌ Type error
+add(1)         // ❌ Type error (missing parameter)
+```
+
+### Dual Package Support
+
+Works in both ESM and CJS environments:
+
+```javascript
+// ESM
+import { add } from '@myorg/utils'
+
+// CJS
+const { add } = require('@myorg/utils')
+```
+
+## Publishing
+
+Before publishing to npm:
+
+1. **Build the library**:
+   ```bash
+   npm run build
+   ```
+
+2. **Test the output**:
+   ```bash
+   node test.mjs
+   ```
+
+3. **Publish to npm**:
+   ```bash
+   npm publish
+   ```
+
+<Callout type="info">
+Make sure to test your library in both ESM and CJS environments before publishing.
+</Callout>
+
+## Next Steps
+
+- Add unit tests with Jest or Vitest
+- Set up CI/CD with GitHub Actions
+- Add JSDoc comments for better documentation
+- Consider adding a bundled UMD version for browsers
+- Set up automated changelog generation
+
+This basic library setup provides a solid foundation for most TypeScript utility libraries with proper tooling and modern JavaScript standards.

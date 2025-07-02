@@ -1,0 +1,532 @@
+{
+  "title": "Packen Documentation",
+  "description": "Fast and modern bundler for Node.js and TypeScript",
+  "navigation": [
+    {
+      "title": "Getting Started",
+      "items": [
+        {
+          "title": "Introduction",
+          "href": "/docs/",
+          "description": "Overview of Packen and its features"
+        },
+        {
+          "title": "Installation",
+          "href": "/docs/guide/getting-started",
+          "description": "Install and set up Packen in your project"
+        },
+        {
+          "title": "Quick Start",
+          "href": "/docs/guide/getting-started#quick-setup",
+          "description": "Get up and running in minutes"
+        }
+      ]
+    },
+    {
+      "title": "Guide",
+      "items": [
+        {
+          "title": "Introduction",
+          "href": "/docs/guide/introduction",
+          "description": "Overview of Packen and its features"
+        },
+        {
+          "title": "Getting Started",
+          "href": "/docs/guide/getting-started",
+          "description": "Install and set up Packen in your project"
+        },
+        {
+          "title": "Configuration",
+          "href": "/docs/guide/configuration",
+          "description": "Configure Packen for your needs"
+        },
+        {
+          "title": "Package.json Setup",
+          "href": "/docs/guide/package-json",
+          "description": "Configure your package.json for optimal bundling"
+        },
+        {
+          "title": "Transformers",
+          "href": "/docs/guide/transformers",
+          "description": "Choose and configure transformers"
+        },
+        {
+          "title": "TypeScript",
+          "href": "/docs/guide/typescript",
+          "description": "TypeScript support and configuration"
+        },
+        {
+          "title": "CSS Processing",
+          "href": "/docs/guide/css",
+          "description": "CSS, Sass, Less, Stylus, and CSS Modules"
+        },
+        {
+          "title": "React Support",
+          "href": "/docs/guide/react",
+          "description": "React components and server components"
+        },
+        {
+          "title": "Multi-Runtime",
+          "href": "/docs/guide/multi-runtime",
+          "description": "Target multiple runtimes with conditional exports"
+        },
+        {
+          "title": "Plugins",
+          "href": "/docs/guide/plugins",
+          "description": "Extend Packen with custom plugins"
+        },
+        {
+          "title": "Optimization",
+          "href": "/docs/guide/optimization",
+          "description": "Bundle analysis and performance optimization"
+        },
+        {
+          "title": "Watch Mode",
+          "href": "/docs/guide/watch-mode",
+          "description": "Development workflow with hot reloading"
+        },
+        {
+          "title": "CLI Reference",
+          "href": "/docs/guide/cli",
+          "description": "Complete command-line interface documentation"
+        }
+      ]
+    },
+    {
+      "title": "Options",
+      "items": [
+        {
+          "title": "Overview",
+          "href": "/docs/options/",
+          "description": "Complete reference for all configuration options"
+        },
+        {
+          "title": "Entry",
+          "href": "/docs/options/entry",
+          "description": "Configure entry points for your build"
+        },
+        {
+          "title": "Config File",
+          "href": "/docs/options/config-file",
+          "description": "Configuration file setup and usage"
+        },
+        {
+          "title": "Declaration Files",
+          "href": "/docs/options/declaration-files",
+          "description": "TypeScript declaration generation"
+        },
+        {
+          "title": "Output Format",
+          "href": "/docs/options/output-format",
+          "description": "Control output formats (ESM, CJS, IIFE)"
+        },
+        {
+          "title": "Output Directory",
+          "href": "/docs/options/output-directory",
+          "description": "Configure output directory and file naming"
+        },
+        {
+          "title": "Transformers",
+          "href": "/docs/options/transformers",
+          "description": "Choose and configure transformers"
+        },
+        {
+          "title": "Target",
+          "href": "/docs/options/target",
+          "description": "JavaScript compilation targets"
+        },
+        {
+          "title": "Platform",
+          "href": "/docs/options/platform",
+          "description": "Target runtime platforms"
+        },
+        {
+          "title": "Watch Mode",
+          "href": "/docs/options/watch-mode",
+          "description": "File watching and development workflow"
+        },
+        {
+          "title": "Cleaning",
+          "href": "/docs/options/cleaning",
+          "description": "Clean output directory before build"
+        },
+        {
+          "title": "Dependencies",
+          "href": "/docs/options/dependencies",
+          "description": "External dependency handling"
+        },
+        {
+          "title": "Tree Shaking",
+          "href": "/docs/options/tree-shaking",
+          "description": "Dead code elimination"
+        },
+        {
+          "title": "Source Maps",
+          "href": "/docs/options/source-maps",
+          "description": "Source map generation"
+        },
+        {
+          "title": "Minification",
+          "href": "/docs/options/minification",
+          "description": "Code minification options"
+        },
+        {
+          "title": "Silent Mode",
+          "href": "/docs/options/silent-mode",
+          "description": "Control logging and output verbosity"
+        },
+        {
+          "title": "Shims",
+          "href": "/docs/options/shims",
+          "description": "ESM/CJS interoperability"
+        },
+        {
+          "title": "Package Exports",
+          "href": "/docs/options/package-exports",
+          "description": "Automatic package.json exports"
+        },
+        {
+          "title": "Unbundle",
+          "href": "/docs/options/unbundle",
+          "description": "Preserve file structure mode"
+        },
+        {
+          "title": "Plugins",
+          "href": "/docs/options/plugins",
+          "description": "Rollup plugin integration"
+        },
+        {
+          "title": "Hooks",
+          "href": "/docs/options/hooks",
+          "description": "Build lifecycle hooks"
+        }
+      ]
+    },
+    {
+      "title": "Migration",
+      "items": [
+        {
+          "title": "From tsup",
+          "href": "/docs/guide/migration/tsup",
+          "description": "Migrate from tsup to Packen"
+        },
+        {
+          "title": "From Rollup",
+          "href": "/docs/guide/migration/rollup",
+          "description": "Migrate from plain Rollup configuration"
+        },
+        {
+          "title": "From Webpack",
+          "href": "/docs/guide/migration/webpack",
+          "description": "Migrate from Webpack to Packen"
+        },
+        {
+          "title": "From unbuild",
+          "href": "/docs/guide/migration/unbuild",
+          "description": "Migrate from unbuild to Packen"
+        }
+      ]
+    },
+    {
+      "title": "API Reference",
+      "items": [
+        {
+          "title": "Overview",
+          "href": "/docs/api/",
+          "description": "Complete API documentation for all packages"
+        },
+        {
+          "title": "@visulima/packem",
+          "href": "/docs/api/packem",
+          "description": "Main bundler package with CLI and core functionality"
+        },
+        {
+          "title": "@visulima/packem-rollup",
+          "href": "/docs/api/packem-rollup",
+          "description": "Rollup plugins and transformer integrations"
+        },
+        {
+          "title": "@visulima/rollup-css-plugin",
+          "href": "/docs/api/rollup-css-plugin",
+          "description": "CSS processing and optimization plugin"
+        },
+        {
+          "title": "@visulima/css-style-inject",
+          "href": "/docs/api/css-style-inject",
+          "description": "Runtime CSS injection utility"
+        },
+        {
+          "title": "@visulima/packem-share",
+          "href": "/docs/api/packem-share",
+          "description": "Shared types, utilities, and constants"
+        }
+      ]
+    },
+    {
+      "title": "Examples",
+      "items": [
+        {
+          "title": "Overview",
+          "href": "/docs/examples/",
+          "description": "Practical examples and use cases"
+        },
+        {
+          "title": "Basic Examples",
+          "items": [
+            {
+              "title": "TypeScript Library",
+              "href": "/docs/examples/basic-typescript",
+              "description": "Simple TypeScript library with ESM and CJS outputs"
+            },
+            {
+              "title": "JavaScript Package",
+              "href": "/docs/examples/basic-javascript",
+              "description": "Modern JavaScript package with zero configuration"
+            },
+            {
+              "title": "CLI Tool",
+              "href": "/docs/examples/cli-tool",
+              "description": "Command-line tool with executable binaries"
+            },
+            {
+              "title": "Multiple Exports",
+              "href": "/docs/examples/multi-exports",
+              "description": "Package with multiple entry points and exports"
+            }
+          ]
+        },
+        {
+          "title": "Transformers",
+          "items": [
+            {
+              "title": "esbuild",
+              "href": "/docs/examples/transformers/esbuild",
+              "description": "Fast bundling with esbuild transformer"
+            },
+            {
+              "title": "swc",
+              "href": "/docs/examples/transformers/swc",
+              "description": "Rust-powered compilation with swc"
+            },
+            {
+              "title": "OXC",
+              "href": "/docs/examples/transformers/oxc",
+              "description": "Next-generation JavaScript toolchain"
+            },
+            {
+              "title": "sucrase",
+              "href": "/docs/examples/transformers/sucrase",
+              "description": "Simple and fast alternative to Babel"
+            },
+
+          ]
+        },
+        {
+          "title": "CSS",
+          "items": [
+            {
+              "title": "Basic CSS",
+              "href": "/docs/examples/css/basic",
+              "description": "CSS bundling with PostCSS and optimization"
+            },
+            {
+              "title": "Sass/SCSS",
+              "href": "/docs/examples/css/sass",
+              "description": "Sass preprocessing with variables and mixins"
+            },
+            {
+              "title": "Less",
+              "href": "/docs/examples/css/less",
+              "description": "Less compilation with functions and mixins"
+            },
+            {
+              "title": "Stylus",
+              "href": "/docs/examples/css/stylus",
+              "description": "Stylus with expressive syntax"
+            },
+            {
+              "title": "CSS Modules",
+              "href": "/docs/examples/css/modules",
+              "description": "Scoped CSS with automatic class names"
+            },
+            {
+              "title": "PostCSS",
+              "href": "/docs/examples/css/postcss",
+              "description": "Advanced PostCSS configuration with plugins"
+            },
+            {
+              "title": "Lightning CSS",
+              "href": "/docs/examples/css/lightningcss",
+              "description": "Fast CSS processing with Lightning CSS"
+            }
+          ]
+        },
+        {
+          "title": "React",
+          "items": [
+            {
+              "title": "React Library",
+              "href": "/docs/examples/react/library",
+              "description": "React component library with TypeScript"
+            },
+            {
+              "title": "CSS Modules",
+              "href": "/docs/examples/react/css-modules",
+              "description": "React components with scoped styling"
+            },
+            {
+              "title": "Server Components",
+              "href": "/docs/examples/react/server-components",
+              "description": "Server and client components with proper bundling"
+            },
+            {
+              "title": "Tailwind CSS",
+              "href": "/docs/examples/react/tailwind",
+              "description": "React components with Tailwind CSS integration"
+            }
+          ]
+        },
+        {
+          "title": "Configuration",
+          "items": [
+            {
+              "title": "Extra Conditions",
+              "href": "/docs/examples/configuration/extra-conditions",
+              "description": "Configure custom export conditions in package.json validation"
+            },
+            {
+              "title": "Bundle Size Limits",
+              "href": "/docs/examples/configuration/bundle-limits",
+              "description": "Set up bundle size validation and limits"
+            },
+            {
+              "title": "Package.json Validation",
+              "href": "/docs/examples/configuration/package-validation",
+              "description": "Complete package.json validation setup"
+            },
+            {
+              "title": "Dependency Validation",
+              "href": "/docs/examples/configuration/dependency-validation",
+              "description": "Validate dependencies and detect issues"
+            }
+          ]
+        },
+        {
+          "title": "Advanced",
+          "items": [
+            {
+              "title": "Multi-Runtime",
+              "href": "/docs/examples/advanced/multi-runtime",
+              "description": "Target multiple runtimes with conditional exports"
+            },
+            {
+              "title": "Dynamic Imports",
+              "href": "/docs/examples/advanced/dynamic-imports",
+              "description": "Code splitting with dynamic imports"
+            },
+            {
+              "title": "Shared Modules",
+              "href": "/docs/examples/advanced/shared-modules",
+              "description": "Shared code between different bundles"
+            },
+            {
+              "title": "WebAssembly",
+              "href": "/docs/examples/advanced/webassembly",
+              "description": "Bundle and use WebAssembly modules"
+            },
+            {
+              "title": "Custom Plugins",
+              "href": "/docs/examples/advanced/custom-plugins",
+              "description": "Extend Packen with custom Rollup plugins"
+            },
+            {
+              "title": "Bundle Analysis",
+              "href": "/docs/examples/advanced/bundle-analysis",
+              "description": "Analyze and optimize bundle size"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Troubleshooting",
+      "items": [
+        {
+          "title": "Common Issues",
+          "href": "/docs/guide/troubleshooting/common-issues",
+          "description": "Solutions to frequently encountered problems"
+        },
+        {
+          "title": "TypeScript Problems",
+          "href": "/docs/guide/troubleshooting/typescript",
+          "description": "TypeScript-specific troubleshooting"
+        },
+        {
+          "title": "CSS Issues",
+          "href": "/docs/guide/troubleshooting/css",
+          "description": "CSS processing and styling problems"
+        },
+        {
+          "title": "Build Errors",
+          "href": "/docs/guide/troubleshooting/build-errors",
+          "description": "Common build failures and solutions"
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "links": [
+      {
+        "title": "Resources",
+        "items": [
+          {
+            "title": "GitHub",
+            "href": "https://github.com/visulima/packem"
+          },
+          {
+            "title": "Issues",
+            "href": "https://github.com/visulima/packem/issues"
+          },
+          {
+            "title": "Discussions",
+            "href": "https://github.com/visulima/packem/discussions"
+          },
+          {
+            "title": "Changelog",
+            "href": "https://github.com/visulima/packem/blob/main/CHANGELOG.md"
+          }
+        ]
+      },
+      {
+        "title": "Community",
+        "items": [
+          {
+            "title": "Twitter",
+            "href": "https://twitter.com/visulima"
+          },
+          {
+            "title": "Discord",
+            "href": "https://discord.gg/visulima"
+          },
+          {
+            "title": "Sponsor",
+            "href": "https://github.com/sponsors/prisis"
+          }
+        ]
+      },
+      {
+        "title": "More",
+        "items": [
+          {
+            "title": "Blog",
+            "href": "https://visulima.com/blog"
+          },
+          {
+            "title": "Newsletter",
+            "href": "https://visulima.com/newsletter"
+          }
+        ]
+      }
+    ]
+  }
+}

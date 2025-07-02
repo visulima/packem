@@ -1,0 +1,562 @@
+---
+title: API Reference
+description: Complete API documentation for all Packen packages and their features
+---
+
+import { ApiCard } from '../../components/ApiCard'
+import { Badge } from '../../components/Badge'
+
+# API Reference
+
+Complete API documentation for all Packen packages. Each package provides specific functionality for the Packen bundling ecosystem.
+
+## Core Packages
+
+<div className="api-grid">
+  <ApiCard
+    title="@visulima/packem"
+    description="Main bundler package with CLI and core functionality"
+    href="/docs/api/packem"
+    badges={['CLI', 'Core', 'TypeScript']}
+  />
+  
+  <ApiCard
+    title="@visulima/packem-rollup"
+    description="Rollup plugins and transformer integrations"
+    href="/docs/api/packem-rollup"
+    badges={['Rollup', 'Plugins', 'Transformers']}
+  />
+  
+  <ApiCard
+    title="@visulima/rollup-css-plugin"
+    description="CSS processing and optimization plugin"
+    href="/docs/api/rollup-css-plugin"
+    badges={['CSS', 'Sass', 'PostCSS']}
+  />
+  
+  <ApiCard
+    title="@visulima/css-style-inject"
+    description="Runtime CSS injection utility"
+    href="/docs/api/css-style-inject"
+    badges={['Runtime', 'CSS', 'DOM']}
+  />
+  
+  <ApiCard
+    title="@visulima/packem-share"
+    description="Shared types, utilities, and constants"
+    href="/docs/api/packem-share"
+    badges={['Types', 'Utils', 'Shared']}
+  />
+</div>
+
+## Quick Navigation
+
+### Configuration APIs
+- [`defineConfig()`](/docs/api/packem#defineconfig) - Main configuration function
+- [`PackemConfig`](/docs/api/packem#packemconfig) - Configuration interface
+- [`TransformerOptions`](/docs/api/packem#transformeroptions) - Transformer configuration
+
+### CLI APIs
+- [`packem build`](/docs/api/packem#cli-build) - Build command
+- [`packem init`](/docs/api/packem#cli-init) - Initialize configuration
+- [`packem watch`](/docs/api/packem#cli-watch) - Watch mode
+
+### Transformer APIs
+- [`esbuild`](/docs/api/packem-rollup#esbuild) - esbuild transformer
+- [`swc`](/docs/api/packem-rollup#swc) - swc transformer
+- [`oxc`](/docs/api/packem-rollup#oxc) - OXC transformer
+- [`sucrase`](/docs/api/packem-rollup#sucrase) - sucrase transformer
+
+### CSS APIs
+- [`CssOptions`](/docs/api/rollup-css-plugin#cssoptions) - CSS configuration
+- [`SassOptions`](/docs/api/rollup-css-plugin#sassoptions) - Sass configuration
+- [`PostCssOptions`](/docs/api/rollup-css-plugin#postcssoptions) - PostCSS configuration
+- [`injectStyles()`](/docs/api/css-style-inject#injectstyles) - Runtime CSS injection
+
+## Type Definitions
+
+All packages include comprehensive TypeScript definitions. Key interfaces:
+
+```typescript
+// Main configuration interface
+interface BuildConfig {
+  // Core options (top-level)
+  transformer: TransformerFn
+  entries?: (BuildEntry | string)[]
+  externals?: (RegExp | string)[]
+  runtime?: 'browser' | 'node'
+  sourcemap?: boolean
+  declaration?: boolean | 'compatible' | 'node16'
+  minify?: boolean
+  cjsInterop?: boolean
+  clean?: boolean
+  debug?: boolean
+  
+  // Rollup-specific options
+  rollup?: {
+    css?: StyleOptions
+    watch?: WatchOptions
+    // ... other rollup options
+  }
+  
+  // Other configuration
+  validation?: ValidationOptions
+  typedoc?: TypeDocumentOptions | false
+  experimental?: {
+    oxcResolve?: boolean
+  }
+}
+
+// Build entry configuration
+interface BuildEntry {
+  input: string
+  outDir?: string
+  runtime?: Runtime
+  declaration?: boolean | 'compatible' | 'node16'
+  // ... more options
+}
+
+// CSS configuration (from rollup-css-plugin)
+interface StyleOptions {
+  mode?: 'inject' | 'extract' | 'emit'
+  loaders?: CssLoader[]
+  minifier?: CssMinifier
+  // ... more options
+}
+```
+
+## Usage Patterns
+
+### Basic Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  sourcemap: true,
+  declaration: true
+})
+```
+
+### Advanced Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/swc'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+import sassLoader from '@visulima/packem/css/loader/sass'
+import cssnanoMinifier from '@visulima/packem/css/minifier/cssnano'
+
+export default defineConfig({
+  transformer,
+  externals: ['react', 'react-dom'],
+  sourcemap: true,
+  declaration: true,
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader, sassLoader],
+      minifier: cssnanoMinifier
+    },
+    plugins: [
+      // Custom plugins
+    ]
+  }
+})
+```
+
+### Programmatic Usage
+
+```typescript
+import { packem } from '@visulima/packem'
+
+const result = await packem('./src', {
+  mode: 'build',
+  environment: 'production',
+  declaration: true,
+  minify: true,
+  sourcemap: true
+})
+```
+
+## Plugin Development
+
+### Custom Rollup Plugin
+
+```typescript
+import type { Plugin } from 'rollup'
+
+export function myCustomPlugin(): Plugin {
+  return {
+    name: 'my-custom-plugin',
+    buildStart() {
+      // Plugin logic
+    },
+    transform(code, id) {
+      // Transform logic
+      return null
+    }
+  }
+}
+```
+
+### CSS Loader
+
+```typescript
+import type { CssLoader } from '@visulima/rollup-css-plugin'
+
+export const myCustomLoader: CssLoader = {
+  name: 'my-loader',
+  test: /\.mycss$/,
+  async process(code, id) {
+    // Process CSS
+    return {
+      code: processedCode,
+      map: sourceMap
+    }
+  }
+}
+```
+
+## Error Handling
+
+### Build Errors
+
+```typescript
+try {
+  await build(config)
+} catch (error) {
+  if (error instanceof PackemError) {
+    console.error('Packem Error:', error.message)
+    console.error('Code:', error.code)
+  } else {
+    console.error('Unknown Error:', error)
+  }
+}
+```
+
+### Configuration Validation
+
+```typescript
+import { validateConfig } from '@visulima/packem/config'
+
+try {
+  const validConfig = validateConfig(userConfig)
+} catch (error) {
+  console.error('Invalid configuration:', error.message)
+}
+```
+
+## Hooks and Events
+
+### Build Hooks
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'build:before': async (config) => {
+      console.log('Build starting...')
+    },
+    'build:after': async (result) => {
+      console.log('Build completed:', result)
+    },
+    'build:error': async (error) => {
+      console.error('Build failed:', error)
+    }
+  }
+})
+```
+
+### Watch Mode Hooks
+
+```typescript
+export default defineConfig({
+  hooks: {
+    'watch:change': async (id) => {
+      console.log('File changed:', id)
+    },
+    'watch:restart': async () => {
+      console.log('Watcher restarted')
+    }
+  }
+})
+```
+
+## Environment Variables
+
+Packen respects several environment variables:
+
+- `NODE_ENV` - Environment mode (development/production)
+- `PACKEM_DEBUG` - Enable debug logging
+- `PACKEM_CACHE_DIR` - Custom cache directory
+- `PACKEM_CONFIG` - Custom config file path
+
+```bash
+# Enable debug mode
+PACKEM_DEBUG=1 packem build
+
+# Use custom config
+PACKEM_CONFIG=./custom.config.ts packem build
+```
+
+## Performance APIs
+
+### Bundle Analysis
+
+```typescript
+export default defineConfig({
+  rollup: {
+    plugins: [
+      // Enable bundle analysis
+      bundleAnalyzer({
+        open: true,
+        filename: 'bundle-report.html'
+      })
+    ]
+  }
+})
+```
+
+### Caching
+
+```typescript
+export default defineConfig({
+  cache: {
+    enabled: true,
+    directory: '.packem-cache',
+    key: 'my-project'
+  }
+})
+```
+
+## Version Compatibility
+
+| Package | Version | Node.js | TypeScript |
+|---------|---------|---------|------------|
+| `@visulima/packem` | ^1.28.0 | >=20.0.0 | >=4.5.0 |
+| `@visulima/packem-rollup` | ^0.0.0 | >=20.0.0 | >=4.5.0 |
+| `@visulima/rollup-css-plugin` | ^0.0.0 | >=20.0.0 | >=4.5.0 |
+
+## Migration Guides
+
+- [From tsup](/docs/guide/migration/tsup) - Migrate from tsup
+- [From Rollup](/docs/guide/migration/rollup) - Migrate from plain Rollup
+- [From Webpack](/docs/guide/migration/webpack) - Migrate from Webpack
+
+## Contributing
+
+Want to contribute to the API? Check out:
+
+- [Contributing Guide](https://github.com/visulima/packem/blob/main/CONTRIBUTING.md)
+- [API Design Guidelines](/docs/contributing/api-design)
+- [Plugin Development Guide](/docs/contributing/plugins)
+
+---
+
+## Package Details
+
+Click on any package below to explore its complete API documentation:
+
+<div className="package-list">
+  <a href="/docs/api/packem" className="package-link">
+    <h3>@visulima/packem</h3>
+    <p>Main bundler package with CLI, configuration, and core bundling functionality</p>
+    <div className="package-stats">
+      <Badge>CLI</Badge>
+      <Badge>Config</Badge>
+      <Badge>Core</Badge>
+    </div>
+  </a>
+  
+  <a href="/docs/api/packem-rollup" className="package-link">
+    <h3>@visulima/packem-rollup</h3>
+    <p>Rollup plugins for all supported transformers and build optimizations</p>
+    <div className="package-stats">
+      <Badge>Plugins</Badge>
+      <Badge>Transformers</Badge>
+      <Badge>Rollup</Badge>
+    </div>
+  </a>
+  
+  <a href="/docs/api/rollup-css-plugin" className="package-link">
+    <h3>@visulima/rollup-css-plugin</h3>
+    <p>Comprehensive CSS processing with preprocessors and optimization</p>
+    <div className="package-stats">
+      <Badge>CSS</Badge>
+      <Badge>Sass</Badge>
+      <Badge>PostCSS</Badge>
+    </div>
+  </a>
+  
+  <a href="/docs/api/css-style-inject" className="package-link">
+    <h3>@visulima/css-style-inject</h3>
+    <p>Runtime CSS injection utility for dynamic styling</p>
+    <div className="package-stats">
+      <Badge>Runtime</Badge>
+      <Badge>DOM</Badge>
+      <Badge>Utility</Badge>
+    </div>
+  </a>
+  
+  <a href="/docs/api/packem-share" className="package-link">
+    <h3>@visulima/packem-share</h3>
+    <p>Shared types, utilities, and constants used across packages</p>
+    <div className="package-stats">
+      <Badge>Types</Badge>
+      <Badge>Utils</Badge>
+      <Badge>Shared</Badge>
+    </div>
+  </a>
+</div>
+
+## BuildConfig Validation Examples
+
+### Required Configuration
+All BuildConfig objects must include a transformer function:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+// ✅ Valid - transformer is required
+export default defineConfig({
+  transformer
+})
+
+// ❌ Invalid - missing transformer
+export default defineConfig({
+  entries: ['src/index.ts']
+})
+```
+
+### Entry Configuration
+Entries can be strings or detailed BuildEntry objects:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  
+  // ✅ Valid - string entries
+  entries: ['src/index.ts', 'src/cli.ts'],
+  
+  // ✅ Valid - detailed entry objects
+  entries: [
+    {
+      input: 'src/index.ts',
+      outDir: 'dist'
+    },
+    {
+      input: 'src/cli.ts',
+      runtime: 'node',
+      executable: true
+    }
+  ]
+})
+```
+
+### Declaration Generation
+Declaration options must use valid values:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  
+  // ✅ Valid declaration options
+  declaration: true,           // boolean
+  declaration: 'compatible',   // for .d.ts, .d.mts, .d.cts
+  declaration: 'node16',       // for .d.mts, .d.cts only
+  declaration: false,          // disable
+  
+  // ❌ Invalid - string not in allowed values
+  declaration: 'strict'
+})
+```
+
+### CSS Configuration
+CSS must be configured under rollup.css:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import postcssLoader from '@visulima/packem/css/loader/postcss'
+
+export default defineConfig({
+  transformer,
+  
+  // ✅ Valid - CSS under rollup
+  rollup: {
+    css: {
+      mode: 'extract',
+      loaders: [postcssLoader]
+    }
+  },
+  
+  // ❌ Invalid - CSS at top level
+  css: {
+    mode: 'extract'
+  }
+})
+```
+
+### External Dependencies
+Externals should be specified at the top level:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  
+  // ✅ Valid - externals at top level
+  externals: ['react', 'react-dom', /^@myorg\//],
+  
+  // ❌ Invalid - externals under rollup
+  rollup: {
+    external: ['react']
+  }
+})
+```
+
+### Validation Options
+Bundle size and dependency validation:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  validation: {
+    // Bundle size limits
+    bundleLimit: {
+      limit: '1MB',
+      limits: {
+        '**/*.mjs': '500KB',
+        'index.cjs': 1024 * 1024 // 1MB in bytes
+      }
+    },
+    
+    // Package.json validation
+    packageJson: {
+      exports: true,
+      types: true,
+      extraConditions: ['my-framework']
+    },
+    
+    // Dependency validation
+    dependencies: {
+      unused: { exclude: ['@types/*'] },
+      hoisted: { exclude: ['react'] }
+    }
+  }
+})
+```

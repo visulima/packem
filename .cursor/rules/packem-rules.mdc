@@ -3,6 +3,65 @@
 ## Project Overview
 This is a modern bundler for Node.js and TypeScript built on Rollup with support for multiple transformers (esbuild, SWC, OXC, Sucrase). It's designed for zero-configuration bundling with comprehensive package.json validation.
 
+## Documentation Patterns & Standards
+
+### Critical Documentation Rules
+- **Interface-First Documentation**: ALL documentation must match actual TypeScript interfaces in source code
+- **Zero Tolerance for Non-Existent Features**: Never document features that don't exist in the codebase
+- **Example Verification**: Every code example must be tested against actual implementation
+- **Source Code Verification**: Always verify documentation against `packages/packem/src/types.ts` and package exports
+
+### Transformer Documentation Standards
+**CRITICAL**: Only 4 transformers exist - never document more:
+1. `@visulima/packem/transformer/esbuild`
+2. `@visulima/packem/transformer/swc` 
+3. `@visulima/packem/transformer/oxc`
+4. `@visulima/packem/transformer/sucrase`
+
+**Historical Issue**: TypeScript transformer was documented but never existed in codebase. This caused significant user confusion.
+
+### Configuration Documentation Patterns
+**Correct Configuration Structure**:
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,                    // Required import, not string
+  entries: ['src/index.ts'],      // Array, not single 'entry'
+  externals: ['react'],           // Top-level, not under rollup
+  sourcemap: true,                // Top-level boolean
+  declaration: true,              // Top-level, not nested object
+  rollup: {
+    css: {
+      mode: 'extract',           // 'extract' or 'inject'
+      loaders: [postcssLoader],  // Loader imports required
+      minifier: cssnanoMinifier  // Minifier imports required
+    }
+  }
+})
+```
+
+**Common Documentation Mistakes to Avoid**:
+- Using string transformer names instead of imports
+- Placing `externals` under `rollup` instead of top-level
+- Using `entry` instead of `entries` array
+- Incorrect CSS configuration structure
+- Documenting `declaration: { isolated: true }` instead of boolean/string options
+
+### File Organization Standards
+- **Examples**: Categorized by type in `docs/examples/[category]/`
+- **Configuration Examples**: Specific subdirectory `docs/examples/configuration/`
+- **Navigation**: Must reflect actual file structure in `docs/navigation.json`
+- **MDX Format**: All documentation files use MDX with proper frontmatter
+
+### Documentation Verification Process
+1. **Source Code Check**: Verify against actual TypeScript interfaces
+2. **Export Verification**: Check `packages/packem/package.json` exports
+3. **Example Testing**: Test all configuration examples
+4. **Navigation Sync**: Ensure navigation matches file structure
+5. **Link Validation**: Verify all internal links work
+
 ## Key Development Patterns
 
 ### Architecture Patterns
@@ -31,7 +90,7 @@ This is a modern bundler for Node.js and TypeScript built on Rollup with support
 2. **Validator**: Implement in `src/validator/package-json/`
 3. **Tests**: Add unit tests in `__tests__/unit/validator/`
 4. **Integration**: Update validation chain
-5. **Documentation**: Add examples and usage docs
+5. **Documentation**: Add examples and usage docs with verification
 
 ### Adding New Transformer Support
 1. **Plugin**: Create in `src/rollup/plugins/[transformer]/`
@@ -39,6 +98,14 @@ This is a modern bundler for Node.js and TypeScript built on Rollup with support
 3. **Factory**: Update transformer factory
 4. **Tests**: Add transformer-specific tests
 5. **Examples**: Create example project
+6. **Documentation**: Update transformer list and examples
+
+### Updating Documentation
+1. **Verify Source**: Check actual interfaces in `src/types.ts`
+2. **Test Examples**: Ensure all code examples work
+3. **Update Navigation**: Sync `docs/navigation.json` with file structure
+4. **Verify Exports**: Check available exports in package.json
+5. **Validate Links**: Ensure all internal references work
 
 ### Package.json Exports Handling
 - **Detection**: Automatic entry point detection from exports field
@@ -53,6 +120,7 @@ This is a modern bundler for Node.js and TypeScript built on Rollup with support
 - **Integration tests**: End-to-end scenarios
 - **Fixture tests**: Real-world examples
 - **Snapshot tests**: Output consistency
+- **Documentation tests**: Verify all examples work
 
 ### Build Process
 - **Nx orchestration**: Parallel builds and caching
@@ -65,8 +133,15 @@ This is a modern bundler for Node.js and TypeScript built on Rollup with support
 - **Linting**: ESLint with custom rules
 - **Testing**: Comprehensive test coverage
 - **Documentation**: JSDoc for all public APIs
+- **Documentation verification**: All examples tested
 
 ## Known Challenges
+
+### Documentation Maintenance
+- **Interface Changes**: Documentation must be updated when interfaces change
+- **Feature Drift**: Preventing documentation of planned but unimplemented features
+- **Example Accuracy**: Ensuring all code examples remain functional
+- **Navigation Sync**: Keeping navigation in sync with file organization
 
 ### Dependency Management
 - **Optional transformers**: Peer dependencies for transformers
@@ -85,7 +160,13 @@ This is a modern bundler for Node.js and TypeScript built on Rollup with support
 
 ## Recent Changes Context
 
-### Extra Conditions Feature (Recently Implemented)
+### Major Documentation Corrections (Recently Completed)
+- **Issue**: Documentation contained significant inaccuracies vs actual implementation
+- **Resolution**: Complete overhaul of all documentation to match source code
+- **Impact**: Users can now trust documentation matches actual capabilities
+- **Process**: Established verification procedures for future documentation updates
+
+### Extra Conditions Feature (Previously Implemented)
 - **Purpose**: Allow custom export conditions in validation
 - **Location**: `ValidationOptions.packageJson.extraConditions`
 - **Usage**: For custom bundlers, frameworks, tooling conditions
@@ -115,7 +196,7 @@ This is a modern bundler for Node.js and TypeScript built on Rollup with support
 2. Update configuration parser/validator
 3. Implement feature logic
 4. Add comprehensive tests
-5. Update documentation with examples
+5. Update documentation with examples and verification
 
 ### Debugging Build Issues
 1. Check package.json exports configuration
@@ -130,4 +211,11 @@ This is a modern bundler for Node.js and TypeScript built on Rollup with support
 3. Optimize plugin chain order
 4. Leverage Nx caching effectively
 
-This project emphasizes reliability, comprehensive validation, and excellent developer experience over raw performance, making it ideal for library authors who need robust, well-validated builds.
+### Maintaining Documentation Quality
+1. Verify all examples against actual source code
+2. Check transformer lists match available exports
+3. Test all configuration examples
+4. Validate navigation structure
+5. Ensure consistent syntax throughout
+
+This project emphasizes reliability, comprehensive validation, and excellent developer experience over raw performance, making it ideal for library authors who need robust, well-validated builds. The recent documentation overhaul established standards ensuring documentation accuracy and user trust.
