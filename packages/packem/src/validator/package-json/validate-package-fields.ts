@@ -2,8 +2,8 @@ import { VALID_EXPORT_EXTENSIONS } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { warn } from "@visulima/packem-share/utils";
 
-import { getOutputExtension } from "../../utils/get-file-extensions";
 import type { InternalBuildOptions, ValidationOptions } from "../../types";
+import { getOutputExtension } from "../../utils/get-file-extensions";
 
 /**
  * Validates the exports field according to Node.js specification.

@@ -7,8 +7,8 @@ import { dirname, relative, resolve } from "@visulima/path";
 import { fileURLToPath, resolveModuleExportNames, resolvePath } from "mlly";
 
 import resolveAliases from "../rollup/utils/resolve-aliases";
-import { getDtsExtension, getOutputExtension } from "../utils/get-file-extensions";
 import type { InternalBuildOptions } from "../types";
+import { getDtsExtension, getOutputExtension } from "../utils/get-file-extensions";
 
 const IDENTIFIER_REGEX = /^[_$a-z\u00A0-\uFFFF][\w$\u00A0-\uFFFF]*$/iu;
 
