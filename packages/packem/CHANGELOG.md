@@ -11,6 +11,37 @@
 ### Bug Fixes
 
 * **packem:**  changed node10Compatibility to false ([d35e03e](https://github.com/visulima/packem/commit/d35e03e63efad45c32e9eca9831539206e0c4503))
+* style changes to trigger new release ([fbf6b2f](https://github.com/visulima/packem/commit/fbf6b2f9030db0d9fd22ea61f65a2f03457a2a1a))
+
+### Miscellaneous Chores
+
+* **release:** @visulima/packem@2.0.0-alpha.1 [skip ci]\n\n## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02) ([b0b6032](https://github.com/visulima/packem/commit/b0b60320543e1af93414a031c3b748ee4dff1cf7)), closes [#157](https://github.com/visulima/packem/issues/157) [#157](https://github.com/visulima/packem/issues/157)
+* **release:** @visulima/packem@2.0.0-alpha.1 [skip ci]\n\n## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02) ([ffc6d42](https://github.com/visulima/packem/commit/ffc6d425debac8d645c09aee522b62c398ca1b12)), closes [#157](https://github.com/visulima/packem/issues/157)
+* remove unused CSS style inject dependencies and refactor chunk handling ([f50c9e6](https://github.com/visulima/packem/commit/f50c9e69e1adc4661e7fc6b19ace2d1a0a3ab9b2))
+* update multi-semantic-release command to ignore @visulima/packem package ([fa85b28](https://github.com/visulima/packem/commit/fa85b283a5b2cbd15d2b52c09c2db2b2d2c6c65d))
+* update package versions and add engine requirements ([d594ac3](https://github.com/visulima/packem/commit/d594ac31a8302f3a4d86d07415002495361b6ba1))
+
+### Code Refactoring
+
+* centralize output extension logic in new utility functions ([fbf4b01](https://github.com/visulima/packem/commit/fbf4b0188aa9e4584a28bbe7dd02c7a323e2dce2))
+
+### Tests
+
+* add integration and unit tests for file extension handling ([0536e8a](https://github.com/visulima/packem/commit/0536e8a2cb4c7cddf01d66864e0fdbe3912b256c))
+
+## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02)
+
+### ⚠ BREAKING CHANGES
+
+* changed node from 18 to 20, split packem in reusable packages
+
+### Features
+
+* introduce @visulima/packem-share package for shared utilities a… ([#157](https://github.com/visulima/packem/issues/157)) ([99e977a](https://github.com/visulima/packem/commit/99e977a8f62021c9ac286fc0c9b184b96bce88f1))
+
+### Bug Fixes
+
+* **packem:**  changed node10Compatibility to false ([d35e03e](https://github.com/visulima/packem/commit/d35e03e63efad45c32e9eca9831539206e0c4503))
 
 ### Miscellaneous Chores
 
