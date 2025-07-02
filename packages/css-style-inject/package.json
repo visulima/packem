@@ -60,8 +60,8 @@
     },
     "devDependencies": {
         "@anolilab/eslint-config": "^16.2.15",
-        "@anolilab/semantic-release-pnpm": "2.0.1",
-        "@anolilab/semantic-release-preset": "^11.0.1",
+        "@anolilab/semantic-release-pnpm": "2.0.2",
+        "@anolilab/semantic-release-preset": "^11.0.2",
         "@rushstack/eslint-plugin-security": "^0.11.0",
         "@total-typescript/ts-reset": "^0.6.1",
         "@types/node": "24.0.10",
