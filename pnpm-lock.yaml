@@ -873,11 +873,11 @@ importers:
         specifier: 3.5.8
         version: 3.5.8(@types/node@24.0.10)(yaml@2.8.0)
       '@visulima/packem-rollup':
-        specifier: 1.0.0-alpha.2
-        version: 1.0.0-alpha.2(@swc/core@1.12.9(@swc/helpers@0.5.17))(@types/node@24.0.10)(esbuild@0.25.5)(oxc-transform@0.75.0)(picomatch@4.0.2)(rollup@4.44.1)(sucrase@3.35.0)(typescript@5.8.3)(yaml@2.8.0)
+        specifier: workspace:*
+        version: link:../packem-rollup
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.2
-        version: 1.0.0-alpha.2(@types/node@24.0.10)(rollup@4.44.1)(yaml@2.8.0)
+        specifier: workspace:*
+        version: link:../packem-share
       '@visulima/pail':
         specifier: 2.1.25
         version: 2.1.25
@@ -885,8 +885,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0
       '@visulima/rollup-css-plugin':
-        specifier: 1.0.0-alpha.2
-        version: 1.0.0-alpha.2(@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4))(@csstools/css-tokenizer@3.0.4)(@csstools/postcss-slow-plugins@2.0.0(postcss@8.5.6))(@types/node@24.0.10)(cssnano@7.0.7(postcss@8.5.6))(icss-utils@5.1.0(postcss@8.5.6))(less@4.3.0)(lightningcss@1.30.1)(postcss-load-config@6.0.1(jiti@2.4.2)(postcss@8.5.6)(yaml@2.8.0))(postcss-modules-extract-imports@3.1.0(postcss@8.5.6))(postcss-modules-local-by-default@4.2.0(postcss@8.5.6))(postcss-modules-scope@3.2.1(postcss@8.5.6))(postcss-modules-values@4.0.0(postcss@8.5.6))(postcss-value-parser@4.2.0)(postcss@8.5.6)(rollup@4.44.1)(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.64.0)(yaml@2.8.0)
+        specifier: workspace:*
+        version: link:../rollup-css-plugin
       '@visulima/source-map':
         specifier: 1.0.20
         version: 1.0.20
@@ -1201,8 +1201,8 @@ importers:
         specifier: 3.5.8
         version: 3.5.8(@types/node@24.0.10)(yaml@2.8.0)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.2
-        version: 1.0.0-alpha.2(@types/node@24.0.10)(rollup@4.44.1)(yaml@2.8.0)
+        specifier: workspace:*
+        version: link:../packem-share
       '@visulima/path':
         specifier: 1.4.0
         version: 1.4.0
@@ -4554,31 +4554,6 @@ packages:
     engines: {node: '>=18.0.0 <=23.x'}
     os: [darwin, linux, win32]
 
-  '@visulima/packem-rollup@1.0.0-alpha.2':
-    resolution: {integrity: sha512-2zfnSL/RNX2tUDz/6MvXW9M10MWiJ5/SRs/fpMo+4G0pSNDPgZ3qGFcZUJMU9NA2/dpmAGQUu2jm8odlSF/LJA==}
-    engines: {node: '>=18.* <=24.*'}
-    peerDependencies:
-      '@swc/core': '*'
-      esbuild: '*'
-      oxc-transform: '*'
-      p-queue: '*'
-      rollup: '>=4'
-      sucrase: '*'
-      typescript: '*'
-    peerDependenciesMeta:
-      '@swc/core':
-        optional: true
-      esbuild:
-        optional: true
-      oxc-transform:
-        optional: true
-      p-queue:
-        optional: true
-      sucrase:
-        optional: true
-      typescript:
-        optional: true
-
   '@visulima/packem-share@1.0.0-alpha.2':
     resolution: {integrity: sha512-8AcH7OkOWKEW848/mOqDBLnQlcRnP0bmf5SKgTSuHSXJAFiz2yv80il0AUyDcCSMwFRwPbt8yDNNzeW7xwib3A==}
     engines: {node: '>=20.* <=24.*'}
@@ -4681,64 +4656,6 @@ packages:
     resolution: {integrity: sha512-lhtA4woh4KsXWyn3BJ/qYE/HSt+agsHeSGb7j3UeHpRyf3R4ErObR25snvt+Rc4Xlqb1T68U38wjqZ2YpmUGNw==}
     engines: {node: '>=18.0.0 <=23.x'}
     os: [darwin, linux, win32]
-
-  '@visulima/rollup-css-plugin@1.0.0-alpha.2':
-    resolution: {integrity: sha512-a93Eggr4i+WZ3Ttxwxr/IWFciwqX5NThfWkF4hszns0dS68oJYJQo6TlBBhYWlupgS5XkrdYyvVuWUPv5AQ7Pg==}
-    engines: {node: '>=20.* <=24.*'}
-    peerDependencies:
-      '@csstools/css-parser-algorithms': '>=3.0.5'
-      '@csstools/css-tokenizer': '>=3.0.4'
-      '@csstools/postcss-slow-plugins': '>=2.0.0'
-      cssnano: '>=7.0.0'
-      icss-utils: '>=5.1.0'
-      less: '>=4.0.0'
-      lightningcss: '>=1.0.0'
-      postcss: '>=8.0.0'
-      postcss-load-config: '>=6.0.1'
-      postcss-modules-extract-imports: '>=3.1.0'
-      postcss-modules-local-by-default: '>=4.0.5'
-      postcss-modules-scope: '>=3.2.0'
-      postcss-modules-values: '>=4.0.0'
-      postcss-value-parser: '>=4.2.0'
-      rollup: '>=4.21.2'
-      sass: '>=1.0.0'
-      sass-embedded: '>=1.79.4'
-      stylus: '>=0.60.0'
-    peerDependenciesMeta:
-      '@csstools/css-parser-algorithms':
-        optional: true
-      '@csstools/css-tokenizer':
-        optional: true
-      '@csstools/postcss-slow-plugins':
-        optional: true
-      cssnano:
-        optional: true
-      icss-utils:
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      postcss:
-        optional: true
-      postcss-load-config:
-        optional: true
-      postcss-modules-extract-imports:
-        optional: true
-      postcss-modules-local-by-default:
-        optional: true
-      postcss-modules-scope:
-        optional: true
-      postcss-modules-values:
-        optional: true
-      postcss-value-parser:
-        optional: true
-      sass:
-        optional: true
-      sass-embedded:
-        optional: true
-      stylus:
-        optional: true
 
   '@visulima/source-map@1.0.20':
     resolution: {integrity: sha512-7sdq1fBTJr2Hut6MOUHkLzmFhuem7S5UZGu2DvNqhTtSEHkXXz1D6/Mny/gYf39FZ/B19QW5y0QVAgw7cLLB/w==}
@@ -14183,50 +14100,6 @@ snapshots:
       - '@types/node'
       - yaml
 
-  '@visulima/packem-rollup@1.0.0-alpha.2(@swc/core@1.12.9(@swc/helpers@0.5.17))(@types/node@24.0.10)(esbuild@0.25.5)(oxc-transform@0.75.0)(picomatch@4.0.2)(rollup@4.44.1)(sucrase@3.35.0)(typescript@5.8.3)(yaml@2.8.0)':
-    dependencies:
-      '@babel/parser': 7.28.0
-      '@rollup/plugin-alias': 5.1.1(rollup@4.44.1)
-      '@rollup/plugin-commonjs': 28.0.6(rollup@4.44.1)
-      '@rollup/plugin-dynamic-import-vars': 2.1.5(rollup@4.44.1)
-      '@rollup/plugin-inject': 5.0.5(rollup@4.44.1)
-      '@rollup/plugin-json': 6.1.0(rollup@4.44.1)
-      '@rollup/plugin-node-resolve': 16.0.1(rollup@4.44.1)
-      '@rollup/plugin-replace': 6.0.2(rollup@4.44.1)
-      '@rollup/plugin-wasm': 6.2.2(rollup@4.44.1)
-      '@rollup/pluginutils': 5.2.0(rollup@4.44.1)
-      '@visulima/find-cache-dir': 1.0.31(yaml@2.8.0)
-      '@visulima/fs': 3.1.5(yaml@2.8.0)
-      '@visulima/package': 3.5.8(@types/node@24.0.10)(yaml@2.8.0)
-      '@visulima/packem-share': 1.0.0-alpha.2(@types/node@24.0.10)(rollup@4.44.1)(yaml@2.8.0)
-      '@visulima/path': 1.4.0
-      '@visulima/source-map': 1.0.20
-      es-module-lexer: 1.7.0
-      glob-parent: 6.0.2
-      magic-string: 0.30.17
-      mlly: 1.7.4
-      oxc-parser: 0.75.0
-      oxc-resolver: 11.4.0
-      rollup: 4.44.1
-      rollup-plugin-dts: 6.2.1(rollup@4.44.1)(typescript@5.8.3)
-      rollup-plugin-license: 3.6.0(picomatch@4.0.2)(rollup@4.44.1)
-      rollup-plugin-polyfill-node: 0.13.0(rollup@4.44.1)
-      rollup-plugin-pure: 0.4.0(rollup@4.44.1)
-      rollup-plugin-visualizer: 6.0.3(rollup@4.44.1)
-      semver: 7.7.2
-      tinyglobby: 0.2.14
-    optionalDependencies:
-      '@swc/core': 1.12.9(@swc/helpers@0.5.17)
-      esbuild: 0.25.5
-      oxc-transform: 0.75.0
-      sucrase: 3.35.0
-      typescript: 5.8.3
-    transitivePeerDependencies:
-      - '@types/node'
-      - picomatch
-      - rolldown
-      - yaml
-
   '@visulima/packem-share@1.0.0-alpha.2(@types/node@24.0.10)(rollup@4.44.1)(yaml@2.8.0)':
     dependencies:
       '@visulima/colorize': 1.4.23
@@ -14327,40 +14200,6 @@ snapshots:
       safe-stable-stringify: 2.5.0
 
   '@visulima/path@1.4.0': {}
-
-  '@visulima/rollup-css-plugin@1.0.0-alpha.2(@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4))(@csstools/css-tokenizer@3.0.4)(@csstools/postcss-slow-plugins@2.0.0(postcss@8.5.6))(@types/node@24.0.10)(cssnano@7.0.7(postcss@8.5.6))(icss-utils@5.1.0(postcss@8.5.6))(less@4.3.0)(lightningcss@1.30.1)(postcss-load-config@6.0.1(jiti@2.4.2)(postcss@8.5.6)(yaml@2.8.0))(postcss-modules-extract-imports@3.1.0(postcss@8.5.6))(postcss-modules-local-by-default@4.2.0(postcss@8.5.6))(postcss-modules-scope@3.2.1(postcss@8.5.6))(postcss-modules-values@4.0.0(postcss@8.5.6))(postcss-value-parser@4.2.0)(postcss@8.5.6)(rollup@4.44.1)(sass-embedded@1.89.2)(sass@1.89.2)(stylus@0.64.0)(yaml@2.8.0)':
-    dependencies:
-      '@rollup/pluginutils': 5.2.0(rollup@4.44.1)
-      '@visulima/fs': 3.1.5(yaml@2.8.0)
-      '@visulima/package': 3.5.8(@types/node@24.0.10)(yaml@2.8.0)
-      '@visulima/packem-share': 1.0.0-alpha.2(@types/node@24.0.10)(rollup@4.44.1)(yaml@2.8.0)
-      '@visulima/path': 1.4.0
-      mlly: 1.7.4
-      oxc-resolver: 11.4.0
-      p-queue: 8.1.0
-      rollup: 4.44.1
-      source-map-js: 1.2.1
-    optionalDependencies:
-      '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
-      '@csstools/css-tokenizer': 3.0.4
-      '@csstools/postcss-slow-plugins': 2.0.0(postcss@8.5.6)
-      cssnano: 7.0.7(postcss@8.5.6)
-      icss-utils: 5.1.0(postcss@8.5.6)
-      less: 4.3.0
-      lightningcss: 1.30.1
-      postcss: 8.5.6
-      postcss-load-config: 6.0.1(jiti@2.4.2)(postcss@8.5.6)(yaml@2.8.0)
-      postcss-modules-extract-imports: 3.1.0(postcss@8.5.6)
-      postcss-modules-local-by-default: 4.2.0(postcss@8.5.6)
-      postcss-modules-scope: 3.2.1(postcss@8.5.6)
-      postcss-modules-values: 4.0.0(postcss@8.5.6)
-      postcss-value-parser: 4.2.0
-      sass: 1.89.2
-      sass-embedded: 1.89.2
-      stylus: 0.64.0
-    transitivePeerDependencies:
-      - '@types/node'
-      - yaml
 
   '@visulima/source-map@1.0.20':
     dependencies:

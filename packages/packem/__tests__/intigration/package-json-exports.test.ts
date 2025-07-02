@@ -295,7 +295,7 @@ export { IString };`,
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             exports: {
-                "./foo/bar": "./dist/foo/bar.mjs",
+                "./foo/bar": "./dist/foo/bar.js",
             },
             type: "module",
         });
@@ -307,7 +307,7 @@ export { IString };`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const content = readFileSync(`${temporaryDirectoryPath}/dist/foo/bar.mjs`);
+        const content = readFileSync(`${temporaryDirectoryPath}/dist/foo/bar.js`);
 
         expect(content).toMatch(`const value = "foo.bar";
 
@@ -993,8 +993,8 @@ exports.index = index;
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
             exports: {
-                "edge-light": "./dist/index.edge.mjs",
-                import: "./dist/index.mjs",
+                "edge-light": "./dist/index.edge.js",
+                import: "./dist/index.js",
             },
             type: "module",
         });
@@ -1006,14 +1006,14 @@ exports.index = index;
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mjs).toBe(`const isEdge = false;
 
 export { isEdge };
 `);
 
-        const mjsEdgeLight = readFileSync(`${temporaryDirectoryPath}/dist/index.edge.mjs`);
+        const mjsEdgeLight = readFileSync(`${temporaryDirectoryPath}/dist/index.edge.js`);
 
         expect(mjsEdgeLight).toBe(`const isEdge = true;
 

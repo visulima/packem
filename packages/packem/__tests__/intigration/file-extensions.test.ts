@@ -150,7 +150,7 @@ describe("packem file extensions", () => {
     });
 
     it("should use traditional extensions for Node.js 10 compatibility", async () => {
-        expect.assertions(4);
+        expect.assertions(7);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const hello = "world";`);
         await createTsConfig(temporaryDirectoryPath, {
@@ -168,19 +168,16 @@ describe("packem file extensions", () => {
             devDependencies: {
                 typescript: "^5.0.0",
             },
-            main: "./dist/index.mjs",
+            main: "./dist/index.cjs",
             module: "./dist/index.mjs",
             type: "module",
-            types: "./dist/index.d.mts",
+            types: "./dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 declaration: true,
-                emitCJS: false,
+                emitCJS: true,
                 emitESM: true,
-                node10Compatibility: {
-                    // Enable Node.js 10 compatibility
-                },
             },
         });
 
@@ -192,7 +189,10 @@ describe("packem file extensions", () => {
         expect(binProcess.exitCode).toBe(0);
 
         expect(existsSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(true);
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.cjs`)).toBe(true);
         expect(existsSync(`${temporaryDirectoryPath}/dist/index.d.mts`)).toBe(true);
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.d.cts`)).toBe(true);
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.d.ts`)).toBe(true);
     });
 
     it("should respect custom outputExtensionMap for single format", async () => {

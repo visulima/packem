@@ -16,10 +16,12 @@ import { parseAsync } from "oxc-parser";
 import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginContext, PreRenderedChunk } from "rollup";
 
 import { ENDING_REGEX } from "@visulima/packem-share/constants";
+import { getDtsExtension } from "@visulima/packem-share/utils";
 import type { IsolatedDeclarationsTransformer } from "../../types";
 import extendString from "./utils/extend-string";
 import fixDtsDefaultCJSExports from "./utils/fix-dts-default-cjs-exports";
 import lowestCommonAncestor from "./utils/lowest-common-ancestor";
+import type { BuildContext } from "@visulima/packem-share/types";
 
 const appendMapUrl = (map: string, filename: string) => `${map}\n//# sourceMappingURL=${basename(filename)}.map\n`;
 
@@ -228,6 +230,23 @@ export const isolatedDeclarationsPlugin = (
 
             const entryFileName = outputOptions.entryFileNames.replace(/\.(.)?[jt]sx?$/, (_, s) => `.d.${s || ""}ts`);
 
+            // Create extension options for the shared utility
+            // Rollup InternalModuleFormat: "amd" | "cjs" | "es" | "iife" | "system" | "umd"
+            const isCjs = outputOptions.format === "cjs";
+            const isEsm = outputOptions.format === "es";
+            
+            const miniContext: Partial<BuildContext<{
+                declaration: boolean | "compatible" | "node16" | undefined;
+                emitCJS: boolean;
+                emitESM: boolean;
+            }>> = {
+                options: {
+                    declaration,
+                    emitCJS: isCjs,
+                    emitESM: isEsm,
+                }
+            };
+
             // eslint-disable-next-line prefer-const
             for await (let [filename, { ext, map, source }] of Object.entries(outputFiles)) {
                 if (cjsInterop && outputOptions.format === "cjs") {
@@ -263,14 +282,17 @@ export const isolatedDeclarationsPlugin = (
                         });
                     }
 
+                    // Use shared extension logic for compatible mode
+                    const compatibleExtension = getDtsExtension({ ...miniContext, declaration: "compatible" }, "cjs");
+                    const compatibleDtsExtension = compatibleExtension === "d.ts" ? "d.ts" : compatibleExtension;
+
                     this.emitFile({
                         fileName: emitName,
                         originalFileName,
                         source: compatibleSource.replaceAll(
                             // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
                             /(from\s)['|"]((.*)\..+|['|"].*)['|"];?/g,
-
-                            (_, group1, group2, group3) => `${group1 + quote + (group3 || group2)}.d.ts${quote};`,
+                            (_, group1, group2, group3) => `${group1 + quote + (group3 || group2)}.${compatibleDtsExtension}${quote};`,
                         ),
                         type: "asset",
                     });
@@ -295,6 +317,10 @@ export const isolatedDeclarationsPlugin = (
                     });
                 }
 
+                // Use shared extension logic for regular mode
+                const formatForExtension = outputOptions.format === "cjs" ? "cjs" as const : "esm" as const;
+                const dtsExtension = getDtsExtension(miniContext, formatForExtension);
+
                 this.emitFile({
                     fileName: emitName,
                     originalFileName,
@@ -302,7 +328,7 @@ export const isolatedDeclarationsPlugin = (
                         // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
                         /(from\s)['|"]((.*)\..+|['|"].*)['|"];?/g,
                         (_, group1, group2, group3) =>
-                            `${group1 + quote + (group3 || group2) + (outputOptions.format === "cjs" ? ".d.cts" : ".d.mts") + quote};`,
+                            `${group1 + quote + (group3 || group2)}.${dtsExtension}${quote};`,
                     ),
                     type: "asset",
                 });

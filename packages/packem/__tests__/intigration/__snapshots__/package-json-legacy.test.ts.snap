@@ -8,9 +8,7 @@ console.log("Hello, world!");
 `;
 
 exports[`packem package.json legacy > should work with the main field and type module > cjs output 1`] = `
-"'use strict';
-
-console.log("Hello, world!");
+"console.log("Hello, world!");
 "
 `;
 

@@ -334,7 +334,7 @@ export const value = dep
         );
         await writeFile(`${temporaryDirectoryPath}/src/lib/polyfill.js`, `export const dep = 'polyfill-dep'`);
         await createPackageJson(temporaryDirectoryPath, {
-            exports: "./dist/index.cjs",
+            exports: "./dist/index.js",
             imports: {
                 "#dep": "./src/lib/polyfill.js",
             },
@@ -350,7 +350,7 @@ export const value = dep
 
         expect(binProcess.stdout).not.toContain("Inlined implicit external");
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(cjsContent).toBe(`'use strict';
 

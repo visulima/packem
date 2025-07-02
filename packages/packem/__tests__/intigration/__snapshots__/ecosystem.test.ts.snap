@@ -9,7 +9,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { EventEmitter } from 'events';
 import { encode } from 'gpt-tokenizer/model/gpt-4o';
-import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-BpbaYNxF.mjs';
+import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-BpbaYNxF.js';
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -666,7 +666,7 @@ cli.parse();
 export declare function fetchSite(url: string, options: Options): Promise<FetchSiteResult>;
 export declare function serializePages(pages: FetchSiteResult, format: "json" | "text"): string;
 ",
-  "export { f as fetchSite, s as serializePages } from './packem_shared/index-BpbaYNxF.mjs';
+  "export { f as fetchSite, s as serializePages } from './packem_shared/index-BpbaYNxF.js';
 import 'happy-dom';
 import 'cheerio';
 ",

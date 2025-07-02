@@ -34,7 +34,7 @@ describe("packem package.json legacy", () => {
             devDependencies: {
                 typescript: "*",
             },
-            main: "./dist/index.cjs",
+            main: "./dist/index.js",
         });
         await createTsConfig(temporaryDirectoryPath);
 
@@ -45,7 +45,7 @@ describe("packem package.json legacy", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
     });
@@ -97,7 +97,7 @@ describe("packem package.json legacy", () => {
             devDependencies: {
                 typescript: "*",
             },
-            module: "./dist/index.mjs",
+            module: "./dist/index.js",
         });
         await createTsConfig(temporaryDirectoryPath);
 
@@ -108,7 +108,7 @@ describe("packem package.json legacy", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mjsContent).toMatchSnapshot("mjs output");
     });

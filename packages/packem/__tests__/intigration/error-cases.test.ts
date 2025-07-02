@@ -103,14 +103,17 @@ describe("packem error cases", () => {
     });
 
     it("should throw a error if conflicting entry in package.json", async () => {
-        expect.assertions(3);
+        expect.assertions(4);
 
         await createPackageJson(temporaryDirectoryPath, {
             dependencies: {},
             files: ["dist"],
-            main: "dist/index.mjs",
-            module: "dist/index.mjs",
+            main: "dist/index.js",
+            module: "dist/index.js",
             name: "pkg",
+            engines: {
+                node: ">=20",
+            },
         });
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, "");
 
@@ -120,7 +123,8 @@ describe("packem error cases", () => {
         });
 
         expect(binProcess.stdout).toContain(`Conflict detected: The 'module' and 'main' fields both point to `);
-        expect(binProcess.stdout).toContain(`'dist/index.mjs'. Please ensure they refer to different module types.`);
+        expect(binProcess.stdout).toContain(`'dist/index.js'.`);
+        expect(binProcess.stdout).toContain(`Please ensure they refer to different module types.`);
         expect(binProcess.exitCode).toBe(1);
     });
 

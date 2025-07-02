@@ -380,7 +380,7 @@ exports.getRequireModule = getRequireModule;
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `const test = "this should be in final bundle";\nexport default test;`);
         await createPackageJson(temporaryDirectoryPath, {
-            module: "./dist/index.mjs",
+            module: "./dist/index.js",
             type: "module",
         });
 
@@ -391,7 +391,7 @@ exports.getRequireModule = getRequireModule;
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mjsContent).toBe(`const test = "this should be in final bundle";
 
@@ -417,7 +417,7 @@ export { test as default };
 export { getFilename } from "./filename.js";`,
         );
         await createPackageJson(temporaryDirectoryPath, {
-            module: "./dist/index.mjs",
+            module: "./dist/index.js",
             type: "module",
         });
 
@@ -428,13 +428,13 @@ export { getFilename } from "./filename.js";`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mjsContent).toBe(`import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
 import __cjs_path__ from "node:path"; // -- packem CommonJS __dirname shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
 const __dirname = __cjs_path__.dirname(__filename);
-export { getFilename } from './packem_shared/getFilename-CyjjIqAi.mjs';
+export { getFilename } from './packem_shared/getFilename-CyjjIqAi.js';
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -446,7 +446,7 @@ __name(getDirname, "getDirname");
 export { getDirname };
 `);
 
-        const mjsSharedContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/getFilename-CyjjIqAi.mjs`);
+        const mjsSharedContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/getFilename-CyjjIqAi.js`);
 
         expect(mjsSharedContent).toBe(`import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
@@ -479,7 +479,7 @@ export { getFilename };
 export { getFilename } from "./level2/filename.js";`,
         );
         await createPackageJson(temporaryDirectoryPath, {
-            module: "./dist/index.mjs",
+            module: "./dist/index.js",
             type: "module",
         });
 
@@ -490,13 +490,13 @@ export { getFilename } from "./level2/filename.js";`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mjsContent).toBe(`import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
 import __cjs_path__ from "node:path"; // -- packem CommonJS __dirname shim --
 const __filename = __cjs_url__.fileURLToPath(import.meta.url);
 const __dirname = __cjs_path__.dirname(__filename);
-export { getFilename } from './packem_shared/getFilename-CyjjIqAi.mjs';
+export { getFilename } from './packem_shared/getFilename-CyjjIqAi.js';
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -508,7 +508,7 @@ __name(getDirname, "getDirname");
 export { getDirname };
 `);
 
-        const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/getFilename-CyjjIqAi.mjs`);
+        const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/getFilename-CyjjIqAi.js`);
 
         expect(mjsFilenameContent).toBe(`
 // -- pack CommonJS Shims --

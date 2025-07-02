@@ -33,7 +33,7 @@ describe("packem cli", () => {
             devDependencies: {
                 typescript: "5",
             },
-            module: "dist/index.mjs",
+            module: "dist/index.js",
             type: "module",
             types: "dist/index.d.ts",
         });
@@ -63,7 +63,7 @@ export { A as default };
 export = A;
 `);
 
-        const mtsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mtsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContentEs2018).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -88,7 +88,7 @@ export { A as default };
             devDependencies: {
                 typescript: "*",
             },
-            module: "dist/index.mjs",
+            module: "dist/index.js",
             type: "module",
             types: "dist/index.d.ts",
         });
@@ -107,7 +107,7 @@ export { A as default };
         expect(binProcess.stdout).toContain("environment with");
         expect(binProcess.stdout).not.toContain("Minification is enabled, the output will be minified");
 
-        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const a = 1;
 
@@ -128,7 +128,7 @@ export { a };
             devDependencies: {
                 typescript: "*",
             },
-            module: "dist/index.mjs",
+            module: "dist/index.js",
             type: "module",
             types: "dist/index.d.ts",
         });
@@ -147,7 +147,7 @@ export { a };
         expect(binProcess.stdout).not.toContain("environment with");
         expect(binProcess.stdout).not.toContain("Minification is enabled, the output will be minified");
 
-        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const a = process.env.NODE_ENV;
 
@@ -167,7 +167,7 @@ export { a };
             devDependencies: {
                 typescript: "*",
             },
-            module: "dist/index.mjs",
+            module: "dist/index.js",
             type: "module",
             types: "dist/index.d.ts",
         });
@@ -186,7 +186,7 @@ export { a };
         expect(binProcess.stdout).toContain("environment with");
         expect(binProcess.stdout).toContain("Minification is enabled, the output will be minified");
 
-        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const o=1;export{o as a};
 `);
@@ -205,7 +205,7 @@ export { a };
             devDependencies: {
                 typescript: "*",
             },
-            module: "dist/index.mjs",
+            module: "dist/index.js",
             type: "module",
             types: "dist/index.d.ts",
         });
@@ -221,7 +221,7 @@ export { a };
 
         expect(binProcess.stdout).not.toContain("Cleaning dist directory");
 
-        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const a = 1;
 
@@ -244,7 +244,7 @@ export { a };
             devDependencies: {
                 typescript: "*",
             },
-            module: "dist/index.mjs",
+            module: "dist/index.js",
             type: "module",
             types: "dist/index.d.ts",
         });
@@ -260,7 +260,7 @@ export { a };
 
         expect(binProcess.stdout).toContain("Cleaning dist directory");
 
-        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const a = 1;
 
@@ -327,7 +327,7 @@ export { a };
             devDependencies: {
                 typescript: "*",
             },
-            module: "dist/index.mjs",
+            module: "dist/index.js",
             type: "module",
             types: "dist/index.d.ts",
         });
@@ -344,7 +344,7 @@ export { a };
         expect(binProcess.stdout).toContain("hello");
         expect(binProcess.stdout).toContain("world");
 
-        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const a = 1;
 
@@ -364,7 +364,7 @@ export { a };
             devDependencies: {
                 typescript: "*",
             },
-            module: "dist/index.mjs",
+            module: "dist/index.js",
             type: "module",
             types: "dist/index.d.ts",
         });
@@ -385,7 +385,7 @@ export { a };
         expect(binProcess.stdout).toContain("hello");
         expect(binProcess.stdout).toContain("world");
 
-        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const a = 1;
 
@@ -417,7 +417,7 @@ export function barFunction() {
             devDependencies: {
                 typescript: "*",
             },
-            module: "dist/index.mjs",
+            module: "dist/index.js",
             type: "module",
         });
         await createPackemConfig(temporaryDirectoryPath);
@@ -435,7 +435,7 @@ export function barFunction() {
         expect(binProcess.stdout).toContain("environment with");
         expect(binProcess.stdout).not.toContain("Minification is enabled, the output will be minified");
 
-        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`import { __TEST_EXPECTED_STRING__ } from '@test/shouldbeexternal';
 import bar from 'bar-package';

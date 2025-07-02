@@ -33,7 +33,7 @@ console.log(path.basename(__filename));
         await installPackage(temporaryDirectoryPath, "typescript");
 
         await createPackageJson(temporaryDirectoryPath, {
-            bin: "./dist/bin/index.cjs",
+            bin: "./dist/bin/index.js",
             devDependencies: {
                 typescript: "*",
             },
@@ -47,7 +47,7 @@ console.log(path.basename(__filename));
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/index.js`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
     });
@@ -65,7 +65,7 @@ console.log("Hello, world!");
         await installPackage(temporaryDirectoryPath, "typescript");
 
         await createPackageJson(temporaryDirectoryPath, {
-            bin: "./dist/bin/index.mjs",
+            bin: "./dist/bin/index.js",
             devDependencies: {
                 typescript: "*",
             },
@@ -80,7 +80,7 @@ console.log("Hello, world!");
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/index.mjs`);
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/index.js`);
 
         expect(mjsContent).toMatchSnapshot("mjs output");
     });
@@ -105,8 +105,8 @@ console.log("b");
 
         await createPackageJson(temporaryDirectoryPath, {
             bin: {
-                a: "./dist/bin/a.cjs",
-                b: "./dist/bin/b.cjs",
+                a: "./dist/bin/a.js",
+                b: "./dist/bin/b.js",
             },
             devDependencies: {
                 typescript: "*",
@@ -121,11 +121,11 @@ console.log("b");
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsAContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/a.cjs`);
+        const cjsAContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/a.js`);
 
         expect(cjsAContent).toMatchSnapshot("cjs output");
 
-        const cjsBContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/b.cjs`);
+        const cjsBContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/b.js`);
 
         expect(cjsBContent).toMatchSnapshot("cjs output");
     });
@@ -142,7 +142,7 @@ console.log("b");
         await installPackage(temporaryDirectoryPath, "typescript");
 
         await createPackageJson(temporaryDirectoryPath, {
-            bin: "./dist/bin/index.cjs",
+            bin: "./dist/bin/index.js",
             devDependencies: {
                 typescript: "*",
             },
@@ -156,7 +156,7 @@ console.log("b");
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/index.cjs`);
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/index.js`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
     });
