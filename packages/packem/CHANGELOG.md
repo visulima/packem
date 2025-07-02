@@ -1,3 +1,34 @@
+## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02)
+
+### ⚠ BREAKING CHANGES
+
+* changed node from 18 to 20, split packem in reusable packages
+
+### Features
+
+* introduce @visulima/packem-share package for shared utilities a… ([#157](https://github.com/visulima/packem/issues/157)) ([99e977a](https://github.com/visulima/packem/commit/99e977a8f62021c9ac286fc0c9b184b96bce88f1))
+
+### Miscellaneous Chores
+
+* remove unused CSS style inject dependencies and refactor chunk handling ([f50c9e6](https://github.com/visulima/packem/commit/f50c9e69e1adc4661e7fc6b19ace2d1a0a3ab9b2))
+* update multi-semantic-release command to ignore @visulima/packem package ([fa85b28](https://github.com/visulima/packem/commit/fa85b283a5b2cbd15d2b52c09c2db2b2d2c6c65d))
+* update package versions and add engine requirements ([d594ac3](https://github.com/visulima/packem/commit/d594ac31a8302f3a4d86d07415002495361b6ba1))
+
+### Code Refactoring
+
+* centralize output extension logic in new utility functions ([fbf4b01](https://github.com/visulima/packem/commit/fbf4b0188aa9e4584a28bbe7dd02c7a323e2dce2))
+
+### Tests
+
+* add integration and unit tests for file extension handling ([0536e8a](https://github.com/visulima/packem/commit/0536e8a2cb4c7cddf01d66864e0fdbe3912b256c))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.1
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.1
+* **@visulima/rollup-css-plugin:** upgraded to 1.0.0-alpha.1
+
 ## @visulima/packem [1.28.2](https://github.com/visulima/packem/compare/@visulima/packem@1.28.1...@visulima/packem@1.28.2) (2025-06-24)
 
 ### Bug Fixes
