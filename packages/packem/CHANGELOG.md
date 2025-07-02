@@ -5,6 +5,35 @@
 * update package dependencies and versions ([e7a77fc](https://github.com/visulima/packem/commit/e7a77fcbbc6a03b5a387357378c0a474397478a2))
 * update test snapshots and package.json dependencies ([648dda3](https://github.com/visulima/packem/commit/648dda32516f84f5ce9d93c5a03b8e07fd0fd2d5))
 
+### Bug Fixes
+
+* **packem:**  changed node10Compatibility to false ([d35e03e](https://github.com/visulima/packem/commit/d35e03e63efad45c32e9eca9831539206e0c4503))
+
+### Miscellaneous Chores
+
+* **release:** @visulima/packem@2.0.0-alpha.1 [skip ci]\n\n## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02) ([ffc6d42](https://github.com/visulima/packem/commit/ffc6d425debac8d645c09aee522b62c398ca1b12)), closes [#157](https://github.com/visulima/packem/issues/157)
+* remove unused CSS style inject dependencies and refactor chunk handling ([f50c9e6](https://github.com/visulima/packem/commit/f50c9e69e1adc4661e7fc6b19ace2d1a0a3ab9b2))
+* update multi-semantic-release command to ignore @visulima/packem package ([fa85b28](https://github.com/visulima/packem/commit/fa85b283a5b2cbd15d2b52c09c2db2b2d2c6c65d))
+* update package versions and add engine requirements ([d594ac3](https://github.com/visulima/packem/commit/d594ac31a8302f3a4d86d07415002495361b6ba1))
+
+### Code Refactoring
+
+* centralize output extension logic in new utility functions ([fbf4b01](https://github.com/visulima/packem/commit/fbf4b0188aa9e4584a28bbe7dd02c7a323e2dce2))
+
+### Tests
+
+* add integration and unit tests for file extension handling ([0536e8a](https://github.com/visulima/packem/commit/0536e8a2cb4c7cddf01d66864e0fdbe3912b256c))
+
+## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02)
+
+### ⚠ BREAKING CHANGES
+
+* changed node from 18 to 20, split packem in reusable packages
+
+### Features
+
+* introduce @visulima/packem-share package for shared utilities a… ([#157](https://github.com/visulima/packem/issues/157)) ([99e977a](https://github.com/visulima/packem/commit/99e977a8f62021c9ac286fc0c9b184b96bce88f1))
+
 ### Miscellaneous Chores
 
 * update package dependencies and versions ([c6220ac](https://github.com/visulima/packem/commit/c6220ac490b132b45420ecebe232467f73ad0140))
