@@ -49,10 +49,10 @@
     ],
     "dependencies": {
         "@anolilab/commitlint-config": "^6.0.1",
-        "@anolilab/lint-staged-config": "^3.0.17",
-        "@anolilab/multi-semantic-release": "^2.0.0",
-        "@anolilab/textlint-config": "^9.0.1",
-        "@babel/core": "^7.27.7",
+        "@anolilab/lint-staged-config": "^3.0.19",
+        "@anolilab/multi-semantic-release": "^2.0.1",
+        "@anolilab/textlint-config": "^9.0.2",
+        "@babel/core": "^7.28.0",
         "@commitlint/cli": "^19.8.1",
         "@commitlint/config-conventional": "^19.8.1",
         "@secretlint/secretlint-rule-preset-recommend": "^10.1.1",
@@ -84,11 +84,11 @@
         "onlyBuiltDependencies": [
             "@parcel/watcher",
             "@swc/core",
-            "@tailwindcss/oxide",
             "esbuild",
             "node-sass",
             "nodehun",
-            "nx"
+            "nx",
+            "unrs-resolver"
         ],
         "overrides": {
             "@octokit/plugin-paginate-rest@>=1.0.0 <11.4.1": ">=11.4.1",
