@@ -1,3 +1,18 @@
+# @visulima/packem-rollup [1.0.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.1...@visulima/packem-rollup@1.0.0-alpha.2) (2025-07-02)
+
+
+### Bug Fixes
+
+* fixed release ([047b530](https://github.com/visulima/packem/commit/047b530ebcd6458f93699fd9d0f819bc7dbf9990))
+
+
+
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.2
+
 ## @visulima/packem-rollup 1.0.0-alpha.1 (2025-07-02)
 
 ### ⚠ BREAKING CHANGES
