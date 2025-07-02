@@ -6,7 +6,7 @@ import internalPackem from "./packem";
 import type { BuildConfig, Environment, Mode } from "./types";
 
 /**
- * Configuration options for Packem bundler
+ * Configuration options for Packem bundler.
  * @interface PackemOptions
  * @augments {BuildConfig}
  */
