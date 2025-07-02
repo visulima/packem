@@ -287,7 +287,7 @@ const generateOptions = (
                     }# Bundled types:\n${
                         dependencyLicenseTexts}`,
             },
-            node10Compatibility: {},
+            node10Compatibility: false,
             output: {
                 importAttributesKey: Number(splitRuntimeVersion[0] as string) >= 22 ? "with" : "assert",
             },
@@ -524,39 +524,23 @@ const generateOptions = (
         options.runtime = "node";
     }
 
-    let version = "0.0.0";
     const dependencies = new Map([...Object.entries(packageJson.dependencies ?? {}), ...Object.entries(packageJson.devDependencies ?? {})]);
 
-    if (options.transformer?.NAME !== undefined) {
-        options.transformerName = options.transformer.NAME;
-
-        let dependencyName: string = options.transformerName;
-
-        if (options.transformerName === "oxc") {
-            dependencyName = "oxc-transform";
-        } else if (options.transformerName === "swc") {
-            dependencyName = "@swc/core";
-        }
-
-        version = dependencies.get(dependencyName) ?? "0.0.0";
-        // TODO: Remove this in v2, and a throw error if transformer.NAME is not set
-    } else if (!options.transformerName) {
-        if (dependencies.has("esbuild")) {
-            options.transformerName = "esbuild";
-            version = dependencies.get("esbuild") as string;
-        } else if (dependencies.has("@swc/core")) {
-            options.transformerName = "swc";
-            version = dependencies.get("@swc/core") as string;
-        } else if (dependencies.has("sucrase")) {
-            options.transformerName = "sucrase";
-            version = dependencies.get("sucrase") as string;
-        } else if (dependencies.has("oxc-transform")) {
-            options.transformerName = "oxc";
-            version = dependencies.get("oxc-transform") as string;
-        } else {
-            throw new Error("Unknown transformer, check your transformer options or install one of the supported transformers: esbuild, swc, sucrase");
-        }
+    if (options.transformer?.NAME === undefined) {
+        throw new Error("Unknown transformer, check your transformer options or install one of the supported transformers: esbuild, swc, sucrase");
     }
+
+    options.transformerName = options.transformer.NAME;
+
+    let dependencyName: string = options.transformerName;
+
+    if (options.transformerName === "oxc") {
+        dependencyName = "oxc-transform";
+    } else if (options.transformerName === "swc") {
+        dependencyName = "@swc/core";
+    }
+
+    const version = dependencies.get(dependencyName) ?? "0.0.0";
 
     logger.info({
         message: `Using ${cyan("node ")}${runtimeVersion}`,
@@ -950,20 +934,26 @@ const packem = async (
         } else {
             logged = await build(context, fileCache);
 
-            if (context.options.emitCJS && context.options.declaration === "compatible" && (context.options.node10Compatibility || context.options.rollup.node10Compatibility)) {
+            if (context.options.emitCJS && context.options.declaration === "compatible") {
                 if (logged) {
                     context.logger.raw("\n");
                 }
 
-                const node10CompatibilityOptions = (context.options.node10Compatibility ?? context.options.rollup.node10Compatibility) as Node10CompatibilityOptions;
+                let outputMode: "console" | "file" = "console";
+                let typeScriptVersion: string = "*";
+
+                if (context.options.node10Compatibility) {
+                    outputMode = context.options.node10Compatibility?.writeToPackageJson ? "file" : "console";
+                    typeScriptVersion = context.options.node10Compatibility?.typeScriptVersion ?? "*";
+                }
 
                 await node10Compatibility(
                     context.logger,
                     context.options.entries,
                     context.options.outDir,
                     context.options.rootDir,
-                    node10CompatibilityOptions.writeToPackageJson ? "file" : "console",
-                    node10CompatibilityOptions.typeScriptVersion ?? "*",
+                    outputMode,
+                    typeScriptVersion,
                 );
             }
 

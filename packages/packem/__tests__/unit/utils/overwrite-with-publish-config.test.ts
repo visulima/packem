@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle, @typescript-eslint/naming-convention */
 import type { NormalizedPackageJson } from "@visulima/package";
 import { describe, expect, it } from "vitest";
 
@@ -25,16 +26,16 @@ describe(overwriteWithPublishConfig, () => {
                 types: "./dist/types.d.ts",
             },
             version: "1.0.0",
-        };
+        } as unknown as NormalizedPackageJson;
 
-        const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
+        const result = overwriteWithPublishConfig(package_, undefined);
 
-        expect(result.bin).toStrictEqual(package_.publishConfig.bin);
-        expect(result.type).toStrictEqual(package_.publishConfig.type);
-        expect(result.main).toStrictEqual(package_.publishConfig.main);
-        expect(result.module).toStrictEqual(package_.publishConfig.module);
-        expect(result.types).toStrictEqual(package_.publishConfig.types);
-        expect(result.exports).toStrictEqual(package_.publishConfig.exports);
+        expect(result.bin).toStrictEqual(package_.publishConfig?.bin);
+        expect(result.type).toStrictEqual(package_.publishConfig?.type);
+        expect(result.main).toStrictEqual(package_.publishConfig?.main);
+        expect(result.module).toStrictEqual(package_.publishConfig?.module);
+        expect(result.types).toStrictEqual(package_.publishConfig?.types);
+        expect(result.exports).toStrictEqual(package_.publishConfig?.exports);
     });
 
     it("should return the package object with updated properties", () => {
@@ -58,7 +59,7 @@ describe(overwriteWithPublishConfig, () => {
                 types: "./dist/types.d.ts",
             },
             version: "1.0.0",
-        };
+        } as unknown as NormalizedPackageJson;
 
         const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
 
@@ -71,7 +72,7 @@ describe(overwriteWithPublishConfig, () => {
         const package_ = {
             name: "test-package",
             version: "1.0.0",
-        };
+        } as unknown as NormalizedPackageJson;
 
         const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
 
@@ -85,7 +86,7 @@ describe(overwriteWithPublishConfig, () => {
             name: "test-package",
             publishConfig: {},
             version: "1.0.0",
-        };
+        } as unknown as NormalizedPackageJson;
 
         const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
 
@@ -106,7 +107,7 @@ describe(overwriteWithPublishConfig, () => {
                 types: "",
             },
             version: "1.0.0",
-        };
+        } as unknown as NormalizedPackageJson;
 
         const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
 
@@ -134,7 +135,7 @@ describe(overwriteWithPublishConfig, () => {
                 types: "./dist/types.d.ts",
             },
             version: "",
-        };
+        } as unknown as NormalizedPackageJson;
 
         const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
 
