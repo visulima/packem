@@ -11,8 +11,11 @@ const { mockedWarn } = vi.hoisted(() => {
 });
 
 // Mock the warn function
-vi.mock("@visulima/packem-share/utils", () => {
+vi.mock("@visulima/packem-share/utils", async () => {
+    const original = await vi.importActual("@visulima/packem-share/utils");
+    
     return {
+        ...original,
         warn: mockedWarn,
     };
 });
