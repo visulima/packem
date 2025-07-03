@@ -113,10 +113,10 @@ const inferEntries = (
     context: BuildContext<InternalBuildOptions>,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): InferEntriesResult => {
-    const warnings: string[] = [];
+    const cjsJSExtension = (context.options.outputExtensionMap?.cjs ?? "cjs").replaceAll(".", String.raw`\.`);
+    const esmJSExtension = (context.options.outputExtensionMap?.esm ?? "mjs").replaceAll(".", String.raw`\.`);
 
-    const cjsJSExtension = getOutputExtension(context, "cjs").replaceAll(".", String.raw`\.`);
-    const esmJSExtension = getOutputExtension(context, "esm").replaceAll(".", String.raw`\.`);
+    const warnings: string[] = [];
 
     // Sort files so least-nested files are first
     sourceFiles.sort((a, b) => a.split("/").length - b.split("/").length);

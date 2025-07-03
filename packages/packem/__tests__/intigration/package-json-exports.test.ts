@@ -1381,7 +1381,7 @@ exports.Client = Client;
         expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-9.cjs`)).toBe(true);
     });
 
-    it("should generate different files, if file with same name, cts and mts ending was found", async () => {
+    it("should generate different files, if file with same name, but with cts and mts ending was found", async () => {
         expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.mts`, `export const result = "mts"`);
