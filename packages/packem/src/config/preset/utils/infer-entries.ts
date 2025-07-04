@@ -285,6 +285,10 @@ const inferEntries = (
         }
     }
 
+    if (context.options.emitESM && !context.options.emitCJS && context.options.declaration === undefined) {
+        context.options.declaration = "node16";
+    }
+
     return { entries, warnings };
 };
 
