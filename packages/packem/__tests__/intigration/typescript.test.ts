@@ -1528,7 +1528,7 @@ export declare let num: Num;
                     case "oxc": {
                         // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsMapContent).toBe(
-                            `{"file":"index.d.cts","mappings":"AAAA,cAAc,WAAW,SAAS;AAClC,YAAY;AAEZ,OAAO,iBAAS,MAAMA,GAAG,MAAM;AAI/B,OAAO,YAAIC,KAAK","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
+                            `{"file":"index.d.ts","mappings":"AAAA,cAAc,WAAW,SAAS;AAClC,YAAY;AAEZ,OAAO,iBAAS,MAAMA,GAAG,MAAM;AAI/B,OAAO,YAAIC,KAAK","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
 
                         break;
@@ -1595,7 +1595,7 @@ export declare let num: Num;
                 const dCtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/types.d.cts`);
 
                 expect(dCtsTypesContent).toBe(`export type Num = number;
-//# sourceMappingURL=types.d.ts.map
+//# sourceMappingURL=types.d.cts.map
 `);
 
                 const dCtsTypesMapContent = await readFile(`${temporaryDirectoryPath}/dist/types.d.ts.map`);
