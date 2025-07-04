@@ -7,10 +7,7 @@ const assertContainFiles = (directory: string, filePaths: string[]): void => {
     const results = [];
 
     for (const filePath of filePaths) {
-        const fullPath = resolve(directory, filePath);
-        const existed = existsSync(fullPath);
-
-        if (existed) {
+        if (existsSync(resolve(directory, filePath))) {
             results.push(filePath);
         }
     }

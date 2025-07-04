@@ -101,9 +101,8 @@ const getExtensionStrategy = <T extends FileExtensionOptions>(context: BuildCont
 export const getOutputExtension = <T extends FileExtensionOptions>(context: BuildContext<T>, format: Format): string => {
     const strategy = getExtensionStrategy(context);
 
-    // If outputExtensionMap is provided, always use it
     if (strategy.hasOutputMap) {
-        return strategy.outputExtensionMap![format] ?? FORMAT_EXTENSIONS.traditional[format];
+        return strategy.outputExtensionMap?.[format] ?? FORMAT_EXTENSIONS.traditional[format];
     }
 
     // Use traditional extensions if Node.js 10 compatibility is enabled or dual format
