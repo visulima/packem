@@ -662,7 +662,7 @@ cli.version(version);
 cli.help();
 cli.parse();
 ",
-  "import type { Options, FetchSiteResult } from "./types.d.mts";
+  "import type { Options, FetchSiteResult } from "./types.d.ts";
 export declare function fetchSite(url: string, options: Options): Promise<FetchSiteResult>;
 export declare function serializePages(pages: FetchSiteResult, format: "json" | "text"): string;
 ",

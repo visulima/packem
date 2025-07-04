@@ -1,18 +1,20 @@
 import type { BuildContext, Format } from "../types";
 
 /**
- * Options interface for determining file extensions
+ * Extension mappings for better performance than switch statements
  */
-interface FileExtensionOptions {
-    /** Map of format to file extension */
-    outputExtensionMap?: Record<Format, string>;
-    /** Whether to emit CommonJS format */
-    emitCJS?: boolean;
-    /** Whether to emit ESM format */
-    emitESM?: boolean;
-    /** Declaration file generation mode */
-    declaration?: boolean | "compatible" | "node16" | undefined;
-}
+const JS_TO_DTS_MAP = new Map([
+    ["cjs", "d.cts"],
+    ["js", "d.ts"],
+    ["mjs", "d.mts"],
+] as const);
+
+const FORMAT_EXTENSIONS = {
+    js: { esm: "js", cjs: "js" },
+    traditional: { esm: "mjs", cjs: "cjs" },
+    dts: { esm: "d.ts", cjs: "d.ts" },
+    traditionalDts: { esm: "d.mts", cjs: "d.cts" },
+} as const;
 
 /**
  * Maps JavaScript extension to corresponding TypeScript declaration extension.
@@ -41,11 +43,46 @@ const getDtsExtensionFromMap = <T extends FileExtensionOptions>(context: BuildCo
     const jsExtension = context.options.outputExtensionMap?.[format];
 
     if (jsExtension) {
-        return mapJsExtensionToDts(jsExtension);
+        const mappedExtension = mapJsExtensionToDts(jsExtension);
+
+        // If we get d.ts for an unknown extension and both formats are emitted, use format-based extensions
+        if (mappedExtension === "d.ts" && jsExtension !== "js" && context.options.emitCJS && context.options.emitESM) {
+            return format === "esm" ? "d.mts" : "d.cts";
+        }
+
+        return mappedExtension;
     }
 
     // Fallback to traditional extensions
     return format === "esm" ? "d.mts" : "d.cts";
+};
+
+/**
+ * Options interface for determining file extensions
+ */
+export interface FileExtensionOptions {
+    /** Declaration file generation mode */
+    declaration?: boolean | "compatible" | "node16" | undefined;
+    /** Whether to emit CommonJS format */
+    emitCJS?: boolean;
+    /** Whether to emit ESM format */
+    emitESM?: boolean;
+    /** Map of format to file extension */
+    outputExtensionMap?: Record<Format, string>;
+}
+
+/**
+ * Computes extension resolution strategy based on build context
+ */
+const getExtensionStrategy = <T extends FileExtensionOptions>(context: BuildContext<T>) => {
+    const { emitCJS, emitESM, declaration, outputExtensionMap } = context.options;
+
+    return {
+        hasOutputMap: Boolean(outputExtensionMap),
+        isDualFormat: Boolean(emitCJS && emitESM),
+        isCompatible: emitCJS && (declaration === "compatible" || declaration === true),
+        outputExtensionMap,
+    };
 };
 
 /**
@@ -62,19 +99,20 @@ const getDtsExtensionFromMap = <T extends FileExtensionOptions>(context: BuildCo
  * @returns File extension string
  */
 export const getOutputExtension = <T extends FileExtensionOptions>(context: BuildContext<T>, format: Format): string => {
+    const strategy = getExtensionStrategy(context);
+
     // If outputExtensionMap is provided, always use it
-    if (context.options.outputExtensionMap) {
-        return context.options.outputExtensionMap[format] ?? (format === "esm" ? "mjs" : "cjs");
+    if (strategy.hasOutputMap) {
+        return strategy.outputExtensionMap![format] ?? FORMAT_EXTENSIONS.traditional[format];
     }
 
-    // If Node.js 10 compatibility is enabled, use traditional extensions
-    // If both ESM and CJS are emitted, use traditional extensions for clarity
-    if ((context.options.emitCJS && context.options.declaration === "compatible") || (context.options.emitESM && context.options.emitCJS)) {
-        return format === "esm" ? "mjs" : "cjs";
+    // Use traditional extensions if Node.js 10 compatibility is enabled or dual format
+    if (strategy.isCompatible || strategy.isDualFormat) {
+        return FORMAT_EXTENSIONS.traditional[format];
     }
 
-    // If only one format is emitted and no special config, use .js
-    return "js";
+    // Default to .js for single format builds
+    return FORMAT_EXTENSIONS.js[format];
 };
 
 /**
@@ -91,17 +129,31 @@ export const getOutputExtension = <T extends FileExtensionOptions>(context: Buil
  * @returns Declaration file extension string
  */
 export const getDtsExtension = <T extends FileExtensionOptions>(context: BuildContext<T>, format: Format): string => {
-    // If outputExtensionMap is provided, derive DTS extension from it
-    if (context.options.outputExtensionMap) {
-        return getDtsExtensionFromMap(context, format);
+    const strategy = getExtensionStrategy(context);
+
+    if (strategy.hasOutputMap) {
+        const jsExtension = strategy.outputExtensionMap![format];
+
+        if (jsExtension) {
+            const mappedExtension = JS_TO_DTS_MAP.get(jsExtension as "cjs" | "js" | "mjs") ?? "d.ts";
+
+            // If we get d.ts for an unknown extension and both formats are emitted, use format-based extensions
+            if (mappedExtension === "d.ts" && jsExtension !== "js" && strategy.isDualFormat) {
+                return FORMAT_EXTENSIONS.traditionalDts[format];
+            }
+
+            return mappedExtension;
+        }
+
+        // Fallback to traditional extensions
+        return FORMAT_EXTENSIONS.traditionalDts[format];
     }
 
-    // If Node.js 10 compatibility is enabled, use traditional extensions
-    // If both ESM and CJS are emitted, use traditional extensions for clarity
-    if ((context.options.emitCJS && context.options.declaration === "compatible") || (context.options.emitESM && context.options.emitCJS)) {
-        return format === "esm" ? "d.mts" : "d.cts";
+    // Use traditional extensions if Node.js 10 compatibility is enabled or dual format
+    if (strategy.isCompatible || strategy.isDualFormat) {
+        return FORMAT_EXTENSIONS.traditionalDts[format];
     }
 
-    // If only one format is emitted and no special config, use .d.ts
-    return "d.ts";
-}; 
+    // Default to .d.ts for single format builds
+    return FORMAT_EXTENSIONS.dts[format];
+};

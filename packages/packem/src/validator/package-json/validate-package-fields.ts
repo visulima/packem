@@ -1,7 +1,6 @@
 import { VALID_EXPORT_EXTENSIONS } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
-import { warn } from "@visulima/packem-share/utils";
-import { getOutputExtension } from "@visulima/packem-share/utils";
+import { warn, getOutputExtension } from "@visulima/packem-share/utils";
 
 import type { InternalBuildOptions, ValidationOptions } from "../../types";
 
