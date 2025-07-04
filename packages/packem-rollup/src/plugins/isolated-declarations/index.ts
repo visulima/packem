@@ -9,19 +9,16 @@ import type { ExportAllDeclaration, ExportNamedDeclaration, ImportDeclaration, S
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { readFile } from "@visulima/fs";
-import type { Pail } from "@visulima/pail";
+import { ENDING_REGEX } from "@visulima/packem-share/constants";
+import type { BuildContext } from "@visulima/packem-share/types";
+import { getDtsExtension } from "@visulima/packem-share/utils";
 import { basename, dirname, extname, join, relative, toNamespacedPath } from "@visulima/path";
-import type { TsConfigResult } from "@visulima/tsconfig";
 import { parseAsync } from "oxc-parser";
 import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginContext, PreRenderedChunk } from "rollup";
 
-import { ENDING_REGEX } from "@visulima/packem-share/constants";
-import { getDtsExtension } from "@visulima/packem-share/utils";
-import type { IsolatedDeclarationsTransformer } from "../../types";
 import extendString from "./utils/extend-string";
 import fixDtsDefaultCJSExports from "./utils/fix-dts-default-cjs-exports";
 import lowestCommonAncestor from "./utils/lowest-common-ancestor";
-import type { BuildContext } from "@visulima/packem-share/types";
 
 const appendMapUrl = (map: string, filename: string) => `${map}\n//# sourceMappingURL=${basename(filename)}.map\n`;
 
@@ -46,17 +43,11 @@ export type IsolatedDeclarationsOptions = {
     include?: FilterPattern;
 };
 
-export const isolatedDeclarationsPlugin = (
+export const isolatedDeclarationsPlugin = <T>(
     sourceDirectory: string,
-    transformer: IsolatedDeclarationsTransformer,
-    declaration: boolean | "compatible" | "node16" | undefined,
-    cjsInterop: boolean,
-    logger: Pail,
-    options: IsolatedDeclarationsOptions,
-    sourceMap: boolean,
-    tsconfig?: TsConfigResult,
+    context: BuildContext<T>,
 ): Plugin => {
-    const filter = createFilter(options.include, options.exclude);
+    const filter = createFilter(context.options.include, context.options.exclude);
 
     let outputFiles: Record<string, { ext: string; map?: string; source: string }> = Object.create(null);
 
@@ -66,8 +57,8 @@ export const isolatedDeclarationsPlugin = (
 
     let tsconfigPathPatterns: RegExp[] = [];
 
-    if (tsconfig?.config.compilerOptions) {
-        tsconfigPathPatterns = Object.entries(tsconfig.config.compilerOptions.paths ?? {}).map(([key]) =>
+    if (context.tsconfig?.config.compilerOptions) {
+        tsconfigPathPatterns = Object.entries(context.tsconfig.config.compilerOptions.paths ?? {}).map(([key]) =>
             (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
         );
     }
@@ -87,7 +78,7 @@ export const isolatedDeclarationsPlugin = (
             program = result.program;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-            logger.debug({
+            context.logger.debug({
                 message: error.message,
                 prefix: "packem:isolated-declarations",
             });
@@ -133,10 +124,10 @@ export const isolatedDeclarationsPlugin = (
         }
 
         // @ts-expect-error - the ts transformer is getting 4 arguments
-        const { errors, map, sourceText } = await transformer(id, code, sourceMap, tsconfig?.config?.compilerOptions);
+        const { errors, map, sourceText } = await context.options.isolatedDeclarationTransformer(id, code, context.options.sourcemap, context.tsconfig?.config?.compilerOptions);
 
         if (errors.length > 0) {
-            if (options.ignoreErrors) {
+            if (context.options.rollup.isolatedDeclarations.ignoreErrors) {
                 this.warn(errors[0] as string);
 
                 return;
@@ -218,7 +209,7 @@ export const isolatedDeclarationsPlugin = (
         async renderStart(outputOptions: NormalizedOutputOptions, { input }: NormalizedInputOptions): Promise<void> {
             const inputBase = lowestCommonAncestor(...Array.isArray(input) ? input : Object.values(input));
 
-            logger.debug({
+            context.logger.debug({
                 message: `Input base:${inputBase}`,
                 prefix: "packem:isolated-declarations",
             });
@@ -230,26 +221,9 @@ export const isolatedDeclarationsPlugin = (
 
             const entryFileName = outputOptions.entryFileNames.replace(/\.(.)?[jt]sx?$/, (_, s) => `.d.${s || ""}ts`);
 
-            // Create extension options for the shared utility
-            // Rollup InternalModuleFormat: "amd" | "cjs" | "es" | "iife" | "system" | "umd"
-            const isCjs = outputOptions.format === "cjs";
-            const isEsm = outputOptions.format === "es";
-            
-            const miniContext: Partial<BuildContext<{
-                declaration: boolean | "compatible" | "node16" | undefined;
-                emitCJS: boolean;
-                emitESM: boolean;
-            }>> = {
-                options: {
-                    declaration,
-                    emitCJS: isCjs,
-                    emitESM: isEsm,
-                }
-            };
-
             // eslint-disable-next-line prefer-const
             for await (let [filename, { ext, map, source }] of Object.entries(outputFiles)) {
-                if (cjsInterop && outputOptions.format === "cjs") {
+                if (Boolean(context.options.rollup.cjsInterop) && outputOptions.format === "cjs") {
                     const fixedSource = fixDtsDefaultCJSExports(source, { fileName: filename, imports: [] }, { warn: this.warn });
 
                     if (fixedSource) {
@@ -261,8 +235,8 @@ export const isolatedDeclarationsPlugin = (
                 const quote = source.includes("from '") ? "'" : "\"";
                 const originalFileName = filename + ext;
 
-                if ((declaration === true || declaration === "compatible") && outputOptions.format === "cjs") {
-                    logger.debug({
+                if ((context.options.declaration === true || context.options.declaration === "compatible") && outputOptions.format === "cjs") {
+                    context.logger.debug({
                         message: `Emit compatible dts file: ${filename}`,
                         prefix: "packem:isolated-declarations",
                     });
@@ -271,7 +245,7 @@ export const isolatedDeclarationsPlugin = (
 
                     let compatibleSource = source;
 
-                    if (sourceMap && map) {
+                    if (context.options.sourcemap && map) {
                         compatibleSource = appendMapUrl(compatibleSource.trim(), emitName);
 
                         this.emitFile({
@@ -282,30 +256,26 @@ export const isolatedDeclarationsPlugin = (
                         });
                     }
 
-                    // Use shared extension logic for compatible mode
-                    const compatibleExtension = getDtsExtension({ ...miniContext, declaration: "compatible" }, "cjs");
-                    const compatibleDtsExtension = compatibleExtension === "d.ts" ? "d.ts" : compatibleExtension;
-
                     this.emitFile({
                         fileName: emitName,
                         originalFileName,
                         source: compatibleSource.replaceAll(
                             // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
                             /(from\s)['|"]((.*)\..+|['|"].*)['|"];?/g,
-                            (_, group1, group2, group3) => `${group1 + quote + (group3 || group2)}.${compatibleDtsExtension}${quote};`,
+                            (_, group1, group2, group3) => `${group1 + quote + (group3 || group2)}.d.ts${quote};`,
                         ),
                         type: "asset",
                     });
                 }
 
-                logger.debug({
+                context.logger.debug({
                     message: `Emit dts file: ${filename}`,
                     prefix: "packem:isolated-declarations",
                 });
 
                 const emitName = entryFileName.replace("[name]", toNamespacedPath(filename).replace(`${sourceDirectory}/`, ""));
 
-                if (sourceMap && map) {
+                if (context.options.sourcemap && map) {
                     // eslint-disable-next-line sonarjs/updated-loop-counter
                     source = appendMapUrl(source.trim(), emitName);
 
@@ -318,8 +288,7 @@ export const isolatedDeclarationsPlugin = (
                 }
 
                 // Use shared extension logic for regular mode
-                const formatForExtension = outputOptions.format === "cjs" ? "cjs" as const : "esm" as const;
-                const dtsExtension = getDtsExtension(miniContext, formatForExtension);
+                const dtsExtension = getDtsExtension(context, outputOptions.format === "cjs" ? "cjs" : "esm");
 
                 this.emitFile({
                     fileName: emitName,

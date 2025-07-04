@@ -111,7 +111,7 @@ const extractExports = (
             continue;
         }
 
-        // eslint-disable-next-line security/detect-unsafe-regex
+        // eslint-disable-next-line sonarjs/slow-regex
         const m = exp.match(/\s*as\s+default\s*/);
 
         if (m) {
@@ -349,7 +349,6 @@ const createCjsNamespace = (
             continue;
         }
 
-        // eslint-disable-next-line security/detect-unsafe-regex
         const chunk = code.slice(decl.start, decl.end).replace(/\s+\}$/, " }");
 
         ms.append("    ");

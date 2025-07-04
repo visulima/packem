@@ -447,15 +447,9 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
             context.options.declaration
             && context.options.rollup.isolatedDeclarations
-            && context.options.isolatedDeclarationTransformer && isolatedDeclarationsPlugin(
+            && context.options.isolatedDeclarationTransformer && isolatedDeclarationsPlugin<InternalBuildOptions>(
                 join(context.options.rootDir, context.options.sourceDir),
-                context.options.isolatedDeclarationTransformer,
-                context.options.declaration,
-                Boolean(context.options.rollup.cjsInterop),
-                context.logger,
-                context.options.rollup.isolatedDeclarations,
-                context.options.sourcemap,
-                context.tsconfig,
+                context,
             ),
 
             context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
