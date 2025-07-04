@@ -31,7 +31,7 @@ export type FixDtsDefaultCjsExportsPluginOptions = {
  * @returns The Rollup plugin object.
  */
 export const fixDtsDefaultCjsExportsPlugin = (
-    options: FixDtsDefaultCjsExportsPluginOptions = {},
+    options: FixDtsDefaultCjsExportsPluginOptions = {}
 ): Plugin => {
     const {
         matcher = (info: RenderedChunk) =>
@@ -40,7 +40,7 @@ export const fixDtsDefaultCjsExportsPlugin = (
             // We should process the file if it's a d.ts entry,
             // and allow the main plugin logic to decide if default exports need fixing
             // OR if it's a pure type-only export block (e.g., `export { type Foo, type Bar };`).
-            && /\.d\.c?ts$/.test(info.fileName) && info.isEntry, // Added info.isEntry here
+            && /\.d\.c?ts$/.test(info.fileName) && info.isEntry,
     } = options;
 
     return {
@@ -48,7 +48,7 @@ export const fixDtsDefaultCjsExportsPlugin = (
         renderChunk(this: PluginContext, code: string, chunkInfo: RenderedChunk) {
             // eslint-disable-next-line no-secrets/no-secrets
             // Renamed `info` to `chunkInfo` to avoid confusion with the `info` object passed to fixDefaultCJSExports
-            return matcher(chunkInfo) // Use chunkInfo with the matcher
+            return matcher(chunkInfo)
                 ? fixDtsDefaultCJSExports(
                     code,
                     { fileName: chunkInfo.fileName, imports: chunkInfo.imports },

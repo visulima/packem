@@ -590,7 +590,7 @@ export { index as default };
         expect(binProcess.stdout).toContain("exports: foo");
         expect(binProcess.stdout).toContain("dist/bin/cli.js (total size: 148.00 Bytes, brotli size: 112.00 Bytes, gzip size: 146.00 Bytes)");
         expect(binProcess.stdout).toContain("exports: cli");
-        expect(binProcess.stdout).toContain("dist/index.js (total size: 136.00 Bytes, brotli size: 96.00 Bytes, gzip size: 134.00 Bytes)");
+        expect(binProcess.stdout).toContain("dist/index.js (total size: 42.00 Bytes, brotli size: 46.00 Bytes, gzip size: 53.00 Bytes)");
         expect(binProcess.stdout).toContain("exports: index");
         expect(binProcess.stdout).toContain("Σ Total dist size (byte size):");
 

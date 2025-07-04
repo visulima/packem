@@ -47,7 +47,7 @@ describe("packem cli", () => {
         expect(binProcessEs2018.stderr).toBe("");
         expect(binProcessEs2018.exitCode).toBe(0);
 
-        const dMtsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+        const dMtsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dMtsContentEs2018).toBe(`declare class A {
 }

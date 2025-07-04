@@ -680,12 +680,12 @@ export { index as default };
 
         expect(dMtsContent).toBe(`declare const _default: () => string;
 
-export = _default;
+export { _default as default };
 `);
     });
 
     it("should work with symlink dependencies", async () => {
-        expect.assertions(4);
+        expect.assertions(3);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -718,7 +718,7 @@ export declare function fn(a: data): data;
             devDependencies: {
                 typescript: "*",
             },
-            main: "./dist/index.mjs",
+            main: "./dist/index.js",
             peerDependencies: {
                 "dep-a": "*",
             },
@@ -739,22 +739,13 @@ export declare function fn(a: data): data;
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dMtsContent).toBe(`import * as dep_a from 'dep-a';
 
 declare const _default: dep_a.data;
 
 export { _default as default };
-`);
-
-        const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
-
-        expect(dTsContent).toBe(`import * as dep_a from 'dep-a';
-
-declare const _default: dep_a.data;
-
-export = _default;
 `);
     });
 

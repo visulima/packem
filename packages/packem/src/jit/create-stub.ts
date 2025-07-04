@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { getShebang, makeExecutable } from "@visulima/packem-rollup";
 import { DEFAULT_EXTENSIONS, ENDING_REGEX } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
-import { warn, getDtsExtension, getOutputExtension } from "@visulima/packem-share/utils";
+import { getDtsExtension, getOutputExtension, warn } from "@visulima/packem-share/utils";
 import { dirname, relative, resolve } from "@visulima/path";
 import { fileURLToPath, resolveModuleExportNames, resolvePath } from "mlly";
 

@@ -1,6 +1,6 @@
 import type { FileCache } from "@visulima/packem-share";
 import type { BuildContext } from "@visulima/packem-share/types";
-import { getChunkFilename } from "@visulima/packem-share/utils";
+import { getChunkFilename, getDtsExtension } from "@visulima/packem-share/utils";
 import { resolve } from "@visulima/path";
 import type { RollupCache } from "rollup";
 import { rollup } from "rollup";
@@ -43,18 +43,22 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
     });
 
     if (context.options.emitCJS) {
+        const cjsDTSExtension = getDtsExtension(context, "cjs");
+
         await typesBuild.write({
-            chunkFileNames: (chunk) => getChunkFilename(chunk, "d.cts"),
+            chunkFileNames: (chunk) => getChunkFilename(chunk, cjsDTSExtension),
             dir: resolve(context.options.rootDir, context.options.outDir),
-            entryFileNames: "[name].d.cts",
+            entryFileNames: `[name].${cjsDTSExtension}`,
         });
     }
 
     if (context.options.emitESM) {
+        const esmDTSExtension = getDtsExtension(context, "esm");
+
         await typesBuild.write({
-            chunkFileNames: (chunk) => getChunkFilename(chunk, "d.mts"),
+            chunkFileNames: (chunk) => getChunkFilename(chunk, esmDTSExtension),
             dir: resolve(context.options.rootDir, context.options.outDir),
-            entryFileNames: "[name].d.mts",
+            entryFileNames: `[name].${esmDTSExtension}`,
         });
     }
 

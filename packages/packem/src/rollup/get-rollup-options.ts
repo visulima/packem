@@ -11,7 +11,7 @@ import type { SwcPluginConfig } from "@visulima/packem-rollup/swc";
 import { patchTypescriptTypesPlugin, resolveTsconfigPathsPlugin, resolveTsconfigRootDirectoriesPlugin, resolveTypescriptMjsCtsPlugin } from "@visulima/packem-rollup/typescript";
 import type { BuildContext, FileCache } from "@visulima/packem-share";
 import { arrayify, memoizeByKey } from "@visulima/packem-share";
-import { getChunkFilename, getEntryFileNames, sortUserPlugins, getDtsExtension, getOutputExtension } from "@visulima/packem-share/utils";
+import { getChunkFilename, getDtsExtension, getEntryFileNames, getOutputExtension, sortUserPlugins } from "@visulima/packem-share/utils";
 import { join, relative, resolve } from "@visulima/path";
 import { cssModulesTypesPlugin, rollupCssPlugin } from "@visulima/rollup-css-plugin";
 import type { TsConfigResult } from "@visulima/tsconfig";
@@ -824,7 +824,7 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
 
             await memoizeDtsPluginByKey(uniqueProcessId)(context),
 
-            fixDtsDefaultCjsExportsPlugin(),
+            context.options.emitCJS && fixDtsDefaultCjsExportsPlugin(),
 
             context.options.cjsInterop
             && context.options.emitCJS
