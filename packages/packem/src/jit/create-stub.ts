@@ -94,7 +94,9 @@ const createStub = async (context: BuildContext<InternalBuildOptions>): Promise<
                 }),
             );
 
-            const typePath = `${resolvedEntryWithoutExtension}.d.mts`;
+            const dtsExtension = getDtsExtension(context, "esm");
+
+            const typePath = `${resolvedEntryWithoutExtension}.${dtsExtension}`;
 
             writeFileSync(
                 `${output}.${getOutputExtension(context, "esm")}`,
@@ -135,7 +137,7 @@ const createStub = async (context: BuildContext<InternalBuildOptions>): Promise<
             // DTS Stub
             if (context.options.declaration) {
                 writeFileSync(
-                    `${output}.${getDtsExtension(context, "esm")}`,
+                    `${output}.${dtsExtension}`,
                     `export * from "${typePath}";\n${hasDefaultExport ? `export { default } from "${typePath}";` : ""}`,
                 );
             }
@@ -152,7 +154,9 @@ const createStub = async (context: BuildContext<InternalBuildOptions>): Promise<
                 }),
             );
 
-            const typePath = `${resolvedEntryWithoutExtension}.d.cts`;
+            const dtsExtension = getDtsExtension(context, "cjs");
+
+            const typePath = `${resolvedEntryWithoutExtension}.${dtsExtension}`;
 
             writeFileSync(
                 `${output}.${getOutputExtension(context, "cjs")}`,
@@ -173,7 +177,7 @@ const createStub = async (context: BuildContext<InternalBuildOptions>): Promise<
             // DTS Stub
             if (context.options.declaration) {
                 writeFileSync(
-                    `${output}.${getDtsExtension(context, "cjs")}`,
+                    `${output}.${dtsExtension}`,
                     `export * from "${typePath}";\n${hasDefaultExport ? `export { default } from "${typePath}";` : ""}`,
                 );
             }

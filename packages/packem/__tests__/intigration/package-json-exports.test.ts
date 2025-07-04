@@ -574,6 +574,7 @@ export { index as default };
                 },
                 "./foo": "./dist/foo.js",
             },
+            type: "commonjs",
             name: "@scope/output-app",
         });
 
@@ -1506,7 +1507,7 @@ export type { Colorize } from "./types";`,
         const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
-
+console.log(binProcess.stdout)
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
@@ -1611,29 +1612,30 @@ module.exports = result;
             // entry files
             "index.mjs",
             "index.cjs",
-            "index.browser.mjs",
-            "index.workerd.mjs",
-            "index.edge-light.mjs",
+            "index.browser.js",
+            "index.workerd.js",
+            "index.edge-light.js",
             // types
             "index.d.cts",
+            "index.d.mts",
             "index.d.ts",
-            "index.browser.d.mts",
-            "index.workerd.d.mts",
-            "index.edge-light.d.mts",
+            "index.browser.d.ts",
+            "index.workerd.d.ts",
+            "index.edge-light.d.ts",
         ];
 
         const files = readdirSync(join(temporaryDirectoryPath, "dist"));
 
-        expect(files).toHaveLength(14);
+        expect(files).toHaveLength(11);
 
         assertContainFiles(join(temporaryDirectoryPath, "dist"), distributionFiles);
 
         for (const [file, regex] of [
             ["index.cjs", /const runtime = "node"/],
             ["index.mjs", /const runtime = "node"/],
-            ["index.browser.mjs", /const runtime = "browser"/],
-            ["index.workerd.mjs", /const runtime = "workerd"/],
-            ["index.edge-light.mjs", /const runtime = "edge-light"/],
+            ["index.browser.js", /const runtime = "browser"/],
+            ["index.workerd.js", /const runtime = "workerd"/],
+            ["index.edge-light.js", /const runtime = "edge-light"/],
         ]) {
             const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
 
