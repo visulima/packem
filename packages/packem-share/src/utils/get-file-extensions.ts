@@ -10,10 +10,10 @@ const JS_TO_DTS_MAP = new Map([
 ] as const);
 
 const FORMAT_EXTENSIONS = {
-    js: { esm: "js", cjs: "js" },
-    traditional: { esm: "mjs", cjs: "cjs" },
-    dts: { esm: "d.ts", cjs: "d.ts" },
-    traditionalDts: { esm: "d.mts", cjs: "d.cts" },
+    dts: { cjs: "d.ts", esm: "d.ts" },
+    js: { cjs: "js", esm: "js" },
+    traditional: { cjs: "cjs", esm: "mjs" },
+    traditionalDts: { cjs: "d.cts", esm: "d.mts" },
 } as const;
 
 /**
@@ -37,24 +37,17 @@ const mapJsExtensionToDts = (jsExtension: string): string => {
 };
 
 /**
- * Determines declaration extension when outputExtensionMap is provided.
+ * Computes extension resolution strategy based on build context
  */
-const getDtsExtensionFromMap = <T extends FileExtensionOptions>(context: BuildContext<T>, format: Format): string => {
-    const jsExtension = context.options.outputExtensionMap?.[format];
+const getExtensionStrategy = <T extends FileExtensionOptions>(context: BuildContext<T>) => {
+    const { declaration, emitCJS, emitESM, outputExtensionMap } = context.options;
 
-    if (jsExtension) {
-        const mappedExtension = mapJsExtensionToDts(jsExtension);
-
-        // If we get d.ts for an unknown extension and both formats are emitted, use format-based extensions
-        if (mappedExtension === "d.ts" && jsExtension !== "js" && context.options.emitCJS && context.options.emitESM) {
-            return format === "esm" ? "d.mts" : "d.cts";
-        }
-
-        return mappedExtension;
-    }
-
-    // Fallback to traditional extensions
-    return format === "esm" ? "d.mts" : "d.cts";
+    return {
+        hasOutputMap: Boolean(outputExtensionMap),
+        isCompatible: emitCJS && (declaration === "compatible" || declaration === true),
+        isDualFormat: Boolean(emitCJS && emitESM),
+        outputExtensionMap,
+    };
 };
 
 /**
@@ -72,29 +65,15 @@ export interface FileExtensionOptions {
 }
 
 /**
- * Computes extension resolution strategy based on build context
- */
-const getExtensionStrategy = <T extends FileExtensionOptions>(context: BuildContext<T>) => {
-    const { emitCJS, emitESM, declaration, outputExtensionMap } = context.options;
-
-    return {
-        hasOutputMap: Boolean(outputExtensionMap),
-        isDualFormat: Boolean(emitCJS && emitESM),
-        isCompatible: emitCJS && (declaration === "compatible" || declaration === true),
-        outputExtensionMap,
-    };
-};
-
-/**
  * Determines the appropriate output extension for JavaScript files based on build configuration.
  *
  * Returns '.js' when:
- * - Only ESM or CJS is emitted (not both)
+ * - Only E declaration,SM or CJS is emit)
  * - No outputExtensionMap is configured
  * - Node.js 10 compatibility is disabled
  *
- * Otherwise returns traditional extensions ('.mjs' for ESM, '.cjs' for CJS).
- * @param context Build context
+ * Otherwixontext Build contextue),
+ * isDalFormat: Boolean(emitCJS &amp;& mitESM
  * @param format Target format ('esm' or 'cjs')
  * @returns File extension string
  */

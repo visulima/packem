@@ -1,10 +1,11 @@
+/* eslint-disable sonarjs/no-nested-conditional, unicorn/no-nested-ternary */
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { writeFile } from "@visulima/fs";
 import { dirname } from "@visulima/path";
+import type { StyleOptions } from "@visulima/rollup-css-plugin";
 
-import type { StyleOptions } from "../../src/rollup/plugins/css/types";
 import type { BuildConfig } from "../../src/types";
 import installPackage from "./install-package";
 
@@ -77,7 +78,7 @@ export const createPackemConfig = async (
     }
 
     if (cssLoader.length > 0) {
-        rollupConfig += `        css: {\n        loaders: [${cssLoader.map((loader) => `${loader}Loader`).join(", ")}],${minimizer ? `\n        minifier: ${minimizer},` : ""}${typeof cssOptions === "string" ? cssOptions : (typeof cssOptions === "object" ? JSON.stringify(cssOptions, undefined, 4).slice(1, -1) : "")}
+        rollupConfig += `        css: {\n        loaders: [${cssLoader.map((loader) => `${loader}Loader`).join(", ")}],${minimizer ? `\n        minifier: ${minimizer},` : ""}${typeof cssOptions === "string" ? cssOptions : typeof cssOptions === "object" ? JSON.stringify(cssOptions, undefined, 4).slice(1, -1) : ""}
     },`;
     }
 
@@ -105,7 +106,7 @@ export const createPackemConfig = async (
     await writeFile(
         join(fixturePath, "packem.config.ts"),
         `import { defineConfig } from "${distributionPath}/config";
-import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : (transformer === "oxc" ? "oxc-transformer" : "index")}";
+import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : transformer === "oxc" ? "oxc-transformer" : "index"}";
 ${isolatedDeclarationTransformer ? `import isolatedDeclarationTransformer from "${distributionPath}/rollup/plugins/${isolatedDeclarationTransformer}/isolated-declarations-${isolatedDeclarationTransformer}-transformer";` : ""}
 ${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/rollup/plugins/css/loaders/${loader}";`).join("\n")}
 ${minimizer ? `import ${minimizer} from "${distributionPath}/rollup/plugins/css/minifiers/${minimizer}";` : ""}${pluginImports.join("\n")}

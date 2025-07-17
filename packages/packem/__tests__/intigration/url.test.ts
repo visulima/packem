@@ -1,14 +1,13 @@
-import type { Dirent } from "node:fs";
 import { cpSync } from "node:fs";
-import { readdir, rm } from "node:fs/promises";
+import { rm } from "node:fs/promises";
 
 import { ensureDir, isAccessibleSync, readFileSync, writeFile, writeJson } from "@visulima/fs";
+import type { UrlOptions } from "@visulima/packem-rollup";
 import { basename, join, resolve } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import type { UrlOptions } from "../../src/rollup/plugins/url";
-import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
+import { assertContainFiles, createPackageJson, createPackemConfig, execPackem } from "../helpers";
 
 const fixturePath = join(__dirname, "../..", "__fixtures__", "url");
 
@@ -66,18 +65,16 @@ describe("url", () => {
 
         const distributionPath = join(temporaryDirectoryPath, "dist");
 
-        const foundFiles: Dirent[] = await readdir(distributionPath, {
-            recursive: true,
-            withFileTypes: true,
+        // Convert absolute paths to relative paths for assertContainFiles
+        const relativeFiles = generatedFiles.map((file) => {
+            // Remove the base directory path to get relative path
+            const relativePath = file.replace(join(temporaryDirectoryPath, "dist"), "");
+
+            // Remove leading slash if present
+            return relativePath.startsWith("/") ? relativePath.slice(1) : relativePath;
         });
 
-        const files: string[] = foundFiles
-            .filter((dirent) => dirent.isFile())
-            // @TODO: Change this readdir to @visulima/fs readdir
-            // eslint-disable-next-line deprecation/deprecation
-            .map((dirent) => join(dirent.path, dirent.name));
-
-        expect(files).toStrictEqual(generatedFiles);
+        assertContainFiles(distributionPath, relativeFiles);
     };
 
     it("should inline png files", async () => {
@@ -214,6 +211,7 @@ export { png as default };
 
         const cjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.cjs`));
 
+        // eslint-disable-next-line no-secrets/no-secrets
         expect(cjsContent).toBe(`'use strict';
 
 const png = "/batman/6b71fbe07b498a82.png";
@@ -228,6 +226,7 @@ module.exports = png;
         await build("png", { emitFiles: true, fileName: "joker/[hash][extname]", limit: 10 }, [
             join(temporaryDirectoryPath, "/dist/png.cjs"),
             join(temporaryDirectoryPath, "/dist/png.mjs"),
+            // eslint-disable-next-line no-secrets/no-secrets
             join(temporaryDirectoryPath, "/dist/joker/6b71fbe07b498a82.png"),
         ]);
     });
@@ -246,6 +245,7 @@ module.exports = png;
         expect.assertions(5);
 
         await build("png", { emitFiles: true, fileName: "[name]-[hash][extname]", limit: 10 }, [
+
             join(temporaryDirectoryPath, "/dist/png-6b71fbe07b498a82.png"),
             join(temporaryDirectoryPath, "/dist/png.cjs"),
             join(temporaryDirectoryPath, "/dist/png.mjs"),
@@ -258,6 +258,7 @@ module.exports = png;
         await build("png", { emitFiles: true, fileName: "[dirname][hash][extname]", limit: 10 }, [
             join(temporaryDirectoryPath, "/dist/png.cjs"),
             join(temporaryDirectoryPath, "/dist/png.mjs"),
+
             join(temporaryDirectoryPath, "/dist/src/6b71fbe07b498a82.png"),
         ]);
     });
@@ -316,6 +317,8 @@ module.exports = png;
     });
 
     it("should import images from the node_modules", async () => {
+        expect.assertions(4);
+
         const type = "svg";
 
         await writeFile(
