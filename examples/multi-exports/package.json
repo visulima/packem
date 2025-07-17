@@ -61,10 +61,10 @@
         "@types/react": "^19.1.8",
         "@types/react-dom": "^19.1.6",
         "@visulima/packem": "workspace:*",
-        "esbuild": "^0.25.5",
+        "esbuild": "^0.25.6",
         "rimraf": "^6.0.1",
         "typescript": "^5.8.3",
-        "vite": "7.0.0"
+        "vite": "7.0.5"
     },
     "engines": {
         "node": ">=18"

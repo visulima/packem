@@ -129,9 +129,6 @@ export type KillSignal = "SIGKILL" | "SIGTERM";
 
 export interface RollupBuildOptions extends PackemRollupOptions {
     css?: StyleOptions | false;
-    // TODO: Move this out of the `RollupBuildOptions` type
-    // @deprecated Use `node10Compatibility` in the main config instead
-    node10Compatibility?: Node10CompatibilityOptions | false;
     resolveExternals?: ResolveExternalsPluginOptions;
 }
 
@@ -212,4 +209,4 @@ export type ValidationOptions = {
 };
 
 export type { Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
-export type { InjectOptions, PostCSSMeta, StyleOptions } from "@visulima/rollup-css-plugin";
+export type { InjectOptions, StyleOptions } from "@visulima/rollup-css-plugin";

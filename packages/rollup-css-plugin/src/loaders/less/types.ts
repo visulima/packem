@@ -1,4 +1,4 @@
-import type { Less } from "less";
+import type less from "less";
 
 /**
  * Configuration options for the Less loader.
@@ -23,4 +23,4 @@ import type { Less } from "less";
  * ```
  * @see {@link https://lesscss.org/usage/#less-options} Less.js Options Documentation
  */
-export type LESSLoaderOptions = Less.Options;
+export type LESSLoaderOptions = typeof less.options;

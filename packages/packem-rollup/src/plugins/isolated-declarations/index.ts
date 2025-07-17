@@ -43,7 +43,7 @@ export type IsolatedDeclarationsOptions = {
     include?: FilterPattern;
 };
 
-export const isolatedDeclarationsPlugin = <T>(
+export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(
     sourceDirectory: string,
     context: BuildContext<T>,
 ): Plugin => {
@@ -123,7 +123,6 @@ export const isolatedDeclarationsPlugin = <T>(
             }
         }
 
-        // @ts-expect-error - the ts transformer is getting 4 arguments
         const { errors, map, sourceText } = await context.options.isolatedDeclarationTransformer(id, code, context.options.sourcemap, context.tsconfig?.config?.compilerOptions);
 
         if (errors.length > 0) {
