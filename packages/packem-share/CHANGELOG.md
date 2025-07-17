@@ -1,3 +1,19 @@
+## @visulima/packem-share [1.0.0-alpha.3](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.2...@visulima/packem-share@1.0.0-alpha.3) (2025-07-17)
+
+### Features
+
+* enhance file extension handling and update package dependencies ([42764b0](https://github.com/visulima/packem/commit/42764b0f0bfc56104c30cc91f43d23e6e8ffbc33))
+
+### Miscellaneous Chores
+
+* update package dependencies and improve TypeScript compatibility ([d0d337f](https://github.com/visulima/packem/commit/d0d337fe20558e1626cbcbeec19e9c2052f15aa2))
+* update semantic-release workflow and clean up test files ([04101d0](https://github.com/visulima/packem/commit/04101d0ea9936dc8231dce23c54e8bbef249e5c8))
+
+### Code Refactoring
+
+* consolidate file extension logic and update package dependencies ([ceff776](https://github.com/visulima/packem/commit/ceff776bbc5eaa6bd85819271942aab7faf77cd2))
+* **tests:** streamline file existence checks and update output extensions ([4567e62](https://github.com/visulima/packem/commit/4567e62dfa6ffdcc153c6d19ba26c88d209ccc95))
+
 # @visulima/packem-share [1.0.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.1...@visulima/packem-share@1.0.0-alpha.2) (2025-07-02)
 
 
