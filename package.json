@@ -90,7 +90,7 @@
             "node-sass",
             "nodehun",
             "nx",
-            "unrs-resolver"
+            "oxc-resolver"
         ],
         "overrides": {
             "@octokit/plugin-paginate-rest@>=1.0.0 <11.4.1": ">=11.4.1",
