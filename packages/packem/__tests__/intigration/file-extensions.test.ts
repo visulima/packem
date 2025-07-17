@@ -62,7 +62,7 @@ describe("packem file extensions", () => {
         expect(existsSync(`${temporaryDirectoryPath}/dist/index.d.ts`)).toBe(true);
     });
 
-    it("should use .cjs/.d.cts/.d.ts for CJS-only modern library", async () => {
+    it("should use .js/.d.ts/.d.ts for CJS-only modern library", async () => {
         expect.assertions(5);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const hello = "world";`);
@@ -81,8 +81,8 @@ describe("packem file extensions", () => {
             devDependencies: {
                 typescript: "^5.0.0",
             },
-            main: "./dist/index.cjs",
-            types: "./dist/index.d.cts",
+            main: "./dist/index.js",
+            types: "./dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
@@ -100,8 +100,7 @@ describe("packem file extensions", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        expect(existsSync(`${temporaryDirectoryPath}/dist/index.cjs`)).toBe(true);
-        expect(existsSync(`${temporaryDirectoryPath}/dist/index.d.cts`)).toBe(true);
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.js`)).toBe(true);
         expect(existsSync(`${temporaryDirectoryPath}/dist/index.d.ts`)).toBe(true);
     });
 

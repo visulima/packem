@@ -638,7 +638,7 @@ export { index as default };
                 typescript: "*",
             },
             exports: {
-                ".": "./dist/index.cjs",
+                ".": "./dist/index.js",
                 "./pages/*": {
                     import: "./dist/pages/*.mjs",
                     require: "./dist/pages/*.cjs",
@@ -655,7 +655,7 @@ export { index as default };
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(cjs).toBe(`'use strict';
 
