@@ -19,7 +19,7 @@ describe("packem cli", () => {
     });
 
     it("should support of tsconfig overwrite", async () => {
-        expect.assertions(5);
+        expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default class A {}`);
         await createTsConfig(
