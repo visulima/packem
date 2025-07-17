@@ -1,3 +1,26 @@
+## @visulima/packem-rollup [1.0.0-alpha.3](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.2...@visulima/packem-rollup@1.0.0-alpha.3) (2025-07-17)
+
+### Features
+
+* enhance file extension handling and update package dependencies ([42764b0](https://github.com/visulima/packem/commit/42764b0f0bfc56104c30cc91f43d23e6e8ffbc33))
+
+### Bug Fixes
+
+* fixed isolated types ([2926425](https://github.com/visulima/packem/commit/29264250a4adb0407fe1a78e613c84d9f5ce9279))
+
+### Miscellaneous Chores
+
+* update package dependencies and improve TypeScript compatibility ([d0d337f](https://github.com/visulima/packem/commit/d0d337fe20558e1626cbcbeec19e9c2052f15aa2))
+
+### Code Refactoring
+
+* consolidate file extension logic and update package dependencies ([ceff776](https://github.com/visulima/packem/commit/ceff776bbc5eaa6bd85819271942aab7faf77cd2))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.3
+
 # @visulima/packem-rollup [1.0.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.1...@visulima/packem-rollup@1.0.0-alpha.2) (2025-07-02)
 
 
