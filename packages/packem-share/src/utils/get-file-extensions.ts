@@ -11,30 +11,9 @@ const JS_TO_DTS_MAP = new Map([
 
 const FORMAT_EXTENSIONS = {
     dts: { cjs: "d.ts", esm: "d.ts" },
-    js: { cjs: "js", esm: "js" },
     traditional: { cjs: "cjs", esm: "mjs" },
     traditionalDts: { cjs: "d.cts", esm: "d.mts" },
 } as const;
-
-/**
- * Maps JavaScript extension to corresponding TypeScript declaration extension.
- */
-const mapJsExtensionToDts = (jsExtension: string): string => {
-    switch (jsExtension) {
-        case "cjs": {
-            return "d.cts";
-        }
-        case "js": {
-            return "d.ts";
-        }
-        case "mjs": {
-            return "d.mts";
-        }
-        default: {
-            return "d.ts";
-        }
-    }
-};
 
 /**
  * Computes extension resolution strategy based on build context
@@ -46,6 +25,7 @@ const getExtensionStrategy = <T extends FileExtensionOptions>(context: BuildCont
         hasOutputMap: Boolean(outputExtensionMap),
         isCompatible: emitCJS && (declaration === "compatible" || declaration === true),
         isDualFormat: Boolean(emitCJS && emitESM),
+        isSingleFormat: (emitCJS && !emitESM) || (emitESM && !emitCJS),
         outputExtensionMap,
     };
 };
@@ -84,13 +64,12 @@ export const getOutputExtension = <T extends FileExtensionOptions>(context: Buil
         return strategy.outputExtensionMap?.[format] ?? FORMAT_EXTENSIONS.traditional[format];
     }
 
-    // Use traditional extensions if Node.js 10 compatibility is enabled or dual format
-    if (strategy.isCompatible || strategy.isDualFormat) {
-        return FORMAT_EXTENSIONS.traditional[format];
+    if (strategy.isSingleFormat) {
+        return "js";
     }
 
-    // Default to .js for single format builds
-    return FORMAT_EXTENSIONS.js[format];
+    // Use traditional extensions if Node.js 10 compatibility is enabled or dual format
+    return FORMAT_EXTENSIONS.traditional[format];
 };
 
 /**
@@ -110,7 +89,7 @@ export const getDtsExtension = <T extends FileExtensionOptions>(context: BuildCo
     const strategy = getExtensionStrategy(context);
 
     if (strategy.hasOutputMap) {
-        const jsExtension = strategy.outputExtensionMap![format];
+        const jsExtension = strategy.outputExtensionMap?.[format];
 
         if (jsExtension) {
             const mappedExtension = JS_TO_DTS_MAP.get(jsExtension as "cjs" | "js" | "mjs") ?? "d.ts";
@@ -125,6 +104,10 @@ export const getDtsExtension = <T extends FileExtensionOptions>(context: BuildCo
 
         // Fallback to traditional extensions
         return FORMAT_EXTENSIONS.traditionalDts[format];
+    }
+
+    if (strategy.isSingleFormat) {
+        return "d.ts";
     }
 
     // Use traditional extensions if Node.js 10 compatibility is enabled or dual format

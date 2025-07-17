@@ -254,8 +254,8 @@ export { IString };`,
             exports: {
                 ".": {
                     import: "./dist/index.mjs",
-                    "react-native": "./dist/index.react-native.cjs",
-                    "react-server": "./dist/index.react-server.mjs",
+                    "react-native": "./dist/index.react-native.js",
+                    "react-server": "./dist/index.react-server.js",
                     require: "./dist/index.cjs",
                     types: "./dist/index.d.ts",
                 },
@@ -275,8 +275,8 @@ export { IString };`,
 
         for (const [file, regex] of [
             ["./index.mjs", /const shared = true/],
-            ["./index.react-server.mjs", /"react-server"/],
-            ["./index.react-native.cjs", /"react-native"/],
+            ["./index.react-server.js", /"react-server"/],
+            ["./index.react-native.js", /"react-native"/],
             ["./index.d.ts", /export const shared = true;/],
             ["./api/index.cjs", /"api:"/],
             ["./api/index.mjs", /"api:"/],
@@ -574,8 +574,8 @@ export { index as default };
                 },
                 "./foo": "./dist/foo.js",
             },
-            type: "commonjs",
             name: "@scope/output-app",
+            type: "commonjs",
         });
 
         const binProcess = await execPackem("build", ["--no-color"], {
@@ -1507,7 +1507,7 @@ export type { Colorize } from "./types";`,
         const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
-console.log(binProcess.stdout)
+
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 

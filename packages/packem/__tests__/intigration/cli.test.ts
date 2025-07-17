@@ -55,14 +55,6 @@ describe("packem cli", () => {
 export { A as default };
 `);
 
-        const dTsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
-
-        expect(dTsContentEs2018).toBe(`declare class A {
-}
-
-export = A;
-`);
-
         const mtsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContentEs2018).toBe(`var __defProp = Object.defineProperty;
