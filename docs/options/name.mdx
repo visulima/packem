@@ -1,0 +1,19 @@
+---
+title: name
+description: Name of the build, used for output file naming and logging
+---
+
+# name
+
+The name of the build, used for output file naming and logging.
+
+**Type:** `string`  
+**Default:** Derived from `package.json` name or `'default'`
+
+## Example
+
+```typescript
+export default defineConfig({
+  name: 'my-library'
+})
+```

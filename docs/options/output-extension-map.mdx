@@ -1,0 +1,22 @@
+---
+title: outputExtensionMap
+description: Custom file extensions for different output formats
+---
+
+# outputExtensionMap
+
+Customizes the file extensions for different output formats (e.g., ESM, CJS). Useful for non-standard file naming.
+
+**Type:** `Record<Format, string>`  
+**Default:** `undefined`
+
+## Example
+
+```typescript
+export default defineConfig({
+  outputExtensionMap: {
+    esm: 'mjs',
+    cjs: 'cjs'
+  }
+})
+```
