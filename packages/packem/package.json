@@ -472,7 +472,7 @@
         "sass": "^1.89.2",
         "sass-embedded": "^1.89.2",
         "secretlint": "10.1.1",
-        "semantic-release": "^24.2.5",
+        "semantic-release": "^24.2.7",
         "sort-package-json": "3.3.0",
         "stylus": "^0.64.0",
         "sucrase": "^3.35.0",
