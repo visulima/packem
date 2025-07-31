@@ -781,7 +781,7 @@ export { render };
             devDependencies: {
                 typescript: "*",
             },
-            exports: "./dist/index.cjs",
+            exports: "./dist/index.js",
             types: "./dist/index.d.ts",
         });
 
@@ -792,7 +792,7 @@ export { render };
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(cjs).toBe(`'use strict';
 

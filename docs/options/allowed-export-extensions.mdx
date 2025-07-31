@@ -1,0 +1,89 @@
+---
+title: allowedExportExtensions
+description: Additional file extensions to consider valid in exports field validation
+---
+
+# allowedExportExtensions
+
+Additional file extensions to consider valid in exports field validation. These will be added to the standard valid extensions.
+
+## Type
+
+```typescript
+allowedExportExtensions?: string[]
+```
+
+## Default
+
+`undefined` (only standard extensions are allowed)
+
+## Description
+
+By default, packem validates that export paths in your `package.json` have valid file extensions. The standard valid extensions are:
+
+- `.js`, `.mjs`, `.cjs` - JavaScript files
+- `.ts`, `.mts`, `.cts` - TypeScript files
+- `.d.ts`, `.d.mts`, `.d.cts` - TypeScript declaration files
+- `.jsx`, `.tsx` - React files
+- `.json` - JSON files
+- `.node` - Node.js native addons
+
+Use `extraExportExtensions` to add custom extensions for assets like images, CSS files, or other non-JavaScript files.
+
+## Examples
+
+### Basic Usage
+
+```typescript
+// packem.config.ts
+import { defineConfig } from "@visulima/packem/config";
+
+export default defineConfig({
+    validation: {
+        packageJson: {
+            allowedExportExtensions: [".svg", ".css", ".png", ".jpg", ".jpeg", ".gif", ".webp"],
+        },
+    },
+});
+```
+
+### With package.json exports
+
+```json
+{
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./images": "./dist/images/icon.svg",
+    "./assets": "./dist/assets/logo.svg",
+    "./styles": "./dist/styles.css"
+  }
+}
+```
+
+With `allowedExportExtensions: [".svg", ".css"]`, these export paths will be considered valid and won't generate warnings.
+
+### Common Asset Extensions
+
+Here are some common extensions you might want to add:
+
+```typescript
+allowedExportExtensions: [
+    // Images
+    ".svg", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".bmp", ".tiff",
+    // Styles
+    ".css", ".scss", ".sass", ".less", ".styl",
+    // Fonts
+    ".woff", ".woff2", ".ttf", ".eot", ".otf",
+    // Documents
+    ".pdf", ".md", ".txt",
+    // Data
+    ".xml", ".yaml", ".yml", ".toml"
+]
+```
+
+## Notes
+
+- Extensions should include the leading dot (e.g., `".svg"` not `"svg"`)
+- This option only affects validation warnings, not the actual build process
+- Use in combination with `ignoreExportKeys` to exclude asset exports from build processing
+- Use with `rollup.copy` to copy asset files to the output directory 

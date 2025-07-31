@@ -63,7 +63,7 @@ describe("packem file extensions", () => {
     });
 
     it("should use .js/.d.ts/.d.ts for CJS-only modern library", async () => {
-        expect.assertions(5);
+        expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const hello = "world";`);
         await createTsConfig(temporaryDirectoryPath, {

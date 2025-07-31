@@ -131,7 +131,10 @@ const inferEntries = (
     }
 
     // Come up with a list of all output files & their formats
-    const outputs = extractExportFilenames(packageJson.exports, packageType, context.options.declaration);
+    const allOutputs = extractExportFilenames(packageJson.exports, packageType, context.options.declaration, [], context.options.ignoreExportKeys);
+
+    // Filter out ignored outputs
+    const outputs = allOutputs.filter((output) => !output.ignored);
 
     if (packageJson.bin) {
         const binaries = (typeof packageJson.bin === "string" ? [packageJson.bin] : Object.values(packageJson.bin)).filter(Boolean);
@@ -230,7 +233,9 @@ const inferEntries = (
             const inputs: string[] = [];
 
             const SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace("*", "(.*)") + fileExtensionRegex);
-            const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace(/(.*)\.[^.]*$/, "$1").replace("*", "(.*)") + fileExtensionRegex);
+            // Use a safer regex pattern to avoid backtracking issues
+            const sourceSlugWithoutExtension = sourceSlug.replace(/^(.+?)\.[^.]*$/, "$1");
+            const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlugWithoutExtension.replace("*", "(.*)") + fileExtensionRegex);
 
             for (const source of sourceFiles) {
                 if (SOURCE_RE.test(source) || (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && SPECIAL_SOURCE_RE.test(source))) {

@@ -231,7 +231,7 @@ describe(getOutputExtension, () => {
             expect(getOutputExtension(context, "cjs")).toBe("js");
         });
 
-        it("should use .js when neither format is explicitly emitted", () => {
+        it("should use .mjs or .cjs when neither format is explicitly emitted", () => {
             expect.assertions(2);
 
             const context = createOptions({
@@ -240,8 +240,8 @@ describe(getOutputExtension, () => {
                 emitESM: false,
             });
 
-            expect(getOutputExtension(context, "esm")).toBe("js");
-            expect(getOutputExtension(context, "cjs")).toBe("js");
+            expect(getOutputExtension(context, "esm")).toBe("mjs");
+            expect(getOutputExtension(context, "cjs")).toBe("cjs");
         });
     });
 

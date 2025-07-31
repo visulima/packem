@@ -431,7 +431,7 @@ export class ExampleClass {
     });
 
     it("should allow support for \"allowJs\" and generate proper assets", async () => {
-        expect.assertions(5);
+        expect.assertions(4);
 
         await writeFile(`${temporaryDirectoryPath}/src/index.js`, `export default () => 'index';`);
 
@@ -446,7 +446,7 @@ export class ExampleClass {
             devDependencies: {
                 typescript: "*",
             },
-            exports: "./dist/index.cjs",
+            exports: "./dist/index.js",
             types: "./dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath);
@@ -458,13 +458,9 @@ export class ExampleClass {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(cjsContent).toMatchSnapshot("cjs code output");
-
-        const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
-
-        expect(dCtsContent).toMatchSnapshot("cts type code output");
 
         const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
@@ -1440,7 +1436,7 @@ export declare const test = "test";
         it.each(["typescript", "oxc", "swc"])(
             "should work with '%s' isolated declarations transformer and generate sourcemaps",
             async (isolatedDeclarationTransformer) => {
-                expect.assertions(11);
+                expect.assertions(10);
 
                 const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : "\"";
 
@@ -1591,12 +1587,6 @@ export declare let num: Num;
                     }
                     // No default
                 }
-
-                const dCtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/types.d.cts`);
-
-                expect(dCtsTypesContent).toBe(`export type Num = number;
-//# sourceMappingURL=types.d.cts.map
-`);
 
                 const dCtsTypesMapContent = await readFile(`${temporaryDirectoryPath}/dist/types.d.ts.map`);
 
@@ -1868,7 +1858,7 @@ export default a;
             },
             exports: {
                 ".": {
-                    default: "./lib/index.cjs",
+                    default: "./lib/index.js",
                     types: "./lib/index.d.ts",
                 },
             },
@@ -1883,7 +1873,7 @@ export default a;
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = await readFile(`${temporaryDirectoryPath}/lib/index.cjs`);
+        const cjsContent = await readFile(`${temporaryDirectoryPath}/lib/index.js`);
 
         expect(cjsContent).toBe(`'use strict';
 

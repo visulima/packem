@@ -1,0 +1,23 @@
+{
+  "name": "ignore-export-keys-example",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./images": "./dist/images/icon.svg",
+    "./assets": "./dist/assets/logo.svg",
+    "./styles": "./dist/styles.css"
+  },
+  "scripts": {
+    "build": "packem build",
+    "build:ignore-assets": "packem build --ignore-export-keys=images,assets,styles"
+  },
+  "devDependencies": {
+      "@visulima/packem": "workspace:*",
+      "esbuild": "^0.25.8",
+      "typescript": "^5.8.3"
+  },
+  "engines": {
+      "node": ">=18"
+  }
+} 
