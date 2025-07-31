@@ -1,3 +1,36 @@
+## @visulima/packem [2.0.0-alpha.3](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.2...@visulima/packem@2.0.0-alpha.3) (2025-07-31)
+
+### Features
+
+* add support for ignoring export keys and allowed export extensions ([3a49564](https://github.com/visulima/packem/commit/3a4956481e6896b7f86670e7df8efb521f30e6e6))
+* enhance file extension handling and update package dependencies ([42764b0](https://github.com/visulima/packem/commit/42764b0f0bfc56104c30cc91f43d23e6e8ffbc33))
+* set default TypeScript declaration option for ESM-only builds ([7064518](https://github.com/visulima/packem/commit/706451805bab49cadbf597b052cd44e20a55a493))
+
+### Bug Fixes
+
+* add new configuration options for build process ([f2f6b25](https://github.com/visulima/packem/commit/f2f6b25338b92dc2d17e103281de4523177a8356))
+* fixed isolated types ([2926425](https://github.com/visulima/packem/commit/29264250a4adb0407fe1a78e613c84d9f5ce9279))
+* **tests:** improve test descriptions and mock implementation ([8a11cdd](https://github.com/visulima/packem/commit/8a11cdd08277ef9d2229e81bd693c73ee28d4c56))
+* update .npmrc and package.json for dependency management ([71104f0](https://github.com/visulima/packem/commit/71104f0718aee2b66e548723c06c220a8a71cab7))
+* update package dependencies and improve compatibility ([0db341b](https://github.com/visulima/packem/commit/0db341b4e8c90e21d6bda36612d880168f183b7c))
+
+### Styles
+
+* cs fix ([9566a74](https://github.com/visulima/packem/commit/9566a74136eb8e78ae209997c652ce66a56afbf7))
+
+### Miscellaneous Chores
+
+* update package dependencies and improve TypeScript compatibility ([d0d337f](https://github.com/visulima/packem/commit/d0d337fe20558e1626cbcbeec19e9c2052f15aa2))
+* update package dependencies to version 2.0.3 for @anolilab/semantic-release-pnpm and @anolilab/semantic-release-preset; bump oxc-transform and oxc-parser to 0.79.1 ([ce60668](https://github.com/visulima/packem/commit/ce606682c65afcb710e7a923429c2c543f52d88f))
+* update semantic-release workflow and clean up test files ([04101d0](https://github.com/visulima/packem/commit/04101d0ea9936dc8231dce23c54e8bbef249e5c8))
+* update semantic-release workflow and refine integration tests ([d5a800f](https://github.com/visulima/packem/commit/d5a800fadb5037ec9c398ceba93f7b2b25fa6fb5))
+
+### Code Refactoring
+
+* consolidate file extension logic and update package dependencies ([ceff776](https://github.com/visulima/packem/commit/ceff776bbc5eaa6bd85819271942aab7faf77cd2))
+* **tests:** streamline file existence checks and update output extensions ([4567e62](https://github.com/visulima/packem/commit/4567e62dfa6ffdcc153c6d19ba26c88d209ccc95))
+* update output extension handling and improve TypeScript declaration mapping ([bca86e4](https://github.com/visulima/packem/commit/bca86e4fc1d5c3934f2ba5fff74c2f017d98068f))
+
 ## @visulima/packem [2.0.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.1...@visulima/packem@2.0.0-alpha.2) (2025-07-02)
 
 ### Bug Fixes
