@@ -1,3 +1,13 @@
+## @visulima/packem-share [1.0.0-alpha.4](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.3...@visulima/packem-share@1.0.0-alpha.4) (2025-07-31)
+
+### Features
+
+* add support for ignoring export keys and allowed export extensions ([3a49564](https://github.com/visulima/packem/commit/3a4956481e6896b7f86670e7df8efb521f30e6e6))
+
+### Bug Fixes
+
+* update package dependencies and improve compatibility ([0db341b](https://github.com/visulima/packem/commit/0db341b4e8c90e21d6bda36612d880168f183b7c))
+
 ## @visulima/packem-share [1.0.0-alpha.3](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.2...@visulima/packem-share@1.0.0-alpha.3) (2025-07-17)
 
 ### Features
