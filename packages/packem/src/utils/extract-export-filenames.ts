@@ -29,12 +29,12 @@ export type OutputDescriptor = {
     exportKey?: string;
     fieldName?: string;
     file: string;
+    /** Whether this output was from an ignored export key */
+    ignored?: boolean;
     isExecutable?: true;
     key: "bin" | "exports" | "main" | "module" | "types";
     subKey?: typeof runtimeExportConventions | (NonNullable<unknown> & string);
     type?: Format;
-    /** Whether this output was from an ignored export key */
-    ignored?: boolean;
 };
 
 export const extractExportFilenames = (
@@ -71,7 +71,7 @@ export const extractExportFilenames = (
         for (const [exportKey, packageExport] of filteredEntries) {
             const normalizedKey = exportKey.replace("./", "");
             const isIgnored = ignoreExportKeys.includes(normalizedKey);
-            
+
             if (typeof packageExport === "string") {
                 let descriptor = {};
 
@@ -88,7 +88,7 @@ export const extractExportFilenames = (
                     file: packageExport,
                     key: "exports",
                     type: inferExportType(exportKey, conditions, packageType, packageExport),
-                    ...(isIgnored && { ignored: true }),
+                    ...isIgnored && { ignored: true },
                 } as OutputDescriptor);
             } else if (typeof packageExport === "object" && packageExport !== undefined) {
                 for (const [condition, entryExport] of Object.entries(packageExport as Record<string, string[] | string | null>)) {
@@ -105,22 +105,22 @@ export const extractExportFilenames = (
                             key: "exports",
                             ...runtimeExportConventions.has(condition) ? { subKey: condition as OutputDescriptor["subKey"] } : {},
                             type: inferExportType(condition, conditions, packageType, entryExport),
-                            ...(isIgnored && { ignored: true }),
+                            ...isIgnored && { ignored: true },
                         } as OutputDescriptor);
                     } else {
                         // For nested exports, we need to check if the parent export key should be ignored
                         const nestedKey = key.replace("./", "");
                         const isNestedIgnored = isIgnored || ignoreExportKeys.includes(nestedKey);
-                        
+
                         const nestedResults = extractExportFilenames({ [key]: entryExport } as PackageJson["exports"], packageType, declaration, [...conditions, condition], ignoreExportKeys);
-                        
+
                         // Mark all nested results as ignored if the parent was ignored
                         if (isNestedIgnored) {
-                            nestedResults.forEach(result => {
+                            nestedResults.forEach((result) => {
                                 result.ignored = true;
                             });
                         }
-                        
+
                         descriptors = [
                             ...descriptors,
                             ...nestedResults,
