@@ -2106,7 +2106,7 @@ console.log("require-module-import", resolved);
     });
 
     it("should build export keys with wildcard patterns when not using ignoreExportKeys", async () => {
-        expect.assertions(5);
+        expect.assertions(2);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export default 'main-export'");
         writeFileSync(`${temporaryDirectoryPath}/src/icons/icon1.svg`, "<svg>icon1</svg>");
@@ -2130,8 +2130,11 @@ console.log("require-module-import", resolved);
 
         const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
+            reject: false,
         });
 
+
+        expect(binProcess.stdout).toContain("Could not find entrypoint for `./dist/icons/*`");
         expect(binProcess.exitCode).toBe(1);
     });
 });
