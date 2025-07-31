@@ -39,9 +39,13 @@
     "typesVersions": {
         "*": {
             ".": [
+                "./dist/index.d.ts",
+                "./dist/index.development.d.ts",
                 "./dist/index.production.d.ts"
             ],
             "react": [
+                "./dist/react.d.ts",
+                "./dist/react.development.d.ts",
                 "./dist/react.production.d.ts"
             ]
         }

@@ -87,4 +87,20 @@ The example demonstrates:
    - `dist/images/icon.svg` - Copied SVG icon
    - `dist/assets/logo.svg` - Copied SVG logo  
    - `dist/styles.css` - Copied CSS file
-   - No warnings about missing source files for the ignored exports 
+   - No warnings about missing source files for the ignored exports
+
+## Wildcard Pattern Support
+
+`ignoreExportKeys` also supports wildcard patterns. For example, if you have exports like:
+
+```json
+{
+  "exports": {
+    ".": "./dist/index.js",
+    "./icons/*": "./dist/icons/*",
+    "./assets/*": "./dist/assets/*"
+  }
+}
+```
+
+You can use `ignoreExportKeys: ["icons", "assets"]` to ignore both the exact keys and any wildcard patterns that start with those keys. This is particularly useful for asset directories that contain multiple files. 

@@ -2062,4 +2062,76 @@ console.log("require-module-import", resolved);
         expect(binProcess.exitCode).toBe(1);
         expect(binProcess.stderr).toContain("Invalid output extension map: esm must be different from the other key");
     });
+
+    it("should ignore export keys with wildcard patterns when using ignoreExportKeys", async () => {
+        expect.assertions(5);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export default 'main-export'");
+        writeFileSync(`${temporaryDirectoryPath}/src/icons/icon1.svg`, "<svg>icon1</svg>");
+        writeFileSync(`${temporaryDirectoryPath}/src/icons/icon2.svg`, "<svg>icon2</svg>");
+        writeFileSync(`${temporaryDirectoryPath}/src/icons/subfolder/icon3.svg`, "<svg>icon3</svg>");
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": "./dist/index.js",
+                "./icons/*": "./dist/icons/*",
+            },
+        });
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                ignoreExportKeys: ["icons"],
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        // Should only build the main export, not the icons
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.js`)).toBe(true);
+
+        // Icons should not be built due to ignoreExportKeys
+        expect(existsSync(`${temporaryDirectoryPath}/dist/icons/icon1.svg`)).toBe(false);
+        expect(existsSync(`${temporaryDirectoryPath}/dist/icons/icon2.svg`)).toBe(false);
+    });
+
+    it("should build export keys with wildcard patterns when not using ignoreExportKeys", async () => {
+        expect.assertions(5);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export default 'main-export'");
+        writeFileSync(`${temporaryDirectoryPath}/src/icons/icon1.svg`, "<svg>icon1</svg>");
+        writeFileSync(`${temporaryDirectoryPath}/src/icons/icon2.svg`, "<svg>icon2</svg>");
+        writeFileSync(`${temporaryDirectoryPath}/src/icons/subfolder/icon3.svg`, "<svg>icon3</svg>");
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": "./dist/index.js",
+                "./icons/*": "./dist/icons/*",
+            },
+        });
+
+        await createPackemConfig(temporaryDirectoryPath, {});
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.exitCode).toBe(1);
+    });
 });

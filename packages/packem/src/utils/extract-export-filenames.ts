@@ -70,7 +70,7 @@ export const extractExportFilenames = (
 
         for (const [exportKey, packageExport] of filteredEntries) {
             const normalizedKey = exportKey.replace("./", "");
-            const isIgnored = ignoreExportKeys.includes(normalizedKey);
+            const isIgnored = ignoreExportKeys.some((ignoredKey) => normalizedKey === ignoredKey || normalizedKey.startsWith(`${ignoredKey}/`));
 
             if (typeof packageExport === "string") {
                 let descriptor = {};
@@ -110,7 +110,7 @@ export const extractExportFilenames = (
                     } else {
                         // For nested exports, we need to check if the parent export key should be ignored
                         const nestedKey = key.replace("./", "");
-                        const isNestedIgnored = isIgnored || ignoreExportKeys.includes(nestedKey);
+                        const isNestedIgnored = isIgnored || ignoreExportKeys.some((ignoredKey) => nestedKey === ignoredKey || nestedKey.startsWith(`${ignoredKey}/`));
 
                         const nestedResults = extractExportFilenames({ [key]: entryExport } as PackageJson["exports"], packageType, declaration, [...conditions, condition], ignoreExportKeys);
 

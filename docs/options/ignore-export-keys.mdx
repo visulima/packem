@@ -53,6 +53,20 @@ export default config;
 
 With `ignoreExportKeys: ["images", "assets", "styles"]`, only the main export (`"."`) will be processed as a build entry.
 
+### With wildcard patterns
+
+```json
+{
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./icons/*": "./dist/icons/*",
+    "./assets/*": "./dist/assets/*"
+  }
+}
+```
+
+With `ignoreExportKeys: ["icons", "assets"]`, both `"./icons/*"` and `"./assets/*"` wildcard patterns will be ignored, and only the main export (`"."`) will be processed as a build entry.
+
 ### CLI Usage
 
 ```bash
@@ -62,6 +76,7 @@ packem build --ignore-export-keys=images,assets,styles
 ## Notes
 
 - Export keys are matched without the `./` prefix (e.g., `"./images"` matches `"images"`)
+- **Wildcard patterns are supported**: Export keys starting with the ignored key are also ignored (e.g., `"images"` will ignore both `"./images"` and `"./images/*"`)
 - Ignored exports are still included in the final `package.json` for consumers
 - No warnings are generated for ignored exports
 - Works with both simple string exports and nested conditional exports
