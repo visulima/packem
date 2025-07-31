@@ -1,3 +1,9 @@
+## @visulima/packem [2.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.4...@visulima/packem@2.0.0-alpha.5) (2025-07-31)
+
+### Bug Fixes
+
+* add comprehensive tests for glob pattern validation in package exports ([00cdaf1](https://github.com/visulima/packem/commit/00cdaf1770ce8997174392a5e6ef3f53c3e54da7))
+
 ## @visulima/packem [2.0.0-alpha.4](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.3...@visulima/packem@2.0.0-alpha.4) (2025-07-31)
 
 ### Bug Fixes
