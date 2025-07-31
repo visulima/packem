@@ -116,8 +116,8 @@
     },
     "devDependencies": {
         "@anolilab/eslint-config": "^16.2.22",
-        "@anolilab/semantic-release-pnpm": "2.0.2",
-        "@anolilab/semantic-release-preset": "^11.0.2",
+        "@anolilab/semantic-release-pnpm": "2.0.3",
+        "@anolilab/semantic-release-preset": "^11.0.3",
         "@csstools/css-parser-algorithms": "3.0.5",
         "@csstools/css-tokenizer": "3.0.4",
         "@csstools/postcss-slow-plugins": "^2.0.0",
