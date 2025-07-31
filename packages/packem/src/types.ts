@@ -130,9 +130,8 @@ export interface BuildOptions {
      */
     ignoreExportKeys?: string[];
 
-    /** 
+    /**
      * Isolated declaration transformer for TypeScript declaration generation
-     * 
      * @experimental
      */
     isolatedDeclarationTransformer?: IsolatedDeclarationsTransformer;
