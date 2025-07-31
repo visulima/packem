@@ -254,6 +254,156 @@ describe(validatePackageFields, () => {
             expect(mockedWarn).not.toHaveBeenCalled();
         });
 
+        it("should accept exports path with wildcard patterns", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: { exports: "./dist/icons/*" },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(mockedWarn).not.toHaveBeenCalled();
+        });
+
+        it("should accept exports path with various dynamic patterns", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: { validation: { packageJson: { exports: true, main: false, name: false } } },
+                pkg: {
+                    exports: {
+                        ".": "./dist/index.js",
+                        "./icons/*": "./dist/icons/*",
+                        "./assets/*.png": "./dist/assets/**/*.png",
+                        "./styles/*.css": "./dist/styles/*.css",
+                        "./components/*.jsx": "./dist/components/**/*.jsx",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            expect(mockedWarn).not.toHaveBeenCalled();
+        });
+
+        it("should handle glob patterns gracefully when no files are found", () => {
+            expect.assertions(1);
+
+            const context = {
+                options: {
+                    rootDir: "/test/project",
+                    validation: { packageJson: { exports: true, main: false, name: false } },
+                },
+                pkg: {
+                    exports: {
+                        ".": "./dist/index.js",
+                        "./icons/*": "./src/icons/*",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            // Should not warn when no files are found (this is acceptable for glob patterns)
+            expect(mockedWarn).not.toHaveBeenCalled();
+        });
+
+        it("should validate glob patterns and warn about invalid file extensions", async () => {
+            expect.assertions(1);
+
+            // Create temporary test files
+            const fs = await import("node:fs/promises");
+            const path = await import("node:path");
+            const { temporaryDirectory } = await import("tempy");
+
+            const tempDir = temporaryDirectory();
+            const testDir = path.join(tempDir, "src", "icons");
+
+            await fs.mkdir(testDir, { recursive: true });
+
+            // Create test files with different extensions
+            await fs.writeFile(path.join(testDir, "icon1.svg"), "// valid svg");
+            await fs.writeFile(path.join(testDir, "icon2.png"), "// invalid png for icons");
+            await fs.writeFile(path.join(testDir, "icon3.js"), "// invalid js for icons");
+            await fs.writeFile(path.join(testDir, "icon4.ts"), "// invalid ts for icons");
+
+            const context = {
+                options: {
+                    rootDir: tempDir,
+                    validation: { packageJson: { exports: true, main: false, name: false } },
+                },
+                pkg: {
+                    exports: {
+                        ".": "./dist/index.js",
+                        "./icons/*": "./src/icons/*",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            // Clean up
+            await fs.rm(tempDir, { recursive: true, force: true });
+
+            // Should warn about files with invalid extensions
+            expect(mockedWarn).toHaveBeenCalledWith(
+                context,
+                expect.stringContaining("matches files with invalid extensions: src/icons/icon1.svg, src/icons/icon2.png"),
+            );
+        });
+
+        it("should validate glob patterns with custom allowed extensions", async () => {
+            expect.assertions(1);
+
+            // Create temporary test files
+            const fs = await import("node:fs/promises");
+            const path = await import("node:path");
+            const { temporaryDirectory } = await import("tempy");
+
+            const tempDir = temporaryDirectory();
+            const testDir = path.join(tempDir, "src", "assets");
+
+            await fs.mkdir(testDir, { recursive: true });
+
+            // Create test files
+            await fs.writeFile(path.join(testDir, "asset1.png"), "// valid png");
+            await fs.writeFile(path.join(testDir, "asset2.jpg"), "// valid jpg");
+            await fs.writeFile(path.join(testDir, "asset3.txt"), "// invalid txt");
+
+            const context = {
+                options: {
+                    rootDir: tempDir,
+                    validation: {
+                        packageJson: {
+                            exports: true,
+                            main: false,
+                            name: false,
+                            allowedExportExtensions: [".png", ".jpg", ".jpeg"],
+                        },
+                    },
+                },
+                pkg: {
+                    exports: {
+                        ".": "./dist/index.js",
+                        "./assets/*": "./src/assets/*",
+                    },
+                },
+            };
+
+            validatePackageFields(context as unknown as BuildContext);
+
+            // Clean up
+            await fs.rm(tempDir, { recursive: true, force: true });
+
+            // Should warn about files with invalid extensions
+            expect(mockedWarn).toHaveBeenCalledWith(
+                context,
+                expect.stringContaining("matches files with invalid extensions: src/assets/asset3.txt"),
+            );
+        });
+
         it("should accept valid conditional exports", () => {
             expect.assertions(1);
 
