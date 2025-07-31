@@ -44,7 +44,7 @@ export const createPackemConfig = async (
     }: PackemConfigProperties = {},
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
-    await installPackage(fixturePath, transformer === "swc" ? "@swc" : (transformer === "oxc" ? "oxc-transform" : transformer));
+    await installPackage(fixturePath, transformer === "swc" ? "@swc" : transformer === "oxc" ? "oxc-transform" : transformer);
 
     let rollupConfig = "";
 

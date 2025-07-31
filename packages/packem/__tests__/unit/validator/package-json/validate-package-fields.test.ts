@@ -13,7 +13,7 @@ const { mockedWarn } = vi.hoisted(() => {
 // Mock the warn function
 vi.mock("@visulima/packem-share/utils", async () => {
     const original = await vi.importActual("@visulima/packem-share/utils");
-    
+
     return {
         ...original,
         warn: mockedWarn,
@@ -98,20 +98,20 @@ describe(validatePackageFields, () => {
         expect.assertions(2);
 
         const contextStringBin = {
-            options: { 
-                emitCJS: true, 
-                emitESM: true, 
+            options: {
+                emitCJS: true,
+                emitESM: true,
                 declaration: "compatible" as const,
-                validation: { packageJson: { bin: true } } 
+                validation: { packageJson: { bin: true } },
             },
             pkg: { bin: "bin/index.mjs", type: "commonjs" },
         };
         const contextObjectBin = {
-            options: { 
-                emitCJS: true, 
-                emitESM: true, 
+            options: {
+                emitCJS: true,
+                emitESM: true,
                 declaration: "compatible" as const,
-                validation: { packageJson: { bin: true } } 
+                validation: { packageJson: { bin: true } },
             },
             pkg: { bin: { cli1: "bin/cli1.mjs", cli2: "bin/cli2.cjs" }, type: "commonjs" },
         };

@@ -13,11 +13,11 @@
     "build:ignore-assets": "packem build --ignore-export-keys=images,assets,styles"
   },
   "devDependencies": {
-      "@visulima/packem": "workspace:*",
-      "esbuild": "^0.25.8",
-      "typescript": "^5.8.3"
+    "@visulima/packem": "workspace:*",
+    "esbuild": "^0.25.8",
+    "typescript": "^5.8.3"
   },
   "engines": {
-      "node": ">=18"
+    "node": ">=18"
   }
-} 
+}

@@ -107,13 +107,13 @@ describe("packem error cases", () => {
 
         await createPackageJson(temporaryDirectoryPath, {
             dependencies: {},
+            engines: {
+                node: ">=20",
+            },
             files: ["dist"],
             main: "dist/index.js",
             module: "dist/index.js",
             name: "pkg",
-            engines: {
-                node: ">=20",
-            },
         });
         writeFileSync(`${temporaryDirectoryPath}/src/index.js`, "");
 
