@@ -1,0 +1,22 @@
+---
+title: typedoc
+description: Options for generating API documentation with TypeDoc
+---
+
+# typedoc
+
+Options for generating API documentation with [TypeDoc](https://typedoc.org/). Set to `false` to disable.
+
+**Type:** `TypeDocumentOptions | false`  
+**Default:** `{}`
+
+## Example
+
+```typescript
+export default defineConfig({
+  typedoc: {
+    format: 'markdown',
+    output: 'docs/api'
+  }
+})
+```

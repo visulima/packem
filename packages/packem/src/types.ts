@@ -40,32 +40,53 @@ export type BuildPreset = BuildConfig | (() => BuildConfig);
 export type BuildConfigFunction = (environment: Environment, mode: Mode) => BuildConfig | Promise<BuildConfig>;
 
 export type BuildEntry = {
+    /** Whether to generate CommonJS output for this entry */
     cjs?: boolean;
+    /** TypeScript declaration file generation mode */
     declaration?: boolean | "compatible" | "node16";
+    /** Build environment for this entry */
     environment?: Environment;
+    /** Whether to generate ESM output for this entry */
     esm?: boolean;
+    /** Whether this entry should be marked as executable */
     executable?: true;
+    /** Set of export keys to include for this entry */
     exportKey?: Set<string>;
+    /** Alternative filename for the output file */
     fileAlias?: string;
+    /** Input file path for this entry */
     input: string;
+    /** Whether the input is a glob pattern */
     isGlob?: boolean;
+    /** Name identifier for this entry */
     name?: string;
+    /** Output directory for this entry */
     outDir?: string;
+    /** Runtime environment for this entry */
     runtime?: Runtime;
 };
 
 export type InferEntriesResult = {
+    /** Inferred build entries */
     entries: BuildEntry[];
+    /** Warning messages from the inference process */
     warnings: string[];
 };
 
 export interface BuildOptions {
+    /** Path alias mappings for module resolution */
     alias: Record<string, string>;
+    /** Whether to analyze bundle size and dependencies */
     analyze?: boolean;
+    /** Browser targets for transpilation (e.g., ['chrome 58', 'firefox 57']) */
     browserTargets?: string[];
+    /** Custom builder functions for different build types */
     builder?: Record<string, (context: BuildContext<BuildOptions>, cachePath: string | undefined, fileCache: FileCache, logged: boolean) => Promise<void>>;
+    /** Whether to enable CommonJS interop for ESM modules */
     cjsInterop?: boolean;
+    /** Whether to clean the output directory before building */
     clean: boolean;
+    /** Whether to enable debug mode with verbose logging */
     debug: boolean;
 
     /**
@@ -82,17 +103,24 @@ export interface BuildOptions {
      * If `false` or `undefined`, generate both declaration and source files.
      */
     dtsOnly?: boolean;
+    /** Whether to emit CommonJS output */
     emitCJS?: boolean;
+    /** Whether to emit ESM output */
     emitESM?: boolean;
+    /** Build entry points */
     entries: BuildEntry[];
+    /** Experimental features configuration */
     experimental?: {
         /**
          * If `true`, the `oxc resolve` plugin will be used instead of the default `@rollup/plugin-node-resolve` and `@rollup/plugin-alias`.
          */
         oxcResolve?: boolean;
     };
+    /** External dependencies that should not be bundled */
     externals: (RegExp | string)[];
+    /** Whether to fail the build on warnings */
     failOnWarn?: boolean;
+    /** Whether to enable file caching for faster rebuilds */
     fileCache?: boolean;
 
     /**
@@ -102,46 +130,75 @@ export interface BuildOptions {
      */
     ignoreExportKeys?: string[];
 
-    /** @experimental */
+    /** 
+     * Isolated declaration transformer for TypeScript declaration generation
+     * 
+     * @experimental
+     */
     isolatedDeclarationTransformer?: IsolatedDeclarationsTransformer;
 
     /**
      * Jiti options, where [jiti](https://github.com/unjs/jiti) is used to load the entry files.
+     * @default { alias: {}, debug: false, interopDefault: true }
      */
     jiti: Omit<JitiOptions, "onError" | "transform">;
+    /** Signal to use when killing child processes */
     killSignal?: KillSignal;
+    /** Whether to minify the output */
     minify?: boolean | undefined;
+    /** Name of the build */
     name: string;
+    /** Node.js 10 compatibility options */
     node10Compatibility?: Node10CompatibilityOptions | false;
+    /** Command to run or function to execute after successful build */
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
     onSuccess?: string | (() => Promise<(() => Promise<void> | void) | undefined | void>);
+    /** Timeout for the onSuccess command in milliseconds */
     onSuccessTimeout?: number;
+    /** Output directory for build artifacts */
     outDir: string;
+    /** Custom file extensions for different output formats */
     outputExtensionMap?: Record<Format, string>;
+    /** Rollup-specific build options */
     rollup: RollupBuildOptions;
+    /** Root directory of the project */
     rootDir: string;
+    /** Target runtime environment */
     runtime?: "browser" | "node";
+    /** Source directory containing the source files */
     sourceDir: string;
+    /** Whether to generate source maps */
     sourcemap: boolean;
+    /** Transformer function for processing source files */
     transformer: TransformerFn;
+    /** TypeDoc configuration for generating documentation */
     typedoc: TypeDocumentOptions | false;
+    /** Validation options for the build */
     validation?: ValidationOptions | false;
 }
 export interface InternalBuildOptions extends BuildOptions {
+    /** Rollup options with internal OXC configuration */
     rollup: Omit<BuildOptions["rollup"], "oxc"> & { oxc?: InternalOXCTransformPluginConfig };
+    /** Name of the transformer being used */
     transformerName: TransformerName | undefined;
 }
 
+/** Valid kill signals for terminating child processes */
 export type KillSignal = "SIGKILL" | "SIGTERM";
 
 export interface RollupBuildOptions extends PackemRollupOptions {
+    /** CSS processing options or false to disable */
     css?: StyleOptions | false;
+    /** External dependency resolution plugin options */
     resolveExternals?: ResolveExternalsPluginOptions;
 }
 
 export type RollupPlugins = {
+    /** Plugin enforcement order ('pre' or 'post') */
     enforce?: "post" | "pre";
+    /** The Rollup plugin instance */
     plugin: Plugin;
+    /** Type of build this plugin applies to */
     type?: "build" | "dts";
 }[];
 
@@ -175,8 +232,9 @@ export type TypeDocumentOptions = Partial<Omit<BaseTypeDocumentOptions, "entryPo
 };
 
 export type ValidationOptions = {
+    /** Bundle size validation options */
     bundleLimit?: {
-        // Allow the build to succeed even if limits are exceeded
+        /** Allow the build to succeed even if limits are exceeded */
         allowFail?: boolean;
 
         /**
@@ -187,18 +245,27 @@ export type ValidationOptions = {
          * - 1048576 // 1MB in bytes
          */
         limit?: number | `${number}${"B" | "GB" | "KB" | "MB" | "TB"}`;
-        // Size limits for specific files or globs
+        /** Size limits for specific files or globs */
         limits?: Record<string, number | `${number}${"B" | "GB" | "KB" | "MB" | "TB"}`>;
     };
+    /** Dependency validation options */
     dependencies: {
+        /** Hoisted dependency validation with exclusions */
         hoisted: { exclude: string[] } | false;
+        /** Unused dependency validation with exclusions */
         unused: { exclude: string[] } | false;
     } | false;
+    /** Package.json validation options */
     packageJson?: {
+        /** Allowed file extensions in exports field */
         allowedExportExtensions?: string[];
+        /** Whether to validate the bin field */
         bin?: boolean;
+        /** Whether to validate dependencies */
         dependencies?: boolean;
+        /** Whether to validate the engines field */
         engines?: boolean;
+        /** Whether to validate the exports field */
         exports?: boolean;
 
         /**
@@ -207,11 +274,17 @@ export type ValidationOptions = {
          * @example ["custom", "my-bundler"]
          */
         extraConditions?: string[];
+        /** Whether to validate the files field */
         files?: boolean;
+        /** Whether to validate the main field */
         main?: boolean;
+        /** Whether to validate the module field */
         module?: boolean;
+        /** Whether to validate the name field */
         name?: boolean;
+        /** Whether to validate the types field */
         types?: boolean;
+        /** Whether to validate the typesVersions field */
         typesVersions?: boolean;
     };
 };

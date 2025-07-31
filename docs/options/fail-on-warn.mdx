@@ -1,0 +1,19 @@
+---
+title: failOnWarn
+description: Fail the build on any warning
+---
+
+# failOnWarn
+
+If true, the build will fail on any warning. Useful for enforcing strict build hygiene in CI.
+
+**Type:** `boolean`  
+**Default:** `true`
+
+## Example
+
+```typescript
+export default defineConfig({
+  failOnWarn: false // Allow warnings without failing
+})
+```

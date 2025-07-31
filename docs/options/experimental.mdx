@@ -1,0 +1,21 @@
+---
+title: experimental
+description: Enable experimental features
+---
+
+# experimental
+
+Enables experimental features. For example, `oxcResolve` switches to an alternative module resolver.
+
+**Type:** `{ oxcResolve?: boolean }`  
+**Default:** `{}`
+
+## Example
+
+```typescript
+export default defineConfig({
+  experimental: {
+    oxcResolve: true
+  }
+})
+```

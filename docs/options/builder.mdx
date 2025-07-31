@@ -1,0 +1,23 @@
+---
+title: builder
+description: Custom builder functions for advanced build scenarios
+---
+
+# builder
+
+Custom builder functions for advanced build scenarios. Allows you to hook into and extend the build process programmatically.
+
+**Type:** `Record<string, (context, cachePath, fileCache, logged) => Promise<void>>`  
+**Default:** `undefined`
+
+## Example
+
+```typescript
+export default defineConfig({
+  builder: {
+    custom: async (context, cachePath, fileCache, logged) => {
+      // Custom build logic here
+    }
+  }
+})
+```

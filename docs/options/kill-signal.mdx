@@ -1,0 +1,19 @@
+---
+title: killSignal
+description: Signal used to terminate child processes during the build
+---
+
+# killSignal
+
+Specifies the signal used to terminate child processes during the build.
+
+**Type:** `"SIGKILL" | "SIGTERM"`  
+**Default:** `undefined`
+
+## Example
+
+```typescript
+export default defineConfig({
+  killSignal: 'SIGTERM'
+})
+```

@@ -1,0 +1,22 @@
+---
+title: onSuccess / onSuccessTimeout
+description: Run a command or function after a successful build
+---
+
+# onSuccess / onSuccessTimeout
+
+Runs a command or function after a successful build. `onSuccessTimeout` sets a timeout for this action.
+
+**Type:**  
+- `onSuccess`: `string | (() => Promise<void>)`
+- `onSuccessTimeout`: `number` (ms)  
+**Default:** `undefined`
+
+## Example
+
+```typescript
+export default defineConfig({
+  onSuccess: 'echo Build complete!',
+  onSuccessTimeout: 5000
+})
+```

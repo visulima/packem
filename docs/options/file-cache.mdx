@@ -1,0 +1,19 @@
+---
+title: fileCache
+description: Enable or disable the file cache for faster rebuilds
+---
+
+# fileCache
+
+Enables or disables the file cache for faster rebuilds. Disabling may help with debugging or in CI environments.
+
+**Type:** `boolean`  
+**Default:** `true`
+
+## Example
+
+```typescript
+export default defineConfig({
+  fileCache: false
+})
+```

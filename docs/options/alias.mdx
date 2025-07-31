@@ -1,0 +1,22 @@
+---
+title: alias
+description: Path alias mappings for module resolution
+---
+
+# alias
+
+Defines custom path aliases for module resolution, similar to TypeScript’s `paths` or Webpack’s `resolve.alias`. Useful for shortening import paths or redirecting modules.
+
+**Type:** `Record<string, string>`  
+**Default:** `{}`
+
+## Example
+
+```typescript
+export default defineConfig({
+  alias: {
+    '@utils': './src/utils',
+    '@components': './src/components'
+  }
+})
+```

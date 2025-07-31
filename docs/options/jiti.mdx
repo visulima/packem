@@ -1,0 +1,21 @@
+---
+title: jiti
+description: Advanced options for the jiti runtime used to load entry files
+---
+
+# jiti
+
+Advanced: Options for the [jiti](https://github.com/unjs/jiti) runtime used to load entry files. Rarely needed unless customizing module loading.
+
+**Type:** `Omit<JitiOptions, "onError" | "transform">`  
+**Default:** `{ alias: {}, debug: false, interopDefault: true }`
+
+## Example
+
+```typescript
+export default defineConfig({
+  jiti: {
+    debug: true
+  }
+})
+```
