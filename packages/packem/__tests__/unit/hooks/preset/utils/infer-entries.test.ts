@@ -955,4 +955,126 @@ describe(inferEntries, () => {
             warnings: [],
         } satisfies InferEntriesResult);
     });
+
+    it("should ignore specified export keys", () => {
+        expect.assertions(1);
+
+        createFiles(["src/index.ts", "src/images/icon.png"], temporaryDirectoryPath);
+
+        const result = inferEntries(
+            {
+                exports: {
+                    ".": "./dist/index.mjs",
+                    "./assets": "./dist/assets/logo.svg",
+                    "./images": "./dist/images/icon.png",
+                },
+                type: "module",
+            },
+            ["src/", "src/index.ts", "src/images/icon.png"].map((file) => join(temporaryDirectoryPath, file)),
+            {
+                ...defaultContext,
+                options: {
+                    ...defaultContext.options,
+                    ignoreExportKeys: ["images", "assets"],
+                },
+            },
+        );
+
+        expect(result).toStrictEqual({
+            entries: [
+                {
+                    environment: "development",
+                    esm: true,
+                    exportKey: new Set<string>(["."]),
+                    input: join(temporaryDirectoryPath, "src/index.ts"),
+                    runtime: "node",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+    });
+
+    it("should ignore nested export keys", () => {
+        expect.assertions(1);
+
+        createFiles(["src/index.ts"], temporaryDirectoryPath);
+
+        const result = inferEntries(
+            {
+                exports: {
+                    ".": {
+                        import: "./dist/index.mjs",
+                        require: "./dist/index.cjs",
+                    },
+                    "./images": {
+                        import: "./dist/images/index.mjs",
+                        require: "./dist/images/index.cjs",
+                    },
+                },
+            },
+            ["src/", "src/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            {
+                ...defaultContext,
+                options: {
+                    ...defaultContext.options,
+                    ignoreExportKeys: ["images"],
+                },
+            },
+        );
+
+        expect(result).toStrictEqual({
+            entries: [
+                {
+                    cjs: true,
+                    environment: "development",
+                    esm: true,
+                    exportKey: new Set<string>(["."]),
+                    input: join(temporaryDirectoryPath, "src/index.ts"),
+                    runtime: "node",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+    });
+
+    it("should work with allowedExportExtensions", () => {
+        expect.assertions(1);
+
+        createFiles(["src/index.ts", "src/images/icon.svg"], temporaryDirectoryPath);
+
+        const result = inferEntries(
+            {
+                exports: {
+                    ".": "./dist/index.mjs",
+                    "./images": "./dist/images/icon.svg",
+                },
+                type: "module",
+            },
+            ["src/", "src/index.ts", "src/images/icon.svg"].map((file) => join(temporaryDirectoryPath, file)),
+            {
+                ...defaultContext,
+                options: {
+                    ...defaultContext.options,
+                    validation: {
+                        packageJson: {
+                            allowedExportExtensions: [".svg"],
+                        },
+                    },
+                },
+            },
+        );
+
+        expect(result).toStrictEqual({
+            entries: [
+                {
+                    environment: "development",
+                    esm: true,
+                    exportKey: new Set<string>(["."]),
+                    input: join(temporaryDirectoryPath, "src/index.ts"),
+                    runtime: "node",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+    });
 });

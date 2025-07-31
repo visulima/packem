@@ -100,7 +100,8 @@
             "undici@>=6.0.0 <6.21.2": ">=6.21.2",
             "@visulima/packem-rollup": "workspace:*",
             "@visulima/packem-share": "workspace:*",
-            "@visulima/rollup-css-plugin": "workspace:*"
+            "@visulima/rollup-css-plugin": "workspace:*",
+            "form-data@>=4.0.0 <4.0.4": ">=4.0.4"
         }
     }
 }

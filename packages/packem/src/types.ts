@@ -95,6 +95,13 @@ export interface BuildOptions {
     failOnWarn?: boolean;
     fileCache?: boolean;
 
+    /**
+     * Array of export keys to ignore during entry inference.
+     * Useful for excluding exports that only contain images or other non-JavaScript assets.
+     * @example ["images", "assets", "icons"]
+     */
+    ignoreExportKeys?: string[];
+
     /** @experimental */
     isolatedDeclarationTransformer?: IsolatedDeclarationsTransformer;
 
@@ -188,6 +195,7 @@ export type ValidationOptions = {
         unused: { exclude: string[] } | false;
     } | false;
     packageJson?: {
+        allowedExportExtensions?: string[];
         bin?: boolean;
         dependencies?: boolean;
         engines?: boolean;

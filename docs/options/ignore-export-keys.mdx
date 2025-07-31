@@ -1,0 +1,74 @@
+---
+title: ignoreExportKeys
+description: Array of export keys to ignore during entry inference
+---
+
+# ignoreExportKeys
+
+Array of export keys to ignore during entry inference. Useful for excluding exports that only contain images or other non-JavaScript assets.
+
+## Type
+
+```typescript
+ignoreExportKeys?: string[]
+```
+
+## Default
+
+`undefined` (no exports are ignored)
+
+## Description
+
+When packem processes your `package.json` exports, it tries to find corresponding source files for each export. However, some exports may only contain non-JavaScript assets (like images, CSS files, etc.) that don't have corresponding source files to build.
+
+By default, packem will generate warnings for exports where it can't find source files. Use `ignoreExportKeys` to tell packem to skip these exports entirely.
+
+## Examples
+
+### Basic Usage
+
+```typescript
+// packem.config.ts
+import type { BuildConfig } from "@visulima/packem";
+
+const config: BuildConfig = {
+  ignoreExportKeys: ["images", "assets", "styles"],
+};
+
+export default config;
+```
+
+### With package.json exports
+
+```json
+{
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./images": "./dist/images/icon.png",
+    "./assets": "./dist/assets/logo.svg",
+    "./styles": "./dist/styles.css"
+  }
+}
+```
+
+With `ignoreExportKeys: ["images", "assets", "styles"]`, only the main export (`"."`) will be processed as a build entry.
+
+### CLI Usage
+
+```bash
+packem build --ignore-export-keys=images,assets,styles
+```
+
+## Notes
+
+- Export keys are matched without the `./` prefix (e.g., `"./images"` matches `"images"`)
+- Ignored exports are still included in the final `package.json` for consumers
+- No warnings are generated for ignored exports
+- Works with both simple string exports and nested conditional exports
+
+## Related Options
+
+When using `ignoreExportKeys` with asset exports, you may also want to configure:
+
+- `validation.packageJson.allowedExportExtensions` - Add custom file extensions to the valid export extensions list
+- `rollup.copy` - Copy asset files to the output directory 

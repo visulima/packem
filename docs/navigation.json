@@ -186,6 +186,16 @@
           "description": "Automatic package.json exports"
         },
         {
+          "title": "Ignore Export Keys",
+          "href": "/docs/options/ignore-export-keys",
+          "description": "Exclude specific export keys from build processing"
+        },
+        {
+          "title": "Allowed Export Extensions",
+          "href": "/docs/options/allowed-export-extensions",
+          "description": "Add custom file extensions to exports validation"
+        },
+        {
           "title": "Unbundle",
           "href": "/docs/options/unbundle",
           "description": "Preserve file structure mode"

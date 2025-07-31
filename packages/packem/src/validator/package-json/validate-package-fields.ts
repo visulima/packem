@@ -1,6 +1,6 @@
 import { VALID_EXPORT_EXTENSIONS } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
-import { warn, getOutputExtension } from "@visulima/packem-share/utils";
+import { getOutputExtension, warn } from "@visulima/packem-share/utils";
 
 import type { InternalBuildOptions, ValidationOptions } from "../../types";
 
@@ -79,10 +79,12 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
             }
 
             // Check for valid file extensions
-            const hasValidExtension = VALID_EXPORT_EXTENSIONS.some((extension) => value.endsWith(extension));
+            const allowedExtensions = validation.packageJson?.allowedExportExtensions || [];
+            const allValidExtensions = [...VALID_EXPORT_EXTENSIONS, ...allowedExtensions];
+            const hasValidExtension = allValidExtensions.some((extension) => value.endsWith(extension));
 
             if (!hasValidExtension) {
-                warn(context, `Export path "${value}" at ${path} should have a valid file extension (${VALID_EXPORT_EXTENSIONS.join(", ")})`);
+                warn(context, `Export path "${value}" at ${path} should have a valid file extension (${allValidExtensions.join(", ")})`);
             }
 
             return;
