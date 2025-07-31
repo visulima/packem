@@ -1,3 +1,13 @@
+## @visulima/packem [2.0.0-alpha.4](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.3...@visulima/packem@2.0.0-alpha.4) (2025-07-31)
+
+### Bug Fixes
+
+* enhance `ignoreExportKeys` functionality to support wildcard patterns ([18370ae](https://github.com/visulima/packem/commit/18370ae4d298119ccc3ccfdb95b1c82968990209))
+
+### Tests
+
+* adjust assertions in package-json-exports integration test ([1b75e29](https://github.com/visulima/packem/commit/1b75e29d2c9e04e27c8ef00a64374c374c6a8f24))
+
 ## @visulima/packem [2.0.0-alpha.3](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.2...@visulima/packem@2.0.0-alpha.3) (2025-07-31)
 
 ### Features
