@@ -86,11 +86,12 @@
         "onlyBuiltDependencies": [
             "@parcel/watcher",
             "@swc/core",
+            "@tailwindcss/oxide",
             "esbuild",
             "node-sass",
             "nodehun",
             "nx",
-            "oxc-resolver"
+            "unrs-resolver"
         ],
         "overrides": {
             "@octokit/plugin-paginate-rest@>=1.0.0 <11.4.1": ">=11.4.1",
