@@ -1,6 +1,8 @@
 import { VALID_EXPORT_EXTENSIONS } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getOutputExtension, warn } from "@visulima/packem-share/utils";
+import { join, resolve } from "@visulima/path";
+import { globSync, isDynamicPattern } from "tinyglobby";
 
 import type { InternalBuildOptions, ValidationOptions } from "../../types";
 
@@ -78,9 +80,48 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
                 return;
             }
 
-            // Check for valid file extensions
             const allowedExtensions = validation.packageJson?.allowedExportExtensions || [];
             const allValidExtensions = [...VALID_EXPORT_EXTENSIONS, ...allowedExtensions];
+
+            // Handle dynamic patterns by expanding glob and validating each matched file
+            if (isDynamicPattern(value)) {
+                try {
+                    // Convert relative path to absolute path for glob expansion
+                    const absolutePattern = value.startsWith("./")
+                        ? resolve(context.options.rootDir, value.slice(2))
+                        : resolve(context.options.rootDir, value);
+
+                    // Expand the glob pattern to find all matching files
+                    const matchedFiles = globSync([absolutePattern], {
+                        cwd: context.options.rootDir,
+                        dot: false,
+                        ignore: [
+                            "**/node_modules/**",
+                            "**/.git/**",
+                            "**/dist/**", // Skip dist directory to avoid circular validation
+                        ],
+                    });
+
+                    if (matchedFiles.length === 0) {
+                        // No files found matching the pattern - this is acceptable for glob patterns
+                        // as they may be used for future files or in different environments
+                        return;
+                    }
+
+                    const invalidFiles = matchedFiles.filter((file) => !allValidExtensions.some((extension) => file.endsWith(extension)));
+
+                    if (invalidFiles.length > 0) {
+                        warn(context, `Export path "${value}" at ${path} matches files with invalid extensions: ${invalidFiles.join(", ")}. Valid extensions are: ${allValidExtensions.join(", ")}`);
+                    }
+                } catch (error) {
+                    // If glob expansion fails, fall back to skipping validation
+                    warn(context, `Could not validate glob pattern "${value}" at ${path}: ${error instanceof Error ? error.message : "Unknown error"}`);
+                }
+
+                return;
+            }
+
+            // Check for valid file extensions for non-glob patterns
             const hasValidExtension = allValidExtensions.some((extension) => value.endsWith(extension));
 
             if (!hasValidExtension) {
