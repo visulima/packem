@@ -9,7 +9,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { EventEmitter } from 'events';
 import { encode } from 'gpt-tokenizer/model/gpt-4o';
-import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-BpbaYNxF.mjs';
+import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-CpMQ4hPi.mjs';
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -666,7 +666,7 @@ cli.parse();
 export declare function fetchSite(url: string, options: Options): Promise<FetchSiteResult>;
 export declare function serializePages(pages: FetchSiteResult, format: "json" | "text"): string;
 ",
-  "export { f as fetchSite, s as serializePages } from './packem_shared/index-BpbaYNxF.mjs';
+  "export { f as fetchSite, s as serializePages } from './packem_shared/index-CpMQ4hPi.mjs';
 import 'happy-dom';
 import 'cheerio';
 ",
@@ -937,6 +937,7 @@ function pTimeout(promise, options) {
     customTimers = { setTimeout, clearTimeout }
   } = options;
   let timer;
+  let abortHandler;
   const wrappedPromise = new Promise((resolve, reject) => {
     if (typeof milliseconds !== "number" || Math.sign(milliseconds) !== 1) {
       throw new TypeError(\`Expected \\\`milliseconds\\\` to be a positive number, got \\\`\${milliseconds}\\\`\`);
@@ -946,13 +947,10 @@ function pTimeout(promise, options) {
       if (signal.aborted) {
         reject(getAbortedReason(signal));
       }
-      const abortHandler = /* @__PURE__ */ __name$7(() => {
+      abortHandler = /* @__PURE__ */ __name$7(() => {
         reject(getAbortedReason(signal));
       }, "abortHandler");
       signal.addEventListener("abort", abortHandler, { once: true });
-      promise.finally(() => {
-        signal.removeEventListener("abort", abortHandler);
-      });
     }
     if (milliseconds === Number.POSITIVE_INFINITY) {
       promise.then(resolve, reject);
@@ -990,6 +988,9 @@ function pTimeout(promise, options) {
   });
   const cancelablePromise = wrappedPromise.finally(() => {
     cancelablePromise.clear();
+    if (abortHandler && options.signal) {
+      options.signal.removeEventListener("abort", abortHandler);
+    }
   });
   cancelablePromise.clear = () => {
     customTimers.clearTimeout.call(void 0, timer);

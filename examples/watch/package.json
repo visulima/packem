@@ -30,8 +30,8 @@
     },
     "devDependencies": {
         "@visulima/packem": "workspace:*",
-        "esbuild": "^0.25.5",
-        "typescript": "^5.8.3"
+        "esbuild": "^0.25.8",
+        "typescript": "^5.9.2"
     },
     "engines": {
         "node": ">=18"
