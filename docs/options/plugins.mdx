@@ -227,6 +227,42 @@ export default defineConfig({
 })
 ```
 
+### Data URI imports (`?data-uri`)
+
+Inline files as data URIs at import sites. SVG files are encoded as tiny, human-readable data URIs; other file types are base64-encoded.
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { dataUriPlugin } from '@visulima/packem-rollup/plugins'
+
+export default defineConfig({
+  rollup: {
+    plugins: [
+      dataUriPlugin({
+        // Optional: when using output in an <img srcset="..."> attribute
+        // spaces are encoded as %20 to be srcset-safe
+        srcset: false
+      })
+    ]
+  }
+})
+```
+
+Usage examples:
+
+```ts
+// SVG → tiny data URI (not base64), whitespace-collapsed
+import icon from './assets/icon.svg?data-uri'
+
+// Any other file → base64 data URI with appropriate mime type
+import txt from './assets/readme.txt?data-uri'
+```
+
+Notes:
+- Only imports ending with `?data-uri` are transformed; regular imports are unaffected.
+- SVGs are encoded as `data:image/svg+xml,....` (tiny URI). Others as `data:<mime>;base64,...`.
+- For `srcset` attributes, enable `{ srcset: true }` to encode spaces as `%20`.
+
 ## Development Plugins
 
 ### Live Reload

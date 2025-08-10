@@ -25,13 +25,13 @@
 	},
 	"devDependencies": {
 		"@mozilla/readability": "^0.6.0",
-		"@types/bun": "^1.2.19",
+		"@types/bun": "^1.2.20",
 		"@types/micromatch": "^4.0.9",
 		"@types/turndown": "^5.0.5",
 		"cac": "^6.7.14",
 		"p-queue": "^8.1.0",
 		"picocolors": "^1.1.1",
-		"typescript": "^5.8.3",
+		"typescript": "^5.9.2",
 		"esbuild": "0.25.8"
 	}
 }

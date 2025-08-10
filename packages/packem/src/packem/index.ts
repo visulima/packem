@@ -134,6 +134,9 @@ const generateOptions = (
                 extensions: [".css", ".pcss", ".postcss", ".sss"],
                 namedExports: true,
             },
+            dataUri: {
+                srcset: true,
+            },
             dts: {
                 compilerOptions: {
                     baseUrl: tsconfig?.config.compilerOptions?.baseUrl ?? ".",

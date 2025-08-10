@@ -72,6 +72,7 @@ export interface PackemRollupOptions {
     cjsInterop?: CJSInteropOptions;
     commonjs: RollupCommonJSOptions | false;
     copy?: CopyPluginOptions | false;
+    dataUri?: DataUriPluginOptions | false;
     dts: RollupDtsOptions;
     dynamicVars?: RollupDynamicImportVariablesOptions | false;
     esbuild?: EsbuildOptions | false;
