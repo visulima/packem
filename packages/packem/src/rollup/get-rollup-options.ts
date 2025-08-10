@@ -2,7 +2,7 @@ import { versions } from "node:process";
 
 import { cyan } from "@visulima/colorize";
 import type { AliasResolverObject, ShebangOptions } from "@visulima/packem-rollup";
-import { alias as aliasPlugin, browserslistToEsbuild, cachingPlugin, chunkSplitter, cjsInteropPlugin, commonjs as commonjsPlugin, copyPlugin, createSplitChunks, dynamicImportVars as dynamicImportVariablesPlugin, esmShimCjsSyntaxPlugin, fixDtsDefaultCjsExportsPlugin, fixDynamicImportExtension, isolatedDeclarationsPlugin, jsonPlugin as JSONPlugin, jsxRemoveAttributes, licensePlugin, metafilePlugin, nodeResolve as nodeResolvePlugin, polyfillNode as polyfillPlugin, preserveDirectivesPlugin, pure as PluginPure, rawPlugin, removeShebangPlugin, replace as replacePlugin, resolveFileUrl as resolveFileUrlPlugin, shebangPlugin, sourcemapsPlugin, urlPlugin, visualizer as visualizerPlugin, wasm as wasmPlugin } from "@visulima/packem-rollup";
+import { alias as aliasPlugin, browserslistToEsbuild, cachingPlugin, chunkSplitter, cjsInteropPlugin, commonjs as commonjsPlugin, copyPlugin, createSplitChunks, dataUriPlugin, dynamicImportVars as dynamicImportVariablesPlugin, esmShimCjsSyntaxPlugin, fixDtsDefaultCjsExportsPlugin, fixDynamicImportExtension, isolatedDeclarationsPlugin, jsonPlugin, jsxRemoveAttributes, licensePlugin, metafilePlugin, nodeResolve as nodeResolvePlugin, polyfillNode as polyfillPlugin, preserveDirectivesPlugin, pure as PluginPure, rawPlugin, removeShebangPlugin, replace as replacePlugin, resolveFileUrlPlugin, shebangPlugin, sourcemapsPlugin, urlPlugin, visualizer as visualizerPlugin, wasm as wasmPlugin } from "@visulima/packem-rollup";
 import type { EsbuildPluginConfig } from "@visulima/packem-rollup/esbuild";
 import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
 import { oxcResolvePlugin } from "@visulima/packem-rollup/oxc";
@@ -397,6 +397,10 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
             nodeResolver,
 
+            context.options.rollup.dataUri && dataUriPlugin({
+                ...context.options.rollup.dataUri,
+            }),
+
             context.options.rollup.polyfillNode
             && polyfillPlugin({
                 sourceMap: context.options.sourcemap,
@@ -404,7 +408,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             }),
 
             context.options.rollup.json
-            && JSONPlugin({
+            && jsonPlugin({
                 ...context.options.rollup.json,
             }),
 
@@ -771,7 +775,7 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
             context.options.rollup.json
-            && JSONPlugin({
+            && jsonPlugin({
                 ...context.options.rollup.json,
             }),
 
