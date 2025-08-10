@@ -1067,6 +1067,9 @@ importers:
       lightningcss:
         specifier: 1.30.1
         version: 1.30.1
+      lucide-static:
+        specifier: 0.539.0
+        version: 0.539.0
       minireset.css:
         specifier: 0.0.7
         version: 0.0.7
@@ -7775,6 +7778,9 @@ packages:
   lru-cache@7.18.3:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
     engines: {node: '>=12'}
+
+  lucide-static@0.539.0:
+    resolution: {integrity: sha512-ybhtBJOeIgY1d1WV3vxJkSOoWi1EaYOkA15WYtct9/kX3+HSTCdbkeM0fQ4i5JxsKmp874J8dsNI92r4t5qCzg==}
 
   lunr@2.3.9:
     resolution: {integrity: sha512-zTU3DaZaF3Rt9rhN3uBMGQD3dD2/vFQqnvZCDv4dl5iOzq2IZQqTxu90r4E5J+nP70J3ilqVCrbho2eWaeW8Ow==}
@@ -17633,6 +17639,8 @@ snapshots:
       yallist: 4.0.0
 
   lru-cache@7.18.3: {}
+
+  lucide-static@0.539.0: {}
 
   lunr@2.3.9: {}
 

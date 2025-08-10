@@ -234,6 +234,7 @@
         "conventional-changelog-conventionalcommits": "9.1.0",
         "cross-env": "^10.0.0",
         "cssnano": "7.1.0",
+        "lucide-static": "^0.539.0",
         "deeks": "^3.1.1",
         "detect-indent": "^7.0.1",
         "es-module-lexer": "1.7.0",
