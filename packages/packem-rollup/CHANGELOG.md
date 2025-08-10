@@ -1,3 +1,18 @@
+## @visulima/packem-rollup [1.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.4...@visulima/packem-rollup@1.0.0-alpha.5) (2025-08-10)
+
+### Bug Fixes
+
+* update dependencies and add data-uri plugin support ([a52dab5](https://github.com/visulima/packem/commit/a52dab541290324218949ad5ea9502b127d0b0dd))
+
+### Miscellaneous Chores
+
+* update package dependencies to version 2.0.3 for @anolilab/semantic-release-pnpm and @anolilab/semantic-release-preset; bump oxc-transform and oxc-parser to 0.79.1 ([ce60668](https://github.com/visulima/packem/commit/ce606682c65afcb710e7a923429c2c543f52d88f))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.5
+
 ## @visulima/packem-rollup [1.0.0-alpha.4](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.3...@visulima/packem-rollup@1.0.0-alpha.4) (2025-07-31)
 
 ### Bug Fixes
