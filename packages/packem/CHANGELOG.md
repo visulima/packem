@@ -1,3 +1,16 @@
+## @visulima/packem [2.0.0-alpha.6](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.5...@visulima/packem@2.0.0-alpha.6) (2025-08-10)
+
+### Bug Fixes
+
+* update dependencies and add data-uri plugin support ([a52dab5](https://github.com/visulima/packem/commit/a52dab541290324218949ad5ea9502b127d0b0dd))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.5
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.5
+* **@visulima/rollup-css-plugin:** upgraded to 1.0.0-alpha.5
+
 ## @visulima/packem [2.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.4...@visulima/packem@2.0.0-alpha.5) (2025-07-31)
 
 ### Bug Fixes
