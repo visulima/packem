@@ -30,9 +30,12 @@ const specialHexEncode = (match: string): string => {
 const collapseWhitespace = (input: string): string => input.trim().replaceAll(REGEX.whitespace, " ");
 const dataUriPayload = (input: string): string => encodeURIComponent(input).replaceAll(REGEX.urlHexPairs, specialHexEncode);
 
+const stripSvgComments = (input: string): string => input.replaceAll(/<!--[\s\S]*?-->/g, "");
+
 const svgToTinyDataUri = (svgString: string): string => {
     const withoutBom = svgString.startsWith("\uFEFF") ? svgString.slice(1) : svgString;
-    const body = collapseWhitespace(withoutBom).replaceAll(REGEX.quotes, "'");
+    const noComments = stripSvgComments(withoutBom);
+    const body = collapseWhitespace(noComments).replaceAll(REGEX.quotes, "'");
 
     return `data:image/svg+xml,${dataUriPayload(body)}`;
 };
