@@ -1,3 +1,14 @@
+## @visulima/packem [2.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.6...@visulima/packem@2.0.0-alpha.7) (2025-08-10)
+
+### Features
+
+* add lucide-static integration and SVG comment stripping ([ac344b3](https://github.com/visulima/packem/commit/ac344b3eb9566e479764625cd877617379d10c16))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.6
+
 ## @visulima/packem [2.0.0-alpha.6](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.5...@visulima/packem@2.0.0-alpha.6) (2025-08-10)
 
 ### Bug Fixes
