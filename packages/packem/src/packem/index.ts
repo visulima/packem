@@ -895,7 +895,8 @@ const packem = async (
             } else if (typeof context.options.onSuccess === "string") {
                 const timeout = context.options.onSuccessTimeout ?? 30_000; // 30 seconds default
 
-                onSuccessProcess = exec(context.options.onSuccess, [], {
+                // Capture the spawned process locally to avoid race conditions with cleanup
+                const executedProcess = onSuccessProcess = exec(context.options.onSuccess, [], {
                     nodeOptions: {
                         shell: true,
                         stdio: "inherit",
@@ -903,10 +904,12 @@ const packem = async (
                     },
                 });
 
-                await onSuccessProcess;
+                await executedProcess;
 
-                if (onSuccessProcess.exitCode && onSuccessProcess.exitCode !== 0) {
-                    throw new Error(`onSuccess script failed with exit code ${onSuccessProcess.exitCode}. Check the output above for details.`);
+                const { exitCode } = executedProcess;
+
+                if (typeof exitCode === "number" && exitCode !== 0) {
+                    throw new Error(`onSuccess script failed with exit code ${exitCode}. Check the output above for details.`);
                 }
             }
         };
