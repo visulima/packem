@@ -536,7 +536,9 @@ const generateOptions = (
         prefix: "system",
     });
     logger.info({
-        message: `Using ${cyan("rollup ")}${VERSION} with ${cyan(options.runtime as string)} build runtime`,
+        message: options.bundler === "rolldown"
+            ? `Using ${cyan("rolldown")} with ${cyan(options.runtime as string)} build runtime`
+            : `Using ${cyan("rollup ")}${VERSION} with ${cyan(options.runtime as string)} build runtime`,
         prefix: "bundler",
     });
     logger.info({
