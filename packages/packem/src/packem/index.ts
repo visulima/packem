@@ -8,7 +8,7 @@ import type { NormalizedPackageJson, PackageJson } from "@visulima/package";
 import { hasPackageJsonAnyDependency } from "@visulima/package";
 import { enhanceRollupError, FileCache } from "@visulima/packem-share";
 import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "@visulima/packem-share/constants";
-import type { BuildContext, BuildHooks } from "@visulima/packem-share/types";
+import type { BuildContext } from "@visulima/packem-share/types";
 import { getHash } from "@visulima/packem-share/utils";
 import type { Pail } from "@visulima/pail";
 import { join, resolve } from "@visulima/path";
@@ -33,6 +33,7 @@ import getPackageSideEffect from "../utils/get-package-side-effect";
 import killProcess from "../utils/kill-process";
 import logBuildErrors from "../utils/log-build-errors";
 import removeOldCacheFolders from "../utils/remove-old-cache-folders";
+import warnLegacyCJS from "../utils/warn-legacy-cjs";
 import packageJsonValidator from "../validator/package-json";
 import validateAliasEntries from "../validator/validate-alias-entries";
 import validateBundleSize from "../validator/validate-bundle-size";
@@ -686,6 +687,8 @@ const createContext = async (
     if (context.options.minify) {
         context.logger.info("Minification is enabled, the output will be minified");
     }
+
+    warnLegacyCJS(context);
 
     const hasTypescript = hasPackageJsonAnyDependency(packageJson as NormalizedPackageJson, ["typescript"]);
 
