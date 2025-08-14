@@ -120,6 +120,7 @@ const createBuildCommand = (cli: Cli<Console>): void => {
                 const customDefu = createDefuWithHooksMerger();
                 const mergedConfig = customDefu(buildConfig, autoPreset, preset, {
                     analyze: options.analyze,
+                    bundler: options.bundler,
                     cjsInterop: options.cjsInterop,
                     clean: options.clean,
                     dtsOnly: options.dtsOnly,
@@ -182,6 +183,17 @@ const createBuildCommand = (cli: Cli<Console>): void => {
         },
         name: "build",
         options: [
+            {
+                description: "Specify the bundler to use (rollup or rolldown)",
+                name: "bundler",
+                type: (input: string) => {
+                    if (input === "rollup" || input === "rolldown") {
+                        return input;
+                    }
+
+                    throw new Error("Invalid bundler. Use 'rollup' or 'rolldown'.");
+                },
+            },
             {
                 defaultValue: ".",
                 description: "The directory to build",

@@ -11,6 +11,7 @@ import { join, relative, resolve } from "@visulima/path";
 
 import { buildExe } from "../exe";
 import runWithConcurrency from "../lib/concurrency";
+import rolldownBuild from "../rolldown/build";
 import rollupBuild from "../rollup/build";
 import rollupBuildTypes from "../rollup/build-types";
 import type { BuildEntry, InternalBuildOptions } from "../types";
@@ -709,7 +710,10 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
     // Run JS bundling in parallel (fast and memory-efficient)
     if (builders.size > 0) {
         await Promise.all(
-            Array.from(builders, async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuild(rollupContext, cache, subDirectory)),
+            Array.from(builders, async ({ context: bContext, fileCache: cache, subDirectory }) =>
+                (bContext.options.bundler === "rolldown"
+                    ? await rolldownBuild(bContext, cache, subDirectory)
+                    : await rollupBuild(bContext, cache, subDirectory))),
         );
     }
 

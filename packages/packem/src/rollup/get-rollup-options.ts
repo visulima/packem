@@ -434,7 +434,8 @@ const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "b
 // eslint-disable-next-line import/exports-last
 export const getRollupOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
-    const nodeResolver = createNodeResolver(context);
+    const isRolldown = context.options.bundler === "rolldown";
+    const nodeResolver = isRolldown ? undefined : createNodeResolver(context);
 
     const chunking
         = context.options.unbundle || context.options.rollup.output?.preserveModules
@@ -754,12 +755,18 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             })(),
 
             context.options.rollup.alias
-            && aliasPlugin({
-                // https://github.com/rollup/plugins/tree/master/packages/alias#custom-resolvers
-                customResolver: nodeResolver as AliasResolverObject,
-                ...context.options.rollup.alias,
-                entries: resolvedAliases,
-            }),
+            && (() => {
+                const aliasOptions = {
+                    ...context.options.rollup.alias,
+                    entries: resolvedAliases,
+                } as Record<string, unknown>;
+
+                if (!isRolldown && nodeResolver) {
+                    (aliasOptions as { customResolver: AliasResolverObject }).customResolver = nodeResolver as AliasResolverObject;
+                }
+
+                return aliasPlugin(aliasOptions as never);
+            })(),
 
             ...prePlugins,
 
@@ -878,7 +885,8 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 context.options.rollup.shebang as ShebangOptions,
             ),
 
-            context.options.cjsInterop
+            !isRolldown
+            && context.options.cjsInterop
             && context.options.emitCJS
             && cjsInteropPlugin({
                 ...context.options.rollup.cjsInterop,
@@ -888,7 +896,8 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             context.options.rollup.dynamicVars && fixDynamicImportExtension(),
             context.options.rollup.dynamicVars && dynamicImportVariablesPlugin(context.options.rollup.dynamicVars),
 
-            context.options.rollup.commonjs
+            !isRolldown
+            && context.options.rollup.commonjs
             && cachingPlugin(
                 commonjsPlugin({
                     sourceMap: context.options.sourcemap,

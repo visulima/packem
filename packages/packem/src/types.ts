@@ -131,6 +131,8 @@ export interface BuildOptions {
     browserTargets?: string[];
     /** Custom builder functions for different build types */
     builder?: Record<string, (context: BuildContext<BuildOptions>, cachePath: string | undefined, fileCache: FileCache, logged: boolean) => Promise<void>>;
+    /** Bundler to use for building source files */
+    bundler?: "rollup" | "rolldown";
     /** Whether to enable CommonJS interop for ESM modules */
     cjsInterop?: boolean;
     /** Whether to clean the output directory before building */
@@ -170,9 +172,7 @@ export interface BuildOptions {
     exe?: boolean | ExeOptions;
     /** Experimental features configuration */
     experimental?: {
-        /**
-         * If `true`, the `oxc resolve` plugin will be used instead of the default `@rollup/plugin-node-resolve` and `@rollup/plugin-alias`.
-         */
+        // If true, the `oxc resolve` plugin will be used instead of the default `@rollup/plugin-node-resolve` and `@rollup/plugin-alias`.
         oxcResolve?: boolean;
     };
     /** External dependencies that should not be bundled */

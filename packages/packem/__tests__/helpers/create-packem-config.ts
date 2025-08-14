@@ -11,6 +11,7 @@ import type { BuildConfig } from "../../src/types";
 const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../dist");
 
 export type PackemConfigProperties = {
+    bundler?: "rollup" | "rolldown";
     config?: BuildConfig | string | undefined;
     cssLoader?: ("less" | "lightningcss" | "postcss" | "sass" | "sourcemap" | "stylus" | "tailwindcss")[];
     cssOptions?: StyleOptions | string | undefined;
@@ -31,6 +32,7 @@ export type PackemConfigProperties = {
 export const createPackemConfig = async (
     fixturePath: string,
     {
+        bundler = undefined,
         config = undefined,
         cssLoader = [],
         cssOptions = undefined,
@@ -119,6 +121,7 @@ ${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/ro
 ${minimizer ? `import ${minimizer} from "${distributionPath}/rollup/plugins/css/minifiers/${minimizer}";` : ""}${pluginImports.join("\n")}
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
+    ${bundler ? `bundler: "${bundler}",` : ""}
     runtime: "${runtime}",
     experimental: ${JSON.stringify(experimental, undefined, 4)},
     transformer,${config as string}${rollupConfig}
