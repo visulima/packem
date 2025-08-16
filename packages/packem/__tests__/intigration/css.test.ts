@@ -762,7 +762,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 for (let index = 0; index < (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[]).length; index++) {
                     // this is needed because of the temporary directory path, that is generated on every test run
                     // eslint-disable-next-line no-param-reassign
-                    (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index]
+                    ((((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] as string)
 
                         = ((((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] as string).replace(
                             "__REPLACE__",
@@ -771,6 +771,96 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 }
             }
 
+            await validate(data);
+        });
+    });
+
+    describe.only("tailwind-oxide", () => {
+        // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
+        it.each([
+            {
+                input: "tailwind-oxide/index.js",
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    tailwindcss: {
+                        autoprefixer: true,
+                        content: ["**/*.{html,js,ts,jsx,tsx}"],
+                        jit: true,
+                        minify: true,
+                        purge: true,
+                        sourceMap: true,
+                    },
+                },
+                title: "basic",
+            },
+            {
+                input: "tailwind-oxide/index.js",
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "extract",
+                    tailwindcss: {
+                        autoprefixer: true,
+                        content: ["**/*.{html,js,ts,jsx,tsx}"],
+                        jit: true,
+                        minify: true,
+                        purge: true,
+                        sourceMap: true,
+                    },
+                },
+                title: "extract",
+            },
+            {
+                input: "tailwind-oxide/index.js",
+                styleOptions: {
+                    loaders: ["tailwindcss", "sourcemap"],
+                    mode: "extract",
+                    sourceMap: true,
+                    tailwindcss: {
+                        autoprefixer: true,
+                        content: ["**/*.{html,js,ts,jsx,tsx}"],
+                        jit: true,
+                        minify: true,
+                        purge: true,
+                        sourceMap: true,
+                    },
+                },
+                title: "extract-sourcemap",
+            },
+            {
+                input: "tailwind-oxide/index.js",
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "emit",
+                    tailwindcss: {
+                        autoprefixer: true,
+                        content: ["**/*.{html,js,ts,jsx,tsx}"],
+                        jit: true,
+                        minify: true,
+                        purge: true,
+                        sourceMap: true,
+                    },
+                },
+                title: "emit",
+            },
+            {
+                input: "tailwind-oxide/index.js",
+                styleOptions: {
+                    loaders: ["tailwindcss", "sourcemap"],
+                    mode: "emit",
+                    sourceMap: true,
+                    tailwindcss: {
+                        autoprefixer: true,
+                        content: ["**/*.{html,js,ts,jsx,tsx}"],
+                        jit: true,
+                        minify: true,
+                        purge: true,
+                        sourceMap: true,
+                    },
+                },
+                title: "emit-sourcemap",
+            },
+        ] as WriteData[])("should work with tailwind-oxide processed $title css", async ({ title, ...data }: WriteData) => {
+            await installPackage(temporaryDirectoryPath, "tailwindcss");
             await validate(data);
         });
     });

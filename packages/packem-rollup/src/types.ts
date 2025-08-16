@@ -27,6 +27,7 @@ import type { SwcPluginConfig } from "./plugins/swc/types";
 import type { PatchTypesOptions } from "./plugins/typescript/patch-typescript-types";
 import type { TsconfigPathsPluginOptions } from "./plugins/typescript/resolve-tsconfig-paths-plugin";
 import type { UrlOptions } from "./plugins/url";
+import type { DataUriPluginOptions } from "./plugins/data-uri";
 
 interface RollupDynamicImportVariablesOptions {
     /**

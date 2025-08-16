@@ -182,6 +182,7 @@ const generateOptions = (
             dynamicVars: {
                 errorWhenNoFilesFound: true,
                 exclude: EXCLUDE_REGEXP,
+                include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
             },
             esbuild: {
                 charset: "utf8",

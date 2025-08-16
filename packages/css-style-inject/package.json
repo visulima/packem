@@ -70,7 +70,7 @@
         "conventional-changelog-conventionalcommits": "9.1.0",
         "eslint": "^9.33.0",
         "rimraf": "^6.0.1",
-        "secretlint": "11.0.1",
+        "secretlint": "11.0.2",
         "semantic-release": "^24.2.7",
         "typescript": "^5.9.2",
         "vitest": "^3.2.4"

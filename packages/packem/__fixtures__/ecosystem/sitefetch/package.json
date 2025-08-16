@@ -19,7 +19,7 @@
 		"happy-dom": "^18.0.1",
 		"cheerio": "^1.1.2",
 		"gpt-tokenizer": "^3.0.1",
-		"turndown": "^7.2.0",
+		"turndown": "^7.2.1",
 		"turndown-plugin-gfm": "^1.0.2",
 		"micromatch": "^4.0.8"
 	},
@@ -32,6 +32,6 @@
 		"p-queue": "^8.1.0",
 		"picocolors": "^1.1.1",
 		"typescript": "^5.9.2",
-		"esbuild": "0.25.8"
+		"esbuild": "0.25.9"
 	}
 }
