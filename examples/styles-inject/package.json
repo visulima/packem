@@ -20,7 +20,7 @@
         "@visulima/css-style-inject": "workspace:*",
         "@visulima/packem": "workspace:*",
         "cssnano": "7.1.0",
-        "esbuild": "^0.25.8",
+        "esbuild": "^0.25.9",
         "icss-utils": "^5.1.0",
         "less": "^4.4.0",
         "postcss": "^8.5.6",
