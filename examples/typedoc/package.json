@@ -27,6 +27,6 @@
         "typedoc-plugin-rename-defaults": "0.7.3"
     },
     "engines": {
-        "node": ">=18"
+        "node": ">=20"
     }
 }
