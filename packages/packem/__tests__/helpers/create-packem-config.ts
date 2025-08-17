@@ -13,7 +13,7 @@ const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../di
 
 export type PackemConfigProperties = {
     config?: BuildConfig | string | undefined;
-    cssLoader?: ("less" | "lightningcss" | "postcss" | "sass" | "sourcemap" | "stylus")[];
+    cssLoader?: ("less" | "lightningcss" | "postcss" | "sass" | "sourcemap" | "stylus" | "tailwindcss")[];
     cssOptions?: StyleOptions | string | undefined;
     experimental?: Record<string, boolean>;
     isolatedDeclarationTransformer?: "oxc" | "swc" | "typescript" | undefined;

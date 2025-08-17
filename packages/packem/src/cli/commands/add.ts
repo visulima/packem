@@ -98,39 +98,42 @@ const createAddCommand = (cli: Cli): void => {
                     options: [
                         { label: "PostCSS", value: "postcss" },
                         { hint: "experimental", label: "Lightning CSS", value: "lightningcss" },
+                        { hint: "Tailwind Css Oxide", label: "Tailwind CSS", value: "tailwindcss" },
                     ],
                 })) as keyof typeof cssLoaderDependencies;
 
                 cssLoaders.push(mainCssLoader);
 
-                let extraCssLoaders = (await multiselect({
-                    message: "Pick extra loaders",
-                    options: [
-                        { label: "Sass", value: "sass" },
-                        { label: "Stylus", value: "stylus" },
-                        { label: "Less", value: "less" },
-                    ],
-                    required: false,
-                })) as (keyof typeof cssLoaderDependencies)[];
-
-                if (extraCssLoaders.includes("sass")) {
-                    const sassLoader = await select({
-                        message: "Pick a sass loader",
+                if (mainCssLoader !== "tailwindcss") {
+                    let extraCssLoaders = (await multiselect({
+                        message: "Pick extra loaders",
                         options: [
-                            { hint: "recommended", label: "Sass embedded", value: "sass-embedded" },
                             { label: "Sass", value: "sass" },
-                            { hint: "legacy", label: "Node Sass", value: "node-sass" },
+                            { label: "Stylus", value: "stylus" },
+                            { label: "Less", value: "less" },
                         ],
-                    });
+                        required: false,
+                    })) as (keyof typeof cssLoaderDependencies)[];
 
-                    if (sassLoader !== "sass") {
-                        extraCssLoaders = extraCssLoaders.filter((loader) => loader !== "sass");
+                    if (extraCssLoaders.includes("sass")) {
+                        const sassLoader = await select({
+                            message: "Pick a sass loader",
+                            options: [
+                                { hint: "recommended", label: "Sass embedded", value: "sass-embedded" },
+                                { label: "Sass", value: "sass" },
+                                { hint: "legacy", label: "Node Sass", value: "node-sass" },
+                            ],
+                        });
 
-                        extraCssLoaders.push(sassLoader as keyof typeof cssLoaderDependencies);
+                        if (sassLoader !== "sass") {
+                            extraCssLoaders = extraCssLoaders.filter((loader) => loader !== "sass");
+
+                            extraCssLoaders.push(sassLoader as keyof typeof cssLoaderDependencies);
+                        }
                     }
-                }
 
-                cssLoaders.push(...extraCssLoaders);
+                    cssLoaders.push(...extraCssLoaders);
+                }
 
                 const packagesToInstall: string[] = [];
 
@@ -138,10 +141,13 @@ const createAddCommand = (cli: Cli): void => {
                     packagesToInstall.push(...(cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies] as string[]));
                 }
 
-                cssLoaders.push("sourceMap");
+                if (mainCssLoader !== "tailwindcss") {
+                    cssLoaders.push("sourceMap");
+                }
 
                 for (let loader of cssLoaders) {
                     if (loader === "sass-embedded" || loader === "node-sass") {
+                        // eslint-disable-next-line sonarjs/updated-loop-counter
                         loader = "sass";
                     }
 

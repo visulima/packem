@@ -31,7 +31,7 @@ export type FixDtsDefaultCjsExportsPluginOptions = {
  * @returns The Rollup plugin object.
  */
 export const fixDtsDefaultCjsExportsPlugin = (
-    options: FixDtsDefaultCjsExportsPluginOptions = {}
+    options: FixDtsDefaultCjsExportsPluginOptions = {},
 ): Plugin => {
     const {
         matcher = (info: RenderedChunk) =>

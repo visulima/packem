@@ -1,5 +1,5 @@
 import MagicString from "magic-string";
-import type { Plugin, NormalizedOutputOptions, RenderedChunk } from "rollup";
+import type { NormalizedOutputOptions, Plugin, RenderedChunk } from "rollup";
 
 const fixDynamicImportExtension = (): Plugin =>
     ({

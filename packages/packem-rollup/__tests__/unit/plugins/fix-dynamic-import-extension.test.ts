@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import type { NormalizedOutputOptions, RenderedChunk } from "rollup";
+import { describe, expect, it } from "vitest";
 
 import fixDynamicImportExtension from "../../../src/plugins/fix-dynamic-import-extension";
 
@@ -20,7 +20,7 @@ describe(fixDynamicImportExtension, () => {
             code: string,
             chunk: RenderedChunk,
             options: NormalizedOutputOptions
-        ) => ({ code: string; map: any } | undefined);
+        ) => { code: string; map: any } | undefined;
 
         it("should replace .ts with .mjs for es format", () => {
             expect.assertions(1);

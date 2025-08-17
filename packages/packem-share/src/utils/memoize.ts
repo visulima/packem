@@ -46,7 +46,7 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
  * @returns A function that returns memoized versions with optional cache key
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const memoizeByKey = <T extends (...arguments_: any[]) => any>(function_: T): ((cacheKey?: CacheKeyResolver) => T) => {
+export const memoizeByKey = <T extends (...arguments_: any[]) => any>(function_: T): (cacheKey?: CacheKeyResolver) => T => {
     const cache = new Map<string, ReturnType<T>>();
 
     return (cacheKey?: CacheKeyResolver) => memoize(function_, cacheKey, cache);

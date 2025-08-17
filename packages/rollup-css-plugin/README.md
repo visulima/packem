@@ -9,6 +9,7 @@ A comprehensive CSS processing plugin for [Packem](https://github.com/visulima/p
 - **Sass/SCSS** - Popular CSS extension language
 - **Less** - Dynamic stylesheet language
 - **Stylus** - Expressive, dynamic, robust CSS
+- **Tailwind Oxide** - Next-generation Tailwind CSS with Rust-based engine
 
 ### 🔧 CSS Processing
 - **CSS Modules** - Localized CSS with automatic class name generation
@@ -54,6 +55,9 @@ npm install lightningcss
 
 # cssnano (for CSS minification)
 npm install cssnano
+
+# Tailwind Oxide (for Tailwind CSS processing)
+npm install @tailwindcss/node @tailwindcss/oxide
 ```
 
 ## Usage
@@ -74,6 +78,8 @@ export default {
 
       // Enable source maps
       sourceMap: true,
+
+
     }),
     
     // Generate TypeScript declarations for CSS modules
@@ -123,6 +129,8 @@ export default {
       // Minification
       minifier: "lightningcss",
 
+
+
       // Custom loaders
       loaders: [
         {
@@ -162,6 +170,7 @@ Main CSS processing plugin for Rollup/Packem.
 - `include/exclude` - File inclusion/exclusion patterns
 - `autoModules` - Enable CSS modules automatically
 - `namedExports` - Enable named exports for CSS classes
+
 
 #### Preprocessor Options
 
@@ -314,6 +323,16 @@ export default {
 - **Multiple Processors**: Supports PostCSS and LightningCSS modules
 - **Custom Naming**: Respects your CSS modules naming configuration
 - **Build Integration**: Seamlessly integrates with your build process
+
+
+### Tailwind Oxide Features
+
+- **Ultra-Fast Processing**: Rust-based engine for lightning-fast CSS generation
+- **Just-In-Time (JIT) Mode**: Generate only the CSS you actually use
+- **Smart Content Scanning**: Automatically detect and watch file changes
+- **Source Map Support**: Full debugging support with accurate source maps
+- **Production Optimization**: Automatic CSS purging and minification
+- **Plugin Compatibility**: Works with existing Tailwind plugins and configuration
 
 ## PostCSS Integration
 

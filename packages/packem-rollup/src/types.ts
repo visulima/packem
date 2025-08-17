@@ -13,6 +13,7 @@ import type { PluginVisualizerOptions } from "rollup-plugin-visualizer";
 
 import type { CJSInteropOptions } from "./plugins/cjs-interop";
 import type { CopyPluginOptions } from "./plugins/copy";
+import type { DataUriPluginOptions } from "./plugins/data-uri";
 import type { EsbuildPluginConfig, Options as EsbuildOptions } from "./plugins/esbuild/types";
 import type { EsmShimCjsSyntaxOptions } from "./plugins/esm-shim-cjs-syntax";
 import type { IsolatedDeclarationsOptions } from "./plugins/isolated-declarations";

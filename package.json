@@ -56,10 +56,14 @@
         "@commitlint/cli": "^19.8.1",
         "@commitlint/config-conventional": "^19.8.1",
         "@secretlint/secretlint-rule-preset-recommend": "^11.0.2",
+=======
+        "@visulima/packem": "^1.28.2",
+>>>>>>> acbbc5907 (feat: added tailwindcss oxide loader (#166))
         "audit-ci": "^7.1.0",
         "browserslist-config-anolilab": "^6.0.2",
         "commitizen": "^4.3.1",
         "cross-env": "^10.0.0",
+<<<<<<< HEAD
         "husky": "^9.1.7",
         "is-ci": "^4.1.0",
         "lint-staged": "^16.1.5",

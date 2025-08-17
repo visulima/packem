@@ -75,7 +75,7 @@ describe("fileCache", () => {
 
         expect(fileCache.get("/path/to/file")).toStrictEqual(data);
         expect(fileCache.get("/path/to/file")).toStrictEqual(data);
-        expect(readFileSync).toHaveBeenCalledOnce();
+        expect(readFileSync).toHaveBeenCalledTimes(1);
     });
 
     it("should read and parse JSON data from file system correctly", () => {

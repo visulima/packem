@@ -102,6 +102,10 @@
             "types": "./dist/rollup/plugins/css/loaders/lightningcss.d.ts",
             "default": "./dist/rollup/plugins/css/loaders/lightningcss.js"
         },
+        "./css/loader/tailwindcss": {
+            "types": "./dist/rollup/plugins/css/loaders/tailwindcss.d.ts",
+            "default": "./dist/rollup/plugins/css/loaders/tailwindcss.js"
+        },
         "./css/minifier/cssnano": {
             "types": "./dist/rollup/plugins/css/minifiers/cssnano.d.ts",
             "default": "./dist/rollup/plugins/css/minifiers/cssnano.js"
@@ -208,7 +212,7 @@
         "@anolilab/semantic-release-pnpm": "^2.0.3",
         "@anolilab/semantic-release-preset": "^11.0.3",
         "@arethetypeswrong/cli": "^0.18.2",
-        "@babel/parser": "7.28.0",
+        "@babel/parser": "7.28.3",
         "@csstools/css-parser-algorithms": "3.0.5",
         "@csstools/css-tokenizer": "3.0.4",
         "@csstools/postcss-slow-plugins": "^2.0.0",
@@ -234,7 +238,6 @@
         "conventional-changelog-conventionalcommits": "9.2.0",
         "cross-env": "^10.0.0",
         "cssnano": "7.1.0",
-        "lucide-static": "^0.539.0",
         "deeks": "^3.1.1",
         "detect-indent": "^7.0.1",
         "es-module-lexer": "1.7.0",
@@ -245,10 +248,12 @@
         "icss-utils": "^5.1.0",
         "less": "^4.4.0",
         "lightningcss": "1.30.1",
+        "lit": "^3.3.1",
+        "lucide-static": "^0.539.0",
         "minireset.css": "0.0.7",
-        "oxc-parser": "0.81.0",
+        "oxc-parser": "0.82.2",
         "oxc-resolver": "11.6.1",
-        "oxc-transform": "^0.81.0",
+        "oxc-transform": "^0.82.2",
         "postcss": "^8.5.6",
         "postcss-custom-properties": "14.0.6",
         "postcss-load-config": "^6.0.1",
@@ -274,6 +279,7 @@
         "stylus": "^0.64.0",
         "sucrase": "^3.35.0",
         "sugarss": "5.0.1",
+        "tailwindcss": "^4",
         "tempy": "^3.1.0",
         "tree-kill": "^1.2.2",
         "typedoc": "0.28.10",
