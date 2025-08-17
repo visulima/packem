@@ -329,6 +329,7 @@ const tailwindcssLoader: Loader = {
         // Use the shared utility for JavaScript export generation
         const jsExportResult = generateJsExports({
             css: result.code,
+            cwd: this.cwd as string,
             dts: this.dts,
             emit: this.emit,
             id: this.id,

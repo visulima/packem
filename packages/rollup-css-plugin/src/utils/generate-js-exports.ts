@@ -1,4 +1,4 @@
-import { basename } from "@visulima/path";
+import { basename, relative } from "@visulima/path";
 
 import type { InjectOptions } from "../types";
 import safeId from "./safe-id";
@@ -7,7 +7,74 @@ import safeId from "./safe-id";
 const cssVariableName = "css";
 
 /** Set of reserved JavaScript keywords to avoid conflicts */
-const reservedWords = new Set([cssVariableName]);
+const reservedWords = new Set([
+    // JavaScript reserved keywords
+    "abstract",
+    "arguments",
+    "await",
+    "boolean",
+    "break",
+    "byte",
+    "case",
+    "catch",
+    "char",
+    "class",
+    "const",
+    "continue", // Current CSS variable name
+    cssVariableName,
+    "debugger",
+    "default",
+    "delete",
+    "do",
+    "double",
+    "else",
+    "enum",
+    "eval",
+    "export",
+    "extends",
+    "false",
+    "final",
+    "finally",
+    "float",
+    "for",
+    "function",
+    "goto",
+    "if",
+    "implements",
+    "import",
+    "in",
+    "instanceof",
+    "int",
+    "interface",
+    "let",
+    "long",
+    "native",
+    "new",
+    "null",
+    "package",
+    "private",
+    "protected",
+    "public",
+    "return",
+    "short",
+    "static",
+    "super",
+    "switch",
+    "synchronized",
+    "this",
+    "throw",
+    "throws",
+    "transient",
+    "true",
+    "try",
+    "typeof",
+    "var",
+    "void",
+    "volatile",
+    "while",
+    "with",
+    "yield",
+]);
 
 /**
  * Converts a CSS class name to a legal JavaScript identifier.
@@ -32,6 +99,8 @@ const getClassNameDefault = (name: string): string => {
 export interface JsExportOptions {
     /** CSS content to export */
     css: string;
+    /** Current working directory for relative path calculations */
+    cwd?: string;
     /** Whether to generate TypeScript declarations */
     dts?: boolean;
     /** Whether to emit CSS instead of JavaScript */
@@ -64,10 +133,21 @@ export interface JsExportResult {
 /**
  * Generates JavaScript exports for CSS content with support for CSS modules and injection
  * @param options Configuration options for export generation
+ * @param options.css CSS content to export
+ * @param options.cwd Current working directory for relative path calculations
+ * @param options.dts Whether to generate TypeScript declarations
+ * @param options.emit Whether to emit CSS instead of JavaScript
+ * @param options.id File ID for safe identifier generation
+ * @param options.inject CSS injection configuration
+ * @param options.logger Logger for warnings
+ * @param options.modulesExports CSS modules exports mapping class names to hashed names
+ * @param options.namedExports Named exports configuration
+ * @param options.supportModules Whether CSS modules are supported
  * @returns Generated JavaScript code and TypeScript declarations
  */
 export const generateJsExports = ({
     css,
+    cwd,
     dts = false,
     emit = false,
     id,
@@ -99,7 +179,9 @@ export const generateJsExports = ({
             const newName = getClassName(name);
 
             if (name !== newName && logger) {
-                logger.warn({ message: `Exported \`${name}\` as \`${newName}\` in ${id}` });
+                const relativePath = cwd ? relative(cwd, id) : id;
+
+                logger.warn({ message: `Exported \`${name}\` as \`${newName}\` in ${relativePath}` });
             }
 
             const fmt = JSON.stringify(value);
