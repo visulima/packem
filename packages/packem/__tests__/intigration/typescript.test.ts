@@ -1537,7 +1537,7 @@ export declare let num: Num;
                     case "oxc": {
                         // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsMapContent).toBe(
-                            `{"file":"index.d.cts","mappings":"AAAA,cAAc,WAAW,SAAS;AAClC,YAAY;AAEZ,OAAO,iBAAS,MAAMA,GAAG,MAAM;AAI/B,OAAO,YAAIC,KAAK","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
+                            `{"file":"index.d.cts","mappings":"AAAA,cAAc,WAAW;AACzB,YAAY;AAEZ,OAAO,iBAAS,MAAM,GAAG,MAAM;AAI/B,OAAO,YAAIA,KAAK","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
 
                         break;
@@ -1577,7 +1577,7 @@ export declare let num: Num;
                     case "oxc": {
                         // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dtsMapContent).toBe(
-                            `{"file":"index.d.ts","mappings":"AAAA,cAAc,WAAW,SAAS;AAClC,YAAY;AAEZ,OAAO,iBAAS,MAAMA,GAAG,MAAM;AAI/B,OAAO,YAAIC,KAAK","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
+                            `{"file":"index.d.ts","mappings":"AAAA,cAAc,WAAW;AACzB,YAAY;AAEZ,OAAO,iBAAS,MAAM,GAAG,MAAM;AAI/B,OAAO,YAAIA,KAAK","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
 
                         break;
