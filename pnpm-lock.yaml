@@ -370,20 +370,26 @@ importers:
         version: 19.1.1
     devDependencies:
       '@tailwindcss/node':
-        specifier: ^4.0.0
-        version: 4.1.12
+        specifier: 0.0.0-insiders.ffb1d72
+        version: 0.0.0-insiders.ffb1d72
       '@tailwindcss/oxide':
-        specifier: ^4.0.0
-        version: 4.1.12
+        specifier: 0.0.0-oxide-insiders.ff2c25f
+        version: 0.0.0-oxide-insiders.ff2c25f
       '@types/react':
         specifier: ^18.2.0
         version: 18.3.23
       '@types/react-dom':
         specifier: ^18.2.0
         version: 18.3.7(@types/react@18.3.23)
+      '@visulima/css-style-inject':
+        specifier: workspace:*
+        version: link:../../packages/css-style-inject
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
+      cssnano:
+        specifier: 7.1.0
+        version: 7.1.0(postcss@8.5.6)
       esbuild:
         specifier: ^0.25.9
         version: 0.25.9

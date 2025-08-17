@@ -107,10 +107,10 @@ export interface JsExportOptions {
     emit?: boolean;
     /** Whether to extract CSS to separate files */
     extract?: boolean | string;
-    /** File ID for safe identifier generation */
-    id: string;
     /** ICSS dependencies for CSS modules */
     icssDependencies?: string[];
+    /** File ID for safe identifier generation */
+    id: string;
     /** CSS injection configuration */
     inject?: InjectOptions | boolean | ((varname: string, id: string, output: string[]) => string);
     /** Logger for warnings */
@@ -312,7 +312,7 @@ ${Object.keys(modulesExports)
 
     // Handle CSS extraction for separate CSS files
     let extracted: { css: string; id: string; map?: string } | undefined;
-    
+
     if (extract) {
         extracted = { css, id, map };
     }
