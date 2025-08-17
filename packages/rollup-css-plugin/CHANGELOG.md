@@ -1,3 +1,14 @@
+## @visulima/rollup-css-plugin [1.0.0-alpha.6](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.5...@visulima/rollup-css-plugin@1.0.0-alpha.6) (2025-08-17)
+
+### Features
+
+* added tailwindcss oxide loader ([#166](https://github.com/visulima/packem/issues/166)) ([acbbc59](https://github.com/visulima/packem/commit/acbbc59071e771a94d1a0c5435b267e483e3ad73))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.6
+
 ## @visulima/rollup-css-plugin [1.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.4...@visulima/rollup-css-plugin@1.0.0-alpha.5) (2025-08-10)
 
 ### Bug Fixes
