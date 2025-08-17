@@ -249,7 +249,7 @@ class TailwindRoot {
  * Tailwind Oxide loader for processing Tailwind CSS files
  */
 const tailwindcssLoader: Loader<TailwindOxideLoaderOptions> = {
-    name: "tailwind-oxide",
+    name: "tailwindcss",
 
     /**
      * Process Tailwind CSS content using Tailwind Oxide
@@ -317,9 +317,9 @@ const tailwindcssLoader: Loader<TailwindOxideLoaderOptions> = {
         // Handle emit mode - return CSS directly when emit is true
         if (this.emit) {
             return {
-                code: result.code,
-                map: result.map,
+                ...result,
                 meta: {
+                    moduleContents: result, // Use CSS directly instead of JS code
                     types: undefined, // No types for emit mode
                 },
                 moduleSideEffects: true,
@@ -328,8 +328,8 @@ const tailwindcssLoader: Loader<TailwindOxideLoaderOptions> = {
 
         // Use the shared utility for JavaScript export generation
         const jsExportResult = generateJsExports({
+            cleanCss: !this.extract,
             css: result.code,
-            cwd: this.cwd as string,
             dts: this.dts,
             emit: this.emit,
             id: this.id,

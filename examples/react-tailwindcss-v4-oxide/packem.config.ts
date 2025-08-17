@@ -11,7 +11,7 @@ export default defineConfig({
     rollup: {
         css: {
             mode: "extract",
-            loaders: [tailwindcssLoader, sourceMapLoader],
+            loaders: [tailwindcssLoader],
             minifier: cssnanoMinifier
         },
     },

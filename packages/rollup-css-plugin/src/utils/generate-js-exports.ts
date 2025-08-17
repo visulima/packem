@@ -1,6 +1,6 @@
 import { basename } from "@visulima/path";
 
-import type { InjectOptions, InternalStyleOptions } from "../types";
+import type { InjectOptions } from "../types";
 import safeId from "./safe-id";
 
 /** Variable name used for the exported CSS string */
@@ -8,6 +8,18 @@ const cssVariableName = "css";
 
 /** Set of reserved JavaScript keywords to avoid conflicts */
 const reservedWords = new Set([cssVariableName]);
+
+/**
+ * Removes CSS comments from the given CSS string
+ * @param css CSS content to clean
+ * @returns CSS content without comments
+ * @example
+ * ```typescript
+ * removeCssComments("/** comment *\/ body { color: red; }") // " body { color: red; }"
+ * removeCssComments("body { color: red; /** inline comment *\/ }") // "body { color: red;  }"
+ * ```
+ */
+const removeCssComments = (css: string): string => css.replaceAll(/\/\*[\s\S]*?\*\//g, "");
 
 /**
  * Converts a CSS class name to a legal JavaScript identifier.
@@ -33,10 +45,10 @@ const getClassNameDefault = (name: string): string => {
  * Options for JavaScript export generation
  */
 export interface JsExportOptions {
+    /** Enable CSS comment removal */
+    cleanCss?: boolean;
     /** CSS content to export */
     css: string;
-    /** Current working directory for relative path resolution */
-    cwd?: string;
     /** Whether to generate TypeScript declarations */
     dts?: boolean;
     /** Whether to emit CSS instead of JavaScript */
@@ -74,19 +86,23 @@ export interface JsExportResult {
  * @param options Configuration options for export generation
  * @returns Generated JavaScript code and TypeScript declarations
  */
-export function generateJsExports(options: JsExportOptions): JsExportResult {
-    const {
-        css,
-        cwd,
-        dts = false,
-        emit = false,
-        id,
-        inject,
-        logger,
-        modulesExports,
-        namedExports,
-        supportModules,
-    } = options;
+export const generateJsExports = ({
+    cleanCss = false,
+    css,
+    dts = false,
+    emit = false,
+    id,
+    inject,
+    logger,
+    modulesExports,
+    namedExports,
+    supportModules,
+}: JsExportOptions): JsExportResult => {
+    if (cleanCss) {
+        // Remove CSS comments before processing
+        // eslint-disable-next-line no-param-reassign
+        css = removeCssComments(css);
+    }
 
     // Generate safe identifiers for JavaScript output
     const saferId = (identifier: string): string => safeId(identifier, basename(id));
@@ -212,4 +228,4 @@ ${Object.keys(modulesExports)
         moduleSideEffects: supportModules || (typeof inject === "object" && inject.treeshakeable) ? false : "no-treeshake",
         types,
     };
-}
+};
