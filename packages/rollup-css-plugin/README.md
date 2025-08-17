@@ -178,7 +178,6 @@ Main CSS processing plugin for Rollup/Packem.
 - `sass` - Sass/SCSS compiler options
 - `less` - Less compiler options
 - `stylus` - Stylus compiler options
-- `tailwindcss` - Tailwind Oxide configuration options
 
 #### Output Options
 
@@ -325,49 +324,6 @@ export default {
 - **Custom Naming**: Respects your CSS modules naming configuration
 - **Build Integration**: Seamlessly integrates with your build process
 
-## Tailwind Oxide Integration
-
-Leverage the power of Tailwind Oxide for ultra-fast Tailwind CSS processing:
-
-```typescript
-import { rollupCssPlugin, tailwindcssLoader } from "@visulima/rollup-css-plugin";
-
-export default {
-  plugins: [
-    rollupCssPlugin({
-      // Enable Tailwind Oxide processing
-      tailwindcss: {
-        // Enable source maps
-        sourceMap: true,
-        
-        // Custom Tailwind config path
-        config: './tailwind.config.js',
-        
-        // Enable JIT mode for faster builds
-        jit: true,
-        
-        // Custom content paths for scanning
-        content: ['**/*.{html,js,ts,jsx,tsx}'],
-        
-        // Enable CSS purging in production
-        purge: true,
-        
-        // Enable autoprefixer
-        autoprefixer: true,
-        
-        // Enable CSS minification in production
-        minify: true
-      },
-      
-      // Add the Tailwind Oxide loader to your loaders array
-      loaders: [
-        tailwindcssLoader,
-        // ... other loaders
-      ]
-    })
-  ]
-};
-```
 
 ### Tailwind Oxide Features
 
@@ -376,19 +332,7 @@ export default {
 - **Smart Content Scanning**: Automatically detect and watch file changes
 - **Source Map Support**: Full debugging support with accurate source maps
 - **Production Optimization**: Automatic CSS purging and minification
-- **Plugin Compatibility**: Works with existing Tailwind plugins and configurations
-
-### Configuration Options
-
-- `config` - Path to Tailwind CSS configuration file
-- `jit` - Enable Just-In-Time mode for faster builds
-- `sourceMap` - Enable source map generation
-- `content` - Custom content paths for scanning
-- `purge` - Enable CSS purging in production
-- `autoprefixer` - Enable automatic vendor prefixing
-- `minify` - Enable CSS minification in production
-
-
+- **Plugin Compatibility**: Works with existing Tailwind plugins and configuration
 
 ## PostCSS Integration
 
