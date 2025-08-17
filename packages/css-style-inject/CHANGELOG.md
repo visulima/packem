@@ -1,3 +1,9 @@
+## @visulima/css-style-inject [1.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.4...@visulima/css-style-inject@1.0.0-alpha.5) (2025-08-17)
+
+### Features
+
+* added tailwindcss oxide loader ([#166](https://github.com/visulima/packem/issues/166)) ([acbbc59](https://github.com/visulima/packem/commit/acbbc59071e771a94d1a0c5435b267e483e3ad73))
+
 ## @visulima/css-style-inject [1.0.0-alpha.4](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.3...@visulima/css-style-inject@1.0.0-alpha.4) (2025-08-10)
 
 ### Bug Fixes
