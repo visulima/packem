@@ -1,3 +1,9 @@
+## @visulima/packem [2.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.7...@visulima/packem@2.0.0-alpha.8) (2025-08-11)
+
+### Bug Fixes
+
+* fixed undefined based on exitCode ([9bd9a54](https://github.com/visulima/packem/commit/9bd9a5413d78163b56efda75c18270ad9f099106))
+
 ## @visulima/packem [2.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.6...@visulima/packem@2.0.0-alpha.7) (2025-08-10)
 
 ### Features
