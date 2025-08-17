@@ -1,12 +1,11 @@
 import postcssSlowPlugins from "@csstools/postcss-slow-plugins";
-import { makeLegalIdentifier } from "@rollup/pluginutils";
-import { basename, dirname, normalize, relative } from "@visulima/path";
+import { dirname, normalize } from "@visulima/path";
 import type { AcceptedPlugin, ProcessOptions } from "postcss";
 import postcss from "postcss";
 import type { RawSourceMap } from "source-map-js";
 
-import type { InjectOptions, InternalStyleOptions } from "../../types";
-import safeId from "../../utils/safe-id";
+import type { InternalStyleOptions } from "../../types";
+import { generateJsExports } from "../../utils/generate-js-exports";
 import { mm } from "../../utils/sourcemap";
 import type { Loader } from "../types";
 import ensureAutoModules from "../utils/ensure-auto-modules";
@@ -16,32 +15,6 @@ import loadConfig from "./load-config";
 import postcssModules from "./modules";
 import postcssNoop from "./noop";
 import postcssUrl from "./url";
-
-/** Variable name used for the exported CSS string */
-const cssVariableName = "css";
-
-/** Set of reserved JavaScript keywords to avoid conflicts */
-const reservedWords = new Set([cssVariableName]);
-
-/**
- * Converts a CSS class name to a legal JavaScript identifier.
- * @param name CSS class name to convert
- * @returns Legal JavaScript identifier, prefixed with underscore if it conflicts with reserved words
- * @example
- * ```typescript
- * getClassNameDefault("my-class") // "my_class"
- * getClassNameDefault("css") // "_css" (reserved word)
- * ```
- */
-const getClassNameDefault = (name: string): string => {
-    const id = makeLegalIdentifier(name);
-
-    if (reservedWords.has(id)) {
-        return `_${id}`;
-    }
-
-    return id;
-};
 
 /** PostCSS options combining internal options with required PostCSS properties */
 type PostCSSOptions = InternalStyleOptions["postcss"] & Pick<Required<ProcessOptions>, "from" | "map" | "to">;
@@ -245,42 +218,22 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             result.css += mapModifier.toCommentData();
         }
 
-        // Generate safe identifiers for JavaScript output
-        const saferId = (id: string): string => safeId(id, basename(this.id));
-        const modulesVariableName = saferId("modules");
-
-        // Build JavaScript output for CSS injection
-        const output = [`var ${cssVariableName} = ${JSON.stringify(result.css)};`];
-        const dts = [];
-        const outputExports = [cssVariableName];
-
-        // Generate named exports for CSS modules
-        if (this.namedExports) {
-            if (this.dts) {
-                dts.push(`declare const ${cssVariableName}: string;`);
-            }
-
-            const getClassName = typeof this.namedExports === "function" ? this.namedExports : getClassNameDefault;
-
-            // eslint-disable-next-line guard-for-in
-            for (const name in modulesExports) {
-                const newName = getClassName(name);
-
-                if (name !== newName) {
-                    this.logger.warn({ message: `Exported \`${name}\` as \`${newName}\` in ${relative(this.cwd as string, this.id)}` });
-                }
-
-                const fmt = JSON.stringify(modulesExports[name]);
-
-                output.push(`var ${newName} = ${fmt};`);
-
-                if (this.dts) {
-                    dts.push(`declare const ${newName}: ${fmt};`);
-                }
-
-                outputExports.push(newName);
-            }
-        }
+        // Use the shared utility for JavaScript export generation
+        const jsExportResult = generateJsExports({
+            css: result.css,
+            cwd: this.cwd as string,
+            dts: this.dts,
+            emit: this.emit,
+            extract: this.extract,
+            icssDependencies,
+            id: this.id,
+            inject: this.inject,
+            logger: this.logger,
+            map,
+            modulesExports,
+            namedExports: this.namedExports,
+            supportModules,
+        });
 
         // Handle CSS extraction for separate CSS files
         if (this.extract) {
@@ -288,96 +241,12 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             extracted = { css: result.css, id: this.id, map };
         }
 
-        // Handle CSS injection for runtime styles
-        if (this.inject) {
-            if (typeof this.inject === "function") {
-                output.push(this.inject(cssVariableName, this.id, output), `var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`);
-            } else {
-                const { treeshakeable, ...injectorOptions } = typeof this.inject === "object" ? this.inject : ({} as InjectOptions);
-
-                const injectorName = saferId("injector");
-                const injectorCall = `${injectorName}(${cssVariableName},${JSON.stringify(injectorOptions)});`;
-
-                output.unshift(`import { cssStyleInject as ${injectorName} } from "@visulima/css-style-inject";`);
-
-                if (!treeshakeable) {
-                    output.push(`var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`, injectorCall);
-                }
-
-                if (treeshakeable) {
-                    output.push("var injected = false;");
-
-                    const injectorCallOnce = `if (!injected) { injected = true; ${injectorCall} }`;
-
-                    if (modulesExports.inject) {
-                        throw new Error("`inject` keyword is reserved when using `inject.treeshakeable` option");
-                    }
-
-                    let getters = "";
-
-                    for (const [k, v] of Object.entries(modulesExports)) {
-                        const name = JSON.stringify(k);
-                        const value = JSON.stringify(v);
-
-                        getters += `get ${name}() { ${injectorCallOnce} return ${value}; },\n`;
-                    }
-
-                    getters += `inject: function inject() { ${injectorCallOnce} },`;
-
-                    output.push(`var ${modulesVariableName} = {${getters}};`);
-                }
-            }
-        }
-
-        if (!this.inject && Object.keys(modulesExports).length > 0) {
-            output.push(`var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`);
-        }
-
-        const defaultExport = `\nexport default ${supportModules ? modulesVariableName : cssVariableName};\n`;
-
-        output.push(defaultExport);
-
-        if (this.dts) {
-            if (supportModules) {
-                dts.push(
-                    `\ninterface ModulesExports {
-${Object.keys(modulesExports)
-    .map((key) => `  '${key}': string;`)
-    .join("\n")}
-}\n`,
-                    typeof this.inject === "object" && this.inject.treeshakeable ? `interface ModulesExports {inject:()=>void}` : "",
-                    `declare const ${modulesVariableName}: ModulesExports;`,
-                );
-            }
-
-            dts.push(defaultExport);
-        }
-
-        if (this.namedExports) {
-            const namedExport = `export {\n  ${outputExports.filter(Boolean).join(",\n  ")}\n};`;
-
-            output.push(namedExport);
-
-            if (this.dts) {
-                dts.push(namedExport);
-            }
-        }
-
-        const outputString = output.filter(Boolean).join("\n");
-        const types = dts.length > 0 ? dts.filter(Boolean).join("\n") : undefined;
-
-        if (this.emit) {
-            return { code: result.css, map, meta: { icssDependencies, moduleContents: outputString, types } };
-        }
-
         return {
-            code: outputString,
+            code: jsExportResult.code,
             extracted,
-            map,
-            meta: {
-                types,
-            },
-            moduleSideEffects: supportModules || (typeof this.inject === "object" && this.inject.treeshakeable) ? false : "no-treeshake",
+            map: jsExportResult.map,
+            meta: jsExportResult.meta,
+            moduleSideEffects: jsExportResult.moduleSideEffects,
         };
     },
 };

@@ -14,10 +14,12 @@ const cssLoaderDependencies: Record<string, string[]> = {
         "@csstools/css-tokenizer",
         "@csstools/postcss-slow-plugins",
         "icss-utils",
+        "@visulima/css-style-inject",
     ],
     sass: ["sass"],
     "sass-embedded": ["sass-embedded"],
     stylus: ["stylus"],
+    tailwindcss: ["@tailwindcss/node", "@tailwindcss/oxide", "tailwindcss"],
 };
 
 export default cssLoaderDependencies;

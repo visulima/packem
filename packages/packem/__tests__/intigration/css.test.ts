@@ -762,13 +762,138 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 for (let index = 0; index < (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[]).length; index++) {
                     // this is needed because of the temporary directory path, that is generated on every test run
                     // eslint-disable-next-line no-param-reassign
-                    (((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index]
+                    ((((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] as string)
 
                         = ((((data.styleOptions as StyleOptions).less as LESSLoaderOptions).paths as string[])[index] as string).replace(
                             "__REPLACE__",
                             temporaryDirectoryPath,
                         );
                 }
+            }
+
+            await validate(data);
+        });
+    });
+
+    describe("tailwind-oxide", () => {
+        // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
+        it.each([
+            {
+                dependencies: {
+                    tailwindcss: "*",
+                },
+                input: "tailwind-oxide/index.js",
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                },
+                title: "basic",
+            },
+            {
+                dependencies: {
+                    tailwindcss: "*",
+                },
+                input: "tailwind-oxide/index.js",
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "extract",
+                },
+                title: "extract",
+            },
+            {
+                dependencies: {
+                    tailwindcss: "*",
+                },
+                input: "tailwind-oxide/index.js",
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "extract",
+                    sourceMap: true,
+                },
+                title: "extract-sourcemap",
+            },
+            {
+                dependencies: {
+                    tailwindcss: "*",
+                },
+                input: "tailwind-oxide/index.js",
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "extract",
+                    sourceMap: "inline",
+                },
+                title: "extract-sourcemap-inline",
+            },
+            {
+                dependencies: {
+                    "rollup-plugin-lit-css": "*",
+                    tailwindcss: "*",
+                },
+                input: "tailwind-oxide/index.js",
+                packemPlugins: [
+                    {
+                        code: "litCss()",
+                        from: "rollup-plugin-lit-css",
+                        importName: "litCss",
+                        namedExport: true,
+                        when: "after",
+                    },
+                ],
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "emit",
+                },
+                title: "emit",
+            },
+            {
+                dependencies: {
+                    "rollup-plugin-lit-css": "*",
+                    tailwindcss: "*",
+                },
+                input: "tailwind-oxide/index.js",
+                packemPlugins: [
+                    {
+                        code: "litCss()",
+                        from: "rollup-plugin-lit-css",
+                        importName: "litCss",
+                        namedExport: true,
+                        when: "after",
+                    },
+                ],
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "emit",
+                    sourceMap: true,
+                },
+                title: "emit-sourcemap",
+            },
+            {
+                dependencies: {
+                    "rollup-plugin-lit-css": "*",
+                    tailwindcss: "*",
+                },
+                input: "tailwind-oxide/index.js",
+                packemPlugins: [
+                    {
+                        code: "litCss()",
+                        from: "rollup-plugin-lit-css",
+                        importName: "litCss",
+                        namedExport: true,
+                        when: "after",
+                    },
+                ],
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "emit",
+                    sourceMap: "inline",
+                },
+                title: "emit-sourcemap-inline",
+            },
+        ] as WriteData[])("should work with tailwind-oxide processed $title css", async ({ title, ...data }: WriteData) => {
+            await installPackage(temporaryDirectoryPath, "tailwindcss");
+
+            // eslint-disable-next-line vitest/no-conditional-in-test
+            if (data.styleOptions.mode === "emit") {
+                await installPackage(temporaryDirectoryPath, "rollup-plugin-lit-css");
             }
 
             await validate(data);
@@ -1113,7 +1238,12 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 title: "meta",
             },
         ] as WriteData[])("should work with emitted processed $title css", async ({ title, ...data }: WriteData) => {
-            await installPackage(temporaryDirectoryPath, "rollup-plugin-lit-css");
+            await installPackage(temporaryDirectoryPath, "lit");
+
+            // eslint-disable-next-line vitest/no-conditional-in-test
+            if (data.dependencies !== undefined) {
+                await installPackage(temporaryDirectoryPath, "rollup-plugin-lit-css");
+            }
 
             await validate(data);
         });

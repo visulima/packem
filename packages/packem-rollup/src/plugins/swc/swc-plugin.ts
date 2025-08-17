@@ -1,8 +1,8 @@
 import { createFilter } from "@rollup/pluginutils";
 import { transform as swcTransform } from "@swc/core";
+import { EXCLUDE_REGEXP } from "@visulima/packem-share/constants";
 import type { Plugin } from "rollup";
 
-import { EXCLUDE_REGEXP } from "@visulima/packem-share/constants";
 import type { TransformerFn as TransformerFunction } from "../../types";
 import type { SwcPluginConfig } from "./types";
 

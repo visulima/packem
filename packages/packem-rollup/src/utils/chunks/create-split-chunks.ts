@@ -7,11 +7,11 @@
  *
  * Copyright (c) 2018 these people -> https://github.com/huozhi/bunchee/graphs/contributors
  */
+import type { BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "@visulima/packem-share/types";
 import { memoize } from "@visulima/packem-share/utils";
 import { basename, extname } from "@visulima/path";
 import type { GetManualChunk } from "rollup";
 
-import type { BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "@visulima/packem-share/types";
 import getCustomModuleLayer from "./get-custom-module-layer";
 import getModuleLayer from "./get-module-layer";
 

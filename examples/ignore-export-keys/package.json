@@ -1,6 +1,7 @@
 {
   "name": "ignore-export-keys-example",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
   "exports": {
     ".": "./dist/index.js",
@@ -14,10 +15,10 @@
   },
   "devDependencies": {
     "@visulima/packem": "workspace:*",
-    "esbuild": "^0.25.8",
+    "esbuild": "^0.25.9",
     "typescript": "^5.9.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   }
 }

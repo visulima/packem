@@ -1,11 +1,11 @@
+import type { FileCache } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
 import type { ObjectHook, Plugin } from "rollup";
 
-import type { FileCache } from "@visulima/packem-share/utils";
 import { getHash } from "../utils";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getHandler = (plugin: ObjectHook<any> | ((...arguments_: any[]) => any)): ((...arguments_: any[]) => any) => plugin.handler || plugin;
+const getHandler = (plugin: ObjectHook<any> | ((...arguments_: any[]) => any)): (...arguments_: any[]) => any => plugin.handler || plugin;
 
 /**
  * Wrap a Rollup plugin to add caching to various hooks.

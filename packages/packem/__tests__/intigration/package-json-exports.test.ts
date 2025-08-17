@@ -2133,7 +2133,6 @@ console.log("require-module-import", resolved);
             reject: false,
         });
 
-
         expect(binProcess.stdout).toContain("Could not find entrypoint for `./dist/icons/*`");
         expect(binProcess.exitCode).toBe(1);
     });

@@ -167,8 +167,8 @@ interface Export {
 }
 
 /** Oxc AST declaration node types that the plugin handles. */
-type Declaration =
-    import("oxc-parser").Class | import("oxc-parser").Function | import("oxc-parser").TSEnumDeclaration | import("oxc-parser").TSInterfaceDeclaration | import("oxc-parser").TSTypeAliasDeclaration | import("oxc-parser").VariableDeclaration;
+type Declaration
+    = import("oxc-parser").Class | import("oxc-parser").Function | import("oxc-parser").TSEnumDeclaration | import("oxc-parser").TSInterfaceDeclaration | import("oxc-parser").TSTypeAliasDeclaration | import("oxc-parser").VariableDeclaration;
 
 /**
  * Prepares a declaration node by extracting its name and span, and adds it to the declarations map.
