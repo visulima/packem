@@ -1,3 +1,14 @@
+## @visulima/packem-rollup [1.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.6...@visulima/packem-rollup@1.0.0-alpha.7) (2025-08-17)
+
+### Features
+
+* added tailwindcss oxide loader ([#166](https://github.com/visulima/packem/issues/166)) ([acbbc59](https://github.com/visulima/packem/commit/acbbc59071e771a94d1a0c5435b267e483e3ad73))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.6
+
 ## @visulima/packem-rollup [1.0.0-alpha.6](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.5...@visulima/packem-rollup@1.0.0-alpha.6) (2025-08-10)
 
 ### Features
