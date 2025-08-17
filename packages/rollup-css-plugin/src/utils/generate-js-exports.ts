@@ -10,18 +10,6 @@ const cssVariableName = "css";
 const reservedWords = new Set([cssVariableName]);
 
 /**
- * Removes CSS comments from the given CSS string
- * @param css CSS content to clean
- * @returns CSS content without comments
- * @example
- * ```typescript
- * removeCssComments("/** comment *\/ body { color: red; }") // " body { color: red; }"
- * removeCssComments("body { color: red; /** inline comment *\/ }") // "body { color: red;  }"
- * ```
- */
-const removeCssComments = (css: string): string => css.replaceAll(/\/\*[\s\S]*?\*\//g, "");
-
-/**
  * Converts a CSS class name to a legal JavaScript identifier.
  * @param name CSS class name to convert
  * @returns Legal JavaScript identifier, prefixed with underscore if it conflicts with reserved words
@@ -41,12 +29,7 @@ const getClassNameDefault = (name: string): string => {
     return id;
 };
 
-/**
- * Options for JavaScript export generation
- */
 export interface JsExportOptions {
-    /** Enable CSS comment removal */
-    cleanCss?: boolean;
     /** CSS content to export */
     css: string;
     /** Whether to generate TypeScript declarations */
@@ -69,9 +52,6 @@ export interface JsExportOptions {
     supportModules: boolean;
 }
 
-/**
- * Result of JavaScript export generation
- */
 export interface JsExportResult {
     /** Generated JavaScript code */
     code: string;
@@ -87,7 +67,6 @@ export interface JsExportResult {
  * @returns Generated JavaScript code and TypeScript declarations
  */
 export const generateJsExports = ({
-    cleanCss = false,
     css,
     dts = false,
     emit = false,
@@ -98,12 +77,6 @@ export const generateJsExports = ({
     namedExports,
     supportModules,
 }: JsExportOptions): JsExportResult => {
-    if (cleanCss) {
-        // Remove CSS comments before processing
-        // eslint-disable-next-line no-param-reassign
-        css = removeCssComments(css);
-    }
-
     // Generate safe identifiers for JavaScript output
     const saferId = (identifier: string): string => safeId(identifier, basename(id));
     const modulesVariableName = saferId("modules");

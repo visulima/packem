@@ -6,8 +6,8 @@
  * Copyright (c) 2017 these people -> https://github.com/rollup/rollup/graphs/contributors
  */
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import type { Pail } from "@visulima/pail";
 import { replaceContentWithinMarker } from "@visulima/packem-share/utils";
+import type { Pail } from "@visulima/pail";
 import type { Plugin } from "rollup";
 import licensePlugin from "rollup-plugin-license";
 
@@ -59,7 +59,7 @@ export const license = ({
 
             const dependencyLicenseTexts = dependencies
                 // eslint-disable-next-line etc/no-assign-mutated-array
-                .sort(({ name: nameA }, { name: nameB }) => ((nameA || 0) > (nameB || 0) ? 1 : ((nameB || 0) > (nameA || 0) ? -1 : 0)))
+                .sort(({ name: nameA }, { name: nameB }) => ((nameA || 0) > (nameB || 0) ? 1 : (nameB || 0) > (nameA || 0) ? -1 : 0))
                 .map(({ author, contributors, license: dependencyLicense, licenseText, maintainers, name, repository }) => {
                     let text = `## ${name}\n`;
 

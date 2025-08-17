@@ -9,7 +9,6 @@ import type { ModulesOptions } from "./loaders/postcss/modules";
 import type { UrlOptions } from "./loaders/postcss/url";
 import type { SassLoaderOptions } from "./loaders/sass/types";
 import type { StylusLoaderOptions } from "./loaders/stylus/types";
-import type { TailwindOxideLoaderOptions } from "./loaders/tailwindcss-oxide/types";
 import type { Loader, SourceMapOptions } from "./loaders/types";
 import type { Minifier } from "./minifiers/types";
 
@@ -253,7 +252,4 @@ export interface StyleOptions {
 
     /** Options for Stylus loader */
     stylus?: StylusLoaderOptions;
-
-    /** Options for Tailwind Oxide loader */
-    tailwindcss?: TailwindOxideLoaderOptions;
 }

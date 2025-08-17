@@ -233,7 +233,6 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
 
         // Use the shared utility for JavaScript export generation
         const jsExportResult = generateJsExports({
-            cleanCss: !this.extract,
             css: result.css,
             dts: this.dts,
             emit: this.emit,

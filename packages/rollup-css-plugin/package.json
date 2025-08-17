@@ -73,8 +73,8 @@
             "default": "./dist/loaders/lightningcss.mjs"
         },
         "./loader/tailwindcss": {
-            "types": "./dist/loaders/tailwindcss-oxide/index.d.mts",
-            "default": "./dist/loaders/tailwindcss-oxide/index.mjs"
+            "types": "./dist/loaders/tailwindcss-oxide.d.mts",
+            "default": "./dist/loaders/tailwindcss-oxide.mjs"
         },
         "./minifier/cssnano": {
             "types": "./dist/minifiers/cssnano.d.mts",

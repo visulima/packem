@@ -78,6 +78,8 @@ export default {
 
       // Enable source maps
       sourceMap: true,
+
+
     }),
     
     // Generate TypeScript declarations for CSS modules
@@ -127,6 +129,8 @@ export default {
       // Minification
       minifier: "lightningcss",
 
+
+
       // Custom loaders
       loaders: [
         {
@@ -166,6 +170,7 @@ Main CSS processing plugin for Rollup/Packem.
 - `include/exclude` - File inclusion/exclusion patterns
 - `autoModules` - Enable CSS modules automatically
 - `namedExports` - Enable named exports for CSS classes
+
 
 #### Preprocessor Options
 
@@ -382,6 +387,8 @@ export default {
 - `purge` - Enable CSS purging in production
 - `autoprefixer` - Enable automatic vendor prefixing
 - `minify` - Enable CSS minification in production
+
+
 
 ## PostCSS Integration
 

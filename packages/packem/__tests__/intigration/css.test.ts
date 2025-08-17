@@ -775,92 +775,127 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         });
     });
 
-    describe.only("tailwind-oxide", () => {
+    describe("tailwind-oxide", () => {
         // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
         it.each([
             {
+                dependencies: {
+                    tailwindcss: "*",
+                },
                 input: "tailwind-oxide/index.js",
                 styleOptions: {
                     loaders: ["tailwindcss"],
-                    tailwindcss: {
-                        autoprefixer: true,
-                        content: ["**/*.{html,js,ts,jsx,tsx}"],
-                        jit: true,
-                        minify: true,
-                        purge: true,
-                        sourceMap: true,
-                    },
                 },
                 title: "basic",
             },
             {
+                dependencies: {
+                    tailwindcss: "*",
+                },
                 input: "tailwind-oxide/index.js",
                 styleOptions: {
                     loaders: ["tailwindcss"],
                     mode: "extract",
-                    tailwindcss: {
-                        autoprefixer: true,
-                        content: ["**/*.{html,js,ts,jsx,tsx}"],
-                        jit: true,
-                        minify: true,
-                        purge: true,
-                        sourceMap: true,
-                    },
                 },
                 title: "extract",
             },
             {
+                dependencies: {
+                    tailwindcss: "*",
+                },
                 input: "tailwind-oxide/index.js",
                 styleOptions: {
-                    loaders: ["tailwindcss", "sourcemap"],
+                    loaders: ["tailwindcss"],
                     mode: "extract",
                     sourceMap: true,
-                    tailwindcss: {
-                        autoprefixer: true,
-                        content: ["**/*.{html,js,ts,jsx,tsx}"],
-                        jit: true,
-                        minify: true,
-                        purge: true,
-                        sourceMap: true,
-                    },
                 },
                 title: "extract-sourcemap",
             },
             {
+                dependencies: {
+                    tailwindcss: "*",
+                },
                 input: "tailwind-oxide/index.js",
                 styleOptions: {
                     loaders: ["tailwindcss"],
-                    mode: "emit",
-                    tailwindcss: {
-                        autoprefixer: true,
-                        content: ["**/*.{html,js,ts,jsx,tsx}"],
-                        jit: true,
-                        minify: true,
-                        purge: true,
-                        sourceMap: true,
+                    mode: "extract",
+                    sourceMap: "inline",
+                },
+                title: "extract-sourcemap-inline",
+            },
+            {
+                dependencies: {
+                    "rollup-plugin-lit-css": "*",
+                    tailwindcss: "*",
+                },
+                input: "tailwind-oxide/index.js",
+                packemPlugins: [
+                    {
+                        code: "litCss()",
+                        from: "rollup-plugin-lit-css",
+                        importName: "litCss",
+                        namedExport: true,
+                        when: "after",
                     },
+                ],
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "emit",
                 },
                 title: "emit",
             },
             {
+                dependencies: {
+                    "rollup-plugin-lit-css": "*",
+                    tailwindcss: "*",
+                },
                 input: "tailwind-oxide/index.js",
+                packemPlugins: [
+                    {
+                        code: "litCss()",
+                        from: "rollup-plugin-lit-css",
+                        importName: "litCss",
+                        namedExport: true,
+                        when: "after",
+                    },
+                ],
                 styleOptions: {
-                    loaders: ["tailwindcss", "sourcemap"],
+                    loaders: ["tailwindcss"],
                     mode: "emit",
                     sourceMap: true,
-                    tailwindcss: {
-                        autoprefixer: true,
-                        content: ["**/*.{html,js,ts,jsx,tsx}"],
-                        jit: true,
-                        minify: true,
-                        purge: true,
-                        sourceMap: true,
-                    },
                 },
                 title: "emit-sourcemap",
             },
+            {
+                dependencies: {
+                    "rollup-plugin-lit-css": "*",
+                    tailwindcss: "*",
+                },
+                input: "tailwind-oxide/index.js",
+                packemPlugins: [
+                    {
+                        code: "litCss()",
+                        from: "rollup-plugin-lit-css",
+                        importName: "litCss",
+                        namedExport: true,
+                        when: "after",
+                    },
+                ],
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "emit",
+                    sourceMap: "inline",
+                },
+                title: "emit-sourcemap-inline",
+            },
         ] as WriteData[])("should work with tailwind-oxide processed $title css", async ({ title, ...data }: WriteData) => {
             await installPackage(temporaryDirectoryPath, "tailwindcss");
+
+            // eslint-disable-next-line vitest/no-conditional-in-test
+            if (data.styleOptions.mode === "emit") {
+                await installPackage(temporaryDirectoryPath, "rollup-plugin-lit-css");
+            }
+
             await validate(data);
         });
     });
@@ -1203,7 +1238,9 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 title: "meta",
             },
         ] as WriteData[])("should work with emitted processed $title css", async ({ title, ...data }: WriteData) => {
-            await installPackage(temporaryDirectoryPath, "rollup-plugin-lit-css");
+            if (data.dependencies !== undefined) {
+                await installPackage(temporaryDirectoryPath, "rollup-plugin-lit-css");
+            }
 
             await validate(data);
         });

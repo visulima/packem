@@ -5,9 +5,8 @@ import { clearRequireCache } from "@tailwindcss/node/require-cache";
 import { readFile } from "@visulima/fs";
 import { dirname, join, normalize, relative, resolve } from "@visulima/path";
 
-import { generateJsExports } from "../../utils/generate-js-exports";
-import type { Loader, LoaderContext } from "../types";
-import type { TailwindOxideLoaderOptions } from "./types";
+import { generateJsExports } from "../utils/generate-js-exports";
+import type { Loader, LoaderContext } from "./types";
 
 // Type alias for resolver functions
 type ResolverFunction = (id: string, base: string) => Promise<string | false | undefined>;
@@ -248,13 +247,13 @@ class TailwindRoot {
 /**
  * Tailwind Oxide loader for processing Tailwind CSS files
  */
-const tailwindcssLoader: Loader<TailwindOxideLoaderOptions> = {
+const tailwindcssLoader: Loader = {
     name: "tailwindcss",
 
     /**
      * Process Tailwind CSS content using Tailwind Oxide
      */
-    async process(this: LoaderContext<TailwindOxideLoaderOptions>, { code, map }) {
+    async process(this: LoaderContext, { code, map }) {
         // Create custom resolvers for CSS and JS imports
         const customCssResolver = async (id: string, base: string): Promise<string | false | undefined> => {
             // Resolve CSS imports using the loader context
@@ -309,6 +308,7 @@ const tailwindcssLoader: Loader<TailwindOxideLoaderOptions> = {
             this.logger.debug({ message: "[@tailwindcss/rollup] Optimize CSS" });
 
             result = optimize(result.code, {
+                file: this.id,
                 map: result.map,
                 minify: true,
             });
@@ -328,7 +328,6 @@ const tailwindcssLoader: Loader<TailwindOxideLoaderOptions> = {
 
         // Use the shared utility for JavaScript export generation
         const jsExportResult = generateJsExports({
-            cleanCss: !this.extract,
             css: result.code,
             dts: this.dts,
             emit: this.emit,

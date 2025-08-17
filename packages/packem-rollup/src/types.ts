@@ -13,6 +13,7 @@ import type { PluginVisualizerOptions } from "rollup-plugin-visualizer";
 
 import type { CJSInteropOptions } from "./plugins/cjs-interop";
 import type { CopyPluginOptions } from "./plugins/copy";
+import type { DataUriPluginOptions } from "./plugins/data-uri";
 import type { EsbuildPluginConfig, Options as EsbuildOptions } from "./plugins/esbuild/types";
 import type { EsmShimCjsSyntaxOptions } from "./plugins/esm-shim-cjs-syntax";
 import type { IsolatedDeclarationsOptions } from "./plugins/isolated-declarations";
@@ -27,7 +28,6 @@ import type { SwcPluginConfig } from "./plugins/swc/types";
 import type { PatchTypesOptions } from "./plugins/typescript/patch-typescript-types";
 import type { TsconfigPathsPluginOptions } from "./plugins/typescript/resolve-tsconfig-paths-plugin";
 import type { UrlOptions } from "./plugins/url";
-import type { DataUriPluginOptions } from "./plugins/data-uri";
 
 interface RollupDynamicImportVariablesOptions {
     /**

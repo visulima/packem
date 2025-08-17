@@ -1,13 +1,13 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import type { BuildContext } from "@visulima/packem-share/types";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import warnLegacyCJS from "../../../src/utils/warn-legacy-cjs";
-import type { BuildContext } from "@visulima/packem-share/types";
 
 describe(warnLegacyCJS, () => {
-    let logger: { warn: ReturnType<typeof vi.fn>; info: ReturnType<typeof vi.fn>; debug: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
+    let logger: { debug: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn>; info: ReturnType<typeof vi.fn>; warn: ReturnType<typeof vi.fn> };
 
     beforeEach(() => {
-        logger = { warn: vi.fn(), info: vi.fn(), debug: vi.fn(), error: vi.fn() };
+        logger = { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() };
     });
 
     it("should warn when emitting CJS for Node engines >= 23", () => {
@@ -27,7 +27,7 @@ describe(warnLegacyCJS, () => {
 
         warnLegacyCJS(context);
 
-        expect(logger.warn).toHaveBeenCalled();
+        expect(logger.warn).toHaveBeenCalledWith();
     });
 
     it("should not warn when not emitting CJS", () => {
@@ -70,8 +70,3 @@ describe(warnLegacyCJS, () => {
         expect(logger.warn).not.toHaveBeenCalled();
     });
 });
-
-
-
-
-
