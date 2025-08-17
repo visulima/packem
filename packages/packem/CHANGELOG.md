@@ -1,3 +1,20 @@
+## @visulima/packem [1.28.3](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@1.28.3) (2025-08-17)
+
+### Bug Fixes
+
+* update package dependencies and versions ([e7a77fc](https://github.com/visulima/packem/commit/e7a77fcbbc6a03b5a387357378c0a474397478a2))
+* update test snapshots and package.json dependencies ([648dda3](https://github.com/visulima/packem/commit/648dda32516f84f5ce9d93c5a03b8e07fd0fd2d5))
+
+### Miscellaneous Chores
+
+* update package dependencies and versions ([c6220ac](https://github.com/visulima/packem/commit/c6220ac490b132b45420ecebe232467f73ad0140))
+* update package dependencies and versions ([b82ae05](https://github.com/visulima/packem/commit/b82ae050af50303281ba486bd4e508711a46b380))
+* update package versions and add engine requirements ([d594ac3](https://github.com/visulima/packem/commit/d594ac31a8302f3a4d86d07415002495361b6ba1))
+
+### Tests
+
+* update snapshots for browserslist-to-esbuild tests ([ac6e60b](https://github.com/visulima/packem/commit/ac6e60bc1e4f0f8a1d5d4fedf4998d9c42101696))
+
 ## @visulima/packem [1.28.2](https://github.com/visulima/packem/compare/@visulima/packem@1.28.1...@visulima/packem@1.28.2) (2025-06-24)
 
 ### Bug Fixes
