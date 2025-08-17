@@ -1238,6 +1238,9 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 title: "meta",
             },
         ] as WriteData[])("should work with emitted processed $title css", async ({ title, ...data }: WriteData) => {
+            await installPackage(temporaryDirectoryPath, "lit");
+
+            // eslint-disable-next-line vitest/no-conditional-in-test
             if (data.dependencies !== undefined) {
                 await installPackage(temporaryDirectoryPath, "rollup-plugin-lit-css");
             }

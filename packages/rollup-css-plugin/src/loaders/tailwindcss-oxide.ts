@@ -332,9 +332,12 @@ const tailwindcssLoader: Loader = {
             cwd: this.cwd as string,
             dts: this.dts,
             emit: this.emit,
+            extract: this.extract,
+            icssDependencies: [], // Tailwind Oxide doesn't support CSS modules by default
             id: this.id,
             inject: this.inject,
             logger: this.logger,
+            map: result.map,
             modulesExports: {}, // Tailwind Oxide doesn't support CSS modules by default
             namedExports: this.namedExports,
             supportModules: false,
@@ -345,10 +348,8 @@ const tailwindcssLoader: Loader = {
             return {
                 code: jsExportResult.code,
                 extracted: { css: result.code, id: this.id, map: result.map },
-                map: result.map,
-                meta: {
-                    types: jsExportResult.types,
-                },
+                map: jsExportResult.map,
+                meta: jsExportResult.meta,
                 moduleSideEffects: jsExportResult.moduleSideEffects,
             };
         }
@@ -356,10 +357,8 @@ const tailwindcssLoader: Loader = {
         // Return JavaScript code for CSS injection
         return {
             code: jsExportResult.code,
-            map: result.map,
-            meta: {
-                types: jsExportResult.types,
-            },
+            map: jsExportResult.map,
+            meta: jsExportResult.meta,
             moduleSideEffects: jsExportResult.moduleSideEffects,
         };
     },

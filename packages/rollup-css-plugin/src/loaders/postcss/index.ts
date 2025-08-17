@@ -218,28 +218,18 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
             result.css += mapModifier.toCommentData();
         }
 
-        // Handle emit mode - return CSS directly when emit is true
-        if (this.emit) {
-            return {
-                code: result.css,
-                map,
-                meta: {
-                    icssDependencies,
-                    moduleContents: result.css, // Use CSS directly instead of JS code
-                    types: undefined, // No types for emit mode
-                },
-            };
-        }
-
         // Use the shared utility for JavaScript export generation
         const jsExportResult = generateJsExports({
             css: result.css,
             cwd: this.cwd as string,
             dts: this.dts,
             emit: this.emit,
+            extract: this.extract,
+            icssDependencies,
             id: this.id,
             inject: this.inject,
             logger: this.logger,
+            map,
             modulesExports,
             namedExports: this.namedExports,
             supportModules,
@@ -254,10 +244,8 @@ const loader: Loader<NonNullable<InternalStyleOptions["postcss"]>> = {
         return {
             code: jsExportResult.code,
             extracted,
-            map,
-            meta: {
-                types: jsExportResult.types,
-            },
+            map: jsExportResult.map,
+            meta: jsExportResult.meta,
             moduleSideEffects: jsExportResult.moduleSideEffects,
         };
     },

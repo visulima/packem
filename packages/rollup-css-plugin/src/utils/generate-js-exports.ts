@@ -105,14 +105,20 @@ export interface JsExportOptions {
     dts?: boolean;
     /** Whether to emit CSS instead of JavaScript */
     emit?: boolean;
+    /** Whether to extract CSS to separate files */
+    extract?: boolean | string;
     /** File ID for safe identifier generation */
     id: string;
+    /** ICSS dependencies for CSS modules */
+    icssDependencies?: string[];
     /** CSS injection configuration */
     inject?: InjectOptions | boolean | ((varname: string, id: string, output: string[]) => string);
     /** Logger for warnings */
     logger?: {
         warn: (log: { message: string; plugin?: string }) => void;
     };
+    /** Source map for the CSS */
+    map?: string;
     /** CSS modules exports mapping class names to hashed names */
     modulesExports: Record<string, string>;
     /** Named exports configuration */
@@ -124,6 +130,16 @@ export interface JsExportOptions {
 export interface JsExportResult {
     /** Generated JavaScript code */
     code: string;
+    /** Extracted CSS data for file extraction */
+    extracted?: { css: string; id: string; map?: string };
+    /** Source map */
+    map?: string;
+    /** Metadata including types and module contents */
+    meta?: {
+        icssDependencies?: string[];
+        moduleContents?: string;
+        types?: string;
+    };
     /** Module side effects configuration */
     moduleSideEffects: boolean | "no-treeshake";
     /** Generated TypeScript declarations */
@@ -137,9 +153,12 @@ export interface JsExportResult {
  * @param options.cwd Current working directory for relative path calculations
  * @param options.dts Whether to generate TypeScript declarations
  * @param options.emit Whether to emit CSS instead of JavaScript
+ * @param options.extract Whether to extract CSS to separate files
+ * @param options.icssDependencies ICSS dependencies for CSS modules
  * @param options.id File ID for safe identifier generation
  * @param options.inject CSS injection configuration
  * @param options.logger Logger for warnings
+ * @param options.map Source map for the CSS
  * @param options.modulesExports CSS modules exports mapping class names to hashed names
  * @param options.namedExports Named exports configuration
  * @param options.supportModules Whether CSS modules are supported
@@ -150,9 +169,12 @@ export const generateJsExports = ({
     cwd,
     dts = false,
     emit = false,
+    extract = false,
+    icssDependencies = [],
     id,
     inject,
     logger,
+    map,
     modulesExports,
     namedExports,
     supportModules,
@@ -274,12 +296,36 @@ ${Object.keys(modulesExports)
     const outputString = output.filter(Boolean).join("\n");
     const types = dtsOutput.length > 0 ? dtsOutput.filter(Boolean).join("\n") : undefined;
 
+    // Handle emit mode - return CSS directly when emit is true
     if (emit) {
-        return { code: css, moduleSideEffects: true, types };
+        return {
+            code: css,
+            map,
+            meta: {
+                icssDependencies,
+                moduleContents: outputString, // Use JavaScript code for moduleContents in emit mode
+                types: undefined, // No types for emit mode
+            },
+            moduleSideEffects: true,
+        };
+    }
+
+    // Handle CSS extraction for separate CSS files
+    let extracted: { css: string; id: string; map?: string } | undefined;
+    
+    if (extract) {
+        extracted = { css, id, map };
     }
 
     return {
         code: outputString,
+        extracted,
+        map,
+        meta: {
+            icssDependencies,
+            moduleContents: outputString,
+            types,
+        },
         moduleSideEffects: supportModules || (typeof inject === "object" && inject.treeshakeable) ? false : "no-treeshake",
         types,
     };
