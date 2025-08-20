@@ -1,5 +1,6 @@
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
+import { readFile } from "@visulima/fs";
 import type { Plugin } from "rollup";
 
 export interface RawLoaderOptions {
@@ -13,28 +14,44 @@ export const rawPlugin = (options: RawLoaderOptions): Plugin => {
     return <Plugin>{
         async load(id) {
             if (id.includes("?raw")) {
-                return await this.load({
-                    id: id.replace(/\?raw$/, ""),
-                });
+                const cleanId = id.split("?")[0] as string;
+
+                try {
+                    const content = await readFile(cleanId);
+
+                    // Normalize line endings only on Windows: convert \r\n to \n
+                    return process.platform === "win32"
+                        ? content.replaceAll("\r\n", "\n")
+                        : content;
+                } catch {
+                    this.error(`Failed to read file: ${cleanId}`);
+                }
             }
 
-            return undefined;
+            // eslint-disable-next-line unicorn/no-null
+            return null;
         },
         name: "packem:raw",
+
         transform(code, id) {
-            if (!filter(id) && !id.includes("?raw")) {
-                return undefined;
+            // Check if the file has ?raw query parameter
+            const isRawQuery = id.includes("?raw");
+            const cleanId = isRawQuery ? id.split("?")[0] : id;
+
+            if (filter(cleanId) || isRawQuery) {
+                // Normalize line endings only on Windows for .txt and .data files
+                const normalizedCode
+                = process.platform === "win32" ? code.replaceAll("\r\n", "\n") : code;
+
+                return {
+                    code: `const data = ${JSON.stringify(normalizedCode)};\nexport default data;`,
+                    // eslint-disable-next-line unicorn/no-null
+                    map: null,
+                };
             }
 
-            if (!id.includes("?raw")) {
-                // eslint-disable-next-line no-param-reassign
-                code = `export default ${JSON.stringify(code)}`;
-            }
-
-            return {
-                code,
-                map: { mappings: "" },
-            };
+            // eslint-disable-next-line unicorn/no-null
+            return null;
         },
     };
 };
