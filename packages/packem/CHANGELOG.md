@@ -1,3 +1,20 @@
+## @visulima/packem [2.0.0-alpha.10](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.9...@visulima/packem@2.0.0-alpha.10) (2025-08-20)
+
+### Bug Fixes
+
+* fixed the custom resolver for tailwind loader ([1fd0b43](https://github.com/visulima/packem/commit/1fd0b4345aa90f5c250eba9fd8c741e569b84abc))
+
+### Miscellaneous Chores
+
+* update dependencies for Tailwind CSS and CSS Style Inject ([ef84f41](https://github.com/visulima/packem/commit/ef84f4193be1008b630e9bb29b2cbc78a6d93532))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.8
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.7
+* **@visulima/rollup-css-plugin:** upgraded to 1.0.0-alpha.7
+
 ## @visulima/packem [2.0.0-alpha.9](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.8...@visulima/packem@2.0.0-alpha.9) (2025-08-17)
 
 ### Features
