@@ -13,68 +13,91 @@ const ecosystemSuites = readdirSync(ecosystemPath, { withFileTypes: true })
     .filter((dirent) => dirent.isDirectory())
     .map((dirent) => dirent.name);
 
+const ecosystemConfigs = {
+    "advanced-tailwind": {
+        // isolatedDeclarationTransformer: "typescript",
+        cssLoader: ["tailwindcss"],
+        runtime: "browser",
+        transformer: "esbuild",
+    },
+};
+
 describe("packem ecosystem", () => {
     afterEach(async () => {
         for await (const suite of ecosystemSuites) {
-            await rm(join(ecosystemPath, suite, "dist"), { force: true, recursive: true });
+            await rm(join(ecosystemPath, suite, "dist"), {
+                force: true,
+                recursive: true,
+            });
         }
     });
 
-    it.each(ecosystemSuites)("should work with provided '%s' ecosystem suite", async (suite) => {
-        expect.assertions(3);
+    it.each(ecosystemSuites)(
+        "should work with provided '%s' ecosystem suite",
+        async (suite) => {
+            expect.assertions(3);
 
-        const fullSuitePath = join(ecosystemPath, suite);
+            const fullSuitePath = join(ecosystemPath, suite);
 
-        await createPackemConfig(fullSuitePath, {
-            isolatedDeclarationTransformer: "typescript",
-            transformer: "esbuild",
-        });
+            await createPackemConfig(fullSuitePath, {
+                isolatedDeclarationTransformer: "typescript",
+                transformer: "esbuild",
+                ...ecosystemConfigs[suite],
+            });
 
-        const binProcess = await execPackem("build", [], {
-            cwd: fullSuitePath,
-        });
+            const binProcess = await execPackem("build", [], {
+                cwd: fullSuitePath,
+            });
 
-        expect(binProcess.stderr).toBe("");
-        expect(binProcess.exitCode).toBe(0);
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
 
-        const distributionFiles = readdirSync(join(fullSuitePath, "dist"), {
-            recursive: true,
-            withFileTypes: true,
-        })
-            .filter((dirent) => dirent.isFile())
+            const distributionFiles = readdirSync(join(fullSuitePath, "dist"), {
+                recursive: true,
+                withFileTypes: true,
+            })
+                .filter((dirent) => dirent.isFile())
 
-            .map((dirent) => readFileSync(join(dirent.parentPath, dirent.name)));
+                .map((dirent) =>
+                    readFileSync(join(dirent.parentPath, dirent.name)),
+                );
 
-        expect(distributionFiles).toMatchSnapshot();
-    });
+            expect(distributionFiles).toMatchSnapshot();
+        },
+    );
 
-    it.todo.each(ecosystemSuites)("should work with provided '%s' ecosystem suite and oxc resolver", async (suite) => {
-        expect.assertions(3);
+    it.todo.each(ecosystemSuites)(
+        "should work with provided '%s' ecosystem suite and oxc resolver",
+        async (suite) => {
+            expect.assertions(3);
 
-        const fullSuitePath = join(ecosystemPath, suite);
+            const fullSuitePath = join(ecosystemPath, suite);
 
-        await createPackemConfig(fullSuitePath, {
-            experimental: {
-                oxcResolve: true,
-            },
-            isolatedDeclarationTransformer: "typescript",
-            transformer: "esbuild",
-        });
+            await createPackemConfig(fullSuitePath, {
+                experimental: {
+                    oxcResolve: true,
+                },
+                isolatedDeclarationTransformer: "typescript",
+                transformer: "esbuild",
+            });
 
-        const binProcess = await execPackem("build", [], {
-            cwd: fullSuitePath,
-        });
+            const binProcess = await execPackem("build", [], {
+                cwd: fullSuitePath,
+            });
 
-        expect(binProcess.stderr).toBe("");
-        expect(binProcess.exitCode).toBe(0);
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
 
-        const distributionFiles = readdirSync(join(fullSuitePath, "dist"), {
-            recursive: true,
-            withFileTypes: true,
-        })
-            .filter((dirent) => dirent.isFile())
-            .map((dirent) => readFileSync(join(dirent.parentPath, dirent.name)));
+            const distributionFiles = readdirSync(join(fullSuitePath, "dist"), {
+                recursive: true,
+                withFileTypes: true,
+            })
+                .filter((dirent) => dirent.isFile())
+                .map((dirent) =>
+                    readFileSync(join(dirent.parentPath, dirent.name)),
+                );
 
-        expect(distributionFiles).toMatchSnapshot();
-    });
+            expect(distributionFiles).toMatchSnapshot();
+        },
+    );
 });

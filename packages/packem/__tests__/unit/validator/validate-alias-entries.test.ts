@@ -6,7 +6,14 @@ describe(validateAliasEntries, () => {
     it("should accept valid alias names and process them correctly", () => {
         expect.assertions(1);
 
-        const entries = { "#": __dirname, "@": __dirname, "@components": __dirname, "@components/test": __dirname, validAlias: __dirname, "~": __dirname };
+        const entries = {
+            "#": __dirname,
+            "@": __dirname,
+            "@components": __dirname,
+            "@components/test": __dirname,
+            validAlias: __dirname,
+            "~": __dirname,
+        };
 
         expect(() => validateAliasEntries(entries)).not.toThrow();
     });
@@ -48,7 +55,9 @@ describe(validateAliasEntries, () => {
 
         const entries = { "": "/valid/path" };
 
-        expect(() => validateAliasEntries(entries)).toThrow("Alias name \"\" is invalid. Alias names should be non-empty strings.");
+        expect(() => validateAliasEntries(entries)).toThrow(
+            "Alias name \"\" is invalid. Alias names should be non-empty strings.",
+        );
     });
 
     it("should throw an error for alias names starting with invalid characters", () => {
@@ -76,7 +85,9 @@ describe(validateAliasEntries, () => {
 
         const entries = { class: "/valid/path" };
 
-        expect(() => validateAliasEntries(entries)).toThrow("Alias name \"class\" is a reserved keyword and cannot be used.");
+        expect(() => validateAliasEntries(entries)).toThrow(
+            "Alias name \"class\" is a reserved keyword and cannot be used.",
+        );
     });
 
     it("should throw an error for target paths that do not exist", () => {
@@ -84,7 +95,9 @@ describe(validateAliasEntries, () => {
 
         const entries = { validAlias: "/invalid/path" };
 
-        expect(() => validateAliasEntries(entries)).toThrow("Target path \"/invalid/path\" for alias \"validAlias\" does not exist.");
+        expect(() => validateAliasEntries(entries)).toThrow(
+            "Target path \"/invalid/path\" for alias \"validAlias\" does not exist.",
+        );
     });
 
     it("should throw an error if the entries object contains @/ or ~/", () => {

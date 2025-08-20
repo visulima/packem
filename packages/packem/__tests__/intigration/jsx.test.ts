@@ -4,7 +4,13 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackem,
+    installPackage,
+} from "../helpers";
 
 describe("packem jsx", () => {
     let temporaryDirectoryPath: string;
@@ -62,7 +68,9 @@ export default Tr;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toBe(`import { jsx } from 'react/jsx-runtime';
 
@@ -73,7 +81,9 @@ const Tr = /* @__PURE__ */ __name(() => jsx("tr", { className: "m-0 border-t bor
 export { Tr as default };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -86,21 +96,27 @@ const Tr = /* @__PURE__ */ __name(() => jsxRuntime.jsx("tr", { className: "m-0 b
 module.exports = Tr;
 `);
 
-        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+        const dCtsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.cts`,
+        );
 
         expect(dCtsContent).toBe(`declare const Tr: () => any;
 
 export = Tr;
 `);
 
-        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+        const dMtsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.mts`,
+        );
 
         expect(dMtsContent).toBe(`declare const Tr: () => any;
 
 export { Tr as default };
 `);
 
-        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+        const dContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.ts`,
+        );
 
         expect(dContent).toBe(`declare const Tr: () => any;
 
@@ -153,7 +169,9 @@ export default Tr;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toBe(`import { jsx } from 'react/jsx-runtime';
 
@@ -164,7 +182,9 @@ const Tr = /* @__PURE__ */ __name(() => jsx("tr", { className: "m-0 border-t bor
 export { Tr as default };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -177,21 +197,27 @@ const Tr = /* @__PURE__ */ __name(() => jsxRuntime.jsx("tr", { className: "m-0 b
 module.exports = Tr;
 `);
 
-        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+        const dCtsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.cts`,
+        );
 
         expect(dCtsContent).toBe(`declare const Tr: () => any;
 
 export = Tr;
 `);
 
-        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+        const dMtsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.mts`,
+        );
 
         expect(dMtsContent).toBe(`declare const Tr: () => any;
 
 export { Tr as default };
 `);
 
-        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+        const dContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.ts`,
+        );
 
         expect(dContent).toBe(`declare const Tr: () => any;
 
@@ -250,7 +276,9 @@ export default Tr;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toBe(`import { jsx } from 'react/jsx-runtime';
 
@@ -261,7 +289,9 @@ const Tr = /* @__PURE__ */ __name(() => jsx("tr", { className: "m-0 border-t bor
 export { Tr as default };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -274,21 +304,27 @@ const Tr = /* @__PURE__ */ __name(() => jsxRuntime.jsx("tr", { className: "m-0 b
 module.exports = Tr;
 `);
 
-        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+        const dCtsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.cts`,
+        );
 
         expect(dCtsContent).toBe(`declare const Tr: () => any;
 
 export = Tr;
 `);
 
-        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+        const dMtsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.mts`,
+        );
 
         expect(dMtsContent).toBe(`declare const Tr: () => any;
 
 export { Tr as default };
 `);
 
-        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+        const dContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.ts`,
+        );
 
         expect(dContent).toBe(`declare const Tr: () => any;
 
@@ -348,7 +384,9 @@ export default Tr;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toBe(`import { jsx } from 'react/jsx-runtime';
 
@@ -359,7 +397,9 @@ const Tr = /* @__PURE__ */ __name(() => jsx("tr", { className: "m-0 border-t bor
 export { Tr as default };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -372,21 +412,27 @@ const Tr = /* @__PURE__ */ __name(() => jsxRuntime.jsx("tr", { className: "m-0 b
 module.exports = Tr;
 `);
 
-        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+        const dCtsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.cts`,
+        );
 
         expect(dCtsContent).toBe(`declare const Tr: () => any;
 
 export = Tr;
 `);
 
-        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+        const dMtsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.mts`,
+        );
 
         expect(dMtsContent).toBe(`declare const Tr: () => any;
 
 export { Tr as default };
 `);
 
-        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+        const dContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.ts`,
+        );
 
         expect(dContent).toBe(`declare const Tr: () => any;
 

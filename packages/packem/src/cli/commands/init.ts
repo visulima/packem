@@ -1,7 +1,16 @@
 import { cwd } from "node:process";
 
 import { installPackage } from "@antfu/install-pkg";
-import { cancel, confirm, intro, log, multiselect, outro, select, spinner } from "@clack/prompts";
+import {
+    cancel,
+    confirm,
+    intro,
+    log,
+    multiselect,
+    outro,
+    select,
+    spinner,
+} from "@clack/prompts";
 import type { Cli } from "@visulima/cerebro";
 import { isAccessibleSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { parsePackageJson } from "@visulima/package/package-json";
@@ -17,7 +26,9 @@ const createInitCommand = (cli: Cli): void => {
             intro("Welcome to packem setup");
 
             if (isAccessibleSync(join(options.dir, "packem.config.ts"))) {
-                logger.info("Packem project already initialized, you can use `packem build` to build your project");
+                logger.info(
+                    "Packem project already initialized, you can use `packem build` to build your project",
+                );
 
                 return;
             }
@@ -40,7 +51,10 @@ const createInitCommand = (cli: Cli): void => {
                 packages.push(...Object.keys(packageJson.devDependencies));
             }
 
-            const hasTypescript = Boolean(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript);
+            const hasTypescript = Boolean(
+                packageJson.devDependencies?.typescript
+                ?? packageJson.dependencies?.typescript,
+            );
 
             const packagesToInstall: string[] = [];
 
@@ -55,7 +69,6 @@ const createInitCommand = (cli: Cli): void => {
                 }
             } else {
                 log.message(
-
                     `TypeScript version ${packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript} is already installed`,
                 );
             }
@@ -91,7 +104,9 @@ const createInitCommand = (cli: Cli): void => {
                             outDir: "dist",
                             sourceMap: true,
                             declaration: true,
-                            lib: runInDom ? ["es2022", "dom", "dom.iterable"] : ["es2022"],
+                            lib: runInDom
+                                ? ["es2022", "dom", "dom.iterable"]
+                                : ["es2022"],
                         },
                     });
                     s.stop("");
@@ -132,23 +147,34 @@ const createInitCommand = (cli: Cli): void => {
                     ],
                 });
 
-                if (options.transformer && options.transformer !== "oxc" && !packages.includes(options.transformer as string)) {
+                if (
+                    options.transformer
+                    && options.transformer !== "oxc"
+                    && !packages.includes(options.transformer as string)
+                ) {
                     const shouldInstall = await confirm({
                         message: `Do you want to install ${options.transformer}?`,
                     });
 
                     if (shouldInstall) {
-                        packagesToInstall.push(options.transformer === "swc" ? "@swc/core" : options.transformer);
+                        packagesToInstall.push(
+                            options.transformer === "swc"
+                                ? "@swc/core"
+                                : options.transformer,
+                        );
                     }
                 }
             } else {
-                log.message(`Transformer ${options.transformer} is already installed.`);
+                log.message(
+                    `Transformer ${options.transformer} is already installed.`,
+                );
             }
 
             if (options.isolatedDeclarationTransformer === undefined) {
                 // eslint-disable-next-line no-param-reassign
                 options.isolatedDeclarationTransformer = (await confirm({
-                    message: "Do you want to use an isolated declaration types?",
+                    message:
+                        "Do you want to use an isolated declaration types?",
                     initialValue: false,
                 })) as boolean;
             }
@@ -189,7 +215,10 @@ const createInitCommand = (cli: Cli): void => {
                         }
                     }
 
-                    if (packageName !== undefined && !packages.includes(packageName as string)) {
+                    if (
+                        packageName !== undefined
+                        && !packages.includes(packageName as string)
+                    ) {
                         const shouldInstall = await confirm({
                             message: `Do you want to install ${packageName}?`,
                         });
@@ -209,14 +238,21 @@ const createInitCommand = (cli: Cli): void => {
                 })) as boolean;
             }
 
-            const cssLoaders: (keyof typeof cssLoaderDependencies | "sourceMap")[] = [];
+            const cssLoaders: (
+                | keyof typeof cssLoaderDependencies
+                | "sourceMap"
+            )[] = [];
 
             if (options.css) {
                 const mainCssLoader = (await select({
                     message: "Pick a css loader",
                     options: [
                         { label: "PostCSS", value: "postcss" },
-                        { hint: "experimental", label: "Lightning CSS", value: "lightningcss" },
+                        {
+                            hint: "experimental",
+                            label: "Lightning CSS",
+                            value: "lightningcss",
+                        },
                     ],
                 })) as keyof typeof cssLoaderDependencies;
 
@@ -236,16 +272,28 @@ const createInitCommand = (cli: Cli): void => {
                     const sassLoader = await select({
                         message: "Pick a sass loader",
                         options: [
-                            { label: "Sass embedded", value: "sass-embedded", hint: "recommended" },
+                            {
+                                label: "Sass embedded",
+                                value: "sass-embedded",
+                                hint: "recommended",
+                            },
                             { label: "Sass", value: "sass" },
-                            { label: "Node Sass", value: "node-sass", hint: "legacy" },
+                            {
+                                label: "Node Sass",
+                                value: "node-sass",
+                                hint: "legacy",
+                            },
                         ],
                     });
 
                     if (sassLoader !== "sass") {
-                        extraCssLoaders = extraCssLoaders.filter((loader) => loader !== "sass");
+                        extraCssLoaders = extraCssLoaders.filter(
+                            (loader) => loader !== "sass",
+                        );
 
-                        extraCssLoaders.push(sassLoader as keyof typeof cssLoaderDependencies);
+                        extraCssLoaders.push(
+                            sassLoader as keyof typeof cssLoaderDependencies,
+                        );
                     }
                 }
 
@@ -257,7 +305,11 @@ const createInitCommand = (cli: Cli): void => {
 
                 if (shouldInstall) {
                     for (const loader of cssLoaders) {
-                        packagesToInstall.push(...(cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies] as string[]));
+                        packagesToInstall.push(
+                            ...(cssLoaderDependencies[
+                                loader as keyof typeof cssLoaderDependencies
+                            ] as string[]),
+                        );
                     }
                 }
 
@@ -308,7 +360,10 @@ const createInitCommand = (cli: Cli): void => {
             if (options.css) {
                 const stringCssLoaders = cssLoaders
                     .map((loader) => {
-                        if (loader === "sass-embedded" || loader === "node-sass") {
+                        if (
+                            loader === "sass-embedded"
+                            || loader === "node-sass"
+                        ) {
                             // eslint-disable-next-line no-param-reassign
                             loader = "sass";
                         }
@@ -337,7 +392,10 @@ const createInitCommand = (cli: Cli): void => {
 
                 if (options.css) {
                     for (let loader of cssLoaders) {
-                        if (loader === "sass-embedded" || loader === "node-sass") {
+                        if (
+                            loader === "sass-embedded"
+                            || loader === "node-sass"
+                        ) {
                             loader = "sass";
                         }
 
@@ -366,7 +424,10 @@ export default defineConfig({
 
                 if (options.css) {
                     for (let loader of cssLoaders) {
-                        if (loader === "sass-embedded" || loader === "node-sass") {
+                        if (
+                            loader === "sass-embedded"
+                            || loader === "node-sass"
+                        ) {
                             loader = "sass";
                         }
 
@@ -394,12 +455,19 @@ module.exports = defineConfig({
 
             if (packagesToInstall.length > 0) {
                 s.start("Installing packages");
-                await installPackage(packagesToInstall, { cwd: rootDirectory, dev: true, silent: true });
+                await installPackage(packagesToInstall, {
+                    cwd: rootDirectory,
+                    dev: true,
+                    silent: true,
+                });
                 s.stop("Installed packages");
             }
 
             s.start(`Creating packem.config.${extension}`);
-            writeFileSync(join(rootDirectory, `packem.config.${extension}`), template);
+            writeFileSync(
+                join(rootDirectory, `packem.config.${extension}`),
+                template,
+            );
             s.stop(`Created packem.config.${extension}`);
 
             outro("Now you can run `packem build` to build your project");
@@ -416,22 +484,32 @@ module.exports = defineConfig({
                 description: "Choose a transformer",
                 name: "transformer",
                 type: (value: unknown) => {
-                    if (typeof value === "string" && ["esbuild", "sucrase", "swc"].includes(value)) {
+                    if (
+                        typeof value === "string"
+                        && ["esbuild", "sucrase", "swc"].includes(value)
+                    ) {
                         return value;
                     }
 
-                    throw new Error("Invalid transformer, please choose one of 'swc', 'sucrase' or 'esbuild'");
+                    throw new Error(
+                        "Invalid transformer, please choose one of 'swc', 'sucrase' or 'esbuild'",
+                    );
                 },
             },
             {
                 description: "Choose a isolated declaration transformer",
                 name: "isolated-declaration-transformer",
                 type: (value: unknown) => {
-                    if (typeof value === "string" && ["none", "oxc", "swc", "typescript"].includes(value)) {
+                    if (
+                        typeof value === "string"
+                        && ["none", "oxc", "swc", "typescript"].includes(value)
+                    ) {
                         return value;
                     }
 
-                    throw new Error("Invalid isolated declaration isolated declaration, please choose one of 'none', 'oxc', 'swc' or 'typescript'");
+                    throw new Error(
+                        "Invalid isolated declaration isolated declaration, please choose one of 'none', 'oxc', 'swc' or 'typescript'",
+                    );
                 },
             },
             {
@@ -458,7 +536,9 @@ module.exports = defineConfig({
                         return input;
                     }
 
-                    throw new Error("Invalid runtime. Use 'node' or 'browser'.");
+                    throw new Error(
+                        "Invalid runtime. Use 'node' or 'browser'.",
+                    );
                 },
             },
         ],

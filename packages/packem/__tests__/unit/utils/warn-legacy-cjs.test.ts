@@ -4,10 +4,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import warnLegacyCJS from "../../../src/utils/warn-legacy-cjs";
 
 describe(warnLegacyCJS, () => {
-    let logger: { debug: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn>; info: ReturnType<typeof vi.fn>; warn: ReturnType<typeof vi.fn> };
+    let logger: {
+        debug: ReturnType<typeof vi.fn>;
+        error: ReturnType<typeof vi.fn>;
+        info: ReturnType<typeof vi.fn>;
+        warn: ReturnType<typeof vi.fn>;
+    };
 
     beforeEach(() => {
-        logger = { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() };
+        logger = {
+            debug: vi.fn(),
+            error: vi.fn(),
+            info: vi.fn(),
+            warn: vi.fn(),
+        };
     });
 
     it("should warn when emitting CJS for Node engines >= 23", () => {

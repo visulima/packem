@@ -44,13 +44,6 @@ module.exports = index;
 "
 `;
 
-exports[`packem typescript > should allow support for "allowJs" and generate proper assets > cts type code output 1`] = `
-"declare function _default(): string;
-
-export = _default;
-"
-`;
-
 exports[`packem typescript > should allow support for "allowJs" and generate proper assets > ts type code output 1`] = `
 "declare function _default(): string;
 
@@ -113,7 +106,7 @@ function requireDeeks () {
 	(function (exports) {
 		var __defProp = Object.defineProperty;
 		var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-		var __createBinding = deeks && deeks.__createBinding || (Object.create ? function(o, m, k, k2) {
+		var __createBinding = deeks && deeks.__createBinding || (Object.create ? (function(o, m, k, k2) {
 		  if (k2 === void 0) k2 = k;
 		  var desc = Object.getOwnPropertyDescriptor(m, k);
 		  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -122,13 +115,13 @@ function requireDeeks () {
 		    }, "get") };
 		  }
 		  Object.defineProperty(o, k2, desc);
-		} : function(o, m, k, k2) {
+		}) : (function(o, m, k, k2) {
 		  if (k2 === void 0) k2 = k;
 		  o[k2] = m[k];
-		});
-		var __setModuleDefault = deeks && deeks.__setModuleDefault || (Object.create ? function(o, v) {
+		}));
+		var __setModuleDefault = deeks && deeks.__setModuleDefault || (Object.create ? (function(o, v) {
 		  Object.defineProperty(o, "default", { enumerable: true, value: v });
-		} : function(o, v) {
+		}) : function(o, v) {
 		  o["default"] = v;
 		});
 		var __importStar = deeks && deeks.__importStar || function(mod) {
@@ -291,7 +284,7 @@ function requireDeeks () {
 	(function (exports) {
 		var __defProp = Object.defineProperty;
 		var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-		var __createBinding = deeks && deeks.__createBinding || (Object.create ? function(o, m, k, k2) {
+		var __createBinding = deeks && deeks.__createBinding || (Object.create ? (function(o, m, k, k2) {
 		  if (k2 === void 0) k2 = k;
 		  var desc = Object.getOwnPropertyDescriptor(m, k);
 		  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -300,13 +293,13 @@ function requireDeeks () {
 		    }, "get") };
 		  }
 		  Object.defineProperty(o, k2, desc);
-		} : function(o, m, k, k2) {
+		}) : (function(o, m, k, k2) {
 		  if (k2 === void 0) k2 = k;
 		  o[k2] = m[k];
-		});
-		var __setModuleDefault = deeks && deeks.__setModuleDefault || (Object.create ? function(o, v) {
+		}));
+		var __setModuleDefault = deeks && deeks.__setModuleDefault || (Object.create ? (function(o, v) {
 		  Object.defineProperty(o, "default", { enumerable: true, value: v });
-		} : function(o, v) {
+		}) : function(o, v) {
 		  o["default"] = v;
 		});
 		var __importStar = deeks && deeks.__importStar || function(mod) {

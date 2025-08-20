@@ -3,7 +3,10 @@ import type { Jiti } from "jiti";
 import type { BuildConfig, BuildPreset } from "../../types";
 import autoPreset from "../preset/auto";
 
-const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<BuildConfig> => {
+const loadPreset = async (
+    preset: BuildPreset | string,
+    jiti: Jiti,
+): Promise<BuildConfig> => {
     if (preset === "auto") {
         // eslint-disable-next-line no-param-reassign
         preset = autoPreset;

@@ -1,0 +1,25 @@
+{
+    "name": "advanced-tailwind-test",
+    "version": "1.0.0",
+    "description": "Test fixture for advanced Tailwind CSS features",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "packem build",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "tailwindcss": "^4.1.12",
+        "@tailwindcss/typography": "^0.5.16",
+        "@tailwindcss/forms": "^0.5.10",
+        "preline": "^3.2.3"
+    },
+    "devDependencies": {
+        "@visulima/packem": "workspace:*",
+        "typescript": "^5.9.2",
+        "@tailwindcss/node": "^4.1.12",
+        "@tailwindcss/oxide": "^4.1.12",
+        "esbuild": "^0.25.9"
+    }
+}

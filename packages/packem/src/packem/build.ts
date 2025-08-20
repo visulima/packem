@@ -4,8 +4,15 @@ import { bold, cyan, gray, green } from "@visulima/colorize";
 import { walk } from "@visulima/fs";
 import { formatBytes } from "@visulima/humanizer";
 import type { FileCache } from "@visulima/packem-share";
-import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "@visulima/packem-share/types";
-import { getDtsExtension, getOutputExtension } from "@visulima/packem-share/utils";
+import type {
+    BuildContext,
+    BuildContextBuildAssetAndChunk,
+    BuildContextBuildEntry,
+} from "@visulima/packem-share/types";
+import {
+    getDtsExtension,
+    getOutputExtension,
+} from "@visulima/packem-share/utils";
 import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
 
@@ -24,14 +31,20 @@ import gzipSize from "./utils/gzip-size";
  * @returns Boolean indicating whether any entries were logged
  * @internal
  */
-// eslint-disable-next-line sonarjs/cognitive-complexity
-const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOptions>): boolean => {
-    const rPath = (p: string) => relative(context.options.rootDir, resolve(context.options.outDir, p));
+
+const showSizeInformation = (
+    logger: Pail,
+    context: BuildContext<InternalBuildOptions>,
+): boolean => {
+    const rPath = (p: string) =>
+        relative(context.options.rootDir, resolve(context.options.outDir, p));
 
     let loggedEntries = false;
 
     const foundDtsEntries: string[] = [];
-    const entries = context.buildEntries.filter((bEntry) => bEntry.type === "entry");
+    const entries = context.buildEntries.filter(
+        (bEntry) => bEntry.type === "entry",
+    );
 
     if (entries.length > 0) {
         logger.raw("Entries:\n");
@@ -41,62 +54,61 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
             let chunkBytes = 0;
 
             for (const chunk of entry.chunks ?? []) {
-                const bytes = context.buildEntries.find((bEntry) => bEntry.path.endsWith(chunk))?.size?.bytes ?? 0;
+                const bytes
+                    = context.buildEntries.find((bEntry) =>
+                        bEntry.path.endsWith(chunk),
+                    )?.size?.bytes ?? 0;
 
                 totalBytes += bytes;
                 chunkBytes += bytes;
             }
 
             let line = `  ${bold(rPath(entry.path))} (${[
-                `total size: ${
-                    cyan(
-                        formatBytes(totalBytes, {
-                            decimals: 2,
-                        }),
-                    )}`,
+                `total size: ${cyan(
+                    formatBytes(totalBytes, {
+                        decimals: 2,
+                    }),
+                )}`,
                 entry.size?.brotli
-                && `brotli size: ${
-                    cyan(
-                        formatBytes(entry.size.brotli, {
-                            decimals: 2,
-                        }),
-                    )}`,
+                && `brotli size: ${cyan(
+                    formatBytes(entry.size.brotli, {
+                        decimals: 2,
+                    }),
+                )}`,
                 entry.size?.gzip
-                && `gzip size: ${
-                    cyan(
-                        formatBytes(entry.size.gzip, {
-                            decimals: 2,
-                        }),
-                    )}`,
+                && `gzip size: ${cyan(
+                    formatBytes(entry.size.gzip, {
+                        decimals: 2,
+                    }),
+                )}`,
                 chunkBytes !== 0
-                && `chunk size: ${
-                    cyan(
-                        formatBytes(chunkBytes, {
-                            decimals: 2,
-                        }),
-                    )}`,
+                && `chunk size: ${cyan(
+                    formatBytes(chunkBytes, {
+                        decimals: 2,
+                    }),
+                )}`,
             ]
                 .filter(Boolean)
                 .join(", ")})`;
 
-            line += entry.exports?.length ? `\n  exports: ${gray(entry.exports.join(", "))}` : "";
+            line += entry.exports?.length
+                ? `\n  exports: ${gray(entry.exports.join(", "))}`
+                : "";
 
             if (entry.chunks?.length) {
                 line += `\n${entry.chunks
                     .map((p) => {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const chunk = context.buildEntries.find((buildEntry) => buildEntry.path === p) ?? ({} as any);
+                        const chunk
+                            = context.buildEntries.find(
+                                (buildEntry) => buildEntry.path === p,
+                            ) ?? ({} as any);
 
                         return gray(
-                            `  └─ ${
-                                rPath(p)
-                            }${bold(
+                            `  └─ ${rPath(p)}${bold(
                                 chunk.bytes
-                                    ? ` (${
-                                        formatBytes(chunk?.bytes, {
-                                            decimals: 2,
-                                        })
-                                    })`
+                                    ? ` (${formatBytes(chunk?.bytes, {
+                                        decimals: 2,
+                                    })})`
                                     : "",
                             )}`,
                         );
@@ -115,22 +127,21 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
                     .sort((a, b) => (b.bytes || 0) - (a.bytes || 0))
                     .map((m) =>
                         gray(
-                            `  📦 ${
-                                rPath(m.id)
-                            }${bold(
+                            `  📦 ${rPath(m.id)}${bold(
                                 m.bytes
-                                    ? ` (${
-                                        formatBytes(m.bytes, {
-                                            decimals: 2,
-                                        })
-                                    })`
+                                    ? ` (${formatBytes(m.bytes, {
+                                        decimals: 2,
+                                    })})`
                                     : "",
                             )}`,
                         ),
                     )
                     .join("\n");
 
-                line += moduleList.length > 0 ? `\n  inlined modules:\n${moduleList}` : "";
+                line
+                    += moduleList.length > 0
+                        ? `\n  inlined modules:\n${moduleList}`
+                        : "";
             }
 
             if (context.options.declaration) {
@@ -143,54 +154,76 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
                 let type = "commonjs";
 
                 if (entry.path.endsWith(`.${cjsJSExtension}`)) {
-                    dtsPath = entry.path.replace(new RegExp(`\\.${cjsJSExtension}$`), `.${cjsDTSExtension}`);
+                    dtsPath = entry.path.replace(
+                        new RegExp(`\\.${cjsJSExtension}$`),
+                        `.${cjsDTSExtension}`,
+                    );
                 } else if (entry.path.endsWith(`.${esmJSExtension}`)) {
                     type = "module";
-                    dtsPath = entry.path.replace(new RegExp(`\\.${esmJSExtension}$`), `.${esmDTSExtension}`);
+                    dtsPath = entry.path.replace(
+                        new RegExp(`\\.${esmJSExtension}$`),
+                        `.${esmDTSExtension}`,
+                    );
                 }
 
-                const foundDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
+                const foundDts = context.buildEntries.find((bEntry) =>
+                    bEntry.path.endsWith(dtsPath),
+                );
 
                 if (foundDts) {
                     foundDtsEntries.push(foundDts.path);
 
-                    let foundCompatibleDts: BuildContextBuildAssetAndChunk | BuildContextBuildEntry | undefined;
+                    let foundCompatibleDts:
+                        | BuildContextBuildAssetAndChunk
+                        | BuildContextBuildEntry
+                        | undefined;
 
                     if (!dtsPath.includes(".d.ts")) {
-                        dtsPath = (dtsPath as string).replace(/\.d\.mts$/, `.${cjsDTSExtension}`);
+                        dtsPath = (dtsPath as string).replace(
+                            /\.d\.mts$/,
+                            `.${cjsDTSExtension}`,
+                        );
 
-                        foundCompatibleDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
+                        foundCompatibleDts = context.buildEntries.find(
+                            (bEntry) => bEntry.path.endsWith(dtsPath),
+                        );
                     }
 
                     if (foundCompatibleDts) {
                         foundDtsEntries.push(foundCompatibleDts.path);
 
                         if (type === "commonjs") {
-                            line += `\n  types:\n${
-                                [foundDts, foundCompatibleDts]
-                                    .map(
-                                        (value: BuildContextBuildAssetAndChunk | BuildContextBuildEntry) =>
-                                            `${gray("  └─ ")
+                            line += `\n  types:\n${[
+                                foundDts,
+                                foundCompatibleDts,
+                            ]
+                                .map(
+                                    (
+                                        value:
+                                            | BuildContextBuildAssetAndChunk
+                                            | BuildContextBuildEntry,
+                                    ) =>
+                                        `${
+                                            gray("  └─ ")
                                             + bold(rPath(value.path))
-                                            } (total size: ${
-                                                cyan(
-                                                    formatBytes(value.size?.bytes ?? 0, {
-                                                        decimals: 2,
-                                                    }),
-                                                )
-                                            })`,
-                                    )
-                                    .join("\n")}`;
-                        } else {
-                            line += `\n  types: ${
-                                bold(rPath(foundDts.path))
-                            } (total size: ${
-                                cyan(
-                                    formatBytes(foundDts.size?.bytes ?? 0, {
-                                        decimals: 2,
-                                    }),
+                                        } (total size: ${cyan(
+                                            formatBytes(
+                                                value.size?.bytes ?? 0,
+                                                {
+                                                    decimals: 2,
+                                                },
+                                            ),
+                                        )})`,
                                 )
-                            })`;
+                                .join("\n")}`;
+                        } else {
+                            line += `\n  types: ${bold(
+                                rPath(foundDts.path),
+                            )} (total size: ${cyan(
+                                formatBytes(foundDts.size?.bytes ?? 0, {
+                                    decimals: 2,
+                                }),
+                            )})`;
                         }
                     }
                 }
@@ -204,22 +237,25 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
         }
     }
 
-    const assets = context.buildEntries.filter((bEntry) => bEntry.type === "asset");
+    const assets = context.buildEntries.filter(
+        (bEntry) => bEntry.type === "asset",
+    );
 
     if (assets.length > 0) {
         let line = "Assets:";
 
-        for (const asset of context.buildEntries.filter((bEntry) => bEntry.type === "asset" && !foundDtsEntries.includes(bEntry.path))) {
-            line
-                += `${gray("\n  └─ ")
-                + bold(rPath(asset.path))
-                } (total size: ${
-                    cyan(
-                        formatBytes(asset.size?.bytes ?? 0, {
-                            decimals: 2,
-                        }),
-                    )
-                })`;
+        for (const asset of context.buildEntries.filter(
+            (bEntry) =>
+                bEntry.type === "asset"
+                && !foundDtsEntries.includes(bEntry.path),
+        )) {
+            line += `${
+                gray("\n  └─ ") + bold(rPath(asset.path))
+            } (total size: ${cyan(
+                formatBytes(asset.size?.bytes ?? 0, {
+                    decimals: 2,
+                }),
+            )})`;
         }
 
         line += "\n\n";
@@ -232,7 +268,10 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
             "Σ Total dist size (byte size):",
             cyan(
                 formatBytes(
-                    context.buildEntries.reduce((index, entry) => index + (entry.size?.bytes ?? 0), 0),
+                    context.buildEntries.reduce(
+                        (index, entry) => index + (entry.size?.bytes ?? 0),
+                        0,
+                    ),
                     {
                         decimals: 2,
                     },
@@ -276,21 +315,32 @@ const prepareRollupConfig = (
     typeBuilders: Set<BuilderProperties>;
     // eslint-disable-next-line sonarjs/cognitive-complexity
 } => {
-    const groupedEntries = groupByKeys(context.options.entries, "environment", "runtime");
+    const groupedEntries = groupByKeys(
+        context.options.entries,
+        "environment",
+        "runtime",
+    );
 
     const builders = new Set<BuilderProperties>();
     const typeBuilders = new Set<BuilderProperties>();
 
-    for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
+    for (const [environment, environmentEntries] of Object.entries(
+        groupedEntries,
+    )) {
         for (const [runtime, entries] of Object.entries(environmentEntries)) {
             const environmentRuntimeContext = {
                 ...context,
             };
 
-            if (!context.options.dtsOnly && (environment !== "undefined" || runtime !== "undefined")) {
+            if (
+                !context.options.dtsOnly
+                && (environment !== "undefined" || runtime !== "undefined")
+            ) {
                 context.logger.info(
                     `Preparing build for ${
-                        environment === "undefined" ? "" : `${cyan(environment)} environment${runtime === "undefined" ? "" : " with "}`
+                        environment === "undefined"
+                            ? ""
+                            : `${cyan(environment)} environment${runtime === "undefined" ? "" : " with "}`
                     }${runtime === "undefined" ? "" : `${cyan(runtime)} runtime`}`,
                 );
             }
@@ -298,20 +348,28 @@ const prepareRollupConfig = (
             const replaceValues: Record<string, string> = {};
 
             if (environmentRuntimeContext.options.rollup.replace) {
-                if (environmentRuntimeContext.options.rollup.replace.values === undefined) {
-                    environmentRuntimeContext.options.rollup.replace.values = {};
+                if (
+                    environmentRuntimeContext.options.rollup.replace.values
+                    === undefined
+                ) {
+                    environmentRuntimeContext.options.rollup.replace.values
+                        = {};
                 }
 
                 if (environment !== "undefined") {
                     // hack to make sure, that the replace plugin don't replace the environment
-                    replaceValues[["process", "env", "NODE_ENV"].join(".")] = JSON.stringify(environment);
+                    replaceValues[["process", "env", "NODE_ENV"].join(".")]
+                        = JSON.stringify(environment);
                 }
 
-                replaceValues[["process", "env", "EdgeRuntime"].join(".")] = JSON.stringify(runtime === "edge-light");
+                replaceValues[["process", "env", "EdgeRuntime"].join(".")]
+                    = JSON.stringify(runtime === "edge-light");
 
                 Object.freeze(replaceValues);
             } else {
-                context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
+                context.logger.warn(
+                    "'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.",
+                );
             }
 
             let subDirectory = "";
@@ -354,35 +412,52 @@ const prepareRollupConfig = (
             }
 
             if (esmAndCjsEntries.length > 0) {
-                const adjustedEsmAndCjsContext: BuildContext<InternalBuildOptions> = {
-                    ...environmentRuntimeContext,
-                    options: {
-                        ...environmentRuntimeContext.options,
-                        emitCJS: true,
-                        emitESM: true,
-                        entries: [...esmAndCjsEntries].filter((entry) => !DTS_REGEX.test(entry.input)),
-                        minify,
-                        rollup: {
-                            ...environmentRuntimeContext.options.rollup,
-                            replace: environmentRuntimeContext.options.rollup.replace
-                                ? {
-                                    ...environmentRuntimeContext.options.rollup.replace,
-                                    values: {
-                                        ...environmentRuntimeContext.options.rollup.replace.values,
-                                        ...replaceValues,
-                                    },
-                                }
-                                : false,
+                const adjustedEsmAndCjsContext: BuildContext<InternalBuildOptions>
+                    = {
+                        ...environmentRuntimeContext,
+                        options: {
+                            ...environmentRuntimeContext.options,
+                            emitCJS: true,
+                            emitESM: true,
+                            entries: [...esmAndCjsEntries].filter(
+                                (entry) => !DTS_REGEX.test(entry.input),
+                            ),
+                            minify,
+                            rollup: {
+                                ...environmentRuntimeContext.options.rollup,
+                                replace: environmentRuntimeContext.options
+                                    .rollup
+                                    .replace
+                                    ? {
+                                        ...environmentRuntimeContext.options
+                                            .rollup
+                                            .replace,
+                                        values: {
+                                            ...environmentRuntimeContext
+                                                .options
+                                                .rollup
+                                                .replace
+                                                .values,
+                                            ...replaceValues,
+                                        },
+                                    }
+                                    : false,
+                            },
                         },
-                    },
-                };
+                    };
 
                 if (!context.options.dtsOnly) {
-                    builders.add({ context: adjustedEsmAndCjsContext, fileCache, subDirectory });
+                    builders.add({
+                        context: adjustedEsmAndCjsContext,
+                        fileCache,
+                        subDirectory,
+                    });
                 }
 
                 if (context.options.declaration) {
-                    const typedEntries = [...esmAndCjsEntries].filter((entry) => entry.declaration);
+                    const typedEntries = [...esmAndCjsEntries].filter(
+                        (entry) => entry.declaration,
+                    );
 
                     if (typedEntries.length > 0) {
                         typeBuilders.add({
@@ -407,15 +482,23 @@ const prepareRollupConfig = (
                         ...environmentRuntimeContext.options,
                         emitCJS: false,
                         emitESM: true,
-                        entries: [...esmEntries].filter((entry) => !DTS_REGEX.test(entry.input)),
+                        entries: [...esmEntries].filter(
+                            (entry) => !DTS_REGEX.test(entry.input),
+                        ),
                         minify,
                         rollup: {
                             ...environmentRuntimeContext.options.rollup,
-                            replace: environmentRuntimeContext.options.rollup.replace
+                            replace: environmentRuntimeContext.options.rollup
+                                .replace
                                 ? {
-                                    ...environmentRuntimeContext.options.rollup.replace,
+                                    ...environmentRuntimeContext.options
+                                        .rollup
+                                        .replace,
                                     values: {
-                                        ...environmentRuntimeContext.options.rollup.replace.values,
+                                        ...environmentRuntimeContext.options
+                                            .rollup
+                                            .replace
+                                            .values,
                                         ...replaceValues,
                                     },
                                 }
@@ -425,11 +508,17 @@ const prepareRollupConfig = (
                 };
 
                 if (!context.options.dtsOnly) {
-                    builders.add({ context: adjustedEsmContext, fileCache, subDirectory });
+                    builders.add({
+                        context: adjustedEsmContext,
+                        fileCache,
+                        subDirectory,
+                    });
                 }
 
                 if (context.options.declaration) {
-                    const typedEntries = [...esmEntries].filter((entry) => entry.declaration);
+                    const typedEntries = [...esmEntries].filter(
+                        (entry) => entry.declaration,
+                    );
 
                     if (typedEntries.length > 0) {
                         typeBuilders.add({
@@ -454,15 +543,23 @@ const prepareRollupConfig = (
                         ...environmentRuntimeContext.options,
                         emitCJS: true,
                         emitESM: false,
-                        entries: [...cjsEntries].filter((entry) => !DTS_REGEX.test(entry.input)),
+                        entries: [...cjsEntries].filter(
+                            (entry) => !DTS_REGEX.test(entry.input),
+                        ),
                         minify,
                         rollup: {
                             ...environmentRuntimeContext.options.rollup,
-                            replace: environmentRuntimeContext.options.rollup.replace
+                            replace: environmentRuntimeContext.options.rollup
+                                .replace
                                 ? {
-                                    ...environmentRuntimeContext.options.rollup.replace,
+                                    ...environmentRuntimeContext.options
+                                        .rollup
+                                        .replace,
                                     values: {
-                                        ...environmentRuntimeContext.options.rollup.replace.values,
+                                        ...environmentRuntimeContext.options
+                                            .rollup
+                                            .replace
+                                            .values,
                                         ...replaceValues,
                                     },
                                 }
@@ -472,11 +569,17 @@ const prepareRollupConfig = (
                 };
 
                 if (!context.options.dtsOnly) {
-                    builders.add({ context: adjustedCjsContext, fileCache, subDirectory });
+                    builders.add({
+                        context: adjustedCjsContext,
+                        fileCache,
+                        subDirectory,
+                    });
                 }
 
                 if (context.options.declaration) {
-                    const typedEntries = [...cjsEntries].filter((entry) => entry.declaration);
+                    const typedEntries = [...cjsEntries].filter(
+                        (entry) => entry.declaration,
+                    );
 
                     if (typedEntries.length > 0) {
                         typeBuilders.add({
@@ -494,7 +597,10 @@ const prepareRollupConfig = (
                 }
             }
 
-            if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
+            if (
+                environmentRuntimeContext.options.declaration
+                && dtsEntries.length > 0
+            ) {
                 typeBuilders.add({
                     context: {
                         ...environmentRuntimeContext,
@@ -506,11 +612,19 @@ const prepareRollupConfig = (
                             minify,
                             rollup: {
                                 ...environmentRuntimeContext.options.rollup,
-                                replace: environmentRuntimeContext.options.rollup.replace
+                                replace: environmentRuntimeContext.options
+                                    .rollup
+                                    .replace
                                     ? {
-                                        ...environmentRuntimeContext.options.rollup.replace,
+                                        ...environmentRuntimeContext.options
+                                            .rollup
+                                            .replace,
                                         values: {
-                                            ...environmentRuntimeContext.options.rollup.replace.values,
+                                            ...environmentRuntimeContext
+                                                .options
+                                                .rollup
+                                                .replace
+                                                .values,
                                             ...replaceValues,
                                         },
                                     }
@@ -544,31 +658,63 @@ const prepareRollupConfig = (
  * @throws {Error} If the build process encounters critical errors
  * @public
  */
-const build = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<boolean> => {
+const build = async (
+    context: BuildContext<InternalBuildOptions>,
+    fileCache: FileCache,
+): Promise<boolean> => {
     await context.hooks.callHook("build:before", context);
 
     const { builders, typeBuilders } = prepareRollupConfig(context, fileCache);
 
     await Promise.all(
-        [...builders].map(async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuild(rollupContext, cache, subDirectory)),
+        [...builders].map(
+            async ({
+                context: rollupContext,
+                fileCache: cache,
+                subDirectory,
+            }) => await rollupBuild(rollupContext, cache, subDirectory),
+        ),
     );
     await Promise.all(
-        [...typeBuilders].map(async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuildTypes(rollupContext, cache, subDirectory)),
+        [...typeBuilders].map(
+            async ({
+                context: rollupContext,
+                fileCache: cache,
+                subDirectory,
+            }) => await rollupBuildTypes(rollupContext, cache, subDirectory),
+        ),
     );
 
-    context.logger.success(green(context.options.name ? `Build succeeded for ${context.options.name}` : "Build succeeded"));
+    context.logger.success(
+        green(
+            context.options.name
+                ? `Build succeeded for ${context.options.name}`
+                : "Build succeeded",
+        ),
+    );
 
     // Remove duplicated build entries
-    context.buildEntries = context.buildEntries.filter((entry, index, self) => self.findIndex((bEntry) => bEntry.path === entry.path) === index);
+    context.buildEntries = context.buildEntries.filter(
+        (entry, index, self) =>
+            self.findIndex((bEntry) => bEntry.path === entry.path) === index,
+    );
 
     // Find all dist files and add missing entries as chunks
-    for await (const file of walk(join(context.options.rootDir, context.options.outDir), {
-        includeDirs: false,
-        includeFiles: true,
-    })) {
-        const distributionPath = join(context.options.rootDir, context.options.outDir);
+    for await (const file of walk(
+        join(context.options.rootDir, context.options.outDir),
+        {
+            includeDirs: false,
+            includeFiles: true,
+        },
+    )) {
+        const distributionPath = join(
+            context.options.rootDir,
+            context.options.outDir,
+        );
 
-        let entry = context.buildEntries.find((bEntry) => join(distributionPath, bEntry.path) === file.path);
+        let entry = context.buildEntries.find(
+            (bEntry) => join(distributionPath, bEntry.path) === file.path,
+        );
 
         if (!entry) {
             entry = {

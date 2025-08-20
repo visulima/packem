@@ -1,6 +1,8 @@
 import type { Format } from "../types";
 
-export const inferExportTypeFromFileName = (filename: string): Format | undefined => {
+export const inferExportTypeFromFileName = (
+    filename: string,
+): Format | undefined => {
     if (filename.endsWith(".mjs") || filename.endsWith(".d.mts")) {
         return "esm";
     }
@@ -12,7 +14,12 @@ export const inferExportTypeFromFileName = (filename: string): Format | undefine
     return undefined;
 };
 
-export const inferExportType = (condition: string, previousConditions: string[], packageType: Format, filename?: string): Format => {
+export const inferExportType = (
+    condition: string,
+    previousConditions: string[],
+    packageType: Format,
+    filename?: string,
+): Format => {
     if (condition === "module-sync") {
         return "esm";
     }

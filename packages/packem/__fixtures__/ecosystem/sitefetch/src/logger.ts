@@ -1,23 +1,23 @@
-import c from "picocolors"
+import c from "picocolors";
 
-type LoggerLevel = "silent" | "warn"
+type LoggerLevel = "silent" | "warn";
 
 class Logger {
-  private level?: LoggerLevel
+    private level?: LoggerLevel;
 
-  setLevel(level: LoggerLevel): void {
-    this.level = level
-  }
+    setLevel(level: LoggerLevel): void {
+        this.level = level;
+    }
 
-  info(...args: any[]): void {
-    if (this.level === "silent") return
-    console.log(c.cyan("INFO"), ...args)
-  }
+    info(...args: any[]): void {
+        if (this.level === "silent") return;
+        console.log(c.cyan("INFO"), ...args);
+    }
 
-  warn(...args: any[]): void {
-    if (this.level === "silent") return
-    console.warn(c.yellow("WARN"), ...args)
-  }
+    warn(...args: any[]): void {
+        if (this.level === "silent") return;
+        console.warn(c.yellow("WARN"), ...args);
+    }
 }
 
-export const logger: Logger = new Logger()
+export const logger: Logger = new Logger();

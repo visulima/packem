@@ -4,7 +4,13 @@ import { readFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackem,
+    installPackage,
+} from "../helpers";
 
 describe("data-uri plugin", () => {
     let temporaryDirectoryPath: string;
@@ -14,7 +20,7 @@ describe("data-uri plugin", () => {
     });
 
     afterEach(async () => {
-    // cleanup handled by harness elsewhere if needed
+        // cleanup handled by harness elsewhere if needed
     });
 
     it("emits tiny data-uri for svg with ?data-uri", async () => {
@@ -41,12 +47,17 @@ export const data = icon;`,
             module: "./dist/index.mjs",
         });
 
-        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath, reject: false });
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
 
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         // Should be a data:image/svg+xml URI and not base64; comments must be stripped
         expect(mjsContent).toContain("data:image/svg+xml,");
@@ -74,12 +85,17 @@ export const data = file;`,
             module: "./dist/index.mjs",
         });
 
-        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath, reject: false });
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
 
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         // Should be a data URI with base64 for text/plain
         expect(mjsContent).toMatch(/data:text\/plain;.*base64,/);
@@ -110,12 +126,17 @@ export const length = Circle.length;`,
             module: "./dist/index.mjs",
         });
 
-        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath, reject: false });
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
 
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toContain("data:image/svg+xml,");
         // lucide icons should also not include comments

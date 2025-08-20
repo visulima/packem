@@ -4,7 +4,13 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackem,
+    installPackage,
+} from "../helpers";
 
 describe("packem-transformers", () => {
     let temporaryDirectoryPath: string;
@@ -78,40 +84,62 @@ module.exports = index;
 export { index as default };
 `,
         ],
-    ])("should transfrom the file with the '%s' transformer", async (transformer, expectedCjs, expectedMjs) => {
-        expect.assertions(6);
+    ])(
+        "should transfrom the file with the '%s' transformer",
+        async (transformer, expectedCjs, expectedMjs) => {
+            expect.assertions(6);
 
-        await installPackage(temporaryDirectoryPath, "typescript");
+            await installPackage(temporaryDirectoryPath, "typescript");
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                `export default () => 'index';`,
+            );
 
-        await createTsConfig(temporaryDirectoryPath);
-        await createPackageJson(
-            temporaryDirectoryPath,
-            {
-                devDependencies: {
-                    typescript: "*",
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackageJson(
+                temporaryDirectoryPath,
+                {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    main: "./dist/index.cjs",
+                    module: "./dist/index.mjs",
                 },
-                main: "./dist/index.cjs",
-                module: "./dist/index.mjs",
-            },
-            transformer as "esbuild" | "sucrase" | "swc",
-        );
-        await createPackemConfig(temporaryDirectoryPath, { transformer: transformer as "esbuild" | "oxc" | "sucrase" | "swc" });
+                transformer as "esbuild" | "sucrase" | "swc",
+            );
+            await createPackemConfig(temporaryDirectoryPath, {
+                transformer: transformer as
+                | "esbuild"
+                | "oxc"
+                | "sucrase"
+                | "swc",
+            });
 
-        expect(readFileSync(`${temporaryDirectoryPath}/packem.config.ts`)).toContain(
-            transformer === "swc" ? "swc/swc-plugin" : (transformer === "oxc" ? `${transformer}/oxc-transformer` : `${transformer}/index`),
-        );
+            expect(
+                readFileSync(`${temporaryDirectoryPath}/packem.config.ts`),
+            ).toContain(
+                transformer === "swc"
+                    ? "swc/swc-plugin"
+                    : (transformer === "oxc"
+                      ? `${transformer}/oxc-transformer`
+                      : `${transformer}/index`),
+            );
 
-        const binProcess = await execPackem("build", [], {
-            cwd: temporaryDirectoryPath,
-        });
+            const binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
 
-        expect(binProcess.stdout).contains(transformer);
-        expect(binProcess.stderr).toBe("");
-        expect(binProcess.exitCode).toBe(0);
+            expect(binProcess.stdout).contains(transformer);
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
 
-        expect(readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`)).toBe(expectedCjs);
-        expect(readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(expectedMjs);
-    });
+            expect(
+                readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`),
+            ).toBe(expectedCjs);
+            expect(
+                readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`),
+            ).toBe(expectedMjs);
+        },
+    );
 });

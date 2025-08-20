@@ -2,7 +2,12 @@ import { isAccessibleSync, readJsonSync, writeJsonSync } from "@visulima/fs";
 import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
 
-const createOrUpdateKeyStorage = (hashKey: string, storePath: string, logger: Pail, shouldUpdate?: true): void => {
+const createOrUpdateKeyStorage = (
+    hashKey: string,
+    storePath: string,
+    logger: Pail,
+    shouldUpdate?: true,
+): void => {
     try {
         let keyStore: Record<string, string> = {};
 

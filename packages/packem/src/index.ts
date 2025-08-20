@@ -51,7 +51,10 @@ export interface PackemOptions extends BuildConfig {
  * });
  * ```
  */
-export const packem = async (rootDirectory: string, options: PackemOptions = {}): Promise<void> => {
+export const packem = async (
+    rootDirectory: string,
+    options: PackemOptions = {},
+): Promise<void> => {
     const { debug, environment, logger, mode, tsconfigPath, ...inputConfig } = {
         debug: false,
         environment: "production" as Environment,
@@ -75,14 +78,18 @@ export const packem = async (rootDirectory: string, options: PackemOptions = {})
         ...logger,
     });
 
-    await internalPackem(rootDirectory, mode, environment, pail, debug, inputConfig as BuildConfig, tsconfigPath);
+    await internalPackem(
+        rootDirectory,
+        mode,
+        environment,
+        pail,
+        debug,
+        inputConfig as BuildConfig,
+        tsconfigPath,
+    );
 };
 
-export type {
-    BuildEntry,
-    BuildOptions,
-    RollupBuildOptions,
-} from "./types";
+export type { BuildEntry, BuildOptions, RollupBuildOptions } from "./types";
 export type {
     IsolatedDeclarationsTransformer,
     TransformerFn,

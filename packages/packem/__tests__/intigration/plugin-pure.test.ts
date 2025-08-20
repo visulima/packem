@@ -4,7 +4,13 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackem,
+    installPackage,
+} from "../helpers";
 
 describe("packem plugin-pure", () => {
     let temporaryDirectoryPath: string;
@@ -44,7 +50,9 @@ export const used = "only this should remain";`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { rootDir: "./src" },
+        });
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 rollup: {
@@ -60,7 +68,9 @@ export const used = "only this should remain";`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         // Should contain pure annotations for Symbol functions
         expect(mjsContent).toContain("/*@__PURE__*/");
@@ -94,7 +104,9 @@ export const used = "only this should remain";`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { rootDir: "./src" },
+        });
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 rollup: {
@@ -110,7 +122,9 @@ export const used = "only this should remain";`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         // Should contain pure annotations for Proxy constructor
         expect(mjsContent).toContain("/* @__PURE__ */");
@@ -143,7 +157,9 @@ export const used = "only this should remain";`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { rootDir: "./src" },
+        });
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 rollup: {
@@ -159,7 +175,9 @@ export const used = "only this should remain";`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         // Should contain pure annotations for Object utility methods
         expect(mjsContent).toContain("/* @__PURE__ */");
@@ -184,7 +202,9 @@ export const used = "this should remain";`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { rootDir: "./src" },
+        });
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 rollup: {
@@ -200,7 +220,9 @@ export const used = "this should remain";`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         // Should still build successfully without pure annotations
         expect(mjsContent).toContain("Symbol()");
@@ -234,7 +256,9 @@ export const used = "only this should remain";`,
             type: "commonjs",
             types: "./dist/index.d.ts",
         });
-        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { rootDir: "./src" },
+        });
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 rollup: {
@@ -252,7 +276,9 @@ export const used = "only this should remain";`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         // Should contain pure annotations for custom function
         expect(mjsContent).toContain("/*@__PURE__*/");
