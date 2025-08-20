@@ -61,9 +61,9 @@ export const data = content;`,
             `${temporaryDirectoryPath}/dist/index.mjs`,
         );
 
-        expect(mjsContent).toBe(`const content = "thisismydata";
+        expect(mjsContent).toBe(`const data$1 = "thisismydata";
 
-const data = content;
+const data = data$1;
 
 export { data };
 `);
@@ -76,9 +76,9 @@ export { data };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const content = "thisismydata";
+const data$1 = "thisismydata";
 
-const data = content;
+const data = data$1;
 
 exports.data = data;
 `);
@@ -120,9 +120,9 @@ export const data = content;`,
             `${temporaryDirectoryPath}/dist/index.mjs`,
         );
 
-        expect(mjsContent).toBe(`const content = "thisismydata";
+        expect(mjsContent).toBe(`const data$1 = "thisismydata";
 
-const data = content;
+const data = data$1;
 
 export { data };
 `);
@@ -135,9 +135,73 @@ export { data };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const content = "thisismydata";
+const data$1 = "thisismydata";
 
-const data = content;
+const data = data$1;
+
+exports.data = data;
+`);
+    });
+
+    it("should generate js files with included raw content when importing .js?raw", async () => {
+        expect.assertions(4);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/data.js`,
+            `const message = "Hello from JS file";
+console.log(message);
+export default message;`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `import jsContent from './data.js?raw';
+
+export const data = jsContent;`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+        });
+
+        // Configure packem to include .js files for raw imports
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
+
+        expect(mjsContent).toBe(`const data$1 = "const message = \\"Hello from JS file\\";\\nconsole.log(message);\\nexport default message;";
+
+const data = data$1;
+
+export { data };
+`);
+
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
+
+        expect(cjsContent).toBe(`'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const data$1 = "const message = \\"Hello from JS file\\";\\nconsole.log(message);\\nexport default message;";
+
+const data = data$1;
 
 exports.data = data;
 `);
