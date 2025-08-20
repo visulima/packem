@@ -1638,8 +1638,8 @@ importers:
         specifier: ^0.0.11
         version: 0.0.11
       '@visulima/css-style-inject':
-        specifier: workspace:*
-        version: link:../css-style-inject
+        specifier: 1.0.0-alpha.5
+        version: 1.0.0-alpha.5
       '@vitest/coverage-v8':
         specifier: ^3.2.4
         version: 3.2.4(vitest@3.2.4)
@@ -4657,6 +4657,10 @@ packages:
     resolution: {integrity: sha512-HX5BhQNIkf/u7msKjwRjN3P7VF0RwhBidWBqXeZAwojyKm22aRco/VjKuWplm0y3XeebFQhqvDcEcRWoyOiJgg==}
     engines: {node: '>=18.0.0 <=23.x'}
     os: [darwin, linux, win32]
+
+  '@visulima/css-style-inject@1.0.0-alpha.5':
+    resolution: {integrity: sha512-2Ft4eyUn9Xwe21t8GIgEBIEVyNspThQ440irn39q6u27zyxIaYDne+5vTUCEJ3tRkpdTzWHTIyzqjcCiWr822g==}
+    engines: {node: '>=20.* <=24.*'}
 
   '@visulima/error@4.4.18':
     resolution: {integrity: sha512-JSfYrRRb3LLRTaql1Fi4T7067ilTSWwxLjcLQv61zhCKOoQoUJux88C9/m4+ebXspqZV98KbAP9W9uPpIpp6Ig==}
@@ -14200,6 +14204,8 @@ snapshots:
   '@visulima/colorize@1.4.23':
     dependencies:
       '@visulima/is-ansi-color-supported': 2.2.14
+
+  '@visulima/css-style-inject@1.0.0-alpha.5': {}
 
   '@visulima/error@4.4.18': {}
 
