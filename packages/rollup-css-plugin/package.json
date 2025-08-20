@@ -140,6 +140,7 @@
         "@types/postcss-modules-scope": "^3.0.4",
         "@types/stylus": "^0.48.43",
         "@types/uglifycss": "^0.0.11",
+        "@visulima/css-style-inject": "workspace:*",
         "@vitest/coverage-v8": "^3.2.4",
         "@vitest/ui": "^3.2.4",
         "conventional-changelog-conventionalcommits": "9.1.0",
@@ -173,6 +174,7 @@
         "@csstools/postcss-slow-plugins": ">=2.0.0",
         "@tailwindcss/node": ">=0.0.0-insiders.20241201a",
         "@tailwindcss/oxide": ">=0.0.0-insiders.20241201a",
+        "@visulima/css-style-inject": "*",
         "cssnano": ">=7.0.0",
         "icss-utils": ">=5.1.0",
         "less": ">=4.0.0",
@@ -203,6 +205,9 @@
             "optional": true
         },
         "@tailwindcss/oxide": {
+            "optional": true
+        },
+        "@visulima/css-style-inject": {
             "optional": true
         },
         "cssnano": {

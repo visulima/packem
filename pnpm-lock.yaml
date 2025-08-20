@@ -992,6 +992,12 @@ importers:
       '@swc/types':
         specifier: 0.1.24
         version: 0.1.24
+      '@tailwindcss/node':
+        specifier: ^4.1.12
+        version: 4.1.12
+      '@tailwindcss/oxide':
+        specifier: ^4.1.12
+        version: 4.1.12
       '@total-typescript/ts-reset':
         specifier: ^0.6.1
         version: 0.6.1
@@ -1602,6 +1608,9 @@ importers:
       '@types/uglifycss':
         specifier: ^0.0.11
         version: 0.0.11
+      '@visulima/css-style-inject':
+        specifier: workspace:*
+        version: link:../css-style-inject
       '@vitest/coverage-v8':
         specifier: ^3.2.4
         version: 3.2.4(vitest@3.2.4)
