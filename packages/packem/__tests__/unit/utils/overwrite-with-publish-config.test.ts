@@ -61,7 +61,9 @@ describe(overwriteWithPublishConfig, () => {
             version: "1.0.0",
         } as unknown as NormalizedPackageJson;
 
-        const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
+        const result = overwriteWithPublishConfig(
+            package_ as unknown as NormalizedPackageJson,
+        );
 
         expect(result).toStrictEqual(package_);
     });
@@ -74,7 +76,9 @@ describe(overwriteWithPublishConfig, () => {
             version: "1.0.0",
         } as unknown as NormalizedPackageJson;
 
-        const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
+        const result = overwriteWithPublishConfig(
+            package_ as unknown as NormalizedPackageJson,
+        );
 
         expect(result).toStrictEqual(package_);
     });
@@ -88,7 +92,9 @@ describe(overwriteWithPublishConfig, () => {
             version: "1.0.0",
         } as unknown as NormalizedPackageJson;
 
-        const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
+        const result = overwriteWithPublishConfig(
+            package_ as unknown as NormalizedPackageJson,
+        );
 
         expect(result).toStrictEqual(package_);
     });
@@ -109,7 +115,9 @@ describe(overwriteWithPublishConfig, () => {
             version: "1.0.0",
         } as unknown as NormalizedPackageJson;
 
-        const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
+        const result = overwriteWithPublishConfig(
+            package_ as unknown as NormalizedPackageJson,
+        );
 
         expect(result).toStrictEqual(package_);
     });
@@ -137,7 +145,9 @@ describe(overwriteWithPublishConfig, () => {
             version: "",
         } as unknown as NormalizedPackageJson;
 
-        const result = overwriteWithPublishConfig(package_ as unknown as NormalizedPackageJson);
+        const result = overwriteWithPublishConfig(
+            package_ as unknown as NormalizedPackageJson,
+        );
 
         expect(result).toStrictEqual(package_);
     });

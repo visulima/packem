@@ -1,6 +1,15 @@
 import type { FileCache } from "@visulima/packem-share";
-import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "@visulima/packem-share/types";
-import type { OutputAsset, OutputChunk, OutputOptions, RollupCache } from "rollup";
+import type {
+    BuildContext,
+    BuildContextBuildAssetAndChunk,
+    BuildContextBuildEntry,
+} from "@visulima/packem-share/types";
+import type {
+    OutputAsset,
+    OutputChunk,
+    OutputOptions,
+    RollupCache,
+} from "rollup";
 import { rollup } from "rollup";
 
 import type { InternalBuildOptions } from "../types";
@@ -8,7 +17,11 @@ import { getRollupOptions } from "./get-rollup-options";
 
 const BUNDLE_CACHE_KEY = "rollup-build.json";
 
-const build = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, subDirectory: string): Promise<void> => {
+const build = async (
+    context: BuildContext<InternalBuildOptions>,
+    fileCache: FileCache,
+    subDirectory: string,
+): Promise<void> => {
     const rollupOptions = await getRollupOptions(context, fileCache);
 
     await context.hooks.callHook("rollup:options", context, rollupOptions);
@@ -22,12 +35,19 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
 
     // TODO: find a way to remove this hack
     // This is a hack to prevent caching when using isolated declarations or css loaders
-    if (context.options.rollup.isolatedDeclarations || context.options.isolatedDeclarationTransformer || context.options.rollup.css) {
+    if (
+        context.options.rollup.isolatedDeclarations
+        || context.options.isolatedDeclarationTransformer
+        || context.options.rollup.css
+    ) {
         loadCache = false;
     }
 
     if (loadCache) {
-        rollupOptions.cache = fileCache.get<RollupCache>(BUNDLE_CACHE_KEY, subDirectory);
+        rollupOptions.cache = fileCache.get<RollupCache>(
+            BUNDLE_CACHE_KEY,
+            subDirectory,
+        );
     }
 
     const buildResult = await rollup(rollupOptions);
@@ -38,16 +58,23 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
 
     await context.hooks.callHook("rollup:build", context, buildResult);
 
-    const assets = new Map<string, BuildContextBuildAssetAndChunk | BuildContextBuildEntry>();
+    const assets = new Map<
+        string,
+        BuildContextBuildAssetAndChunk | BuildContextBuildEntry
+    >();
 
     for (const outputOptions of rollupOptions.output as OutputOptions[]) {
         // eslint-disable-next-line no-await-in-loop
         const { output } = await buildResult.write(outputOptions);
-        const outputChunks = output.filter((fOutput) => fOutput.type === "chunk" && fOutput.isEntry) as OutputChunk[];
+        const outputChunks = output.filter(
+            (fOutput) => fOutput.type === "chunk" && fOutput.isEntry,
+        ) as OutputChunk[];
 
         for (const entry of outputChunks) {
             context.buildEntries.push({
-                chunks: entry.imports.filter((index) => outputChunks.find((c) => c.fileName === index)),
+                chunks: entry.imports.filter((index) =>
+                    outputChunks.find((c) => c.fileName === index),
+                ),
                 dynamicImports: entry.dynamicImports,
                 exports: entry.exports,
                 modules: Object.entries(entry.modules).map(([id, module_]) => {
@@ -64,7 +91,9 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
             });
         }
 
-        const outputAssets = output.filter((fOutput) => fOutput.type === "asset") as OutputAsset[];
+        const outputAssets = output.filter(
+            (fOutput) => fOutput.type === "asset",
+        ) as OutputAsset[];
 
         for (const entry of outputAssets) {
             if (assets.has(entry.fileName)) {

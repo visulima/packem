@@ -44,13 +44,6 @@ module.exports = index;
 "
 `;
 
-exports[`packem typescript > should allow support for "allowJs" and generate proper assets > cts type code output 1`] = `
-"declare function _default(): string;
-
-export = _default;
-"
-`;
-
 exports[`packem typescript > should allow support for "allowJs" and generate proper assets > ts type code output 1`] = `
 "declare function _default(): string;
 

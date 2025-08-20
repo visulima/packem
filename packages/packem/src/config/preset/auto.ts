@@ -11,16 +11,23 @@ import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";
 
 const autoPreset: BuildPreset = {
     hooks: {
-        "build:prepare": function (context: BuildContext<InternalBuildOptions>) {
+        "build:prepare": function (
+            context: BuildContext<InternalBuildOptions>,
+        ) {
             // Disable auto if entries already provided of pkg not available
             if (context.options.entries.length > 0) {
                 return;
             }
 
-            const sourceDirectory = join(context.options.rootDir, context.options.sourceDir);
+            const sourceDirectory = join(
+                context.options.rootDir,
+                context.options.sourceDir,
+            );
 
             if (!isAccessibleSync(sourceDirectory)) {
-                throw new Error("No 'src' directory found. Please provide entries manually.");
+                throw new Error(
+                    "No 'src' directory found. Please provide entries manually.",
+                );
             }
 
             const sourceFiles = collectSync(sourceDirectory, {
@@ -31,20 +38,25 @@ const autoPreset: BuildPreset = {
             });
 
             if (sourceFiles.length === 0) {
-                throw new Error("No source files found in 'src' directory. Please provide entries manually.");
+                throw new Error(
+                    "No source files found in 'src' directory. Please provide entries manually.",
+                );
             }
 
             let packageJson = { ...context.pkg } as NormalizedPackageJson;
 
             if (packageJson.publishConfig) {
                 context.logger.info(
-                    `Using publishConfig found in package.json, to override the default key-value pairs of "${
-                        Object.keys(packageJson.publishConfig).join(", ")
-                    }".`,
+                    `Using publishConfig found in package.json, to override the default key-value pairs of "${Object.keys(
+                        packageJson.publishConfig,
+                    ).join(", ")}".`,
                 );
                 context.logger.debug(packageJson.publishConfig);
 
-                packageJson = overwriteWithPublishConfig(packageJson, context.options.declaration);
+                packageJson = overwriteWithPublishConfig(
+                    packageJson,
+                    context.options.declaration,
+                );
             }
 
             const result = inferEntries(packageJson, sourceFiles, context);
@@ -56,7 +68,9 @@ const autoPreset: BuildPreset = {
             context.options.entries.push(...result.entries);
 
             if (context.options.entries.length === 0) {
-                throw new Error("No entries detected. Please provide entries manually.");
+                throw new Error(
+                    "No entries detected. Please provide entries manually.",
+                );
             } else {
                 context.logger.info(
                     "Automatically detected entries:",
@@ -64,19 +78,35 @@ const autoPreset: BuildPreset = {
                         context.options.entries
                             .map((buildEntry) => {
                                 if (buildEntry.fileAlias) {
-                                    return (
-                                        `${bold(buildEntry.fileAlias)
-                                        } => ${
-                                            bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*"))}`
-                                    );
+                                    return `${bold(
+                                        buildEntry.fileAlias,
+                                    )} => ${bold(
+                                        buildEntry.input
+                                            .replace(
+                                                `${context.options.rootDir}/`,
+                                                "",
+                                            )
+                                            .replace(/\/$/, "/*"),
+                                    )}`;
                                 }
 
-                                return bold(buildEntry.input.replace(`${context.options.rootDir}/`, "").replace(/\/$/, "/*"));
+                                return bold(
+                                    buildEntry.input
+                                        .replace(
+                                            `${context.options.rootDir}/`,
+                                            "",
+                                        )
+                                        .replace(/\/$/, "/*"),
+                                );
                             })
                             .join(", "),
                     ),
                     gray(
-                        [context.options.emitESM && "esm", context.options.emitCJS && "cjs", context.options.declaration && "dts"]
+                        [
+                            context.options.emitESM && "esm",
+                            context.options.emitCJS && "cjs",
+                            context.options.declaration && "dts",
+                        ]
                             .filter(Boolean)
                             .map((tag) => `[${tag}]`)
                             .join(" "),

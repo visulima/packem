@@ -9,7 +9,9 @@ describe(inferExportType, () => {
         expect(inferExportType("import", [], "cjs")).toBe("esm");
         expect(inferExportType("require", [], "esm")).toBe("cjs");
         expect(inferExportType("node", [], "esm")).toBe("esm");
-        expect(inferExportType("some_unknown_condition", [], "esm")).toBe("esm");
+        expect(inferExportType("some_unknown_condition", [], "esm")).toBe(
+            "esm",
+        );
     });
 
     it("should infers export type based on previous conditions", () => {
@@ -18,7 +20,9 @@ describe(inferExportType, () => {
         expect(inferExportType("import", ["require"], "cjs")).toBe("esm");
         expect(inferExportType("node", ["require"], "esm")).toBe("cjs");
         expect(inferExportType("node", ["import"], "cjs")).toBe("esm");
-        expect(inferExportType("node", ["unknown", "require"], "esm")).toBe("cjs");
+        expect(inferExportType("node", ["unknown", "require"], "esm")).toBe(
+            "cjs",
+        );
     });
 
     it("should infers export type based on filename", () => {

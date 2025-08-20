@@ -24,7 +24,9 @@ describe(extractExportFilenames, () => {
 
         const result = extractExportFilenames(packageExports, type, false);
 
-        expect(result).toStrictEqual([{ file: "index.js", key: "exports", type: "esm" }]);
+        expect(result).toStrictEqual([
+            { file: "index.js", key: "exports", type: "esm" },
+        ]);
     });
 
     it("should return an array of objects when packageExports is an object", () => {
@@ -171,7 +173,9 @@ describe(extractExportFilenames, () => {
 
         expect(() => {
             extractExportFilenames(packageExports, type, false);
-        }).toThrow("Exported file \"./src/index.cjs\" has an extension that does not match the package.json type \"module\".");
+        }).toThrow(
+            "Exported file \"./src/index.cjs\" has an extension that does not match the package.json type \"module\".",
+        );
     });
 
     it.each([
@@ -335,7 +339,12 @@ describe(extractExportFilenames, () => {
         ],
         [
             "cjs",
-            ["./dist/index.mjs", "./dist/index.cjs", "./dist/deep/index.cjs", "./dist/deep/index.mjs"],
+            [
+                "./dist/index.mjs",
+                "./dist/index.cjs",
+                "./dist/deep/index.cjs",
+                "./dist/deep/index.mjs",
+            ],
             [
                 {
                     exportKey: "*",
@@ -755,7 +764,11 @@ describe(extractExportFilenames, () => {
         ],
     ] as ["cjs" | "esm", PackageJson["exports"], OutputDescriptor[]][])(
         "should infer the correct export type",
-        (type: "cjs" | "esm", packageExports: PackageJson["exports"], expectedResult: OutputDescriptor[]) => {
+        (
+            type: "cjs" | "esm",
+            packageExports: PackageJson["exports"],
+            expectedResult: OutputDescriptor[],
+        ) => {
             expect.assertions(1);
 
             const result = extractExportFilenames(packageExports, type, true);

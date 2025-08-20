@@ -29,7 +29,10 @@ describe("packem watch", () => {
             type: "module",
         });
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const a = 1;\n`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.js`,
+            `export const a = 1;\n`,
+        );
     });
 
     afterEach(async () => {
@@ -43,16 +46,20 @@ describe("packem watch", () => {
             expect.assertions(2);
 
             // Start watch with a quick onSuccess command that prints a marker
-            const proc = execaNode(join(distributionPath, "cli/index.js"), [
-                "build",
-                "--development",
-                "--watch",
-                "--onSuccess=node -e \"console.log('ON_SUCCESS_OK')\"",
-                "--no-validation",
-            ], {
-                cwd: temporaryDirectoryPath,
-                reject: false,
-            });
+            const proc = execaNode(
+                join(distributionPath, "cli/index.js"),
+                [
+                    "build",
+                    "--development",
+                    "--watch",
+                    "--onSuccess=node -e \"console.log('ON_SUCCESS_OK')\"",
+                    "--no-validation",
+                ],
+                {
+                    cwd: temporaryDirectoryPath,
+                    reject: false,
+                },
+            );
 
             // Accumulate stdout to detect markers
             let stdout = "";
@@ -66,7 +73,14 @@ describe("packem watch", () => {
                 const start = Date.now();
 
                 while (Date.now() - start < 10_000) {
-                    if ((stdout.includes("Rebuild finished") || stdout.includes("Build run in") || stdout.includes("Build succeeded")) && stdout.includes("ON_SUCCESS_OK")) { return; }
+                    if (
+                        (stdout.includes("Rebuild finished")
+                            || stdout.includes("Build run in")
+                            || stdout.includes("Build succeeded"))
+                        && stdout.includes("ON_SUCCESS_OK")
+                    ) {
+                        return;
+                    }
 
                     await sleep(100);
                 }
@@ -76,7 +90,10 @@ describe("packem watch", () => {
             await waitForFirstSuccess();
 
             // Trigger a change to invoke doOnSuccessCleanup and then another onSuccess run
-            writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const a = 2;\n`);
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/index.js`,
+                `export const a = 2;\n`,
+            );
 
             const waitForSecondSuccess = async () => {
                 const start = Date.now();
@@ -86,11 +103,15 @@ describe("packem watch", () => {
                     // Count occurrences of marker; need 2 (initial + rebuild)
                     count = (stdout.match(/ON_SUCCESS_OK/g) ?? []).length;
 
-                    if (count >= 2) { return; }
+                    if (count >= 2) {
+                        return;
+                    }
 
                     await sleep(100);
                 }
-                throw new Error("Timed out waiting for second onSuccess after change");
+                throw new Error(
+                    "Timed out waiting for second onSuccess after change",
+                );
             };
 
             await waitForSecondSuccess();
@@ -100,9 +121,13 @@ describe("packem watch", () => {
             const result = await proc; // resolved due to reject:false
 
             // Ensure we didn't hit the previous crash path
-            expect(stdout).not.toContain("Cannot read properties of undefined (reading 'exitCode')");
+            expect(stdout).not.toContain(
+                "Cannot read properties of undefined (reading 'exitCode')",
+            );
             // Process terminated by our SIGINT is acceptable
-            expect(result.signal === "SIGINT" || result.exitCode === 0).toBe(true);
+            expect(result.signal === "SIGINT" || result.exitCode === 0).toBe(
+                true,
+            );
         },
     );
 });

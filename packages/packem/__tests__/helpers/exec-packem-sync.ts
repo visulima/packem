@@ -5,13 +5,23 @@ import { dirname } from "@visulima/path";
 import type { Options } from "execa";
 import { execaNode } from "execa";
 
-const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../dist");
+const distributionPath = join(
+    dirname(fileURLToPath(import.meta.url)),
+    "../../dist",
+);
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-const execPackem = async (command: "build" | "init", flags: string[] = [], options: Options = {}) => {
+const execPackem = async (
+    command: "build" | "init",
+    flags: string[] = [],
+    options: Options = {},
+) => {
     let environmentFlag: string | undefined = "--development";
 
-    if (flags.includes("--production") || flags.includes("--development") || flags.includes("--no-environment")) {
+    if (
+        flags.includes("--production")
+        || flags.includes("--development")
+        || flags.includes("--no-environment")
+    ) {
         environmentFlag = undefined;
     }
 
@@ -24,10 +34,14 @@ const execPackem = async (command: "build" | "init", flags: string[] = [], optio
         flags.push("--no-validation");
     }
 
-    return await execaNode(join(distributionPath, "cli/index.js"), [command, environmentFlag, ...flags].filter(Boolean) as string[], {
-        cleanup: true,
-        ...options,
-    });
+    return await execaNode(
+        join(distributionPath, "cli/index.js"),
+        [command, environmentFlag, ...flags].filter(Boolean) as string[],
+        {
+            cleanup: true,
+            ...options,
+        },
+    );
 };
 
 export default execPackem;

@@ -8,28 +8,45 @@ import { Application } from "typedoc";
 
 import type { BuildEntry, TypeDocumentOptions } from "../../types";
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
-const generateReferenceDocumentation = async (options: TypeDocumentOptions, entries: BuildEntry[], outputDirectory: string, logger: Pail): Promise<void> => {
+const generateReferenceDocumentation = async (
+    options: TypeDocumentOptions,
+    entries: BuildEntry[],
+    outputDirectory: string,
+    logger: Pail,
+): Promise<void> => {
     if (entries.length === 0) {
         return;
     }
 
-    const { format, jsonFileName, marker, output, plugin, readmePath, ...typedocOptions } = options;
+    const {
+        format,
+        jsonFileName,
+        marker,
+        output,
+        plugin,
+        readmePath,
+        ...typedocOptions
+    } = options;
 
     if (format === "inline" && readmePath === undefined) {
-        throw new Error("The `readmePath` option is required when using the `inline` format.");
+        throw new Error(
+            "The `readmePath` option is required when using the `inline` format.",
+        );
     }
 
     if (format !== "inline" && typeof readmePath === "string") {
         logger.warn({
-            message: "The `readmePath` option is only used when the `inline` format is used.",
+            message:
+                "The `readmePath` option is only used when the `inline` format is used.",
             prefix: "typedoc",
         });
     }
 
     if (format === "json") {
         if (jsonFileName === undefined) {
-            throw new Error("The `jsonFileName` option is required when using the `json` format.");
+            throw new Error(
+                "The `jsonFileName` option is required when using the `json` format.",
+            );
         } else if (!jsonFileName.endsWith(".json")) {
             throw new Error("The `jsonFileName` option must end with `.json`.");
         }
@@ -37,7 +54,8 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
 
     if (format !== "json" && typeof jsonFileName === "string") {
         logger.warn({
-            message: "The `jsonFileName` option is only used when the `json` format is used.",
+            message:
+                "The `jsonFileName` option is only used when the `json` format is used.",
             prefix: "typedoc",
         });
     }
@@ -100,7 +118,9 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
 
             if (format === "inline") {
                 if (marker === undefined) {
-                    throw new Error("The `marker` option is required when using the `inline` format.");
+                    throw new Error(
+                        "The `marker` option is required when using the `inline` format.",
+                    );
                 }
 
                 const markdownPathsList = readdirSync(outputDirectory, {
@@ -114,15 +134,28 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
                         continue;
                     }
 
-                    markdownContent += (readFileSync(join(outputDirectory, item.name)) as unknown as string)
+                    markdownContent += (
+                        readFileSync(
+                            join(outputDirectory, item.name),
+                        ) as unknown as string
+                    )
                         // This is needed to not include the content in the wrong place
                         .replaceAll(`<!-- ${marker}`, `<!-- _REPLACE_${marker}`)
-                        .replaceAll(`<!-- \${marker}`, `<!-- _REPLACE_\\${marker}`);
+                        .replaceAll(
+                            `<!-- \${marker}`,
+                            `<!-- _REPLACE_\\${marker}`,
+                        );
                 }
 
                 if (markdownContent !== "") {
-                    const readmeContent = readFileSync(readmePath as string) as unknown as string;
-                    const updatedReadmeContent = replaceContentWithinMarker(readmeContent, marker, `\n${markdownContent}`);
+                    const readmeContent = readFileSync(
+                        readmePath as string,
+                    ) as unknown as string;
+                    const updatedReadmeContent = replaceContentWithinMarker(
+                        readmeContent,
+                        marker,
+                        `\n${markdownContent}`,
+                    );
 
                     if (!updatedReadmeContent) {
                         logger.error({
@@ -141,8 +174,14 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
                         writeFileSync(
                             readmePath as string,
                             updatedReadmeContent
-                                .replaceAll(`<!-- _REPLACE_${marker}`, `<!-- ${marker}`)
-                                .replaceAll(`<!-- _REPLACE_\\${marker}`, `<!-- \${marker}`),
+                                .replaceAll(
+                                    `<!-- _REPLACE_${marker}`,
+                                    `<!-- ${marker}`,
+                                )
+                                .replaceAll(
+                                    `<!-- _REPLACE_\\${marker}`,
+                                    `<!-- \${marker}`,
+                                ),
                             {
                                 overwrite: true,
                             },

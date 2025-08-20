@@ -4,7 +4,13 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackem,
+    installPackage,
+} from "../helpers";
 
 describe("packem package.json bin", () => {
     let temporaryDirectoryPath: string;
@@ -47,7 +53,9 @@ console.log(path.basename(__filename));
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/index.js`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/bin/index.js`,
+        );
 
         expect(cjsContent).toMatchSnapshot("cjs output");
     });
@@ -80,7 +88,9 @@ console.log("Hello, world!");
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/index.js`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/bin/index.js`,
+        );
 
         expect(mjsContent).toMatchSnapshot("mjs output");
     });
@@ -121,11 +131,15 @@ console.log("b");
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsAContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/a.js`);
+        const cjsAContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/bin/a.js`,
+        );
 
         expect(cjsAContent).toMatchSnapshot("cjs output");
 
-        const cjsBContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/b.js`);
+        const cjsBContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/bin/b.js`,
+        );
 
         expect(cjsBContent).toMatchSnapshot("cjs output");
     });
@@ -156,7 +170,9 @@ console.log("b");
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/index.js`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/bin/index.js`,
+        );
 
         expect(cjsContent).toMatchSnapshot("cjs output");
     });

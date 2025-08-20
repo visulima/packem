@@ -63,10 +63,10 @@
         "browserslist-config-anolilab": "^6.0.2",
         "commitizen": "^4.3.1",
         "cross-env": "^10.0.0",
-<<<<<<< HEAD
         "husky": "^9.1.7",
         "is-ci": "^4.1.0",
         "lint-staged": "^16.1.5",
+<<<<<<< HEAD
         "nx": "^21.6.10",
         "pkg-pr-new": "^0.0.55",
         "plop": "^4.0.1",
@@ -80,7 +80,7 @@
         "typescript": "^5.9.2",
         "vitest": "^3.2.4"
     },
-    "packageManager": "pnpm@10.14.0",
+    "packageManager": "pnpm@10.15.0",
     "engines": {
         "node": ">=18.* <=24.*"
     },

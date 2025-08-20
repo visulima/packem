@@ -1,13 +1,9 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`packem package.json exports > should generate output with all cjs exports > cjs output 1`] = `
-"'use strict';
+"const index = "index";
 
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const index = "index";
-
-exports.index = index;
+export { index };
 "
 `;
 

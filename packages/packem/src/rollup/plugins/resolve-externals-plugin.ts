@@ -15,15 +15,25 @@ import resolveAliases from "../utils/resolve-aliases";
 
 type MaybeFalsy<T> = T | false | null | undefined;
 
-const getRegExps = (data: MaybeFalsy<RegExp | string>[], type: "exclude" | "include", logger: Pail): RegExp[] =>
+const getRegExps = (
+    data: MaybeFalsy<RegExp | string>[],
+    type: "exclude" | "include",
+    logger: Pail,
+): RegExp[] =>
     // eslint-disable-next-line unicorn/no-array-reduce
     data.reduce<RegExp[]>((result, entry, index) => {
         if (entry instanceof RegExp) {
             result.push(entry);
         } else if (typeof entry === "string" && entry.length > 0) {
-            result.push(new RegExp(`^${entry.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)}$`));
+            result.push(
+                new RegExp(
+                    `^${entry.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)}$`,
+                ),
+            );
         } else {
-            logger.warn(`Ignoring wrong entry type #${index} in '${type}' option: ${JSON.stringify(entry)}`);
+            logger.warn(
+                `Ignoring wrong entry type #${index} in '${type}' option: ${JSON.stringify(entry)}`,
+            );
         }
 
         return result;
@@ -110,20 +120,41 @@ export const resolveExternalsPlugin = (
 ): Plugin => {
     const cachedGlobFiles = new Map<string, string[]>();
     const cacheResolved = new Map<string, boolean>();
-    const resolvedExternalsOptions = context.options?.rollup?.resolveExternals ?? {};
+    const resolvedExternalsOptions
+        = context.options?.rollup?.resolveExternals ?? {};
 
     // Map the include and exclude options to arrays of regexes.
-    const include = new Set(getRegExps([...context.options?.externals ?? []], "include", context.logger));
-    const exclude = new Set(getRegExps([...resolvedExternalsOptions.exclude ?? []], "exclude", context.logger));
+    const include = new Set(
+        getRegExps(
+            [...context.options?.externals ?? []],
+            "include",
+            context.logger,
+        ),
+    );
+    const exclude = new Set(
+        getRegExps(
+            [...resolvedExternalsOptions.exclude ?? []],
+            "exclude",
+            context.logger,
+        ),
+    );
 
     const dependencies: Record<string, string> = {};
 
     Object.assign(
         dependencies,
-        resolvedExternalsOptions.deps ? context.pkg.dependencies ?? {} : undefined,
-        resolvedExternalsOptions.devDeps ? context.pkg.devDependencies ?? {} : undefined,
-        resolvedExternalsOptions.peerDeps ? context.pkg.peerDependencies ?? {} : undefined,
-        resolvedExternalsOptions.optDeps ? context.pkg.optionalDependencies ?? {} : undefined,
+        resolvedExternalsOptions.deps
+            ? context.pkg.dependencies ?? {}
+            : undefined,
+        resolvedExternalsOptions.devDeps
+            ? context.pkg.devDependencies ?? {}
+            : undefined,
+        resolvedExternalsOptions.peerDeps
+            ? context.pkg.peerDependencies ?? {}
+            : undefined,
+        resolvedExternalsOptions.optDeps
+            ? context.pkg.optionalDependencies ?? {}
+            : undefined,
     );
 
     // Add all dependencies as an include RegEx.
@@ -135,8 +166,15 @@ export const resolveExternalsPlugin = (
     }
 
     if (context.pkg?.peerDependenciesMeta) {
-        for (const [key, value] of Object.entries(context.pkg.peerDependenciesMeta)) {
-            if (value && typeof value === "object" && "optional" in value && value.optional) {
+        for (const [key, value] of Object.entries(
+            context.pkg.peerDependenciesMeta,
+        )) {
+            if (
+                value
+                && typeof value === "object"
+                && "optional" in value
+                && value.optional
+            ) {
                 include.add(new RegExp(`^${key}(?:/.+)?$`));
             }
         }
@@ -148,8 +186,12 @@ export const resolveExternalsPlugin = (
     let tsconfigPathPatterns: RegExp[] = [];
 
     if (context.tsconfig) {
-        tsconfigPathPatterns = Object.entries(context.tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) =>
-            (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
+        tsconfigPathPatterns = Object.entries(
+            context.tsconfig.config.compilerOptions?.paths ?? {},
+        ).map(([key]) =>
+            (key.endsWith("*")
+                ? new RegExp(`^${key.replace("*", "(.*)")}$`)
+                : new RegExp(`^${key}$`)),
         );
     }
 
@@ -181,20 +223,36 @@ export const resolveExternalsPlugin = (
                         || parseNodeModulePath(originalId)?.name
                         || getPackageName(originalId);
 
-                if (packageName && !packageName.startsWith(".") && !isNodeBuiltin(packageName)) {
+                if (
+                    packageName
+                    && !packageName.startsWith(".")
+                    && !isNodeBuiltin(packageName)
+                ) {
                     context.usedDependencies.add(packageName);
 
                     if (
-                    // Only treat as hoisted if the importer is source
+                        // Only treat as hoisted if the importer is source
                         (!importer || !importer.includes("/node_modules/"))
-                        && !Object.keys(context.pkg.dependencies ?? {}).includes(packageName)
-                        && !Object.keys(context.pkg.devDependencies ?? {}).includes(packageName)
-                        && !Object.keys(context.pkg.peerDependencies ?? {}).includes(packageName)
-                        && !Object.keys(context.pkg.optionalDependencies ?? {}).includes(packageName)
+                        && !Object.keys(context.pkg.dependencies ?? {}).includes(
+                            packageName,
+                        )
+                        && !Object.keys(
+                            context.pkg.devDependencies ?? {},
+                        ).includes(packageName)
+                        && !Object.keys(
+                            context.pkg.peerDependencies ?? {},
+                        ).includes(packageName)
+                        && !Object.keys(
+                            context.pkg.optionalDependencies ?? {},
+                        ).includes(packageName)
                         && context.options.validation
                         && context.options.validation.dependencies !== false
-                        && context.options.validation.dependencies.hoisted !== false
-                        && !context.options.validation.dependencies.hoisted?.exclude.includes(packageName)) {
+                        && context.options.validation.dependencies.hoisted
+                        !== false
+                        && !context.options.validation.dependencies.hoisted?.exclude.includes(
+                            packageName,
+                        )
+                    ) {
                         context.hoistedDependencies.add(packageName);
                     }
                 }
@@ -203,7 +261,9 @@ export const resolveExternalsPlugin = (
                     if (
                         /^(?:\0|\.{1,2}\/)/.test(id) // Ignore virtual modules and relative imports
                         || isAbsolute(id) // Ignore already resolved ids
-                        || new RegExp(`${context.options?.sourceDir}[/.*|\\.*]`).test(id) // Ignore source files
+                        || new RegExp(
+                            `${context.options?.sourceDir}[/.*|\\.*]`,
+                        ).test(id) // Ignore source files
                         || (context.pkg.name && id.startsWith(context.pkg.name)) // Ignore self import
                     ) {
                         cacheResolved.set(id, false);
@@ -215,7 +275,8 @@ export const resolveExternalsPlugin = (
                         let result = resolvedExternalsOptions.builtins;
 
                         if (result === undefined && importer) {
-                            result = isIncluded(importer) && !isExcluded(importer);
+                            result
+                                = isIncluded(importer) && !isExcluded(importer);
                         }
 
                         cacheResolved.set(id, result as boolean);
@@ -225,7 +286,9 @@ export const resolveExternalsPlugin = (
 
                     // package.json imports are not externals
                     if (id[0] === "#" && context.pkg.imports) {
-                        for (const [key, value] of Object.entries(context.pkg.imports)) {
+                        for (const [key, value] of Object.entries(
+                            context.pkg.imports,
+                        )) {
                             if (key[0] !== "#") {
                                 context.logger.debug({
                                     message: `Ignoring package.json import "${cyan(key)}" because it does not start with "#".`,
@@ -246,9 +309,17 @@ export const resolveExternalsPlugin = (
                                 let files: string[];
 
                                 if (cachedGlobFiles.has(key)) {
-                                    files = cachedGlobFiles.get(key) as string[];
+                                    files = cachedGlobFiles.get(
+                                        key,
+                                    ) as string[];
                                 } else {
-                                    files = readdirSync(join(context.options.rootDir, (value as string).replace("/*", "")), { withFileTypes: true })
+                                    files = readdirSync(
+                                        join(
+                                            context.options.rootDir,
+                                            (value as string).replace("/*", ""),
+                                        ),
+                                        { withFileTypes: true },
+                                    )
                                         .filter((dirent) => dirent.isFile())
                                         .map((dirent) => dirent.name);
 
@@ -256,7 +327,12 @@ export const resolveExternalsPlugin = (
                                 }
 
                                 for (const file of files) {
-                                    if (file.replace(ENDING_REGEX, "") === id.replace(ENDING_REGEX, "").replace("#", "")) {
+                                    if (
+                                        file.replace(ENDING_REGEX, "")
+                                        === id
+                                            .replace(ENDING_REGEX, "")
+                                            .replace("#", "")
+                                    ) {
                                         cacheResolved.set(id, false);
 
                                         return false;
@@ -292,7 +368,11 @@ export const resolveExternalsPlugin = (
             };
         },
         resolveId: {
-            async handler(specifier: string, _, { isEntry }): Promise<ResolveIdResult> {
+            async handler(
+                specifier: string,
+                _,
+                { isEntry },
+            ): Promise<ResolveIdResult> {
                 // Ignore entry points (they should always be resolved)
                 if (isEntry) {
                     return undefined;
@@ -311,12 +391,18 @@ export const resolveExternalsPlugin = (
                     const stripped = specifier.replace(/^node:/, "");
                     let prefixId: string = stripped;
 
-                    if (resolvedExternalsOptions.builtinsPrefix === "add" || !isNodeBuiltin(stripped)) {
+                    if (
+                        resolvedExternalsOptions.builtinsPrefix === "add"
+                        || !isNodeBuiltin(stripped)
+                    ) {
                         prefixId = `node:${stripped}`;
                     }
 
                     return {
-                        external: (resolvedExternalsOptions.builtins || isIncluded(specifier)) && !isExcluded(specifier),
+                        external:
+                            (resolvedExternalsOptions.builtins
+                                || isIncluded(specifier))
+                            && !isExcluded(specifier),
                         id:
                             resolvedExternalsOptions.builtinsPrefix === "ignore"
                                 ? specifier

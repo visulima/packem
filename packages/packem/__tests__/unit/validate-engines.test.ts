@@ -17,14 +17,18 @@ vi.mock("@visulima/packem-share/utils", () => {
 });
 
 describe(validateEngines, () => {
-    const createMockContext = (package_: any, validation: any = {}): BuildContext => ({
-        options: {
-            validation: {
-                packageJson: validation,
+    const createMockContext = (
+        package_: any,
+        validation: any = {},
+    ): BuildContext =>
+        ({
+            options: {
+                validation: {
+                    packageJson: validation,
+                },
             },
-        },
-        pkg: package_,
-    } as BuildContext);
+            pkg: package_,
+        }) as BuildContext;
 
     beforeEach(() => {
         vi.resetAllMocks();

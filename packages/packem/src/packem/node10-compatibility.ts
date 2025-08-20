@@ -11,7 +11,9 @@ import type { InternalBuildOptions } from "../types";
  * @param object The nested object containing string arrays
  * @returns A new object with unique values in all string arrays
  */
-const uniqueNestedValues = (object: Partial<Record<string, Partial<Record<string, string[]>>>>): Partial<Record<string, Partial<Record<string, string[]>>>> =>
+const uniqueNestedValues = (
+    object: Partial<Record<string, Partial<Record<string, string[]>>>>,
+): Partial<Record<string, Partial<Record<string, string[]>>>> =>
     Object.fromEntries(
         Object.entries(object).map(([key, value]) => {
             if (!value) {
@@ -45,8 +47,13 @@ export const node10Compatibility = async (
     mode: "console" | "file",
     typeScriptVersion: string,
 ): Promise<void> => {
-    if (typeScriptVersion !== "*" && valid(coerce(typeScriptVersion)) === undefined) {
-        throw new Error("Invalid typeScriptVersion option. It must be a valid semver range.");
+    if (
+        typeScriptVersion !== "*"
+        && valid(coerce(typeScriptVersion)) === undefined
+    ) {
+        throw new Error(
+            "Invalid typeScriptVersion option. It must be a valid semver range.",
+        );
     }
 
     logger.info({
@@ -59,7 +66,9 @@ export const node10Compatibility = async (
     for (const entry of entries) {
         for (const exportKey of entry.exportKey as Set<string>) {
             if (exportKey.includes("/*")) {
-                typesVersions[exportKey as string] = [`./${join(outDirectory, dirname(entry.name as string), "*.d.ts")}`];
+                typesVersions[exportKey as string] = [
+                    `./${join(outDirectory, dirname(entry.name as string), "*.d.ts")}`,
+                ];
             } else {
                 typesVersions[exportKey as string] = [
                     ...typesVersions[exportKey as string] ?? [],

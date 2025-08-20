@@ -7,7 +7,12 @@ import { duration } from "@visulima/humanizer";
 import type { NormalizedPackageJson, PackageJson } from "@visulima/package";
 import { hasPackageJsonAnyDependency } from "@visulima/package";
 import { enhanceRollupError, FileCache } from "@visulima/packem-share";
-import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, DEFAULT_EXTENSIONS, EXCLUDE_REGEXP, PRODUCTION_ENV } from "@visulima/packem-share/constants";
+import {
+    ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
+    DEFAULT_EXTENSIONS,
+    EXCLUDE_REGEXP,
+    PRODUCTION_ENV,
+} from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getHash } from "@visulima/packem-share/utils";
 import type { Pail } from "@visulima/pail";
@@ -26,7 +31,13 @@ import loadTsconfig from "../config/utils/load-tsconfig";
 import prepareEntries from "../config/utils/prepare-entries";
 import createStub from "../jit/create-stub";
 import rollupWatch from "../rollup/watch";
-import type { BuildConfig, BuildOptions, Environment, InternalBuildOptions, Mode } from "../types";
+import type {
+    BuildConfig,
+    BuildOptions,
+    Environment,
+    InternalBuildOptions,
+    Mode,
+} from "../types";
 import cleanDistributionDirectories from "../utils/clean-distribution-directories";
 import createOrUpdateKeyStorage from "../utils/create-or-update-key-storage";
 import getPackageSideEffect from "../utils/get-package-side-effect";
@@ -46,7 +57,9 @@ import { node10Compatibility } from "./node10-compatibility";
  * @returns Standardized JSX runtime value ('automatic', 'preserve', or 'transform')
  * @internal
  */
-const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX): "automatic" | "preserve" | "transform" | undefined => {
+const resolveTsconfigJsxToJsxRuntime = (
+    jsx?: TsConfigJson.CompilerOptions.JSX,
+): "automatic" | "preserve" | "transform" | undefined => {
     switch (jsx) {
         case "preserve":
         case "react-native": {
@@ -91,7 +104,9 @@ const generateOptions = (
     runtimeVersion: string,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): InternalBuildOptions => {
-    const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
+    const jsxRuntime = resolveTsconfigJsxToJsxRuntime(
+        tsconfig?.config.compilerOptions?.jsx,
+    );
     const splitRuntimeVersion = runtimeVersion.split(".");
 
     // @ts-ignore TS2589 is just deeply nested and this is needed for typedoc
@@ -187,10 +202,13 @@ const generateOptions = (
             esbuild: {
                 charset: "utf8",
                 jsx: jsxRuntime,
-                jsxDev: tsconfig?.config.compilerOptions?.jsx === "react-jsxdev",
+                jsxDev:
+                    tsconfig?.config.compilerOptions?.jsx === "react-jsxdev",
                 jsxFactory: tsconfig?.config.compilerOptions?.jsxFactory,
-                jsxFragment: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
-                jsxImportSource: tsconfig?.config.compilerOptions?.jsxImportSource,
+                jsxFragment:
+                    tsconfig?.config.compilerOptions?.jsxFragmentFactory,
+                jsxImportSource:
+                    tsconfig?.config.compilerOptions?.jsxImportSource,
                 jsxSideEffects: true,
 
                 /**
@@ -250,7 +268,15 @@ const generateOptions = (
                         ".jsx": [".tsx", ".d.ts", ".jsx"],
                         ".mjs": [".mts", ".d.mts", ".mjs"],
                     },
-                    extensions: [".ts", ".tsx", ".d.ts", ".js", ".jsx", ".json", ".node"],
+                    extensions: [
+                        ".ts",
+                        ".tsx",
+                        ".d.ts",
+                        ".js",
+                        ".jsx",
+                        ".json",
+                        ".node",
+                    ],
                     mainFields: [
                         "types",
                         "typings",
@@ -278,22 +304,35 @@ const generateOptions = (
                 preferConst: true,
             },
             license: {
-                dependenciesTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
+                dependenciesTemplate: (
+                    licenses: string[],
+                    dependencyLicenseTexts: string,
+                    pName: string,
+                ) =>
                     `\n# Licenses of bundled dependencies\n`
                     + `The published ${pName} artifact additionally contains code with the following licenses:\n${
-                        licenses.length > 0 ? `${licenses.join(", ")}\n\n` : "\n"
-                    }# Bundled dependencies:\n${
-                        dependencyLicenseTexts}`,
-                dtsTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
+                        licenses.length > 0
+                            ? `${licenses.join(", ")}\n\n`
+                            : "\n"
+                    }# Bundled dependencies:\n${dependencyLicenseTexts}`,
+                dtsTemplate: (
+                    licenses: string[],
+                    dependencyLicenseTexts: string,
+                    pName: string,
+                ) =>
                     `\n# Licenses of bundled types\n`
                     + `The published ${pName} artifact additionally contains code with the following licenses:\n${
-                        licenses.length > 0 ? `${licenses.join(", ")}\n\n` : "\n"
-                    }# Bundled types:\n${
-                        dependencyLicenseTexts}`,
+                        licenses.length > 0
+                            ? `${licenses.join(", ")}\n\n`
+                            : "\n"
+                    }# Bundled types:\n${dependencyLicenseTexts}`,
             },
             node10Compatibility: false,
             output: {
-                importAttributesKey: Number(splitRuntimeVersion[0] as string) >= 22 ? "with" : "assert",
+                importAttributesKey:
+                    Number(splitRuntimeVersion[0] as string) >= 22
+                        ? "with"
+                        : "assert",
             },
             oxc: {
                 jsx:
@@ -301,10 +340,17 @@ const generateOptions = (
                         ? "preserve"
                         : {
                             development: environment !== "production",
-                            pragma: tsconfig?.config.compilerOptions?.jsxFactory,
-                            pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
+                            pragma: tsconfig?.config.compilerOptions
+                                ?.jsxFactory,
+                            pragmaFrag:
+                                  tsconfig?.config.compilerOptions
+                                      ?.jsxFragmentFactory,
                             pure: true,
-                            runtime: jsxRuntime === "transform" || jsxRuntime === "automatic" ? "automatic" : "classic",
+                            runtime:
+                                  jsxRuntime === "transform"
+                                  || jsxRuntime === "automatic"
+                                      ? "automatic"
+                                      : "classic",
                             useBuiltIns: true,
                             useSpread: true,
                         },
@@ -358,21 +404,41 @@ const generateOptions = (
             sucrase: {
                 disableESTransforms: true,
                 enableLegacyBabel5ModuleInterop: false,
-                enableLegacyTypeScriptModuleInterop: tsconfig?.config.compilerOptions?.esModuleInterop === false,
+                enableLegacyTypeScriptModuleInterop:
+                    tsconfig?.config.compilerOptions?.esModuleInterop === false,
                 include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
                 injectCreateRequireForImportRequire: false,
                 preserveDynamicImport: true,
                 production: environment === PRODUCTION_ENV,
-                ...tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
+                ...tsconfig?.config.compilerOptions?.jsx
+                && ["react", "react-jsx", "react-jsxdev"].includes(
+                    tsconfig.config.compilerOptions.jsx,
+                )
                     ? {
-                        jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
-                        jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
+                        jsxFragmentPragma:
+                              tsconfig.config.compilerOptions
+                                  .jsxFragmentFactory,
+                        jsxImportSource:
+                              tsconfig.config.compilerOptions.jsxImportSource,
                         jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
                         jsxRuntime,
-                        transforms: ["typescript", "jsx", ...tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : []],
+                        transforms: [
+                            "typescript",
+                            "jsx",
+                            ...tsconfig.config.compilerOptions
+                                .esModuleInterop
+                                ? ["imports"]
+                                : [],
+                        ],
                     }
                     : {
-                        transforms: ["typescript", ...tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : []],
+                        transforms: [
+                            "typescript",
+                            ...tsconfig?.config.compilerOptions
+                                ?.esModuleInterop
+                                ? ["imports"]
+                                : [],
+                        ],
                     },
             },
             swc: {
@@ -388,24 +454,37 @@ const generateOptions = (
                     keepClassNames: true,
                     loose: true, // Use loose mode
                     parser: {
-                        decorators: tsconfig?.config.compilerOptions?.experimentalDecorators,
+                        decorators:
+                            tsconfig?.config.compilerOptions
+                                ?.experimentalDecorators,
                         syntax: tsconfig ? "typescript" : "ecmascript",
                         [tsconfig ? "tsx" : "jsx"]: true,
                     },
                     target: tsconfig?.config.compilerOptions?.target?.toLowerCase(),
                     transform: {
-                        decoratorMetadata: tsconfig?.config.compilerOptions?.emitDecoratorMetadata,
+                        decoratorMetadata:
+                            tsconfig?.config.compilerOptions
+                                ?.emitDecoratorMetadata,
                         decoratorVersion: "2022-03",
-                        legacyDecorator: tsconfig?.config.compilerOptions?.experimentalDecorators,
+                        legacyDecorator:
+                            tsconfig?.config.compilerOptions
+                                ?.experimentalDecorators,
                         react: {
                             development: environment !== PRODUCTION_ENV,
-                            pragma: tsconfig?.config.compilerOptions?.jsxFactory,
-                            pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
+                            pragma: tsconfig?.config.compilerOptions
+                                ?.jsxFactory,
+                            pragmaFrag:
+                                tsconfig?.config.compilerOptions
+                                    ?.jsxFragmentFactory,
                             runtime: jsxRuntime,
                             throwIfNamespace: true,
                         },
-                        treatConstEnumAsEnum: tsconfig?.config.compilerOptions?.preserveConstEnums,
-                        useDefineForClassFields: tsconfig?.config.compilerOptions?.useDefineForClassFields,
+                        treatConstEnumAsEnum:
+                            tsconfig?.config.compilerOptions
+                                ?.preserveConstEnums,
+                        useDefineForClassFields:
+                            tsconfig?.config.compilerOptions
+                                ?.useDefineForClassFields,
                     },
                 },
                 module: {
@@ -418,7 +497,10 @@ const generateOptions = (
                 },
             },
             treeshake: {
-                moduleSideEffects: getPackageSideEffect(rootDirectory, packageJson),
+                moduleSideEffects: getPackageSideEffect(
+                    rootDirectory,
+                    packageJson,
+                ),
                 preset: "recommended",
                 propertyReadSideEffects: true,
             },
@@ -429,7 +511,13 @@ const generateOptions = (
             url: {
                 emitFiles: true,
                 fileName: "[hash][extname]",
-                include: ["**/*.svg", "**/*.png", "**/*.jp(e)?g", "**/*.gif", "**/*.webp"],
+                include: [
+                    "**/*.svg",
+                    "**/*.png",
+                    "**/*.jp(e)?g",
+                    "**/*.gif",
+                    "**/*.webp",
+                ],
                 limit: 14 * 1024,
             },
             visualizer: {},
@@ -528,10 +616,15 @@ const generateOptions = (
         options.runtime = "node";
     }
 
-    const dependencies = new Map([...Object.entries(packageJson.dependencies ?? {}), ...Object.entries(packageJson.devDependencies ?? {})]);
+    const dependencies = new Map([
+        ...Object.entries(packageJson.dependencies ?? {}),
+        ...Object.entries(packageJson.devDependencies ?? {}),
+    ]);
 
     if (options.transformer?.NAME === undefined) {
-        throw new Error("Unknown transformer, check your transformer options or install one of the supported transformers: esbuild, swc, sucrase");
+        throw new Error(
+            "Unknown transformer, check your transformer options or install one of the supported transformers: esbuild, swc, sucrase",
+        );
     }
 
     options.transformerName = options.transformer.NAME;
@@ -565,7 +658,9 @@ const generateOptions = (
         if (options.rollup.resolve.preferBuiltins) {
             options.rollup.polyfillNode = false;
 
-            logger.debug("Disabling polyfillNode because preferBuiltins is set to true");
+            logger.debug(
+                "Disabling polyfillNode because preferBuiltins is set to true",
+            );
         }
     }
 
@@ -574,12 +669,17 @@ const generateOptions = (
     }
 
     if (options.runtime === "browser") {
-        if (options.rollup.resolve && options.rollup.resolve.browser === undefined) {
+        if (
+            options.rollup.resolve
+            && options.rollup.resolve.browser === undefined
+        ) {
             options.rollup.resolve.browser = true;
         }
 
         if (options.browserTargets && options.browserTargets.length > 0) {
-            logger.debug(`Using browser targets: ${options.browserTargets.join(", ")}`);
+            logger.debug(
+                `Using browser targets: ${options.browserTargets.join(", ")}`,
+            );
         }
     }
 
@@ -594,21 +694,29 @@ const generateOptions = (
 
         for (const [key, value] of Object.entries(options.outputExtensionMap)) {
             if (!["cjs", "esm"].includes(key)) {
-                throw new Error(`Invalid output extension map: ${key} must be "cjs" or "esm"`);
+                throw new Error(
+                    `Invalid output extension map: ${key} must be "cjs" or "esm"`,
+                );
             }
 
             if (typeof value !== "string") {
-                throw new TypeError(`Invalid output extension map: ${key} must be a string`);
+                throw new TypeError(
+                    `Invalid output extension map: ${key} must be a string`,
+                );
             }
 
             if (value.startsWith(".")) {
-                throw new Error(`Invalid output extension map: ${key} must not start with a dot. Example: "cjs": "c.js", "esm": "m.js"`);
+                throw new Error(
+                    `Invalid output extension map: ${key} must not start with a dot. Example: "cjs": "c.js", "esm": "m.js"`,
+                );
             }
 
             if (temporaryValue === undefined) {
                 temporaryValue = value;
             } else if (temporaryValue === value) {
-                throw new Error(`Invalid output extension map: ${key} must be different from the other key`);
+                throw new Error(
+                    `Invalid output extension map: ${key} must be different from the other key`,
+                );
             }
         }
     }
@@ -616,7 +724,9 @@ const generateOptions = (
     if (tsconfig?.config.compilerOptions?.declarationMap === true) {
         options.sourcemap = true;
 
-        logger.info("Enabling sourcemap because declarationMap is enabled in tsconfig.json");
+        logger.info(
+            "Enabling sourcemap because declarationMap is enabled in tsconfig.json",
+        );
     }
 
     return options;
@@ -647,7 +757,16 @@ const createContext = async (
     tsconfig: TsConfigResult | undefined,
     nodeVersion: string,
 ): Promise<BuildContext<InternalBuildOptions>> => {
-    const options = generateOptions(logger, rootDirectory, environment, debug, buildConfig, packageJson, tsconfig, nodeVersion);
+    const options = generateOptions(
+        logger,
+        rootDirectory,
+        environment,
+        debug,
+        buildConfig,
+        packageJson,
+        tsconfig,
+        nodeVersion,
+    );
 
     ensureDirSync(join(options.rootDir, options.outDir));
 
@@ -686,22 +805,34 @@ const createContext = async (
     }
 
     if (context.options.minify) {
-        context.logger.info("Minification is enabled, the output will be minified");
+        context.logger.info(
+            "Minification is enabled, the output will be minified",
+        );
     }
 
     warnLegacyCJS(context);
 
-    const hasTypescript = hasPackageJsonAnyDependency(packageJson as NormalizedPackageJson, ["typescript"]);
+    const hasTypescript = hasPackageJsonAnyDependency(
+        packageJson as NormalizedPackageJson,
+        ["typescript"],
+    );
 
-    if (context.options.declaration && context.tsconfig === undefined && hasTypescript) {
-        throw new Error("Cannot build declaration files without a tsconfig.json");
+    if (
+        context.options.declaration
+        && context.tsconfig === undefined
+        && hasTypescript
+    ) {
+        throw new Error(
+            "Cannot build declaration files without a tsconfig.json",
+        );
     }
 
     if (!hasTypescript) {
         context.options.declaration = false;
 
         context.logger.info({
-            message: "Typescript is not installed. Generation of declaration files are disabled.",
+            message:
+                "Typescript is not installed. Generation of declaration files are disabled.",
             prefix: "dts",
         });
     } else if (context.options.declaration === false) {
@@ -712,12 +843,15 @@ const createContext = async (
     }
 
     if (context.options.declaration) {
-        context.logger.info(`Using typescript version: ${cyan(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript ?? "unknown")}`);
+        context.logger.info(
+            `Using typescript version: ${cyan(packageJson.devDependencies?.typescript ?? packageJson.dependencies?.typescript ?? "unknown")}`,
+        );
     }
 
     if (
         context.options.declaration
-        && (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript)
+        && (packageJson.dependencies?.typescript
+            || packageJson.devDependencies?.typescript)
         && !context.tsconfig?.config.compilerOptions?.isolatedModules
     ) {
         context.logger.warn(
@@ -798,7 +932,12 @@ const packem = async (
 
     logger.debug("Using package.json found at", packageJsonPath);
 
-    const tsconfig = await loadTsconfig(rootDirectory, packageJson, logger, tsconfigPath);
+    const tsconfig = await loadTsconfig(
+        rootDirectory,
+        packageJson,
+        logger,
+        tsconfigPath,
+    );
 
     const cachePath = findCacheDirSync("@visulima/packem", {
         cwd: rootDirectory,
@@ -835,7 +974,17 @@ const packem = async (
     const fileCache = new FileCache(rootDirectory, cachePath, cacheKey, logger);
 
     try {
-        const context = await createContext(logger, rootDirectory, mode, environment, debug, config, packageJson, tsconfig, nodeVersion);
+        const context = await createContext(
+            logger,
+            rootDirectory,
+            mode,
+            environment,
+            debug,
+            config,
+            packageJson,
+            tsconfig,
+            nodeVersion,
+        );
 
         fileCache.isEnabled = context.options.fileCache as boolean;
 
@@ -847,20 +996,25 @@ const packem = async (
         });
 
         const runBuilder = async (watchMode?: true) => {
-            for await (const [name, builder] of Object.entries(context.options.builder ?? {})) {
+            for await (const [name, builder] of Object.entries(
+                context.options.builder ?? {},
+            )) {
                 context.logger.raw("\n");
 
                 await context.hooks.callHook("builder:before", name, context);
 
                 const builderStart = Date.now();
 
-                const getBuilderDuration = () => duration(Math.floor(Date.now() - builderStart));
+                const getBuilderDuration = () =>
+                    duration(Math.floor(Date.now() - builderStart));
 
                 await builder(context, cachePath, fileCache, logged);
 
                 await context.hooks.callHook("builder:done", name, context);
 
-                context.logger.raw(`\n⚡️ ${name} run in ${getBuilderDuration()}`);
+                context.logger.raw(
+                    `\n⚡️ ${name} run in ${getBuilderDuration()}`,
+                );
 
                 if (watchMode) {
                     context.logger.raw("\n\n");
@@ -879,7 +1033,10 @@ const packem = async (
                     await onSuccessCleanup();
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (error: any) {
-                    throw new Error(`onSuccess function cleanup failed: ${error.message}`, { cause: error });
+                    throw new Error(
+                        `onSuccess function cleanup failed: ${error.message}`,
+                        { cause: error },
+                    );
                 }
             }
 
@@ -894,26 +1051,35 @@ const packem = async (
                     onSuccessCleanup = await context.options.onSuccess();
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (error: any) {
-                    throw new Error(`onSuccess function failed: ${error.message}`, { cause: error });
+                    throw new Error(
+                        `onSuccess function failed: ${error.message}`,
+                        { cause: error },
+                    );
                 }
             } else if (typeof context.options.onSuccess === "string") {
                 const timeout = context.options.onSuccessTimeout ?? 30_000; // 30 seconds default
 
                 // Capture the spawned process locally to avoid race conditions with cleanup
-                const executedProcess = onSuccessProcess = exec(context.options.onSuccess, [], {
-                    nodeOptions: {
-                        shell: true,
-                        stdio: "inherit",
-                        timeout,
+                const executedProcess = onSuccessProcess = exec(
+                    context.options.onSuccess,
+                    [],
+                    {
+                        nodeOptions: {
+                            shell: true,
+                            stdio: "inherit",
+                            timeout,
+                        },
                     },
-                });
+                );
 
                 await executedProcess;
 
                 const { exitCode } = executedProcess;
 
                 if (typeof exitCode === "number" && exitCode !== 0) {
-                    throw new Error(`onSuccess script failed with exit code ${exitCode}. Check the output above for details.`);
+                    throw new Error(
+                        `onSuccess script failed with exit code ${exitCode}. Check the output above for details.`,
+                    );
                 }
             }
         };
@@ -923,10 +1089,18 @@ const packem = async (
 
         if (mode === "watch") {
             if (context.options.rollup.watch === false) {
-                throw new Error("Rollup watch is disabled. You should check your packem config.");
+                throw new Error(
+                    "Rollup watch is disabled. You should check your packem config.",
+                );
             }
 
-            await rollupWatch(context, fileCache, runBuilder, runOnsuccess, doOnSuccessCleanup);
+            await rollupWatch(
+                context,
+                fileCache,
+                runBuilder,
+                runOnsuccess,
+                doOnSuccessCleanup,
+            );
 
             logBuildErrors(context, false);
 
@@ -943,7 +1117,10 @@ const packem = async (
         } else {
             logged = await build(context, fileCache);
 
-            if (context.options.emitCJS && context.options.declaration === "compatible") {
+            if (
+                context.options.emitCJS
+                && context.options.declaration === "compatible"
+            ) {
                 if (logged) {
                     context.logger.raw("\n");
                 }
@@ -952,8 +1129,13 @@ const packem = async (
                 let typeScriptVersion: string = "*";
 
                 if (context.options.node10Compatibility) {
-                    outputMode = context.options.node10Compatibility?.writeToPackageJson ? "file" : "console";
-                    typeScriptVersion = context.options.node10Compatibility?.typeScriptVersion ?? "*";
+                    outputMode = context.options.node10Compatibility
+                        ?.writeToPackageJson
+                        ? "file"
+                        : "console";
+                    typeScriptVersion
+                        = context.options.node10Compatibility
+                            ?.typeScriptVersion ?? "*";
                 }
 
                 await node10Compatibility(

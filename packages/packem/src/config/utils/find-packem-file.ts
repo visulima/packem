@@ -1,11 +1,21 @@
 import { isAccessible } from "@visulima/fs";
 import { join } from "@visulima/path";
 
-const findPackemFile = async (rootDirectory: string, configPath = ""): Promise<string> => {
+const findPackemFile = async (
+    rootDirectory: string,
+    configPath = "",
+): Promise<string> => {
     let packemConfigFilePath = configPath;
 
     if (!packemConfigFilePath) {
-        const packemConfigFiles = ["packem.config.js", "packem.config.mjs", "packem.config.cjs", "packem.config.ts", "packem.config.cts", "packem.config.mts"];
+        const packemConfigFiles = [
+            "packem.config.js",
+            "packem.config.mjs",
+            "packem.config.cjs",
+            "packem.config.ts",
+            "packem.config.cts",
+            "packem.config.mts",
+        ];
 
         for (const file of packemConfigFiles) {
             // eslint-disable-next-line no-await-in-loop
@@ -17,7 +27,9 @@ const findPackemFile = async (rootDirectory: string, configPath = ""): Promise<s
     }
 
     if (!/\.(?:js|mjs|cjs|ts|cts|mts)$/.test(packemConfigFilePath)) {
-        throw new Error("Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.");
+        throw new Error(
+            "Invalid packem config file extension. Only .js, .mjs, .cjs, .ts, .cts and .mts extensions are allowed.",
+        );
     }
 
     return packemConfigFilePath;

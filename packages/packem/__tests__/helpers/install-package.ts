@@ -4,7 +4,10 @@ import { join, resolve } from "node:path";
 
 import { ensureSymlink } from "@visulima/fs";
 
-const installPackage = async (fixturePath: string, packageName: string): Promise<void> => {
+const installPackage = async (
+    fixturePath: string,
+    packageName: string,
+): Promise<void> => {
     const nodeModulesDirectory = join(fixturePath, "node_modules");
 
     await mkdir(nodeModulesDirectory, { recursive: true });

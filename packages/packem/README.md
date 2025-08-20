@@ -454,13 +454,13 @@ Native Node.js import mapping supports conditional imports (eg. resolving differ
 {
     // ...
 
-    "imports": {
+    imports: {
         // Mapping '~utils' to './src/utils.js'
         "~utils": "./src/utils.js",
 
         // Native Node.js import mapping (can't reference ./src)
-        "#internal-package": "./vendors/package/index.js"
-    }
+        "#internal-package": "./vendors/package/index.js",
+    },
 }
 ```
 
@@ -895,9 +895,20 @@ Will look for `_custom` first (_with the appropriate extension(s)_), and then fo
 styles({
     mode: "inject", // Unnecessary, set by default
     // ...or with custom options for injector
-    mode: ["inject", { attributes: { id: "global" }, container: "body", prepend: true, singleTag: true }],
+    mode: [
+        "inject",
+        {
+            attributes: { id: "global" },
+            container: "body",
+            prepend: true,
+            singleTag: true,
+        },
+    ],
     // ...or with custom injector
-    mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(id)})`],
+    mode: [
+        "inject",
+        (varname, id) => `console.log(${varname},${JSON.stringify(id)})`,
+    ],
 });
 ```
 

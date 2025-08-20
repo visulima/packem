@@ -1,11 +1,13 @@
 import { stat } from "node:fs/promises";
 
-import { compile, Features, normalizePath, optimize, toSourceMap } from "@tailwindcss/node";
+import { compile, Features, optimize, toSourceMap } from "@tailwindcss/node";
 import { clearRequireCache } from "@tailwindcss/node/require-cache";
-import { readFile } from "@visulima/fs";
-import { dirname, join, normalize, relative, resolve } from "@visulima/path";
+import { findPackageJson } from "@visulima/package";
+import { dirname, join, normalize, relative, resolve as pathResolve } from "@visulima/path";
+import { resolveAlias } from "@visulima/path/utils";
 
 import { generateJsExports } from "../utils/generate-js-exports";
+import { resolve } from "../utils/resolve";
 import type { Loader, LoaderContext } from "./types";
 
 // Type alias for resolver functions
@@ -47,7 +49,7 @@ class TailwindRoot {
         content: string,
         addWatchFile: (file: string) => void,
     ): Promise<{ code: string; map: string | undefined } | false> {
-        const inputPath = this.idToPath(this.id);
+        const inputPath = pathResolve(this.id.replace(/\?.*$/u, ""));
 
         const addWatchFileWrapper = (file: string) => {
             // Don't watch the input file since it's already a dependency
@@ -64,15 +66,17 @@ class TailwindRoot {
         };
 
         const requiresBuildPromise = this.requiresBuild();
-        const inputBase = dirname(resolve(inputPath));
+        const inputBase = dirname(pathResolve(inputPath));
 
         if (!this.compiler || !this.scanner || await requiresBuildPromise) {
             clearRequireCache([...this.buildDependencies.keys()]);
+
             this.buildDependencies.clear();
 
             this.addBuildDependency(inputPath);
 
             this.logger.debug({ message: "Setup compiler" });
+
             const addBuildDependenciesPromises: Promise<void>[] = [];
 
             this.compiler = await compile(content, {
@@ -167,15 +171,12 @@ class TailwindRoot {
                         relativePath = `./${relativePath}`;
                     }
 
-                    // Ensure relative is a posix style path since we will merge it with the glob
-                    relativePath = normalizePath(relativePath);
-
                     addWatchFileWrapper(join(relativePath, glob.pattern));
 
                     const { root } = this.compiler;
 
                     if (root !== "none" && root !== null) {
-                        const basePath = normalizePath(resolve(root.base, root.pattern));
+                        const basePath = pathResolve(root.base, root.pattern);
 
                         try {
                             const stats = await stat(basePath);
@@ -238,10 +239,6 @@ class TailwindRoot {
 
         return false;
     }
-
-    private idToPath(id: string): string {
-        return resolve(id.replace(/\?.*$/u, ""));
-    }
 }
 
 /**
@@ -254,31 +251,58 @@ const tailwindcssLoader: Loader = {
      * Process Tailwind CSS content using Tailwind Oxide
      */
     async process(this: LoaderContext, { code, map }) {
+        const aliases = this.alias;
+
         // Create custom resolvers for CSS and JS imports
         const customCssResolver = async (id: string, base: string): Promise<string | false | undefined> => {
-            // Resolve CSS imports using the loader context
-            const resolvedPath = resolve(base, id);
-
             try {
-                const content = await readFile(resolvedPath, { encoding: "utf8" });
+                const packageJsonResult = await findPackageJson(base);
 
-                return content;
+                const resolvedPath = resolve([id, resolveAlias(id, aliases ?? {})], {
+                    baseDirs: [base, join(dirname(packageJsonResult.path), "node_modules")],
+                    caller: "Tailwind CSS Resolver",
+                    conditionNames: ["style", "development|production"],
+                    extensions: [".css"],
+                    mainFields: ["style"],
+                    preferRelative: true,
+                });
+
+                if (resolvedPath) {
+                    this.logger.debug({ message: `Resolved CSS import: ${id} -> ${resolvedPath}` });
+
+                    return resolvedPath;
+                }
             } catch {
-                return false;
+                // File doesn't exist or can't be accessed
             }
+
+            this.logger.debug({ message: `Failed to resolve CSS import: ${id} from ${base}` });
+
+            return false;
         };
 
         const customJsResolver = async (id: string, base: string): Promise<string | false | undefined> => {
-            // Resolve JS imports using the loader context
-            const resolvedPath = resolve(base, id);
-
             try {
-                const content = await readFile(resolvedPath, { encoding: "utf8" });
+                const packageJsonResult = await findPackageJson(base);
 
-                return content;
+                const resolvedPath = resolve([id, resolveAlias(id, aliases ?? {})], {
+                    baseDirs: [base, join(dirname(packageJsonResult.path), "node_modules")],
+                    caller: "Tailwind JS Resolver",
+                    extensions: [".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx"],
+                });
+
+                if (resolvedPath) {
+                    this.logger.debug({ message: `Resolved JS import: ${id} -> ${resolvedPath}` });
+
+                    return resolvedPath;
+                }
             } catch {
-                return false;
+                // File doesn't exist or can't be accessed
             }
+
+            this.logger.debug({ message: `Failed to resolve JS import: ${id} from ${base}` });
+
+            return false;
         };
 
         // Create or get the Tailwind root for this file

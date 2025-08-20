@@ -6,7 +6,14 @@ import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { assertContainFiles, createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import {
+    assertContainFiles,
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackem,
+    installPackage,
+} from "../helpers";
 
 const splitedNodeJsVersion = process.versions.node.split(".");
 
@@ -56,11 +63,15 @@ export function method() {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toMatchSnapshot("mjs output");
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsContent).toMatchSnapshot("cjs output");
     });
@@ -68,7 +79,10 @@ export function method() {
     it("should generate proper assets with js based on the package.json exports", async () => {
         expect.assertions(4);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export default 'exports-sugar'`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.js`,
+            `export default 'exports-sugar'`,
+        );
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -90,14 +104,19 @@ export function method() {
         expect(binProcess.exitCode).toBe(0);
 
         for (const file of ["index.cjs", "index.mjs"]) {
-            expect(existsSync(`${temporaryDirectoryPath}/dist/${file}`)).toBe(true);
+            expect(existsSync(`${temporaryDirectoryPath}/dist/${file}`)).toBe(
+                true,
+            );
         }
     });
 
     it("should work with dev and prod optimize conditions", async () => {
         expect.assertions(8);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = process.env.NODE_ENV;`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export const value = process.env.NODE_ENV;`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -140,7 +159,9 @@ export function method() {
             ["index.cjs", /process.env.NODE_ENV/],
             ["index.mjs", /process.env.NODE_ENV/],
         ]) {
-            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
+            const content = readFileSync(
+                `${temporaryDirectoryPath}/dist/${file as string}`,
+            );
 
             expect(content).toMatch(regex as RegExp);
         }
@@ -149,12 +170,30 @@ export function method() {
     it("should work with dev and prod optimize conditions in nested-convention", async () => {
         expect.assertions(14);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = 'index';`);
-        writeFileSync(`${temporaryDirectoryPath}/src/index.production.ts`, `export const value = process.env.NODE_ENV;`);
-        writeFileSync(`${temporaryDirectoryPath}/src/index.development.ts`, `export const value = process.env.NODE_ENV;`);
-        writeFileSync(`${temporaryDirectoryPath}/src/core.ts`, `export const value = 'core';`);
-        writeFileSync(`${temporaryDirectoryPath}/src/core.production.ts`, `export const value = 'core' + process.env.NODE_ENV;`);
-        writeFileSync(`${temporaryDirectoryPath}/src/core.development.ts`, `export const value = 'core' + process.env.NODE_ENV;`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export const value = 'index';`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.production.ts`,
+            `export const value = process.env.NODE_ENV;`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.development.ts`,
+            `export const value = process.env.NODE_ENV;`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/core.ts`,
+            `export const value = 'core';`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/core.production.ts`,
+            `export const value = 'core' + process.env.NODE_ENV;`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/core.development.ts`,
+            `export const value = 'core' + process.env.NODE_ENV;`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -215,7 +254,9 @@ export function method() {
             ["core.cjs", /= "core"/],
             ["core.mjs", /= "core"/],
         ]) {
-            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
+            const content = readFileSync(
+                `${temporaryDirectoryPath}/dist/${file as string}`,
+            );
 
             expect(content).toMatch(regex as RegExp);
         }
@@ -231,8 +272,14 @@ export const shared = true;
 
 export type IString = string;`,
         );
-        writeFileSync(`${temporaryDirectoryPath}/src/index.react-native.ts`, `export default 'react-native';`);
-        writeFileSync(`${temporaryDirectoryPath}/src/index.react-server.ts`, `export default 'react-server';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.react-native.ts`,
+            `export default 'react-native';`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.react-server.ts`,
+            `export default 'react-server';`,
+        );
         writeFileSync(
             `${temporaryDirectoryPath}/src/api/index.ts`,
             `import index, { type IString } from '../index';
@@ -281,7 +328,9 @@ export { IString };`,
             ["./api/index.cjs", /"api:"/],
             ["./api/index.mjs", /"api:"/],
         ]) {
-            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
+            const content = readFileSync(
+                `${temporaryDirectoryPath}/dist/${file as string}`,
+            );
 
             expect(content).toMatch(regex as RegExp);
         }
@@ -290,7 +339,10 @@ export { IString };`,
     it("should work with nested path in exports", async () => {
         expect.assertions(3);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/foo/bar.js`, `export const value = 'foo.bar';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/foo/bar.js`,
+            `export const value = 'foo.bar';`,
+        );
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -307,7 +359,9 @@ export { IString };`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const content = readFileSync(`${temporaryDirectoryPath}/dist/foo/bar.js`);
+        const content = readFileSync(
+            `${temporaryDirectoryPath}/dist/foo/bar.js`,
+        );
 
         expect(content).toMatch(`const value = "foo.bar";
 
@@ -318,7 +372,10 @@ export { value };
     it("should work with ESM package with CJS main field", async () => {
         expect.assertions(4);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const value = 'cjs';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.js`,
+            `export const value = 'cjs';`,
+        );
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -339,11 +396,15 @@ export { value };
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toMatchSnapshot("mjs output");
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsContent).toMatchSnapshot("cjs output");
     });
@@ -351,7 +412,10 @@ export { value };
     it("should deduplicate entries", async () => {
         expect.assertions(3);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = 'cjs';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export const value = 'cjs';`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -391,7 +455,10 @@ export { value };
     it("should export dual package for type module", async () => {
         expect.assertions(4);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export default () => 'index';`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -440,9 +507,18 @@ export { index as default };
     it("should allow to have folder name the same like file for export", async () => {
         expect.assertions(4);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/config/index.ts`, `export default () => 'index';`);
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
-        writeFileSync(`${temporaryDirectoryPath}/src/config.ts`, `export default () => 'config';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/config/index.ts`,
+            `export default () => 'index';`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export default () => 'index';`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/config.ts`,
+            `export default () => 'config';`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -508,7 +584,10 @@ export { config as default };
     it("should export dual package for type commonjs", async () => {
         expect.assertions(4);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export default () => 'index';`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -557,10 +636,22 @@ export { index as default };
     it("should generate output with all cjs exports", async () => {
         expect.assertions(15);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/bin/cli.js`, `export const cli = 'cli';`);
-        writeFileSync(`${temporaryDirectoryPath}/src/foo.js`, `export const foo = 'foo'`);
-        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const index = 'index'`);
-        writeFileSync(`${temporaryDirectoryPath}/src/index.react-server.js`, `export const index = 'index.react-server'`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/bin/cli.js`,
+            `export const cli = 'cli';`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/foo.js`,
+            `export const foo = 'foo'`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.js`,
+            `export const index = 'index'`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.react-server.js`,
+            `export const index = 'index.react-server'`,
+        );
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -585,29 +676,45 @@ export { index as default };
         expect(binProcess.stderr).toBe("");
 
         expect(binProcess.stdout).toContain("Build succeeded for output-app");
-        expect(binProcess.stdout).toContain("dist/index.react-server.js (total size: 149.00 Bytes, brotli size: 110.00 Bytes, gzip size: 142.00 Bytes)");
+        expect(binProcess.stdout).toContain(
+            "dist/index.react-server.js (total size: 149.00 Bytes, brotli size: 110.00 Bytes, gzip size: 142.00 Bytes)",
+        );
         expect(binProcess.stdout).toContain("exports: index");
-        expect(binProcess.stdout).toContain("dist/foo.js (total size: 128.00 Bytes, brotli size: 108.00 Bytes, gzip size: 132.00 Bytes)");
+        expect(binProcess.stdout).toContain(
+            "dist/foo.js (total size: 128.00 Bytes, brotli size: 108.00 Bytes, gzip size: 132.00 Bytes)",
+        );
         expect(binProcess.stdout).toContain("exports: foo");
-        expect(binProcess.stdout).toContain("dist/bin/cli.js (total size: 148.00 Bytes, brotli size: 112.00 Bytes, gzip size: 146.00 Bytes)");
+        expect(binProcess.stdout).toContain(
+            "dist/bin/cli.js (total size: 148.00 Bytes, brotli size: 112.00 Bytes, gzip size: 146.00 Bytes)",
+        );
         expect(binProcess.stdout).toContain("exports: cli");
-        expect(binProcess.stdout).toContain("dist/index.js (total size: 42.00 Bytes, brotli size: 46.00 Bytes, gzip size: 53.00 Bytes)");
+        expect(binProcess.stdout).toContain(
+            "dist/index.js (total size: 42.00 Bytes, brotli size: 46.00 Bytes, gzip size: 53.00 Bytes)",
+        );
         expect(binProcess.stdout).toContain("exports: index");
         expect(binProcess.stdout).toContain("Σ Total dist size (byte size):");
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.js`,
+        );
 
         expect(cjsContent).toMatchSnapshot("cjs output");
 
-        const cjsReactContent = readFileSync(`${temporaryDirectoryPath}/dist/index.react-server.js`);
+        const cjsReactContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.react-server.js`,
+        );
 
         expect(cjsReactContent).toMatchSnapshot("cjs output");
 
-        const cjsFooContent = readFileSync(`${temporaryDirectoryPath}/dist/foo.js`);
+        const cjsFooContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/foo.js`,
+        );
 
         expect(cjsFooContent).toMatchSnapshot("cjs output");
 
-        const cjsCliContent = readFileSync(`${temporaryDirectoryPath}/dist/bin/cli.js`);
+        const cjsCliContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/bin/cli.js`,
+        );
 
         expect(cjsCliContent).toMatchSnapshot("cjs output");
     });
@@ -615,7 +722,10 @@ export { index as default };
     it("should support wildcard subpath exports", async () => {
         expect.assertions(7);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export default () => 'index';`,
+        );
         writeFileSync(
             `${temporaryDirectoryPath}/src/pages/a.ts`,
             `export function render() {
@@ -666,7 +776,9 @@ const index = /* @__PURE__ */ __name(() => "index", "default");
 module.exports = index;
 `);
 
-        const cjsPageA = readFileSync(`${temporaryDirectoryPath}/dist/pages/a.cjs`);
+        const cjsPageA = readFileSync(
+            `${temporaryDirectoryPath}/dist/pages/a.cjs`,
+        );
 
         expect(cjsPageA).toBe(`'use strict';
 
@@ -682,7 +794,9 @@ __name(render, "render");
 exports.render = render;
 `);
 
-        const mjsPageA = readFileSync(`${temporaryDirectoryPath}/dist/pages/a.mjs`);
+        const mjsPageA = readFileSync(
+            `${temporaryDirectoryPath}/dist/pages/a.mjs`,
+        );
 
         expect(mjsPageA).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -694,7 +808,9 @@ __name(render, "render");
 export { render };
 `);
 
-        const cjsPageB = readFileSync(`${temporaryDirectoryPath}/dist/pages/b.cjs`);
+        const cjsPageB = readFileSync(
+            `${temporaryDirectoryPath}/dist/pages/b.cjs`,
+        );
 
         expect(cjsPageB).toBe(`'use strict';
 
@@ -710,7 +826,9 @@ __name(render, "render");
 exports.render = render;
 `);
 
-        const mjsPageB = readFileSync(`${temporaryDirectoryPath}/dist/pages/b.mjs`);
+        const mjsPageB = readFileSync(
+            `${temporaryDirectoryPath}/dist/pages/b.mjs`,
+        );
 
         expect(mjsPageB).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -726,7 +844,10 @@ export { render };
     it("should throw a error if exports is mjs file without type module in package.json", async () => {
         expect.assertions(2);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export default () => 'index';`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -741,14 +862,19 @@ export { render };
             reject: false,
         });
 
-        expect(binProcess.stderr).toContain(`Exported file "./dist/index.mjs" has an extension that does not match the package.json type "commonjs"`);
+        expect(binProcess.stderr).toContain(
+            `Exported file "./dist/index.mjs" has an extension that does not match the package.json type "commonjs"`,
+        );
         expect(binProcess.exitCode).toBe(1);
     });
 
     it("should throw a error if exports is cjs file with type module in package.json", async () => {
         expect.assertions(2);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export default () => 'index';`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -764,14 +890,19 @@ export { render };
             reject: false,
         });
 
-        expect(binProcess.stderr).toContain(`Exported file "./dist/index.cjs" has an extension that does not match the package.json type "module"`);
+        expect(binProcess.stderr).toContain(
+            `Exported file "./dist/index.cjs" has an extension that does not match the package.json type "module"`,
+        );
         expect(binProcess.exitCode).toBe(1);
     });
 
     it("should work with single entry", async () => {
         expect.assertions(3);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export default () => 'index';`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -807,8 +938,14 @@ module.exports = index;
     it("should work with multi entries", async () => {
         expect.assertions(4);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/server/index.edge-light.ts`, `export const name = "server.edge-light";`);
-        writeFileSync(`${temporaryDirectoryPath}/src/server/index.react-server.ts`, `export const name = "server.react-server";`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/server/index.edge-light.ts`,
+            `export const name = "server.edge-light";`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/server/index.react-server.ts`,
+            `export const name = "server.react-server";`,
+        );
         writeFileSync(
             `${temporaryDirectoryPath}/src/server/index.ts`,
             `import { type Client } from "../client";
@@ -832,7 +969,10 @@ export type Client = string;
 export { Shared };
 `,
         );
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default "index";`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export default "index";`,
+        );
         writeFileSync(
             `${temporaryDirectoryPath}/src/lite.ts`,
             `export default function lite(c: string) {
@@ -896,7 +1036,9 @@ export type Shared = string;
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsIndexContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsIndexContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsIndexContent).toBe(`'use strict';
 
@@ -905,7 +1047,9 @@ const index = "index";
 module.exports = index;
 `);
 
-        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/client.cjs`);
+        const cjsClientContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/client.cjs`,
+        );
 
         expect(cjsClientContent).toBe(`'use strict';
 
@@ -923,7 +1067,10 @@ module.exports = client;
     it("should work with multi types", async () => {
         expect.assertions(5);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const index = "index";`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export const index = "index";`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -965,7 +1112,9 @@ module.exports = client;
 export { index };
 `);
 
-        const cjsDts = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+        const cjsDts = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.cts`,
+        );
 
         expect(cjsDts).toBe(`declare const index = "index";
 
@@ -987,7 +1136,10 @@ exports.index = index;
     it("should work with edge export condition", async () => {
         expect.assertions(4);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const isEdge = process.env.EdgeRuntime;`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.js`,
+            `export const isEdge = process.env.EdgeRuntime;`,
+        );
 
         await createTsConfig(temporaryDirectoryPath);
 
@@ -1014,7 +1166,9 @@ exports.index = index;
 export { isEdge };
 `);
 
-        const mjsEdgeLight = readFileSync(`${temporaryDirectoryPath}/dist/index.edge.js`);
+        const mjsEdgeLight = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.edge.js`,
+        );
 
         expect(mjsEdgeLight).toBe(`const isEdge = true;
 
@@ -1072,7 +1226,9 @@ export function Client() {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toBe(`'use client';
 import React, { useState } from 'react';
@@ -1089,7 +1245,9 @@ __name(Button, "Button");
 export { Button };
 `);
 
-        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-C2Syj0qA.mjs`);
+        const mjsClientContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/packem_shared/Client-C2Syj0qA.mjs`,
+        );
 
         expect(mjsClientContent).toBe(`'use client';
 var __defProp = Object.defineProperty;
@@ -1102,7 +1260,9 @@ __name(Client, "Client");
 export { Client };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsContent).toBe(`'use client';
 'use strict';
@@ -1128,7 +1288,9 @@ exports.Client = Client.Client;
 exports.Button = Button;
 `);
 
-        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-CjMHur1x.cjs`);
+        const cjsClientContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/packem_shared/Client-CjMHur1x.cjs`,
+        );
 
         expect(cjsClientContent).toBe(`'use client';
 'use strict';
@@ -1225,14 +1387,18 @@ export const asset = "asset-module";
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toBe(`export { Button } from './ui.mjs';
 export { action } from './packem_shared/action-DScVMxSh.mjs';
 export { Client, Client as UIClient } from './packem_shared/Client-C2Syj0qA.mjs';
 `);
 
-        const mjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-DScVMxSh.mjs`);
+        const mjsActionContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/packem_shared/action-DScVMxSh.mjs`,
+        );
 
         expect(mjsActionContent).toBe(`'use server';
 var __defProp = Object.defineProperty;
@@ -1245,7 +1411,9 @@ __name(action, "action");
 export { action };
 `);
 
-        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-C2Syj0qA.mjs`);
+        const mjsClientContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/packem_shared/Client-C2Syj0qA.mjs`,
+        );
 
         expect(mjsClientContent).toBe(`'use client';
 var __defProp = Object.defineProperty;
@@ -1258,7 +1426,9 @@ __name(Client, "Client");
 export { Client };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -1276,7 +1446,9 @@ exports.Client = Client.Client;
 exports.UIClient = Client.Client;
 `);
 
-        const cjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-DdW0-Ipg.cjs`);
+        const cjsActionContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/packem_shared/action-DdW0-Ipg.cjs`,
+        );
 
         expect(cjsActionContent).toBe(`'use server';
 'use strict';
@@ -1293,7 +1465,9 @@ __name(action, "action");
 exports.action = action;
 `);
 
-        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-CjMHur1x.cjs`);
+        const cjsClientContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/packem_shared/Client-CjMHur1x.cjs`,
+        );
 
         expect(cjsClientContent).toBe(`'use client';
 'use strict';
@@ -1314,10 +1488,16 @@ exports.Client = Client;
     it("should find all files in the same directory if globstar is used", async () => {
         expect.assertions(22);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export default () => 'index';`,
+        );
 
         Array.from({ length: 10 }).forEach((_, index) => {
-            writeFileSync(`${temporaryDirectoryPath}/src/deep/index-${index}.js`, `export default 'index-${index}'`);
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/deep/index-${index}.js`,
+                `export default 'index-${index}'`,
+            );
         });
 
         await installPackage(temporaryDirectoryPath, "typescript");
@@ -1359,34 +1539,80 @@ exports.Client = Client;
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-0.mjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-1.mjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-2.mjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-3.mjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-4.mjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-5.mjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-6.mjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-7.mjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-8.mjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-9.mjs`)).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-0.mjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-1.mjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-2.mjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-3.mjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-4.mjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-5.mjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-6.mjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-7.mjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-8.mjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-9.mjs`),
+        ).toBe(true);
 
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-0.cjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-1.cjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-2.cjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-3.cjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-4.cjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-5.cjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-6.cjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-7.cjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-8.cjs`)).toBe(true);
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-9.cjs`)).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-0.cjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-1.cjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-2.cjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-3.cjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-4.cjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-5.cjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-6.cjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-7.cjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-8.cjs`),
+        ).toBe(true);
+        expect(
+            isAccessibleSync(`${temporaryDirectoryPath}/dist/deep/index-9.cjs`),
+        ).toBe(true);
     });
 
     it("should generate different files, if file with same name, but with cts and mts ending was found", async () => {
         expect.assertions(4);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.mts`, `export const result = "mts"`);
-        writeFileSync(`${temporaryDirectoryPath}/src/index.cts`, `export const result = "cts"`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.mts`,
+            `export const result = "mts"`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.cts`,
+            `export const result = "cts"`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -1404,7 +1630,9 @@ exports.Client = Client;
             },
         });
 
-        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { rootDir: "./src" },
+        });
 
         const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
@@ -1413,14 +1641,18 @@ exports.Client = Client;
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toBe(`const result = "mts";
 
 export { result };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -1502,7 +1734,9 @@ export type { Colorize } from "./types";`,
             },
         });
 
-        await createTsConfig(temporaryDirectoryPath, { compilerOptions: { rootDir: "./src" } });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { rootDir: "./src" },
+        });
 
         const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
@@ -1511,7 +1745,9 @@ export type { Colorize } from "./types";`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -1531,7 +1767,9 @@ const {
 export { color, result as default, text };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -1553,10 +1791,22 @@ module.exports = result;
     it("should work with multiple exports conditions", async () => {
         expect.assertions(9);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const runtime = 'node';`);
-        writeFileSync(`${temporaryDirectoryPath}/src/index.browser.ts`, `export const runtime = 'browser';`);
-        writeFileSync(`${temporaryDirectoryPath}/src/index.edge-light.ts`, `export const runtime = 'edge-light';`);
-        writeFileSync(`${temporaryDirectoryPath}/src/index.workerd.ts`, `export const runtime = 'workerd';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export const runtime = 'node';`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.browser.ts`,
+            `export const runtime = 'browser';`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.edge-light.ts`,
+            `export const runtime = 'edge-light';`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.workerd.ts`,
+            `export const runtime = 'workerd';`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -1628,7 +1878,10 @@ module.exports = result;
 
         expect(files).toHaveLength(11);
 
-        assertContainFiles(join(temporaryDirectoryPath, "dist"), distributionFiles);
+        assertContainFiles(
+            join(temporaryDirectoryPath, "dist"),
+            distributionFiles,
+        );
 
         for (const [file, regex] of [
             ["index.cjs", /const runtime = "node"/],
@@ -1637,18 +1890,22 @@ module.exports = result;
             ["index.workerd.js", /const runtime = "workerd"/],
             ["index.edge-light.js", /const runtime = "edge-light"/],
         ]) {
-            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
+            const content = readFileSync(
+                `${temporaryDirectoryPath}/dist/${file as string}`,
+            );
 
             expect(content).toMatch(regex as RegExp);
         }
     });
 
-    it.skipIf(NODE_JS_VERSION !== "22.9")("should support the new 'module-sync' exports", async () => {
-        expect.assertions(3);
+    it.skipIf(NODE_JS_VERSION !== "22.9")(
+        "should support the new 'module-sync' exports",
+        async () => {
+            expect.assertions(3);
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.mts`,
-            `import { resolved as import_module_require } from 'import-module-require';
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/index.mts`,
+                `import { resolved as import_module_require } from 'import-module-require';
 import { resolved as module_and_import } from 'module-and-import';
 import { resolved as module_and_require } from 'module-and-require';
 import { resolved as module_import_require } from 'module-import-require';
@@ -1663,60 +1920,69 @@ console.log('module-import-require', module_import_require);
 console.log('module-only', module_only);
 console.log('module-require-import', module_require_import);
 console.log('require-module-import', require_module_import);`,
-        );
+            );
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.cts`,
-            `console.log('import-module-require', require('import-module-require').resolved);
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/index.cts`,
+                `console.log('import-module-require', require('import-module-require').resolved);
 console.log('module-and-import', require('module-and-import').resolved);
 console.log('module-and-require', require('module-and-require').resolved);
 console.log('module-import-require', require('module-import-require').resolved);
 console.log('module-only', require('module-only').resolved);
 console.log('module-require-import', require('module-require-import').resolved);
 console.log('require-module-import', require('require-module-import').resolved);`,
-        );
+            );
 
-        await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath);
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createTsConfig(temporaryDirectoryPath);
 
-        await createPackemConfig(temporaryDirectoryPath);
-        await createPackageJson(temporaryDirectoryPath, {
-            devDependencies: {
-                typescript: "*",
-            },
-            exports: {
-                // On older version of Node.js, where "module-sync" and require(esm) are
-                // not supported, use the CJS version to avoid dual-package hazard.
-                // When package authors think it's time to drop support for older versions of
-                // On new version of Node.js, both require() and import get the ESM version
-                default: "./dist/index.cjs",
-                // Node.js, they can remove the exports conditions and just use "main": "index.js".
-                "module-sync": "./dist/index.mjs",
-            },
-            type: "module",
-        });
-
-        const fixturePath = join(__dirname, "../../__fixtures__/module-conditions");
-
-        const moduleConditionsFixture = readdirSync(fixturePath);
-
-        for (const file of moduleConditionsFixture) {
-            cpSync(`${fixturePath}/${file}`, `${temporaryDirectoryPath}/node_modules/${file}`, {
-                recursive: true,
+            await createPackemConfig(temporaryDirectoryPath);
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
+                },
+                exports: {
+                    // On older version of Node.js, where "module-sync" and require(esm) are
+                    // not supported, use the CJS version to avoid dual-package hazard.
+                    // When package authors think it's time to drop support for older versions of
+                    // On new version of Node.js, both require() and import get the ESM version
+                    default: "./dist/index.cjs",
+                    // Node.js, they can remove the exports conditions and just use "main": "index.js".
+                    "module-sync": "./dist/index.mjs",
+                },
+                type: "module",
             });
-        }
 
-        const binProcess = await execPackem("build", [], {
-            cwd: temporaryDirectoryPath,
-            nodeOptions: ["--experimental-require-module"],
-            reject: false,
-        });
+            const fixturePath = join(
+                __dirname,
+                "../../__fixtures__/module-conditions",
+            );
 
-        expect(binProcess.exitCode).toBe(0);
+            const moduleConditionsFixture = readdirSync(fixturePath);
 
-        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+            for (const file of moduleConditionsFixture) {
+                cpSync(
+                    `${fixturePath}/${file}`,
+                    `${temporaryDirectoryPath}/node_modules/${file}`,
+                    {
+                        recursive: true,
+                    },
+                );
+            }
 
-        expect(cjs).toBe(`'use strict';
+            const binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+                nodeOptions: ["--experimental-require-module"],
+                reject: false,
+            });
+
+            expect(binProcess.exitCode).toBe(0);
+
+            const cjs = readFileSync(
+                `${temporaryDirectoryPath}/dist/index.cjs`,
+            );
+
+            expect(cjs).toBe(`'use strict';
 
 console.log("import-module-require", require("import-module-require").resolved);
 console.log("module-and-import", require("module-and-import").resolved);
@@ -1727,9 +1993,11 @@ console.log("module-require-import", require("module-require-import").resolved);
 console.log("require-module-import", require("require-module-import").resolved);
 `);
 
-        const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+            const mjs = readFileSync(
+                `${temporaryDirectoryPath}/dist/index.mjs`,
+            );
 
-        expect(mjs).toBe(`const resolved$6 = "module";
+            expect(mjs).toBe(`const resolved$6 = "module";
 
 const resolved$5 = "module";
 
@@ -1751,14 +2019,17 @@ console.log("module-only", resolved$2);
 console.log("module-require-import", resolved$1);
 console.log("require-module-import", resolved);
 `);
-    });
+        },
+    );
 
-    it.skipIf(NODE_JS_VERSION !== "22.9")("should support the new 'module-sync' exports node", async () => {
-        expect.assertions(3);
+    it.skipIf(NODE_JS_VERSION !== "22.9")(
+        "should support the new 'module-sync' exports node",
+        async () => {
+            expect.assertions(3);
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.mts`,
-            `import { resolved as import_module_require } from 'import-module-require';
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/index.mts`,
+                `import { resolved as import_module_require } from 'import-module-require';
 import { resolved as module_and_import } from 'module-and-import';
 import { resolved as module_and_require } from 'module-and-require';
 import { resolved as module_import_require } from 'module-import-require';
@@ -1774,64 +2045,73 @@ console.log('module-import-require', module_import_require);
 console.log('module-only', module_only);
 console.log('module-require-import', module_require_import);
 console.log('require-module-import', require_module_import);`,
-        );
+            );
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.cts`,
-            `console.log('import-module-require', require('import-module-require').resolved);
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/index.cts`,
+                `console.log('import-module-require', require('import-module-require').resolved);
 console.log('module-and-import', require('module-and-import').resolved);
 console.log('module-and-require', require('module-and-require').resolved);
 console.log('module-import-require', require('module-import-require').resolved);
 console.log('module-only', require('module-only').resolved);
 console.log('module-require-import', require('module-require-import').resolved);
 console.log('require-module-import', require('require-module-import').resolved);`,
-        );
+            );
 
-        await installPackage(temporaryDirectoryPath, "typescript");
-        await createTsConfig(temporaryDirectoryPath);
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createTsConfig(temporaryDirectoryPath);
 
-        await createPackemConfig(temporaryDirectoryPath);
-        await createPackageJson(temporaryDirectoryPath, {
-            devDependencies: {
-                typescript: "*",
-            },
-            exports: {
-                // On any other environment, use the ESM version.
-                default: "./dist/index.js",
-                node: {
-                    // On older version of Node.js, where "module-sync" and require(esm) are
-                    // not supported, use the CJS version to avoid dual-package hazard.
-                    // When package authors think it's time to drop support for older versions of
-                    // the ESM version
-                    default: "./dist/index.cjs",
-                    // On new version of Node.js, both require() and import get
-                    // Node.js, they can remove the exports conditions and just use "main": "index.js".
-                    "module-sync": "./dist/index.mjs",
+            await createPackemConfig(temporaryDirectoryPath);
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
                 },
-            },
-            type: "module",
-        });
-
-        const fixturePath = join(__dirname, "../../__fixtures__/module-conditions");
-
-        const moduleConditionsFixture = readdirSync(fixturePath);
-
-        for (const file of moduleConditionsFixture) {
-            cpSync(`${fixturePath}/${file}`, `${temporaryDirectoryPath}/node_modules/${file}`, {
-                recursive: true,
+                exports: {
+                    // On any other environment, use the ESM version.
+                    default: "./dist/index.js",
+                    node: {
+                        // On older version of Node.js, where "module-sync" and require(esm) are
+                        // not supported, use the CJS version to avoid dual-package hazard.
+                        // When package authors think it's time to drop support for older versions of
+                        // the ESM version
+                        default: "./dist/index.cjs",
+                        // On new version of Node.js, both require() and import get
+                        // Node.js, they can remove the exports conditions and just use "main": "index.js".
+                        "module-sync": "./dist/index.mjs",
+                    },
+                },
+                type: "module",
             });
-        }
 
-        const binProcess = await execPackem("build", [], {
-            cwd: temporaryDirectoryPath,
-            nodeOptions: ["--experimental-require-module"],
-        });
+            const fixturePath = join(
+                __dirname,
+                "../../__fixtures__/module-conditions",
+            );
 
-        expect(binProcess.exitCode).toBe(0);
+            const moduleConditionsFixture = readdirSync(fixturePath);
 
-        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+            for (const file of moduleConditionsFixture) {
+                cpSync(
+                    `${fixturePath}/${file}`,
+                    `${temporaryDirectoryPath}/node_modules/${file}`,
+                    {
+                        recursive: true,
+                    },
+                );
+            }
 
-        expect(cjs).toBe(`'use strict';
+            const binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+                nodeOptions: ["--experimental-require-module"],
+            });
+
+            expect(binProcess.exitCode).toBe(0);
+
+            const cjs = readFileSync(
+                `${temporaryDirectoryPath}/dist/index.cjs`,
+            );
+
+            expect(cjs).toBe(`'use strict';
 
 console.log("import-module-require", require("import-module-require").resolved);
 console.log("module-and-import", require("module-and-import").resolved);
@@ -1842,9 +2122,11 @@ console.log("module-require-import", require("module-require-import").resolved);
 console.log("require-module-import", require("require-module-import").resolved);
 `);
 
-        const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+            const mjs = readFileSync(
+                `${temporaryDirectoryPath}/dist/index.mjs`,
+            );
 
-        expect(mjs).toBe(`const resolved$6 = "module";
+            expect(mjs).toBe(`const resolved$6 = "module";
 
 const resolved$5 = "module";
 
@@ -1866,12 +2148,16 @@ console.log("module-only", resolved$2);
 console.log("module-require-import", resolved$1);
 console.log("require-module-import", resolved);
 `);
-    });
+        },
+    );
 
     it("should generate proper assets with custom extensions from outputExtensionMap", async () => {
         expect.assertions(7);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = 'index';`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export const value = 'index';`,
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -1917,17 +2203,29 @@ console.log("require-module-import", resolved);
 
         expect(files).toHaveLength(5);
 
-        assertContainFiles(join(temporaryDirectoryPath, "dist"), ["index.c.js", "index.m.js", "index.d.cts", "index.d.mts", "index.d.ts"]);
+        assertContainFiles(join(temporaryDirectoryPath, "dist"), [
+            "index.c.js",
+            "index.m.js",
+            "index.d.cts",
+            "index.d.mts",
+            "index.d.ts",
+        ]);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.c.js`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.c.js`,
+        );
 
         expect(cjsContent).toMatchSnapshot("cjs output");
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.m.js`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.m.js`,
+        );
 
         expect(mjsContent).toMatchSnapshot("mjs output");
 
-        const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+        const dtsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.d.ts`,
+        );
 
         expect(dtsContent).toMatchSnapshot("dts output");
     });
@@ -1935,7 +2233,10 @@ console.log("require-module-import", resolved);
     it("should throw an error for invalid key in outputExtensionMap", async () => {
         expect.assertions(2);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export default 'test'");
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            "export default 'test'",
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -1962,13 +2263,18 @@ console.log("require-module-import", resolved);
         });
 
         expect(binProcess.exitCode).toBe(1);
-        expect(binProcess.stderr).toContain("Invalid output extension map: foo must be \"cjs\" or \"esm\"");
+        expect(binProcess.stderr).toContain(
+            "Invalid output extension map: foo must be \"cjs\" or \"esm\"",
+        );
     });
 
     it("should throw a TypeError for non-string value in outputExtensionMap", async () => {
         expect.assertions(2);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export default 'test'");
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            "export default 'test'",
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -1995,13 +2301,18 @@ console.log("require-module-import", resolved);
         });
 
         expect(binProcess.exitCode).toBe(1);
-        expect(binProcess.stderr).toContain("Invalid output extension map: cjs must be a string");
+        expect(binProcess.stderr).toContain(
+            "Invalid output extension map: cjs must be a string",
+        );
     });
 
     it("should throw an error for value starting with a dot in outputExtensionMap", async () => {
         expect.assertions(2);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export default 'test'");
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            "export default 'test'",
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -2027,13 +2338,18 @@ console.log("require-module-import", resolved);
         });
 
         expect(binProcess.exitCode).toBe(1);
-        expect(binProcess.stderr).toContain("Invalid output extension map: cjs must not start with a dot.");
+        expect(binProcess.stderr).toContain(
+            "Invalid output extension map: cjs must not start with a dot.",
+        );
     });
 
     it("should throw an error when outputExtensionMap values are the same", async () => {
         expect.assertions(2);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export default 'test'");
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            "export default 'test'",
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -2060,16 +2376,30 @@ console.log("require-module-import", resolved);
         });
 
         expect(binProcess.exitCode).toBe(1);
-        expect(binProcess.stderr).toContain("Invalid output extension map: esm must be different from the other key");
+        expect(binProcess.stderr).toContain(
+            "Invalid output extension map: esm must be different from the other key",
+        );
     });
 
     it("should ignore export keys with wildcard patterns when using ignoreExportKeys", async () => {
         expect.assertions(5);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export default 'main-export'");
-        writeFileSync(`${temporaryDirectoryPath}/src/icons/icon1.svg`, "<svg>icon1</svg>");
-        writeFileSync(`${temporaryDirectoryPath}/src/icons/icon2.svg`, "<svg>icon2</svg>");
-        writeFileSync(`${temporaryDirectoryPath}/src/icons/subfolder/icon3.svg`, "<svg>icon3</svg>");
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            "export default 'main-export'",
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/icons/icon1.svg`,
+            "<svg>icon1</svg>",
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/icons/icon2.svg`,
+            "<svg>icon2</svg>",
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/icons/subfolder/icon3.svg`,
+            "<svg>icon3</svg>",
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -2098,20 +2428,38 @@ console.log("require-module-import", resolved);
         expect(binProcess.exitCode).toBe(0);
 
         // Should only build the main export, not the icons
-        expect(existsSync(`${temporaryDirectoryPath}/dist/index.js`)).toBe(true);
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.js`)).toBe(
+            true,
+        );
 
         // Icons should not be built due to ignoreExportKeys
-        expect(existsSync(`${temporaryDirectoryPath}/dist/icons/icon1.svg`)).toBe(false);
-        expect(existsSync(`${temporaryDirectoryPath}/dist/icons/icon2.svg`)).toBe(false);
+        expect(
+            existsSync(`${temporaryDirectoryPath}/dist/icons/icon1.svg`),
+        ).toBe(false);
+        expect(
+            existsSync(`${temporaryDirectoryPath}/dist/icons/icon2.svg`),
+        ).toBe(false);
     });
 
     it("should build export keys with wildcard patterns when not using ignoreExportKeys", async () => {
         expect.assertions(2);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export default 'main-export'");
-        writeFileSync(`${temporaryDirectoryPath}/src/icons/icon1.svg`, "<svg>icon1</svg>");
-        writeFileSync(`${temporaryDirectoryPath}/src/icons/icon2.svg`, "<svg>icon2</svg>");
-        writeFileSync(`${temporaryDirectoryPath}/src/icons/subfolder/icon3.svg`, "<svg>icon3</svg>");
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            "export default 'main-export'",
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/icons/icon1.svg`,
+            "<svg>icon1</svg>",
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/icons/icon2.svg`,
+            "<svg>icon2</svg>",
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/icons/subfolder/icon3.svg`,
+            "<svg>icon3</svg>",
+        );
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createTsConfig(temporaryDirectoryPath);
@@ -2133,7 +2481,9 @@ console.log("require-module-import", resolved);
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain("Could not find entrypoint for `./dist/icons/*`");
+        expect(binProcess.stdout).toContain(
+            "Could not find entrypoint for `./dist/icons/*`",
+        );
         expect(binProcess.exitCode).toBe(1);
     });
 });

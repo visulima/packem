@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@source "../node_modules/preline/dist/*.js";
+@import "preline/variants.css";
+
+/* Optional Preline UI Datepicker Plugin */
+/* @import "preline/src/plugins/datepicker/styles.css"; */
+
+/* Plugins */
+@plugin '@tailwindcss/typography';
+@plugin '@tailwindcss/forms';
+
+@custom-variant dark (&:where(.dark, .dark *));

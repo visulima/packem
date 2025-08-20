@@ -1,13 +1,24 @@
 import { cpSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
-import { ensureDir, isAccessibleSync, readFileSync, writeFile, writeJson } from "@visulima/fs";
+import {
+    ensureDir,
+    isAccessibleSync,
+    readFileSync,
+    writeFile,
+    writeJson,
+} from "@visulima/fs";
 import type { UrlOptions } from "@visulima/packem-rollup";
 import { basename, join, resolve } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { assertContainFiles, createPackageJson, createPackemConfig, execPackem } from "../helpers";
+import {
+    assertContainFiles,
+    createPackageJson,
+    createPackemConfig,
+    execPackem,
+} from "../helpers";
 
 const fixturePath = join(__dirname, "../..", "__fixtures__", "url");
 
@@ -22,10 +33,21 @@ describe("url", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    const build = async (type: string, options: Partial<UrlOptions>, generatedFiles: string[], useSnapshot?: boolean) => {
+    const build = async (
+        type: string,
+        options: Partial<UrlOptions>,
+        generatedFiles: string[],
+        useSnapshot?: boolean,
+    ) => {
         // copy fixtures to temporary directory
-        cpSync(join(fixturePath, `${type}.js`), join(temporaryDirectoryPath, "src", `${type}.js`));
-        cpSync(join(fixturePath, `${type}.${type}`), join(temporaryDirectoryPath, "src", `${type}.${type}`));
+        cpSync(
+            join(fixturePath, `${type}.js`),
+            join(temporaryDirectoryPath, "src", `${type}.js`),
+        );
+        cpSync(
+            join(fixturePath, `${type}.${type}`),
+            join(temporaryDirectoryPath, "src", `${type}.${type}`),
+        );
 
         await createPackageJson(temporaryDirectoryPath, {
             exports: {
@@ -54,11 +76,15 @@ describe("url", () => {
         expect(binProcess.exitCode).toBe(0);
 
         if (useSnapshot !== false) {
-            const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.mjs`));
+            const mjsContent = readFileSync(
+                join(temporaryDirectoryPath, "dist", `${type}.mjs`),
+            );
 
             expect(mjsContent).toMatchSnapshot("mjs");
 
-            const cjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.cjs`));
+            const cjsContent = readFileSync(
+                join(temporaryDirectoryPath, "dist", `${type}.cjs`),
+            );
 
             expect(cjsContent).toMatchSnapshot("cjs");
         }
@@ -68,10 +94,15 @@ describe("url", () => {
         // Convert absolute paths to relative paths for assertContainFiles
         const relativeFiles = generatedFiles.map((file) => {
             // Remove the base directory path to get relative path
-            const relativePath = file.replace(join(temporaryDirectoryPath, "dist"), "");
+            const relativePath = file.replace(
+                join(temporaryDirectoryPath, "dist"),
+                "",
+            );
 
             // Remove leading slash if present
-            return relativePath.startsWith("/") ? relativePath.slice(1) : relativePath;
+            return relativePath.startsWith("/")
+                ? relativePath.slice(1)
+                : relativePath;
         });
 
         assertContainFiles(distributionPath, relativeFiles);
@@ -80,37 +111,55 @@ describe("url", () => {
     it("should inline png files", async () => {
         expect.assertions(5);
 
-        await build("png", { limit: 10 * 1024 }, [join(temporaryDirectoryPath, "/dist/png.cjs"), join(temporaryDirectoryPath, "/dist/png.mjs")]);
+        await build("png", { limit: 10 * 1024 }, [
+            join(temporaryDirectoryPath, "/dist/png.cjs"),
+            join(temporaryDirectoryPath, "/dist/png.mjs"),
+        ]);
     });
 
     it("should inline jpg files", async () => {
         expect.assertions(5);
 
-        await build("jpg", { limit: 10 * 1024 }, [join(temporaryDirectoryPath, "/dist/jpg.cjs"), join(temporaryDirectoryPath, "/dist/jpg.mjs")]);
+        await build("jpg", { limit: 10 * 1024 }, [
+            join(temporaryDirectoryPath, "/dist/jpg.cjs"),
+            join(temporaryDirectoryPath, "/dist/jpg.mjs"),
+        ]);
     });
 
     it("should inline jpeg files", async () => {
         expect.assertions(5);
 
-        await build("jpeg", { limit: 10 * 1024 }, [join(temporaryDirectoryPath, "/dist/jpeg.cjs"), join(temporaryDirectoryPath, "/dist/jpeg.mjs")]);
+        await build("jpeg", { limit: 10 * 1024 }, [
+            join(temporaryDirectoryPath, "/dist/jpeg.cjs"),
+            join(temporaryDirectoryPath, "/dist/jpeg.mjs"),
+        ]);
     });
 
     it("should inline gif files", async () => {
         expect.assertions(5);
 
-        await build("gif", { limit: 10 * 1024 }, [join(temporaryDirectoryPath, "/dist/gif.cjs"), join(temporaryDirectoryPath, "/dist/gif.mjs")]);
+        await build("gif", { limit: 10 * 1024 }, [
+            join(temporaryDirectoryPath, "/dist/gif.cjs"),
+            join(temporaryDirectoryPath, "/dist/gif.mjs"),
+        ]);
     });
 
     it("should inline webp files", async () => {
         expect.assertions(5);
 
-        await build("webp", { limit: 10 * 1024 }, [join(temporaryDirectoryPath, "/dist/webp.cjs"), join(temporaryDirectoryPath, "/dist/webp.mjs")]);
+        await build("webp", { limit: 10 * 1024 }, [
+            join(temporaryDirectoryPath, "/dist/webp.cjs"),
+            join(temporaryDirectoryPath, "/dist/webp.mjs"),
+        ]);
     });
 
     it("should inline text files", async () => {
         expect.assertions(5);
 
-        await build("svg", { limit: 10 * 1024 }, [join(temporaryDirectoryPath, "/dist/svg.cjs"), join(temporaryDirectoryPath, "/dist/svg.mjs")]);
+        await build("svg", { limit: 10 * 1024 }, [
+            join(temporaryDirectoryPath, "/dist/svg.cjs"),
+            join(temporaryDirectoryPath, "/dist/svg.mjs"),
+        ]);
     });
 
     it("inline \"large\" files", async () => {
@@ -202,14 +251,18 @@ describe("url", () => {
             false,
         );
 
-        const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.mjs`));
+        const mjsContent = readFileSync(
+            join(temporaryDirectoryPath, "dist", `${type}.mjs`),
+        );
 
         expect(mjsContent).toBe(`const png = "/batman/6b71fbe07b498a82.png";
 
 export { png as default };
 `);
 
-        const cjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.cjs`));
+        const cjsContent = readFileSync(
+            join(temporaryDirectoryPath, "dist", `${type}.cjs`),
+        );
 
         // eslint-disable-next-line no-secrets/no-secrets
         expect(cjsContent).toBe(`'use strict';
@@ -223,44 +276,66 @@ module.exports = png;
     it("should create a nested directory for the output, if required", async () => {
         expect.assertions(5);
 
-        await build("png", { emitFiles: true, fileName: "joker/[hash][extname]", limit: 10 }, [
-            join(temporaryDirectoryPath, "/dist/png.cjs"),
-            join(temporaryDirectoryPath, "/dist/png.mjs"),
-            // eslint-disable-next-line no-secrets/no-secrets
-            join(temporaryDirectoryPath, "/dist/joker/6b71fbe07b498a82.png"),
-        ]);
+        await build(
+            "png",
+            { emitFiles: true, fileName: "joker/[hash][extname]", limit: 10 },
+            [
+                join(temporaryDirectoryPath, "/dist/png.cjs"),
+                join(temporaryDirectoryPath, "/dist/png.mjs"),
+
+                join(
+                    temporaryDirectoryPath,
+                    "/dist/joker/6b71fbe07b498a82.png",
+                ),
+            ],
+        );
     });
 
     it("should create a file with the name and extension of the file", async () => {
         expect.assertions(5);
 
-        await build("png", { emitFiles: true, fileName: "[name][extname]", limit: 10 }, [
-            join(temporaryDirectoryPath, "/dist/png.cjs"),
-            join(temporaryDirectoryPath, "/dist/png.mjs"),
-            join(temporaryDirectoryPath, "/dist/png.png"),
-        ]);
+        await build(
+            "png",
+            { emitFiles: true, fileName: "[name][extname]", limit: 10 },
+            [
+                join(temporaryDirectoryPath, "/dist/png.cjs"),
+                join(temporaryDirectoryPath, "/dist/png.mjs"),
+                join(temporaryDirectoryPath, "/dist/png.png"),
+            ],
+        );
     });
 
     it("should create a file with the name, hash and extension of the file", async () => {
         expect.assertions(5);
 
-        await build("png", { emitFiles: true, fileName: "[name]-[hash][extname]", limit: 10 }, [
-
-            join(temporaryDirectoryPath, "/dist/png-6b71fbe07b498a82.png"),
-            join(temporaryDirectoryPath, "/dist/png.cjs"),
-            join(temporaryDirectoryPath, "/dist/png.mjs"),
-        ]);
+        await build(
+            "png",
+            { emitFiles: true, fileName: "[name]-[hash][extname]", limit: 10 },
+            [
+                join(temporaryDirectoryPath, "/dist/png-6b71fbe07b498a82.png"),
+                join(temporaryDirectoryPath, "/dist/png.cjs"),
+                join(temporaryDirectoryPath, "/dist/png.mjs"),
+            ],
+        );
     });
 
     it("should prefix the file with the parent directory of the source file", async () => {
         expect.assertions(5);
 
-        await build("png", { emitFiles: true, fileName: "[dirname][hash][extname]", limit: 10 }, [
-            join(temporaryDirectoryPath, "/dist/png.cjs"),
-            join(temporaryDirectoryPath, "/dist/png.mjs"),
+        await build(
+            "png",
+            {
+                emitFiles: true,
+                fileName: "[dirname][hash][extname]",
+                limit: 10,
+            },
+            [
+                join(temporaryDirectoryPath, "/dist/png.cjs"),
+                join(temporaryDirectoryPath, "/dist/png.mjs"),
 
-            join(temporaryDirectoryPath, "/dist/src/6b71fbe07b498a82.png"),
-        ]);
+                join(temporaryDirectoryPath, "/dist/src/6b71fbe07b498a82.png"),
+            ],
+        );
     });
 
     it("should prefix the file with the parent directory of the source file, relative to the sourceDir option", async () => {
@@ -268,7 +343,10 @@ module.exports = png;
 
         const type = "png";
 
-        const pngPath = join(basename(temporaryDirectoryPath), "/src/6b71fbe07b498a82.png");
+        const pngPath = join(
+            basename(temporaryDirectoryPath),
+            "/src/6b71fbe07b498a82.png",
+        );
 
         await build(
             type,
@@ -278,18 +356,26 @@ module.exports = png;
                 limit: 10,
                 sourceDir: join(temporaryDirectoryPath, ".."),
             },
-            [join(temporaryDirectoryPath, "/dist/png.cjs"), join(temporaryDirectoryPath, "/dist/png.mjs"), join(temporaryDirectoryPath, "/dist/", pngPath)],
+            [
+                join(temporaryDirectoryPath, "/dist/png.cjs"),
+                join(temporaryDirectoryPath, "/dist/png.mjs"),
+                join(temporaryDirectoryPath, "/dist/", pngPath),
+            ],
             false,
         );
 
-        const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.mjs`));
+        const mjsContent = readFileSync(
+            join(temporaryDirectoryPath, "dist", `${type}.mjs`),
+        );
 
         expect(mjsContent).toBe(`const png = "${pngPath}";
 
 export { png as default };
 `);
 
-        const cjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.cjs`));
+        const cjsContent = readFileSync(
+            join(temporaryDirectoryPath, "dist", `${type}.cjs`),
+        );
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -310,10 +396,20 @@ module.exports = png;
                 fileName: "[dirname][hash][extname]",
                 limit: 10,
             },
-            [join(temporaryDirectoryPath, "/dist/png.cjs"), join(temporaryDirectoryPath, "/dist/png.mjs")],
+            [
+                join(temporaryDirectoryPath, "/dist/png.cjs"),
+                join(temporaryDirectoryPath, "/dist/png.mjs"),
+            ],
         );
 
-        expect(isAccessibleSync(join(temporaryDirectoryPath, "output/dest/src/6b71fbe07b498a82.png"))).toBe(true);
+        expect(
+            isAccessibleSync(
+                join(
+                    temporaryDirectoryPath,
+                    "output/dest/src/6b71fbe07b498a82.png",
+                ),
+            ),
+        ).toBe(true);
     });
 
     it("should import images from the node_modules", async () => {
@@ -328,11 +424,17 @@ module.exports = png;
 export default svg;`,
         );
 
-        const imagesPackagePath = join(temporaryDirectoryPath, "node_modules/@test/images");
+        const imagesPackagePath = join(
+            temporaryDirectoryPath,
+            "node_modules/@test/images",
+        );
 
         await ensureDir(imagesPackagePath);
 
-        cpSync(join(fixturePath, `${type}.${type}`), join(imagesPackagePath, "icons", `${type}.${type}`));
+        cpSync(
+            join(fixturePath, `${type}.${type}`),
+            join(imagesPackagePath, "icons", `${type}.${type}`),
+        );
 
         await writeJson(
             join(imagesPackagePath, "package.json"),
@@ -363,11 +465,15 @@ export default svg;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.mjs`));
+        const mjsContent = readFileSync(
+            join(temporaryDirectoryPath, "dist", `${type}.mjs`),
+        );
 
         expect(mjsContent).toMatchSnapshot("mjs");
 
-        const cjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.cjs`));
+        const cjsContent = readFileSync(
+            join(temporaryDirectoryPath, "dist", `${type}.cjs`),
+        );
 
         expect(cjsContent).toMatchSnapshot("cjs");
     });

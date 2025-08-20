@@ -4,7 +4,13 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackem,
+    installPackage,
+} from "../helpers";
 
 describe("packem package.json legacy", () => {
     let temporaryDirectoryPath: string;
@@ -45,7 +51,9 @@ describe("packem package.json legacy", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.js`,
+        );
 
         expect(cjsContent).toMatchSnapshot("cjs output");
     });
@@ -77,7 +85,9 @@ describe("packem package.json legacy", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.js`,
+        );
 
         expect(cjsContent).toMatchSnapshot("cjs output");
     });
@@ -108,7 +118,9 @@ describe("packem package.json legacy", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.js`,
+        );
 
         expect(mjsContent).toMatchSnapshot("mjs output");
     });
@@ -140,7 +152,9 @@ describe("packem package.json legacy", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.js`,
+        );
 
         expect(mjsContent).toMatchSnapshot("mjs output");
     });

@@ -1,8 +1,14 @@
 import type { PackageJson } from "@visulima/package";
-import { RUNTIME_EXPORT_CONVENTIONS, SPECIAL_EXPORT_CONVENTIONS } from "@visulima/packem-share/constants";
+import {
+    RUNTIME_EXPORT_CONVENTIONS,
+    SPECIAL_EXPORT_CONVENTIONS,
+} from "@visulima/packem-share/constants";
 
 import type { BuildOptions, Format } from "../types";
-import { inferExportType, inferExportTypeFromFileName } from "./infer-export-type";
+import {
+    inferExportType,
+    inferExportTypeFromFileName,
+} from "./infer-export-type";
 
 // This Set contains keys representing various JavaScript runtime environments and module systems.
 // It is used to identify and process different types of exports in package.json files.
@@ -58,7 +64,13 @@ export const extractExportFilenames = (
             );
         }
 
-        return [{ file: packageExports, key: "exports", type: inferredType ?? packageType }];
+        return [
+            {
+                file: packageExports,
+                key: "exports",
+                type: inferredType ?? packageType,
+            },
+        ];
     }
 
     if (typeof packageExports === "object") {
@@ -70,7 +82,11 @@ export const extractExportFilenames = (
 
         for (const [exportKey, packageExport] of filteredEntries) {
             const normalizedKey = exportKey.replace("./", "");
-            const isIgnored = ignoreExportKeys.some((ignoredKey) => normalizedKey === ignoredKey || normalizedKey.startsWith(`${ignoredKey}/`));
+            const isIgnored = ignoreExportKeys.some(
+                (ignoredKey) =>
+                    normalizedKey === ignoredKey
+                    || normalizedKey.startsWith(`${ignoredKey}/`),
+            );
 
             if (typeof packageExport === "string") {
                 let descriptor = {};
@@ -80,39 +96,75 @@ export const extractExportFilenames = (
                 } else if (exportKey.startsWith("./")) {
                     descriptor = { exportKey: exportKey.replace("./", "") };
                 } else {
-                    descriptor = { exportKey: exportKey === "." ? "." : "*", subKey: exportKey };
+                    descriptor = {
+                        exportKey: exportKey === "." ? "." : "*",
+                        subKey: exportKey,
+                    };
                 }
 
                 descriptors.push({
                     ...descriptor,
                     file: packageExport,
                     key: "exports",
-                    type: inferExportType(exportKey, conditions, packageType, packageExport),
+                    type: inferExportType(
+                        exportKey,
+                        conditions,
+                        packageType,
+                        packageExport,
+                    ),
                     ...isIgnored && { ignored: true },
                 } as OutputDescriptor);
-            } else if (typeof packageExport === "object" && packageExport !== undefined) {
-                for (const [condition, entryExport] of Object.entries(packageExport as Record<string, string[] | string | null>)) {
+            } else if (
+                typeof packageExport === "object"
+                && packageExport !== undefined
+            ) {
+                for (const [condition, entryExport] of Object.entries(
+                    packageExport as Record<string, string[] | string | null>,
+                )) {
                     if (declaration === false && condition === "types") {
                         continue;
                     }
 
-                    const key: string = Number.isInteger(+exportKey) ? condition : (exportKey as string);
+                    const key: string = Number.isInteger(+exportKey)
+                        ? condition
+                        : (exportKey as string);
 
                     if (typeof entryExport === "string") {
                         descriptors.push({
                             exportKey: key.replace("./", ""),
                             file: entryExport,
                             key: "exports",
-                            ...runtimeExportConventions.has(condition) ? { subKey: condition as OutputDescriptor["subKey"] } : {},
-                            type: inferExportType(condition, conditions, packageType, entryExport),
+                            ...runtimeExportConventions.has(condition)
+                                ? {
+                                    subKey: condition as OutputDescriptor["subKey"],
+                                }
+                                : {},
+                            type: inferExportType(
+                                condition,
+                                conditions,
+                                packageType,
+                                entryExport,
+                            ),
                             ...isIgnored && { ignored: true },
                         } as OutputDescriptor);
                     } else {
                         // For nested exports, we need to check if the parent export key should be ignored
                         const nestedKey = key.replace("./", "");
-                        const isNestedIgnored = isIgnored || ignoreExportKeys.some((ignoredKey) => nestedKey === ignoredKey || nestedKey.startsWith(`${ignoredKey}/`));
+                        const isNestedIgnored
+                            = isIgnored
+                                || ignoreExportKeys.some(
+                                    (ignoredKey) =>
+                                        nestedKey === ignoredKey
+                                        || nestedKey.startsWith(`${ignoredKey}/`),
+                                );
 
-                        const nestedResults = extractExportFilenames({ [key]: entryExport } as PackageJson["exports"], packageType, declaration, [...conditions, condition], ignoreExportKeys);
+                        const nestedResults = extractExportFilenames(
+                            { [key]: entryExport } as PackageJson["exports"],
+                            packageType,
+                            declaration,
+                            [...conditions, condition],
+                            ignoreExportKeys,
+                        );
 
                         // Mark all nested results as ignored if the parent was ignored
                         if (isNestedIgnored) {
@@ -121,10 +173,7 @@ export const extractExportFilenames = (
                             });
                         }
 
-                        descriptors = [
-                            ...descriptors,
-                            ...nestedResults,
-                        ];
+                        descriptors = [...descriptors, ...nestedResults];
                     }
                 }
             }

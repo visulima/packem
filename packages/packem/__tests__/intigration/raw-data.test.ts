@@ -4,7 +4,13 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import {
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackem,
+    installPackage,
+} from "../helpers";
 
 describe("packem raw data", () => {
     let temporaryDirectoryPath: string;
@@ -22,7 +28,10 @@ describe("packem raw data", () => {
     it("should generate js files with included raw content", async () => {
         expect.assertions(4);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `thisismydata`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/content.txt`,
+            `thisismydata`,
+        );
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
             `import content from './content.txt';
@@ -48,7 +57,9 @@ export const data = content;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toBe(`const content = "thisismydata";
 
@@ -57,7 +68,9 @@ const data = content;
 export { data };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -74,7 +87,10 @@ exports.data = data;
     it("should generate js files with included raw content when the '?raw' query param is used", async () => {
         expect.assertions(4);
 
-        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `thisismydata`);
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/content.txt`,
+            `thisismydata`,
+        );
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
             `import content from './content.txt?raw';
@@ -100,7 +116,9 @@ export const data = content;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toBe(`const content = "thisismydata";
 
@@ -109,7 +127,9 @@ const data = content;
 export { data };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsContent).toBe(`'use strict';
 

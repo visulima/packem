@@ -6,7 +6,14 @@ import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { assertContainFiles, createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import {
+    assertContainFiles,
+    createPackageJson,
+    createPackemConfig,
+    createTsConfig,
+    execPackem,
+    installPackage,
+} from "../helpers";
 
 describe("packem swc", () => {
     let temporaryDirectoryPath: string;
@@ -151,24 +158,34 @@ export const entry2 = () => {
         // Check that chunks directory exists (indicating code splitting)
         expect(files).toContain("chunks");
 
-        const chunksDirectory = readdirSync(join(temporaryDirectoryPath, "dist", "chunks"));
+        const chunksDirectory = readdirSync(
+            join(temporaryDirectoryPath, "dist", "chunks"),
+        );
 
         expect(chunksDirectory.length).toBeGreaterThan(0);
 
         // Verify the content of all generated files using snapshots
-        const entry1MjsContent = await readFile(`${temporaryDirectoryPath}/dist/entry1.mjs`);
+        const entry1MjsContent = await readFile(
+            `${temporaryDirectoryPath}/dist/entry1.mjs`,
+        );
 
         expect(entry1MjsContent).toMatchSnapshot("entry1.mjs output");
 
-        const entry1CjsContent = await readFile(`${temporaryDirectoryPath}/dist/entry1.cjs`);
+        const entry1CjsContent = await readFile(
+            `${temporaryDirectoryPath}/dist/entry1.cjs`,
+        );
 
         expect(entry1CjsContent).toMatchSnapshot("entry1.cjs output");
 
-        const entry2MjsContent = await readFile(`${temporaryDirectoryPath}/dist/entry2.mjs`);
+        const entry2MjsContent = await readFile(
+            `${temporaryDirectoryPath}/dist/entry2.mjs`,
+        );
 
         expect(entry2MjsContent).toMatchSnapshot("entry2.mjs output");
 
-        const entry2CjsContent = await readFile(`${temporaryDirectoryPath}/dist/entry2.cjs`);
+        const entry2CjsContent = await readFile(
+            `${temporaryDirectoryPath}/dist/entry2.cjs`,
+        );
 
         expect(entry2CjsContent).toMatchSnapshot("entry2.cjs output");
     });
@@ -249,18 +266,28 @@ export const entry2 = () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        assertContainFiles(join(temporaryDirectoryPath, "dist"), ["index.mjs", "index.cjs", "index.d.ts"]);
+        assertContainFiles(join(temporaryDirectoryPath, "dist"), [
+            "index.mjs",
+            "index.cjs",
+            "index.d.ts",
+        ]);
 
         // Verify the transformed content using snapshots
-        const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = await readFile(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
         expect(mjsContent).toMatchSnapshot("modern features index.mjs output");
 
-        const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
+        const cjsContent = await readFile(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
 
         expect(cjsContent).toMatchSnapshot("modern features index.cjs output");
 
-        const dtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
+        const dtsContent = await readFile(
+            `${temporaryDirectoryPath}/dist/index.d.ts`,
+        );
 
         expect(dtsContent).toMatchSnapshot("modern features index.d.ts output");
     });
