@@ -1,3 +1,14 @@
+## @visulima/packem-rollup [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.7...@visulima/packem-rollup@1.0.0-alpha.8) (2025-08-20)
+
+### Bug Fixes
+
+* fixed the custom resolver for tailwind loader ([1fd0b43](https://github.com/visulima/packem/commit/1fd0b4345aa90f5c250eba9fd8c741e569b84abc))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.7
+
 ## @visulima/packem-rollup [1.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.6...@visulima/packem-rollup@1.0.0-alpha.7) (2025-08-17)
 
 ### Features
