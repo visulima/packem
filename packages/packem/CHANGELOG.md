@@ -1,3 +1,14 @@
+## @visulima/packem [2.0.0-alpha.11](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.10...@visulima/packem@2.0.0-alpha.11) (2025-08-20)
+
+### Bug Fixes
+
+* update raw plugin to handle .js?raw imports and improve file reading ([670dad5](https://github.com/visulima/packem/commit/670dad559e535af5c883556e6a7af7794465c669))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.9
+
 ## @visulima/packem [2.0.0-alpha.10](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.9...@visulima/packem@2.0.0-alpha.10) (2025-08-20)
 
 ### Bug Fixes
