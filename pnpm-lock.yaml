@@ -13,8 +13,9 @@ overrides:
   brace-expansion@>=1.0.0 <=1.1.11: '>=1.1.12'
   chrono-node@<2.2.4: '>=2.2.4'
   form-data@>=4.0.0 <4.0.4: '>=4.0.4'
-  undici@>=6.0.0 <6.21.2: '>=6.21.2'
   tmp@<=0.2.3: '>=0.2.4'
+  undici@>=6.0.0 <6.21.2: '>=6.21.2'
+  '@mozilla/readability@<0.6.0': '>=0.6.0'
 
 importers:
 
@@ -1525,8 +1526,8 @@ importers:
         version: 1.0.2
     devDependencies:
       '@mozilla/readability':
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: '>=0.6.0'
+        version: 0.6.0
       '@types/bun':
         specifier: ^1.1.15
         version: 1.2.20(@types/react@19.1.10)
@@ -2500,8 +2501,8 @@ packages:
     resolution: {integrity: sha512-JPwUKWSsbzx+DLFznf/QZ32Qa+ptfbUlHhRLrBQBAFu9iI1iYvizM4p+zhhRDceSsPutXp4z+R/HPVphlIiclg==}
     engines: {node: '>=18'}
 
-  '@mozilla/readability@0.5.0':
-    resolution: {integrity: sha512-Z+CZ3QaosfFaTqvhQsIktyGrjFjSC0Fa4EMph4mqKnWhmyoGICsV/8QK+8HpXut6zV7zwfWwqDmEjtk1Qf6EgQ==}
+  '@mozilla/readability@0.6.0':
+    resolution: {integrity: sha512-juG5VWh4qAivzTAeMzvY9xs9HY5rAcr2E4I7tiSSCokRFi7XIZCAu92ZkSTsIj1OPceCifL3cpfteP3pDT9/QQ==}
     engines: {node: '>=14.0.0'}
 
   '@napi-rs/wasm-runtime@0.2.11':
@@ -12057,7 +12058,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@mozilla/readability@0.5.0': {}
+  '@mozilla/readability@0.6.0': {}
 
   '@napi-rs/wasm-runtime@0.2.11':
     dependencies:
