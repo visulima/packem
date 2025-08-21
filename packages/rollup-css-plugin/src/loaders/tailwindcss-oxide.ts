@@ -2,6 +2,7 @@ import { stat } from "node:fs/promises";
 
 import { compile, Features, optimize, toSourceMap } from "@tailwindcss/node";
 import { clearRequireCache } from "@tailwindcss/node/require-cache";
+import { Scanner } from "@tailwindcss/oxide";
 import { findPackageJson } from "@visulima/package";
 import { dirname, join, normalize, relative, resolve as pathResolve } from "@visulima/path";
 import { resolveAlias } from "@visulima/path/utils";
@@ -13,21 +14,13 @@ import type { Loader, LoaderContext } from "./types";
 // Type alias for resolver functions
 type ResolverFunction = (id: string, base: string) => Promise<string | false | undefined>;
 
-// Mock scanner interface since we don't have the actual Scanner class
-interface MockScanner {
-    files: string[];
-    globs: { base: string; pattern: string }[];
-    scan: () => string[];
-    sources: { base: string; negated: boolean; pattern: string }[];
-}
-
 /**
  * Tailwind Oxide Root class for managing compilation and scanning
  */
 class TailwindRoot {
     private compiler?: Awaited<ReturnType<typeof compile>>;
 
-    private scanner?: MockScanner;
+    private scanner?: Scanner;
 
     private candidates: Set<string> = new Set<string>();
 
@@ -114,12 +107,7 @@ class TailwindRoot {
             const allSources = [...sources, ...this.compiler.sources];
 
             // Create scanner with sources
-            this.scanner = {
-                files: [],
-                globs: [],
-                scan: () => [],
-                sources: allSources,
-            };
+            this.scanner = new Scanner({ sources: allSources });
         } else {
             for (const buildDependency of this.buildDependencies.keys()) {
                 addWatchFileWrapper(buildDependency);
@@ -173,8 +161,8 @@ class TailwindRoot {
                 message: "Scan for candidates - Utilities feature enabled",
             });
 
-            // Mock scanner.scan() since we don't have the actual Scanner class
-            if (this.scanner && typeof this.scanner.scan === "function") {
+            // Use the real scanner to scan for candidates
+            if (this.scanner) {
                 const scannedCandidates = this.scanner.scan();
 
                 this.logger.debug({
@@ -321,7 +309,8 @@ class TailwindRoot {
             data: { enableSourceMaps: this.enableSourceMaps },
             message: "Build Source Map",
         });
-        const map = this.enableSourceMaps ? toSourceMap(this.compiler.buildSourceMap()).raw : undefined;
+        const sourceMap = this.enableSourceMaps ? toSourceMap(this.compiler.buildSourceMap()) : undefined;
+        const map = sourceMap?.raw;
 
         if (map) {
             this.logger.debug({

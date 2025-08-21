@@ -1,3 +1,5 @@
+@reference "tailwindcss";
+
 /* Card component specific styles */
 .card {
     @apply p-6;
