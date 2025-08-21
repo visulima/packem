@@ -333,60 +333,8 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             expect(cssContent).toContain(".bg-blue-600");
             expect(cssContent).toContain(`.hover\\:bg-blue-700`);
             expect(cssContent).toContain(".text-white");
-            expect(cssContent).toContain(".rounded-lg");
-            expect(cssContent).toContain(".shadow-md");
             expect(cssContent).toContain(".transition-all");
             expect(cssContent).toContain(".duration-200");
-            expect(cssContent).toContain(".bg-gradient-to-r");
-            expect(cssContent).toContain(".from-blue-600");
-            expect(cssContent).toContain(".to-blue-700");
-            expect(cssContent).toContain(".from-gray-600");
-            expect(cssContent).toContain(".to-gray-700");
-            expect(cssContent).toContain(".rounded-xl");
-            expect(cssContent).toContain(".shadow-lg");
-            expect(cssContent).toContain(".bg-white");
-            expect(cssContent).toContain(".border");
-            expect(cssContent).toContain(".border-gray-200");
-            expect(cssContent).toContain(".shadow-2xl");
-            expect(cssContent).toContain(".transform");
-            expect(cssContent).toContain(`.hover\:scale-105`);
-            expect(cssContent).toContain(".bg-transparent");
-            expect(cssContent).toContain(".border-2");
-            expect(cssContent).toContain(".border-gray-300");
-            expect(cssContent).toContain(`.hover\\:border-gray-400`);
-            expect(cssContent).toContain(".transition-colors");
-            expect(cssContent).toContain(".text-xl");
-            expect(cssContent).toContain(".font-semibold");
-            expect(cssContent).toContain(".text-gray-800");
-            expect(cssContent).toContain(".mb-3");
-            expect(cssContent).toContain(".text-gray-600");
-            expect(cssContent).toContain(".leading-relaxed");
-            expect(cssContent).toContain(".bg-blue-900");
-            expect(cssContent).toContain(".bg-blue-700");
-            expect(cssContent).toContain(".text-3xl");
-            expect(cssContent).toContain(".font-bold");
-            expect(cssContent).toContain(".text-blue-100");
-            expect(cssContent).toContain(".text-lg");
-            expect(cssContent).toContain(".py-8");
-            expect(cssContent).toContain(".px-6");
-            expect(cssContent).toContain(".max-w-xl");
-            expect(cssContent).toContain(".mx-auto");
-            expect(cssContent).toContain(".text-center");
-            expect(cssContent).toContain(".mb-2");
-            expect(cssContent).toContain(".tracking-tight");
-            expect(cssContent).toContain(".opacity-90");
-            expect(cssContent).toContain(".font-medium");
-            expect(cssContent).toContain(".bg-gray-900");
-            expect(cssContent).toContain(".py-12");
-            expect(cssContent).toContain(".mt-auto");
-            expect(cssContent).toContain(".flex");
-            expect(cssContent).toContain(".flex-col");
-            expect(cssContent).toContain(`.md\\:flex-row`);
-            expect(cssContent).toContain(".justify-between");
-            expect(cssContent).toContain(".items-center");
-            expect(cssContent).toContain(".space-x-6");
-            expect(cssContent).toContain(".list-none");
-            expect(cssContent).toContain(`.hover\\:text-white`);
 
             for (const f of result.css()) {
                 expect(f).toMatchSnapshot("css");
@@ -1060,7 +1008,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         );
     });
 
-    describe.only("tailwind-oxide", () => {
+    describe("tailwind-oxide", () => {
         // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
         it.each([
             {
@@ -1229,6 +1177,10 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
 
     describe("tailwind-oxide-cross-folder", () => {
         it("should discover and include all classes from components in different folders", async () => {
+            expect.assertions(25);
+
+            await installPackage(temporaryDirectoryPath, "tailwindcss");
+            
             const result = (await build({
                 dependencies: {
                     tailwindcss: "*",
@@ -1275,55 +1227,18 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 expect(cssContent).toContain(className);
             }
 
-            // Verify key utility classes are generated
-            const utilityClasses = [
-                ".bg-blue-600",
-                ".hover:bg-blue-700",
-                ".text-white",
-                ".rounded-lg",
-                ".shadow-md",
-                ".transition-all",
-                ".duration-200",
-                ".bg-gradient-to-r",
-                ".from-blue-600",
-                ".to-blue-700",
-                ".rounded-xl",
-                ".shadow-lg",
-                ".bg-white",
-                ".border",
-                ".border-gray-200",
-                ".shadow-2xl",
-                ".transform",
-                ".hover:scale-105",
-                ".text-xl",
-                ".font-semibold",
-                ".text-gray-800",
-                ".mb-3",
-                ".bg-blue-900",
-                ".text-3xl",
-                ".font-bold",
-                ".py-8",
-                ".px-6",
-                ".max-w-xl",
-                ".mx-auto",
-                ".text-center",
-                ".bg-gray-900",
-                ".py-12",
-            ];
-
-            for (const className of utilityClasses) {
-                expect(cssContent).toContain(className);
-            }
+            expect(cssContent).toMatchSnapshot();
 
             // Verify that the CSS is substantial (not just empty)
             expect(cssContent.length).toBeGreaterThan(1000);
-
-            // Verify that Tailwind base styles are included
-            expect(cssContent).toContain("/*! tailwindcss");
         });
 
         describe("tailwind-oxide-cross-folder", () => {
             it("should discover and include all classes from components in different folders", async () => {
+                expect.assertions(25);
+
+                await installPackage(temporaryDirectoryPath, "tailwindcss");
+
                 const result = (await build({
                     dependencies: {
                         tailwindcss: "*",
@@ -1370,51 +1285,10 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                     expect(cssContent).toContain(className);
                 }
 
-                // Verify key utility classes are generated
-                const utilityClasses = [
-                    ".bg-blue-600",
-                    ".hover:bg-blue-700",
-                    ".text-white",
-                    ".rounded-lg",
-                    ".shadow-md",
-                    ".transition-all",
-                    ".duration-200",
-                    ".bg-gradient-to-r",
-                    ".from-blue-600",
-                    ".to-blue-700",
-                    ".rounded-xl",
-                    ".shadow-lg",
-                    ".bg-white",
-                    ".border",
-                    ".border-gray-200",
-                    ".shadow-2xl",
-                    ".transform",
-                    ".hover:scale-105",
-                    ".text-xl",
-                    ".font-semibold",
-                    ".text-gray-800",
-                    ".mb-3",
-                    ".bg-blue-900",
-                    ".text-3xl",
-                    ".font-bold",
-                    ".py-8",
-                    ".px-6",
-                    ".max-w-xl",
-                    ".mx-auto",
-                    ".text-center",
-                    ".bg-gray-900",
-                    ".py-12",
-                ];
-
-                for (const className of utilityClasses) {
-                    expect(cssContent).toContain(className);
-                }
+                expect(cssContent).toMatchSnapshot();
 
                 // Verify that the CSS is substantial (not just empty)
                 expect(cssContent.length).toBeGreaterThan(1000);
-
-                // Verify that Tailwind base styles are included
-                expect(cssContent).toContain("/*! tailwindcss");
             });
         });
     });

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "./components/Button.css";
+@import "./components/Card.css";
 
 /* Basic CSS for testing Tailwind Oxide loader */
 .container {

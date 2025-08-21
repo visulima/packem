@@ -1,5 +1,3 @@
-import "./Button.css";
-
 export function Button({ children, variant = "primary", size = "medium" }) {
     const baseClasses = "button font-medium transition-all duration-200";
     const variantClasses = {
