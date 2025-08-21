@@ -133,35 +133,117 @@ class TailwindRoot {
             Features.AtApply | Features.JsPluginCompat | Features.ThemeFunction | Features.Utilities
         );
 
+        this.logger.debug({
+            data: {
+                availableFeatures: this.compiler.features,
+                hasAtApply: Boolean(this.compiler.features & Features.AtApply),
+                hasJsPluginCompat: Boolean(this.compiler.features & Features.JsPluginCompat),
+                hasRequiredFeatures: Boolean(hasRequiredFeatures),
+                hasThemeFunction: Boolean(this.compiler.features & Features.ThemeFunction),
+                hasUtilities: Boolean(this.compiler.features & Features.Utilities),
+                requiredFeatures: Features.AtApply | Features.JsPluginCompat | Features.ThemeFunction | Features.Utilities,
+            },
+            message: "Feature analysis",
+        });
+
         if (!hasRequiredFeatures) {
+            this.logger.debug({
+                data: {
+                    missingFeatures: {
+                        AtApply: !(this.compiler.features & Features.AtApply),
+                        JsPluginCompat: !(this.compiler.features & Features.JsPluginCompat),
+                        ThemeFunction: !(this.compiler.features & Features.ThemeFunction),
+                        Utilities: !(this.compiler.features & Features.Utilities),
+                    },
+                },
+                message: "Missing required features, returning false",
+            });
+
             return false;
         }
 
         // eslint-disable-next-line no-bitwise
         if (this.compiler.features & Features.Utilities) {
-            this.logger.debug({ message: "Scan for candidates" });
+            this.logger.debug({
+                data: {
+                    candidatesCountBefore: this.candidates.size,
+                    scannerExists: Boolean(this.scanner),
+                    scannerHasScan: Boolean(this.scanner && typeof this.scanner.scan === "function"),
+                },
+                message: "Scan for candidates - Utilities feature enabled",
+            });
 
             // Mock scanner.scan() since we don't have the actual Scanner class
             if (this.scanner && typeof this.scanner.scan === "function") {
-                for (const candidate of this.scanner.scan()) {
+                const scannedCandidates = this.scanner.scan();
+
+                this.logger.debug({
+                    data: {
+                        scannedCandidates: scannedCandidates.slice(0, 10), // Limit to first 10 for readability
+                        scannedCandidatesCount: scannedCandidates.length,
+                    },
+                    message: "Scanner results",
+                });
+
+                for (const candidate of scannedCandidates) {
                     this.candidates.add(candidate);
                 }
+
+                this.logger.debug({
+                    data: {
+                        candidatesCountAfter: this.candidates.size,
+                        newCandidatesAdded: scannedCandidates.length,
+                    },
+                    message: "Candidates updated",
+                });
+            } else {
+                this.logger.debug({
+                    data: {
+                        hasScanMethod: Boolean(this.scanner && typeof this.scanner.scan === "function"),
+                        scannerType: typeof this.scanner,
+                    },
+                    message: "Scanner not available or missing scan method",
+                });
             }
+        } else {
+            this.logger.debug({ message: "Utilities feature not enabled, skipping candidate scanning" });
         }
 
         // eslint-disable-next-line no-bitwise
         if (this.compiler.features & Features.Utilities) {
             // Watch individual files found via custom `@source` paths
             if (this.scanner && this.scanner.files) {
+                this.logger.debug({
+                    data: {
+                        files: this.scanner.files.slice(0, 5), // Limit to first 5 for readability
+                        filesCount: this.scanner.files.length,
+                    },
+                    message: "Watching individual files from scanner",
+                });
+
                 for (const file of this.scanner.files) {
                     addWatchFileWrapper(file);
                 }
+            } else {
+                this.logger.debug({ message: "No individual files to watch from scanner" });
             }
 
             // Watch globs found via custom `@source` paths
             if (this.scanner && this.scanner.globs) {
+                this.logger.debug({
+                    data: {
+                        globs: this.scanner.globs.slice(0, 3), // Limit to first 3 for readability
+                        globsCount: this.scanner.globs.length,
+                    },
+                    message: "Processing globs from scanner",
+                });
+
                 for await (const glob of this.scanner.globs) {
                     if (glob.pattern[0] === "!") {
+                        this.logger.debug({
+                            data: { pattern: glob.pattern },
+                            message: "Skipping negated glob pattern",
+                        });
                         continue;
                     }
 
@@ -171,7 +253,14 @@ class TailwindRoot {
                         relativePath = `./${relativePath}`;
                     }
 
-                    addWatchFileWrapper(join(relativePath, glob.pattern));
+                    const watchPath = join(relativePath, glob.pattern);
+
+                    this.logger.debug({
+                        data: { base: glob.base, glob: glob.pattern, watchPath },
+                        message: "Adding glob to watch list",
+                    });
+
+                    addWatchFileWrapper(watchPath);
 
                     const { root } = this.compiler;
 
@@ -181,24 +270,71 @@ class TailwindRoot {
                         try {
                             const stats = await stat(basePath);
 
-                            if (!stats.isDirectory()) {
-                                throw new Error(
-                                    `The path given to \`source(…)\` must be a directory but got \`source(${basePath})\` instead.`,
-                                );
+                            if (stats.isDirectory()) {
+                                this.logger.debug({
+                                    data: { basePath, isDirectory: stats.isDirectory() },
+                                    message: "Valid source directory confirmed",
+                                });
+                            } else {
+                                const errorMessage = `The path given to \`source(…)\` must be a directory but got \`source(${basePath})\` instead.`;
+
+                                this.logger.debug({
+                                    data: { basePath, error: errorMessage, isDirectory: stats.isDirectory() },
+                                    message: "Invalid source path detected",
+                                });
+                                throw new Error(errorMessage);
                             }
-                        } catch {
+                        } catch (error) {
+                            this.logger.debug({
+                                data: { basePath, error: error instanceof Error ? error.message : String(error) },
+                                message: "Error checking source directory",
+                            });
                             // File doesn't exist or can't be accessed
                         }
                     }
                 }
+            } else {
+                this.logger.debug({ message: "No globs to process from scanner" });
             }
+        } else {
+            this.logger.debug({ message: "Utilities feature not enabled, skipping file watching" });
         }
 
-        this.logger.debug({ message: "Build CSS" });
+        this.logger.debug({
+            data: {
+                candidates: [...this.candidates].slice(0, 10), // Limit to first 10 for readability
+                candidatesCount: this.candidates.size,
+            },
+            message: "Build CSS",
+        });
         const code = this.compiler.build([...this.candidates]);
 
-        this.logger.debug({ message: "Build Source Map" });
+        this.logger.debug({
+            data: {
+                cssLength: code.length,
+                cssPreview: code.slice(0, 200) + (code.length > 200 ? "..." : ""),
+            },
+            message: "CSS build completed",
+        });
+
+        this.logger.debug({
+            data: { enableSourceMaps: this.enableSourceMaps },
+            message: "Build Source Map",
+        });
         const map = this.enableSourceMaps ? toSourceMap(this.compiler.buildSourceMap()).raw : undefined;
+
+        if (map) {
+            this.logger.debug({
+                data: {
+                    hasMappings: Boolean(map.mappings),
+                    mapSize: JSON.stringify(map).length,
+                    sourcesCount: map.sources?.length || 0,
+                },
+                message: "Source map generated",
+            });
+        } else {
+            this.logger.debug({ message: "No source map generated" });
+        }
 
         return {
             code,
@@ -322,6 +458,11 @@ const tailwindcssLoader: Loader = {
 
         if (!result) {
             // Not a Tailwind file, return original content
+            this.logger.debug({
+                data: { returningOriginalContent: true },
+                message: "Tailwind generation returned false - not a Tailwind file or missing features",
+            });
+
             return { code, map };
         }
 
@@ -329,12 +470,35 @@ const tailwindcssLoader: Loader = {
 
         // Optimize the CSS if in production mode
         if (this.environment === "production") {
-            this.logger.debug({ message: "[@tailwindcss/rollup] Optimize CSS" });
+            this.logger.debug({
+                data: {
+                    minify: true,
+                    originalSize: result.code.length,
+                },
+                message: "[@tailwindcss/rollup] Optimize CSS",
+            });
 
-            result = optimize(result.code, {
+            const optimizedResult = optimize(result.code, {
                 file: this.id,
                 map: result.map,
                 minify: true,
+            });
+
+            this.logger.debug({
+                data: {
+                    optimizedSize: optimizedResult.code.length,
+                    originalSize: result.code.length,
+                    sizeReduction: result.code.length - optimizedResult.code.length,
+                    sizeReductionPercent: `${(((result.code.length - optimizedResult.code.length) / result.code.length) * 100).toFixed(2)}%`,
+                },
+                message: "CSS optimization completed",
+            });
+
+            result = optimizedResult;
+        } else {
+            this.logger.debug({
+                data: { environment: this.environment },
+                message: "Development mode - skipping CSS optimization",
             });
         }
 
@@ -350,7 +514,6 @@ const tailwindcssLoader: Loader = {
             };
         }
 
-        // Use the shared utility for JavaScript export generation
         const jsExportResult = generateJsExports({
             css: result.code,
             cwd: this.cwd as string,
@@ -378,7 +541,6 @@ const tailwindcssLoader: Loader = {
             };
         }
 
-        // Return JavaScript code for CSS injection
         return {
             code: jsExportResult.code,
             map: jsExportResult.map,
