@@ -1,0 +1,14 @@
+@reference "tailwindcss";
+
+/* Card component specific styles */
+.card {
+    @apply p-6;
+}
+
+.card.elevated {
+    @apply transition-all duration-300 ease-in-out;
+}
+
+.card.outlined {
+    @apply hover:border-gray-400 transition-colors duration-200;
+}

@@ -1,0 +1,22 @@
+@reference "tailwindcss";
+
+/* Card component styles with specific classes */
+.card {
+    @apply p-6;
+}
+
+.card-title {
+    @apply font-bold text-gray-900;
+}
+
+.card-content {
+    @apply leading-relaxed;
+}
+
+.card.elevated {
+    @apply transition-all duration-300 ease-in-out;
+}
+
+.card.outlined {
+    @apply hover:border-gray-400 transition-colors duration-200;
+}

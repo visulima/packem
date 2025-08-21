@@ -3,7 +3,8 @@
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
         "moduleResolution": "bundler",
-        "verbatimModuleSyntax": false
+        "verbatimModuleSyntax": false,
+        "isolatedModules": false
     },
     "include": ["src/**/*", "*.d.ts"]
 }

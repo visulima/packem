@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* Button component specific styles */
+.button {
+    @apply rounded-lg shadow-md;
+}
+
+.button:focus {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+.button:disabled {
+    @apply opacity-50 cursor-not-allowed;
+}

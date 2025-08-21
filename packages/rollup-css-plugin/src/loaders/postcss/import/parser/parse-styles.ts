@@ -231,7 +231,7 @@ const parseStyles = async (
                     + `  ${stmt.stylesheet.charset.params} specified in ${stmt.stylesheet.charset.source?.input.file}\n`
                     + `  ${charset.params} specified in ${charset.source?.input.file}`,
                 );
-            } else if (!charset && !!stmt.stylesheet.charset) {
+            } else if (!charset && stmt.stylesheet.charset) {
                 charset = stmt.stylesheet.charset;
             }
 

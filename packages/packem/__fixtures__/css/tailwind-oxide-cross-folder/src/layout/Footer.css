@@ -1,0 +1,34 @@
+@reference "tailwindcss";
+
+/* Footer component styles with specific classes */
+.footer {
+    @apply mt-auto;
+}
+
+.footer-container {
+    @apply max-w-xl mx-auto px-6;
+}
+
+.footer-content {
+    @apply flex flex-col md:flex-row justify-between items-center;
+}
+
+.footer-copyright {
+    @apply mb-4 md:mb-0;
+}
+
+.footer-nav {
+    @apply flex;
+}
+
+.footer-links {
+    @apply flex space-x-6;
+}
+
+.footer-link-item {
+    @apply list-none;
+}
+
+.footer-link {
+    @apply text-gray-400 hover:text-white transition-colors duration-200;
+}

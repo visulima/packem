@@ -270,6 +270,94 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         }
     };
 
+    const validateCrossFolder = async (data: WriteData): Promise<void> => {
+        if (data.shouldFail) {
+            const result = (await build(data)) as WriteFailResult;
+
+            expect(result.stderr).toContain(data.errorMessage);
+            expect(result.exitCode).toBe(1);
+
+            return;
+        }
+
+        const result = (await build(data)) as WriteResult;
+
+        for (const f of result.js()) {
+            expect(f).toMatchSnapshot("js");
+        }
+
+        const optionMode: StyleOptions["mode"]
+            = typeof data.styleOptions === "object"
+                ? data.styleOptions.mode
+                : (data as StringWriteData).mode;
+        const optionSourceMap: StyleOptions["sourceMap"]
+            = typeof data.styleOptions === "object"
+                ? data.styleOptions.sourceMap
+                : (data as StringWriteData).sourceMap;
+
+        const mode = inferModeOption(optionMode ?? "inject");
+
+        if (mode.extract) {
+            expect(result.isCss()).toBe(true);
+
+            // Check that all expected classes from cross-folder components are present
+            const cssContent = result.css().join("\n");
+
+            // Button component classes
+            expect(cssContent).toContain(".btn");
+            expect(cssContent).toContain(".btn-primary");
+            expect(cssContent).toContain(".btn-secondary");
+
+            // Card component classes
+            expect(cssContent).toContain(".card");
+            expect(cssContent).toContain(".card-title");
+            expect(cssContent).toContain(".card-content");
+
+            // Header component classes
+            expect(cssContent).toContain(".header");
+            expect(cssContent).toContain(".header-container");
+            expect(cssContent).toContain(".header-title");
+            expect(cssContent).toContain(".header-subtitle");
+
+            // Footer component classes
+            expect(cssContent).toContain(".footer");
+            expect(cssContent).toContain(".footer-container");
+            expect(cssContent).toContain(".footer-content");
+            expect(cssContent).toContain(".footer-copyright");
+            expect(cssContent).toContain(".footer-nav");
+            expect(cssContent).toContain(".footer-links");
+            expect(cssContent).toContain(".footer-link-item");
+            expect(cssContent).toContain(".footer-link");
+
+            // Utility classes that should be generated
+            expect(cssContent).toContain(".bg-blue-600");
+            expect(cssContent).toContain(`.hover\\:bg-blue-700`);
+            expect(cssContent).toContain(".text-white");
+            expect(cssContent).toContain(".transition-all");
+            expect(cssContent).toContain(".duration-200");
+
+            for (const f of result.css()) {
+                expect(f).toMatchSnapshot("css");
+            }
+        }
+
+        const sourceMap = inferSourceMapOption(optionSourceMap);
+
+        if (sourceMap && !sourceMap.inline) {
+            expect(result.isMap()).toBe(Boolean(mode.extract));
+
+            for (const f of result.map()) {
+                expect(f).toMatchSnapshot("map");
+            }
+        } else {
+            expect(result.isMap()).toBe(false);
+        }
+
+        for (const file of data.files ?? []) {
+            expect(result.isFile(file)).toBe(true);
+        }
+    };
+
     describe("basic", () => {
         // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
         it.each([
@@ -1033,9 +1121,44 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "emit-sourcemap-inline",
             },
+            {
+                dependencies: {
+                    tailwindcss: "*",
+                },
+                input: "tailwind-oxide-cross-folder/index.js",
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "extract",
+                },
+                title: "cross-folder-extract",
+            },
+            {
+                dependencies: {
+                    tailwindcss: "*",
+                },
+                input: "tailwind-oxide-cross-folder/index.js",
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "extract",
+                    sourceMap: true,
+                },
+                title: "cross-folder-extract-sourcemap",
+            },
+            {
+                dependencies: {
+                    tailwindcss: "*",
+                },
+                input: "tailwind-oxide-cross-folder/index.js",
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "extract",
+                    sourceMap: "inline",
+                },
+                title: "cross-folder-extract-sourcemap-inline",
+            },
         ] as WriteData[])(
             "should work with tailwind-oxide processed $title css",
-            async ({ title, ...data }: WriteData) => {
+            async (data: WriteData) => {
                 await installPackage(temporaryDirectoryPath, "tailwindcss");
 
                 // eslint-disable-next-line vitest/no-conditional-in-test
@@ -1046,9 +1169,128 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                     );
                 }
 
-                await validate(data);
+                // Use cross-folder validation for cross-folder tests
+                await ((data.title as string).includes("cross-folder") ? validateCrossFolder(data) : validate(data));
             },
         );
+    });
+
+    describe("tailwind-oxide-cross-folder", () => {
+        it("should discover and include all classes from components in different folders", async () => {
+            expect.assertions(25);
+
+            await installPackage(temporaryDirectoryPath, "tailwindcss");
+            
+            const result = (await build({
+                dependencies: {
+                    tailwindcss: "*",
+                },
+                input: "tailwind-oxide-cross-folder/index.js",
+                styleOptions: {
+                    loaders: ["tailwindcss"],
+                    mode: "extract",
+                },
+            })) as WriteResult;
+
+            expect(result.isCss()).toBe(true);
+            expect(result.isMap()).toBe(false);
+
+            const cssContent = result.css().join("\n");
+
+            // Verify component-specific classes are present
+            const componentClasses = [
+                // Button component
+                ".btn",
+                ".btn-primary",
+                ".btn-secondary",
+                // Card component
+                ".card",
+                ".card-title",
+                ".card-content",
+                // Header component
+                ".header",
+                ".header-container",
+                ".header-title",
+                ".header-subtitle",
+                // Footer component
+                ".footer",
+                ".footer-container",
+                ".footer-content",
+                ".footer-copyright",
+                ".footer-nav",
+                ".footer-links",
+                ".footer-link-item",
+                ".footer-link",
+            ];
+
+            for (const className of componentClasses) {
+                expect(cssContent).toContain(className);
+            }
+
+            expect(cssContent).toMatchSnapshot();
+
+            // Verify that the CSS is substantial (not just empty)
+            expect(cssContent.length).toBeGreaterThan(1000);
+        });
+
+        describe("tailwind-oxide-cross-folder", () => {
+            it("should discover and include all classes from components in different folders", async () => {
+                expect.assertions(25);
+
+                await installPackage(temporaryDirectoryPath, "tailwindcss");
+
+                const result = (await build({
+                    dependencies: {
+                        tailwindcss: "*",
+                    },
+                    input: "tailwind-oxide-cross-folder/index.js",
+                    styleOptions: {
+                        loaders: ["tailwindcss"],
+                        mode: "extract",
+                    },
+                })) as WriteResult;
+
+                expect(result.isCss()).toBe(true);
+                expect(result.isMap()).toBe(false);
+
+                const cssContent = result.css().join("\n");
+
+                // Verify component-specific classes are present
+                const componentClasses = [
+                // Button component
+                    ".btn",
+                    ".btn-primary",
+                    ".btn-secondary",
+                    // Card component
+                    ".card",
+                    ".card-title",
+                    ".card-content",
+                    // Header component
+                    ".header",
+                    ".header-container",
+                    ".header-title",
+                    ".header-subtitle",
+                    // Footer component
+                    ".footer",
+                    ".footer-container",
+                    ".footer-content",
+                    ".footer-copyright",
+                    ".footer-nav",
+                    ".footer-links",
+                    ".footer-link-item",
+                    ".footer-link",
+                ];
+
+                for (const className of componentClasses) {
+                    expect(cssContent).toContain(className);
+                }
+
+                expect(cssContent).toMatchSnapshot();
+
+                // Verify that the CSS is substantial (not just empty)
+                expect(cssContent.length).toBeGreaterThan(1000);
+            });
+        });
     });
 
     describe("css-modules", () => {
