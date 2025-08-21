@@ -1,3 +1,20 @@
+## @visulima/packem [2.0.0-alpha.13](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.12...@visulima/packem@2.0.0-alpha.13) (2025-08-21)
+
+### Bug Fixes
+
+* Introduce Button and Card components with Tailwind CSS styles ([bd9d5c3](https://github.com/visulima/packem/commit/bd9d5c371afbc6adf030ade6a64b572f6eb4c2cc))
+
+### Code Refactoring
+
+* Update component imports and CSS references for Tailwind integration ([46a1293](https://github.com/visulima/packem/commit/46a1293c5694fccd79670f9c9f51565374f26069))
+* Update CSS imports and component structure for Tailwind integration ([8f4535a](https://github.com/visulima/packem/commit/8f4535a6cf762ae8a5369154fdc870e76e817ffc))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.10
+* **@visulima/rollup-css-plugin:** upgraded to 1.0.0-alpha.9
+
 ## @visulima/packem [2.0.0-alpha.12](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.11...@visulima/packem@2.0.0-alpha.12) (2025-08-21)
 
 
