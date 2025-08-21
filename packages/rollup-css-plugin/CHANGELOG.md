@@ -1,3 +1,13 @@
+## @visulima/rollup-css-plugin [1.0.0-alpha.9](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.8...@visulima/rollup-css-plugin@1.0.0-alpha.9) (2025-08-21)
+
+### Bug Fixes
+
+* Introduce Button and Card components with Tailwind CSS styles ([bd9d5c3](https://github.com/visulima/packem/commit/bd9d5c371afbc6adf030ade6a64b572f6eb4c2cc))
+
+### Code Refactoring
+
+* Update component imports and CSS references for Tailwind integration ([46a1293](https://github.com/visulima/packem/commit/46a1293c5694fccd79670f9c9f51565374f26069))
+
 ## @visulima/rollup-css-plugin [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.7...@visulima/rollup-css-plugin@1.0.0-alpha.8) (2025-08-21)
 
 ### Bug Fixes
