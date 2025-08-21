@@ -1,3 +1,9 @@
+## @visulima/rollup-css-plugin [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.7...@visulima/rollup-css-plugin@1.0.0-alpha.8) (2025-08-21)
+
+### Bug Fixes
+
+* Enhance logging in Tailwind CSS loader for better feature analysis and debugging ([5c8f36e](https://github.com/visulima/packem/commit/5c8f36ef50cc8004664dc95b5ba81f681a2cfb2a))
+
 ## @visulima/rollup-css-plugin [1.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.6...@visulima/rollup-css-plugin@1.0.0-alpha.7) (2025-08-20)
 
 ### Bug Fixes
