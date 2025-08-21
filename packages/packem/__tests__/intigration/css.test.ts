@@ -331,7 +331,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
 
             // Utility classes that should be generated
             expect(cssContent).toContain(".bg-blue-600");
-            expect(cssContent).toContain(".hover:bg-blue-700");
+            expect(cssContent).toContain(`.hover\\:bg-blue-700`);
             expect(cssContent).toContain(".text-white");
             expect(cssContent).toContain(".rounded-lg");
             expect(cssContent).toContain(".shadow-md");
@@ -349,11 +349,11 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             expect(cssContent).toContain(".border-gray-200");
             expect(cssContent).toContain(".shadow-2xl");
             expect(cssContent).toContain(".transform");
-            expect(cssContent).toContain(".hover:scale-105");
+            expect(cssContent).toContain(`.hover\:scale-105`);
             expect(cssContent).toContain(".bg-transparent");
             expect(cssContent).toContain(".border-2");
             expect(cssContent).toContain(".border-gray-300");
-            expect(cssContent).toContain(".hover:border-gray-400");
+            expect(cssContent).toContain(`.hover\\:border-gray-400`);
             expect(cssContent).toContain(".transition-colors");
             expect(cssContent).toContain(".text-xl");
             expect(cssContent).toContain(".font-semibold");
@@ -381,12 +381,12 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             expect(cssContent).toContain(".mt-auto");
             expect(cssContent).toContain(".flex");
             expect(cssContent).toContain(".flex-col");
-            expect(cssContent).toContain(".md:flex-row");
+            expect(cssContent).toContain(`.md\\:flex-row`);
             expect(cssContent).toContain(".justify-between");
             expect(cssContent).toContain(".items-center");
             expect(cssContent).toContain(".space-x-6");
             expect(cssContent).toContain(".list-none");
-            expect(cssContent).toContain(".hover:text-white");
+            expect(cssContent).toContain(`.hover\\:text-white`);
 
             for (const f of result.css()) {
                 expect(f).toMatchSnapshot("css");

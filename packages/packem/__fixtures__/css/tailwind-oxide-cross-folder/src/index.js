@@ -1,5 +1,5 @@
 import "./styles.css";
-import { Button, Card } from "./components/index.js";
+import { Button, Card } from "./components/index.jsx";
 import { Header } from "./layout/Header.jsx";
 import { Footer } from "./layout/Footer.jsx";
 
