@@ -20,6 +20,9 @@ const ecosystemConfigs = {
         runtime: "browser",
         transformer: "esbuild",
     },
+    sitefetch: {
+        isolatedDeclarationTransformer: "typescript",
+    },
 };
 
 describe("packem ecosystem", () => {
@@ -40,7 +43,6 @@ describe("packem ecosystem", () => {
             const fullSuitePath = join(ecosystemPath, suite);
 
             await createPackemConfig(fullSuitePath, {
-                isolatedDeclarationTransformer: "typescript",
                 transformer: "esbuild",
                 ...ecosystemConfigs[suite],
             });

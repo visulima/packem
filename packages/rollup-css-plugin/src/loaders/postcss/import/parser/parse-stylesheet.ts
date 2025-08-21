@@ -220,7 +220,7 @@ const parseStylesheet = (result: Result, styles: Document | Root, importingNode:
                     + `  ${subStylesheet.charset.params} specified in ${subStylesheet.charset.source?.input.file}\n`
                     + `  ${stylesheet.charset.params} specified in ${stylesheet.charset.source?.input.file}`,
                 );
-            } else if (!stylesheet.charset && !!subStylesheet.charset) {
+            } else if (!stylesheet.charset && subStylesheet.charset) {
                 stylesheet.charset = subStylesheet.charset;
             }
 

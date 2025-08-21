@@ -16353,12 +16353,50 @@ console.log(css$5, css$4);
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'basic' css > js 1`] = `
 "'use strict';
 
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
 const cssStyleInject = require('@visulima/css-style-inject');
 
 var css = "/*! tailwindcss v4.1.12 | MIT License | https://tailwindcss.com */\\n@layer theme, base, components, utilities;\\n@layer theme {\\n  :root, :host {\\n    --font-sans: ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\";\\n    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace;\\n    --default-font-family: var(--font-sans);\\n    --default-mono-font-family: var(--font-mono);\\n  }\\n}\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\", \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\");\\n    font-feature-settings: var(--default-font-feature-settings, normal);\\n    font-variation-settings: var(--default-font-variation-settings, normal);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\", \\"Courier New\\", monospace);\\n    font-feature-settings: var(--default-mono-font-feature-settings, normal);\\n    font-variation-settings: var(--default-mono-font-variation-settings, normal);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities;\\n.container {\\n  max-width: 1200px;\\n  margin: 0 auto;\\n  padding: 0 1rem;\\n}\\n.button {\\n  display: inline-block;\\n  padding: 0.5rem 1rem;\\n  background-color: #3b82f6;\\n  color: white;\\n  border-radius: 0.375rem;\\n  text-decoration: none;\\n  transition: background-color 0.2s;\\n}\\n.button:hover {\\n  background-color: #2563eb;\\n}\\n.card {\\n  background: white;\\n  border-radius: 0.5rem;\\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);\\n  padding: 1.5rem;\\n}\\n.text-gradient {\\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\\n  -webkit-background-clip: text;\\n  -webkit-text-fill-color: transparent;\\n  background-clip: text;\\n}\\n.animate-fade-in {\\n  animation: fadeIn 0.5s ease-in-out;\\n}\\n@keyframes fadeIn {\\n  from {\\n    opacity: 0;\\n    transform: translateY(10px);\\n  }\\n  to {\\n    opacity: 1;\\n    transform: translateY(0);\\n  }\\n}\\n";
 cssStyleInject.cssStyleInject(css,{});
 
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
 console.log("Tailwind Oxide test loaded");
+
+exports.Button = Button;
+exports.Card = Card;
 "
 `;
 
@@ -16368,12 +16406,394 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'basic
 var css = "/*! tailwindcss v4.1.12 | MIT License | https://tailwindcss.com */\\n@layer theme, base, components, utilities;\\n@layer theme {\\n  :root, :host {\\n    --font-sans: ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\";\\n    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace;\\n    --default-font-family: var(--font-sans);\\n    --default-mono-font-family: var(--font-mono);\\n  }\\n}\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\", \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\");\\n    font-feature-settings: var(--default-font-feature-settings, normal);\\n    font-variation-settings: var(--default-font-variation-settings, normal);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\", \\"Courier New\\", monospace);\\n    font-feature-settings: var(--default-mono-font-feature-settings, normal);\\n    font-variation-settings: var(--default-mono-font-variation-settings, normal);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities;\\n.container {\\n  max-width: 1200px;\\n  margin: 0 auto;\\n  padding: 0 1rem;\\n}\\n.button {\\n  display: inline-block;\\n  padding: 0.5rem 1rem;\\n  background-color: #3b82f6;\\n  color: white;\\n  border-radius: 0.375rem;\\n  text-decoration: none;\\n  transition: background-color 0.2s;\\n}\\n.button:hover {\\n  background-color: #2563eb;\\n}\\n.card {\\n  background: white;\\n  border-radius: 0.5rem;\\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);\\n  padding: 1.5rem;\\n}\\n.text-gradient {\\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\\n  -webkit-background-clip: text;\\n  -webkit-text-fill-color: transparent;\\n  background-clip: text;\\n}\\n.animate-fade-in {\\n  animation: fadeIn 0.5s ease-in-out;\\n}\\n@keyframes fadeIn {\\n  from {\\n    opacity: 0;\\n    transform: translateY(10px);\\n  }\\n  to {\\n    opacity: 1;\\n    transform: translateY(0);\\n  }\\n}\\n";
 cssStyleInject(css,{});
 
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
 console.log("Tailwind Oxide test loaded");
+
+export { Button, Card };
+"
+`;
+
+exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross-folder-extract' css > js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp$3 = Object.defineProperty;
+var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "btn font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$3(Button, "Button");
+
+var __defProp$2 = Object.defineProperty;
+var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "card-title text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "card-content text-gray-600" }, children));
+}
+__name$2(Card, "Card");
+
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Header({ title, subtitle }) {
+  return React.createElement("header", { className: "header bg-gradient-to-r from-blue-900 to-blue-700 text-white" }, React.createElement("div", { className: "header-container" }, React.createElement("h1", { className: "header-title text-3xl font-bold" }, title), subtitle && React.createElement("p", { className: "header-subtitle text-blue-100 text-lg" }, subtitle)));
+}
+__name$1(Header, "Header");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Footer({ links = [] }) {
+  return React.createElement("footer", { className: "footer bg-gray-900 text-white py-12" }, React.createElement("div", { className: "footer-container" }, React.createElement("div", { className: "footer-content" }, React.createElement("p", { className: "footer-copyright text-gray-400" }, "© 2024 Tailwind Oxide Test. All rights reserved."), links.length > 0 && React.createElement("nav", { className: "footer-nav" }, React.createElement("ul", { className: "footer-links" }, links.map((link, index) => React.createElement("li", { key: index, className: "footer-link-item" }, React.createElement("a", { href: link.href, className: "footer-link" }, link.text))))))));
+}
+__name(Footer, "Footer");
+
+console.log("Tailwind Oxide cross-folder test loaded");
+
+exports.Button = Button;
+exports.Card = Card;
+exports.Footer = Footer;
+exports.Header = Header;
+"
+`;
+
+exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross-folder-extract' css > js 2`] = `
+"var __defProp$3 = Object.defineProperty;
+var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "btn font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$3(Button, "Button");
+
+var __defProp$2 = Object.defineProperty;
+var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "card-title text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "card-content text-gray-600" }, children));
+}
+__name$2(Card, "Card");
+
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Header({ title, subtitle }) {
+  return React.createElement("header", { className: "header bg-gradient-to-r from-blue-900 to-blue-700 text-white" }, React.createElement("div", { className: "header-container" }, React.createElement("h1", { className: "header-title text-3xl font-bold" }, title), subtitle && React.createElement("p", { className: "header-subtitle text-blue-100 text-lg" }, subtitle)));
+}
+__name$1(Header, "Header");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Footer({ links = [] }) {
+  return React.createElement("footer", { className: "footer bg-gray-900 text-white py-12" }, React.createElement("div", { className: "footer-container" }, React.createElement("div", { className: "footer-content" }, React.createElement("p", { className: "footer-copyright text-gray-400" }, "© 2024 Tailwind Oxide Test. All rights reserved."), links.length > 0 && React.createElement("nav", { className: "footer-nav" }, React.createElement("ul", { className: "footer-links" }, links.map((link, index) => React.createElement("li", { key: index, className: "footer-link-item" }, React.createElement("a", { href: link.href, className: "footer-link" }, link.text))))))));
+}
+__name(Footer, "Footer");
+
+console.log("Tailwind Oxide cross-folder test loaded");
+
+export { Button, Card, Footer, Header };
+"
+`;
+
+exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross-folder-extract-sourcemap' css > js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp$3 = Object.defineProperty;
+var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "btn font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$3(Button, "Button");
+
+var __defProp$2 = Object.defineProperty;
+var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "card-title text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "card-content text-gray-600" }, children));
+}
+__name$2(Card, "Card");
+
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Header({ title, subtitle }) {
+  return React.createElement("header", { className: "header bg-gradient-to-r from-blue-900 to-blue-700 text-white" }, React.createElement("div", { className: "header-container" }, React.createElement("h1", { className: "header-title text-3xl font-bold" }, title), subtitle && React.createElement("p", { className: "header-subtitle text-blue-100 text-lg" }, subtitle)));
+}
+__name$1(Header, "Header");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Footer({ links = [] }) {
+  return React.createElement("footer", { className: "footer bg-gray-900 text-white py-12" }, React.createElement("div", { className: "footer-container" }, React.createElement("div", { className: "footer-content" }, React.createElement("p", { className: "footer-copyright text-gray-400" }, "© 2024 Tailwind Oxide Test. All rights reserved."), links.length > 0 && React.createElement("nav", { className: "footer-nav" }, React.createElement("ul", { className: "footer-links" }, links.map((link, index) => React.createElement("li", { key: index, className: "footer-link-item" }, React.createElement("a", { href: link.href, className: "footer-link" }, link.text))))))));
+}
+__name(Footer, "Footer");
+
+console.log("Tailwind Oxide cross-folder test loaded");
+
+exports.Button = Button;
+exports.Card = Card;
+exports.Footer = Footer;
+exports.Header = Header;
+"
+`;
+
+exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross-folder-extract-sourcemap' css > js 2`] = `
+"var __defProp$3 = Object.defineProperty;
+var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "btn font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$3(Button, "Button");
+
+var __defProp$2 = Object.defineProperty;
+var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "card-title text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "card-content text-gray-600" }, children));
+}
+__name$2(Card, "Card");
+
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Header({ title, subtitle }) {
+  return React.createElement("header", { className: "header bg-gradient-to-r from-blue-900 to-blue-700 text-white" }, React.createElement("div", { className: "header-container" }, React.createElement("h1", { className: "header-title text-3xl font-bold" }, title), subtitle && React.createElement("p", { className: "header-subtitle text-blue-100 text-lg" }, subtitle)));
+}
+__name$1(Header, "Header");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Footer({ links = [] }) {
+  return React.createElement("footer", { className: "footer bg-gray-900 text-white py-12" }, React.createElement("div", { className: "footer-container" }, React.createElement("div", { className: "footer-content" }, React.createElement("p", { className: "footer-copyright text-gray-400" }, "© 2024 Tailwind Oxide Test. All rights reserved."), links.length > 0 && React.createElement("nav", { className: "footer-nav" }, React.createElement("ul", { className: "footer-links" }, links.map((link, index) => React.createElement("li", { key: index, className: "footer-link-item" }, React.createElement("a", { href: link.href, className: "footer-link" }, link.text))))))));
+}
+__name(Footer, "Footer");
+
+console.log("Tailwind Oxide cross-folder test loaded");
+
+export { Button, Card, Footer, Header };
+"
+`;
+
+exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross-folder-extract-sourcemap-inline' css > js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp$3 = Object.defineProperty;
+var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "btn font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$3(Button, "Button");
+
+var __defProp$2 = Object.defineProperty;
+var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "card-title text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "card-content text-gray-600" }, children));
+}
+__name$2(Card, "Card");
+
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Header({ title, subtitle }) {
+  return React.createElement("header", { className: "header bg-gradient-to-r from-blue-900 to-blue-700 text-white" }, React.createElement("div", { className: "header-container" }, React.createElement("h1", { className: "header-title text-3xl font-bold" }, title), subtitle && React.createElement("p", { className: "header-subtitle text-blue-100 text-lg" }, subtitle)));
+}
+__name$1(Header, "Header");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Footer({ links = [] }) {
+  return React.createElement("footer", { className: "footer bg-gray-900 text-white py-12" }, React.createElement("div", { className: "footer-container" }, React.createElement("div", { className: "footer-content" }, React.createElement("p", { className: "footer-copyright text-gray-400" }, "© 2024 Tailwind Oxide Test. All rights reserved."), links.length > 0 && React.createElement("nav", { className: "footer-nav" }, React.createElement("ul", { className: "footer-links" }, links.map((link, index) => React.createElement("li", { key: index, className: "footer-link-item" }, React.createElement("a", { href: link.href, className: "footer-link" }, link.text))))))));
+}
+__name(Footer, "Footer");
+
+console.log("Tailwind Oxide cross-folder test loaded");
+
+exports.Button = Button;
+exports.Card = Card;
+exports.Footer = Footer;
+exports.Header = Header;
+"
+`;
+
+exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross-folder-extract-sourcemap-inline' css > js 2`] = `
+"var __defProp$3 = Object.defineProperty;
+var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "btn font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$3(Button, "Button");
+
+var __defProp$2 = Object.defineProperty;
+var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "card-title text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "card-content text-gray-600" }, children));
+}
+__name$2(Card, "Card");
+
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Header({ title, subtitle }) {
+  return React.createElement("header", { className: "header bg-gradient-to-r from-blue-900 to-blue-700 text-white" }, React.createElement("div", { className: "header-container" }, React.createElement("h1", { className: "header-title text-3xl font-bold" }, title), subtitle && React.createElement("p", { className: "header-subtitle text-blue-100 text-lg" }, subtitle)));
+}
+__name$1(Header, "Header");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Footer({ links = [] }) {
+  return React.createElement("footer", { className: "footer bg-gray-900 text-white py-12" }, React.createElement("div", { className: "footer-container" }, React.createElement("div", { className: "footer-content" }, React.createElement("p", { className: "footer-copyright text-gray-400" }, "© 2024 Tailwind Oxide Test. All rights reserved."), links.length > 0 && React.createElement("nav", { className: "footer-nav" }, React.createElement("ul", { className: "footer-links" }, links.map((link, index) => React.createElement("li", { key: index, className: "footer-link-item" }, React.createElement("a", { href: link.href, className: "footer-link" }, link.text))))))));
+}
+__name(Footer, "Footer");
+
+console.log("Tailwind Oxide cross-folder test loaded");
+
+export { Button, Card, Footer, Header };
 "
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'emit' css > js 1`] = `
 "'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 const lit = require('lit');
 
@@ -16582,7 +17002,43 @@ lit.css\`/*! tailwindcss v4.1.12 | MIT License | https://tailwindcss.com */
 }
 \`;
 
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
 console.log("Tailwind Oxide test loaded");
+
+exports.Button = Button;
+exports.Card = Card;
 "
 `;
 
@@ -16794,12 +17250,49 @@ css\`/*! tailwindcss v4.1.12 | MIT License | https://tailwindcss.com */
 }
 \`;
 
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
 console.log("Tailwind Oxide test loaded");
+
+export { Button, Card };
 "
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'emit-sourcemap' css > js 1`] = `
 "'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 const lit = require('lit');
 
@@ -17008,7 +17501,43 @@ lit.css\`/*! tailwindcss v4.1.12 | MIT License | https://tailwindcss.com */
 }
 \`;
 
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
 console.log("Tailwind Oxide test loaded");
+
+exports.Button = Button;
+exports.Card = Card;
 "
 `;
 
@@ -17220,12 +17749,49 @@ css\`/*! tailwindcss v4.1.12 | MIT License | https://tailwindcss.com */
 }
 \`;
 
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
 console.log("Tailwind Oxide test loaded");
+
+export { Button, Card };
 "
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'emit-sourcemap-inline' css > js 1`] = `
 "'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 const lit = require('lit');
 
@@ -17434,7 +18000,43 @@ lit.css\`/*! tailwindcss v4.1.12 | MIT License | https://tailwindcss.com */
 }
 \`;
 
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
 console.log("Tailwind Oxide test loaded");
+
+exports.Button = Button;
+exports.Card = Card;
 "
 `;
 
@@ -17646,7 +18248,42 @@ css\`/*! tailwindcss v4.1.12 | MIT License | https://tailwindcss.com */
 }
 \`;
 
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
 console.log("Tailwind Oxide test loaded");
+
+export { Button, Card };
 "
 `;
 
@@ -17860,12 +18497,85 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extra
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extract' css > js 1`] = `
 "'use strict';
 
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
 console.log("Tailwind Oxide test loaded");
+
+exports.Button = Button;
+exports.Card = Card;
 "
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extract' css > js 2`] = `
-"console.log("Tailwind Oxide test loaded");
+"var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
+console.log("Tailwind Oxide test loaded");
+
+export { Button, Card };
 "
 `;
 
@@ -18288,12 +18998,85 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extra
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extract-sourcemap' css > js 1`] = `
 "'use strict';
 
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
 console.log("Tailwind Oxide test loaded");
+
+exports.Button = Button;
+exports.Card = Card;
 "
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extract-sourcemap' css > js 2`] = `
-"console.log("Tailwind Oxide test loaded");
+"var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
+console.log("Tailwind Oxide test loaded");
+
+export { Button, Card };
 "
 `;
 
@@ -18522,11 +19305,84 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extra
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extract-sourcemap-inline' css > js 1`] = `
 "'use strict';
 
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
 console.log("Tailwind Oxide test loaded");
+
+exports.Button = Button;
+exports.Card = Card;
 "
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extract-sourcemap-inline' css > js 2`] = `
-"console.log("Tailwind Oxide test loaded");
+"var __defProp$1 = Object.defineProperty;
+var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+function Button({ children, variant = "primary", size = "medium" }) {
+  const baseClasses = "button font-medium transition-all duration-200";
+  const variantClasses = {
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+  };
+  const sizeClasses = {
+    small: "px-3 py-1.5 text-sm",
+    medium: "px-4 py-2 text-base",
+    large: "px-6 py-3 text-lg"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
+  return React.createElement("button", { className: classes }, children);
+}
+__name$1(Button, "Button");
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function Card({ title, children, variant = "default" }) {
+  const baseClasses = "card rounded-xl shadow-lg";
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    elevated: "bg-white shadow-2xl transform hover:scale-105",
+    outlined: "bg-transparent border-2 border-gray-300"
+  };
+  const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
+  return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
+}
+__name(Card, "Card");
+
+console.log("Tailwind Oxide test loaded");
+
+export { Button, Card };
 "
 `;

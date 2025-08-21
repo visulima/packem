@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@source "./components";
+@source "./layout";
+
+/* Main styles that import components from different folders */
+@import "./components/Button.css";
+@import "./components/Card.css";
+@import "./layout/Header.css";
+@import "./layout/Footer.css";
+
+/* Additional utility classes */
+.container {
+    @apply max-w-xl mx-auto px-4;
+}
+
+.section {
+    @apply py-12;
+}

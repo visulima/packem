@@ -87,7 +87,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(
         if (program) {
             const imports = program.body.filter(
                 (node): node is OxcImport =>
-                    (node.type === "ImportDeclaration" || node.type === "ExportAllDeclaration" || node.type === "ExportNamedDeclaration") && !!node.source,
+                    (node.type === "ImportDeclaration" || node.type === "ExportAllDeclaration" || node.type === "ExportNamedDeclaration") && node.source,
             );
 
             for await (const node of imports) {
@@ -157,7 +157,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(
 
             if (node.type === "ImportDeclaration") {
                 return (
-                    !!node.specifiers
+                    node.specifiers
                     && node.specifiers.every(
                         (spec: { importKind: string; type: string }) =>
                             spec.type === "ImportSpecifier" && spec.importKind === "type",

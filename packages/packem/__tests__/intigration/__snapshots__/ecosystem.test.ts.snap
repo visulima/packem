@@ -2,16 +2,9 @@
 
 exports[`packem ecosystem > should work with provided 'advanced-tailwind' ecosystem suite 1`] = `
 [
-  "import "./styles.css";
-export interface AdvancedTailwindComponent {
-    name: string;
-    className: string;
-    description: string;
-}
-export declare const components: AdvancedTailwindComponent[];
-export declare function getComponent(name: string): AdvancedTailwindComponent | undefined;
-export declare function getAllComponents(): AdvancedTailwindComponent[];
-//# sourceMappingURL=index.d.ts.map
+  "declare const Container: () => any;
+
+export { Container as default };
 ",
   "#!/usr/bin/env node
 import path from 'node:path';
@@ -22,33 +15,11 @@ import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e 
 
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const components = [
-  {
-    name: "Primary Button",
-    className: "btn-primary",
-    description: "A primary button with hover effects and transitions"
-  },
-  {
-    name: "Card",
-    className: "card",
-    description: "A card component with shadow and border styling"
-  },
-  {
-    name: "Gradient Text",
-    className: "text-gradient",
-    description: "Text with blue to purple gradient effect"
-  }
-];
-function getComponent(name) {
-  return components.find((comp) => comp.name === name);
-}
-__name(getComponent, "getComponent");
-function getAllComponents() {
-  return components;
-}
-__name(getAllComponents, "getAllComponents");
+const Container = /* @__PURE__ */ __name(() => {
+  return jsxRuntimeExports.jsx("div", { className: "bg-red-500 h-32", children: jsxRuntimeExports.jsx("h1", { children: "Hello World" }) });
+}, "Container");
 
-export { components, getAllComponents, getComponent };
+export { Container as default };
 //# sourceMappingURL=index.js.map
 ",
   "import type { Options, FetchSiteResult } from "./types.d.ts";
