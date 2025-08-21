@@ -1,5 +1,3 @@
-import "./Card.css";
-
 export function Card({ title, children, variant = "default" }) {
     const baseClasses = "card rounded-xl shadow-lg";
     const variantClasses = {
