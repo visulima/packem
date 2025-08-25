@@ -11,7 +11,7 @@ import {
     warn,
 } from "@visulima/packem-share/utils";
 import { dirname, relative, resolve } from "@visulima/path";
-import { fileURLToPath, resolveModuleExportNames, resolvePath } from "mlly";
+import { fileURLToPath, pathToFileURL, resolveModuleExportNames, resolvePath } from "mlly";
 
 import resolveAliases from "../rollup/utils/resolve-aliases";
 import type { InternalBuildOptions } from "../types";
@@ -106,8 +106,12 @@ const createStub = async (
         const hasDefaultExport
             = namedExports.includes("default") || namedExports.length === 0;
 
+        const jitiImportResolve = context.options.jiti.absoluteJitiPath
+            ? (...arguments_: string[]): string => pathToFileURL(resolve(...arguments_))
+            : relative;
+
         if (context.options.emitESM) {
-            const jitiESMPath = relative(
+            const jitiESMPath = jitiImportResolve(
                 dirname(output),
                 // eslint-disable-next-line no-await-in-loop
                 await resolvePath("jiti", {
@@ -173,7 +177,7 @@ const createStub = async (
 
         // CJS Stub
         if (context.options.emitCJS) {
-            const jitiCJSPath = relative(
+            const jitiCJSPath = jitiImportResolve(
                 dirname(output),
                 // eslint-disable-next-line no-await-in-loop
                 await resolvePath("jiti", {
