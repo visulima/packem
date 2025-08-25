@@ -1,0 +1,8 @@
+{
+    "name": "rollup-plugin-css",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/rollup-plugin-css/src",
+    "projectType": "library",
+    "tags": ["rollup-plugin-css", "css", "postcss", "sass", "less", "stylus", "tailwind", "tailwindcss", "tailwind-oxide", "type:package"],
+    "implicitDependencies": ["packem-share", "css-style-inject", "!packem"]
+}

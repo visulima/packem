@@ -23,7 +23,7 @@ SOFTWARE.
 <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-The published @visulima/rollup-css-plugin artifact additionally contains code with the following licenses:
+The published @visulima/rollup-plugin-css artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
@@ -59,7 +59,7 @@ Repository: https://github.com/broofa/mime
 <!-- TYPE_DEPENDENCIES -->
 
 # Licenses of bundled types
-The published @visulima/rollup-css-plugin artifact additionally contains code with the following licenses:
+The published @visulima/rollup-plugin-css artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled types:
@@ -113,7 +113,7 @@ Repository: git+https://github.com/visulima/visulima.git
 > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-The published @visulima/rollup-css-plugin artifact additionally contains code with the following licenses:
+The published @visulima/rollup-plugin-css artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
@@ -178,7 +178,7 @@ Repository: git+https://github.com/visulima/visulima.git
 > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-The published @visulima/rollup-css-plugin artifact additionally contains code with the following licenses:
+The published @visulima/rollup-plugin-css artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
