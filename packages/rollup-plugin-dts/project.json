@@ -1,0 +1,8 @@
+{
+    "name": "rollup-plugin-dts",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/rollup-plugin-dts/src",
+    "projectType": "library",
+    "tags": ["type:package"],
+    "implicitDependencies": ["!packem"]
+}

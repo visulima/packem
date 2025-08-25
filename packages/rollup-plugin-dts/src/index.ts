@@ -1,16 +1,16 @@
 import Debug from "debug";
-import type { Plugin } from "rollup";
+import type { Plugin } from "rolldown";
 
-import { createDtsInputPlugin } from "./dts-input.js";
-import { createFakeJsPlugin } from "./fake-js.js";
-import { createGeneratePlugin } from "./generate.js";
-import type { Options } from "./options.js";
-import { resolveOptions } from "./options.js";
-import { createDtsResolvePlugin } from "./resolver.js";
+import { createDtsInputPlugin } from "./dts-input";
+import { createFakeJsPlugin } from "./fake-js";
+import { createGeneratePlugin } from "./generate";
+import type { Options } from "./options";
+import { resolveOptions } from "./options";
+import { createDtsResolvePlugin } from "./resolver";
 
-export { createFakeJsPlugin } from "./fake-js.js";
+export { createFakeJsPlugin } from "./fake-js";
 
-const debug = Debug("rollup-plugin-dts:options");
+const debug = Debug("rolldown-plugin-dts:options");
 
 export function dts(options: Options = {}): Plugin[] {
     debug("resolving dts options");
@@ -41,6 +41,6 @@ export {
     RE_NODE_MODULES,
     RE_TS,
     RE_VUE,
-} from "./filename.js";
-export { createGeneratePlugin } from "./generate.js";
-export { type Options, resolveOptions } from "./options.js";
+} from "./filename.ts";
+export { createGeneratePlugin } from "./generate.ts";
+export { type Options, resolveOptions } from "./options.ts";

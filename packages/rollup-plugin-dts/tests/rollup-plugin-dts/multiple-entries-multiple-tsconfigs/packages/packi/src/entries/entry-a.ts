@@ -1,1 +1,1 @@
-export { A } from "../.."; // the test should fail without `moduleResolution: node`
+export { A } from "../../"; // the test should fail without `moduleResolution: node`

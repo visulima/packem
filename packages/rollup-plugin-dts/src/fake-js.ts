@@ -1,17 +1,19 @@
-import _generate from `@babel/generator`;
+import _generate from "@babel/generator";
 import { parse } from "@babel/parser";
 import * as t from "@babel/types";
-import { isDeclarationType, isTypeOf } from "ast-kit";
+import { isDeclarationType, isTypeOf, resolveString } from "ast-kit";
 import { walk } from "estree-walker";
-import type { Plugin, RenderedChunk } from "rollup";
+import type { Plugin, RenderedChunk } from "rolldown";
 
 import {
     filename_dts_to,
     filename_js_to_dts,
     RE_DTS,
     RE_DTS_MAP,
-} from "./filename.js";
-import type { OptionsResolved } from "./options.js";
+    replaceTemplateName,
+    resolveTemplateFn as resolveTemplateFunction,
+} from "./filename";
+import type { OptionsResolved } from "./options";
 
 const generate: typeof _generate.default
   = (_generate.default as any) || _generate;
@@ -34,18 +36,19 @@ interface SymbolInfo {
 }
 
 type NamespaceMap = Map<
-  string,
-  { local: t.Identifier | t.TSQualifiedName; stmt: t.Statement }
+    string,
+    { local: t.Identifier | t.TSQualifiedName; stmt: t.Statement }
 >;
 
 export function createFakeJsPlugin({
-    dtsInput,
+    cjsDefault,
     sourcemap,
-}: Pick<OptionsResolved, "dtsInput" | "sourcemap">): Plugin {
+}: Pick<OptionsResolved, "sourcemap" | "cjsDefault">): Plugin {
     let symbolIndex = 0;
-    let identifierIndex = 0;
+    const identifierMap: Record<string, number> = Object.create(null);
     const symbolMap = new Map<number /* symbol id */, SymbolInfo>();
     const commentsMap = new Map<string /* filename */, t.Comment[]>();
+    const typeOnlyMap = new Map<string, string[]>();
 
     return {
         generateBundle: sourcemap
@@ -58,35 +61,46 @@ export function createFakeJsPlugin({
                 }
             },
 
-        name: "rollup-plugin-dts:fake-js",
+        name: "rolldown-plugin-dts:fake-js",
 
         outputOptions(options) {
             if (options.format === "cjs" || options.format === "commonjs") {
                 throw new Error(
-                    "[rollup-plugin-dts] Cannot bundle dts files with `cjs` format.",
+                    "[rolldown-plugin-dts] Cannot bundle dts files with `cjs` format.",
                 );
             }
+
+            const { chunkFileNames } = options;
 
             return {
                 ...options,
                 chunkFileNames(chunk) {
-                    const original
-            = (typeof options.chunkFileNames === "function"
-                ? options.chunkFileNames(chunk)
-                : options.chunkFileNames) || "[name]-[hash].js";
+                    const nameTemplate = resolveTemplateFunction(
+                        chunkFileNames || "[name]-[hash].js",
+                        chunk,
+                    );
 
-                    if (!original.includes(".d") && chunk.name.endsWith(".d")) {
-                        return filename_js_to_dts(original).replace(
-                            "[name]",
-                            chunk.name.slice(0, -2),
+                    if (chunk.name.endsWith(".d")) {
+                        const renderedNameWithoutD = filename_js_to_dts(
+                            replaceTemplateName(nameTemplate, chunk.name.slice(0, -2)),
                         );
+
+                        if (RE_DTS.test(renderedNameWithoutD)) {
+                            return renderedNameWithoutD;
+                        }
+
+                        const renderedName = filename_js_to_dts(
+                            replaceTemplateName(nameTemplate, chunk.name),
+                        );
+
+                        if (RE_DTS.test(renderedName)) {
+                            return renderedName;
+                        }
                     }
 
-                    return original;
+                    return nameTemplate;
                 },
-                entryFileNames:
-          options.entryFileNames ?? (dtsInput ? "[name].ts" : undefined),
-                sourcemap: sourcemap ? true : options.sourcemap,
+                sourcemap: options.sourcemap || sourcemap,
             };
         },
         renderChunk,
@@ -103,6 +117,7 @@ export function createFakeJsPlugin({
             sourceType: "module",
         });
         const { comments, program } = file;
+        const typeOnlyIds: string[] = [];
 
         if (comments) {
             const directives = collectReferenceDirectives(comments);
@@ -116,7 +131,7 @@ export function createFakeJsPlugin({
         for (const [index, stmt] of program.body.entries()) {
             const setStmt = (node: t.Node) => (program.body[index] = node as any);
 
-            if (rewriteImportExport(stmt, setStmt)) { continue; }
+            if (rewriteImportExport(stmt, setStmt, typeOnlyIds)) { continue; }
 
             const sideEffect
         = stmt.type === "TSModuleDeclaration" && stmt.kind !== "namespace";
@@ -168,7 +183,7 @@ export function createFakeJsPlugin({
                 let binding = decl.id;
 
                 binding = sideEffect
-                    ? t.identifier(`_${identifierIndex++}`)
+                    ? t.identifier(`_${getIdentifierIndex("")}`)
                     : (binding as t.Identifier);
                 bindings.push(binding);
             } else {
@@ -185,7 +200,7 @@ export function createFakeJsPlugin({
                 t.numericLiteral(0),
                 ...deps.map((dep) => t.arrowFunctionExpression([], dep)),
                 ...sideEffect
-                    ? [t.callExpression(t.identifier("sideEffect"), [])]
+                    ? [t.callExpression(t.identifier("sideEffect"), [bindings[0]])]
                     : [],
             ];
             const runtime: t.ArrayExpression = t.arrayExpression(elements);
@@ -246,6 +261,8 @@ export function createFakeJsPlugin({
             ...appendStmts,
         ];
 
+        typeOnlyMap.set(id, typeOnlyIds);
+
         const result = generate(file, {
             comments: false,
             sourceFileName: id,
@@ -260,6 +277,14 @@ export function createFakeJsPlugin({
             return;
         }
 
+        const typeOnlyIds: string[] = [];
+
+        for (const module of chunk.moduleIds) {
+            const ids = typeOnlyMap.get(module);
+
+            if (ids) { typeOnlyIds.push(...ids); }
+        }
+
         const file = parse(code, {
             sourceType: "module",
         });
@@ -271,7 +296,11 @@ export function createFakeJsPlugin({
             .map((node) => {
                 if (isHelperImport(node)) { return null; }
 
-                if (patchImportSource(node)) { return node; }
+                const newNode = patchImportExport(node, typeOnlyIds, cjsDefault);
+
+                if (newNode) {
+                    return newNode;
+                }
 
                 if (node.type !== "VariableDeclaration") { return node; }
 
@@ -357,8 +386,12 @@ export function createFakeJsPlugin({
         return result;
     }
 
-    function getIdentifierIndex() {
-        return identifierIndex++;
+    function getIdentifierIndex(name: string) {
+        if (name in identifierMap) {
+            return identifierMap[name]++;
+        }
+
+        return (identifierMap[name] = 0);
     }
 
     function registerSymbol(info: SymbolInfo) {
@@ -469,7 +502,7 @@ export function createFakeJsPlugin({
     ): Dep {
         const sourceText = source.value.replaceAll(/\W/g, "_");
         let local: t.Identifier | t.TSQualifiedName = t.identifier(
-            `${sourceText}${getIdentifierIndex()}`,
+            `${sourceText}${getIdentifierIndex(sourceText)}`,
         );
 
         if (namespaceStmts.has(source.value)) {
@@ -553,26 +586,63 @@ function isHelperImport(node: t.Node) {
     return (
         node.type === "ImportDeclaration"
         && node.specifiers.length === 1
-        && node.specifiers[0].type === "ImportSpecifier"
-        && node.specifiers[0].imported.type === "Identifier"
-        && node.specifiers[0].imported.name === "__export"
+        && node.specifiers.every(
+            (spec) =>
+                spec.type === "ImportSpecifier"
+                && spec.imported.type === "Identifier"
+                && ["__export", "__reExport"].includes(spec.imported.name),
+        )
     );
 }
 
 // patch `.d.ts` suffix in import source to `.js`
-function patchImportSource(node: t.Node) {
+function patchImportExport(
+    node: t.Node,
+    typeOnlyIds: string[],
+    cjsDefault: boolean,
+): t.Statement | undefined {
     if (
         isTypeOf(node, [
             "ImportDeclaration",
             "ExportAllDeclaration",
             "ExportNamedDeclaration",
         ])
-        && node.source?.value
-        && RE_DTS.test(node.source.value)
     ) {
-        node.source.value = filename_dts_to(node.source.value, "js");
+        if (typeOnlyIds.length > 0 && node.type === "ExportNamedDeclaration") {
+            for (const spec of node.specifiers) {
+                const name = resolveString(spec.exported);
 
-        return true;
+                if (typeOnlyIds.includes(name)) {
+                    if (spec.type === "ExportSpecifier") {
+                        spec.exportKind = "type";
+                    } else {
+                        node.exportKind = "type";
+                    }
+                }
+            }
+        }
+
+        if (node.source?.value && RE_DTS.test(node.source.value)) {
+            node.source.value = filename_dts_to(node.source.value, "js");
+
+            return node;
+        }
+
+        if (
+            cjsDefault
+            && node.type === "ExportNamedDeclaration"
+            && !node.source
+            && node.specifiers.length === 1
+            && node.specifiers[0].type === "ExportSpecifier"
+            && resolveString(node.specifiers[0].exported) === "default"
+        ) {
+            const defaultExport = node.specifiers[0] as t.ExportSpecifier;
+
+            return {
+                expression: defaultExport.local,
+                type: "TSExportAssignment",
+            };
+        }
     }
 }
 
@@ -646,13 +716,14 @@ function patchTsNamespace(nodes: t.Statement[]) {
 // - import { type ... } from '...'
 // - export type { ... }
 // - export { type ... }
-// - export type * as '...'
+// - export type * as x '...'
 // - import Foo = require("./bar")
 // - export = Foo
 // - export default x
 function rewriteImportExport(
     node: t.Node,
     set: (node: t.Node) => void,
+    typeOnlyIds: string[],
 ): node is
 | t.ImportDeclaration
 | t.ExportAllDeclaration
@@ -662,6 +733,22 @@ function rewriteImportExport(
         || (node.type === "ExportNamedDeclaration" && !node.declaration)
     ) {
         for (const specifier of node.specifiers) {
+            if (
+                ("exportKind" in specifier && specifier.exportKind === "type")
+                || ("exportKind" in node && node.exportKind === "type")
+            ) {
+                typeOnlyIds.push(
+                    resolveString(
+                        (
+                            specifier as
+                            | t.ExportSpecifier
+                            | t.ExportDefaultSpecifier
+                            | t.ExportNamespaceSpecifier
+                        ).exported,
+                    ),
+                );
+            }
+
             if (specifier.type === "ImportSpecifier") {
                 specifier.importKind = "value";
             } else if (specifier.type === "ExportSpecifier") {
@@ -768,6 +855,10 @@ function inheritNodeComments<T extends t.Node>(oldNode: t.Node, newNode: T): T {
     newNode.leadingComments = collectReferenceDirectives(
         newNode.leadingComments,
         true,
+    );
+
+    newNode.trailingComments = newNode.trailingComments?.filter(
+        (comment) => !comment.value.startsWith("# sourceMappingURL"),
     );
 
     return newNode;

@@ -8,7 +8,7 @@ import { dts as rollupDts } from "rollup-plugin-dts";
 import { glob } from "tinyglobby";
 import { expect } from "vitest";
 
-import { dts } from "../src/index.js";
+import { dts } from "../src/index";
 
 const isUpdateEnabled
   = process.env.npm_lifecycle_script?.includes("-u")

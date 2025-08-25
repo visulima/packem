@@ -4,9 +4,9 @@ import { fileURLToPath } from "node:url";
 
 import { rolldownBuild } from "@sxzz/test-utils";
 import { glob } from "tinyglobby";
-import { describe, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { dts } from "../src/index.js";
+import { dts } from "../src/index";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,7 +22,7 @@ describe("tsc", () => {
                         skipLibCheck: true,
                     },
                     emitDtsOnly: true,
-                    isolatedDeclarations: false,
+                    oxc: false,
                 }),
             ],
         );
@@ -37,6 +37,23 @@ describe("tsc", () => {
                 dts({
                     compilerOptions: { isolatedDeclarations: false },
                     emitDtsOnly: true,
+                }),
+            ],
+        );
+
+        expect(snapshot).toMatchSnapshot();
+    });
+
+    it("references", async () => {
+        const root = path.resolve(dirname, "fixtures/refs");
+
+        const { snapshot } = await rolldownBuild(
+            [path.resolve(root, "src/index.ts")],
+            [
+                dts({
+                    build: true,
+                    compilerOptions: { isolatedDeclarations: false },
+                    tsconfig: path.resolve(root, "tsconfig.json"),
                 }),
             ],
         );
@@ -60,6 +77,7 @@ describe("tsc", () => {
             ],
             [
                 dts({
+                    build: true,
                     compilerOptions: { isolatedDeclarations: false },
                     tsconfig: path.resolve(root, "tsconfig.json"),
                 }),
@@ -93,6 +111,7 @@ describe("tsc", () => {
             ],
             [
                 dts({
+                    build: true,
                     compilerOptions: { isolatedDeclarations: false },
                     tsconfig: path.resolve(root, "tsconfig.json"),
                 }),
@@ -127,11 +146,36 @@ describe("tsc", () => {
         expect(snapshot).toMatchSnapshot();
     });
 
+    it("vue-sfc w/ ts-compiler w/ vueCompilerOptions in tsconfig", async () => {
+        const root = path.resolve(dirname, "fixtures/vue-sfc-fallthrough");
+        const { snapshot } = await rolldownBuild(path.resolve(root, "main.ts"), [
+            dts({
+                emitDtsOnly: true,
+                tsconfig: path.resolve(root, "tsconfig.json"),
+                vue: true,
+            }),
+        ]);
+
+        expect(snapshot).toMatchSnapshot();
+    });
+
     it("jsdoc", async () => {
         const { snapshot } = await rolldownBuild(
             path.resolve(dirname, "fixtures/jsdoc.ts"),
-            [dts({ isolatedDeclarations: false })],
+            [dts({ oxc: false })],
         );
+
+        expect(snapshot).toMatchSnapshot();
+    });
+
+    it("jsdoc in js", async () => {
+        const root = path.resolve(dirname, "fixtures/jsdoc-js");
+        const { snapshot } = await rolldownBuild(path.resolve(root, "main.js"), [
+            dts({
+                emitDtsOnly: true,
+                tsconfig: path.resolve(root, "tsconfig.json"),
+            }),
+        ]);
 
         expect(snapshot).toMatchSnapshot();
     });

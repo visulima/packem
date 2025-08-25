@@ -1,7 +1,7 @@
 import Debug from "debug";
 import ts from "typescript";
 
-const debug = Debug("rollup-plugin-dts:tsc-system");
+const debug = Debug("rolldown-plugin-dts:tsc-system");
 
 /**
  * A system that writes files to both memory and disk. It will try read files
