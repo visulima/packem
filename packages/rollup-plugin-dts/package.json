@@ -1,0 +1,103 @@
+{
+    "name": "@visulima/rollup-plugin-dts",
+    "version": "0.0.0",
+    "description": "A Rollup plugin to bundle dts files",
+    "homepage": "https://github.com/sxzz/rolldown-plugin-dts#readme",
+    "bugs": {
+        "url": "https://github.com/sxzz/rolldown-plugin-dts/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/sxzz/rolldown-plugin-dts.git"
+    },
+    "funding": "https://github.com/sponsors/sxzz",
+    "license": "MIT",
+    "author": "三咲智子 Kevin Deng <sxzz@sxzz.moe>",
+    "type": "module",
+    "exports": {
+        ".": "./dist/index.js",
+        "./filename": "./dist/filename.js",
+        "./package.json": "./package.json"
+    },
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "packem build --development",
+        "build:prod": "packem build --production",
+        "clean": "rimraf node_modules dist .eslintcache",
+        "dev": "pnpm run build",
+        "lint:attw": "attw --pack",
+        "lint:eslint": "eslint ./src",
+        "lint:eslint:fix": "eslint . --fix",
+        "lint:fix": "pnpm run lint:eslint:fix",
+        "lint:package-json": "publint --strict",
+        "lint:types": "tsc --noEmit",
+        "test": "vitest run --cache",
+        "test:coverage": "vitest run --cache --coverage",
+        "test:ui": "vitest --cache --ui --coverage.enabled=true",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "@babel/generator": "^7.28.3",
+        "@babel/parser": "^7.28.3",
+        "@babel/types": "^7.28.2",
+        "@visulima/tsconfig": "1.1.19",
+        "ast-kit": "^2.1.2",
+        "birpc": "^2.5.0",
+        "debug": "^4.4.1",
+        "dts-resolver": "^2.1.2"
+    },
+    "devDependencies": {
+        "@anolilab/eslint-config": "^16.2.23",
+        "@anolilab/semantic-release-pnpm": "^2.0.3",
+        "@anolilab/semantic-release-preset": "^11.0.3",
+        "@arethetypeswrong/cli": "^0.18.2",
+        "@sxzz/test-utils": "^0.5.10",
+        "@types/babel__generator": "^7.27.0",
+        "@types/debug": "^4.1.12",
+        "@types/node": "^24.3.0",
+        "@typescript/native-preview": "7.0.0-dev.20250825.1",
+        "@visulima/packem": "^2.0.0-alpha.14",
+        "@volar/typescript": "^2.4.23",
+        "@vue/language-core": "^3.0.6",
+        "conventional-changelog-conventionalcommits": "9.1.0",
+        "diff": "^8.0.2",
+        "eslint": "^9.34.0",
+        "estree-walker": "^3.0.3",
+        "rollup": "4.48.1",
+        "rollup-plugin-dts": "^6.2.3",
+        "tinyglobby": "^0.2.14",
+        "tsx": "^4.20.5",
+        "typescript": "^5.9.2",
+        "vitest": "^3.2.4",
+        "vue": "^3.5.20",
+        "vue-tsc": "^3.0.6"
+    },
+    "peerDependencies": {
+        "@typescript/native-preview": ">=7.0.0-dev.20250601.1",
+        "rollup": ">=4.0.0",
+        "typescript": "^5.0.0",
+        "vue-tsc": "~2.2.0"
+    },
+    "peerDependenciesMeta": {
+        "@typescript/native-preview": {
+            "optional": true
+        },
+        "typescript": {
+            "optional": true
+        },
+        "vue-tsc": {
+            "optional": true
+        }
+    },
+    "engines": {
+        "node": ">=20.* <=24.*"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

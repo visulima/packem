@@ -57,8 +57,9 @@
         "@commitlint/config-conventional": "^19.8.1",
         "@secretlint/secretlint-rule-preset-recommend": "^11.0.2",
 =======
-        "@visulima/packem": "^1.28.2",
->>>>>>> acbbc5907 (feat: added tailwindcss oxide loader (#166))
+        "@secretlint/secretlint-rule-preset-recommend": "^11.2.0",
+        "@visulima/packem": "^1.28.3",
+>>>>>>> fb3321fed (feat: added the first migration for the rolldown-plugin-dts for rollup)
         "audit-ci": "^7.1.0",
         "browserslist-config-anolilab": "^6.0.2",
         "commitizen": "^4.3.1",
@@ -71,7 +72,7 @@
         "plop": "^4.0.1",
         "publint": "^0.3.12",
         "rimraf": "6.0.1",
-        "secretlint": "11.0.2",
+        "secretlint": "11.2.0",
         "semantic-release": "^24.2.7",
         "sort-package-json": "^3.4.0",
         "taze": "^19.1.0",
