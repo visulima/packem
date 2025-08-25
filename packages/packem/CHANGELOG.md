@@ -1,3 +1,16 @@
+## @visulima/packem [2.0.0-alpha.14](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.13...@visulima/packem@2.0.0-alpha.14) (2025-08-25)
+
+### Features
+
+* Add Data URI plugin support for SVG files ([8528648](https://github.com/visulima/packem/commit/852864828d09a70367c93228b1bee8699e1e00f2))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.11
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.8
+* **@visulima/rollup-css-plugin:** upgraded to 1.0.0-alpha.10
+
 ## @visulima/packem [2.0.0-alpha.13](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.12...@visulima/packem@2.0.0-alpha.13) (2025-08-21)
 
 ### Bug Fixes
