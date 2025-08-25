@@ -64,16 +64,22 @@ const mockLogger = {
 
 describe("tailwind-oxide loader", () => {
     it("should have the correct name", () => {
-        expect(tailwindcssLoader.name).toBe("tailwind-oxide");
+        expect.assertions(1);
+
+        expect(tailwindcssLoader.name).toBe("tailwindcss");
     });
 
     it("should match CSS files", () => {
+        expect.assertions(3);
+
         expect(tailwindcssLoader.test).toBeInstanceOf(RegExp);
         expect(tailwindcssLoader.test?.test("styles.css")).toBe(true);
         expect(tailwindcssLoader.test?.test("styles.scss")).toBe(false);
     });
 
     it("should process CSS content", async () => {
+        expect.assertions(2);
+        
         const mockContext = {
             deps: new Set<string>(),
             environment: "development",

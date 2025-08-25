@@ -14,7 +14,7 @@
         "lightningcss",
         "cssnano",
         "tailwind",
-        "tailwind-oxide",
+        "tailwindcss",
         "rollup-plugin"
     ],
     "homepage": "https://github.com/visulima/packem/tree/main/packages/rollup-css-plugin",

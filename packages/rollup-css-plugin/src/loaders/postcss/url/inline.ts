@@ -4,15 +4,19 @@ import liteMime from "mime/lite";
 /**
  * Converts a file to a data URI for inline embedding in CSS.
  *
- * Creates a base64-encoded data URI that can be used directly in CSS
- * without requiring a separate file request.
+ * Creates a data URI that can be used directly in CSS
+ * without requiring a separate file request. All files are encoded
+ * using base64 for consistent behavior.
  * @param file File path used to determine MIME type
- * @param source File content as Uint8Array to be base64 encoded
- * @returns Data URI string in format "data:mime/type;base64,encodedContent"
+ * @param source File content as Uint8Array to be encoded
+ * @returns Data URI string optimized for CSS usage
  * @example
  * ```ts
  * inlineFile("image.png", pngBuffer)
  * // Returns: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+ *
+ * inlineFile("icon.svg", svgBuffer)
+ * // Returns: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDov..."
  * ```
  */
 const inline = (file: string, source: Uint8Array): string => {

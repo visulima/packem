@@ -168,6 +168,8 @@ import {
   getRegexMatches,
   replaceContentWithinMarker,
   svgEncoder,
+  svgToCssDataUri,
+  svgToTinyDataUri,
   warn
 } from "@visulima/packem-share";
 
@@ -181,8 +183,10 @@ const matches = getRegexMatches(/pattern/g, "text");
 // Content replacement
 const updated = replaceContentWithinMarker(content, "marker", newContent);
 
-// SVG encoding
-const encoded = svgEncoder(svgContent);
+// SVG encoding and data URI generation
+const encoded = svgEncoder(svgBuffer); // Base64 encoding
+const cssUri = svgToCssDataUri(svgContent); // CSS-optimized data URI
+const tinyUri = svgToTinyDataUri(svgContent); // Size-optimized data URI
 
 // Warning utilities
 warn(logger, "Warning message", "prefix");
