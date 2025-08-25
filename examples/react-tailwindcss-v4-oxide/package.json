@@ -33,11 +33,11 @@
   "devDependencies": {
     "@tailwindcss/node": "4.1.12",
     "@tailwindcss/oxide": "4.1.12",
-    "@types/react": "^19.1.10",
+    "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.7",
     "@visulima/css-style-inject": "workspace:*",
     "@visulima/packem": "workspace:*",
-    "cssnano": "7.1.0",
+    "cssnano": "7.1.1",
     "esbuild": "^0.25.9",
     "react-dom": "^19.1.1",
     "rimraf": "^6.0.1",
