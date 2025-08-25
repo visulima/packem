@@ -2,9 +2,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { rolldownBuild } from "@sxzz/test-utils";
-import { expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { dts } from "../src/index.js";
+import { dts } from "../src/index";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -32,7 +32,7 @@ it("resolve dependencies", async () => {
         [
             dts({
                 emitDtsOnly: true,
-                isolatedDeclarations: true,
+                oxc: true,
                 resolve: ["get-tsconfig"],
             }),
         ],
@@ -84,7 +84,7 @@ it("isolated declaration error", async () => {
         [
             dts({
                 emitDtsOnly: true,
-                isolatedDeclarations: true,
+                oxc: true,
             }),
         ],
     ).catch((error: any) => error);
@@ -100,7 +100,7 @@ it("paths", async () => {
     const { snapshot } = await rolldownBuild(path.resolve(root, "index.ts"), [
         dts({
             emitDtsOnly: true,
-            isolatedDeclarations: true,
+            oxc: true,
             tsconfig: path.resolve(root, "tsconfig.json"),
         }),
     ]);
@@ -126,23 +126,351 @@ it("tree-shaking", async () => {
     expect(snapshot).matchSnapshot();
 });
 
-it("dts input", async () => {
-    const { snapshot } = await rolldownBuild(null!, [dts({ dtsInput: true })], {
-        input: {
-            index: path.resolve(dirname, "fixtures/dts-input.d.ts"),
-        },
+describe("dts input", () => {
+    it("input array", async () => {
+        const { chunks, snapshot } = await rolldownBuild(
+            [path.resolve(dirname, "fixtures/dts-input.d.ts")],
+            [dts({ dtsInput: true })],
+            {},
+        );
+
+        expect(chunks[0].fileName).toBe("dts-input.d.ts");
+        expect(snapshot).toMatchSnapshot();
     });
+
+    it("input object", async () => {
+        const { chunks, snapshot } = await rolldownBuild(
+            null!,
+            [dts({ dtsInput: true })],
+            {
+                input: {
+                    index: path.resolve(dirname, "fixtures/dts-input.d.ts"),
+                },
+            },
+        );
+
+        expect(chunks[0].fileName).toBe("index.d.ts");
+        expect(snapshot).toMatchSnapshot();
+    });
+
+    it(".d in chunk name", async () => {
+        const { chunks } = await rolldownBuild(null!, [dts({ dtsInput: true })], {
+            input: {
+                "index.d": path.resolve(dirname, "fixtures/dts-input.d.ts"),
+            },
+        });
+
+        expect(chunks[0].fileName).toBe("index.d.ts");
+    });
+
+    it("full extension in chunk name", async () => {
+        const { chunks } = await rolldownBuild(null!, [dts({ dtsInput: true })], {
+            input: {
+                "index.d.mts": path.resolve(dirname, "fixtures/dts-input.d.ts"),
+            },
+        });
+
+        expect(chunks[0].fileName).toBe("index.d.mts");
+    });
+
+    it("custom entryFileNames with .d", async () => {
+        const { chunks } = await rolldownBuild(
+            null!,
+            [dts({ dtsInput: true })],
+            {
+                input: {
+                    index: path.resolve(dirname, "fixtures/dts-input.d.ts"),
+                },
+            },
+            {
+                entryFileNames: "[name].d.cts",
+            },
+        );
+
+        expect(chunks[0].fileName).toBe("index.d.cts");
+    });
+
+    it("custom entryFileNames without .d", async () => {
+        const { chunks } = await rolldownBuild(
+            [path.resolve(dirname, "fixtures/dts-input.d.ts")],
+            [dts({ dtsInput: true })],
+            {},
+            {
+                entryFileNames: "[name].mts",
+            },
+        );
+
+        expect(chunks[0].fileName).toBe("dts-input.d.mts");
+    });
+
+    it("custom entryFileNames function", async () => {
+        const { chunks } = await rolldownBuild(
+            null!,
+            [dts({ dtsInput: true })],
+            {
+                input: {
+                    index: path.resolve(dirname, "fixtures/dts-input.d.ts"),
+                },
+            },
+            {
+                entryFileNames: () => "[name].mts",
+            },
+        );
+
+        expect(chunks[0].fileName).toBe("index.d.mts");
+    });
+
+    it("invalid entryFileNames gets overridden with stripped .d", async () => {
+        const { chunks } = await rolldownBuild(
+            null!,
+            [dts({ dtsInput: true })],
+            {
+                input: {
+                    "index.d": path.resolve(dirname, "fixtures/dts-input.d.ts"),
+                },
+            },
+            {
+                entryFileNames: "[name].invalid",
+            },
+        );
+
+        expect(chunks[0].fileName).toBe("index.d.ts");
+    });
+
+    it("invalid entryFileNames gets overridden and preserves subextension", async () => {
+        const { chunks } = await rolldownBuild(
+            null!,
+            [dts({ dtsInput: true })],
+            {
+                input: {
+                    "index.asdf": path.resolve(dirname, "fixtures/dts-input.d.ts"),
+                },
+            },
+            {
+                entryFileNames: "[name].invalid",
+            },
+        );
+
+        expect(chunks[0].fileName).toBe("index.asdf.d.ts");
+    });
+
+    it("default chunk name", async () => {
+        const { chunks, snapshot } = await rolldownBuild(
+            [
+                path.resolve(dirname, "fixtures/dts-multi-input/input1.d.ts"),
+                path.resolve(dirname, "fixtures/dts-multi-input/input2.d.ts"),
+            ],
+            [dts({ dtsInput: true })],
+            {},
+            {
+                entryFileNames: "[name].mts",
+            },
+        );
+
+        const chunkNames = chunks.map((chunk) => chunk.fileName).sort();
+
+        expect(chunkNames).toStrictEqual([
+            "input1.d.mts",
+            "input2.d.mts",
+            "types-VwSK8P_f.d.ts",
+        ]);
+
+        expect(snapshot).toMatchSnapshot();
+    });
+
+    it("custom chunk name", async () => {
+        const { chunks, snapshot } = await rolldownBuild(
+            [
+                path.resolve(dirname, "fixtures/dts-multi-input/input1.d.ts"),
+                path.resolve(dirname, "fixtures/dts-multi-input/input2.d.ts"),
+            ],
+            [dts({ dtsInput: true })],
+            {},
+            {
+                chunkFileNames: "chunks/[hash]-[name].ts",
+            },
+        );
+
+        const chunkNames = chunks.map((chunk) => chunk.fileName).sort();
+
+        expect(chunkNames).toStrictEqual([
+            "chunks/DqALGAwS-types.d.ts",
+            "input1.d.ts",
+            "input2.d.ts",
+        ]);
+
+        expect(snapshot).toMatchSnapshot();
+    });
+});
+
+describe("entryFileNames", () => {
+    it(".mjs -> .d.mts", async () => {
+        const { chunks } = await rolldownBuild(
+            [path.resolve(dirname, "fixtures/basic.ts")],
+            [dts()],
+            {},
+            {
+                entryFileNames: "[name].mjs",
+            },
+        );
+
+        const chunkNames = chunks.map((chunk) => chunk.fileName).sort();
+
+        expect(chunkNames).toStrictEqual(["basic.d.mts", "basic.mjs"]);
+    });
+
+    it(".cjs -> .d.cts", async () => {
+        const { chunks } = await rolldownBuild(
+            [path.resolve(dirname, "fixtures/basic.ts")],
+            [dts()],
+            {},
+            {
+                entryFileNames: "[name].cjs",
+            },
+        );
+
+        const chunkNames = chunks.map((chunk) => chunk.fileName).sort();
+
+        expect(chunkNames).toStrictEqual(["basic.cjs", "basic.d.cts"]);
+    });
+
+    it(".mjs -> .d.mts with custom chunk name", async () => {
+        const { chunks } = await rolldownBuild(
+            null!,
+            [dts()],
+            {
+                input: {
+                    custom: path.resolve(dirname, "fixtures/basic.ts"),
+                },
+            },
+            {
+                entryFileNames: "[name].mjs",
+            },
+        );
+
+        const chunkNames = chunks.map((chunk) => chunk.fileName).sort();
+
+        expect(chunkNames).toStrictEqual(["custom.d.mts", "custom.mjs"]);
+    });
+
+    it("preserves invalid extension", async () => {
+        const { chunks } = await rolldownBuild(
+            [path.resolve(dirname, "fixtures/basic.ts")],
+            [dts()],
+            {},
+            {
+                entryFileNames: "[name].invalid",
+            },
+        );
+
+        const chunkNames = chunks.map((chunk) => chunk.fileName).sort();
+
+        expect(chunkNames).toStrictEqual(["basic.d.invalid", "basic.invalid"]);
+    });
+
+    it("same-name output (for JS & DTS)", async () => {
+        const { chunks } = await rolldownBuild(
+            [path.resolve(dirname, "fixtures/same-name/index.ts")],
+            [dts()],
+            {},
+            {
+                entryFileNames: "foo.d.ts",
+                preserveModules: true,
+            },
+        );
+
+        expect(chunks.every((chunk) => chunk.fileName.endsWith(".d.ts"))).toBe(true);
+    });
+
+    it("default chunk name", async () => {
+        const { chunks, snapshot } = await rolldownBuild(
+            [
+                path.resolve(dirname, "fixtures/alias/input1.ts"),
+                path.resolve(dirname, "fixtures/alias/input2.ts"),
+            ],
+            [dts({ emitDtsOnly: true })],
+            {},
+            {
+                entryFileNames: "[name].mjs",
+            },
+        );
+
+        const chunkNames = chunks.map((chunk) => chunk.fileName).sort();
+
+        expect(chunkNames).toStrictEqual([
+            "input1.d.mts",
+            "input2-CzdQ8V-e.d.ts",
+            "input2.d.mts",
+        ]);
+
+        expect(snapshot).toMatchSnapshot();
+    });
+
+    it("custom chunk name", async () => {
+        const { chunks, snapshot } = await rolldownBuild(
+            [
+                path.resolve(dirname, "fixtures/dts-multi-input/input1.d.ts"),
+                path.resolve(dirname, "fixtures/dts-multi-input/input2.d.ts"),
+            ],
+            [dts({ emitDtsOnly: true })],
+            {},
+            {
+                chunkFileNames: "chunks/[hash]-[name].js",
+            },
+        );
+
+        const chunkNames = chunks.map((chunk) => chunk.fileName).sort();
+
+        expect(chunkNames).toStrictEqual([
+            "chunks/DqALGAwS-types.d.ts",
+            "input1.d.ts",
+            "input2.d.ts",
+        ]);
+
+        expect(snapshot).toMatchSnapshot();
+    });
+});
+
+it("type-only export", async () => {
+    const { snapshot } = await rolldownBuild(
+        [path.resolve(dirname, "fixtures/type-only-export/index.ts")],
+        [dts({ emitDtsOnly: true })],
+    );
 
     expect(snapshot).toMatchSnapshot();
 });
 
-it("same-name output", async () => {
-    const { chunks } = await rolldownBuild(
-        [path.resolve(dirname, "fixtures/same-name/index.ts")],
-        [dts()],
-        {},
-        { entryFileNames: "foo.d.ts", preserveModules: true },
-    );
+it("cjs exports", async () => {
+    {
+        const { snapshot } = await rolldownBuild(
+            [path.resolve(dirname, "fixtures/cjs-exports.ts")],
+            [],
+            {},
+            { exports: "auto", format: "cjs" },
+        );
 
-    expect(chunks.every((chunk) => chunk.fileName.endsWith(".d.ts"))).toBe(true);
+        expect(snapshot).toMatchSnapshot();
+    }
+
+    {
+        const { snapshot } = await rolldownBuild(
+            [path.resolve(dirname, "fixtures/cjs-exports.ts")],
+            [dts({ cjsDefault: true, emitDtsOnly: true })],
+        );
+
+        expect(snapshot).toMatchSnapshot();
+    }
+});
+
+it("should error when file import cannot be found", async () => {
+    await expect(() =>
+        rolldownBuild(
+            path.resolve(dirname, "fixtures/unresolved-import/index.d.ts"),
+            [
+                dts({
+                    emitDtsOnly: true,
+                }),
+            ],
+        ),
+    ).rejects.toThrow("Cannot resolve import './missing-file'");
 });

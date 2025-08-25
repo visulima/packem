@@ -4,9 +4,9 @@ import { fileURLToPath } from "node:url";
 
 import { expectFilesSnapshot, rolldownBuild } from "@sxzz/test-utils";
 import { build } from "rolldown";
-import { beforeAll, expect } from "vitest";
+import { beforeAll, expect, it } from "vitest";
 
-import { dts } from "../src/index.js";
+import { dts } from "../src/index";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const tempDir = path.join(dirname, "temp");
@@ -15,16 +15,18 @@ beforeAll(async () => {
     await rm(tempDir, { force: true, recursive: true });
 });
 
+const input = path.resolve(dirname, "fixtures/source-map.ts");
+
 it("oxc", async () => {
     const dir = path.join(tempDir, "source-map-oxc");
 
     await build({
-        input: path.resolve(dirname, "fixtures/basic.ts"),
+        input,
         output: { dir },
         plugins: [
             dts({
                 emitDtsOnly: true,
-                isolatedDeclarations: true,
+                oxc: true,
                 sourcemap: true,
             }),
         ],
@@ -37,12 +39,12 @@ it("tsc", async () => {
     const dir = path.join(tempDir, "source-map-tsc");
 
     await build({
-        input: path.resolve(dirname, "fixtures/basic.ts"),
+        input,
         output: { dir },
         plugins: [
             dts({
                 emitDtsOnly: true,
-                isolatedDeclarations: false,
+                oxc: false,
                 sourcemap: true,
             }),
         ],
@@ -53,7 +55,7 @@ it("tsc", async () => {
 
 it("disable dts source map only", async () => {
     const { chunks } = await rolldownBuild(
-        path.resolve(dirname, "fixtures/basic.ts"),
+        input,
         [dts({ sourcemap: false })],
         {},
         { sourcemap: true },
@@ -61,9 +63,9 @@ it("disable dts source map only", async () => {
 
     expect(chunks.map((chunk) => chunk.fileName)).toMatchInlineSnapshot(`
         [
-          "basic.d.ts",
-          "basic.js",
-          "basic.js.map",
+          "source-map.d.ts",
+          "source-map.js",
+          "source-map.js.map",
         ]
     `);
 });

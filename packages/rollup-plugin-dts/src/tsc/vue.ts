@@ -3,7 +3,7 @@ import { createRequire } from "node:module";
 import Debug from "debug";
 import type Ts from "typescript";
 
-const debug = Debug("rollup-plugin-dts:vue");
+const debug = Debug("rolldown-plugin-dts:vue");
 
 let createVueProgram: typeof Ts.createProgram;
 const require = createRequire(import.meta.url);
@@ -44,15 +44,17 @@ export function createVueProgramFactory(
         ts,
         ts.createProgram,
         (ts, options) => {
-            const { configFilePath } = options.options;
-            const vueOptions
-        = typeof configFilePath === "string"
-            ? vue.createParsedCommandLine(
-                ts,
-                ts.sys,
-                configFilePath.replaceAll("\\", "/"),
-            ).vueOptions
-            : vue.getDefaultCompilerOptions();
+            const $rootDir = options.options.$rootDir as string;
+            const $configRaw = options.options.$configRaw as
+        | (Ts.TsConfigSourceFile & { vueCompilerOptions?: any })
+        | undefined;
+
+            const resolver = new vue.CompilerOptionsResolver(ts.sys.fileExists);
+
+            resolver.addConfig($configRaw?.vueCompilerOptions ?? {}, $rootDir);
+            const vueOptions = resolver.build();
+
+            vue.writeGlobalTypes(vueOptions, ts.sys.writeFile);
             const vueLanguagePlugin = vue.createVueLanguagePlugin<string>(
                 ts,
                 options.options,

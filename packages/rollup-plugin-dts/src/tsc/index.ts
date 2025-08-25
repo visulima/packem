@@ -5,13 +5,10 @@ import type { TsConfigJson } from "get-tsconfig";
 import type { SourceMapInput } from "rollup";
 import ts from "typescript";
 
-import { createFsSystem, createMemorySystem } from "./system.js";
-import { createVueProgramFactory } from "./vue.js";
-
-export interface TscContext {
-    files: Map<string, string>;
-    programs: ts.Program[];
-}
+import type { TscContext } from "./context";
+import { globalContext } from "./context";
+import { createFsSystem, createMemorySystem } from "./system";
+import { createVueProgramFactory } from "./vue";
 
 export interface TscModule {
     file: ts.SourceFile;
@@ -19,6 +16,7 @@ export interface TscModule {
 }
 
 export interface TscOptions {
+    build: boolean;
     context?: TscContext;
     cwd: string;
     entries?: string[];
@@ -29,18 +27,9 @@ export interface TscOptions {
     vue?: boolean;
 }
 
-const debug = Debug("rollup-plugin-dts:tsc");
+const debug = Debug("rolldown-plugin-dts:tsc");
 
 debug(`loaded typescript: ${ts.version}`);
-
-export function createContext(): TscContext {
-    const programs: ts.Program[] = [];
-    const files = new Map<string, string>();
-
-    return { files, programs };
-}
-
-const globalContext: TscContext = createContext();
 
 const formatHost: ts.FormatDiagnosticsHost = {
     getCanonicalFileName: ts.sys.useCaseSensitiveFileNames
@@ -121,12 +110,81 @@ function buildSolution(
         verbose: true,
     });
 
-    const exitStatus = builder.build();
+    // Collect all projects in the solution using the `getCustomTransformers`
+    // callback. This doesn't seem to be the intended use of the callback, but
+    // it's an easy way to collect all projects at any nesting level without the
+    // need to implement the traversing logic ourselves.
+    //
+    // A project is a string that represents the path to the project's `tsconfig`
+    // file.
+    const projects: string[] = [];
+    const getCustomTransformers = (project: string): ts.CustomTransformers => {
+        projects.push(project);
+
+        return {};
+    };
+
+    const exitStatus = builder.build(
+        undefined,
+        undefined,
+        undefined,
+        getCustomTransformers,
+    );
 
     debug(`built solution for ${tsconfig} with exit status ${exitStatus}`);
+
+    return [...new Set(projects)];
+}
+
+function findProjectContainingFile(
+    projects: string[],
+    targetFile: string,
+    fsSystem: ts.System,
+): { parsedConfig: ts.ParsedCommandLine; tsconfigPath: string } | undefined {
+    const resolvedTargetFile = fsSystem.resolvePath(targetFile);
+
+    for (const tsconfigPath of projects) {
+        const parsedConfig = parseTsconfig(tsconfigPath, fsSystem);
+
+        if (
+            parsedConfig
+            && parsedConfig.fileNames.some(
+                (fileName) => fsSystem.resolvePath(fileName) === resolvedTargetFile,
+            )
+        ) {
+            return { parsedConfig, tsconfigPath };
+        }
+    }
+}
+
+function parseTsconfig(
+    tsconfigPath: string,
+    fsSystem: ts.System,
+): ts.ParsedCommandLine | undefined {
+    const diagnostics: ts.Diagnostic[] = [];
+
+    const parsedConfig = ts.getParsedCommandLineOfConfigFile(
+        tsconfigPath,
+        undefined,
+        {
+            ...fsSystem,
+            onUnRecoverableConfigFileDiagnostic: (diagnostic) => {
+                diagnostics.push(diagnostic);
+            },
+        },
+    );
+
+    if (diagnostics.length > 0) {
+        throw new Error(
+            `[rolldown-plugin-dts] Unable to read ${tsconfigPath}: ${ts.formatDiagnostics(diagnostics, formatHost)}`,
+        );
+    }
+
+    return parsedConfig;
 }
 
 function createTsProgram({
+    build,
     context = globalContext,
     cwd,
     entries,
@@ -137,24 +195,71 @@ function createTsProgram({
     vue,
 }: TscOptions): TscModule {
     const fsSystem = createFsSystem(context.files);
-    const parsedCmd = ts.parseJsonConfigFileContent(
+    const baseDir = tsconfig ? path.dirname(tsconfig) : cwd;
+    const parsedConfig = ts.parseJsonConfigFileContent(
         tsconfigRaw,
         fsSystem,
-        tsconfig ? path.dirname(tsconfig) : cwd,
+        baseDir,
     );
 
     // If the tsconfig has project references, build the project tree.
-    if (tsconfig && parsedCmd.projectReferences?.length) {
-        buildSolution(tsconfig, incremental, context);
+    if (tsconfig && build) {
+    // Build the project tree and collect all projects.
+        const projectPaths = buildSolution(tsconfig, incremental, context);
+
+        debug(`collected projects: ${JSON.stringify(projectPaths)}`);
+
+        // Find which project contains the source file
+        const project = findProjectContainingFile(projectPaths, id, fsSystem);
+
+        if (project) {
+            debug(`Creating program for project: ${project.tsconfigPath}`);
+
+            return createTsProgramFromParsedConfig({
+                baseDir: path.dirname(project.tsconfigPath),
+                entries,
+                fsSystem,
+                id,
+                parsedConfig: project.parsedConfig,
+                vue,
+            });
+        }
     }
 
+    // If the tsconfig doesn't have project references, create a single program
+    // for the root project.
+    return createTsProgramFromParsedConfig({
+        baseDir,
+        entries,
+        fsSystem,
+        id,
+        parsedConfig,
+        vue,
+    });
+}
+
+function createTsProgramFromParsedConfig({
+    baseDir,
+    entries,
+    fsSystem,
+    id,
+    parsedConfig,
+    vue,
+}: Pick<TscOptions, "entries" | "vue" | "id"> & {
+    baseDir: string;
+    fsSystem: ts.System;
+    parsedConfig: ts.ParsedCommandLine;
+}): TscModule {
     const compilerOptions: ts.CompilerOptions = {
         ...defaultCompilerOptions,
-        ...parsedCmd.options,
+        ...parsedConfig.options,
+        $configRaw: parsedConfig.raw,
+        $rootDir: baseDir,
     };
+
     const rootNames = [
         ...new Set(
-            [id, ...entries || parsedCmd.fileNames].map((f) =>
+            [id, ...entries || parsedConfig.fileNames].map((f) =>
                 fsSystem.resolvePath(f),
             ),
         ),
@@ -171,7 +276,7 @@ function createTsProgram({
     const program = createProgram({
         host,
         options: compilerOptions,
-        projectReferences: parsedCmd.projectReferences,
+        projectReferences: parsedConfig.projectReferences,
         rootNames,
     });
 
@@ -183,7 +288,7 @@ function createTsProgram({
         if (fsSystem.fileExists(id)) {
             debug(`File ${id} exists on disk.`);
             throw new Error(
-                `Unable to load file ${id} from the program. This seems like a bug of rollup-plugin-dts. Please report this issue to https://github.com/sxzz/rollup-plugin-dts/issues`,
+                `Unable to load file ${id} from the program. This seems like a bug of rolldown-plugin-dts. Please report this issue to https://github.com/sxzz/rolldown-plugin-dts/issues`,
             );
         } else {
             debug(`File ${id} does not exist on disk.`);
@@ -211,6 +316,27 @@ export function tscEmit(tscOptions: TscOptions): TscResult {
     debug(`got source file: ${file.fileName}`);
     let dtsCode: string | undefined;
     let map: SourceMapInput | undefined;
+
+    // fix #77
+    const stripPrivateFields: ts.TransformerFactory<ts.SourceFile> = (context) => {
+        const visitor = (node: ts.Node) => {
+            if (ts.isPropertySignature(node) && ts.isPrivateIdentifier(node.name)) {
+                return context.factory.updatePropertySignature(
+                    node,
+                    node.modifiers,
+                    context.factory.createStringLiteral(node.name.text),
+                    node.questionToken,
+                    node.type,
+                );
+            }
+
+            return ts.visitEachChild(node, visitor, context);
+        };
+
+        return (sourceFile) =>
+            ts.visitNode(sourceFile, visitor, ts.isSourceFile) ?? sourceFile;
+    };
+
     const { diagnostics, emitSkipped } = program.emit(
         file,
         (fileName, code) => {
@@ -224,7 +350,7 @@ export function tscEmit(tscOptions: TscOptions): TscResult {
         },
         undefined,
         true,
-        undefined,
+        { afterDeclarations: [stripPrivateFields] },
         // @ts-expect-error private API: forceDtsEmit
         true,
     );

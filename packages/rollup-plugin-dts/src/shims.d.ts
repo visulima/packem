@@ -3,5 +3,3 @@ declare global {
         WORKER_URL?: string;
     }
 }
-
-export {};
