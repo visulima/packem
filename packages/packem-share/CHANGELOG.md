@@ -1,3 +1,9 @@
+## @visulima/packem-share [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.7...@visulima/packem-share@1.0.0-alpha.8) (2025-08-25)
+
+### Features
+
+* Add Data URI plugin support for SVG files ([8528648](https://github.com/visulima/packem/commit/852864828d09a70367c93228b1bee8699e1e00f2))
+
 ## @visulima/packem-share [1.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.6...@visulima/packem-share@1.0.0-alpha.7) (2025-08-20)
 
 ### Bug Fixes
