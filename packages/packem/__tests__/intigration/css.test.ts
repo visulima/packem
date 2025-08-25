@@ -1180,7 +1180,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             expect.assertions(25);
 
             await installPackage(temporaryDirectoryPath, "tailwindcss");
-            
+
             const result = (await build({
                 dependencies: {
                     tailwindcss: "*",

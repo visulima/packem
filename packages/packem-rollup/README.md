@@ -41,6 +41,60 @@ pnpm add @visulima/packem-rollup
 
 ## Usage
 
+### Data URI Plugin
+
+The `dataUriPlugin` converts files to data URIs for inline embedding. It supports configurable SVG encoding strategies via query parameters.
+
+```typescript
+import { dataUriPlugin } from "@visulima/packem-rollup";
+
+export default {
+  plugins: [
+    dataUriPlugin()
+  ]
+};
+```
+
+#### Query Parameters
+
+- `?data-uri` - Basic data URI conversion
+- `?data-uri&encoding=css` - Use CSS-optimized SVG encoding
+- `?data-uri&encoding=tiny` - Use tiny SVG encoding (default)
+- `?data-uri&srcset` - Encode spaces as %20 for srcset compatibility
+
+#### Examples
+
+```typescript
+// Tiny SVG encoding (default)
+import icon from './icon.svg?data-uri';
+
+// CSS-optimized SVG encoding
+import icon from './icon.svg?data-uri&encoding=css';
+
+// Tiny SVG with srcset compatibility
+import icon from './icon.svg?data-uri&srcset';
+
+// CSS encoding with srcset compatibility
+import icon from './icon.svg?data-uri&encoding=css&srcset';
+```
+
+### URL Plugin
+
+The `urlPlugin` handles asset URLs, either inlining them as data URIs or copying them to a destination directory. SVG files are optimized using the shared `svgEncoder` utility before being base64 encoded.
+
+```typescript
+import { urlPlugin } from "@visulima/packem-rollup";
+
+export default {
+  plugins: [
+    urlPlugin({
+      limit: 14336, // 14kb
+      fileName: '[hash][extname]'
+    })
+  ]
+};
+```
+
 ## Related
 
 ## Supported Node.js Versions

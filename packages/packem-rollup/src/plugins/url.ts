@@ -13,6 +13,7 @@ import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { ensureDir } from "@visulima/fs";
 import { basename, dirname, extname, join, relative } from "@visulima/path";
+// eslint-disable-next-line import/no-extraneous-dependencies
 import mime from "mime";
 import type { Plugin } from "rollup";
 

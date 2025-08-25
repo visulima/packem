@@ -223,3 +223,40 @@ declare module "*?raw" {
 
     export default source;
 }
+
+// Data URI plugin support
+declare module "*?data-uri" {
+    const dataUri: string;
+
+    export default dataUri;
+}
+
+declare module "*?data-uri&encoding=css" {
+    const dataUri: string;
+
+    export default dataUri;
+}
+
+declare module "*?data-uri&encoding=tiny" {
+    const dataUri: string;
+
+    export default dataUri;
+}
+
+declare module "*?data-uri&srcset" {
+    const dataUri: string;
+
+    export default dataUri;
+}
+
+declare module "*?data-uri&encoding=css&srcset" {
+    const dataUri: string;
+
+    export default dataUri;
+}
+
+declare module "*?data-uri&encoding=tiny&srcset" {
+    const dataUri: string;
+
+    export default dataUri;
+}
