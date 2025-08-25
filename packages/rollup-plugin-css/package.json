@@ -1,10 +1,10 @@
 {
-    "name": "@visulima/rollup-css-plugin",
+    "name": "@visulima/rollup-plugin-css",
     "version": "1.0.0-alpha.10",
     "description": "CSS processing plugin for packem",
     "keywords": [
         "visulima",
-        "rollup-css-plugin",
+        "rollup-plugin-css",
         "css",
         "postcss",
         "sass",
@@ -17,7 +17,7 @@
         "tailwindcss",
         "rollup-plugin"
     ],
-    "homepage": "https://github.com/visulima/packem/tree/main/packages/rollup-css-plugin",
+    "homepage": "https://github.com/visulima/packem/tree/main/packages/rollup-plugin-css",
     "bugs": {
         "url": "https://github.com/visulima/packem/issues"
     },

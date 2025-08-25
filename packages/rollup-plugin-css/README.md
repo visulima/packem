@@ -1,4 +1,4 @@
-# @visulima/rollup-css-plugin
+# @visulima/rollup-plugin-css
 
 A comprehensive CSS processing plugin for [Packem](https://github.com/visulima/packem) that provides support for multiple CSS preprocessors, CSS modules, and advanced optimization features.
 
@@ -35,17 +35,17 @@ A comprehensive CSS processing plugin for [Packem](https://github.com/visulima/p
 ## Installation
 
 ```bash
-npm install --save-dev @visulima/rollup-css-plugin
+npm install --save-dev @visulima/rollup-plugin-css
 ```
 
 Or with other package managers:
 
 ```bash
-yarn add -D @visulima/rollup-css-plugin
+yarn add -D @visulima/rollup-plugin-css
 ```
 
 ```bash
-pnpm add -D @visulima/rollup-css-plugin
+pnpm add -D @visulima/rollup-plugin-css
 ```
 
 ### Peer Dependencies
@@ -83,12 +83,12 @@ npm install @visulima/css-style-inject
 
 ## Usage
 
-The `@visulima/rollup-css-plugin` provides comprehensive CSS processing capabilities for Rollup and Packem builds.
+The `@visulima/rollup-plugin-css` provides comprehensive CSS processing capabilities for Rollup and Packem builds.
 
 ### Basic CSS Processing
 
 ```typescript
-import { rollupCssPlugin } from "@visulima/rollup-css-plugin";
+import { rollupCssPlugin } from "@visulima/rollup-plugin-css";
 
 export default {
   plugins: [
@@ -112,7 +112,7 @@ export default {
 ### Multiple Preprocessors
 
 ```typescript
-import { rollupCssPlugin } from "@visulima/rollup-css-plugin";
+import { rollupCssPlugin } from "@visulima/rollup-plugin-css";
 
 export default {
   plugins: [
@@ -153,7 +153,7 @@ export default {
 **Note:** Inject mode requires `@visulima/css-style-inject` to be installed.
 
 ```typescript
-import { rollupCssPlugin } from "@visulima/rollup-css-plugin";
+import { rollupCssPlugin } from "@visulima/rollup-plugin-css";
 
 export default {
   plugins: [
@@ -179,7 +179,7 @@ export default {
 ### Tailwind CSS v4 with PostCSS
 
 ```typescript
-import { rollupCssPlugin } from "@visulima/rollup-css-plugin";
+import { rollupCssPlugin } from "@visulima/rollup-plugin-css";
 
 export default {
   plugins: [
@@ -210,7 +210,7 @@ export default {
 ### Tailwind Oxide (Rust-based)
 
 ```typescript
-import { rollupCssPlugin } from "@visulima/rollup-css-plugin";
+import { rollupCssPlugin } from "@visulima/rollup-plugin-css";
 
 export default {
   plugins: [

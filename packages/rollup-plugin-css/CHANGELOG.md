@@ -1,4 +1,4 @@
-## @visulima/rollup-css-plugin [1.0.0-alpha.10](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.9...@visulima/rollup-css-plugin@1.0.0-alpha.10) (2025-08-25)
+## @visulima/rollup-plugin-css [1.0.0-alpha.10](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.9...@visulima/rollup-plugin-css@1.0.0-alpha.10) (2025-08-25)
 
 ### Features
 
@@ -9,7 +9,7 @@
 
 * **@visulima/packem-share:** upgraded to 1.0.0-alpha.8
 
-## @visulima/rollup-css-plugin [1.0.0-alpha.9](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.8...@visulima/rollup-css-plugin@1.0.0-alpha.9) (2025-08-21)
+## @visulima/rollup-plugin-css [1.0.0-alpha.9](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.8...@visulima/rollup-plugin-css@1.0.0-alpha.9) (2025-08-21)
 
 ### Bug Fixes
 
@@ -19,13 +19,13 @@
 
 * Update component imports and CSS references for Tailwind integration ([46a1293](https://github.com/visulima/packem/commit/46a1293c5694fccd79670f9c9f51565374f26069))
 
-## @visulima/rollup-css-plugin [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.7...@visulima/rollup-css-plugin@1.0.0-alpha.8) (2025-08-21)
+## @visulima/rollup-plugin-css [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.7...@visulima/rollup-plugin-css@1.0.0-alpha.8) (2025-08-21)
 
 ### Bug Fixes
 
 * Enhance logging in Tailwind CSS loader for better feature analysis and debugging ([5c8f36e](https://github.com/visulima/packem/commit/5c8f36ef50cc8004664dc95b5ba81f681a2cfb2a))
 
-## @visulima/rollup-css-plugin [1.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.6...@visulima/rollup-css-plugin@1.0.0-alpha.7) (2025-08-20)
+## @visulima/rollup-plugin-css [1.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.6...@visulima/rollup-plugin-css@1.0.0-alpha.7) (2025-08-20)
 
 ### Bug Fixes
 
@@ -40,7 +40,7 @@
 
 * **@visulima/packem-share:** upgraded to 1.0.0-alpha.7
 
-## @visulima/rollup-css-plugin [1.0.0-alpha.6](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.5...@visulima/rollup-css-plugin@1.0.0-alpha.6) (2025-08-17)
+## @visulima/rollup-plugin-css [1.0.0-alpha.6](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.5...@visulima/rollup-plugin-css@1.0.0-alpha.6) (2025-08-17)
 
 ### Features
 
@@ -51,7 +51,7 @@
 
 * **@visulima/packem-share:** upgraded to 1.0.0-alpha.6
 
-## @visulima/rollup-css-plugin [1.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.4...@visulima/rollup-css-plugin@1.0.0-alpha.5) (2025-08-10)
+## @visulima/rollup-plugin-css [1.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.4...@visulima/rollup-plugin-css@1.0.0-alpha.5) (2025-08-10)
 
 ### Bug Fixes
 
@@ -66,7 +66,7 @@
 
 * **@visulima/packem-share:** upgraded to 1.0.0-alpha.5
 
-## @visulima/rollup-css-plugin [1.0.0-alpha.4](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.3...@visulima/rollup-css-plugin@1.0.0-alpha.4) (2025-07-31)
+## @visulima/rollup-plugin-css [1.0.0-alpha.4](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.3...@visulima/rollup-plugin-css@1.0.0-alpha.4) (2025-07-31)
 
 ### Bug Fixes
 
@@ -77,7 +77,7 @@
 
 * **@visulima/packem-share:** upgraded to 1.0.0-alpha.4
 
-## @visulima/rollup-css-plugin [1.0.0-alpha.3](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.2...@visulima/rollup-css-plugin@1.0.0-alpha.3) (2025-07-17)
+## @visulima/rollup-plugin-css [1.0.0-alpha.3](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.2...@visulima/rollup-plugin-css@1.0.0-alpha.3) (2025-07-17)
 
 ### Miscellaneous Chores
 
@@ -88,7 +88,7 @@
 
 * **@visulima/packem-share:** upgraded to 1.0.0-alpha.3
 
-# @visulima/rollup-css-plugin [1.0.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/rollup-css-plugin@1.0.0-alpha.1...@visulima/rollup-css-plugin@1.0.0-alpha.2) (2025-07-02)
+# @visulima/rollup-plugin-css [1.0.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.1...@visulima/rollup-plugin-css@1.0.0-alpha.2) (2025-07-02)
 
 
 ### Bug Fixes
@@ -103,7 +103,7 @@
 
 * **@visulima/packem-share:** upgraded to 1.0.0-alpha.2
 
-## @visulima/rollup-css-plugin 1.0.0-alpha.1 (2025-07-02)
+## @visulima/rollup-plugin-css 1.0.0-alpha.1 (2025-07-02)
 
 ### ⚠ BREAKING CHANGES
 
@@ -137,7 +137,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial release of @visulima/rollup-css-plugin
+- Initial release of @visulima/rollup-plugin-css
 - Support for PostCSS, Sass, Less, and Stylus
 - CSS Modules support
 - Multiple output modes (inject, extract, emit)

@@ -99,7 +99,7 @@
             "@octokit/request@>=1.0.0 <9.2.1": ">=9.2.1",
             "@visulima/packem-rollup": "workspace:*",
             "@visulima/packem-share": "workspace:*",
-            "@visulima/rollup-css-plugin": "workspace:*",
+            "@visulima/rollup-plugin-css": "workspace:*",
             "brace-expansion@>=1.0.0 <=1.1.11": ">=1.1.12",
             "chrono-node@<2.2.4": ">=2.2.4",
             "form-data@>=4.0.0 <4.0.4": ">=4.0.4",

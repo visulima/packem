@@ -503,7 +503,7 @@ const cssPlugin = async (
                 });
             }
         },
-        name: "rollup-css-plugin",
+        name: "rollup-plugin-css",
         async transform(code, transformId) {
             if (!isIncluded(transformId) || !loaders.isSupported(transformId)) {
                 return undefined;

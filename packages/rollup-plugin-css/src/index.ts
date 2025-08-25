@@ -14,7 +14,7 @@
  * @example
  * ```typescript
  * // Usage alongside main CSS plugin
- * import { rollupCssPlugin, cssModulesTypesPlugin } from '@packem/rollup-css-plugin';
+ * import { rollupCssPlugin, cssModulesTypesPlugin } from '@packem/rollup-plugin-css';
  *
  * export default {
  *   plugins: [
