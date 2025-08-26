@@ -1,6 +1,8 @@
-# rolldown-plugin-dts [![npm](https://img.shields.io/npm/v/rolldown-plugin-dts.svg)](https://npmjs.com/package/rolldown-plugin-dts)
+# rolldown-plugin-dts
 
-[![Unit Test](https://github.com/sxzz/rolldown-plugin-dts/actions/workflows/unit-test.yml/badge.svg)](https://github.com/sxzz/rolldown-plugin-dts/actions/workflows/unit-test.yml)
+[![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
+[![Unit Test][unit-test-src]][unit-test-href]
 
 A Rolldown plugin to generate and bundle dts files.
 
@@ -35,33 +37,26 @@ You can find an example in [here](./rolldown.config.ts).
 ## Options
 
 Configuration options for the plugin.
-Certainly! Here’s your documentation with simplified section titles (just the option name, no type annotation):
 
----
+### General Options
 
-### cwd
+#### `cwd`
 
 The directory in which the plugin will search for the `tsconfig.json` file.
 
----
-
-### dtsInput
+#### `dtsInput`
 
 Set to `true` if your entry files are `.d.ts` files instead of `.ts` files.
 
 When enabled, the plugin will skip generating a `.d.ts` file for the entry point.
 
----
-
-### emitDtsOnly
+#### `emitDtsOnly`
 
 If `true`, the plugin will emit only `.d.ts` files and remove all other output chunks.
 
 This is especially useful when generating `.d.ts` files for the CommonJS format as part of a separate build step.
 
----
-
-### tsconfig
+#### `tsconfig`
 
 The path to the `tsconfig.json` file.
 
@@ -70,21 +65,58 @@ The path to the `tsconfig.json` file.
 
 **Default:** `'tsconfig.json'`
 
----
-
-### tsconfigRaw
+#### `tsconfigRaw`
 
 Pass a raw `tsconfig.json` object directly to the plugin.
 
 See: [TypeScript tsconfig documentation](https://www.typescriptlang.org/tsconfig)
 
----
+#### `compilerOptions`
 
-### incremental
+Override the `compilerOptions` specified in `tsconfig.json`.
+
+See: [TypeScript compilerOptions documentation](https://www.typescriptlang.org/tsconfig/#compilerOptions)
+
+#### `sourcemap`
+
+If `true`, the plugin will generate declaration maps (`.d.ts.map`) for `.d.ts` files.
+
+#### `resolve`
+
+Controls whether type definitions from `node_modules` are bundled into your final `.d.ts` file or kept as external `import` statements.
+
+By default, dependencies are external, resulting in `import { Type } from 'some-package'`. When bundled, this `import` is removed, and the type definitions from `some-package` are copied directly into your file.
+
+- `true`: Bundles all dependencies.
+- `false`: (Default) Keeps all dependencies external.
+- `(string | RegExp)[]`: Bundles only dependencies matching the provided strings or regular expressions (e.g. `['pkg-a', /^@scope\//]`).
+
+#### `cjsDefault`
+
+Determines how the default export is emitted.
+
+If set to `true`, and you are only exporting a single item using `export default ...`,
+the output will use `export = ...` instead of the standard ES module syntax.
+This is useful for compatibility with CommonJS.
+
+### `tsc` Options
+
+> [!NOTE]
+> These options are only applicable when `oxc` and `tsgo` are not enabled.
+
+#### `build`
+
+Build mode for the TypeScript compiler:
+
+- If `true`, the plugin will use [`tsc -b`](https://www.typescriptlang.org/docs/handbook/project-references.html#build-mode-for-typescript) to build the project and all referenced projects before emitting `.d.ts` files.
+- If `false`, the plugin will use [`tsc`](https://www.typescriptlang.org/docs/handbook/compiler-options.html) to emit `.d.ts` files without building referenced projects.
+
+**Default:** `false`
+
+#### `incremental`
 
 Controls how project references and incremental builds are handled:
 
-- If your `tsconfig.json` uses [`references`](https://www.typescriptlang.org/tsconfig/#references), the plugin will use [`tsc -b`](https://www.typescriptlang.org/docs/handbook/project-references.html#build-mode-for-typescript) to build the project and all referenced projects before emitting `.d.ts` files.
 - If `incremental` is `true`, all built files (including [`.tsbuildinfo`](https://www.typescriptlang.org/tsconfig/#tsBuildInfoFile)) will be written to disk, similar to running `tsc -b` in your project.
 - If `incremental` is `false`, built files are kept in memory, minimizing disk usage.
 
@@ -92,74 +124,63 @@ Enabling this option can speed up builds by caching previous results, which is h
 
 **Default:** `true` if your `tsconfig` has [`incremental`](https://www.typescriptlang.org/tsconfig/#incremental) or [`tsBuildInfoFile`](https://www.typescriptlang.org/tsconfig/#tsBuildInfoFile) enabled.
 
-> [!NOTE]
-> This option is only used when [`isolatedDeclarations`](#isolateddeclarations) is `false`.
-
----
-
-### compilerOptions
-
-Override the `compilerOptions` specified in `tsconfig.json`.
-
-See: [TypeScript compilerOptions documentation](https://www.typescriptlang.org/tsconfig/#compilerOptions)
-
----
-
-### isolatedDeclarations
-
-If `true`, the plugin will generate `.d.ts` files using [Oxc](https://oxc.rs/docs/guide/usage/transformer.html), which is significantly faster than the TypeScript compiler.
-
-This option is automatically enabled when `isolatedDeclarations` in `compilerOptions` is set to `true`.
-
----
-
-### sourcemap
-
-If `true`, the plugin will generate declaration maps (`.d.ts.map`) for `.d.ts` files.
-
----
-
-### resolve
-
-Resolve external types used in `.d.ts` files from `node_modules`.
-
-- If `true`, all external types are resolved.
-- If an array, only types matching the provided strings or regular expressions are resolved.
-
----
-
-### vue
+#### `vue`
 
 If `true`, the plugin will generate `.d.ts` files using `vue-tsc`.
 
----
-
-### parallel
+#### `parallel`
 
 If `true`, the plugin will launch a separate process for `tsc` or `vue-tsc`, enabling parallel processing of multiple projects.
 
----
-
-### eager
+#### `eager`
 
 If `true`, the plugin will prepare all files listed in `tsconfig.json` for `tsc` or `vue-tsc`.
 
 This is especially useful when you have a single `tsconfig.json` for multiple projects in a monorepo.
 
----
+#### `newContext`
 
-### tsgo
+If `true`, the plugin will create a new isolated context for each build,
+ensuring that previously generated `.d.ts` code and caches are not reused.
+
+By default, the plugin may reuse internal caches or incremental build artifacts
+to speed up repeated builds. Enabling this option forces a clean context,
+guaranteeing that all type definitions are generated from scratch.
+
+`invalidateContextFile` API can be used to clear invalidated files from the context.
+
+```ts
+import { globalContext, invalidateContextFile } from 'rolldown-plugin-dts/tsc'
+invalidateContextFile(globalContext, 'src/foo.ts')
+```
+
+#### `emitJs`
+
+If `true`, the plugin will emit `.d.ts` files for `.js` files as well.
+This is useful when you want to generate type definitions for JavaScript files with JSDoc comments.
+
+Enabled by default when `allowJs` in compilerOptions is `true`.
+
+### Oxc
+
+#### `oxc`
+
+If `true`, the plugin will generate `.d.ts` files using [Oxc](https://oxc.rs/docs/guide/usage/transformer.html), which is significantly faster than the TypeScript compiler.
+
+This option is automatically enabled when `isolatedDeclarations` in `compilerOptions` is set to `true`.
+
+### TypeScript Go
+
+> [!WARNING]
+> This feature is experimental and not yet recommended for production environments.
+
+#### `tsgo`
 
 **[Experimental]** Enables DTS generation using [`tsgo`](https://github.com/microsoft/typescript-go).
 
 To use this option, ensure that `@typescript/native-preview` is installed as a dependency.
 
-`tsconfigRaw` and `isolatedDeclarations` options will be ignored when this option is enabled.
-
-> [!WARNING]
-> This option is experimental and not yet recommended for production environments.
-
----
+`tsconfigRaw` and `compilerOptions` options will be ignored when this option is enabled.
 
 ## Differences from `rollup-plugin-dts`
 
@@ -196,3 +217,12 @@ Furthermore, the test suite is authorized by them and distributed under the MIT 
 ## License
 
 [MIT](./LICENSE) License © 2025 [三咲智子 Kevin Deng](https://github.com/sxzz)
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/rolldown-plugin-dts.svg
+[npm-version-href]: https://npmjs.com/package/rolldown-plugin-dts
+[npm-downloads-src]: https://img.shields.io/npm/dm/rolldown-plugin-dts
+[npm-downloads-href]: https://www.npmcharts.com/compare/rolldown-plugin-dts?interval=30
+[unit-test-src]: https://github.com/sxzz/rolldown-plugin-dts/actions/workflows/unit-test.yml/badge.svg
+[unit-test-href]: https://github.com/sxzz/rolldown-plugin-dts/actions/workflows/unit-test.yml

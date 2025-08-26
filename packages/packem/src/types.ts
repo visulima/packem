@@ -14,8 +14,8 @@ import type {
     Runtime,
 } from "@visulima/packem-share/types";
 import type { FileCache } from "@visulima/packem-share/utils";
-import type { StyleOptions } from "@visulima/rollup-css-plugin";
-import type { JitiOptions } from "jiti";
+import type { StyleOptions } from "@visulima/rollup-plugin-css";
+import type {  & { absoluteJitiPath?: boolean; } } from "jiti";
 import type { Plugin } from "rollup";
 import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
@@ -159,7 +159,7 @@ export interface BuildOptions {
      * Jiti options, where [jiti](https://github.com/unjs/jiti) is used to load the entry files.
      * @default { alias: {}, debug: false, interopDefault: true }
      */
-    jiti: Omit<JitiOptions, "onError" | "transform">;
+    jiti: Omit<JitiOptions & { absoluteJitiPath?: boolean; }, "onError" | "transform">;
     /** Signal to use when killing child processes */
     killSignal?: KillSignal;
     /** Whether to minify the output */
@@ -331,4 +331,4 @@ export type {
     Mode,
     Runtime,
 } from "@visulima/packem-share/types";
-export type { InjectOptions, StyleOptions } from "@visulima/rollup-css-plugin";
+export type { InjectOptions, StyleOptions } from "@visulima/rollup-plugin-css";

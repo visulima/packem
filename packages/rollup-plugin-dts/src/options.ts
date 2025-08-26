@@ -1,12 +1,16 @@
-import path from "node:path";
 import process from "node:process";
 
-import type { TsConfigJson, TsConfigJsonResolved } from "get-tsconfig";
+import { resolve as pathResolve } from "@visulima/path";
+import type { TsConfigJson, TsConfigJsonResolved } from "@visulima/tsconfig";
 import {
-    getTsconfig,
-    parseTsconfig,
-} from "get-tsconfig";
+    findTsConfigSync,
+    readTsConfig,
+} from "@visulima/tsconfig";
 import type { IsolatedDeclarationsOptions } from "rolldown/experimental";
+
+type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
+
+let warnedTsgo = false;
 
 // #region General Options
 export interface GeneralOptions {
@@ -45,7 +49,13 @@ export interface GeneralOptions {
     emitDtsOnly?: boolean;
 
     /**
-     * Resolve external types used in `.d.ts` files from `node_modules`.
+     * Controls whether type definitions from `node_modules` are bundled into your final `.d.ts` file or kept as external `import` statements.
+     *
+     * By default, dependencies are external, resulting in `import { Type } from 'some-package'`. When bundled, this `import` is removed, and the type definitions from `some-package` are copied directly into your file.
+     *
+     * - `true`: Bundles all dependencies.
+     * - `false`: (Default) Keeps all dependencies external.
+     * - `(string | RegExp)[]`: Bundles only dependencies matching the provided strings or regular expressions (e.g. `['pkg-a', /^@scope\//]`).
      */
     resolve?: boolean | (string | RegExp)[];
 
@@ -176,8 +186,6 @@ export interface Options extends GeneralOptions, TscOptions {
     tsgo?: boolean;
 }
 
-type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
-
 export type OptionsResolved = Overwrite<
     Required<Omit<Options, "compilerOptions">>,
     {
@@ -187,9 +195,7 @@ export type OptionsResolved = Overwrite<
     }
 >;
 
-let warnedTsgo = false;
-
-export function resolveOptions({
+export const resolveOptions = ({
     // tsc
     build = false,
     cjsDefault = false,
@@ -211,17 +217,17 @@ export function resolveOptions({
 
     tsgo = false,
     vue = false,
-}: Options): OptionsResolved {
+}: Options): OptionsResolved => {
     let resolvedTsconfig: TsConfigJsonResolved | undefined;
 
     if (tsconfig === true || tsconfig == undefined) {
-        const { config, path } = getTsconfig(cwd) || {};
+        const { config, path } = findTsConfigSync(cwd) || {};
 
         tsconfig = path;
         resolvedTsconfig = config;
     } else if (typeof tsconfig === "string") {
-        tsconfig = path.resolve(cwd || process.cwd(), tsconfig);
-        resolvedTsconfig = parseTsconfig(tsconfig);
+        tsconfig = pathResolve(cwd || process.cwd(), tsconfig);
+        resolvedTsconfig = readTsConfig(tsconfig);
     } else {
         tsconfig = undefined;
     }
@@ -301,8 +307,7 @@ export function resolveOptions({
         sourcemap,
         tsconfig,
         tsconfigRaw,
-
         tsgo,
         vue,
     };
-}
+};

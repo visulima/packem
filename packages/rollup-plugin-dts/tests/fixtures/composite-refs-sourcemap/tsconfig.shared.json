@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "composite": true,
+        "target": "ESNext",
+        "rootDir": "src",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "outDir": "build/shared",
+        "isolatedDeclarations": false,
+        "skipLibCheck": true
+    },
+    "files": ["src/types.ts"]
+}

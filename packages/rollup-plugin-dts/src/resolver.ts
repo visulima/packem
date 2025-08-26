@@ -1,7 +1,6 @@
-import path from "node:path";
-
+import { isAbsolute } from "@visulima/path";
 import { createResolver } from "dts-resolver";
-import type { Plugin } from "rollup";
+import type { Plugin, ResolvedId } from "rolldown";
 import { ResolverFactory } from "rolldown/experimental";
 
 import {
@@ -11,129 +10,104 @@ import {
     RE_NODE_MODULES,
     RE_TS,
     RE_VUE,
-} from "./filename";
-import type { OptionsResolved } from "./options";
+} from "./filename.ts";
+import type { OptionsResolved } from "./options.ts";
 
 export function createDtsResolvePlugin({
     resolve,
     tsconfig,
 }: Pick<OptionsResolved, "tsconfig" | "resolve">): Plugin {
-    const resolver = createResolver({
+    const isSourceFile = (p: string) => RE_TS.test(p) || RE_VUE.test(p);
+
+    const shouldBundleNodeModule = (id: string) => {
+        if (typeof resolve === "boolean") { return resolve; }
+
+        return resolve.some((pattern) =>
+            (typeof pattern === "string" ? id === pattern : pattern.test(id)),
+        );
+    };
+
+    const baseDtsResolver = createResolver({
         resolveNodeModules: !!resolve,
         ResolverFactory,
         tsconfig,
     });
 
+    const resolveDtsPath = (
+        id: string,
+        importer: string,
+        rolldownResolution: ResolvedId | null,
+    ): string | null => {
+        let dtsPath = baseDtsResolver(id, importer);
+
+        if (dtsPath) {
+            dtsPath = normalize(dtsPath);
+        }
+
+        if (!dtsPath || !isSourceFile(dtsPath)) {
+            if (rolldownResolution && isSourceFile(rolldownResolution.id)) {
+                return rolldownResolution.id;
+            }
+
+            return null;
+        }
+
+        return dtsPath;
+    };
+
     return {
         name: "rolldown-plugin-dts:resolver",
-
-        // Resolution algorithm
-        //
-        // 1. If no importer or not a dts file, skip to next plugin
-        // 2. If css, externalize
-        // 3. Resolve with rolldown's resolver
-        // 4. Resolve with dts-resolver
-        // 5. If dts resolution is a type file
-        //    1. If rolldown resolution is not a type file, externalize
-        //    2. Use rolldown resolution
-        // 6. If dts resolution is from node_modules
-        //    1. get shouldResolve from options.resolve
-        //    2. If shouldResolve is false
-        //       1. If importer is from node_modules
-        //          1. If rolldown resolution is external, externalize
-        //          2. Otherwise, continue resolving (even shouldResolve is false)
-        //       2. Otherwise, externalize (from user code)
-        // 7. If dts resolution is a TS file or vue file
-        //    1. Load the file
-        //    2. Redirect to corresponding dts file
-        // 8. Ensure dts resolution is a dts file, return it
 
         resolveId: {
             async handler(id, importer, options) {
                 const external = { external: true, id, moduleSideEffects: false };
 
-                // 1. Only resolve in dts file
+                // Guard: Only operate on imports inside .d.ts files
                 if (!importer || !RE_DTS.test(importer)) {
                     return;
                 }
 
-                // 2. If css, externalize
+                // Guard: Externalize non-code imports
                 if (RE_CSS.test(id)) {
                     return external;
                 }
 
-                // 3. Resolve with rolldown's resolver
+                // Get Rolldown's resolution first for fallback and policy checks
                 const rolldownResolution = await this.resolve(id, importer, options);
+                const dtsResolution = resolveDtsPath(id, importer, rolldownResolution);
 
-                // 4. Resolve with dts-resolver
-                let dtsResolution = resolver(id, importer);
+                // If resolution failed, error or externalize
+                if (!dtsResolution) {
+                    const isFileImport = id.startsWith(".") || isAbsolute(id);
 
-                dtsResolution &&= path.normalize(dtsResolution);
+                    // Auto-export unresolvable packages
+                    return isFileImport ? null : external;
+                }
 
-                // 5. If dts resolution is not a TS/Vue file
+                // Externalize non-bundled node_modules dependencies
                 if (
-                    !dtsResolution
-                    || (!RE_TS.test(dtsResolution) && !RE_VUE.test(dtsResolution))
+                // request resolved to inside node_modules
+                    RE_NODE_MODULES.test(dtsResolution)
+                    // User doesn't want to bundle this module
+                    && !shouldBundleNodeModule(id)
+                    // The importer is not in node_modules, or if it is, the module is marked as external by Rolldown
+                    && (!RE_NODE_MODULES.test(importer) || rolldownResolution?.external)
                 ) {
-                    const unresolved
-            = !rolldownResolution
-                || (!RE_TS.test(rolldownResolution.id)
-                    && !RE_VUE.test(rolldownResolution.id));
-
-                    if (unresolved) {
-                        // For relative/absolute type imports, surface an error instead of
-                        // silently externalizing so users know a local type file is missing.
-                        const isRelativeOrAbsolute
-              = id.startsWith(".") || path.isAbsolute(id);
-
-                        if (isRelativeOrAbsolute) {
-                            return this.error(`Cannot resolve import '${id}' from '${importer}'`);
-                        }
-
-                        return external;
-                    }
-
-                    dtsResolution = rolldownResolution.id;
+                    return external;
                 }
 
-                // 6. If dts resolution is from node_modules
-                if (RE_NODE_MODULES.test(dtsResolution)) {
-                    let shouldResolve: boolean;
-
-                    if (typeof resolve === "boolean") {
-                        shouldResolve = resolve;
-                    } else {
-                        shouldResolve = resolve.some((pattern) =>
-                            (typeof pattern === "string" ? id === pattern : pattern.test(id)),
-                        );
-                    }
-
-                    if (!shouldResolve) {
-                        if (RE_NODE_MODULES.test(importer)) {
-                            // from node_modules
-                            if (rolldownResolution?.external) {
-                                return external;
-                            }
-                        } else {
-                            // from user code
-                            return external;
-                        }
-                    }
-                }
-
-                // 7. If dts resolution is a TS file or vue file
-                if (
-                    (RE_TS.test(dtsResolution) && !RE_DTS.test(dtsResolution))
-                    || RE_VUE.test(dtsResolution)
-                ) {
-                    await this.load({ id: dtsResolution });
-                    // redirect ts to dts
-                    dtsResolution = filename_to_dts(dtsResolution);
-                }
-
-                // 8. Ensure dts resolution is a dts file, return it
+                // The path is either a declaration file or a source file that needs redirection.
                 if (RE_DTS.test(dtsResolution)) {
+                    // It's already a .d.ts file, we're done
                     return dtsResolution;
+                }
+
+                if (isSourceFile(dtsResolution)) {
+                    // It's a .ts/.vue source file, so we load it to ensure its .d.ts is generated,
+                    // then redirect the import to the future .d.ts path
+                    await this.load({ id: dtsResolution });
+
+                    return filename_to_dts(dtsResolution);
                 }
             },
             order: "pre",
