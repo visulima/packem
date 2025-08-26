@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 
-import { relative, resolve } from "@visulima/path";
+import { join, relative, resolve } from "@visulima/path";
 import type { BirpcReturn } from "birpc";
 import Debug from "debug";
 import { isolatedDeclaration as oxcIsolatedDeclaration } from "rolldown/experimental";

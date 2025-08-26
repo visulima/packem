@@ -1,4 +1,4 @@
-import { isAbsolute } from "@visulima/path";
+import { isAbsolute, normalize } from "@visulima/path";
 import { createResolver } from "dts-resolver";
 import type { Plugin, ResolvedId } from "rolldown";
 import { ResolverFactory } from "rolldown/experimental";
