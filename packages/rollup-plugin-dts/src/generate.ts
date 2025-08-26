@@ -3,12 +3,12 @@ import { fork, spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import path from "node:path";
 
+import { relative, resolve } from "@visulima/path";
 import type { BirpcReturn } from "birpc";
 import Debug from "debug";
-import type { Plugin, SourceMapInput } from "rollup";
 import { isolatedDeclaration as oxcIsolatedDeclaration } from "rolldown/experimental";
+import type { Plugin, SourceMapInput } from "rollup";
 
 import {
     filename_to_dts,
@@ -194,9 +194,9 @@ export function createGeneratePlugin({
                 if (tsgo) {
                     if (RE_VUE.test(id)) { throw new Error("tsgo does not support Vue files."); }
 
-                    const dtsPath = path.resolve(
+                    const dtsPath = resolve(
                         tsgoDistribution!,
-                        path.relative(path.resolve(cwd), filename_to_dts(id)),
+                        relative(resolve(cwd), filename_to_dts(id)),
                     );
 
                     if (existsSync(dtsPath)) {
@@ -347,7 +347,7 @@ async function runTsgo(root: string, tsconfig?: string) {
         new URL("lib/getExePath.js", tsgoPackage).href
     );
     const tsgo = getExePath();
-    const tsgoDistribution = await mkdtemp(path.join(tmpdir(), "rolldown-plugin-dts-"));
+    const tsgoDistribution = await mkdtemp(join(tmpdir(), "rolldown-plugin-dts-"));
 
     debug("[tsgo] tsgoDist", tsgoDistribution);
 

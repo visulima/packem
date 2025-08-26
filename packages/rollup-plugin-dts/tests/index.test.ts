@@ -464,13 +464,10 @@ it("cjs exports", async () => {
 
 it("should error when file import cannot be found", async () => {
     await expect(() =>
-        rolldownBuild(
-            path.resolve(dirname, "fixtures/unresolved-import/index.d.ts"),
-            [
-                dts({
-                    emitDtsOnly: true,
-                }),
-            ],
-        ),
-    ).rejects.toThrow("Cannot resolve import './missing-file'");
+        rolldownBuild(path.resolve(dirname, "fixtures/unresolved-import/ts.ts"), [
+            dts({
+                emitDtsOnly: true,
+            }),
+        ]),
+    ).rejects.toThrow("Could not resolve './missing-file'");
 });

@@ -31,8 +31,6 @@ export function dts(options: Options = {}): Plugin[] {
     return plugins;
 }
 
-
-
 export {
     RE_CSS,
     RE_DTS,

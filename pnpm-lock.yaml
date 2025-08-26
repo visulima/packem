@@ -1759,6 +1759,9 @@ importers:
       dts-resolver:
         specifier: ^2.1.2
         version: 2.1.2(oxc-resolver@11.6.2)
+      get-tsconfig:
+        specifier: 4.10.1
+        version: 4.10.1
     devDependencies:
       '@anolilab/eslint-config':
         specifier: ^16.2.23

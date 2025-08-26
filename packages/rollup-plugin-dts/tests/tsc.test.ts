@@ -61,6 +61,43 @@ describe("tsc", () => {
         expect(snapshot).toMatchSnapshot();
     });
 
+    it("should generate correct sourcemaps for a complex composite project with conflicting tsconfig options", async () => {
+        const root = path.resolve(dirname, "fixtures/composite-refs-sourcemap");
+        const { chunks } = await rolldownBuild(
+            [path.resolve(root, "src/react/index.ts")],
+            [
+                dts({
+                    build: true,
+                    emitDtsOnly: true,
+                    sourcemap: true,
+                    tsconfig: path.resolve(root, "tsconfig.react.json"),
+                }),
+            ],
+            {},
+            { dir: path.resolve(root, "actual-output/react") },
+        );
+
+        const sourcemapChunk = chunks.find((chunk) =>
+            chunk.fileName.endsWith(".d.ts.map"),
+        );
+
+        expect(sourcemapChunk).toBeDefined();
+        expect(sourcemapChunk?.type).toBe("asset");
+
+        const sourcemap = JSON.parse((sourcemapChunk as any).source as string);
+        const sources: string[] = sourcemap.sources.map((s: string) =>
+            s.replaceAll("\\\\", "/"),
+        );
+        const expectedSources = ["../../src/types.ts", "../../src/react/index.ts"];
+
+        expect(sources.sort()).toEqual(expectedSources.sort());
+        expect(
+            sourcemap.sourcesContent === undefined
+            || (Array.isArray(sourcemap.sourcesContent)
+                && sourcemap.sourcesContent.length === 0),
+        ).toBe(true);
+    });
+
     it("composite references", async () => {
         const root = path.resolve(dirname, "fixtures/composite-refs");
 
