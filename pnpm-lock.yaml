@@ -896,6 +896,12 @@ importers:
       '@visulima/tsconfig':
         specifier: 1.1.19
         version: 1.1.19(yaml@2.8.1)
+      acorn:
+        specifier: ^8.11.0
+        version: 8.15.0
+      acorn-walk:
+        specifier: ^8.3.0
+        version: 8.3.4
       browserslist:
         specifier: 4.25.3
         version: 4.25.3

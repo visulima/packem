@@ -303,6 +303,10 @@ const generateOptions = (
             json: {
                 preferConst: true,
             },
+            lazyBarrel: {
+                lazyThreshold: 2,
+                sideEffectsCheck: true,
+            },
             license: {
                 dependenciesTemplate: (
                     licenses: string[],
