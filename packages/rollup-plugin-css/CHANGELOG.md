@@ -1,3 +1,19 @@
+## @visulima/rollup-plugin-css 1.0.0-alpha.1 (2025-08-29)
+
+### Features
+
+* introduce debarrel optimization for improved import handling ([129435e](https://github.com/visulima/packem/commit/129435ee941f2cd9f003046225e2a8862eb2cba7))
+
+### Bug Fixes
+
+* rename css plugin ([fdcf9f1](https://github.com/visulima/packem/commit/fdcf9f166e5fc90ad6c3c5d1fbf7381630fda4e6))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.9
+* **@visulima/css-style-inject:** upgraded to 1.0.0-alpha.6
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.10](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.9...@visulima/rollup-plugin-css@1.0.0-alpha.10) (2025-08-25)
 
 ### Features
