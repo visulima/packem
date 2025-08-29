@@ -1,3 +1,9 @@
+## @visulima/css-style-inject [1.0.0-alpha.6](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.5...@visulima/css-style-inject@1.0.0-alpha.6) (2025-08-29)
+
+### Features
+
+* added the first migration for the rolldown-plugin-dts for rollup ([fb3321f](https://github.com/visulima/packem/commit/fb3321fedb5101368bdf8e711db30d00d9ef26f3))
+
 ## @visulima/css-style-inject [1.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.4...@visulima/css-style-inject@1.0.0-alpha.5) (2025-08-17)
 
 ### Features
