@@ -1,3 +1,16 @@
+## @visulima/packem-rollup [1.0.0-alpha.12](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.11...@visulima/packem-rollup@1.0.0-alpha.12) (2025-08-29)
+
+### Features
+
+* added the first migration for the rolldown-plugin-dts for rollup ([fb3321f](https://github.com/visulima/packem/commit/fb3321fedb5101368bdf8e711db30d00d9ef26f3))
+* implement lazy barrel optimization in rollup-plugin ([2cdcb34](https://github.com/visulima/packem/commit/2cdcb342f41940b4b277698740153953b905acd0))
+* introduce debarrel optimization for improved import handling ([129435e](https://github.com/visulima/packem/commit/129435ee941f2cd9f003046225e2a8862eb2cba7))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.9
+
 ## @visulima/packem-rollup [1.0.0-alpha.11](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.10...@visulima/packem-rollup@1.0.0-alpha.11) (2025-08-25)
 
 ### Features
