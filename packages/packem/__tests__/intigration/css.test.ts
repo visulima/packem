@@ -371,7 +371,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             },
             {
                 errorMessage:
-                    "Incorrect mode provided, allowed modes are `inject`, `extract` or `emit`",
+                    "Incorrect mode provided, allowed modes are `inject`, `extract`, `emit` or `inline`",
                 input: "simple/index.js",
                 shouldFail: true,
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -620,6 +620,76 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "extract-sourcemap-inline",
             },
+            {
+                input: "simple/index.js",
+                minimizer: "cssnano" as const,
+                styleOptions: { mode: "inline" },
+                title: "inline",
+            },
+            {
+                input: "simple/index.js",
+                minimizer: "cssnano" as const,
+                styleOptions: {
+                    mode: "inline",
+                    namedExports: true,
+                },
+                title: "inline-named-exports",
+            },
+            {
+                input: "auto-modules/index.js",
+                minimizer: "cssnano" as const,
+                styleOptions: {
+                    autoModules: true,
+                    mode: "inline",
+                },
+                title: "inline-auto-modules",
+            },
+            {
+                input: "modules/index.js",
+                minimizer: "cssnano" as const,
+                styleOptions: {
+                    mode: "inline",
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "inline-modules",
+            },
+            {
+                input: "simple/index.js",
+                minimizer: "lightningcss" as const,
+                styleOptions: { mode: "inline" },
+                title: "inline-lightningcss",
+            },
+            {
+                input: "simple/index.js",
+                minimizer: "lightningcss" as const,
+                styleOptions: {
+                    mode: "inline",
+                    namedExports: true,
+                },
+                title: "inline-named-exports-lightningcss",
+            },
+            {
+                input: "auto-modules/index.js",
+                minimizer: "lightningcss" as const,
+                styleOptions: {
+                    autoModules: true,
+                    mode: "inline",
+                },
+                title: "inline-auto-modules-lightningcss",
+            },
+            {
+                input: "modules/index.js",
+                minimizer: "lightningcss" as const,
+                styleOptions: {
+                    mode: "inline",
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "inline-modules-lightningcss",
+            },
         ] as WriteData[])(
             "should minimize processed $title css with $minimizer",
             async ({ minimizer, title, ...data }: WriteData) => {
@@ -672,6 +742,74 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                     ],
                 },
                 title: "inline-transform",
+            },
+            {
+                input: "simple/index.js",
+                styleOptions: { mode: "inline", sourceMap: true },
+                title: "inline-true",
+            },
+            {
+                input: "simple/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    sourceMap: [true, { content: false }],
+                },
+                title: "inline-no-content",
+            },
+            {
+                input: "simple/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    sourceMap: [
+                        true,
+                        { transform: (map: any) => (map.sources = ["virt"]) },
+                    ],
+                },
+                title: "inline-transform",
+            },
+            {
+                input: "simple/index.js",
+                styleOptions: { mode: "inline", sourceMap: "inline" },
+                title: "inline-inline",
+            },
+            {
+                input: "simple/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    sourceMap: ["inline", { content: false }],
+                },
+                title: "inline-inline-no-content",
+            },
+            {
+                input: "simple/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    sourceMap: [
+                        "inline",
+                        { transform: (m: any) => (m.sources = ["virt"]) },
+                    ],
+                },
+                title: "inline-inline-transform",
+            },
+            {
+                input: "auto-modules/index.js",
+                styleOptions: {
+                    autoModules: true,
+                    mode: "inline",
+                    sourceMap: true,
+                },
+                title: "inline-auto-modules-sourcemap",
+            },
+            {
+                input: "modules/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    postcss: {
+                        modules: true,
+                    },
+                    sourceMap: true,
+                },
+                title: "inline-modules-sourcemap",
             },
         ] as WriteData[])(
             "should generate sourcemap for processed $title css",
@@ -836,6 +974,85 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                     );
                 }
 
+                await validate(data);
+            },
+        );
+    });
+
+    describe("inline", () => {
+        // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
+        it.each([
+            {
+                input: "simple/index.js",
+                styleOptions: { mode: "inline" },
+                title: "basic",
+            },
+            {
+                input: "simple/index.js",
+                styleOptions: { mode: "inline", namedExports: true },
+                title: "named-exports",
+            },
+            {
+                input: "auto-modules/index.js",
+                styleOptions: { autoModules: true, mode: "inline" },
+                title: "auto-modules",
+            },
+            {
+                input: "auto-modules/index.js",
+                styleOptions: { autoModules: true, mode: "inline", namedExports: true },
+                title: "auto-modules-named-exports",
+            },
+            {
+                input: "modules/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "modules",
+            },
+            {
+                input: "modules/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    namedExports: true,
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "modules-named-exports",
+            },
+            {
+                input: "named-exports/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    namedExports: true,
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "modules-custom-named-exports",
+            },
+            {
+                input: "simple/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    sourceMap: true,
+                },
+                title: "inline-sourcemap",
+            },
+            {
+                input: "simple/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    sourceMap: "inline",
+                },
+                title: "inline-sourcemap-inline",
+            },
+        ] as WriteData[])(
+            "should work with inline processed $title css",
+            async ({ title, ...data }: WriteData) => {
                 await validate(data);
             },
         );
@@ -1401,6 +1618,70 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             {
                 input: "modules/index.js",
                 styleOptions: {
+                    mode: "inline",
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "inline-modules",
+            },
+            {
+                input: "modules/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    namedExports: true,
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "inline-modules-named-exports",
+            },
+            {
+                input: "modules-duplication/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "inline-duplication",
+            },
+            {
+                input: "treeshake-module/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    namedExports: true,
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "inline-treeshake-module",
+            },
+            {
+                input: "named-exports/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    namedExports: true,
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "inline-named-exports",
+            },
+            {
+                input: "named-exports/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    namedExports: (name: string) => `${name}hacked`,
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "inline-named-exports-custom-class-name",
+            },
+            {
+                input: "modules/index.js",
+                styleOptions: {
                     mode: "extract",
                     postcss: {
                         modules: true,
@@ -1539,6 +1820,25 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "multi-entry-single",
             },
+            {
+                input: "code-splitting/index.js",
+                styleOptions: {
+                    mode: "inline",
+                    sourceMap: true,
+                },
+                title: "inline",
+            },
+            {
+                input: [
+                    "code-splitting/index.js",
+                    "code-splitting/indextwo.js",
+                ],
+                styleOptions: {
+                    mode: "inline",
+                    sourceMap: true,
+                },
+                title: "inline-multi-entry",
+            },
         ] as WriteData[])(
             "should work with processed $title css",
             async ({ title, ...data }: WriteData) => {
@@ -1631,6 +1931,13 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 ],
                 styleOptions: `mode: "emit", sourceMap: [true, { transform: (m) => (m.sources = ["virt"]) }]`,
                 title: "sourcemap-transform",
+            },
+            {
+                input: "simple/index.js",
+                styleOptions: {
+                    mode: "inline",
+                },
+                title: "inline-basic",
             },
             {
                 input: "emit-with-modules/index.js",

@@ -82,11 +82,11 @@ const reservedWords = new Set([
  * @returns Legal JavaScript identifier, prefixed with underscore if it conflicts with reserved words
  * @example
  * ```typescript
- * getClassNameDefault("my-class") // "my_class"
- * getClassNameDefault("css") // "_css" (reserved word)
+ * getClassNameIdentifier("my-class") // "my_class"
+ * getClassNameIdentifier("css") // "_css" (reserved word)
  * ```
  */
-const getClassNameDefault = (name: string): string => {
+const getClassNameIdentifier = (name: string): string => {
     const id = name.replaceAll(/[^\w$]/g, "_");
 
     if (reservedWords.has(id)) {
@@ -94,6 +94,98 @@ const getClassNameDefault = (name: string): string => {
     }
 
     return id;
+};
+
+/**
+ * Parameters for generating inline CSS exports
+ */
+interface GenerateInlineExportsParameters {
+    css: string;
+    cssVariableName: string;
+    cwd?: string;
+    dts?: boolean;
+    dtsOutput: string[];
+    id: string;
+    logger?: JsExportOptions["logger"];
+    modulesExports: Record<string, string>;
+    modulesVariableName: string;
+    namedExports?: boolean | ((name: string) => string);
+    supportModules: boolean;
+}
+
+/**
+ * Generates JavaScript exports for inline CSS mode
+ */
+const generateInlineExports = ({
+    css,
+    cssVariableName: cssVName,
+    cwd,
+    dts,
+    dtsOutput,
+    id,
+    logger,
+    modulesExports,
+    modulesVariableName,
+    namedExports,
+    supportModules,
+}: GenerateInlineExportsParameters): JsExportResult => {
+    const inlineOutput = [`var ${cssVName} = ${JSON.stringify(css)};`];
+
+    if (namedExports && Object.keys(modulesExports).length > 0) {
+        const getClassName = typeof namedExports === "function" ? namedExports : getClassNameIdentifier;
+
+        // Add named exports for CSS modules
+        for (const [name, value] of Object.entries(modulesExports)) {
+            const newName = getClassName(name);
+
+            if (name !== newName && logger) {
+                const relativePath = cwd ? relative(cwd, id) : id;
+
+                logger.warn({ message: `Exported \`${name}\` as \`${newName}\` in ${relativePath}` });
+            }
+
+            const fmt = JSON.stringify(value);
+
+            inlineOutput.push(`var ${newName} = ${fmt};`);
+
+            if (dts) {
+                dtsOutput.push(`declare const ${newName}: ${fmt};`);
+            }
+        }
+    }
+
+    // Create the modules object for inline mode
+    if (Object.keys(modulesExports).length > 0) {
+        inlineOutput.push(`var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`);
+    }
+
+    const defaultExport = `\nexport default ${supportModules ? modulesVariableName : cssVName};\n`;
+
+    inlineOutput.push(defaultExport);
+
+    // Generate TypeScript declarations for inline mode
+    if (dts) {
+        dtsOutput.push(`declare const ${cssVName}: string;`);
+
+        if (supportModules) {
+            dtsOutput.push(
+                `\ninterface ModulesExports {
+${Object.keys(modulesExports)
+    .map((key) => `  '${key}': string;`)
+    .join("\n")}
+}\n`,
+                `declare const ${modulesVariableName}: ModulesExports;`,
+            );
+        }
+
+        dtsOutput.push(defaultExport);
+    }
+
+    return {
+        code: inlineOutput.join("\n"),
+        moduleSideEffects: false,
+        types: dts ? dtsOutput.join("\n") : undefined,
+    };
 };
 
 export interface JsExportOptions {
@@ -113,6 +205,8 @@ export interface JsExportOptions {
     id: string;
     /** CSS injection configuration */
     inject?: InjectOptions | boolean | ((varname: string, id: string, output: string[]) => string);
+    /** Whether to inline CSS as strings */
+    inline?: boolean;
     /** Logger for warnings */
     logger?: {
         warn: (log: { message: string; plugin?: string }) => void;
@@ -157,6 +251,7 @@ export interface JsExportResult {
  * @param options.icssDependencies ICSS dependencies for CSS modules
  * @param options.id File ID for safe identifier generation
  * @param options.inject CSS injection configuration
+ * @param options.inline Whether to inline CSS as strings
  * @param options.logger Logger for warnings
  * @param options.map Source map for the CSS
  * @param options.modulesExports CSS modules exports mapping class names to hashed names
@@ -173,6 +268,7 @@ export const generateJsExports = ({
     icssDependencies = [],
     id,
     inject,
+    inline = false,
     logger,
     map,
     modulesExports,
@@ -194,7 +290,7 @@ export const generateJsExports = ({
             dtsOutput.push(`declare const ${cssVariableName}: string;`);
         }
 
-        const getClassName = typeof namedExports === "function" ? namedExports : getClassNameDefault;
+        const getClassName = typeof namedExports === "function" ? namedExports : getClassNameIdentifier;
 
         // Use Object.entries instead of for..in to avoid prototype chain iteration
         for (const [name, value] of Object.entries(modulesExports)) {
@@ -218,6 +314,23 @@ export const generateJsExports = ({
         }
     }
 
+    // Handle inline mode - embed CSS directly as strings
+    if (inline) {
+        return generateInlineExports({
+            css,
+            cssVariableName,
+            cwd,
+            dts,
+            dtsOutput,
+            id,
+            logger,
+            modulesExports,
+            modulesVariableName,
+            namedExports,
+            supportModules,
+        });
+    }
+
     // Handle CSS injection for runtime styles
     if (inject) {
         if (typeof inject === "function") {
@@ -228,7 +341,10 @@ export const generateJsExports = ({
             const injectorName = saferId("injector");
             const injectorCall = `${injectorName}(${cssVariableName},${JSON.stringify(injectorOptions)});`;
 
-            output.unshift(`import { cssStyleInject as ${injectorName} } from "@visulima/css-style-inject";`);
+            const packageName = typeof inject === "object" && inject.package ? inject.package : "@visulima/css-style-inject";
+            const methodName = typeof inject === "object" && inject.method ? inject.method : "cssStyleInject";
+
+            output.unshift(`import { ${methodName} as ${injectorName} } from "${packageName}";`);
 
             if (!treeshakeable) {
                 output.push(`var ${modulesVariableName} = ${JSON.stringify(modulesExports)};`, injectorCall);

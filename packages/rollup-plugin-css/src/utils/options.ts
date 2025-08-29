@@ -23,10 +23,13 @@ interface Mode {
 
     /** Whether to inject CSS at runtime (boolean or injection options) */
     inject: InternalStyleOptions["inject"];
+
+    /** Whether to inline CSS as strings in JavaScript */
+    inline: InternalStyleOptions["inline"];
 }
 
 /** Available CSS processing modes */
-const modes = ["inject", "extract", "emit"];
+const modes = ["inject", "extract", "emit", "inline"];
 
 /** Formatted string of available modes for error messages */
 const modesFmt = arrayFmt(modes);
@@ -62,10 +65,14 @@ export const inferModeOption = (mode: StyleOptions["mode"]): Mode => {
         throw new Error(`Incorrect mode provided, allowed modes are ${modesFmt}`);
     }
 
+    // Default mode is "inject" when not provided
+    const modeName = (m[0] ?? "inject") as (typeof modes)[number];
+
     return {
-        emit: m[0] === "emit",
-        extract: m[0] === "extract" && (m[1] ?? true),
-        inject: (!m[0] || m[0] === "inject") && (m[1] ?? true),
+        emit: modeName === "emit",
+        extract: Boolean(modeName === "extract" && (m[1] ?? true)),
+        inject: Boolean(modeName === "inject" && (m[1] ?? true)),
+        inline: modeName === "inline",
     };
 };
 
@@ -88,7 +95,7 @@ export const inferModeOption = (mode: StyleOptions["mode"]): Mode => {
  * inferOption(undefined, { default: true }) // { default: true }
  * ```
  */
-export const inferOption = <T, TDefine extends T | boolean | undefined>(option: T | boolean | undefined, defaultValue: TDefine): T | TDefine | false => {
+export const inferOption = <T, TDefine extends T | boolean | undefined>(option: T | boolean | undefined, defaultValue: TDefine): OptionType<T, TDefine> => {
     if (typeof option === "boolean") {
         return option && ({} as TDefine);
     }
@@ -244,3 +251,8 @@ export const ensurePCSSPlugins = async (plugins: PostCSSOptions["plugins"], cwd:
 
     return ps;
 };
+
+/**
+ * Type alias for option function return types
+ */
+export type OptionType<T, TDefine extends T | boolean | undefined> = T | TDefine | false;

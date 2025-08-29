@@ -75,6 +75,9 @@ export interface LoaderContext<T = Record<string, unknown>> {
     /** @see {@link InternalStyleOptions.inject} */
     readonly inject: InternalStyleOptions["inject"];
 
+    /** @see {@link InternalStyleOptions.inline} */
+    readonly inline: InternalStyleOptions["inline"];
+
     /** Rollup-compatible logger for plugin messages */
     readonly logger: RollupLogger;
 
