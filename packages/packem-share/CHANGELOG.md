@@ -1,3 +1,10 @@
+## @visulima/packem-share [1.0.0-alpha.9](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.8...@visulima/packem-share@1.0.0-alpha.9) (2025-08-29)
+
+### Features
+
+* added the first migration for the rolldown-plugin-dts for rollup ([fb3321f](https://github.com/visulima/packem/commit/fb3321fedb5101368bdf8e711db30d00d9ef26f3))
+* introduce debarrel optimization for improved import handling ([129435e](https://github.com/visulima/packem/commit/129435ee941f2cd9f003046225e2a8862eb2cba7))
+
 ## @visulima/packem-share [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.7...@visulima/packem-share@1.0.0-alpha.8) (2025-08-25)
 
 ### Features
