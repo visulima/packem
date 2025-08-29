@@ -1,12 +1,12 @@
 export { default as chunkSplitter } from "./plugins/chunk-splitter";
 export type { CJSInteropOptions } from "./plugins/cjs-interop";
 export { cjsInteropPlugin } from "./plugins/cjs-interop";
-export type { LazyBarrelOptions } from "./plugins/lazy-barrel";
-export { lazyBarrelPlugin } from "./plugins/lazy-barrel";
 export type { CopyPluginOptions } from "./plugins/copy";
 export { copyPlugin } from "./plugins/copy";
 export type { DataUriPluginOptions } from "./plugins/data-uri";
 export { dataUriPlugin } from "./plugins/data-uri";
+export type { DebarrelPluginOptions } from "./plugins/debarrel";
+export { debarrelPlugin } from "./plugins/debarrel";
 export { default as browserslistToEsbuild } from "./plugins/esbuild/browserslist-to-esbuild";
 export type { EsmShimCjsSyntaxOptions } from "./plugins/esm-shim-cjs-syntax";
 export { esmShimCjsSyntaxPlugin } from "./plugins/esm-shim-cjs-syntax";

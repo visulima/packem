@@ -79,7 +79,7 @@ describe("tailwind-oxide loader", () => {
 
     it("should process CSS content", async () => {
         expect.assertions(2);
-        
+
         const mockContext = {
             deps: new Set<string>(),
             environment: "development",

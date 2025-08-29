@@ -263,36 +263,6 @@ Notes:
 - SVGs are encoded as `data:image/svg+xml,....` (tiny URI). Others as `data:<mime>;base64,...`.
 - For `srcset` attributes, enable `{ srcset: true }` to encode spaces as `%20`.
 
-### Lazy Barrel (barrel re-export optimization)
-
-Optimizes side‑effect‑free barrel files (modules that primarily re‑export from others). It analyzes re‑exports and defers work so only actually used exports are included, improving build performance and chunking.
-
-```ts
-import { defineConfig } from '@visulima/packem/config'
-import { lazyBarrelPlugin } from '@visulima/packem-rollup'
-
-export default defineConfig({
-  rollup: {
-    plugins: [
-      // Recommended: place early (after resolve/json), before splitters/transformers
-      lazyBarrelPlugin({
-        sideEffectsCheck: true, // respect package.json "sideEffects"
-        lazyThreshold: 2        // min number of re-exports to treat as a barrel
-      })
-    ]
-  }
-})
-```
-
-Options:
-- `sideEffectsCheck` (boolean, default `true`): Only optimize modules within packages where `package.json.sideEffects` is `false` (or the specific file is side‑effect‑free).
-- `lazyThreshold` (number, default `2`): Minimum count of re‑exports required to consider a module a barrel.
-- `include` / `exclude` (FilterPattern): Limit files the plugin inspects.
-
-Notes:
-- Works best when barrel directories (e.g., `src/components`) are under a package with `"sideEffects": false`.
-- Place before chunk splitting and before your transformer so downstream plugins see the optimized module graph.
-
 ## Development Plugins
 
 ### Live Reload

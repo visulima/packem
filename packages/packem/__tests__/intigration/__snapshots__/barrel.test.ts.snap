@@ -1,0 +1,79 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`barrel > should build a project with barrel re-exports and run output > CommonJS output 1`] = `
+"'use strict';
+
+Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+
+const a = "a";
+
+const value = "c";
+
+const d = "d";
+
+const b$1 = "b";
+
+const b = "b";
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const run = /* @__PURE__ */ __name(() => ({ a, b: b$1, c: value, d, nestedA: b }), "run");
+
+exports.default = run;
+exports.run = run;
+"
+`;
+
+exports[`barrel > should build a project with barrel re-exports and run output > ESM output 1`] = `
+"const a = "a";
+
+const value = "c";
+
+const d = "d";
+
+const b$1 = "b";
+
+const b = "b";
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const run = /* @__PURE__ */ __name(() => ({ a, b: b$1, c: value, d, nestedA: b }), "run");
+
+export { run as default, run };
+"
+`;
+
+exports[`barrel > should rewrite barrel imports and run output > CommonJS output 1`] = `
+"'use strict';
+
+Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+
+const Foo = "foo";
+
+const bar = "bar";
+
+const baz = "baz";
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const run = /* @__PURE__ */ __name(() => ({ Foo, bar, baz }), "run");
+
+exports.default = run;
+exports.run = run;
+"
+`;
+
+exports[`barrel > should rewrite barrel imports and run output > ESM output 1`] = `
+"const Foo = "foo";
+
+const bar = "bar";
+
+const baz = "baz";
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+const run = /* @__PURE__ */ __name(() => ({ Foo, bar, baz }), "run");
+
+export { run as default, run };
+"
+`;

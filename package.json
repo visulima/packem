@@ -66,7 +66,7 @@
         "is-ci": "^4.1.0",
         "lint-staged": "^16.1.5",
         "nx": "^21.4.1",
-        "pkg-pr-new": "^0.0.57",
+        "pkg-pr-new": "^0.0.58",
         "plop": "^4.0.1",
         "publint": "^0.3.12",
         "rimraf": "6.0.1",
@@ -86,12 +86,10 @@
         "onlyBuiltDependencies": [
             "@parcel/watcher",
             "@swc/core",
-            "@tailwindcss/oxide",
             "esbuild",
             "node-sass",
             "nodehun",
             "nx",
-            "unrs-resolver",
             "oxc-resolver"
         ],
         "overrides": {

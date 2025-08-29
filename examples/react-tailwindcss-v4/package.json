@@ -22,8 +22,8 @@
     },
     "devDependencies": {
         "@tailwindcss/postcss": "^4.1.12",
-        "@types/react": "^19.1.11",
-        "@types/react-dom": "^19.1.7",
+        "@types/react": "^19.1.12",
+        "@types/react-dom": "^19.1.9",
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.25.9",
         "postcss": "^8.5.6",

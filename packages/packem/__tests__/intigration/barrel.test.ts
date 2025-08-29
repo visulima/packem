@@ -1,14 +1,13 @@
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
-import { pathToFileURL } from "node:url";
 
-import { writeFile, writeJson } from "@visulima/fs";
+import { readFileSync, writeFile, writeJson } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 
-describe("lazy-barrel", () => {
+describe("barrel", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
@@ -20,9 +19,8 @@ describe("lazy-barrel", () => {
     });
 
     it("should build a project with barrel re-exports and run output", async () => {
-        expect.assertions(3);
+        expect.assertions(4);
 
-        // Create source files similar to provided lazy-barrel case
         const source = (p: string) => join(temporaryDirectoryPath, "src", p);
 
         await writeJson(join(temporaryDirectoryPath, "src", "package.json"), { sideEffects: false }, { overwrite: true });
@@ -101,11 +99,86 @@ describe("lazy-barrel", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        // Dynamically import built module and verify runtime values
-        const mjsUrl = pathToFileURL(join(temporaryDirectoryPath, "dist", "index.mjs")).href;
-        const module_ = (await import(mjsUrl)) as { default?: () => unknown; run?: () => unknown };
-        const result = module_.run?.() ?? await module_.default?.();
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
 
-        expect(result).toStrictEqual({ a: "a", b: "b", c: "c", d: "d", nestedA: "b" });
+        expect(mjsContent).toMatchSnapshot("ESM output");
+
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
+
+        expect(cjsContent).toMatchSnapshot("CommonJS output");
+    });
+
+    it("should rewrite barrel imports and run output", async () => {
+        expect.assertions(4);
+
+        const source = (p: string) => join(temporaryDirectoryPath, "src", p);
+
+        // optional: mark src as side-effect-free to align with common barrel setups
+        await writeJson(join(temporaryDirectoryPath, "src", "package.json"), { sideEffects: false }, { overwrite: true });
+
+        // leaf modules
+        await writeFile(source("components/foo.js"), "export default 'foo';\n");
+        await writeFile(source("components/bar.js"), "export const bar = 'bar';\n");
+        await writeFile(source("components/baz.js"), "export const baz = 'baz';\n");
+
+        // barrel file (re-exports)
+        await writeFile(
+            source("components/index.js"),
+            [
+                "export { default as Foo } from './foo';",
+                "export { bar } from './bar';",
+                "export * from './baz';",
+                "",
+            ].join("\n"),
+        );
+
+        // entry
+        await writeFile(
+            source("index.js"),
+            [
+                "import { Foo, bar, baz } from './components/index.js';",
+                "export const run = () => ({ Foo, bar, baz });",
+                "export default run;",
+                "",
+            ].join("\n"),
+        );
+
+        await createPackageJson(temporaryDirectoryPath, {
+            exports: {
+                ".": {
+                    import: "./dist/index.mjs",
+                    require: "./dist/index.cjs",
+                },
+            },
+            sideEffects: false,
+        });
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            transformer: "esbuild",
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
+
+        expect(mjsContent).toMatchSnapshot("ESM output");
+
+        const cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
+
+        expect(cjsContent).toMatchSnapshot("CommonJS output");
     });
 });

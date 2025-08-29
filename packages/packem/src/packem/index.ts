@@ -153,6 +153,7 @@ const generateOptions = (
             dataUri: {
                 srcset: true,
             },
+            debarrel: {},
             dts: {
                 compilerOptions: {
                     baseUrl: tsconfig?.config.compilerOptions?.baseUrl ?? ".",
@@ -302,10 +303,6 @@ const generateOptions = (
             },
             json: {
                 preferConst: true,
-            },
-            lazyBarrel: {
-                lazyThreshold: 2,
-                sideEffectsCheck: true,
             },
             license: {
                 dependenciesTemplate: (

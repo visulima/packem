@@ -15,6 +15,7 @@ import {
     copyPlugin,
     createSplitChunks,
     dataUriPlugin,
+    debarrelPlugin,
     dynamicImportVars as dynamicImportVariablesPlugin,
     esmShimCjsSyntaxPlugin,
     fixDtsDefaultCjsExportsPlugin,
@@ -22,7 +23,6 @@ import {
     isolatedDeclarationsPlugin,
     jsonPlugin,
     jsxRemoveAttributes,
-    lazyBarrelPlugin,
     licensePlugin,
     metafilePlugin,
     nodeResolve as nodeResolvePlugin,
@@ -598,7 +598,7 @@ export const getRollupOptions = async (
                 ...context.options.rollup.json,
             }),
 
-            context.options.rollup.lazyBarrel && lazyBarrelPlugin(context.options.rollup.lazyBarrel),
+            context.options.rollup.debarrel && debarrelPlugin(context.options.rollup.debarrel),
 
             chunkSplitter(),
 

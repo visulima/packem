@@ -35,7 +35,7 @@ describe(generateJsExports, () => {
 
         it("should handle TypeScript declarations", () => {
             expect.assertions(2);
-            
+
             const result = generateJsExports({
                 ...baseOptions,
                 dts: true,
@@ -50,7 +50,7 @@ describe(generateJsExports, () => {
     describe("cSS modules support", () => {
         it("should handle CSS modules exports", () => {
             expect.assertions(2);
-            
+
             const modulesExports = {
                 button: "button_abc123",
                 container: "container_def456",
@@ -68,7 +68,7 @@ describe(generateJsExports, () => {
 
         it("should handle CSS modules with TypeScript declarations", () => {
             expect.assertions(3);
-            
+
             const modulesExports = {
                 button: "button_abc123",
             };
@@ -89,7 +89,7 @@ describe(generateJsExports, () => {
     describe("named exports", () => {
         it("should generate named exports when enabled", () => {
             expect.assertions(4);
-            
+
             const modulesExports = {
                 button: "button_abc123",
             };
@@ -108,7 +108,7 @@ describe(generateJsExports, () => {
 
         it("should handle custom named export function", () => {
             expect.assertions(3);
-            
+
             const modulesExports = {
                 "my-button": "button_abc123",
             };
@@ -128,7 +128,7 @@ describe(generateJsExports, () => {
 
         it("should handle named exports with TypeScript declarations", () => {
             expect.assertions(3);
-            
+
             const modulesExports = {
                 button: "button_abc123",
             };
@@ -149,7 +149,7 @@ describe(generateJsExports, () => {
     describe("cSS injection", () => {
         it("should handle basic injection", () => {
             expect.assertions(3);
-            
+
             const result = generateJsExports({
                 ...baseOptions,
                 inject: true,
@@ -162,7 +162,7 @@ describe(generateJsExports, () => {
 
         it("should handle injection with options", () => {
             expect.assertions(3);
-            
+
             const result = generateJsExports({
                 ...baseOptions,
                 inject: { insertAt: "top" },
@@ -175,7 +175,7 @@ describe(generateJsExports, () => {
 
         it("should handle treeshakeable injection", () => {
             expect.assertions(3);
-            
+
             const result = generateJsExports({
                 ...baseOptions,
                 inject: { treeshakeable: true },
@@ -188,7 +188,7 @@ describe(generateJsExports, () => {
 
         it("should handle custom injection function", () => {
             expect.assertions(1);
-            
+
             const customInject = (varname: string, id: string, output: string[]) =>
                 `console.log("Injecting ${varname} from ${id}");`;
 
@@ -204,7 +204,7 @@ describe(generateJsExports, () => {
     describe("edge cases", () => {
         it("should handle CSS with special characters", () => {
             expect.assertions(1);
-            
+
             const cssWithSpecialChars = String.raw`body { content: "Hello \"World\""; }`;
             const result = generateJsExports({
                 ...baseOptions,
@@ -216,7 +216,7 @@ describe(generateJsExports, () => {
 
         it("should handle CSS with newlines", () => {
             expect.assertions(3);
-            
+
             const cssWithNewlines = `body {
                 color: red;
             }`;
@@ -232,7 +232,7 @@ describe(generateJsExports, () => {
 
         it("should handle reserved JavaScript keywords", () => {
             expect.assertions(1);
-            
+
             const modulesExports = {
                 css: "css_abc123", // 'css' is a reserved word
             };
@@ -250,7 +250,7 @@ describe(generateJsExports, () => {
     describe("error handling", () => {
         it("should throw error for reserved 'inject' keyword with treeshakeable", () => {
             expect.assertions(1);
-            
+
             const modulesExports = {
                 inject: "inject_abc123",
             };
