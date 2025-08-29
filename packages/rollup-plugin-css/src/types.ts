@@ -41,6 +41,18 @@ export interface InjectOptions {
     container?: string;
 
     /**
+     * Package method name to use with the package
+     * @default "cssStyleInject"
+     */
+    method?: string;
+
+    /**
+     * Package to import the CSS injector from
+     * @default "@visulima/css-style-inject"
+     */
+    package?: string;
+
+    /**
      * Insert `&lt;style>` tag(s) to the beginning of the container
      * @default false
      */
@@ -72,6 +84,9 @@ export interface InternalStyleOptions extends StyleOptions {
 
     /** @see {@link StyleOptions.mode} */
     inject: InjectOptions | boolean | ((varname: string, id: string, output: string[]) => string);
+
+    /** @see {@link StyleOptions.mode} */
+    inline: boolean;
 }
 
 export type LightningCSSOptions = Omit<TransformOptions<CustomAtRules>, "code" | "cssModules" | "filename" | "minify" | "targets"> & {
@@ -213,9 +228,11 @@ export interface StyleOptions {
      * but not outside of it.
      * - `"emit"` - Emit pure processed CSS and pass it along the build pipeline.
      * Useful if you want to preprocess CSS before using it with CSS consuming plugins.
+     * - `"inline"` - Embed CSS directly as strings in JavaScript modules.
+     * Reduces HTTP requests but increases bundle size. Ideal for small CSS files or critical CSS.
      * @default "inject"
      */
-    mode?: "emit" | "extract" | "inject" | ["extract", string] | ["inject", InjectOptions | ((varname: string, id: string) => string)];
+    mode?: "emit" | "extract" | "inject" | "inline" | ["extract", string] | ["inject", InjectOptions | ((varname: string, id: string) => string)];
 
     /**
      * Use named exports alongside default export.

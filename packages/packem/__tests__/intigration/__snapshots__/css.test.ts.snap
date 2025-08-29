@@ -373,6 +373,286 @@ console.log(css$5, css$4);
 "
 `;
 
+exports[`css > code-splitting > should work with processed 'inline' css > js 1`] = `
+"'use strict';
+
+var css = ".fourth {\\n  color: magenta;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb3VydGguc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGNBQWM7QUFDaEIiLCJzb3VyY2VzQ29udGVudCI6WyIuZm91cnRoIHtcbiAgY29sb3I6IG1hZ2VudGE7XG59Il19 */";
+
+console.log("sub");
+
+(async () => {
+  const first = await import('./packem_chunks/first.cjs');
+  const second = await import('./packem_chunks/second.cjs');
+  const otherScript = await import('./packem_chunks/other-script.cjs');
+  console.log(first, second, otherScript);
+})();
+console.log(css);
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline' css > js 2`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var css = ".partial {\\n    color: rosybrown;\\n}\\n.first {\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9wYXJ0aWFsLmNzcyIsInNyYy9maXJzdC5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksZ0JBQWdCO0FBQ3BCO0FDREE7RUFDRSxVQUFVO0FBQ1oiLCJzb3VyY2VzQ29udGVudCI6WyIucGFydGlhbCB7XG4gICAgY29sb3I6IHJvc3licm93bjtcbn1cbiIsIkBpbXBvcnQgXCIuL3BhcnRpYWwuY3NzXCI7XG4uZmlyc3Qge1xuICBjb2xvcjogcmVkO1xufSJdfQ== */";
+
+exports.css = css;
+exports.default = css;
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline' css > js 3`] = `
+"'use strict';
+
+var css = ".nondynamic2 {\\n  color: deeppink;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9ub25keW5hbWljMi5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsZUFBZTtBQUNqQiIsInNvdXJjZXNDb250ZW50IjpbIi5ub25keW5hbWljMiB7XG4gIGNvbG9yOiBkZWVwcGluaztcbn0iXX0= */";
+
+console.log(css);
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline' css > js 4`] = `
+"'use strict';
+
+console.log("noncss");
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline' css > js 5`] = `
+"'use strict';
+
+(async () => {
+  await import('./noncss.cjs');
+  const nestedScript = await import('./nested-script.cjs');
+  console.log(nestedScript);
+})();
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline' css > js 6`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var css = ".second {\\n  color: royalblue;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zZWNvbmQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGdCQUFnQjtBQUNsQiIsInNvdXJjZXNDb250ZW50IjpbIi5zZWNvbmQge1xuICBjb2xvcjogcm95YWxibHVlO1xufSJdfQ== */";
+
+exports.css = css;
+exports.default = css;
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline' css > js 7`] = `
+"var css = ".fourth {\\n  color: magenta;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb3VydGguc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGNBQWM7QUFDaEIiLCJzb3VyY2VzQ29udGVudCI6WyIuZm91cnRoIHtcbiAgY29sb3I6IG1hZ2VudGE7XG59Il19 */";
+
+console.log("sub");
+
+(async () => {
+  const first = await import('./packem_chunks/first.mjs');
+  const second = await import('./packem_chunks/second.mjs');
+  const otherScript = await import('./packem_chunks/other-script.mjs');
+  console.log(first, second, otherScript);
+})();
+console.log(css);
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline' css > js 8`] = `
+"var css = ".partial {\\n    color: rosybrown;\\n}\\n.first {\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9wYXJ0aWFsLmNzcyIsInNyYy9maXJzdC5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksZ0JBQWdCO0FBQ3BCO0FDREE7RUFDRSxVQUFVO0FBQ1oiLCJzb3VyY2VzQ29udGVudCI6WyIucGFydGlhbCB7XG4gICAgY29sb3I6IHJvc3licm93bjtcbn1cbiIsIkBpbXBvcnQgXCIuL3BhcnRpYWwuY3NzXCI7XG4uZmlyc3Qge1xuICBjb2xvcjogcmVkO1xufSJdfQ== */";
+
+export { css, css as default };
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline' css > js 9`] = `
+"var css = ".nondynamic2 {\\n  color: deeppink;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9ub25keW5hbWljMi5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsZUFBZTtBQUNqQiIsInNvdXJjZXNDb250ZW50IjpbIi5ub25keW5hbWljMiB7XG4gIGNvbG9yOiBkZWVwcGluaztcbn0iXX0= */";
+
+console.log(css);
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline' css > js 10`] = `
+"console.log("noncss");
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline' css > js 11`] = `
+"(async () => {
+  await import('./noncss.mjs');
+  const nestedScript = await import('./nested-script.mjs');
+  console.log(nestedScript);
+})();
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline' css > js 12`] = `
+"var css = ".second {\\n  color: royalblue;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zZWNvbmQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGdCQUFnQjtBQUNsQiIsInNvdXJjZXNDb250ZW50IjpbIi5zZWNvbmQge1xuICBjb2xvcjogcm95YWxibHVlO1xufSJdfQ== */";
+
+export { css, css as default };
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 1`] = `
+"'use strict';
+
+require('./packem_shared/index-_5HPSrDP.cjs');
+
+var css = ".fourth {\\n  color: magenta;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb3VydGguc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGNBQWM7QUFDaEIiLCJzb3VyY2VzQ29udGVudCI6WyIuZm91cnRoIHtcbiAgY29sb3I6IG1hZ2VudGE7XG59Il19 */";
+
+(async () => {
+  const first = await import('./packem_chunks/first.cjs');
+  const second = await import('./packem_chunks/second.cjs');
+  const otherScript = await import('./packem_chunks/other-script.cjs');
+  console.log(first, second, otherScript);
+})();
+console.log(css);
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 2`] = `
+"'use strict';
+
+require('./packem_shared/index-_5HPSrDP.cjs');
+
+var css = ".fourthtwo {\\n  color: honeydew;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb3VydGh0d28uc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGVBQWU7QUFDakIiLCJzb3VyY2VzQ29udGVudCI6WyIuZm91cnRodHdvIHtcbiAgY29sb3I6IGhvbmV5ZGV3O1xufSJdfQ== */";
+
+(async () => {
+  const first = await import('./packem_chunks/first.cjs');
+  const second = await import('./packem_chunks/second.cjs');
+  const otherScript = await import('./packem_chunks/other-script.cjs');
+  console.log(first, second, otherScript);
+})();
+console.log(css);
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 3`] = `
+"'use strict';
+
+console.log("sub");
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 4`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var css = ".partial {\\n    color: rosybrown;\\n}\\n.first {\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9wYXJ0aWFsLmNzcyIsInNyYy9maXJzdC5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksZ0JBQWdCO0FBQ3BCO0FDREE7RUFDRSxVQUFVO0FBQ1oiLCJzb3VyY2VzQ29udGVudCI6WyIucGFydGlhbCB7XG4gICAgY29sb3I6IHJvc3licm93bjtcbn1cbiIsIkBpbXBvcnQgXCIuL3BhcnRpYWwuY3NzXCI7XG4uZmlyc3Qge1xuICBjb2xvcjogcmVkO1xufSJdfQ== */";
+
+exports.css = css;
+exports.default = css;
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 5`] = `
+"'use strict';
+
+var css = ".nondynamic2 {\\n  color: deeppink;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9ub25keW5hbWljMi5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsZUFBZTtBQUNqQiIsInNvdXJjZXNDb250ZW50IjpbIi5ub25keW5hbWljMiB7XG4gIGNvbG9yOiBkZWVwcGluaztcbn0iXX0= */";
+
+console.log(css);
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 6`] = `
+"'use strict';
+
+console.log("noncss");
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 7`] = `
+"'use strict';
+
+(async () => {
+  await import('./noncss.cjs');
+  const nestedScript = await import('./nested-script.cjs');
+  console.log(nestedScript);
+})();
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 8`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var css = ".second {\\n  color: royalblue;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zZWNvbmQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGdCQUFnQjtBQUNsQiIsInNvdXJjZXNDb250ZW50IjpbIi5zZWNvbmQge1xuICBjb2xvcjogcm95YWxibHVlO1xufSJdfQ== */";
+
+exports.css = css;
+exports.default = css;
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 9`] = `
+"import './packem_shared/index-se_V0QGn.mjs';
+
+var css = ".fourth {\\n  color: magenta;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb3VydGguc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGNBQWM7QUFDaEIiLCJzb3VyY2VzQ29udGVudCI6WyIuZm91cnRoIHtcbiAgY29sb3I6IG1hZ2VudGE7XG59Il19 */";
+
+(async () => {
+  const first = await import('./packem_chunks/first.mjs');
+  const second = await import('./packem_chunks/second.mjs');
+  const otherScript = await import('./packem_chunks/other-script.mjs');
+  console.log(first, second, otherScript);
+})();
+console.log(css);
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 10`] = `
+"import './packem_shared/index-se_V0QGn.mjs';
+
+var css = ".fourthtwo {\\n  color: honeydew;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb3VydGh0d28uc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGVBQWU7QUFDakIiLCJzb3VyY2VzQ29udGVudCI6WyIuZm91cnRodHdvIHtcbiAgY29sb3I6IGhvbmV5ZGV3O1xufSJdfQ== */";
+
+(async () => {
+  const first = await import('./packem_chunks/first.mjs');
+  const second = await import('./packem_chunks/second.mjs');
+  const otherScript = await import('./packem_chunks/other-script.mjs');
+  console.log(first, second, otherScript);
+})();
+console.log(css);
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 11`] = `
+"console.log("sub");
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 12`] = `
+"var css = ".partial {\\n    color: rosybrown;\\n}\\n.first {\\n  color: red;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9wYXJ0aWFsLmNzcyIsInNyYy9maXJzdC5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksZ0JBQWdCO0FBQ3BCO0FDREE7RUFDRSxVQUFVO0FBQ1oiLCJzb3VyY2VzQ29udGVudCI6WyIucGFydGlhbCB7XG4gICAgY29sb3I6IHJvc3licm93bjtcbn1cbiIsIkBpbXBvcnQgXCIuL3BhcnRpYWwuY3NzXCI7XG4uZmlyc3Qge1xuICBjb2xvcjogcmVkO1xufSJdfQ== */";
+
+export { css, css as default };
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 13`] = `
+"var css = ".nondynamic2 {\\n  color: deeppink;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9ub25keW5hbWljMi5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsZUFBZTtBQUNqQiIsInNvdXJjZXNDb250ZW50IjpbIi5ub25keW5hbWljMiB7XG4gIGNvbG9yOiBkZWVwcGluaztcbn0iXX0= */";
+
+console.log(css);
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 14`] = `
+"console.log("noncss");
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 15`] = `
+"(async () => {
+  await import('./noncss.mjs');
+  const nestedScript = await import('./nested-script.mjs');
+  console.log(nestedScript);
+})();
+"
+`;
+
+exports[`css > code-splitting > should work with processed 'inline-multi-entry' css > js 16`] = `
+"var css = ".second {\\n  color: royalblue;\\n}\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9zZWNvbmQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGdCQUFnQjtBQUNsQiIsInNvdXJjZXNDb250ZW50IjpbIi5zZWNvbmQge1xuICBjb2xvcjogcm95YWxibHVlO1xufSJdfQ== */";
+
+export { css, css as default };
+"
+`;
+
 exports[`css > code-splitting > should work with processed 'multi-entry' css > css 1`] = `
 ".partial {
     color: rosybrown;
@@ -2517,6 +2797,207 @@ inject: function inject() { if (!injected) { injected = true; cssStyleInject(css
 
 if (modules_354770d7.inject) modules_354770d7.inject();
 else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-duplication' css > js 1`] = `
+"'use strict';
+
+var modules_fa509c68 = {"test":"shared_test_aaf91828"};
+
+var modules_52530603 = {"foo":"foo_foo_15d01375 shared_test_aaf91828"};
+
+var modules_ad1fd3ff = {"bar":"bar_bar_932cc2fc shared_test_aaf91828"};
+
+console.log(modules_fa509c68, modules_52530603, modules_ad1fd3ff);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-duplication' css > js 2`] = `
+"var modules_fa509c68 = {"test":"shared_test_aaf91828"};
+
+var modules_52530603 = {"foo":"foo_foo_15d01375 shared_test_aaf91828"};
+
+var modules_ad1fd3ff = {"bar":"bar_bar_932cc2fc shared_test_aaf91828"};
+
+console.log(modules_fa509c68, modules_52530603, modules_ad1fd3ff);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-modules' css > js 1`] = `
+"'use strict';
+
+var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-modules' css > js 2`] = `
+"var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-modules-named-exports' css > js 1`] = `
+"'use strict';
+
+var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-modules-named-exports' css > js 2`] = `
+"var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-named-exports' css > js 1`] = `
+"'use strict';
+
+var css = ".style_valid_eb2cde07 {\\n    color: red;\\n}\\n\\n.style_new_eb2cde07 {\\n    color: blue;\\n}\\n\\n.style_css_eb2cde07 {\\n    color: green;\\n}\\n";
+var modules_5a199c00 = {"valid":"style_valid_eb2cde07","new":"style_new_eb2cde07","css":"style_css_eb2cde07"};
+
+console.log(css);
+for (const name of Object.values(modules_5a199c00)) {
+  console.log(name);
+}
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-named-exports' css > js 2`] = `
+"var css = ".style_valid_eb2cde07 {\\n    color: red;\\n}\\n\\n.style_new_eb2cde07 {\\n    color: blue;\\n}\\n\\n.style_css_eb2cde07 {\\n    color: green;\\n}\\n";
+var modules_5a199c00 = {"valid":"style_valid_eb2cde07","new":"style_new_eb2cde07","css":"style_css_eb2cde07"};
+
+console.log(css);
+for (const name of Object.values(modules_5a199c00)) {
+  console.log(name);
+}
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-named-exports-custom-class-name' css > js 1`] = `
+"'use strict';
+
+var css = ".style_valid_eb2cde07 {\\n    color: red;\\n}\\n\\n.style_new_eb2cde07 {\\n    color: blue;\\n}\\n\\n.style_css_eb2cde07 {\\n    color: green;\\n}\\n";
+var modules_5a199c00 = {"valid":"style_valid_eb2cde07","new":"style_new_eb2cde07","css":"style_css_eb2cde07"};
+
+console.log(css);
+for (const name of Object.values(modules_5a199c00)) {
+  console.log(name);
+}
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-named-exports-custom-class-name' css > js 2`] = `
+"var css = ".style_valid_eb2cde07 {\\n    color: red;\\n}\\n\\n.style_new_eb2cde07 {\\n    color: blue;\\n}\\n\\n.style_css_eb2cde07 {\\n    color: green;\\n}\\n";
+var modules_5a199c00 = {"valid":"style_valid_eb2cde07","new":"style_new_eb2cde07","css":"style_css_eb2cde07"};
+
+console.log(css);
+for (const name of Object.values(modules_5a199c00)) {
+  console.log(name);
+}
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const a = require('./packem_shared/a-cKDs89PO.cjs');
+const b = require('./packem_shared/b-nXuuMSaC.cjs');
+
+
+
+exports.a = a.a;
+exports.b = b.b;
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 2`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var modules_bdb828b9 = {"treeshake-module-a":"a_treeshakeModuleA_a9b36f2f"};
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function a() {
+  return modules_bdb828b9;
+}
+__name(a, "a");
+
+exports.a = a;
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 3`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+var modules_af8c69dd = {"treeshake-module-b":"b_treeshakeModuleB_1a2d7396"};
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function b() {
+  return modules_af8c69dd;
+}
+__name(b, "b");
+
+exports.b = b;
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 4`] = `
+"export { a } from './packem_shared/a-DF7uJU-7.mjs';
+export { b } from './packem_shared/b-CSY5UMJG.mjs';
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 5`] = `
+"var modules_bdb828b9 = {"treeshake-module-a":"a_treeshakeModuleA_a9b36f2f"};
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function a() {
+  return modules_bdb828b9;
+}
+__name(a, "a");
+
+export { a };
+"
+`;
+
+exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 6`] = `
+"var modules_af8c69dd = {"treeshake-module-b":"b_treeshakeModuleB_1a2d7396"};
+
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+function b() {
+  return modules_af8c69dd;
+}
+__name(b, "b");
+
+export { b };
 "
 `;
 
@@ -6733,6 +7214,26 @@ const styles = css\`main {
 \`;
 
 console.log(styles);
+"
+`;
+
+exports[`css > emit > should work with emitted processed 'inline-basic' css > js 1`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > emit > should work with emitted processed 'inline-basic' css > js 2`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
 "
 `;
 
@@ -15270,6 +15771,210 @@ console.log(css$5, css$4);
 "
 `;
 
+exports[`css > inline > should work with inline processed 'auto-modules' css > js 1`] = `
+"'use strict';
+
+var modules_bdb828b9 = {"a":"a_a_69de543e"};
+
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'auto-modules' css > js 2`] = `
+"var modules_bdb828b9 = {"a":"a_a_69de543e"};
+
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'auto-modules-named-exports' css > js 1`] = `
+"'use strict';
+
+var modules_bdb828b9 = {"a":"a_a_69de543e"};
+
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'auto-modules-named-exports' css > js 2`] = `
+"var modules_bdb828b9 = {"a":"a_a_69de543e"};
+
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'basic' css > js 1`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'basic' css > js 2`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'inline-sourcemap' css > js 1`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'inline-sourcemap' css > js 2`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'inline-sourcemap-inline' css > js 1`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'inline-sourcemap-inline' css > js 2`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'modules' css > js 1`] = `
+"'use strict';
+
+var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'modules' css > js 2`] = `
+"var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'modules-custom-named-exports' css > js 1`] = `
+"'use strict';
+
+var css = ".style_valid_eb2cde07 {\\n    color: red;\\n}\\n\\n.style_new_eb2cde07 {\\n    color: blue;\\n}\\n\\n.style_css_eb2cde07 {\\n    color: green;\\n}\\n";
+var modules_5a199c00 = {"valid":"style_valid_eb2cde07","new":"style_new_eb2cde07","css":"style_css_eb2cde07"};
+
+console.log(css);
+for (const name of Object.values(modules_5a199c00)) {
+  console.log(name);
+}
+"
+`;
+
+exports[`css > inline > should work with inline processed 'modules-custom-named-exports' css > js 2`] = `
+"var css = ".style_valid_eb2cde07 {\\n    color: red;\\n}\\n\\n.style_new_eb2cde07 {\\n    color: blue;\\n}\\n\\n.style_css_eb2cde07 {\\n    color: green;\\n}\\n";
+var modules_5a199c00 = {"valid":"style_valid_eb2cde07","new":"style_new_eb2cde07","css":"style_css_eb2cde07"};
+
+console.log(css);
+for (const name of Object.values(modules_5a199c00)) {
+  console.log(name);
+}
+"
+`;
+
+exports[`css > inline > should work with inline processed 'modules-named-exports' css > js 1`] = `
+"'use strict';
+
+var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'modules-named-exports' css > js 2`] = `
+"var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'named-exports' css > js 1`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > inline > should work with inline processed 'named-exports' css > js 2`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
+"
+`;
+
 exports[`css > less > should work with less processed 'paths' css > js 1`] = `
 "'use strict';
 
@@ -15685,6 +16390,186 @@ var css = ".less {\\n  color: #6c94be;\\n}\\n";
 cssStyleInject(css,{});
 
 console.log(css$5, css$4);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline' css with 'cssnano' > js 1`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline' css with 'cssnano' > js 2`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-auto-modules' css with 'cssnano' > js 1`] = `
+"'use strict';
+
+var modules_bdb828b9 = {"a":"a_a_69de543e"};
+
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-auto-modules' css with 'cssnano' > js 2`] = `
+"var modules_bdb828b9 = {"a":"a_a_69de543e"};
+
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-auto-modules-lightningcss' css with 'lightningcss' > js 1`] = `
+"'use strict';
+
+var modules_bdb828b9 = {"a":"a_a_69de543e"};
+
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-auto-modules-lightningcss' css with 'lightningcss' > js 2`] = `
+"var modules_bdb828b9 = {"a":"a_a_69de543e"};
+
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-lightningcss' css with 'lightningcss' > js 1`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-lightningcss' css with 'lightningcss' > js 2`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-modules' css with 'cssnano' > js 1`] = `
+"'use strict';
+
+var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-modules' css with 'cssnano' > js 2`] = `
+"var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-modules-lightningcss' css with 'lightningcss' > js 1`] = `
+"'use strict';
+
+var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-modules-lightningcss' css with 'lightningcss' > js 2`] = `
+"var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-named-exports' css with 'cssnano' > js 1`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-named-exports' css with 'cssnano' > js 2`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-named-exports-lightningcss' css with 'lightningcss' > js 1`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > minify > should minimize processed 'inline-named-exports-lightningcss' css with 'lightningcss' > js 2`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n";
+
+var css = ".bar {\\n    color: red;\\n}\\n";
+
+console.log(css$1, css);
 "
 `;
 
@@ -16114,6 +16999,116 @@ console.log(css$5, css$4);
 "
 `;
 
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-auto-modules-sourcemap' css > js 1`] = `
+"'use strict';
+
+var modules_bdb828b9 = {"a":"a_a_69de543e"};
+
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-auto-modules-sourcemap' css > js 2`] = `
+"var modules_bdb828b9 = {"a":"a_a_69de543e"};
+
+var modules_9fa995d6 = {"b":"b_b_cc874d97"};
+
+var modules_2b321dac = {"c":"c_c_4990a2ba"};
+
+var modules_39901a8c = {"d":"d_d_964cca5f"};
+
+console.log(modules_bdb828b9, modules_9fa995d6, modules_2b321dac, modules_39901a8c);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-inline' css > js 1`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-inline' css > js 2`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-inline-no-content' css > js 1`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-inline-no-content' css > js 2`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-inline-transform' css > js 1`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-inline-transform' css > js 2`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-modules-sourcemap' css > js 1`] = `
+"'use strict';
+
+var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-modules-sourcemap' css > js 2`] = `
+"var modules_5a199c00 = {"module":"style_module_ea61eaf4"};
+
+var modules_354770d7 = {"compositioned":"composition2_compositioned_33aa26b9"};
+
+if (modules_354770d7.inject) modules_354770d7.inject();
+else console.log(modules_5a199c00.module, modules_354770d7.compositioned);
+"
+`;
+
 exports[`css > sourcemap > should generate sourcemap for processed 'inline-no-content' css > js 1`] = `
 "'use strict';
 
@@ -16166,6 +17161,26 @@ console.log(css$5, css$4);
 "
 `;
 
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-no-content' css > js 3`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-no-content' css > js 4`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIn0= */";
+
+console.log(css$1, css);
+"
+`;
+
 exports[`css > sourcemap > should generate sourcemap for processed 'inline-transform' css > js 1`] = `
 "'use strict';
 
@@ -16215,6 +17230,46 @@ var css = ".less {\\n  color: #6c94be;\\n}\\n\\n/*# sourceMappingURL=data:applic
 cssStyleInject(css,{});
 
 console.log(css$5, css$4);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-transform' css > js 3`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-transform' css > js 4`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-true' css > js 1`] = `
+"'use strict';
+
+var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+console.log(css$1, css);
+"
+`;
+
+exports[`css > sourcemap > should generate sourcemap for processed 'inline-true' css > js 2`] = `
+"var css$1 = ".foo {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9mb28uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmZvbyB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+var css = ".bar {\\n    color: red;\\n}\\n\\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9iYXIuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0lBQ0ksVUFBVTtBQUNkIiwic291cmNlc0NvbnRlbnQiOlsiLmJhciB7XG4gICAgY29sb3I6IHJlZDtcbn1cbiJdfQ== */";
+
+console.log(css$1, css);
 "
 `;
 

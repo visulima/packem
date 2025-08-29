@@ -537,6 +537,7 @@ const cssPlugin = async (
                 extract: loaderOptions.extract,
                 id: transformId,
                 inject: loaderOptions.inject,
+                inline: loaderOptions.inline,
                 logger,
                 namedExports: loaderOptions.namedExports,
                 options: {},
