@@ -1,1 +1,1 @@
-export { default } from "@visulima/rollup-css-plugin/loader/tailwindcss";
+export { default } from "@visulima/rollup-plugin-css/loader/tailwindcss";

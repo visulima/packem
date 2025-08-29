@@ -5,7 +5,7 @@
     "projectType": "library",
     "tags": ["type:package", "packem"],
     "implicitDependencies": [
-        "rollup-css-plugin",
+        "rollup-plugin-css",
         "packem-share",
         "packem-rollup"
     ]

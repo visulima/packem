@@ -28,9 +28,9 @@ Complete API documentation for all Packen packages. Each package provides specif
   />
   
   <ApiCard
-    title="@visulima/rollup-css-plugin"
+    title="@visulima/rollup-plugin-css"
     description="CSS processing and optimization plugin"
-    href="/docs/api/rollup-css-plugin"
+    href="/docs/api/rollup-plugin-css"
     badges={['CSS', 'Sass', 'PostCSS']}
   />
   
@@ -68,9 +68,9 @@ Complete API documentation for all Packen packages. Each package provides specif
 - [`sucrase`](/docs/api/packem-rollup#sucrase) - sucrase transformer
 
 ### CSS APIs
-- [`CssOptions`](/docs/api/rollup-css-plugin#cssoptions) - CSS configuration
-- [`SassOptions`](/docs/api/rollup-css-plugin#sassoptions) - Sass configuration
-- [`PostCssOptions`](/docs/api/rollup-css-plugin#postcssoptions) - PostCSS configuration
+- [`CssOptions`](/docs/api/rollup-plugin-css#cssoptions) - CSS configuration
+- [`SassOptions`](/docs/api/rollup-plugin-css#sassoptions) - Sass configuration
+- [`PostCssOptions`](/docs/api/rollup-plugin-css#postcssoptions) - PostCSS configuration
 - [`injectStyles()`](/docs/api/css-style-inject#injectstyles) - Runtime CSS injection
 
 ## Type Definitions
@@ -116,7 +116,7 @@ interface BuildEntry {
   // ... more options
 }
 
-// CSS configuration (from rollup-css-plugin)
+// CSS configuration (from rollup-plugin-css)
 interface StyleOptions {
   mode?: 'inject' | 'extract' | 'emit'
   loaders?: CssLoader[]
@@ -205,7 +205,7 @@ export function myCustomPlugin(): Plugin {
 ### CSS Loader
 
 ```typescript
-import type { CssLoader } from '@visulima/rollup-css-plugin'
+import type { CssLoader } from '@visulima/rollup-plugin-css'
 
 export const myCustomLoader: CssLoader = {
   name: 'my-loader',
@@ -337,7 +337,7 @@ export default defineConfig({
 |---------|---------|---------|------------|
 | `@visulima/packem` | ^1.28.0 | >=20.0.0 | >=4.5.0 |
 | `@visulima/packem-rollup` | ^0.0.0 | >=20.0.0 | >=4.5.0 |
-| `@visulima/rollup-css-plugin` | ^0.0.0 | >=20.0.0 | >=4.5.0 |
+| `@visulima/rollup-plugin-css` | ^0.0.0 | >=20.0.0 | >=4.5.0 |
 
 ## Migration Guides
 
@@ -380,8 +380,8 @@ Click on any package below to explore its complete API documentation:
     </div>
   </a>
   
-  <a href="/docs/api/rollup-css-plugin" className="package-link">
-    <h3>@visulima/rollup-css-plugin</h3>
+  <a href="/docs/api/rollup-plugin-css" className="package-link">
+    <h3>@visulima/rollup-plugin-css</h3>
     <p>Comprehensive CSS processing with preprocessors and optimization</p>
     <div className="package-stats">
       <Badge>CSS</Badge>

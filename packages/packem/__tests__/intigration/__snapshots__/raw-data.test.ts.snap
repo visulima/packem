@@ -1,0 +1,23 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem raw data > should generate js files with included raw HTML content > CommonJS output with raw HTML content 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const data = "<!DOCTYPE html>\\n<html lang=\\"en\\" data-theme=\\"dark\\" class=\\"no-js\\">\\n<head>\\n    <meta charset=\\"UTF-8\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">\\n    <meta name=\\"description\\" content=\\"Test HTML file with various attributes\\">\\n    <title data-testid=\\"page-title\\">Test Page</title>\\n    <link rel=\\"stylesheet\\" href=\\"styles.css\\" crossorigin=\\"anonymous\\" data-preload>\\n    <script src=\\"app.js\\" defer async type=\\"module\\" data-entry-point></script>\\n</head>\\n<body data-page=\\"test\\" class=\\"loading ready\\">\\n    <header role=\\"banner\\" aria-label=\\"Site header\\">\\n        <nav role=\\"navigation\\" aria-labelledby=\\"main-nav\\">\\n            <ul id=\\"main-nav\\" class=\\"nav-list\\">\\n                <li><a href=\\"/\\" class=\\"nav-link active\\" data-nav-item=\\"home\\">Home</a></li>\\n                <li><a href=\\"/about\\" class=\\"nav-link\\" data-nav-item=\\"about\\" aria-current=\\"false\\">About</a></li>\\n            </ul>\\n        </nav>\\n    </header>\\n    <main role=\\"main\\" id=\\"content\\" data-content-area>\\n        <article class=\\"post\\" data-post-id=\\"123\\" itemscope itemtype=\\"https://schema.org/Article\\">\\n            <h1 itemprop=\\"headline\\" data-heading-level=\\"1\\">Test Article</h1>\\n            <p class=\\"excerpt\\" data-word-count=\\"150\\">This is a test paragraph with <strong>bold text</strong> and <em>italic text</em>.</p>\\n            <img src=\\"image.jpg\\" alt=\\"Test image\\" width=\\"800\\" height=\\"600\\" loading=\\"lazy\\" data-src=\\"image.jpg\\">\\n        </article>\\n    </main>\\n    <footer role=\\"contentinfo\\" data-footer>\\n        <p>&copy; 2024 Test Site</p>\\n    </footer>\\n</body>\\n</html>";
+
+const template = data;
+
+exports.template = template;
+"
+`;
+
+exports[`packem raw data > should generate js files with included raw HTML content > ESM output with raw HTML content 1`] = `
+"const data = "<!DOCTYPE html>\\n<html lang=\\"en\\" data-theme=\\"dark\\" class=\\"no-js\\">\\n<head>\\n    <meta charset=\\"UTF-8\\">\\n    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">\\n    <meta name=\\"description\\" content=\\"Test HTML file with various attributes\\">\\n    <title data-testid=\\"page-title\\">Test Page</title>\\n    <link rel=\\"stylesheet\\" href=\\"styles.css\\" crossorigin=\\"anonymous\\" data-preload>\\n    <script src=\\"app.js\\" defer async type=\\"module\\" data-entry-point></script>\\n</head>\\n<body data-page=\\"test\\" class=\\"loading ready\\">\\n    <header role=\\"banner\\" aria-label=\\"Site header\\">\\n        <nav role=\\"navigation\\" aria-labelledby=\\"main-nav\\">\\n            <ul id=\\"main-nav\\" class=\\"nav-list\\">\\n                <li><a href=\\"/\\" class=\\"nav-link active\\" data-nav-item=\\"home\\">Home</a></li>\\n                <li><a href=\\"/about\\" class=\\"nav-link\\" data-nav-item=\\"about\\" aria-current=\\"false\\">About</a></li>\\n            </ul>\\n        </nav>\\n    </header>\\n    <main role=\\"main\\" id=\\"content\\" data-content-area>\\n        <article class=\\"post\\" data-post-id=\\"123\\" itemscope itemtype=\\"https://schema.org/Article\\">\\n            <h1 itemprop=\\"headline\\" data-heading-level=\\"1\\">Test Article</h1>\\n            <p class=\\"excerpt\\" data-word-count=\\"150\\">This is a test paragraph with <strong>bold text</strong> and <em>italic text</em>.</p>\\n            <img src=\\"image.jpg\\" alt=\\"Test image\\" width=\\"800\\" height=\\"600\\" loading=\\"lazy\\" data-src=\\"image.jpg\\">\\n        </article>\\n    </main>\\n    <footer role=\\"contentinfo\\" data-footer>\\n        <p>&copy; 2024 Test Site</p>\\n    </footer>\\n</body>\\n</html>";
+
+const template = data;
+
+export { template };
+"
+`;
