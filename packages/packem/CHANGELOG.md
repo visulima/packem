@@ -1,3 +1,24 @@
+## @visulima/packem [2.0.0-alpha.15](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.14...@visulima/packem@2.0.0-alpha.15) (2025-08-29)
+
+### Features
+
+* added the first migration for the rolldown-plugin-dts for rollup ([fb3321f](https://github.com/visulima/packem/commit/fb3321fedb5101368bdf8e711db30d00d9ef26f3))
+* enhance jiti import resolution in create-stub ([6c4ddb3](https://github.com/visulima/packem/commit/6c4ddb32238fd5cb3ac94e9f98ce27999c58034a))
+* implement lazy barrel optimization in rollup-plugin ([2cdcb34](https://github.com/visulima/packem/commit/2cdcb342f41940b4b277698740153953b905acd0))
+* introduce debarrel optimization for improved import handling ([129435e](https://github.com/visulima/packem/commit/129435ee941f2cd9f003046225e2a8862eb2cba7))
+* update rollup-plugin-dts with new dependencies and type handling improvements ([b9ca7f8](https://github.com/visulima/packem/commit/b9ca7f802247977c5cd0a4debf8fe3a376c525df))
+
+### Code Refactoring
+
+* rename rollup-css-plugin to rollup-plugin-css and update related imports ([876e241](https://github.com/visulima/packem/commit/876e241ec8cf727e9f1666902733996752b18295))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.12
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.9
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.1
+
 ## @visulima/packem [2.0.0-alpha.14](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.13...@visulima/packem@2.0.0-alpha.14) (2025-08-25)
 
 ### Features
