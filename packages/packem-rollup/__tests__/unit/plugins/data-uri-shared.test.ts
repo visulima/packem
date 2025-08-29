@@ -16,6 +16,7 @@ describe("dataUriPlugin with shared utilities", () => {
         expect.assertions(2);
 
         const plugin = dataUriPlugin();
+
         expect(plugin).toBeDefined();
         expect(plugin.name).toBe("packem:data-uri");
     });
@@ -24,8 +25,8 @@ describe("dataUriPlugin with shared utilities", () => {
         expect.assertions(2);
 
         const plugin = dataUriPlugin({
-            include: [/\.svg$/],
             exclude: [/\.min\.svg$/],
+            include: [/\.svg$/],
             srcset: true,
         });
 

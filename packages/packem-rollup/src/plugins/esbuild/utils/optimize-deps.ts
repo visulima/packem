@@ -8,9 +8,10 @@
 import { findCacheDirSync } from "@visulima/find-cache-dir";
 import { readFileSync } from "@visulima/fs";
 import { join } from "@visulima/path";
-import { init, parse } from "es-module-lexer";
 import type { OnResolveArgs, OnResolveResult } from "esbuild";
 import { build as esbuildBuild } from "esbuild";
+// eslint-disable-next-line import/no-namespace
+import * as rsModuleLexer from "rs-module-lexer";
 
 import type { Optimized, OptimizeDepsOptions, OptimizeDepsResult } from "../types";
 
@@ -27,7 +28,6 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
         throw new Error("[packem:optimize-deps]: failed to find or create cache directory \"node_modules/.cache/packem/optimize_deps\".");
     }
 
-    await init;
     await esbuildBuild({
         absWorkingDir: options.cwd,
         bundle: true,
@@ -81,10 +81,14 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
 
                     build.onLoad({ filter: /.*/, namespace: "optimize-deps" }, async (arguments_) => {
                         const { absolute, resolveDir } = arguments_.pluginData;
-                        const [, exported] = parse(readFileSync(absolute) as unknown as string);
+                        const sourceCode = readFileSync(absolute) as unknown as string;
+                        const { output } = await rsModuleLexer.parseAsync({ input: [{ code: sourceCode, filename: absolute }] });
+                        const exported = output[0]?.exports ?? [];
 
                         return {
-                            contents: exported.length > 0 ? `export * from '${slash(absolute)}'` : `module.exports = require('${slash(absolute)}')`,
+                            contents: exported.length > 0
+                                ? `export * from '${slash(absolute)}'`
+                                : `module.exports = require('${slash(absolute)}')`,
                             resolveDir,
                         };
                     });

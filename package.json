@@ -88,12 +88,10 @@
         "onlyBuiltDependencies": [
             "@parcel/watcher",
             "@swc/core",
-            "@tailwindcss/oxide",
             "esbuild",
             "node-sass",
             "nodehun",
             "nx",
-            "unrs-resolver",
             "oxc-resolver"
         ],
         "overrides": {

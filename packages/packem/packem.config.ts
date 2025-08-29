@@ -20,7 +20,7 @@ export default defineConfig({
         "rollup-plugin-pure",
         "rollup-plugin-dts",
         "rollup-plugin-license",
-        "es-module-lexer",
+        "rs-module-lexer",
         "glob-parent",
         "oxc-parser",
         "oxc-resolver",

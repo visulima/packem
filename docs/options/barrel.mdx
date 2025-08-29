@@ -1,0 +1,37 @@
+---
+title: Barrel files
+description: Optimize barrel files by rewriting to direct imports (debarrel)
+---
+
+## Overview
+
+Barrel files (e.g., `index.ts`) re‑export from multiple modules for ergonomic imports. They can hurt tree‑shaking and create cycles.
+Debarrel rewrites imports that target a barrel file into direct imports from source files at build time (best for dev/test speed and tree‑shaking)
+
+## Debarrel
+
+Rewrites `import { X } from "./components"` to `import { X } from "./components/X"` (based on re‑exports) during transform.
+
+Enable via Packem config (built-in):
+
+```ts
+import { defineConfig } from "@visulima/packem/config";
+
+export default defineConfig({
+  rollup: {
+    debarrel: {
+      // include: [/\.([cm]?tsx?|jsx)$/],
+      // possibleBarrelFiles: [/index\.(t|j)sx?$/],
+    },
+  },
+});
+```
+
+Notes:
+- Targets TS/JS and JSX variants; you can further scope via `include`
+- Works purely at build time; no runtime overhead
+
+## Tests
+
+See integration tests under `packages/packem/__tests__/intigration`:
+- `barrel.test.ts` (general barrel usage)

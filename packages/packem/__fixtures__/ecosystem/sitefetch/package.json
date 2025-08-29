@@ -25,7 +25,7 @@
     },
     "devDependencies": {
         "@mozilla/readability": "^0.6.0",
-        "@types/bun": "^1.2.20",
+        "@types/bun": "^1.2.21",
         "@types/micromatch": "^4.0.9",
         "@types/turndown": "^5.0.5",
         "cac": "^6.7.14",
