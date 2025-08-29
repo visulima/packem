@@ -1,1 +1,1 @@
-export { default } from "@visulima/rollup-css-plugin/loader/stylus";
+export { default } from "@visulima/rollup-plugin-css/loader/stylus";

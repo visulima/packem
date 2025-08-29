@@ -4,12 +4,12 @@ import { readdir, rm } from "node:fs/promises";
 
 import { isAccessibleSync, readFileSync } from "@visulima/fs";
 import { dirname, join } from "@visulima/path";
-import type { StyleOptions } from "@visulima/rollup-css-plugin";
-import type { LESSLoaderOptions } from "@visulima/rollup-css-plugin/less";
+import type { StyleOptions } from "@visulima/rollup-plugin-css";
+import type { LESSLoaderOptions } from "@visulima/rollup-plugin-css/less";
 import {
     inferModeOption,
     inferSourceMapOption,
-} from "@visulima/rollup-css-plugin/utils";
+} from "@visulima/rollup-plugin-css/utils";
 import type { OutputOptions } from "rollup";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";

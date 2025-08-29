@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { writeFile } from "@visulima/fs";
 import { dirname } from "@visulima/path";
-import type { StyleOptions } from "@visulima/rollup-css-plugin";
+import type { StyleOptions } from "@visulima/rollup-plugin-css";
 
 import type { BuildConfig } from "../../src/types";
 import installPackage from "./install-package";

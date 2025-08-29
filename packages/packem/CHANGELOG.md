@@ -9,7 +9,7 @@
 
 * **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.11
 * **@visulima/packem-share:** upgraded to 1.0.0-alpha.8
-* **@visulima/rollup-css-plugin:** upgraded to 1.0.0-alpha.10
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.10
 
 ## @visulima/packem [2.0.0-alpha.13](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.12...@visulima/packem@2.0.0-alpha.13) (2025-08-21)
 
@@ -26,14 +26,14 @@
 ### Dependencies
 
 * **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.10
-* **@visulima/rollup-css-plugin:** upgraded to 1.0.0-alpha.9
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.9
 
 ## @visulima/packem [2.0.0-alpha.12](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.11...@visulima/packem@2.0.0-alpha.12) (2025-08-21)
 
 
 ### Dependencies
 
-* **@visulima/rollup-css-plugin:** upgraded to 1.0.0-alpha.8
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.8
 
 ## @visulima/packem [2.0.0-alpha.11](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.10...@visulima/packem@2.0.0-alpha.11) (2025-08-20)
 
@@ -61,7 +61,7 @@
 
 * **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.8
 * **@visulima/packem-share:** upgraded to 1.0.0-alpha.7
-* **@visulima/rollup-css-plugin:** upgraded to 1.0.0-alpha.7
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.7
 
 ## @visulima/packem [2.0.0-alpha.9](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.8...@visulima/packem@2.0.0-alpha.9) (2025-08-17)
 
@@ -74,7 +74,7 @@
 
 * **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.7
 * **@visulima/packem-share:** upgraded to 1.0.0-alpha.6
-* **@visulima/rollup-css-plugin:** upgraded to 1.0.0-alpha.6
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.6
 
 ## @visulima/packem [2.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.7...@visulima/packem@2.0.0-alpha.8) (2025-08-11)
 
@@ -104,7 +104,7 @@
 
 * **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.5
 * **@visulima/packem-share:** upgraded to 1.0.0-alpha.5
-* **@visulima/rollup-css-plugin:** upgraded to 1.0.0-alpha.5
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.5
 
 ## @visulima/packem [2.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.4...@visulima/packem@2.0.0-alpha.5) (2025-07-31)
 
@@ -287,7 +287,7 @@
 
 * **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.1
 * **@visulima/packem-share:** upgraded to 1.0.0-alpha.1
-* **@visulima/rollup-css-plugin:** upgraded to 1.0.0-alpha.1
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.1
 
 ## @visulima/packem [1.28.2](https://github.com/visulima/packem/compare/@visulima/packem@1.28.1...@visulima/packem@1.28.2) (2025-06-24)
 

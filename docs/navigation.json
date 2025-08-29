@@ -256,8 +256,8 @@
           "description": "Rollup plugins and transformer integrations"
         },
         {
-          "title": "@visulima/rollup-css-plugin",
-          "href": "/docs/api/rollup-css-plugin",
+          "title": "@visulima/rollup-plugin-css",
+          "href": "/docs/api/rollup-plugin-css",
           "description": "CSS processing and optimization plugin"
         },
         {

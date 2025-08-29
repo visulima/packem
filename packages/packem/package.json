@@ -190,7 +190,7 @@
         "@visulima/packem-share": "1.0.0-alpha.8",
         "@visulima/pail": "2.1.25",
         "@visulima/path": "1.4.0",
-        "@visulima/rollup-css-plugin": "1.0.0-alpha.10",
+        "@visulima/rollup-plugin-css": "workspace:*",
         "@visulima/source-map": "1.0.20",
         "@visulima/tsconfig": "1.1.19",
         "browserslist": "4.25.3",
