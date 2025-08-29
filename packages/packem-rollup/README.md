@@ -78,6 +78,41 @@ import icon from './icon.svg?data-uri&srcset';
 import icon from './icon.svg?data-uri&encoding=css&srcset';
 ```
 
+### Lazy Barrel Plugin
+
+The `lazyBarrelPlugin` implements lazy barrel optimization similar to Rspack's `lazyBarrel` experiment. It identifies side-effect-free barrel files and marks their re-export dependencies as lazy, only building them when their exports are actually requested.
+
+```typescript
+import { lazyBarrelPlugin } from "@visulima/packem-rollup";
+
+export default {
+  plugins: [
+    lazyBarrelPlugin({
+      sideEffectsCheck: true,
+      lazyThreshold: 2,
+      include: [/\.ts$/, /\.js$/],
+      exclude: [/\.test\.ts$/]
+    })
+  ]
+};
+```
+
+#### Features
+
+- **Barrel Detection**: Automatically identifies files with multiple re-exports
+- **Side Effects Checking**: Reads package.json to check `sideEffects` field
+- **Lazy Loading**: Generates lazy loading code for unused exports
+- **Configurable Threshold**: Set minimum exports to consider a file as a barrel
+- **Filtering**: Include/exclude specific file patterns
+
+#### How It Works
+
+1. **Analysis**: Parses module code to detect barrel export patterns
+2. **Side Effects Check**: Verifies if the module is marked as side-effect-free
+3. **Lazy Marking**: Marks re-export dependencies as lazy for deferred building
+4. **Code Generation**: Creates lazy loading wrappers for unused exports
+5. **Optimization**: Only builds modules when their exports are actually requested
+
 ### URL Plugin
 
 The `urlPlugin` handles asset URLs, either inlining them as data URIs or copying them to a destination directory. SVG files are optimized using the shared `svgEncoder` utility before being base64 encoded.

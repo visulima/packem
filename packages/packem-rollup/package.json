@@ -95,6 +95,8 @@
         "@visulima/packem-share": "1.0.0-alpha.8",
         "@visulima/path": "1.4.0",
         "@visulima/source-map": "1.0.20",
+        "acorn": "^8.11.0",
+        "acorn-walk": "^8.3.0",
         "es-module-lexer": "1.7.0",
         "glob-parent": "6.0.2",
         "magic-string": "0.30.18",

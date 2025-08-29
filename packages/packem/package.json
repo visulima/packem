@@ -200,6 +200,8 @@
         "jiti": "2.5.1",
         "magic-string": "0.30.18",
         "mlly": "1.8.0",
+        "acorn": "^8.11.0",
+        "acorn-walk": "^8.3.0",
         "picomatch": "4.0.3",
         "rollup": "4.48.1",
         "semver": "7.7.2",

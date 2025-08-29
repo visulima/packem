@@ -18,6 +18,7 @@ import type { EsbuildPluginConfig, Options as EsbuildOptions } from "./plugins/e
 import type { EsmShimCjsSyntaxOptions } from "./plugins/esm-shim-cjs-syntax";
 import type { IsolatedDeclarationsOptions } from "./plugins/isolated-declarations";
 import type { JSXRemoveAttributesPlugin } from "./plugins/jsx-remove-attributes";
+import type { LazyBarrelOptions } from "./plugins/lazy-barrel";
 import type { LicenseOptions } from "./plugins/license";
 import type { InternalOXCTransformPluginConfig, OxcResolveOptions, OXCTransformPluginConfig } from "./plugins/oxc/types";
 import type { RawLoaderOptions } from "./plugins/raw";
@@ -83,6 +84,7 @@ export interface PackemRollupOptions {
     isolatedDeclarations?: IsolatedDeclarationsOptions;
     json: RollupJsonOptions | false;
     jsxRemoveAttributes?: JSXRemoveAttributesPlugin | false;
+    lazyBarrel?: LazyBarrelOptions | false;
     license?: LicenseOptions | false;
     metafile?: boolean;
     output?: OutputOptions;
@@ -99,8 +101,8 @@ export interface PackemRollupOptions {
     preserveDynamicImports?: boolean;
     raw?: RawLoaderOptions | false;
     replace: RollupReplaceOptions | false;
-    resolve: RollupNodeResolveOptions | false;
 
+    resolve: RollupNodeResolveOptions | false;
     shebang?: Partial<ShebangOptions> | false;
     shim?: EsmShimCjsSyntaxOptions | false;
     sourcemap?: SourcemapsPluginOptions;

@@ -22,6 +22,7 @@ import {
     isolatedDeclarationsPlugin,
     jsonPlugin,
     jsxRemoveAttributes,
+    lazyBarrelPlugin,
     licensePlugin,
     metafilePlugin,
     nodeResolve as nodeResolvePlugin,
@@ -62,7 +63,7 @@ import { join, relative, resolve } from "@visulima/path";
 import {
     cssModulesTypesPlugin,
     rollupCssPlugin,
-} from "@visulima/rollup-css-plugin";
+} from "@visulima/rollup-plugin-css";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type {
     OutputOptions,
@@ -596,6 +597,8 @@ export const getRollupOptions = async (
             && jsonPlugin({
                 ...context.options.rollup.json,
             }),
+
+            context.options.rollup.lazyBarrel && lazyBarrelPlugin(context.options.rollup.lazyBarrel),
 
             chunkSplitter(),
 
