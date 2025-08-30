@@ -505,7 +505,13 @@ const cssPlugin = async (
         },
         name: "rollup-plugin-css",
         async transform(code, transformId) {
-            if (!isIncluded(transformId) || !loaders.isSupported(transformId)) {
+            // Support per-file shorthand query overrides: ?emit, ?extract, ?inject, ?inline
+            const qIndex = transformId.indexOf("?");
+            const resourceId = qIndex === -1 ? transformId : transformId.slice(0, qIndex);
+            const rawQuery = qIndex === -1 ? "" : transformId.slice(qIndex + 1);
+            const query = new URLSearchParams(rawQuery);
+
+            if (!isIncluded(resourceId) || !loaders.isSupported(resourceId)) {
                 return undefined;
             }
 
@@ -516,10 +522,40 @@ const cssPlugin = async (
                 return undefined;
             }
 
-            logger.info({ message: `Processing CSS file: ${transformId}`, plugin: "css", size: code.length });
+            logger.info({ message: `Processing CSS file: ${resourceId}`, plugin: "css", size: code.length });
 
             if (typeof options.onImport === "function") {
                 options.onImport(code, transformId);
+            }
+
+            // Derive effective mode flags with shorthand query overrides
+            const has = (k: string) => query.has(k) && (query.get(k) === "" || query.get(k) === "true");
+
+            let effectiveEmit = loaderOptions.emit;
+            let effectiveExtract = loaderOptions.extract;
+            let effectiveInject = loaderOptions.inject;
+            let effectiveInline = loaderOptions.inline;
+
+            if (has("emit")) {
+                effectiveEmit = true;
+                effectiveExtract = false;
+                effectiveInject = false;
+                effectiveInline = false;
+            } else if (has("extract")) {
+                effectiveEmit = false;
+                effectiveExtract = true;
+                effectiveInject = false;
+                effectiveInline = false;
+            } else if (has("inject")) {
+                effectiveEmit = false;
+                effectiveExtract = false;
+                effectiveInject = typeof effectiveInject === "object" ? effectiveInject : ({} as InternalStyleOptions["inject"]);
+                effectiveInline = false;
+            } else if (has("inline")) {
+                effectiveEmit = false;
+                effectiveExtract = false;
+                effectiveInject = false;
+                effectiveInline = true;
             }
 
             const context: LoaderContext = {
@@ -531,13 +567,13 @@ const cssPlugin = async (
                 debug,
                 deps: new Set(),
                 dts: loaderOptions.dts,
-                emit: loaderOptions.emit,
+                emit: effectiveEmit,
                 environment,
                 extensions: loaderOptions.extensions,
-                extract: loaderOptions.extract,
-                id: transformId,
-                inject: loaderOptions.inject,
-                inline: loaderOptions.inline,
+                extract: effectiveExtract,
+                id: resourceId,
+                inject: effectiveInject,
+                inline: effectiveInline,
                 logger,
                 namedExports: loaderOptions.namedExports,
                 options: {},
@@ -554,7 +590,7 @@ const cssPlugin = async (
                 assets: context.assets.size,
                 dependencies: context.deps.size,
                 hasExtracted: Boolean(result.extracted),
-                message: `Processed ${transformId}`,
+                message: `Processed ${resourceId}`,
                 outputSize: result.code.length,
                 plugin: "css",
             });

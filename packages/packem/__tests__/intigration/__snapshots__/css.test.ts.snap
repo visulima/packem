@@ -16797,6 +16797,58 @@ injector_64c8688c__default(css,{});
 "
 `;
 
+exports[`css > query-shorthand-modes > should inject via ?inject query shorthand > js 1`] = `
+"'use strict';
+
+const cssStyleInject = require('@visulima/css-style-inject');
+
+var css$5 = ".foo {\\n    color: red;\\n}\\n";
+cssStyleInject.cssStyleInject(css$5,{});
+
+var css$4 = ".bar {\\n    color: red;\\n}\\n";
+cssStyleInject.cssStyleInject(css$4,{});
+
+var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n";
+cssStyleInject.cssStyleInject(css$3,{});
+
+var css$2 = ".pcss {\\n    color: red;\\n}\\n";
+cssStyleInject.cssStyleInject(css$2,{});
+
+var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}";
+cssStyleInject.cssStyleInject(css$1,{});
+
+var css = ".less {\\n  color: #6c94be;\\n}\\n";
+cssStyleInject.cssStyleInject(css,{});
+
+console.log(css$5, css$4);
+"
+`;
+
+exports[`css > query-shorthand-modes > should inject via ?inject query shorthand > js 2`] = `
+"import { cssStyleInject } from '@visulima/css-style-inject';
+
+var css$5 = ".foo {\\n    color: red;\\n}\\n";
+cssStyleInject(css$5,{});
+
+var css$4 = ".bar {\\n    color: red;\\n}\\n";
+cssStyleInject(css$4,{});
+
+var css$3 = ".stylus {\\n  color: #f00;\\n  background: #f00;\\n}\\n";
+cssStyleInject(css$3,{});
+
+var css$2 = ".pcss {\\n    color: red;\\n}\\n";
+cssStyleInject(css$2,{});
+
+var css$1 = ".sass {\\n  width: 30%;\\n  color: red;\\n}";
+cssStyleInject(css$1,{});
+
+var css = ".less {\\n  color: #6c94be;\\n}\\n";
+cssStyleInject(css,{});
+
+console.log(css$5, css$4);
+"
+`;
+
 exports[`css > sass > should work with sass/scss processed 'sass - data' css > js 1`] = `
 "'use strict';
 

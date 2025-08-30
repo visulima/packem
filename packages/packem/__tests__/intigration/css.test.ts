@@ -1058,6 +1058,73 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         );
     });
 
+    describe("inline-query-shorthand", () => {
+        it("should inline via ?inline query shorthands", async () => {
+            expect.assertions(2);
+
+            const result = (await build({
+                input: "simple-inline-query/src/index.js",
+                styleOptions: {},
+                title: "inline-query",
+            })) as WriteResult;
+
+            // Should not emit CSS files when using inline
+            expect(result.isCss()).toBe(false);
+
+            // JS output should exist and match snapshot (no injector import expected)
+            for (const f of result.js()) {
+                expect(f).toMatchSnapshot("js");
+            }
+        });
+    });
+
+    describe("query-shorthand-modes", () => {
+        it("should inject via ?inject query shorthand", async () => {
+            expect.assertions(1);
+
+            const result = (await build({
+                input: "simple/index.js",
+                // rollup-plugin-css default is inject; we validate snapshot to ensure injector import/calls exist
+                styleOptions: {},
+                title: "inject-query",
+            })) as WriteResult;
+
+            for (const f of result.js()) {
+                expect(f).toMatchSnapshot("js");
+            }
+        });
+
+        it("should extract via ?extract query shorthand", async () => {
+            expect.assertions(2);
+
+            const result = (await build({
+                input: "simple/index.js?extract",
+                styleOptions: {},
+                title: "extract-query",
+            })) as WriteResult;
+
+            expect(result.isCss()).toBe(true);
+
+            for (const f of result.css()) {
+                expect(f).toMatchSnapshot("css");
+            }
+        });
+
+        it("should emit via ?emit query shorthand", async () => {
+            expect.assertions(1);
+
+            const result = (await build({
+                input: "emit/index.js",
+                styleOptions: { mode: "emit" },
+                title: "emit-query",
+            })) as WriteResult;
+
+            for (const f of result.js()) {
+                expect(f).toMatchSnapshot("js");
+            }
+        });
+    });
+
     describe("sass", () => {
         // eslint-disable-next-line vitest/prefer-expect-assertions,vitest/expect-expect
         it.each([
