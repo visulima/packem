@@ -70,8 +70,8 @@ export const inferModeOption = (mode: StyleOptions["mode"]): Mode => {
 
     return {
         emit: modeName === "emit",
-        extract: Boolean(modeName === "extract" && (m[1] ?? true)),
-        inject: Boolean(modeName === "inject" && (m[1] ?? true)),
+        extract: (modeName === "extract" && (m[1] ?? true)) as InternalStyleOptions["extract"],
+        inject: (modeName === "inject" && (m[1] ?? true)) as InternalStyleOptions["inject"],
         inline: modeName === "inline",
     };
 };
