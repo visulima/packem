@@ -1,3 +1,18 @@
+## @visulima/packem [2.0.0-alpha.16](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.15...@visulima/packem@2.0.0-alpha.16) (2025-09-01)
+
+### Features
+
+* add inline CSS processing mode to rollup-plugin-css ([2605997](https://github.com/visulima/packem/commit/2605997bc1e76a80b22529fd71ec053c02111ea2))
+
+### Miscellaneous Chores
+
+* update dependencies and versions in package.json and pnpm-lock.yaml ([e6086fb](https://github.com/visulima/packem/commit/e6086fbd6ad21bbc35b8365b03e8a5d543354154))
+
+
+### Dependencies
+
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.2
+
 ## @visulima/packem [2.0.0-alpha.15](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.14...@visulima/packem@2.0.0-alpha.15) (2025-08-29)
 
 ### Features
