@@ -70,6 +70,7 @@ dist
 .nx/cache
 
 packages/packem/__fixtures__/ecosystem/**/packem.config.ts
+packages/rollup-plugin-dts/tests/**/temp/**
 
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md

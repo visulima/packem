@@ -68,10 +68,24 @@ export const inferModeOption = (mode: StyleOptions["mode"]): Mode => {
     // Default mode is "inject" when not provided
     const modeName = (m[0] ?? "inject") as (typeof modes)[number];
 
+    // Preserve detailed options for extract/inject when provided
+    let extract: Mode["extract"] = false;
+    let inject: Mode["inject"] = false;
+
+    if (modeName === "extract") {
+        // Use provided output file name if present, otherwise enable extraction
+        extract = (m[1] as string | undefined) ?? true;
+    }
+
+    if (modeName === "inject") {
+        // Preserve injector options or function if provided; otherwise enable with defaults
+        inject = (m[1] as Mode["inject"]) ?? true;
+    }
+
     return {
         emit: modeName === "emit",
-        extract: Boolean(modeName === "extract" && (m[1] ?? true)),
-        inject: Boolean(modeName === "inject" && (m[1] ?? true)),
+        extract,
+        inject,
         inline: modeName === "inline",
     };
 };
