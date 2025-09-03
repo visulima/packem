@@ -1,5 +1,5 @@
 import type { Dirent } from "node:fs";
-import { cpSync } from "node:fs";
+import { cpSync, mkdirSync, writeFileSync } from "node:fs";
 import { readdir, rm } from "node:fs/promises";
 
 import { isAccessibleSync, readFileSync } from "@visulima/fs";
@@ -848,7 +848,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             },
             {
                 errorMessage:
-                    "Extraction path must be relative to the output directory,",
+                    "Extraction path must be nested inside output directory,",
                 input: "simple/index.js",
                 shouldFail: true,
                 styleOptions: { mode: ["extract", "../wrong.css"] },
@@ -1985,5 +1985,72 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 await validate(data);
             },
         );
+    });
+
+    describe("cache invalidation", () => {
+        it("should update extracted CSS when source changes", async () => {
+            expect.assertions(4);
+
+            // Create minimal project with CSS extraction enabled
+            await createPackemConfig(temporaryDirectoryPath, {
+                cssLoader: ["postcss"],
+                cssOptions: { mode: "extract" },
+                transformer: "esbuild",
+            });
+
+            await createPackageJson(temporaryDirectoryPath, {
+                main: "./dist/index.cjs",
+                module: "./dist/index.mjs",
+            });
+
+            // Initial source files
+            const sourcePath = join(temporaryDirectoryPath, "src");
+
+            await rm(sourcePath, { force: true, recursive: true });
+            // ensure src exists
+
+            mkdirSync(sourcePath, { recursive: true });
+            const stylePath = join(sourcePath, "style.css");
+            const indexPath = join(sourcePath, "index.js");
+
+            writeFileSync(stylePath, "body{color:red}");
+            writeFileSync(indexPath, "import './style.css';\nexport const ok = true;\n");
+
+            let binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+                reject: false,
+            });
+
+            expect(binProcess.exitCode).toBe(0);
+
+            // Find emitted CSS file and assert content
+            const distributionPath = join(temporaryDirectoryPath, "dist");
+            const files = await readdir(distributionPath, { recursive: true, withFileTypes: true });
+            const cssFiles = files
+                .filter((d) => d.isFile() && d.name.endsWith(".css"))
+                .map((d) => join(d.path, d.name));
+
+            const initialCss = cssFiles.map((f) => readFileSync(f)).join("\n");
+
+            expect(initialCss).toContain("color:red");
+
+            // Modify CSS source and rebuild
+            writeFileSync(stylePath, "body{color:blue}");
+
+            binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+                reject: false,
+            });
+
+            expect(binProcess.exitCode).toBe(0);
+
+            const files2 = await readdir(distributionPath, { recursive: true, withFileTypes: true });
+            const cssFiles2 = files2
+                .filter((d) => d.isFile() && d.name.endsWith(".css"))
+                .map((d) => join(d.path, d.name));
+            const updatedCss = cssFiles2.map((f) => readFileSync(f)).join("\n");
+
+            expect(updatedCss).toContain("color:blue");
+        });
     });
 });
