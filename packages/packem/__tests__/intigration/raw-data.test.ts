@@ -322,8 +322,8 @@ export const data = content;`,
             `${temporaryDirectoryPath}/dist/index.cjs`,
         );
 
-        expect(mjsContent.includes("first-version")).toBe(true);
-        expect(cjsContent.includes("first-version")).toBe(true);
+        expect(mjsContent).toContain("first-version");
+        expect(cjsContent).toContain("first-version");
 
         // Change source content and rebuild
         writeFileSync(
@@ -345,8 +345,8 @@ export const data = content;`,
             `${temporaryDirectoryPath}/dist/index.cjs`,
         );
 
-        expect(mjsContent.includes("second-version")).toBe(true);
-        expect(cjsContent.includes("second-version")).toBe(true);
+        expect(mjsContent).toContain("second-version");
+        expect(cjsContent).toContain("second-version");
     });
 
     it("should update output when source changes without '?raw' (transform path)", async () => {
@@ -389,8 +389,8 @@ export const data = content;`,
             `${temporaryDirectoryPath}/dist/index.cjs`,
         );
 
-        expect(mjsContent.includes("alpha")).toBe(true);
-        expect(cjsContent.includes("alpha")).toBe(true);
+        expect(mjsContent).toContain("alpha");
+        expect(cjsContent).toContain("alpha");
 
         // Change source content and rebuild
         writeFileSync(
@@ -412,7 +412,7 @@ export const data = content;`,
             `${temporaryDirectoryPath}/dist/index.cjs`,
         );
 
-        expect(mjsContent.includes("beta")).toBe(true);
-        expect(cjsContent.includes("beta")).toBe(true);
+        expect(mjsContent).toContain("beta");
+        expect(cjsContent).toContain("beta");
     });
 });
