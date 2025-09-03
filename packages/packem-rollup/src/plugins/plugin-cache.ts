@@ -1,3 +1,4 @@
+import { isAccessibleSync, readFileSync } from "@visulima/fs";
 import type { FileCache } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
 import type { ObjectHook, Plugin } from "rollup";
@@ -36,7 +37,23 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
             }
 
             const pluginPath = join(subDirectory, plugin.name);
-            const cacheKey = join("load", getHash(id));
+            // Support query params in id (e.g., ?raw). Keep the query as part of the cache key,
+            // but compute file fingerprint using the clean path (without query) when possible.
+            const cleanId = id.includes("?") ? (id.split("?")[0] as string) : id;
+
+            let contentHash = "";
+
+            try {
+                if (cleanId && isAccessibleSync(cleanId)) {
+                    const fileContent = readFileSync(cleanId);
+
+                    contentHash = getHash(fileContent);
+                }
+            } catch {
+                // Ignore fingerprint errors; fall back to id-only based caching
+            }
+
+            const cacheKey = join("load", getHash(id), contentHash);
 
             if (cache.has(cacheKey, pluginPath)) {
                 return await cache.get(cacheKey, pluginPath);
