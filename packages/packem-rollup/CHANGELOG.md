@@ -1,3 +1,14 @@
+## @visulima/packem-rollup [1.0.0-alpha.13](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.12...@visulima/packem-rollup@1.0.0-alpha.13) (2025-09-03)
+
+### Bug Fixes
+
+* enhance integration tests for CSS and raw data handling ([67aecd3](https://github.com/visulima/packem/commit/67aecd337192d8ea284425db7230661e87de7ad5))
+
+### Miscellaneous Chores
+
+* update dependencies and versions in package.json and pnpm-lock.yaml ([df62809](https://github.com/visulima/packem/commit/df628094fc6fd5e79cbb939a61bab79d6c89b833))
+* update dependencies and versions in package.json and pnpm-lock.yaml ([e6086fb](https://github.com/visulima/packem/commit/e6086fbd6ad21bbc35b8365b03e8a5d543354154))
+
 ## @visulima/packem-rollup [1.0.0-alpha.12](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.11...@visulima/packem-rollup@1.0.0-alpha.12) (2025-08-29)
 
 ### Features
