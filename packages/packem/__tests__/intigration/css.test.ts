@@ -834,6 +834,8 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 title: "preserve-modules",
             },
             {
+                errorMessage:
+                    "Extraction path must be relative to the output directory,",
                 input: "simple/index.js",
                 shouldFail: true,
                 styleOptions: {
@@ -845,6 +847,8 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 title: "absolute-path-fail",
             },
             {
+                errorMessage:
+                    "Extraction path must be relative to the output directory,",
                 input: "simple/index.js",
                 shouldFail: true,
                 styleOptions: { mode: ["extract", "../wrong.css"] },

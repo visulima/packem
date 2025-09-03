@@ -59,8 +59,8 @@ export const data = icon;`,
             `${temporaryDirectoryPath}/dist/index.mjs`,
         );
 
-        // Should be a data:image/svg+xml URI and not base64; comments must be stripped
-        expect(mjsContent).toContain("data:image/svg+xml,");
+        // Should be an SVG data URI; comments must be stripped
+        expect(mjsContent).toMatch(/data:image\/svg\+xml;?charset=utf-8?,/);
         expect(mjsContent).not.toContain("comment to strip");
     });
 
@@ -138,7 +138,7 @@ export const length = Circle.length;`,
             `${temporaryDirectoryPath}/dist/index.mjs`,
         );
 
-        expect(mjsContent).toContain("data:image/svg+xml,");
+        expect(mjsContent).toMatch(/data:image\/svg\+xml;?charset=utf-8?,/);
         // lucide icons should also not include comments
         expect(mjsContent).not.toMatch(/<!--[\s\S]*?-->/);
     });

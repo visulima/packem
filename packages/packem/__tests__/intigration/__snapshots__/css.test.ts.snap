@@ -922,6 +922,51 @@ exports[`css > code-splitting > should work with processed 'multi-entry-single' 
 /*# sourceMappingURL=extracted.css.map */"
 `;
 
+exports[`css > code-splitting > should work with processed 'multi-entry-single' css > css 2`] = `
+".first_sub {
+  color: black;
+}
+/*# sourceMappingURL=index.css.map */
+/*# sourceMappingURL=index.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'multi-entry-single' css > css 3`] = `
+".thirdtwo {
+  color: hotpink;
+}
+.fourthtwo {
+  color: honeydew;
+}
+/*# sourceMappingURL=indextwo.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'multi-entry-single' css > css 4`] = `
+".nested-script {
+  color: rebeccapurple;
+}
+.nondynamic {
+  color: deepskyblue;
+}
+.nondynamic2 {
+  color: deeppink;
+}
+/*# sourceMappingURL=nested-script.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'multi-entry-single' css > css 5`] = `
+".other-script {
+  color: wheat;
+}
+/*# sourceMappingURL=other-script.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'multi-entry-single' css > css 6`] = `
+".second {
+  color: royalblue;
+}
+/*# sourceMappingURL=second.css.map */"
+`;
+
 exports[`css > code-splitting > should work with processed 'multi-entry-single' css > js 1`] = `
 "'use strict';
 
@@ -1749,6 +1794,77 @@ exports[`css > code-splitting > should work with processed 'preserve-modules-sin
 /*# sourceMappingURL=extracted.css.map */"
 `;
 
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > css 2`] = `
+".fourth {
+  color: magenta;
+}
+/*# sourceMappingURL=fourth.scss.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > css 3`] = `
+".third {
+  color: maroon;
+}
+.fourth {
+  color: magenta;
+}
+.first_sub {
+  color: black;
+}
+/*# sourceMappingURL=index.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > css 4`] = `
+".nested-script {
+  color: rebeccapurple;
+}
+.nondynamic {
+  color: deepskyblue;
+}
+.nondynamic2 {
+  color: deeppink;
+}
+/*# sourceMappingURL=nested-script.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > css 5`] = `
+".nondynamic {
+  color: deepskyblue;
+}
+.nondynamic2 {
+  color: deeppink;
+}
+/*# sourceMappingURL=nondynamic.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > css 6`] = `
+".nondynamic2 {
+  color: deeppink;
+}
+/*# sourceMappingURL=nondynamic2.scss.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > css 7`] = `
+".other-script {
+  color: wheat;
+}
+/*# sourceMappingURL=other-script.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > css 8`] = `
+".second {
+  color: royalblue;
+}
+/*# sourceMappingURL=second.scss.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > css 9`] = `
+".first_sub {
+  color: black;
+}
+/*# sourceMappingURL=index.css.map */"
+`;
+
 exports[`css > code-splitting > should work with processed 'preserve-modules-single' css > js 1`] = `
 "'use strict';
 
@@ -1962,6 +2078,46 @@ exports[`css > code-splitting > should work with processed 'single' css > css 1`
   color: deeppink;
 }
 /*# sourceMappingURL=extracted.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'single' css > css 2`] = `
+".third {
+  color: maroon;
+}
+.fourth {
+  color: magenta;
+}
+.first_sub {
+  color: black;
+}
+/*# sourceMappingURL=index.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'single' css > css 3`] = `
+".nested-script {
+  color: rebeccapurple;
+}
+.nondynamic {
+  color: deepskyblue;
+}
+.nondynamic2 {
+  color: deeppink;
+}
+/*# sourceMappingURL=nested-script.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'single' css > css 4`] = `
+".other-script {
+  color: wheat;
+}
+/*# sourceMappingURL=other-script.css.map */"
+`;
+
+exports[`css > code-splitting > should work with processed 'single' css > css 5`] = `
+".second {
+  color: royalblue;
+}
+/*# sourceMappingURL=second.css.map */"
 `;
 
 exports[`css > code-splitting > should work with processed 'single' css > js 1`] = `
