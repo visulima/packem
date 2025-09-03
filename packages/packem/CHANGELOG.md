@@ -1,3 +1,18 @@
+## @visulima/packem [2.0.0-alpha.18](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.17...@visulima/packem@2.0.0-alpha.18) (2025-09-03)
+
+### Bug Fixes
+
+* enhance integration tests for CSS and raw data handling ([67aecd3](https://github.com/visulima/packem/commit/67aecd337192d8ea284425db7230661e87de7ad5))
+
+### Code Refactoring
+
+* update integration tests to use toContain for better readability ([f4015b1](https://github.com/visulima/packem/commit/f4015b10f9910e6f6e4f214a9e0a423c57c0291f))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.13
+
 ## @visulima/packem [2.0.0-alpha.17](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.16...@visulima/packem@2.0.0-alpha.17) (2025-09-03)
 
 ### Bug Fixes
