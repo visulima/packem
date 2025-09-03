@@ -281,4 +281,138 @@ export const template = htmlContent;`,
 
         expect(cjsContent).toMatchSnapshot("CommonJS output with raw HTML content");
     });
+
+    it("should update output when source changes using '?raw'", async () => {
+        expect.assertions(7);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/content.txt`,
+            `first-version`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `import content from './content.txt?raw';
+
+export const data = content;`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+        });
+
+        // First build
+        let binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        let mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
+        let cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
+
+        expect(mjsContent.includes("first-version")).toBe(true);
+        expect(cjsContent.includes("first-version")).toBe(true);
+
+        // Change source content and rebuild
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/content.txt`,
+            `second-version`,
+        );
+
+        binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
+        cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
+
+        expect(mjsContent.includes("second-version")).toBe(true);
+        expect(cjsContent.includes("second-version")).toBe(true);
+    });
+
+    it("should update output when source changes without '?raw' (transform path)", async () => {
+        expect.assertions(7);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/content.txt`,
+            `alpha`,
+        );
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `import content from './content.txt';
+
+export const data = content;`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+        });
+
+        // First build
+        let binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        let mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
+        let cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
+
+        expect(mjsContent.includes("alpha")).toBe(true);
+        expect(cjsContent.includes("alpha")).toBe(true);
+
+        // Change source content and rebuild
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/content.txt`,
+            `beta`,
+        );
+
+        binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        mjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.mjs`,
+        );
+        cjsContent = readFileSync(
+            `${temporaryDirectoryPath}/dist/index.cjs`,
+        );
+
+        expect(mjsContent.includes("beta")).toBe(true);
+        expect(cjsContent.includes("beta")).toBe(true);
+    });
 });

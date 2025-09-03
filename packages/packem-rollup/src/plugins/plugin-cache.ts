@@ -8,6 +8,15 @@ import { getHash } from "../utils";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getHandler = (plugin: ObjectHook<any> | ((...arguments_: any[]) => any)): (...arguments_: any[]) => any => plugin.handler || plugin;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const unwrapCachedValue = (value: any) => {
+    if (value && typeof value === "object" && value.__packem_cache_wrapped === true) {
+        return value.data;
+    }
+
+    return value;
+};
+
 /**
  * Wrap a Rollup plugin to add caching to various hooks.
  * @param plugin
@@ -56,12 +65,18 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
             const cacheKey = join("load", getHash(id), contentHash);
 
             if (cache.has(cacheKey, pluginPath)) {
-                return await cache.get(cacheKey, pluginPath);
+                return unwrapCachedValue(await cache.get(cacheKey, pluginPath));
             }
 
             const result = await getHandler(plugin.load).call(this, id);
 
-            cache.set(cacheKey, result, pluginPath);
+            // Store raw plugin results in a wrapped form to avoid type coercion issues
+            const toStore
+                = result && typeof result === "object" && "code" in (result as Record<string, unknown>)
+                    ? result
+                    : { __packem_cache_wrapped: true, data: result };
+
+            cache.set(cacheKey, toStore, pluginPath);
 
             return result;
         },
@@ -77,7 +92,7 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
             const cacheKey = join("resolveId", getHash(id), importer ? getHash(importer) : "", getHash(JSON.stringify(options)));
 
             if (cache.has(cacheKey, pluginPath)) {
-                return await cache.get(cacheKey, pluginPath);
+                return unwrapCachedValue(await cache.get(cacheKey, pluginPath));
             }
 
             const result = await getHandler(plugin.resolveId).call(this, id, importer, options);
@@ -96,7 +111,7 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
             const cacheKey = join("transform", getHash(id), getHash(code));
 
             if (cache.has(cacheKey, pluginPath)) {
-                return await cache.get(cacheKey, pluginPath);
+                return unwrapCachedValue(await cache.get(cacheKey, pluginPath));
             }
 
             const result = await getHandler(plugin.transform).call(this, code, id);

@@ -31,17 +31,7 @@ const build = async (
         return;
     }
 
-    let loadCache = true;
-
-    // TODO: find a way to remove this hack
-    // This is a hack to prevent caching when using isolated declarations or css loaders
-    if (
-        context.options.rollup.isolatedDeclarations
-        || context.options.isolatedDeclarationTransformer
-        || context.options.rollup.css
-    ) {
-        loadCache = false;
-    }
+    const loadCache = true;
 
     if (loadCache) {
         rollupOptions.cache = fileCache.get<RollupCache>(
