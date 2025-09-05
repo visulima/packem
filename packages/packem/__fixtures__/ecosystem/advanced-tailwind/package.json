@@ -10,7 +10,7 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "tailwindcss": "^4.1.12",
+        "tailwindcss": "^4.1.13",
         "@tailwindcss/typography": "^0.5.16",
         "@tailwindcss/forms": "^0.5.10",
         "preline": "^3.2.3"
@@ -18,8 +18,8 @@
     "devDependencies": {
         "@visulima/packem": "workspace:*",
         "typescript": "^5.9.2",
-        "@tailwindcss/node": "^4.1.12",
-        "@tailwindcss/oxide": "^4.1.12",
+        "@tailwindcss/node": "^4.1.13",
+        "@tailwindcss/oxide": "^4.1.13",
         "esbuild": "^0.25.9"
     }
 }

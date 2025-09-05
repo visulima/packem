@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import tailwindcssLoader from "../../../../../src/loaders/tailwindcss-oxide";
 
@@ -98,6 +98,7 @@ describe("tailwind-oxide loader", () => {
         });
 
         expect(result).toBeDefined();
-        expect(typeof result.code).toBe("string");
+
+        expectTypeOf(result.code).toBeString();
     });
 });

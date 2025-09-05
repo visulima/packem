@@ -16,7 +16,7 @@ import {
 import type { OptionsResolved } from "./options";
 
 const generate: typeof _generate.default
-  = (_generate.default as any) || _generate;
+    = (_generate.default as any) || _generate;
 
 // input:
 // export declare function x(xx: X): void
@@ -134,7 +134,7 @@ export function createFakeJsPlugin({
             if (rewriteImportExport(stmt, setStmt, typeOnlyIds)) { continue; }
 
             const sideEffect
-        = stmt.type === "TSModuleDeclaration" && stmt.kind !== "namespace";
+                = stmt.type === "TSModuleDeclaration" && stmt.kind !== "namespace";
 
             if (
                 sideEffect
@@ -146,10 +146,10 @@ export function createFakeJsPlugin({
 
             const isDefaultExport = stmt.type === "ExportDefaultDeclaration";
             const isDecl
-        = isTypeOf(stmt, [
-            "ExportNamedDeclaration",
-            "ExportDefaultDeclaration",
-        ]) && stmt.declaration;
+                = isTypeOf(stmt, [
+                    "ExportNamedDeclaration",
+                    "ExportDefaultDeclaration",
+                ]) && stmt.declaration;
 
             const decl: t.Node = isDecl ? stmt.declaration! : stmt;
             const setDecl = isDecl

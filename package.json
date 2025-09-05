@@ -48,11 +48,11 @@
         "extends browserslist-config-anolilab"
     ],
     "dependencies": {
-        "@anolilab/commitlint-config": "^6.0.2",
-        "@anolilab/lint-staged-config": "^3.0.27",
+        "@anolilab/commitlint-config": "^6.0.3",
+        "@anolilab/lint-staged-config": "^3.0.29",
         "@anolilab/multi-semantic-release": "^2.0.3",
-        "@anolilab/textlint-config": "^9.0.4",
-        "@babel/core": "^7.28.3",
+        "@anolilab/textlint-config": "^9.0.5",
+        "@babel/core": "^7.28.4",
         "@commitlint/cli": "^19.8.1",
         "@commitlint/config-conventional": "^19.8.1",
         "@secretlint/secretlint-rule-preset-recommend": "^11.0.2",
@@ -61,7 +61,7 @@
         "@visulima/packem": "^1.28.3",
 >>>>>>> fb3321fed (feat: added the first migration for the rolldown-plugin-dts for rollup)
         "audit-ci": "^7.1.0",
-        "browserslist-config-anolilab": "^6.0.2",
+        "browserslist-config-anolilab": "^6.0.3",
         "commitizen": "^4.3.1",
         "cross-env": "^10.0.0",
         "husky": "^9.1.7",
@@ -88,11 +88,11 @@
         "onlyBuiltDependencies": [
             "@parcel/watcher",
             "@swc/core",
+            "@tailwindcss/oxide",
             "esbuild",
             "node-sass",
             "nodehun",
-            "nx",
-            "oxc-resolver"
+            "nx"
         ],
         "overrides": {
             "@eslint/plugin-kit@<0.3.4": ">=0.3.4",
