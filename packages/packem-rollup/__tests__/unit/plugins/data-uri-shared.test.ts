@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 import { dataUriPlugin } from "../../../src/plugins/data-uri";
 
@@ -9,7 +9,8 @@ describe("dataUriPlugin with shared utilities", () => {
         // This test verifies that the plugin can be imported without errors
         // and that it's using the shared utilities from packem-share
         expect(dataUriPlugin).toBeDefined();
-        expect(typeof dataUriPlugin).toBe("function");
+
+        expectTypeOf(dataUriPlugin).toBeFunction();
     });
 
     it("should create plugin with default options", () => {

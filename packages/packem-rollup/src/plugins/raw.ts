@@ -41,7 +41,7 @@ export const rawPlugin = (options: RawLoaderOptions): Plugin => {
             if (filter(cleanId) || isRawQuery) {
                 // Normalize line endings only on Windows for .txt and .data files
                 const normalizedCode
-                = process.platform === "win32" ? code.replaceAll("\r\n", "\n") : code;
+                    = process.platform === "win32" ? code.replaceAll("\r\n", "\n") : code;
 
                 return {
                     code: `const data = ${JSON.stringify(normalizedCode)};\nexport default data;`,

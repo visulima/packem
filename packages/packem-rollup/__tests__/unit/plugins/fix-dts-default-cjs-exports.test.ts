@@ -1,5 +1,5 @@
 import type { NormalizedOutputOptions, PluginContext, RenderedChunk } from "rollup";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import { fixDtsDefaultCjsExportsPlugin } from "../../../src/plugins/fix-dts-default-cjs-exports-plugin";
 
@@ -26,7 +26,8 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
 
         expect(plugin).toBeInstanceOf(Object);
         expect(plugin.name).toBe("packem:fix-dts-default-cjs-exports-plugin");
-        expect(typeof plugin.renderChunk).toBe("function");
+
+        expectTypeOf(plugin.renderChunk).toBeFunction();
     });
 
     describe("renderChunk", () => {

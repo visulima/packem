@@ -11,8 +11,8 @@ import { expect } from "vitest";
 import { dts } from "../src/index";
 
 const isUpdateEnabled
-  = process.env.npm_lifecycle_script?.includes("-u")
-      || process.env.npm_lifecycle_script?.includes("--update");
+    = process.env.npm_lifecycle_script?.includes("-u")
+        || process.env.npm_lifecycle_script?.includes("--update");
 
 await testFixtures(
     "tests/rollup-plugin-dts/**/{index,main-a}.d.ts",

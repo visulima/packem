@@ -163,13 +163,9 @@ Enable the automatic `node 10` typesVersions generation in packem.config.js:
 ```js
 export default defineConfig({
     // ...
-    rollup: {
-        // ...
-        node10Compatibility: {
-            typeScriptVersion: ">=5.0", // Chose the version of TypeScript you want to support
-            writeToPackageJson: true,
-        },
-        // ...
+    node10Compatibility: {
+        typeScriptVersion: ">=5.0", // Chose the version of TypeScript you want to support
+        writeToPackageJson: true,
     },
     transformer,
 });

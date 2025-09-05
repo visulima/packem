@@ -238,7 +238,7 @@ export const resolveOptions = ({
     };
 
     incremental
-    ||= compilerOptions.incremental || !!compilerOptions.tsBuildInfoFile;
+        ||= compilerOptions.incremental || !!compilerOptions.tsBuildInfoFile;
     sourcemap ??= !!compilerOptions.declarationMap;
     compilerOptions.declarationMap = sourcemap;
 

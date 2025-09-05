@@ -157,9 +157,9 @@ const createStub = async (
                             // If the name is already quoted (starts and ends with quotes), use it directly
                             // Otherwise, wrap it in JSON.stringify
                             const propertyAccess
-                                    = name.startsWith("'") && name.endsWith("'")
-                                        ? `_module[${name}]`
-                                        : `_module[${JSON.stringify(name)}]`;
+                                = name.startsWith("'") && name.endsWith("'")
+                                    ? `_module[${name}]`
+                                    : `_module[${JSON.stringify(name)}]`;
 
                             return `const ${temporaryVariable} = ${propertyAccess};\nexport { ${temporaryVariable} as ${JSON.stringify(name)} };`;
                         }),
