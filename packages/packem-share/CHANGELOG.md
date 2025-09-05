@@ -1,3 +1,13 @@
+## @visulima/packem-share [1.0.0-alpha.10](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.9...@visulima/packem-share@1.0.0-alpha.10) (2025-09-05)
+
+### Bug Fixes
+
+* update dependencies and versions across multiple packages ([1bf21ee](https://github.com/visulima/packem/commit/1bf21ee3bf5e06c6ac53872ec33d64b4ad7cf588))
+
+### Miscellaneous Chores
+
+* update dependencies and versions in package.json and pnpm-lock.yaml ([e6086fb](https://github.com/visulima/packem/commit/e6086fbd6ad21bbc35b8365b03e8a5d543354154))
+
 ## @visulima/packem-share [1.0.0-alpha.9](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.8...@visulima/packem-share@1.0.0-alpha.9) (2025-08-29)
 
 ### Features
