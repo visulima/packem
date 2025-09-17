@@ -49,15 +49,13 @@
     ],
     "dependencies": {
         "@anolilab/commitlint-config": "^6.0.3",
-        "@anolilab/lint-staged-config": "^3.0.29",
+        "@anolilab/lint-staged-config": "^3.0.31",
         "@anolilab/multi-semantic-release": "^2.0.3",
         "@anolilab/textlint-config": "^9.0.5",
         "@babel/core": "^7.28.4",
         "@commitlint/cli": "^19.8.1",
         "@commitlint/config-conventional": "^19.8.1",
         "@secretlint/secretlint-rule-preset-recommend": "^11.0.2",
-=======
-        "@secretlint/secretlint-rule-preset-recommend": "^11.2.0",
         "@visulima/packem": "^1.28.3",
 >>>>>>> fb3321fed (feat: added the first migration for the rolldown-plugin-dts for rollup)
         "audit-ci": "^7.1.0",
@@ -72,15 +70,15 @@
         "plop": "^4.0.1",
         "publint": "^0.3.12",
         "rimraf": "6.0.1",
-        "secretlint": "11.2.0",
-        "semantic-release": "^24.2.7",
+        "secretlint": "11.2.4",
+        "semantic-release": "^24.2.8",
         "sort-package-json": "^3.4.0",
         "taze": "^19.1.0",
         "textlint": "^15.5.2",
         "typescript": "^5.9.2",
         "vitest": "^3.2.4"
     },
-    "packageManager": "pnpm@10.15.1",
+    "packageManager": "pnpm@10.16.1",
     "engines": {
         "node": ">=18.* <=24.*"
     },
@@ -88,17 +86,16 @@
         "onlyBuiltDependencies": [
             "@parcel/watcher",
             "@swc/core",
-            "@tailwindcss/oxide",
             "esbuild",
             "node-sass",
             "nodehun",
-            "nx"
+            "nx",
+            "oxc-resolver"
         ],
         "overrides": {
             "@eslint/plugin-kit@<0.3.4": ">=0.3.4",
             "@octokit/plugin-paginate-rest@>=1.0.0 <11.4.1": ">=11.4.1",
             "@octokit/request@>=1.0.0 <9.2.1": ">=9.2.1",
-<<<<<<< HEAD
 =======
             "@visulima/packem-rollup": "workspace:*",
             "@visulima/packem-share": "workspace:*",
@@ -108,6 +105,7 @@
             "chrono-node@<2.2.4": ">=2.2.4",
             "form-data@>=4.0.0 <4.0.4": ">=4.0.4",
             "tmp@<=0.2.3": ">=0.2.4",
+<<<<<<< HEAD
 <<<<<<< HEAD
             "undici@>=6.0.0 <6.21.2": ">=7.24.0"
         }
