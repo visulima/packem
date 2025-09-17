@@ -1,3 +1,9 @@
+## @visulima/packem-share [1.0.0-alpha.11](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.10...@visulima/packem-share@1.0.0-alpha.11) (2025-09-17)
+
+### Bug Fixes
+
+* update dependencies and versions across multiple packages ([b17ec3b](https://github.com/visulima/packem/commit/b17ec3b30f1bfa6267e9eede14fbb569c55b09cf))
+
 ## @visulima/packem-share [1.0.0-alpha.10](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.9...@visulima/packem-share@1.0.0-alpha.10) (2025-09-05)
 
 ### Bug Fixes
