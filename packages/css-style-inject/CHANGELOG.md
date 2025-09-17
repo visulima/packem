@@ -1,3 +1,9 @@
+## @visulima/css-style-inject [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.7...@visulima/css-style-inject@1.0.0-alpha.8) (2025-09-17)
+
+### Bug Fixes
+
+* update dependencies and versions across multiple packages ([b17ec3b](https://github.com/visulima/packem/commit/b17ec3b30f1bfa6267e9eede14fbb569c55b09cf))
+
 ## @visulima/css-style-inject [1.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.6...@visulima/css-style-inject@1.0.0-alpha.7) (2025-09-05)
 
 ### Bug Fixes
