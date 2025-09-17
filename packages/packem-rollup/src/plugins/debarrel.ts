@@ -5,8 +5,7 @@ import { createFilter } from "@rollup/pluginutils";
 import MagicString from "magic-string";
 import type { Plugin, PluginContext, TransformResult } from "rollup";
 import type { ExportSpecifier, ImportSpecifier } from "rs-module-lexer";
-// eslint-disable-next-line import/no-namespace
-import * as rsModuleLexer from "rs-module-lexer";
+import rsModuleLexer from "rs-module-lexer";
 
 type Modifications = [start: number, end: number, replace: string][];
 
@@ -27,7 +26,6 @@ interface ResolvedSource {
     id: string;
     resolved?: boolean;
 }
-
 interface DebarrelContext {
     /** Temporarily stores file contents to reduce/dedupe readFile calls */
     fileCache: Map<string, Promise<string>>;
@@ -40,6 +38,8 @@ interface DebarrelContext {
 
     resolve: PluginContext["resolve"];
 }
+
+const { parseAsync } = rsModuleLexer;
 
 const IS_SOURCE_EXT = /\.[mc]?tsx?(?:\?.*)?$/;
 
@@ -74,7 +74,7 @@ const getDeclarationKind = (specifiers: string) => (IS_EXPORT_PREFIXED.test(spec
 
 const safeParse = async (id: string, code: string): Promise<SimpleParseResult> => {
     try {
-        const { output } = await rsModuleLexer.parseAsync({
+        const { output } = await parseAsync({
             input: [
                 {
                     code,

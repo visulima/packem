@@ -31,7 +31,7 @@
         "postcss-modules-values": "^4.0.0",
         "postcss-value-parser": "^4.2.0",
         "rimraf": "^6.0.1",
-        "sass-embedded": "^1.92.0",
+        "sass-embedded": "^1.92.1",
         "stylus": "^0.64.0",
         "typescript": "^5.9.2"
     },

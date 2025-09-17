@@ -32,8 +32,8 @@ class Bar {
 }
 
 const entry1 = ()=>{
-    let t = new Bar(), e = new foo.Foo();
-    return t.method(), e.foo();
+    let o = new Bar(), r = new foo.Foo();
+    return o.method(), r.foo();
 };
 
 exports.entry1 = entry1;
@@ -68,8 +68,8 @@ class Bar {
 }
 
 const entry1 = ()=>{
-    let t = new Bar(), e = new Foo();
-    return t.method(), e.foo();
+    let o = new Bar(), r = new Foo();
+    return o.method(), r.foo();
 };
 
 export { entry1 };
@@ -98,8 +98,8 @@ class Index {
 }
 
 const entry2 = ()=>{
-    let r = new Index(), t = new foo.Foo();
-    return r.method(), t.foo();
+    let o = new Index(), e = new foo.Foo();
+    return o.method(), e.foo();
 };
 
 exports.entry2 = entry2;
@@ -124,8 +124,8 @@ class Index {
 }
 
 const entry2 = ()=>{
-    let r = new Index(), t = new Foo();
-    return r.method(), t.foo();
+    let o = new Index(), e = new Foo();
+    return o.method(), e.foo();
 };
 
 export { entry2 };
