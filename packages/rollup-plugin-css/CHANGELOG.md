@@ -1,3 +1,15 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.6](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.5...@visulima/rollup-plugin-css@1.0.0-alpha.6) (2025-09-22)
+
+### Bug Fixes
+
+* updated deps, added usage of pnpm catalog ([14987df](https://github.com/visulima/packem/commit/14987dff37121ca7aab6f9d0a07b24a1a2f5284a))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.12
+* **@visulima/css-style-inject:** upgraded to 1.0.0-alpha.9
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.4...@visulima/rollup-plugin-css@1.0.0-alpha.5) (2025-09-17)
 
 ### Bug Fixes
