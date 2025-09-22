@@ -174,8 +174,7 @@ const findMatchingImport = (exp: ExportSpecifier, imports: ImportSpecifier[], co
     let imp = imports.find((index: ImportSpecifier) => index.ss < exp.s && index.se > exp.e && index.d === -1);
 
     if (!imp || !imp.n) {
-        const ln
-            = localExportName || code.slice(exp.s).match(/default\s+([a-zA-Z_$][\w$]*)(?:;|\n|$)/)?.[1];
+        const ln = localExportName || code.slice(exp.s).match(/default\s+([a-zA-Z_$][\w$]*)(?:;|\n|$)/)?.[1];
 
         if (ln) {
             imp = imports.find((index: ImportSpecifier) => {
@@ -206,12 +205,7 @@ const findMatchingImport = (exp: ExportSpecifier, imports: ImportSpecifier[], co
     return { imp, localExportName } as { imp: ImportSpecifier | undefined; localExportName?: string };
 };
 
-const resolveThroughBarrel = async (
-    context: DebarrelContext,
-    id: string,
-    exportName: string,
-    options: DebarrelPluginOptions,
-): Promise<ResolvedSource> => {
+const resolveThroughBarrel = async (context: DebarrelContext, id: string, exportName: string, options: DebarrelPluginOptions): Promise<ResolvedSource> => {
     const { resolve } = context;
     const code = await readFileCached(context, id);
     const { exports, imports } = await parsePotentialBarrelFile(context, id, code);
@@ -314,41 +308,50 @@ const getDeclarationClause = (resolvedSource: ResolvedSource, importName: Import
     const { aliasedImportName, exportName } = resolvedSource;
     const local = importName.local || importName.imported;
 
-    if (aliasedImportName) { return `{${aliasedImportName}}`; }
+    if (aliasedImportName) {
+        return `{${aliasedImportName}}`;
+    }
 
-    if (exportName === "default" && declarationKind !== "export") { return local; }
+    if (exportName === "default" && declarationKind !== "export") {
+        return local;
+    }
 
     const isLocallyAliased = exportName !== local;
 
     return `{${isLocallyAliased ? `${exportName} as ${local}` : exportName}}`;
 };
 
-const getDebarrelModifications = async (
-    context: DebarrelContext,
-    id: string,
-    code: string,
-    options: DebarrelPluginOptions,
-) => {
+const getDebarrelModifications = async (context: DebarrelContext, id: string, code: string, options: DebarrelPluginOptions) => {
     const modifications: Modifications = [];
     const { imports } = await safeParse(id, code);
 
     await Promise.all(
         imports.map(async (imp) => {
-            if (!imp.n || imp.d !== -1) { return; }
+            if (!imp.n || imp.d !== -1) {
+                return;
+            }
 
             const specifiers = code.slice(imp.ss, imp.s);
             const importNames = getImportNames(specifiers);
 
-            if (importNames.length === 0) { return; }
+            if (importNames.length === 0) {
+                return;
+            }
 
             const resolved = await context.resolve(imp.n, id);
             const resolvedId = resolved?.id;
 
-            if (!resolvedId) { return; }
+            if (!resolvedId) {
+                return;
+            }
 
-            if (!isSourceFile(resolvedId)) { return; }
+            if (!isSourceFile(resolvedId)) {
+                return;
+            }
 
-            if (isIgnoredModule(resolvedId)) { return; }
+            if (isIgnoredModule(resolvedId)) {
+                return;
+            }
 
             const declarationKind = getDeclarationKind(specifiers);
 
@@ -357,7 +360,9 @@ const getDebarrelModifications = async (
                     importNames.map(async (importName) => {
                         const debarrelled = await resolveThroughBarrel(context, resolvedId, importName.imported, options);
 
-                        if (!debarrelled) { return undefined; }
+                        if (!debarrelled) {
+                            return undefined;
+                        }
 
                         const clause = getDeclarationClause(debarrelled, importName, declarationKind);
                         const moduleSpecifier = JSON.stringify(debarrelled.id);
@@ -366,7 +371,9 @@ const getDebarrelModifications = async (
                     }),
                 );
 
-                if (replacements.includes(undefined)) { return; }
+                if (replacements.includes(undefined)) {
+                    return;
+                }
 
                 modifications.push([imp.ss, imp.se, replacements.join(";")]);
             } catch (error) {
@@ -379,13 +386,10 @@ const getDebarrelModifications = async (
     return modifications;
 };
 
-const applyModifications = (
-    id: string,
-    code: string,
-    modifications: Modifications,
-    sourceMap: boolean,
-): TransformResult | undefined => {
-    if (modifications.length === 0) { return undefined; }
+const applyModifications = (id: string, code: string, modifications: Modifications, sourceMap: boolean): TransformResult | undefined => {
+    if (modifications.length === 0) {
+        return undefined;
+    }
 
     const out = new MagicString(code, { filename: id });
 
@@ -414,9 +418,7 @@ export const debarrelPlugin = (options: DebarrelPluginOptions = {}): Plugin => {
     };
 
     // Allow user to scope by include patterns if needed
-    const includeFilter: ((id: string) => boolean) | undefined = options.include
-        ? createFilter(options.include, [])
-        : undefined;
+    const includeFilter: ((id: string) => boolean) | undefined = options.include ? createFilter(options.include, []) : undefined;
 
     let sourceMap = true;
 
@@ -427,7 +429,9 @@ export const debarrelPlugin = (options: DebarrelPluginOptions = {}): Plugin => {
         async load(id) {
             const cached = fileCache.get(id);
 
-            if (cached) { return await cached; }
+            if (cached) {
+                return await cached;
+            }
 
             return undefined;
         },
@@ -437,17 +441,24 @@ export const debarrelPlugin = (options: DebarrelPluginOptions = {}): Plugin => {
         // align sourcemap behavior with Rollup options
         options(inputOptions) {
             // @ts-expect-error rollup types
-            const sm = inputOptions.output && (Array.isArray(inputOptions.output) ? inputOptions.output[0]?.sourcemap : (inputOptions.output as any)?.sourcemap);
+            const sm
+                = inputOptions.output && (Array.isArray(inputOptions.output) ? inputOptions.output[0]?.sourcemap : (inputOptions.output as any)?.sourcemap);
 
-            if (sm === false) { sourceMap = false; }
+            if (sm === false) {
+                sourceMap = false;
+            }
 
             return undefined;
         },
 
         async transform(code, id) {
-            if (!isSourceFile(id)) { return undefined; }
+            if (!isSourceFile(id)) {
+                return undefined;
+            }
 
-            if (includeFilter && !includeFilter(id)) { return undefined; }
+            if (includeFilter && !includeFilter(id)) {
+                return undefined;
+            }
 
             const context: DebarrelContext = {
                 fileCache,

@@ -1,6 +1,6 @@
 // index.d.ts
 declare namespace foo_d_exports {
-  export { _in as in };
+    export { _in as in };
 }
 declare const _in = "foo";
 //#endregion

@@ -55,17 +55,10 @@ const watchHandler = ({
                 await event.result.close();
 
                 if (useCache) {
-                    fileCache.set(
-                        mode === "bundle"
-                            ? WATCH_CACHE_KEY
-                            : `dts-${WATCH_CACHE_KEY}`,
-                        event.result.cache,
-                    );
+                    fileCache.set(mode === "bundle" ? WATCH_CACHE_KEY : `dts-${WATCH_CACHE_KEY}`, event.result.cache);
                 }
 
-                context.logger.raw(
-                    `\n⚡️ Build run in ${event.duration}ms\n\n`,
-                );
+                context.logger.raw(`\n⚡️ Build run in ${event.duration}ms\n\n`);
 
                 await runBuilder?.(true);
 
@@ -126,11 +119,7 @@ const watch = async (
 
     // TODO: find a way to remove this hack
     // This is a hack to prevent caching when using isolated declarations or css loaders
-    if (
-        context.options.rollup.isolatedDeclarations
-        || context.options.isolatedDeclarationTransformer
-        || context.options.rollup.css
-    ) {
+    if (context.options.rollup.isolatedDeclarations || context.options.isolatedDeclarationTransformer || context.options.rollup.css) {
         useCache = false;
     }
 
@@ -138,33 +127,18 @@ const watch = async (
         rollupOptions.cache = fileCache.get<RollupCache>(WATCH_CACHE_KEY);
     }
 
-    if (
-        context.options.rollup.watch
-        && typeof rollupOptions.watch === "object"
-        && rollupOptions.watch.include === undefined
-    ) {
+    if (context.options.rollup.watch && typeof rollupOptions.watch === "object" && rollupOptions.watch.include === undefined) {
         rollupOptions.watch = {
             ...rollupOptions.watch,
             ...context.options.rollup.watch,
         };
 
-        rollupOptions.watch.include = [
-            join(context.options.sourceDir, "**", "*"),
-            "package.json",
-            "packem.config.*",
-            "tsconfig.json",
-            "tsconfig.*.json",
-        ];
+        rollupOptions.watch.include = [join(context.options.sourceDir, "**", "*"), "package.json", "packem.config.*", "tsconfig.json", "tsconfig.*.json"];
 
         if (Array.isArray(context.options.rollup.watch.include)) {
-            rollupOptions.watch.include = [
-                ...rollupOptions.watch.include,
-                ...context.options.rollup.watch.include,
-            ];
+            rollupOptions.watch.include = [...rollupOptions.watch.include, ...context.options.rollup.watch.include];
         } else if (context.options.rollup.watch.include) {
-            rollupOptions.watch.include.push(
-                context.options.rollup.watch.include,
-            );
+            rollupOptions.watch.include.push(context.options.rollup.watch.include);
         }
 
         rollupOptions.watch.chokidar = {
@@ -212,14 +186,9 @@ const watch = async (
         watcher,
     });
 
-    if (
-        context.options.declaration
-        && context.options.rollup.isolatedDeclarations
-        && context.options.isolatedDeclarationTransformer
-    ) {
+    if (context.options.declaration && context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer) {
         context.logger.info({
-            message:
-                "Using isolated declaration transformer to generate declaration files...",
+            message: "Using isolated declaration transformer to generate declaration files...",
             prefix: "dts",
         });
     } else if (context.options.declaration) {
@@ -229,11 +198,7 @@ const watch = async (
             rollupDtsOptions.cache = fileCache.get(`dts-${WATCH_CACHE_KEY}`);
         }
 
-        await context.hooks.callHook(
-            "rollup:dts:options",
-            context,
-            rollupDtsOptions,
-        );
+        await context.hooks.callHook("rollup:dts:options", context, rollupDtsOptions);
 
         const dtsWatcher = rollupWatch(rollupDtsOptions);
 

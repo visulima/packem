@@ -18,10 +18,13 @@ export const cjsInteropPlugin = ({
             code: string,
             chunk: RenderedChunk,
             options: NormalizedOutputOptions,
-        ): Promise<{
-            code: string;
-            map: SourceMapInput;
-        } | undefined> => {
+        ): Promise<
+            | {
+                code: string;
+                map: SourceMapInput;
+            }
+            | undefined
+        > => {
             if (chunk.type !== "chunk" || !chunk.isEntry) {
                 return undefined;
             }

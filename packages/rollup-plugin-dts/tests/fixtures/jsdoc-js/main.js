@@ -6,3 +6,5 @@
 export function foo(baz) {
     console.log(baz);
 }
+
+export { bar } from "./bar";

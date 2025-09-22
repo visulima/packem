@@ -10,16 +10,16 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "tailwindcss": "^4.1.13",
-        "@tailwindcss/typography": "^0.5.16",
-        "@tailwindcss/forms": "^0.5.10",
-        "preline": "^3.2.3"
+        "tailwindcss": "catalog:style",
+        "@tailwindcss/typography": "catalog:style",
+        "@tailwindcss/forms": "catalog:style",
+        "preline": "catalog:prod"
     },
     "devDependencies": {
         "@visulima/packem": "workspace:*",
-        "typescript": "^5.9.2",
-        "@tailwindcss/node": "^4.1.13",
-        "@tailwindcss/oxide": "^4.1.13",
-        "esbuild": "^0.25.9"
+        "typescript": "catalog:tsc",
+        "@tailwindcss/node": "catalog:style",
+        "@tailwindcss/oxide": "catalog:style",
+        "esbuild": "catalog:build"
     }
 }

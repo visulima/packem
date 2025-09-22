@@ -38,10 +38,7 @@ describe(validatePackageFields, () => {
 
         validatePackageFields(context as unknown as BuildContext);
 
-        expect(mockedWarn).not.toHaveBeenCalledWith(
-            context,
-            "The 'files' field is missing in your package.json. Add the files to be included in the package.",
-        );
+        expect(mockedWarn).not.toHaveBeenCalledWith(context, "The 'files' field is missing in your package.json. Add the files to be included in the package.");
     });
 
     it("should warn if \"main\" field is missing in package.json for CJS packages", () => {
@@ -54,10 +51,7 @@ describe(validatePackageFields, () => {
 
         validatePackageFields(context as unknown as BuildContext);
 
-        expect(mockedWarn).toHaveBeenCalledWith(
-            context,
-            "The 'name' field is missing in your package.json. Please provide a valid package name.",
-        );
+        expect(mockedWarn).toHaveBeenCalledWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
     });
 
     it("should warn if \"exports\" field is missing in package.json for ESM packages when emitCJS is false", () => {
@@ -73,10 +67,7 @@ describe(validatePackageFields, () => {
 
         validatePackageFields(context as unknown as BuildContext);
 
-        expect(mockedWarn).toHaveBeenCalledWith(
-            context,
-            "The 'exports' field is missing in your package.json. Define module exports explicitly.",
-        );
+        expect(mockedWarn).toHaveBeenCalledWith(context, "The 'exports' field is missing in your package.json. Define module exports explicitly.");
     });
 
     it("should warn if \"types\" field is missing in package.json when declaration is enabled", () => {
@@ -172,10 +163,7 @@ describe(validatePackageFields, () => {
 
         validatePackageFields(context as unknown as BuildContext);
 
-        expect(mockedWarn).toHaveBeenCalledWith(
-            context,
-            "The 'name' field is missing in your package.json. Please provide a valid package name.",
-        );
+        expect(mockedWarn).toHaveBeenCalledWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
     });
 
     it("should not display a error if the pkg is module and has no cjs files", () => {
@@ -234,10 +222,7 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledWith(
-                context,
-                "Invalid exports path \"dist/index.js\" at exports. Export paths must start with \"./\"",
-            );
+            expect(mockedWarn).toHaveBeenCalledWith(context, "Invalid exports path \"dist/index.js\" at exports. Export paths must start with \"./\"");
         });
 
         it("should warn on exports path containing '../'", () => {
@@ -428,18 +413,9 @@ describe(validatePackageFields, () => {
 
             // Create test files with different extensions
             await fs.writeFile(path.join(testDir, "icon1.svg"), "// valid svg");
-            await fs.writeFile(
-                path.join(testDir, "icon2.png"),
-                "// invalid png for icons",
-            );
-            await fs.writeFile(
-                path.join(testDir, "icon3.js"),
-                "// invalid js for icons",
-            );
-            await fs.writeFile(
-                path.join(testDir, "icon4.ts"),
-                "// invalid ts for icons",
-            );
+            await fs.writeFile(path.join(testDir, "icon2.png"), "// invalid png for icons");
+            await fs.writeFile(path.join(testDir, "icon3.js"), "// invalid js for icons");
+            await fs.writeFile(path.join(testDir, "icon4.ts"), "// invalid ts for icons");
 
             const context = {
                 options: {
@@ -468,9 +444,7 @@ describe(validatePackageFields, () => {
             // Should warn about files with invalid extensions
             expect(mockedWarn).toHaveBeenCalledWith(
                 context,
-                expect.stringContaining(
-                    "matches files with invalid extensions: src/icons/icon1.svg, src/icons/icon2.png",
-                ),
+                expect.stringContaining("matches files with invalid extensions: src/icons/icon1.svg, src/icons/icon2.png"),
             );
         });
 
@@ -488,18 +462,9 @@ describe(validatePackageFields, () => {
             await fs.mkdir(testDir, { recursive: true });
 
             // Create test files
-            await fs.writeFile(
-                path.join(testDir, "asset1.png"),
-                "// valid png",
-            );
-            await fs.writeFile(
-                path.join(testDir, "asset2.jpg"),
-                "// valid jpg",
-            );
-            await fs.writeFile(
-                path.join(testDir, "asset3.txt"),
-                "// invalid txt",
-            );
+            await fs.writeFile(path.join(testDir, "asset1.png"), "// valid png");
+            await fs.writeFile(path.join(testDir, "asset2.jpg"), "// valid jpg");
+            await fs.writeFile(path.join(testDir, "asset3.txt"), "// invalid txt");
 
             const context = {
                 options: {
@@ -527,12 +492,7 @@ describe(validatePackageFields, () => {
             await fs.rm(tempDir, { recursive: true, force: true });
 
             // Should warn about files with invalid extensions
-            expect(mockedWarn).toHaveBeenCalledWith(
-                context,
-                expect.stringContaining(
-                    "matches files with invalid extensions: src/assets/asset3.txt",
-                ),
-            );
+            expect(mockedWarn).toHaveBeenCalledWith(context, expect.stringContaining("matches files with invalid extensions: src/assets/asset3.txt"));
         });
 
         it("should accept valid conditional exports", () => {
@@ -597,10 +557,7 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledWith(
-                context,
-                "Empty exports object. Define at least one export entry",
-            );
+            expect(mockedWarn).toHaveBeenCalledWith(context, "Empty exports object. Define at least one export entry");
         });
 
         it("should warn on mixed subpaths and conditions", () => {
@@ -638,10 +595,7 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledWith(
-                context,
-                "Missing main export \".\". Subpaths exports should include a main export entry",
-            );
+            expect(mockedWarn).toHaveBeenCalledWith(context, "Missing main export \".\". Subpaths exports should include a main export entry");
         });
 
         it("should warn on invalid subpath format", () => {
@@ -658,10 +612,7 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledWith(
-                context,
-                "Invalid subpath \".invalid\". Subpaths should start with \"./\" or be exactly \".\"",
-            );
+            expect(mockedWarn).toHaveBeenCalledWith(context, "Invalid subpath \".invalid\". Subpaths should start with \"./\" or be exactly \".\"");
         });
 
         it("should warn on multiple wildcards in subpath pattern", () => {
@@ -679,10 +630,7 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledWith(
-                context,
-                "Invalid subpath pattern \"./*/*.js\". Only one \"*\" wildcard is allowed per subpath",
-            );
+            expect(mockedWarn).toHaveBeenCalledWith(context, "Invalid subpath pattern \"./*/*.js\". Only one \"*\" wildcard is allowed per subpath");
         });
 
         it("should warn on unknown export conditions", () => {
@@ -815,10 +763,7 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledWith(
-                context,
-                "Empty fallback array at exports[\".\"]. Fallback arrays should contain at least one entry",
-            );
+            expect(mockedWarn).toHaveBeenCalledWith(context, "Empty fallback array at exports[\".\"]. Fallback arrays should contain at least one entry");
         });
 
         it("should warn on empty conditions object", () => {
@@ -871,10 +816,7 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledWith(
-                context,
-                "Invalid exports value type at exports[\".\"]. Expected string, array, object, or null",
-            );
+            expect(mockedWarn).toHaveBeenCalledWith(context, "Invalid exports value type at exports[\".\"]. Expected string, array, object, or null");
         });
 
         it("should accept all standard Node.js conditions", () => {

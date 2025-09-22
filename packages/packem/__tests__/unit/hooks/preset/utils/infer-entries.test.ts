@@ -6,10 +6,7 @@ import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import inferEntries from "../../../../../src/config/preset/utils/infer-entries";
-import type {
-    BuildContext,
-    InferEntriesResult,
-} from "../../../../../src/types";
+import type { BuildContext, InferEntriesResult } from "../../../../../src/types";
 
 const createFiles = (files: string[], directory: string) => {
     for (const file of files) {
@@ -63,14 +60,10 @@ describe(inferEntries, () => {
         expect(() =>
             inferEntries(
                 { main: "dist/test.cjs" },
-                ["src/", "src/test.ts"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
                 { ...defaultContext, pkg: {} } as unknown as BuildContext,
             ),
-        ).toThrow(
-            "You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.",
-        );
+        ).toThrow("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");
     });
 
     it("should recognise main and module outputs", () => {
@@ -80,9 +73,7 @@ describe(inferEntries, () => {
 
         const result = inferEntries(
             { main: "dist/test.cjs", module: "dist/test.mjs" },
-            ["src/", "src/test.ts"].map((file) =>
-                join(temporaryDirectoryPath, file),
-            ),
+            ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
             defaultContext,
         );
 
@@ -104,16 +95,11 @@ describe(inferEntries, () => {
     it("should handle nested indexes", () => {
         expect.assertions(1);
 
-        createFiles(
-            ["src/event/index.ts", "src/index.ts"],
-            temporaryDirectoryPath,
-        );
+        createFiles(["src/event/index.ts", "src/index.ts"], temporaryDirectoryPath);
 
         const result = inferEntries(
             { module: "dist/index.mjs" },
-            ["src/", "src/event/index.ts", "src/index.ts"].map((file) =>
-                join(temporaryDirectoryPath, file),
-            ),
+            ["src/", "src/event/index.ts", "src/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
             defaultContext,
         );
 
@@ -139,9 +125,7 @@ describe(inferEntries, () => {
         expect(
             inferEntries(
                 { bin: "dist/cli.cjs" },
-                ["src/", "src/cli.ts"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                ["src/", "src/cli.ts"].map((file) => join(temporaryDirectoryPath, file)),
                 defaultContext,
             ),
         ).toStrictEqual({
@@ -162,9 +146,7 @@ describe(inferEntries, () => {
         expect(
             inferEntries(
                 { bin: { nuxt: "dist/cli.js" } },
-                ["src/", "src/cli.ts"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                ["src/", "src/cli.ts"].map((file) => join(temporaryDirectoryPath, file)),
                 defaultContext,
             ),
         ).toStrictEqual({
@@ -185,9 +167,7 @@ describe(inferEntries, () => {
         expect(
             inferEntries(
                 { bin: { nuxt: "dist/cli.js" }, type: "module" },
-                ["src/", "src/cli.ts"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                ["src/", "src/cli.ts"].map((file) => join(temporaryDirectoryPath, file)),
                 defaultContext,
             ),
         ).toStrictEqual({
@@ -213,9 +193,7 @@ describe(inferEntries, () => {
 
         const result = inferEntries(
             { main: "dist/test.js", type: "module" },
-            ["src/", "src/test.ts"].map((file) =>
-                join(temporaryDirectoryPath, file),
-            ),
+            ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
             defaultContext,
         );
 
@@ -240,12 +218,7 @@ describe(inferEntries, () => {
 
         const result = inferEntries(
             { exports: "dist/other/runtime/index.js" },
-            [
-                "src/",
-                "src/other",
-                "src/other/runtime",
-                "src/other/runtime/index.ts",
-            ].map((file) => join(temporaryDirectoryPath, file)),
+            ["src/", "src/other", "src/other/runtime", "src/other/runtime/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
             defaultContext,
         );
 
@@ -255,10 +228,7 @@ describe(inferEntries, () => {
                     cjs: true,
                     environment: "development",
                     exportKey: new Set<string>(),
-                    input: join(
-                        temporaryDirectoryPath,
-                        "src/other/runtime/index.ts",
-                    ),
+                    input: join(temporaryDirectoryPath, "src/other/runtime/index.ts"),
                     runtime: "node",
                 },
             ],
@@ -274,9 +244,7 @@ describe(inferEntries, () => {
         expect(
             inferEntries(
                 { main: "dist/test.cjs", types: "custom/handwritten.d.ts" },
-                ["src/", "src/test.ts"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
                 {
                     options: { ...defaultContext.options, declaration: true },
                     pkg: defaultContext.pkg,
@@ -292,9 +260,7 @@ describe(inferEntries, () => {
                     runtime: "node",
                 },
             ],
-            warnings: [
-                "Could not find entrypoint for `custom/handwritten.d.ts`",
-            ],
+            warnings: ["Could not find entrypoint for `custom/handwritten.d.ts`"],
         } satisfies InferEntriesResult);
 
         expect(
@@ -304,9 +270,7 @@ describe(inferEntries, () => {
                     module: "dist/test.mjs",
                     types: "dist/test.d.ts",
                 },
-                ["src/", "src/test.ts"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
                 {
                     environment: defaultContext.environment,
                     options: { ...defaultContext.options, declaration: true },
@@ -335,9 +299,7 @@ describe(inferEntries, () => {
                     module: "dist/test.mjs",
                     typings: "dist/test.d.ts",
                 },
-                ["src/", "src/test.ts"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
                 {
                     environment: defaultContext.environment,
                     options: { ...defaultContext.options, declaration: true },
@@ -378,9 +340,7 @@ describe(inferEntries, () => {
                     },
                 },
             },
-            ["src/", "src/test.ts"].map((file) =>
-                join(temporaryDirectoryPath, file),
-            ),
+            ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 environment: defaultContext.environment,
                 options: { ...defaultContext.options, declaration: true },
@@ -420,9 +380,7 @@ describe(inferEntries, () => {
                     },
                 },
             },
-            ["src/", "src/test.d.ts"].map((file) =>
-                join(temporaryDirectoryPath, file),
-            ),
+            ["src/", "src/test.d.ts"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 environment: defaultContext.environment,
                 options: { ...defaultContext.options, declaration: true },
@@ -458,9 +416,7 @@ describe(inferEntries, () => {
                     },
                 },
             },
-            ["src/", "src/test.d.ts"].map((file) =>
-                join(temporaryDirectoryPath, file),
-            ),
+            ["src/", "src/test.d.ts"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 environment: defaultContext.environment,
                 options: { ...defaultContext.options, declaration: true },
@@ -491,9 +447,7 @@ describe(inferEntries, () => {
                     },
                 },
             },
-            ["src/", "src/test.d.ts"].map((file) =>
-                join(temporaryDirectoryPath, file),
-            ),
+            ["src/", "src/test.d.ts"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 environment: defaultContext.environment,
                 options: { ...defaultContext.options, declaration: true },
@@ -524,9 +478,7 @@ describe(inferEntries, () => {
         expect(
             inferEntries(
                 { exports: "dist/test.js" },
-                ["src/", "src/gather.ts"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                ["src/", "src/gather.ts"].map((file) => join(temporaryDirectoryPath, file)),
                 defaultContext,
             ),
         ).toStrictEqual({
@@ -550,9 +502,7 @@ describe(inferEntries, () => {
         expect(
             inferEntries(
                 { exports: { "./*": "./*" } },
-                ["src/", "src/", "src/gather.ts"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                ["src/", "src/", "src/gather.ts"].map((file) => join(temporaryDirectoryPath, file)),
                 context,
             ),
         ).toStrictEqual({
@@ -574,10 +524,7 @@ describe(inferEntries, () => {
     it("should handle multiple entries", () => {
         expect.assertions(1);
 
-        createFiles(
-            ["src/index.ts", "src/first-test.ts", "src/test.mjs"],
-            temporaryDirectoryPath,
-        );
+        createFiles(["src/index.ts", "src/first-test.ts", "src/test.mjs"], temporaryDirectoryPath);
 
         expect(
             inferEntries(
@@ -589,12 +536,7 @@ describe(inferEntries, () => {
                         "./test.css": "./dist/test.css",
                     },
                 },
-                [
-                    "src/",
-                    "src/index.ts",
-                    "src/first-test.ts",
-                    "src/test.mjs",
-                ].map((file) => join(temporaryDirectoryPath, file)),
+                ["src/", "src/index.ts", "src/first-test.ts", "src/test.mjs"].map((file) => join(temporaryDirectoryPath, file)),
                 defaultContext,
             ),
         ).toStrictEqual({
@@ -628,17 +570,12 @@ describe(inferEntries, () => {
     it("should recognise directory mappings", () => {
         expect.assertions(5);
 
-        createFiles(
-            ["src/runtime/test.js", "src/runtime/test2.js"],
-            temporaryDirectoryPath,
-        );
+        createFiles(["src/runtime/test.js", "src/runtime/test2.js"], temporaryDirectoryPath);
 
         expect(
             inferEntries(
                 { exports: "./dist/runtime/*" },
-                ["src/", "src/runtime/", "src/runtime/test.js"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                ["src/", "src/runtime/", "src/runtime/test.js"].map((file) => join(temporaryDirectoryPath, file)),
                 defaultContext,
             ),
         ).toStrictEqual({
@@ -661,9 +598,7 @@ describe(inferEntries, () => {
                     exports: { "./runtime/*": "./dist/runtime/*.mjs" },
                     type: "module",
                 },
-                ["src/", "src/runtime/", "src/runtime/test.js"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                ["src/", "src/runtime/", "src/runtime/test.js"].map((file) => join(temporaryDirectoryPath, file)),
                 defaultContext,
             ),
         ).toStrictEqual({
@@ -683,9 +618,7 @@ describe(inferEntries, () => {
         expect(
             inferEntries(
                 { exports: { "./runtime/*": { require: "./dist/runtime/*" } } },
-                ["src/", "src/runtime/", "src/runtime/test.js"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                ["src/", "src/runtime/", "src/runtime/test.js"].map((file) => join(temporaryDirectoryPath, file)),
                 defaultContext,
             ),
         ).toStrictEqual({
@@ -702,28 +635,14 @@ describe(inferEntries, () => {
             warnings: [],
         } satisfies InferEntriesResult);
 
-        createFiles(
-            [
-                "src/test/gather.ts",
-                "src/test/test2/gather.ts",
-                "src/test/index2.ts",
-                "src/gather.ts",
-            ],
-            temporaryDirectoryPath,
-        );
+        createFiles(["src/test/gather.ts", "src/test/test2/gather.ts", "src/test/index2.ts", "src/gather.ts"], temporaryDirectoryPath);
 
         expect(
             inferEntries(
                 { exports: { "./test/*": "./test/*.js" } },
-                [
-                    "src/",
-                    "src/test/",
-                    "src/test/gather.ts",
-                    "src/test/test2/",
-                    "src/test/test2/gather.ts",
-                    "src/test/index2.ts",
-                    "src/gather.ts",
-                ].map((file) => join(temporaryDirectoryPath, file)),
+                ["src/", "src/test/", "src/test/gather.ts", "src/test/test2/", "src/test/test2/gather.ts", "src/test/index2.ts", "src/gather.ts"].map((file) =>
+                    join(temporaryDirectoryPath, file),
+                ),
                 defaultContext,
             ),
         ).toStrictEqual({
@@ -748,10 +667,7 @@ describe(inferEntries, () => {
                     cjs: true,
                     environment: "development",
                     exportKey: new Set<string>(["test/*"]),
-                    input: join(
-                        temporaryDirectoryPath,
-                        "src/test/test2/gather.ts",
-                    ),
+                    input: join(temporaryDirectoryPath, "src/test/test2/gather.ts"),
                     isGlob: true,
                     runtime: "node",
                 },
@@ -801,10 +717,7 @@ describe(inferEntries, () => {
                     cjs: true,
                     environment: "development",
                     exportKey: new Set<string>(["test/*"]),
-                    input: join(
-                        temporaryDirectoryPath,
-                        "src/test/test2/gather.ts",
-                    ),
+                    input: join(temporaryDirectoryPath, "src/test/test2/gather.ts"),
                     isGlob: true,
                     runtime: "node",
                 },
@@ -819,9 +732,7 @@ describe(inferEntries, () => {
         expect(
             inferEntries(
                 { exports: { "./runtime/*": "./dist/runtime/*.mjs" } },
-                ["src/", "src/runtime/"].map((file) =>
-                    join(temporaryDirectoryPath, file),
-                ),
+                ["src/", "src/runtime/"].map((file) => join(temporaryDirectoryPath, file)),
                 defaultContext,
             ),
         ).toStrictEqual({
@@ -833,10 +744,7 @@ describe(inferEntries, () => {
     it("should map cjs and mjs to mts and cts, if they exists", () => {
         expect.assertions(1);
 
-        createFiles(
-            ["src/test.cts", "src/test.mts", "src/test.ts"],
-            temporaryDirectoryPath,
-        );
+        createFiles(["src/test.cts", "src/test.mts", "src/test.ts"], temporaryDirectoryPath);
 
         const result = inferEntries(
             {
@@ -851,9 +759,7 @@ describe(inferEntries, () => {
                     },
                 },
             },
-            ["src/", "src/test.ts", "src/test.cts", "src/test.mts"].map(
-                (file) => join(temporaryDirectoryPath, file),
-            ),
+            ["src/", "src/test.ts", "src/test.cts", "src/test.mts"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 environment: defaultContext.environment,
                 options: { ...defaultContext.options, declaration: true },
@@ -911,12 +817,7 @@ describe(inferEntries, () => {
                     },
                 },
             },
-            [
-                "src/",
-                "src/index.ts",
-                "src/index.react-server.ts",
-                "src/index.production.ts",
-            ].map((file) => join(temporaryDirectoryPath, file)),
+            ["src/", "src/index.ts", "src/index.react-server.ts", "src/index.production.ts"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 environment: defaultContext.environment,
                 options: {
@@ -945,10 +846,7 @@ describe(inferEntries, () => {
                     environment: "production",
                     esm: true,
                     exportKey: new Set<string>(["."]),
-                    input: join(
-                        temporaryDirectoryPath,
-                        "src/index.production.ts",
-                    ),
+                    input: join(temporaryDirectoryPath, "src/index.production.ts"),
 
                     runtime: "node",
                 },
@@ -956,10 +854,7 @@ describe(inferEntries, () => {
                     environment: "development",
                     esm: true,
                     exportKey: new Set<string>(["."]),
-                    input: join(
-                        temporaryDirectoryPath,
-                        "src/index.react-server.ts",
-                    ),
+                    input: join(temporaryDirectoryPath, "src/index.react-server.ts"),
 
                     runtime: "react-server",
                 },
@@ -981,9 +876,7 @@ describe(inferEntries, () => {
                 },
                 type: "module",
             },
-            ["src/", "src/index.ts"].map((file) =>
-                join(temporaryDirectoryPath, file),
-            ),
+            ["src/", "src/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 options: {
                     ...defaultContext.options,
@@ -1039,9 +932,7 @@ describe(inferEntries, () => {
                     },
                 },
             },
-            ["src/", "src/index.ts"].map((file) =>
-                join(temporaryDirectoryPath, file),
-            ),
+            ["src/", "src/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 ...defaultContext,
                 environment: undefined,
@@ -1084,10 +975,7 @@ describe(inferEntries, () => {
     it("should ignore specified export keys", () => {
         expect.assertions(1);
 
-        createFiles(
-            ["src/index.ts", "src/images/icon.png"],
-            temporaryDirectoryPath,
-        );
+        createFiles(["src/index.ts", "src/images/icon.png"], temporaryDirectoryPath);
 
         const result = inferEntries(
             {
@@ -1098,9 +986,7 @@ describe(inferEntries, () => {
                 },
                 type: "module",
             },
-            ["src/", "src/index.ts", "src/images/icon.png"].map((file) =>
-                join(temporaryDirectoryPath, file),
-            ),
+            ["src/", "src/index.ts", "src/images/icon.png"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 ...defaultContext,
                 options: {
@@ -1142,9 +1028,7 @@ describe(inferEntries, () => {
                     },
                 },
             },
-            ["src/", "src/index.ts"].map((file) =>
-                join(temporaryDirectoryPath, file),
-            ),
+            ["src/", "src/index.ts"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 ...defaultContext,
                 options: {
@@ -1172,10 +1056,7 @@ describe(inferEntries, () => {
     it("should work with allowedExportExtensions", () => {
         expect.assertions(1);
 
-        createFiles(
-            ["src/index.ts", "src/images/icon.svg"],
-            temporaryDirectoryPath,
-        );
+        createFiles(["src/index.ts", "src/images/icon.svg"], temporaryDirectoryPath);
 
         const result = inferEntries(
             {
@@ -1185,9 +1066,7 @@ describe(inferEntries, () => {
                 },
                 type: "module",
             },
-            ["src/", "src/index.ts", "src/images/icon.svg"].map((file) =>
-                join(temporaryDirectoryPath, file),
-            ),
+            ["src/", "src/index.ts", "src/images/icon.svg"].map((file) => join(temporaryDirectoryPath, file)),
             {
                 ...defaultContext,
                 options: {

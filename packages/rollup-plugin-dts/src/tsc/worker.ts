@@ -2,7 +2,7 @@ import process from "node:process";
 
 import { createBirpc } from "birpc";
 
-import { tscEmit } from "./index";
+import { tscEmit } from "./index.ts";
 
 const functions: { tscEmit: typeof tscEmit } = { tscEmit };
 

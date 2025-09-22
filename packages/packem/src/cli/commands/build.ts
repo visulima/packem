@@ -1,10 +1,7 @@
 import { cwd, exit } from "node:process";
 
 import type { Cli } from "@visulima/cerebro";
-import {
-    DEVELOPMENT_ENV,
-    PRODUCTION_ENV,
-} from "@visulima/packem-share/constants";
+import { DEVELOPMENT_ENV, PRODUCTION_ENV } from "@visulima/packem-share/constants";
 import { resolve } from "@visulima/path";
 import { defu } from "defu";
 import { createJiti } from "jiti";
@@ -54,8 +51,7 @@ const createBuildCommand = (cli: Cli): void => {
                     if (environment.key === "NODE_ENV") {
                         nodeEnvironment = environment.value;
                     } else {
-                        environments[`process.env.${environment.key}`]
-                            = JSON.stringify(environment.value);
+                        environments[`process.env.${environment.key}`] = JSON.stringify(environment.value);
                     }
                 }
             }
@@ -81,14 +77,13 @@ const createBuildCommand = (cli: Cli): void => {
             const rootPath = resolve(cwd(), options.dir ?? ".");
 
             const jiti = createJiti(rootPath, { debug: options.debug });
-            const { config: buildConfig, path: buildConfigPath }
-                = await loadPackemConfig(
-                    jiti,
-                    rootPath,
-                    nodeEnvironment as Environment,
-                    mode,
-                    options.config ?? undefined,
-                );
+            const { config: buildConfig, path: buildConfigPath } = await loadPackemConfig(
+                jiti,
+                rootPath,
+                nodeEnvironment as Environment,
+                mode,
+                options.config ?? undefined,
+            );
 
             logger.debug("Using packem config found at", buildConfigPath);
 
@@ -114,10 +109,7 @@ const createBuildCommand = (cli: Cli): void => {
                         dtsOnly: options.dtsOnly,
                         externals,
                         killSignal: options.killSignal,
-                        minify:
-                            options.minify === undefined
-                                ? nodeEnvironment === PRODUCTION_ENV
-                                : options.minify,
+                        minify: options.minify === undefined ? nodeEnvironment === PRODUCTION_ENV : options.minify,
                         onSuccess: options.onSuccess,
                         rollup: {
                             esbuild: {
@@ -141,10 +133,7 @@ const createBuildCommand = (cli: Cli): void => {
                                 : {},
                         },
                         runtime: options.runtime,
-                        sourcemap:
-                            options.metafile
-                            || options.analyze
-                            || options.sourcemap,
+                        sourcemap: options.metafile || options.analyze || options.sourcemap,
                         // validation will take the default values
                         validation: options.validation === false ? false : {},
                         ...options.typedoc
@@ -173,8 +162,7 @@ const createBuildCommand = (cli: Cli): void => {
             },
             {
                 alias: "t",
-                description:
-                    "Environments to support. `target` in tsconfig.json is automatically added. Defaults to the current Node.js version.",
+                description: "Environments to support. `target` in tsconfig.json is automatically added. Defaults to the current Node.js version.",
                 name: "target",
             },
             {
@@ -210,8 +198,7 @@ const createBuildCommand = (cli: Cli): void => {
                 type: Boolean,
             },
             {
-                description:
-                    "Compile-time environment variables (eg. --env.NODE_ENV=production)",
+                description: "Compile-time environment variables (eg. --env.NODE_ENV=production)",
                 multiple: true,
                 name: "env",
                 type: (input: string) => {
@@ -241,8 +228,7 @@ const createBuildCommand = (cli: Cli): void => {
                 type: Boolean,
             },
             {
-                description:
-                    "CJS interop mode, can export default and named export, (experimental).",
+                description: "CJS interop mode, can export default and named export, (experimental).",
                 name: "cjsInterop",
                 type: Boolean,
             },
@@ -284,28 +270,23 @@ const createBuildCommand = (cli: Cli): void => {
                 type: Boolean,
             },
             {
-                description:
-                    "Execute command after successful build, specially useful for watch mode",
+                description: "Execute command after successful build, specially useful for watch mode",
                 name: "onSuccess",
                 type: String,
             },
             {
-                description:
-                    "Signal to kill child process, \"SIGTERM\" or \"SIGKILL\"",
+                description: "Signal to kill child process, \"SIGTERM\" or \"SIGKILL\"",
                 name: "killSignal",
                 type: (input: string) => {
                     if (input === "SIGTERM" || input === "SIGKILL") {
                         return input;
                     }
 
-                    throw new Error(
-                        "Invalid kill signal. Use 'SIGTERM' or 'SIGKILL'.",
-                    );
+                    throw new Error("Invalid kill signal. Use 'SIGTERM' or 'SIGKILL'.");
                 },
             },
             {
-                description:
-                    "Specify an external dependency, separate by comma (eg. --external lodash,react,react-dom)",
+                description: "Specify an external dependency, separate by comma (eg. --external lodash,react,react-dom)",
                 multiple: true,
                 name: "external",
                 typeLabel: "string[]",
@@ -324,9 +305,7 @@ const createBuildCommand = (cli: Cli): void => {
                         return input;
                     }
 
-                    throw new Error(
-                        "Invalid runtime. Use 'node' or 'browser'.",
-                    );
+                    throw new Error("Invalid runtime. Use 'node' or 'browser'.");
                 },
             },
         ],

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Comp from './Comp.vue'
+import Comp from "./Comp.vue";
 
-defineProps<{ foo: string }>()
+defineProps<{ foo: string }>();
 </script>
 
 <template>
-  <Comp bar="baz" />
+    <Comp bar="baz" />
 </template>

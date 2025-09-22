@@ -1,5 +1,5 @@
 interface Bar {}
 export interface Foo {
-  bar: Bar;
+    bar: Bar;
 }
 export {};

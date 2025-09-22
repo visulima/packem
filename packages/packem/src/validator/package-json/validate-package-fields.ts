@@ -15,10 +15,7 @@ import type { InternalBuildOptions, ValidationOptions } from "../../types";
  * @see https://nodejs.org/api/packages.html#subpath-exports Documentation for subpath exports patterns
  * @see https://nodejs.org/api/packages.html#exports-sugar Simplified syntax for exports field
  */
-const validateExports = (
-    context: BuildContext<InternalBuildOptions>,
-    exports: unknown,
-): void => {
+const validateExports = (context: BuildContext<InternalBuildOptions>, exports: unknown): void => {
     const validation = context.options.validation as ValidationOptions;
 
     if (validation.packageJson?.exports === false) {
@@ -59,11 +56,7 @@ const validateExports = (
     const extraConditions = validation.packageJson?.extraConditions || [];
     const EXTRA_CONDITIONS = new Set(extraConditions);
 
-    const ALL_CONDITIONS = new Set([
-        ...COMMUNITY_CONDITIONS,
-        ...EXTRA_CONDITIONS,
-        ...STANDARD_CONDITIONS,
-    ]);
+    const ALL_CONDITIONS = new Set([...COMMUNITY_CONDITIONS, ...EXTRA_CONDITIONS, ...STANDARD_CONDITIONS]);
 
     // eslint-disable-next-line sonarjs/cognitive-complexity
     const validateExportsValue = (value: unknown, path: string): void => {
@@ -75,38 +68,26 @@ const validateExports = (
         if (typeof value === "string") {
             // Must be a relative path starting with "./"
             if (!value.startsWith("./")) {
-                warn(
-                    context,
-                    `Invalid exports path "${value}" at ${path}. Export paths must start with "./"`,
-                );
+                warn(context, `Invalid exports path "${value}" at ${path}. Export paths must start with "./"`);
 
                 return;
             }
 
             // Should not contain ".." to prevent directory traversal
             if (value.includes("../")) {
-                warn(
-                    context,
-                    `Invalid exports path "${value}" at ${path}. Export paths should not contain "../" for security reasons`,
-                );
+                warn(context, `Invalid exports path "${value}" at ${path}. Export paths should not contain "../" for security reasons`);
 
                 return;
             }
 
-            const allowedExtensions
-                = validation.packageJson?.allowedExportExtensions || [];
-            const allValidExtensions = [
-                ...VALID_EXPORT_EXTENSIONS,
-                ...allowedExtensions,
-            ];
+            const allowedExtensions = validation.packageJson?.allowedExportExtensions || [];
+            const allValidExtensions = [...VALID_EXPORT_EXTENSIONS, ...allowedExtensions];
 
             // Handle dynamic patterns by expanding glob and validating each matched file
             if (isDynamicPattern(value)) {
                 try {
                     // Convert relative path to absolute path for glob expansion
-                    const absolutePattern = value.startsWith("./")
-                        ? resolve(context.options.rootDir, value.slice(2))
-                        : resolve(context.options.rootDir, value);
+                    const absolutePattern = value.startsWith("./") ? resolve(context.options.rootDir, value.slice(2)) : resolve(context.options.rootDir, value);
 
                     // Expand the glob pattern to find all matching files
                     const matchedFiles = globSync([absolutePattern], {
@@ -125,12 +106,7 @@ const validateExports = (
                         return;
                     }
 
-                    const invalidFiles = matchedFiles.filter(
-                        (file) =>
-                            !allValidExtensions.some((extension) =>
-                                file.endsWith(extension),
-                            ),
-                    );
+                    const invalidFiles = matchedFiles.filter((file) => !allValidExtensions.some((extension) => file.endsWith(extension)));
 
                     if (invalidFiles.length > 0) {
                         warn(
@@ -140,25 +116,17 @@ const validateExports = (
                     }
                 } catch (error) {
                     // If glob expansion fails, fall back to skipping validation
-                    warn(
-                        context,
-                        `Could not validate glob pattern "${value}" at ${path}: ${error instanceof Error ? error.message : "Unknown error"}`,
-                    );
+                    warn(context, `Could not validate glob pattern "${value}" at ${path}: ${error instanceof Error ? error.message : "Unknown error"}`);
                 }
 
                 return;
             }
 
             // Check for valid file extensions for non-glob patterns
-            const hasValidExtension = allValidExtensions.some((extension) =>
-                value.endsWith(extension),
-            );
+            const hasValidExtension = allValidExtensions.some((extension) => value.endsWith(extension));
 
             if (!hasValidExtension) {
-                warn(
-                    context,
-                    `Export path "${value}" at ${path} should have a valid file extension (${allValidExtensions.join(", ")})`,
-                );
+                warn(context, `Export path "${value}" at ${path} should have a valid file extension (${allValidExtensions.join(", ")})`);
             }
 
             return;
@@ -167,10 +135,7 @@ const validateExports = (
         if (Array.isArray(value)) {
             // Fallback arrays are supported but should contain valid values
             if (value.length === 0) {
-                warn(
-                    context,
-                    `Empty fallback array at ${path}. Fallback arrays should contain at least one entry`,
-                );
+                warn(context, `Empty fallback array at ${path}. Fallback arrays should contain at least one entry`);
 
                 return;
             }
@@ -187,24 +152,17 @@ const validateExports = (
             const conditions = Object.keys(value);
 
             if (conditions.length === 0) {
-                warn(
-                    context,
-                    `Empty conditions object at ${path}. Conditional exports should define at least one condition`,
-                );
+                warn(context, `Empty conditions object at ${path}. Conditional exports should define at least one condition`);
 
                 return;
             }
 
             // Check for unknown conditions
-            const unknownConditions = conditions.filter(
-                (condition) => !ALL_CONDITIONS.has(condition),
-            );
+            const unknownConditions = conditions.filter((condition) => !ALL_CONDITIONS.has(condition));
 
             if (unknownConditions.length > 0) {
                 const hasExtraConditions = extraConditions.length > 0;
-                const standardConditionsList = [...STANDARD_CONDITIONS].join(
-                    ", ",
-                );
+                const standardConditionsList = [...STANDARD_CONDITIONS].join(", ");
 
                 if (hasExtraConditions) {
                     warn(
@@ -220,67 +178,36 @@ const validateExports = (
             }
 
             // Validate condition priority order
-            const standardConditionsPresent = conditions.filter((c) =>
-                STANDARD_CONDITIONS.has(c),
-            );
+            const standardConditionsPresent = conditions.filter((c) => STANDARD_CONDITIONS.has(c));
 
             if (standardConditionsPresent.length > 1) {
-                const expectedOrder = [
-                    "node-addons",
-                    "node",
-                    "import",
-                    "require",
-                    "module-sync",
-                    "default",
-                ];
+                const expectedOrder = ["node-addons", "node", "import", "require", "module-sync", "default"];
                 const actualOrder = standardConditionsPresent;
-                const correctOrder = expectedOrder.filter((c) =>
-                    actualOrder.includes(c),
-                );
+                const correctOrder = expectedOrder.filter((c) => actualOrder.includes(c));
 
-                if (
-                    JSON.stringify(actualOrder) !== JSON.stringify(correctOrder)
-                ) {
-                    warn(
-                        context,
-                        `Incorrect condition order at ${path}. Standard conditions should be ordered: ${correctOrder.join(" > ")}`,
-                    );
+                if (JSON.stringify(actualOrder) !== JSON.stringify(correctOrder)) {
+                    warn(context, `Incorrect condition order at ${path}. Standard conditions should be ordered: ${correctOrder.join(" > ")}`);
                 }
             }
 
             // Validate mutually exclusive conditions
-            if (
-                conditions.includes("import")
-                && conditions.includes("require")
-            ) {
+            if (conditions.includes("import") && conditions.includes("require")) {
                 // This is actually valid they are mutually exclusive by nature
             }
 
-            if (
-                conditions.includes("development")
-                && conditions.includes("production")
-            ) {
-                warn(
-                    context,
-                    `Conflicting conditions "development" and "production" at ${path}. These conditions are mutually exclusive`,
-                );
+            if (conditions.includes("development") && conditions.includes("production")) {
+                warn(context, `Conflicting conditions "development" and "production" at ${path}. These conditions are mutually exclusive`);
             }
 
             // Recursively validate condition values
             conditions.forEach((condition) => {
-                validateExportsValue(
-                    value[condition as keyof typeof value],
-                    `${path}.${condition}`,
-                );
+                validateExportsValue(value[condition as keyof typeof value], `${path}.${condition}`);
             });
 
             return;
         }
 
-        warn(
-            context,
-            `Invalid exports value type at ${path}. Expected string, array, object, or null`,
-        );
+        warn(context, `Invalid exports value type at ${path}. Expected string, array, object, or null`);
     };
 
     const validateExportsObject = (exportsObject: unknown): void => {
@@ -302,10 +229,7 @@ const validateExports = (
             const keys = Object.keys(exportsObject);
 
             if (keys.length === 0) {
-                warn(
-                    context,
-                    "Empty exports object. Define at least one export entry",
-                );
+                warn(context, "Empty exports object. Define at least one export entry");
 
                 return;
             }
@@ -315,10 +239,7 @@ const validateExports = (
             const conditionKeys = keys.filter((key) => !key.startsWith("."));
 
             if (subpathKeys.length > 0 && conditionKeys.length > 0) {
-                warn(
-                    context,
-                    "Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with \".\") or conditions, not both",
-                );
+                warn(context, "Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with \".\") or conditions, not both");
 
                 return;
             }
@@ -326,10 +247,7 @@ const validateExports = (
             if (subpathKeys.length > 0) {
                 // Subpaths exports
                 if (!keys.includes(".")) {
-                    warn(
-                        context,
-                        "Missing main export \".\". Subpaths exports should include a main export entry",
-                    );
+                    warn(context, "Missing main export \".\". Subpaths exports should include a main export entry");
                 }
 
                 // Validate subpath patterns
@@ -339,10 +257,7 @@ const validateExports = (
                     } else if (key === ".") {
                         // Valid main export
                     } else if (key.startsWith(".") && !key.startsWith("./")) {
-                        warn(
-                            context,
-                            `Invalid subpath "${key}". Subpaths should start with "./" or be exactly "."`,
-                        );
+                        warn(context, `Invalid subpath "${key}". Subpaths should start with "./" or be exactly "."`);
                     }
 
                     // Check for wildcard patterns
@@ -350,17 +265,11 @@ const validateExports = (
                         const asteriskCount = (key.match(/\*/g) || []).length;
 
                         if (asteriskCount > 1) {
-                            warn(
-                                context,
-                                `Invalid subpath pattern "${key}". Only one "*" wildcard is allowed per subpath`,
-                            );
+                            warn(context, `Invalid subpath pattern "${key}". Only one "*" wildcard is allowed per subpath`);
                         }
                     }
 
-                    validateExportsValue(
-                        exportsObject[key as keyof typeof exportsObject],
-                        `exports["${key}"]`,
-                    );
+                    validateExportsValue(exportsObject[key as keyof typeof exportsObject], `exports["${key}"]`);
                 });
             } else {
                 // Conditions object at root level
@@ -370,45 +279,28 @@ const validateExports = (
             return;
         }
 
-        warn(
-            context,
-            "Invalid exports field type. Expected string, array, or object",
-        );
+        warn(context, "Invalid exports field type. Expected string, array, or object");
     };
 
     validateExportsObject(exports);
 };
 
-const validatePackageFields = (
-    context: BuildContext<InternalBuildOptions>,
-): void => {
+const validatePackageFields = (context: BuildContext<InternalBuildOptions>): void => {
     const validation = context.options.validation as ValidationOptions;
     const { pkg } = context;
     const cjsJSExtension = getOutputExtension(context, "cjs");
     const esmJSExtension = getOutputExtension(context, "esm");
 
     if (pkg.name === undefined && validation.packageJson?.name !== false) {
-        warn(
-            context,
-            "The 'name' field is missing in your package.json. Please provide a valid package name.",
-        );
+        warn(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
     }
 
     // Omitting the field will make it default to ["*"], which means it will include all files.
     // @see {@link https://docs.npmjs.com/cli/v11/configuring-npm/package-json#files}
-    if (
-        validation.packageJson?.files !== false
-        && Array.isArray(pkg.files)
-        && !pkg.files.includes("*")
-    ) {
+    if (validation.packageJson?.files !== false && Array.isArray(pkg.files) && !pkg.files.includes("*")) {
         if (pkg.files.length === 0) {
-            warn(
-                context,
-                "The 'files' field in your package.json is empty. Please specify the files to be included in the package.",
-            );
-        } else if (
-            !pkg.files.some((file) => file.includes(context.options.outDir))
-        ) {
+            warn(context, "The 'files' field in your package.json is empty. Please specify the files to be included in the package.");
+        } else if (!pkg.files.some((file) => file.includes(context.options.outDir))) {
             warn(
                 context,
                 `The 'files' field in your package.json is missing the '${context.options.outDir}' directory. Ensure the output directory is included.`,
@@ -422,26 +314,17 @@ const validatePackageFields = (
     if (isCjs) {
         if (validation.packageJson?.main !== false) {
             if (pkg.main === undefined) {
-                warn(
-                    context,
-                    "The 'main' field is missing in your package.json. This field should point to your main entry file.",
-                );
+                warn(context, "The 'main' field is missing in your package.json. This field should point to your main entry file.");
             }
 
             if (pkg.main?.endsWith(`.${esmJSExtension}`)) {
-                warn(
-                    context,
-                    `The 'main' field in your package.json should not use a '.${esmJSExtension}' extension for CommonJS modules.`,
-                );
+                warn(context, `The 'main' field in your package.json should not use a '.${esmJSExtension}' extension for CommonJS modules.`);
             }
         }
 
         if (validation.packageJson?.module !== false) {
             if (pkg.module === undefined && context.options.emitESM) {
-                warn(
-                    context,
-                    "The 'module' field is missing in your package.json, but you are emitting ES modules.",
-                );
+                warn(context, "The 'module' field is missing in your package.json, but you are emitting ES modules.");
             }
 
             if (pkg.module && pkg.main && pkg.module === pkg.main) {
@@ -451,48 +334,27 @@ const validatePackageFields = (
                 );
             }
 
-            if (
-                context.options.emitESM
-                && pkg.module?.endsWith(`.${cjsJSExtension}`)
-            ) {
-                warn(
-                    context,
-                    `The 'module' field in your package.json should not use a '.${cjsJSExtension}' extension for ES modules.`,
-                );
+            if (context.options.emitESM && pkg.module?.endsWith(`.${cjsJSExtension}`)) {
+                warn(context, `The 'module' field in your package.json should not use a '.${cjsJSExtension}' extension for ES modules.`);
             }
         }
     } else if (isEsm) {
         if (pkg.exports === undefined && !context.options.emitCJS) {
             if (validation.packageJson?.exports !== false) {
-                warn(
-                    context,
-                    "The 'exports' field is missing in your package.json. Define module exports explicitly.",
-                );
+                warn(context, "The 'exports' field is missing in your package.json. Define module exports explicitly.");
             }
         } else if (context.options.emitCJS) {
-            if (
-                validation.packageJson?.main !== false
-                && pkg.main === undefined
-            ) {
-                warn(
-                    context,
-                    "The 'main' field is missing in your package.json. This field is needed when emitting CommonJS modules.",
-                );
+            if (validation.packageJson?.main !== false && pkg.main === undefined) {
+                warn(context, "The 'main' field is missing in your package.json. This field is needed when emitting CommonJS modules.");
             }
 
             if (validation.packageJson?.module !== false) {
                 if (pkg.module === undefined) {
-                    warn(
-                        context,
-                        "The 'module' field is missing in your package.json. This field is necessary when emitting ES modules.",
-                    );
+                    warn(context, "The 'module' field is missing in your package.json. This field is necessary when emitting ES modules.");
                 }
 
                 if (pkg.module?.endsWith(`.${cjsJSExtension}`)) {
-                    warn(
-                        context,
-                        `The 'module' field should not use a '.${cjsJSExtension}' extension for ES modules.`,
-                    );
+                    warn(context, `The 'module' field should not use a '.${cjsJSExtension}' extension for ES modules.`);
                 }
 
                 if (pkg.module && pkg.main && pkg.module === pkg.main) {
@@ -503,14 +365,8 @@ const validatePackageFields = (
                 }
             }
 
-            if (
-                validation.packageJson?.exports !== false
-                && pkg.exports === undefined
-            ) {
-                warn(
-                    context,
-                    "The 'exports' field is missing in your package.json. This field is required for defining explicit exports.",
-                );
+            if (validation.packageJson?.exports !== false && pkg.exports === undefined) {
+                warn(context, "The 'exports' field is missing in your package.json. This field is required for defining explicit exports.");
             }
         }
     }
@@ -526,20 +382,14 @@ const validatePackageFields = (
         const shouldValidateBinExtensions = cjsJSExtension !== esmJSExtension;
 
         if (shouldValidateBinExtensions) {
-            if (
-                typeof pkg.bin === "string"
-                && pkg.bin.endsWith(`.${forbiddenExtension}`)
-            ) {
+            if (typeof pkg.bin === "string" && pkg.bin.endsWith(`.${forbiddenExtension}`)) {
                 warn(
                     context,
                     `The 'bin' field in your package.json should not use a .${forbiddenExtension} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
                 );
             } else if (typeof pkg.bin === "object") {
                 for (const [bin, binPath] of Object.entries(pkg.bin)) {
-                    if (
-                        binPath
-                        && (binPath as string).endsWith(`.${forbiddenExtension}`)
-                    ) {
+                    if (binPath && (binPath as string).endsWith(`.${forbiddenExtension}`)) {
                         warn(
                             context,
                             `The 'bin.${bin}' field in your package.json should not use a .${forbiddenExtension} extension for ${isCjs ? "CommonJS" : "ES modules"} binaries.`,
@@ -557,25 +407,15 @@ const validatePackageFields = (
             showWarning = Boolean(pkg.main?.endsWith(`.${cjsJSExtension}`));
         }
 
-        if (
-            pkg.types === undefined
-            && pkg.typings === undefined
-            && showWarning
-            && validation.packageJson?.types !== false
-        ) {
-            warn(
-                context,
-                "The 'types' field is missing in your package.json. This field should point to your type definitions file.",
-            );
+        if (pkg.types === undefined && pkg.typings === undefined && showWarning && validation.packageJson?.types !== false) {
+            warn(context, "The 'types' field is missing in your package.json. This field should point to your type definitions file.");
         }
 
         if (
-            (context.options.declaration === true
-                || context.options.declaration === "compatible")
+            (context.options.declaration === true || context.options.declaration === "compatible")
             && showWarning
             && validation.packageJson?.typesVersions !== false
-            && (pkg.typesVersions === undefined
-                || Object.keys(pkg.typesVersions).length === 0)
+            && (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
         ) {
             warn(
                 context,

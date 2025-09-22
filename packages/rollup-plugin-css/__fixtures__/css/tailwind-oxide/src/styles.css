@@ -2,17 +2,17 @@
 @tailwind utilities;
 
 @layer components {
-  .btn {
-    @apply px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600;
-  }
-  
-  .card {
-    @apply bg-white rounded-lg shadow-md p-6;
-  }
+    .btn {
+        @apply px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600;
+    }
+
+    .card {
+        @apply bg-white rounded-lg shadow-md p-6;
+    }
 }
 
 @layer utilities {
-  .text-gradient {
-    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
-  }
+    .text-gradient {
+        @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+    }
 }

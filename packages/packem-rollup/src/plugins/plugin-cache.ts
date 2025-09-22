@@ -72,9 +72,7 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
 
             // Store raw plugin results in a wrapped form to avoid type coercion issues
             const toStore
-                = result && typeof result === "object" && "code" in (result as Record<string, unknown>)
-                    ? result
-                    : { __packem_cache_wrapped: true, data: result };
+                = result && typeof result === "object" && "code" in (result as Record<string, unknown>) ? result : { __packem_cache_wrapped: true, data: result };
 
             cache.set(cacheKey, toStore, pluginPath);
 

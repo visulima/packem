@@ -4,49 +4,37 @@ import { fileURLToPath } from "node:url";
 import { rolldownBuild } from "@sxzz/test-utils";
 import { describe, expect, it } from "vitest";
 
-import { dts } from "../src/index";
+import { dts } from "../src/index.ts";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 it("basic", async () => {
-    const { snapshot } = await rolldownBuild(
-        path.resolve(dirname, "fixtures/basic.ts"),
-        [dts()],
-    );
+    const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/basic.ts"), [dts()]);
 
     expect(snapshot).toMatchSnapshot();
 });
 
 it("tsx", async () => {
-    const { snapshot } = await rolldownBuild(
-        path.resolve(dirname, "fixtures/tsx.tsx"),
-        [dts()],
-    );
+    const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/tsx.tsx"), [dts()]);
 
     expect(snapshot).toMatchSnapshot();
 });
 
 it("resolve dependencies", async () => {
-    const { snapshot } = await rolldownBuild(
-        path.resolve(dirname, "fixtures/resolve-dep.ts"),
-        [
-            dts({
-                emitDtsOnly: true,
-                oxc: true,
-                resolve: ["get-tsconfig"],
-            }),
-        ],
-    );
+    const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/resolve-dep.ts"), [
+        dts({
+            emitDtsOnly: true,
+            oxc: true,
+            resolve: ["get-tsconfig"],
+        }),
+    ]);
 
     expect(snapshot).contain("type TsConfigResult");
     expect(snapshot).not.contain("node_modules/rolldown");
 });
 
 it("resolve dts", async () => {
-    const { snapshot } = await rolldownBuild(
-        path.resolve(dirname, "fixtures/resolve-dts/index.ts"),
-        [dts()],
-    );
+    const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/resolve-dts/index.ts"), [dts()]);
 
     expect(snapshot).matchSnapshot();
 });
@@ -54,19 +42,15 @@ it("resolve dts", async () => {
 // Test alias mapping based on rolldown input option
 it("input alias", async () => {
     const root = path.resolve(dirname, "fixtures/alias");
-    const { chunks, snapshot } = await rolldownBuild(
-        null!,
-        [dts({ emitDtsOnly: false })],
-        {
-            cwd: root,
-            // A mapping from output chunk names to input files. This mapping should
-            // be used in both JS and DTS outputs.
-            input: {
-                output1: "input1.ts",
-                "output2/index": "input2.ts",
-            },
+    const { chunks, snapshot } = await rolldownBuild(null!, [dts({ emitDtsOnly: false })], {
+        cwd: root,
+        // A mapping from output chunk names to input files. This mapping should
+        // be used in both JS and DTS outputs.
+        input: {
+            output1: "input1.ts",
+            "output2/index": "input2.ts",
         },
-    );
+    });
     const fileNames = chunks.map((chunk) => chunk.fileName).sort();
 
     // The JS output and DTS output should have the same structure
@@ -79,19 +63,14 @@ it("input alias", async () => {
 });
 
 it("isolated declaration error", async () => {
-    const error = await rolldownBuild(
-        path.resolve(dirname, "fixtures/isolated-decl-error.ts"),
-        [
-            dts({
-                emitDtsOnly: true,
-                oxc: true,
-            }),
-        ],
-    ).catch((error: any) => error);
+    const error = await rolldownBuild(path.resolve(dirname, "fixtures/isolated-decl-error.ts"), [
+        dts({
+            emitDtsOnly: true,
+            oxc: true,
+        }),
+    ]).catch((error: any) => error);
 
-    expect(String(error)).toContain(
-        `Function must have an explicit return type annotation with --isolatedDeclarations.`,
-    );
+    expect(String(error)).toContain(`Function must have an explicit return type annotation with --isolatedDeclarations.`);
     expect(String(error)).toContain(`export function fn() {`);
 });
 
@@ -116,7 +95,8 @@ it("tree-shaking", async () => {
             {
                 name: "external-node",
                 resolveId(id) {
-                    if (id.startsWith("node:")) { return { external: true, id, moduleSideEffects: false }; }
+                    if (id.startsWith("node:"))
+                        return { external: true, id, moduleSideEffects: false };
                 },
             },
         ],
@@ -128,26 +108,18 @@ it("tree-shaking", async () => {
 
 describe("dts input", () => {
     it("input array", async () => {
-        const { chunks, snapshot } = await rolldownBuild(
-            [path.resolve(dirname, "fixtures/dts-input.d.ts")],
-            [dts({ dtsInput: true })],
-            {},
-        );
+        const { chunks, snapshot } = await rolldownBuild([path.resolve(dirname, "fixtures/dts-input.d.ts")], [dts({ dtsInput: true })], {});
 
         expect(chunks[0].fileName).toBe("dts-input.d.ts");
         expect(snapshot).toMatchSnapshot();
     });
 
     it("input object", async () => {
-        const { chunks, snapshot } = await rolldownBuild(
-            null!,
-            [dts({ dtsInput: true })],
-            {
-                input: {
-                    index: path.resolve(dirname, "fixtures/dts-input.d.ts"),
-                },
+        const { chunks, snapshot } = await rolldownBuild(null!, [dts({ dtsInput: true })], {
+            input: {
+                index: path.resolve(dirname, "fixtures/dts-input.d.ts"),
             },
-        );
+        });
 
         expect(chunks[0].fileName).toBe("index.d.ts");
         expect(snapshot).toMatchSnapshot();
@@ -256,10 +228,7 @@ describe("dts input", () => {
 
     it("default chunk name", async () => {
         const { chunks, snapshot } = await rolldownBuild(
-            [
-                path.resolve(dirname, "fixtures/dts-multi-input/input1.d.ts"),
-                path.resolve(dirname, "fixtures/dts-multi-input/input2.d.ts"),
-            ],
+            [path.resolve(dirname, "fixtures/dts-multi-input/input1.d.ts"), path.resolve(dirname, "fixtures/dts-multi-input/input2.d.ts")],
             [dts({ dtsInput: true })],
             {},
             {
@@ -269,21 +238,14 @@ describe("dts input", () => {
 
         const chunkNames = chunks.map((chunk) => chunk.fileName).sort();
 
-        expect(chunkNames).toStrictEqual([
-            "input1.d.mts",
-            "input2.d.mts",
-            "types-VwSK8P_f.d.ts",
-        ]);
+        expect(chunkNames).toStrictEqual(["input1.d.mts", "input2.d.mts", "types-VwSK8P_f.d.ts"]);
 
         expect(snapshot).toMatchSnapshot();
     });
 
     it("custom chunk name", async () => {
         const { chunks, snapshot } = await rolldownBuild(
-            [
-                path.resolve(dirname, "fixtures/dts-multi-input/input1.d.ts"),
-                path.resolve(dirname, "fixtures/dts-multi-input/input2.d.ts"),
-            ],
+            [path.resolve(dirname, "fixtures/dts-multi-input/input1.d.ts"), path.resolve(dirname, "fixtures/dts-multi-input/input2.d.ts")],
             [dts({ dtsInput: true })],
             {},
             {
@@ -293,11 +255,7 @@ describe("dts input", () => {
 
         const chunkNames = chunks.map((chunk) => chunk.fileName).sort();
 
-        expect(chunkNames).toStrictEqual([
-            "chunks/DqALGAwS-types.d.ts",
-            "input1.d.ts",
-            "input2.d.ts",
-        ]);
+        expect(chunkNames).toStrictEqual(["chunks/DqALGAwS-types.d.ts", "input1.d.ts", "input2.d.ts"]);
 
         expect(snapshot).toMatchSnapshot();
     });
@@ -384,10 +342,7 @@ describe("entryFileNames", () => {
 
     it("default chunk name", async () => {
         const { chunks, snapshot } = await rolldownBuild(
-            [
-                path.resolve(dirname, "fixtures/alias/input1.ts"),
-                path.resolve(dirname, "fixtures/alias/input2.ts"),
-            ],
+            [path.resolve(dirname, "fixtures/alias/input1.ts"), path.resolve(dirname, "fixtures/alias/input2.ts")],
             [dts({ emitDtsOnly: true })],
             {},
             {
@@ -397,21 +352,14 @@ describe("entryFileNames", () => {
 
         const chunkNames = chunks.map((chunk) => chunk.fileName).sort();
 
-        expect(chunkNames).toStrictEqual([
-            "input1.d.mts",
-            "input2-CzdQ8V-e.d.ts",
-            "input2.d.mts",
-        ]);
+        expect(chunkNames).toStrictEqual(["input1.d.mts", "input2-CzdQ8V-e.d.ts", "input2.d.mts"]);
 
         expect(snapshot).toMatchSnapshot();
     });
 
     it("custom chunk name", async () => {
         const { chunks, snapshot } = await rolldownBuild(
-            [
-                path.resolve(dirname, "fixtures/dts-multi-input/input1.d.ts"),
-                path.resolve(dirname, "fixtures/dts-multi-input/input2.d.ts"),
-            ],
+            [path.resolve(dirname, "fixtures/dts-multi-input/input1.d.ts"), path.resolve(dirname, "fixtures/dts-multi-input/input2.d.ts")],
             [dts({ emitDtsOnly: true })],
             {},
             {
@@ -421,45 +369,44 @@ describe("entryFileNames", () => {
 
         const chunkNames = chunks.map((chunk) => chunk.fileName).sort();
 
-        expect(chunkNames).toStrictEqual([
-            "chunks/DqALGAwS-types.d.ts",
-            "input1.d.ts",
-            "input2.d.ts",
-        ]);
+        expect(chunkNames).toStrictEqual(["chunks/DqALGAwS-types.d.ts", "input1.d.ts", "input2.d.ts"]);
 
         expect(snapshot).toMatchSnapshot();
     });
 });
 
 it("type-only export", async () => {
-    const { snapshot } = await rolldownBuild(
-        [path.resolve(dirname, "fixtures/type-only-export/index.ts")],
-        [dts({ emitDtsOnly: true })],
-    );
+    const { snapshot } = await rolldownBuild([path.resolve(dirname, "fixtures/type-only-export/index.ts")], [dts({ emitDtsOnly: true })]);
 
     expect(snapshot).toMatchSnapshot();
 });
 
 it("cjs exports", async () => {
     {
-        const { snapshot } = await rolldownBuild(
-            [path.resolve(dirname, "fixtures/cjs-exports.ts")],
-            [],
-            {},
-            { exports: "auto", format: "cjs" },
-        );
+        const { snapshot } = await rolldownBuild([path.resolve(dirname, "fixtures/cjs-exports.ts")], [], {}, { exports: "auto", format: "cjs" });
 
         expect(snapshot).toMatchSnapshot();
     }
 
     {
-        const { snapshot } = await rolldownBuild(
-            [path.resolve(dirname, "fixtures/cjs-exports.ts")],
-            [dts({ cjsDefault: true, emitDtsOnly: true })],
-        );
+        const { snapshot } = await rolldownBuild([path.resolve(dirname, "fixtures/cjs-exports.ts")], [dts({ cjsDefault: true, emitDtsOnly: true })]);
 
         expect(snapshot).toMatchSnapshot();
     }
+});
+
+it("declare module", async () => {
+    const { snapshot } = await rolldownBuild(
+        path.resolve(dirname, "fixtures/declare-module.ts"),
+        [
+            dts({
+                emitDtsOnly: true,
+            }),
+        ],
+        { platform: "node" },
+    );
+
+    expect(snapshot).toMatchSnapshot();
 });
 
 it("should error when file import cannot be found", async () => {
@@ -470,4 +417,18 @@ it("should error when file import cannot be found", async () => {
             }),
         ]),
     ).rejects.toThrow("Could not resolve './missing-file'");
+});
+
+it("banner", async () => {
+    const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/minimal.ts"), [
+        dts({
+            banner: "/* My Banner */",
+            emitDtsOnly: true,
+            footer: (chunk) => `/* My Footer ${chunk.fileName} */`,
+        }),
+    ]);
+
+    expect(snapshot).toMatchSnapshot();
+    expect(snapshot).toContain("/* My Banner */\n");
+    expect(snapshot).toContain("\n/* My Footer minimal.d.ts */");
 });

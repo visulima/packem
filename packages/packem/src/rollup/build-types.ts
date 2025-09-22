@@ -1,9 +1,6 @@
 import type { FileCache } from "@visulima/packem-share";
 import type { BuildContext } from "@visulima/packem-share/types";
-import {
-    getChunkFilename,
-    getDtsExtension,
-} from "@visulima/packem-share/utils";
+import { getChunkFilename, getDtsExtension } from "@visulima/packem-share/utils";
 import { resolve } from "@visulima/path";
 import type { RollupCache } from "rollup";
 import { rollup } from "rollup";
@@ -13,19 +10,10 @@ import { getRollupDtsOptions } from "./get-rollup-options";
 
 const DTS_CACHE_KEY = "rollup-dts.json";
 
-const buildTypes = async (
-    context: BuildContext<InternalBuildOptions>,
-    fileCache: FileCache,
-    subDirectory: string,
-): Promise<void> => {
-    if (
-        context.options.declaration
-        && context.options.rollup.isolatedDeclarations
-        && context.options.isolatedDeclarationTransformer
-    ) {
+const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, subDirectory: string): Promise<void> => {
+    if (context.options.declaration && context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer) {
         context.logger.info({
-            message:
-                "Using isolated declaration transformer to generate declaration files...",
+            message: "Using isolated declaration transformer to generate declaration files...",
             prefix: "dts",
         });
 
@@ -34,21 +22,14 @@ const buildTypes = async (
 
     const rollupTypeOptions = await getRollupDtsOptions(context, fileCache);
 
-    await context.hooks.callHook(
-        "rollup:dts:options",
-        context,
-        rollupTypeOptions,
-    );
+    await context.hooks.callHook("rollup:dts:options", context, rollupTypeOptions);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (Object.keys(rollupTypeOptions.input as any).length === 0) {
         return;
     }
 
-    rollupTypeOptions.cache = fileCache.get<RollupCache>(
-        DTS_CACHE_KEY,
-        subDirectory,
-    );
+    rollupTypeOptions.cache = fileCache.get<RollupCache>(DTS_CACHE_KEY, subDirectory);
 
     const typesBuild = await rollup(rollupTypeOptions);
 
@@ -82,10 +63,7 @@ const buildTypes = async (
     }
 
     // .d.ts for node10 compatibility (TypeScript version < 4.7)
-    if (
-        context.options.declaration === true
-        || context.options.declaration === "compatible"
-    ) {
+    if (context.options.declaration === true || context.options.declaration === "compatible") {
         await typesBuild.write({
             chunkFileNames: (chunk) => getChunkFilename(chunk, "d.ts"),
             dir: resolve(context.options.rootDir, context.options.outDir),

@@ -1,1 +1,1 @@
-export const watch = "first watch file"
+export const watch = "first watch file";

@@ -11,7 +11,6 @@
 
 [![typescript-image]][typescript-url] [![npm-image]][npm-url] [![license-image]][license-url]
 
-
 </div>
 
 ---
@@ -43,7 +42,7 @@ pnpm add @visulima/css-style-inject
 ## Example
 
 ```javascript
-import { cssStyleInject } from '@visulima/css-style-inject';
+import { cssStyleInject } from "@visulima/css-style-inject";
 const css = `
   body {
     margin: 0;
@@ -60,11 +59,11 @@ you need to inject styles during SSR, here's an example:
 ```jsx
 // file: pages/_document.js
 
-import React from 'react';
-import { SSR_INJECT_ID } from '@visulima/css-style-inject';
+import React from "react";
+import { SSR_INJECT_ID } from "@visulima/css-style-inject";
 
 const SSRInjectStyles = () => {
-    if (!globalThis[SSR_INJECT_ID]) return null
+    if (!globalThis[SSR_INJECT_ID]) return null;
 
     return (
         <>
@@ -74,11 +73,11 @@ const SSRInjectStyles = () => {
                 </style>
             ))}
         </>
-    )
-}
+    );
+};
 
 const Document = (props) => {
-    const { locale } = props
+    const { locale } = props;
     return (
         <Html lang={locale}>
             <Head>
@@ -86,15 +85,12 @@ const Document = (props) => {
                 <SSRInjectStyles />
                 {/* ... */}
             </Head>
-            <body>
-            {/* ... */}
-            </body>
+            <body>{/* ... */}</body>
         </Html>
-    )
-}
+    );
+};
 
-export default Document
-
+export default Document;
 ```
 
 ## Options
@@ -112,6 +108,7 @@ Type: `number | 'first' | 'last' | { before: string }`<br>
 Default: `'last'`
 
 Where to insert the style tag:
+
 - `number`: Insert at specific index (0 = first, -1 = last)
 - `'first'`: Insert as first child
 - `'last'`: Insert as last child (default)
@@ -161,8 +158,8 @@ If you would like to help take a look at the [list of issues](https://github.com
 
 ## Credits
 
--   [Daniel Bannert](https://github.com/prisis)
--   [All Contributors](https://github.com/visulima/packem/graphs/contributors)
+- [Daniel Bannert](https://github.com/prisis)
+- [All Contributors](https://github.com/visulima/packem/graphs/contributors)
 
 ## License
 

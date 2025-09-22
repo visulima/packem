@@ -30,10 +30,7 @@ describe("packem resolve-file-url", () => {
 
 export default log`,
         );
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/importer.mjs`,
-            `export { default as effect } from "file://${temporaryDirectoryPath}/src/importee.mjs"`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/importer.mjs`, `export { default as effect } from "file://${temporaryDirectoryPath}/src/importee.mjs"`);
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -49,17 +46,12 @@ export default log`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/importer.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.mjs`);
 
-        expect(mjsContent)
-            .toBe(`export { default as effect } from './packem_shared/effect-U3Biba7s.mjs';
+        expect(mjsContent).toBe(`export { default as effect } from './packem_shared/effect-U3Biba7s.mjs';
 `);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/importer.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 

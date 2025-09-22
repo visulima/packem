@@ -14,5 +14,5 @@ export default defineConfig({
             loaders: [tailwindcssLoader],
         },
     },
-    declaration: "node16"
+    declaration: "node16",
 });

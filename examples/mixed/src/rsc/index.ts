@@ -1,1 +1,1 @@
-export default 'index (rsc)';
+export default "index (rsc)";

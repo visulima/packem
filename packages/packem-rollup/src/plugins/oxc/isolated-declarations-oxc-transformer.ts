@@ -3,7 +3,12 @@ import { isolatedDeclaration } from "oxc-transform";
 
 import type { IsolatedDeclarationsResult } from "../../types";
 
-const isolatedDeclarationsOxcTransformer = (id: string, code: string, sourceMap?: boolean, transformOptions?: Omit<IsolatedDeclarationsOptions, "sourcemap">): IsolatedDeclarationsResult => {
+const isolatedDeclarationsOxcTransformer = (
+    id: string,
+    code: string,
+    sourceMap?: boolean,
+    transformOptions?: Omit<IsolatedDeclarationsOptions, "sourcemap">,
+): IsolatedDeclarationsResult => {
     const result = isolatedDeclaration(id, code, { ...transformOptions, sourcemap: sourceMap });
 
     return {

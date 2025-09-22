@@ -11,9 +11,7 @@ describe(loadPackageJson, () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(() => {
-        temporaryDirectoryPath = mkdtempSync(
-            join(tmpdir(), "load-package-json-test-"),
-        );
+        temporaryDirectoryPath = mkdtempSync(join(tmpdir(), "load-package-json-test-"));
     });
 
     afterEach(async () => {
@@ -29,18 +27,13 @@ describe(loadPackageJson, () => {
             version: "1.0.0",
         };
 
-        writeFileSync(
-            join(temporaryDirectoryPath, "package.json"),
-            JSON.stringify(packageJsonData, undefined, 2),
-        );
+        writeFileSync(join(temporaryDirectoryPath, "package.json"), JSON.stringify(packageJsonData, undefined, 2));
 
         const result = loadPackageJson(temporaryDirectoryPath);
 
         expect(result.packageJson.name).toBe("test-package");
         expect(result.packageJson.version).toBe("1.0.0");
-        expect(result.packageJsonPath).toBe(
-            join(temporaryDirectoryPath, "package.json"),
-        );
+        expect(result.packageJsonPath).toBe(join(temporaryDirectoryPath, "package.json"));
     });
 
     it("should merge publishConfig properties into the main package.json object", () => {
@@ -65,10 +58,7 @@ describe(loadPackageJson, () => {
             version: "1.0.0",
         };
 
-        writeFileSync(
-            join(temporaryDirectoryPath, "package.json"),
-            JSON.stringify(packageJsonData, undefined, 2),
-        );
+        writeFileSync(join(temporaryDirectoryPath, "package.json"), JSON.stringify(packageJsonData, undefined, 2));
 
         const result = loadPackageJson(temporaryDirectoryPath);
 
@@ -98,10 +88,7 @@ describe(loadPackageJson, () => {
             version: "1.0.0",
         };
 
-        writeFileSync(
-            join(temporaryDirectoryPath, "package.json"),
-            JSON.stringify(packageJsonData, undefined, 2),
-        );
+        writeFileSync(join(temporaryDirectoryPath, "package.json"), JSON.stringify(packageJsonData, undefined, 2));
 
         const result = loadPackageJson(temporaryDirectoryPath);
 
@@ -121,10 +108,7 @@ describe(loadPackageJson, () => {
             version: "1.0.0",
         };
 
-        writeFileSync(
-            join(temporaryDirectoryPath, "package.json"),
-            JSON.stringify(packageJsonData, undefined, 2),
-        );
+        writeFileSync(join(temporaryDirectoryPath, "package.json"), JSON.stringify(packageJsonData, undefined, 2));
 
         const result = loadPackageJson(temporaryDirectoryPath);
 
@@ -149,10 +133,7 @@ describe(loadPackageJson, () => {
             version: "1.0.0",
         };
 
-        writeFileSync(
-            join(temporaryDirectoryPath, "package.json"),
-            JSON.stringify(packageJsonData, undefined, 2),
-        );
+        writeFileSync(join(temporaryDirectoryPath, "package.json"), JSON.stringify(packageJsonData, undefined, 2));
 
         const result = loadPackageJson(temporaryDirectoryPath);
 
@@ -190,10 +171,7 @@ describe(loadPackageJson, () => {
             version: "1.0.0",
         };
 
-        writeFileSync(
-            join(temporaryDirectoryPath, "package.json"),
-            JSON.stringify(packageJsonData, undefined, 2),
-        );
+        writeFileSync(join(temporaryDirectoryPath, "package.json"), JSON.stringify(packageJsonData, undefined, 2));
 
         const result = loadPackageJson(temporaryDirectoryPath);
 
@@ -217,9 +195,7 @@ describe(loadPackageJson, () => {
 
         expect(() => {
             loadPackageJson(temporaryDirectoryPath);
-        }).toThrow(
-            `package.json not found at ${join(temporaryDirectoryPath, "package.json")}`,
-        );
+        }).toThrow(`package.json not found at ${join(temporaryDirectoryPath, "package.json")}`);
     });
 
     it("should throw an error when directory does not exist", () => {
@@ -229,9 +205,7 @@ describe(loadPackageJson, () => {
 
         expect(() => {
             loadPackageJson(nonExistentPath);
-        }).toThrow(
-            `package.json not found at ${join(nonExistentPath, "package.json")}`,
-        );
+        }).toThrow(`package.json not found at ${join(nonExistentPath, "package.json")}`);
     });
 
     it("should return correct packageJsonPath", () => {
@@ -242,15 +216,10 @@ describe(loadPackageJson, () => {
             version: "1.0.0",
         };
 
-        writeFileSync(
-            join(temporaryDirectoryPath, "package.json"),
-            JSON.stringify(packageJsonData, undefined, 2),
-        );
+        writeFileSync(join(temporaryDirectoryPath, "package.json"), JSON.stringify(packageJsonData, undefined, 2));
 
         const result = loadPackageJson(temporaryDirectoryPath);
 
-        expect(result.packageJsonPath).toBe(
-            join(temporaryDirectoryPath, "package.json"),
-        );
+        expect(result.packageJsonPath).toBe(join(temporaryDirectoryPath, "package.json"));
     });
 });

@@ -1,2 +1,2 @@
-export class BarType { }
-export class BarValue { }
+export class BarType {}
+export class BarValue {}

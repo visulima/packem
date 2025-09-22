@@ -6,7 +6,7 @@ import { expectFilesSnapshot, rolldownBuild } from "@sxzz/test-utils";
 import { build } from "rolldown";
 import { beforeAll, expect, it } from "vitest";
 
-import { dts } from "../src/index";
+import { dts } from "../src/index.ts";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const tempDir = path.join(dirname, "temp");
@@ -54,18 +54,13 @@ it("tsc", async () => {
 });
 
 it("disable dts source map only", async () => {
-    const { chunks } = await rolldownBuild(
-        input,
-        [dts({ sourcemap: false })],
-        {},
-        { sourcemap: true },
-    );
+    const { chunks } = await rolldownBuild(input, [dts({ sourcemap: false })], {}, { sourcemap: true });
 
     expect(chunks.map((chunk) => chunk.fileName)).toMatchInlineSnapshot(`
-        [
-          "source-map.d.ts",
-          "source-map.js",
-          "source-map.js.map",
-        ]
-    `);
+    [
+      "source-map.d.ts",
+      "source-map.js",
+      "source-map.js.map",
+    ]
+  `);
 });

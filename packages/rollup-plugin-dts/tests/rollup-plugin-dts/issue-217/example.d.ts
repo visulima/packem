@@ -1,5 +1,5 @@
 export interface Example<S extends string> {
-  example: S;
+    example: S;
 }
 
 export declare const dog: Example<"hi">;

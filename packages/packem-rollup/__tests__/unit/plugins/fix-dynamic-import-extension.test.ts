@@ -19,7 +19,7 @@ describe(fixDynamicImportExtension, () => {
         const renderChunk = plugin.renderChunk as (
             code: string,
             chunk: RenderedChunk,
-            options: NormalizedOutputOptions
+            options: NormalizedOutputOptions,
         ) => { code: string; map: any } | undefined;
 
         it("should replace .ts with .mjs for es format", () => {

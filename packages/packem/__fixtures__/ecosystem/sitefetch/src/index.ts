@@ -8,10 +8,7 @@ import { load } from "cheerio";
 import { matchPath } from "./utils.ts";
 import type { Options, FetchSiteResult } from "./types.ts";
 
-export async function fetchSite(
-    url: string,
-    options: Options,
-): Promise<FetchSiteResult> {
+export async function fetchSite(url: string, options: Options): Promise<FetchSiteResult> {
     const fetcher = new Fetcher(options);
 
     return fetcher.fetchSite(url);
@@ -32,18 +29,13 @@ class Fetcher {
     }
 
     #getContentSelector(pathname: string) {
-        if (typeof this.options.contentSelector === "function")
-            return this.options.contentSelector({ pathname });
+        if (typeof this.options.contentSelector === "function") return this.options.contentSelector({ pathname });
 
         return this.options.contentSelector;
     }
 
     async fetchSite(url: string) {
-        logger.info(
-            `Started fetching ${c.green(url)} with a concurrency of ${
-                this.#queue.concurrency
-            }`,
-        );
+        logger.info(`Started fetching ${c.green(url)} with a concurrency of ${this.#queue.concurrency}`);
 
         await this.#fetchPage(url, {
             skipMatch: true,
@@ -70,11 +62,7 @@ class Fetcher {
 
         // return if not matched
         // we don't need to extract content for this page
-        if (
-            !options.skipMatch &&
-            this.options.match &&
-            !matchPath(pathname, this.options.match)
-        ) {
+        if (!options.skipMatch && this.options.match && !matchPath(pathname, this.options.match)) {
             return;
         }
 
@@ -82,8 +70,7 @@ class Fetcher {
 
         const res = await (this.options.fetch || fetch)(url, {
             headers: {
-                "user-agent":
-                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+                "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
             },
         });
 
@@ -132,9 +119,7 @@ class Fetcher {
 
         if (extraUrls.length > 0) {
             for (const url of extraUrls) {
-                this.#queue.add(() =>
-                    this.#fetchPage(url, { ...options, skipMatch: false }),
-                );
+                this.#queue.add(() => this.#fetchPage(url, { ...options, skipMatch: false }));
             }
         }
 
@@ -149,9 +134,7 @@ class Fetcher {
 
         const pageTitle = $("title").text();
         const contentSelector = this.#getContentSelector(pathname);
-        const html = contentSelector
-            ? $(contentSelector).prop("outerHTML")
-            : $.html();
+        const html = contentSelector ? $(contentSelector).prop("outerHTML") : $.html();
 
         if (!html) {
             logger.warn(`No readable content on ${pathname}`);
@@ -180,10 +163,7 @@ class Fetcher {
     }
 }
 
-export function serializePages(
-    pages: FetchSiteResult,
-    format: "json" | "text",
-): string {
+export function serializePages(pages: FetchSiteResult, format: "json" | "text"): string {
     if (format === "json") {
         return JSON.stringify([...pages.values()]);
     }

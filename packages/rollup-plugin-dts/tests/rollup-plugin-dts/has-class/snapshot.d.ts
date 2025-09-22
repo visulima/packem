@@ -8,9 +8,9 @@ interface E {}
 //#endregion
 //#region tests/rollup-plugin-dts/has-class/index.d.ts
 declare class Foo extends A {
-  b: B;
-  constructor(c: C);
-  method(d: D): E;
+    b: B;
+    constructor(c: C);
+    method(d: D): E;
 }
 //#endregion
 export { Foo as default };

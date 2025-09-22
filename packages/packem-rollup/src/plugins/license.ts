@@ -53,7 +53,6 @@ export const license = ({
     packageName: string | undefined;
 }): Plugin =>
     licensePlugin({
-
         thirdParty(dependencies) {
             const licenses = new Set<string>();
 
@@ -86,26 +85,23 @@ export const license = ({
                     }
 
                     if (licenseText) {
-                        text
-                            += `\n${
-                                licenseText
-                                    .trim()
-                                    .replaceAll(/\r\n|\r/g, "\n")
-                                    .replaceAll(`<!-- ${marker} -->`, "")
-                                    .replaceAll(dtsMarker ? `<!-- ${dtsMarker} -->` : "", "")
-                                    .replaceAll(`<!-- /${marker} -->`, "")
-                                    .replaceAll(dtsMarker ? `<!-- /${dtsMarker} -->` : "", "")
-                                    .trim()
-                                    .split("\n")
-                                    .map((line) => {
-                                        if (!line) {
-                                            return ">";
-                                        }
+                        text += `\n${licenseText
+                            .trim()
+                            .replaceAll(/\r\n|\r/g, "\n")
+                            .replaceAll(`<!-- ${marker} -->`, "")
+                            .replaceAll(dtsMarker ? `<!-- ${dtsMarker} -->` : "", "")
+                            .replaceAll(`<!-- /${marker} -->`, "")
+                            .replaceAll(dtsMarker ? `<!-- /${dtsMarker} -->` : "", "")
+                            .trim()
+                            .split("\n")
+                            .map((line) => {
+                                if (!line) {
+                                    return ">";
+                                }
 
-                                        return `> ${line}`;
-                                    })
-                                    .join("\n")
-                            }\n`;
+                                return `> ${line}`;
+                            })
+                            .join("\n")}\n`;
                     }
 
                     if (dependencyLicense) {

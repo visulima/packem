@@ -10,5 +10,5 @@ export default defineConfig({
     },
     typedoc: {
         readmePath: "./README.md",
-    }
+    },
 });

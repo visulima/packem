@@ -35,7 +35,7 @@ export const cssStyleInject = (
         nonce?: string;
         singleTag?: boolean;
     } = {},
-// eslint-disable-next-line sonarjs/cognitive-complexity
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): void => {
     if (!css) {
         return;

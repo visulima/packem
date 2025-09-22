@@ -1,10 +1,7 @@
 import { versions } from "node:process";
 
 import { cyan } from "@visulima/colorize";
-import type {
-    AliasResolverObject,
-    ShebangOptions,
-} from "@visulima/packem-rollup";
+import type { AliasResolverObject, ShebangOptions } from "@visulima/packem-rollup";
 import {
     alias as aliasPlugin,
     browserslistToEsbuild,
@@ -52,27 +49,11 @@ import {
 } from "@visulima/packem-rollup/typescript";
 import type { BuildContext, FileCache } from "@visulima/packem-share";
 import { arrayify, memoizeByKey } from "@visulima/packem-share";
-import {
-    getChunkFilename,
-    getDtsExtension,
-    getEntryFileNames,
-    getOutputExtension,
-    sortUserPlugins,
-} from "@visulima/packem-share/utils";
+import { getChunkFilename, getDtsExtension, getEntryFileNames, getOutputExtension, sortUserPlugins } from "@visulima/packem-share/utils";
 import { join, relative, resolve } from "@visulima/path";
-import {
-    cssModulesTypesPlugin,
-    rollupCssPlugin,
-} from "@visulima/rollup-plugin-css";
+import { cssModulesTypesPlugin, rollupCssPlugin } from "@visulima/rollup-plugin-css";
 import type { TsConfigResult } from "@visulima/tsconfig";
-import type {
-    OutputOptions,
-    Plugin,
-    PreRenderedAsset,
-    PreRenderedChunk,
-    RollupLog,
-    RollupOptions,
-} from "rollup";
+import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
 import { minVersion } from "semver";
 
 import type { InternalBuildOptions } from "../types";
@@ -82,12 +63,7 @@ import resolveAliases from "./utils/resolve-aliases";
 const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],
     context: BuildContext<InternalBuildOptions>,
-
-):
-    | EsbuildPluginConfig
-    | InternalOXCTransformPluginConfig
-    | SucrasePluginConfig
-    | SwcPluginConfig => {
+): EsbuildPluginConfig | InternalOXCTransformPluginConfig | SucrasePluginConfig | SwcPluginConfig => {
     let nodeTarget = `node${versions.node.split(".")[0]}`;
 
     if (context.pkg.engines?.node) {
@@ -103,10 +79,7 @@ const getTransformerConfig = (
             throw new Error("No esbuild options found in your configuration.");
         }
 
-        if (
-            context.tsconfig?.config.compilerOptions?.target?.toLowerCase()
-            === "es3"
-        ) {
+        if (context.tsconfig?.config.compilerOptions?.target?.toLowerCase() === "es3") {
             context.logger.warn(
                 [
                     "ES3 target is not supported by esbuild, so ES5 will be used instead..",
@@ -123,34 +96,19 @@ const getTransformerConfig = (
             const targets = arrayify(context.options.rollup.esbuild.target);
 
             if (context.options.runtime === "node") {
-                context.options.rollup.esbuild.target = [
-                    ...new Set([nodeTarget, ...targets]),
-                ];
+                context.options.rollup.esbuild.target = [...new Set([nodeTarget, ...targets])];
             } else if (context.options.runtime === "browser") {
-                context.options.rollup.esbuild.target = [
-                    ...new Set([
-                        ...browserslistToEsbuild(
-                            context.options.browserTargets ?? [],
-                        ),
-                        ...targets,
-                    ]),
-                ];
+                context.options.rollup.esbuild.target = [...new Set([...browserslistToEsbuild(context.options.browserTargets ?? []), ...targets])];
             }
         } else {
             context.options.rollup.esbuild.target
-                = context.options.runtime === "node"
-                    ? [nodeTarget]
-                    : browserslistToEsbuild(
-                        context.options.browserTargets ?? [],
-                    );
+                = context.options.runtime === "node" ? [nodeTarget] : browserslistToEsbuild(context.options.browserTargets ?? []);
         }
 
         if (context.tsconfig?.config.compilerOptions?.target === "es5") {
             context.options.rollup.esbuild.keepNames = false;
 
-            context.logger.debug(
-                "Disabling keepNames because target is set to es5",
-            );
+            context.logger.debug("Disabling keepNames because target is set to es5");
         }
 
         return {
@@ -194,8 +152,7 @@ const getTransformerConfig = (
                         topLevel: true,
                     },
                     sourceMap: context.options.sourcemap,
-                    toplevel:
-                        context.options.emitCJS ?? context.options.emitESM,
+                    toplevel: context.options.emitCJS ?? context.options.emitESM,
                 },
                 ...context.options.rollup.swc.jsc,
             },
@@ -233,11 +190,8 @@ const getTransformerConfig = (
                     allowDeclareFields: true,
                     allowNamespaces: true,
                     declaration: undefined,
-                    jsxPragma:
-                          context.tsconfig.config.compilerOptions?.jsxFactory,
-                    jsxPragmaFrag:
-                          context.tsconfig.config.compilerOptions
-                              ?.jsxFragmentFactory,
+                    jsxPragma: context.tsconfig.config.compilerOptions?.jsxFactory,
+                    jsxPragmaFrag: context.tsconfig.config.compilerOptions?.jsxFragmentFactory,
                     onlyRemoveTypeImports: true,
                     // Our declaration is handled by the isolated declaration transformer
                     rewriteImportExtensions: false,
@@ -250,44 +204,23 @@ const getTransformerConfig = (
             const targets = arrayify(context.options.rollup.oxc.target);
 
             if (context.options.runtime === "node") {
-                context.options.rollup.oxc.target = [
-                    ...new Set([nodeTarget, ...targets]),
-                ];
+                context.options.rollup.oxc.target = [...new Set([nodeTarget, ...targets])];
             } else if (context.options.runtime === "browser") {
-                context.options.rollup.oxc.target = [
-                    ...new Set([
-                        ...browserslistToEsbuild(
-                            context.options.browserTargets ?? [],
-                        ),
-                        ...targets,
-                    ]),
-                ];
+                context.options.rollup.oxc.target = [...new Set([...browserslistToEsbuild(context.options.browserTargets ?? []), ...targets])];
             }
         } else {
-            context.options.rollup.oxc.target
-                = context.options.runtime === "node"
-                    ? [nodeTarget]
-                    : browserslistToEsbuild(
-                        context.options.browserTargets ?? [],
-                    );
+            context.options.rollup.oxc.target = context.options.runtime === "node" ? [nodeTarget] : browserslistToEsbuild(context.options.browserTargets ?? []);
         }
 
-        return context.options.rollup
-            .oxc satisfies InternalOXCTransformPluginConfig;
+        return context.options.rollup.oxc satisfies InternalOXCTransformPluginConfig;
     }
 
     throw new Error(`A Unknown transformer was provided`);
 };
 
-const sharedOnWarn = (
-    warning: RollupLog,
-    context: BuildContext<InternalBuildOptions>,
-): boolean => {
+const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalBuildOptions>): boolean => {
     // If the circular dependency warning is from node_modules, ignore it
-    if (
-        warning.code === "CIRCULAR_DEPENDENCY"
-        && /Circular dependency:[\s\S]*node_modules/.test(warning.message)
-    ) {
+    if (warning.code === "CIRCULAR_DEPENDENCY" && /Circular dependency:[\s\S]*node_modules/.test(warning.message)) {
         return true;
     }
 
@@ -306,22 +239,12 @@ const sharedOnWarn = (
         return true;
     }
 
-    return (
-        warning.code === "MIXED_EXPORTS" && context.options.cjsInterop === true
-    );
+    return warning.code === "MIXED_EXPORTS" && context.options.cjsInterop === true;
 };
 
-const baseRollupOptions = (
-    context: BuildContext<InternalBuildOptions>,
-    type: "build" | "dts",
-): RollupOptions =>
+const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "build" | "dts"): RollupOptions =>
     <RollupOptions>{
-        input: Object.fromEntries(
-            context.options.entries.map((entry) => [
-                entry.name,
-                resolve(context.options.rootDir, entry.input),
-            ]),
-        ),
+        input: Object.fromEntries(context.options.entries.map((entry) => [entry.name, resolve(context.options.rootDir, entry.input)])),
 
         logLevel: context.options.debug ? "debug" : "info",
 
@@ -337,8 +260,7 @@ const baseRollupOptions = (
                 case "info": {
                     context.logger.info({
                         message: format,
-                        prefix:
-                            type + (log.plugin ? `:plugin:${log.plugin}` : ""),
+                        prefix: type + (log.plugin ? `:plugin:${log.plugin}` : ""),
                     });
 
                     return;
@@ -346,8 +268,7 @@ const baseRollupOptions = (
                 case "warn": {
                     context.logger.warn({
                         message: format,
-                        prefix:
-                            type + (log.plugin ? `:plugin:${log.plugin}` : ""),
+                        prefix: type + (log.plugin ? `:plugin:${log.plugin}` : ""),
                     });
 
                     return;
@@ -355,8 +276,7 @@ const baseRollupOptions = (
                 case "debug": {
                     context.logger.debug({
                         message: format,
-                        prefix:
-                            type + (log.plugin ? `:plugin:${log.plugin}` : ""),
+                        prefix: type + (log.plugin ? `:plugin:${log.plugin}` : ""),
                     });
                 }
             }
@@ -383,55 +303,33 @@ const baseRollupOptions = (
     };
 
 // eslint-disable-next-line import/exports-last
-export const getRollupOptions = async (
-    context: BuildContext<InternalBuildOptions>,
-    fileCache: FileCache,
-): Promise<RollupOptions> => {
+export const getRollupOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
 
     let nodeResolver;
 
-    if (
-        context.options.rollup.resolve
-        && context.options.experimental?.oxcResolve !== true
-    ) {
+    if (context.options.rollup.resolve && context.options.experimental?.oxcResolve !== true) {
         nodeResolver = nodeResolvePlugin({
             ...context.options.rollup.resolve,
         });
-    } else if (
-        context.options.experimental?.oxcResolve
-        && context.options.rollup.experimental?.resolve
-    ) {
-        nodeResolver = oxcResolvePlugin(
-            context.options.rollup.experimental.resolve,
-            context.options.rootDir,
-            context.logger,
-            context.tsconfig?.path,
-        );
+    } else if (context.options.experimental?.oxcResolve && context.options.rollup.experimental?.resolve) {
+        nodeResolver = oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, context.logger, context.tsconfig?.path);
     }
 
     const chunking = context.options.rollup.output?.preserveModules
         ? {
             preserveModules: true,
-            preserveModulesRoot:
-                  context.options.rollup.output.preserveModulesRoot ?? "src",
+            preserveModulesRoot: context.options.rollup.output.preserveModulesRoot ?? "src",
         }
         : {
-            manualChunks: createSplitChunks(
-                context.dependencyGraphMap,
-                context.buildEntries,
-            ),
+            manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries),
             preserveModules: false,
         };
 
-    const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(
-        context.options.rollup.plugins,
-        "build",
-    );
+    const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "build");
 
     // Add esm mark and interop helper if esm export is detected
-    const useEsModuleMark
-        = context.tsconfig?.config.compilerOptions?.esModuleInterop;
+    const useEsModuleMark = context.tsconfig?.config.compilerOptions?.esModuleInterop;
 
     return (<RollupOptions>{
         ...baseRollupOptions(context, "build"),
@@ -444,21 +342,10 @@ export const getRollupOptions = async (
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames: (chunk: PreRenderedChunk) =>
-                    getChunkFilename(
-                        chunk,
-                        getOutputExtension(context, "cjs"),
-                    ),
+                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "cjs")),
                 compact: context.options.minify,
-                dir: resolve(
-                    context.options.rootDir,
-                    context.options.outDir,
-                ),
-                entryFileNames: (chunkInfo: PreRenderedAsset) =>
-                    getEntryFileNames(
-                        chunkInfo,
-                        getOutputExtension(context, "cjs"),
-                    ),
+                dir: resolve(context.options.rootDir, context.options.outDir),
+                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "cjs")),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 extend: true,
@@ -470,11 +357,7 @@ export const getRollupOptions = async (
                     arrowFunctions: true,
                     constBindings: true,
                     objectShorthand: true,
-                    preset:
-                            context.tsconfig?.config.compilerOptions?.target
-                            === "es5"
-                                ? "es5"
-                                : "es2015",
+                    preset: context.tsconfig?.config.compilerOptions?.target === "es5" ? "es5" : "es2015",
                     reservedNamesAsProps: true,
                     symbols: true,
                 },
@@ -494,21 +377,10 @@ export const getRollupOptions = async (
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames: (chunk: PreRenderedChunk) =>
-                    getChunkFilename(
-                        chunk,
-                        getOutputExtension(context, "esm"),
-                    ),
+                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "esm")),
                 compact: context.options.minify,
-                dir: resolve(
-                    context.options.rootDir,
-                    context.options.outDir,
-                ),
-                entryFileNames: (chunkInfo: PreRenderedAsset) =>
-                    getEntryFileNames(
-                        chunkInfo,
-                        getOutputExtension(context, "esm"),
-                    ),
+                dir: resolve(context.options.rootDir, context.options.outDir),
+                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "esm")),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 extend: true,
@@ -520,11 +392,7 @@ export const getRollupOptions = async (
                     arrowFunctions: true,
                     constBindings: true,
                     objectShorthand: true,
-                    preset:
-                            context.tsconfig?.config.compilerOptions?.target
-                            === "es5"
-                                ? "es5"
-                                : "es2015",
+                    preset: context.tsconfig?.config.compilerOptions?.target === "es5" ? "es5" : "es2015",
                     reservedNamesAsProps: true,
                     symbols: true,
                 },
@@ -541,24 +409,11 @@ export const getRollupOptions = async (
         plugins: [
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
 
-            context.tsconfig
-            && cachingPlugin(
-                resolveTsconfigRootDirectoriesPlugin(
-                    context.options.rootDir,
-                    context.logger,
-                    context.tsconfig,
-                ),
-                fileCache,
-            ),
+            context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
             context.tsconfig
             && context.options.rollup.tsconfigPaths
             && cachingPlugin(
-                resolveTsconfigPathsPlugin(
-                    context.options.rootDir,
-                    context.tsconfig,
-                    context.logger,
-                    context.options.rollup.tsconfigPaths,
-                ),
+                resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger, context.options.rollup.tsconfigPaths),
                 fileCache,
             ),
 
@@ -602,8 +457,7 @@ export const getRollupOptions = async (
 
             chunkSplitter(),
 
-            context.options.rollup.wasm
-            && wasmPlugin(context.options.rollup.wasm),
+            context.options.rollup.wasm && wasmPlugin(context.options.rollup.wasm),
 
             context.options.rollup.url && urlPlugin(context.options.rollup.url),
 
@@ -612,10 +466,7 @@ export const getRollupOptions = async (
             && context.options.rollup.css.loaders.length > 0
             && await rollupCssPlugin(
                 {
-                    dts:
-                            Boolean(context.options.declaration)
-                            || context.options.isolatedDeclarationTransformer
-                            !== undefined,
+                    dts: Boolean(context.options.declaration) || context.options.isolatedDeclarationTransformer !== undefined,
                     sourceMap: context.options.sourcemap,
                     ...context.options.rollup.css,
                 },
@@ -633,30 +484,20 @@ export const getRollupOptions = async (
             && context.options.rollup.css.loaders
             && context.options.rollup.css.loaders.length > 0
             && context.options.declaration
-            && cssModulesTypesPlugin(
-                context.options.rollup.css,
-                context.options.rootDir,
-            ),
+            && cssModulesTypesPlugin(context.options.rollup.css, context.options.rootDir),
 
-            context.options.rollup.raw
-            && cachingPlugin(rawPlugin(context.options.rollup.raw), fileCache),
+            context.options.rollup.raw && cachingPlugin(rawPlugin(context.options.rollup.raw), fileCache),
 
-            context.options.sourcemap
-            && sourcemapsPlugin(context.options.rollup.sourcemap),
+            context.options.sourcemap && sourcemapsPlugin(context.options.rollup.sourcemap),
 
             ...normalPlugins,
 
             context.options.declaration
             && context.options.rollup.isolatedDeclarations
             && context.options.isolatedDeclarationTransformer
-            && isolatedDeclarationsPlugin<InternalBuildOptions>(
-                join(context.options.rootDir, context.options.sourceDir),
-                context,
-            ),
+            && isolatedDeclarationsPlugin<InternalBuildOptions>(join(context.options.rootDir, context.options.sourceDir), context),
 
-            context.options.transformer(
-                getTransformerConfig(context.options.transformerName, context),
-            ),
+            context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
 
             context.options.rollup.pluginPure
             && PluginPure({
@@ -813,10 +654,7 @@ export const getRollupOptions = async (
             }),
 
             context.options.rollup.dynamicVars && fixDynamicImportExtension(),
-            context.options.rollup.dynamicVars
-            && dynamicImportVariablesPlugin(
-                context.options.rollup.dynamicVars,
-            ),
+            context.options.rollup.dynamicVars && dynamicImportVariablesPlugin(context.options.rollup.dynamicVars),
 
             context.options.rollup.commonjs
             && cachingPlugin(
@@ -835,19 +673,12 @@ export const getRollupOptions = async (
                 },
             } as Plugin),
 
-            context.options.cjsInterop
-            && context.options.rollup.shim
-            && esmShimCjsSyntaxPlugin(
-                context.pkg,
-                context.options.rollup.shim,
-            ),
+            context.options.cjsInterop && context.options.rollup.shim && esmShimCjsSyntaxPlugin(context.pkg, context.options.rollup.shim),
 
             context.options.rollup.jsxRemoveAttributes
             && cachingPlugin(
                 jsxRemoveAttributes({
-                    attributes:
-                            context.options.rollup.jsxRemoveAttributes
-                                .attributes,
+                    attributes: context.options.rollup.jsxRemoveAttributes.attributes,
                     logger: context.logger,
                 }),
                 fileCache,
@@ -857,24 +688,17 @@ export const getRollupOptions = async (
 
             context.options.rollup.metafile && metafilePlugin(),
 
-            context.options.rollup.copy
-            && copyPlugin(context.options.rollup.copy, context.logger),
+            context.options.rollup.copy && copyPlugin(context.options.rollup.copy, context.logger),
 
             context.options.rollup.license
             && context.options.rollup.license.path
-            && typeof context.options.rollup.license.dependenciesTemplate
-            === "function"
+            && typeof context.options.rollup.license.dependenciesTemplate === "function"
             && licensePlugin({
-                dtsMarker:
-                        context.options.rollup.license.dtsMarker
-                        ?? "TYPE_DEPENDENCIES",
+                dtsMarker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
                 licenseFilePath: context.options.rollup.license.path,
-                licenseTemplate:
-                        context.options.rollup.license.dependenciesTemplate,
+                licenseTemplate: context.options.rollup.license.dependenciesTemplate,
                 logger: context.logger,
-                marker:
-                        context.options.rollup.license.dependenciesMarker
-                        ?? "DEPENDENCIES",
+                marker: context.options.rollup.license.dependenciesMarker ?? "DEPENDENCIES",
                 mode: "dependencies",
                 packageName: context.pkg.name,
             }),
@@ -894,11 +718,8 @@ export const getRollupOptions = async (
     }) as RollupOptions;
 };
 
-const createDtsPlugin = async (
-    context: BuildContext<InternalBuildOptions>,
-): Promise<Plugin> => {
-    const { dts }
-        = require("rollup-plugin-dts") as typeof import("rollup-plugin-dts");
+const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>): Promise<Plugin> => {
+    const { dts } = require("rollup-plugin-dts") as typeof import("rollup-plugin-dts");
 
     return dts({
         compilerOptions: {
@@ -915,13 +736,9 @@ const createDtsPlugin = async (
 
 // Avoid create multiple dts plugins instance and parsing the same tsconfig multi times,
 // This will avoid memory leak and performance issue.
-const memoizeDtsPluginByKey
-    = memoizeByKey<typeof createDtsPlugin>(createDtsPlugin);
+const memoizeDtsPluginByKey = memoizeByKey<typeof createDtsPlugin>(createDtsPlugin);
 
-export const getRollupDtsOptions = async (
-    context: BuildContext<InternalBuildOptions>,
-    fileCache: FileCache,
-): Promise<RollupOptions> => {
+export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
     const compilerOptions = context.tsconfig?.config.compilerOptions;
 
@@ -929,36 +746,21 @@ export const getRollupDtsOptions = async (
 
     let nodeResolver;
 
-    if (
-        context.options.rollup.resolve
-        && context.options.experimental?.oxcResolve !== true
-    ) {
+    if (context.options.rollup.resolve && context.options.experimental?.oxcResolve !== true) {
         nodeResolver = nodeResolvePlugin({
             ...context.options.rollup.resolve,
         });
-    } else if (
-        context.options.experimental?.oxcResolve
-        && context.options.rollup.experimental?.resolve
-    ) {
-        nodeResolver = oxcResolvePlugin(
-            context.options.rollup.experimental.resolve,
-            context.options.rootDir,
-            context.logger,
-            context.tsconfig?.path,
-        );
+    } else if (context.options.experimental?.oxcResolve && context.options.rollup.experimental?.resolve) {
+        nodeResolver = oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, context.logger, context.tsconfig?.path);
     }
 
     // Each process should be unique
     // Each package build should be unique
     // Composing above factors into a unique cache key to retrieve the memoized dts plugin with tsconfigs
 
-    const uniqueProcessId
-        = `dts-plugin:${process.pid}${(context.tsconfig as TsConfigResult).path}` as string;
+    const uniqueProcessId = `dts-plugin:${process.pid}${(context.tsconfig as TsConfigResult).path}` as string;
 
-    const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(
-        context.options.rollup.plugins,
-        "dts",
-    );
+    const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "dts");
 
     return <RollupOptions>{
         ...baseRollupOptions(context, "dts"),
@@ -978,16 +780,9 @@ export const getRollupDtsOptions = async (
         output: [
             context.options.emitCJS
             && <OutputOptions>{
-                chunkFileNames: (chunk: PreRenderedChunk) =>
-                    getChunkFilename(
-                        chunk,
-                        getDtsExtension(context, "cjs"),
-                    ),
+                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getDtsExtension(context, "cjs")),
                 compact: context.options.minify,
-                dir: resolve(
-                    context.options.rootDir,
-                    context.options.outDir,
-                ),
+                dir: resolve(context.options.rootDir, context.options.outDir),
                 entryFileNames: `[name].${getDtsExtension(context, "cjs")}`,
                 format: "cjs",
                 sourcemap: context.options.sourcemap,
@@ -995,16 +790,9 @@ export const getRollupDtsOptions = async (
             },
             context.options.emitESM
             && <OutputOptions>{
-                chunkFileNames: (chunk: PreRenderedChunk) =>
-                    getChunkFilename(
-                        chunk,
-                        getDtsExtension(context, "esm"),
-                    ),
+                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getDtsExtension(context, "esm")),
                 compact: context.options.minify,
-                dir: resolve(
-                    context.options.rootDir,
-                    context.options.outDir,
-                ),
+                dir: resolve(context.options.rootDir, context.options.outDir),
                 entryFileNames: `[name].${getDtsExtension(context, "esm")}`,
                 format: "esm",
                 sourcemap: context.options.sourcemap,
@@ -1013,13 +801,9 @@ export const getRollupDtsOptions = async (
             // .d.ts for node10 compatibility (TypeScript version < 4.7)
             context.options.declaration === "compatible"
             && <OutputOptions>{
-                chunkFileNames: (chunk: PreRenderedChunk) =>
-                    getChunkFilename(chunk, "d.ts"),
+                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, "d.ts"),
                 compact: context.options.minify,
-                dir: resolve(
-                    context.options.rootDir,
-                    context.options.outDir,
-                ),
+                dir: resolve(context.options.rootDir, context.options.outDir),
                 entryFileNames: "[name].d.ts",
                 format: "cjs",
                 sourcemap: context.options.sourcemap,
@@ -1038,11 +822,7 @@ export const getRollupDtsOptions = async (
 
             <Plugin>{
                 load(id) {
-                    if (
-                        !/\.(?:js|cjs|mjs|jsx|ts|tsx|ctsx|mtsx|mts|json)$/.test(
-                            id,
-                        )
-                    ) {
+                    if (!/\.(?:js|cjs|mjs|jsx|ts|tsx|ctsx|mtsx|mts|json)$/.test(id)) {
                         return "";
                     }
 
@@ -1051,24 +831,11 @@ export const getRollupDtsOptions = async (
                 name: "packem:ignore-files",
             },
 
-            context.tsconfig
-            && cachingPlugin(
-                resolveTsconfigRootDirectoriesPlugin(
-                    context.options.rootDir,
-                    context.logger,
-                    context.tsconfig,
-                ),
-                fileCache,
-            ),
+            context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
             context.tsconfig
             && context.options.rollup.tsconfigPaths
             && cachingPlugin(
-                resolveTsconfigPathsPlugin(
-                    context.options.rootDir,
-                    context.tsconfig,
-                    context.logger,
-                    context.options.rollup.tsconfigPaths,
-                ),
+                resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger, context.options.rollup.tsconfigPaths),
                 fileCache,
             ),
 
@@ -1105,14 +872,7 @@ export const getRollupDtsOptions = async (
                 logger: context.logger,
             }),
 
-            context.options.rollup.patchTypes
-            && cachingPlugin(
-                patchTypescriptTypesPlugin(
-                    context.options.rollup.patchTypes,
-                    context.logger,
-                ),
-                fileCache,
-            ),
+            context.options.rollup.patchTypes && cachingPlugin(patchTypescriptTypesPlugin(context.options.rollup.patchTypes, context.logger), fileCache),
 
             removeShebangPlugin(),
 
@@ -1120,15 +880,12 @@ export const getRollupDtsOptions = async (
 
             context.options.rollup.license
             && context.options.rollup.license.path
-            && typeof context.options.rollup.license.dtsTemplate
-            === "function"
+            && typeof context.options.rollup.license.dtsTemplate === "function"
             && licensePlugin({
                 licenseFilePath: context.options.rollup.license.path,
                 licenseTemplate: context.options.rollup.license.dtsTemplate,
                 logger: context.logger,
-                marker:
-                        context.options.rollup.license.dtsMarker
-                        ?? "TYPE_DEPENDENCIES",
+                marker: context.options.rollup.license.dtsMarker ?? "TYPE_DEPENDENCIES",
                 mode: "types",
                 packageName: context.pkg.name,
             }),

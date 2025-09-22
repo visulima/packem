@@ -70,15 +70,11 @@ const reservedKeywords = new Set([
     "yield",
 ]);
 
-const validateAliasEntries = (
-    entries: ReadonlyArray<Alias> | Record<string, string>,
-): void => {
+const validateAliasEntries = (entries: ReadonlyArray<Alias> | Record<string, string>): void => {
     if (!Array.isArray(entries) && entries !== undefined) {
         for (const [alias, target] of Object.entries(entries)) {
             if (typeof alias !== "string" || alias.trim() === "") {
-                throw new Error(
-                    `Alias name "${alias}" is invalid. Alias names should be non-empty strings.`,
-                );
+                throw new Error(`Alias name "${alias}" is invalid. Alias names should be non-empty strings.`);
             }
 
             if (invalidAliasPattern.test(alias)) {
@@ -88,17 +84,13 @@ const validateAliasEntries = (
             }
 
             if (reservedKeywords.has(alias)) {
-                throw new Error(
-                    `Alias name "${alias}" is a reserved keyword and cannot be used.`,
-                );
+                throw new Error(`Alias name "${alias}" is a reserved keyword and cannot be used.`);
             }
 
             const resolvedPath = resolve(target);
 
             if (!isAccessibleSync(resolvedPath)) {
-                throw new Error(
-                    `Target path "${resolvedPath}" for alias "${alias}" does not exist.`,
-                );
+                throw new Error(`Target path "${resolvedPath}" for alias "${alias}" does not exist.`);
             }
         }
     }

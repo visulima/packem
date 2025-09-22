@@ -1,3 +1,3 @@
 export declare class NumberSchema {
-  min: () => typeof this;
+    min: () => typeof this;
 }

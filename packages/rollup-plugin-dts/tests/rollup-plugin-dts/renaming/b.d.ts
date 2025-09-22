@@ -6,13 +6,13 @@ interface E {}
 interface F {}
 declare class Parent {}
 export declare class Klass extends Parent {
-  a: A;
+    a: A;
 }
 export interface Interface extends B {
-  c: C;
+    c: C;
 }
 export declare function Func(d: D): E;
 export declare type Type = {
-  f: F;
+    f: F;
 };
 export {};

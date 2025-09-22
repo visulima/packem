@@ -8,11 +8,9 @@ import { dts as rollupDts } from "rollup-plugin-dts";
 import { glob } from "tinyglobby";
 import { expect } from "vitest";
 
-import { dts } from "../src/index";
+import { dts } from "../src/index.ts";
 
-const isUpdateEnabled
-    = process.env.npm_lifecycle_script?.includes("-u")
-        || process.env.npm_lifecycle_script?.includes("--update");
+const isUpdateEnabled = process.env.npm_lifecycle_script?.includes("-u") || process.env.npm_lifecycle_script?.includes("--update");
 
 await testFixtures(
     "tests/rollup-plugin-dts/**/{index,main-a}.d.ts",
@@ -50,27 +48,19 @@ await testFixtures(
             return expect(error).toBe(true);
         }
 
-        if (error) { throw error; }
+        if (error)
+            throw error;
 
-        await expect(rolldownSnapshot).toMatchFileSnapshot(
-            path.resolve(dirname, "snapshot.d.ts"),
-        );
+        await expect(rolldownSnapshot).toMatchFileSnapshot(path.resolve(dirname, "snapshot.d.ts"));
 
         rollupSnapshot = cleanupCode(rollupSnapshot);
         rolldownSnapshot = cleanupCode(rolldownSnapshot);
         const diffPath = path.resolve(dirname, "diff.patch");
         const knownDiffPath = path.resolve(dirname, "known-diff.patch");
-        const diff = createPatch(
-            "diff.patch",
-            rollupSnapshot,
-            rolldownSnapshot,
-            undefined,
-            undefined,
-            {
-                ignoreWhitespace: true,
-                stripTrailingCr: true,
-            },
-        );
+        const diff = createPatch("diff.patch", rollupSnapshot, rolldownSnapshot, undefined, undefined, {
+            ignoreWhitespace: true,
+            stripTrailingCr: true,
+        });
 
         // not the same
         if (diff.split("\n").length !== 5) {
@@ -79,17 +69,12 @@ await testFixtures(
             if (knownDiff === diff) {
                 await unlink(diffPath).catch(() => {});
             } else {
-                await expect(diff).toMatchFileSnapshot(
-                    knownDiff ? knownDiffPath : diffPath,
-                );
+                await expect(diff).toMatchFileSnapshot(knownDiff ? knownDiffPath : diffPath);
 
                 await unlink(knownDiff ? diffPath : knownDiffPath).catch(() => {});
             }
         } else if (isUpdateEnabled) {
-            await Promise.all([
-                unlink(diffPath).catch(() => {}),
-                unlink(knownDiffPath).catch(() => {}),
-            ]);
+            await Promise.all([unlink(diffPath).catch(() => {}), unlink(knownDiffPath).catch(() => {})]);
         } else {
             await expect(access(diffPath)).rejects.toThrow();
             await expect(access(knownDiffPath)).rejects.toThrow();

@@ -12,19 +12,13 @@ export function filename_js_to_dts(id: string): string {
     return id.replace(RE_JS, ".d.$1ts");
 }
 export function filename_to_dts(id: string): string {
-    return id
-        .replace(RE_VUE, ".vue.ts")
-        .replace(RE_TS, ".d.$1ts")
-        .replace(RE_JS, ".d.$1ts");
+    return id.replace(RE_VUE, ".vue.ts").replace(RE_TS, ".d.$1ts").replace(RE_JS, ".d.$1ts");
 }
 export function filename_dts_to(id: string, extension: "js" | "ts"): string {
     return id.replace(RE_DTS, `.$1${extension}`);
 }
 
-export function resolveTemplateFn(
-    function_: string | ChunkFileNamesFunction,
-    chunk: PreRenderedChunk,
-): string {
+export function resolveTemplateFn(function_: string | ChunkFileNamesFunction, chunk: PreRenderedChunk): string {
     return typeof function_ === "function" ? function_(chunk) : function_;
 }
 

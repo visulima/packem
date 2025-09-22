@@ -29,105 +29,81 @@ describe("packem watch", () => {
             type: "module",
         });
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.js`,
-            `export const a = 1;\n`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const a = 1;\n`);
     });
 
     afterEach(async () => {
         // Cleanup handled by tempy and test runner; child process will be killed in test
     });
 
-    it(
-        "should not crash when onSuccess runs and a rebuild is triggered",
-        { timeout: 30_000 },
-        async () => {
-            expect.assertions(2);
+    it("should not crash when onSuccess runs and a rebuild is triggered", { timeout: 30_000 }, async () => {
+        expect.assertions(2);
 
-            // Start watch with a quick onSuccess command that prints a marker
-            const proc = execaNode(
-                join(distributionPath, "cli/index.js"),
-                [
-                    "build",
-                    "--development",
-                    "--watch",
-                    "--onSuccess=node -e \"console.log('ON_SUCCESS_OK')\"",
-                    "--no-validation",
-                ],
-                {
-                    cwd: temporaryDirectoryPath,
-                    reject: false,
-                },
-            );
+        // Start watch with a quick onSuccess command that prints a marker
+        const proc = execaNode(
+            join(distributionPath, "cli/index.js"),
+            ["build", "--development", "--watch", "--onSuccess=node -e \"console.log('ON_SUCCESS_OK')\"", "--no-validation"],
+            {
+                cwd: temporaryDirectoryPath,
+                reject: false,
+            },
+        );
 
-            // Accumulate stdout to detect markers
-            let stdout = "";
+        // Accumulate stdout to detect markers
+        let stdout = "";
 
-            proc.stdout?.on("data", (chunk) => {
-                stdout += String(chunk);
-            });
+        proc.stdout?.on("data", (chunk) => {
+            stdout += String(chunk);
+        });
 
-            // Wait for initial build completion and onSuccess marker
-            const waitForFirstSuccess = async () => {
-                const start = Date.now();
+        // Wait for initial build completion and onSuccess marker
+        const waitForFirstSuccess = async () => {
+            const start = Date.now();
 
-                while (Date.now() - start < 10_000) {
-                    if (
-                        (stdout.includes("Rebuild finished")
-                            || stdout.includes("Build run in")
-                            || stdout.includes("Build succeeded"))
-                        && stdout.includes("ON_SUCCESS_OK")
-                    ) {
-                        return;
-                    }
-
-                    await sleep(100);
+            while (Date.now() - start < 10_000) {
+                if (
+                    (stdout.includes("Rebuild finished") || stdout.includes("Build run in") || stdout.includes("Build succeeded"))
+                    && stdout.includes("ON_SUCCESS_OK")
+                ) {
+                    return;
                 }
-                throw new Error("Timed out waiting for initial onSuccess");
-            };
 
-            await waitForFirstSuccess();
+                await sleep(100);
+            }
+            throw new Error("Timed out waiting for initial onSuccess");
+        };
 
-            // Trigger a change to invoke doOnSuccessCleanup and then another onSuccess run
-            writeFileSync(
-                `${temporaryDirectoryPath}/src/index.js`,
-                `export const a = 2;\n`,
-            );
+        await waitForFirstSuccess();
 
-            const waitForSecondSuccess = async () => {
-                const start = Date.now();
-                let count = 0;
+        // Trigger a change to invoke doOnSuccessCleanup and then another onSuccess run
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const a = 2;\n`);
 
-                while (Date.now() - start < 10_000) {
-                    // Count occurrences of marker; need 2 (initial + rebuild)
-                    count = (stdout.match(/ON_SUCCESS_OK/g) ?? []).length;
+        const waitForSecondSuccess = async () => {
+            const start = Date.now();
+            let count = 0;
 
-                    if (count >= 2) {
-                        return;
-                    }
+            while (Date.now() - start < 10_000) {
+                // Count occurrences of marker; need 2 (initial + rebuild)
+                count = (stdout.match(/ON_SUCCESS_OK/g) ?? []).length;
 
-                    await sleep(100);
+                if (count >= 2) {
+                    return;
                 }
-                throw new Error(
-                    "Timed out waiting for second onSuccess after change",
-                );
-            };
 
-            await waitForSecondSuccess();
+                await sleep(100);
+            }
+            throw new Error("Timed out waiting for second onSuccess after change");
+        };
 
-            // Stop the watcher
-            proc.kill("SIGINT");
-            const result = await proc; // resolved due to reject:false
+        await waitForSecondSuccess();
 
-            // Ensure we didn't hit the previous crash path
-            expect(stdout).not.toContain(
-                "Cannot read properties of undefined (reading 'exitCode')",
-            );
-            // Process terminated by our SIGINT is acceptable
-            expect(result.signal === "SIGINT" || result.exitCode === 0).toBe(
-                true,
-            );
-        },
-    );
+        // Stop the watcher
+        proc.kill("SIGINT");
+        const result = await proc; // resolved due to reject:false
+
+        // Ensure we didn't hit the previous crash path
+        expect(stdout).not.toContain("Cannot read properties of undefined (reading 'exitCode')");
+        // Process terminated by our SIGINT is acceptable
+        expect(result.signal === "SIGINT" || result.exitCode === 0).toBe(true);
+    });
 });

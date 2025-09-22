@@ -1,5 +1,5 @@
 interface Stuff {
-  id: string;
+    id: string;
 }
 export declare const Stuff: Stuff;
 export {};

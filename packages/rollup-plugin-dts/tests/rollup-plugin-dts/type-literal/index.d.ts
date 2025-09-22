@@ -1,5 +1,5 @@
 interface A {}
 export declare type Foo = {
-  a: A;
+    a: A;
 };
 export {};

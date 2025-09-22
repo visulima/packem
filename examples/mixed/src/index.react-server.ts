@@ -1,9 +1,9 @@
-import rsc from './rsc';
+import rsc from "./rsc";
 
 export function index() {
-  if (process.env.NODE_ENV === 'development') {
-    console.log('index function called');
-  }
+    if (process.env.NODE_ENV === "development") {
+        console.log("index function called");
+    }
 
-  return rsc;
+    return rsc;
 }

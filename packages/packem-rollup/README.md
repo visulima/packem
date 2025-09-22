@@ -49,9 +49,7 @@ The `dataUriPlugin` converts files to data URIs for inline embedding. It support
 import { dataUriPlugin } from "@visulima/packem-rollup";
 
 export default {
-  plugins: [
-    dataUriPlugin()
-  ]
+    plugins: [dataUriPlugin()],
 };
 ```
 
@@ -66,16 +64,16 @@ export default {
 
 ```typescript
 // Tiny SVG encoding (default)
-import icon from './icon.svg?data-uri';
+import icon from "./icon.svg?data-uri";
 
 // CSS-optimized SVG encoding
-import icon from './icon.svg?data-uri&encoding=css';
+import icon from "./icon.svg?data-uri&encoding=css";
 
 // Tiny SVG with srcset compatibility
-import icon from './icon.svg?data-uri&srcset';
+import icon from "./icon.svg?data-uri&srcset";
 
 // CSS encoding with srcset compatibility
-import icon from './icon.svg?data-uri&encoding=css&srcset';
+import icon from "./icon.svg?data-uri&encoding=css&srcset";
 ```
 
 ### Lazy Barrel Plugin
@@ -86,14 +84,14 @@ The `lazyBarrelPlugin` implements lazy barrel optimization similar to Rspack's `
 import { lazyBarrelPlugin } from "@visulima/packem-rollup";
 
 export default {
-  plugins: [
-    lazyBarrelPlugin({
-      sideEffectsCheck: true,
-      lazyThreshold: 2,
-      include: [/\.ts$/, /\.js$/],
-      exclude: [/\.test\.ts$/]
-    })
-  ]
+    plugins: [
+        lazyBarrelPlugin({
+            sideEffectsCheck: true,
+            lazyThreshold: 2,
+            include: [/\.ts$/, /\.js$/],
+            exclude: [/\.test\.ts$/],
+        }),
+    ],
 };
 ```
 
@@ -121,12 +119,12 @@ The `urlPlugin` handles asset URLs, either inlining them as data URIs or copying
 import { urlPlugin } from "@visulima/packem-rollup";
 
 export default {
-  plugins: [
-    urlPlugin({
-      limit: 14336, // 14kb
-      fileName: '[hash][extname]'
-    })
-  ]
+    plugins: [
+        urlPlugin({
+            limit: 14336, // 14kb
+            fileName: "[hash][extname]",
+        }),
+    ],
 };
 ```
 
@@ -145,8 +143,8 @@ If you would like to help take a look at the [list of issues](https://github.com
 
 ## Credits
 
--   [Daniel Bannert](https://github.com/prisis)
--   [All Contributors](https://github.com/visulima/packem/graphs/contributors)
+- [Daniel Bannert](https://github.com/prisis)
+- [All Contributors](https://github.com/visulima/packem/graphs/contributors)
 
 ## License
 

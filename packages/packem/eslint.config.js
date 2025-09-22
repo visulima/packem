@@ -12,6 +12,7 @@ export default createConfig(
             "examples",
             "vitest.config.ts",
             ".secretlintrc.cjs",
+            ".prettierrc.cjs",
             "tsconfig.eslint.json",
             "README.md",
         ],

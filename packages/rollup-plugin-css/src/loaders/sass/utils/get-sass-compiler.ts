@@ -6,7 +6,8 @@ import type * as sassEmbedded from "sass-embedded";
 const getSassCompiler = async (
     implementation: "sass-embedded" | "sass" | undefined,
 ): Promise<
-((sassOptions: sass.StringOptions<"sync"> & { data: string }) => sass.CompileResult) | ((sassOptions: sassEmbedded.StringOptions<"sync"> & { data: string }) => sassEmbedded.CompileResult)
+    | ((sassOptions: sass.StringOptions<"sync"> & { data: string }) => sass.CompileResult)
+    | ((sassOptions: sassEmbedded.StringOptions<"sync"> & { data: string }) => sassEmbedded.CompileResult)
 > => {
     let resolvedCompiler: typeof sass.compileString | typeof sassEmbedded.compileString | undefined;
 

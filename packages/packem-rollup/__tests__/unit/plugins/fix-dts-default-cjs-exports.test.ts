@@ -20,7 +20,7 @@ const getCode = (result: string | { code: string } | null | undefined): string |
 // TODO: Refactor this test to use the new fixDtsDefaultCJSExports function, when work starts on packem v2
 describe(fixDtsDefaultCjsExportsPlugin, () => {
     it("should return a plugin object", () => {
-        expect.assertions(3);
+        expect.assertions(2);
 
         const plugin = fixDtsDefaultCjsExportsPlugin();
 
@@ -35,7 +35,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             code: string,
             chunk: Partial<RenderedChunk>,
             options: NormalizedOutputOptions,
-            meta: { chunks: Record<string, RenderedChunk> }
+            meta: { chunks: Record<string, RenderedChunk> },
         ) => string | { code: string; map?: unknown } | null | undefined;
 
         beforeEach(() => {
@@ -47,15 +47,14 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
                 code: string,
                 chunk: RenderedChunk,
                 options: NormalizedOutputOptions,
-                meta: { chunks: Record<string, RenderedChunk> }
+                meta: { chunks: Record<string, RenderedChunk> },
             ) => string | { code: string; map?: unknown } | null | undefined;
 
             if (typeof directRenderChunk !== "function") {
                 throw new TypeError("fixDtsDefaultCjsExportsPlugin.renderChunk is not a function");
             }
 
-            renderChunk = (code, chunk, options, meta) =>
-                directRenderChunk.call(rollupContext, code, chunk as RenderedChunk, options, meta);
+            renderChunk = (code, chunk, options, meta) => directRenderChunk.call(rollupContext, code, chunk as RenderedChunk, options, meta);
         });
 
         afterEach(() => {
@@ -353,15 +352,16 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             const plugin = fixDtsDefaultCjsExportsPlugin();
             const mockContext = { warn: vi.fn() } as unknown as PluginContext;
 
-            const result = typeof plugin.renderChunk === "function"
-                ? plugin.renderChunk.call(
-                    mockContext,
-                    code,
-                    chunkInfo as RenderedChunk,
-                    {} as NormalizedOutputOptions,
-                    { chunks: {} } as { chunks: Record<string, RenderedChunk> },
-                )
-                : undefined;
+            const result
+                = typeof plugin.renderChunk === "function"
+                    ? plugin.renderChunk.call(
+                        mockContext,
+                        code,
+                        chunkInfo as RenderedChunk,
+                        {} as NormalizedOutputOptions,
+                        { chunks: {} } as { chunks: Record<string, RenderedChunk> },
+                    )
+                    : undefined;
 
             expect(result).toBeUndefined();
         });
@@ -380,15 +380,16 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             const plugin = fixDtsDefaultCjsExportsPlugin();
             const mockContext = { warn: vi.fn() } as unknown as PluginContext;
 
-            const result = typeof plugin.renderChunk === "function"
-                ? plugin.renderChunk.call(
-                    mockContext,
-                    code,
-                    chunkInfo as RenderedChunk,
-                    {} as NormalizedOutputOptions,
-                    { chunks: {} } as { chunks: Record<string, RenderedChunk> },
-                )
-                : undefined;
+            const result
+                = typeof plugin.renderChunk === "function"
+                    ? plugin.renderChunk.call(
+                        mockContext,
+                        code,
+                        chunkInfo as RenderedChunk,
+                        {} as NormalizedOutputOptions,
+                        { chunks: {} } as { chunks: Record<string, RenderedChunk> },
+                    )
+                    : undefined;
 
             expect(result).toBeUndefined();
         });
@@ -446,9 +447,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             const expectedPreamble = `// @ts-ignore\nfs;\nexport { anotherVal };`;
 
             expect(resultOutput).toBe(expectedPreamble.trim());
-            expect(mockWarn).toHaveBeenCalledWith(
-                "Cannot infer default export from the file: test.d.ts. Declaration for 'fs' not found.",
-            );
+            expect(mockWarn).toHaveBeenCalledWith("Cannot infer default export from the file: test.d.ts. Declaration for 'fs' not found.");
         });
 
         it("should return transformedCode if no defaultExport and transformedCode does not start with 'export type' (L325-328)", () => {
@@ -625,9 +624,7 @@ export { MyNamedImport as default } from 'some-module';`;
             const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
 
             expect(result).toBeUndefined();
-            expect(mockWarn).toHaveBeenCalledWith(
-                `Cannot parse "MyNamedImport" named export from some-module import at test.d.ts!.`,
-            );
+            expect(mockWarn).toHaveBeenCalledWith(`Cannot parse "MyNamedImport" named export from some-module import at test.d.ts!.`);
         });
 
         it("handleDefaultNamedCJSExport: re-export with alias and others, existing import provides alias", () => {

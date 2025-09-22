@@ -16,7 +16,7 @@ const getSassOptions = async (
     options: SassLoaderOptions,
     content: string,
     useSourceMap: boolean,
-// eslint-disable-next-line sonarjs/cognitive-complexity
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<SassLoaderOptions> => {
     const { warnRuleAsWarning, ...otherOptions } = options;
     let data = content;

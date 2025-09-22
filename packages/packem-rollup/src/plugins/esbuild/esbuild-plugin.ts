@@ -18,16 +18,7 @@ import getRenderChunk from "./utils/get-render-chunk";
 import doOptimizeDeps from "./utils/optimize-deps";
 import warn from "./utils/warn";
 
-const esbuildTransformer = ({
-    exclude,
-    include,
-    loaders: _loaders,
-    logger,
-    optimizeDeps,
-    sourceMap,
-    ...esbuildOptions
-
-}: EsbuildPluginConfig): RollupPlugin => {
+const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optimizeDeps, sourceMap, ...esbuildOptions }: EsbuildPluginConfig): RollupPlugin => {
     const loaders = DEFAULT_LOADERS;
 
     if (_loaders !== undefined) {

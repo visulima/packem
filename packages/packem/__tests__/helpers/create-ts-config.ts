@@ -1,11 +1,7 @@
 import { writeJson } from "@visulima/fs";
 import type { TsConfigJson } from "@visulima/tsconfig";
 
-const createTsConfig = async (
-    fixturePath: string,
-    config: TsConfigJson = {},
-    name = "",
-): Promise<void> => {
+const createTsConfig = async (fixturePath: string, config: TsConfigJson = {}, name = ""): Promise<void> => {
     await writeJson(
         `${fixturePath}/tsconfig${name}.json`,
         {

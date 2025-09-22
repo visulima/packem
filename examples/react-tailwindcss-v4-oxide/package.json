@@ -1,50 +1,50 @@
 {
-  "name": "examples_packem_react_tailwindcss-v4-oxide",
-  "private": true,
-  "keywords": [
-    "tailwind",
-    "tailwind-oxide",
-    "rollup",
-    "css",
-    "react",
-    "typescript",
-    "example"
-  ],
-  "license": "MIT",
-  "author": "Visulima Team",
-  "type": "module",
-  "exports": [
-    "./dist/index.mjs",
-    "./dist/index.cjs"
-  ],
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.cts",
-  "files": [
-    "./dist"
-  ],
-  "scripts": {
-    "build": "packem build",
-    "clean": "rimraf node_modules dist"
-  },
-  "dependencies": {
-    "react": "^19.1.1"
-  },
-  "devDependencies": {
-    "@tailwindcss/node": "4.1.13",
-    "@tailwindcss/oxide": "4.1.13",
-    "@types/react": "^19.1.13",
-    "@types/react-dom": "^19.1.9",
-    "@visulima/css-style-inject": "workspace:*",
-    "@visulima/packem": "workspace:*",
-    "cssnano": "7.1.1",
-    "esbuild": "^0.25.9",
-    "react-dom": "^19.1.1",
-    "rimraf": "^6.0.1",
-    "tailwindcss": "^4.1.13",
-    "typescript": "^5.9.2"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+    "name": "examples_packem_react_tailwindcss-v4-oxide",
+    "private": true,
+    "keywords": [
+        "tailwind",
+        "tailwind-oxide",
+        "rollup",
+        "css",
+        "react",
+        "typescript",
+        "example"
+    ],
+    "license": "MIT",
+    "author": "Visulima Team",
+    "type": "module",
+    "exports": [
+        "./dist/index.mjs",
+        "./dist/index.cjs"
+    ],
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.cts",
+    "files": [
+        "./dist"
+    ],
+    "scripts": {
+        "build": "packem build",
+        "clean": "rimraf node_modules dist"
+    },
+    "dependencies": {
+        "react": "^19.1.1"
+    },
+    "devDependencies": {
+        "@tailwindcss/node": "4.1.13",
+        "@tailwindcss/oxide": "4.1.13",
+        "@types/react": "^19.1.13",
+        "@types/react-dom": "^19.1.9",
+        "@visulima/css-style-inject": "workspace:*",
+        "@visulima/packem": "workspace:*",
+        "cssnano": "7.1.1",
+        "esbuild": "^0.25.10",
+        "react-dom": "^19.1.1",
+        "rimraf": "^6.0.1",
+        "tailwindcss": "^4.1.13",
+        "typescript": "^5.9.2"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
 }

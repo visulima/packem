@@ -142,7 +142,8 @@ export interface PostCSSOptions {
      * which are used before plugins loaded from PostCSS config file, if any.
      */
     plugins?:
-        (AcceptedPlugin | string | [PluginCreator<unknown> | string, Record<string, unknown>] | [PluginCreator<unknown> | string] | null | undefined)[] | Record<string, unknown>;
+        | (AcceptedPlugin | string | [PluginCreator<unknown> | string, Record<string, unknown>] | [PluginCreator<unknown> | string] | null | undefined)[]
+        | Record<string, unknown>;
 
     /**
      * Set PostCSS stringifier.

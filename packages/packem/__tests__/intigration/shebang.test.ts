@@ -4,13 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import {
-    createPackageJson,
-    createPackemConfig,
-    createTsConfig,
-    execPackem,
-    installPackage,
-} from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("shebang", () => {
     let temporaryDirectoryPath: string;
@@ -54,15 +48,11 @@ console.log('Hello, world!');
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toMatchSnapshot("mjs output");
     });
@@ -109,16 +99,12 @@ console.log('Hello, world!');
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toContain(customShebang);
         expect(cjsContent).toMatchSnapshot("cjs output");
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toContain(customShebang);
         expect(mjsContent).toMatchSnapshot("mjs output");
@@ -160,15 +146,11 @@ export { getNodeSheBang };
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toMatchSnapshot("mjs output");
     });
@@ -211,15 +193,11 @@ export { getNodeSheBang };
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toMatchSnapshot("mjs output");
     });
@@ -253,15 +231,11 @@ for (let i = 0; i < 10; i++) { console.log('🦄');}`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toMatchSnapshot("mjs output");
     });

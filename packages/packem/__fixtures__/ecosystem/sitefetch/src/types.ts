@@ -11,9 +11,7 @@ export type Options = {
     /**
      * The CSS selector to find content
      */
-    contentSelector?:
-        | string
-        | ((ctx: { pathname: string }) => string | void | undefined);
+    contentSelector?: string | ((ctx: { pathname: string }) => string | void | undefined);
 
     /**
      * Limit the result to this amount of pages

@@ -4,13 +4,7 @@ import { readFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import {
-    createPackageJson,
-    createPackemConfig,
-    createTsConfig,
-    execPackem,
-    installPackage,
-} from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("data-uri plugin", () => {
     let temporaryDirectoryPath: string;
@@ -27,10 +21,7 @@ describe("data-uri plugin", () => {
         expect.assertions(4);
 
         mkdirSync(`${temporaryDirectoryPath}/src`, { recursive: true });
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/icon.svg`,
-            `<!-- comment to strip --><svg viewBox="0 0 1 1"><path d="M0 0"/></svg>`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/icon.svg`, `<!-- comment to strip --><svg viewBox="0 0 1 1"><path d="M0 0"/></svg>`);
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
             `import icon from './icon.svg?data-uri';
@@ -55,9 +46,7 @@ export const data = icon;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // Should be an SVG data URI; comments must be stripped
         expect(mjsContent).toMatch(/data:image\/svg\+xml;?charset=utf-8?,/);
@@ -93,9 +82,7 @@ export const data = file;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // Should be a data URI with base64 for text/plain
         expect(mjsContent).toMatch(/data:text\/plain;.*base64,/);
@@ -134,9 +121,7 @@ export const length = Circle.length;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toMatch(/data:image\/svg\+xml;?charset=utf-8?,/);
         // lucide icons should also not include comments

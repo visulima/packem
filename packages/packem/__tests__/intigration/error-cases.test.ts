@@ -28,9 +28,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stderr).toContain(
-            `package.json not found at ${temporaryDirectoryPath}`,
-        );
+        expect(binProcess.stderr).toContain(`package.json not found at ${temporaryDirectoryPath}`);
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -46,11 +44,7 @@ describe("packem error cases", () => {
 
         const NODE_JS_VERSION = Number(process.versions.node.split(".")[0]);
 
-        expect(binProcess.stderr).toContain(
-            NODE_JS_VERSION < 20
-                ? "Unexpected end of JSON input in"
-                : "Expected property name or",
-        );
+        expect(binProcess.stderr).toContain(NODE_JS_VERSION < 20 ? "Unexpected end of JSON input in" : "Expected property name or");
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -67,9 +61,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stderr).toContain(
-            "No 'src' directory found. Please provide entries manually.",
-        );
+        expect(binProcess.stderr).toContain("No 'src' directory found. Please provide entries manually.");
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -88,9 +80,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stderr).toContain(
-            "No source files found in 'src' directory. Please provide entries manually.",
-        );
+        expect(binProcess.stderr).toContain("No source files found in 'src' directory. Please provide entries manually.");
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -108,9 +98,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stderr).toContain(
-            "No entries detected. Please provide entries manually.",
-        );
+        expect(binProcess.stderr).toContain("No entries detected. Please provide entries manually.");
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -134,27 +122,17 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain(
-            `Conflict detected: The 'module' and 'main' fields both point to `,
-        );
+        expect(binProcess.stdout).toContain(`Conflict detected: The 'module' and 'main' fields both point to `);
         expect(binProcess.stdout).toContain(`'dist/index.js'.`);
-        expect(binProcess.stdout).toContain(
-            `Please ensure they refer to different module types.`,
-        );
+        expect(binProcess.stdout).toContain(`Please ensure they refer to different module types.`);
         expect(binProcess.exitCode).toBe(1);
     });
 
     it("should warn on invalid exports as ESM", async () => {
         expect.assertions(3);
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/foo.js`,
-            `export const foo = "foo";`,
-        );
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.js`,
-            `export const index = "index";`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/foo.js`, `export const foo = "foo";`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const index = "index";`);
 
         await createPackageJson(temporaryDirectoryPath, {
             exports: {
@@ -175,9 +153,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain(
-            `The 'main' field in your package.json should not use a '.mjs' extension for`,
-        );
+        expect(binProcess.stdout).toContain(`The 'main' field in your package.json should not use a '.mjs' extension for`);
         expect(binProcess.stdout).toContain(`CommonJS modules.`);
         expect(binProcess.exitCode).toBe(1);
     });
@@ -185,14 +161,8 @@ describe("packem error cases", () => {
     it("should warn on invalid exports as CJS", async () => {
         expect.assertions(3);
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/foo.js`,
-            `export const foo = "foo";`,
-        );
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.js`,
-            `export const index = "index";`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/foo.js`, `export const foo = "foo";`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.js`, `export const index = "index";`);
 
         await createPackageJson(temporaryDirectoryPath, {
             exports: {
@@ -213,9 +183,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain(
-            `The 'module' field in your package.json should not use a '.cjs' extension`,
-        );
+        expect(binProcess.stdout).toContain(`The 'module' field in your package.json should not use a '.cjs' extension`);
         expect(binProcess.stdout).toContain(`for ES modules.`);
         expect(binProcess.exitCode).toBe(1);
     });

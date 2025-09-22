@@ -86,9 +86,7 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
                         const exported = output[0]?.exports ?? [];
 
                         return {
-                            contents: exported.length > 0
-                                ? `export * from '${slash(absolute)}'`
-                                : `module.exports = require('${slash(absolute)}')`,
+                            contents: exported.length > 0 ? `export * from '${slash(absolute)}'` : `module.exports = require('${slash(absolute)}')`,
                             resolveDir,
                         };
                     });

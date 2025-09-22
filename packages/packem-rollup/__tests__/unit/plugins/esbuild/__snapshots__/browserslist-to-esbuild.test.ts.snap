@@ -2,13 +2,13 @@
 
 exports[`browserslist-to-esbuild > should no support android 4 1`] = `
 [
-  "chrome138",
+  "chrome139",
 ]
 `;
 
 exports[`browserslist-to-esbuild > should work with android and ios 1`] = `
 [
-  "chrome138",
+  "chrome139",
   "ios11",
 ]
 `;
@@ -21,22 +21,23 @@ exports[`browserslist-to-esbuild > should work with ios 1`] = `
 
 exports[`browserslist-to-esbuild > works by passing browsers as array 1`] = `
 [
-  "chrome109",
-  "edge137",
-  "firefox140",
+  "chrome105",
+  "edge138",
+  "firefox141",
   "ios11",
+  "opera120",
   "safari18.5",
 ]
 `;
 
 exports[`browserslist-to-esbuild > works by passing browsers as string 1`] = `
 [
-  "chrome138",
-  "edge137",
-  "firefox140",
+  "chrome139",
+  "edge139",
+  "firefox141",
   "ie10",
-  "ios18.4",
-  "opera116",
-  "safari18.4",
+  "ios18.5",
+  "opera120",
+  "safari18.5",
 ]
 `;

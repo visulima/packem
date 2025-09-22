@@ -2,10 +2,10 @@
 //#region tests/rollup-plugin-dts/issue-254/foo.d.ts
 declare enum E {}
 interface Foo {
-  e: E;
+    e: E;
 }
 declare namespace Bar {
-  export enum F {}
+    export enum F {}
 }
 //#endregion
 export { Bar, Foo };

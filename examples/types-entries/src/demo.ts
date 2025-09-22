@@ -1,7 +1,3 @@
-export interface InterfaceA {
+export interface InterfaceA {}
 
-}
-
-export interface InterfaceB {
-
-}
+export interface InterfaceB {}

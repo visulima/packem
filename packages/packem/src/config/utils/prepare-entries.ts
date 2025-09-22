@@ -8,23 +8,16 @@ import { globSync, isDynamicPattern } from "tinyglobby";
 
 import type { BuildEntry, InternalBuildOptions } from "../../types";
 
-const extendEntry = async (
-    entry: BuildEntry,
-    context: BuildContext<InternalBuildOptions>,
-): Promise<void> => {
+const extendEntry = async (entry: BuildEntry, context: BuildContext<InternalBuildOptions>): Promise<void> => {
     if (typeof entry.name !== "string") {
-        let relativeInput = isAbsolute(entry.input)
-            ? relative(context.options.rootDir, entry.input)
-            : normalize(entry.input);
+        let relativeInput = isAbsolute(entry.input) ? relative(context.options.rootDir, entry.input) : normalize(entry.input);
 
         if (relativeInput.startsWith("./")) {
             relativeInput = relativeInput.slice(2);
         }
 
         // eslint-disable-next-line no-param-reassign
-        entry.name = relativeInput
-            .replace(new RegExp(`^${context.options.sourceDir}/`), "")
-            .replace(ENDING_REGEX, "");
+        entry.name = relativeInput.replace(new RegExp(`^${context.options.sourceDir}/`), "").replace(ENDING_REGEX, "");
     }
 
     if (!entry.input) {
@@ -42,24 +35,13 @@ const extendEntry = async (
     }
 
     // @TODO: improve this logic
-    if (
-        entry.executable
-        && (entry.cjs === undefined || entry.esm === undefined)
-    ) {
-        if (
-            context.pkg.type === "commonjs"
-            && entry.cjs === undefined
-            && context.options.emitCJS !== undefined
-        ) {
+    if (entry.executable && (entry.cjs === undefined || entry.esm === undefined)) {
+        if (context.pkg.type === "commonjs" && entry.cjs === undefined && context.options.emitCJS !== undefined) {
             // eslint-disable-next-line no-param-reassign
             entry.cjs = context.options.emitCJS;
             // eslint-disable-next-line no-param-reassign
             entry.esm = false;
-        } else if (
-            context.pkg.type === "module"
-            && entry.esm === undefined
-            && context.options.emitESM !== undefined
-        ) {
+        } else if (context.pkg.type === "module" && entry.esm === undefined && context.options.emitESM !== undefined) {
             // eslint-disable-next-line no-param-reassign
             entry.esm = context.options.emitESM;
             // eslint-disable-next-line no-param-reassign
@@ -78,15 +60,10 @@ const extendEntry = async (
     }
 
     // eslint-disable-next-line no-param-reassign
-    entry.outDir = resolve(
-        context.options.rootDir,
-        entry.outDir ?? context.options.outDir,
-    );
+    entry.outDir = resolve(context.options.rootDir, entry.outDir ?? context.options.outDir);
 };
 
-const prepareEntries = async (
-    context: BuildContext<InternalBuildOptions>,
-): Promise<void> => {
+const prepareEntries = async (context: BuildContext<InternalBuildOptions>): Promise<void> => {
     context.options.entries = context.options.entries.map((entry) =>
         (typeof entry === "string"
             ? { input: entry, isGlob: isDynamicPattern(entry) }
@@ -97,9 +74,7 @@ const prepareEntries = async (
             }),
     );
 
-    for (const entry of context.options.entries.filter(
-        (entry) => entry.isGlob,
-    )) {
+    for (const entry of context.options.entries.filter((entry) => entry.isGlob)) {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const { isGlob: _, ...entryWithoutGlob } = entry;
         const ignore = [
@@ -128,9 +103,7 @@ const prepareEntries = async (
         });
 
         if (files.length === 0) {
-            throw new NotFoundError(
-                `No files found in the glob pattern: ${cyan(join(context.options.rootDir, entryWithoutGlob.input))}`,
-            );
+            throw new NotFoundError(`No files found in the glob pattern: ${cyan(join(context.options.rootDir, entryWithoutGlob.input))}`);
         }
 
         for (const file of files) {
@@ -140,22 +113,15 @@ const prepareEntries = async (
             });
         }
 
-        context.options.entries.splice(
-            context.options.entries.indexOf(entry),
-            1,
-        );
+        context.options.entries.splice(context.options.entries.indexOf(entry), 1);
     }
 
-    for (const entry of context.options.entries.filter(
-        (entry) => entry.fileAlias === undefined,
-    )) {
+    for (const entry of context.options.entries.filter((entry) => entry.fileAlias === undefined)) {
         // eslint-disable-next-line no-await-in-loop
         await extendEntry(entry, context);
     }
 
-    for (const entry of context.options.entries.filter(
-        (entry) => entry.fileAlias !== undefined,
-    )) {
+    for (const entry of context.options.entries.filter((entry) => entry.fileAlias !== undefined)) {
         entry.name = entry.fileAlias;
         entry.fileAlias = undefined;
 

@@ -5,5 +5,4 @@
     "projectType": "library",
     "tags": ["css-style-inject", "type:package"],
     "implicitDependencies": ["!packem"]
-
 }

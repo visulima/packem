@@ -5,4 +5,5 @@ export type Toast = {
     title: string;
     type: "info" | "success" | "error" | "warning";
 };
+
 export const sharedValue = 1;

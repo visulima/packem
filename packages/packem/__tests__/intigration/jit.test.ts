@@ -7,13 +7,7 @@ import { resolvePath } from "mlly";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import {
-    createPackageJson,
-    createPackemConfig,
-    createTsConfig,
-    execPackem,
-    installPackage,
-} from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem build --jit", () => {
     let temporaryDirectoryPath: string;
@@ -31,10 +25,7 @@ describe("packem build --jit", () => {
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `export default () => 'index';`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default () => 'index';`);
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -64,9 +55,7 @@ describe("packem build --jit", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
         const jitiCJSPath = relative(
             join(temporaryDirectoryPath, "dist"),
 
@@ -76,8 +65,7 @@ describe("packem build --jit", () => {
             }),
         );
 
-        expect(cjsContent)
-            .toBe(`const { createJiti } = require("${jitiCJSPath}");
+        expect(cjsContent).toBe(`const { createJiti } = require("${jitiCJSPath}");
 
 const jiti = createJiti(__filename, {
   "alias": {},
@@ -92,17 +80,12 @@ const jiti = createJiti(__filename, {
 /** @type {import("${temporaryDirectoryPath}/src/index.d.cts")} */
 module.exports = jiti("${temporaryDirectoryPath}/src/index.ts")`);
 
-        const cDtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.d.cts`,
-        );
+        const cDtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(cDtsContent)
-            .toBe(`export * from "${temporaryDirectoryPath}/src/index.d.cts";
+        expect(cDtsContent).toBe(`export * from "${temporaryDirectoryPath}/src/index.d.cts";
 export { default } from "${temporaryDirectoryPath}/src/index.d.cts";`);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
         const jitiESMPath = relative(
             join(temporaryDirectoryPath, "dist"),
 
@@ -128,12 +111,9 @@ const jiti = createJiti(import.meta.url, {
 const _module = await jiti.import("${temporaryDirectoryPath}/src/index.ts");
 export default _module?.default ?? _module;`);
 
-        const mDtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.d.mts`,
-        );
+        const mDtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(mDtsContent)
-            .toBe(`export * from "${temporaryDirectoryPath}/src/index.d.mts";
+        expect(mDtsContent).toBe(`export * from "${temporaryDirectoryPath}/src/index.d.mts";
 export { default } from "${temporaryDirectoryPath}/src/index.d.mts";`);
     });
 
@@ -142,10 +122,7 @@ export { default } from "${temporaryDirectoryPath}/src/index.d.mts";`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `const foo = {};\n\nexport { foo as 'module.exports' };`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `const foo = {};\n\nexport { foo as 'module.exports' };`);
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -175,9 +152,7 @@ export { default } from "${temporaryDirectoryPath}/src/index.d.mts";`);
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
         const jitiCJSPath = relative(
             join(temporaryDirectoryPath, "dist"),
 
@@ -187,8 +162,7 @@ export { default } from "${temporaryDirectoryPath}/src/index.d.mts";`);
             }),
         );
 
-        expect(cjsContent)
-            .toBe(`const { createJiti } = require("${jitiCJSPath}");
+        expect(cjsContent).toBe(`const { createJiti } = require("${jitiCJSPath}");
 
 const jiti = createJiti(__filename, {
   "alias": {},
@@ -203,17 +177,12 @@ const jiti = createJiti(__filename, {
 /** @type {import("${temporaryDirectoryPath}/src/index.d.cts")} */
 module.exports = jiti("${temporaryDirectoryPath}/src/index.ts")`);
 
-        const cDtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.d.cts`,
-        );
+        const cDtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(cDtsContent)
-            .toBe(`export * from "${temporaryDirectoryPath}/src/index.d.cts";
+        expect(cDtsContent).toBe(`export * from "${temporaryDirectoryPath}/src/index.d.cts";
 `);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
         const jitiESMPath = relative(
             join(temporaryDirectoryPath, "dist"),
 
@@ -240,12 +209,9 @@ const _module = await jiti.import("${temporaryDirectoryPath}/src/index.ts");
 const __packem_export_0 = _module['module.exports'];
 export { __packem_export_0 as "'module.exports'" };`);
 
-        const mDtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.d.mts`,
-        );
+        const mDtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(mDtsContent)
-            .toBe(`export * from "${temporaryDirectoryPath}/src/index.d.mts";
+        expect(mDtsContent).toBe(`export * from "${temporaryDirectoryPath}/src/index.d.mts";
 `);
     });
 
@@ -254,10 +220,7 @@ export { __packem_export_0 as "'module.exports'" };`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `const foo = { test: 'value' };\n\nexport { foo as 'module.exports' };`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `const foo = { test: 'value' };\n\nexport { foo as 'module.exports' };`);
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -300,10 +263,7 @@ export { __packem_export_0 as "'module.exports'" };`);
                 cwd: temporaryDirectoryPath,
                 encoding: "utf8",
             });
-            const cjsResult = JSON.parse(cjsOutput.trim()) as Record<
-                string,
-                unknown
-            >;
+            const cjsResult = JSON.parse(cjsOutput.trim()) as Record<string, unknown>;
 
             expect(cjsResult["module.exports"]).toStrictEqual({
                 test: "value",
@@ -325,10 +285,7 @@ export { __packem_export_0 as "'module.exports'" };`);
                 cwd: temporaryDirectoryPath,
                 encoding: "utf8",
             });
-            const mjsResult = JSON.parse(mjsOutput.trim()) as Record<
-                string,
-                unknown
-            >;
+            const mjsResult = JSON.parse(mjsOutput.trim()) as Record<string, unknown>;
 
             expect(mjsResult["module.exports"]).toStrictEqual({
                 test: "value",

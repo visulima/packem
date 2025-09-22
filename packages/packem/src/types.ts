@@ -1,18 +1,6 @@
-import type {
-    IsolatedDeclarationsTransformer,
-    PackemRollupOptions,
-    TransformerFn,
-    TransformerName,
-} from "@visulima/packem-rollup";
+import type { IsolatedDeclarationsTransformer, PackemRollupOptions, TransformerFn, TransformerName } from "@visulima/packem-rollup";
 import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
-import type {
-    BuildContext,
-    BuildHooks,
-    Environment,
-    Format,
-    Mode,
-    Runtime,
-} from "@visulima/packem-share/types";
+import type { BuildContext, BuildHooks, Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
 import type { FileCache } from "@visulima/packem-share/utils";
 import type { StyleOptions } from "@visulima/rollup-plugin-css";
 import type { JitiOptions } from "jiti";
@@ -28,8 +16,7 @@ type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
  * In addition to basic `entries`, `presets`, and `hooks`,
  * there are also all the properties of `BuildOptions` except for BuildOption's `entries`.
  */
-export interface BuildConfig
-    extends DeepPartial<Omit<BuildOptions, "entries">> {
+export interface BuildConfig extends DeepPartial<Omit<BuildOptions, "entries">> {
     entries?: (BuildEntry | string)[];
     hooks?: Partial<BuildHooks<InternalBuildOptions>>;
     preset?: BuildPreset | "auto" | "none" | (NonNullable<unknown> & string);
@@ -45,10 +32,7 @@ export type BuildPreset = BuildConfig | (() => BuildConfig);
  * @returns Build configuration object or Promise resolving to one
  * @public
  */
-export type BuildConfigFunction = (
-    environment: Environment,
-    mode: Mode,
-) => BuildConfig | Promise<BuildConfig>;
+export type BuildConfigFunction = (environment: Environment, mode: Mode) => BuildConfig | Promise<BuildConfig>;
 
 export type BuildEntry = {
     /** Whether to generate CommonJS output for this entry */
@@ -92,15 +76,7 @@ export interface BuildOptions {
     /** Browser targets for transpilation (e.g., ['chrome 58', 'firefox 57']) */
     browserTargets?: string[];
     /** Custom builder functions for different build types */
-    builder?: Record<
-        string,
-        (
-            context: BuildContext<BuildOptions>,
-            cachePath: string | undefined,
-            fileCache: FileCache,
-            logged: boolean,
-        ) => Promise<void>
-    >;
+    builder?: Record<string, (context: BuildContext<BuildOptions>, cachePath: string | undefined, fileCache: FileCache, logged: boolean) => Promise<void>>;
     /** Whether to enable CommonJS interop for ESM modules */
     cjsInterop?: boolean;
     /** Whether to clean the output directory before building */
@@ -170,9 +146,7 @@ export interface BuildOptions {
     node10Compatibility?: Node10CompatibilityOptions | false;
     /** Command to run or function to execute after successful build */
 
-    onSuccess?:
-        | string
-        | (() => Promise<(() => Promise<void> | void) | undefined | void>);
+    onSuccess?: string | (() => Promise<(() => Promise<void> | void) | undefined | void>);
     /** Timeout for the onSuccess command in milliseconds */
     onSuccessTimeout?: number;
     /** Output directory for build artifacts */
@@ -224,16 +198,7 @@ export type RollupPlugins = {
     type?: "build" | "dts";
 }[];
 
-export type TypeDocumentOptions = Partial<
-    Omit<
-        BaseTypeDocumentOptions,
-        | "entryPoints"
-        | "hideGenerator"
-        | "out"
-        | "preserveWatchOutput"
-        | "watch"
-    >
-> & {
+export type TypeDocumentOptions = Partial<Omit<BaseTypeDocumentOptions, "entryPoints" | "hideGenerator" | "out" | "preserveWatchOutput" | "watch">> & {
     /**
      * The format of the output.
      * @default "html"
@@ -277,10 +242,7 @@ export type ValidationOptions = {
          */
         limit?: number | `${number}${"B" | "GB" | "KB" | "MB" | "TB"}`;
         /** Size limits for specific files or globs */
-        limits?: Record<
-            string,
-            number | `${number}${"B" | "GB" | "KB" | "MB" | "TB"}`
-        >;
+        limits?: Record<string, number | `${number}${"B" | "GB" | "KB" | "MB" | "TB"}`>;
     };
     /** Dependency validation options */
     dependencies:
@@ -325,10 +287,5 @@ export type ValidationOptions = {
     };
 };
 
-export type {
-    Environment,
-    Format,
-    Mode,
-    Runtime,
-} from "@visulima/packem-share/types";
+export type { Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
 export type { InjectOptions, StyleOptions } from "@visulima/rollup-plugin-css";

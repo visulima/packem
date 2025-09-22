@@ -3,10 +3,7 @@ import type { Alias } from "@visulima/packem-rollup";
 
 import type { InternalBuildOptions } from "../../types";
 
-const resolveAliases = (
-    packageJson: PackageJson,
-    options: InternalBuildOptions,
-): Record<string, string> => {
+const resolveAliases = (packageJson: PackageJson, options: InternalBuildOptions): Record<string, string> => {
     let aliases: Record<string, string> = {};
 
     if (packageJson.name) {
@@ -20,19 +17,9 @@ const resolveAliases = (
 
     if (options.rollup.alias) {
         if (Array.isArray(options.rollup.alias.entries)) {
-            Object.assign(
-                aliases,
-                Object.fromEntries(
-                    (options.rollup.alias.entries as Alias[]).map(
-                        (entry: Alias) => [entry.find, entry.replacement],
-                    ),
-                ),
-            );
+            Object.assign(aliases, Object.fromEntries((options.rollup.alias.entries as Alias[]).map((entry: Alias) => [entry.find, entry.replacement])));
         } else {
-            Object.assign(
-                aliases,
-                options.rollup.alias.entries ?? options.rollup.alias,
-            );
+            Object.assign(aliases, options.rollup.alias.entries ?? options.rollup.alias);
         }
     }
 

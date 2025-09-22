@@ -73,26 +73,11 @@ export function foo() {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        await expect(
-            getFileNamesFromDirectory(`${temporaryDirectoryPath}/dist`),
-        ).resolves.toStrictEqual([
-            "foo.cjs",
-            "foo.mjs",
-            "index.cjs",
-            "index.mjs",
-        ]);
+        await expect(getFileNamesFromDirectory(`${temporaryDirectoryPath}/dist`)).resolves.toStrictEqual(["foo.cjs", "foo.mjs", "index.cjs", "index.mjs"]);
 
-        expect(
-            readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`),
-        ).toMatchSnapshot("mjs");
-        expect(
-            readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`),
-        ).toMatchSnapshot("cjs");
-        expect(
-            readFileSync(`${temporaryDirectoryPath}/dist/foo.mjs`),
-        ).toMatchSnapshot("foo.mjs");
-        expect(
-            readFileSync(`${temporaryDirectoryPath}/dist/foo.cjs`),
-        ).toMatchSnapshot("foo.cjs");
+        expect(readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toMatchSnapshot("mjs");
+        expect(readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`)).toMatchSnapshot("cjs");
+        expect(readFileSync(`${temporaryDirectoryPath}/dist/foo.mjs`)).toMatchSnapshot("foo.mjs");
+        expect(readFileSync(`${temporaryDirectoryPath}/dist/foo.cjs`)).toMatchSnapshot("foo.cjs");
     });
 });

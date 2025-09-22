@@ -2,7 +2,7 @@
 //#region tests/rollup-plugin-dts/type-index/index.d.ts
 interface A {}
 declare type Foo = {
-  [k: string]: A;
+    [k: string]: A;
 };
 //#endregion
 export { Foo };

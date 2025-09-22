@@ -1,5 +1,5 @@
 export interface Cache {
-  destroy: () => void;
+    destroy: () => void;
 }
 export declare const uniqueId: (prefix?: string) => string;
 export declare const Cache: () => Cache;

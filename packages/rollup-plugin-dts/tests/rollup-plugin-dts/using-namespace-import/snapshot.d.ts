@@ -4,7 +4,7 @@ interface Bar {}
 //#endregion
 //#region tests/rollup-plugin-dts/using-namespace-import/index.d.ts
 interface Foo {
-  bar: Bar;
+    bar: Bar;
 }
 //#endregion
 export { Foo };

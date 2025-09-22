@@ -1,3 +1,3 @@
 export declare const depth: {
-  [-24]: string;
+    [-24]: string;
 };

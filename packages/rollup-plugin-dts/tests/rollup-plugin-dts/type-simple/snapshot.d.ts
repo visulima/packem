@@ -14,7 +14,7 @@ declare const K: undefined;
 declare const L: symbol;
 declare const M: never;
 interface N {
-  foo(): this;
+    foo(): this;
 }
 declare const O: bigint;
 //#endregion

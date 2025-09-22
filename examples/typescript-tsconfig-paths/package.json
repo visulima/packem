@@ -12,7 +12,7 @@
     },
     "devDependencies": {
         "@visulima/packem": "workspace:*",
-        "esbuild": "^0.25.9",
+        "esbuild": "^0.25.10",
         "typescript": "^5.9.2"
     },
     "engines": {
