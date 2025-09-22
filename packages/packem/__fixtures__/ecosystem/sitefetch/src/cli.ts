@@ -42,22 +42,12 @@ cli.command("[url]", "Fetch a site")
 
         const pagesArr = [...pages.values()];
 
-        const totalTokenCount = pagesArr.reduce(
-            (acc, page) => acc + encode(page.content).length,
-            0,
-        );
+        const totalTokenCount = pagesArr.reduce((acc, page) => acc + encode(page.content).length, 0);
 
-        logger.info(
-            `Total token count for ${pages.size} pages: ${formatNumber(
-                totalTokenCount,
-            )}`,
-        );
+        logger.info(`Total token count for ${pages.size} pages: ${formatNumber(totalTokenCount)}`);
 
         if (flags.outfile) {
-            const output = serializePages(
-                pages,
-                flags.outfile.endsWith(".json") ? "json" : "text",
-            );
+            const output = serializePages(pages, flags.outfile.endsWith(".json") ? "json" : "text");
             fs.mkdirSync(path.dirname(flags.outfile), { recursive: true });
             fs.writeFileSync(flags.outfile, output, "utf8");
         } else {

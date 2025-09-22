@@ -1,3 +1,3 @@
 export interface Foo {
-  bar: import("./bar").Bar<number>;
+    bar: import("./bar").Bar<number>;
 }

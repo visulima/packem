@@ -15,8 +15,8 @@ export default defineConfig({
         dependencies: {
             unused: {
                 // TODO: remove this, currently the type process dont provide the info for the validation
-                exclude: ["@visulima/package", "@visulima/pail"]
-            }
-        }
-    }
+                exclude: ["@visulima/package", "@visulima/pail"],
+            },
+        },
+    },
 }) as BuildConfig;

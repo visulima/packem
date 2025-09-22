@@ -50,6 +50,7 @@ pnpm add @visulima/packem-share
 The package provides multiple import patterns for maximum flexibility:
 
 ### Direct Named Imports
+
 ```typescript
 import { arrayify, getHash, FileCache, Environment, Mode } from "@visulima/packem-share";
 
@@ -60,6 +61,7 @@ const cache = new FileCache("/path", "/cache", "key", logger);
 ```
 
 ### Module-based Imports
+
 ```typescript
 import { constants, types, utils } from "@visulima/packem-share";
 
@@ -70,6 +72,7 @@ const normalized = utils.arrayify([1, 2, 3]);
 ```
 
 ### Namespace Imports
+
 ```typescript
 import * as PackemShare from "@visulima/packem-share";
 
@@ -79,6 +82,7 @@ const hash = PackemShare.getHash("content");
 ```
 
 ### Individual Module Imports
+
 ```typescript
 import * as constants from "@visulima/packem-share/constants";
 import * as types from "@visulima/packem-share/types";
@@ -96,18 +100,18 @@ const normalized = utils.arrayify("value");
 Core constants used throughout the Packem ecosystem:
 
 ```typescript
-import { 
-  DEFAULT_EXTENSIONS,
-  DEFAULT_LOADERS,
-  PRODUCTION_ENV,
-  DEVELOPMENT_ENV,
-  RUNTIME_EXPORT_CONVENTIONS,
-  SPECIAL_EXPORT_CONVENTIONS,
-  EXCLUDE_REGEXP,
-  ENDING_REGEX,
-  CHUNKS_PACKEM_FOLDER,
-  SHARED_PACKEM_FOLDER,
-  ALLOWED_TRANSFORM_EXTENSIONS_REGEX
+import {
+    DEFAULT_EXTENSIONS,
+    DEFAULT_LOADERS,
+    PRODUCTION_ENV,
+    DEVELOPMENT_ENV,
+    RUNTIME_EXPORT_CONVENTIONS,
+    SPECIAL_EXPORT_CONVENTIONS,
+    EXCLUDE_REGEXP,
+    ENDING_REGEX,
+    CHUNKS_PACKEM_FOLDER,
+    SHARED_PACKEM_FOLDER,
+    ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
 } from "@visulima/packem-share";
 ```
 
@@ -127,26 +131,23 @@ type Runtime = "browser" | "bun" | "deno" | "edge-light" | "electron" | "node" |
 ### Utilities
 
 #### Array Utilities
+
 ```typescript
 import { arrayify, arrayIncludes } from "@visulima/packem-share";
 
 // Convert single values to arrays
-arrayify("single") // ["single"]
-arrayify(["already", "array"]) // ["already", "array"]
-arrayify(null) // []
+arrayify("single"); // ["single"]
+arrayify(["already", "array"]); // ["already", "array"]
+arrayify(null); // []
 
 // Array search with RegExp support
-arrayIncludes(["test.js", "test.ts"], /\.ts$/) // true
+arrayIncludes(["test.js", "test.ts"], /\.ts$/); // true
 ```
 
 #### File System Utilities
+
 ```typescript
-import { 
-  FileCache, 
-  getChunkFilename, 
-  getEntryFileNames,
-  getHash 
-} from "@visulima/packem-share";
+import { FileCache, getChunkFilename, getEntryFileNames, getHash } from "@visulima/packem-share";
 
 // File caching
 const cache = new FileCache(cwd, cachePath, hashKey, logger);
@@ -162,20 +163,13 @@ const hash = getHash("file content");
 ```
 
 #### String and Content Utilities
+
 ```typescript
-import { 
-  getPackageName,
-  getRegexMatches,
-  replaceContentWithinMarker,
-  svgEncoder,
-  svgToCssDataUri,
-  svgToTinyDataUri,
-  warn
-} from "@visulima/packem-share";
+import { getPackageName, getRegexMatches, replaceContentWithinMarker, svgEncoder, svgToCssDataUri, svgToTinyDataUri, warn } from "@visulima/packem-share";
 
 // Package name extraction
-getPackageName("@scope/package/path") // "@scope/package"
-getPackageName("package/path") // "package"
+getPackageName("@scope/package/path"); // "@scope/package"
+getPackageName("package/path"); // "package"
 
 // Regex utilities
 const matches = getRegexMatches(/pattern/g, "text");
@@ -193,6 +187,7 @@ warn(logger, "Warning message", "prefix");
 ```
 
 #### Performance Utilities
+
 ```typescript
 import { memoize, memoizeByKey } from "@visulima/packem-share";
 
@@ -202,11 +197,9 @@ const keyMemoized = memoizeByKey(expensiveFunction)("cache-key");
 ```
 
 #### Build System Utilities
+
 ```typescript
-import { 
-  enhanceRollupError,
-  sortUserPlugins 
-} from "@visulima/packem-share";
+import { enhanceRollupError, sortUserPlugins } from "@visulima/packem-share";
 
 // Error enhancement
 const enhanced = enhanceRollupError(error, context);
@@ -248,8 +241,8 @@ If you would like to help take a look at the [list of issues](https://github.com
 
 ## Credits
 
--   [Daniel Bannert](https://github.com/prisis)
--   [All Contributors](https://github.com/visulima/packem/graphs/contributors)
+- [Daniel Bannert](https://github.com/prisis)
+- [All Contributors](https://github.com/visulima/packem/graphs/contributors)
 
 ## License
 

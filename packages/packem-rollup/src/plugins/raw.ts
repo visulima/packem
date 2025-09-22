@@ -20,9 +20,7 @@ export const rawPlugin = (options: RawLoaderOptions): Plugin => {
                     const content = await readFile(cleanId);
 
                     // Normalize line endings only on Windows: convert \r\n to \n
-                    return process.platform === "win32"
-                        ? content.replaceAll("\r\n", "\n")
-                        : content;
+                    return process.platform === "win32" ? content.replaceAll("\r\n", "\n") : content;
                 } catch {
                     this.error(`Failed to read file: ${cleanId}`);
                 }
@@ -40,8 +38,7 @@ export const rawPlugin = (options: RawLoaderOptions): Plugin => {
 
             if (filter(cleanId) || isRawQuery) {
                 // Normalize line endings only on Windows for .txt and .data files
-                const normalizedCode
-                    = process.platform === "win32" ? code.replaceAll("\r\n", "\n") : code;
+                const normalizedCode = process.platform === "win32" ? code.replaceAll("\r\n", "\n") : code;
 
                 return {
                     code: `const data = ${JSON.stringify(normalizedCode)};\nexport default data;`,

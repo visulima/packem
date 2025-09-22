@@ -1,7 +1,7 @@
 export interface MyInterface {
-  a: string;
+    a: string;
 }
 
 export namespace MyInterface {
-  export const b: string;
+    export const b: string;
 }

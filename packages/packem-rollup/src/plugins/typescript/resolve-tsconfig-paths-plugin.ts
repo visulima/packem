@@ -16,7 +16,7 @@ interface Pattern {
     suffix: string;
 }
 
-const asterisk = 0x2A;
+const asterisk = 0x2a;
 
 const hasZeroOrOneAsteriskCharacter = (string_: string): boolean => {
     let seenAsterisk = false;

@@ -5,15 +5,15 @@ type MyExclude<T, U> = T extends U ? never : T;
 //#endregion
 //#region tests/rollup-plugin-dts/remapped-mapped-types/index.d.ts
 interface Person {
-  name: string;
-  age: number;
-  location: string;
+    name: string;
+    age: number;
+    location: string;
 }
 type LazyPerson = Getters<Person>;
 type RemoveKindField<T> = { [K in keyof T as MyExclude<K, "kind">]: T[K] };
 interface Circle {
-  kind: "circle";
-  radius: number;
+    kind: "circle";
+    radius: number;
 }
 type KindlessCircle = RemoveKindField<Circle>;
 //#endregion

@@ -23,13 +23,13 @@ Add the plugin to your `rolldown.config.js`:
 
 ```js
 // rolldown.config.js
-import { dts } from 'rolldown-plugin-dts'
+import { dts } from "rolldown-plugin-dts";
 
 export default {
-  input: './src/index.ts',
-  plugins: [dts()],
-  output: [{ dir: 'dist', format: 'es' }],
-}
+    input: "./src/index.ts",
+    plugins: [dts()],
+    output: [{ dir: "dist", format: "es" }],
+};
 ```
 
 You can find an example in [here](./rolldown.config.ts).
@@ -150,8 +150,8 @@ guaranteeing that all type definitions are generated from scratch.
 `invalidateContextFile` API can be used to clear invalidated files from the context.
 
 ```ts
-import { globalContext, invalidateContextFile } from 'rolldown-plugin-dts/tsc'
-invalidateContextFile(globalContext, 'src/foo.ts')
+import { globalContext, invalidateContextFile } from "rolldown-plugin-dts/tsc";
+invalidateContextFile(globalContext, "src/foo.ts");
 ```
 
 #### `emitJs`

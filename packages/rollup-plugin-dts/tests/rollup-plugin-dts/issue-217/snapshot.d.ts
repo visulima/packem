@@ -1,9 +1,9 @@
 // index.d.ts
 declare namespace example_d_exports {
-  export { Example, dog };
+    export { Example, dog };
 }
 interface Example<S extends string> {
-  example: S;
+    example: S;
 }
 declare const dog: Example<"hi">;
 //#endregion

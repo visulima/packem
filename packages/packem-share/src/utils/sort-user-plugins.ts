@@ -6,7 +6,10 @@ import type { Plugin } from "rollup";
  * @param type The build type to filter plugins for ("build" or "dts")
  * @returns A tuple containing [prePlugins, normalPlugins, postPlugins] arrays
  */
-const sortUserPlugins = <T extends { enforce?: "pre" | "post"; plugin: Plugin; type?: string }>(plugins: T[] | undefined, type: "build" | "dts"): [Plugin[], Plugin[], Plugin[]] => {
+const sortUserPlugins = <T extends { enforce?: "pre" | "post"; plugin: Plugin; type?: string }>(
+    plugins: T[] | undefined,
+    type: "build" | "dts",
+): [Plugin[], Plugin[], Plugin[]] => {
     const prePlugins: Plugin[] = [];
     const postPlugins: Plugin[] = [];
     const normalPlugins: Plugin[] = [];

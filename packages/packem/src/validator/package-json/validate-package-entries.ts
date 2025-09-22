@@ -9,9 +9,7 @@ import type { InternalBuildOptions, ValidationOptions } from "../../types";
 import { extractExportFilenames } from "../../utils/extract-export-filenames";
 import levenstein from "../../utils/find-alternatives";
 
-const validatePackageEntries = (
-    context: BuildContext<InternalBuildOptions>,
-): void => {
+const validatePackageEntries = (context: BuildContext<InternalBuildOptions>): void => {
     const { options } = context;
     const validation = options.validation as ValidationOptions;
 
@@ -33,25 +31,13 @@ const validatePackageEntries = (
 
     const filenames = new Set(
         [
-            options.declaration && validation.packageJson?.types
-                ? context.pkg.types
-                : "",
-            options.declaration && validation.packageJson?.types
-                ? context.pkg.typings
-                : "",
+            options.declaration && validation.packageJson?.types ? context.pkg.types : "",
+            options.declaration && validation.packageJson?.types ? context.pkg.typings : "",
             ...bin,
-            options.dtsOnly && validation.packageJson?.main === false
-                ? ""
-                : context.pkg.main,
-            options.dtsOnly && validation.packageJson?.module === false
-                ? ""
-                : context.pkg.module,
+            options.dtsOnly && validation.packageJson?.main === false ? "" : context.pkg.main,
+            options.dtsOnly && validation.packageJson?.module === false ? "" : context.pkg.module,
             ...validation.packageJson?.exports
-                ? extractExportFilenames(
-                    context.pkg.exports,
-                    packageType,
-                    options.declaration,
-                ).map((outputDescriptor) => {
+                ? extractExportFilenames(context.pkg.exports, packageType, options.declaration).map((outputDescriptor) => {
                     if (options.dtsOnly) {
                         if (outputDescriptor.subKey === "types") {
                             return outputDescriptor.file;
@@ -71,10 +57,7 @@ const validatePackageEntries = (
                     && resolve(
                         options.rootDir,
 
-                        index.replace(
-                            /\/[^*/]*\*[^\n\r/\u2028\u2029]*(?:[\n\r\u2028\u2029][^*/]*\*[^\n\r/\u2028\u2029]*)*(?:\/.*)?$/,
-                            "",
-                        ),
+                        index.replace(/\/[^*/]*\*[^\n\r/\u2028\u2029]*(?:[\n\r\u2028\u2029][^*/]*\*[^\n\r/\u2028\u2029]*)*(?:\/.*)?$/, ""),
                     ),
             ),
     );
@@ -87,21 +70,15 @@ const validatePackageEntries = (
         }
     }
 
-    const rPath = (p: string) =>
-        relative(options.rootDir, resolve(options.outDir, p));
+    const rPath = (p: string) => relative(options.rootDir, resolve(options.outDir, p));
 
-    const listOfGeneratedFiles = context.buildEntries
-        .filter((bEntry) => !bEntry.chunk)
-        .map((bEntry) => rPath(bEntry.path));
+    const listOfGeneratedFiles = context.buildEntries.filter((bEntry) => !bEntry.chunk).map((bEntry) => rPath(bEntry.path));
 
     if (missingOutputs.length > 0) {
         let message = "Potential missing or wrong package.json files:";
 
         for (const missingOutput of missingOutputs) {
-            const levensteinOutput = levenstein(
-                missingOutput,
-                listOfGeneratedFiles,
-            );
+            const levensteinOutput = levenstein(missingOutput, listOfGeneratedFiles);
 
             message += `\n  - ${cyan(
                 missingOutput,

@@ -6,15 +6,20 @@ const REGEX = {
 
 const specialHexEncode = (match: string): string => {
     switch (match) {
-        case "%2F": { return "/";
+        case "%2F": {
+            return "/";
         }
-        case "%3A": { return ":";
+        case "%3A": {
+            return ":";
         }
-        case "%3D": { return "=";
+        case "%3D": {
+            return "=";
         }
-        case "%20": { return " ";
+        case "%20": {
+            return " ";
         }
-        default: { return match.toLowerCase();
+        default: {
+            return match.toLowerCase();
         }
     }
 };

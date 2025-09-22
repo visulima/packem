@@ -4,13 +4,7 @@ import { readFile, writeFile } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import {
-    createPackageJson,
-    createPackemConfig,
-    createTsConfig,
-    execPackem,
-    installPackage,
-} from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem externals", () => {
     let temporaryDirectoryPath: string;
@@ -70,15 +64,11 @@ export default a + b
 
         expect(binProcess.stdout).not.toContain("Inlined implicit external");
 
-        const mjsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toMatchSnapshot("mjs output");
 
-        const cjsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
     });
@@ -123,33 +113,23 @@ export const indent = dIndent;
 
         expect(binProcess.stdout).toContain("Inlined implicit external");
 
-        const mjsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toMatchSnapshot("mjs output");
 
-        const cjsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
 
-        const dCtsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.d.cts`,
-        );
+        const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toMatchSnapshot("cjs dts output");
 
-        const dMtsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.d.mts`,
-        );
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toMatchSnapshot("mjs dts output");
 
-        const dContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.d.ts`,
-        );
+        const dContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dContent).toMatchSnapshot("dts output");
     });
@@ -201,33 +181,23 @@ export const indent = dIndent;
 
         expect(binProcess.stdout).not.toContain("Inlined implicit external");
 
-        const mjsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toMatchSnapshot("mjs output");
 
-        const cjsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
 
-        const dCtsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.d.cts`,
-        );
+        const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toMatchSnapshot("cjs dts output");
 
-        const dMtsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.d.mts`,
-        );
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toMatchSnapshot("mjs dts output");
 
-        const dContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.d.ts`,
-        );
+        const dContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dContent).toMatchSnapshot("dts output");
     });
@@ -277,33 +247,23 @@ export const transform = svgrTransform;
 
         expect(binProcess.stdout).not.toContain("Inlined implicit external");
 
-        const mjsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toMatchSnapshot("mjs output");
 
-        const cjsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("cjs output");
 
-        const dCtsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.d.cts`,
-        );
+        const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toMatchSnapshot("cjs dts output");
 
-        const dMtsContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.d.mts`,
-        );
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toMatchSnapshot("mjs dts output");
 
-        const dContent = await readFile(
-            `${temporaryDirectoryPath}/dist/index.d.ts`,
-        );
+        const dContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dContent).toMatchSnapshot("dts output");
     });

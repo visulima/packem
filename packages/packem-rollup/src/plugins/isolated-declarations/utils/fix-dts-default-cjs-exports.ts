@@ -57,14 +57,8 @@ interface ParsedExports {
  * @param options Plugin options, including the warning function.
  * @returns Parsed export information, or undefined if no default export is found or parsing fails.
  */
-const extractExports = (
-    code: string,
-    info: CodeInfo,
-    options: Options,
-): ParsedExports | undefined => {
-    const defaultExportCandidate = findExports(code).find((esmExport) =>
-        esmExport.names.includes("default"),
-    );
+const extractExports = (code: string, info: CodeInfo, options: Options): ParsedExports | undefined => {
+    const defaultExportCandidate = findExports(code).find((esmExport) => esmExport.names.includes("default"));
 
     // Check for `export default identifier;` which mlly doesn't pick up as a named export of 'default'
     const directDefaultMatch = code.match(/^export\s+default\s+(\w+);/m);
@@ -74,7 +68,8 @@ const extractExports = (
 
         return {
             defaultAlias: alias,
-            defaultExport: { // Mock an ESMExport-like structure
+            defaultExport: {
+                // Mock an ESMExport-like structure
                 code: directDefaultMatch[0], // Use the actual matched code here
                 end: directDefaultMatch.index === undefined ? undefined : directDefaultMatch.index + directDefaultMatch[0].length,
                 names: ["default"],
@@ -95,9 +90,7 @@ const extractExports = (
     const match = defaultExportCandidate.code.match(/export\s*\{([^}]*)\}/);
 
     if (!match?.length) {
-        options.warn?.(
-            `A default export was indicated in ${info.fileName}, but its structure could not be parsed.`,
-        );
+        options.warn?.(`A default export was indicated in ${info.fileName}, but its structure could not be parsed.`);
 
         return undefined;
     }
@@ -122,9 +115,7 @@ const extractExports = (
     }
 
     if (!defaultAlias) {
-        options.warn?.(
-            `A default export was indicated in ${info.fileName}, but its alias could not be determined from the export statement.`,
-        );
+        options.warn?.(`A default export was indicated in ${info.fileName}, but its alias could not be determined from the export statement.`);
 
         return undefined;
     }
@@ -168,7 +159,12 @@ interface Export {
 
 /** Oxc AST declaration node types that the plugin handles. */
 type Declaration
-    = import("oxc-parser").Class | import("oxc-parser").Function | import("oxc-parser").TSEnumDeclaration | import("oxc-parser").TSInterfaceDeclaration | import("oxc-parser").TSTypeAliasDeclaration | import("oxc-parser").VariableDeclaration;
+    = | import("oxc-parser").Class
+        | import("oxc-parser").Function
+        | import("oxc-parser").TSEnumDeclaration
+        | import("oxc-parser").TSInterfaceDeclaration
+        | import("oxc-parser").TSTypeAliasDeclaration
+        | import("oxc-parser").VariableDeclaration;
 
 /**
  * Prepares a declaration node by extracting its name and span, and adds it to the declarations map.
@@ -176,11 +172,7 @@ type Declaration
  * @param decl The AST declaration node to process.
  * @param unnamed A function to generate a unique name for unnamed declarations.
  */
-const prepareDeclaration = (
-    decls: Map<string, Decl>,
-    decl: Declaration,
-    unnamed: () => string,
-): void => {
+const prepareDeclaration = (decls: Map<string, Decl>, decl: Declaration, unnamed: () => string): void => {
     // VariableDeclaration
     if ("declarations" in decl && decl.declarations.length > 0) {
         const variableDeclarator = decl.declarations[0];
@@ -231,7 +223,7 @@ const createCjsNamespace = (
     transformedCode: string,
     info: CodeInfo,
     options: Options,
-// eslint-disable-next-line sonarjs/cognitive-complexity
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): string => {
     const parsed = parseSync(info.fileName, code, {
         astType: "ts",
@@ -301,7 +293,8 @@ const createCjsNamespace = (
     // Derive typeExports and valueExports from the parsed AST and exportsMap
     const localTypeExports: string[] = [];
 
-    if (defaultExport) { // Only populate if defaultExport is found, to avoid issues with pure type-only runs
+    if (defaultExport) {
+        // Only populate if defaultExport is found, to avoid issues with pure type-only runs
         for (const [name, exp] of exportsMap.entries()) {
             if (name === defaultExport.local) {
                 continue;
@@ -338,9 +331,7 @@ const createCjsNamespace = (
 
     const finalPreamble = transformedCode;
 
-    const ms = new MagicString(
-        `${finalPreamble}\ndeclare namespace ${defaultExport.local} {\n`,
-    );
+    const ms = new MagicString(`${finalPreamble}\ndeclare namespace ${defaultExport.local} {\n`);
 
     // write the declarations
     for (const [name, decl] of declarations.entries()) {
@@ -384,18 +375,17 @@ const createCjsNamespace = (
  * @param defaultImport The parsed static import corresponding to the default export, if it exists.
  * @returns The transformed code string, or undefined if transformation fails.
  */
-const handleDefaultCJSExportAsDefault = (
-    code: string,
-    parsedExportsInfo: ParsedExports,
-    defaultImport?: ParsedStaticImport,
-): string | undefined => {
+const handleDefaultCJSExportAsDefault = (code: string, parsedExportsInfo: ParsedExports, defaultImport?: ParsedStaticImport): string | undefined => {
     const { defaultExport, exports: exportList } = parsedExportsInfo;
 
     if (defaultImport) {
         // Logic for when defaultImport IS present
         let replacementCode = "";
 
-        replacementCode = exportList.length === 0 ? `export = ${defaultImport.defaultImport};` : `// @ts-ignore\nexport = ${defaultImport.defaultImport};\nexport { ${exportList.join(", ")} } from '${defaultExport.specifier}'`;
+        replacementCode
+            = exportList.length === 0
+                ? `export = ${defaultImport.defaultImport};`
+                : `// @ts-ignore\nexport = ${defaultImport.defaultImport};\nexport { ${exportList.join(", ")} } from '${defaultExport.specifier}'`;
 
         const codeWithoutOriginalExportSemi = code.replace(defaultExport.code.replace(/;$/, ""), replacementCode.replace(/;$/, ""));
 
@@ -473,10 +463,7 @@ const handleDefaultNamedCJSExport = (
             }
 
             const simplifiedOtherExports = `export { ${exportList.join(", ")} } from '${defaultExport.specifier}'`; // No semicolon here
-            const preambleForNamespace = new MagicString(code).replace(
-                defaultExport.code,
-                simplifiedOtherExports,
-            ).toString();
+            const preambleForNamespace = new MagicString(code).replace(defaultExport.code, simplifiedOtherExports).toString();
 
             return createCjsNamespace(
                 code, // Original code for AST parsing
@@ -486,9 +473,7 @@ const handleDefaultNamedCJSExport = (
             );
         }
 
-        options.warn?.(
-            `Cannot parse "${defaultAlias}" named export from ${defaultImport.specifier} import at ${info.fileName}!.`,
-        );
+        options.warn?.(`Cannot parse "${defaultAlias}" named export from ${defaultImport.specifier} import at ${info.fileName}!.`);
 
         return undefined;
     }
@@ -515,10 +500,12 @@ const handleDefaultNamedCJSExport = (
         // The default export (defaultAlias) will be handled by createCjsNamespace.
         const simplifiedOtherExports = `export { ${exportList.join(", ")} } from '${defaultExport.specifier}'`; // No semicolon here
 
-        const namespacePreamble = new MagicString(modifiedCode).replace(
-            defaultExport.code, // This is the original export pattern string
-            simplifiedOtherExports,
-        ).toString();
+        const namespacePreamble = new MagicString(modifiedCode)
+            .replace(
+                defaultExport.code, // This is the original export pattern string
+                simplifiedOtherExports,
+            )
+            .toString();
 
         return createCjsNamespace(
             code, // Original code for AST parsing (important for declaration finding)
@@ -562,13 +549,15 @@ const handleNoSpecifierDefaultCJSExport = (
     if (typeExports.length > 0) {
         let preamble = "";
 
-        if (defaultAlias) { // If there is a default (real or marker)
+        if (defaultAlias) {
+            // If there is a default (real or marker)
             preamble += `// @ts-ignore\n${defaultAlias};\n`;
         }
 
         preamble += `export type { ${typeExports.map((exp) => exp.replace(/^type\s+/, "").trim()).join(", ")} };\n`;
 
-        if (valueExports.length > 0) { // Only add value exports to preamble if a defaultAlias exists
+        if (valueExports.length > 0) {
+            // Only add value exports to preamble if a defaultAlias exists
             preamble += `export { ${valueExports.join(", ")} };\n`;
         }
 
@@ -629,7 +618,7 @@ const fixDtsDefaultCJSExports = (
     code: string,
     info: CodeInfo,
     options: Options,
-// eslint-disable-next-line sonarjs/cognitive-complexity
+    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): { code: string; map: SourceMapInput | undefined } | undefined => {
     const mllyMatch = code.match(MLLE_DEFAULT_FROM_RE);
 
@@ -648,9 +637,7 @@ const fixDtsDefaultCJSExports = (
         if (parsedExports.defaultExport.specifier) {
             const { specifier } = parsedExports.defaultExport;
             const allStaticImports: ParsedStaticImport[] = findStaticImports(code);
-            const parsedImports: ParsedStaticImport[] = allStaticImports
-                .filter((imp) => imp.imports)
-                .map((imp) => parseStaticImport(imp));
+            const parsedImports: ParsedStaticImport[] = allStaticImports.filter((imp) => imp.imports).map((imp) => parseStaticImport(imp));
             const defaultImport = parsedImports.find((index) => index.specifier === specifier);
 
             const { defaultAlias, defaultExport, exports: exportList } = parsedExports;
@@ -660,7 +647,13 @@ const fixDtsDefaultCJSExports = (
             if (defaultAlias === "default" && defaultExport.specifier && exportList.length > 0) {
                 // This input type should also go through the full handling to preserve other imports etc.
                 resultString = handleDefaultCJSExportAsDefault(code, parsedExports, defaultImport);
-            } else if (defaultAlias === "default" && defaultExport.specifier && exportList.length === 0 && defaultExportNodeExports && /\bas\s+default\b/.test(defaultExportNodeExports)) {
+            } else if (
+                defaultAlias === "default"
+                && defaultExport.specifier
+                && exportList.length === 0
+                && defaultExportNodeExports
+                && /\bas\s+default\b/.test(defaultExportNodeExports)
+            ) {
                 // Case 2: export { default as default } from 'some-module'; (Warning case)
                 if (parsedImports.find((imp) => imp.specifier === defaultExport.specifier)?.defaultImport) {
                     resultString = handleDefaultCJSExportAsDefault(code, parsedExports, defaultImport);
@@ -680,15 +673,19 @@ const fixDtsDefaultCJSExports = (
                 // eslint-disable-next-line no-secrets/no-secrets
                 // If handleDefaultNamedCJSExport warned and returned undefined because the specific named import was missing,
                 // we should honor that and not proceed to the general noSpecifier fallback.
-                const wasSpecificNamedExportWarning = defaultImport // An import for the module existed
-                    && parsedExports.defaultExport.specifier // It was a re-export
-                    && defaultAlias !== "default" // It was a named alias to default
-                    && (!defaultImport.namedImports || defaultImport.namedImports[defaultAlias] !== defaultAlias); // And the specific alias wasn't found in the import
+                const wasSpecificNamedExportWarning
+                    = defaultImport // An import for the module existed
+                        && parsedExports.defaultExport.specifier // It was a re-export
+                        && defaultAlias !== "default" // It was a named alias to default
+                        && (!defaultImport.namedImports || defaultImport.namedImports[defaultAlias] !== defaultAlias); // And the specific alias wasn't found in the import
 
                 if (resultString === undefined && wasSpecificNamedExportWarning) {
                     // Do nothing here. resultString is already undefined, and we want to propagate that.
                     // This prevents the generic fallback below from kicking in for this specific warning scenario.
-                } else if (resultString === undefined && !(defaultAlias === "default" && exportList.length === 0 && defaultExportNodeExports && /\bas\s+default\b/.test(defaultExportNodeExports))) {
+                } else if (
+                    resultString === undefined
+                    && !(defaultAlias === "default" && exportList.length === 0 && defaultExportNodeExports && /\bas\s+default\b/.test(defaultExportNodeExports))
+                ) {
                     // Fallback if none of the above specific specifier cases match, or if they returned undefined (and it wasn't the specific named export warning case).
                     // Avoid re-processing the explicit warning case that sets resultString to undefined.
                     const fallbackResult = handleNoSpecifierDefaultCJSExport(code, info, parsedExports, options);
@@ -714,7 +711,12 @@ const fixDtsDefaultCJSExports = (
     if (ast.program.body.length > 0) {
         const lastStatement = ast.program.body.at(-1);
 
-        if (lastStatement?.type === "ExportNamedDeclaration" && !lastStatement.declaration && lastStatement.specifiers.length > 0 && lastStatement.specifiers.every((s) => s.exportKind === "type")) {
+        if (
+            lastStatement?.type === "ExportNamedDeclaration"
+            && !lastStatement.declaration
+            && lastStatement.specifiers.length > 0
+            && lastStatement.specifiers.every((s) => s.exportKind === "type")
+        ) {
             isPureTypeExportBlock = true;
             typeExportNames = lastStatement.specifiers.map((s) => (s.local.type === "Identifier" ? s.local.name : "")).filter(Boolean);
         }

@@ -14,6 +14,6 @@ export default defineConfig({
             mode: "inject",
             loaders: [postcssLoader, stylusLoader, lessLoader, sassLoader, sourceMapLoader],
             minifier: cssnanoMinifier,
-        }
-    }
+        },
+    },
 });

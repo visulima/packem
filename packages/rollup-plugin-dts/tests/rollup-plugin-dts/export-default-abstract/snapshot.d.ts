@@ -7,9 +7,9 @@ interface TypeInfo {}
 //#endregion
 //#region tests/rollup-plugin-dts/export-default-abstract/index.d.ts
 declare abstract class MemberInfo {
-  abstract readonly name: string;
-  abstract readonly declaringType: TypeInfo;
-  abstract readonly memberType: MemberTypes;
+    abstract readonly name: string;
+    abstract readonly declaringType: TypeInfo;
+    abstract readonly memberType: MemberTypes;
 }
 //#endregion
 export { MemberInfo as default };

@@ -2,6 +2,6 @@ export interface ShowT {}
 export interface HideT {}
 
 export class SomeComponent {
-  show(): ShowT;
-  hide(): HideT;
+    show(): ShowT;
+    hide(): HideT;
 }

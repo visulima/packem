@@ -12,8 +12,8 @@ export default defineConfig({
         css: {
             mode: "extract",
             loaders: [postcssLoader, sourceMapLoader],
-            minifier: cssnanoMinifier
+            minifier: cssnanoMinifier,
         },
     },
-    declaration: "node16"
+    declaration: "node16",
 });

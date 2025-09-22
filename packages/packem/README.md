@@ -901,10 +901,7 @@ styles({
         },
     ],
     // ...or with custom injector
-    mode: [
-        "inject",
-        (varname, id) => `console.log(${varname},${JSON.stringify(id)})`,
-    ],
+    mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(id)})`],
 });
 ```
 

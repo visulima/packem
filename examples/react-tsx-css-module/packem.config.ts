@@ -15,5 +15,5 @@ export default defineConfig({
         },
     },
     minify: false,
-    declaration: "node16"
+    declaration: "node16",
 });

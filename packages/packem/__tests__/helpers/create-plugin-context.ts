@@ -1,12 +1,4 @@
-import type {
-    InputOptions,
-    NormalizedInputOptions,
-    NullValue,
-    Plugin,
-    PluginContextMeta,
-    ResolveIdResult,
-    RollupError,
-} from "rollup";
+import type { InputOptions, NormalizedInputOptions, NullValue, Plugin, PluginContextMeta, ResolveIdResult, RollupError } from "rollup";
 
 class MockPluginContext {
     public readonly warnings: string[];
@@ -30,9 +22,7 @@ class MockPluginContext {
 
         if (typeof options === "function") {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return options.call(this as any, option) as
-                | InputOptions
-                | NullValue;
+            return options.call(this as any, option) as InputOptions | NullValue;
         }
 
         throw new Error("Ooops");
@@ -55,10 +45,7 @@ class MockPluginContext {
         throw new Error("Ooops");
     }
 
-    public async resolveId(
-        specifier: string,
-        importer: string | undefined,
-    ): Promise<ResolveIdResult> {
+    public async resolveId(specifier: string, importer: string | undefined): Promise<ResolveIdResult> {
         let { resolveId } = this.oPlugin;
 
         if (typeof resolveId === "object") {
@@ -78,8 +65,7 @@ class MockPluginContext {
 
     // eslint-disable-next-line class-methods-use-this
     public error(error: RollupError | string): never {
-        const message: string
-            = typeof error === "string" ? error : error.message;
+        const message: string = typeof error === "string" ? error : error.message;
 
         throw new Error(message);
     }

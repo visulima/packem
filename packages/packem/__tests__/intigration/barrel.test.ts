@@ -28,10 +28,7 @@ describe("barrel", () => {
         // named-barrel
         await writeFile(source("named-barrel/a.js"), "export const a = 'a';\n");
         await writeFile(source("named-barrel/b.js"), "export const b = 'b';\n");
-        await writeFile(
-            source("named-barrel/index.js"),
-            "export { a as b } from './a';\nexport { b as c } from './b';\n",
-        );
+        await writeFile(source("named-barrel/index.js"), "export { a as b } from './a';\nexport { b as c } from './b';\n");
 
         // mixed-barrel
         await writeFile(source("mixed-barrel/a.js"), "export default 'a';\n");
@@ -46,22 +43,13 @@ describe("barrel", () => {
         await writeFile(source("star-barrel/a.js"), "export const a = 'a';\n");
         await writeFile(source("star-barrel/b.js"), "export const b = 'b';\n");
         await writeFile(source("star-barrel/c.js"), "export const c = 'c';\n");
-        await writeFile(
-            source("star-barrel/index.js"),
-            "export { c } from './c';\nexport * from './a';\nexport * from './b';\nexport const d = 'd';\n",
-        );
+        await writeFile(source("star-barrel/index.js"), "export { c } from './c';\nexport * from './a';\nexport * from './b';\nexport const d = 'd';\n");
 
         // nested-barrel
         await writeFile(source("nested-barrel/b.js"), "export const b = 'b';\n");
         await writeFile(source("nested-barrel/c.js"), "export const c = 'c';\n");
-        await writeFile(
-            source("nested-barrel/a.js"),
-            "import { b as a } from './b';\nexport { a };\nexport { c } from './c';\n",
-        );
-        await writeFile(
-            source("nested-barrel/index.js"),
-            "export { a } from './a';\nexport { c } from './c';\n",
-        );
+        await writeFile(source("nested-barrel/a.js"), "import { b as a } from './b';\nexport { a };\nexport { c } from './c';\n");
+        await writeFile(source("nested-barrel/index.js"), "export { a } from './a';\nexport { c } from './c';\n");
 
         // Entry that imports from barrels and exports a run function for assertions
         await writeFile(
@@ -99,15 +87,11 @@ describe("barrel", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toMatchSnapshot("ESM output");
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("CommonJS output");
     });
@@ -128,23 +112,13 @@ describe("barrel", () => {
         // barrel file (re-exports)
         await writeFile(
             source("components/index.js"),
-            [
-                "export { default as Foo } from './foo';",
-                "export { bar } from './bar';",
-                "export * from './baz';",
-                "",
-            ].join("\n"),
+            ["export { default as Foo } from './foo';", "export { bar } from './bar';", "export * from './baz';", ""].join("\n"),
         );
 
         // entry
         await writeFile(
             source("index.js"),
-            [
-                "import { Foo, bar, baz } from './components/index.js';",
-                "export const run = () => ({ Foo, bar, baz });",
-                "export default run;",
-                "",
-            ].join("\n"),
+            ["import { Foo, bar, baz } from './components/index.js';", "export const run = () => ({ Foo, bar, baz });", "export default run;", ""].join("\n"),
         );
 
         await createPackageJson(temporaryDirectoryPath, {
@@ -169,15 +143,11 @@ describe("barrel", () => {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toMatchSnapshot("ESM output");
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("CommonJS output");
     });

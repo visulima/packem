@@ -10,11 +10,7 @@ import MagicString from "magic-string";
 import findPackemFile from "../../config/utils/find-packem-file";
 import cssLoaderDependencies from "./utils/css-loader-dependencies";
 
-const typedocPackages = [
-    "typedoc",
-    "typedoc-plugin-markdown",
-    "typedoc-plugin-rename-defaults",
-];
+const typedocPackages = ["typedoc", "typedoc-plugin-markdown", "typedoc-plugin-rename-defaults"];
 
 const createAddCommand = (cli: Cli): void => {
     cli.addCommand({
@@ -33,15 +29,10 @@ const createAddCommand = (cli: Cli): void => {
             let packemConfigFilePath: string | undefined;
 
             try {
-                packemConfigFilePath = await findPackemFile(
-                    rootDirectory,
-                    options.config,
-                );
+                packemConfigFilePath = await findPackemFile(rootDirectory, options.config);
             } catch {
                 // @TODO: Add a sub command run question to run `packem init` if the user wants to
-                logger.error(
-                    "Could not find a packem config file, please run `packem init` first.",
-                );
+                logger.error("Could not find a packem config file, please run `packem init` first.");
 
                 return;
             }
@@ -66,39 +57,24 @@ const createAddCommand = (cli: Cli): void => {
             }
 
             if (argument.includes("typedoc")) {
-                if (
-                    packemConfig.includes("typedoc: typedocBuilder")
-                    || packemConfig.includes("@visulima/packem/builder/typedoc")
-                ) {
-                    logger.warn(
-                        "Typedoc has already been added to the packem config.",
-                    );
+                if (packemConfig.includes("typedoc: typedocBuilder") || packemConfig.includes("@visulima/packem/builder/typedoc")) {
+                    logger.warn("Typedoc has already been added to the packem config.");
 
                     return;
                 }
 
                 if (packemConfigFormat === "cjs") {
-                    magic.prepend(
-                        `const typedocBuilder = require("@visulima/packem/builder/typedoc");\n`,
-                    );
+                    magic.prepend(`const typedocBuilder = require("@visulima/packem/builder/typedoc");\n`);
                 } else {
-                    magic.prepend(
-                        `import typedocBuilder from "@visulima/packem/builder/typedoc";\n`,
-                    );
+                    magic.prepend(`import typedocBuilder from "@visulima/packem/builder/typedoc";\n`);
                 }
 
                 // add the builder key to the packem config, if it doesn't exist
                 if (packemConfig.includes("builder: {")) {
                     // add typedoc to the builder key
-                    magic.replace(
-                        "builder: {",
-                        `builder: {\n        typedoc: typedocBuilder,\n    `,
-                    );
+                    magic.replace("builder: {", `builder: {\n        typedoc: typedocBuilder,\n    `);
                 } else {
-                    magic.replace(
-                        transformerSearchKey,
-                        `${transformerReplaceKey}\n    builder: {\n        typedoc: typedocBuilder,\n    },`,
-                    );
+                    magic.replace(transformerSearchKey, `${transformerReplaceKey}\n    builder: {\n        typedoc: typedocBuilder,\n    },`);
                 }
 
                 logger.info("Adding typedoc dependencies...");
@@ -115,21 +91,13 @@ const createAddCommand = (cli: Cli): void => {
             }
 
             if (argument.includes("css")) {
-                if (
-                    packemConfig.includes("css: {")
-                    || packemConfig.includes("@visulima/packem/css")
-                ) {
-                    logger.warn(
-                        "Css loaders have already been added to the packem config.",
-                    );
+                if (packemConfig.includes("css: {") || packemConfig.includes("@visulima/packem/css")) {
+                    logger.warn("Css loaders have already been added to the packem config.");
 
                     return;
                 }
 
-                const cssLoaders: (
-                    | keyof typeof cssLoaderDependencies
-                    | "sourceMap"
-                )[] = [];
+                const cssLoaders: (keyof typeof cssLoaderDependencies | "sourceMap")[] = [];
 
                 const mainCssLoader = (await select({
                     message: "Pick a css loader",
@@ -180,13 +148,9 @@ const createAddCommand = (cli: Cli): void => {
                         });
 
                         if (sassLoader !== "sass") {
-                            extraCssLoaders = extraCssLoaders.filter(
-                                (loader) => loader !== "sass",
-                            );
+                            extraCssLoaders = extraCssLoaders.filter((loader) => loader !== "sass");
 
-                            extraCssLoaders.push(
-                                sassLoader as keyof typeof cssLoaderDependencies,
-                            );
+                            extraCssLoaders.push(sassLoader as keyof typeof cssLoaderDependencies);
                         }
                     }
 
@@ -196,11 +160,7 @@ const createAddCommand = (cli: Cli): void => {
                 const packagesToInstall: string[] = [];
 
                 for (const loader of cssLoaders) {
-                    packagesToInstall.push(
-                        ...(cssLoaderDependencies[
-                            loader as keyof typeof cssLoaderDependencies
-                        ] as string[]),
-                    );
+                    packagesToInstall.push(...(cssLoaderDependencies[loader as keyof typeof cssLoaderDependencies] as string[]));
                 }
 
                 if (mainCssLoader !== "tailwindcss") {
@@ -214,13 +174,9 @@ const createAddCommand = (cli: Cli): void => {
                     }
 
                     if (packemConfigFormat === "cjs") {
-                        magic.prepend(
-                            `const ${loader as string}Loader = require("@visulima/packem/css/loader/${loader.toLowerCase() as string}");\n`,
-                        );
+                        magic.prepend(`const ${loader as string}Loader = require("@visulima/packem/css/loader/${loader.toLowerCase() as string}");\n`);
                     } else {
-                        magic.prepend(
-                            `import ${loader as string}Loader from "@visulima/packem/css/loader/${loader.toLowerCase() as string}";\n`,
-                        );
+                        magic.prepend(`import ${loader as string}Loader from "@visulima/packem/css/loader/${loader.toLowerCase() as string}";\n`);
                     }
                 }
 
@@ -249,18 +205,13 @@ const createAddCommand = (cli: Cli): void => {
                             `const ${cssMinifier as string}Minifier = require("@visulima/packem/css/minifier/${cssMinifier.toLowerCase() as string}");\n`,
                         );
                     } else {
-                        magic.prepend(
-                            `import ${cssMinifier as string}Minifier from "@visulima/packem/css/minifier/${cssMinifier.toLowerCase() as string}";\n`,
-                        );
+                        magic.prepend(`import ${cssMinifier as string}Minifier from "@visulima/packem/css/minifier/${cssMinifier.toLowerCase() as string}";\n`);
                     }
                 }
 
                 const stringCssLoaders = cssLoaders
                     .map((loader) => {
-                        if (
-                            loader === "sass-embedded"
-                            || loader === "node-sass"
-                        ) {
+                        if (loader === "sass-embedded" || loader === "node-sass") {
                             // eslint-disable-next-line no-param-reassign
                             loader = "sass";
                         }

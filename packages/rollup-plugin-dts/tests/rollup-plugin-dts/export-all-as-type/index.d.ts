@@ -1,1 +1,1 @@
-export type * from './all'
+export type * from "./all";

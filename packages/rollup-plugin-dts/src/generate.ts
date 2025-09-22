@@ -3,12 +3,12 @@ import { fork, spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
+import path from "node:path";
 
-import { join, relative, resolve } from "@visulima/path";
 import type { BirpcReturn } from "birpc";
 import Debug from "debug";
+import type { Plugin, SourceMapInput } from "rolldown";
 import { isolatedDeclaration as oxcIsolatedDeclaration } from "rolldown/experimental";
-import type { Plugin, SourceMapInput } from "rollup";
 
 import {
     filename_to_dts,
@@ -20,20 +20,16 @@ import {
     RE_VUE,
     replaceTemplateName,
     resolveTemplateFn as resolveTemplateFunction,
-} from "./filename";
-import type { OptionsResolved } from "./options";
-import type { TscContext } from "./tsc/context";
-import {
-    createContext,
-    globalContext,
-    invalidateContextFile,
-} from "./tsc/context";
-import type { TscOptions, TscResult } from "./tsc/index";
-import type { TscFunctions } from "./tsc/worker";
+} from "./filename.ts";
+import type { OptionsResolved } from "./options.ts";
+import type { TscContext } from "./tsc/context.ts";
+import { createContext, globalContext, invalidateContextFile } from "./tsc/context.ts";
+import type { TscOptions, TscResult } from "./tsc/index.ts";
+import type { TscFunctions } from "./tsc/worker.ts";
 
 const debug = Debug("rolldown-plugin-dts:generate");
 
-const WORKER_URL = import.meta.WORKER_URL || "./tsc/worker";
+const WORKER_URL = import.meta.WORKER_URL || "./tsc/worker.ts";
 
 const spawnAsync = (...arguments_: Parameters<typeof spawn>) =>
     new Promise<void>((resolve, reject) => {
@@ -63,9 +59,11 @@ export function createGeneratePlugin({
     newContext,
     oxc,
     parallel,
+    sourcemap,
     tsconfig,
     tsconfigRaw,
     tsgo,
+    tsMacro,
     vue,
 }: Pick<
     OptionsResolved,
@@ -77,11 +75,13 @@ export function createGeneratePlugin({
     | "oxc"
     | "emitDtsOnly"
     | "vue"
+    | "tsMacro"
     | "parallel"
     | "eager"
     | "tsgo"
     | "newContext"
     | "emitJs"
+    | "sourcemap"
 >): Plugin {
     const dtsMap: DtsMap = new Map<string, TsModule>();
 
@@ -164,11 +164,7 @@ export function createGeneratePlugin({
         generateBundle: emitDtsOnly
             ? (options, bundle) => {
                 for (const fileName of Object.keys(bundle)) {
-                    if (
-                        bundle[fileName].type === "chunk"
-                        && !RE_DTS.test(fileName)
-                        && !RE_DTS_MAP.test(fileName)
-                    ) {
+                    if (bundle[fileName].type === "chunk" && !RE_DTS.test(fileName) && !RE_DTS_MAP.test(fileName)) {
                         delete bundle[fileName];
                     }
                 }
@@ -183,7 +179,8 @@ export function createGeneratePlugin({
                 },
             },
             async handler(dtsId) {
-                if (!dtsMap.has(dtsId)) { return; }
+                if (!dtsMap.has(dtsId))
+                    return;
 
                 const { code, id } = dtsMap.get(dtsId)!;
                 let dtsCode: string | undefined;
@@ -192,20 +189,16 @@ export function createGeneratePlugin({
                 debug("generate dts %s from %s", dtsId, id);
 
                 if (tsgo) {
-                    if (RE_VUE.test(id)) { throw new Error("tsgo does not support Vue files."); }
+                    if (RE_VUE.test(id))
+                        throw new Error("tsgo does not support Vue files.");
 
-                    const dtsPath = resolve(
-                        tsgoDistribution!,
-                        relative(resolve(cwd), filename_to_dts(id)),
-                    );
+                    const dtsPath = path.resolve(tsgoDistribution!, path.relative(path.resolve(cwd), filename_to_dts(id)));
 
                     if (existsSync(dtsPath)) {
                         dtsCode = await readFile(dtsPath, "utf8");
                     } else {
                         debug("[tsgo]", dtsPath, "is missing");
-                        throw new Error(
-                            `tsgo did not generate dts file for ${id}, please check your tsconfig.`,
-                        );
+                        throw new Error(`tsgo did not generate dts file for ${id}, please check your tsconfig.`);
                     }
                 } else if (oxc && !RE_VUE.test(id)) {
                     const result = oxcIsolatedDeclaration(id, code, oxc);
@@ -226,11 +219,7 @@ export function createGeneratePlugin({
                         map.sourcesContent = undefined;
                     }
                 } else {
-                    const entries = eager
-                        ? undefined
-                        : [...dtsMap.values()]
-                            .filter((v) => v.isEntry)
-                            .map((v) => v.id);
+                    const entries = eager ? undefined : [...dtsMap.values()].filter((v) => v.isEntry).map((v) => v.id);
                     const options: Omit<TscOptions, "programs"> = {
                         build,
                         context: tscContext,
@@ -238,8 +227,10 @@ export function createGeneratePlugin({
                         entries,
                         id,
                         incremental,
+                        sourcemap,
                         tsconfig,
                         tsconfigRaw,
+                        tsMacro,
                         vue,
                     };
                     let result: TscResult;
@@ -269,10 +260,7 @@ export function createGeneratePlugin({
                 ...options,
                 entryFileNames(chunk) {
                     const { entryFileNames } = options;
-                    const nameTemplate = resolveTemplateFunction(
-                        entryFileNames || "[name].js",
-                        chunk,
-                    );
+                    const nameTemplate = resolveTemplateFunction(entryFileNames || "[name].js", chunk);
 
                     if (chunk.name.endsWith(".d")) {
                         if (RE_DTS.test(nameTemplate)) {
@@ -343,11 +331,9 @@ export function createGeneratePlugin({
 
 async function runTsgo(root: string, tsconfig?: string) {
     const tsgoPackage = import.meta.resolve("@typescript/native-preview/package.json");
-    const { default: getExePath } = await import(
-        new URL("lib/getExePath.js", tsgoPackage).href
-    );
+    const { default: getExePath } = await import(new URL("lib/getExePath.js", tsgoPackage).href);
     const tsgo = getExePath();
-    const tsgoDistribution = await mkdtemp(join(tmpdir(), "rolldown-plugin-dts-"));
+    const tsgoDistribution = await mkdtemp(path.join(tmpdir(), "rolldown-plugin-dts-"));
 
     debug("[tsgo] tsgoDist", tsgoDistribution);
 

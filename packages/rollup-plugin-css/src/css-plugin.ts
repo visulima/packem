@@ -74,7 +74,6 @@ const cssPlugin = async (
     debug: boolean,
     minify: boolean,
     alias: Record<string, string>,
-
 ): Promise<Plugin> => {
     const mergedAlias = { ...alias, ...options.alias };
     const isIncluded = createFilter(options.include, options.exclude);

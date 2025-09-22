@@ -30,7 +30,9 @@ const mockElement: {
 
 const mockDocument = {
     createElement: vi.fn(() => mockElement),
-    createTextNode: vi.fn(() => { return { nodeType: 3, textContent: "" }; }),
+    createTextNode: vi.fn(() => {
+        return { nodeType: 3, textContent: "" };
+    }),
     getElementById: vi.fn(),
     querySelector: vi.fn(),
     querySelectorAll: vi.fn(() => [mockElement]),
@@ -374,9 +376,7 @@ describe(cssStyleInject, () => {
             const container1 = { ...mockElement };
             const container2 = { ...mockElement };
 
-            mockDocument.querySelector
-                .mockReturnValueOnce(container1)
-                .mockReturnValueOnce(container2);
+            mockDocument.querySelector.mockReturnValueOnce(container1).mockReturnValueOnce(container2);
 
             cssStyleInject("body { margin: 0; }", { container: ".container1", singleTag: true });
             cssStyleInject("h1 { color: red; }", { container: ".container2", singleTag: true });
@@ -434,10 +434,7 @@ describe(cssStyleInject, () => {
 
             const customContainer = {
                 ...mockElement,
-                children: [
-                    { before: vi.fn() },
-                    { before: vi.fn() },
-                ],
+                children: [{ before: vi.fn() }, { before: vi.fn() }],
             };
 
             // Mock querySelector for container selection and ID check

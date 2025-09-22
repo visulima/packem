@@ -4,13 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import {
-    createPackageJson,
-    createPackemConfig,
-    createTsConfig,
-    execPackem,
-    installPackage,
-} from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem raw data", () => {
     let temporaryDirectoryPath: string;
@@ -28,10 +22,7 @@ describe("packem raw data", () => {
     it("should generate js files with included raw content", async () => {
         expect.assertions(4);
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/content.txt`,
-            `thisismydata`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `thisismydata`);
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
             `import content from './content.txt';
@@ -57,9 +48,7 @@ export const data = content;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`const data$1 = "thisismydata";
 
@@ -68,9 +57,7 @@ const data = data$1;
 export { data };
 `);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -87,10 +74,7 @@ exports.data = data;
     it("should generate js files with included raw content when the '?raw' query param is used", async () => {
         expect.assertions(4);
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/content.txt`,
-            `thisismydata`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `thisismydata`);
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
             `import content from './content.txt?raw';
@@ -116,9 +100,7 @@ export const data = content;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`const data$1 = "thisismydata";
 
@@ -127,9 +109,7 @@ const data = data$1;
 export { data };
 `);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -180,9 +160,7 @@ export const data = jsContent;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`const data$1 = "const message = \\"Hello from JS file\\";\\nconsole.log(message);\\nexport default message;";
 
@@ -191,9 +169,7 @@ const data = data$1;
 export { data };
 `);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -269,15 +245,11 @@ export const template = htmlContent;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toMatchSnapshot("ESM output with raw HTML content");
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toMatchSnapshot("CommonJS output with raw HTML content");
     });
@@ -285,10 +257,7 @@ export const template = htmlContent;`,
     it("should update output when source changes using '?raw'", async () => {
         expect.assertions(7);
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/content.txt`,
-            `first-version`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `first-version`);
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
             `import content from './content.txt?raw';
@@ -315,21 +284,14 @@ export const data = content;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        let mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
-        let cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        let mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        let cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(mjsContent).toContain("first-version");
         expect(cjsContent).toContain("first-version");
 
         // Change source content and rebuild
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/content.txt`,
-            `second-version`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `second-version`);
 
         binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
@@ -338,12 +300,8 @@ export const data = content;`,
 
         expect(binProcess.exitCode).toBe(0);
 
-        mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
-        cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(mjsContent).toContain("second-version");
         expect(cjsContent).toContain("second-version");
@@ -352,10 +310,7 @@ export const data = content;`,
     it("should update output when source changes without '?raw' (transform path)", async () => {
         expect.assertions(7);
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/content.txt`,
-            `alpha`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `alpha`);
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
             `import content from './content.txt';
@@ -382,21 +337,14 @@ export const data = content;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        let mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
-        let cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        let mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        let cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(mjsContent).toContain("alpha");
         expect(cjsContent).toContain("alpha");
 
         // Change source content and rebuild
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/content.txt`,
-            `beta`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/content.txt`, `beta`);
 
         binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
@@ -405,12 +353,8 @@ export const data = content;`,
 
         expect(binProcess.exitCode).toBe(0);
 
-        mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
-        cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(mjsContent).toContain("beta");
         expect(cjsContent).toContain("beta");

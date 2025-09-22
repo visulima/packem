@@ -17,10 +17,7 @@ vi.mock("@visulima/packem-share/utils", () => {
 });
 
 describe(validateEngines, () => {
-    const createMockContext = (
-        package_: any,
-        validation: any = {},
-    ): BuildContext =>
+    const createMockContext = (package_: any, validation: any = {}): BuildContext =>
         ({
             options: {
                 validation: {
@@ -136,9 +133,6 @@ describe(validateEngines, () => {
 
         validateEngines(context);
 
-        expect(mockedWarn).toHaveBeenCalledWith(
-            context,
-            expect.stringContaining(">=18.0.0"),
-        );
+        expect(mockedWarn).toHaveBeenCalledWith(context, expect.stringContaining(">=18.0.0"));
     });
 });

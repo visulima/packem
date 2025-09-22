@@ -1,11 +1,7 @@
 import { createFilter as _createFilter } from "@rollup/pluginutils";
 import type { PackageJson } from "@visulima/package";
 
-type FilterPattern
-    = | ReadonlyArray<RegExp | string>
-        | RegExp
-        | string
-        | undefined;
+type FilterPattern = ReadonlyArray<RegExp | string> | RegExp | string | undefined;
 
 const createFilter = _createFilter as (
     include?: FilterPattern,
@@ -13,10 +9,7 @@ const createFilter = _createFilter as (
     options?: { resolve?: string | false | undefined },
 ) => (id: string | unknown) => boolean;
 
-const getPackageSideEffect = (
-    cwd: string,
-    packageJson: PackageJson,
-): (id: string) => boolean | undefined => {
+const getPackageSideEffect = (cwd: string, packageJson: PackageJson): (id: string) => boolean | undefined => {
     const { sideEffects } = packageJson;
 
     let hasSideEffects: (id: string) => boolean | undefined;

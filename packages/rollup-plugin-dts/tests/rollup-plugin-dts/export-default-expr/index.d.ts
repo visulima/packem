@@ -1,2 +1,2 @@
-declare const _default: number
-export default _default
+declare const _default: number;
+export default _default;

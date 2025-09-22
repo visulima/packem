@@ -1,10 +1,6 @@
 type Key = number | string | symbol;
 
-const groupByKeys = <T extends Record<Key, unknown>>(
-    array: T[],
-    key1: Key,
-    key2: Key,
-): Record<string, Record<string, T[]>> =>
+const groupByKeys = <T extends Record<Key, unknown>>(array: T[], key1: Key, key2: Key): Record<string, Record<string, T[]>> =>
     // eslint-disable-next-line unicorn/no-array-reduce
     array.reduce<Record<string, Record<string, T[]>>>((result, currentItem) => {
         const groupKey1 = currentItem[key1] as string;

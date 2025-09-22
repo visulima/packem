@@ -10,7 +10,13 @@ import { ensurePCSSOption, ensurePCSSPlugins } from "../../utils/options";
 
 let configCache: Result | undefined;
 
-const loadConfig = async (id: string, cwd: string, environment: Environment, logger: RollupLogger, options?: PostCSSConfigLoaderOptions | false): Promise<Result> => {
+const loadConfig = async (
+    id: string,
+    cwd: string,
+    environment: Environment,
+    logger: RollupLogger,
+    options?: PostCSSConfigLoaderOptions | false,
+): Promise<Result> => {
     if (!options) {
         return { file: "", options: {}, plugins: [] };
     }
@@ -56,7 +62,11 @@ const loadConfig = async (id: string, cwd: string, environment: Environment, log
             configCache = postcssConfig;
         }
 
-        const result: Result = { file: postcssConfig.file, options: postcssConfig.options, plugins: await ensurePCSSPlugins(postcssConfig.plugins, cwd, logger) };
+        const result: Result = {
+            file: postcssConfig.file,
+            options: postcssConfig.options,
+            plugins: await ensurePCSSPlugins(postcssConfig.plugins, cwd, logger),
+        };
 
         if (result.options.parser) {
             result.options.parser = await ensurePCSSOption(result.options.parser, "parser", cwd, logger);

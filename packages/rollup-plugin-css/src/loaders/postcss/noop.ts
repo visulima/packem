@@ -21,11 +21,13 @@ import type { PluginCreator } from "postcss";
  */
 const postcssNoop: PluginCreator<unknown> = () => {
     return {
-    /** Plugin name for identification in PostCSS pipeline */
+        /** Plugin name for identification in PostCSS pipeline */
         postcssPlugin: "css-noop",
 
         /** Version requirement for PostCSS compatibility */
-        prepare: () => { return {}; },
+        prepare: () => {
+            return {};
+        },
     };
 };
 

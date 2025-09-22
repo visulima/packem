@@ -2,15 +2,21 @@
     "compilerOptions": {
         "composite": true,
         "target": "ESNext",
+        "baseUrl": ".",
         "rootDir": "src",
         "module": "ESNext",
         "moduleResolution": "Bundler",
         "declaration": true,
+        "declarationMap": true,
         "emitDeclarationOnly": true,
         "outDir": "build/server",
         "isolatedDeclarations": false,
         "skipLibCheck": true
     },
-    "references": [{ "path": "./tsconfig.shared.json" }],
+    "references": [
+        {
+            "path": "./tsconfig.shared.json"
+        }
+    ],
     "include": ["src/server"]
 }

@@ -1,9 +1,9 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  server: {
-    watch: {
-      ignored: ['**/temp/**'],
+    server: {
+        watch: {
+            ignored: ["**/temp/**"],
+        },
     },
-  },
-})
+});

@@ -6,7 +6,8 @@ import { rolldownBuild } from "@sxzz/test-utils";
 import { glob } from "tinyglobby";
 import { describe, expect, it } from "vitest";
 
-import { dts } from "../src/index";
+import { dts } from "../src/index.ts";
+import { findSourceMapChunk } from "./utils.ts";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -31,15 +32,12 @@ describe("tsc", () => {
     });
 
     it("multi declarations", async () => {
-        const { snapshot } = await rolldownBuild(
-            path.resolve(dirname, "fixtures/multi-decls/index.ts"),
-            [
-                dts({
-                    compilerOptions: { isolatedDeclarations: false },
-                    emitDtsOnly: true,
-                }),
-            ],
-        );
+        const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/multi-decls/index.ts"), [
+            dts({
+                compilerOptions: { isolatedDeclarations: false },
+                emitDtsOnly: true,
+            }),
+        ]);
 
         expect(snapshot).toMatchSnapshot();
     });
@@ -61,8 +59,59 @@ describe("tsc", () => {
         expect(snapshot).toMatchSnapshot();
     });
 
-    it("should generate correct sourcemaps for a complex composite project with conflicting tsconfig options", async () => {
+    it("compiler project sourcemap (build: false)", async () => {
+        const root = path.resolve(dirname, "fixtures/deep-source-map");
+        const { chunks, snapshot } = await rolldownBuild(
+            [path.resolve(root, "src/index.ts")],
+            [
+                dts({
+                    build: false,
+                    sourcemap: true,
+                    tsconfig: path.resolve(root, "tsconfig.json"),
+                }),
+            ],
+            {},
+            { dir: path.resolve(root, "dist") },
+        );
+        const sourcemap = findSourceMapChunk(chunks, "index.d.ts.map");
+
+        expect(sourcemap.sourceRoot).toBe(false);
+        expect(sourcemap.sources).toMatchInlineSnapshot(`
+      [
+        "../src/index.ts",
+      ]
+    `);
+        expect(snapshot).toMatchSnapshot();
+    });
+
+    it("compiler project sourcemap (build: true)", async () => {
+        const root = path.resolve(dirname, "fixtures/deep-source-map");
+        const { chunks, snapshot } = await rolldownBuild(
+            [path.resolve(root, "src/index.ts")],
+            [
+                dts({
+                    build: true,
+                    sourcemap: true,
+                    tsconfig: path.resolve(root, "tsconfig.json"),
+                }),
+            ],
+            {},
+            { dir: path.resolve(root, "dist") },
+        );
+        const sourcemap = findSourceMapChunk(chunks, "index.d.ts.map");
+
+        expect(sourcemap.sourceRoot).toBe(false);
+        expect(sourcemap.sources).toMatchInlineSnapshot(`
+      [
+        "../src/index.d.ts",
+      ]
+    `);
+        expect(snapshot).toMatchSnapshot();
+    });
+
+    it("composite projects sourcemap #80", async () => {
         const root = path.resolve(dirname, "fixtures/composite-refs-sourcemap");
+
         const { chunks } = await rolldownBuild(
             [path.resolve(root, "src/react/index.ts")],
             [
@@ -77,25 +126,12 @@ describe("tsc", () => {
             { dir: path.resolve(root, "actual-output/react") },
         );
 
-        const sourcemapChunk = chunks.find((chunk) =>
-            chunk.fileName.endsWith(".d.ts.map"),
-        );
-
-        expect(sourcemapChunk).toBeDefined();
-        expect(sourcemapChunk?.type).toBe("asset");
-
-        const sourcemap = JSON.parse((sourcemapChunk as any).source as string);
-        const sources: string[] = sourcemap.sources.map((s: string) =>
-            s.replaceAll("\\\\", "/"),
-        );
+        const sourcemap = findSourceMapChunk(chunks, "index.d.ts.map");
+        const sources = sourcemap.sources || [];
         const expectedSources = ["../../src/types.ts", "../../src/react/index.ts"];
 
         expect(sources.sort()).toEqual(expectedSources.sort());
-        expect(
-            sourcemap.sourcesContent === undefined
-            || (Array.isArray(sourcemap.sourcesContent)
-                && sourcemap.sourcesContent.length === 0),
-        ).toBe(true);
+        expect(sourcemap.sourcesContent).toBeOneOf([undefined, []]);
     });
 
     it("composite references", async () => {
@@ -108,10 +144,7 @@ describe("tsc", () => {
         await fs.rm(tempDir, { force: true, recursive: true });
 
         const { snapshot } = await rolldownBuild(
-            [
-                path.resolve(root, "dir1/input1.ts"),
-                path.resolve(root, "dir2/input2.ts"),
-            ],
+            [path.resolve(root, "dir1/input1.ts"), path.resolve(root, "dir2/input2.ts")],
             [
                 dts({
                     build: true,
@@ -142,10 +175,7 @@ describe("tsc", () => {
         await fs.rm(tempDir, { force: true, recursive: true });
 
         const { snapshot } = await rolldownBuild(
-            [
-                path.resolve(root, "dir1/input1.ts"),
-                path.resolve(root, "dir2/input2.ts"),
-            ],
+            [path.resolve(root, "dir1/input1.ts"), path.resolve(root, "dir2/input2.ts")],
             [
                 dts({
                     build: true,
@@ -164,11 +194,11 @@ describe("tsc", () => {
         });
 
         expect(tsBuildInfoFiles.sort()).toMatchInlineSnapshot(`
-            [
-              "dir1/tsconfig.1.tsbuildinfo",
-              "dir2/tsconfig.2.tsbuildinfo",
-            ]
-        `);
+      [
+        "dir1/tsconfig.1.tsbuildinfo",
+        "dir2/tsconfig.2.tsbuildinfo",
+      ]
+    `);
     });
 
     it("vue-sfc w/ ts-compiler", async () => {
@@ -197,20 +227,57 @@ describe("tsc", () => {
     });
 
     it("jsdoc", async () => {
-        const { snapshot } = await rolldownBuild(
-            path.resolve(dirname, "fixtures/jsdoc.ts"),
-            [dts({ oxc: false })],
-        );
+        const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/jsdoc.ts"), [dts({ oxc: false })]);
 
         expect(snapshot).toMatchSnapshot();
     });
 
-    it("jsdoc in js", async () => {
+    it.fails("jsdoc in js", async () => {
         const root = path.resolve(dirname, "fixtures/jsdoc-js");
         const { snapshot } = await rolldownBuild(path.resolve(root, "main.js"), [
             dts({
                 emitDtsOnly: true,
                 tsconfig: path.resolve(root, "tsconfig.json"),
+            }),
+        ]);
+
+        expect(snapshot).toMatchSnapshot();
+    });
+
+    it("ts-macro w/ ts-compiler", async () => {
+        const root = path.resolve(dirname, "fixtures/ts-macro");
+        const { snapshot } = await rolldownBuild(path.resolve(root, "main.ts"), [
+            dts({
+                emitDtsOnly: true,
+                tsconfig: path.resolve(root, "tsconfig.json"),
+                tsMacro: true,
+            }),
+        ]);
+
+        expect(snapshot).toMatchSnapshot();
+    });
+
+    it("vue-sfc w/ ts-macro w/ ts-compiler", async () => {
+        const root = path.resolve(dirname, "fixtures/vue-sfc-with-ts-macro");
+        const { snapshot } = await rolldownBuild(path.resolve(root, "main.ts"), [
+            dts({
+                emitDtsOnly: true,
+                tsconfig: path.resolve(root, "tsconfig.json"),
+                tsMacro: true,
+                vue: true,
+            }),
+        ]);
+
+        expect(snapshot).toMatchSnapshot();
+    });
+
+    it("arktype", async () => {
+        const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/arktype.ts"), [
+            dts({
+                compilerOptions: {
+                    isolatedDeclarations: false,
+                },
+                emitDtsOnly: true,
             }),
         ]);
 

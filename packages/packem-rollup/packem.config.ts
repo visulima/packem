@@ -8,14 +8,14 @@ export default defineConfig({
     rollup: {
         license: {
             path: "./LICENSE.md",
-        }
+        },
     },
     validation: {
         dependencies: {
             unused: {
-                exclude: ["rollup-plugin-dts"]
-            }
-        }
+                exclude: ["rollup-plugin-dts"],
+            },
+        },
     },
     transformer,
 }) as BuildConfig;

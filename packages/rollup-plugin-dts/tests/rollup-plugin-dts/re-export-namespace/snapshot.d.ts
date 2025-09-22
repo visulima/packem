@@ -1,13 +1,13 @@
 // index.d.ts
 declare namespace namespace_d_exports {
-  export { A, B, C, D, E, F, GenericC, GenericF, GenericI, GenericT };
+    export { A, B, C, D, E, F, GenericC, GenericF, GenericI, GenericT };
 }
 interface A {}
 declare function B(): void;
 declare class C {}
 declare enum D {
-  A = 0,
-  B = 1,
+    A = 0,
+    B = 1,
 }
 declare const E: string;
 declare type F = string;

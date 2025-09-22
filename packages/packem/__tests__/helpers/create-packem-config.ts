@@ -1,4 +1,4 @@
-/* eslint-disable sonarjs/no-nested-conditional, unicorn/no-nested-ternary */
+/* eslint-disable sonarjs/no-nested-conditional */
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -9,22 +9,11 @@ import type { StyleOptions } from "@visulima/rollup-plugin-css";
 import type { BuildConfig } from "../../src/types";
 import installPackage from "./install-package";
 
-const distributionPath = join(
-    dirname(fileURLToPath(import.meta.url)),
-    "../../dist",
-);
+const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../dist");
 
 export type PackemConfigProperties = {
     config?: BuildConfig | string | undefined;
-    cssLoader?: (
-        | "less"
-        | "lightningcss"
-        | "postcss"
-        | "sass"
-        | "sourcemap"
-        | "stylus"
-        | "tailwindcss"
-    )[];
+    cssLoader?: ("less" | "lightningcss" | "postcss" | "sass" | "sourcemap" | "stylus" | "tailwindcss")[];
     cssOptions?: StyleOptions | string | undefined;
     experimental?: Record<string, boolean>;
     isolatedDeclarationTransformer?: "oxc" | "swc" | "typescript" | undefined;
@@ -55,22 +44,11 @@ export const createPackemConfig = async (
     }: PackemConfigProperties = {},
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
-    await installPackage(
-        fixturePath,
-        transformer === "swc"
-            ? "@swc"
-            : transformer === "oxc"
-                ? "oxc-transform"
-                : transformer,
-    );
+    await installPackage(fixturePath, transformer === "swc" ? "@swc" : transformer === "oxc" ? "oxc-transform" : transformer);
 
     let rollupConfig = "";
 
-    if (
-        typeof config === "object"
-        || cssLoader.length > 0
-        || plugins.length > 0
-    ) {
+    if (typeof config === "object" || cssLoader.length > 0 || plugins.length > 0) {
         rollupConfig = "\n    rollup: {\n";
     }
 
@@ -81,9 +59,7 @@ export const createPackemConfig = async (
         const { rollup, ...rest } = config;
 
         if (rollup?.css && cssLoader.length > 0) {
-            throw new Error(
-                "Cannot use both `rollup.css` and `cssLoader` options in the same configuration",
-            );
+            throw new Error("Cannot use both `rollup.css` and `cssLoader` options in the same configuration");
         }
 
         if (rollup) {
@@ -110,19 +86,13 @@ export const createPackemConfig = async (
     const pluginCode: string[] = [];
 
     for (const plugin of plugins) {
-        if (
-            plugin.namedExport !== undefined
-            && plugin.importName
-            && plugin.from
-        ) {
+        if (plugin.namedExport !== undefined && plugin.importName && plugin.from) {
             pluginImports.push(
                 `import ${plugin.namedExport ? `{${plugin.importName}}` : plugin.importName} from "${plugin.from.replace("__dist__", distributionPath)}";`,
             );
         }
 
-        pluginCode.push(
-            `{ ${plugin.when}: "packem:${transformer}", plugin: ${plugin.code}, }`,
-        );
+        pluginCode.push(`{ ${plugin.when}: "packem:${transformer}", plugin: ${plugin.code}, }`);
     }
 
     if (pluginCode.length > 0) {

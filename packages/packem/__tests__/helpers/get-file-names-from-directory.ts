@@ -1,9 +1,7 @@
 import { normalizePath } from "@rollup/pluginutils";
 import { glob } from "tinyglobby";
 
-const getFileNamesFromDirectory = async (
-    directory: string,
-): Promise<string[]> => {
+const getFileNamesFromDirectory = async (directory: string): Promise<string[]> => {
     const files = await glob(["**/*.{,c,m}js", "**/*.{,c,m}d.ts"], {
         cwd: directory,
     });

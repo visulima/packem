@@ -17,7 +17,9 @@ export type SassLoaderContext = {
 
 export type SassLoaderOptions = (Omit<SassEmbeddedStringOptions<"sync">, "charset" | "indentedSyntax"> | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">) & {
     additionalData:
-        string | ((content: string | Buffer, loaderContext: SassLoaderContext) => Promise<string>) | ((content: string | Buffer, loaderContext: SassLoaderContext) => string);
+        | string
+        | ((content: string | Buffer, loaderContext: SassLoaderContext) => Promise<string>)
+        | ((content: string | Buffer, loaderContext: SassLoaderContext) => string);
     implementation?: "sass-embedded" | "sass";
     warnRuleAsWarning?: boolean;
 };

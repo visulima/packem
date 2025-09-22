@@ -1,19 +1,19 @@
 class Parent {
-  constructor() {}
+    constructor() {}
 }
 
 class Feature {
-  constructor() {}
+    constructor() {}
 }
 
 export class Child extends Parent {
-  feature = new Feature();
+    feature = new Feature();
 
-  constructor() {
-    console.log("before");
+    constructor() {
+        console.log("before");
 
-    super();
+        super();
 
-    console.log("after");
-  }
+        console.log("after");
+    }
 }

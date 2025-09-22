@@ -4,33 +4,21 @@ import { warn } from "@visulima/packem-share/utils";
 
 import type { InternalBuildOptions, ValidationOptions } from "../../types";
 
-const joinWarnings = (warnings: Set<string> | string[]): string =>
-    [...warnings].map((id) => yellow(id)).join(", ");
+const joinWarnings = (warnings: Set<string> | string[]): string => [...warnings].map((id) => yellow(id)).join(", ");
 
-const validateDependencies = (
-    context: BuildContext<InternalBuildOptions>,
-): void => {
+const validateDependencies = (context: BuildContext<InternalBuildOptions>): void => {
     if (context.hoistedDependencies.size > 0) {
         const message = `These dependencies are shamefully hoisted: ${joinWarnings(context.hoistedDependencies)}`;
 
         warn(context, message);
     }
 
-    let unusedDependencies = Object.keys(context.pkg.dependencies || {}).filter(
-        (index) => !context.usedDependencies.has(index),
-    );
+    let unusedDependencies = Object.keys(context.pkg.dependencies || {}).filter((index) => !context.usedDependencies.has(index));
 
-    if (
-        context.options?.validation
-        && context.options?.validation?.dependencies !== false
-        && context.options?.validation?.dependencies?.unused !== false
-    ) {
+    if (context.options?.validation && context.options?.validation?.dependencies !== false && context.options?.validation?.dependencies?.unused !== false) {
         unusedDependencies = unusedDependencies.filter(
             (dependency) =>
-                !(
-                    (context.options?.validation as ValidationOptions)
-                        ?.dependencies as { unused: { exclude: string[] } }
-                )?.unused?.exclude.includes(dependency),
+                !((context.options?.validation as ValidationOptions)?.dependencies as { unused: { exclude: string[] } })?.unused?.exclude.includes(dependency),
         );
     }
 

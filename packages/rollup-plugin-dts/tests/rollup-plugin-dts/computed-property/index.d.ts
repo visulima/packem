@@ -7,8 +7,8 @@ interface C {}
 interface D {}
 
 export type Klass = {
-  [Aprop]?: A[];
-  ["B"]: B;
-  [0]: C;
-  [Dprop]: D;
+    [Aprop]?: A[];
+    ["B"]: B;
+    [0]: C;
+    [Dprop]: D;
 };

@@ -9,6 +9,6 @@ export const test3 = {
     test5: () => {
         return "this should be in final bundle, test5 function";
     },
-}
+};
 
 export { test2, test as default };

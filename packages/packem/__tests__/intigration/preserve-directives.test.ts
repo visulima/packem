@@ -4,13 +4,7 @@ import { readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import {
-    createPackageJson,
-    createPackemConfig,
-    createTsConfig,
-    execPackem,
-    installPackage,
-} from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem preserve-directives", () => {
     let temporaryDirectoryPath: string;
@@ -54,17 +48,13 @@ console.log("Hello, world!");`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`#!/usr/bin/env node
 console.log("Hello, world!");
 `);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`#!/usr/bin/env node
 'use strict';
@@ -76,10 +66,7 @@ console.log("Hello, world!");
     it("should preserve package.json bin added shebang", async () => {
         expect.assertions(4);
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `console.log("Hello, world!");`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `console.log("Hello, world!");`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createPackageJson(temporaryDirectoryPath, {
@@ -103,17 +90,13 @@ console.log("Hello, world!");
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`#!/usr/bin/env node
 console.log("Hello, world!");
 `);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`#!/usr/bin/env node
 'use strict';
@@ -169,9 +152,7 @@ export default Tr;`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`'use client';
 import { jsx } from 'react/jsx-runtime';
@@ -183,9 +164,7 @@ const Tr = /* @__PURE__ */ __name(() => jsx("tr", { className: "m-0 border-t bor
 export { Tr as default };
 `);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use client';
 'use strict';
@@ -199,27 +178,21 @@ const Tr = /* @__PURE__ */ __name(() => jsxRuntime.jsx("tr", { className: "m-0 b
 module.exports = Tr;
 `);
 
-        const dCtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.d.cts`,
-        );
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare const Tr: () => any;
 
 export = Tr;
 `);
 
-        const dMtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.d.mts`,
-        );
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare const Tr: () => any;
 
 export { Tr as default };
 `);
 
-        const dContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.d.ts`,
-        );
+        const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dContent).toBe(`declare const Tr: () => any;
 
@@ -235,10 +208,7 @@ export = Tr;
             `#!/usr/bin/env node
 console.log("Hello, cli!");`,
         );
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `export const foo = 'foo';`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const foo = 'foo';`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createPackageJson(temporaryDirectoryPath, {
@@ -265,18 +235,14 @@ console.log("Hello, cli!");`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         expect(mjsContent).toBe(`const foo = "foo";
 
 export { foo };
 `);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -287,9 +253,7 @@ const foo = "foo";
 exports.foo = foo;
 `);
 
-        const cjsCliContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/cli.js`,
-        );
+        const cjsCliContent = readFileSync(`${temporaryDirectoryPath}/dist/cli.js`);
 
         expect(cjsCliContent).toBe(`#!/usr/bin/env node
 'use strict';
@@ -301,10 +265,7 @@ console.log("Hello, cli!");
     it("should chunk directives in separated files", async () => {
         expect.assertions(8);
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/bar.ts`,
-            `'use client';export const bar = 'bar';`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/bar.ts`, `'use client';export const bar = 'bar';`);
         writeFileSync(
             `${temporaryDirectoryPath}/src/foo.ts`,
             `"use client";
@@ -348,12 +309,9 @@ export const baz = 'baz';`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const mjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.mjs`,
-        );
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent)
-            .toBe(`export { foo } from './packem_shared/foo-Dx82TkZf.mjs';
+        expect(mjsContent).toBe(`export { foo } from './packem_shared/foo-Dx82TkZf.mjs';
 export { bar } from './packem_shared/bar-dfxpx6LX.mjs';
 
 const baz = "baz";
@@ -361,9 +319,7 @@ const baz = "baz";
 export { baz };
 `);
 
-        const mjsChunk1Content = readFileSync(
-            `${temporaryDirectoryPath}/dist/packem_shared/foo-Dx82TkZf.mjs`,
-        );
+        const mjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/foo-Dx82TkZf.mjs`);
 
         expect(mjsChunk1Content).toBe(`'use client';
 'use sukka';
@@ -372,9 +328,7 @@ const foo = "foo";
 export { foo };
 `);
 
-        const mjsChunk2Content = readFileSync(
-            `${temporaryDirectoryPath}/dist/packem_shared/bar-dfxpx6LX.mjs`,
-        );
+        const mjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/bar-dfxpx6LX.mjs`);
 
         expect(mjsChunk2Content).toBe(`'use client';
 const bar = "bar";
@@ -382,9 +336,7 @@ const bar = "bar";
 export { bar };
 `);
 
-        const cjsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.cjs`,
-        );
+        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjsContent).toBe(`'use strict';
 
@@ -400,9 +352,7 @@ exports.bar = bar.bar;
 exports.baz = baz;
 `);
 
-        const cjsChunk1Content = readFileSync(
-            `${temporaryDirectoryPath}/dist/packem_shared/foo-CPDxWGQe.cjs`,
-        );
+        const cjsChunk1Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/foo-CPDxWGQe.cjs`);
 
         expect(cjsChunk1Content).toBe(`'use client';
 'use sukka';
@@ -415,9 +365,7 @@ const foo = "foo";
 exports.foo = foo;
 `);
 
-        const cjsChunk2Content = readFileSync(
-            `${temporaryDirectoryPath}/dist/packem_shared/bar-ChnaedqB.cjs`,
-        );
+        const cjsChunk2Content = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/bar-ChnaedqB.cjs`);
 
         expect(cjsChunk2Content).toBe(`'use client';
 'use strict';

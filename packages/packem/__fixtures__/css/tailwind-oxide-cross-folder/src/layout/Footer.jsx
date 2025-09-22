@@ -5,9 +5,7 @@ export function Footer({ links = [] }) {
         <footer className="footer bg-gray-900 text-white py-12">
             <div className="footer-container">
                 <div className="footer-content">
-                    <p className="footer-copyright text-gray-400">
-                        © 2024 Tailwind Oxide Test. All rights reserved.
-                    </p>
+                    <p className="footer-copyright text-gray-400">© 2024 Tailwind Oxide Test. All rights reserved.</p>
                     {links.length > 0 && (
                         <nav className="footer-nav">
                             <ul className="footer-links">

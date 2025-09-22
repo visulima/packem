@@ -43,10 +43,7 @@ export type IsolatedDeclarationsOptions = {
     include?: FilterPattern;
 };
 
-export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(
-    sourceDirectory: string,
-    context: BuildContext<T>,
-): Plugin => {
+export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(sourceDirectory: string, context: BuildContext<T>): Plugin => {
     const filter = createFilter(context.options.include, context.options.exclude);
 
     let outputFiles: Record<string, { ext: string; map?: string; source: string }> = Object.create(null);
@@ -123,7 +120,12 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(
             }
         }
 
-        const { errors, map, sourceText } = await context.options.isolatedDeclarationTransformer(id, code, context.options.sourcemap, context.tsconfig?.config?.compilerOptions);
+        const { errors, map, sourceText } = await context.options.isolatedDeclarationTransformer(
+            id,
+            code,
+            context.options.sourcemap,
+            context.tsconfig?.config?.compilerOptions,
+        );
 
         if (errors.length > 0) {
             if (context.options.rollup.isolatedDeclarations.ignoreErrors) {
@@ -158,10 +160,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(
             if (node.type === "ImportDeclaration") {
                 return (
                     node.specifiers
-                    && node.specifiers.every(
-                        (spec: { importKind: string; type: string }) =>
-                            spec.type === "ImportSpecifier" && spec.importKind === "type",
-                    )
+                    && node.specifiers.every((spec: { importKind: string; type: string }) => spec.type === "ImportSpecifier" && spec.importKind === "type")
                 );
             }
 
@@ -295,8 +294,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(
                     source: source.replaceAll(
                         // eslint-disable-next-line regexp/no-misleading-capturing-group,regexp/no-super-linear-backtracking
                         /(from\s)['|"]((.*)\..+|['|"].*)['|"];?/g,
-                        (_, group1, group2, group3) =>
-                            `${group1 + quote + (group3 || group2)}.${dtsExtension}${quote};`,
+                        (_, group1, group2, group3) => `${group1 + quote + (group3 || group2)}.${dtsExtension}${quote};`,
                     ),
                     type: "asset",
                 });

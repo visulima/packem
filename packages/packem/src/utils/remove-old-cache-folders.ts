@@ -4,27 +4,19 @@ import { isAccessible, readJson } from "@visulima/fs";
 import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
 
-const removeOldCacheFolders = async (
-    cachePath: string | undefined,
-    logger: Pail,
-    logged: boolean,
-): Promise<void> => {
+const removeOldCacheFolders = async (cachePath: string | undefined, logger: Pail, logged: boolean): Promise<void> => {
     if (!cachePath) {
         return;
     }
 
     if (await isAccessible(join(cachePath, "keystore.json"))) {
-        const keyStore: Record<string, string> = await readJson(
-            join(cachePath, "keystore.json"),
-        );
+        const keyStore: Record<string, string> = await readJson(join(cachePath, "keystore.json"));
 
         let cacheDirectories = await readdir(cachePath, {
             withFileTypes: true,
         });
 
-        cacheDirectories = cacheDirectories.filter((dirent) =>
-            dirent.isDirectory(),
-        );
+        cacheDirectories = cacheDirectories.filter((dirent) => dirent.isDirectory());
 
         let hasLogged = logged;
 

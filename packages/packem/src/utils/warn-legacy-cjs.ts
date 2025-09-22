@@ -12,10 +12,7 @@ import type { InternalBuildOptions } from "../types";
  */
 const warnLegacyCJS = (context: BuildContext<InternalBuildOptions>): void => {
     // Only relevant for Node runtime and when emitting CJS
-    if (
-        context.options.runtime !== "node"
-        || context.options.emitCJS !== true
-    ) {
+    if (context.options.runtime !== "node" || context.options.emitCJS !== true) {
         return;
     }
 
@@ -31,9 +28,7 @@ const warnLegacyCJS = (context: BuildContext<InternalBuildOptions>): void => {
     }
 
     // 2) transformer explicit targets if already provided
-    const esbuildTargets = arrayify(
-        context.options.rollup.esbuild?.target ?? [],
-    ) as string[];
+    const esbuildTargets = arrayify(context.options.rollup.esbuild?.target ?? []) as string[];
 
     for (const t of esbuildTargets) {
         if (typeof t === "string" && t.startsWith("node")) {
@@ -72,9 +67,7 @@ const warnLegacyCJS = (context: BuildContext<InternalBuildOptions>): void => {
         }
     }
 
-    const isLegacy = candidateVersions.some((v) =>
-        satisfies(v, ">=23.0.0 || >=22.12.0"),
-    );
+    const isLegacy = candidateVersions.some((v) => satisfies(v, ">=23.0.0 || >=22.12.0"));
 
     if (isLegacy) {
         context.logger.warn(

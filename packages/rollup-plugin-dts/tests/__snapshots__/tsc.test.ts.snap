@@ -1,5 +1,57 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`tsc > arktype 1`] = `
+"// arktype.d.ts
+import * as arktype_internal_methods_object_ts0 from "arktype/internal/methods/object.ts";
+
+//#region tests/fixtures/arktype.d.ts
+declare const test: arktype_internal_methods_object_ts0.ObjectType<{
+  test: string;
+}, {}>;
+//#endregion
+export { test };"
+`;
+
+exports[`tsc > compiler project sourcemap (build: false) 2`] = `
+"// index.d.ts
+//#region tests/fixtures/deep-source-map/src/index.d.ts
+declare const a = 1;
+//#endregion
+export { a };
+//# sourceMappingURL=index.d.ts.map
+// index.d.ts.map
+{"version":3,"file":"index.d.ts","names":[],"sources":["../src/index.ts"],"sourcesContent":[],"mappings":";cAAa,CAAA"}
+// index.js
+//#region tests/fixtures/deep-source-map/src/index.ts
+const a = 1;
+
+//#endregion
+export { a };
+//# sourceMappingURL=index.js.map
+// index.js.map
+{"version":3,"file":"index.js","names":[],"sources":["../src/index.ts"],"sourcesContent":["export const a = 1\\n"],"mappings":";AAAA,MAAa,IAAI"}"
+`;
+
+exports[`tsc > compiler project sourcemap (build: true) 2`] = `
+"// index.d.ts
+//#region tests/fixtures/deep-source-map/src/index.d.ts
+declare const a = 1;
+//#endregion
+export { a };
+//# sourceMappingURL=index.d.ts.map
+// index.d.ts.map
+{"version":3,"file":"index.d.ts","names":["a"],"sources":["../src/index.d.ts"],"sourcesContent":["export declare const a = 1;\\n"],"mappings":";cAAqBA,CAAAA"}
+// index.js
+//#region tests/fixtures/deep-source-map/src/index.ts
+const a = 1;
+
+//#endregion
+export { a };
+//# sourceMappingURL=index.js.map
+// index.js.map
+{"version":3,"file":"index.js","names":[],"sources":["../src/index.ts"],"sourcesContent":["export const a = 1\\n"],"mappings":";AAAA,MAAa,IAAI"}"
+`;
+
 exports[`tsc > composite references 1`] = `
 "// input1.d.ts
 //#region tests/fixtures/composite-refs/dir1/input1.d.ts
@@ -100,20 +152,6 @@ var jsdoc_default = fn();
 export { jsdoc_default as default, fn };"
 `;
 
-exports[`tsc > jsdoc in js 1`] = `
-"// main.d.ts
-//#region tests/fixtures/jsdoc-js/main.d.ts
-/**
- * Does bar.
- *
- * @param {string} baz
- * @returns {void}
- */
-declare function foo(baz: string): void;
-//#endregion
-export { foo };"
-`;
-
 exports[`tsc > multi declarations 1`] = `
 "// index.d.ts
 //#region tests/fixtures/multi-decls/mod.d.ts
@@ -138,6 +176,14 @@ const a = 1;
 
 //#endregion
 export { a };"
+`;
+
+exports[`tsc > ts-macro w/ ts-compiler 1`] = `
+"// main.d.ts
+//#region tests/fixtures/ts-macro/main.d.ts
+declare function defineStyle(style: string): string;
+//#endregion
+export { defineStyle as default };"
 `;
 
 exports[`tsc > typescript compiler 1`] = `
@@ -184,95 +230,95 @@ import * as vue0 from "vue";
 declare const _default: vue0.DefineComponent<{
   foo: string;
   bar?: string;
-  innerHTML?: string;
+  innerHTML?: string | undefined;
   class?: any;
-  style?: vue0.StyleValue;
-  accesskey?: string;
-  contenteditable?: (boolean | "true" | "false") | "inherit" | "plaintext-only";
-  contextmenu?: string;
-  dir?: string;
-  draggable?: boolean | "true" | "false";
-  hidden?: (boolean | "true" | "false") | "" | "hidden" | "until-found";
-  id?: string;
-  inert?: boolean | "true" | "false";
-  lang?: string;
-  placeholder?: string;
-  spellcheck?: boolean | "true" | "false";
-  tabindex?: string | number;
-  title?: string;
-  translate?: "yes" | "no";
-  radiogroup?: string;
-  role?: string;
-  about?: string;
-  datatype?: string;
+  style?: vue0.StyleValue | undefined;
+  accesskey?: string | undefined;
+  contenteditable?: (boolean | "true" | "false") | "inherit" | "plaintext-only" | undefined;
+  contextmenu?: string | undefined;
+  dir?: string | undefined;
+  draggable?: (boolean | "true" | "false") | undefined;
+  hidden?: (boolean | "true" | "false") | "" | "hidden" | "until-found" | undefined;
+  id?: string | undefined;
+  inert?: (boolean | "true" | "false") | undefined;
+  lang?: string | undefined;
+  placeholder?: string | undefined;
+  spellcheck?: (boolean | "true" | "false") | undefined;
+  tabindex?: (string | number) | undefined;
+  title?: string | undefined;
+  translate?: "yes" | "no" | undefined;
+  radiogroup?: string | undefined;
+  role?: string | undefined;
+  about?: string | undefined;
+  datatype?: string | undefined;
   inlist?: any;
-  prefix?: string;
-  property?: string;
-  resource?: string;
-  typeof?: string;
-  vocab?: string;
-  autocapitalize?: string;
-  autocorrect?: string;
-  autosave?: string;
-  color?: string;
-  itemprop?: string;
-  itemscope?: boolean | "true" | "false";
-  itemtype?: string;
-  itemid?: string;
-  itemref?: string;
-  results?: string | number;
-  security?: string;
-  unselectable?: "on" | "off";
-  inputmode?: "none" | "text" | "tel" | "url" | "email" | "numeric" | "decimal" | "search";
-  is?: string;
-  'aria-activedescendant'?: string;
-  'aria-atomic'?: boolean | "true" | "false";
-  'aria-autocomplete'?: "none" | "inline" | "list" | "both";
-  'aria-busy'?: boolean | "true" | "false";
-  'aria-checked'?: (boolean | "true" | "false") | "mixed";
-  'aria-colcount'?: string | number;
-  'aria-colindex'?: string | number;
-  'aria-colspan'?: string | number;
-  'aria-controls'?: string;
-  'aria-current'?: (boolean | "true" | "false") | "page" | "step" | "location" | "date" | "time";
-  'aria-describedby'?: string;
-  'aria-details'?: string;
-  'aria-disabled'?: boolean | "true" | "false";
-  'aria-dropeffect'?: "none" | "copy" | "execute" | "link" | "move" | "popup";
-  'aria-errormessage'?: string;
-  'aria-expanded'?: boolean | "true" | "false";
-  'aria-flowto'?: string;
-  'aria-grabbed'?: boolean | "true" | "false";
-  'aria-haspopup'?: (boolean | "true" | "false") | "menu" | "listbox" | "tree" | "grid" | "dialog";
-  'aria-hidden'?: boolean | "true" | "false";
-  'aria-invalid'?: (boolean | "true" | "false") | "grammar" | "spelling";
-  'aria-keyshortcuts'?: string;
-  'aria-label'?: string;
-  'aria-labelledby'?: string;
-  'aria-level'?: string | number;
-  'aria-live'?: "off" | "assertive" | "polite";
-  'aria-modal'?: boolean | "true" | "false";
-  'aria-multiline'?: boolean | "true" | "false";
-  'aria-multiselectable'?: boolean | "true" | "false";
-  'aria-orientation'?: "horizontal" | "vertical";
-  'aria-owns'?: string;
-  'aria-placeholder'?: string;
-  'aria-posinset'?: string | number;
-  'aria-pressed'?: (boolean | "true" | "false") | "mixed";
-  'aria-readonly'?: boolean | "true" | "false";
-  'aria-relevant'?: "additions" | "additions removals" | "additions text" | "all" | "removals" | "removals additions" | "removals text" | "text" | "text additions" | "text removals";
-  'aria-required'?: boolean | "true" | "false";
-  'aria-roledescription'?: string;
-  'aria-rowcount'?: string | number;
-  'aria-rowindex'?: string | number;
-  'aria-rowspan'?: string | number;
-  'aria-selected'?: boolean | "true" | "false";
-  'aria-setsize'?: string | number;
-  'aria-sort'?: "none" | "ascending" | "descending" | "other";
-  'aria-valuemax'?: string | number;
-  'aria-valuemin'?: string | number;
-  'aria-valuenow'?: string | number;
-  'aria-valuetext'?: string;
+  prefix?: string | undefined;
+  property?: string | undefined;
+  resource?: string | undefined;
+  typeof?: string | undefined;
+  vocab?: string | undefined;
+  autocapitalize?: string | undefined;
+  autocorrect?: string | undefined;
+  autosave?: string | undefined;
+  color?: string | undefined;
+  itemprop?: string | undefined;
+  itemscope?: (boolean | "true" | "false") | undefined;
+  itemtype?: string | undefined;
+  itemid?: string | undefined;
+  itemref?: string | undefined;
+  results?: (string | number) | undefined;
+  security?: string | undefined;
+  unselectable?: "on" | "off" | undefined;
+  inputmode?: "none" | "text" | "tel" | "url" | "email" | "numeric" | "decimal" | "search" | undefined;
+  is?: string | undefined;
+  'aria-activedescendant'?: string | undefined;
+  'aria-atomic'?: (boolean | "true" | "false") | undefined;
+  'aria-autocomplete'?: "none" | "inline" | "list" | "both" | undefined;
+  'aria-busy'?: (boolean | "true" | "false") | undefined;
+  'aria-checked'?: (boolean | "true" | "false") | "mixed" | undefined;
+  'aria-colcount'?: (string | number) | undefined;
+  'aria-colindex'?: (string | number) | undefined;
+  'aria-colspan'?: (string | number) | undefined;
+  'aria-controls'?: string | undefined;
+  'aria-current'?: (boolean | "true" | "false") | "page" | "step" | "location" | "date" | "time" | undefined;
+  'aria-describedby'?: string | undefined;
+  'aria-details'?: string | undefined;
+  'aria-disabled'?: (boolean | "true" | "false") | undefined;
+  'aria-dropeffect'?: "none" | "copy" | "execute" | "link" | "move" | "popup" | undefined;
+  'aria-errormessage'?: string | undefined;
+  'aria-expanded'?: (boolean | "true" | "false") | undefined;
+  'aria-flowto'?: string | undefined;
+  'aria-grabbed'?: (boolean | "true" | "false") | undefined;
+  'aria-haspopup'?: (boolean | "true" | "false") | "menu" | "listbox" | "tree" | "grid" | "dialog" | undefined;
+  'aria-hidden'?: (boolean | "true" | "false") | undefined;
+  'aria-invalid'?: (boolean | "true" | "false") | "grammar" | "spelling" | undefined;
+  'aria-keyshortcuts'?: string | undefined;
+  'aria-label'?: string | undefined;
+  'aria-labelledby'?: string | undefined;
+  'aria-level'?: (string | number) | undefined;
+  'aria-live'?: "off" | "assertive" | "polite" | undefined;
+  'aria-modal'?: (boolean | "true" | "false") | undefined;
+  'aria-multiline'?: (boolean | "true" | "false") | undefined;
+  'aria-multiselectable'?: (boolean | "true" | "false") | undefined;
+  'aria-orientation'?: "horizontal" | "vertical" | undefined;
+  'aria-owns'?: string | undefined;
+  'aria-placeholder'?: string | undefined;
+  'aria-posinset'?: (string | number) | undefined;
+  'aria-pressed'?: (boolean | "true" | "false") | "mixed" | undefined;
+  'aria-readonly'?: (boolean | "true" | "false") | undefined;
+  'aria-relevant'?: "additions" | "additions removals" | "additions text" | "all" | "removals" | "removals additions" | "removals text" | "text" | "text additions" | "text removals" | undefined;
+  'aria-required'?: (boolean | "true" | "false") | undefined;
+  'aria-roledescription'?: string | undefined;
+  'aria-rowcount'?: (string | number) | undefined;
+  'aria-rowindex'?: (string | number) | undefined;
+  'aria-rowspan'?: (string | number) | undefined;
+  'aria-selected'?: (boolean | "true" | "false") | undefined;
+  'aria-setsize'?: (string | number) | undefined;
+  'aria-sort'?: "none" | "ascending" | "descending" | "other" | undefined;
+  'aria-valuemax'?: (string | number) | undefined;
+  'aria-valuemin'?: (string | number) | undefined;
+  'aria-valuenow'?: (string | number) | undefined;
+  'aria-valuetext'?: string | undefined;
   onCopy?: (payload: ClipboardEvent) => void;
   onCut?: (payload: ClipboardEvent) => void;
   onPaste?: (payload: ClipboardEvent) => void;
@@ -292,19 +338,19 @@ declare const _default: vue0.DefineComponent<{
   onFocusout?: (payload: FocusEvent) => void;
   onBlur?: (payload: FocusEvent) => void;
   onChange?: (payload: Event) => void;
-  onBeforeinput?: (payload: Event) => void;
+  onBeforeinput?: (payload: InputEvent) => void;
   onInput?: (payload: Event) => void;
   onReset?: (payload: Event) => void;
-  onSubmit?: (payload: Event) => void;
+  onSubmit?: (payload: SubmitEvent) => void;
   onInvalid?: (payload: Event) => void;
   onLoad?: (payload: Event) => void;
   onError?: (payload: Event) => void;
   onKeydown?: (payload: KeyboardEvent) => void;
   onKeypress?: (payload: KeyboardEvent) => void;
   onKeyup?: (payload: KeyboardEvent) => void;
-  onAuxclick?: (payload: MouseEvent) => void;
-  onClick?: (payload: MouseEvent) => void;
-  onContextmenu?: (payload: MouseEvent) => void;
+  onAuxclick?: (payload: PointerEvent) => void;
+  onClick?: (payload: PointerEvent) => void;
+  onContextmenu?: (payload: PointerEvent) => void;
   onDblclick?: (payload: MouseEvent) => void;
   onMousedown?: (payload: MouseEvent) => void;
   onMouseenter?: (payload: MouseEvent) => void;
@@ -313,12 +359,12 @@ declare const _default: vue0.DefineComponent<{
   onMouseout?: (payload: MouseEvent) => void;
   onMouseover?: (payload: MouseEvent) => void;
   onMouseup?: (payload: MouseEvent) => void;
-  onAbort?: (payload: Event) => void;
+  onAbort?: (payload: UIEvent) => void;
   onCanplay?: (payload: Event) => void;
   onCanplaythrough?: (payload: Event) => void;
   onDurationchange?: (payload: Event) => void;
   onEmptied?: (payload: Event) => void;
-  onEncrypted?: (payload: Event) => void;
+  onEncrypted?: (payload: MediaEncryptedEvent) => void;
   onEnded?: (payload: Event) => void;
   onLoadeddata?: (payload: Event) => void;
   onLoadedmetadata?: (payload: Event) => void;
@@ -326,7 +372,7 @@ declare const _default: vue0.DefineComponent<{
   onPause?: (payload: Event) => void;
   onPlay?: (payload: Event) => void;
   onPlaying?: (payload: Event) => void;
-  onProgress?: (payload: Event) => void;
+  onProgress?: (payload: ProgressEvent<EventTarget>) => void;
   onRatechange?: (payload: Event) => void;
   onSeeked?: (payload: Event) => void;
   onSeeking?: (payload: Event) => void;
@@ -356,10 +402,10 @@ declare const _default: vue0.DefineComponent<{
   onAnimationiteration?: (payload: AnimationEvent) => void;
   onTransitionend?: (payload: TransitionEvent) => void;
   onTransitionstart?: (payload: TransitionEvent) => void;
-  key?: PropertyKey;
-  ref?: vue0.VNodeRef;
-  ref_for?: boolean;
-  ref_key?: string;
+  key?: PropertyKey | undefined;
+  ref?: vue0.VNodeRef | undefined;
+  ref_for?: boolean | undefined;
+  ref_key?: string | undefined;
   onVnodeBeforeMount?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
   onVnodeMounted?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
   onVnodeBeforeUpdate?: ((vnode: vue0.VNode, oldVNode: vue0.VNode) => void) | ((vnode: vue0.VNode, oldVNode: vue0.VNode) => void)[];
@@ -369,95 +415,95 @@ declare const _default: vue0.DefineComponent<{
 }, {}, {}, {}, {}, vue0.ComponentOptionsMixin, vue0.ComponentOptionsMixin, {}, string, vue0.PublicProps, Readonly<{
   foo: string;
   bar?: string;
-  innerHTML?: string;
+  innerHTML?: string | undefined;
   class?: any;
-  style?: vue0.StyleValue;
-  accesskey?: string;
-  contenteditable?: (boolean | "true" | "false") | "inherit" | "plaintext-only";
-  contextmenu?: string;
-  dir?: string;
-  draggable?: boolean | "true" | "false";
-  hidden?: (boolean | "true" | "false") | "" | "hidden" | "until-found";
-  id?: string;
-  inert?: boolean | "true" | "false";
-  lang?: string;
-  placeholder?: string;
-  spellcheck?: boolean | "true" | "false";
-  tabindex?: string | number;
-  title?: string;
-  translate?: "yes" | "no";
-  radiogroup?: string;
-  role?: string;
-  about?: string;
-  datatype?: string;
+  style?: vue0.StyleValue | undefined;
+  accesskey?: string | undefined;
+  contenteditable?: (boolean | "true" | "false") | "inherit" | "plaintext-only" | undefined;
+  contextmenu?: string | undefined;
+  dir?: string | undefined;
+  draggable?: (boolean | "true" | "false") | undefined;
+  hidden?: (boolean | "true" | "false") | "" | "hidden" | "until-found" | undefined;
+  id?: string | undefined;
+  inert?: (boolean | "true" | "false") | undefined;
+  lang?: string | undefined;
+  placeholder?: string | undefined;
+  spellcheck?: (boolean | "true" | "false") | undefined;
+  tabindex?: (string | number) | undefined;
+  title?: string | undefined;
+  translate?: "yes" | "no" | undefined;
+  radiogroup?: string | undefined;
+  role?: string | undefined;
+  about?: string | undefined;
+  datatype?: string | undefined;
   inlist?: any;
-  prefix?: string;
-  property?: string;
-  resource?: string;
-  typeof?: string;
-  vocab?: string;
-  autocapitalize?: string;
-  autocorrect?: string;
-  autosave?: string;
-  color?: string;
-  itemprop?: string;
-  itemscope?: boolean | "true" | "false";
-  itemtype?: string;
-  itemid?: string;
-  itemref?: string;
-  results?: string | number;
-  security?: string;
-  unselectable?: "on" | "off";
-  inputmode?: "none" | "text" | "tel" | "url" | "email" | "numeric" | "decimal" | "search";
-  is?: string;
-  'aria-activedescendant'?: string;
-  'aria-atomic'?: boolean | "true" | "false";
-  'aria-autocomplete'?: "none" | "inline" | "list" | "both";
-  'aria-busy'?: boolean | "true" | "false";
-  'aria-checked'?: (boolean | "true" | "false") | "mixed";
-  'aria-colcount'?: string | number;
-  'aria-colindex'?: string | number;
-  'aria-colspan'?: string | number;
-  'aria-controls'?: string;
-  'aria-current'?: (boolean | "true" | "false") | "page" | "step" | "location" | "date" | "time";
-  'aria-describedby'?: string;
-  'aria-details'?: string;
-  'aria-disabled'?: boolean | "true" | "false";
-  'aria-dropeffect'?: "none" | "copy" | "execute" | "link" | "move" | "popup";
-  'aria-errormessage'?: string;
-  'aria-expanded'?: boolean | "true" | "false";
-  'aria-flowto'?: string;
-  'aria-grabbed'?: boolean | "true" | "false";
-  'aria-haspopup'?: (boolean | "true" | "false") | "menu" | "listbox" | "tree" | "grid" | "dialog";
-  'aria-hidden'?: boolean | "true" | "false";
-  'aria-invalid'?: (boolean | "true" | "false") | "grammar" | "spelling";
-  'aria-keyshortcuts'?: string;
-  'aria-label'?: string;
-  'aria-labelledby'?: string;
-  'aria-level'?: string | number;
-  'aria-live'?: "off" | "assertive" | "polite";
-  'aria-modal'?: boolean | "true" | "false";
-  'aria-multiline'?: boolean | "true" | "false";
-  'aria-multiselectable'?: boolean | "true" | "false";
-  'aria-orientation'?: "horizontal" | "vertical";
-  'aria-owns'?: string;
-  'aria-placeholder'?: string;
-  'aria-posinset'?: string | number;
-  'aria-pressed'?: (boolean | "true" | "false") | "mixed";
-  'aria-readonly'?: boolean | "true" | "false";
-  'aria-relevant'?: "additions" | "additions removals" | "additions text" | "all" | "removals" | "removals additions" | "removals text" | "text" | "text additions" | "text removals";
-  'aria-required'?: boolean | "true" | "false";
-  'aria-roledescription'?: string;
-  'aria-rowcount'?: string | number;
-  'aria-rowindex'?: string | number;
-  'aria-rowspan'?: string | number;
-  'aria-selected'?: boolean | "true" | "false";
-  'aria-setsize'?: string | number;
-  'aria-sort'?: "none" | "ascending" | "descending" | "other";
-  'aria-valuemax'?: string | number;
-  'aria-valuemin'?: string | number;
-  'aria-valuenow'?: string | number;
-  'aria-valuetext'?: string;
+  prefix?: string | undefined;
+  property?: string | undefined;
+  resource?: string | undefined;
+  typeof?: string | undefined;
+  vocab?: string | undefined;
+  autocapitalize?: string | undefined;
+  autocorrect?: string | undefined;
+  autosave?: string | undefined;
+  color?: string | undefined;
+  itemprop?: string | undefined;
+  itemscope?: (boolean | "true" | "false") | undefined;
+  itemtype?: string | undefined;
+  itemid?: string | undefined;
+  itemref?: string | undefined;
+  results?: (string | number) | undefined;
+  security?: string | undefined;
+  unselectable?: "on" | "off" | undefined;
+  inputmode?: "none" | "text" | "tel" | "url" | "email" | "numeric" | "decimal" | "search" | undefined;
+  is?: string | undefined;
+  'aria-activedescendant'?: string | undefined;
+  'aria-atomic'?: (boolean | "true" | "false") | undefined;
+  'aria-autocomplete'?: "none" | "inline" | "list" | "both" | undefined;
+  'aria-busy'?: (boolean | "true" | "false") | undefined;
+  'aria-checked'?: (boolean | "true" | "false") | "mixed" | undefined;
+  'aria-colcount'?: (string | number) | undefined;
+  'aria-colindex'?: (string | number) | undefined;
+  'aria-colspan'?: (string | number) | undefined;
+  'aria-controls'?: string | undefined;
+  'aria-current'?: (boolean | "true" | "false") | "page" | "step" | "location" | "date" | "time" | undefined;
+  'aria-describedby'?: string | undefined;
+  'aria-details'?: string | undefined;
+  'aria-disabled'?: (boolean | "true" | "false") | undefined;
+  'aria-dropeffect'?: "none" | "copy" | "execute" | "link" | "move" | "popup" | undefined;
+  'aria-errormessage'?: string | undefined;
+  'aria-expanded'?: (boolean | "true" | "false") | undefined;
+  'aria-flowto'?: string | undefined;
+  'aria-grabbed'?: (boolean | "true" | "false") | undefined;
+  'aria-haspopup'?: (boolean | "true" | "false") | "menu" | "listbox" | "tree" | "grid" | "dialog" | undefined;
+  'aria-hidden'?: (boolean | "true" | "false") | undefined;
+  'aria-invalid'?: (boolean | "true" | "false") | "grammar" | "spelling" | undefined;
+  'aria-keyshortcuts'?: string | undefined;
+  'aria-label'?: string | undefined;
+  'aria-labelledby'?: string | undefined;
+  'aria-level'?: (string | number) | undefined;
+  'aria-live'?: "off" | "assertive" | "polite" | undefined;
+  'aria-modal'?: (boolean | "true" | "false") | undefined;
+  'aria-multiline'?: (boolean | "true" | "false") | undefined;
+  'aria-multiselectable'?: (boolean | "true" | "false") | undefined;
+  'aria-orientation'?: "horizontal" | "vertical" | undefined;
+  'aria-owns'?: string | undefined;
+  'aria-placeholder'?: string | undefined;
+  'aria-posinset'?: (string | number) | undefined;
+  'aria-pressed'?: (boolean | "true" | "false") | "mixed" | undefined;
+  'aria-readonly'?: (boolean | "true" | "false") | undefined;
+  'aria-relevant'?: "additions" | "additions removals" | "additions text" | "all" | "removals" | "removals additions" | "removals text" | "text" | "text additions" | "text removals" | undefined;
+  'aria-required'?: (boolean | "true" | "false") | undefined;
+  'aria-roledescription'?: string | undefined;
+  'aria-rowcount'?: (string | number) | undefined;
+  'aria-rowindex'?: (string | number) | undefined;
+  'aria-rowspan'?: (string | number) | undefined;
+  'aria-selected'?: (boolean | "true" | "false") | undefined;
+  'aria-setsize'?: (string | number) | undefined;
+  'aria-sort'?: "none" | "ascending" | "descending" | "other" | undefined;
+  'aria-valuemax'?: (string | number) | undefined;
+  'aria-valuemin'?: (string | number) | undefined;
+  'aria-valuenow'?: (string | number) | undefined;
+  'aria-valuetext'?: string | undefined;
   onCopy?: (payload: ClipboardEvent) => void;
   onCut?: (payload: ClipboardEvent) => void;
   onPaste?: (payload: ClipboardEvent) => void;
@@ -477,19 +523,19 @@ declare const _default: vue0.DefineComponent<{
   onFocusout?: (payload: FocusEvent) => void;
   onBlur?: (payload: FocusEvent) => void;
   onChange?: (payload: Event) => void;
-  onBeforeinput?: (payload: Event) => void;
+  onBeforeinput?: (payload: InputEvent) => void;
   onInput?: (payload: Event) => void;
   onReset?: (payload: Event) => void;
-  onSubmit?: (payload: Event) => void;
+  onSubmit?: (payload: SubmitEvent) => void;
   onInvalid?: (payload: Event) => void;
   onLoad?: (payload: Event) => void;
   onError?: (payload: Event) => void;
   onKeydown?: (payload: KeyboardEvent) => void;
   onKeypress?: (payload: KeyboardEvent) => void;
   onKeyup?: (payload: KeyboardEvent) => void;
-  onAuxclick?: (payload: MouseEvent) => void;
-  onClick?: (payload: MouseEvent) => void;
-  onContextmenu?: (payload: MouseEvent) => void;
+  onAuxclick?: (payload: PointerEvent) => void;
+  onClick?: (payload: PointerEvent) => void;
+  onContextmenu?: (payload: PointerEvent) => void;
   onDblclick?: (payload: MouseEvent) => void;
   onMousedown?: (payload: MouseEvent) => void;
   onMouseenter?: (payload: MouseEvent) => void;
@@ -498,12 +544,12 @@ declare const _default: vue0.DefineComponent<{
   onMouseout?: (payload: MouseEvent) => void;
   onMouseover?: (payload: MouseEvent) => void;
   onMouseup?: (payload: MouseEvent) => void;
-  onAbort?: (payload: Event) => void;
+  onAbort?: (payload: UIEvent) => void;
   onCanplay?: (payload: Event) => void;
   onCanplaythrough?: (payload: Event) => void;
   onDurationchange?: (payload: Event) => void;
   onEmptied?: (payload: Event) => void;
-  onEncrypted?: (payload: Event) => void;
+  onEncrypted?: (payload: MediaEncryptedEvent) => void;
   onEnded?: (payload: Event) => void;
   onLoadeddata?: (payload: Event) => void;
   onLoadedmetadata?: (payload: Event) => void;
@@ -511,7 +557,7 @@ declare const _default: vue0.DefineComponent<{
   onPause?: (payload: Event) => void;
   onPlay?: (payload: Event) => void;
   onPlaying?: (payload: Event) => void;
-  onProgress?: (payload: Event) => void;
+  onProgress?: (payload: ProgressEvent<EventTarget>) => void;
   onRatechange?: (payload: Event) => void;
   onSeeked?: (payload: Event) => void;
   onSeeking?: (payload: Event) => void;
@@ -541,10 +587,10 @@ declare const _default: vue0.DefineComponent<{
   onAnimationiteration?: (payload: AnimationEvent) => void;
   onTransitionend?: (payload: TransitionEvent) => void;
   onTransitionstart?: (payload: TransitionEvent) => void;
-  key?: PropertyKey;
-  ref?: vue0.VNodeRef;
-  ref_for?: boolean;
-  ref_key?: string;
+  key?: PropertyKey | undefined;
+  ref?: vue0.VNodeRef | undefined;
+  ref_for?: boolean | undefined;
+  ref_key?: string | undefined;
   onVnodeBeforeMount?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
   onVnodeMounted?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
   onVnodeBeforeUpdate?: ((vnode: vue0.VNode, oldVNode: vue0.VNode) => void) | ((vnode: vue0.VNode, oldVNode: vue0.VNode) => void)[];
@@ -554,4 +600,25 @@ declare const _default: vue0.DefineComponent<{
 }> & Readonly<{}>, {}, {}, {}, {}, string, vue0.ComponentProvideOptions, false, {}, any>;
 //#endregion
 export { _default as App };"
+`;
+
+exports[`tsc > vue-sfc w/ ts-macro w/ ts-compiler 1`] = `
+"// main.d.ts
+import * as vue0 from "vue";
+
+//#region tests/fixtures/vue-sfc-with-ts-macro/App.vue.d.ts
+type __VLS_Props = {
+  foo: string;
+};
+declare global {
+  interface Window {
+    foo: string;
+  }
+}
+declare const _default: vue0.DefineComponent<__VLS_Props, {}, {}, {}, {}, vue0.ComponentOptionsMixin, vue0.ComponentOptionsMixin, {}, string, vue0.PublicProps, Readonly<__VLS_Props> & Readonly<{}>, {}, {}, {}, {}, string, vue0.ComponentProvideOptions, false, {}, any>;
+//#endregion
+//#region tests/fixtures/vue-sfc-with-ts-macro/main.d.ts
+declare function defineStyle(style: string): any;
+//#endregion
+export { _default as App, defineStyle };"
 `;

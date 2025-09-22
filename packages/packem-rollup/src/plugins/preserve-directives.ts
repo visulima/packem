@@ -100,7 +100,10 @@ const preserveDirectives = ({
         },
 
         // eslint-disable-next-line sonarjs/cognitive-complexity
-        transform(code, id): { code: string; map: SourceMap | undefined; meta: { preserveDirectives: { directives: string[]; shebang: string | undefined } } } | undefined {
+        transform(
+            code,
+            id,
+        ): { code: string; map: SourceMap | undefined; meta: { preserveDirectives: { directives: string[]; shebang: string | undefined } } } | undefined {
             if (!filter(id)) {
                 return undefined;
             }
@@ -229,7 +232,6 @@ const preserveDirectives = ({
                 map: magicString.generateMap({ hires: true }),
                 meta: {
                     preserveDirectives: {
-
                         directives: [...directives[id] ?? []],
 
                         shebang: shebangs[id] ?? undefined,

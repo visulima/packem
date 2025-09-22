@@ -189,8 +189,7 @@ describe(generateJsExports, () => {
         it("should handle custom injection function", () => {
             expect.assertions(1);
 
-            const customInject = (varname: string, id: string, output: string[]) =>
-                `console.log("Injecting ${varname} from ${id}");`;
+            const customInject = (varname: string, id: string, output: string[]) => `console.log("Injecting ${varname} from ${id}");`;
 
             const result = generateJsExports({
                 ...baseOptions,

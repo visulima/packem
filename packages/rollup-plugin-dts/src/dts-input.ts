@@ -9,12 +9,12 @@ export function createDtsInputPlugin(): Plugin {
         options(options) {
             return {
                 treeshake:
-          options.treeshake === false
-              ? false
-              : {
-                  ...options.treeshake === true ? {} : options.treeshake,
-                  moduleSideEffects: false,
-              },
+                    options.treeshake === false
+                        ? false
+                        : {
+                            ...options.treeshake === true ? {} : options.treeshake,
+                            moduleSideEffects: false,
+                        },
                 ...options,
             };
         },
@@ -34,10 +34,7 @@ export function createDtsInputPlugin(): Plugin {
                             return nameTemplate;
                         }
 
-                        const renderedNameWithD = replaceTemplateName(
-                            nameTemplate,
-                            `${chunk.name}.d`,
-                        );
+                        const renderedNameWithD = replaceTemplateName(nameTemplate, `${chunk.name}.d`);
 
                         if (RE_DTS.test(renderedNameWithD)) {
                             return renderedNameWithD;

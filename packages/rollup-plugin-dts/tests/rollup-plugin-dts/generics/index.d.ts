@@ -15,16 +15,16 @@ interface O {}
 interface P {}
 declare type Gen<T> = T;
 export interface I1<T = A> {
-  a: T;
-  b: Gen<B>;
+    a: T;
+    b: Gen<B>;
 }
 export declare type Ty<T = C> = {
-  c: T;
-  d: Gen<D>;
+    c: T;
+    d: Gen<D>;
 };
 export declare class Cl<T = E> {
-  e: T;
-  f: Gen<F>;
+    e: T;
+    f: Gen<F>;
 }
 export declare function fn<T = G>(g: T, h: Gen<H>): void;
 export declare type TyFn = <T = J>(j: T, k: Gen<K>) => L;

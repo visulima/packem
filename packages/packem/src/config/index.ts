@@ -24,9 +24,7 @@ export type { BuildHooks } from "@visulima/packem-share/types";
  * ```
  * @public
  */
-export const defineConfig = (
-    config: BuildConfig | BuildConfigFunction,
-): BuildConfig | BuildConfigFunction => config;
+export const defineConfig = (config: BuildConfig | BuildConfigFunction): BuildConfig | BuildConfigFunction => config;
 
 /**
  * Defines a build preset for Packem.

@@ -17,7 +17,7 @@
         "clean": "nx run-many --target=clean --all --parallel && rimraf ./node_modules",
         "graph": "nx dep-graph",
         "preinstall": "node -e \"if(process.env.CI == 'true') {console.info('Skipping preinstall...')} else {process.exit(1)}\" || (node verify-node-version.js && npm -y exec only-allow pnpm)",
-        "lint": "pnpm run lint:eslint && lint:dedupe",
+        "lint": "pnpm run lint:prettier && pnpm run lint:eslint && lint:dedupe",
         "lint:affected:attw": "nx affected --target=lint:attw --parallel --exclude=*-bench,docs,storybook --nxBail",
         "lint:affected:eslint": "nx affected --target=lint:eslint --parallel --exclude=*-bench,docs,examples_* --nxBail",
         "lint:affected:eslint:fix": "nx affected --target=lint:eslint:fix --parallel --exclude=*-bench,docs,examples_* --nxBail",
@@ -27,6 +27,10 @@
         "lint:dedupe": "pnpm dedupe --check",
         "lint:eslint": "nx run-many --target=lint:eslint --all --parallel",
         "lint:eslint:fix": "nx run-many --target=lint:eslint:fix --all --parallel",
+        "lint:prettier": "pnpm run lint:prettier:root && nx run-many --target=lint:prettier --all --parallel",
+        "lint:prettier:fix": "pnpm run lint:prettier:fix:root && nx run-many --target=lint:prettier:fix --all --parallel",
+        "lint:prettier:fix:root": "prettier --config=.prettierrc.cjs --write '*.{json,yml,yaml,js,mjs,cjs,ts}' && prettier --config=.prettierrc.cjs --write 'examples/**/*.{json,yml,yaml,js,mjs,cjs,ts}' && prettier --config=.prettierrc.cjs --write 'scripts/**/*.{json,yml,yaml,js,mjs,cjs,ts}'",
+        "lint:prettier:root": "prettier --config=.prettierrc.cjs --check '*.{json,yml,yaml,js,mjs,cjs,ts}' && prettier --config=.prettierrc.cjs --check 'examples/**/*.{json,yml,yaml,js,mjs,cjs,ts}' && prettier --config=.prettierrc.cjs --check 'scripts/**/*.{json,yml,yaml,js,mjs,cjs,ts}'",
         "lint:fix": "pnpm run lint:eslint:fix && pnpm run sort-package-json",
         "lint:package-json": "nx run-many --target=lint:package-json --parallel --projects=tag:type:package",
         "lint:secrets": "secretlint **/*",
@@ -78,7 +82,7 @@
         "typescript": "^5.9.2",
         "vitest": "^3.2.4"
     },
-    "packageManager": "pnpm@10.16.1",
+    "packageManager": "pnpm@10.17.1",
     "engines": {
         "node": ">=18.* <=24.*"
     },
@@ -96,16 +100,9 @@
             "@eslint/plugin-kit@<0.3.4": ">=0.3.4",
             "@octokit/plugin-paginate-rest@>=1.0.0 <11.4.1": ">=11.4.1",
             "@octokit/request@>=1.0.0 <9.2.1": ">=9.2.1",
-=======
-            "@visulima/packem-rollup": "workspace:*",
-            "@visulima/packem-share": "workspace:*",
-            "@visulima/rollup-plugin-css": "workspace:*",
-            "brace-expansion@>=1.0.0 <=1.1.11": ">=1.1.12",
->>>>>>> fdcf9f166 (fix: rename css plugin)
             "chrono-node@<2.2.4": ">=2.2.4",
             "form-data@>=4.0.0 <4.0.4": ">=4.0.4",
             "tmp@<=0.2.3": ">=0.2.4",
-<<<<<<< HEAD
 <<<<<<< HEAD
             "undici@>=6.0.0 <6.21.2": ">=7.24.0"
         }

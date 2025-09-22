@@ -64,7 +64,11 @@ const loadModule = async (moduleId: string, cwd: string, logger: RollupLogger): 
 
         loaded[moduleId] = await loadModuleFromPath(resolvedPath, require);
     } catch (error) {
-        logger.warn({ message: `Failed to resolve or load module: ${error instanceof Error ? error.message : String(error)}`, module: moduleId, plugin: "css" });
+        logger.warn({
+            message: `Failed to resolve or load module: ${error instanceof Error ? error.message : String(error)}`,
+            module: moduleId,
+            plugin: "css",
+        });
 
         // eslint-disable-next-line unicorn/no-null
         loaded[moduleId] = null;

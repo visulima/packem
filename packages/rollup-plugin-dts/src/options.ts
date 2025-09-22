@@ -1,16 +1,10 @@
+import path from "node:path";
 import process from "node:process";
 
-import { resolve as pathResolve } from "@visulima/path";
-import type { TsConfigJson, TsConfigJsonResolved } from "@visulima/tsconfig";
-import {
-    findTsConfigSync,
-    readTsConfig,
-} from "@visulima/tsconfig";
+import type { TsConfigJson, TsConfigJsonResolved } from "get-tsconfig";
+import { getTsconfig, parseTsconfig } from "get-tsconfig";
+import type { AddonFunction } from "rolldown";
 import type { IsolatedDeclarationsOptions } from "rolldown/experimental";
-
-type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
-
-let warnedTsgo = false;
 
 // #region General Options
 export interface GeneralOptions {
@@ -83,6 +77,11 @@ export interface GeneralOptions {
 // #region tsc Options
 export interface TscOptions {
     /**
+     * Content to be added at the top of each generated `.d.ts` file.
+     */
+    banner?: string | Promise<string> | AddonFunction;
+
+    /**
      * Build mode for the TypeScript compiler:
      *
      * - If `true`, the plugin will use [`tsc -b`](https://www.typescriptlang.org/docs/handbook/project-references.html#build-mode-for-typescript) to build the project and all referenced projects before emitting `.d.ts` files.
@@ -107,6 +106,11 @@ export interface TscOptions {
      * `false`.
      */
     emitJs?: boolean;
+
+    /**
+     * Content to be added at the bottom of each generated `.d.ts` file.
+     */
+    footer?: string | Promise<string> | AddonFunction;
 
     /**
      * If your tsconfig.json has
@@ -157,6 +161,11 @@ export interface TscOptions {
     parallel?: boolean;
 
     /**
+     * If `true`, the plugin will generate `.d.ts` files using `@ts-macro/tsc`.
+     */
+    tsMacro?: boolean;
+
+    /**
      * If `true`, the plugin will generate `.d.ts` files using `vue-tsc`.
      */
     vue?: boolean;
@@ -186,16 +195,22 @@ export interface Options extends GeneralOptions, TscOptions {
     tsgo?: boolean;
 }
 
+type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
+type MarkPartial<T, K extends keyof T> = Omit<Required<T>, K> & Partial<Pick<T, K>>;
+
 export type OptionsResolved = Overwrite<
-    Required<Omit<Options, "compilerOptions">>,
+    MarkPartial<Omit<Options, "compilerOptions">, "banner" | "footer">,
     {
         oxc: IsolatedDeclarationsOptions | false;
-        tsconfig: string | undefined;
+        tsconfig?: string;
         tsconfigRaw: TsConfigJson;
     }
 >;
 
-export const resolveOptions = ({
+let warnedTsgo = false;
+
+export function resolveOptions({
+    banner,
     // tsc
     build = false,
     cjsDefault = false,
@@ -205,6 +220,7 @@ export const resolveOptions = ({
     eager = false,
     emitDtsOnly = false,
     emitJs,
+    footer,
     incremental = false,
 
     newContext = false,
@@ -214,20 +230,21 @@ export const resolveOptions = ({
     sourcemap,
     tsconfig,
     tsconfigRaw: overriddenTsconfigRaw = {},
-
     tsgo = false,
+
+    tsMacro = false,
     vue = false,
-}: Options): OptionsResolved => {
+}: Options): OptionsResolved {
     let resolvedTsconfig: TsConfigJsonResolved | undefined;
 
     if (tsconfig === true || tsconfig == undefined) {
-        const { config, path } = findTsConfigSync(cwd) || {};
+        const { config, path } = getTsconfig(cwd) || {};
 
         tsconfig = path;
         resolvedTsconfig = config;
     } else if (typeof tsconfig === "string") {
-        tsconfig = pathResolve(cwd || process.cwd(), tsconfig);
-        resolvedTsconfig = readTsConfig(tsconfig);
+        tsconfig = path.resolve(cwd || process.cwd(), tsconfig);
+        resolvedTsconfig = parseTsconfig(tsconfig);
     } else {
         tsconfig = undefined;
     }
@@ -237,8 +254,7 @@ export const resolveOptions = ({
         ...compilerOptions,
     };
 
-    incremental
-        ||= compilerOptions.incremental || !!compilerOptions.tsBuildInfoFile;
+    incremental ||= compilerOptions.incremental || !!compilerOptions.tsBuildInfoFile;
     sourcemap ??= !!compilerOptions.declarationMap;
     compilerOptions.declarationMap = sourcemap;
 
@@ -248,7 +264,7 @@ export const resolveOptions = ({
         compilerOptions,
     };
 
-    oxc ??= !!(compilerOptions?.isolatedDeclarations && !vue && !tsgo);
+    oxc ??= !!(compilerOptions?.isolatedDeclarations && !vue && !tsgo && !tsMacro);
 
     if (oxc === true) {
         oxc = {};
@@ -264,32 +280,33 @@ export const resolveOptions = ({
 
     if (tsgo) {
         if (vue) {
-            throw new Error(
-                "[rolldown-plugin-dts] The `tsgo` option is not compatible with the `vue` option. Please disable one of them.",
-            );
+            throw new Error("[rolldown-plugin-dts] The `tsgo` option is not compatible with the `vue` option. Please disable one of them.");
+        }
+
+        if (tsMacro) {
+            throw new Error("[rolldown-plugin-dts] The `tsgo` option is not compatible with the `tsMacro` option. Please disable one of them.");
         }
 
         if (oxc) {
-            throw new Error(
-                "[rolldown-plugin-dts] The `tsgo` option is not compatible with the `oxc` option. Please disable one of them.",
-            );
+            throw new Error("[rolldown-plugin-dts] The `tsgo` option is not compatible with the `oxc` option. Please disable one of them.");
         }
     }
 
     if (oxc && vue) {
-        throw new Error(
-            "[rolldown-plugin-dts] The `oxc` option is not compatible with the `vue` option. Please disable one of them.",
-        );
+        throw new Error("[rolldown-plugin-dts] The `oxc` option is not compatible with the `vue` option. Please disable one of them.");
+    }
+
+    if (oxc && tsMacro) {
+        throw new Error("[rolldown-plugin-dts] The `oxc` option is not compatible with the `tsMacro` option. Please disable one of them.");
     }
 
     if (tsgo && !warnedTsgo) {
-        console.warn(
-            "The `tsgo` option is experimental and may change in the future.",
-        );
+        console.warn("The `tsgo` option is experimental and may change in the future.");
         warnedTsgo = true;
     }
 
     return {
+        banner,
         // tsc
         build,
         cjsDefault,
@@ -298,6 +315,7 @@ export const resolveOptions = ({
         eager,
         emitDtsOnly,
         emitJs,
+        footer,
         incremental,
 
         newContext,
@@ -308,6 +326,8 @@ export const resolveOptions = ({
         tsconfig,
         tsconfigRaw,
         tsgo,
+
+        tsMacro,
         vue,
     };
-};
+}

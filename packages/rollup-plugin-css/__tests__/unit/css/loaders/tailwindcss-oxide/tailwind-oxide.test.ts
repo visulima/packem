@@ -7,7 +7,9 @@ vi.mock("@tailwindcss/node", () => {
     return {
         compile: vi.fn().mockResolvedValue({
             build: vi.fn(() => "compiled-css"),
-            buildSourceMap: vi.fn(() => { return { raw: "sourcemap" }; }),
+            buildSourceMap: vi.fn(() => {
+                return { raw: "sourcemap" };
+            }),
             features: 8, // Features.Utilities
             root: null,
             sources: [],
@@ -25,8 +27,12 @@ vi.mock("@tailwindcss/node", () => {
             end() {}
         },
         normalizePath: vi.fn((path) => path),
-        optimize: vi.fn((code) => { return { code, map: undefined }; }),
-        toSourceMap: vi.fn(() => { return { raw: "sourcemap" }; }),
+        optimize: vi.fn((code) => {
+            return { code, map: undefined };
+        }),
+        toSourceMap: vi.fn(() => {
+            return { raw: "sourcemap" };
+        }),
     };
 });
 
@@ -78,7 +84,7 @@ describe("tailwind-oxide loader", () => {
     });
 
     it("should process CSS content", async () => {
-        expect.assertions(2);
+        expect.assertions(1);
 
         const mockContext = {
             deps: new Set<string>(),

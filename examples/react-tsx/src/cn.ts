@@ -10,5 +10,5 @@ import { twMerge } from "tailwind-merge";
  * // Returns: "px-2 py-1 bg-red-500" (if isError is true)
  */
 export function cn(...classes: ClassValue[]): string {
-  return twMerge(clsx(...classes));
+    return twMerge(clsx(...classes));
 }

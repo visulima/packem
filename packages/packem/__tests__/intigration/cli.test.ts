@@ -5,13 +5,7 @@ import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import {
-    createPackageJson,
-    createPackemConfig,
-    createTsConfig,
-    execPackem,
-    installPackage,
-} from "../helpers";
+import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
 describe("packem cli", () => {
     let temporaryDirectoryPath: string;
@@ -27,10 +21,7 @@ describe("packem cli", () => {
     it("should support of tsconfig overwrite", async () => {
         expect.assertions(4);
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `export default class A {}`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export default class A {}`);
         await createTsConfig(
             temporaryDirectoryPath,
             {
@@ -49,20 +40,14 @@ describe("packem cli", () => {
         await createPackemConfig(temporaryDirectoryPath);
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        const binProcessEs2018 = await execPackem(
-            "build",
-            ["--tsconfig=tsconfig.build.json"],
-            {
-                cwd: temporaryDirectoryPath,
-            },
-        );
+        const binProcessEs2018 = await execPackem("build", ["--tsconfig=tsconfig.build.json"], {
+            cwd: temporaryDirectoryPath,
+        });
 
         expect(binProcessEs2018.stderr).toBe("");
         expect(binProcessEs2018.exitCode).toBe(0);
 
-        const dMtsContentEs2018 = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.d.ts`,
-        );
+        const dMtsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dMtsContentEs2018).toBe(`declare class A {
 }
@@ -70,9 +55,7 @@ describe("packem cli", () => {
 export { A as default };
 `);
 
-        const mtsContentEs2018 = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.js`,
-        );
+        const mtsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContentEs2018).toBe(`var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -90,10 +73,7 @@ export { A as default };
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `export const a = 1;`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -117,13 +97,9 @@ export { A as default };
         expect(binProcess.stdout).toContain("Preparing build for");
         expect(binProcess.stdout).toContain("development");
         expect(binProcess.stdout).toContain("environment with");
-        expect(binProcess.stdout).not.toContain(
-            "Minification is enabled, the output will be minified",
-        );
+        expect(binProcess.stdout).not.toContain("Minification is enabled, the output will be minified");
 
-        const mtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.js`,
-        );
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const a = 1;
 
@@ -137,10 +113,7 @@ export { a };
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "@types/node");
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `export const a = process.env.NODE_ENV;`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = process.env.NODE_ENV;`);
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -164,13 +137,9 @@ export { a };
         expect(binProcess.stdout).toContain("Preparing build for");
         expect(binProcess.stdout).not.toContain("development");
         expect(binProcess.stdout).not.toContain("environment with");
-        expect(binProcess.stdout).not.toContain(
-            "Minification is enabled, the output will be minified",
-        );
+        expect(binProcess.stdout).not.toContain("Minification is enabled, the output will be minified");
 
-        const mtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.js`,
-        );
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const a = process.env.NODE_ENV;
 
@@ -183,10 +152,7 @@ export { a };
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `export const a = 1;`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -210,13 +176,9 @@ export { a };
         expect(binProcess.stdout).toContain("Preparing build for");
         expect(binProcess.stdout).toContain("production");
         expect(binProcess.stdout).toContain("environment with");
-        expect(binProcess.stdout).toContain(
-            "Minification is enabled, the output will be minified",
-        );
+        expect(binProcess.stdout).toContain("Minification is enabled, the output will be minified");
 
-        const mtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.js`,
-        );
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const o=1;export{o as a};
 `);
@@ -227,14 +189,8 @@ export { a };
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `export const a = 1;`,
-        );
-        writeFileSync(
-            `${temporaryDirectoryPath}/dist/dont-delete.txt`,
-            `dot do it`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
+        writeFileSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`, `dot do it`);
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -257,18 +213,14 @@ export { a };
 
         expect(binProcess.stdout).not.toContain("Cleaning dist directory");
 
-        const mtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.js`,
-        );
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const a = 1;
 
 export { a };
 `);
 
-        expect(
-            existsSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`),
-        ).toBe(true);
+        expect(existsSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`)).toBe(true);
     });
 
     it("should clean the dist directory before building, when no --no-clean option was given", async () => {
@@ -276,14 +228,8 @@ export { a };
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `export const a = 1;`,
-        );
-        writeFileSync(
-            `${temporaryDirectoryPath}/dist/dont-delete.txt`,
-            `dot do it`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
+        writeFileSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`, `dot do it`);
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -306,18 +252,14 @@ export { a };
 
         expect(binProcess.stdout).toContain("Cleaning dist directory");
 
-        const mtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.js`,
-        );
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const a = 1;
 
 export { a };
 `);
 
-        expect(
-            existsSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`),
-        ).toBe(false);
+        expect(existsSync(`${temporaryDirectoryPath}/dist/dont-delete.txt`)).toBe(false);
     });
 
     it("should generate only d.ts files when --dts-only option was given", async () => {
@@ -325,10 +267,7 @@ export { a };
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `export const a = 1;`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -361,21 +300,11 @@ export { a };
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        expect(
-            isAccessibleSync(`${temporaryDirectoryPath}/dist/index.mjs`),
-        ).toBe(false);
-        expect(
-            isAccessibleSync(`${temporaryDirectoryPath}/dist/index.cjs`),
-        ).toBe(false);
-        expect(
-            isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.mts`),
-        ).toBe(true);
-        expect(
-            isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.cts`),
-        ).toBe(true);
-        expect(
-            isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.ts`),
-        ).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(false);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.cjs`)).toBe(false);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.mts`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.cts`)).toBe(true);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.d.ts`)).toBe(true);
     });
 
     it("should run 'onSuccess' when option was given", async () => {
@@ -383,10 +312,7 @@ export { a };
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `export const a = 1;`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -399,14 +325,10 @@ export { a };
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackem(
-            "build",
-            ["--onSuccess=echo hello && echo world"],
-            {
-                cwd: temporaryDirectoryPath,
-                env: {},
-            },
-        );
+        const binProcess = await execPackem("build", ["--onSuccess=echo hello && echo world"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
 
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
@@ -414,9 +336,7 @@ export { a };
         expect(binProcess.stdout).toContain("hello");
         expect(binProcess.stdout).toContain("world");
 
-        const mtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.js`,
-        );
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const a = 1;
 
@@ -429,10 +349,7 @@ export { a };
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `export const a = 1;`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -460,9 +377,7 @@ export { a };
         expect(binProcess.stdout).toContain("hello");
         expect(binProcess.stdout).toContain("world");
 
-        const mtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.js`,
-        );
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
         expect(mtsContent).toBe(`const a = 1;
 
@@ -499,14 +414,10 @@ export function barFunction() {
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackem(
-            "build",
-            ["--external=@test/shouldbeexternal"],
-            {
-                cwd: temporaryDirectoryPath,
-                env: {},
-            },
-        );
+        const binProcess = await execPackem("build", ["--external=@test/shouldbeexternal"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
 
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
@@ -514,16 +425,11 @@ export function barFunction() {
         expect(binProcess.stdout).toContain("Preparing build for");
         expect(binProcess.stdout).toContain("development");
         expect(binProcess.stdout).toContain("environment with");
-        expect(binProcess.stdout).not.toContain(
-            "Minification is enabled, the output will be minified",
-        );
+        expect(binProcess.stdout).not.toContain("Minification is enabled, the output will be minified");
 
-        const mtsContent = readFileSync(
-            `${temporaryDirectoryPath}/dist/index.js`,
-        );
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mtsContent)
-            .toBe(`import { __TEST_EXPECTED_STRING__ } from '@test/shouldbeexternal';
+        expect(mtsContent).toBe(`import { __TEST_EXPECTED_STRING__ } from '@test/shouldbeexternal';
 import bar from 'bar-package';
 
 var __defProp = Object.defineProperty;
@@ -579,13 +485,9 @@ export { barFunction, baz };
 
         expect(binProcess.stdout).toContain("Preparing build for");
         expect(binProcess.stdout).toContain("production");
-        expect(binProcess.stdout).toContain(
-            "Minification is enabled, the output will be minified",
-        );
+        expect(binProcess.stdout).toContain("Minification is enabled, the output will be minified");
 
         // Verify that no sourcemap files are generated
-        expect(
-            isAccessibleSync(`${temporaryDirectoryPath}/dist/index.mjs.map`),
-        ).toBe(false);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.mjs.map`)).toBe(false);
     });
 });

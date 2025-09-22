@@ -38,10 +38,7 @@ class TailwindRoot {
     /**
      * Generate CSS for the root file
      */
-    public async generate(
-        content: string,
-        addWatchFile: (file: string) => void,
-    ): Promise<{ code: string; map: string | undefined } | false> {
+    public async generate(content: string, addWatchFile: (file: string) => void): Promise<{ code: string; map: string | undefined } | false> {
         const inputPath = pathResolve(this.id.replace(/\?.*$/u, ""));
 
         const addWatchFileWrapper = (file: string) => {
@@ -115,11 +112,11 @@ class TailwindRoot {
         }
 
         // Check if compiler has required features using bitwise operations
-        // eslint-disable-next-line no-bitwise
-        const hasRequiredFeatures = this.compiler.features & (
+
+        const hasRequiredFeatures
+            = this.compiler.features
             // eslint-disable-next-line no-bitwise
-            Features.AtApply | Features.JsPluginCompat | Features.ThemeFunction | Features.Utilities
-        );
+                & (Features.AtApply | Features.JsPluginCompat | Features.ThemeFunction | Features.Utilities);
 
         this.logger.debug({
             data: {
@@ -431,19 +428,9 @@ const tailwindcssLoader: Loader = {
         };
 
         // Create or get the Tailwind root for this file
-        const root = new TailwindRoot(
-            this.id,
-            this.sourceDir || process.cwd(),
-            this.useSourcemap,
-            customCssResolver,
-            customJsResolver,
-            this.logger,
-        );
+        const root = new TailwindRoot(this.id, this.sourceDir || process.cwd(), this.useSourcemap, customCssResolver, customJsResolver, this.logger);
 
-        let result = await root.generate(
-            code,
-            (file) => this.deps.add(normalize(file)),
-        );
+        let result = await root.generate(code, (file) => this.deps.add(normalize(file)));
 
         if (!result) {
             // Not a Tailwind file, return original content
