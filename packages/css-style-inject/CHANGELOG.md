@@ -1,3 +1,9 @@
+## @visulima/css-style-inject [1.0.0-alpha.9](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.8...@visulima/css-style-inject@1.0.0-alpha.9) (2025-09-22)
+
+### Bug Fixes
+
+* updated deps, added usage of pnpm catalog ([14987df](https://github.com/visulima/packem/commit/14987dff37121ca7aab6f9d0a07b24a1a2f5284a))
+
 ## @visulima/css-style-inject [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.7...@visulima/css-style-inject@1.0.0-alpha.8) (2025-09-17)
 
 ### Bug Fixes
