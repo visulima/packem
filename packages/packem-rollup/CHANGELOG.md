@@ -1,3 +1,14 @@
+## @visulima/packem-rollup [1.0.0-alpha.16](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.15...@visulima/packem-rollup@1.0.0-alpha.16) (2025-09-22)
+
+### Bug Fixes
+
+* updated deps, added usage of pnpm catalog ([14987df](https://github.com/visulima/packem/commit/14987dff37121ca7aab6f9d0a07b24a1a2f5284a))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.12
+
 ## @visulima/packem-rollup [1.0.0-alpha.15](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.14...@visulima/packem-rollup@1.0.0-alpha.15) (2025-09-17)
 
 ### Bug Fixes
