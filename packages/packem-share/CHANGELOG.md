@@ -1,3 +1,9 @@
+## @visulima/packem-share [1.0.0-alpha.12](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.11...@visulima/packem-share@1.0.0-alpha.12) (2025-09-22)
+
+### Bug Fixes
+
+* updated deps, added usage of pnpm catalog ([14987df](https://github.com/visulima/packem/commit/14987dff37121ca7aab6f9d0a07b24a1a2f5284a))
+
 ## @visulima/packem-share [1.0.0-alpha.11](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.10...@visulima/packem-share@1.0.0-alpha.11) (2025-09-17)
 
 ### Bug Fixes
