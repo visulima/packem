@@ -49,6 +49,7 @@
         "build:prod": "../../node_modules/.bin/packem build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build --watch",
+        "lint:attw": "attw --pack",
         "lint:eslint": "eslint .",
         "lint:eslint:fix": "eslint . --fix",
         "lint:package-json": "publint --strict",
@@ -61,6 +62,8 @@
         "test:watch": "vitest"
     },
     "devDependencies": {
+        "publint": "catalog:lint",
+        "@arethetypeswrong/cli": "catalog:dev",
         "@anolilab/eslint-config": "catalog:lint",
         "@anolilab/prettier-config": "catalog:lint",
         "@anolilab/semantic-release-pnpm": "catalog:cli",

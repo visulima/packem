@@ -1,265 +1,268 @@
 {
-    "name": "@visulima/rollup-plugin-css",
-    "version": "1.0.0-alpha.6",
-    "description": "CSS processing plugin for packem",
-    "keywords": [
-        "visulima",
-        "rollup-plugin-css",
-        "css",
-        "postcss",
-        "sass",
-        "less",
-        "stylus",
-        "css-modules",
-        "lightningcss",
-        "cssnano",
-        "tailwind",
-        "tailwindcss",
-        "rollup-plugin"
-    ],
-    "homepage": "https://github.com/visulima/packem/tree/main/packages/rollup-plugin-css",
-    "bugs": {
-        "url": "https://github.com/visulima/packem/issues"
+  "name": "@visulima/rollup-plugin-css",
+  "version": "1.0.0-alpha.6",
+  "description": "CSS processing plugin for packem",
+  "keywords": [
+    "visulima",
+    "rollup-plugin-css",
+    "css",
+    "postcss",
+    "sass",
+    "less",
+    "stylus",
+    "css-modules",
+    "lightningcss",
+    "cssnano",
+    "tailwind",
+    "tailwindcss",
+    "rollup-plugin"
+  ],
+  "homepage": "https://github.com/visulima/packem/tree/main/packages/rollup-plugin-css",
+  "bugs": {
+    "url": "https://github.com/visulima/packem/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/visulima/packem.git",
+    "directory": "packages/packem-css"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/prisis"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/visulima/packem.git",
-        "directory": "packages/packem-css"
-    },
-    "funding": [
-        {
-            "type": "github",
-            "url": "https://github.com/sponsors/prisis"
-        },
-        {
-            "type": "consulting",
-            "url": "https://anolilab.com/support"
-        }
-    ],
-    "license": "MIT",
-    "author": {
-        "name": "Daniel Bannert",
-        "email": "d.bannert@anolilab.de"
-    },
-    "sideEffects": false,
-    "type": "module",
-    "exports": {
-        ".": {
-            "types": "./dist/index.d.mts",
-            "default": "./dist/index.mjs"
-        },
-        "./loader/sourcemap": {
-            "types": "./dist/loaders/sourcemap.d.mts",
-            "default": "./dist/loaders/sourcemap.mjs"
-        },
-        "./loader/less": {
-            "types": "./dist/loaders/less/index.d.mts",
-            "default": "./dist/loaders/less/index.mjs"
-        },
-        "./loader/postcss": {
-            "types": "./dist/loaders/postcss/index.d.mts",
-            "default": "./dist/loaders/postcss/index.mjs"
-        },
-        "./loader/sass": {
-            "types": "./dist/loaders/sass/index.d.mts",
-            "default": "./dist/loaders/sass/index.mjs"
-        },
-        "./loader/stylus": {
-            "types": "./dist/loaders/stylus/index.d.mts",
-            "default": "./dist/loaders/stylus/index.mjs"
-        },
-        "./loader/lightningcss": {
-            "types": "./dist/loaders/lightningcss.d.mts",
-            "default": "./dist/loaders/lightningcss.mjs"
-        },
-        "./loader/tailwindcss": {
-            "types": "./dist/loaders/tailwindcss-oxide.d.mts",
-            "default": "./dist/loaders/tailwindcss-oxide.mjs"
-        },
-        "./minifier/cssnano": {
-            "types": "./dist/minifiers/cssnano.d.mts",
-            "default": "./dist/minifiers/cssnano.mjs"
-        },
-        "./minifier/lightningcss": {
-            "types": "./dist/minifiers/lightningcss.d.mts",
-            "default": "./dist/minifiers/lightningcss.mjs"
-        },
-        "./utils": {
-            "types": "./dist/utils/index.d.mts",
-            "default": "./dist/utils/index.mjs"
-        },
-        "./package.json": "./package.json"
-    },
-    "files": [
-        "CHANGELOG.md",
-        "README.md",
-        "dist"
-    ],
-    "scripts": {
-        "build": "../../node_modules/.bin/packem build --development",
-        "build:prod": "../../node_modules/.bin/packem build --production",
-        "clean": "rimraf node_modules dist .eslintcache",
-        "dev": "pnpm run build --watch",
-        "lint:eslint": "eslint .",
-        "lint:eslint:fix": "eslint . --fix",
-        "lint:package-json": "publint --strict",
-        "lint:prettier": "prettier --config=.prettierrc.cjs --check .",
-        "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
-        "lint:types": "tsc --noEmit",
-        "test": "vitest run",
-        "test:coverage": "vitest run --coverage",
-        "test:ui": "vitest --ui --coverage.enabled=true",
-        "test:watch": "vitest"
-    },
-    "dependencies": {
-        "@rollup/pluginutils": "catalog:build",
-        "@visulima/fs": "catalog:prod",
-        "@visulima/package": "catalog:prod",
-        "@visulima/packem-share": "1.0.0-alpha.12",
-        "@visulima/path": "catalog:node",
-        "mlly": "catalog:prod",
-        "oxc-resolver": "catalog:node",
-        "p-queue": "catalog:prod",
-        "source-map-js": "catalog:prod"
-    },
-    "devDependencies": {
-        "@anolilab/eslint-config": "^16.3.0",
-        "@anolilab/semantic-release-pnpm": "2.0.3",
-        "@anolilab/semantic-release-preset": "^11.0.3",
-        "@csstools/css-parser-algorithms": "3.0.5",
-        "@csstools/css-tokenizer": "3.0.4",
-        "@csstools/postcss-slow-plugins": "^2.0.0",
-        "@rollup/plugin-inject": "5.0.5",
-        "@rushstack/eslint-plugin-security": "^0.11.0",
-        "@secretlint/secretlint-rule-preset-recommend": "^11.2.4",
-        "@tailwindcss/node": "^4.1.13",
-        "@tailwindcss/oxide": "^4.1.13",
-        "@total-typescript/ts-reset": "^0.6.1",
-        "@types/icss-utils": "^5.1.2",
-        "@types/less": "3.0.8",
-        "@types/node": "24.5.1",
-        "@types/postcss-modules-local-by-default": "^4.0.2",
-        "@types/postcss-modules-scope": "^3.0.4",
-        "@types/stylus": "^0.48.43",
-        "@types/uglifycss": "^0.0.11",
-        "@visulima/css-style-inject": "1.0.0-alpha.9",
-        "@vitest/coverage-v8": "^3.2.4",
-        "@vitest/ui": "^3.2.4",
-        "conventional-changelog-conventionalcommits": "9.1.0",
-        "cssnano": "^7.1.1",
-        "eslint": "^9.35.0",
-        "icss-utils": "^5.1.0",
-        "less": "^4.4.1",
-        "lightningcss": "^1.30.1",
-        "mime": "^4.1.0",
-        "postcss": "^8.5.6",
-        "postcss-load-config": "^6.0.1",
-        "postcss-modules-extract-imports": "^3.1.0",
-        "postcss-modules-local-by-default": "^4.2.0",
-        "postcss-modules-scope": "^3.2.1",
-        "postcss-modules-values": "^4.0.0",
-        "postcss-value-parser": "^4.2.0",
-        "rimraf": "^6.0.1",
-        "rollup": "^4.50.2",
-        "sass": "^1.92.1",
-        "sass-embedded": "^1.92.1",
-        "secretlint": "^11.2.4",
-        "semantic-release": "^24.2.8",
-        "stylus": "^0.64.0",
-        "sugarss": "5.0.1",
-        "typescript": "^5.9.2",
-        "vitest": "^3.2.4"
-    },
-    "peerDependencies": {
-        "@csstools/css-parser-algorithms": ">=3.0.5",
-        "@csstools/css-tokenizer": ">=3.0.4",
-        "@csstools/postcss-slow-plugins": ">=2.0.0",
-        "@tailwindcss/node": ">=4.1.12",
-        "@tailwindcss/oxide": ">=4.1.12",
-        "@visulima/css-style-inject": "1.0.0-alpha.9",
-        "cssnano": ">=7.0.0",
-        "icss-utils": ">=5.1.0",
-        "less": ">=4.0.0",
-        "lightningcss": ">=1.0.0",
-        "postcss": ">=8.0.0",
-        "postcss-load-config": ">=6.0.1",
-        "postcss-modules-extract-imports": ">=3.1.0",
-        "postcss-modules-local-by-default": ">=4.0.5",
-        "postcss-modules-scope": ">=3.2.0",
-        "postcss-modules-values": ">=4.0.0",
-        "postcss-value-parser": ">=4.2.0",
-        "rollup": ">=4.21.2",
-        "sass": ">=1.0.0",
-        "sass-embedded": ">=1.79.4",
-        "stylus": ">=0.60.0"
-    },
-    "peerDependenciesMeta": {
-        "@csstools/css-parser-algorithms": {
-            "optional": true
-        },
-        "@csstools/css-tokenizer": {
-            "optional": true
-        },
-        "@csstools/postcss-slow-plugins": {
-            "optional": true
-        },
-        "@tailwindcss/node": {
-            "optional": true
-        },
-        "@tailwindcss/oxide": {
-            "optional": true
-        },
-        "@visulima/css-style-inject": {
-            "optional": true
-        },
-        "cssnano": {
-            "optional": true
-        },
-        "icss-utils": {
-            "optional": true
-        },
-        "less": {
-            "optional": true
-        },
-        "lightningcss": {
-            "optional": true
-        },
-        "postcss": {
-            "optional": true
-        },
-        "postcss-load-config": {
-            "optional": true
-        },
-        "postcss-modules-extract-imports": {
-            "optional": true
-        },
-        "postcss-modules-local-by-default": {
-            "optional": true
-        },
-        "postcss-modules-scope": {
-            "optional": true
-        },
-        "postcss-modules-values": {
-            "optional": true
-        },
-        "postcss-value-parser": {
-            "optional": true
-        },
-        "sass": {
-            "optional": true
-        },
-        "sass-embedded": {
-            "optional": true
-        },
-        "stylus": {
-            "optional": true
-        }
-    },
-    "engines": {
-        "node": ">=20.* <=24.*"
-    },
-    "publishConfig": {
-        "access": "public",
-        "provenance": true
+    {
+      "type": "consulting",
+      "url": "https://anolilab.com/support"
     }
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Daniel Bannert",
+    "email": "d.bannert@anolilab.de"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./loader/sourcemap": {
+      "types": "./dist/loaders/sourcemap.d.mts",
+      "default": "./dist/loaders/sourcemap.mjs"
+    },
+    "./loader/less": {
+      "types": "./dist/loaders/less/index.d.mts",
+      "default": "./dist/loaders/less/index.mjs"
+    },
+    "./loader/postcss": {
+      "types": "./dist/loaders/postcss/index.d.mts",
+      "default": "./dist/loaders/postcss/index.mjs"
+    },
+    "./loader/sass": {
+      "types": "./dist/loaders/sass/index.d.mts",
+      "default": "./dist/loaders/sass/index.mjs"
+    },
+    "./loader/stylus": {
+      "types": "./dist/loaders/stylus/index.d.mts",
+      "default": "./dist/loaders/stylus/index.mjs"
+    },
+    "./loader/lightningcss": {
+      "types": "./dist/loaders/lightningcss.d.mts",
+      "default": "./dist/loaders/lightningcss.mjs"
+    },
+    "./loader/tailwindcss": {
+      "types": "./dist/loaders/tailwindcss-oxide.d.mts",
+      "default": "./dist/loaders/tailwindcss-oxide.mjs"
+    },
+    "./minifier/cssnano": {
+      "types": "./dist/minifiers/cssnano.d.mts",
+      "default": "./dist/minifiers/cssnano.mjs"
+    },
+    "./minifier/lightningcss": {
+      "types": "./dist/minifiers/lightningcss.d.mts",
+      "default": "./dist/minifiers/lightningcss.mjs"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.mts",
+      "default": "./dist/utils/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "CHANGELOG.md",
+    "README.md",
+    "dist"
+  ],
+  "scripts": {
+    "build": "../../node_modules/.bin/packem build --development",
+    "build:prod": "../../node_modules/.bin/packem build --production",
+    "clean": "rimraf node_modules dist .eslintcache",
+    "dev": "pnpm run build --watch",
+    "lint:attw": "attw --pack",
+    "lint:eslint": "eslint .",
+    "lint:eslint:fix": "eslint . --fix",
+    "lint:package-json": "publint --strict",
+    "lint:prettier": "prettier --config=.prettierrc.cjs --check .",
+    "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
+    "lint:types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui --coverage.enabled=true",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@rollup/pluginutils": "catalog:build",
+    "@visulima/fs": "catalog:prod",
+    "@visulima/package": "catalog:prod",
+    "@visulima/packem-share": "catalog:prod",
+    "@visulima/path": "catalog:node",
+    "mlly": "catalog:prod",
+    "oxc-resolver": "catalog:node",
+    "p-queue": "catalog:prod",
+    "source-map-js": "catalog:prod"
+  },
+  "devDependencies": {
+    "@anolilab/eslint-config": "catalog:lint",
+    "@anolilab/semantic-release-pnpm": "catalog:cli",
+    "@anolilab/semantic-release-preset": "catalog:cli",
+    "@arethetypeswrong/cli": "catalog:dev",
+    "@csstools/css-parser-algorithms": "catalog:style",
+    "@csstools/css-tokenizer": "catalog:style",
+    "@csstools/postcss-slow-plugins": "catalog:style",
+    "@rollup/plugin-inject": "catalog:build",
+    "@rushstack/eslint-plugin-security": "catalog:lint",
+    "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
+    "@tailwindcss/node": "catalog:style",
+    "@tailwindcss/oxide": "catalog:style",
+    "@total-typescript/ts-reset": "catalog:tsc",
+    "@types/icss-utils": "catalog:types",
+    "@types/less": "catalog:types",
+    "@types/node": "catalog:types",
+    "@types/postcss-modules-local-by-default": "catalog:types",
+    "@types/postcss-modules-scope": "catalog:types",
+    "@types/stylus": "catalog:types",
+    "@types/uglifycss": "catalog:types",
+    "@visulima/css-style-inject": "catalog:style",
+    "@vitest/coverage-v8": "catalog:test",
+    "@vitest/ui": "catalog:test",
+    "conventional-changelog-conventionalcommits": "catalog:dev",
+    "cssnano": "catalog:style",
+    "eslint": "catalog:lint",
+    "icss-utils": "catalog:style",
+    "less": "catalog:style",
+    "lightningcss": "catalog:style",
+    "mime": "catalog:dev",
+    "postcss": "catalog:style",
+    "postcss-load-config": "catalog:style",
+    "postcss-modules-extract-imports": "catalog:style",
+    "postcss-modules-local-by-default": "catalog:style",
+    "postcss-modules-scope": "catalog:style",
+    "postcss-modules-values": "catalog:style",
+    "postcss-value-parser": "catalog:style",
+    "publint": "catalog:lint",
+    "rimraf": "catalog:node",
+    "rollup": "catalog:build",
+    "sass": "catalog:style",
+    "sass-embedded": "catalog:style",
+    "secretlint": "catalog:lint",
+    "semantic-release": "catalog:cli",
+    "stylus": "catalog:dev",
+    "sugarss": "catalog:dev",
+    "typescript": "catalog:tsc",
+    "vitest": "catalog:test"
+  },
+  "peerDependencies": {
+    "@csstools/css-parser-algorithms": ">=3.0.5",
+    "@csstools/css-tokenizer": ">=3.0.4",
+    "@csstools/postcss-slow-plugins": ">=2.0.0",
+    "@tailwindcss/node": ">=4.1.12",
+    "@tailwindcss/oxide": ">=4.1.12",
+    "@visulima/css-style-inject": "catalog:style",
+    "cssnano": ">=7.0.0",
+    "icss-utils": ">=5.1.0",
+    "less": ">=4.0.0",
+    "lightningcss": ">=1.0.0",
+    "postcss": ">=8.0.0",
+    "postcss-load-config": ">=6.0.1",
+    "postcss-modules-extract-imports": ">=3.1.0",
+    "postcss-modules-local-by-default": ">=4.0.5",
+    "postcss-modules-scope": ">=3.2.0",
+    "postcss-modules-values": ">=4.0.0",
+    "postcss-value-parser": ">=4.2.0",
+    "rollup": ">=4.21.2",
+    "sass": ">=1.0.0",
+    "sass-embedded": ">=1.79.4",
+    "stylus": ">=0.60.0"
+  },
+  "peerDependenciesMeta": {
+    "@csstools/css-parser-algorithms": {
+      "optional": true
+    },
+    "@csstools/css-tokenizer": {
+      "optional": true
+    },
+    "@csstools/postcss-slow-plugins": {
+      "optional": true
+    },
+    "@tailwindcss/node": {
+      "optional": true
+    },
+    "@tailwindcss/oxide": {
+      "optional": true
+    },
+    "@visulima/css-style-inject": {
+      "optional": true
+    },
+    "cssnano": {
+      "optional": true
+    },
+    "icss-utils": {
+      "optional": true
+    },
+    "less": {
+      "optional": true
+    },
+    "lightningcss": {
+      "optional": true
+    },
+    "postcss": {
+      "optional": true
+    },
+    "postcss-load-config": {
+      "optional": true
+    },
+    "postcss-modules-extract-imports": {
+      "optional": true
+    },
+    "postcss-modules-local-by-default": {
+      "optional": true
+    },
+    "postcss-modules-scope": {
+      "optional": true
+    },
+    "postcss-modules-values": {
+      "optional": true
+    },
+    "postcss-value-parser": {
+      "optional": true
+    },
+    "sass": {
+      "optional": true
+    },
+    "sass-embedded": {
+      "optional": true
+    },
+    "stylus": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=20.* <=24.*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
 }
