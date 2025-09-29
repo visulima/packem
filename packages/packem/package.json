@@ -169,9 +169,9 @@
         "lint:attw": "attw --pack",
         "lint:eslint": "eslint ./src",
         "lint:eslint:fix": "eslint . --fix",
+        "lint:package-json": "publint --strict",
         "lint:prettier": "prettier --config=.prettierrc.cjs --check .",
         "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
-        "lint:package-json": "publint --strict",
         "lint:types": "tsc --noEmit",
         "test": "vitest run --cache",
         "test:coverage": "vitest run --cache --coverage",
@@ -292,6 +292,8 @@
         "vitest": "^3.2.4"
     },
     "peerDependencies": {
+        "which-pm-runs": "catalog:peer",
+        "@arethetypeswrong/core": ">=0.18.2",
         "@swc/core": ">=1.11.29",
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
@@ -308,6 +310,7 @@
         "postcss-modules-scope": ">=3.2.0",
         "postcss-modules-values": ">=4.0.0",
         "postcss-value-parser": ">=4.2.0",
+        "publint": ">=0.3.13",
         "sass": ">=1.43.4",
         "sass-embedded": ">=1.79.4",
         "stylus": ">=0.63.0",
@@ -318,6 +321,12 @@
         "typescript": ">=4.5 || >=5.0"
     },
     "peerDependenciesMeta": {
+        "which-pm-runs": {
+            "optional": true
+        },
+        "@arethetypeswrong/core": {
+            "optional": true
+        },
         "@ckeditor/typedoc-plugins": {
             "optional": true
         },
@@ -367,6 +376,9 @@
             "optional": true
         },
         "postcss-value-parser": {
+            "optional": true
+        },
+        "publint": {
             "optional": true
         },
         "sass": {

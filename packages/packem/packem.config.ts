@@ -41,5 +41,6 @@ export default defineConfig({
                 exclude: ["@rollup/plugin-inject"],
             },
         },
+        publint: true,
     },
 });

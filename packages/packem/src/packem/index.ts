@@ -34,7 +34,9 @@ import killProcess from "../utils/kill-process";
 import logBuildErrors from "../utils/log-build-errors";
 import removeOldCacheFolders from "../utils/remove-old-cache-folders";
 import warnLegacyCJS from "../utils/warn-legacy-cjs";
+import attw from "../validator/attw";
 import packageJsonValidator from "../validator/package-json";
+import publint from "../validator/publint";
 import validateAliasEntries from "../validator/validate-alias-entries";
 import validateBundleSize from "../validator/validate-bundle-size";
 import build from "./build";
@@ -899,6 +901,7 @@ const packem = async (
                 const timeout = context.options.onSuccessTimeout ?? 30_000; // 30 seconds default
 
                 // Capture the spawned process locally to avoid race conditions with cleanup
+                // eslint-disable-next-line no-multi-assign
                 const executedProcess = onSuccessProcess = exec(context.options.onSuccess, [], {
                     nodeOptions: {
                         shell: true,
@@ -969,12 +972,29 @@ const packem = async (
 
             // TODO: Add a validation handler, to add custom validation checks
             if (typeof context.options.validation === "object") {
+                const validationPromises: Promise<void>[] = [];
+
                 if (context.options.validation.packageJson) {
+                    // packageJsonValidator is synchronous, run immediately
                     packageJsonValidator(context);
                 }
 
+                if (context.options.validation.attw) {
+                    validationPromises.push(attw(context, logged));
+                }
+
+                if (context.options.validation.publint) {
+                    validationPromises.push(publint(context, logged));
+                }
+
                 if (context.options.validation.bundleLimit) {
+                    // validateBundleSize is synchronous, run immediately
                     validateBundleSize(context, logged);
+                }
+
+                // Run async validations in parallel
+                if (validationPromises.length > 0) {
+                    await Promise.all(validationPromises);
                 }
             }
 

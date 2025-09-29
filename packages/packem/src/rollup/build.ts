@@ -7,6 +7,7 @@ import type { InternalBuildOptions } from "../types";
 import { getRollupOptions } from "./get-rollup-options";
 
 const BUNDLE_CACHE_KEY = "rollup-build.json";
+const DEPENDENCIES_CACHE_KEY = "dependencies-cache.json";
 
 const build = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, subDirectory: string): Promise<void> => {
     const rollupOptions = await getRollupOptions(context, fileCache);
@@ -18,16 +19,45 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
         return;
     }
 
-    const loadCache = true;
+    // Check if we have cached dependencies available
+    const hasCachedDependencies
+        = context.options.validation
+            && context.options.validation.dependencies !== false
+            && !!fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
+
+    // Use bundle cache only if we have cached dependencies (to avoid stale cache issues)
+    const loadCache = !context.options.validation || context.options.validation.dependencies === false || hasCachedDependencies;
 
     if (loadCache) {
         rollupOptions.cache = fileCache.get<RollupCache>(BUNDLE_CACHE_KEY, subDirectory);
+
+        // Restore cached dependencies if available
+        if (hasCachedDependencies) {
+            const cachedDeps = fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
+
+            if (cachedDeps) {
+                cachedDeps.used?.forEach((dep) => context.usedDependencies.add(dep));
+                cachedDeps.hoisted?.forEach((dep) => context.hoistedDependencies.add(dep));
+            }
+        }
     }
 
     const buildResult = await rollup(rollupOptions);
 
     if (loadCache) {
         fileCache.set(BUNDLE_CACHE_KEY, buildResult.cache, subDirectory);
+    }
+
+    // Always cache dependency information when validation is enabled
+    if (context.options.validation && context.options.validation.dependencies !== false) {
+        fileCache.set(
+            DEPENDENCIES_CACHE_KEY,
+            {
+                hoisted: [...context.hoistedDependencies],
+                used: [...context.usedDependencies],
+            },
+            subDirectory,
+        );
     }
 
     await context.hooks.callHook("rollup:build", context, buildResult);
