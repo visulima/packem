@@ -1,119 +1,119 @@
 {
-  "name": "@visulima/rollup-plugin-dts",
-  "version": "0.0.0",
-  "private": "true",
-  "description": "A Rollup/Rolldown plugin to bundle dts files",
-  "homepage": "https://github.com/sxzz/rolldown-plugin-dts#readme",
-  "bugs": {
-    "url": "https://github.com/sxzz/rolldown-plugin-dts/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sxzz/rolldown-plugin-dts.git"
-  },
-  "funding": "https://github.com/sponsors/sxzz",
-  "license": "MIT",
-  "author": "三咲智子 Kevin Deng <sxzz@sxzz.moe>",
-  "type": "module",
-  "exports": {
-    ".": "./dist/index.js",
-    "./filename": "./dist/filename.js",
-    "./package.json": "./package.json"
-  },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "packem build --development || exit 0",
-    "build:prod": "packem build --production || exit 0",
-    "clean": "rimraf node_modules dist .eslintcache",
-    "dev": "pnpm run build",
-    "lint:attw": "attw --pack",
-    "lint:eslint": "eslint ./src",
-    "lint:eslint:fix": "eslint . --fix",
-    "lint:fix": "pnpm run lint:eslint:fix",
-    "lint:package-json": "publint --strict",
-    "lint:prettier": "prettier --config=.prettierrc.cjs --check .",
-    "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
-    "lint:types": "tsc --noEmit",
-    "test": "vitest run --cache",
-    "test:coverage": "vitest run --cache --coverage",
-    "test:ui": "vitest --cache --ui --coverage.enabled=true",
-    "test:watch": "vitest"
-  },
-  "dependencies": {
-    "@babel/generator": "catalog:prod",
-    "@babel/parser": "catalog:prod",
-    "@babel/types": "catalog:prod",
-    "@visulima/tsconfig": "catalog:tsc",
-    "ast-kit": "catalog:prod",
-    "birpc": "catalog:prod",
-    "debug": "catalog:prod",
-    "dts-resolver": "catalog:node",
-    "magic-string": "catalog:utils"
-  },
-  "devDependencies": {
-    "@anolilab/eslint-config": "catalog:lint",
-    "@anolilab/prettier-config": "catalog:lint",
-    "@anolilab/semantic-release-pnpm": "catalog:cli",
-    "@anolilab/semantic-release-preset": "catalog:cli",
-    "@arethetypeswrong/cli": "catalog:dev",
-    "@sxzz/test-utils": "catalog:test",
-    "@types/babel__generator": "catalog:types",
-    "@types/debug": "catalog:types",
-    "@types/node": "catalog:types",
-    "@typescript/native-preview": "catalog:types",
-    "@visulima/packem": "catalog:dev",
-    "@volar/typescript": "catalog:tsc",
-    "@vue/language-core": "catalog:frontend",
-    "conventional-changelog-conventionalcommits": "catalog:dev",
-    "diff": "catalog:dev",
-    "eslint": "catalog:lint",
-    "estree-walker": "catalog:dev",
-    "prettier": "catalog:lint",
-    "publint": "catalog:lint",
-    "rolldown": "catalog:build",
-    "rollup": "catalog:build",
-    "rollup-plugin-dts": "catalog:build",
-    "tinyglobby": "catalog:node",
-    "tsx": "catalog:script",
-    "typescript": "catalog:tsc",
-    "vitest": "catalog:test",
-    "vue": "catalog:frontend",
-    "vue-tsc": "catalog:tsc"
-  },
-  "peerDependencies": {
-    "@ts-macro/tsc": "catalog:tsc",
-    "@typescript/native-preview": ">=7.0.0-dev.20250601.1",
-    "rolldown": "catalog:build",
-    "rollup": ">=4.0.0",
-    "typescript": "catalog:tsc",
-    "vue-tsc": "catalog:tsc"
-  },
-  "peerDependenciesMeta": {
-    "@typescript/native-preview": {
-      "optional": true
+    "name": "@visulima/rollup-plugin-dts",
+    "version": "0.0.0",
+    "private": "true",
+    "description": "A Rollup/Rolldown plugin to bundle dts files",
+    "homepage": "https://github.com/sxzz/rolldown-plugin-dts#readme",
+    "bugs": {
+        "url": "https://github.com/sxzz/rolldown-plugin-dts/issues"
     },
-    "rolldown": {
-      "optional": true
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/sxzz/rolldown-plugin-dts.git"
     },
-    "rollup": {
-      "optional": true
+    "funding": "https://github.com/sponsors/sxzz",
+    "license": "MIT",
+    "author": "三咲智子 Kevin Deng <sxzz@sxzz.moe>",
+    "type": "module",
+    "exports": {
+        ".": "./dist/index.js",
+        "./filename": "./dist/filename.js",
+        "./package.json": "./package.json"
     },
-    "typescript": {
-      "optional": true
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "packem build --development || exit 0",
+        "build:prod": "packem build --production || exit 0",
+        "clean": "rimraf node_modules dist .eslintcache",
+        "dev": "pnpm run build",
+        "lint:attw": "attw --pack",
+        "lint:eslint": "eslint ./src",
+        "lint:eslint:fix": "eslint . --fix",
+        "lint:fix": "pnpm run lint:eslint:fix",
+        "lint:package-json": "publint --strict",
+        "lint:prettier": "prettier --config=.prettierrc.cjs --check .",
+        "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
+        "lint:types": "tsc --noEmit",
+        "test": "vitest run --cache",
+        "test:coverage": "vitest run --cache --coverage",
+        "test:ui": "vitest --cache --ui --coverage.enabled=true",
+        "test:watch": "vitest"
     },
-    "vue-tsc": {
-      "optional": true
+    "dependencies": {
+        "@babel/generator": "catalog:prod",
+        "@babel/parser": "catalog:prod",
+        "@babel/types": "catalog:prod",
+        "@visulima/tsconfig": "catalog:tsc",
+        "ast-kit": "catalog:prod",
+        "birpc": "catalog:prod",
+        "debug": "catalog:prod",
+        "dts-resolver": "catalog:node",
+        "magic-string": "catalog:utils"
+    },
+    "devDependencies": {
+        "@anolilab/eslint-config": "catalog:lint",
+        "@anolilab/prettier-config": "catalog:lint",
+        "@anolilab/semantic-release-pnpm": "catalog:cli",
+        "@anolilab/semantic-release-preset": "catalog:cli",
+        "@arethetypeswrong/cli": "catalog:dev",
+        "@sxzz/test-utils": "catalog:test",
+        "@types/babel__generator": "catalog:types",
+        "@types/debug": "catalog:types",
+        "@types/node": "catalog:types",
+        "@typescript/native-preview": "catalog:types",
+        "@visulima/packem": "catalog:dev",
+        "@volar/typescript": "catalog:tsc",
+        "@vue/language-core": "catalog:frontend",
+        "conventional-changelog-conventionalcommits": "catalog:dev",
+        "diff": "catalog:dev",
+        "eslint": "catalog:lint",
+        "estree-walker": "catalog:dev",
+        "prettier": "catalog:lint",
+        "publint": "catalog:lint",
+        "rolldown": "catalog:build",
+        "rollup": "catalog:build",
+        "rollup-plugin-dts": "catalog:build",
+        "tinyglobby": "catalog:node",
+        "tsx": "catalog:script",
+        "typescript": "catalog:tsc",
+        "vitest": "catalog:test",
+        "vue": "catalog:frontend",
+        "vue-tsc": "catalog:tsc"
+    },
+    "peerDependencies": {
+        "@ts-macro/tsc": "catalog:tsc",
+        "@typescript/native-preview": ">=7.0.0-dev.20250601.1",
+        "rolldown": "catalog:build",
+        "rollup": ">=4.0.0",
+        "typescript": "catalog:tsc",
+        "vue-tsc": "catalog:tsc"
+    },
+    "peerDependenciesMeta": {
+        "@typescript/native-preview": {
+            "optional": true
+        },
+        "rolldown": {
+            "optional": true
+        },
+        "rollup": {
+            "optional": true
+        },
+        "typescript": {
+            "optional": true
+        },
+        "vue-tsc": {
+            "optional": true
+        }
+    },
+    "engines": {
+        "node": ">=20.* <=24.*"
+    },
+    "publishConfig": {
+        "access": "public"
     }
-  },
-  "engines": {
-    "node": ">=20.* <=24.*"
-  },
-  "publishConfig": {
-    "access": "public"
-  }
 }

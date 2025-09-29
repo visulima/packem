@@ -5,7 +5,7 @@ import { createFilter } from "@rollup/pluginutils";
 import MagicString from "magic-string";
 import type { Plugin, PluginContext, TransformResult } from "rollup";
 import type { ExportSpecifier, ImportSpecifier } from "rs-module-lexer";
-import {parse} from "rs-module-lexer";
+import { parse } from "rs-module-lexer";
 
 type Modifications = [start: number, end: number, replace: string][];
 

@@ -292,7 +292,6 @@
         "vitest": "^3.2.4"
     },
     "peerDependencies": {
-        "which-pm-runs": "catalog:peer",
         "@arethetypeswrong/core": ">=0.18.2",
         "@swc/core": ">=1.11.29",
         "@tailwindcss/node": "catalog:style",
@@ -318,12 +317,10 @@
         "typedoc": ">=0.26.0",
         "typedoc-plugin-markdown": ">=4.2.0",
         "typedoc-plugin-rename-defaults": ">=0.7.0",
-        "typescript": ">=4.5 || >=5.0"
+        "typescript": ">=4.5 || >=5.0",
+        "which-pm-runs": "catalog:peer"
     },
     "peerDependenciesMeta": {
-        "which-pm-runs": {
-            "optional": true
-        },
         "@arethetypeswrong/core": {
             "optional": true
         },
@@ -403,6 +400,9 @@
             "optional": true
         },
         "typescript": {
+            "optional": true
+        },
+        "which-pm-runs": {
             "optional": true
         }
     },
