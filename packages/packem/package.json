@@ -194,6 +194,7 @@
         "@visulima/path": "catalog:node",
         "@visulima/rollup-plugin-css": "workspace:*",
         "@visulima/source-map": "catalog:prod",
+        "@visulima/tabular": "catalog:prod",
         "@visulima/tsconfig": "catalog:tsc",
         "browserslist": "catalog:network",
         "defu": "catalog:utils",
@@ -206,12 +207,9 @@
         "rollup": "catalog:build",
         "semver": "catalog:utils",
         "tinyexec": "catalog:node",
-        "tinyglobby": "catalog:node",
-        "@visulima/tabular": "catalog:prod"
+        "tinyglobby": "catalog:node"
     },
     "devDependencies": {
-        "@types/which-pm-runs": "catalog:types",
-        "which-pm-runs": "catalog:dev",
         "@anolilab/eslint-config": "catalog:lint",
         "@anolilab/prettier-config": "catalog:lint",
         "@anolilab/semantic-release-pnpm": "catalog:cli",
@@ -242,6 +240,7 @@
         "@types/picomatch": "catalog:types",
         "@types/react-dom": "catalog:types",
         "@types/semver": "catalog:types",
+        "@types/which-pm-runs": "catalog:types",
         "@vitest/coverage-v8": "catalog:test",
         "@vitest/ui": "catalog:test",
         "conventional-changelog-conventionalcommits": "catalog:dev",
@@ -297,10 +296,10 @@
         "typedoc-plugin-markdown": "catalog:markdown",
         "typedoc-plugin-rename-defaults": "catalog:dev",
         "typescript": "catalog:tsc",
-        "vitest": "catalog:test"
+        "vitest": "catalog:test",
+        "which-pm-runs": "catalog:dev"
     },
     "peerDependencies": {
-        "which-pm-runs": "catalog:peer",
         "@arethetypeswrong/core": ">=0.18.2",
         "@swc/core": ">=1.11.29",
         "@tailwindcss/node": "catalog:style",
@@ -326,12 +325,10 @@
         "typedoc": ">=0.26.0",
         "typedoc-plugin-markdown": ">=4.2.0",
         "typedoc-plugin-rename-defaults": ">=0.7.0",
-        "typescript": ">=4.5 || >=5.0"
+        "typescript": ">=4.5 || >=5.0",
+        "which-pm-runs": "catalog:peer"
     },
     "peerDependenciesMeta": {
-        "which-pm-runs": {
-            "optional": true
-        },
         "@arethetypeswrong/core": {
             "optional": true
         },
@@ -411,6 +408,9 @@
             "optional": true
         },
         "typescript": {
+            "optional": true
+        },
+        "which-pm-runs": {
             "optional": true
         }
     },

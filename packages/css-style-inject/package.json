@@ -62,12 +62,11 @@
         "test:watch": "vitest"
     },
     "devDependencies": {
-        "publint": "catalog:lint",
-        "@arethetypeswrong/cli": "catalog:dev",
         "@anolilab/eslint-config": "catalog:lint",
         "@anolilab/prettier-config": "catalog:lint",
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
+        "@arethetypeswrong/cli": "catalog:dev",
         "@rushstack/eslint-plugin-security": "catalog:lint",
         "@total-typescript/ts-reset": "catalog:tsc",
         "@types/node": "catalog:types",
@@ -76,6 +75,7 @@
         "conventional-changelog-conventionalcommits": "catalog:dev",
         "eslint": "catalog:lint",
         "prettier": "catalog:lint",
+        "publint": "catalog:lint",
         "rimraf": "catalog:node",
         "secretlint": "catalog:lint",
         "semantic-release": "catalog:cli",
