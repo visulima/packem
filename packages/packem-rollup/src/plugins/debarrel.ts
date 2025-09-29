@@ -5,7 +5,7 @@ import { createFilter } from "@rollup/pluginutils";
 import MagicString from "magic-string";
 import type { Plugin, PluginContext, TransformResult } from "rollup";
 import type { ExportSpecifier, ImportSpecifier } from "rs-module-lexer";
-import rsModuleLexer from "rs-module-lexer";
+import {parse} from "rs-module-lexer";
 
 type Modifications = [start: number, end: number, replace: string][];
 
@@ -38,8 +38,6 @@ interface DebarrelContext {
 
     resolve: PluginContext["resolve"];
 }
-
-const { parseAsync } = rsModuleLexer;
 
 const IS_SOURCE_EXT = /\.[mc]?tsx?(?:\?.*)?$/;
 
@@ -74,7 +72,7 @@ const getDeclarationKind = (specifiers: string) => (IS_EXPORT_PREFIXED.test(spec
 
 const safeParse = async (id: string, code: string): Promise<SimpleParseResult> => {
     try {
-        const { output } = await parseAsync({
+        const { output } = parse({
             input: [
                 {
                     code,

@@ -169,9 +169,9 @@
         "lint:attw": "attw --pack",
         "lint:eslint": "eslint ./src",
         "lint:eslint:fix": "eslint . --fix",
+        "lint:package-json": "publint --strict",
         "lint:prettier": "prettier --config=.prettierrc.cjs --check .",
         "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
-        "lint:package-json": "publint --strict",
         "lint:types": "tsc --noEmit",
         "test": "vitest run --cache",
         "test:coverage": "vitest run --cache --coverage",
@@ -188,11 +188,11 @@
         "@visulima/fs": "catalog:prod",
         "@visulima/humanizer": "catalog:prod",
         "@visulima/package": "catalog:prod",
-        "@visulima/packem-rollup": "1.0.0-alpha.16",
-        "@visulima/packem-share": "1.0.0-alpha.12",
+        "@visulima/packem-rollup": "workspace:*",
+        "@visulima/packem-share": "workspace:*",
         "@visulima/pail": "catalog:prod",
         "@visulima/path": "catalog:node",
-        "@visulima/rollup-plugin-css": "1.0.0-alpha.6",
+        "@visulima/rollup-plugin-css": "workspace:*",
         "@visulima/source-map": "catalog:prod",
         "@visulima/tsconfig": "catalog:tsc",
         "browserslist": "catalog:network",
@@ -206,19 +206,23 @@
         "rollup": "catalog:build",
         "semver": "catalog:utils",
         "tinyexec": "catalog:node",
-        "tinyglobby": "catalog:node"
+        "tinyglobby": "catalog:node",
+        "@visulima/tabular": "catalog:prod"
     },
     "devDependencies": {
-        "@oxc-transform/binding-linux-x64-gnu": "*",
+        "@types/which-pm-runs": "catalog:types",
+        "which-pm-runs": "catalog:dev",
         "@anolilab/eslint-config": "catalog:lint",
         "@anolilab/prettier-config": "catalog:lint",
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
+        "@arethetypeswrong/core": "catalog:prod",
         "@babel/parser": "catalog:dev",
         "@csstools/css-parser-algorithms": "catalog:style",
         "@csstools/css-tokenizer": "catalog:style",
         "@csstools/postcss-slow-plugins": "catalog:style",
+        "@oxc-transform/binding-linux-x64-gnu": "*",
         "@rollup/plugin-alias": "catalog:build",
         "@rollup/plugin-commonjs": "catalog:build",
         "@rollup/plugin-dynamic-import-vars": "catalog:build",
@@ -267,6 +271,7 @@
         "postcss-modules-values": "catalog:style",
         "postcss-value-parser": "catalog:style",
         "prettier": "catalog:lint",
+        "publint": "catalog:lint",
         "react": "catalog:frontend",
         "react-dom": "catalog:frontend",
         "rimraf": "catalog:node",
@@ -295,6 +300,8 @@
         "vitest": "catalog:test"
     },
     "peerDependencies": {
+        "which-pm-runs": "catalog:peer",
+        "@arethetypeswrong/core": ">=0.18.2",
         "@swc/core": ">=1.11.29",
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
@@ -311,6 +318,7 @@
         "postcss-modules-scope": ">=3.2.0",
         "postcss-modules-values": ">=4.0.0",
         "postcss-value-parser": ">=4.2.0",
+        "publint": ">=0.3.13",
         "sass": ">=1.43.4",
         "sass-embedded": ">=1.79.4",
         "stylus": ">=0.63.0",
@@ -321,6 +329,12 @@
         "typescript": ">=4.5 || >=5.0"
     },
     "peerDependenciesMeta": {
+        "which-pm-runs": {
+            "optional": true
+        },
+        "@arethetypeswrong/core": {
+            "optional": true
+        },
         "@ckeditor/typedoc-plugins": {
             "optional": true
         },
@@ -370,6 +384,9 @@
             "optional": true
         },
         "postcss-value-parser": {
+            "optional": true
+        },
+        "publint": {
             "optional": true
         },
         "sass": {

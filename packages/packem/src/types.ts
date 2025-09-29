@@ -1,9 +1,11 @@
+import type { CheckPackageOptions } from "@arethetypeswrong/core";
 import type { IsolatedDeclarationsTransformer, PackemRollupOptions, TransformerFn, TransformerName } from "@visulima/packem-rollup";
 import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
 import type { BuildContext, BuildHooks, Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
 import type { FileCache } from "@visulima/packem-share/utils";
 import type { StyleOptions } from "@visulima/rollup-plugin-css";
 import type { JitiOptions } from "jiti";
+import type { Options as PublintOptions } from "publint";
 import type { Plugin } from "rollup";
 import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
@@ -11,6 +13,36 @@ import type { Node10CompatibilityOptions } from "./packem/node10-compatibility";
 import type { ResolveExternalsPluginOptions } from "./rollup/plugins/resolve-externals-plugin";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
+
+export interface AttwOptions extends CheckPackageOptions {
+    /**
+     * The level of the check.
+     *
+     * The available levels are:
+     * - `error`: fails the build
+     * - `warn`: warns the build
+     * @default 'warn'
+     */
+    level?: "error" | "warn";
+
+    /**
+     * Specify the package manager to use for --pack
+     * @default 'auto'
+     */
+    pm?: "pnpm" | "yarn-classic" | "yarn-modern" | "npm" | "auto";
+
+    /**
+     * Profiles select a set of resolution modes to require/ignore. All are evaluated but failures outside
+     * of those required are ignored.
+     *
+     * The available profiles are:
+     * - `strict`: requires all resolutions
+     * - `node16`: ignores node10 resolution failures
+     * - `esmOnly`: ignores CJS resolution failures
+     * @default 'strict'
+     */
+    profile?: "strict" | "node16" | "esmOnly";
+}
 
 /**
  * In addition to basic `entries`, `presets`, and `hooks`,
@@ -228,6 +260,13 @@ export type TypeDocumentOptions = Partial<Omit<BaseTypeDocumentOptions, "entryPo
 };
 
 export type ValidationOptions = {
+    /**
+     * Run `arethetypeswrong` after bundling.
+     * Requires `@arethetypeswrong/core` to be installed.
+     * @default false
+     * @see https://github.com/arethetypeswrong/arethetypeswrong.github.io
+     */
+    attw?: boolean | AttwOptions;
     /** Bundle size validation options */
     bundleLimit?: {
         /** Allow the build to succeed even if limits are exceeded */
@@ -285,6 +324,13 @@ export type ValidationOptions = {
         /** Whether to validate the typesVersions field */
         typesVersions?: boolean;
     };
+
+    /**
+     * Run publint after bundling.
+     * Requires `publint` to be installed.
+     * @default false
+     */
+    publint?: boolean | PublintOptions;
 };
 
 export type { Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
