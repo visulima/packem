@@ -76,6 +76,71 @@ const profiles: Record<Required<AttwOptions>["profile"], string[]> = {
     strict: [],
 };
 
+/**
+ * Start.
+ *
+ * Modified copies of https://github.com/publint/publint/blob/master/packages/pack/src/node/pack-as-json.js#L63
+ * and
+ * https://github.com/publint/publint/blob/master/packages/pack/src/node/pack-as-json.js#L83
+ *
+ * MIT License
+ * Copyright (c) 2025 Bjorn Lu and publint contributors
+ */
+// pnpm outputs lifecycle script logs if not ignoring scripts
+
+/**
+ * @param stdout
+ */
+const fixPnpmStdout = (stdout: string) => {
+    // If starts with `{`, it's likely a valid JSON
+    if (stdout.startsWith("{"))
+        return stdout;
+
+    // Otherwise try to find its usual output format, `{\n  "name": ...`
+    const usualStartIndex = /\{\s*"name"/.exec(stdout)?.index;
+
+    if (usualStartIndex != undefined)
+        return stdout.slice(usualStartIndex);
+
+    // Otherwise, simply try to find the first `{` character
+    const firstBraceIndex = stdout.indexOf("{");
+
+    if (firstBraceIndex !== -1)
+        return stdout.slice(firstBraceIndex);
+
+    // If all fails, return the original stdout
+    return stdout;
+};
+
+// yarn outputs invalid json for some reason
+
+/**
+ * @param stdout
+ */
+const fixYarnStdout = (stdout: string): string => {
+    const lines = stdout.split("\n");
+    // Combine lines as arrays
+    let fixedStdout = "[";
+
+    for (const line of lines) {
+        if (line)
+            fixedStdout += `${line},`;
+    }
+
+    // Remove trailing slash
+    if (fixedStdout[fixedStdout.length - 1] === ",") {
+        fixedStdout = fixedStdout.slice(0, -1);
+    }
+
+    fixedStdout += "]";
+
+    return fixedStdout;
+};
+
+/**
+ * End.
+ */
+
 const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean): Promise<void> => {
     if (!context.options?.validation) {
         return;
@@ -146,12 +211,17 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
                     const yarnVersion = dpm.version.split(".")[0];
 
                     if (validation.attw) {
-                        pm = yarnVersion === "1" ? "yarn-classic" : "yarn-modern";
+                        packageManager = yarnVersion === "1" ? "yarn-classic" : "yarn-modern";
                     }
+                } else if (dpm.name === "bun") {
+                    throw new Error("Bun does not support --json on the pack command");
                 }
             }
 
             break;
+        }
+        case "bun": {
+            throw new Error("Bun does not support --json on the pack command");
         }
         case "pnpm": {
             packageManager = "pnpm";
@@ -171,11 +241,36 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
     const { filterProblems, problemAffectsEntrypoint, problemAffectsResolutionKind, problemKindInfo } = await import("@arethetypeswrong/core/problems");
 
     try {
-        const { stdout: tarballInfo } = await exec(`${packageManager} pack --json --pack-destination ${temporaryDirectory}`, {
+        let destination = `--pack-destination ${temporaryDirectory}`;
+
+        if (packageManager === "yarn") {
+            destination = `--out "${join(temporaryDirectory, "package.tgz")}"`;
+        } else if (packageManager === "bun") {
+            destination = ` --destination "${temporaryDirectory}"`;
+        }
+
+        let ignoreScripts = " --ignore-scripts";
+
+        if (packageManager === "yarn") {
+            ignoreScripts = "";
+        } else if (packageManager === "pnpm") {
+            ignoreScripts = " --config.ignore-scripts=true";
+        }
+
+        let { stdout } = await exec(`${packageManager} pack --json ${destination}${ignoreScripts}`, {
             cwd: context.options.rootDir,
             encoding: "utf8",
         });
-        const parsed = JSON.parse(tarballInfo) as
+
+        stdout = stdout.trim();
+
+        if (packageManager === "pnpm") {
+            stdout = fixPnpmStdout(stdout);
+        } else if (packageManager === "yarn") {
+            stdout = fixYarnStdout(stdout);
+        }
+
+        const parsed = JSON.parse(stdout) as
             | {
                 filename: string;
                 files: {
@@ -187,7 +282,7 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
             | undefined;
 
         if (!parsed?.filename) {
-            throw new Error(`Invalid npm pack output format: ${tarballInfo}`);
+            throw new Error(`Invalid npm pack output format: ${stdout}`);
         }
 
         const tarballPath = parsed.filename;

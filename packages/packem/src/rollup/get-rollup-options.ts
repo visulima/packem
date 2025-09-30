@@ -500,10 +500,15 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
             context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
 
-            context.options.rollup.requireCJS && context.options.emitESM && requireCJSTransformerPlugin({
-                ...context.options.rollup.requireCJS,
-                cwd: context.options.rootDir,
-            }, context.logger),
+            context.options.rollup.requireCJS
+            && context.options.emitESM
+            && requireCJSTransformerPlugin(
+                {
+                    ...context.options.rollup.requireCJS,
+                    cwd: context.options.rootDir,
+                },
+                context.logger,
+            ),
 
             context.options.rollup.pluginPure
             && PluginPure({

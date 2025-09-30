@@ -31,7 +31,7 @@ export default defineConfig({
         },
         requireCJS: {
             builtinNodeModules: true,
-        }
+        },
     },
     runtime: "node",
     transformer,
@@ -44,6 +44,5 @@ export default defineConfig({
                 exclude: ["@rollup/plugin-inject"],
             },
         },
-        publint: true,
     },
 });

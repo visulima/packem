@@ -5,7 +5,6 @@ import type { BuildContext, BuildHooks, Environment, Format, Mode, Runtime } fro
 import type { FileCache } from "@visulima/packem-share/utils";
 import type { StyleOptions } from "@visulima/rollup-plugin-css";
 import type { JitiOptions } from "jiti";
-import type { Options as PublintOptions } from "publint";
 import type { Plugin } from "rollup";
 import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
@@ -15,6 +14,12 @@ import type { ResolveExternalsPluginOptions } from "./rollup/plugins/resolve-ext
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
 export interface AttwOptions extends CheckPackageOptions {
+    /**
+     * Ignore the scripts on pack
+     * @default false
+     */
+    ignoreScripts?: boolean;
+
     /**
      * The level of the check.
      *
@@ -27,9 +32,10 @@ export interface AttwOptions extends CheckPackageOptions {
 
     /**
      * Specify the package manager to use for --pack
+     * Bun does not support --json option on the pack command, if you choose bun you will get a error.
      * @default 'auto'
      */
-    pm?: "pnpm" | "yarn-classic" | "yarn-modern" | "npm" | "auto";
+    pm?: "pnpm" | "yarn-classic" | "yarn-modern" | "npm" | "bun" | "auto";
 
     /**
      * Profiles select a set of resolution modes to require/ignore. All are evaluated but failures outside
@@ -324,13 +330,6 @@ export type ValidationOptions = {
         /** Whether to validate the typesVersions field */
         typesVersions?: boolean;
     };
-
-    /**
-     * Run publint after bundling.
-     * Requires `publint` to be installed.
-     * @default false
-     */
-    publint?: boolean | PublintOptions;
 };
 
 export type { Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
