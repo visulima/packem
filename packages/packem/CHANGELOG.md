@@ -1,3 +1,24 @@
+## @visulima/packem [2.0.0-alpha.22](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.21...@visulima/packem@2.0.0-alpha.22) (2025-09-30)
+
+### Features
+
+* added support for attw and publint, fixed caching issue on validation ([6f05388](https://github.com/visulima/packem/commit/6f0538802b3cd5a2cd84a373c96b25eb7fa1c01c))
+* update dependencies and add requireCJS transformer support ([050ed47](https://github.com/visulima/packem/commit/050ed47cf1ced64e74e0cf5c043edd1b8f4dead1))
+
+### Miscellaneous Chores
+
+* update dependencies and versions across multiple packages ([5bd26ea](https://github.com/visulima/packem/commit/5bd26ea047d62464758e5810307f6e059f5c1025))
+* update dependencies and versions across multiple packages ([3e5b4a2](https://github.com/visulima/packem/commit/3e5b4a229fc514828ab9e012a5d556163b30c2fc))
+
+### Code Refactoring
+
+* remove publint integration and clean up related code ([68c0215](https://github.com/visulima/packem/commit/68c021590b5224e85d0609fad39705f71323fc6b))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.17
+
 ## @visulima/packem [2.0.0-alpha.21](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.20...@visulima/packem@2.0.0-alpha.21) (2025-09-22)
 
 ### Bug Fixes
