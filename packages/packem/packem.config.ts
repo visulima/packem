@@ -29,6 +29,9 @@ export default defineConfig({
         license: {
             path: "./LICENSE.md",
         },
+        requireCJS: {
+            builtinNodeModules: true,
+        }
     },
     runtime: "node",
     transformer,

@@ -21,6 +21,7 @@ import type { IsolatedDeclarationsOptions } from "./plugins/isolated-declaration
 import type { JSXRemoveAttributesPlugin } from "./plugins/jsx-remove-attributes";
 import type { LicenseOptions } from "./plugins/license";
 import type { InternalOXCTransformPluginConfig, OxcResolveOptions, OXCTransformPluginConfig } from "./plugins/oxc/types";
+import type { Options as RequireCJSPluginOptions } from "./plugins/require-cjs-transformer";
 import type { RawLoaderOptions } from "./plugins/raw";
 import type { ShebangOptions } from "./plugins/shebang";
 import type { SourcemapsPluginOptions } from "./plugins/source-maps";
@@ -100,7 +101,8 @@ export interface PackemRollupOptions {
     };
     preserveDynamicImports?: boolean;
     raw?: RawLoaderOptions | false;
-    replace: RollupReplaceOptions | false;
+    replace: Omit<RollupReplaceOptions, "cwd"> | false;
+    requireCJS?: RequireCJSPluginOptions | false;
 
     resolve: RollupNodeResolveOptions | false;
     shebang?: Partial<ShebangOptions> | false;

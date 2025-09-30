@@ -1,0 +1,413 @@
+---
+title: require-cjs-transformer Plugin
+description: Transform ESM imports of CJS packages to require calls for better performance
+---
+
+# require-cjs-transformer Plugin Example
+
+This example demonstrates how to use the `require-cjs-transformer` plugin to automatically transform ESM imports of CommonJS-only packages into `require()` calls for better Node.js performance.
+
+## Overview
+
+The `require-cjs-transformer` plugin solves a specific performance issue: when you import CommonJS-only packages using ESM syntax, Node.js must use the expensive `cjs-module-lexer` to analyze the CJS module. This plugin converts ESM imports to `require()` calls, allowing Node.js to skip this analysis step.
+
+## Basic Example
+
+### Project Structure
+
+```
+require-cjs-example/
+├── src/
+│   ├── index.ts
+│   ├── parser.ts
+│   └── utils.ts
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+### Source Files
+
+**src/index.ts**
+```typescript
+import { parseCode } from './parser'
+import { processUtils } from './utils'
+
+export function main() {
+  const result = parseCode('const x = 1')
+  const processed = processUtils(result)
+  return processed
+}
+```
+
+**src/parser.ts**
+```typescript
+// These packages are CJS-only and benefit from transformation
+import { parse } from '@babel/parser'
+import { transpile } from 'typescript'
+
+export function parseCode(code: string) {
+  // Parse with Babel
+  const ast = parse(code, {
+    sourceType: 'module',
+    plugins: ['typescript']
+  })
+
+  // Transpile with TypeScript
+  const js = transpile(code, {
+    target: 'ES2020',
+    module: 'ESNext'
+  })
+
+  return { ast, js }
+}
+```
+
+**src/utils.ts**
+```typescript
+// Node.js built-ins also benefit from transformation
+import { readFileSync } from 'fs'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+export function processUtils(data: any) {
+  // Read a config file
+  const configPath = join(__dirname, 'config.json')
+  const config = JSON.parse(readFileSync(configPath, 'utf8'))
+
+  return {
+    ...data,
+    config
+  }
+}
+```
+
+### Configuration
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  sourcemap: true,
+  declaration: true,
+  emitESM: true,
+  rollup: {
+    requireCJS: {
+      builtinNodeModules: true
+    }
+  }
+})
+```
+
+**package.json**
+```json
+{
+  "name": "@myorg/require-cjs-example",
+  "version": "1.0.0",
+  "type": "module",
+  "files": ["dist"],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "packem build",
+    "dev": "packem build --watch"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.23.0",
+    "typescript": "^5.3.0"
+  },
+  "devDependencies": {
+    "@visulima/packem": "^1.28.2",
+    "@types/node": "^20.0.0"
+  }
+}
+```
+
+### Output
+
+After building, the ESM output (`dist/index.js`) will be transformed:
+
+```javascript
+// dist/index.js (transformed)
+const { parse } = require("@babel/parser")
+const { transpile } = require("typescript")
+const { readFileSync } = globalThis.process.getBuiltinModule("fs")
+const { join, dirname } = globalThis.process.getBuiltinModule("path")
+const { fileURLToPath } = globalThis.process.getBuiltinModule("url")
+
+// ... rest of the transformed code
+```
+
+## Advanced Configuration
+
+### Custom Package Detection
+
+```typescript
+export default defineConfig({
+  transformer,
+  emitESM: true,
+  rollup: {
+    requireCJS: {
+      builtinNodeModules: true,
+      additionalPackages: ['my-cjs-package'],
+      exclude: ['some-package']
+    }
+  }
+})
+```
+
+### Selective Transformation
+
+```typescript
+export default defineConfig({
+  transformer,
+  emitESM: true,
+  rollup: {
+    requireCJS: {
+      // Only transform specific packages
+      builtinNodeModules: false,
+      additionalPackages: ['typescript', '@babel/parser']
+    }
+  }
+})
+```
+
+## Performance Comparison
+
+### Without the Plugin
+
+```typescript
+// src/parser.ts - Original ESM imports
+import { parse } from '@babel/parser'
+import { transpile } from 'typescript'
+
+export function parseCode(code: string) {
+  return { ast: parse(code), js: transpile(code) }
+}
+```
+
+**Startup time**: ~50ms (includes cjs-module-lexer analysis)
+
+### With the Plugin
+
+```typescript
+// dist/parser.js - Transformed to require calls
+const { parse } = require('@babel/parser')
+const { transpile } = require('typescript')
+
+export function parseCode(code) {
+  return { ast: parse(code), js: transpile(code) }
+}
+```
+
+**Startup time**: ~30ms (skips cjs-module-lexer analysis)
+
+## Use Cases
+
+### CLI Tools
+
+CLI tools that use CJS-only packages benefit significantly:
+
+```typescript
+// src/cli.ts
+import { Command } from 'commander'
+import { readFileSync } from 'fs'
+import { parse } from '@babel/parser'
+import { transpile } from 'typescript'
+
+const program = new Command()
+program
+  .command('analyze <file>')
+  .action((file) => {
+    const code = readFileSync(file, 'utf8')
+    const ast = parse(code)
+    const js = transpile(code)
+    console.log('Analysis complete')
+  })
+
+program.parse()
+```
+
+### Build Tools
+
+Build tools and bundlers that process many files:
+
+```typescript
+// src/bundler.ts
+import { parse } from '@babel/parser'
+import { transpile } from 'typescript'
+import { transform } from 'swc'
+import { build } from 'esbuild'
+
+export class Bundler {
+  async processFile(file: string) {
+    const code = await fs.readFile(file, 'utf8')
+
+    // Multiple CJS-only transformers
+    const ast = parse(code)
+    const ts = transpile(code)
+    const swc = transform(code)
+    const esbuild = await build({ ... })
+
+    return { ast, ts, swc, esbuild }
+  }
+}
+```
+
+### Development Servers
+
+Development servers that restart frequently:
+
+```typescript
+// src/dev-server.ts
+import express from 'express'
+import { transpile } from 'typescript'
+import { parse } from '@babel/parser'
+
+const app = express()
+
+app.post('/transform', (req, res) => {
+  const { code } = req.body
+  const ast = parse(code)
+  const js = transpile(code)
+  res.json({ ast, js })
+})
+
+app.listen(3000)
+```
+
+## Migration Examples
+
+### From Manual require() Calls
+
+```typescript
+// Before - manual require calls
+const { parse } = require('@babel/parser')
+
+export function transform(code) {
+  return parse(code)
+}
+
+// After - ESM imports (plugin transforms automatically)
+import { parse } from '@babel/parser'
+
+export function transform(code) {
+  return parse(code)
+}
+```
+
+### From Dynamic Imports
+
+```typescript
+// Before - dynamic imports
+export async function transform(code) {
+  const { parse } = await import('@babel/parser')
+  return parse(code)
+}
+
+// After - static imports (better performance)
+import { parse } from '@babel/parser'
+
+export function transform(code) {
+  return parse(code)
+}
+```
+
+## Testing the Transformation
+
+Create a test to verify the transformation works:
+
+**test/transformation.test.js**
+```javascript
+import { readFileSync } from 'fs'
+import { expect, test } from 'vitest'
+
+test('transforms CJS imports correctly', () => {
+  const esmOutput = readFileSync('dist/index.js', 'utf8')
+
+  // Should contain require calls for CJS packages
+  expect(esmOutput).toContain('require("@babel/parser")')
+  expect(esmOutput).toContain('require("typescript")')
+
+  // Should contain globalThis.process.getBuiltinModule for Node.js built-ins
+  expect(esmOutput).toContain('globalThis.process.getBuiltinModule("fs")')
+
+  // Should NOT contain original ESM imports
+  expect(esmOutput).not.toContain('import { parse } from "@babel/parser"')
+})
+```
+
+## Best Practices
+
+### When to Use
+
+- ✅ CLI tools with many CJS dependencies
+- ✅ Build tools and bundlers
+- ✅ Applications with measurable startup time issues
+- ✅ Development servers that restart frequently
+
+### When NOT to Use
+
+- ❌ Simple applications with few CJS imports
+- ❌ Libraries that will be consumed by others
+- ❌ When performance gain is negligible
+- ❌ If you prefer simpler build configuration
+
+### Performance Monitoring
+
+Monitor the impact of the plugin:
+
+```typescript
+// Measure startup time
+const start = Date.now()
+import('./dist/index.js')
+const end = Date.now()
+console.log(`Startup time: ${end - start}ms`)
+```
+
+### Alternative Approaches
+
+1. **Use ESM-compatible packages** when available
+2. **Bundle with esbuild/swc** for better optimization
+3. **Use dynamic imports** strategically
+4. **Consider dual package publishing** for your own libraries
+
+## Troubleshooting
+
+### Plugin Not Transforming
+
+1. **Check `emitESM`**: Must be `true` for the plugin to activate
+2. **Verify package detection**: Only CJS-only packages are transformed
+3. **Check configuration**: Ensure `requireCJS` options are set correctly
+
+### Build Errors
+
+1. **CommonJS compatibility**: Ensure target environment supports `require()`
+2. **Module resolution**: Verify all packages are installed
+3. **TypeScript issues**: Update import statements if needed
+
+### Performance Issues
+
+1. **Too many transformations**: Use `exclude` to skip unnecessary packages
+2. **Bundle size increase**: Consider tree-shaking implications
+3. **Debug overhead**: Disable in production if issues arise
+
+## Related Examples
+
+- [Basic TypeScript Library](/docs/examples/basic-typescript) - Simple library setup
+- [CLI Tool](/docs/examples/cli-tool) - Command-line application
+- [Dual Package](/docs/examples/dual-package) - ESM and CJS compatibility

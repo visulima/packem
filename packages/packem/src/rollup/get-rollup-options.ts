@@ -29,6 +29,7 @@ import {
     rawPlugin,
     removeShebangPlugin,
     replace as replacePlugin,
+    requireCJSTransformerPlugin,
     resolveFileUrlPlugin,
     shebangPlugin,
     sourcemapsPlugin,
@@ -453,7 +454,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 ...context.options.rollup.json,
             }),
 
-            context.options.rollup.debarrel && debarrelPlugin(context.options.rollup.debarrel),
+            context.options.rollup.debarrel && debarrelPlugin(context.options.rollup.debarrel, context.logger),
 
             chunkSplitter(),
 
@@ -498,6 +499,11 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             && isolatedDeclarationsPlugin<InternalBuildOptions>(join(context.options.rootDir, context.options.sourceDir), context),
 
             context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
+
+            context.options.rollup.requireCJS && context.options.emitESM && requireCJSTransformerPlugin({
+                ...context.options.rollup.requireCJS,
+                cwd: context.options.rootDir,
+            }, context.logger),
 
             context.options.rollup.pluginPure
             && PluginPure({

@@ -1,0 +1,425 @@
+---
+title: require-cjs-transformer
+description: API documentation for the require-cjs-transformer plugin
+---
+
+# require-cjs-transformer
+
+Transform ESM imports of CommonJS-only packages to `require()` calls for better Node.js performance.
+
+## Installation
+
+The plugin is included with `@visulima/packem-rollup`:
+
+```bash
+npm install @visulima/packem
+```
+
+## Usage
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    requireCJS: {
+      builtinNodeModules: true
+    }
+  }
+})
+```
+
+## API Reference
+
+### requireCJSTransformerPlugin
+
+```typescript
+function requireCJSTransformerPlugin(
+  options?: RequireCJSPluginOptions,
+  logger?: Pail
+): Plugin
+```
+
+Creates a Rollup plugin that transforms ESM imports of CJS packages.
+
+#### Parameters
+
+- **options** (`RequireCJSPluginOptions?`): Plugin configuration options
+- **logger** (`Pail?`): Logger instance for debug output
+
+#### Returns
+
+A Rollup plugin instance.
+
+## Options
+
+### RequireCJSPluginOptions
+
+```typescript
+interface RequireCJSPluginOptions {
+  /**
+   * Transform Node.js built-in modules (fs, path, etc.) to use globalThis.process.getBuiltinModule()
+   * @default false
+   */
+  builtinNodeModules?: boolean
+
+  /**
+   * Custom working directory for module resolution
+   * @default process.cwd()
+   */
+  cwd?: string
+
+  /**
+   * Additional packages to consider as CJS-only (force transformation)
+   * @default []
+   */
+  additionalPackages?: string[]
+
+  /**
+   * Packages to exclude from transformation
+   * @default []
+   */
+  exclude?: string[]
+
+  /**
+   * Include patterns for files to process
+   * @default ['**/*.{js,jsx,ts,tsx,mjs,mts,cjs,cts}']
+   */
+  include?: string[]
+
+  /**
+   * Exclude patterns for files to skip
+   * @default ['**/node_modules/**']
+   */
+  excludePatterns?: string[]
+}
+```
+
+### builtinNodeModules
+
+**Type:** `boolean`  
+**Default:** `false`
+
+When enabled, transforms Node.js built-in modules to use `globalThis.process.getBuiltinModule()` instead of `require()`.
+
+**Example:**
+```typescript
+// Input
+import { readFileSync } from 'fs'
+import { join } from 'path'
+
+// Output (with builtinNodeModules: true)
+const { readFileSync } = globalThis.process.getBuiltinModule("fs")
+const { join } = globalThis.process.getBuiltinModule("path")
+```
+
+### cwd
+
+**Type:** `string`  
+**Default:** `process.cwd()`
+
+Working directory for module resolution. Useful when the plugin runs in a different directory than the project root.
+
+### additionalPackages
+
+**Type:** `string[]`  
+**Default:** `[]`
+
+Additional packages to force transformation for, even if they appear to be ESM-compatible.
+
+**Example:**
+```typescript
+requireCJS: {
+  additionalPackages: ['my-cjs-package', '@myorg/cjs-lib']
+}
+```
+
+### exclude
+
+**Type:** `string[]`  
+**Default:** `[]`
+
+Packages to exclude from transformation, even if they are detected as CJS-only.
+
+**Example:**
+```typescript
+requireCJS: {
+  exclude: ['some-package', '@myorg/esm-package']
+}
+```
+
+### include
+
+**Type:** `string[]`  
+**Default:** `['**/*.{js,jsx,ts,tsx,mjs,mts,cjs,cts}']`
+
+File patterns to include for transformation processing.
+
+### excludePatterns
+
+**Type:** `string[]`  
+**Default:** `['**/node_modules/**']`
+
+File patterns to exclude from transformation processing.
+
+## Examples
+
+### Basic Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    requireCJS: {
+      builtinNodeModules: true
+    }
+  }
+})
+```
+
+### Advanced Configuration
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    requireCJS: {
+      builtinNodeModules: true,
+      additionalPackages: ['my-cjs-lib'],
+      exclude: ['some-esm-package'],
+      include: ['src/**/*.{ts,tsx}'],
+      excludePatterns: ['src/vendor/**']
+    }
+  }
+})
+```
+
+### Programmatic Usage
+
+```typescript
+import { requireCJSTransformerPlugin } from '@visulima/packem-rollup'
+
+const plugin = requireCJSTransformerPlugin({
+  builtinNodeModules: true,
+  additionalPackages: ['typescript']
+})
+```
+
+## Transformation Examples
+
+### Named Imports
+
+```typescript
+// Input
+import { parse } from '@babel/parser'
+import { transpile } from 'typescript'
+
+// Output
+const { parse } = require("@babel/parser")
+const { transpile } = require("typescript")
+```
+
+### Default Imports
+
+```typescript
+// Input
+import typescript from 'typescript'
+import parser from '@babel/parser'
+
+// Output
+const typescript = require("typescript")
+const parser = require("@babel/parser")
+```
+
+### Namespace Imports
+
+```typescript
+// Input
+import * as ts from 'typescript'
+import * as babel from '@babel/core'
+
+// Output
+const ts = require("typescript")
+const babel = require("@babel/core")
+```
+
+### Node.js Built-ins
+
+```typescript
+// Input (with builtinNodeModules: true)
+import { readFileSync } from 'fs'
+import { join, dirname } from 'path'
+
+// Output
+const { readFileSync } = globalThis.process.getBuiltinModule("fs")
+const { join, dirname } = globalThis.process.getBuiltinModule("path")
+```
+
+### Mixed Imports
+
+```typescript
+// Input
+import fs, { readFileSync } from 'fs'
+import * as path from 'path'
+import { join } from 'path'
+
+// Output (with builtinNodeModules: true)
+const fs = globalThis.process.getBuiltinModule("fs")
+const { readFileSync } = globalThis.process.getBuiltinModule("fs")
+const path = globalThis.process.getBuiltinModule("path")
+const { join } = globalThis.process.getBuiltinModule("path")
+```
+
+## Detection Logic
+
+The plugin automatically detects CJS-only packages by:
+
+1. **Package.json Analysis**: Checks if `type: "commonjs"` is set
+2. **Export Conditions**: Analyzes available export conditions
+3. **Entry Points**: Verifies if only CommonJS entry points exist
+4. **Additional Packages**: Includes user-specified packages
+5. **Exclusions**: Respects user-defined exclusions
+
+### Automatic Detection Examples
+
+**CJS-only package** (transformed):
+```json
+{
+  "name": "cjs-package",
+  "main": "index.js",
+  "type": "commonjs"
+}
+```
+
+**ESM package** (not transformed):
+```json
+{
+  "name": "esm-package",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    }
+  }
+}
+```
+
+**Dual package** (not transformed - has ESM exports):
+```json
+{
+  "name": "dual-package",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  }
+}
+```
+
+## TypeScript Support
+
+The plugin generates TypeScript declaration files that reflect the transformed imports:
+
+```typescript
+// Input types (from package)
+export declare function parse(code: string): AST
+
+// Generated declaration (transformed)
+declare const parse: (code: string) => AST
+export { parse }
+```
+
+## Rollup Integration
+
+The plugin integrates with Rollup's plugin system and provides:
+
+- **Transform Hook**: Processes individual chunks during bundling
+- **ResolveId Hook**: Handles module resolution for transformed imports
+- **Logger Integration**: Uses Rollup's logging system for debug output
+
+### Plugin Hooks
+
+```typescript
+interface Plugin {
+  name: 'packem:require-cjs-transformer'
+  version: string
+
+  renderChunk: (code: string, chunk: RenderedChunk) => { code: string } | null
+  resolveId: (id: string, importer?: string) => Promise<string | null>
+}
+```
+
+## Performance Considerations
+
+### When to Use
+
+- ✅ CLI tools with heavy CJS package usage
+- ✅ Build tools and bundlers
+- ✅ Applications with measurable startup time issues
+- ✅ Development servers with frequent restarts
+
+### When NOT to Use
+
+- ❌ Simple applications with few CJS imports
+- ❌ Libraries consumed by other packages
+- ❌ When performance gain is negligible
+- ❌ If you prefer simpler build configuration
+
+### Benchmarking
+
+```typescript
+// Measure startup time impact
+const start = Date.now()
+await import('./dist/index.js')
+const end = Date.now()
+console.log(`Startup time: ${end - start}ms`)
+```
+
+## Error Handling
+
+### Common Errors
+
+**"Cannot resolve module"**
+- Ensure the package is installed
+- Check if the package name is spelled correctly
+- Verify the package exports the expected modules
+
+**"Plugin only works with ESM output"**
+- Ensure your Rollup output format is ESM-compatible
+
+**"Module not found in exclude list"**
+- Check your `exclude` configuration
+- Verify package names match exactly
+
+### Debug Logging
+
+Enable debug logging to troubleshoot transformation issues:
+
+```typescript
+export default defineConfig({
+  // ... other config
+  rollup: {
+    requireCJS: {
+      // ... options
+    }
+  }
+})
+```
+
+The plugin logs transformation details with the prefix `packem:plugin-require-cjs`.
+
+## Related APIs
+
+- [`defineConfig`](/docs/api/packem#defineconfig) - Main configuration function
+- [`PackemConfig`](/docs/api/packem#packemconfig) - Configuration interface
+- [`isPureCJS`](/docs/api/packem-rollup#ispurecjs) - Utility for detecting CJS packages

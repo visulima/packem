@@ -17,6 +17,8 @@ import type { Optimized, OptimizeDepsOptions, OptimizeDepsResult } from "../type
 
 const slash = (p: string) => p.replaceAll("\\", "/");
 
+const { parseAsync } = rsModuleLexer;
+
 const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsResult> => {
     // eslint-disable-next-line unicorn/prevent-abbreviations
     const cacheDir = findCacheDirSync("@visulima/packem/optimize-deps", {
@@ -82,7 +84,7 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
                     build.onLoad({ filter: /.*/, namespace: "optimize-deps" }, async (arguments_) => {
                         const { absolute, resolveDir } = arguments_.pluginData;
                         const sourceCode = readFileSync(absolute) as unknown as string;
-                        const { output } = await rsModuleLexer.parseAsync({ input: [{ code: sourceCode, filename: absolute }] });
+                        const { output } = await parseAsync({ input: [{ code: sourceCode, filename: absolute }] });
                         const exported = output[0]?.exports ?? [];
 
                         return {
