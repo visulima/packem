@@ -21,10 +21,7 @@ describe("packem require-cjs-transformer", () => {
         expect.assertions(4);
 
         // Create a simple source file
-        writeFileSync(
-            `${temporaryDirectoryPath}/src/index.ts`,
-            `export const test = "hello";`,
-        );
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const test = "hello";`);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createPackageJson(temporaryDirectoryPath, {
