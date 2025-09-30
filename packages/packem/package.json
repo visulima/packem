@@ -196,8 +196,8 @@
         "@visulima/source-map": "catalog:prod",
         "@visulima/tabular": "catalog:prod",
         "@visulima/tsconfig": "catalog:tsc",
-        "cjs-module-lexer": "catalog:prod",
         "browserslist": "catalog:network",
+        "cjs-module-lexer": "catalog:prod",
         "defu": "catalog:utils",
         "fastest-levenshtein": "catalog:prod",
         "hookable": "catalog:prod",
@@ -241,7 +241,6 @@
         "@types/picomatch": "catalog:types",
         "@types/react-dom": "catalog:types",
         "@types/semver": "catalog:types",
-        "@types/which-pm-runs": "catalog:types",
         "@vitest/coverage-v8": "catalog:test",
         "@vitest/ui": "catalog:test",
         "conventional-changelog-conventionalcommits": "catalog:dev",
@@ -262,6 +261,7 @@
         "oxc-parser": "catalog:dev",
         "oxc-resolver": "catalog:node",
         "oxc-transform": "catalog:database",
+        "package-manager-detector": "^1.3.0",
         "postcss": "catalog:style",
         "postcss-custom-properties": "catalog:style",
         "postcss-load-config": "catalog:style",
@@ -297,8 +297,7 @@
         "typedoc-plugin-markdown": "catalog:markdown",
         "typedoc-plugin-rename-defaults": "catalog:dev",
         "typescript": "catalog:tsc",
-        "vitest": "catalog:test",
-        "which-pm-runs": "catalog:dev"
+        "vitest": "catalog:test"
     },
     "peerDependencies": {
         "@arethetypeswrong/core": ">=0.18.2",
@@ -326,7 +325,7 @@
         "typedoc-plugin-markdown": ">=4.2.0",
         "typedoc-plugin-rename-defaults": ">=0.7.0",
         "typescript": ">=4.5 || >=5.0",
-        "which-pm-runs": "catalog:peer"
+        "package-manager-detector": "^1.3.0"
     },
     "peerDependenciesMeta": {
         "@arethetypeswrong/core": {

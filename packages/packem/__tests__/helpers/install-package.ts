@@ -12,7 +12,7 @@ const installPackage = async (fixturePath: string, packageName: string): Promise
     const linkPath = join(nodeModulesDirectory, packageName);
 
     if (existsSync(linkPath)) {
-        return;
+        throw new Error(`Package ${packageName} does not exist on ${linkPath}`);
     }
 
     await ensureSymlink(resolve(`node_modules/${packageName}`), linkPath);

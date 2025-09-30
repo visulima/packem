@@ -423,6 +423,10 @@ const validatePackageFields = (context: BuildContext<InternalBuildOptions>): voi
             );
         }
     }
+
+    if (validation.packageJson?.sideEffects !== false && pkg.sideEffects === undefined) {
+        warn(context, "The 'sideEffects' field is missing in your package.json. Consider adding this field to your package.json.");
+    }
 };
 
 export default validatePackageFields;

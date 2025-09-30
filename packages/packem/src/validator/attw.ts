@@ -154,6 +154,7 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
 
     const { packageJson } = loadPackageJson(context.options.rootDir);
 
+    context.logger.log(packageJson);
     context.pkg = packageJson;
 
     if (logged) {
@@ -169,7 +170,16 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
         return;
     }
 
-    await ensurePackages(context.pkg as NormalizedPackageJson, ["@arethetypeswrong/core", "which-pm-runs"], "devDependencies");
+    await ensurePackages(context.pkg as NormalizedPackageJson, ["@arethetypeswrong/core", "package-manager-detector"], "devDependencies", {
+        logger: {
+            warn: (message: string) => {
+                context.logger.warn({
+                    message,
+                    prefix: "attw",
+                });
+            },
+        },
+    });
 
     // eslint-disable-next-line prefer-const
     let { level = "warn", pm = "auto", profile = "strict", ...attwOptions } = validation.attw === true ? {} : validation.attw;
@@ -196,26 +206,20 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
         return;
     }
 
-    const { default: detectPackageManager } = await import("which-pm-runs");
-
     let packageManager: string | undefined;
 
     switch (pm) {
         case "auto": {
-            const dpm = detectPackageManager();
+            const { detect } = await import("package-manager-detector/detect");
+
+            const dpm = await detect({ cwd: context.options.rootDir });
 
             if (dpm) {
-                packageManager = dpm.name;
-
-                if (dpm.name === "yarn") {
-                    const yarnVersion = dpm.version.split(".")[0];
-
-                    if (validation.attw) {
-                        packageManager = yarnVersion === "1" ? "yarn-classic" : "yarn-modern";
-                    }
-                } else if (dpm.name === "bun") {
+                if (dpm.name === "bun") {
                     throw new Error("Bun does not support --json on the pack command");
                 }
+
+                packageManager = dpm.name;
             }
 
             break;
@@ -227,8 +231,7 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
             packageManager = "pnpm";
             break;
         }
-        case "yarn-classic":
-        case "yarn-modern": {
+        case "yarn": {
             packageManager = "yarn";
             break;
         }
