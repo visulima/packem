@@ -2,10 +2,12 @@ import fs from "node:fs/promises";
 
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
+import type { Pail } from "@visulima/pail";
 import MagicString from "magic-string";
 import type { Plugin, PluginContext, TransformResult } from "rollup";
 import type { ExportSpecifier, ImportSpecifier } from "rs-module-lexer";
-import { parse } from "rs-module-lexer";
+// eslint-disable-next-line import/no-namespace
+import * as rsModuleLexer from "rs-module-lexer";
 
 type Modifications = [start: number, end: number, replace: string][];
 
@@ -70,9 +72,11 @@ const isPossibleBarrelSpecifier = (id: string, options: DebarrelPluginOptions) =
 
 const getDeclarationKind = (specifiers: string) => (IS_EXPORT_PREFIXED.test(specifiers) ? "export" : "import");
 
-const safeParse = async (id: string, code: string): Promise<SimpleParseResult> => {
+const { parseAsync } = rsModuleLexer;
+
+const safeParse = async (id: string, code: string, logger: Pail): Promise<SimpleParseResult> => {
     try {
-        const { output } = parse({
+        const { output } = await parseAsync({
             input: [
                 {
                     code,
@@ -83,21 +87,23 @@ const safeParse = async (id: string, code: string): Promise<SimpleParseResult> =
 
         return output[0] as SimpleParseResult;
     } catch (error: unknown) {
-        // eslint-disable-next-line no-console
-        console.warn(`[packem:debarrel] Failed to parse ${id}:\n  ${error instanceof Error ? error.message : String(error)}`);
+        logger.warn({
+            message: `Failed to parse ${id}:\n  ${error instanceof Error ? error.message : String(error)}`,
+            prefix: "plugin:debarrel",
+        });
 
         return EMPTY_PARSE_RESULT;
     }
 };
 
-const parsePotentialBarrelFile = async (context: DebarrelContext, id: string, code: string): Promise<SimpleParseResult> => {
+const parsePotentialBarrelFile = async (context: DebarrelContext, id: string, code: string, logger: Pail): Promise<SimpleParseResult> => {
     const cached = context.parseCache.get(id);
 
     if (cached !== undefined) {
         return cached;
     }
 
-    const parsed = await safeParse(id, code);
+    const parsed = await safeParse(id, code, logger);
 
     context.parseCache.set(id, parsed);
 
@@ -203,10 +209,10 @@ const findMatchingImport = (exp: ExportSpecifier, imports: ImportSpecifier[], co
     return { imp, localExportName } as { imp: ImportSpecifier | undefined; localExportName?: string };
 };
 
-const resolveThroughBarrel = async (context: DebarrelContext, id: string, exportName: string, options: DebarrelPluginOptions): Promise<ResolvedSource> => {
+const resolveThroughBarrel = async (context: DebarrelContext, id: string, exportName: string, options: DebarrelPluginOptions, logger: Pail): Promise<ResolvedSource> => {
     const { resolve } = context;
     const code = await readFileCached(context, id);
-    const { exports, imports } = await parsePotentialBarrelFile(context, id, code);
+    const { exports, imports } = await parsePotentialBarrelFile(context, id, code, logger);
 
     // Walk all explicit export specifiers
     for await (const exp of exports) {
@@ -250,7 +256,7 @@ const resolveThroughBarrel = async (context: DebarrelContext, id: string, export
         }
 
         if (isPossibleBarrelSpecifier(resolvedId, options)) {
-            return resolveThroughBarrel(context, resolvedId, localExportName || exported, options);
+            return resolveThroughBarrel(context, resolvedId, localExportName || exported, options, logger);
         }
 
         return {
@@ -319,9 +325,9 @@ const getDeclarationClause = (resolvedSource: ResolvedSource, importName: Import
     return `{${isLocallyAliased ? `${exportName} as ${local}` : exportName}}`;
 };
 
-const getDebarrelModifications = async (context: DebarrelContext, id: string, code: string, options: DebarrelPluginOptions) => {
+const getDebarrelModifications = async (context: DebarrelContext, id: string, code: string, options: DebarrelPluginOptions, logger: Pail) => {
     const modifications: Modifications = [];
-    const { imports } = await safeParse(id, code);
+    const { imports } = await safeParse(id, code, logger);
 
     await Promise.all(
         imports.map(async (imp) => {
@@ -375,8 +381,13 @@ const getDebarrelModifications = async (context: DebarrelContext, id: string, co
 
                 modifications.push([imp.ss, imp.se, replacements.join(";")]);
             } catch (error) {
-                // eslint-disable-next-line no-console
-                console.warn(error);
+                logger.warn({
+                    context: {
+                        error,
+                    },
+                    message: error.toString(),
+                    prefix: "plugin:debarrel",
+                });
             }
         }),
     );
@@ -406,7 +417,7 @@ export interface DebarrelPluginOptions {
     possibleBarrelFiles?: (RegExp | string)[];
 }
 
-export const debarrelPlugin = (options: DebarrelPluginOptions = {}): Plugin => {
+export const debarrelPlugin = (options: DebarrelPluginOptions, logger: Pail): Plugin => {
     const fileCache: DebarrelContext["fileCache"] = new Map();
     const parseCache: DebarrelContext["parseCache"] = new Map();
 
@@ -464,7 +475,7 @@ export const debarrelPlugin = (options: DebarrelPluginOptions = {}): Plugin => {
                 resolve: this.resolve.bind(this),
             };
 
-            const modifications = await getDebarrelModifications(context, id, code, options);
+            const modifications = await getDebarrelModifications(context, id, code, options, logger);
 
             return applyModifications(id, code, modifications, sourceMap);
         },

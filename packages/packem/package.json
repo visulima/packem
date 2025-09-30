@@ -196,6 +196,7 @@
         "@visulima/source-map": "catalog:prod",
         "@visulima/tabular": "catalog:prod",
         "@visulima/tsconfig": "catalog:tsc",
+        "cjs-module-lexer": "catalog:prod",
         "browserslist": "catalog:network",
         "defu": "catalog:utils",
         "fastest-levenshtein": "catalog:prod",

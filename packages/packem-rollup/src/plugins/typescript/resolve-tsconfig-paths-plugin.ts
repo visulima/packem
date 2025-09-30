@@ -122,7 +122,7 @@ const getTsconfigPaths = (
 
     logger?.debug({
         message: `Resolved baseUrl to ${resolvedBaseUrl}`,
-        prefix: "plugin:packem:resolve-tsconfig-paths",
+        prefix: "plugin:resolve-tsconfig-paths",
     });
 
     const paths = tsconfig.config.compilerOptions?.paths ?? {};
@@ -131,7 +131,7 @@ const getTsconfigPaths = (
     if (pathsKeys.length === 0) {
         logger?.debug({
             message: `No paths found in tsconfig.json`,
-            prefix: "plugin:packem:resolve-tsconfig-paths",
+            prefix: "plugin:resolve-tsconfig-paths",
         });
     }
 
@@ -160,7 +160,7 @@ export const resolveTsconfigPathsPlugin = (
     const pathsKeys = Object.keys(paths);
 
     return {
-        name: "packem:resolve-tsconfig-paths",
+        name: "plugin:resolve-tsconfig-paths",
         // eslint-disable-next-line sonarjs/cognitive-complexity
         async resolveId(id, importer, options) {
             if (pathsKeys.length === 0) {
@@ -170,7 +170,7 @@ export const resolveTsconfigPathsPlugin = (
             if (id.includes("\0")) {
                 logger.debug({
                     message: `Skipping resolution of ${id} as it is a virtual module`,
-                    prefix: "plugin:packem:resolve-tsconfig-paths",
+                    prefix: "plugin:resolve-tsconfig-paths",
                 });
 
                 return undefined;
@@ -180,7 +180,7 @@ export const resolveTsconfigPathsPlugin = (
             if (id.includes("node_modules")) {
                 logger.debug({
                     message: `Skipping request as it is inside node_modules ${id}`,
-                    prefix: "plugin:packem:resolve-tsconfig-paths",
+                    prefix: "plugin:resolve-tsconfig-paths",
                 });
 
                 return undefined;
@@ -189,7 +189,7 @@ export const resolveTsconfigPathsPlugin = (
             if (!pluginOptions.resolveAbsolutePath && isAbsolute(id)) {
                 logger.debug({
                     message: `Skipping request as it is an absolute path ${id}`,
-                    prefix: "plugin:packem:resolve-tsconfig-paths",
+                    prefix: "plugin:resolve-tsconfig-paths",
                 });
 
                 return undefined;
@@ -198,7 +198,7 @@ export const resolveTsconfigPathsPlugin = (
             if (isRelative(id)) {
                 logger.debug({
                     message: `Skipping request as it is a relative path ${id}`,
-                    prefix: "plugin:packem:resolve-tsconfig-paths",
+                    prefix: "plugin:resolve-tsconfig-paths",
                 });
 
                 return undefined;
@@ -210,7 +210,7 @@ export const resolveTsconfigPathsPlugin = (
             if (!matchedPattern) {
                 logger.debug({
                     message: `moduleName did not match any paths pattern ${id}`,
-                    prefix: "plugin:packem:resolve-tsconfig-paths",
+                    prefix: "plugin:resolve-tsconfig-paths",
                 });
 
                 return undefined;
@@ -239,7 +239,7 @@ export const resolveTsconfigPathsPlugin = (
                     logger.debug({
                         context: [error],
                         message: `Failed to resolve ${candidate} from ${id as string}`,
-                        prefix: "plugin:packem:resolve-tsconfig-paths",
+                        prefix: "plugin:resolve-tsconfig-paths",
                     });
                 }
             }

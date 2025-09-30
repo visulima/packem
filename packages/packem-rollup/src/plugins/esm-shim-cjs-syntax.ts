@@ -134,5 +134,5 @@ export const esmShimCjsSyntaxPlugin = (packageJson: PackageJson, options: EsmShi
 
             return undefined;
         },
-    } as Plugin;
+    } satisfies Plugin;
 };

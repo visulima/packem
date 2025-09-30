@@ -71,6 +71,11 @@
           "description": "Target multiple runtimes with conditional exports"
         },
         {
+          "title": "require-cjs-transformer Plugin",
+          "href": "/docs/guide/require-cjs-transformer",
+          "description": "Transform ESM imports of CJS packages for better performance"
+        },
+        {
           "title": "Plugins",
           "href": "/docs/guide/plugins",
           "description": "Extend Packen with custom plugins"
@@ -254,6 +259,11 @@
           "title": "@visulima/packem-rollup",
           "href": "/docs/api/packem-rollup",
           "description": "Rollup plugins and transformer integrations"
+        },
+        {
+          "title": "require-cjs-transformer",
+          "href": "/docs/api/require-cjs-transformer",
+          "description": "Transform ESM imports of CJS packages for performance"
         },
         {
           "title": "@visulima/rollup-plugin-css",
@@ -449,11 +459,16 @@
               "href": "/docs/examples/advanced/custom-plugins",
               "description": "Extend Packen with custom Rollup plugins"
             },
-            {
-              "title": "Bundle Analysis",
-              "href": "/docs/examples/advanced/bundle-analysis",
-              "description": "Analyze and optimize bundle size"
-            }
+          {
+            "title": "Bundle Analysis",
+            "href": "/docs/examples/advanced/bundle-analysis",
+            "description": "Analyze and optimize bundle size"
+          },
+          {
+            "title": "require-cjs-transformer",
+            "href": "/docs/examples/advanced/require-cjs-transformer",
+            "description": "Transform ESM imports of CJS packages for performance"
+          }
           ]
         }
       ]

@@ -37,6 +37,6 @@ const metafilePlugin = (): Plugin =>
             });
         },
         name: "packem:metafile",
-    }) as Plugin;
+    }) satisfies Plugin;
 
 export default metafilePlugin;

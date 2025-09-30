@@ -1,0 +1,196 @@
+---
+title: @visulima/packem-rollup
+description: API documentation for Packen Rollup plugins and transformers
+---
+
+# @visulima/packem-rollup
+
+Rollup plugins and transformer integrations for Packen.
+
+## Installation
+
+```bash
+npm install @visulima/packem-rollup
+```
+
+## Transformers
+
+### esbuild Transformer
+
+```typescript
+import transformer from '@visulima/packem-rollup/transformer/esbuild'
+```
+
+Fast JavaScript/TypeScript transformer using esbuild.
+
+### swc Transformer
+
+```typescript
+import transformer from '@visulima/packem-rollup/transformer/swc'
+```
+
+Rust-powered transformer using swc.
+
+### OXC Transformer
+
+```typescript
+import transformer from '@visulima/packem-rollup/transformer/oxc'
+```
+
+Next-generation JavaScript toolchain.
+
+### sucrase Transformer
+
+```typescript
+import transformer from '@visulima/packem-rollup/transformer/sucrase'
+```
+
+Lightweight JavaScript transformer.
+
+### TypeScript Transformer
+
+```typescript
+import transformer from '@visulima/packem-rollup/transformer/typescript'
+```
+
+Official TypeScript compiler transformer.
+
+## Plugins
+
+### require-cjs-transformer
+
+```typescript
+import { requireCJSTransformerPlugin } from '@visulima/packem-rollup'
+```
+
+Transform ESM imports of CJS packages to `require()` calls for better performance.
+
+#### Usage
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+import { requireCJSTransformerPlugin } from '@visulima/packem-rollup'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    plugins: [
+      requireCJSTransformerPlugin({
+        builtinNodeModules: true
+      })
+    ]
+  }
+})
+```
+
+#### Options
+
+```typescript
+interface RequireCJSPluginOptions {
+  builtinNodeModules?: boolean
+  cwd?: string
+  additionalPackages?: string[]
+  exclude?: string[]
+  include?: string[]
+  excludePatterns?: string[]
+}
+```
+
+See [require-cjs-transformer API docs](/docs/api/require-cjs-transformer) for detailed documentation.
+
+### Other Rollup Plugins
+
+Packen includes several other Rollup plugins:
+
+- **CSS Processing**: Sass, Less, Stylus, PostCSS support
+- **Asset Handling**: Image and font processing
+- **TypeScript**: Declaration file generation
+- **Optimization**: Minification and tree shaking
+
+## Utilities
+
+### isPureCJS
+
+```typescript
+import { isPureCJS } from '@visulima/packem-rollup'
+
+const result = await isPureCJS('typescript', '/path/to/importer')
+console.log(result) // true
+```
+
+Detects if a package is CommonJS-only.
+
+#### Parameters
+
+- **id** (`string`): Package name or path
+- **importer** (`string`): Importing file path
+- **rollupResolve** (`Function?`): Custom resolver function
+
+#### Returns
+
+`Promise<boolean>` - True if the package is CJS-only.
+
+## Types
+
+### PackemRollupOptions
+
+```typescript
+interface PackemRollupOptions {
+  css?: CssOptions
+  requireCJS?: RequireCJSPluginOptions | false
+  plugins?: Plugin[]
+  // ... other Rollup options
+}
+```
+
+Configuration options for Rollup in Packen.
+
+### RequireCJSPluginOptions
+
+See [require-cjs-transformer API docs](/docs/api/require-cjs-transformer#requirecjspluginoptions).
+
+## Examples
+
+### Basic Transformer Usage
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import esbuildTransformer from '@visulima/packem-rollup/transformer/esbuild'
+
+export default defineConfig({
+  transformer: esbuildTransformer,
+  rollup: {
+    requireCJS: {
+      builtinNodeModules: true
+    }
+  }
+})
+```
+
+### Advanced Plugin Configuration
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem-rollup/transformer/swc'
+import { requireCJSTransformerPlugin } from '@visulima/packem-rollup'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    plugins: [
+      requireCJSTransformerPlugin({
+        builtinNodeModules: true,
+        additionalPackages: ['my-cjs-lib']
+      })
+    ]
+  }
+})
+```
+
+## Related
+
+- [Packen Configuration](/docs/guide/configuration)
+- [Transformers Guide](/docs/guide/transformers)
+- [require-cjs-transformer Plugin](/docs/guide/require-cjs-transformer)
+- [require-cjs-transformer Examples](/docs/examples/advanced/require-cjs-transformer)

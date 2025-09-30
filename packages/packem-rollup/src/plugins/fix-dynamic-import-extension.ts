@@ -37,6 +37,6 @@ const fixDynamicImportExtension = (): Plugin =>
 
             return undefined;
         },
-    }) as Plugin;
+    }) satisfies Plugin;
 
 export default fixDynamicImportExtension;

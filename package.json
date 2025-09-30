@@ -71,6 +71,7 @@
         "is-ci": "catalog:prod",
         "lint-staged": "catalog:lint",
         "nx": "catalog:monorepo",
+        "oxc-parser": "0.93.0",
         "pkg-pr-new": "catalog:node",
         "plop": "catalog:prod",
         "prettier": "catalog:lint",

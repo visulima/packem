@@ -64,7 +64,7 @@ catalogs:
     "@svgr/core": ^8.1.0
     "@swc/core": ^1.13.5
     "@swc/types": 0.1.25
-    "@visulima/packem": ^2.0.0-alpha.14
+    "@visulima/packem": ^2.0.0-alpha.21
     "@visulima/pail": 2.1.28
     conventional-changelog-conventionalcommits: 9.1.0
     deeks: ^3.1.1
@@ -157,6 +157,7 @@ catalogs:
     ast-kit: ^2.1.2
     audit-ci: ^7.1.0
     birpc: ^2.6.1
+    cjs-module-lexer: ^2.1.0
     debug: ^4.4.3
     fastest-levenshtein: 1.0.16
     gpt-tokenizer: ^3.0.1
