@@ -35,7 +35,7 @@ export interface AttwOptions extends CheckPackageOptions {
      * Bun does not support --json option on the pack command, if you choose bun you will get a error.
      * @default 'auto'
      */
-    pm?: "pnpm" | "yarn-classic" | "yarn-modern" | "npm" | "bun" | "auto";
+    pm?: "pnpm" | "yarn" | "npm" | "bun" | "auto";
 
     /**
      * Profiles select a set of resolution modes to require/ignore. All are evaluated but failures outside
@@ -325,6 +325,8 @@ export type ValidationOptions = {
         module?: boolean;
         /** Whether to validate the name field */
         name?: boolean;
+        /** Whether to validate the sideEffects field */
+        sideEffects?: boolean;
         /** Whether to validate the types field */
         types?: boolean;
         /** Whether to validate the typesVersions field */

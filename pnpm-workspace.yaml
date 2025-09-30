@@ -37,7 +37,7 @@ catalogs:
     "@visulima/packem-rollup": 1.0.0-alpha.14
     "@visulima/rollup-plugin-css": 1.0.0-alpha.4
     esbuild: ^0.25.10
-    rolldown: ^1.0.0-beta.40
+    rolldown: ^1.0.0-beta.41
     rollup: ^4.52.3
     rollup-plugin-dts: 6.2.3
     rollup-plugin-license: 3.6.0
@@ -100,7 +100,7 @@ catalogs:
     "@anolilab/lint-staged-config": ^3.0.31
     "@anolilab/prettier-config": ^6.0.4
     "@anolilab/textlint-config": ^9.0.5
-    "@commitlint/cli": ^20.0.0
+    "@commitlint/cli": ^20.1.0
     "@commitlint/config-conventional": ^20.0.0
     "@rushstack/eslint-plugin-security": ^0.11.0
     "@secretlint/secretlint-rule-preset-recommend": ^11.2.4
@@ -116,7 +116,7 @@ catalogs:
     turndown-plugin-gfm: ^1.0.2
     typedoc-plugin-markdown: 4.9.0
   monorepo:
-    nx: ^21.5.3
+    nx: ^21.6.2
   network:
     browserslist: 4.26.2
     browserslist-config-anolilab: ^6.0.3
@@ -148,7 +148,7 @@ catalogs:
     "@visulima/colorize": 1.4.23
     "@visulima/fs": 3.1.8
     "@visulima/humanizer": 1.2.2
-    "@visulima/package": 3.5.11
+    "@visulima/package": 3.6.1
     "@visulima/packem": ^1.28.3
     "@visulima/packem-share": 1.0.0-alpha.10
     "@visulima/pail": 2.1.28
@@ -161,7 +161,7 @@ catalogs:
     debug: ^4.4.3
     fastest-levenshtein: 1.0.16
     gpt-tokenizer: ^3.0.1
-    happy-dom: ^19.0.1
+    happy-dom: ^19.0.2
     hookable: 5.5.3
     is-ci: ^4.1.0
     micromatch: ^4.0.8
@@ -189,7 +189,7 @@ catalogs:
     cssnano: ^7.1.1
     icss-utils: ^5.1.0
     less: ^4.4.1
-    lightningcss: ^1.30.1
+    lightningcss: ^1.30.2
     minireset.css: 0.0.7
     postcss: ^8.5.6
     postcss-custom-properties: 14.0.6
@@ -212,7 +212,7 @@ catalogs:
     "@ts-macro/tsc": ^0.3.6
     "@visulima/tsconfig": 1.1.22
     "@volar/typescript": ^2.4.23
-    typescript: ^5.9.2
+    typescript: ^5.9.3
     vue-tsc: ^3.1.0
   types:
     "@types/babel__generator": ^7.27.0
