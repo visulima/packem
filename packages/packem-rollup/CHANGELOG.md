@@ -1,3 +1,9 @@
+## @visulima/packem-rollup [1.0.0-alpha.18](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.17...@visulima/packem-rollup@1.0.0-alpha.18) (2025-10-02)
+
+### Bug Fixes
+
+* update dependencies and versions across multiple packages ([a0d209d](https://github.com/visulima/packem/commit/a0d209d847b1feb171850994a64591ab7d26f8cb))
+
 ## @visulima/packem-rollup [1.0.0-alpha.17](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.16...@visulima/packem-rollup@1.0.0-alpha.17) (2025-09-30)
 
 ### Features
