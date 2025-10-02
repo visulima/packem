@@ -10,6 +10,7 @@ const createPackageJson = async (fixturePAth: string, data: PackageJson, transfo
                 [transformer === "swc" ? "@swc/core" : transformer === "oxc" ? "oxc-transform" : transformer]: "*",
                 ...data.devDependencies,
             },
+            sideEffects: true,
         },
         {
             overwrite: true,

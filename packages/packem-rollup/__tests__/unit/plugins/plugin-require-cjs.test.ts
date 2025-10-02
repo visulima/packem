@@ -9,7 +9,7 @@ describe(requireCJSTransformerPlugin, async () => {
     it("plugin exports correctly", () => {
         expect.assertions(3);
 
-        const plugin = requireCJSTransformerPlugin({}, { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() });
+        const plugin = requireCJSTransformerPlugin({}, { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() });
 
         expect(plugin).toBeDefined();
         expect(plugin.name).toBe("packem:plugin-require-cjs");
@@ -19,7 +19,7 @@ describe(requireCJSTransformerPlugin, async () => {
     it("plugin handles CJS modules correctly", async () => {
         expect.assertions(6);
 
-        const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() });
+        const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() });
 
         // Mock chunk with CJS import
         const code = `import { readFileSync } from 'fs';
@@ -35,7 +35,8 @@ export const test = 'hello';`;
         const result = await plugin.renderChunk?.handler?.call(
             { debug: mockLogger.debug },
             code,
-            { fileName: "test.js" }
+            { fileName: "test.js" },
+            { format: "es" },
         );
 
         // Should transform the code

@@ -33,7 +33,9 @@ describe(validatePackageFields, () => {
                 outDir: "dist",
                 validation: { packageJson: { files: true } },
             },
-            pkg: {},
+            pkg: {
+                sideEffects: false,
+            },
         };
 
         validatePackageFields(context as unknown as BuildContext);
@@ -46,7 +48,10 @@ describe(validatePackageFields, () => {
 
         const context = {
             options: { validation: { packageJson: { main: true } } },
-            pkg: { type: "commonjs" },
+            pkg: {
+                sideEffects: false,
+                type: "commonjs",
+            },
         };
 
         validatePackageFields(context as unknown as BuildContext);
@@ -62,7 +67,10 @@ describe(validatePackageFields, () => {
                 emitCJS: false,
                 validation: { packageJson: { exports: true } },
             },
-            pkg: { type: "module" },
+            pkg: {
+                sideEffects: false,
+                type: "module",
+            },
         };
 
         validatePackageFields(context as unknown as BuildContext);
@@ -80,6 +88,7 @@ describe(validatePackageFields, () => {
                 validation: { packageJson: { types: true } },
             },
             pkg: {
+                sideEffects: false,
                 files: ["dist"],
                 main: "dist/index.cjs",
                 name: "test",
@@ -102,7 +111,10 @@ describe(validatePackageFields, () => {
                 outDir: "dist",
                 validation: { packageJson: { files: true } },
             },
-            pkg: { files: [] },
+            pkg: {
+                sideEffects: false,
+                files: [],
+            },
         };
 
         validatePackageFields(context as unknown as BuildContext);
@@ -123,7 +135,11 @@ describe(validatePackageFields, () => {
                 declaration: "compatible" as const,
                 validation: { packageJson: { bin: true } },
             },
-            pkg: { bin: "bin/index.mjs", type: "commonjs" },
+            pkg: {
+                sideEffects: false,
+                bin: "bin/index.mjs",
+                type: "commonjs",
+            },
         };
         const contextObjectBin = {
             options: {
@@ -133,6 +149,7 @@ describe(validatePackageFields, () => {
                 validation: { packageJson: { bin: true } },
             },
             pkg: {
+                sideEffects: false,
                 bin: { cli1: "bin/cli1.mjs", cli2: "bin/cli2.cjs" },
                 type: "commonjs",
             },
@@ -158,7 +175,9 @@ describe(validatePackageFields, () => {
 
         const context = {
             options: { validation: { packageJson: { name: true } } },
-            pkg: {},
+            pkg: {
+                sideEffects: false,
+            },
         };
 
         validatePackageFields(context as unknown as BuildContext);
@@ -172,6 +191,7 @@ describe(validatePackageFields, () => {
         const context = {
             options: { declaration: true, outDir: "dist", validation: false },
             pkg: {
+                sideEffects: false,
                 exports: {
                     ".": {
                         default: "./dist/test.mjs",
@@ -204,7 +224,10 @@ describe(validatePackageFields, () => {
                         },
                     },
                 },
-                pkg: { exports: "./dist/index.js" },
+                pkg: {
+                    sideEffects: false,
+                    exports: "./dist/index.js",
+                },
             };
 
             validatePackageFields(context as unknown as BuildContext);
@@ -217,7 +240,10 @@ describe(validatePackageFields, () => {
 
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
-                pkg: { exports: "dist/index.js" },
+                pkg: {
+                    sideEffects: false,
+                    exports: "dist/index.js",
+                },
             };
 
             validatePackageFields(context as unknown as BuildContext);
@@ -230,7 +256,10 @@ describe(validatePackageFields, () => {
 
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
-                pkg: { exports: "./../unsafe/path.js" },
+                pkg: {
+                    sideEffects: false,
+                    exports: "./../unsafe/path.js",
+                },
             };
 
             validatePackageFields(context as unknown as BuildContext);
@@ -246,7 +275,10 @@ describe(validatePackageFields, () => {
 
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
-                pkg: { exports: "./dist/index.xyz" },
+                pkg: {
+                    sideEffects: false,
+                    exports: "./dist/index.xyz",
+                },
             };
 
             validatePackageFields(context as unknown as BuildContext);
@@ -270,7 +302,10 @@ describe(validatePackageFields, () => {
                         },
                     },
                 },
-                pkg: { exports: "./dist/native.node" },
+                pkg: {
+                    sideEffects: false,
+                    exports: "./dist/native.node",
+                },
             };
 
             validatePackageFields(context as unknown as BuildContext);
@@ -291,7 +326,10 @@ describe(validatePackageFields, () => {
                         },
                     },
                 },
-                pkg: { exports: "./dist/component.jsx" },
+                pkg: {
+                    sideEffects: false,
+                    exports: "./dist/component.jsx",
+                },
             };
 
             validatePackageFields(context as unknown as BuildContext);
@@ -312,7 +350,10 @@ describe(validatePackageFields, () => {
                         },
                     },
                 },
-                pkg: { exports: "./dist/component.tsx" },
+                pkg: {
+                    sideEffects: false,
+                    exports: "./dist/component.tsx",
+                },
             };
 
             validatePackageFields(context as unknown as BuildContext);
@@ -333,7 +374,10 @@ describe(validatePackageFields, () => {
                         },
                     },
                 },
-                pkg: { exports: "./dist/icons/*" },
+                pkg: {
+                    sideEffects: false,
+                    exports: "./dist/icons/*",
+                },
             };
 
             validatePackageFields(context as unknown as BuildContext);
@@ -355,6 +399,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         "./icons/*": "./dist/icons/*",
@@ -385,6 +430,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         "./icons/*": "./src/icons/*",
@@ -429,6 +475,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         "./icons/*": "./src/icons/*",
@@ -479,6 +526,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         "./assets/*": "./src/assets/*",
@@ -509,6 +557,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         import: "./dist/index.mjs",
                         require: "./dist/index.cjs",
@@ -535,6 +584,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         "./utils": "./dist/utils.js",
@@ -552,7 +602,10 @@ describe(validatePackageFields, () => {
 
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
-                pkg: { exports: {} },
+                pkg: {
+                    sideEffects: false,
+                    exports: {},
+                },
             };
 
             validatePackageFields(context as unknown as BuildContext);
@@ -566,6 +619,7 @@ describe(validatePackageFields, () => {
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         import: "./dist/index.mjs",
@@ -587,6 +641,7 @@ describe(validatePackageFields, () => {
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         "./utils": "./dist/utils.js",
                     },
@@ -604,6 +659,7 @@ describe(validatePackageFields, () => {
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".invalid": "./dist/invalid.js",
                     },
@@ -621,6 +677,7 @@ describe(validatePackageFields, () => {
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         "./*/*.js": "./dist/*/*.js",
@@ -647,6 +704,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         "custom-unknown": "./dist/custom.js",
                         default: "./dist/index.js",
@@ -676,6 +734,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         development: "./dist/dev.js",
                         production: "./dist/prod.js",
@@ -705,6 +764,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".": "./dist/index.js",
                         // eslint-disable-next-line unicorn/no-null
@@ -732,6 +792,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: ["./dist/modern.js", "./dist/fallback.js"],
                 },
             };
@@ -755,6 +816,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".": [],
                     },
@@ -780,6 +842,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".": {},
                     },
@@ -808,6 +871,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".": 123,
                     },
@@ -833,6 +897,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         "node-addons": "./dist/addons.js",
                         node: "./dist/node.js",
@@ -863,6 +928,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         browser: "./dist/browser.js",
                         bun: "./dist/bun.js",
@@ -897,7 +963,10 @@ describe(validatePackageFields, () => {
                         },
                     },
                 },
-                pkg: { exports: "invalid-path" },
+                pkg: {
+                    sideEffects: false,
+                    exports: "invalid-path",
+                },
             };
 
             validatePackageFields(context as unknown as BuildContext);
@@ -919,6 +988,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".": {
                             node: {
@@ -950,6 +1020,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         ".": {
                             import: "./dist/index.mjs",
@@ -986,6 +1057,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         "custom-bundler": "./dist/custom.js",
                         "my-framework": "./dist/framework.js",
@@ -1012,6 +1084,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         "known-custom": "./dist/known.js",
                         "unknown-custom": "./dist/unknown.js",
@@ -1043,6 +1116,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         import: "./dist/index.mjs",
                         require: "./dist/index.cjs",
@@ -1069,6 +1143,7 @@ describe(validatePackageFields, () => {
                     },
                 },
                 pkg: {
+                    sideEffects: false,
                     exports: {
                         "custom-condition": "./dist/custom.js",
                         default: "./dist/index.js",
