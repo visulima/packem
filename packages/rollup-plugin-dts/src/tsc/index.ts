@@ -1,17 +1,17 @@
 import Debug from "debug";
 import ts from "typescript";
 
-import { tscEmitBuild } from "./emit-build.ts";
-import { tscEmitCompiler } from "./emit-compiler.ts";
-import type { TscOptions, TscResult } from "./types.ts";
+import { tscEmitBuild } from "./emit-build.js";
+import { tscEmitCompiler } from "./emit-compiler.js";
+import type { TscOptions, TscResult } from "./types.js";
 
-export type { TscModule, TscOptions, TscResult } from "./types.ts";
+export type { TscModule, TscOptions, TscResult } from "./types.js";
 
-const debug = Debug("rolldown-plugin-dts:tsc");
+const debug = Debug("rollup-plugin-dts:tsc");
 
 debug(`loaded typescript: ${ts.version}`);
 
-export function tscEmit(tscOptions: TscOptions): TscResult {
+const tscEmit = (tscOptions: TscOptions): TscResult => {
     debug(`running tscEmit ${tscOptions.id}`);
 
     if (tscOptions.build) {
@@ -19,4 +19,6 @@ export function tscEmit(tscOptions: TscOptions): TscResult {
     }
 
     return tscEmitCompiler(tscOptions);
-}
+};
+
+export default tscEmit;

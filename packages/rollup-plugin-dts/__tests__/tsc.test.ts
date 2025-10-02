@@ -6,8 +6,8 @@ import { rolldownBuild } from "@sxzz/test-utils";
 import { glob } from "tinyglobby";
 import { describe, expect, it } from "vitest";
 
-import { dts } from "../src/index.ts";
-import { findSourceMapChunk } from "./utils.ts";
+import { dts } from "../src/index.js";
+import { findSourceMapChunk } from "./utils.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -130,7 +130,7 @@ describe("tsc", () => {
         const sources = sourcemap.sources || [];
         const expectedSources = ["../../src/types.ts", "../../src/react/index.ts"];
 
-        expect(sources.sort()).toEqual(expectedSources.sort());
+        expect(sources.toSorted()).toEqual(expectedSources.toSorted());
         expect(sourcemap.sourcesContent).toBeOneOf([undefined, []]);
     });
 
@@ -193,7 +193,7 @@ describe("tsc", () => {
             cwd: tempDir,
         });
 
-        expect(tsBuildInfoFiles.sort()).toMatchInlineSnapshot(`
+        expect(tsBuildInfoFiles.toSorted()).toMatchInlineSnapshot(`
       [
         "dir1/tsconfig.1.tsbuildinfo",
         "dir2/tsconfig.2.tsbuildinfo",
@@ -205,6 +205,9 @@ describe("tsc", () => {
         const root = path.resolve(dirname, "fixtures/vue-sfc");
         const { snapshot } = await rolldownBuild(path.resolve(root, "main.ts"), [
             dts({
+                compilerOptions: {
+                    isolatedDeclarations: false,
+                },
                 emitDtsOnly: true,
                 vue: true,
             }),
@@ -273,6 +276,19 @@ describe("tsc", () => {
 
     it("arktype", async () => {
         const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/arktype.ts"), [
+            dts({
+                compilerOptions: {
+                    isolatedDeclarations: false,
+                },
+                emitDtsOnly: true,
+            }),
+        ]);
+
+        expect(snapshot).toMatchSnapshot();
+    });
+
+    it("import JSON", async () => {
+        const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/import-json/index.ts"), [
             dts({
                 compilerOptions: {
                     isolatedDeclarations: false,

@@ -1,12 +1,12 @@
 import MagicString from "magic-string";
-import type { Plugin } from "rolldown";
+import type { Plugin } from "rollup";
 
-import { RE_DTS } from "./filename.ts";
-import type { OptionsResolved } from "./options.ts";
+import { RE_DTS } from "./filename.js";
+import type { OptionsResolved } from "./options.js";
 
-export function createBannerPlugin({ banner, footer }: Pick<OptionsResolved, "banner" | "footer">): Plugin {
+const createBannerPlugin = ({ banner, footer }: Pick<OptionsResolved, "banner" | "footer">): Plugin => {
     return {
-        name: "rolldown-plugin-dts:banner",
+        name: "rollup-plugin-dts:banner",
         async renderChunk(code: string, chunk) {
             if (!RE_DTS.test(chunk.fileName)) {
                 return;
@@ -40,4 +40,6 @@ export function createBannerPlugin({ banner, footer }: Pick<OptionsResolved, "ba
             };
         },
     };
-}
+};
+
+export default createBannerPlugin;
