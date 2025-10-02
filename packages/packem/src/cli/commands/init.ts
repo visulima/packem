@@ -29,7 +29,9 @@ const createInitCommand = (cli: Cli): void => {
                 throw new Error("No package.json found in the directory");
             }
 
-            const packageJson = parsePackageJson(packageJsonPath);
+            const packageJson = await parsePackageJson(packageJsonPath, {
+                resolveCatalogs: true,
+            });
             const packages: string[] = [];
 
             if (packageJson.dependencies) {

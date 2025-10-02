@@ -23,6 +23,10 @@ onlyBuiltDependencies:
 overrides:
   chrono-node@<2.2.4: ">=2.9.0"
   tmp@<=0.2.3: ">=0.2.5"
+  "@visulima/packem-rollup": "workspace:*"
+  "@visulima/packem-share": "workspace:*"
+  "@visulima/rollup-plugin-css": "workspace:*"
+  "@visulima/rollup-plugin-dts": "workspace:*"
 catalogs:
   build:
     "@rollup/plugin-alias": 5.1.1
@@ -46,7 +50,7 @@ catalogs:
     rollup-plugin-pure: ^0.4.0
     rollup-plugin-visualizer: 6.0.3
   cli:
-    "@anolilab/multi-semantic-release": ^2.0.4
+    "@anolilab/multi-semantic-release": ^2.0.5
     "@anolilab/semantic-release-pnpm": 2.0.4
     "@anolilab/semantic-release-preset": ^11.0.4
     commitizen: ^4.3.1
@@ -75,7 +79,7 @@ catalogs:
     lit: ^3.3.1
     mime: ^4.1.0
     oxc-parser: 0.91.0
-    p-queue: ^8.1.1
+    p-queue: ^9.0.0
     picocolors: ^1.1.1
     rs-module-lexer: ^2.6.0
     sort-package-json: 3.4.0
@@ -89,8 +93,8 @@ catalogs:
     which-pm-runs: ^1.1.0
   frontend:
     "@vue/language-core": ^3.1.0
-    react: ^19.1.1
-    react-dom: ^19.1.1
+    react: ^19.2.0
+    react-dom: ^19.2.0
     vue: ^3.5.22
   icons:
     lucide-static: ^0.544.0
@@ -148,7 +152,7 @@ catalogs:
     "@visulima/colorize": 1.4.23
     "@visulima/fs": 3.1.8
     "@visulima/humanizer": 1.2.2
-    "@visulima/package": 3.6.1
+    "@visulima/package": 4.0.0
     "@visulima/packem": ^1.28.3
     "@visulima/packem-share": 1.0.0-alpha.10
     "@visulima/pail": 2.1.28
@@ -167,7 +171,7 @@ catalogs:
     micromatch: ^4.0.8
     mlly: 1.8.0
     oxc-parser: 0.91.0
-    p-queue: ^8.1.1
+    p-queue: ^9.0.0
     picomatch: 4.0.3
     plop: ^4.0.4
     preline: ^3.2.3
@@ -182,8 +186,8 @@ catalogs:
     "@csstools/css-tokenizer": 3.0.4
     "@csstools/postcss-slow-plugins": ^2.0.0
     "@tailwindcss/forms": ^0.5.10
-    "@tailwindcss/node": ^4.1.13
-    "@tailwindcss/oxide": ^4.1.13
+    "@tailwindcss/node": ^4.1.14
+    "@tailwindcss/oxide": ^4.1.14
     "@tailwindcss/typography": ^0.5.19
     "@visulima/css-style-inject": 1.0.0-alpha.7
     cssnano: ^7.1.1
@@ -201,7 +205,7 @@ catalogs:
     postcss-value-parser: ^4.2.0
     sass: ^1.93.2
     sass-embedded: ^1.93.2
-    tailwindcss: ^4.1.13
+    tailwindcss: ^4.1.14
   test:
     "@sxzz/test-utils": ^0.5.11
     "@vitest/coverage-v8": ^3.2.4
@@ -228,7 +232,7 @@ catalogs:
     "@types/picomatch": ^4.0.2
     "@types/postcss-modules-local-by-default": ^4.0.2
     "@types/postcss-modules-scope": ^3.0.4
-    "@types/react-dom": ^19.1.9
+    "@types/react-dom": ^19.2.0
     "@types/semver": ^7.7.1
     "@types/stylus": ^0.48.43
     "@types/turndown": ^5.0.5

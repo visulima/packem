@@ -1,6 +1,6 @@
 import { isAccessibleSync } from "@visulima/fs";
 import type { NormalizedPackageJson } from "@visulima/package";
-import { parsePackageJson } from "@visulima/package/package-json";
+import { parsePackageJsonSync } from "@visulima/package/package-json";
 import { join } from "@visulima/path";
 
 const loadPackageJson = (
@@ -15,7 +15,9 @@ const loadPackageJson = (
         throw new Error(`package.json not found at ${packageJsonPath}`);
     }
 
-    const packageJson = parsePackageJson(packageJsonPath);
+    const packageJson = parsePackageJsonSync(packageJsonPath, {
+        resolveCatalogs: true,
+    });
 
     if (packageJson.publishConfig) {
         Object.assign(packageJson, packageJson.publishConfig);
