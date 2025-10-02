@@ -1,8 +1,8 @@
 import type { TsConfigJson } from "get-tsconfig";
-import type { SourceMapInput } from "rolldown";
+import type { SourceMapInput } from "rollup";
 import type ts from "typescript";
 
-import type { TscContext } from "./context.ts";
+import type { TscContext } from "./context.js";
 
 export interface TscModule {
     file: ts.SourceFile;

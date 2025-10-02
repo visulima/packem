@@ -1,10 +1,15 @@
-import path from "node:path";
 import process from "node:process";
 
-import type { TsConfigJson, TsConfigJsonResolved } from "get-tsconfig";
-import { getTsconfig, parseTsconfig } from "get-tsconfig";
-import type { AddonFunction } from "rolldown";
+import { resolve } from "@visulima/path";
+import type { TsConfigJson, TsConfigJsonResolved } from "@visulima/tsconfig";
+import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
+import type { AddonFunction } from "rollup";
 import type { IsolatedDeclarationsOptions } from "rolldown/experimental";
+
+type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
+type MarkPartial<T, K extends keyof T> = Omit<Required<T>, K> & Partial<Pick<T, K>>;
+
+let warnedTsgo = false;
 
 // #region General Options
 export interface GeneralOptions {
@@ -115,18 +120,18 @@ export interface TscOptions {
     /**
      * If your tsconfig.json has
      * [`references`](https://www.typescriptlang.org/tsconfig/#references) option,
-     * `rolldown-plugin-dts` will use [`tsc
+     * `rollup-plugin-dts` will use [`tsc
      * -b`](https://www.typescriptlang.org/docs/handbook/project-references.html#build-mode-for-typescript)
      * to build the project and all referenced projects before emitting `.d.ts`
      * files.
      *
-     * In such case, if this option is `true`, `rolldown-plugin-dts` will write
+     * In such case, if this option is `true`, `rollup-plugin-dts` will write
      * down all built files into your disk, including
      * [`.tsbuildinfo`](https://www.typescriptlang.org/tsconfig/#tsBuildInfoFile)
      * and other built files. This is equivalent to running `tsc -b` in your
      * project.
      *
-     * Otherwise, if this option is `false`, `rolldown-plugin-dts` will write
+     * Otherwise, if this option is `false`, `rollup-plugin-dts` will write
      * built files only into memory and leave a small footprint in your disk.
      *
      * Enabling this option will decrease the build time by caching previous build
@@ -195,9 +200,6 @@ export interface Options extends GeneralOptions, TscOptions {
     tsgo?: boolean;
 }
 
-type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
-type MarkPartial<T, K extends keyof T> = Omit<Required<T>, K> & Partial<Pick<T, K>>;
-
 export type OptionsResolved = Overwrite<
     MarkPartial<Omit<Options, "compilerOptions">, "banner" | "footer">,
     {
@@ -207,9 +209,7 @@ export type OptionsResolved = Overwrite<
     }
 >;
 
-let warnedTsgo = false;
-
-export function resolveOptions({
+export const resolveOptions = ({
     banner,
     // tsc
     build = false,
@@ -234,18 +234,23 @@ export function resolveOptions({
 
     tsMacro = false,
     vue = false,
-}: Options): OptionsResolved {
+}: Options): OptionsResolved => {
     let resolvedTsconfig: TsConfigJsonResolved | undefined;
 
     if (tsconfig === true || tsconfig == undefined) {
-        const { config, path } = getTsconfig(cwd) || {};
+        const { config, path } = findTsConfig(cwd) || {};
 
+        // eslint-disable-next-line no-param-reassign
         tsconfig = path;
+
         resolvedTsconfig = config;
     } else if (typeof tsconfig === "string") {
-        tsconfig = path.resolve(cwd || process.cwd(), tsconfig);
-        resolvedTsconfig = parseTsconfig(tsconfig);
+        // eslint-disable-next-line no-param-reassign
+        tsconfig = resolve(cwd || process.cwd(), tsconfig);
+
+        resolvedTsconfig = readTsConfig(tsconfig);
     } else {
+        // eslint-disable-next-line no-param-reassign
         tsconfig = undefined;
     }
 
@@ -280,24 +285,24 @@ export function resolveOptions({
 
     if (tsgo) {
         if (vue) {
-            throw new Error("[rolldown-plugin-dts] The `tsgo` option is not compatible with the `vue` option. Please disable one of them.");
+            throw new Error("[rollup-plugin-dts] The `tsgo` option is not compatible with the `vue` option. Please disable one of them.");
         }
 
         if (tsMacro) {
-            throw new Error("[rolldown-plugin-dts] The `tsgo` option is not compatible with the `tsMacro` option. Please disable one of them.");
+            throw new Error("[rollup-plugin-dts] The `tsgo` option is not compatible with the `tsMacro` option. Please disable one of them.");
         }
 
         if (oxc) {
-            throw new Error("[rolldown-plugin-dts] The `tsgo` option is not compatible with the `oxc` option. Please disable one of them.");
+            throw new Error("[rollup-plugin-dts] The `tsgo` option is not compatible with the `oxc` option. Please disable one of them.");
         }
     }
 
     if (oxc && vue) {
-        throw new Error("[rolldown-plugin-dts] The `oxc` option is not compatible with the `vue` option. Please disable one of them.");
+        throw new Error("[rollup-plugin-dts] The `oxc` option is not compatible with the `vue` option. Please disable one of them.");
     }
 
     if (oxc && tsMacro) {
-        throw new Error("[rolldown-plugin-dts] The `oxc` option is not compatible with the `tsMacro` option. Please disable one of them.");
+        throw new Error("[rollup-plugin-dts] The `oxc` option is not compatible with the `tsMacro` option. Please disable one of them.");
     }
 
     if (tsgo && !warnedTsgo) {
@@ -330,4 +335,4 @@ export function resolveOptions({
         tsMacro,
         vue,
     };
-}
+};

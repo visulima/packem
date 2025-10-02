@@ -2,10 +2,10 @@
 import Debug from "debug";
 import type Ts from "typescript";
 
-import type { TscOptions } from "./types.ts";
+import type { TscOptions } from "./types.js";
 
-function loadVueLanguageTools() {
-    const debug = Debug("rolldown-plugin-dts:vue");
+const loadVueLanguageTools = () => {
+    const debug = Debug("rollup-plugin-dts:vue");
 
     debug("loading vue language tools");
 
@@ -40,10 +40,10 @@ function loadVueLanguageTools() {
         debug("vue language tools not found", error);
         throw new Error("Failed to load vue language tools. Please manually install vue-tsc.");
     }
-}
+};
 
-function loadTsMacro() {
-    const debug = Debug("rolldown-plugin-dts:ts-macro");
+const loadTsMacro = () => {
+    const debug = Debug("rollup-plugin-dts:ts-macro");
 
     debug("loading ts-macro language tools");
 
@@ -76,7 +76,7 @@ function loadTsMacro() {
         debug("ts-macro language tools not found", error);
         throw new Error("Failed to load ts-macro language tools. Please manually install @ts-macro/tsc.");
     }
-}
+};
 
 // credits: https://github.com/vuejs/language-tools/blob/25f40ead59d862b3bd7011f2dd2968f47dfcf629/packages/tsc/index.ts
 export function createProgramFactory(ts: typeof Ts, options: Pick<TscOptions, "vue" | "tsMacro">): typeof Ts.createProgram {

@@ -1,10 +1,10 @@
-import type { Plugin } from "rolldown";
+import type { Plugin } from "rollup";
 
-import { RE_DTS, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename.ts";
+import { RE_DTS, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename.js";
 
-export function createDtsInputPlugin(): Plugin {
+const createDtsInputPlugin = (): Plugin => {
     return {
-        name: "rolldown-plugin-dts:dts-input",
+        name: "rollup-plugin-dts:dts-input",
 
         options(options) {
             return {
@@ -56,4 +56,6 @@ export function createDtsInputPlugin(): Plugin {
             };
         },
     };
-}
+};
+
+export default createDtsInputPlugin;

@@ -1,16 +1,15 @@
-import path from "node:path";
-
+import { dirname } from "@visulima/path";
 import Debug from "debug";
-import type { ExistingRawSourceMap } from "rolldown";
+import type { ExistingRawSourceMap } from "rollup";
 import ts from "typescript";
 
-import { globalContext } from "./context.ts";
-import { createFsSystem } from "./system.ts";
-import type { TscModule, TscOptions, TscResult } from "./types.ts";
-import { customTransformers, formatHost, setSourceMapRoot } from "./utils.ts";
-import { createProgramFactory } from "./volar.ts";
+import { globalContext } from "./context.js";
+import { createFsSystem } from "./system.js";
+import type { TscModule, TscOptions, TscResult } from "./types.js";
+import { customTransformers, formatHost, setSourceMapRoot } from "./utils.js";
+import { createProgramFactory } from "./volar.js";
 
-const debug = Debug("rolldown-plugin-dts:tsc-compiler");
+const debug = Debug("rollup-plugin-dts:tsc-compiler");
 
 const defaultCompilerOptions: ts.CompilerOptions = {
     checkJs: false,
@@ -25,7 +24,7 @@ const defaultCompilerOptions: ts.CompilerOptions = {
     target: 99 satisfies ts.ScriptTarget.ESNext,
 };
 
-function createOrGetTsModule(options: TscOptions): TscModule {
+const createOrGetTsModule = (options: TscOptions): TscModule => {
     const { context = globalContext, entries, id } = options;
     const program = context.programs.find((program) => {
         const roots = program.getRootFileNames();
@@ -53,11 +52,11 @@ function createOrGetTsModule(options: TscOptions): TscModule {
     context.programs.push(module.program);
 
     return module;
-}
+};
 
-function createTsProgram({ context = globalContext, cwd, entries, id, tsconfig, tsconfigRaw, tsMacro, vue }: TscOptions): TscModule {
+const createTsProgram = ({ context = globalContext, cwd, entries, id, tsconfig, tsconfigRaw, tsMacro, vue }: TscOptions): TscModule => {
     const fsSystem = createFsSystem(context.files);
-    const baseDir = tsconfig ? path.dirname(tsconfig) : cwd;
+    const baseDir = tsconfig ? dirname(tsconfig) : cwd;
     const parsedConfig = ts.parseJsonConfigFileContent(tsconfigRaw, fsSystem, baseDir);
 
     debug(`Creating program for root project: ${baseDir}`);
@@ -71,9 +70,9 @@ function createTsProgram({ context = globalContext, cwd, entries, id, tsconfig, 
         tsMacro,
         vue,
     });
-}
+};
 
-function createTsProgramFromParsedConfig({
+const createTsProgramFromParsedConfig = ({
     baseDir,
     entries,
     fsSystem,
@@ -85,7 +84,7 @@ function createTsProgramFromParsedConfig({
     baseDir: string;
     fsSystem: ts.System;
     parsedConfig: ts.ParsedCommandLine;
-}): TscModule {
+}): TscModule => {
     const compilerOptions: ts.CompilerOptions = {
         ...defaultCompilerOptions,
         ...parsedConfig.options,
@@ -114,14 +113,14 @@ function createTsProgramFromParsedConfig({
 
         if (hasReferences) {
             throw new Error(
-                `[rolldown-plugin-dts] Unable to load ${id}; You have "references" in your tsconfig file. Perhaps you want to add \`dts: { build: true }\` in your config?`,
+                `[rollup-plugin-dts] Unable to load ${id}; You have "references" in your tsconfig file. Perhaps you want to add \`dts: { build: true }\` in your config?`,
             );
         }
 
         if (fsSystem.fileExists(id)) {
             debug(`File ${id} exists on disk.`);
             throw new Error(
-                `Unable to load file ${id} from the program. This seems like a bug of rolldown-plugin-dts. Please report this issue to https://github.com/sxzz/rolldown-plugin-dts/issues`,
+                `Unable to load file ${id} from the program. This seems like a bug of rollup-plugin-dts. Please report this issue to https://github.com/sxzz/rollup-plugin-dts/issues`,
             );
         } else {
             debug(`File ${id} does not exist on disk.`);
@@ -133,7 +132,7 @@ function createTsProgramFromParsedConfig({
         file: sourceFile,
         program,
     };
-}
+};
 
 // Emit file using `tsc` mode (without `--build` flag).
 export function tscEmitCompiler(tscOptions: TscOptions): TscResult {

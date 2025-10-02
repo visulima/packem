@@ -4,6 +4,6 @@
     "compilerOptions": {
         "moduleResolution": "bundler"
     },
-    "include": ["src", "tests"],
-    "exclude": ["tests/fixtures", "tests/rollup-plugin-dts"]
+    "include": ["src", "__tests__"],
+    "exclude": ["__tests__/fixtures", "__tests__/rollup-plugin-dts"]
 }

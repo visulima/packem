@@ -3,10 +3,10 @@ import { parse } from "@babel/parser";
 import t from "@babel/types";
 import { isDeclarationType, isTypeOf, resolveString } from "ast-kit";
 import { walk } from "estree-walker";
-import type { Plugin, RenderedChunk } from "rolldown";
+import type { Plugin, RenderedChunk } from "rollup";
 
-import { filename_dts_to, filename_js_to_dts, RE_DTS, RE_DTS_MAP, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename.ts";
-import type { OptionsResolved } from "./options.ts";
+import { filename_dts_to, filename_js_to_dts, RE_DTS, RE_DTS_MAP, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename";
+import type { OptionsResolved } from "./options";
 
 // input:
 // export declare function x(xx: X): void
@@ -19,6 +19,7 @@ import type { OptionsResolved } from "./options.ts";
 // export declare function x$1(xx: X$1): void
 
 type Dep = t.Expression & { replace?: (newNode: t.Node) => void };
+
 interface SymbolInfo {
     bindings: t.Identifier[];
     decl: t.Declaration;
@@ -27,67 +28,314 @@ interface SymbolInfo {
 
 type NamespaceMap = Map<string, { local: t.Identifier | t.TSQualifiedName; stmt: t.Statement }>;
 
-export function createFakeJsPlugin({ cjsDefault, sourcemap }: Pick<OptionsResolved, "sourcemap" | "cjsDefault">): Plugin {
+const REFERENCE_RE = /\/\s*<reference\s+(?:path|types)=/;
+
+const collectReferenceDirectives = (comment: t.Comment[], negative = false) => comment.filter((c) => REFERENCE_RE.test(c.value) !== negative);
+
+const isThisExpression = (node: t.Node): boolean => (node.type === "Identifier" && node.name === "this") || (node.type === "MemberExpression" && isThisExpression(node.object));
+
+const TSEntityNameToRuntime = (node: t.TSEntityName): t.MemberExpression | t.Identifier => {
+    if (node.type === "Identifier") {
+        return node;
+    }
+
+    const left = TSEntityNameToRuntime(node.left);
+
+    return Object.assign(node, t.memberExpression(left, node.right));
+};
+
+const getIdFromTSEntityName = (node: t.TSEntityName) => {
+    if (node.type === "Identifier") {
+        return node;
+    }
+
+    return getIdFromTSEntityName(node.left);
+};
+
+const isReferenceId = (node?: t.Node | null): node is t.Identifier | t.MemberExpression => !!node && (node.type === "Identifier" || node.type === "MemberExpression");
+
+const isHelperImport = (node: t.Node) =>
+    node.type === "ImportDeclaration"
+    && node.specifiers.length === 1
+    && node.specifiers.every(
+        (spec) => spec.type === "ImportSpecifier" && spec.imported.type === "Identifier" && ["__export", "__reExport"].includes(spec.imported.name),
+    )
+;
+
+// patch `.d.ts` suffix in import source to `.js`
+const patchImportExport = (node: t.Node, typeOnlyIds: string[], cjsDefault: boolean): t.Statement | false | undefined => {
+    if (node.type === "ExportNamedDeclaration" && !node.declaration && !node.source && node.specifiers.length === 0 && !node.attributes?.length) {
+        return false;
+    }
+
+    if (isTypeOf(node, ["ImportDeclaration", "ExportAllDeclaration", "ExportNamedDeclaration"])) {
+        if (node.type === "ExportNamedDeclaration" && typeOnlyIds.length > 0) {
+            for (const spec of node.specifiers) {
+                const name = resolveString(spec.exported);
+
+                if (typeOnlyIds.includes(name)) {
+                    if (spec.type === "ExportSpecifier") {
+                        spec.exportKind = "type";
+                    } else {
+                        node.exportKind = "type";
+                    }
+                }
+            }
+        }
+
+        if (node.source?.value && RE_DTS.test(node.source.value)) {
+            node.source.value = filename_dts_to(node.source.value, "js");
+
+            return node;
+        }
+
+        if (
+            cjsDefault
+            && node.type === "ExportNamedDeclaration"
+            && !node.source
+            && node.specifiers.length === 1
+            && node.specifiers[0].type === "ExportSpecifier"
+            && resolveString(node.specifiers[0].exported) === "default"
+        ) {
+            const defaultExport = node.specifiers[0] as t.ExportSpecifier;
+
+            return {
+                expression: defaultExport.local,
+                type: "TSExportAssignment",
+            };
+        }
+    }
+};
+
+const patchTsNamespace = (nodes: t.Statement[]) => {
+    const emptyObjectAssignments = new Map<string, t.VariableDeclaration>();
+    const removed = new Set<t.Node>();
+
+    const handleExport = (node: t.Statement): false | [t.Identifier, t.ObjectExpression] => {
+        if (
+            node.type !== "VariableDeclaration"
+            || node.declarations.length !== 1
+            || node.declarations[0].id.type !== "Identifier"
+            || node.declarations[0].init?.type !== "CallExpression"
+            || node.declarations[0].init.callee.type !== "Identifier"
+            || node.declarations[0].init.callee.name !== "__export"
+            || node.declarations[0].init.arguments.length !== 1
+            || node.declarations[0].init.arguments[0].type !== "ObjectExpression"
+        ) {
+            return false;
+        }
+
+        const source = node.declarations[0].id;
+        const exports = node.declarations[0].init.arguments[0];
+
+        return [source, exports] as const;
+    };
+
+    /**
+     * @deprecated remove me in future
+     */
+    const handleLegacyExport = (node: t.Statement): false | [t.Identifier, t.ObjectExpression] => {
+        if (
+            node.type === "VariableDeclaration"
+            && node.declarations.length === 1
+            && node.declarations[0].id.type === "Identifier"
+            && node.declarations[0].init?.type === "ObjectExpression"
+            && node.declarations[0].init.properties.length === 0
+        ) {
+            emptyObjectAssignments.set(node.declarations[0].id.name, node);
+
+            return false;
+        }
+
+        if (
+            node.type !== "ExpressionStatement"
+            || node.expression.type !== "CallExpression"
+            || node.expression.callee.type !== "Identifier"
+            || !node.expression.callee.name.startsWith("__export")
+        ) {
+            return false;
+        }
+
+        const [binding, exports] = node.expression.arguments;
+
+        if (binding.type !== "Identifier" || exports.type !== "ObjectExpression")
+            return false;
+
+        const bindingText = binding.name;
+
+        if (emptyObjectAssignments.has(bindingText)) {
+            const emptyNode = emptyObjectAssignments.get(bindingText)!;
+
+            emptyObjectAssignments.delete(bindingText);
+            removed.add(emptyNode);
+        }
+
+        return [binding, exports] as const;
+    };
+
+    for (const [index, node] of nodes.entries()) {
+        const result = handleExport(node) || handleLegacyExport(node);
+
+        if (!result)
+            continue;
+
+        const [binding, exports] = result;
+
+        nodes[index] = {
+            body: {
+                body: [
+                    {
+                        declaration: null,
+                        source: null,
+                        specifiers: (exports as t.ObjectExpression).properties.filter((property) => property.type === "ObjectProperty").map((property) => {
+                            const local = (property.value as t.ArrowFunctionExpression).body as t.Identifier;
+                            const exported = property.key as t.Identifier;
+
+                            return t.exportSpecifier(local, exported);
+                        }),
+                        type: "ExportNamedDeclaration",
+                    },
+                ],
+                type: "TSModuleBlock",
+            },
+            declare: true,
+            id: binding,
+            kind: "namespace",
+            type: "TSModuleDeclaration",
+        };
+    }
+
+    return nodes.filter((node) => !removed.has(node));
+};
+
+// fix:
+// - import type { ... } from '...'
+// - import { type ... } from '...'
+// - export type { ... }
+// - export { type ... }
+// - export type * as x '...'
+// - import Foo = require("./bar")
+// - export = Foo
+// - export default x
+const rewriteImportExport = (
+    node: t.Node,
+    set: (node: t.Node) => void,
+    typeOnlyIds: string[],
+): node is t.ImportDeclaration | t.ExportAllDeclaration | t.TSImportEqualsDeclaration => {
+    if (node.type === "ImportDeclaration" || (node.type === "ExportNamedDeclaration" && !node.declaration)) {
+        for (const specifier of node.specifiers) {
+            if (("exportKind" in specifier && specifier.exportKind === "type") || ("exportKind" in node && node.exportKind === "type")) {
+                typeOnlyIds.push(resolveString((specifier as t.ExportSpecifier | t.ExportDefaultSpecifier | t.ExportNamespaceSpecifier).exported));
+            }
+
+            if (specifier.type === "ImportSpecifier") {
+                specifier.importKind = "value";
+            } else if (specifier.type === "ExportSpecifier") {
+                specifier.exportKind = "value";
+            }
+        }
+
+        if (node.type === "ImportDeclaration") {
+            node.importKind = "value";
+        } else if (node.type === "ExportNamedDeclaration") {
+            node.exportKind = "value";
+        }
+
+        return true;
+    }
+
+    if (node.type === "ExportAllDeclaration") {
+        node.exportKind = "value";
+
+        return true;
+    }
+
+    if (node.type === "TSImportEqualsDeclaration") {
+        if (node.moduleReference.type === "TSExternalModuleReference") {
+            set({
+                source: node.moduleReference.expression,
+                specifiers: [
+                    {
+                        local: node.id,
+                        type: "ImportDefaultSpecifier",
+                    },
+                ],
+                type: "ImportDeclaration",
+            });
+        }
+
+        return true;
+    }
+
+    if (node.type === "TSExportAssignment" && node.expression.type === "Identifier") {
+        set({
+            specifiers: [
+                {
+                    exported: {
+                        name: "default",
+                        type: "Identifier",
+                    },
+                    local: node.expression,
+                    type: "ExportSpecifier",
+                },
+            ],
+            type: "ExportNamedDeclaration",
+        });
+
+        return true;
+    }
+
+    if (node.type === "ExportDefaultDeclaration" && node.declaration.type === "Identifier") {
+        set({
+            specifiers: [
+                {
+                    exported: t.identifier("default"),
+                    local: node.declaration,
+                    type: "ExportSpecifier",
+                },
+            ],
+            type: "ExportNamedDeclaration",
+        });
+
+        return true;
+    }
+
+    return false;
+};
+
+const overwriteNode = <T>(node: t.Node, newNode: T): T => {
+    // clear object keys
+    for (const key of Object.keys(node)) {
+        delete (node as any)[key];
+    }
+
+    Object.assign(node, newNode);
+
+    return node as T;
+};
+
+const inheritNodeComments = <T extends t.Node>(oldNode: t.Node, newNode: T): T => {
+    newNode.leadingComments ||= [];
+
+    const leadingComments = oldNode.leadingComments?.filter((comment) => comment.value.startsWith("#"));
+
+    if (leadingComments) {
+        newNode.leadingComments.unshift(...leadingComments);
+    }
+
+    newNode.leadingComments = collectReferenceDirectives(newNode.leadingComments, true);
+
+    return newNode;
+};
+
+const createFakeJsPlugin = ({ cjsDefault, sourcemap }: Pick<OptionsResolved, "sourcemap" | "cjsDefault">): Plugin => {
     let symbolIndex = 0;
     const identifierMap: Record<string, number> = Object.create(null);
     const symbolMap = new Map<number /* symbol id */, SymbolInfo>();
     const commentsMap = new Map<string /* filename */, t.Comment[]>();
     const typeOnlyMap = new Map<string, string[]>();
 
-    return {
-        generateBundle: sourcemap
-            ? undefined
-            : (options, bundle) => {
-                for (const chunk of Object.values(bundle)) {
-                    if (!RE_DTS_MAP.test(chunk.fileName))
-                        continue;
-
-                    delete bundle[chunk.fileName];
-                }
-            },
-
-        name: "rolldown-plugin-dts:fake-js",
-
-        outputOptions(options) {
-            if (options.format === "cjs" || options.format === "commonjs") {
-                throw new Error("[rolldown-plugin-dts] Cannot bundle dts files with `cjs` format.");
-            }
-
-            const { chunkFileNames } = options;
-
-            return {
-                ...options,
-                chunkFileNames(chunk) {
-                    const nameTemplate = resolveTemplateFunction(chunkFileNames || "[name]-[hash].js", chunk);
-
-                    if (chunk.name.endsWith(".d")) {
-                        const renderedNameWithoutD = filename_js_to_dts(replaceTemplateName(nameTemplate, chunk.name.slice(0, -2)));
-
-                        if (RE_DTS.test(renderedNameWithoutD)) {
-                            return renderedNameWithoutD;
-                        }
-
-                        const renderedName = filename_js_to_dts(replaceTemplateName(nameTemplate, chunk.name));
-
-                        if (RE_DTS.test(renderedName)) {
-                            return renderedName;
-                        }
-                    }
-
-                    return nameTemplate;
-                },
-                sourcemap: options.sourcemap || sourcemap,
-            };
-        },
-        renderChunk,
-
-        transform: {
-            filter: { id: RE_DTS },
-            handler: transform,
-        },
-    };
-
-    function transform(code: string, id: string) {
+    const transform = (code: string, id: string) => {
         const file = parse(code, {
             plugins: [["typescript", { dts: true }]],
             sourceType: "module",
@@ -185,12 +433,14 @@ export function createFakeJsPlugin({ cjsDefault, sourcemap }: Pick<OptionsResolv
                         init: runtime,
                         type: "VariableDeclarator",
                     },
-                    ...bindings.slice(1).map((binding): t.VariableDeclarator => {
-                        return {
-                            id: { ...binding, typeAnnotation: null },
-                            type: "VariableDeclarator",
-                        };
-                    }),
+                    ...bindings.slice(1).map(
+                        (binding): t.VariableDeclarator => {
+                            return {
+                                id: { ...binding, typeAnnotation: null },
+                                type: "VariableDeclarator",
+                            };
+                        },
+                    ),
                 ],
                 kind: "var",
                 type: "VariableDeclaration",
@@ -218,9 +468,9 @@ export function createFakeJsPlugin({ cjsDefault, sourcemap }: Pick<OptionsResolv
         });
 
         return result;
-    }
+    };
 
-    function renderChunk(code: string, chunk: RenderedChunk) {
+    const renderChunk = (code: string, chunk: RenderedChunk) => {
         if (!RE_DTS.test(chunk.fileName)) {
             return;
         }
@@ -337,31 +587,36 @@ export function createFakeJsPlugin({ cjsDefault, sourcemap }: Pick<OptionsResolv
         });
 
         return result;
-    }
+    };
 
-    function getIdentifierIndex(name: string) {
+    const getIdentifierIndex = (name: string) => {
         if (name in identifierMap) {
             return identifierMap[name]++;
         }
 
         return (identifierMap[name] = 0);
-    }
+    };
 
-    function registerSymbol(info: SymbolInfo) {
+    const registerSymbol = (info: SymbolInfo) => {
         const symbolId = symbolIndex++;
 
         symbolMap.set(symbolId, info);
 
         return symbolId;
-    }
+    };
 
-    function getSymbol(symbolId: number) {
-        return symbolMap.get(symbolId)!;
-    }
+    const getSymbol = (symbolId: number) => symbolMap.get(symbolId)!;
 
-    function collectDependencies(node: t.Node, namespaceStmts: NamespaceMap): Dep[] {
+    const collectDependencies = (node: t.Node, namespaceStmts: NamespaceMap): Dep[] => {
         const deps = new Set<Dep>();
         const seen = new Set<t.Node>();
+
+        const addDependency = (node: Dep) => {
+            if (isThisExpression(node))
+                return;
+
+            deps.add(node);
+        };
 
         (walk as any)(node, {
             leave(node: t.Node) {
@@ -408,9 +663,10 @@ export function createFakeJsPlugin({ cjsDefault, sourcemap }: Pick<OptionsResolv
                             if (seen.has(node.exprName))
                                 return;
 
-                            if (node.exprName.type !== "TSImportType") {
-                                addDependency(TSEntityNameToRuntime(node.exprName));
-                            }
+                            if (node.exprName.type === "TSImportType")
+                                break;
+
+                            addDependency(TSEntityNameToRuntime(node.exprName));
 
                             break;
                         }
@@ -419,23 +675,15 @@ export function createFakeJsPlugin({ cjsDefault, sourcemap }: Pick<OptionsResolv
 
                             break;
                         }
-                        // No default
                     }
                 }
             },
         });
 
         return [...deps];
+    };
 
-        function addDependency(node: Dep) {
-            if (node.type === "Identifier" && node.name === "this")
-                return;
-
-            deps.add(node);
-        }
-    }
-
-    function importNamespace(node: t.TSImportType, imported: t.TSEntityName | null | undefined, source: t.StringLiteral, namespaceStmts: NamespaceMap): Dep {
+    const importNamespace = (node: t.TSImportType, imported: t.TSEntityName | null | undefined, source: t.StringLiteral, namespaceStmts: NamespaceMap): Dep => {
         const sourceText = source.value.replaceAll(/\W/g, "_");
         let local: t.Identifier | t.TSQualifiedName = t.identifier(`${sourceText}${getIdentifierIndex(sourceText)}`);
 
@@ -473,315 +721,60 @@ export function createFakeJsPlugin({ cjsDefault, sourcemap }: Pick<OptionsResolv
         };
 
         return dep;
-    }
-}
+    };
 
-// function debug(node: t.Node) {
-//   console.info('----')
-//   console.info(generate(node).code)
-//   console.info('----')
-// }
+    return {
+        generateBundle: sourcemap
+            ? undefined
+            : (options, bundle) => {
+                for (const chunk of Object.values(bundle)) {
+                    if (!RE_DTS_MAP.test(chunk.fileName))
+                        continue;
 
-const REFERENCE_RE = /\/\s*<reference\s+(?:path|types)=/;
-
-function collectReferenceDirectives(comment: t.Comment[], negative = false) {
-    return comment.filter((c) => REFERENCE_RE.test(c.value) !== negative);
-}
-
-function TSEntityNameToRuntime(node: t.TSEntityName): t.MemberExpression | t.Identifier {
-    if (node.type === "Identifier") {
-        return node;
-    }
-
-    const left = TSEntityNameToRuntime(node.left);
-
-    return Object.assign(node, t.memberExpression(left, node.right));
-}
-
-function getIdFromTSEntityName(node: t.TSEntityName) {
-    if (node.type === "Identifier") {
-        return node;
-    }
-
-    return getIdFromTSEntityName(node.left);
-}
-
-function isReferenceId(node?: t.Node | null): node is t.Identifier | t.MemberExpression {
-    return !!node && (node.type === "Identifier" || node.type === "MemberExpression");
-}
-
-function isHelperImport(node: t.Node) {
-    return (
-        node.type === "ImportDeclaration"
-        && node.specifiers.length === 1
-        && node.specifiers.every(
-            (spec) => spec.type === "ImportSpecifier" && spec.imported.type === "Identifier" && ["__export", "__reExport"].includes(spec.imported.name),
-        )
-    );
-}
-
-// patch `.d.ts` suffix in import source to `.js`
-function patchImportExport(node: t.Node, typeOnlyIds: string[], cjsDefault: boolean): t.Statement | false | undefined {
-    if (node.type === "ExportNamedDeclaration" && !node.declaration && !node.source && node.specifiers.length === 0 && !node.attributes?.length) {
-        return false;
-    }
-
-    if (isTypeOf(node, ["ImportDeclaration", "ExportAllDeclaration", "ExportNamedDeclaration"])) {
-        if (node.type === "ExportNamedDeclaration" && typeOnlyIds.length > 0) {
-            for (const spec of node.specifiers) {
-                const name = resolveString(spec.exported);
-
-                if (typeOnlyIds.includes(name)) {
-                    if (spec.type === "ExportSpecifier") {
-                        spec.exportKind = "type";
-                    } else {
-                        node.exportKind = "type";
-                    }
+                    delete bundle[chunk.fileName];
                 }
+            },
+
+        name: "rollup-plugin-dts:fake-js",
+
+        outputOptions(options) {
+            if (options.format === "cjs" || options.format === "commonjs") {
+                throw new Error("[rollup-plugin-dts] Cannot bundle dts files with `cjs` format.");
             }
-        }
 
-        if (node.source?.value && RE_DTS.test(node.source.value)) {
-            node.source.value = filename_dts_to(node.source.value, "js");
-
-            return node;
-        }
-
-        if (
-            cjsDefault
-            && node.type === "ExportNamedDeclaration"
-            && !node.source
-            && node.specifiers.length === 1
-            && node.specifiers[0].type === "ExportSpecifier"
-            && resolveString(node.specifiers[0].exported) === "default"
-        ) {
-            const defaultExport = node.specifiers[0] as t.ExportSpecifier;
+            const { chunkFileNames } = options;
 
             return {
-                expression: defaultExport.local,
-                type: "TSExportAssignment",
+                ...options,
+                chunkFileNames(chunk) {
+                    const nameTemplate = resolveTemplateFunction(chunkFileNames || "[name]-[hash].js", chunk);
+
+                    if (chunk.name.endsWith(".d")) {
+                        const renderedNameWithoutD = filename_js_to_dts(replaceTemplateName(nameTemplate, chunk.name.slice(0, -2)));
+
+                        if (RE_DTS.test(renderedNameWithoutD)) {
+                            return renderedNameWithoutD;
+                        }
+
+                        const renderedName = filename_js_to_dts(replaceTemplateName(nameTemplate, chunk.name));
+
+                        if (RE_DTS.test(renderedName)) {
+                            return renderedName;
+                        }
+                    }
+
+                    return nameTemplate;
+                },
+                sourcemap: options.sourcemap || sourcemap,
             };
-        }
-    }
-}
+        },
+        renderChunk,
 
-function patchTsNamespace(nodes: t.Statement[]) {
-    const emptyObjectAssignments = new Map<string, t.VariableDeclaration>();
-    const removed = new Set<t.Node>();
+        transform: {
+            filter: { id: RE_DTS },
+            handler: transform,
+        },
+    };
+};
 
-    for (const [index, node] of nodes.entries()) {
-        const result = handleExport(node) || handleLegacyExport(node);
-
-        if (!result)
-            continue;
-
-        const [binding, exports] = result;
-
-        nodes[index] = {
-            body: {
-                body: [
-                    {
-                        declaration: null,
-                        source: null,
-                        specifiers: (exports as t.ObjectExpression).properties.filter((property) => property.type === "ObjectProperty").map((property) => {
-                            const local = (property.value as t.ArrowFunctionExpression).body as t.Identifier;
-                            const exported = property.key as t.Identifier;
-
-                            return t.exportSpecifier(local, exported);
-                        }),
-                        type: "ExportNamedDeclaration",
-                    },
-                ],
-                type: "TSModuleBlock",
-            },
-            declare: true,
-            id: binding,
-            kind: "namespace",
-            type: "TSModuleDeclaration",
-        };
-    }
-
-    return nodes.filter((node) => !removed.has(node));
-
-    function handleExport(node: t.Statement): false | [t.Identifier, t.ObjectExpression] {
-        if (
-            node.type !== "VariableDeclaration"
-            || node.declarations.length !== 1
-            || node.declarations[0].id.type !== "Identifier"
-            || node.declarations[0].init?.type !== "CallExpression"
-            || node.declarations[0].init.callee.type !== "Identifier"
-            || node.declarations[0].init.callee.name !== "__export"
-            || node.declarations[0].init.arguments.length !== 1
-            || node.declarations[0].init.arguments[0].type !== "ObjectExpression"
-        ) {
-            return false;
-        }
-
-        const source = node.declarations[0].id;
-        const exports = node.declarations[0].init.arguments[0];
-
-        return [source, exports] as const;
-    }
-
-    /**
-     * @deprecated remove me in future
-     */
-    function handleLegacyExport(node: t.Statement): false | [t.Identifier, t.ObjectExpression] {
-        if (
-            node.type === "VariableDeclaration"
-            && node.declarations.length === 1
-            && node.declarations[0].id.type === "Identifier"
-            && node.declarations[0].init?.type === "ObjectExpression"
-            && node.declarations[0].init.properties.length === 0
-        ) {
-            emptyObjectAssignments.set(node.declarations[0].id.name, node);
-
-            return false;
-        }
-
-        if (
-            node.type !== "ExpressionStatement"
-            || node.expression.type !== "CallExpression"
-            || node.expression.callee.type !== "Identifier"
-            || !node.expression.callee.name.startsWith("__export")
-        ) {
-            return false;
-        }
-
-        const [binding, exports] = node.expression.arguments;
-
-        if (binding.type !== "Identifier" || exports.type !== "ObjectExpression")
-            return false;
-
-        const bindingText = binding.name;
-
-        if (emptyObjectAssignments.has(bindingText)) {
-            const emptyNode = emptyObjectAssignments.get(bindingText)!;
-
-            emptyObjectAssignments.delete(bindingText);
-            removed.add(emptyNode);
-        }
-
-        return [binding, exports] as const;
-    }
-}
-
-// fix:
-// - import type { ... } from '...'
-// - import { type ... } from '...'
-// - export type { ... }
-// - export { type ... }
-// - export type * as x '...'
-// - import Foo = require("./bar")
-// - export = Foo
-// - export default x
-function rewriteImportExport(
-    node: t.Node,
-    set: (node: t.Node) => void,
-    typeOnlyIds: string[],
-): node is t.ImportDeclaration | t.ExportAllDeclaration | t.TSImportEqualsDeclaration {
-    if (node.type === "ImportDeclaration" || (node.type === "ExportNamedDeclaration" && !node.declaration)) {
-        for (const specifier of node.specifiers) {
-            if (("exportKind" in specifier && specifier.exportKind === "type") || ("exportKind" in node && node.exportKind === "type")) {
-                typeOnlyIds.push(resolveString((specifier as t.ExportSpecifier | t.ExportDefaultSpecifier | t.ExportNamespaceSpecifier).exported));
-            }
-
-            if (specifier.type === "ImportSpecifier") {
-                specifier.importKind = "value";
-            } else if (specifier.type === "ExportSpecifier") {
-                specifier.exportKind = "value";
-            }
-        }
-
-        if (node.type === "ImportDeclaration") {
-            node.importKind = "value";
-        } else if (node.type === "ExportNamedDeclaration") {
-            node.exportKind = "value";
-        }
-
-        return true;
-    }
-
-    if (node.type === "ExportAllDeclaration") {
-        node.exportKind = "value";
-
-        return true;
-    }
-
-    if (node.type === "TSImportEqualsDeclaration") {
-        if (node.moduleReference.type === "TSExternalModuleReference") {
-            set({
-                source: node.moduleReference.expression,
-                specifiers: [
-                    {
-                        local: node.id,
-                        type: "ImportDefaultSpecifier",
-                    },
-                ],
-                type: "ImportDeclaration",
-            });
-        }
-
-        return true;
-    }
-
-    if (node.type === "TSExportAssignment" && node.expression.type === "Identifier") {
-        set({
-            specifiers: [
-                {
-                    exported: {
-                        name: "default",
-                        type: "Identifier",
-                    },
-                    local: node.expression,
-                    type: "ExportSpecifier",
-                },
-            ],
-            type: "ExportNamedDeclaration",
-        });
-
-        return true;
-    }
-
-    if (node.type === "ExportDefaultDeclaration" && node.declaration.type === "Identifier") {
-        set({
-            specifiers: [
-                {
-                    exported: t.identifier("default"),
-                    local: node.declaration,
-                    type: "ExportSpecifier",
-                },
-            ],
-            type: "ExportNamedDeclaration",
-        });
-
-        return true;
-    }
-
-    return false;
-}
-
-function overwriteNode<T>(node: t.Node, newNode: T): T {
-    // clear object keys
-    for (const key of Object.keys(node)) {
-        delete (node as any)[key];
-    }
-
-    Object.assign(node, newNode);
-
-    return node as T;
-}
-
-function inheritNodeComments<T extends t.Node>(oldNode: t.Node, newNode: T): T {
-    newNode.leadingComments ||= [];
-
-    const leadingComments = oldNode.leadingComments?.filter((comment) => comment.value.startsWith("#"));
-
-    if (leadingComments) {
-        newNode.leadingComments.unshift(...leadingComments);
-    }
-
-    newNode.leadingComments = collectReferenceDirectives(newNode.leadingComments, true);
-
-    return newNode;
-}
+export default createFakeJsPlugin;

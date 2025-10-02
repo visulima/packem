@@ -1,7 +1,8 @@
+import { resolve } from "@visulima/path";
 import Debug from "debug";
 import type ts from "typescript";
 
-const debug = Debug("rolldown-plugin-dts:tsc-context");
+const debug = Debug("rollup-plugin-dts:tsc-context");
 
 // A parsed tsconfig file with its path.
 export interface ParsedProject {
@@ -21,7 +22,7 @@ export interface TscContext {
     projects: Map<string, SourceFileToProjectMap>;
 }
 
-export function createContext(): TscContext {
+export const createContext = (): TscContext => {
     const programs: ts.Program[] = [];
     const files = new Map<string, string>();
     const projects = new Map<string, SourceFileToProjectMap>();
@@ -29,7 +30,8 @@ export function createContext(): TscContext {
     return { files, programs, projects };
 }
 
-export function invalidateContextFile(context: TscContext, file: string): void {
+export const invalidateContextFile = (context: TscContext, file: string): void => {
+    file = resolve(file).replaceAll("\\", "/");
     debug(`invalidating context file: ${file}`);
     context.files.delete(file);
     context.programs = context.programs.filter((program) => !program.getSourceFiles().some((sourceFile) => sourceFile.fileName === file));

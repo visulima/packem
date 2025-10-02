@@ -1,25 +1,49 @@
-import path from "node:path";
-
+import { isAbsolute, normalize } from "@visulima/path";
 import { createResolver } from "dts-resolver";
-import type { Plugin, ResolvedId } from "rolldown";
 import { ResolverFactory } from "rolldown/experimental";
+import type { Plugin, ResolvedId } from "rollup";
 
-import { filename_to_dts, RE_CSS, RE_DTS, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename.ts";
-import type { OptionsResolved } from "./options.ts";
+import { filename_to_dts, RE_CSS, RE_DTS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename.js";
+import type { OptionsResolved } from "./options.js";
 
-function isSourceFile(id: string) {
-    return RE_TS.test(id) || RE_VUE.test(id);
-}
+const isSourceFile = (id: string) => RE_TS.test(id) || RE_VUE.test(id) || RE_JSON.test(id);
 
-export function createDtsResolvePlugin({ resolve, tsconfig }: Pick<OptionsResolved, "tsconfig" | "resolve">): Plugin {
+const isFilePath = (id: string) => id.startsWith(".") || isAbsolute(id);
+
+const createDtsResolvePlugin = ({ resolve, tsconfig }: Pick<OptionsResolved, "tsconfig" | "resolve">): Plugin => {
     const baseDtsResolver = createResolver({
         resolveNodeModules: !!resolve,
         ResolverFactory,
         tsconfig,
     });
 
+    const shouldBundleNodeModule = (id: string) => {
+        if (typeof resolve === "boolean")
+            return resolve;
+
+        return resolve.some((pattern) => (typeof pattern === "string" ? id === pattern : pattern.test(id)));
+    };
+
+    const resolveDtsPath = (id: string, importer: string, rolldownResolution: ResolvedId | null): string | null => {
+        let dtsPath = baseDtsResolver(id, importer);
+
+        if (dtsPath) {
+            dtsPath = normalize(dtsPath);
+        }
+
+        if (!dtsPath || !isSourceFile(dtsPath)) {
+            if (rolldownResolution && isFilePath(rolldownResolution.id) && isSourceFile(rolldownResolution.id) && !rolldownResolution.external) {
+                return rolldownResolution.id;
+            }
+
+            return null;
+        }
+
+        return dtsPath;
+    };
+
     return {
-        name: "rolldown-plugin-dts:resolver",
+        name: "rollup-plugin-dts:resolver",
 
         resolveId: {
             async handler(id, importer, options) {
@@ -76,33 +100,6 @@ export function createDtsResolvePlugin({ resolve, tsconfig }: Pick<OptionsResolv
             order: "pre",
         },
     };
+};
 
-    function shouldBundleNodeModule(id: string) {
-        if (typeof resolve === "boolean")
-            return resolve;
-
-        return resolve.some((pattern) => (typeof pattern === "string" ? id === pattern : pattern.test(id)));
-    }
-
-    function resolveDtsPath(id: string, importer: string, rolldownResolution: ResolvedId | null): string | null {
-        let dtsPath = baseDtsResolver(id, importer);
-
-        if (dtsPath) {
-            dtsPath = path.normalize(dtsPath);
-        }
-
-        if (!dtsPath || !isSourceFile(dtsPath)) {
-            if (rolldownResolution && isFilePath(rolldownResolution.id) && isSourceFile(rolldownResolution.id) && !rolldownResolution.external) {
-                return rolldownResolution.id;
-            }
-
-            return null;
-        }
-
-        return dtsPath;
-    }
-}
-
-function isFilePath(id: string) {
-    return id.startsWith(".") || path.isAbsolute(id);
-}
+export default createDtsResolvePlugin;

@@ -6,7 +6,7 @@ import { expectFilesSnapshot, rolldownBuild } from "@sxzz/test-utils";
 import { build } from "rolldown";
 import { beforeAll, expect, it } from "vitest";
 
-import { dts } from "../src/index.ts";
+import { dts } from "../src/index.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const tempDir = path.join(dirname, "temp");

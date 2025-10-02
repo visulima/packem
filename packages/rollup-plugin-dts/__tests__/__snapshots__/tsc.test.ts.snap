@@ -102,6 +102,21 @@ const input2 = "input2";
 export { input2 };"
 `;
 
+exports[`tsc > import JSON 1`] = `
+"// index.d.ts
+declare namespace foo_d_exports {
+  export { age, name };
+}
+declare let name: string;
+declare let age: number;
+declare namespace bar_d_exports {
+  export { _exports as default };
+}
+declare const _exports: string[];
+//#endregion
+export { age, _exports as bar, bar_d_exports as barNs, foo_d_exports as fooNs, name };"
+`;
+
 exports[`tsc > jsdoc 1`] = `
 "// jsdoc.d.ts
 import { Plugin } from "rolldown";
@@ -217,7 +232,8 @@ declare global {
     foo: string;
   }
 }
-declare const _default: vue0.DefineComponent<__VLS_Props, {}, {}, {}, {}, vue0.ComponentOptionsMixin, vue0.ComponentOptionsMixin, {}, string, vue0.PublicProps, Readonly<__VLS_Props> & Readonly<{}>, {}, {}, {}, {}, string, vue0.ComponentProvideOptions, false, {}, any>;
+declare const __VLS_export: vue0.DefineComponent<__VLS_Props, {}, {}, {}, {}, vue0.ComponentOptionsMixin, vue0.ComponentOptionsMixin, {}, string, vue0.PublicProps, Readonly<__VLS_Props> & Readonly<{}>, {}, {}, {}, {}, string, vue0.ComponentProvideOptions, false, {}, any>;
+declare const _default: typeof __VLS_export;
 //#endregion
 export { _default as App };"
 `;
@@ -227,7 +243,7 @@ exports[`tsc > vue-sfc w/ ts-compiler w/ vueCompilerOptions in tsconfig 1`] = `
 import * as vue0 from "vue";
 
 //#region tests/fixtures/vue-sfc-fallthrough/App.vue.d.ts
-declare const _default: vue0.DefineComponent<{
+declare const __VLS_export: vue0.DefineComponent<{
   foo: string;
   bar?: string;
   innerHTML?: string | undefined;
@@ -339,18 +355,18 @@ declare const _default: vue0.DefineComponent<{
   onBlur?: (payload: FocusEvent) => void;
   onChange?: (payload: Event) => void;
   onBeforeinput?: (payload: InputEvent) => void;
-  onInput?: (payload: Event) => void;
+  onFormdata?: (payload: FormDataEvent) => void;
+  onInput?: (payload: InputEvent) => void;
   onReset?: (payload: Event) => void;
   onSubmit?: (payload: SubmitEvent) => void;
   onInvalid?: (payload: Event) => void;
+  onFullscreenchange?: (payload: Event) => void;
+  onFullscreenerror?: (payload: Event) => void;
   onLoad?: (payload: Event) => void;
   onError?: (payload: Event) => void;
   onKeydown?: (payload: KeyboardEvent) => void;
   onKeypress?: (payload: KeyboardEvent) => void;
   onKeyup?: (payload: KeyboardEvent) => void;
-  onAuxclick?: (payload: PointerEvent) => void;
-  onClick?: (payload: PointerEvent) => void;
-  onContextmenu?: (payload: PointerEvent) => void;
   onDblclick?: (payload: MouseEvent) => void;
   onMousedown?: (payload: MouseEvent) => void;
   onMouseenter?: (payload: MouseEvent) => void;
@@ -388,6 +404,11 @@ declare const _default: vue0.DefineComponent<{
   onTouchend?: (payload: TouchEvent) => void;
   onTouchmove?: (payload: TouchEvent) => void;
   onTouchstart?: (payload: TouchEvent) => void;
+  onAuxclick?: (payload: PointerEvent) => void;
+  onClick?: (payload: PointerEvent) => void;
+  onContextmenu?: (payload: PointerEvent) => void;
+  onGotpointercapture?: (payload: PointerEvent) => void;
+  onLostpointercapture?: (payload: PointerEvent) => void;
   onPointerdown?: (payload: PointerEvent) => void;
   onPointermove?: (payload: PointerEvent) => void;
   onPointerup?: (payload: PointerEvent) => void;
@@ -396,11 +417,17 @@ declare const _default: vue0.DefineComponent<{
   onPointerleave?: (payload: PointerEvent) => void;
   onPointerover?: (payload: PointerEvent) => void;
   onPointerout?: (payload: PointerEvent) => void;
+  onBeforetoggle?: (payload: ToggleEvent) => void;
+  onToggle?: (payload: ToggleEvent) => void;
   onWheel?: (payload: WheelEvent) => void;
+  onAnimationcancel?: (payload: AnimationEvent) => void;
   onAnimationstart?: (payload: AnimationEvent) => void;
   onAnimationend?: (payload: AnimationEvent) => void;
   onAnimationiteration?: (payload: AnimationEvent) => void;
+  onSecuritypolicyviolation?: (payload: SecurityPolicyViolationEvent) => void;
+  onTransitioncancel?: (payload: TransitionEvent) => void;
   onTransitionend?: (payload: TransitionEvent) => void;
+  onTransitionrun?: (payload: TransitionEvent) => void;
   onTransitionstart?: (payload: TransitionEvent) => void;
   key?: PropertyKey | undefined;
   ref?: vue0.VNodeRef | undefined;
@@ -524,18 +551,18 @@ declare const _default: vue0.DefineComponent<{
   onBlur?: (payload: FocusEvent) => void;
   onChange?: (payload: Event) => void;
   onBeforeinput?: (payload: InputEvent) => void;
-  onInput?: (payload: Event) => void;
+  onFormdata?: (payload: FormDataEvent) => void;
+  onInput?: (payload: InputEvent) => void;
   onReset?: (payload: Event) => void;
   onSubmit?: (payload: SubmitEvent) => void;
   onInvalid?: (payload: Event) => void;
+  onFullscreenchange?: (payload: Event) => void;
+  onFullscreenerror?: (payload: Event) => void;
   onLoad?: (payload: Event) => void;
   onError?: (payload: Event) => void;
   onKeydown?: (payload: KeyboardEvent) => void;
   onKeypress?: (payload: KeyboardEvent) => void;
   onKeyup?: (payload: KeyboardEvent) => void;
-  onAuxclick?: (payload: PointerEvent) => void;
-  onClick?: (payload: PointerEvent) => void;
-  onContextmenu?: (payload: PointerEvent) => void;
   onDblclick?: (payload: MouseEvent) => void;
   onMousedown?: (payload: MouseEvent) => void;
   onMouseenter?: (payload: MouseEvent) => void;
@@ -573,6 +600,11 @@ declare const _default: vue0.DefineComponent<{
   onTouchend?: (payload: TouchEvent) => void;
   onTouchmove?: (payload: TouchEvent) => void;
   onTouchstart?: (payload: TouchEvent) => void;
+  onAuxclick?: (payload: PointerEvent) => void;
+  onClick?: (payload: PointerEvent) => void;
+  onContextmenu?: (payload: PointerEvent) => void;
+  onGotpointercapture?: (payload: PointerEvent) => void;
+  onLostpointercapture?: (payload: PointerEvent) => void;
   onPointerdown?: (payload: PointerEvent) => void;
   onPointermove?: (payload: PointerEvent) => void;
   onPointerup?: (payload: PointerEvent) => void;
@@ -581,11 +613,17 @@ declare const _default: vue0.DefineComponent<{
   onPointerleave?: (payload: PointerEvent) => void;
   onPointerover?: (payload: PointerEvent) => void;
   onPointerout?: (payload: PointerEvent) => void;
+  onBeforetoggle?: (payload: ToggleEvent) => void;
+  onToggle?: (payload: ToggleEvent) => void;
   onWheel?: (payload: WheelEvent) => void;
+  onAnimationcancel?: (payload: AnimationEvent) => void;
   onAnimationstart?: (payload: AnimationEvent) => void;
   onAnimationend?: (payload: AnimationEvent) => void;
   onAnimationiteration?: (payload: AnimationEvent) => void;
+  onSecuritypolicyviolation?: (payload: SecurityPolicyViolationEvent) => void;
+  onTransitioncancel?: (payload: TransitionEvent) => void;
   onTransitionend?: (payload: TransitionEvent) => void;
+  onTransitionrun?: (payload: TransitionEvent) => void;
   onTransitionstart?: (payload: TransitionEvent) => void;
   key?: PropertyKey | undefined;
   ref?: vue0.VNodeRef | undefined;
@@ -598,6 +636,7 @@ declare const _default: vue0.DefineComponent<{
   onVnodeBeforeUnmount?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
   onVnodeUnmounted?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
 }> & Readonly<{}>, {}, {}, {}, {}, string, vue0.ComponentProvideOptions, false, {}, any>;
+declare const _default: typeof __VLS_export;
 //#endregion
 export { _default as App };"
 `;
@@ -615,7 +654,8 @@ declare global {
     foo: string;
   }
 }
-declare const _default: vue0.DefineComponent<__VLS_Props, {}, {}, {}, {}, vue0.ComponentOptionsMixin, vue0.ComponentOptionsMixin, {}, string, vue0.PublicProps, Readonly<__VLS_Props> & Readonly<{}>, {}, {}, {}, {}, string, vue0.ComponentProvideOptions, false, {}, any>;
+declare const __VLS_export: vue0.DefineComponent<__VLS_Props, {}, {}, {}, {}, vue0.ComponentOptionsMixin, vue0.ComponentOptionsMixin, {}, string, vue0.PublicProps, Readonly<__VLS_Props> & Readonly<{}>, {}, {}, {}, {}, string, vue0.ComponentProvideOptions, false, {}, any>;
+declare const _default: typeof __VLS_export;
 //#endregion
 //#region tests/fixtures/vue-sfc-with-ts-macro/main.d.ts
 declare function defineStyle(style: string): any;
