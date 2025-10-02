@@ -1,13 +1,13 @@
 import Debug from "debug";
 import ts from "typescript";
 
-const debug = Debug("rolldown-plugin-dts:tsc-system");
+const debug = Debug("rollup-plugin-dts:tsc-system");
 
 /**
  * A system that writes files to both memory and disk. It will try read files
  * from memory firstly and fallback to disk if not found.
  */
-export function createFsSystem(files: Map<string, string>): ts.System {
+export const createFsSystem = (files: Map<string, string>): ts.System => {
     return {
         ...ts.sys,
 
@@ -62,11 +62,11 @@ export function createFsSystem(files: Map<string, string>): ts.System {
             ts.sys.writeFile(path, data, ...arguments_);
         },
     };
-}
+};
 
 // A system that only writes files to memory. It will read files from both
 // memory and disk.
-export function createMemorySystem(files: Map<string, string>): ts.System {
+export const createMemorySystem = (files: Map<string, string>): ts.System => {
     return {
         ...createFsSystem(files),
 
@@ -78,4 +78,4 @@ export function createMemorySystem(files: Map<string, string>): ts.System {
             files.set(path, data);
         },
     };
-}
+};
