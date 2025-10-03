@@ -3,7 +3,7 @@ import { nativeModules, type NativeModulesOptions } from "../../../src/plugins/n
 
 describe("nativeModules plugin", () => {
     const mockOptions: NativeModulesOptions = {
-        distDirectory: "/test/dist",
+        nativesDirectory: "natives",
     };
 
     it("should be defined and be a function", () => {
@@ -27,7 +27,6 @@ describe("nativeModules plugin", () => {
         expect.assertions(2);
 
         const customOptions: NativeModulesOptions = {
-            distDirectory: "/test/dist",
             nativesDirectory: "custom-natives",
         };
 
@@ -38,11 +37,12 @@ describe("nativeModules plugin", () => {
     });
 
     it("should have required plugin methods", () => {
-        expect.assertions(4);
+        expect.assertions(5);
 
         const plugin = nativeModules(mockOptions);
 
         expect(plugin.buildStart).toBeDefined();
+        expect(plugin.options).toBeDefined();
         expect(plugin.resolveId).toBeDefined();
         expect(plugin.load).toBeDefined();
         expect(plugin.generateBundle).toBeDefined();
@@ -104,6 +104,25 @@ describe("nativeModules plugin", () => {
                 warn: () => {},
                 error: () => {},
             })).resolves.toBeUndefined();
+        }
+    });
+
+    it("should extract output directory from Rollup options", () => {
+        expect.assertions(1);
+
+        const plugin = nativeModules(mockOptions);
+
+        if (plugin.options) {
+            const result = plugin.options.call({
+                warn: () => {},
+                error: () => {},
+            }, {
+                output: {
+                    dir: "/test/output"
+                }
+            });
+
+            expect(result).toBeNull();
         }
     });
 });

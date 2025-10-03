@@ -12,7 +12,6 @@ const bundle = await rollup({
   input: 'src/index.js',
   plugins: [
     nativeModules({
-      distDirectory: './dist',
       nativesDirectory: 'natives' // optional, defaults to 'natives'
     })
   ]
@@ -34,6 +33,7 @@ The `nativeModules` plugin works in two stages:
 ## Features
 
 - **Automatic Detection**: Automatically detects and handles `.node` files in your imports
+- **Auto Output Detection**: Automatically detects the output directory from Rollup's configuration
 - **Name Collision Handling**: Handles name collisions by appending numbers to duplicate filenames
 - **Custom Directory**: Allows you to specify a custom subdirectory for native modules
 - **Error Handling**: Provides warnings when native modules are not found

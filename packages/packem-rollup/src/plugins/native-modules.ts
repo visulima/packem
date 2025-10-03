@@ -6,10 +6,6 @@ const PREFIX = '\0natives:';
 
 export interface NativeModulesOptions {
     /**
-     * The output directory where native modules will be copied
-     */
-    distDirectory: string;
-    /**
      * Custom subdirectory name for native modules within the output directory
      * @default 'natives'
      */
@@ -22,18 +18,32 @@ export interface NativeModulesOptions {
  * - Stage 2 (generateBundle): Copies the identified .node files to the output dir. 
  */ 
 export const nativeModules = ( 
-        options: NativeModulesOptions, 
+        options: NativeModulesOptions = {}, 
 ): Plugin => { 
-        const { distDirectory, nativesDirectory = 'natives' } = options;
-        const nativeLibsDirectory = `${distDirectory}/${nativesDirectory}`; 
+        const { nativesDirectory = 'natives' } = options;
         // Map<original_path, final_destination_path> 
         const modulesToCopy = new Map<string, string>(); 
+        let distDirectory: string | undefined;
 
         return { 
                 name: 'native-modules', 
 
                 buildStart: () => { 
                         modulesToCopy.clear(); 
+                        distDirectory = undefined;
+                },
+
+                options(options) {
+                        // Extract output directory from Rollup options
+                        if (options.output) {
+                                const output = Array.isArray(options.output) ? options.output[0] : options.output;
+                                if (output.dir) {
+                                        distDirectory = output.dir;
+                                } else if (output.file) {
+                                        distDirectory = path.dirname(output.file);
+                                }
+                        }
+                        return null;
                 }, 
 
                 async resolveId(source, importer) { 
@@ -67,8 +77,8 @@ export const nativeModules = (
                                 counter += 1; 
                         } 
 
-                        const destinationPath = path.join(nativeLibsDirectory, outputName); 
-                        modulesToCopy.set(resolvedPath, destinationPath); 
+                        // We'll set the destination path in generateBundle when we have the distDirectory
+                        modulesToCopy.set(resolvedPath, outputName); 
 
                         // Return a virtual module ID containing the original path 
                         return PREFIX + resolvedPath; 
@@ -80,15 +90,19 @@ export const nativeModules = (
                         } 
 
                         const originalPath = id.slice(PREFIX.length); 
-                        const destinationPath = modulesToCopy.get(originalPath); 
+                        const outputName = modulesToCopy.get(originalPath); 
 
-                        if (!destinationPath) { 
+                        if (!outputName) { 
                                 // Should not happen if resolveId ran correctly 
                                 return this.error(`Could not find staged native module for: ${originalPath}`); 
                         } 
 
+                        if (!distDirectory) {
+                                return this.error('Output directory not detected. Please ensure Rollup output options are configured.');
+                        }
+
                         // Generate the require path relative to the final bundle directory 
-                        const relativePath = `./${path.relative(distDirectory, destinationPath)}`; 
+                        const relativePath = `./${nativesDirectory}/${outputName}`; 
 
                         return `export default require("${relativePath.replaceAll('\\', '/')}");`; 
                 }, 
@@ -98,13 +112,23 @@ export const nativeModules = (
                                 return; 
                         } 
 
+                        if (!distDirectory) {
+                                this.error('Output directory not detected. Please ensure Rollup output options are configured.');
+                                return;
+                        }
+
+                        const nativeLibsDirectory = `${distDirectory}/${nativesDirectory}`;
+
                         // Create the directory once. 
                         await fs.mkdir(nativeLibsDirectory, { recursive: true }); 
 
                         // Copy all staged files in parallel. 
                         await Promise.all( 
                                 Array.from(modulesToCopy.entries()).map( 
-                                        ([source, destination]) => fs.copyFile(source, destination), 
+                                        ([source, outputName]) => {
+                                                const destination = path.join(nativeLibsDirectory, outputName);
+                                                return fs.copyFile(source, destination);
+                                        }, 
                                 ), 
                         ); 
                 }, 
