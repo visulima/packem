@@ -1,11 +1,11 @@
 ---
 title: @visulima/packem-rollup
-description: API documentation for Packen Rollup plugins and transformers
+description: API documentation for Packem Rollup plugins and transformers
 ---
 
 # @visulima/packem-rollup
 
-Rollup plugins and transformer integrations for Packen.
+Rollup plugins and transformer integrations for Packem.
 
 ## Installation
 
@@ -57,6 +57,44 @@ Official TypeScript compiler transformer.
 
 ## Plugins
 
+### nativeModulesPlugin
+
+```typescript
+import { nativeModulesPlugin } from '@visulima/packem-rollup'
+```
+
+Handles native Node.js addons (.node files) by copying them to the output directory and generating appropriate import statements.
+
+#### Usage
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    nativeModules: {
+      nativesDirectory: 'natives'
+    }
+  }
+})
+```
+
+#### Options
+
+```typescript
+interface NativeModulesOptions {
+  /**
+   * Custom subdirectory name for native modules within the output directory
+   * @default 'natives'
+   */
+  nativesDirectory?: string
+}
+```
+
+See [native-modules-plugin API docs](/docs/api/native-modules-plugin) for detailed documentation.
+
 ### require-cjs-transformer
 
 ```typescript
@@ -101,7 +139,7 @@ See [require-cjs-transformer API docs](/docs/api/require-cjs-transformer) for de
 
 ### Other Rollup Plugins
 
-Packen includes several other Rollup plugins:
+Packem includes several other Rollup plugins:
 
 - **CSS Processing**: Sass, Less, Stylus, PostCSS support
 - **Asset Handling**: Image and font processing
@@ -138,13 +176,28 @@ Detects if a package is CommonJS-only.
 ```typescript
 interface PackemRollupOptions {
   css?: CssOptions
+  nativeModules?: NativeModulesOptions | false
   requireCJS?: RequireCJSPluginOptions | false
   plugins?: Plugin[]
   // ... other Rollup options
 }
 ```
 
-Configuration options for Rollup in Packen.
+Configuration options for Rollup in Packem.
+
+### NativeModulesOptions
+
+```typescript
+interface NativeModulesOptions {
+  /**
+   * Custom subdirectory name for native modules within the output directory
+   * @default 'natives'
+   */
+  nativesDirectory?: string
+}
+```
+
+Configuration options for the native modules plugin.
 
 ### RequireCJSPluginOptions
 
@@ -190,7 +243,7 @@ export default defineConfig({
 
 ## Related
 
-- [Packen Configuration](/docs/guide/configuration)
+- [Packem Configuration](/docs/guide/configuration)
 - [Transformers Guide](/docs/guide/transformers)
 - [require-cjs-transformer Plugin](/docs/guide/require-cjs-transformer)
 - [require-cjs-transformer Examples](/docs/examples/advanced/require-cjs-transformer)

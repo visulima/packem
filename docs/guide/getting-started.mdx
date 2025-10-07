@@ -1,15 +1,15 @@
 ---
 title: Getting Started
-description: Install Packen and create your first bundle in minutes
+description: Install Packem and create your first bundle in minutes
 ---
 
 # Getting Started
 
-Get up and running with Packen in just a few minutes. This guide will walk you through installation, basic configuration, and your first build.
+Get up and running with Packem in just a few minutes. This guide will walk you through installation, basic configuration, and your first build.
 
 ## Installation
 
-Install Packen as a development dependency in your project:
+Install Packem as a development dependency in your project:
 
 ```npm
 npm install --save-dev @visulima/packem
@@ -35,7 +35,7 @@ The init command is smart enough to detect existing configurations and suggest o
 
 ## Project Structure
 
-Packen works best with a conventional project structure:
+Packem works best with a conventional project structure:
 
 ```
 my-package/
@@ -45,13 +45,13 @@ my-package/
 │   └── utils/
 │       └── helper.ts
 ├── package.json
-├── packem.config.ts     # Packen configuration
+├── packem.config.ts     # Packem configuration
 └── tsconfig.json        # TypeScript configuration
 ```
 
 ## Configure package.json
 
-Packen uses your `package.json` to determine what to build and how. Here's a basic setup:
+Packem uses your `package.json` to determine what to build and how. Here's a basic setup:
 
 <Tabs>
   <TabItem label="ESM Library">
@@ -126,7 +126,7 @@ Packen uses your `package.json` to determine what to build and how. Here's a bas
 </Tabs>
 
 <Callout type="tip">
-Packen automatically detects your entry points from the `exports`, `main`, `module`, and `bin` fields in package.json.
+Packem automatically detects your entry points from the `exports`, `main`, `module`, and `bin` fields in package.json.
 </Callout>
 
 ## Basic Configuration
@@ -164,7 +164,7 @@ npm run build
 npm run dev
 ```
 
-Packen will:
+Packem will:
 - Analyze your `package.json` exports
 - Find matching source files in the `src` directory
 - Transform your code using the selected transformer
@@ -244,7 +244,7 @@ my-utils/
 
 ## Next Steps
 
-Congratulations! You've successfully set up Packen and created your first bundle. Here's what to explore next:
+Congratulations! You've successfully set up Packem and created your first bundle. Here's what to explore next:
 
 <Cards>
   <Card href="/docs/guide/configuration" title="Configuration">
@@ -268,7 +268,7 @@ Congratulations! You've successfully set up Packen and created your first bundle
 
 ### Entry Points Not Found
 
-If Packen can't find your entry points, make sure:
+If Packem can't find your entry points, make sure:
 - Your `package.json` has proper `exports`, `main`, or `module` fields
 - The corresponding source files exist in the `src` directory
 - File extensions match (`.ts` for TypeScript, `.js` for JavaScript)

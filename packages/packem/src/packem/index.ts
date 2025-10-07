@@ -291,6 +291,7 @@ const generateOptions = (
                         licenses.length > 0 ? `${licenses.join(", ")}\n\n` : "\n"
                     }# Bundled types:\n${dependencyLicenseTexts}`,
             },
+            nativeModules: {},
             node10Compatibility: false,
             output: {
                 importAttributesKey: Number(splitRuntimeVersion[0] as string) >= 22 ? "with" : "assert",

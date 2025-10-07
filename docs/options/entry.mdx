@@ -1,6 +1,6 @@
 ---
 title: Entry Points
-description: Configure entry points for your Packen builds
+description: Configure entry points for your Packem builds
 ---
 
 import { Callout } from '../../components/Callout'
@@ -8,7 +8,7 @@ import { Tabs, TabItem } from '../../components/Tabs'
 
 # Entry Points
 
-Entry points define which files Packen should process as the starting points for your build. Packen can automatically detect entry points from your `package.json` or you can configure them explicitly.
+Entry points define which files Packem should process as the starting points for your build. Packem can automatically detect entry points from your `package.json` or you can configure them explicitly.
 
 ## Basic Configuration
 
@@ -56,7 +56,7 @@ export default defineConfig({
 
 ### From Package.json Exports
 
-If no entries are specified, Packen automatically detects them from your `package.json`:
+If no entries are specified, Packem automatically detects them from your `package.json`:
 
 ```json
 {
@@ -82,7 +82,7 @@ This automatically creates entries for all export paths.
 }
 ```
 
-Packen detects entries from:
+Packem detects entries from:
 - `main` field
 - `module` field  
 - `bin` field (marked as executable)
@@ -415,7 +415,7 @@ export default defineConfig({
 
 ### Entry Validation
 
-Packen automatically validates entries:
+Packem automatically validates entries:
 
 - Checks if source files exist
 - Warns about missing files
@@ -438,7 +438,7 @@ export default defineConfig({
 ### Entry Not Found
 
 <Callout type="warning">
-If Packen can't find your entry files, check the file paths and ensure they exist.
+If Packem can't find your entry files, check the file paths and ensure they exist.
 </Callout>
 
 ```typescript

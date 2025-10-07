@@ -1,5 +1,5 @@
 {
-  "title": "Packen Documentation",
+  "title": "Packem Documentation",
   "description": "Fast and modern bundler for Node.js and TypeScript",
   "navigation": [
     {
@@ -8,12 +8,12 @@
         {
           "title": "Introduction",
           "href": "/docs/",
-          "description": "Overview of Packen and its features"
+          "description": "Overview of Packem and its features"
         },
         {
           "title": "Installation",
           "href": "/docs/guide/getting-started",
-          "description": "Install and set up Packen in your project"
+          "description": "Install and set up Packem in your project"
         },
         {
           "title": "Quick Start",
@@ -28,17 +28,17 @@
         {
           "title": "Introduction",
           "href": "/docs/guide/introduction",
-          "description": "Overview of Packen and its features"
+          "description": "Overview of Packem and its features"
         },
         {
           "title": "Getting Started",
           "href": "/docs/guide/getting-started",
-          "description": "Install and set up Packen in your project"
+          "description": "Install and set up Packem in your project"
         },
         {
           "title": "Configuration",
           "href": "/docs/guide/configuration",
-          "description": "Configure Packen for your needs"
+          "description": "Configure Packem for your needs"
         },
         {
           "title": "Package.json Setup",
@@ -78,7 +78,7 @@
         {
           "title": "Plugins",
           "href": "/docs/guide/plugins",
-          "description": "Extend Packen with custom plugins"
+          "description": "Extend Packem with custom plugins"
         },
         {
           "title": "Optimization",
@@ -223,7 +223,7 @@
         {
           "title": "From tsup",
           "href": "/docs/guide/migration/tsup",
-          "description": "Migrate from tsup to Packen"
+          "description": "Migrate from tsup to Packem"
         },
         {
           "title": "From Rollup",
@@ -233,12 +233,12 @@
         {
           "title": "From Webpack",
           "href": "/docs/guide/migration/webpack",
-          "description": "Migrate from Webpack to Packen"
+          "description": "Migrate from Webpack to Packem"
         },
         {
           "title": "From unbuild",
           "href": "/docs/guide/migration/unbuild",
-          "description": "Migrate from unbuild to Packen"
+          "description": "Migrate from unbuild to Packem"
         }
       ]
     },
@@ -457,7 +457,7 @@
             {
               "title": "Custom Plugins",
               "href": "/docs/examples/advanced/custom-plugins",
-              "description": "Extend Packen with custom Rollup plugins"
+              "description": "Extend Packem with custom Rollup plugins"
             },
           {
             "title": "Bundle Analysis",

@@ -1,6 +1,6 @@
 ---
 title: Config File
-description: Set up and configure Packen using configuration files
+description: Set up and configure Packem using configuration files
 ---
 
 import { Callout } from '../../components/Callout'
@@ -8,11 +8,11 @@ import { Tabs, TabItem } from '../../components/Tabs'
 
 # Config File
 
-Packen supports configuration files to customize your build process. While many options can be set via CLI flags, configuration files provide a more maintainable and powerful way to configure complex builds.
+Packem supports configuration files to customize your build process. While many options can be set via CLI flags, configuration files provide a more maintainable and powerful way to configure complex builds.
 
 ## Configuration File Discovery
 
-Packen automatically discovers configuration files in the following order:
+Packem automatically discovers configuration files in the following order:
 
 1. `packem.config.ts`
 2. `packem.config.js`
@@ -243,7 +243,7 @@ export default defineConfig([
 
 ## Configuration Merging
 
-Packen automatically merges configurations from multiple sources:
+Packem automatically merges configurations from multiple sources:
 
 1. **Default configuration** - Sensible defaults
 2. **Configuration file** - Your custom configuration
@@ -291,7 +291,7 @@ export default defineConfig({
 
 ## Configuration Validation
 
-Packen validates your configuration and provides helpful error messages:
+Packem validates your configuration and provides helpful error messages:
 
 ```typescript
 export default defineConfig({

@@ -20,6 +20,8 @@ export { jsxRemoveAttributes } from "./plugins/jsx-remove-attributes";
 export type { LicenseOptions } from "./plugins/license";
 export { license as licensePlugin } from "./plugins/license";
 export { default as metafilePlugin } from "./plugins/metafile";
+export type { NativeModulesOptions } from "./plugins/native-modules-plugin";
+export { nativeModulesPlugin } from "./plugins/native-modules-plugin";
 export { default as cachingPlugin } from "./plugins/plugin-cache";
 export { default as preserveDirectivesPlugin } from "./plugins/preserve-directives";
 export type { RawLoaderOptions } from "./plugins/raw";
