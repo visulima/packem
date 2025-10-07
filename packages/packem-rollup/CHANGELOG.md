@@ -1,3 +1,9 @@
+## @visulima/packem-rollup [1.0.0-alpha.19](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.18...@visulima/packem-rollup@1.0.0-alpha.19) (2025-10-07)
+
+### Bug Fixes
+
+* update documentation and references from Packen to Packem ([9983009](https://github.com/visulima/packem/commit/99830099c953e2b12269ea18606838d80f1e6e2b))
+
 ## @visulima/packem-rollup [1.0.0-alpha.18](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.17...@visulima/packem-rollup@1.0.0-alpha.18) (2025-10-02)
 
 ### Bug Fixes
