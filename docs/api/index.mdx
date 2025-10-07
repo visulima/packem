@@ -1,6 +1,6 @@
 ---
 title: API Reference
-description: Complete API documentation for all Packen packages and their features
+description: Complete API documentation for all Packem packages and their features
 ---
 
 import { ApiCard } from '../../components/ApiCard'
@@ -8,7 +8,7 @@ import { Badge } from '../../components/Badge'
 
 # API Reference
 
-Complete API documentation for all Packen packages. Each package provides specific functionality for the Packen bundling ecosystem.
+Complete API documentation for all Packem packages. Each package provides specific functionality for the Packem bundling ecosystem.
 
 ## Core Packages
 
@@ -66,6 +66,10 @@ Complete API documentation for all Packen packages. Each package provides specif
 - [`swc`](/docs/api/packem-rollup#swc) - swc transformer
 - [`oxc`](/docs/api/packem-rollup#oxc) - OXC transformer
 - [`sucrase`](/docs/api/packem-rollup#sucrase) - sucrase transformer
+
+### Plugin APIs
+- [`nativeModulesPlugin`](/docs/api/native-modules-plugin) - Native Node.js addon support
+- [`requireCJSTransformerPlugin`](/docs/api/require-cjs-transformer) - CJS import optimization
 
 ### CSS APIs
 - [`CssOptions`](/docs/api/rollup-plugin-css#cssoptions) - CSS configuration
@@ -286,7 +290,7 @@ export default defineConfig({
 
 ## Environment Variables
 
-Packen respects several environment variables:
+Packem respects several environment variables:
 
 - `NODE_ENV` - Environment mode (development/production)
 - `PACKEM_DEBUG` - Enable debug logging
@@ -372,11 +376,12 @@ Click on any package below to explore its complete API documentation:
   
   <a href="/docs/api/packem-rollup" className="package-link">
     <h3>@visulima/packem-rollup</h3>
-    <p>Rollup plugins for all supported transformers and build optimizations</p>
+    <p>Rollup plugins for all supported transformers, build optimizations, and native module support</p>
     <div className="package-stats">
       <Badge>Plugins</Badge>
       <Badge>Transformers</Badge>
       <Badge>Rollup</Badge>
+      <Badge>Native Modules</Badge>
     </div>
   </a>
   

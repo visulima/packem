@@ -1,6 +1,6 @@
 ---
 title: Declaration Files (dts)
-description: TypeScript declaration file generation and isolated declarations in Packen
+description: TypeScript declaration file generation and isolated declarations in Packem
 ---
 
 import { Callout } from '../../components/Callout'
@@ -8,11 +8,11 @@ import { Tabs, TabItem } from '../../components/Tabs'
 
 # Declaration Files (dts)
 
-Packen provides comprehensive TypeScript declaration file generation with support for both traditional and isolated declarations. Declaration files (`.d.ts`) are essential for TypeScript libraries to provide type information to consumers.
+Packem provides comprehensive TypeScript declaration file generation with support for both traditional and isolated declarations. Declaration files (`.d.ts`) are essential for TypeScript libraries to provide type information to consumers.
 
 ## Automatic Detection
 
-Packen automatically enables declaration file generation when it detects TypeScript usage in your project:
+Packem automatically enables declaration file generation when it detects TypeScript usage in your project:
 
 - TypeScript files (`.ts`, `.tsx`) in your source code
 - `types` or `typings` field in your `package.json`
@@ -158,12 +158,12 @@ export const config: { apiUrl: string } = {
 ```
 
 <Callout type="warning">
-Isolated declarations require explicit type annotations on all exported declarations. This is a TypeScript compiler requirement, not a Packen limitation.
+Isolated declarations require explicit type annotations on all exported declarations. This is a TypeScript compiler requirement, not a Packem limitation.
 </Callout>
 
 ## Declaration File Formats
 
-Packen generates declaration files that match your output formats:
+Packem generates declaration files that match your output formats:
 
 ### ESM/CJS Dual Package
 
@@ -184,7 +184,7 @@ Packen generates declaration files that match your output formats:
 }
 ```
 
-Packen will generate:
+Packem will generate:
 - `dist/index.d.mts` - ESM declaration file
 - `dist/index.d.cts` - CJS declaration file
 
@@ -323,7 +323,7 @@ import { helper } from '@utils/helper'
 import { Component } from '@/components/Component'
 ```
 
-Packen automatically resolves these paths in the generated declarations.
+Packem automatically resolves these paths in the generated declarations.
 
 ## Validation
 

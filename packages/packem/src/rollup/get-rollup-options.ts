@@ -22,6 +22,7 @@ import {
     jsxRemoveAttributes,
     licensePlugin,
     metafilePlugin,
+    nativeModulesPlugin,
     nodeResolve as nodeResolvePlugin,
     polyfillNode as polyfillPlugin,
     preserveDirectivesPlugin,
@@ -437,6 +438,8 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             ...prePlugins,
 
             nodeResolver,
+
+            context.options.rollup.nativeModules && nativeModulesPlugin(context.options.rollup.nativeModules),
 
             context.options.rollup.dataUri
             && dataUriPlugin({

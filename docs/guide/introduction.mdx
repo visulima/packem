@@ -1,27 +1,27 @@
 ---
 title: Introduction
-description: Packen - The Fast and Modern Bundler for Node.js and TypeScript
+description: Packem - The Fast and Modern Bundler for Node.js and TypeScript
 ---
 
 # Introduction
 
-**Packen** is _The Fast and Modern Bundler_ for Node.js and TypeScript projects. Designed with performance and developer experience in mind, it provides a seamless and efficient way to bundle your TypeScript and JavaScript libraries. Whether you're building a small utility or a complex library, Packen empowers you to focus on your code while it handles the bundling process with elegance and speed.
+**Packem** is _The Fast and Modern Bundler_ for Node.js and TypeScript projects. Designed with performance and developer experience in mind, it provides a seamless and efficient way to bundle your TypeScript and JavaScript libraries. Whether you're building a small utility or a complex library, Packem empowers you to focus on your code while it handles the bundling process with elegance and speed.
 
-## Why Packen?
+## Why Packem?
 
-Packen is built on top of Rollup, a proven and battle-tested bundler, combined with cutting-edge transformers like esbuild, swc, OXC, and sucrase. While Rollup is a powerful and general-purpose tool, Packen takes it a step further by providing a **complete out-of-the-box solution** for modern library development.
+Packem is built on top of Rollup, a proven and battle-tested bundler, combined with cutting-edge transformers like esbuild, swc, OXC, and sucrase. While Rollup is a powerful and general-purpose tool, Packem takes it a step further by providing a **complete out-of-the-box solution** for modern library development.
 
-### Key Differences Between Packen and Plain Rollup
+### Key Differences Between Packem and Plain Rollup
 
-- **Zero Configuration**: Packen minimizes the need for complex configurations by offering sensible defaults tailored for library development. It provides a streamlined experience, so you can focus on your code rather than the bundling process.
-- **Library-Specific Features**: Unlike plain Rollup, which requires extensive configuration, Packen is optimized specifically for building libraries. It includes features like automatic TypeScript declaration generation, multiple output formats, and package.json-driven builds.
+- **Zero Configuration**: Packem minimizes the need for complex configurations by offering sensible defaults tailored for library development. It provides a streamlined experience, so you can focus on your code rather than the bundling process.
+- **Library-Specific Features**: Unlike plain Rollup, which requires extensive configuration, Packem is optimized specifically for building libraries. It includes features like automatic TypeScript declaration generation, multiple output formats, and package.json-driven builds.
 - **Multiple Transformers**: Choose from esbuild, swc, OXC, sucrase, or TypeScript compiler based on your performance and feature requirements.
 - **Advanced CSS Support**: Built-in support for CSS, Sass, Less, Stylus, PostCSS, and CSS Modules with optimization.
 - **Multi-Runtime Ready**: Target multiple runtimes including Node.js, browser, edge-light, and react-server with conditional exports.
 
 ## Transformer Ecosystem
 
-Packen supports multiple high-performance transformers, giving you the flexibility to choose the best tool for your needs:
+Packem supports multiple high-performance transformers, giving you the flexibility to choose the best tool for your needs:
 
 - **esbuild** - Lightning-fast JavaScript/TypeScript transformer written in Go
 - **swc** - Rust-based super-fast compiler with advanced features
@@ -33,25 +33,26 @@ For more details, refer to the [Transformers documentation](/docs/guide/transfor
 
 ## What Can It Bundle?
 
-Packen is designed to handle all the essentials for modern library development and more:
+Packem is designed to handle all the essentials for modern library development and more:
 
 - **TypeScript and JavaScript**: Seamlessly bundle `.ts`, `.tsx`, `.js`, and `.jsx` files with support for modern syntax and features.
 - **TypeScript Declarations**: Automatically generate declaration files (`.d.ts`) for your library with support for isolated declarations.
 - **Multiple Output Formats**: Generate `esm`, `cjs`, and `iife` bundles to ensure compatibility across different environments.
 - **CSS and Preprocessors**: Process CSS, Sass, Less, Stylus files with PostCSS plugins and CSS Modules support.
 - **React Components**: Built-in support for React Server Components, Client Components, and server actions.
+- **Native Modules**: Automatic handling of Node.js native addons (.node files) with platform-aware copying.
 - **Assets**: Include and process non-code assets like `.json`, `.wasm`, `.txt`, and `.data` files.
 - **Dynamic Imports**: Code splitting with dynamic imports and shared modules.
 
-With its built-in support for tree shaking, minification, source maps, and bundle analysis, Packen ensures your library is optimized for production.
+With its built-in support for tree shaking, minification, source maps, and bundle analysis, Packem ensures your library is optimized for production.
 
 ## Fast and Modern
 
-Packen is built to be **fast**. By leveraging Rollup's proven architecture combined with high-performance transformers like esbuild, swc, and OXC, it delivers blazing-fast builds even for large projects. At the same time, it is **modern**—offering support for the latest JavaScript and TypeScript features, React Server Components, and multi-runtime deployment.
+Packem is built to be **fast**. By leveraging Rollup's proven architecture combined with high-performance transformers like esbuild, swc, and OXC, it delivers blazing-fast builds even for large projects. At the same time, it is **modern**—offering support for the latest JavaScript and TypeScript features, React Server Components, and multi-runtime deployment.
 
 ## Package.json Driven
 
-Packen uses your `package.json` exports configuration to automatically determine:
+Packem uses your `package.json` exports configuration to automatically determine:
 
 - Entry points from `exports`, `main`, `module`, and `bin` fields
 - Output formats (ESM/CJS) based on export conditions
@@ -62,20 +63,20 @@ This approach ensures your build configuration stays in sync with your package's
 
 ## Getting Started
 
-Ready to dive in? Check out the [Getting Started guide](/docs/guide/getting-started) to set up your first project with Packen.
+Ready to dive in? Check out the [Getting Started guide](/docs/guide/getting-started) to set up your first project with Packem.
 
-Want to use Packen from your own scripts? See [Programmatic Usage](/docs/guide/programmatic-usage).
+Want to use Packem from your own scripts? See [Programmatic Usage](/docs/guide/programmatic-usage).
 
 ## Credits
 
-Packen is made possible by the open-source community and the many innovative tools in the JavaScript and TypeScript ecosystem. We extend our gratitude to all contributors and maintainers whose work has laid the foundation for this project.
+Packem is made possible by the open-source community and the many innovative tools in the JavaScript and TypeScript ecosystem. We extend our gratitude to all contributors and maintainers whose work has laid the foundation for this project.
 
 ### Prior Arts
 
-- **Rollup**: Provided the original inspiration for modern JavaScript bundling and a robust plugin system that powers Packen.
+- **Rollup**: Provided the original inspiration for modern JavaScript bundling and a robust plugin system that powers Packem.
 - **esbuild**: Demonstrated the power of fast, native bundling and influenced the pursuit of performance in build tools.
 - **tsup**: Inspired the out-of-the-box developer experience and many CLI options, as well as some implementation details.
-- **unbuild**: Inspired the flexible hooks system and configuration patterns now available in Packen.
+- **unbuild**: Inspired the flexible hooks system and configuration patterns now available in Packem.
 - **swc**: Rust-based compilation that enables incredible performance for large codebases.
 - **OXC**: Next-generation toolchain that pushes the boundaries of JavaScript/TypeScript processing speed.
 
@@ -86,7 +87,7 @@ Packen is made possible by the open-source community and the many innovative too
 <div className="next-steps">
   <a href="/docs/guide/getting-started" className="next-step-card">
     <h3>🚀 Getting Started</h3>
-    <p>Install Packen and create your first bundle</p>
+    <p>Install Packem and create your first bundle</p>
   </a>
   
   <a href="/docs/guide/transformers" className="next-step-card">

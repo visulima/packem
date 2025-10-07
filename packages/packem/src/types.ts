@@ -210,7 +210,8 @@ export interface BuildOptions {
 }
 export interface InternalBuildOptions extends BuildOptions {
     /** Rollup options with internal OXC configuration */
-    rollup: Omit<BuildOptions["rollup"], "oxc"> & {
+    rollup: BuildOptions["rollup"] & {
+        nativeModules?: NativeModulesOptions | false;
         oxc?: InternalOXCTransformPluginConfig;
     };
     /** Name of the transformer being used */

@@ -1,15 +1,15 @@
 ---
 title: Configuration
-description: Complete guide to configuring Packen for your project needs
+description: Complete guide to configuring Packem for your project needs
 ---
 
 # Configuration
 
-Learn how to configure Packen to meet your specific project requirements with detailed examples and best practices.
+Learn how to configure Packem to meet your specific project requirements with detailed examples and best practices.
 
 ## Configuration File
 
-Packen uses a `packem.config.ts` file for configuration. This file should be placed in your project root.
+Packem uses a `packem.config.ts` file for configuration. This file should be placed in your project root.
 
 ### Basic Configuration
 
@@ -91,7 +91,7 @@ export default defineConfig({
 
 #### Automatic Detection
 
-Packen automatically detects entry points from your `package.json`:
+Packem automatically detects entry points from your `package.json`:
 
 ```json
 {
@@ -137,7 +137,7 @@ export default defineConfig({
 
 ### Rollup Configuration
 
-Packen is built on Rollup, so you can use any Rollup options:
+Packem is built on Rollup, so you can use any Rollup options:
 
 ```typescript
 export default defineConfig({
@@ -181,6 +181,59 @@ export default defineConfig({
   }
 })
 ```
+
+### Native Modules Configuration
+
+Configure native Node.js addon (.node files) handling:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+
+  rollup: {
+    nativeModules: {
+      nativesDirectory: 'natives' // Custom directory name
+    }
+  }
+})
+```
+
+The native modules plugin automatically:
+- Detects `.node` file imports
+- Copies native modules to the output directory
+- Generates appropriate `require()` statements
+- Handles name collisions and platform-specific files
+
+**Options:**
+- `nativesDirectory`: Directory name for native modules (default: `'natives'`)
+
+After bundling, the `.node` file will be copied to `dist/natives/` and the import will be automatically rewritten to load from the correct location at runtime.
+
+> [!NOTE]
+> - Native modules are platform and architecture-specific. Make sure to distribute the correct `.node` files for your target platforms.
+> - This only works with direct `.node` imports. If you're using packages that dynamically load native modules via `bindings` or `node-pre-gyp`, you'll need to handle them separately.
+
+#### Handling dependencies with native modules
+
+If you're using packages with native modules (like `chokidar` which depends on `fsevents`):
+
+- **If in `dependencies`/`peerDependencies`**: ✅ Works automatically - these are externalized (not bundled)
+- **If in `devDependencies`**: ⚠️ Will be bundled. If they use `bindings()` or `node-pre-gyp` patterns, move them to `dependencies` instead, or use `optionalDependencies` if they're optional.
+
+Example - if you have `chokidar` in `devDependencies` and get build errors, move it to `dependencies`:
+
+```json
+{
+    "dependencies": {
+        "chokidar": "^3.0.0"
+    }
+}
+```
+
+This externalizes it (users will need to install it), avoiding the need to bundle its native modules.
 
 ## Advanced Configurations
 
@@ -529,4 +582,4 @@ Ensure TypeScript configuration is correct:
 }
 ```
 
-This configuration guide provides a comprehensive foundation for setting up Packen in any project scenario.
+This configuration guide provides a comprehensive foundation for setting up Packem in any project scenario.

@@ -1,0 +1,334 @@
+---
+title: native-modules-plugin
+description: API documentation for the native modules plugin
+---
+
+# native-modules-plugin
+
+Handles native Node.js addons (.node files) by copying them to the output directory and generating appropriate import statements.
+
+## Installation
+
+The plugin is included with `@visulima/packem-rollup`:
+
+```bash
+npm install @visulima/packem
+```
+
+## Usage
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    nativeModules: {
+      nativesDirectory: 'natives'
+    }
+  }
+})
+```
+
+## API Reference
+
+### nativeModulesPlugin
+
+```typescript
+function nativeModulesPlugin(
+  options?: NativeModulesOptions
+): Plugin
+```
+
+Creates a Rollup plugin that handles native Node.js addons.
+
+#### Parameters
+
+- **options** (`NativeModulesOptions?`): Plugin configuration options
+
+#### Returns
+
+A Rollup plugin instance.
+
+## Options
+
+### NativeModulesOptions
+
+```typescript
+interface NativeModulesOptions {
+  /**
+   * Custom subdirectory name for native modules within the output directory
+   * @default 'natives'
+   */
+  nativesDirectory?: string
+}
+```
+
+### nativesDirectory
+
+**Type:** `string`  
+**Default:** `'natives'`
+
+The subdirectory name within the output directory where native modules will be copied. This directory will be created automatically.
+
+**Example:**
+```typescript
+nativeModules: {
+  nativesDirectory: 'native-addons'
+}
+```
+
+## How It Works
+
+The native modules plugin operates in two stages:
+
+### Stage 1: Resolve and Load (Build Time)
+
+1. **Detection**: Identifies `.node` file imports in your code
+2. **Resolution**: Resolves the file paths and validates accessibility
+3. **Registration**: Registers native modules for copying
+4. **Virtual Module**: Creates virtual module IDs for each native module
+
+### Stage 2: Bundle Generation (Bundle Time)
+
+1. **Directory Creation**: Creates the natives directory in the output
+2. **File Copying**: Copies all registered `.node` files in parallel
+3. **Import Generation**: Generates appropriate `require()` statements
+
+## Examples
+
+### Basic Usage
+
+```typescript
+// src/index.ts
+import myAddon from './my-addon.node'
+
+export function useAddon() {
+  return myAddon.someFunction()
+}
+```
+
+**Output:**
+```javascript
+// dist/index.js
+const myAddon = require("./natives/my-addon.node")
+
+export function useAddon() {
+  return myAddon.someFunction()
+}
+```
+
+### Custom Directory
+
+```typescript
+export default defineConfig({
+  transformer,
+  rollup: {
+    nativeModules: {
+      nativesDirectory: 'addons'
+    }
+  }
+})
+```
+
+**Output:**
+```javascript
+const myAddon = require("./addons/my-addon.node")
+```
+
+### Multiple Native Modules
+
+```typescript
+// src/index.ts
+import addon1 from './addon1.node'
+import addon2 from './addon2.node'
+import addon3 from './addon3.node'
+
+export { addon1, addon2, addon3 }
+```
+
+**Output:**
+```javascript
+const addon1 = require("./natives/addon1.node")
+const addon2 = require("./natives/addon2.node")
+const addon3 = require("./natives/addon3.node")
+
+export { addon1, addon2, addon3 }
+```
+
+## File Structure
+
+```
+project/
+├── src/
+│   ├── index.ts
+│   └── my-addon.node
+├── dist/
+│   ├── index.js
+│   └── natives/
+│       └── my-addon.node  # Copied here
+└── package.json
+```
+
+## Import Patterns
+
+The plugin supports various import patterns for native modules:
+
+### Default Import
+
+```typescript
+import myAddon from './my-addon.node'
+```
+
+### Named Import
+
+```typescript
+import { someFunction } from './my-addon.node'
+```
+
+### Dynamic Import
+
+```typescript
+const myAddon = await import('./my-addon.node')
+```
+
+## Error Handling
+
+The plugin provides clear error messages for common issues:
+
+### File Not Found
+
+```
+Native module not found: /path/to/missing.node
+```
+
+### Output Directory Not Configured
+
+```
+Output directory not detected. Please ensure Rollup output options are configured.
+```
+
+### Module Registration Failed
+
+```
+Could not find staged native module for: /path/to/module.node
+```
+
+## Platform Considerations
+
+### Cross-Platform Builds
+
+Native modules are platform-specific. When building for multiple platforms:
+
+1. **Separate builds**: Create separate builds for each target platform
+2. **Conditional loading**: Use dynamic imports with platform detection
+3. **Optional dependencies**: Mark platform-specific modules as optional
+
+### Platform-Specific Imports
+
+```typescript
+// src/native.ts
+const isWindows = process.platform === 'win32'
+const isMac = process.platform === 'darwin'
+const isLinux = process.platform === 'linux'
+
+let nativeModule
+if (isWindows) {
+  nativeModule = await import('./native.win32.node')
+} else if (isMac) {
+  nativeModule = await import('./native.darwin.node')
+} else if (isLinux) {
+  nativeModule = await import('./native.linux.node')
+}
+
+export default nativeModule
+```
+
+## Performance Considerations
+
+### Bundle Size
+
+- Native modules are copied as-is to the output directory
+- File size impacts distribution size but not bundle parsing time
+- Consider compression for large native modules
+
+### Load Time
+
+- Native modules load faster than JavaScript bundles
+- No JavaScript parsing overhead for native code
+- Platform-specific optimization opportunities
+
+## Troubleshooting
+
+### Module Not Copied
+
+1. **Verify import syntax**: Use relative imports for `.node` files
+2. **Check file existence**: Ensure the `.node` file exists at build time
+3. **Validate path resolution**: Confirm relative paths are correct
+
+### Import Errors
+
+1. **Output directory**: Ensure the output directory is properly configured
+2. **File permissions**: Check read/write permissions for native module files
+3. **Platform compatibility**: Verify the native module matches the target platform
+
+### Build Failures
+
+1. **Clean build**: Remove `dist/` and rebuild
+2. **Dependency order**: Ensure native modules are built before bundling
+3. **File watchers**: Restart file watchers after adding new native modules
+
+## Integration Examples
+
+### With Electron
+
+```typescript
+// electron/main.ts
+import { app, BrowserWindow } from 'electron'
+import nativeAddon from './native-addon.node'
+
+app.whenReady().then(() => {
+  // Use native addon in main process
+  const result = nativeAddon.initialize()
+  
+  const mainWindow = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true
+    }
+  })
+})
+```
+
+### With N-API
+
+```typescript
+// C++ addon with N-API
+#include <napi.h>
+
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  exports.Set("version", Napi::String::New(env, "1.0.0"));
+  return exports;
+}
+
+NODE_API_MODULE(addon, Init)
+```
+
+```typescript
+// TypeScript usage
+import addon from './addon.node'
+
+console.log('Addon version:', addon.version)
+```
+
+## Related APIs
+
+- [`defineConfig`](/docs/api/packem#defineconfig) - Main configuration function
+- [`PackemConfig`](/docs/api/packem#packemconfig) - Configuration interface
+- [`PackemRollupOptions`](/docs/api/packem-rollup#packemrollupoptions) - Rollup configuration options
+
+## See Also
+
+- [Native Addons Guide](https://nodejs.org/api/addons.html) - Node.js native addons documentation
+- [N-API Guide](https://nodejs.org/api/n-api.html) - N-API documentation
+- [Electron Native Modules](https://www.electronjs.org/docs/latest/tutorial/using-native-node-modules) - Electron-specific guide
