@@ -302,7 +302,7 @@
         "less": ">=4.2.0",
         "lightningcss": ">=1.27.0",
         "oxc-transform": ">=0.20.0",
-        "package-manager-detector": "^1.3.0",
+        "package-manager-detector": "catalog:peer",
         "postcss": ">=8.4.47",
         "postcss-load-config": ">=6.0.1",
         "postcss-modules-extract-imports": ">=3.1.0",

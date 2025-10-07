@@ -10,7 +10,7 @@ const { mockedWarn } = vi.hoisted(() => {
 });
 
 // Mock the warn function
-vi.mock("@visulima/packem-share/utils", () => {
+vi.mock(import("@visulima/packem-share/utils"), () => {
     return {
         warn: mockedWarn,
     };
@@ -40,7 +40,7 @@ describe(validateEngines, () => {
 
         validateEngines(context);
 
-        expect(mockedWarn).toHaveBeenCalledWith(
+        expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
             context,
             "The 'engines.node' field is missing in your package.json. Consider adding \"engines\": { \"node\": \">=18.0.0\" } to specify Node.js version requirements.",
         );
@@ -73,7 +73,7 @@ describe(validateEngines, () => {
 
         validateEngines(context);
 
-        expect(mockedWarn).toHaveBeenCalledWith(
+        expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
             context,
             "Invalid Node.js version range \"invalid-version-range\" in engines.node field. Please use a valid semver range like \">=18.0.0\".",
         );
@@ -133,6 +133,6 @@ describe(validateEngines, () => {
 
         validateEngines(context);
 
-        expect(mockedWarn).toHaveBeenCalledWith(context, expect.stringContaining(">=18.0.0"));
+        expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, expect.stringContaining(">=18.0.0"));
     });
 });

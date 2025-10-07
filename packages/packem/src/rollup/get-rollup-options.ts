@@ -22,6 +22,7 @@ import {
     jsxRemoveAttributes,
     licensePlugin,
     metafilePlugin,
+    minifyHTMLLiteralsPlugin,
     nativeModulesPlugin,
     nodeResolve as nodeResolvePlugin,
     polyfillNode as polyfillPlugin,
@@ -502,6 +503,8 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             && isolatedDeclarationsPlugin<InternalBuildOptions>(join(context.options.rootDir, context.options.sourceDir), context),
 
             context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
+
+            context.options.rollup.minifyHTMLLiterals && context.options.minify && minifyHTMLLiteralsPlugin(context.options.rollup.minifyHTMLLiterals),
 
             context.options.rollup.requireCJS
             && context.options.emitESM

@@ -57,14 +57,16 @@ describe("nativeModules plugin", () => {
 
         const plugin = nativeModulesPlugin(mockOptions);
 
-        if (plugin.resolveId) {
-            const result = await plugin.resolveId.call({
+        const result = await plugin.resolveId.call(
+            {
                 error: () => {},
                 warn: () => {},
-            }, "test.js", "/test/source/file.js");
+            },
+            "test.js",
+            "/test/source/file.js",
+        );
 
-            expect(result).toBeNull();
-        }
+        expect(result).toBeUndefined();
     });
 
     it("should not resolve files that start with prefix", async () => {
@@ -72,14 +74,16 @@ describe("nativeModules plugin", () => {
 
         const plugin = nativeModulesPlugin(mockOptions);
 
-        if (plugin.resolveId) {
-            const result = await plugin.resolveId.call({
+        const result = await plugin.resolveId.call(
+            {
                 error: () => {},
                 warn: () => {},
-            }, "\0natives:test.node", "/test/source/file.js");
+            },
+            "\0natives:test.node",
+            "/test/source/file.js",
+        );
 
-            expect(result).toBeNull();
-        }
+        expect(result).toBeUndefined();
     });
 
     it("should not load non-virtual modules", () => {
@@ -87,14 +91,15 @@ describe("nativeModules plugin", () => {
 
         const plugin = nativeModulesPlugin(mockOptions);
 
-        if (plugin.load) {
-            const result = plugin.load.call({
+        const result = plugin.load.call(
+            {
                 error: () => {},
                 warn: () => {},
-            }, "not-a-virtual-module");
+            },
+            "not-a-virtual-module",
+        );
 
-            expect(result).toBeNull();
-        }
+        expect(result).toBeUndefined();
     });
 
     it("should handle empty generateBundle", async () => {
@@ -102,13 +107,13 @@ describe("nativeModules plugin", () => {
 
         const plugin = nativeModulesPlugin(mockOptions);
 
-        if (plugin.generateBundle) {
-            // This should not throw an error even with empty modulesToCopy
-            await expect(plugin.generateBundle.call({
+        // This should not throw an error even with empty modulesToCopy
+        await expect(
+            plugin.generateBundle.call({
                 error: () => {},
                 warn: () => {},
-            })).resolves.toBeUndefined();
-        }
+            }),
+        ).resolves.toBeUndefined();
     });
 
     it("should extract output directory from Rollup options", () => {
@@ -116,17 +121,22 @@ describe("nativeModules plugin", () => {
 
         const plugin = nativeModulesPlugin(mockOptions);
 
-        if (plugin.options) {
-            const result = plugin.options.call({
+        const result = plugin.options.call(
+            {
                 error: () => {},
                 warn: () => {},
-            }, {
+            },
+            {
                 output: {
                     dir: "/test/output",
                 },
-            });
+            },
+        );
 
-            expect(result).toBeNull();
-        }
+        expect(result).toStrictEqual({
+            output: {
+                dir: "/test/output",
+            },
+        });
     });
 });

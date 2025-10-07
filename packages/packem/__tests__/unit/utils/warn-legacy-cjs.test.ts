@@ -37,7 +37,7 @@ describe(warnLegacyCJS, () => {
 
         warnLegacyCJS(context);
 
-        expect(logger.warn).toHaveBeenCalledWith(
+        expect(logger.warn).toHaveBeenCalledExactlyOnceWith(
             "We recommend using the ESM format instead of CommonJS.\n"
             + "The ESM format is compatible with modern platforms and runtimes, and most new libraries are now distributed only in ESM format.\n"
             + "Learn more at https://nodejs.org/en/learn/modules/publishing-a-package#how-did-we-get-here",

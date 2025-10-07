@@ -465,6 +465,11 @@
             "description": "Analyze and optimize bundle size"
           },
           {
+            "title": "minify-html-literals",
+            "href": "/docs/examples/advanced/minify-html-literals",
+            "description": "Automatically minify HTML and CSS in template literals"
+          },
+          {
             "title": "require-cjs-transformer",
             "href": "/docs/examples/advanced/require-cjs-transformer",
             "description": "Transform ESM imports of CJS packages for performance"

@@ -70,7 +70,7 @@ const isPossibleBarrelSpecifier = (id: string, options: DebarrelPluginOptions) =
     return false;
 };
 
-const getDeclarationKind = (specifiers: string) => (IS_EXPORT_PREFIXED.test(specifiers) ? "export" : "import");
+const getDeclarationKind = (specifiers: string) => IS_EXPORT_PREFIXED.test(specifiers) ? "export" : "import";
 
 const { parseAsync } = rsModuleLexer;
 
@@ -209,7 +209,13 @@ const findMatchingImport = (exp: ExportSpecifier, imports: ImportSpecifier[], co
     return { imp, localExportName } as { imp: ImportSpecifier | undefined; localExportName?: string };
 };
 
-const resolveThroughBarrel = async (context: DebarrelContext, id: string, exportName: string, options: DebarrelPluginOptions, logger: Pail): Promise<ResolvedSource> => {
+const resolveThroughBarrel = async (
+    context: DebarrelContext,
+    id: string,
+    exportName: string,
+    options: DebarrelPluginOptions,
+    logger: Pail,
+): Promise<ResolvedSource> => {
     const { resolve } = context;
     const code = await readFileCached(context, id);
     const { exports, imports } = await parsePotentialBarrelFile(context, id, code, logger);

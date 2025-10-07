@@ -314,7 +314,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             };
             const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
 
-            expect(mockWarn).toHaveBeenCalledWith(
+            expect(mockWarn).toHaveBeenCalledExactlyOnceWith(
                 `Cannot parse default export name from some-module import at test.d.ts!. The module might not have a default export, or it's aliased as 'default'.`,
             );
             expect(result).toBeUndefined();
@@ -447,7 +447,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             const expectedPreamble = `// @ts-ignore\nfs;\nexport { anotherVal };`;
 
             expect(resultOutput).toBe(expectedPreamble.trim());
-            expect(mockWarn).toHaveBeenCalledWith("Cannot infer default export from the file: test.d.ts. Declaration for 'fs' not found.");
+            expect(mockWarn).toHaveBeenCalledExactlyOnceWith("Cannot infer default export from the file: test.d.ts. Declaration for 'fs' not found.");
         });
 
         it("should return transformedCode if no defaultExport and transformedCode does not start with 'export type' (L325-328)", () => {
@@ -480,7 +480,7 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
 
             renderChunk(codeWithMissingDeclAndType, chunkInfoWithMissingDeclAndType, {} as NormalizedOutputOptions, { chunks: {} });
 
-            expect(mockWarn).toHaveBeenCalledWith(
+            expect(mockWarn).toHaveBeenCalledExactlyOnceWith(
                 expect.stringContaining("Cannot infer default export from the file: test.d.ts. Declaration for 'MissingVar' not found."),
             );
         });
@@ -624,7 +624,7 @@ export { MyNamedImport as default } from 'some-module';`;
             const result = renderChunk(code, chunkInfo, {} as NormalizedOutputOptions, { chunks: {} });
 
             expect(result).toBeUndefined();
-            expect(mockWarn).toHaveBeenCalledWith(`Cannot parse "MyNamedImport" named export from some-module import at test.d.ts!.`);
+            expect(mockWarn).toHaveBeenCalledExactlyOnceWith(`Cannot parse "MyNamedImport" named export from some-module import at test.d.ts!.`);
         });
 
         it("handleDefaultNamedCJSExport: re-export with alias and others, existing import provides alias", () => {

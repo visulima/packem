@@ -32,12 +32,7 @@ export const test = 'hello';`;
             debug: vi.fn(),
         };
 
-        const result = await plugin.renderChunk?.handler?.call(
-            { debug: mockLogger.debug },
-            code,
-            { fileName: "test.js" },
-            { format: "es" },
-        );
+        const result = await plugin.renderChunk?.handler?.call({ debug: mockLogger.debug }, code, { fileName: "test.js" }, { format: "es" });
 
         // Should transform the code
         expect(result).toBeDefined();

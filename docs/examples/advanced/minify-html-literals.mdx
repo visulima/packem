@@ -1,0 +1,364 @@
+---
+title: minify-html-literals Plugin
+description: Automatically minify HTML and CSS content within template literals
+---
+
+# minify-html-literals Plugin Example
+
+This example demonstrates how to use the `minify-html-literals` plugin to automatically minify HTML and CSS content within template literals during the build process, reducing bundle size and improving performance.
+
+## Overview
+
+The `minify-html-literals` plugin analyzes your JavaScript/TypeScript code and automatically identifies template literals tagged with HTML or containing HTML/CSS content. It then applies minification to reduce the size of your bundles.
+
+## Basic Example
+
+### Project Structure
+
+```
+minify-html-example/
+├── src/
+│   ├── components/
+│   │   ├── Button.ts
+│   │   ├── Card.ts
+│   │   └── Layout.ts
+│   ├── styles/
+│   │   ├── global.css
+│   │   └── themes.css
+│   ├── index.ts
+│   └── utils.ts
+├── package.json
+├── packem.config.ts
+└── tsconfig.json
+```
+
+### Source Files
+
+**src/components/Button.ts**
+```typescript
+import { html } from 'lit'
+
+export class Button extends HTMLElement {
+  render() {
+    return html`
+      <button class="btn btn-primary">
+        <span class="btn-text">Click me</span>
+      </button>
+    `
+  }
+}
+```
+
+**src/components/Card.ts**
+```typescript
+import { html } from 'lit'
+
+export class Card extends HTMLElement {
+  render() {
+    return html`
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Card Title</h2>
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            This is some example content for the card component.
+            It has multiple lines and various HTML elements.
+          </p>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-secondary">Action</button>
+        </div>
+      </div>
+    `
+  }
+}
+```
+
+**src/styles/global.css**
+```css
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #545b62;
+}
+
+.btn-text {
+  font-weight: 500;
+}
+```
+
+**src/index.ts**
+```typescript
+import { Button } from './components/Button'
+import { Card } from './components/Card'
+
+// Register custom elements
+customElements.define('my-button', Button)
+customElements.define('my-card', Card)
+
+export { Button, Card }
+```
+
+### Configuration
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import esbuildTransformer from '@visulima/packem-rollup/transformer/esbuild'
+
+export default defineConfig({
+  transformer: esbuildTransformer,
+  entry: {
+    index: 'src/index.ts'
+  },
+  rollup: {
+    minifyHTMLLiterals: {
+      // Include only TypeScript files
+      include: ['**/*.ts'],
+      // Don't fail the build on minification errors
+      failOnError: false
+    }
+  }
+})
+```
+
+## Advanced Configuration
+
+### Custom Minification Options
+
+**packem.config.ts**
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import esbuildTransformer from '@visulima/packem-rollup/transformer/esbuild'
+
+export default defineConfig({
+  transformer: esbuildTransformer,
+  entry: {
+    index: 'src/index.ts'
+  },
+  rollup: {
+    minifyHTMLLiterals: {
+      include: ['src/**/*.ts'],
+      failOnError: true, // Fail build on minification errors
+      options: {
+        // Custom HTML minification options
+        minifyOptions: {
+          collapseWhitespace: true,
+          removeComments: true,
+          removeEmptyAttributes: true,
+          removeOptionalTags: true,
+          minifyCSS: true,
+          minifyJS: true
+        },
+        // Custom CSS minification options
+        minifyCSSOptions: {
+          level: 2, // Maximum compression
+          compatibility: 'ie8'
+        }
+      }
+    }
+  }
+})
+```
+
+### Using Tagged Template Literals
+
+**src/components/Modal.ts**
+```typescript
+import { html, css } from 'lit'
+
+const modalStyles = css`
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .modal-header {
+    margin-bottom: 1rem;
+  }
+
+  .modal-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .modal-body {
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+`
+
+export class Modal extends HTMLElement {
+  render() {
+    return html`
+      <div class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title">Modal Title</h2>
+          </div>
+          <div class="modal-body">
+            <p>This is the modal content. The plugin will automatically minify both the HTML and CSS within this template literal.</p>
+            <p>Notice how the CSS is also minified, reducing the bundle size significantly.</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary">Cancel</button>
+            <button class="btn btn-primary">Confirm</button>
+          </div>
+        </div>
+      </div>
+    `
+  }
+
+  static get styles() {
+    return modalStyles
+  }
+}
+```
+
+## Custom Strategy Example
+
+### Using a Custom Minification Strategy
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import esbuildTransformer from '@visulima/packem-rollup/transformer/esbuild'
+import type { Strategy } from '@visulima/packem-rollup'
+
+const customStrategy: Strategy = {
+  async minifyHTML(html: string, options: any): Promise<string> {
+    // Custom HTML minification logic
+    return html
+      .replace(/\s+/g, ' ')  // Replace multiple spaces with single space
+      .replace(/>\s+</g, '><')  // Remove spaces between tags
+      .trim()
+  },
+
+  async minifyCSS(css: string, options: any): Promise<string> {
+    // Custom CSS minification logic
+    return css
+      .replace(/\/\*[\s\S]*?\*\//g, '')  // Remove comments
+      .replace(/\s+/g, ' ')  // Replace multiple spaces
+      .replace(/;\s*}/g, '}')  // Remove trailing semicolons
+      .trim()
+  }
+}
+
+export default defineConfig({
+  transformer: esbuildTransformer,
+  rollup: {
+    minifyHTMLLiterals: {
+      include: ['src/**/*.ts'],
+      options: {
+        strategy: customStrategy
+      }
+    }
+  }
+})
+```
+
+## Performance Benefits
+
+### Before Minification
+```typescript
+const template = html`
+  <div class="container">
+    <h1 class="title">
+      Welcome to my app
+    </h1>
+    <p class="description">
+      This is a description with lots of whitespace
+      that will be removed during minification.
+    </p>
+  </div>
+`
+
+const styles = css`
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  .description {
+    line-height: 1.6;
+    color: #666;
+  }
+`
+```
+
+### After Minification
+```typescript
+const template = html`<div class="container"><h1 class="title">Welcome to my app</h1><p class="description">This is a description with lots of whitespace that will be removed during minification.</p></div>`
+
+const styles = css`.container{max-width:1200px;margin:0 auto;padding:20px}.title{font-size:2rem;font-weight:bold;margin-bottom:1rem}.description{line-height:1.6;color:#666}`
+```
+
+## Build Output
+
+After running the build, the HTML and CSS content within your template literals will be automatically minified, resulting in smaller bundle sizes and better performance.
+
+```bash
+$ packem build
+
+✓ Built in 1.2s
+📦 Bundle size: 15.3 kB (minified)
+```
+
+## Related
+
+- [Packem Rollup API Documentation](/docs/api/packem-rollup)
+- [Configuration Guide](/docs/guide/configuration)
+- [CSS Processing Guide](/docs/guide/css)
