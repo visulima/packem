@@ -89,6 +89,7 @@ export interface PackemRollupOptions {
     jsxRemoveAttributes?: JSXRemoveAttributesPlugin | false;
     license?: LicenseOptions | false;
     metafile?: boolean;
+    minifyHTMLLiterals?: MinifyHTMLLiteralsOptions | false;
     nativeModules?: NativeModulesOptions | false;
     output?: OutputOptions;
     oxc?: Omit<OXCTransformPluginConfig, "cwd" | "sourcemap" | "target"> | false;

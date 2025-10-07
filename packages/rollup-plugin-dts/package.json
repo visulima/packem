@@ -1,8 +1,8 @@
 {
     "name": "@visulima/rollup-plugin-dts",
     "version": "0.0.0",
-    "description": "A Rollup plugin to bundle dts files",
     "private": true,
+    "description": "A Rollup plugin to bundle dts files",
     "homepage": "https://github.com/visulima/packem/tree/main/packages/rollup-plugin-dts",
     "bugs": {
         "url": "https://github.com/visulima/packem/issues"
@@ -91,14 +91,14 @@
         "@types/debug": "catalog:types",
         "@types/node": "catalog:types",
         "@typescript/native-preview": "catalog:types",
-        "@visulima/path": "catalog:node",
-        "estree-walker": "catalog:dev",
         "@visulima/packem": "catalog:dev",
+        "@visulima/path": "catalog:node",
         "@volar/typescript": "catalog:tsc",
         "@vue/language-core": "catalog:frontend",
         "conventional-changelog-conventionalcommits": "catalog:dev",
         "diff": "catalog:dev",
         "eslint": "catalog:lint",
+        "estree-walker": "catalog:dev",
         "prettier": "catalog:lint",
         "publint": "catalog:lint",
         "rollup": "catalog:build",

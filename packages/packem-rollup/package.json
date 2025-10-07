@@ -57,6 +57,10 @@
             "types": "./dist/plugins/sucrase/index.d.mts",
             "default": "./dist/plugins/sucrase/index.mjs"
         },
+        "./minify-html-literals": {
+            "types": "./dist/plugins/minify-html-literals/index.d.mts",
+            "default": "./dist/plugins/minify-html-literals/index.mjs"
+        },
         "./package.json": "./package.json"
     },
     "files": [
@@ -95,11 +99,13 @@
         "@visulima/find-cache-dir": "catalog:node",
         "@visulima/fs": "catalog:prod",
         "@visulima/package": "catalog:prod",
-        "@visulima/packem-share": "1.0.0-alpha.12",
+        "@visulima/packem-share": "workspace:*",
         "@visulima/path": "catalog:node",
         "@visulima/source-map": "catalog:prod",
         "cjs-module-lexer": "catalog:prod",
+        "clean-css": "catalog:style",
         "glob-parent": "catalog:node",
+        "html-minifier-next": "catalog:prod",
         "magic-string": "catalog:utils",
         "mlly": "catalog:prod",
         "oxc-parser": "catalog:prod",
@@ -128,8 +134,10 @@
         "@swc/core": "catalog:dev",
         "@swc/types": "catalog:dev",
         "@total-typescript/ts-reset": "catalog:tsc",
+        "@types/clean-css": "catalog:types",
         "@types/estree": "catalog:types",
         "@types/glob-parent": "catalog:types",
+        "@types/html-minifier-next": "catalog:types",
         "@types/is-glob": "catalog:types",
         "@types/node": "catalog:types",
         "@types/semver": "catalog:types",

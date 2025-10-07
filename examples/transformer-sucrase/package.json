@@ -37,8 +37,8 @@
         "react-dom": "^19.2.0"
     },
     "devDependencies": {
-        "@types/react": "^19.2.0",
-        "@types/react-dom": "^19.2.0",
+        "@types/react": "^19.2.2",
+        "@types/react-dom": "^19.2.1",
         "@visulima/packem": "workspace:*",
         "sucrase": "^3.35.0",
         "typescript": "^5.9.3"

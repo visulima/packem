@@ -19,16 +19,13 @@ export interface NativeModulesOptions {
  * - Stage 1 (resolve/load): Identifies .node files and generates runtime code.
  * - Stage 2 (generateBundle): Copies the identified .node files to the output dir.
  */
-export const nativeModulesPlugin = (
-    config: NativeModulesOptions = {},
-): Plugin => {
+export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin => {
     const { nativesDirectory = "natives" } = config;
     // Map<original_path, final_destination_path>
     const modulesToCopy = new Map<string, string>();
     let distributionDirectory: string | undefined;
 
     return {
-
         buildStart() {
             modulesToCopy.clear();
         },
@@ -61,13 +58,11 @@ export const nativeModulesPlugin = (
 
             // Copy all staged files in parallel.
             await Promise.all(
-                [...modulesToCopy.entries()].map(
-                    ([source, outputName]) => {
-                        const destination = join(nativeLibsDirectory, outputName);
+                [...modulesToCopy.entries()].map(([source, outputName]) => {
+                    const destination = join(nativeLibsDirectory, outputName);
 
-                        return copyFile(source, destination);
-                    },
-                ),
+                    return copyFile(source, destination);
+                }),
             );
         },
 
@@ -80,18 +75,18 @@ export const nativeModulesPlugin = (
             const outputName = modulesToCopy.get(originalPath);
 
             if (!outputName) {
-            // Should not happen if resolveId ran correctly
+                // Should not happen if resolveId ran correctly
                 this.error(`Could not find staged native module for: ${originalPath}`);
             }
 
             // If distributionDirectory is not set yet, try to get it from this context
             if (!distributionDirectory) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const rollupContext = this as any;
 
                 if (rollupContext && rollupContext.meta && rollupContext.meta.rollupVersion) {
-                // We're in a rollup context, but output dir might not be available yet
-                // Return a placeholder that will be resolved later
+                    // We're in a rollup context, but output dir might not be available yet
+                    // Return a placeholder that will be resolved later
                     return `export default require("./${nativesDirectory}/${outputName}");`;
                 }
 
@@ -129,9 +124,7 @@ export const nativeModulesPlugin = (
                 return undefined;
             }
 
-            const resolvedPath = importer
-                ? resolve(dirname(importer), source)
-                : resolve(source);
+            const resolvedPath = importer ? resolve(dirname(importer), source) : resolve(source);
 
             if (!await isAccessible(resolvedPath)) {
                 this.warn(`Native module not found: ${resolvedPath}`);
@@ -144,9 +137,7 @@ export const nativeModulesPlugin = (
             let counter = 1;
 
             // Handle name collisions by checking already staged values
-            const stagedBasenames = new Set(
-                [...modulesToCopy.values()].map((p) => basename(p)),
-            );
+            const stagedBasenames = new Set([...modulesToCopy.values()].map((p) => basename(p)));
 
             while (stagedBasenames.has(outputName)) {
                 const extension = extname(resolvedPathBasename);

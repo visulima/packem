@@ -137,6 +137,69 @@ interface RequireCJSPluginOptions {
 
 See [require-cjs-transformer API docs](/docs/api/require-cjs-transformer) for detailed documentation.
 
+### minify-html-literals
+
+```typescript
+import { minifyHTMLLiteralsPlugin } from '@visulima/packem-rollup'
+```
+
+Automatically minifies HTML and CSS content within template literals during the build process. This plugin identifies tagged template literals containing HTML/CSS and applies minification to reduce bundle size.
+
+#### Usage
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  rollup: {
+    minifyHTMLLiterals: {
+      include: ['**/*.ts', '**/*.js'],
+      failOnError: false
+    }
+  }
+})
+```
+
+#### Options
+
+```typescript
+interface MinifyHTMLLiteralsOptions {
+  /**
+   * Pattern or array of patterns of files not to minify.
+   */
+  exclude?: FilterPattern;
+
+  /**
+   * If true, any errors while parsing or minifying will abort the bundle
+   * process. Defaults to false, which will only show a warning.
+   */
+  failOnError?: boolean;
+
+  /**
+   * Override include/exclude filter.
+   */
+  filter?: (id: string) => boolean;
+
+  /**
+   * Pattern or array of patterns of files to minify.
+   */
+  include?: string | string[];
+
+  /**
+   * Override minify-html-literals function.
+   */
+  minifyHTMLLiterals?: typeof minifyHTMLLiterals;
+
+  /**
+   * Minify options, see
+   * https://www.npmjs.com/package/minify-html-literals#options.
+   */
+  options?: Partial<MinifyHTMLLiteralsOptions>;
+}
+```
+
 ### Other Rollup Plugins
 
 Packem includes several other Rollup plugins:
@@ -176,6 +239,7 @@ Detects if a package is CommonJS-only.
 ```typescript
 interface PackemRollupOptions {
   css?: CssOptions
+  minifyHTMLLiterals?: MinifyHTMLLiteralsOptions | false
   nativeModules?: NativeModulesOptions | false
   requireCJS?: RequireCJSPluginOptions | false
   plugins?: Plugin[]
@@ -231,6 +295,15 @@ import { requireCJSTransformerPlugin } from '@visulima/packem-rollup'
 export default defineConfig({
   transformer,
   rollup: {
+    minifyHTMLLiterals: {
+      include: ['src/**/*.ts'],
+      options: {
+        minifyOptions: {
+          collapseWhitespace: true,
+          removeComments: true
+        }
+      }
+    },
     plugins: [
       requireCJSTransformerPlugin({
         builtinNodeModules: true,

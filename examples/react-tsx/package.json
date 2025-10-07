@@ -38,8 +38,8 @@
         "tailwind-merge": "^3.3.1"
     },
     "devDependencies": {
-        "@types/react": "^19.2.0",
-        "@types/react-dom": "^19.2.0",
+        "@types/react": "^19.2.2",
+        "@types/react-dom": "^19.2.1",
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.25.10",
         "react": "^19.2.0",
