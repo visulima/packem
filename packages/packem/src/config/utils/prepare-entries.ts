@@ -65,13 +65,13 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext<InternalBuil
 
 const prepareEntries = async (context: BuildContext<InternalBuildOptions>): Promise<void> => {
     context.options.entries = context.options.entries.map((entry) =>
-        (typeof entry === "string"
+        typeof entry === "string"
             ? { input: entry, isGlob: isDynamicPattern(entry) }
             : {
-                ...entry,
-                exportKey: entry.exportKey ?? new Set(),
-                isGlob: isDynamicPattern(entry.input),
-            }),
+                  ...entry,
+                  exportKey: entry.exportKey ?? new Set(),
+                  isGlob: isDynamicPattern(entry.input),
+              },
     );
 
     for (const entry of context.options.entries.filter((entry) => entry.isGlob)) {

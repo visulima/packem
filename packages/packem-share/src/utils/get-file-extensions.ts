@@ -48,7 +48,7 @@ export interface FileExtensionOptions {
  * Determines the appropriate output extension for JavaScript files based on build configuration.
  *
  * Returns '.js' when:
- * - Only E declaration,SM or CJS is emit)
+ * - Only declaration, ESM or CJS is emitted
  * - No outputExtensionMap is configured
  * - Node.js 10 compatibility is disabled
  *
