@@ -11,7 +11,7 @@ import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";
 
 const autoPreset: BuildPreset = {
     hooks: {
-        "build:prepare": function (context: BuildContext<InternalBuildOptions>) {
+        "build:prepare": async function (context: BuildContext<InternalBuildOptions>) {
             // Disable auto if entries already provided of pkg not available
             if (context.options.entries.length > 0) {
                 return;
@@ -47,7 +47,7 @@ const autoPreset: BuildPreset = {
                 packageJson = overwriteWithPublishConfig(packageJson, context.options.declaration);
             }
 
-            const result = inferEntries(packageJson, sourceFiles, context);
+            const result = await inferEntries(packageJson, sourceFiles, context);
 
             for (const message of result.warnings) {
                 warn(context, message);

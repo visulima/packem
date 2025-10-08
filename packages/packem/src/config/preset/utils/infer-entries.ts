@@ -1,3 +1,6 @@
+import fs from "node:fs/promises";
+import path from "node:path/posix";
+
 import { isAccessibleSync } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import {
@@ -15,6 +18,114 @@ import type { BuildEntry, Environment, InferEntriesResult, InternalBuildOptions,
 import type { OutputDescriptor } from "../../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../../utils/extract-export-filenames";
 import { inferExportTypeFromFileName } from "../../../utils/infer-export-type";
+
+// Cache directory scans to avoid scanning same directory multiple times
+// Key: search path, Value: promise resolving to file list
+const directoryCache = new Map<string, Promise<string[]>>();
+const extensionPattern = /\.[^./]+$/;
+
+const safeReaddir = async (searchPath: string) => {
+    try {
+        return await fs.readdir(searchPath, { withFileTypes: true });
+    } catch (error) {
+        // Directory doesn't exist - can happen when package.json exports reference
+        // source directories that don't exist yet (e.g., optional wildcard patterns)
+        const { code } = error as NodeJS.ErrnoException;
+
+        if (code === "ENOENT") {
+            return [];
+        }
+
+        throw error;
+    }
+};
+
+const getDirectoryFilesRecursive = async (searchPath: string, basePath: string): Promise<string[]> => {
+    const entries = await safeReaddir(searchPath);
+    const files = await Promise.all(
+        entries.map(async (entry) => {
+            const fullPath = path.join(searchPath, entry.name);
+
+            if (entry.isDirectory()) {
+                return getDirectoryFilesRecursive(fullPath, basePath);
+            }
+
+            if (entry.isFile()) {
+                return path.relative(basePath, fullPath);
+            }
+
+            return [];
+        }),
+    );
+
+    return files.flat();
+};
+
+/**
+ * Recursively list all file paths in a directory (with caching)
+ * @param searchPath Directory to search in (expected to use forward slashes)
+ * @returns Array of relative file paths with forward slashes (e.g., ["foo.js", "bar/baz.js"])
+ */
+const getDirectoryFiles = async (searchPath: string): Promise<string[]> => {
+    let filesPromise = directoryCache.get(searchPath);
+
+    if (!filesPromise) {
+        filesPromise = getDirectoryFilesRecursive(searchPath, searchPath);
+        directoryCache.set(searchPath, filesPromise);
+    }
+
+    return filesPromise;
+};
+
+/**
+ * Match a file path against a wildcard pattern and return captured values
+ * @param filePath File path to match (e.g., "foo/bar.ts")
+ * @param pattern Wildcard pattern (e.g., "*")
+ * @returns Array of captured wildcard values, or null if no match
+ */
+const matchWildcardPattern = (filePath: string, pattern: string): string[] | null => {
+    // Remove extension from file path for matching
+    const pathWithoutExtension = filePath.replace(extensionPattern, "");
+
+    // Convert wildcard pattern to regex
+    // Handle special case for "*" pattern
+    if (pattern === "*") {
+        // For pattern "*", capture the first segment
+        const segments = pathWithoutExtension.split("/");
+
+        if (segments.length > 0) {
+            return [segments[0]]; // Return the first segment
+        }
+
+        return null;
+    }
+
+    // For other patterns, convert to regex
+    const regexPattern = pattern
+        .replaceAll(/[.+?^${}()|[\]\\]/g, String.raw`\$&`) // Escape regex special chars
+        .replaceAll("*", "(.*)"); // Convert * to capture group (allow multi-segment)
+
+    const regex = new RegExp(`^${regexPattern}$`);
+    const match = pathWithoutExtension.match(regex);
+
+    return match ? match.slice(1) : null; // Return captured groups, excluding full match
+};
+
+/**
+ * Substitute wildcard captures into a pattern
+ * @param pattern Pattern with wildcards
+ * @param captures Captured values from matchWildcardPattern
+ * @returns Pattern with wildcards replaced
+ */
+const substituteWildcards = (pattern: string, captures: string[]): string => {
+    let result = pattern;
+
+    for (const capture of captures) {
+        result = result.replace("*", capture);
+    }
+
+    return result;
+};
 
 const getEnvironment = (output: OutputDescriptor, environment: Environment): Environment => {
     if (output.key === "exports" && output.subKey === PRODUCTION_ENV) {
@@ -118,12 +229,15 @@ const validateIfTypescriptIsInstalled = (context: BuildContext<InternalBuildOpti
  * @param context
  * @returns
  */
-const inferEntries = (
+const inferEntries = async (
     packageJson: PackageJson,
     sourceFiles: string[],
     context: BuildContext<InternalBuildOptions>,
     // eslint-disable-next-line sonarjs/cognitive-complexity
-): InferEntriesResult => {
+): Promise<InferEntriesResult> => {
+    // Clear directory cache to ensure fresh results for each test run
+    directoryCache.clear();
+
     const cjsJSExtension = (context.options.outputExtensionMap?.cjs ?? "cjs").replaceAll(".", String.raw`\.`);
     const esmJSExtension = (context.options.outputExtensionMap?.esm ?? "mjs").replaceAll(".", String.raw`\.`);
 
@@ -198,7 +312,7 @@ const inferEntries = (
     // Infer entries from package files
     const entries: BuildEntry[] = [];
 
-    for (const output of outputs) {
+    for await (const output of outputs) {
         const outputExtension = extname(output.file);
 
         // Only javascript files are supported
@@ -240,34 +354,66 @@ const inferEntries = (
             : String.raw`(\.d\.[cm]?ts|(\.[cm]?[tj]sx?)|${[`\\.${cjsJSExtension}`, `\\.${esmJSExtension}`].join("|")})$`;
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
-        if (output.file.includes("/*") && output.key === "exports") {
+        if ((output.file.includes("/*") || outputSlug.includes("*")) && output.key === "exports") {
             if (!privateSubfolderWarningShown) {
                 context.logger.debug("Private subfolders are not supported, if you need this feature please open an issue on GitHub.");
 
                 privateSubfolderWarningShown = true;
             }
 
-            const inputs: string[] = [];
+            // Determine input pattern from export key or file
+            // For string exports like "./dist/runtime/*", extract pattern by removing dist prefix
+            // For object exports like {"./*": "./dist/*"}, use exportKey
+            let inputPattern: string;
 
-            const SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace("*", "(.*)") + fileExtensionRegex);
-            // Use a safer regex pattern to avoid backtracking issues
-            const sourceSlugWithoutExtension = sourceSlug.replace(/^(.+?)\.[^.]*$/, "$1");
-            const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlugWithoutExtension.replace("*", "(.*)") + fileExtensionRegex);
+            if (output.exportKey) {
+                inputPattern = output.exportKey.startsWith("./") ? output.exportKey.slice(2) : output.exportKey;
+            } else {
+                // For string exports, try to derive input pattern from output pattern
+                const outputPath = output.file.startsWith("./") ? output.file.slice(2) : output.file;
 
-            for (const source of sourceFiles) {
-                if (SOURCE_RE.test(source) || (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && SPECIAL_SOURCE_RE.test(source))) {
-                    inputs.push(source);
+                // Remove common build directory prefixes like "dist/"
+                inputPattern = outputPath.replace(/^dist\//, "");
+            }
+
+            // Determine output pattern from file
+            const outputPattern = output.file; // e.g., "./dist/*/*.mjs"
+
+            // Find source files that match the input pattern
+            const sourceDirectoryRelative = context.options.sourceDir.replace(/^\.\//, "");
+            const sourceDirectoryPath = resolve(context.options.rootDir, sourceDirectoryRelative);
+            const matchingInputs: { input: string; output: string }[] = [];
+
+            // Get all source files recursively
+            const allSourceFiles = await getDirectoryFiles(sourceDirectoryPath);
+
+            // For wildcard exports, scan all source files in the source directory
+            for (const relativeFilePath of allSourceFiles) {
+                // Check if this file matches the input pattern
+                const wildcardMatch = matchWildcardPattern(relativeFilePath, inputPattern);
+
+                if (wildcardMatch) {
+                    // Generate output path by substituting wildcards
+                    const outputPath = substituteWildcards(outputPattern, wildcardMatch);
+
+                    matchingInputs.push({
+                        input: resolve(sourceDirectoryPath, relativeFilePath),
+                        output: outputPath,
+                    });
                 }
             }
 
-            if (inputs.length === 0) {
-                warnings.push(`Could not find entrypoint for \`${output.file}\``);
-
+            if (matchingInputs.length === 0) {
+                warnings.push(`Could not find entrypoints matching pattern \`${inputPattern}\` for output \`${outputPattern}\``);
                 continue;
             }
 
-            for (const input of inputs) {
-                createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context, true);
+            // Create entries for each match
+            for (const { input, output: outputPath } of matchingInputs) {
+                // Create a modified output descriptor with the specific output path
+                const specificOutput = { ...output, file: outputPath };
+
+                createOrUpdateEntry(entries, input, isDirectory, outputSlug, specificOutput, context, true);
             }
 
             continue;
