@@ -13,7 +13,7 @@ export interface ParseLiteralsOptions {
     strategy?: Partial<Strategy<unknown>>;
 }
 
-export function parseLiterals(source: string, options: ParseLiteralsOptions = {}): Template[] {
+export const parseLiterals = (source: string, options: ParseLiteralsOptions = {}): Template[] => {
     const strategy = {
         ...(<Strategy<unknown>>typescript),
         ...options.strategy,

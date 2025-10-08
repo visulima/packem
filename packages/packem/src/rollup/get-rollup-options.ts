@@ -342,7 +342,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
     // Add esm mark and interop helper if esm export is detected
     const useEsModuleMark = context.tsconfig?.config.compilerOptions?.esModuleInterop;
 
-    let purePlugin: Plugin;
+    let purePlugin: Plugin | undefined;
 
     if (context.options.rollup.pluginPure) {
         purePlugin = PluginPure({
@@ -643,6 +643,8 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
             ...normalPlugins,
 
+            context.options.rollup.minifyHTMLLiterals && context.options.minify && minifyHTMLLiteralsPlugin(context.options.rollup.minifyHTMLLiterals),
+
             purePlugin,
 
             context.options.declaration
@@ -722,8 +724,6 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             ),
 
             ...postPlugins,
-
-            context.options.rollup.minifyHTMLLiterals && context.options.minify && minifyHTMLLiteralsPlugin(context.options.rollup.minifyHTMLLiterals),
 
             context.options.rollup.metafile && metafilePlugin(),
 

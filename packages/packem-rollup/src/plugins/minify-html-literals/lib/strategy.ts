@@ -21,7 +21,7 @@ const OptimizationLevel = {
 
 type OptimizationLevelKey = (typeof OptimizationLevel)[keyof typeof OptimizationLevel];
 
-function optimizationLevelFrom(level: CleanCSS.Options["level"]) {
+const optimizationLevelFrom = (level: CleanCSS.Options["level"]) => {
     const defaultLevel = {
         [OptimizationLevel.One]: {
             tidySelectors: false,
@@ -237,7 +237,7 @@ export const defaultStrategy: Strategy<HTMLOptions, CleanCSS.Options> = {
     },
 };
 
-export function adjustMinifyCSSOptions(options: CleanCSS.Options = {}) {
+export const adjustMinifyCSSOptions = (options: CleanCSS.Options = {}) => {
     const level = optimizationLevelFrom(options.level);
     const originalTransform = typeof options.level === "object" && options.level[1] && options.level[1].transform;
 
@@ -257,7 +257,7 @@ export function adjustMinifyCSSOptions(options: CleanCSS.Options = {}) {
     };
 }
 
-function fixCleanCssTidySelectors(original: string, result: string) {
+const fixCleanCssTidySelectors = (original: string, result: string) => {
     const regex = /(:.+\((.*)\))\s*\{/g;
     let match: RegExpMatchArray | null;
 
