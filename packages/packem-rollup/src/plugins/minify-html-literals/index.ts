@@ -28,14 +28,9 @@ export interface MinifyHTMLLiteralsOptions {
     failOnError?: boolean;
 
     /**
-     * Override include/exclude filter.
-     */
-    filter?: (id: string) => boolean;
-
-    /**
      * Pattern or array of patterns of files to minify.
      */
-    include?: string | string[];
+    include?: FilterPattern;
 
     /**
      * Override minify-html-literals function.
@@ -52,7 +47,6 @@ export interface MinifyHTMLLiteralsOptions {
 export const minifyHTMLLiteralsPlugin = ({
     exclude,
     failOnError = false,
-    filter,
     include,
     logger,
     minifyHTMLLiterals,
@@ -61,21 +55,20 @@ export const minifyHTMLLiteralsPlugin = ({
     logger: Pail;
 }): Plugin => {
     if (!minifyHTMLLiterals) {
+        // eslint-disable-next-line no-param-reassign
         minifyHTMLLiterals = minify.minifyHTMLLiterals;
     }
 
-    if (!filter) {
-        filter = createFilter(include, exclude);
-    }
+    const filter = createFilter(include, exclude);
 
     const minifyOptions = <minify.DefaultOptions>options || {};
 
     return {
         name: "packem:minify-html-literals",
         async transform(code: string, id: string) {
-            if (filter!(id)) {
+            if (filter(id)) {
                 try {
-                    const result = await minifyHTMLLiterals!(code, {
+                    const result = await minifyHTMLLiterals(code, {
                         ...minifyOptions,
                         fileName: id,
                     });
