@@ -44,7 +44,7 @@ describe(validatePackageFields, () => {
     });
 
     it("should warn if \"main\" field is missing in package.json for CJS packages", () => {
-        expect.assertions(1);
+        expect.assertions(3);
 
         const context = {
             options: { validation: { packageJson: { main: true } } },
@@ -56,11 +56,17 @@ describe(validatePackageFields, () => {
 
         validatePackageFields(context as unknown as BuildContext);
 
-        expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+        expect(mockedWarn).toHaveBeenCalledTimes(2);
+        expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            2,
+            context,
+            "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+        );
     });
 
     it("should warn if \"exports\" field is missing in package.json for ESM packages when emitCJS is false", () => {
-        expect.assertions(1);
+        expect.assertions(3);
 
         const context = {
             options: {
@@ -75,11 +81,13 @@ describe(validatePackageFields, () => {
 
         validatePackageFields(context as unknown as BuildContext);
 
-        expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "The 'exports' field is missing in your package.json. Define module exports explicitly.");
+        expect(mockedWarn).toHaveBeenCalledTimes(2);
+        expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+        expect(mockedWarn).toHaveBeenNthCalledWith(2, context, "The 'exports' field is missing in your package.json. Define module exports explicitly.");
     });
 
     it("should warn if \"types\" field is missing in package.json when declaration is enabled", () => {
-        expect.assertions(1);
+        expect.assertions(3);
 
         const context = {
             options: {
@@ -97,14 +105,21 @@ describe(validatePackageFields, () => {
 
         validatePackageFields(context as unknown as BuildContext);
 
-        expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
+        expect(mockedWarn).toHaveBeenCalledTimes(2);
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            1,
             context,
             "The 'types' field is missing in your package.json. This field should point to your type definitions file.",
+        );
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            2,
+            context,
+            "No 'typesVersions' field found in your package.json. Consider adding this field, or change the declaration option to 'node16' or 'false'.",
         );
     });
 
     it("should handle empty \"files\" array in package.json", () => {
-        expect.assertions(1);
+        expect.assertions(4);
 
         const context = {
             options: {
@@ -119,14 +134,22 @@ describe(validatePackageFields, () => {
 
         validatePackageFields(context as unknown as BuildContext);
 
-        expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
+        expect(mockedWarn).toHaveBeenCalledTimes(3);
+        expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            3,
+            context,
+            "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+        );
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            2,
             context,
             "The 'files' field in your package.json is empty. Please specify the files to be included in the package.",
         );
     });
 
     it("should handle \"bin\" field as both string and object in package.json", () => {
-        expect.assertions(2);
+        expect.assertions(14);
 
         const contextStringBin = {
             options: {
@@ -157,21 +180,69 @@ describe(validatePackageFields, () => {
 
         validatePackageFields(contextStringBin as BuildContext);
 
-        expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
+        expect(mockedWarn).toHaveBeenCalledTimes(6);
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            1,
+            contextStringBin,
+            "The 'name' field is missing in your package.json. Please provide a valid package name.",
+        );
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            2,
+            contextStringBin,
+            "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+        );
+        expect(mockedWarn).toHaveBeenNthCalledWith(3, contextStringBin, "The 'module' field is missing in your package.json, but you are emitting ES modules.");
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            4,
             contextStringBin,
             "The 'bin' field in your package.json should not use a .mjs extension for CommonJS binaries.",
         );
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            5,
+            contextStringBin,
+            "The 'types' field is missing in your package.json. This field should point to your type definitions file.",
+        );
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            6,
+            contextStringBin,
+            "No 'typesVersions' field found in your package.json. Consider adding this field, or change the declaration option to 'node16' or 'false'.",
+        );
+
+        vi.resetAllMocks();
 
         validatePackageFields(contextObjectBin as unknown as BuildContext);
 
-        expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
+        expect(mockedWarn).toHaveBeenCalledTimes(6);
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            1,
+            contextObjectBin,
+            "The 'name' field is missing in your package.json. Please provide a valid package name.",
+        );
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            2,
+            contextObjectBin,
+            "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+        );
+        expect(mockedWarn).toHaveBeenNthCalledWith(3, contextObjectBin, "The 'module' field is missing in your package.json, but you are emitting ES modules.");
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            4,
             contextObjectBin,
             "The 'bin.cli1' field in your package.json should not use a .mjs extension for CommonJS binaries.",
+        );
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            5,
+            contextObjectBin,
+            "The 'types' field is missing in your package.json. This field should point to your type definitions file.",
+        );
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            6,
+            contextObjectBin,
+            "No 'typesVersions' field found in your package.json. Consider adding this field, or change the declaration option to 'node16' or 'false'.",
         );
     });
 
     it("should handle 'name' field in package.json", () => {
-        expect.assertions(1);
+        expect.assertions(3);
 
         const context = {
             options: { validation: { packageJson: { name: true } } },
@@ -182,7 +253,13 @@ describe(validatePackageFields, () => {
 
         validatePackageFields(context as unknown as BuildContext);
 
-        expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+        expect(mockedWarn).toHaveBeenCalledTimes(2);
+        expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+        expect(mockedWarn).toHaveBeenNthCalledWith(
+            2,
+            context,
+            "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+        );
     });
 
     it("should not display a error if the pkg is module and has no cjs files", () => {
@@ -236,7 +313,7 @@ describe(validatePackageFields, () => {
         });
 
         it("should warn on invalid exports path not starting with './'", () => {
-            expect.assertions(2);
+            expect.assertions(4);
 
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
@@ -248,12 +325,18 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "Invalid exports path \"dist/index.js\" at exports. Export paths must start with \"./\"");
+            expect(mockedWarn).toHaveBeenCalledTimes(3);
+            expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+            expect(mockedWarn).toHaveBeenNthCalledWith(
+                2,
+                context,
+                "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+            );
+            expect(mockedWarn).toHaveBeenNthCalledWith(3, context, "Invalid exports path \"dist/index.js\" at exports. Export paths must start with \"./\"");
         });
 
         it("should warn on exports path containing '../'", () => {
-            expect.assertions(1);
+            expect.assertions(4);
 
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
@@ -265,14 +348,22 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
+            expect(mockedWarn).toHaveBeenCalledTimes(3);
+            expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+            expect(mockedWarn).toHaveBeenNthCalledWith(
+                2,
+                context,
+                "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+            );
+            expect(mockedWarn).toHaveBeenNthCalledWith(
+                3,
                 context,
                 "Invalid exports path \"./../unsafe/path.js\" at exports. Export paths should not contain \"../\" for security reasons",
             );
         });
 
         it("should warn on exports path with invalid file extension", () => {
-            expect.assertions(1);
+            expect.assertions(4);
 
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
@@ -284,7 +375,15 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
+            expect(mockedWarn).toHaveBeenCalledTimes(3);
+            expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+            expect(mockedWarn).toHaveBeenNthCalledWith(
+                2,
+                context,
+                "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+            );
+            expect(mockedWarn).toHaveBeenNthCalledWith(
+                3,
                 context,
                 "Export path \"./dist/index.xyz\" at exports should have a valid file extension (.js, .mjs, .cjs, .ts, .mts, .cts, .d.ts, .d.mts, .d.cts, .jsx, .tsx, .json, .node)",
             );
@@ -541,7 +640,10 @@ describe(validatePackageFields, () => {
             await fs.rm(tempDir, { recursive: true, force: true });
 
             // Should warn about files with invalid extensions
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, expect.stringContaining("matches files with invalid extensions: src/assets/asset3.txt"));
+            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
+                context,
+                expect.stringContaining("matches files with invalid extensions: src/assets/asset3.txt"),
+            );
         });
 
         it("should accept valid conditional exports", () => {
@@ -599,7 +701,7 @@ describe(validatePackageFields, () => {
         });
 
         it("should warn on empty exports object", () => {
-            expect.assertions(1);
+            expect.assertions(4);
 
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
@@ -611,11 +713,18 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "Empty exports object. Define at least one export entry");
+            expect(mockedWarn).toHaveBeenCalledTimes(3);
+            expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+            expect(mockedWarn).toHaveBeenNthCalledWith(
+                2,
+                context,
+                "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+            );
+            expect(mockedWarn).toHaveBeenNthCalledWith(3, context, "Empty exports object. Define at least one export entry");
         });
 
         it("should warn on mixed subpaths and conditions", () => {
-            expect.assertions(2);
+            expect.assertions(4);
 
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
@@ -630,15 +739,22 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
+            expect(mockedWarn).toHaveBeenCalledTimes(3);
+            expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+            expect(mockedWarn).toHaveBeenNthCalledWith(
+                2,
+                context,
+                "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+            );
+            expect(mockedWarn).toHaveBeenNthCalledWith(
+                3,
                 context,
                 "Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with \".\") or conditions, not both",
             );
         });
 
         it("should warn on missing main export in subpaths", () => {
-            expect.assertions(2);
+            expect.assertions(4);
 
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
@@ -652,12 +768,18 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "Missing main export \".\". Subpaths exports should include a main export entry");
+            expect(mockedWarn).toHaveBeenCalledTimes(3);
+            expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+            expect(mockedWarn).toHaveBeenNthCalledWith(
+                2,
+                context,
+                "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+            );
+            expect(mockedWarn).toHaveBeenNthCalledWith(3, context, "Missing main export \".\". Subpaths exports should include a main export entry");
         });
 
         it("should warn on invalid subpath format", () => {
-            expect.assertions(1);
+            expect.assertions(5);
 
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
@@ -671,11 +793,19 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "Invalid subpath \".invalid\". Subpaths should start with \"./\" or be exactly \".\"");
+            expect(mockedWarn).toHaveBeenCalledTimes(4);
+            expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+            expect(mockedWarn).toHaveBeenNthCalledWith(
+                2,
+                context,
+                "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+            );
+            expect(mockedWarn).toHaveBeenNthCalledWith(3, context, "Missing main export \".\". Subpaths exports should include a main export entry");
+            expect(mockedWarn).toHaveBeenNthCalledWith(4, context, "Invalid subpath \".invalid\". Subpaths should start with \"./\" or be exactly \".\"");
         });
 
         it("should warn on multiple wildcards in subpath pattern", () => {
-            expect.assertions(2);
+            expect.assertions(4);
 
             const context = {
                 options: { validation: { packageJson: { exports: true } } },
@@ -690,9 +820,14 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "The 'main' field is missing in your package.json. This field should point to your main entry file.");
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "Invalid subpath pattern \"./*/*.js\". Only one \"*\" wildcard is allowed per subpath");
+            expect(mockedWarn).toHaveBeenCalledTimes(3);
+            expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+            expect(mockedWarn).toHaveBeenNthCalledWith(
+                2,
+                context,
+                "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+            );
+            expect(mockedWarn).toHaveBeenNthCalledWith(3, context, "Invalid subpath pattern \"./*/*.js\". Only one \"*\" wildcard is allowed per subpath");
         });
 
         it("should warn on unknown export conditions", () => {
@@ -830,7 +965,10 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "Empty fallback array at exports[\".\"]. Fallback arrays should contain at least one entry");
+            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
+                context,
+                "Empty fallback array at exports[\".\"]. Fallback arrays should contain at least one entry",
+            );
         });
 
         it("should warn on empty conditions object", () => {
@@ -1077,7 +1215,7 @@ describe(validatePackageFields, () => {
         });
 
         it("should warn on unknown conditions even when extraConditions is provided", () => {
-            expect.assertions(2);
+            expect.assertions(4);
 
             const context = {
                 options: {
@@ -1100,9 +1238,15 @@ describe(validatePackageFields, () => {
 
             validatePackageFields(context as unknown as BuildContext);
 
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(context, "The 'main' field is missing in your package.json. This field should point to your main entry file.");
-            expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
+            expect(mockedWarn).toHaveBeenCalledTimes(3);
+            expect(mockedWarn).toHaveBeenNthCalledWith(1, context, "The 'name' field is missing in your package.json. Please provide a valid package name.");
+            expect(mockedWarn).toHaveBeenNthCalledWith(
+                2,
+                context,
+                "The 'main' field is missing in your package.json. This field should point to your main entry file.",
+            );
+            expect(mockedWarn).toHaveBeenNthCalledWith(
+                3,
                 context,
                 "Unknown export conditions [unknown-custom] at exports. Consider using standard conditions (default, import, module-sync, node, node-addons, require) or add custom conditions to 'validation.packageJson.extraConditions' in your packem config.",
             );
