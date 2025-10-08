@@ -108,6 +108,14 @@ const getTransformerConfig = (
                 = context.options.runtime === "node" ? [nodeTarget] : browserslistToEsbuild(context.options.browserTargets ?? []);
         }
 
+        // keepNames is not needed when minify is disabled.
+        // Also transforming multiple times with keepNames enabled breaks tree-shaking.
+        if (!context.options.minify) {
+            context.options.rollup.esbuild.keepNames = false;
+
+            context.logger.debug("Disabling keepNames because minify is disabled");
+        }
+
         if (context.tsconfig?.config.compilerOptions?.target === "es5") {
             context.options.rollup.esbuild.keepNames = false;
 
