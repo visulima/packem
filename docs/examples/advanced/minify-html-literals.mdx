@@ -11,6 +11,10 @@ This example demonstrates how to use the `minify-html-literals` plugin to automa
 
 The `minify-html-literals` plugin analyzes your JavaScript/TypeScript code and automatically identifies template literals tagged with HTML or containing HTML/CSS content. It then applies minification to reduce the size of your bundles.
 
+:::note
+This plugin only runs when minification is enabled in Packem (`minify: true` in your configuration).
+:::
+
 ## Basic Example
 
 ### Project Structure
@@ -135,6 +139,7 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts'
   },
+  minify: true, // Required for the plugin to run
   rollup: {
     minifyHTMLLiterals: {
       // Include only TypeScript files
@@ -160,6 +165,7 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts'
   },
+  minify: true, // Required for the plugin to run
   rollup: {
     minifyHTMLLiterals: {
       include: ['src/**/*.ts'],
@@ -292,6 +298,7 @@ const customStrategy: Strategy = {
 
 export default defineConfig({
   transformer: esbuildTransformer,
+  minify: true, // Required for the plugin to run
   rollup: {
     minifyHTMLLiterals: {
       include: ['src/**/*.ts'],

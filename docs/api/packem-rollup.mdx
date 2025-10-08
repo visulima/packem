@@ -145,6 +145,10 @@ import { minifyHTMLLiteralsPlugin } from '@visulima/packem-rollup'
 
 Automatically minifies HTML and CSS content within template literals during the build process. This plugin identifies tagged template literals containing HTML/CSS and applies minification to reduce bundle size.
 
+:::note
+This plugin only runs when minification is enabled in Packem (`minify: true` in your configuration).
+:::
+
 #### Usage
 
 ```typescript
@@ -153,6 +157,7 @@ import transformer from '@visulima/packem/transformer/esbuild'
 
 export default defineConfig({
   transformer,
+  minify: true, // Required for the plugin to run
   rollup: {
     minifyHTMLLiterals: {
       include: ['**/*.ts', '**/*.js'],
@@ -294,6 +299,7 @@ import { requireCJSTransformerPlugin } from '@visulima/packem-rollup'
 
 export default defineConfig({
   transformer,
+  minify: true, // Required for minify-html-literals to run
   rollup: {
     minifyHTMLLiterals: {
       include: ['src/**/*.ts'],
