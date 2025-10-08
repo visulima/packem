@@ -1,3 +1,9 @@
+## @visulima/packem [2.0.0-alpha.27](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.26...@visulima/packem@2.0.0-alpha.27) (2025-10-08)
+
+### Bug Fixes
+
+* enhance minifyHTMLLiterals plugin options to include logger ([ca6ecae](https://github.com/visulima/packem/commit/ca6ecae6ea18fd5ee4cb13111d3fe3938bd489b0))
+
 ## @visulima/packem [2.0.0-alpha.26](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.25...@visulima/packem@2.0.0-alpha.26) (2025-10-08)
 
 ### Bug Fixes
