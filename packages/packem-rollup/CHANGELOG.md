@@ -1,3 +1,22 @@
+## @visulima/packem-rollup [1.0.0-alpha.20](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.19...@visulima/packem-rollup@1.0.0-alpha.20) (2025-10-08)
+
+### Bug Fixes
+
+* enhance package-json-exports and preserve-directives tests ([c3b58f2](https://github.com/visulima/packem/commit/c3b58f251ea9ed3d8747a967b6f53fd4c1773509))
+
+### Documentation
+
+* clarify minification requirement for minify-html-literals plugin ([287b231](https://github.com/visulima/packem/commit/287b231d04ea8268470a07eadb32350c986d2892))
+
+### Miscellaneous Chores
+
+* update dependencies and add minify-html-literals plugin ([e20007d](https://github.com/visulima/packem/commit/e20007ddf3cbb80c34c323ed37164baaf6f9a649))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.13
+
 ## @visulima/packem-rollup [1.0.0-alpha.19](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.18...@visulima/packem-rollup@1.0.0-alpha.19) (2025-10-07)
 
 ### Bug Fixes
