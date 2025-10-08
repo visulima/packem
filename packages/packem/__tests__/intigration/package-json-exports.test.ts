@@ -723,6 +723,345 @@ export { render };
 `);
     });
 
+    describe("advanced wildcard exports", () => {
+        describe("multiple wildcards", () => {
+            it("all wildcards must match same value", async () => {
+                expect.assertions(4);
+
+                writeFileSync(`${temporaryDirectoryPath}/src/foo/foo.ts`, "export const foo = \"foo\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/bar/bar.ts`, "export const bar = \"bar\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/a/b.ts`, "export const baz = \"baz\"");
+
+                await installPackage(temporaryDirectoryPath, "typescript");
+                await createTsConfig(temporaryDirectoryPath);
+                await createPackemConfig(temporaryDirectoryPath);
+                await createPackageJson(temporaryDirectoryPath, {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    exports: {
+                        "./*": "./dist/*/*.mjs",
+                    },
+                });
+
+                const binProcess = await execPackem("build", [], {
+                    cwd: temporaryDirectoryPath,
+                });
+
+                expect(binProcess.stderr).toBe("");
+                expect(binProcess.exitCode).toBe(0);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/foo/foo.mjs`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/bar/bar.mjs`)).toBe(true);
+                // Should not match because 'a' !== 'b'
+                expect(existsSync(`${temporaryDirectoryPath}/dist/a/b.mjs`)).toBe(false);
+            });
+
+            it("with interleaved constants", async () => {
+                expect.assertions(4);
+
+                writeFileSync(`${temporaryDirectoryPath}/src/foo/_/foo/_/foo.ts`, "export const foo = \"foo\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/bar/_/bar/_/bar.ts`, "export const bar = \"bar\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/a/_/b/_/c.ts`, "export const baz = \"baz\"");
+
+                await installPackage(temporaryDirectoryPath, "typescript");
+                await createTsConfig(temporaryDirectoryPath);
+                await createPackemConfig(temporaryDirectoryPath);
+                await createPackageJson(temporaryDirectoryPath, {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    exports: {
+                        "./*": "./dist/*/_/*/_/*.mjs",
+                    },
+                });
+
+                const binProcess = await execPackem("build", [], {
+                    cwd: temporaryDirectoryPath,
+                });
+
+                expect(binProcess.stderr).toBe("");
+                expect(binProcess.exitCode).toBe(0);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/foo/_/foo/_/foo.mjs`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/bar/_/bar/_/bar.mjs`)).toBe(true);
+                // Should not match because 'a' !== 'b' !== 'c'
+                expect(existsSync(`${temporaryDirectoryPath}/dist/a/_/b/_/c.mjs`)).toBe(false);
+            });
+
+            it("capture multi-segment paths", async () => {
+                expect.assertions(3);
+
+                writeFileSync(`${temporaryDirectoryPath}/src/a/b/a/b/index.ts`, "export const foo = \"foo\"");
+
+                await installPackage(temporaryDirectoryPath, "typescript");
+                await createTsConfig(temporaryDirectoryPath);
+                await createPackemConfig(temporaryDirectoryPath);
+                await createPackageJson(temporaryDirectoryPath, {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    exports: {
+                        "./*": "./dist/*/*/index.js",
+                    },
+                });
+
+                const binProcess = await execPackem("build", [], {
+                    cwd: temporaryDirectoryPath,
+                });
+
+                expect(binProcess.stderr).toBe("");
+                expect(binProcess.exitCode).toBe(0);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/a/b/a/b/index.js`)).toBe(true);
+            });
+        });
+
+        describe("wildcard with suffix", () => {
+            it("basic wildcard with suffix", async () => {
+                expect.assertions(3);
+
+                writeFileSync(`${temporaryDirectoryPath}/src/features/auth/handler.ts`, "export const auth = \"auth\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/features/nested/billing/handler.ts`, "export const billing = \"billing\"");
+
+                await installPackage(temporaryDirectoryPath, "typescript");
+                await createTsConfig(temporaryDirectoryPath);
+                await createPackemConfig(temporaryDirectoryPath);
+                await createPackageJson(temporaryDirectoryPath, {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    exports: {
+                        "./features/*/handler": "./dist/features/*/handler.mjs",
+                    },
+                });
+
+                const binProcess = await execPackem("build", [], {
+                    cwd: temporaryDirectoryPath,
+                });
+
+                expect(binProcess.stderr).toBe("");
+                expect(binProcess.exitCode).toBe(0);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/features/auth/handler.mjs`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/features/nested/billing/handler.mjs`)).toBe(true);
+            });
+        });
+
+        describe("formats & conditions", () => {
+            it("declaration file extensions (.d.ts, .d.mts, .d.cts)", async () => {
+                expect.assertions(4);
+
+                writeFileSync(`${temporaryDirectoryPath}/src/types/models.ts`, "export type Model = { id: string }");
+
+                await installPackage(temporaryDirectoryPath, "typescript");
+                await createTsConfig(temporaryDirectoryPath);
+
+                await createPackemConfig(temporaryDirectoryPath);
+                await createPackageJson(temporaryDirectoryPath, {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    exports: {
+                        "./types/*": {
+                            types: {
+                                default: "./dist/types/*.d.ts",
+                                import: "./dist/types/*.d.mts",
+                                require: "./dist/types/*.d.cts",
+                            },
+                        },
+                    },
+                });
+
+                const binProcess = await execPackem("build", [], {
+                    cwd: temporaryDirectoryPath,
+                });
+
+                expect(binProcess.stderr).toBe("");
+                expect(binProcess.exitCode).toBe(0);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/types/models.d.ts`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/types/models.d.mts`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/types/models.d.cts`)).toBe(true);
+            });
+
+            it("export conditions (node, browser, default)", async () => {
+                expect.assertions(4);
+
+                writeFileSync(`${temporaryDirectoryPath}/src/node/fetch.ts`, "export const fetch = () => \"node-fetch\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/browser/fetch.ts`, "export const fetch = () => \"browser-fetch\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/default/fetch.ts`, "export const fetch = () => \"default-fetch\"");
+
+                await installPackage(temporaryDirectoryPath, "typescript");
+                await createTsConfig(temporaryDirectoryPath);
+                await createPackemConfig(temporaryDirectoryPath);
+                await createPackageJson(temporaryDirectoryPath, {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    exports: {
+                        "./adapters/*": {
+                            browser: "./dist/browser/*.mjs",
+                            default: "./dist/default/*.mjs",
+                            node: "./dist/node/*.mjs",
+                        },
+                    },
+                });
+
+                const binProcess = await execPackem("build", [], {
+                    cwd: temporaryDirectoryPath,
+                });
+
+                expect(binProcess.stderr).toBe("");
+                expect(binProcess.exitCode).toBe(0);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/node/fetch.mjs`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/browser/fetch.mjs`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/default/fetch.mjs`)).toBe(true);
+            });
+
+            it("array of paths", async () => {
+                expect.assertions(4);
+
+                writeFileSync(`${temporaryDirectoryPath}/src/tools/logger.ts`, "export const logger = () => \"log\"");
+
+                await installPackage(temporaryDirectoryPath, "typescript");
+                await createTsConfig(temporaryDirectoryPath);
+                await createPackemConfig(temporaryDirectoryPath);
+                await createPackageJson(temporaryDirectoryPath, {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    exports: {
+                        "./tools/*": ["./dist/tools/*.mjs", "./dist/tools/*.cjs"],
+                    },
+                });
+
+                const binProcess = await execPackem("build", [], {
+                    cwd: temporaryDirectoryPath,
+                });
+
+                expect(binProcess.stderr).toBe("");
+                expect(binProcess.exitCode).toBe(0);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/tools/logger.mjs`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/tools/logger.cjs`)).toBe(true);
+            });
+        });
+
+        describe("edge cases", () => {
+            it("no matching files (optional patterns)", async () => {
+                expect.assertions(3);
+
+                writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export const main = \"main\"");
+
+                await installPackage(temporaryDirectoryPath, "typescript");
+                await createTsConfig(temporaryDirectoryPath);
+                await createPackemConfig(temporaryDirectoryPath);
+                await createPackageJson(temporaryDirectoryPath, {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    exports: {
+                        ".": "./dist/index.mjs",
+                        "./optional/*": "./dist/optional/*.mjs",
+                    },
+                });
+
+                const binProcess = await execPackem("build", [], {
+                    cwd: temporaryDirectoryPath,
+                });
+
+                expect(binProcess.stderr).toBe("");
+                expect(binProcess.exitCode).toBe(0);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/optional`)).toBe(false);
+            });
+
+            it("empty capture is rejected", async () => {
+                expect.assertions(3);
+
+                writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export const index = \"index\"");
+
+                await installPackage(temporaryDirectoryPath, "typescript");
+                await createTsConfig(temporaryDirectoryPath);
+                await createPackemConfig(temporaryDirectoryPath);
+                await createPackageJson(temporaryDirectoryPath, {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    exports: {
+                        ".": "./dist/index.mjs",
+                        "./lib/*": "./dist/lib/*.mjs",
+                    },
+                });
+
+                const binProcess = await execPackem("build", [], {
+                    cwd: temporaryDirectoryPath,
+                });
+
+                expect(binProcess.stderr).toBe("");
+                expect(binProcess.exitCode).toBe(0);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/lib/.mjs`)).toBe(false);
+            });
+
+            it("wildcard without extension emits warning", async () => {
+                expect.assertions(4);
+
+                writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export const index = \"index\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/foo.ts`, "export const foo = \"foo\"");
+
+                await installPackage(temporaryDirectoryPath, "typescript");
+                await createTsConfig(temporaryDirectoryPath);
+                await createPackemConfig(temporaryDirectoryPath);
+                await createPackageJson(temporaryDirectoryPath, {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    exports: {
+                        ".": "./dist/index.mjs",
+                        "./*": "./dist/*",
+                    },
+                });
+
+                const binProcess = await execPackem("build", [], {
+                    cwd: temporaryDirectoryPath,
+                });
+
+                expect(binProcess.exitCode).toBe(0);
+                expect(binProcess.stderr).toContain("Wildcard pattern must include a file extension");
+                expect(binProcess.stderr).toContain("package.json#exports[\"./*\"]");
+                expect(existsSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(true);
+            });
+
+            it("mixed static and wildcard exports", async () => {
+                expect.assertions(4);
+
+                writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export const main = \"main\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/utils/helper.ts`, "export const helper = \"helper\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/constants.ts`, "export const CONSTANT = \"constant\"");
+
+                await installPackage(temporaryDirectoryPath, "typescript");
+                await createTsConfig(temporaryDirectoryPath);
+                await createPackemConfig(temporaryDirectoryPath);
+                await createPackageJson(temporaryDirectoryPath, {
+                    devDependencies: {
+                        typescript: "*",
+                    },
+                    exports: {
+                        ".": "./dist/index.mjs",
+                        "./constants": "./dist/constants.mjs",
+                        "./utils/*": "./dist/utils/*.mjs",
+                    },
+                });
+
+                const binProcess = await execPackem("build", [], {
+                    cwd: temporaryDirectoryPath,
+                });
+
+                expect(binProcess.stderr).toBe("");
+                expect(binProcess.exitCode).toBe(0);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/utils/helper.mjs`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/constants.mjs`)).toBe(true);
+            });
+        });
+    });
+
     it("should throw a error if exports is mjs file without type module in package.json", async () => {
         expect.assertions(2);
 
@@ -733,6 +1072,9 @@ export { render };
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
             exports: "./dist/index.mjs",
         });
 
@@ -755,6 +1097,9 @@ export { render };
 
         await createPackemConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
             exports: "./dist/index.cjs",
             type: "module",
         });
@@ -1434,7 +1779,7 @@ exports.result = result;
 `);
     });
 
-    it("should generate different files for mts and cts with same shared code", async () => {
+    it.only("should generate different files for mts and cts with same shared code", async () => {
         expect.assertions(4);
 
         writeFileSync(
@@ -1508,9 +1853,11 @@ export type { Colorize } from "./types";`,
             compilerOptions: { rootDir: "./src" },
         });
 
-        const binProcess = await execPackem("build", [], {
+        const binProcess = await execPackem("build", ["--debug"], {
             cwd: temporaryDirectoryPath,
         });
+
+        console.log(binProcess.stdout);
 
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);

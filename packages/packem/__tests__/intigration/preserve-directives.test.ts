@@ -157,9 +157,7 @@ export default Tr;`,
         expect(mjsContent).toBe(`'use client';
 import { jsx } from 'react/jsx-runtime';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const Tr = /* @__PURE__ */ __name(() => jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20" }), "Tr");
+const Tr = () => jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20" });
 
 export { Tr as default };
 `);
@@ -171,9 +169,7 @@ export { Tr as default };
 
 const jsxRuntime = require('react/jsx-runtime');
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const Tr = /* @__PURE__ */ __name(() => jsxRuntime.jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20" }), "Tr");
+const Tr = () => jsxRuntime.jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20" });
 
 module.exports = Tr;
 `);
@@ -201,7 +197,7 @@ export = Tr;
     });
 
     it("should merge duplicated directives", async () => {
-        expect.assertions(5);
+        expect.assertions(8);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/cli.ts`,
@@ -213,7 +209,7 @@ console.log("Hello, cli!");`,
         await installPackage(temporaryDirectoryPath, "typescript");
         await createPackageJson(temporaryDirectoryPath, {
             bin: {
-                packem: "./dist/cli.js",
+                packem: "./dist/cli.cjs",
             },
             devDependencies: {
                 typescript: "*",
@@ -253,13 +249,25 @@ const foo = "foo";
 exports.foo = foo;
 `);
 
-        const cjsCliContent = readFileSync(`${temporaryDirectoryPath}/dist/cli.js`);
+        const cjsCliContent = readFileSync(`${temporaryDirectoryPath}/dist/cli.cjs`);
 
         expect(cjsCliContent).toBe(`#!/usr/bin/env node
 'use strict';
 
 console.log("Hello, cli!");
 `);
+
+        const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dtsContent).toMatchSnapshot("d.ts content");
+
+        const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(dCtsContent).toMatchSnapshot("d.cts content");
+
+        const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(dMtsContent).toMatchSnapshot("d.mts content");
     });
 
     it("should chunk directives in separated files", async () => {

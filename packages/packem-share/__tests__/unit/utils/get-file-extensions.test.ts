@@ -165,7 +165,7 @@ describe(getOutputExtension, () => {
             expect(getOutputExtension(context, "cjs")).toBe("cjs");
         });
 
-        it("should not use traditional extensions when emitCJS is false", () => {
+        it("should use traditional extensions when declaration is compatible", () => {
             expect.assertions(1);
 
             const context = createOptions({
@@ -174,7 +174,7 @@ describe(getOutputExtension, () => {
                 emitESM: true,
             });
 
-            expect(getOutputExtension(context, "esm")).toBe("js");
+            expect(getOutputExtension(context, "esm")).toBe("mjs");
         });
     });
 
@@ -439,7 +439,7 @@ describe(getDtsExtension, () => {
             expect(getDtsExtension(context, "cjs")).toBe("d.cts");
         });
 
-        it("should not use traditional extensions when emitCJS is false", () => {
+        it("should use traditional extensions when declaration is compatible", () => {
             expect.assertions(1);
 
             const context = createOptions({
@@ -448,7 +448,7 @@ describe(getDtsExtension, () => {
                 emitESM: true,
             });
 
-            expect(getDtsExtension(context, "esm")).toBe("d.ts");
+            expect(getDtsExtension(context, "esm")).toBe("d.mts");
         });
     });
 

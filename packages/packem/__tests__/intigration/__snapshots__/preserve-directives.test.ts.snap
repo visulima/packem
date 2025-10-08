@@ -1,0 +1,22 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem preserve-directives > should merge duplicated directives > d.cts content 1`] = `
+"declare const foo = "foo";
+
+export { foo };
+"
+`;
+
+exports[`packem preserve-directives > should merge duplicated directives > d.mts content 1`] = `
+"declare const foo = "foo";
+
+export { foo };
+"
+`;
+
+exports[`packem preserve-directives > should merge duplicated directives > d.ts content 1`] = `
+"declare const foo = "foo";
+
+export { foo };
+"
+`;

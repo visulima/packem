@@ -103,7 +103,7 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
             if (entry.modules && entry.modules.length > 0) {
                 const moduleList = entry.modules
                     .filter((m) => m.id.includes("node_modules"))
-                    .sort((a, b) => (b.bytes || 0) - (a.bytes || 0))
+                    .toSorted((a, b) => (b.bytes || 0) - (a.bytes || 0))
                     .map((m) =>
                         gray(
                             `  📦 ${rPath(m.id)}${bold(
@@ -144,7 +144,7 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
                     let foundCompatibleDts: BuildContextBuildAssetAndChunk | BuildContextBuildEntry | undefined;
 
                     if (!dtsPath.includes(".d.ts")) {
-                        dtsPath = (dtsPath as string).replace(/\.d\.mts$/, `.${cjsDTSExtension}`);
+                        dtsPath = (dtsPath as string).replace(/\.d\.[m|c]ts$/, `.d.ts`);
 
                         foundCompatibleDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));
                     }
