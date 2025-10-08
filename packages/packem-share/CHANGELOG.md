@@ -1,3 +1,14 @@
+## @visulima/packem-share [1.0.0-alpha.13](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.12...@visulima/packem-share@1.0.0-alpha.13) (2025-10-08)
+
+### Bug Fixes
+
+* enhance package-json-exports and preserve-directives tests ([c3b58f2](https://github.com/visulima/packem/commit/c3b58f251ea9ed3d8747a967b6f53fd4c1773509))
+
+### Miscellaneous Chores
+
+* update dependencies and improve package validation tests ([b4fd83b](https://github.com/visulima/packem/commit/b4fd83bf3f5749d53c1c01eaf10d61f88530d9f4))
+* update package.json scripts and dependencies ([8f2aa25](https://github.com/visulima/packem/commit/8f2aa25956f2570a65b53d9f936c8cf1d730a49f))
+
 ## @visulima/packem-share [1.0.0-alpha.12](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.11...@visulima/packem-share@1.0.0-alpha.12) (2025-09-22)
 
 ### Bug Fixes
