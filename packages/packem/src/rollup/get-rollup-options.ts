@@ -25,9 +25,9 @@ import {
     minifyHTMLLiteralsPlugin,
     nativeModulesPlugin,
     nodeResolve as nodeResolvePlugin,
+    PluginPure,
     polyfillNode as polyfillPlugin,
     preserveDirectivesPlugin,
-    pure as PluginPure,
     rawPlugin,
     removeShebangPlugin,
     replace as replacePlugin,
@@ -342,6 +342,141 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
     // Add esm mark and interop helper if esm export is detected
     const useEsModuleMark = context.tsconfig?.config.compilerOptions?.esModuleInterop;
 
+    let purePlugin: Plugin;
+
+    if (context.options.rollup.pluginPure) {
+        purePlugin = PluginPure({
+            ...context.options.rollup.pluginPure,
+            functions: [
+                // Common utility functions
+                "Object.defineProperty",
+                "Object.assign",
+                "Object.create",
+                "Object.freeze",
+                "Object.seal",
+                "Object.setPrototypeOf",
+                "Object.getOwnPropertyDescriptor",
+                "Object.getOwnPropertyDescriptors",
+                "Object.getPrototypeOf",
+                "Object.hasOwnProperty",
+                "Object.isExtensible",
+                "Object.isFrozen",
+                "Object.isSealed",
+
+                // Symbol functions - commonly used in libraries but safe to tree-shake when unused
+                "Symbol",
+                "Symbol.for",
+                "Symbol.keyFor",
+                "Symbol.iterator",
+                "Symbol.asyncIterator",
+                "Symbol.hasInstance",
+                "Symbol.isConcatSpreadable",
+                "Symbol.species",
+                "Symbol.toPrimitive",
+                "Symbol.toStringTag",
+
+                // Proxy constructor - safe when unused
+                "Proxy",
+
+                // Reflect methods - typically pure
+                "Reflect.apply",
+                "Reflect.construct",
+                "Reflect.defineProperty",
+                "Reflect.deleteProperty",
+                "Reflect.get",
+                "Reflect.getOwnPropertyDescriptor",
+                "Reflect.getPrototypeOf",
+                "Reflect.has",
+                "Reflect.isExtensible",
+                "Reflect.ownKeys",
+                "Reflect.preventExtensions",
+                "Reflect.set",
+                "Reflect.setPrototypeOf",
+
+                // WeakMap/WeakSet constructors - safe when unused
+                "WeakMap",
+                "WeakSet",
+                "WeakRef",
+
+                // Array methods that don't mutate
+                "Array.from",
+                "Array.of",
+                "Array.isArray",
+
+                // Number methods
+                "Number.isFinite",
+                "Number.isInteger",
+                "Number.isNaN",
+                "Number.isSafeInteger",
+                "Number.parseFloat",
+                "Number.parseInt",
+
+                // String methods
+                "String.fromCharCode",
+                "String.fromCodePoint",
+                "String.raw",
+
+                // Date constructor when used for static methods
+                "Date.now",
+                "Date.parse",
+                "Date.UTC",
+
+                // Math methods (all are pure)
+                "Math.abs",
+                "Math.acos",
+                "Math.acosh",
+                "Math.asin",
+                "Math.asinh",
+                "Math.atan",
+                "Math.atan2",
+                "Math.atanh",
+                "Math.cbrt",
+                "Math.ceil",
+                "Math.clz32",
+                "Math.cos",
+                "Math.cosh",
+                "Math.exp",
+                "Math.expm1",
+                "Math.floor",
+                "Math.fround",
+                "Math.hypot",
+                "Math.imul",
+                "Math.log",
+                "Math.log10",
+                "Math.log1p",
+                "Math.log2",
+                "Math.max",
+                "Math.min",
+                "Math.pow",
+                "Math.random",
+                "Math.round",
+                "Math.sign",
+                "Math.sin",
+                "Math.sinh",
+                "Math.sqrt",
+                "Math.tan",
+                "Math.tanh",
+                "Math.trunc",
+
+                // JSON methods
+                "JSON.parse",
+                "JSON.stringify",
+
+                // Common library patterns
+                "require.resolve",
+                "Buffer.from",
+                "Buffer.alloc",
+                "Buffer.allocUnsafe",
+                "Buffer.isBuffer",
+                ...context.options.rollup.pluginPure?.functions ?? [],
+            ],
+            sourcemap: context.options.sourcemap,
+        });
+
+        // @ts-expect-error Hacking into the plugin ignoring types, we just fixed the order
+        purePlugin.transform.order = "pre";
+    }
+
     return (<RollupOptions>{
         ...baseRollupOptions(context, "build"),
 
@@ -353,10 +488,10 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "cjs")),
+                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "cjs", chunk)),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "cjs")),
+                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "cjs", chunkInfo)),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 extend: true,
@@ -477,20 +612,23 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             context.options.rollup.css
             && context.options.rollup.css.loaders
             && context.options.rollup.css.loaders.length > 0
-            && await rollupCssPlugin(
-                {
-                    dts: Boolean(context.options.declaration) || context.options.isolatedDeclarationTransformer !== undefined,
-                    sourceMap: context.options.sourcemap,
-                    ...context.options.rollup.css,
-                },
-                context.options.browserTargets as string[],
-                context.options.rootDir,
-                context.options.sourceDir,
-                context.environment,
-                context.options.sourcemap,
-                context.options.debug,
-                context.options.minify ?? false,
-                resolvedAliases,
+            && cachingPlugin(
+                await rollupCssPlugin(
+                    {
+                        dts: Boolean(context.options.declaration) || context.options.isolatedDeclarationTransformer !== undefined,
+                        sourceMap: context.options.sourcemap,
+                        ...context.options.rollup.css,
+                    },
+                    context.options.browserTargets as string[],
+                    context.options.rootDir,
+                    context.options.sourceDir,
+                    context.environment,
+                    context.options.sourcemap,
+                    context.options.debug,
+                    context.options.minify ?? false,
+                    resolvedAliases,
+                ),
+                fileCache,
             ),
 
             context.options.rollup.css
@@ -505,153 +643,27 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
             ...normalPlugins,
 
+            purePlugin,
+
             context.options.declaration
             && context.options.rollup.isolatedDeclarations
             && context.options.isolatedDeclarationTransformer
-            && isolatedDeclarationsPlugin<InternalBuildOptions>(join(context.options.rootDir, context.options.sourceDir), context),
+            && cachingPlugin(isolatedDeclarationsPlugin<InternalBuildOptions>(join(context.options.rootDir, context.options.sourceDir), context), fileCache),
 
-            context.options.transformer(getTransformerConfig(context.options.transformerName, context)),
-
-            context.options.rollup.minifyHTMLLiterals && context.options.minify && minifyHTMLLiteralsPlugin(context.options.rollup.minifyHTMLLiterals),
+            cachingPlugin(context.options.transformer(getTransformerConfig(context.options.transformerName, context)), fileCache),
 
             context.options.rollup.requireCJS
             && context.options.emitESM
-            && requireCJSTransformerPlugin(
-                {
-                    ...context.options.rollup.requireCJS,
-                    cwd: context.options.rootDir,
-                },
-                context.logger,
+            && cachingPlugin(
+                requireCJSTransformerPlugin(
+                    {
+                        ...context.options.rollup.requireCJS,
+                        cwd: context.options.rootDir,
+                    },
+                    context.logger,
+                ),
+                fileCache,
             ),
-
-            context.options.rollup.pluginPure
-            && PluginPure({
-                ...context.options.rollup.pluginPure,
-                functions: [
-                    // Common utility functions
-                    "Object.defineProperty",
-                    "Object.assign",
-                    "Object.create",
-                    "Object.freeze",
-                    "Object.seal",
-                    "Object.setPrototypeOf",
-                    "Object.getOwnPropertyDescriptor",
-                    "Object.getOwnPropertyDescriptors",
-                    "Object.getPrototypeOf",
-                    "Object.hasOwnProperty",
-                    "Object.isExtensible",
-                    "Object.isFrozen",
-                    "Object.isSealed",
-
-                    // Symbol functions - commonly used in libraries but safe to tree-shake when unused
-                    "Symbol",
-                    "Symbol.for",
-                    "Symbol.keyFor",
-                    "Symbol.iterator",
-                    "Symbol.asyncIterator",
-                    "Symbol.hasInstance",
-                    "Symbol.isConcatSpreadable",
-                    "Symbol.species",
-                    "Symbol.toPrimitive",
-                    "Symbol.toStringTag",
-
-                    // Proxy constructor - safe when unused
-                    "Proxy",
-
-                    // Reflect methods - typically pure
-                    "Reflect.apply",
-                    "Reflect.construct",
-                    "Reflect.defineProperty",
-                    "Reflect.deleteProperty",
-                    "Reflect.get",
-                    "Reflect.getOwnPropertyDescriptor",
-                    "Reflect.getPrototypeOf",
-                    "Reflect.has",
-                    "Reflect.isExtensible",
-                    "Reflect.ownKeys",
-                    "Reflect.preventExtensions",
-                    "Reflect.set",
-                    "Reflect.setPrototypeOf",
-
-                    // WeakMap/WeakSet constructors - safe when unused
-                    "WeakMap",
-                    "WeakSet",
-                    "WeakRef",
-
-                    // Array methods that don't mutate
-                    "Array.from",
-                    "Array.of",
-                    "Array.isArray",
-
-                    // Number methods
-                    "Number.isFinite",
-                    "Number.isInteger",
-                    "Number.isNaN",
-                    "Number.isSafeInteger",
-                    "Number.parseFloat",
-                    "Number.parseInt",
-
-                    // String methods
-                    "String.fromCharCode",
-                    "String.fromCodePoint",
-                    "String.raw",
-
-                    // Date constructor when used for static methods
-                    "Date.now",
-                    "Date.parse",
-                    "Date.UTC",
-
-                    // Math methods (all are pure)
-                    "Math.abs",
-                    "Math.acos",
-                    "Math.acosh",
-                    "Math.asin",
-                    "Math.asinh",
-                    "Math.atan",
-                    "Math.atan2",
-                    "Math.atanh",
-                    "Math.cbrt",
-                    "Math.ceil",
-                    "Math.clz32",
-                    "Math.cos",
-                    "Math.cosh",
-                    "Math.exp",
-                    "Math.expm1",
-                    "Math.floor",
-                    "Math.fround",
-                    "Math.hypot",
-                    "Math.imul",
-                    "Math.log",
-                    "Math.log10",
-                    "Math.log1p",
-                    "Math.log2",
-                    "Math.max",
-                    "Math.min",
-                    "Math.pow",
-                    "Math.random",
-                    "Math.round",
-                    "Math.sign",
-                    "Math.sin",
-                    "Math.sinh",
-                    "Math.sqrt",
-                    "Math.tan",
-                    "Math.tanh",
-                    "Math.trunc",
-
-                    // JSON methods
-                    "JSON.parse",
-                    "JSON.stringify",
-
-                    // Common library patterns
-                    "require.resolve",
-                    "Buffer.from",
-                    "Buffer.alloc",
-                    "Buffer.allocUnsafe",
-                    "Buffer.isBuffer",
-                    ...context.options.rollup.pluginPure?.functions ?? [],
-                ],
-                sourcemap: context.options.sourcemap,
-            }),
 
             cachingPlugin(
                 preserveDirectivesPlugin({
@@ -710,6 +722,8 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             ),
 
             ...postPlugins,
+
+            context.options.rollup.minifyHTMLLiterals && context.options.minify && minifyHTMLLiteralsPlugin(context.options.rollup.minifyHTMLLiterals),
 
             context.options.rollup.metafile && metafilePlugin(),
 

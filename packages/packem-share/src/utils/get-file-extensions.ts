@@ -21,11 +21,18 @@ const FORMAT_EXTENSIONS = {
 const getExtensionStrategy = <T extends FileExtensionOptions>(context: BuildContext<T>) => {
     const { declaration, emitCJS, emitESM, outputExtensionMap } = context.options;
 
+    // Check if we're in a dual format scenario
+    // This can happen when:
+    // 1. Both emitCJS and emitESM are enabled
+    // 2. Declaration is in compatible mode (indicates dual format support needed)
+    const isDualFormat = Boolean(emitCJS && emitESM);
+    const isSingleFormat = !isDualFormat && ((emitCJS && !emitESM) || (emitESM && !emitCJS));
+
     return {
         hasOutputMap: Boolean(outputExtensionMap),
-        isCompatible: emitCJS && (declaration === "compatible" || declaration === true),
-        isDualFormat: Boolean(emitCJS && emitESM),
-        isSingleFormat: (emitCJS && !emitESM) || (emitESM && !emitCJS),
+        isCompatible: declaration === "compatible" || declaration === true,
+        isDualFormat,
+        isSingleFormat,
         outputExtensionMap,
     };
 };
@@ -48,12 +55,15 @@ export interface FileExtensionOptions {
  * Determines the appropriate output extension for JavaScript files based on build configuration.
  *
  * Returns '.js' when:
- * - Only declaration, ESM or CJS is emitted
+ * - Only ESM or CJS is emitted (single format)
  * - No outputExtensionMap is configured
- * - Node.js 10 compatibility is disabled
+ * - Declaration is not in compatible mode
  *
- * Otherwixontext Build contextue),
- * isDalFormat: Boolean(emitCJS &amp;& mitESM
+ * Returns '.cjs'/'.mjs' when:
+ * - Both ESM and CJS are emitted (dual format)
+ * - Declaration is in compatible mode
+ * - outputExtensionMap is configured
+ * @param context Build context
  * @param format Target format ('esm' or 'cjs')
  * @returns File extension string
  */
@@ -64,11 +74,11 @@ export const getOutputExtension = <T extends FileExtensionOptions>(context: Buil
         return strategy.outputExtensionMap?.[format] ?? FORMAT_EXTENSIONS.traditional[format];
     }
 
-    if (strategy.isSingleFormat) {
+    if (strategy.isSingleFormat && !strategy.isCompatible) {
         return "js";
     }
 
-    // Use traditional extensions if Node.js 10 compatibility is enabled or dual format
+    // Use traditional extensions if dual format or compatible declaration mode
     return FORMAT_EXTENSIONS.traditional[format];
 };
 
@@ -106,7 +116,7 @@ export const getDtsExtension = <T extends FileExtensionOptions>(context: BuildCo
         return FORMAT_EXTENSIONS.traditionalDts[format];
     }
 
-    if (strategy.isSingleFormat) {
+    if (strategy.isSingleFormat && !strategy.isCompatible) {
         return "d.ts";
     }
 

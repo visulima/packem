@@ -235,6 +235,8 @@ const inferEntries = async (
     context: BuildContext<InternalBuildOptions>,
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<InferEntriesResult> => {
+    const hasRootTypes = packageJson.types || packageJson.typings;
+
     // Clear directory cache to ensure fresh results for each test run
     directoryCache.clear();
 
@@ -254,6 +256,12 @@ const inferEntries = async (
 
     if (packageType === "cjs") {
         context.options.emitCJS = true;
+    }
+
+    const isDualFormat = context.options.emitCJS && context.options.emitESM;
+
+    if (context.options.declaration === undefined) {
+        context.options.declaration = isDualFormat ? "compatible" : "node16";
     }
 
     // Come up with a list of all output files & their formats
@@ -296,10 +304,10 @@ const inferEntries = async (
     }
 
     // Entry point for TypeScript
-    if (packageJson.types || packageJson.typings) {
+    if (hasRootTypes) {
         validateIfTypescriptIsInstalled(context);
 
-        if (context.options.declaration === undefined) {
+        if ((context.options.declaration === undefined || context.options.declaration === "node16") && isDualFormat) {
             context.options.declaration = "compatible";
         }
 
@@ -320,16 +328,18 @@ const inferEntries = async (
             continue;
         }
 
-        if (context.options.declaration === undefined && (output.key === "types" || output.subKey === "types")) {
-            context.options.declaration = output.file.includes(".d.ts") ? "compatible" : true;
-        }
-
         if (context.options.emitCJS === undefined && output.type === "cjs") {
             context.options.emitCJS = true;
         }
 
         if (context.options.emitESM === undefined && output.type === "esm") {
             context.options.emitESM = true;
+        }
+
+        if (context.options.declaration === undefined || context.options.declaration === "node16") {
+            const isDualFormat = context.options.emitCJS && context.options.emitESM;
+
+            context.options.declaration = isDualFormat ? "compatible" : "node16";
         }
 
         // Supported output file extensions are `.d.ts`, `.d.cts`, `.d.mts`, `.js`, `.cjs` and `.mjs`
@@ -451,10 +461,6 @@ const inferEntries = async (
         } else {
             createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context, false);
         }
-    }
-
-    if (context.options.emitESM && !context.options.emitCJS && context.options.declaration === undefined) {
-        context.options.declaration = "node16";
     }
 
     return { entries, warnings };

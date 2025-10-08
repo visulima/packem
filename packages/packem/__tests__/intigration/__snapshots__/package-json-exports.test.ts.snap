@@ -77,13 +77,10 @@ const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e 
 
 const myMod__default = /*#__PURE__*/_interopDefaultCompat(myMod);
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 const index = "exports-sugar-default";
 function method() {
   return myMod__default.test();
 }
-__name(method, "method");
 
 exports.default = index;
 exports.method = method;
@@ -93,13 +90,10 @@ exports.method = method;
 exports[`packem package.json exports > should generate proper assets with js based on the package.json exports default > mjs output 1`] = `
 "import myMod from 'my-mod';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 const index = "exports-sugar-default";
 function method() {
   return myMod.test();
 }
-__name(method, "method");
 
 export { index as default, method };
 "
