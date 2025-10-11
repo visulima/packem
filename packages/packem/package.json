@@ -122,18 +122,6 @@
             "types": "./dist/rollup/plugins/swc/swc-plugin.d.ts",
             "default": "./dist/rollup/plugins/swc/swc-plugin.js"
         },
-        "./dts/isolated/transformer/swc": {
-            "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.ts",
-            "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.js"
-        },
-        "./dts/isolated/transformer/oxc": {
-            "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.ts",
-            "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.js"
-        },
-        "./dts/isolated/transformer/typescript": {
-            "types": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.ts",
-            "default": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.js"
-        },
         "./transformer/sucrase": {
             "types": "./dist/rollup/plugins/sucrase/index.d.ts",
             "default": "./dist/rollup/plugins/sucrase/index.js"
@@ -262,7 +250,7 @@
         "minireset.css": "catalog:style",
         "oxc-parser": "catalog:dev",
         "oxc-resolver": "catalog:node",
-        "oxc-transform": "catalog:database",
+        "oxc-transform": "catalog:dev",
         "package-manager-detector": "catalog:dev",
         "postcss": "catalog:style",
         "postcss-custom-properties": "catalog:style",
@@ -413,7 +401,7 @@
         }
     },
     "engines": {
-        "node": ">=20.* <=24.*"
+        "node": ">=20.19 <=24.*"
     },
     "publishConfig": {
         "access": "public",
