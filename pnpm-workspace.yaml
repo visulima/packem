@@ -55,9 +55,8 @@ catalogs:
     commitizen: ^4.3.1
     semantic-release: ^24.2.9
     taze: ^19.7.0
-  database:
-    oxc-transform: ^0.94.0
   dev:
+    oxc-transform: ^0.94.0
     "@arethetypeswrong/cli": ^0.18.2
     "@babel/core": ^7.28.4
     "@babel/parser": 7.28.4

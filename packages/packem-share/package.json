@@ -114,7 +114,7 @@
         "rollup": "catalog:build"
     },
     "engines": {
-        "node": ">=20.* <=24.*"
+        "node": ">=20.19 <=24.*"
     },
     "publishConfig": {
         "access": "public",
