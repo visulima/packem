@@ -76,10 +76,6 @@ catalogs:
     taze:
       specifier: ^19.7.0
       version: 19.7.0
-  database:
-    oxc-transform:
-      specifier: ^0.94.0
-      version: 0.94.0
   dev:
     '@arethetypeswrong/cli':
       specifier: ^0.18.2
@@ -141,6 +137,9 @@ catalogs:
     oxc-parser:
       specifier: 0.91.0
       version: 0.91.0
+    oxc-transform:
+      specifier: ^0.94.0
+      version: 0.94.0
     p-queue:
       specifier: ^9.0.0
       version: 9.0.0
@@ -1705,7 +1704,7 @@ importers:
         specifier: catalog:node
         version: 11.8.2
       oxc-transform:
-        specifier: catalog:database
+        specifier: catalog:dev
         version: 0.94.0
       package-manager-detector:
         specifier: catalog:dev
@@ -2018,7 +2017,7 @@ importers:
         specifier: catalog:dev
         version: 4.1.0
       oxc-transform:
-        specifier: catalog:database
+        specifier: catalog:dev
         version: 0.94.0
       p-queue:
         specifier: catalog:dev
