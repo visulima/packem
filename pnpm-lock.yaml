@@ -220,8 +220,8 @@ catalogs:
       specifier: ^0.12.0
       version: 0.12.0
     '@secretlint/secretlint-rule-preset-recommend':
-      specifier: ^11.2.4
-      version: 11.2.4
+      specifier: ^11.2.5
+      version: 11.2.5
     eslint:
       specifier: ^9.36.0
       version: 9.36.0
@@ -229,8 +229,8 @@ catalogs:
       specifier: ^9.1.7
       version: 9.1.7
     lint-staged:
-      specifier: ^16.2.3
-      version: 16.2.3
+      specifier: ^16.2.4
+      version: 16.2.4
     prettier:
       specifier: ^3.6.2
       version: 3.6.2
@@ -238,8 +238,8 @@ catalogs:
       specifier: ^0.3.14
       version: 0.3.14
     secretlint:
-      specifier: ^11.2.4
-      version: 11.2.4
+      specifier: ^11.2.5
+      version: 11.2.5
     textlint:
       specifier: ^15.2.2
       version: 15.2.2
@@ -369,17 +369,17 @@ catalogs:
       specifier: 1.0.16
       version: 1.0.16
     gpt-tokenizer:
-      specifier: ^3.0.1
-      version: 3.0.1
+      specifier: ^3.2.0
+      version: 3.2.0
     happy-dom:
-      specifier: ^19.0.2
-      version: 19.0.2
+      specifier: ^20.0.0
+      version: 20.0.0
     hookable:
       specifier: 5.5.3
       version: 5.5.3
     html-minifier-next:
-      specifier: ^2.1.6
-      version: 2.1.6
+      specifier: ^2.1.7
+      version: 2.1.7
     is-ci:
       specifier: ^4.1.0
       version: 4.1.0
@@ -527,8 +527,8 @@ catalogs:
       specifier: ^7.27.0
       version: 7.27.0
     '@types/bun':
-      specifier: ^1.2.23
-      version: 1.2.23
+      specifier: ^1.3.0
+      version: 1.3.0
     '@types/clean-css':
       specifier: 4.2.11
       version: 4.2.11
@@ -617,7 +617,7 @@ importers:
         version: 6.0.5(@commitlint/cli@20.1.0(@types/node@24.5.2)(typescript@5.9.3))(@types/node@24.5.2)(typescript@5.9.3)
       '@anolilab/lint-staged-config':
         specifier: catalog:lint
-        version: 3.0.34(@types/node@24.5.2)(eslint@9.36.0(jiti@2.6.0))(husky@9.1.7)(lint-staged@16.2.3)(prettier@3.6.2)(secretlint@11.2.4)(vitest@3.2.4)(yaml@2.8.1)
+        version: 3.0.34(@types/node@24.5.2)(eslint@9.36.0(jiti@2.6.0))(husky@9.1.7)(lint-staged@16.2.4)(prettier@3.6.2)(secretlint@11.2.5)(vitest@3.2.4)(yaml@2.8.1)
       '@anolilab/multi-semantic-release':
         specifier: catalog:cli
         version: 2.0.6(semantic-release@24.2.9(typescript@5.9.3))(typescript@5.9.3)
@@ -638,7 +638,7 @@ importers:
         version: 20.0.0
       '@secretlint/secretlint-rule-preset-recommend':
         specifier: catalog:lint
-        version: 11.2.4
+        version: 11.2.5
       '@visulima/packem':
         specifier: catalog:prod
         version: 1.28.3(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.5.2)(cssnano@7.1.1(postcss@8.5.6))(esbuild@0.25.10)(icss-utils@5.1.0(postcss@8.5.6))(less@4.4.2)(lightningcss@1.30.2)(oxc-transform@0.94.0)(postcss-load-config@6.0.1(jiti@2.6.0)(postcss@8.5.6)(tsx@4.20.6)(yaml@2.8.1))(postcss-modules-extract-imports@3.1.0(postcss@8.5.6))(postcss-modules-local-by-default@4.2.0(postcss@8.5.6))(postcss-modules-scope@3.2.1(postcss@8.5.6))(postcss-modules-values@4.0.0(postcss@8.5.6))(postcss-value-parser@4.2.0)(postcss@8.5.6)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sucrase@3.35.0)(typedoc-plugin-markdown@4.9.0(typedoc@0.28.13(typescript@5.9.3)))(typedoc-plugin-rename-defaults@0.7.3(typedoc@0.28.13(typescript@5.9.3)))(typedoc@0.28.13(typescript@5.9.3))(typescript@5.9.3)(yaml@2.8.1)
@@ -665,7 +665,7 @@ importers:
         version: 4.1.0
       lint-staged:
         specifier: catalog:lint
-        version: 16.2.3
+        version: 16.2.4
       nx:
         specifier: catalog:monorepo
         version: 21.6.4(@swc/core@1.13.5(@swc/helpers@0.5.17))
@@ -689,7 +689,7 @@ importers:
         version: 6.0.1
       secretlint:
         specifier: catalog:lint
-        version: 11.2.4
+        version: 11.2.5
       semantic-release:
         specifier: catalog:cli
         version: 24.2.9(typescript@5.9.3)
@@ -707,7 +707,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: catalog:test
-        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@19.0.2)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@20.0.0)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   examples/cjs-interop:
     devDependencies:
@@ -1447,7 +1447,7 @@ importers:
         version: 6.0.1
       secretlint:
         specifier: catalog:lint
-        version: 11.2.4
+        version: 11.2.5
       semantic-release:
         specifier: catalog:cli
         version: 24.2.9(typescript@5.9.3)
@@ -1456,7 +1456,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: catalog:test
-        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@19.0.2)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@20.0.0)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   packages/packem:
     dependencies:
@@ -1531,7 +1531,7 @@ importers:
         version: 5.5.3
       html-minifier-next:
         specifier: catalog:prod
-        version: 2.1.6
+        version: 2.1.7
       jiti:
         specifier: catalog:script
         version: 2.6.0
@@ -1616,7 +1616,7 @@ importers:
         version: 6.2.2(rollup@4.52.4)
       '@secretlint/secretlint-rule-preset-recommend':
         specifier: catalog:lint
-        version: 11.2.4
+        version: 11.2.5
       '@svgr/core':
         specifier: catalog:dev
         version: 8.1.0(typescript@5.9.3)
@@ -1778,7 +1778,7 @@ importers:
         version: 1.93.2
       secretlint:
         specifier: catalog:lint
-        version: 11.2.4
+        version: 11.2.5
       semantic-release:
         specifier: catalog:cli
         version: 24.2.9(typescript@5.9.3)
@@ -1817,7 +1817,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: catalog:test
-        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@19.0.2)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@20.0.0)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   packages/packem-rollup:
     dependencies:
@@ -1880,7 +1880,7 @@ importers:
         version: 6.0.2
       html-minifier-next:
         specifier: catalog:prod
-        version: 2.1.6
+        version: 2.1.7
       magic-string:
         specifier: catalog:utils
         version: 0.30.19
@@ -1950,7 +1950,7 @@ importers:
         version: 0.12.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)
       '@secretlint/secretlint-rule-preset-recommend':
         specifier: catalog:lint
-        version: 11.2.4
+        version: 11.2.5
       '@swc/core':
         specifier: catalog:dev
         version: 1.13.5(@swc/helpers@0.5.17)
@@ -2037,7 +2037,7 @@ importers:
         version: 4.52.4
       secretlint:
         specifier: catalog:lint
-        version: 11.2.4
+        version: 11.2.5
       semantic-release:
         specifier: catalog:cli
         version: 24.2.9(typescript@5.9.3)
@@ -2049,7 +2049,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: catalog:test
-        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@19.0.2)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@20.0.0)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   packages/packem-share:
     dependencies:
@@ -2092,7 +2092,7 @@ importers:
         version: 0.12.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)
       '@secretlint/secretlint-rule-preset-recommend':
         specifier: catalog:lint
-        version: 11.2.4
+        version: 11.2.5
       '@total-typescript/ts-reset':
         specifier: catalog:tsc
         version: 0.6.1
@@ -2140,7 +2140,7 @@ importers:
         version: 4.52.4
       secretlint:
         specifier: catalog:lint
-        version: 11.2.4
+        version: 11.2.5
       semantic-release:
         specifier: catalog:cli
         version: 24.2.9(typescript@5.9.3)
@@ -2152,7 +2152,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: catalog:test
-        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@19.0.2)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@20.0.0)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   packages/packem/__fixtures__/ecosystem/advanced-tailwind:
     dependencies:
@@ -2192,10 +2192,10 @@ importers:
         version: 1.1.2
       gpt-tokenizer:
         specifier: catalog:prod
-        version: 3.0.1
+        version: 3.2.0
       happy-dom:
         specifier: catalog:prod
-        version: 19.0.2
+        version: 20.0.0
       micromatch:
         specifier: catalog:prod
         version: 4.0.8
@@ -2211,7 +2211,7 @@ importers:
         version: 0.6.0
       '@types/bun':
         specifier: catalog:types
-        version: 1.2.23(@types/react@19.2.2)
+        version: 1.3.0(@types/react@19.2.2)
       '@types/micromatch':
         specifier: catalog:types
         version: 4.0.9
@@ -2290,7 +2290,7 @@ importers:
         version: 0.12.0(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)
       '@secretlint/secretlint-rule-preset-recommend':
         specifier: catalog:lint
-        version: 11.2.4
+        version: 11.2.5
       '@tailwindcss/node':
         specifier: catalog:style
         version: 4.1.14
@@ -2389,7 +2389,7 @@ importers:
         version: 1.93.2
       secretlint:
         specifier: catalog:lint
-        version: 11.2.4
+        version: 11.2.5
       semantic-release:
         specifier: catalog:cli
         version: 24.2.9(typescript@5.9.3)
@@ -2404,7 +2404,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: catalog:test
-        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@19.0.2)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@20.0.0)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   packages/rollup-plugin-css/__fixtures__/css/module-conditions/import-module-require: {}
 
@@ -2524,7 +2524,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: catalog:test
-        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@19.0.2)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@20.0.0)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
       vue:
         specifier: catalog:frontend
         version: 3.5.22(typescript@5.9.3)
@@ -4744,42 +4744,42 @@ packages:
   '@sec-ant/readable-stream@0.4.1':
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
 
-  '@secretlint/config-creator@11.2.4':
-    resolution: {integrity: sha512-Rae1KghKo9l8z+9LM33cc+h9jfyyzQkOr5H4/FyaFqjiECN8CC21xTT4EP1s0bRBwN7UDWM3SgOVHHOvltZ9yA==}
+  '@secretlint/config-creator@11.2.5':
+    resolution: {integrity: sha512-PR+xh8tK2jMlf+ynjBFq7MVBhQR869HtQWZTCSsRSBHoBQBgeoLmEqrgTgCyAt1KT4mtNs7/ReHmKc3K7G62Yg==}
     engines: {node: '>=20.0.0'}
 
-  '@secretlint/config-loader@11.2.4':
-    resolution: {integrity: sha512-3TWVL7aK1/AUr/sphRJV8zeVoLWp7pch3Mi8V8kThBxhI29cDUtM+MNX12ZMf3SLZ0BvXRh2m80Hf5HYNiibQw==}
+  '@secretlint/config-loader@11.2.5':
+    resolution: {integrity: sha512-pUiH5xc3x8RLEDq+0dCz65v4kohtfp68I7qmYPuymTwHodzjyJ089ZbNdN1ZX8SZV4xZLQsFIrRLn1lJ55QyyQ==}
     engines: {node: '>=20.0.0'}
 
-  '@secretlint/core@11.2.4':
-    resolution: {integrity: sha512-uPsTtaJwN2jx09wtBFJP2UliGmnAysWKp+fCx4DAwxN26N3cnJt54xXJnMMQwfGmlCmfA5eeir+lkUuQNFtlyQ==}
+  '@secretlint/core@11.2.5':
+    resolution: {integrity: sha512-PZNpBd6+KVya2tA3o1oC2kTWYKju8lZG9phXyQY7geWKf+a+fInN4/HSYfCQS495oyTSjhc9qI0mNQEw83PY2Q==}
     engines: {node: '>=20.0.0'}
 
-  '@secretlint/formatter@11.2.4':
-    resolution: {integrity: sha512-4B0guLmi5McWiH6Kic0w4aGtnfFbtmHY1GpzKwVvNMslkALDHN+d1EWGbPKy59jKq1dJSQIkvmyGadtrduGm6Q==}
+  '@secretlint/formatter@11.2.5':
+    resolution: {integrity: sha512-9XBMeveo1eKXMC9zLjA6nd2lb5JjUgjj8NUpCo1Il8jO4YJ12k7qXZk3T/QJup+Kh0ThpHO03D9C1xLDIPIEPQ==}
     engines: {node: '>=20.0.0'}
 
-  '@secretlint/node@11.2.4':
-    resolution: {integrity: sha512-GI6MZ8ZIXc/p2NLHyf+kqTeMe0EsYD2ErT3/bu9A1uHQoAPCl+gkyiQhKIo0jqDhHRCJGK4ipyoEwdiGuUmtVw==}
+  '@secretlint/node@11.2.5':
+    resolution: {integrity: sha512-nPdtUsTzDzBJzFiKh80/H5+2ZRRogtDuHhnNiGtF7LSHp8YsQHU5piAVbESdV0AmUjbWijAjscIsWqvtU+2JUQ==}
     engines: {node: '>=20.0.0'}
 
-  '@secretlint/profiler@11.2.4':
-    resolution: {integrity: sha512-ASa+q3tU8vP5DUOsDMkmoROsO2VSJq6NWzFy5DqWyGLA54035Ndnnl9h9Ey3dzgiZb2aTsRb1Kgs7DEqHAYyIQ==}
+  '@secretlint/profiler@11.2.5':
+    resolution: {integrity: sha512-evQ2PeO3Ub0apWIPaXJy8lMDO1OFgvgQhZd+MhYLcLHgR559EtJ9V02Sh5c10wTLkLAtJ+czlJg2kmlt0nm8fw==}
 
-  '@secretlint/resolver@11.2.4':
-    resolution: {integrity: sha512-R9JWA+S8c6/RmkWbyZ8BeRtD7p4/Z/UZevGUSWvYFF3apSI3tzUK4BUBMR9yS4uNnnwU9BFyIXRRY5X1KWGL9g==}
+  '@secretlint/resolver@11.2.5':
+    resolution: {integrity: sha512-Zn9+Gj7cRNjEDX8d1NYZNjTG9/Wjlc8N+JvARFYYYu6JxfbtkabhFxzwxBLkRZ2ZCkPCCnuXJwepcgfVXSPsng==}
 
-  '@secretlint/secretlint-rule-preset-recommend@11.2.4':
-    resolution: {integrity: sha512-JoSFV46ckP9aZoY+AdyDR7n5kSan/r9cUlVtHItspEIaDElSOyHJDw614AGVL3DNpckSe4f+fIqPKSHTtUYsVw==}
+  '@secretlint/secretlint-rule-preset-recommend@11.2.5':
+    resolution: {integrity: sha512-FAnp/dPdbvHEw50aF9JMPF/OwW58ULvVXEsk+mXTtBD09VJZhG0vFum8WzxMbB98Eo4xDddGzYtE3g27pBOaQA==}
     engines: {node: '>=20.0.0'}
 
-  '@secretlint/source-creator@11.2.4':
-    resolution: {integrity: sha512-ClyfIo7qtyr5+jvnVzhPVS99Fs8mH7KR82Au3SbjdsJApIvqsgjDEnwEnYEWAl9VSQvOtA5JUpqY1lkSB27F3w==}
+  '@secretlint/source-creator@11.2.5':
+    resolution: {integrity: sha512-+ApoNDS4uIaLb2PG9PPEP9Zu1HDBWpxSd/+Qlb3MzKTwp2BG9sbUhvpGgxuIHFn7pMWQU60DhzYJJUBpbXZEHQ==}
     engines: {node: '>=20.0.0'}
 
-  '@secretlint/types@11.2.4':
-    resolution: {integrity: sha512-H2zBOoh/HPcQz7pPjTZ0QsuZTe5EqvfDA2+QcVTSaTAWI6k+nlmC1MVb1h4t0AP3otceGukDrTJ06HY5fMziUQ==}
+  '@secretlint/types@11.2.5':
+    resolution: {integrity: sha512-iA7E+uXuiEydOwv8glEYM4tCHnl8C7wTgLxg+3upHhH/iSSnefWfoRqrJwVBhwxPg4MDoypVI7Oal7bX7/ne+w==}
     engines: {node: '>=20.0.0'}
 
   '@semantic-release/changelog@6.0.3':
@@ -5437,8 +5437,8 @@ packages:
   '@types/braces@3.0.5':
     resolution: {integrity: sha512-SQFof9H+LXeWNz8wDe7oN5zu7ket0qwMu5vZubW4GCJ8Kkeh6nBWUz87+KTz/G3Kqsrp0j/W253XJb3KMEeg3w==}
 
-  '@types/bun@1.2.23':
-    resolution: {integrity: sha512-le8ueOY5b6VKYf19xT3McVbXqLqmxzPXHsQT/q9JHgikJ2X22wyTW3g3ohz2ZMnp7dod6aduIiq8A14Xyimm0A==}
+  '@types/bun@1.3.0':
+    resolution: {integrity: sha512-+lAGCYjXjip2qY375xX/scJeVRmZ5cY0wyHYyCYxNcdEXrQ4AOe3gACgd4iQ8ksOslJtW4VNxBJ8llUwc3a6AA==}
 
   '@types/chai@5.2.2':
     resolution: {integrity: sha512-8kB30R7Hwqf40JPiKhVzodJs2Qc1ZJ5zuT3uzw5Hq/dhNCl3G3l83jfpdI1e20BP348+fV7VIL/+FxaXkqBmWg==}
@@ -6612,8 +6612,8 @@ packages:
     resolution: {integrity: sha512-bkXY9WsVpY7CvMhKSR6pZilZu9Ln5WDrKVBUXf2S443etkmEO4V58heTecXcUIsNsi4Rx8JUO4NfX1IcQl4deg==}
     engines: {node: '>=18.20'}
 
-  bun-types@1.2.23:
-    resolution: {integrity: sha512-R9f0hKAZXgFU3mlrA0YpE/fiDvwV0FT9rORApt2aQVWSuJDzZOyB5QLc0N/4HF57CS8IXJ6+L5E4W1bW6NS2Aw==}
+  bun-types@1.3.0:
+    resolution: {integrity: sha512-u8X0thhx+yJ0KmkxuEo9HAtdfgCBaM/aI9K90VQcQioAmkVp3SG3FkwWGibUFz3WdXAdcsqOcbU40lK7tbHdkQ==}
     peerDependencies:
       '@types/react': ^19
 
@@ -6709,8 +6709,8 @@ packages:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
     engines: {node: '>=10'}
 
-  chalk@5.6.0:
-    resolution: {integrity: sha512-46QrSQFyVSEyYAgQ22hQ+zDa60YHA4fBstHmtSApj1Y5vKtG27fWowW03jCk5KcbXEWPZUIR894aARCA/G1kfQ==}
+  chalk@5.6.2:
+    resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
   change-case@4.1.2:
@@ -8253,8 +8253,8 @@ packages:
     resolution: {integrity: sha512-mThBblvlAF1d4O5oqyvN+ZxLAYwIJK7bpMxgYqPD9okW0C3qm5FFn7k811QrcuEBwaogR3ngOFoCfs6mRv7teQ==}
     engines: {node: '>=14.16'}
 
-  gpt-tokenizer@3.0.1:
-    resolution: {integrity: sha512-5jdaspBq/w4sWw322SvQj1Fku+CN4OAfYZeeEg8U7CWtxBz+zkxZ3h0YOHD43ee+nZYZ5Ud70HRN0ANcdIj4qg==}
+  gpt-tokenizer@3.2.0:
+    resolution: {integrity: sha512-QRRhzJIHcGbbdzhMGNCHhF+98RVaBaVD5+NYgyPOamqRBEqG5yN9p5j4udnY5FJnkesjdUPsikG/DO4OfJdhpQ==}
 
   graceful-fs@4.2.10:
     resolution: {integrity: sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==}
@@ -8270,8 +8270,8 @@ packages:
     engines: {node: '>=0.4.7'}
     hasBin: true
 
-  happy-dom@19.0.2:
-    resolution: {integrity: sha512-831CLbgDyjRbd2lApHZFsBDe56onuFcjsCBPodzWpzedTpeDr8CGZjs7iEIdNW1DVwSFRecfwzLpVyGBPamwGA==}
+  happy-dom@20.0.0:
+    resolution: {integrity: sha512-GkWnwIFxVGCf2raNrxImLo397RdGhLapj5cT3R2PT7FwL62Ze1DROhzmYW7+J3p9105DYMVenEejEbnq5wA37w==}
     engines: {node: '>=20.0.0'}
 
   hard-rejection@2.1.0:
@@ -8391,8 +8391,8 @@ packages:
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
 
-  html-minifier-next@2.1.6:
-    resolution: {integrity: sha512-4NzJqfN5WJaTuWXW5dq1nyMcxbqAkenpQPrEHq3/QfL1CQlTEaCpKMUAXiDxVHuHamRoQ/Lo9xQunZIBlq/wIg==}
+  html-minifier-next@2.1.7:
+    resolution: {integrity: sha512-ORX2kXeGlfLHhkmS2Bol8m0j6/NOjH2gnLqYXN4jjkdwt8HWvNzSIkqitAxoL7ST8W+ZISW6fC4OWYmXLU/gXg==}
     hasBin: true
 
   htmlparser2@10.0.0:
@@ -9201,8 +9201,8 @@ packages:
   linkify-it@5.0.0:
     resolution: {integrity: sha512-5aHCbzQRADcdP+ATqnDuhhJ/MRIqDkZX5pyjFHRRysS8vZ5AbqGEoFIb6pYHPZ+L/OC2Lc+xT8uHVVR5CAK/wQ==}
 
-  lint-staged@16.2.3:
-    resolution: {integrity: sha512-1OnJEESB9zZqsp61XHH2fvpS1es3hRCxMplF/AJUDa8Ho8VrscYDIuxGrj3m8KPXbcWZ8fT9XTMUhEQmOVKpKw==}
+  lint-staged@16.2.4:
+    resolution: {integrity: sha512-Pkyr/wd90oAyXk98i/2KwfkIhoYQUMtss769FIT9hFM5ogYZwrk+GRE46yKXSg2ZGhcJ1p38Gf5gmI5Ohjg2yg==}
     engines: {node: '>=20.17'}
     hasBin: true
 
@@ -9959,8 +9959,8 @@ packages:
   mz@2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
 
-  nano-spawn@1.0.3:
-    resolution: {integrity: sha512-jtpsQDetTnvS2Ts1fiRdci5rx0VYws5jGyC+4IYOTnIQ/wwdf6JdomlHBwqC3bJYOvaKu0C2GSZ1A60anrYpaA==}
+  nano-spawn@2.0.0:
+    resolution: {integrity: sha512-tacvGzUY5o2D8CBh2rrwxyNojUsZNU2zjNTzKQrkgGJQTbGAfArVWXSKMBokBeeg6C7OLRGUEyoFlYbfeWQIqw==}
     engines: {node: '>=20.17'}
 
   nanoid@3.3.11:
@@ -11403,8 +11403,8 @@ packages:
     resolution: {integrity: sha512-3A6sD0WYP7+QrjbfNA2FN3FsOaGGFoekCVgTyypy53gPxhbkCIjtO6YWgdrfM+n/8sI8JeXZOIxsHjMTNxQ4nQ==}
     engines: {node: ^14.0.0 || >=16.0.0}
 
-  secretlint@11.2.4:
-    resolution: {integrity: sha512-S6seRApp8sQxW3CyPnwHiyneD9pFI7fkBM65liVeQClmsQQKQZCNwgOyiqUs8oDEbGLFjuydIEZxPoPbT5SfsQ==}
+  secretlint@11.2.5:
+    resolution: {integrity: sha512-Vumt2+t2QXPYb5Yu3OLXMTq7drshE3fbzGGzUn//S9fMEl9sp053O0C3lhTIOsWeJJegy06xxIKP5s0QSmsEtA==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
@@ -11711,8 +11711,8 @@ packages:
     resolution: {integrity: sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==}
     engines: {node: '>=8'}
 
-  strip-ansi@7.1.0:
-    resolution: {integrity: sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==}
+  strip-ansi@7.1.2:
+    resolution: {integrity: sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA==}
     engines: {node: '>=12'}
 
   strip-bom@3.0.0:
@@ -12877,7 +12877,7 @@ snapshots:
       - vitest
       - yaml
 
-  '@anolilab/lint-staged-config@3.0.34(@types/node@24.5.2)(eslint@9.36.0(jiti@2.6.0))(husky@9.1.7)(lint-staged@16.2.3)(prettier@3.6.2)(secretlint@11.2.4)(vitest@3.2.4)(yaml@2.8.1)':
+  '@anolilab/lint-staged-config@3.0.34(@types/node@24.5.2)(eslint@9.36.0(jiti@2.6.0))(husky@9.1.7)(lint-staged@16.2.4)(prettier@3.6.2)(secretlint@11.2.5)(vitest@3.2.4)(yaml@2.8.1)':
     dependencies:
       '@visulima/fs': 3.1.9(yaml@2.8.1)
       '@visulima/package': 4.0.2(@types/node@24.5.2)
@@ -12886,10 +12886,10 @@ snapshots:
       type-fest: 5.0.1
     optionalDependencies:
       eslint: 9.36.0(jiti@2.6.0)
-      lint-staged: 16.2.3
+      lint-staged: 16.2.4
       prettier: 3.6.2
-      secretlint: 11.2.4
-      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@19.0.2)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      secretlint: 11.2.5
+      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@20.0.0)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
     transitivePeerDependencies:
       - '@types/node'
       - yaml
@@ -13208,7 +13208,7 @@ snapshots:
   '@commitlint/format@20.0.0':
     dependencies:
       '@commitlint/types': 20.0.0
-      chalk: 5.6.0
+      chalk: 5.6.2
 
   '@commitlint/is-ignored@20.0.0':
     dependencies:
@@ -13228,7 +13228,7 @@ snapshots:
       '@commitlint/execute-rule': 20.0.0
       '@commitlint/resolve-extends': 20.1.0
       '@commitlint/types': 20.0.0
-      chalk: 5.6.0
+      chalk: 5.6.2
       cosmiconfig: 9.0.0(typescript@5.9.3)
       cosmiconfig-typescript-loader: 6.1.0(@types/node@24.5.2)(cosmiconfig@9.0.0(typescript@5.9.3))(typescript@5.9.3)
       lodash.isplainobject: 4.0.6
@@ -13279,7 +13279,7 @@ snapshots:
   '@commitlint/types@20.0.0':
     dependencies:
       '@types/conventional-commits-parser': 5.0.1
-      chalk: 5.6.0
+      chalk: 5.6.2
 
   '@csstools/cascade-layer-name-parser@2.0.5(@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4))(@csstools/css-tokenizer@3.0.4)':
     dependencies:
@@ -13610,7 +13610,7 @@ snapshots:
     dependencies:
       string-width: 5.1.2
       string-width-cjs: string-width@4.2.3
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
       strip-ansi-cjs: strip-ansi@6.0.1
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
@@ -14772,71 +14772,71 @@ snapshots:
 
   '@sec-ant/readable-stream@0.4.1': {}
 
-  '@secretlint/config-creator@11.2.4':
+  '@secretlint/config-creator@11.2.5':
     dependencies:
-      '@secretlint/types': 11.2.4
+      '@secretlint/types': 11.2.5
 
-  '@secretlint/config-loader@11.2.4':
+  '@secretlint/config-loader@11.2.5':
     dependencies:
-      '@secretlint/profiler': 11.2.4
-      '@secretlint/resolver': 11.2.4
-      '@secretlint/types': 11.2.4
+      '@secretlint/profiler': 11.2.5
+      '@secretlint/resolver': 11.2.5
+      '@secretlint/types': 11.2.5
       ajv: 8.17.1
       debug: 4.4.3
       rc-config-loader: 4.1.3
     transitivePeerDependencies:
       - supports-color
 
-  '@secretlint/core@11.2.4':
+  '@secretlint/core@11.2.5':
     dependencies:
-      '@secretlint/profiler': 11.2.4
-      '@secretlint/types': 11.2.4
+      '@secretlint/profiler': 11.2.5
+      '@secretlint/types': 11.2.5
       debug: 4.4.3
       structured-source: 4.0.0
     transitivePeerDependencies:
       - supports-color
 
-  '@secretlint/formatter@11.2.4':
+  '@secretlint/formatter@11.2.5':
     dependencies:
-      '@secretlint/resolver': 11.2.4
-      '@secretlint/types': 11.2.4
+      '@secretlint/resolver': 11.2.5
+      '@secretlint/types': 11.2.5
       '@textlint/linter-formatter': 15.2.2
       '@textlint/module-interop': 15.2.2
       '@textlint/types': 15.2.2
-      chalk: 5.6.0
+      chalk: 5.6.2
       debug: 4.4.3
       pluralize: 8.0.0
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
       table: 6.9.0
       terminal-link: 4.0.0
     transitivePeerDependencies:
       - supports-color
 
-  '@secretlint/node@11.2.4':
+  '@secretlint/node@11.2.5':
     dependencies:
-      '@secretlint/config-loader': 11.2.4
-      '@secretlint/core': 11.2.4
-      '@secretlint/formatter': 11.2.4
-      '@secretlint/profiler': 11.2.4
-      '@secretlint/source-creator': 11.2.4
-      '@secretlint/types': 11.2.4
+      '@secretlint/config-loader': 11.2.5
+      '@secretlint/core': 11.2.5
+      '@secretlint/formatter': 11.2.5
+      '@secretlint/profiler': 11.2.5
+      '@secretlint/source-creator': 11.2.5
+      '@secretlint/types': 11.2.5
       debug: 4.4.3
       p-map: 7.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@secretlint/profiler@11.2.4': {}
+  '@secretlint/profiler@11.2.5': {}
 
-  '@secretlint/resolver@11.2.4': {}
+  '@secretlint/resolver@11.2.5': {}
 
-  '@secretlint/secretlint-rule-preset-recommend@11.2.4': {}
+  '@secretlint/secretlint-rule-preset-recommend@11.2.5': {}
 
-  '@secretlint/source-creator@11.2.4':
+  '@secretlint/source-creator@11.2.5':
     dependencies:
-      '@secretlint/types': 11.2.4
+      '@secretlint/types': 11.2.5
       istextorbinary: 9.5.0
 
-  '@secretlint/types@11.2.4': {}
+  '@secretlint/types@11.2.5': {}
 
   '@semantic-release/changelog@6.0.3(semantic-release@24.2.9(typescript@5.9.3))':
     dependencies:
@@ -15138,7 +15138,7 @@ snapshots:
     dependencies:
       tinyglobby: 0.2.15
       unplugin-utils: 0.3.0
-      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@19.0.2)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@20.0.0)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
     optionalDependencies:
       '@volar/typescript': 2.4.23
       esbuild: 0.25.10
@@ -15640,9 +15640,9 @@ snapshots:
 
   '@types/braces@3.0.5': {}
 
-  '@types/bun@1.2.23(@types/react@19.2.2)':
+  '@types/bun@1.3.0(@types/react@19.2.2)':
     dependencies:
-      bun-types: 1.2.23(@types/react@19.2.2)
+      bun-types: 1.3.0(@types/react@19.2.2)
     transitivePeerDependencies:
       - '@types/react'
 
@@ -16249,7 +16249,7 @@ snapshots:
       defu: 6.1.4
       fastest-levenshtein: 1.0.16
       hookable: 5.5.3
-      html-minifier-next: 2.1.6
+      html-minifier-next: 2.1.7
       jiti: 2.6.0
       magic-string: 0.30.19
       mlly: 1.8.0
@@ -16362,7 +16362,7 @@ snapshots:
       std-env: 3.9.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@19.0.2)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@20.0.0)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -16373,7 +16373,7 @@ snapshots:
       eslint: 9.36.0(jiti@2.6.0)
     optionalDependencies:
       typescript: 5.9.3
-      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@19.0.2)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@20.0.0)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -16422,7 +16422,7 @@ snapshots:
       sirv: 3.0.1
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@19.0.2)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@20.0.0)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -16811,7 +16811,7 @@ snapshots:
     dependencies:
       ansi-align: 3.0.1
       camelcase: 7.0.1
-      chalk: 5.6.0
+      chalk: 5.6.2
       cli-boxes: 3.0.0
       string-width: 5.1.2
       type-fest: 2.19.0
@@ -16868,7 +16868,7 @@ snapshots:
 
   builtin-modules@5.0.0: {}
 
-  bun-types@1.2.23(@types/react@19.2.2):
+  bun-types@1.3.0(@types/react@19.2.2):
     dependencies:
       '@types/node': 24.5.2
       '@types/react': 19.2.2
@@ -16975,7 +16975,7 @@ snapshots:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
 
-  chalk@5.6.0: {}
+  chalk@5.6.2: {}
 
   change-case@4.1.2:
     dependencies:
@@ -17126,7 +17126,7 @@ snapshots:
   cliui@9.0.1:
     dependencies:
       string-width: 7.2.0
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
       wrap-ansi: 9.0.0
 
   clone-regexp@2.2.0:
@@ -18777,7 +18777,7 @@ snapshots:
       p-cancelable: 3.0.0
       responselike: 3.0.0
 
-  gpt-tokenizer@3.0.1: {}
+  gpt-tokenizer@3.2.0: {}
 
   graceful-fs@4.2.10: {}
 
@@ -18794,7 +18794,7 @@ snapshots:
     optionalDependencies:
       uglify-js: 3.19.3
 
-  happy-dom@19.0.2:
+  happy-dom@20.0.0:
     dependencies:
       '@types/node': 20.19.11
       '@types/whatwg-mimetype': 3.0.2
@@ -18937,7 +18937,7 @@ snapshots:
 
   html-escaper@2.0.2: {}
 
-  html-minifier-next@2.1.6:
+  html-minifier-next@2.1.7:
     dependencies:
       change-case: 4.1.2
       clean-css: 5.3.3
@@ -19655,12 +19655,12 @@ snapshots:
     dependencies:
       uc.micro: 2.1.0
 
-  lint-staged@16.2.3:
+  lint-staged@16.2.4:
     dependencies:
       commander: 14.0.1
       listr2: 9.0.4
       micromatch: 4.0.8
-      nano-spawn: 1.0.3
+      nano-spawn: 2.0.0
       pidtree: 0.6.0
       string-argv: 0.3.2
       yaml: 2.8.1
@@ -19769,7 +19769,7 @@ snapshots:
       ansi-escapes: 7.0.0
       cli-cursor: 5.0.0
       slice-ansi: 7.1.0
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
       wrap-ansi: 9.0.0
 
   longest-streak@2.0.4: {}
@@ -19859,7 +19859,7 @@ snapshots:
     dependencies:
       ansi-escapes: 7.0.0
       ansi-regex: 6.1.0
-      chalk: 5.6.0
+      chalk: 5.6.2
       cli-highlight: 2.1.11
       cli-table3: 0.6.5
       marked: 15.0.12
@@ -19870,7 +19870,7 @@ snapshots:
     dependencies:
       ansi-escapes: 7.0.0
       ansi-regex: 6.1.0
-      chalk: 5.6.0
+      chalk: 5.6.2
       cli-highlight: 2.1.11
       cli-table3: 0.6.5
       marked: 9.1.6
@@ -20907,7 +20907,7 @@ snapshots:
       object-assign: 4.1.1
       thenify-all: 1.6.0
 
-  nano-spawn@1.0.3: {}
+  nano-spawn@2.0.0: {}
 
   nanoid@3.3.11: {}
 
@@ -22646,13 +22646,13 @@ snapshots:
       refa: 0.12.1
       regexp-ast-analysis: 0.7.1
 
-  secretlint@11.2.4:
+  secretlint@11.2.5:
     dependencies:
-      '@secretlint/config-creator': 11.2.4
-      '@secretlint/formatter': 11.2.4
-      '@secretlint/node': 11.2.4
-      '@secretlint/profiler': 11.2.4
-      '@secretlint/resolver': 11.2.4
+      '@secretlint/config-creator': 11.2.5
+      '@secretlint/formatter': 11.2.5
+      '@secretlint/node': 11.2.5
+      '@secretlint/profiler': 11.2.5
+      '@secretlint/resolver': 11.2.5
       debug: 4.4.3
       globby: 14.1.0
       read-pkg: 9.0.1
@@ -22995,18 +22995,18 @@ snapshots:
     dependencies:
       eastasianwidth: 0.2.0
       emoji-regex: 9.2.2
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
 
   string-width@7.2.0:
     dependencies:
       emoji-regex: 10.4.0
       get-east-asian-width: 1.3.0
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
 
   string-width@8.1.0:
     dependencies:
       get-east-asian-width: 1.3.0
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
 
   string.prototype.trim@1.2.10:
     dependencies:
@@ -23050,7 +23050,7 @@ snapshots:
     dependencies:
       ansi-regex: 5.0.1
 
-  strip-ansi@7.1.0:
+  strip-ansi@7.1.2:
     dependencies:
       ansi-regex: 6.1.0
 
@@ -23911,7 +23911,7 @@ snapshots:
   update-notifier@6.0.2:
     dependencies:
       boxen: 7.1.1
-      chalk: 5.6.0
+      chalk: 5.6.2
       configstore: 6.0.0
       has-yarn: 3.0.0
       import-lazy: 4.0.0
@@ -24063,7 +24063,7 @@ snapshots:
       tsx: 4.20.6
       yaml: 2.8.1
 
-  vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@19.0.2)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1):
+  vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@3.2.4)(happy-dom@20.0.0)(jiti@2.6.0)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1):
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.4
@@ -24092,7 +24092,7 @@ snapshots:
       '@types/debug': 4.1.12
       '@types/node': 24.5.2
       '@vitest/ui': 3.2.4(vitest@3.2.4)
-      happy-dom: 19.0.2
+      happy-dom: 20.0.0
     transitivePeerDependencies:
       - jiti
       - less
@@ -24219,13 +24219,13 @@ snapshots:
     dependencies:
       ansi-styles: 6.2.1
       string-width: 5.1.2
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
 
   wrap-ansi@9.0.0:
     dependencies:
       ansi-styles: 6.2.1
       string-width: 7.2.0
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
 
   wrappy@1.0.2: {}
 

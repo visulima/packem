@@ -143,11 +143,30 @@ After building, the ESM output (`dist/index.js`) will be transformed:
 
 ```javascript
 // dist/index.js (transformed)
-const { parse } = require("@babel/parser")
-const { transpile } = require("typescript")
-const { readFileSync } = globalThis.process.getBuiltinModule("fs")
-const { join, dirname } = globalThis.process.getBuiltinModule("path")
-const { fileURLToPath } = globalThis.process.getBuiltinModule("url")
+import { createRequire as __cjs_createRequire } from "node:module";
+const __cjs_require = __cjs_createRequire(import.meta.url);
+
+// Runtime capability helpers
+const __cjs_getBuiltinModule = (module) => {
+    // Check if we're in Node.js and version supports getBuiltinModule
+    if (typeof process !== "undefined" && process.versions?.node) {
+        const [major, minor] = process.versions.node.split(".").map(Number);
+        if (major > 22 || (major === 22 && minor >= 3) || (major === 20 && minor >= 16)) {
+            return process.getBuiltinModule(module);
+        }
+    }
+    // Fallback to createRequire
+    return __cjs_require(module);
+};
+
+const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
+
+const { parse } = __cjs_require("@babel/parser")
+const { transpile } = __cjs_require("typescript")
+const { readFileSync } = __cjs_getBuiltinModule("fs");
+const { join, dirname } = __cjs_getBuiltinModule("path");
+const { fileURLToPath } = __cjs_getBuiltinModule("url");
+const { cwd } = __cjs_getProcess;
 
 // ... rest of the transformed code
 ```
@@ -343,8 +362,11 @@ test('transforms CJS imports correctly', () => {
   expect(esmOutput).toContain('require("@babel/parser")')
   expect(esmOutput).toContain('require("typescript")')
 
-  // Should contain globalThis.process.getBuiltinModule for Node.js built-ins
-  expect(esmOutput).toContain('globalThis.process.getBuiltinModule("fs")')
+  // Should contain runtime capability helpers
+  expect(esmOutput).toContain('const __cjs_getBuiltinModule = (module) => {')
+  expect(esmOutput).toContain('const __cjs_getProcess = (() => {')
+  expect(esmOutput).toContain('__cjs_getBuiltinModule("fs")')
+  expect(esmOutput).toContain('__cjs_getProcess')
 
   // Should NOT contain original ESM imports
   expect(esmOutput).not.toContain('import { parse } from "@babel/parser"')

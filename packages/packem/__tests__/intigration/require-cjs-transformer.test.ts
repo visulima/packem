@@ -103,6 +103,8 @@ export const testPath = (p: string) => {
         });
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
+                node: ">=18.0.0",
+                outDir: "dist",
                 rollup: {
                     requireCJS: {
                         builtinNodeModules: true,
@@ -121,9 +123,9 @@ export const testPath = (p: string) => {
         // Check ESM output - should transform CJS imports to require calls
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        // Check that Node.js built-in modules are transformed to use globalThis.process.getBuiltinModule
-        expect(mjsContent).toContain("globalThis.process.getBuiltinModule(\"fs\")");
-        expect(mjsContent).toContain("const fs = globalThis.process.getBuiltinModule(\"fs\");");
+        // Check that Node.js built-in modules are transformed with runtime helpers
+        expect(mjsContent).toContain("const __cjs_getBuiltinModule = (module) => {");
+        expect(mjsContent).toContain("__cjs_getBuiltinModule(\"fs\")");
 
         // Check that the output contains the expected exports
         expect(mjsContent).toContain("export { readContent, testFs, testPath };");
@@ -185,7 +187,7 @@ export const readContent = (filePath: string) => {
     });
 
     it("should handle different import patterns correctly", async () => {
-        expect.assertions(9);
+        expect.assertions(10);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.ts`,
@@ -232,6 +234,8 @@ export const test = () => {
         });
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
+                node: ">=18.0.0",
+                outDir: "dist",
                 rollup: {
                     requireCJS: {
                         builtinNodeModules: true,
@@ -249,9 +253,10 @@ export const test = () => {
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        // Check that Node.js built-in modules are transformed to use globalThis.process.getBuiltinModule
-        expect(mjsContent).toContain("globalThis.process.getBuiltinModule(\"fs\")");
-        expect(mjsContent).toContain("globalThis.process.getBuiltinModule(\"path\")");
+        // Check that Node.js built-in modules are transformed with runtime helpers
+        expect(mjsContent).toContain("const __cjs_getBuiltinModule = (module) => {");
+        expect(mjsContent).toContain("__cjs_getBuiltinModule(\"fs\")");
+        expect(mjsContent).toContain("__cjs_getBuiltinModule(\"path\")");
 
         // Check that the output contains the expected export
         expect(mjsContent).toContain("export { test };");

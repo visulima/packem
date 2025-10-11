@@ -17,7 +17,7 @@ describe(requireCJSTransformerPlugin, async () => {
     });
 
     it("plugin handles CJS modules correctly", async () => {
-        expect.assertions(6);
+        expect.assertions(7);
 
         const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() });
 
@@ -44,7 +44,9 @@ export const test = 'hello';`;
 
         // Check that the transformation happened
         expect(result.code).toContain("__cjs_require");
-        expect(result.code).toContain("globalThis.process.getBuiltinModule(\"fs\")");
+        // The generated code now includes runtime capability helpers
+        expect(result.code).toContain("const __cjs_getBuiltinModule = (module) => {");
+        expect(result.code).toContain("__cjs_getBuiltinModule(\"fs\")");
         expect(result.code).toContain("const typescript = __cjs_require(\"typescript\")");
     });
 });

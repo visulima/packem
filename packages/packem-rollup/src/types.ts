@@ -20,6 +20,7 @@ import type { EsmShimCjsSyntaxOptions } from "./plugins/esm-shim-cjs-syntax";
 import type { IsolatedDeclarationsOptions } from "./plugins/isolated-declarations";
 import type { JSXRemoveAttributesPlugin } from "./plugins/jsx-remove-attributes";
 import type { LicenseOptions } from "./plugins/license";
+import type { MinifyHTMLLiteralsOptions } from "./plugins/minify-html-literals";
 import type { NativeModulesOptions } from "./plugins/native-modules-plugin";
 import type { InternalOXCTransformPluginConfig, OxcResolveOptions, OXCTransformPluginConfig } from "./plugins/oxc/types";
 import type { RawLoaderOptions } from "./plugins/raw";
@@ -106,7 +107,6 @@ export interface PackemRollupOptions {
     raw?: RawLoaderOptions | false;
     replace: Omit<RollupReplaceOptions, "cwd"> | false;
     requireCJS?: RequireCJSPluginOptions | false;
-
     resolve: RollupNodeResolveOptions | false;
     shebang?: Partial<ShebangOptions> | false;
     shim?: EsmShimCjsSyntaxOptions | false;

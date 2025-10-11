@@ -60,7 +60,7 @@ A Rollup plugin instance.
 ```typescript
 interface RequireCJSPluginOptions {
   /**
-   * Transform Node.js built-in modules (fs, path, etc.) to use globalThis.process.getBuiltinModule()
+   * Transform Node.js built-in modules (fs, path, etc.) to use runtime helpers that check Node.js version compatibility
    * @default false
    */
   builtinNodeModules?: boolean
@@ -102,7 +102,7 @@ interface RequireCJSPluginOptions {
 **Type:** `boolean`  
 **Default:** `false`
 
-When enabled, transforms Node.js built-in modules to use `globalThis.process.getBuiltinModule()` instead of `require()`.
+When enabled, transforms Node.js built-in modules to use runtime helpers that check Node.js version compatibility and fallback to `require()` when needed.
 
 **Example:**
 ```typescript
@@ -111,8 +111,8 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 
 // Output (with builtinNodeModules: true)
-const { readFileSync } = globalThis.process.getBuiltinModule("fs")
-const { join } = globalThis.process.getBuiltinModule("path")
+const { readFileSync } = __cjs_getBuiltinModule("fs")
+const { join } = __cjs_getBuiltinModule("path")
 ```
 
 ### cwd
@@ -256,8 +256,8 @@ import { readFileSync } from 'fs'
 import { join, dirname } from 'path'
 
 // Output
-const { readFileSync } = globalThis.process.getBuiltinModule("fs")
-const { join, dirname } = globalThis.process.getBuiltinModule("path")
+const { readFileSync } = __cjs_getBuiltinModule("fs")
+const { join, dirname } = __cjs_getBuiltinModule("path")
 ```
 
 ### Mixed Imports
@@ -269,10 +269,10 @@ import * as path from 'path'
 import { join } from 'path'
 
 // Output (with builtinNodeModules: true)
-const fs = globalThis.process.getBuiltinModule("fs")
-const { readFileSync } = globalThis.process.getBuiltinModule("fs")
-const path = globalThis.process.getBuiltinModule("path")
-const { join } = globalThis.process.getBuiltinModule("path")
+const fs = __cjs_getBuiltinModule("fs")
+const { readFileSync } = __cjs_getBuiltinModule("fs")
+const path = __cjs_getBuiltinModule("path")
+const { join } = __cjs_getBuiltinModule("path")
 ```
 
 ## Detection Logic
