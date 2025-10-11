@@ -1,3 +1,9 @@
+## @visulima/packem-rollup [1.0.0-alpha.22](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.21...@visulima/packem-rollup@1.0.0-alpha.22) (2025-10-11)
+
+### Bug Fixes
+
+* update dependencies and improve require CJS transformer ([a8d4fb7](https://github.com/visulima/packem/commit/a8d4fb7f35a313fd22c123b4b6487a346eb66e0a))
+
 ## @visulima/packem-rollup [1.0.0-alpha.21](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.20...@visulima/packem-rollup@1.0.0-alpha.21) (2025-10-08)
 
 ### Bug Fixes
