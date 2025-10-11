@@ -62,9 +62,11 @@ export type TransformFunction = (
 export interface Options {
     /**
      * Whether to transform Node.js built-in modules (e.g., `fs`, `path`)
-     * to `process.getBuiltinModule()` calls, which has the best performance.
+     * to `process.getBuiltinModule()` calls when supported, which has the best performance.
+     * Falls back to `createRequire()` for older Node.js versions, Bun, and Deno.
      *
      * Note: `process.getBuiltinModule` is available since Node.js 20.16.0 and 22.3.0.
+     * For older versions, the plugin uses `createRequire()` as fallback.
      */
     builtinNodeModules?: boolean;
     cwd?: string;
@@ -278,10 +280,15 @@ export const requireCJSTransformerPlugin = (userOptions: Options, logger: Pail):
                         let requireCode: string;
 
                         if (isBuiltinModule) {
-                            requireCode
-                                = source === "process" || source === "node:process"
-                                    ? "globalThis.process"
-                                    : `globalThis.process.getBuiltinModule(${JSON.stringify(source)})`;
+                            if (source === "process" || source === "node:process") {
+                                // Use the process helper
+                                requireCode = `__cjs_getProcess`;
+                            } else {
+                                // Use the builtin module helper function
+                                requireCode = `__cjs_getBuiltinModule(${JSON.stringify(source)})`;
+                                usingRequire = true; // Always use __cjs_require as fallback
+                            }
+
                             logger.debug({
                                 message: `Generated builtin require code: ${requireCode}`,
                                 prefix: "plugin:require-cjs-transformer",
@@ -348,10 +355,25 @@ export const requireCJSTransformerPlugin = (userOptions: Options, logger: Pail):
                 }
 
                 if (usingRequire) {
-                    const preamble = builtinNodeModules
-                        ? `const ${REQUIRE} = globalThis.process.getBuiltinModule("module").createRequire(import.meta.url);\n`
-                        : `import { createRequire as __cjs_createRequire } from "node:module";
-const ${REQUIRE} = __cjs_createRequire(import.meta.url);\n`;
+                    const preamble = `import { createRequire as __cjs_createRequire } from "node:module";
+const ${REQUIRE} = __cjs_createRequire(import.meta.url);
+
+// Runtime capability helpers
+const __cjs_getBuiltinModule = (module) => {
+    // Check if we're in Node.js and version supports getBuiltinModule
+    if (typeof process !== "undefined" && process.versions?.node) {
+        const [major, minor] = process.versions.node.split(".").map(Number);
+        // Node.js 20.16.0+ and 22.3.0+
+        if (major > 22 || (major === 22 && minor >= 3) || (major === 20 && minor >= 16)) {
+            return process.getBuiltinModule(module);
+        }
+    }
+    // Fallback to createRequire
+    return __cjs_require(module);
+};
+
+const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
+`;
 
                     logger.debug({
                         message: `Adding require preamble: ${preamble.replaceAll("\n", " ").trim()}`,

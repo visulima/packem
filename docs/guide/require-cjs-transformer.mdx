@@ -128,19 +128,41 @@ The plugin automatically detects which packages are CJS-only by:
 
 ### Node.js Built-ins
 
-When `builtinNodeModules: true` is set, the plugin transforms Node.js built-in modules to use `globalThis.process.getBuiltinModule()`:
+When `builtinNodeModules: true` is set, the plugin generates runtime checks to automatically choose the most efficient approach for the executing environment:
 
 ```typescript
 // Input
 import { readFileSync } from 'fs'
 import { join } from 'path'
+import { cwd } from 'process'
 
-// Output
-const { readFileSync } = globalThis.process.getBuiltinModule("fs")
-const { join } = globalThis.process.getBuiltinModule("path")
+// Output (runtime-detected)
+import { createRequire as __cjs_createRequire } from "node:module";
+const __cjs_require = __cjs_createRequire(import.meta.url);
+
+// Runtime capability helpers
+const __cjs_getBuiltinModule = (module) => {
+    // Check if we're in Node.js and version supports getBuiltinModule
+    if (typeof process !== "undefined" && process.versions?.node) {
+        const [major, minor] = process.versions.node.split(".").map(Number);
+        // Node.js 20.16.0+ and 22.3.0+
+        if (major > 22 || (major === 22 && minor >= 3) || (major === 20 && minor >= 16)) {
+            return process.getBuiltinModule(module);
+        }
+    }
+    // Fallback to createRequire
+    return __cjs_require(module);
+};
+
+const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
+
+// Use helpers for clean module resolution
+const { readFileSync } = __cjs_getBuiltinModule("fs");
+const { join } = __cjs_getBuiltinModule("path");
+const { cwd } = __cjs_getProcess;
 ```
 
-This provides even better performance for built-in modules.
+The generated code automatically detects the runtime environment and Node.js version at execution time, providing optimal performance in any supported environment.
 
 ### Selective Transformation
 
@@ -176,9 +198,25 @@ After transformation:
 
 ```typescript
 // dist/index.mjs
-const { transpile } = require("typescript")
-const { parse } = require("@babel/parser")
-const { readFileSync } = globalThis.process.getBuiltinModule("fs")
+import { createRequire as __cjs_createRequire } from "node:module";
+const __cjs_require = __cjs_createRequire(import.meta.url);
+
+// Runtime capability helpers
+const __cjs_getBuiltinModule = (module) => {
+    // Check if we're in Node.js and version supports getBuiltinModule
+    if (typeof process !== "undefined" && process.versions?.node) {
+        const [major, minor] = process.versions.node.split(".").map(Number);
+        if (major > 22 || (major === 22 && minor >= 3) || (major === 20 && minor >= 16)) {
+            return process.getBuiltinModule(module);
+        }
+    }
+    // Fallback to createRequire
+    return __cjs_require(module);
+};
+
+const { transpile } = __cjs_require("typescript")
+const { parse } = __cjs_require("@babel/parser")
+const { readFileSync } = __cjs_getBuiltinModule("fs")
 
 export function processCode(code) {
   const ast = parse(code)
