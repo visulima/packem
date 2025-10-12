@@ -54,12 +54,9 @@ exports[`shebang > should retain comments defined after a shebang > cjs output 1
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getNodeSheBang() {
   return "#!/usr/bin/env node";
 }
-__name(getNodeSheBang, "getNodeSheBang");
 
 exports.getNodeSheBang = getNodeSheBang;
 "
@@ -67,12 +64,9 @@ exports.getNodeSheBang = getNodeSheBang;
 
 exports[`shebang > should retain comments defined after a shebang > mjs output 1`] = `
 "#!/usr/bin/env node // <-- this thing is a shebang. :)
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getNodeSheBang() {
   return "#!/usr/bin/env node";
 }
-__name(getNodeSheBang, "getNodeSheBang");
 
 export { getNodeSheBang };
 "
@@ -83,24 +77,18 @@ exports[`shebang > should retain shebangs defined elsewhere in a file > cjs outp
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function getNodeSheBang() {
   return "#!/usr/bin/env node";
 }
-__name(getNodeSheBang, "getNodeSheBang");
 
 exports.getNodeSheBang = getNodeSheBang;
 "
 `;
 
 exports[`shebang > should retain shebangs defined elsewhere in a file > mjs output 1`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-function getNodeSheBang() {
+"function getNodeSheBang() {
   return "#!/usr/bin/env node";
 }
-__name(getNodeSheBang, "getNodeSheBang");
 
 export { getNodeSheBang };
 "

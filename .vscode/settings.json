@@ -42,4 +42,5 @@
     "toml",
     "xml"
   ],
+  "typescript.tsdk": "node_modules/typescript/lib",
 }

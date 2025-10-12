@@ -655,8 +655,6 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             && context.options.isolatedDeclarationTransformer
             && cachingPlugin(isolatedDeclarationsPlugin<InternalBuildOptions>(join(context.options.rootDir, context.options.sourceDir), context), fileCache),
 
-            cachingPlugin(context.options.transformer(getTransformerConfig(context.options.transformerName, context)), fileCache),
-
             context.options.rollup.requireCJS
             && context.options.emitESM
             && cachingPlugin(
@@ -670,14 +668,14 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 fileCache,
             ),
 
-            cachingPlugin(
-                preserveDirectivesPlugin({
-                    directiveRegex: /^['|"](use (\w+))['|"]$/,
-                    ...context.options.rollup.preserveDirectives,
-                    logger: context.logger,
-                }),
-                fileCache,
-            ),
+            cachingPlugin(context.options.transformer(getTransformerConfig(context.options.transformerName, context)), fileCache),
+
+            context.options.rollup.preserveDirectives
+            && preserveDirectivesPlugin({
+                directiveRegex: /^['|"](use (\w+))['|"]$/,
+                ...context.options.rollup.preserveDirectives,
+                logger: context.logger,
+            }),
 
             context.options.rollup.shebang
             && shebangPlugin(

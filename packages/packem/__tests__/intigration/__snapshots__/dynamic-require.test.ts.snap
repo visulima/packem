@@ -34,12 +34,9 @@ function getAugmentedNamespace(n) {
 	return a;
 }
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function method() {
   return "being-required";
 }
-__name$1(method, "method");
 
 const requiredModule = /*#__PURE__*/Object.defineProperty({
 	__proto__: null,
@@ -48,12 +45,9 @@ const requiredModule = /*#__PURE__*/Object.defineProperty({
 
 const require$$0 = /*@__PURE__*/getAugmentedNamespace(requiredModule);
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function index() {
   require$$0.method();
 }
-__name(index, "index");
 
 exports.index = index;
 "
@@ -70,12 +64,9 @@ const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e 
 
 const externalLib__default = /*#__PURE__*/_interopDefaultCompat(externalLib);
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function foo() {
   return externalLib__default.method();
 }
-__name(foo, "foo");
 
 exports.foo = foo;
 "
@@ -84,12 +75,9 @@ exports.foo = foo;
 exports[`packem dynamic require > should handle dynamic require in esm > foo.mjs 1`] = `
 "import externalLib from 'external-lib';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function foo() {
   return externalLib.method();
 }
-__name(foo, "foo");
 
 export { foo };
 "
@@ -125,12 +113,9 @@ exports[`packem dynamic require > should handle dynamic require in esm > mjs 1`]
 	return a;
 }
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function method() {
   return "being-required";
 }
-__name$1(method, "method");
 
 const requiredModule = /*#__PURE__*/Object.defineProperty({
 	__proto__: null,
@@ -139,12 +124,9 @@ const requiredModule = /*#__PURE__*/Object.defineProperty({
 
 const require$$0 = /*@__PURE__*/getAugmentedNamespace(requiredModule);
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function index() {
   require$$0.method();
 }
-__name(index, "index");
 
 export { index };
 "

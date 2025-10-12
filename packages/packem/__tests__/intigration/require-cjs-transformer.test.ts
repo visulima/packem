@@ -124,11 +124,7 @@ export const testPath = (p: string) => {
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // Check that Node.js built-in modules are transformed with runtime helpers
-        expect(mjsContent).toContain("const __cjs_getBuiltinModule = (module) => {");
-        expect(mjsContent).toContain("__cjs_getBuiltinModule(\"fs\")");
-
-        // Check that the output contains the expected exports
-        expect(mjsContent).toContain("export { readContent, testFs, testPath };");
+        expect(mjsContent).toMatchSnapshot("mjs");
 
         // Check that the original import statements are not present (they should be transformed)
         expect(mjsContent).not.toContain("import fs from 'fs'");

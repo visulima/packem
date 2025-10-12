@@ -283,6 +283,7 @@ export const requireCJSTransformerPlugin = (userOptions: Options, logger: Pail):
                             if (source === "process" || source === "node:process") {
                                 // Use the process helper
                                 requireCode = `__cjs_getProcess`;
+                                usingRequire = true; // Need runtime helpers for __cjs_getProcess
                             } else {
                                 // Use the builtin module helper function
                                 requireCode = `__cjs_getBuiltinModule(${JSON.stringify(source)})`;
