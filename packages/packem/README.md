@@ -53,7 +53,7 @@ It uses the `exports` configuration in `package.json` and recognizes entry file 
 - ✅ Supports react server and client components
 - ✅ Supports shared modules
 - ✅ Supports dynamic import
-- ✅ Supports `tsconfig.json` paths and `package.json` imports resolution
+- ✅ Supports `tsconfig.json` paths and `package.json`, `package.yml`, `package.yaml` and `package.json5` imports resolution
 - ✅ ESM ⇄ CJS interoperability
 - ✅ Supports isolated declaration types (experimental) (Typescript version 5.5 or higher)
 - ✅ Supports wasm [WebAssembly modules](http://webassembly.org)
