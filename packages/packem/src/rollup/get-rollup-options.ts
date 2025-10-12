@@ -648,8 +648,6 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 logger: context.logger
             }),
 
-            purePlugin,
-
             context.options.declaration
             && context.options.rollup.isolatedDeclarations
             && context.options.isolatedDeclarationTransformer
@@ -669,6 +667,8 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             ),
 
             cachingPlugin(context.options.transformer(getTransformerConfig(context.options.transformerName, context)), fileCache),
+
+            purePlugin,
 
             context.options.rollup.preserveDirectives
             && preserveDirectivesPlugin({

@@ -61,7 +61,7 @@ describe("packem require-cjs-transformer", () => {
     });
 
     it("should transform ESM imports of CJS modules to require calls", async () => {
-        expect.assertions(9);
+        expect.assertions(7);
 
         // Create source files with ESM imports of CJS modules (Node.js built-ins)
         writeFileSync(

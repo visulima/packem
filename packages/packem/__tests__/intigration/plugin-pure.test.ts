@@ -65,7 +65,7 @@ export const used = "only this should remain";`,
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // Should contain pure annotations for Symbol functions
-        expect(mjsContent).toContain("/*@__PURE__*/");
+        expect(mjsContent).toContain("/* @__PURE__ */ Symbol");
     });
 
     it("should add pure annotations for Proxy constructor", async () => {
@@ -265,6 +265,6 @@ export const used = "only this should remain";`,
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // Should contain pure annotations for custom function
-        expect(mjsContent).toContain("/*@__PURE__*/");
+        expect(mjsContent).toContain("/* @__PURE__ */ customPureFunction");
     });
 });

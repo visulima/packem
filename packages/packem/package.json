@@ -114,6 +114,18 @@
             "types": "./dist/rollup/plugins/css/minifiers/lightningcss.d.ts",
             "default": "./dist/rollup/plugins/css/minifiers/lightningcss.js"
         },
+        "./dts/isolated/transformer/swc": {
+            "types": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.d.ts",
+            "default": "./dist/rollup/plugins/swc/isolated-declarations-swc-transformer.js"
+        },
+        "./dts/isolated/transformer/oxc": {
+            "types": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.d.ts",
+            "default": "./dist/rollup/plugins/oxc/isolated-declarations-oxc-transformer.js"
+        },
+        "./dts/isolated/transformer/typescript": {
+            "types": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.d.ts",
+            "default": "./dist/rollup/plugins/typescript/isolated-declarations-typescript-transformer.js"
+        },
         "./transformer/esbuild": {
             "types": "./dist/rollup/plugins/esbuild/index.d.ts",
             "default": "./dist/rollup/plugins/esbuild/index.js"
