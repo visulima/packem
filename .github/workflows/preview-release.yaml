@@ -14,9 +14,39 @@ env:
     HEAD_REPOSITORY: "${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}"
 
 jobs:
+    files-changed:
+        name: "Detect what files changed"
+        runs-on: "ubuntu-24.04"
+        timeout-minutes: 3
+        # Map a step output to a job output
+        outputs:
+            packages: "${{ steps.changes.outputs.packages }}"
+        steps:
+            - name: "Harden Runner"
+              uses: "step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0" # v2.12.0
+              with:
+                  egress-policy: "audit"
+
+            - name: "Git checkout"
+              uses: "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683" # v4.2.2
+              env:
+                  GIT_COMMITTER_NAME: "GitHub Actions Shell"
+                  GIT_AUTHOR_NAME: "GitHub Actions Shell"
+                  EMAIL: "github-actions[bot]@users.noreply.github.com"
+
+            - name: "Check for file changes"
+              uses: "dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36" # v3.0.2
+              id: "changes"
+              with:
+                  token: "${{ github.token }}"
+                  filters: ".github/file-filters.yml"
+
     preview:
         name: "Preview Release"
-        if: "github.repository == 'visulima/packem'"
+        if: |
+            github.repository == 'visulima/packem' &&
+            needs.files-changed.outputs.packages == 'true'
+        needs: "files-changed"
         runs-on: "ubuntu-latest"
         permissions:
             contents: "write"
