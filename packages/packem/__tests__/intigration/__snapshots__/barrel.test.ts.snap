@@ -15,9 +15,7 @@ const b$1 = "b";
 
 const b = "b";
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const run = /* @__PURE__ */ __name(() => ({ a, b: b$1, c: value, d, nestedA: b }), "run");
+const run = () => ({ a, b: b$1, c: value, d, nestedA: b });
 
 exports.default = run;
 exports.run = run;
@@ -35,9 +33,7 @@ const b$1 = "b";
 
 const b = "b";
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const run = /* @__PURE__ */ __name(() => ({ a, b: b$1, c: value, d, nestedA: b }), "run");
+const run = () => ({ a, b: b$1, c: value, d, nestedA: b });
 
 export { run as default, run };
 "
@@ -54,9 +50,7 @@ const bar = "bar";
 
 const baz = "baz";
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const run = /* @__PURE__ */ __name(() => ({ Foo, bar, baz }), "run");
+const run = () => ({ Foo, bar, baz });
 
 exports.default = run;
 exports.run = run;
@@ -70,9 +64,7 @@ const bar = "bar";
 
 const baz = "baz";
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const run = /* @__PURE__ */ __name(() => ({ Foo, bar, baz }), "run");
+const run = () => ({ Foo, bar, baz });
 
 export { run as default, run };
 "

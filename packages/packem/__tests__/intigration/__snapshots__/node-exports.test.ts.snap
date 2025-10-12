@@ -22,11 +22,9 @@ exports[`packem node exports > cjs-interop > should output 'default export with 
 
 Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const test = /* @__PURE__ */ __name(() => {
+const test = () => {
   return "this should be in final bundle";
-}, "test");
+};
 const test2 = "this should be in final bundle";
 const test3 = "this should be in final bundle";
 const test4 = "this should be in final bundle";
@@ -69,11 +67,9 @@ export { test as default, test2, test3, test4, test5 };
 `;
 
 exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > mjs output 1`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const test = /* @__PURE__ */ __name(() => {
+"const test = () => {
   return "this should be in final bundle";
-}, "test");
+};
 const test2 = "this should be in final bundle";
 const test3 = "this should be in final bundle";
 const test4 = "this should be in final bundle";
@@ -102,11 +98,9 @@ exports[`packem node exports > cjs-interop > should output 'default export with 
 
 Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const test = /* @__PURE__ */ __name(() => {
+const test = () => {
   return "this should be in final bundle";
-}, "test");
+};
 const test2 = "this should be in final bundle";
 
 module.exports = test;
@@ -137,11 +131,9 @@ export { test as default, test2 };
 `;
 
 exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > mjs output 1`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const test = /* @__PURE__ */ __name(() => {
+"const test = () => {
   return "this should be in final bundle";
-}, "test");
+};
 const test2 = "this should be in final bundle";
 
 export { test as default, test2 };
@@ -243,26 +235,15 @@ exports[`packem node exports > should output 'class' with 'extends correctly > c
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 class Parent {
-  static {
-    __name(this, "Parent");
-  }
   constructor() {
   }
 }
 class Feature {
-  static {
-    __name(this, "Feature");
-  }
   constructor() {
   }
 }
 class Child extends Parent {
-  static {
-    __name(this, "Child");
-  }
   feature = new Feature();
   constructor() {
     console.log("before");
@@ -308,26 +289,15 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly > mjs output 1`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-class Parent {
-  static {
-    __name(this, "Parent");
-  }
+"class Parent {
   constructor() {
   }
 }
 class Feature {
-  static {
-    __name(this, "Feature");
-  }
   constructor() {
   }
 }
 class Child extends Parent {
-  static {
-    __name(this, "Child");
-  }
   feature = new Feature();
   constructor() {
     console.log("before");
@@ -361,26 +331,15 @@ exports[`packem node exports > should output 'class' with 'extends correctly whe
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 class Parent {
-  static {
-    __name(this, "Parent");
-  }
   constructor() {
   }
 }
 class Feature {
-  static {
-    __name(this, "Feature");
-  }
   constructor() {
   }
 }
 class Child extends Parent {
-  static {
-    __name(this, "Child");
-  }
   feature = new Feature();
   constructor() {
     console.log("before");
@@ -427,26 +386,15 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > mjs output 1`] = `
-"var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-class Parent {
-  static {
-    __name(this, "Parent");
-  }
+"class Parent {
   constructor() {
   }
 }
 class Feature {
-  static {
-    __name(this, "Feature");
-  }
   constructor() {
   }
 }
 class Child extends Parent {
-  static {
-    __name(this, "Child");
-  }
   feature = new Feature();
   constructor() {
     console.log("before");

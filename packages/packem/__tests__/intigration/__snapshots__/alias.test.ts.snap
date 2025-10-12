@@ -3,13 +3,9 @@
 exports[`packem alias > should not trigger a warning if alias option and original is used > cjs content 1`] = `
 "'use strict';
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
-const log = /* @__PURE__ */ __name$1(() => console.log("test"), "log");
+const log = () => console.log("test");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const bar = /* @__PURE__ */ __name(() => console.log("bar"), "bar");
+const bar = () => console.log("bar");
 
 bar();
 const index = log();
@@ -19,13 +15,9 @@ module.exports = index;
 `;
 
 exports[`packem alias > should not trigger a warning if alias option and original is used > mjs content 1`] = `
-"var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
-const log = /* @__PURE__ */ __name$1(() => console.log("test"), "log");
+"const log = () => console.log("test");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const bar = /* @__PURE__ */ __name(() => console.log("bar"), "bar");
+const bar = () => console.log("bar");
 
 bar();
 const index = log();
@@ -37,13 +29,9 @@ export { index as default };
 exports[`packem alias > should not trigger a warning if alias option is used > cjs content 1`] = `
 "'use strict';
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
-const log = /* @__PURE__ */ __name$1(() => console.log("test"), "log");
+const log = () => console.log("test");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const bar = /* @__PURE__ */ __name(() => console.log("bar"), "bar");
+const bar = () => console.log("bar");
 
 bar();
 const index = log();
@@ -53,13 +41,9 @@ module.exports = index;
 `;
 
 exports[`packem alias > should not trigger a warning if alias option is used > mjs content 1`] = `
-"var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
-const log = /* @__PURE__ */ __name$1(() => console.log("test"), "log");
+"const log = () => console.log("test");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const bar = /* @__PURE__ */ __name(() => console.log("bar"), "bar");
+const bar = () => console.log("bar");
 
 bar();
 const index = log();

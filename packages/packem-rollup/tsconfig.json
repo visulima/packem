@@ -4,5 +4,5 @@
     "compilerOptions": {
         "moduleResolution": "bundler"
     },
-    "include": ["src/**/*", "*.d.ts", "__tests__/unit/utils/is-pure-cjs.test.ts", "__tests__/unit/plugins/plugin-require-cjs.test.ts"]
+    "include": ["src/**/*", "*.d.ts", "__tests__/unit/utils/is-pure-cjs.test.ts", "__tests__/unit/plugins/require-cjs-transformer.test.ts"]
 }

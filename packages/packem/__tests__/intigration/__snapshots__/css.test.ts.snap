@@ -3053,8 +3053,8 @@ exports[`css > css-modules > should work with processed modules 'inline-treeshak
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const a = require('./packem_shared/a-cKDs89PO.cjs');
-const b = require('./packem_shared/b-nXuuMSaC.cjs');
+const a = require('./packem_shared/a-Nybcgeuv.cjs');
+const b = require('./packem_shared/b-DgH97bfB.cjs');
 
 
 
@@ -3070,12 +3070,9 @@ Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 var modules_bdb828b9 = {"treeshake-module-a":"a_treeshakeModuleA_a9b36f2f"};
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function a() {
   return modules_bdb828b9;
 }
-__name(a, "a");
 
 exports.a = a;
 "
@@ -3088,32 +3085,26 @@ Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 var modules_af8c69dd = {"treeshake-module-b":"b_treeshakeModuleB_1a2d7396"};
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function b() {
   return modules_af8c69dd;
 }
-__name(b, "b");
 
 exports.b = b;
 "
 `;
 
 exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 4`] = `
-"export { a } from './packem_shared/a-DF7uJU-7.mjs';
-export { b } from './packem_shared/b-CSY5UMJG.mjs';
+"export { a } from './packem_shared/a-CR64K9yI.mjs';
+export { b } from './packem_shared/b-HDCCT7et.mjs';
 "
 `;
 
 exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 5`] = `
 "var modules_bdb828b9 = {"treeshake-module-a":"a_treeshakeModuleA_a9b36f2f"};
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function a() {
   return modules_bdb828b9;
 }
-__name(a, "a");
 
 export { a };
 "
@@ -3122,12 +3113,9 @@ export { a };
 exports[`css > css-modules > should work with processed modules 'inline-treeshake-module' css > js 6`] = `
 "var modules_af8c69dd = {"treeshake-module-b":"b_treeshakeModuleB_1a2d7396"};
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function b() {
   return modules_af8c69dd;
 }
-__name(b, "b");
 
 export { b };
 "
@@ -3194,8 +3182,8 @@ exports[`css > css-modules > should work with processed modules 'treeshake-modul
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const a = require('./packem_shared/a--muZ_n0k.cjs');
-const b = require('./packem_shared/b-B2KxOR1s.cjs');
+const a = require('./packem_shared/a-BIy3QhM_.cjs');
+const b = require('./packem_shared/b-Dc6HOMo-.cjs');
 
 
 
@@ -3216,12 +3204,9 @@ var injected = false;
 var modules_bdb828b9 = {get "treeshake-module-a"() { if (!injected) { injected = true; cssStyleInject.cssStyleInject(css,{}); } return "a_treeshakeModuleA_a9b36f2f"; },
 inject: function inject() { if (!injected) { injected = true; cssStyleInject.cssStyleInject(css,{}); } },};
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function a() {
   return modules_bdb828b9;
 }
-__name(a, "a");
 
 exports.a = a;
 "
@@ -3239,20 +3224,17 @@ var injected = false;
 var modules_af8c69dd = {get "treeshake-module-b"() { if (!injected) { injected = true; cssStyleInject.cssStyleInject(css,{}); } return "b_treeshakeModuleB_1a2d7396"; },
 inject: function inject() { if (!injected) { injected = true; cssStyleInject.cssStyleInject(css,{}); } },};
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function b() {
   return modules_af8c69dd;
 }
-__name(b, "b");
 
 exports.b = b;
 "
 `;
 
 exports[`css > css-modules > should work with processed modules 'treeshake-module' css > js 4`] = `
-"export { a } from './packem_shared/a-DY5_0sqP.mjs';
-export { b } from './packem_shared/b-X7vdqWcI.mjs';
+"export { a } from './packem_shared/a-DOk9EbOS.mjs';
+export { b } from './packem_shared/b-8Sr5Nhe7.mjs';
 "
 `;
 
@@ -3264,12 +3246,9 @@ var injected = false;
 var modules_bdb828b9 = {get "treeshake-module-a"() { if (!injected) { injected = true; cssStyleInject(css,{}); } return "a_treeshakeModuleA_a9b36f2f"; },
 inject: function inject() { if (!injected) { injected = true; cssStyleInject(css,{}); } },};
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function a() {
   return modules_bdb828b9;
 }
-__name(a, "a");
 
 export { a };
 "
@@ -3283,12 +3262,9 @@ var injected = false;
 var modules_af8c69dd = {get "treeshake-module-b"() { if (!injected) { injected = true; cssStyleInject(css,{}); } return "b_treeshakeModuleB_1a2d7396"; },
 inject: function inject() { if (!injected) { injected = true; cssStyleInject(css,{}); } },};
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function b() {
   return modules_af8c69dd;
 }
-__name(b, "b");
 
 export { b };
 "
@@ -3370,8 +3346,6 @@ export { injector_64c8688c__default as i };
 exports[`css > emit > should work with emitted processed 'basic-emit' css > js 1`] = `
 "'use strict';
 
-var __defProp$3 = Object.defineProperty;
-var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
 /**
  * @license
  * Copyright 2019 Google LLC
@@ -3380,12 +3354,9 @@ var __name$3 = (target, value) => __defProp$3(target, "name", { value, configura
 const NODE_MODE = false;
 const global$3 = globalThis;
 const supportsAdoptingStyleSheets = global$3.ShadowRoot && (global$3.ShadyCSS === void 0 || global$3.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
-const constructionToken = /*@__PURE__*/ Symbol();
+const constructionToken = /* @__PURE__ */ Symbol();
 const cssTagCache = /* @__PURE__ */ new WeakMap();
 class CSSResult {
-  static {
-    __name$3(this, "CSSResult");
-  }
   constructor(cssText, strings, safeToken) {
     this["_$cssResult$"] = true;
     if (safeToken !== constructionToken) {
@@ -3417,7 +3388,7 @@ class CSSResult {
     return this.cssText;
   }
 }
-const textFromCSSResult = /* @__PURE__ */ __name$3((value) => {
+const textFromCSSResult = (value) => {
   if (value["_$cssResult$"] === true) {
     return value.cssText;
   } else if (typeof value === "number") {
@@ -3425,13 +3396,13 @@ const textFromCSSResult = /* @__PURE__ */ __name$3((value) => {
   } else {
     throw new Error(\`Value passed to 'css' function must be a 'css' function result: \${value}. Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.\`);
   }
-}, "textFromCSSResult");
-const unsafeCSS = /* @__PURE__ */ __name$3((value) => new CSSResult(typeof value === "string" ? value : String(value), void 0, constructionToken), "unsafeCSS");
-const css = /* @__PURE__ */ __name$3((strings, ...values) => {
+};
+const unsafeCSS = (value) => new CSSResult(typeof value === "string" ? value : String(value), void 0, constructionToken);
+const css = (strings, ...values) => {
   const cssText = strings.length === 1 ? strings[0] : values.reduce((acc, v, idx) => acc + textFromCSSResult(v) + strings[idx + 1], strings[0]);
   return new CSSResult(cssText, strings, constructionToken);
-}, "css");
-const adoptStyles = /* @__PURE__ */ __name$3((renderRoot, styles) => {
+};
+const adoptStyles = (renderRoot, styles) => {
   if (supportsAdoptingStyleSheets) {
     renderRoot.adoptedStyleSheets = styles.map((s) => s instanceof CSSStyleSheet ? s : s.styleSheet);
   } else {
@@ -3445,18 +3416,21 @@ const adoptStyles = /* @__PURE__ */ __name$3((renderRoot, styles) => {
       renderRoot.appendChild(style);
     }
   }
-}, "adoptStyles");
-const cssResultFromStyleSheet = /* @__PURE__ */ __name$3((sheet) => {
+};
+const cssResultFromStyleSheet = (sheet) => {
   let cssText = "";
   for (const rule of sheet.cssRules) {
     cssText += rule.cssText;
   }
   return unsafeCSS(cssText);
-}, "cssResultFromStyleSheet");
+};
 const getCompatibleStyle = supportsAdoptingStyleSheets || NODE_MODE ? (s) => s : (s) => s instanceof CSSStyleSheet ? cssResultFromStyleSheet(s) : s;
 
-var __defProp$2 = Object.defineProperty;
-var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 const { is, defineProperty, getOwnPropertyDescriptor, getOwnPropertyNames, getOwnPropertySymbols, getPrototypeOf } = Object;
 const global$2 = globalThis;
 let issueWarning$2;
@@ -3465,13 +3439,13 @@ const emptyStringForBooleanAttribute = trustedTypes$1 ? trustedTypes$1.emptyScri
 const polyfillSupport$2 = global$2.reactiveElementPolyfillSupportDevMode ;
 {
   global$2.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning$2 = /* @__PURE__ */ __name$2((code, warning) => {
+  issueWarning$2 = (code, warning) => {
     warning += \` See https://lit.dev/msg/\${code} for more information.\`;
     if (!global$2.litIssuedWarnings.has(warning) && !global$2.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global$2.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
   queueMicrotask(() => {
     issueWarning$2("dev-mode", \`Lit is in dev mode. Not recommended for production!\`);
     if (global$2.ShadyDOM?.inUse && polyfillSupport$2 === void 0) {
@@ -3488,7 +3462,7 @@ const debugLogEvent$1 = (event) => {
     detail: event
   }));
 } ;
-const JSCompiler_renameProperty$1 = /* @__PURE__ */ __name$2((prop, _obj) => prop, "JSCompiler_renameProperty");
+const JSCompiler_renameProperty$1 = (prop, _obj) => prop;
 const defaultConverter = {
   toAttribute(value, type) {
     switch (type) {
@@ -3523,7 +3497,7 @@ const defaultConverter = {
     return fromValue;
   }
 };
-const notEqual = /* @__PURE__ */ __name$2((value, old) => !is(value, old), "notEqual");
+const notEqual = (value, old) => !is(value, old);
 const defaultPropertyDeclaration = {
   attribute: true,
   type: String,
@@ -3532,12 +3506,9 @@ const defaultPropertyDeclaration = {
   useDefault: false,
   hasChanged: notEqual
 };
-Symbol.metadata ??= /*@__PURE__*/ Symbol("metadata");
+Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata");
 global$2.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 class ReactiveElement extends HTMLElement {
-  static {
-    __name$2(this, "ReactiveElement");
-  }
   /**
    * Adds an initializer function to the class that is called during instance
    * construction.
@@ -3713,7 +3684,7 @@ class ReactiveElement extends HTMLElement {
    * @nocollapse
    */
   static __prepare() {
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("elementProperties", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("elementProperties"))) {
       return;
     }
     const superCtor = getPrototypeOf(this);
@@ -3735,12 +3706,12 @@ class ReactiveElement extends HTMLElement {
    * @nocollapse
    */
   static finalize() {
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("finalized", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("finalized"))) {
       return;
     }
     this.finalized = true;
     this.__prepare();
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("properties", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("properties"))) {
       const props = this.properties;
       const propKeys = [
         ...getOwnPropertyNames(props),
@@ -4261,19 +4232,19 @@ class ReactiveElement extends HTMLElement {
 }
 ReactiveElement.elementStyles = [];
 ReactiveElement.shadowRootOptions = { mode: "open" };
-ReactiveElement[JSCompiler_renameProperty$1("elementProperties", ReactiveElement)] = /* @__PURE__ */ new Map();
-ReactiveElement[JSCompiler_renameProperty$1("finalized", ReactiveElement)] = /* @__PURE__ */ new Map();
+ReactiveElement[JSCompiler_renameProperty$1("elementProperties")] = /* @__PURE__ */ new Map();
+ReactiveElement[JSCompiler_renameProperty$1("finalized")] = /* @__PURE__ */ new Map();
 polyfillSupport$2?.({ ReactiveElement });
 {
   ReactiveElement.enabledWarnings = [
     "change-in-update",
     "async-perform-update"
   ];
-  const ensureOwnWarnings = /* @__PURE__ */ __name$2(function(ctor) {
-    if (!ctor.hasOwnProperty(JSCompiler_renameProperty$1("enabledWarnings", ctor))) {
+  const ensureOwnWarnings = function(ctor) {
+    if (!ctor.hasOwnProperty(JSCompiler_renameProperty$1("enabledWarnings"))) {
       ctor.enabledWarnings = ctor.enabledWarnings.slice();
     }
-  }, "ensureOwnWarnings");
+  };
   ReactiveElement.enableWarning = function(warning) {
     ensureOwnWarnings(this);
     if (!this.enabledWarnings.includes(warning)) {
@@ -4295,8 +4266,11 @@ if (global$2.reactiveElementVersions.length > 1) {
   });
 }
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 const global$1 = globalThis;
 const debugLogEvent = (event) => {
   const shouldEmit = global$1.emitLitDebugLogEvents;
@@ -4311,13 +4285,13 @@ let debugLogRenderId = 0;
 let issueWarning$1;
 {
   global$1.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning$1 = /* @__PURE__ */ __name$1((code, warning) => {
+  issueWarning$1 = (code, warning) => {
     warning += code ? \` See https://lit.dev/msg/\${code} for more information.\` : "";
     if (!global$1.litIssuedWarnings.has(warning) && !global$1.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global$1.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
   queueMicrotask(() => {
     issueWarning$1("dev-mode", \`Lit is in dev mode. Not recommended for production!\`);
   });
@@ -4325,32 +4299,32 @@ let issueWarning$1;
 const wrap = global$1.ShadyDOM?.inUse && global$1.ShadyDOM?.noPatch === true ? global$1.ShadyDOM.wrap : (node) => node;
 const trustedTypes = global$1.trustedTypes;
 const policy = trustedTypes ? trustedTypes.createPolicy("lit-html", {
-  createHTML: /* @__PURE__ */ __name$1((s) => s, "createHTML")
+  createHTML: (s) => s
 }) : void 0;
-const identityFunction = /* @__PURE__ */ __name$1((value) => value, "identityFunction");
-const noopSanitizer = /* @__PURE__ */ __name$1((_node, _name, _type) => identityFunction, "noopSanitizer");
-const setSanitizer = /* @__PURE__ */ __name$1((newSanitizer) => {
+const identityFunction = (value) => value;
+const noopSanitizer = (_node, _name, _type) => identityFunction;
+const setSanitizer = (newSanitizer) => {
   if (sanitizerFactoryInternal !== noopSanitizer) {
     throw new Error(\`Attempted to overwrite existing lit-html security policy. setSanitizeDOMValueFactory should be called at most once.\`);
   }
   sanitizerFactoryInternal = newSanitizer;
-}, "setSanitizer");
-const _testOnlyClearSanitizerFactoryDoNotCallOrElse = /* @__PURE__ */ __name$1(() => {
+};
+const _testOnlyClearSanitizerFactoryDoNotCallOrElse = () => {
   sanitizerFactoryInternal = noopSanitizer;
-}, "_testOnlyClearSanitizerFactoryDoNotCallOrElse");
-const createSanitizer = /* @__PURE__ */ __name$1((node, name, type) => {
+};
+const createSanitizer = (node, name, type) => {
   return sanitizerFactoryInternal(node, name, type);
-}, "createSanitizer");
+};
 const boundAttributeSuffix = "$lit$";
 const marker = \`lit$\${Math.random().toFixed(9).slice(2)}$\`;
 const markerMatch = "?" + marker;
 const nodeMarker = \`<\${markerMatch}>\`;
 const d = document;
-const createMarker = /* @__PURE__ */ __name$1(() => d.createComment(""), "createMarker");
-const isPrimitive = /* @__PURE__ */ __name$1((value) => value === null || typeof value != "object" && typeof value != "function", "isPrimitive");
+const createMarker = () => d.createComment("");
+const isPrimitive = (value) => value === null || typeof value != "object" && typeof value != "function";
 const isArray = Array.isArray;
-const isIterable = /* @__PURE__ */ __name$1((value) => isArray(value) || // eslint-disable-next-line @typescript-eslint/no-explicit-any
-typeof value?.[Symbol.iterator] === "function", "isIterable");
+const isIterable = (value) => isArray(value) || // eslint-disable-next-line @typescript-eslint/no-explicit-any
+typeof value?.[Symbol.iterator] === "function";
 const SPACE_CHAR = \`[ 	
 \\f\\r]\`;
 const ATTR_VALUE_CHAR = \`[^ 	
@@ -4370,7 +4344,6 @@ const QUOTE_CHAR = 3;
 const singleQuoteAttrEndRegex = /'/g;
 const doubleQuoteAttrEndRegex = /"/g;
 const rawTextElement = /^(?:script|style|textarea|title)$/i;
-const HTML_RESULT = 1;
 const SVG_RESULT = 2;
 const MATHML_RESULT = 3;
 const ATTRIBUTE_PART = 1;
@@ -4380,26 +4353,6 @@ const BOOLEAN_ATTRIBUTE_PART = 4;
 const EVENT_PART = 5;
 const ELEMENT_PART = 6;
 const COMMENT_PART = 7;
-const tag = /* @__PURE__ */ __name$1((type) => (strings, ...values) => {
-  if (strings.some((s) => s === void 0)) {
-    console.warn("Some template strings are undefined.\\nThis is probably caused by illegal octal escape sequences.");
-  }
-  {
-    if (values.some((val) => val?.["_$litStatic$"])) {
-      issueWarning$1("", \`Static values 'literal' or 'unsafeStatic' cannot be used as values to non-static templates.
-Please use the static 'html' tag function. See https://lit.dev/docs/templates/expressions/#static-expressions\`);
-    }
-  }
-  return {
-    // This property needs to remain unminified.
-    ["_$litType$"]: type,
-    strings,
-    values
-  };
-}, "tag");
-tag(HTML_RESULT);
-tag(SVG_RESULT);
-tag(MATHML_RESULT);
 const noChange = Symbol.for("lit-noChange");
 const nothing = Symbol.for("lit-nothing");
 const templateCache = /* @__PURE__ */ new WeakMap();
@@ -4429,8 +4382,7 @@ function trustFromTemplateString(tsa, stringFromTSA) {
   }
   return policy !== void 0 ? policy.createHTML(stringFromTSA) : stringFromTSA;
 }
-__name$1(trustFromTemplateString, "trustFromTemplateString");
-const getTemplateHtml = /* @__PURE__ */ __name$1((strings, type) => {
+const getTemplateHtml = (strings, type) => {
   const l = strings.length - 1;
   const attrNames = [];
   let html2 = type === SVG_RESULT ? "<svg>" : type === MATHML_RESULT ? "<math>" : "";
@@ -4492,11 +4444,8 @@ const getTemplateHtml = /* @__PURE__ */ __name$1((strings, type) => {
   }
   const htmlResult = html2 + (strings[l] || "<?>") + (type === SVG_RESULT ? "</svg>" : type === MATHML_RESULT ? "</math>" : "");
   return [trustFromTemplateString(strings, htmlResult), attrNames];
-}, "getTemplateHtml");
+};
 class Template {
-  static {
-    __name$1(this, "Template");
-  }
   constructor({ strings, ["_$litType$"]: type }, options) {
     this.parts = [];
     let node;
@@ -4624,11 +4573,7 @@ function resolveDirective(part, value, parent = part, attributeIndex) {
   }
   return value;
 }
-__name$1(resolveDirective, "resolveDirective");
 class TemplateInstance {
-  static {
-    __name$1(this, "TemplateInstance");
-  }
   constructor(template, parent) {
     this._$parts = [];
     this._$disconnectableChildren = void 0;
@@ -4698,9 +4643,6 @@ class TemplateInstance {
   }
 }
 class ChildPart {
-  static {
-    __name$1(this, "ChildPart");
-  }
   // See comment in Disconnectable interface for why this is a getter
   get _$isConnected() {
     return this._$parent?._$isConnected ?? this.__isConnected;
@@ -4965,9 +4907,6 @@ class ChildPart {
   }
 }
 class AttributePart {
-  static {
-    __name$1(this, "AttributePart");
-  }
   get tagName() {
     return this.element.tagName;
   }
@@ -5069,9 +5008,6 @@ class AttributePart {
   }
 }
 class PropertyPart extends AttributePart {
-  static {
-    __name$1(this, "PropertyPart");
-  }
   constructor() {
     super(...arguments);
     this.type = PROPERTY_PART;
@@ -5095,9 +5031,6 @@ class PropertyPart extends AttributePart {
   }
 }
 class BooleanAttributePart extends AttributePart {
-  static {
-    __name$1(this, "BooleanAttributePart");
-  }
   constructor() {
     super(...arguments);
     this.type = BOOLEAN_ATTRIBUTE_PART;
@@ -5115,9 +5048,6 @@ class BooleanAttributePart extends AttributePart {
   }
 }
 class EventPart extends AttributePart {
-  static {
-    __name$1(this, "EventPart");
-  }
   constructor(element, name, strings, parent, options) {
     super(element, name, strings, parent, options);
     this.type = EVENT_PART;
@@ -5163,9 +5093,6 @@ class EventPart extends AttributePart {
   }
 }
 class ElementPart {
-  static {
-    __name$1(this, "ElementPart");
-  }
   constructor(element, parent, options) {
     this.element = element;
     this.type = ELEMENT_PART;
@@ -5195,7 +5122,7 @@ if (global$1.litHtmlVersions.length > 1) {
     issueWarning$1("multiple-versions", \`Multiple versions of Lit loaded. Loading multiple versions is not recommended.\`);
   });
 }
-const render = /* @__PURE__ */ __name$1((value, container, options) => {
+const render = (value, container, options) => {
   if (container == null) {
     throw new TypeError(\`The container to render into may not be \${container}\`);
   }
@@ -5224,7 +5151,7 @@ const render = /* @__PURE__ */ __name$1((value, container, options) => {
     part
   });
   return part;
-}, "render");
+};
 {
   render.setSanitizer = setSanitizer;
   render.createSanitizer = createSanitizer;
@@ -5233,25 +5160,25 @@ const render = /* @__PURE__ */ __name$1((value, container, options) => {
   }
 }
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const JSCompiler_renameProperty = /* @__PURE__ */ __name((prop, _obj) => prop, "JSCompiler_renameProperty");
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const JSCompiler_renameProperty = (prop, _obj) => prop;
 const global = globalThis;
 let issueWarning;
 {
   global.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning = /* @__PURE__ */ __name((code, warning) => {
+  issueWarning = (code, warning) => {
     warning += \` See https://lit.dev/msg/\${code} for more information.\`;
     if (!global.litIssuedWarnings.has(warning) && !global.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
 }
 class LitElement extends ReactiveElement {
-  static {
-    __name(this, "LitElement");
-  }
   constructor() {
     super(...arguments);
     this.renderOptions = { host: this };
@@ -5339,7 +5266,7 @@ class LitElement extends ReactiveElement {
   }
 }
 LitElement["_$litElement$"] = true;
-LitElement[JSCompiler_renameProperty("finalized", LitElement)] = true;
+LitElement[JSCompiler_renameProperty("finalized")] = true;
 global.litElementHydrateSupport?.({ LitElement });
 const polyfillSupport = global.litElementPolyfillSupportDevMode ;
 polyfillSupport?.({ LitElement });
@@ -5360,9 +5287,7 @@ console.log(styles);
 `;
 
 exports[`css > emit > should work with emitted processed 'basic-emit' css > js 2`] = `
-"var __defProp$3 = Object.defineProperty;
-var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
-/**
+"/**
  * @license
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
@@ -5370,12 +5295,9 @@ var __name$3 = (target, value) => __defProp$3(target, "name", { value, configura
 const NODE_MODE = false;
 const global$3 = globalThis;
 const supportsAdoptingStyleSheets = global$3.ShadowRoot && (global$3.ShadyCSS === void 0 || global$3.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
-const constructionToken = /*@__PURE__*/ Symbol();
+const constructionToken = /* @__PURE__ */ Symbol();
 const cssTagCache = /* @__PURE__ */ new WeakMap();
 class CSSResult {
-  static {
-    __name$3(this, "CSSResult");
-  }
   constructor(cssText, strings, safeToken) {
     this["_$cssResult$"] = true;
     if (safeToken !== constructionToken) {
@@ -5407,7 +5329,7 @@ class CSSResult {
     return this.cssText;
   }
 }
-const textFromCSSResult = /* @__PURE__ */ __name$3((value) => {
+const textFromCSSResult = (value) => {
   if (value["_$cssResult$"] === true) {
     return value.cssText;
   } else if (typeof value === "number") {
@@ -5415,13 +5337,13 @@ const textFromCSSResult = /* @__PURE__ */ __name$3((value) => {
   } else {
     throw new Error(\`Value passed to 'css' function must be a 'css' function result: \${value}. Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.\`);
   }
-}, "textFromCSSResult");
-const unsafeCSS = /* @__PURE__ */ __name$3((value) => new CSSResult(typeof value === "string" ? value : String(value), void 0, constructionToken), "unsafeCSS");
-const css = /* @__PURE__ */ __name$3((strings, ...values) => {
+};
+const unsafeCSS = (value) => new CSSResult(typeof value === "string" ? value : String(value), void 0, constructionToken);
+const css = (strings, ...values) => {
   const cssText = strings.length === 1 ? strings[0] : values.reduce((acc, v, idx) => acc + textFromCSSResult(v) + strings[idx + 1], strings[0]);
   return new CSSResult(cssText, strings, constructionToken);
-}, "css");
-const adoptStyles = /* @__PURE__ */ __name$3((renderRoot, styles) => {
+};
+const adoptStyles = (renderRoot, styles) => {
   if (supportsAdoptingStyleSheets) {
     renderRoot.adoptedStyleSheets = styles.map((s) => s instanceof CSSStyleSheet ? s : s.styleSheet);
   } else {
@@ -5435,18 +5357,21 @@ const adoptStyles = /* @__PURE__ */ __name$3((renderRoot, styles) => {
       renderRoot.appendChild(style);
     }
   }
-}, "adoptStyles");
-const cssResultFromStyleSheet = /* @__PURE__ */ __name$3((sheet) => {
+};
+const cssResultFromStyleSheet = (sheet) => {
   let cssText = "";
   for (const rule of sheet.cssRules) {
     cssText += rule.cssText;
   }
   return unsafeCSS(cssText);
-}, "cssResultFromStyleSheet");
+};
 const getCompatibleStyle = supportsAdoptingStyleSheets || NODE_MODE ? (s) => s : (s) => s instanceof CSSStyleSheet ? cssResultFromStyleSheet(s) : s;
 
-var __defProp$2 = Object.defineProperty;
-var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 const { is, defineProperty, getOwnPropertyDescriptor, getOwnPropertyNames, getOwnPropertySymbols, getPrototypeOf } = Object;
 const global$2 = globalThis;
 let issueWarning$2;
@@ -5455,13 +5380,13 @@ const emptyStringForBooleanAttribute = trustedTypes$1 ? trustedTypes$1.emptyScri
 const polyfillSupport$2 = global$2.reactiveElementPolyfillSupportDevMode ;
 {
   global$2.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning$2 = /* @__PURE__ */ __name$2((code, warning) => {
+  issueWarning$2 = (code, warning) => {
     warning += \` See https://lit.dev/msg/\${code} for more information.\`;
     if (!global$2.litIssuedWarnings.has(warning) && !global$2.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global$2.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
   queueMicrotask(() => {
     issueWarning$2("dev-mode", \`Lit is in dev mode. Not recommended for production!\`);
     if (global$2.ShadyDOM?.inUse && polyfillSupport$2 === void 0) {
@@ -5478,7 +5403,7 @@ const debugLogEvent$1 = (event) => {
     detail: event
   }));
 } ;
-const JSCompiler_renameProperty$1 = /* @__PURE__ */ __name$2((prop, _obj) => prop, "JSCompiler_renameProperty");
+const JSCompiler_renameProperty$1 = (prop, _obj) => prop;
 const defaultConverter = {
   toAttribute(value, type) {
     switch (type) {
@@ -5513,7 +5438,7 @@ const defaultConverter = {
     return fromValue;
   }
 };
-const notEqual = /* @__PURE__ */ __name$2((value, old) => !is(value, old), "notEqual");
+const notEqual = (value, old) => !is(value, old);
 const defaultPropertyDeclaration = {
   attribute: true,
   type: String,
@@ -5522,12 +5447,9 @@ const defaultPropertyDeclaration = {
   useDefault: false,
   hasChanged: notEqual
 };
-Symbol.metadata ??= /*@__PURE__*/ Symbol("metadata");
+Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata");
 global$2.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 class ReactiveElement extends HTMLElement {
-  static {
-    __name$2(this, "ReactiveElement");
-  }
   /**
    * Adds an initializer function to the class that is called during instance
    * construction.
@@ -5703,7 +5625,7 @@ class ReactiveElement extends HTMLElement {
    * @nocollapse
    */
   static __prepare() {
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("elementProperties", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("elementProperties"))) {
       return;
     }
     const superCtor = getPrototypeOf(this);
@@ -5725,12 +5647,12 @@ class ReactiveElement extends HTMLElement {
    * @nocollapse
    */
   static finalize() {
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("finalized", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("finalized"))) {
       return;
     }
     this.finalized = true;
     this.__prepare();
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("properties", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("properties"))) {
       const props = this.properties;
       const propKeys = [
         ...getOwnPropertyNames(props),
@@ -6251,19 +6173,19 @@ class ReactiveElement extends HTMLElement {
 }
 ReactiveElement.elementStyles = [];
 ReactiveElement.shadowRootOptions = { mode: "open" };
-ReactiveElement[JSCompiler_renameProperty$1("elementProperties", ReactiveElement)] = /* @__PURE__ */ new Map();
-ReactiveElement[JSCompiler_renameProperty$1("finalized", ReactiveElement)] = /* @__PURE__ */ new Map();
+ReactiveElement[JSCompiler_renameProperty$1("elementProperties")] = /* @__PURE__ */ new Map();
+ReactiveElement[JSCompiler_renameProperty$1("finalized")] = /* @__PURE__ */ new Map();
 polyfillSupport$2?.({ ReactiveElement });
 {
   ReactiveElement.enabledWarnings = [
     "change-in-update",
     "async-perform-update"
   ];
-  const ensureOwnWarnings = /* @__PURE__ */ __name$2(function(ctor) {
-    if (!ctor.hasOwnProperty(JSCompiler_renameProperty$1("enabledWarnings", ctor))) {
+  const ensureOwnWarnings = function(ctor) {
+    if (!ctor.hasOwnProperty(JSCompiler_renameProperty$1("enabledWarnings"))) {
       ctor.enabledWarnings = ctor.enabledWarnings.slice();
     }
-  }, "ensureOwnWarnings");
+  };
   ReactiveElement.enableWarning = function(warning) {
     ensureOwnWarnings(this);
     if (!this.enabledWarnings.includes(warning)) {
@@ -6285,8 +6207,11 @@ if (global$2.reactiveElementVersions.length > 1) {
   });
 }
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 const global$1 = globalThis;
 const debugLogEvent = (event) => {
   const shouldEmit = global$1.emitLitDebugLogEvents;
@@ -6301,13 +6226,13 @@ let debugLogRenderId = 0;
 let issueWarning$1;
 {
   global$1.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning$1 = /* @__PURE__ */ __name$1((code, warning) => {
+  issueWarning$1 = (code, warning) => {
     warning += code ? \` See https://lit.dev/msg/\${code} for more information.\` : "";
     if (!global$1.litIssuedWarnings.has(warning) && !global$1.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global$1.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
   queueMicrotask(() => {
     issueWarning$1("dev-mode", \`Lit is in dev mode. Not recommended for production!\`);
   });
@@ -6315,32 +6240,32 @@ let issueWarning$1;
 const wrap = global$1.ShadyDOM?.inUse && global$1.ShadyDOM?.noPatch === true ? global$1.ShadyDOM.wrap : (node) => node;
 const trustedTypes = global$1.trustedTypes;
 const policy = trustedTypes ? trustedTypes.createPolicy("lit-html", {
-  createHTML: /* @__PURE__ */ __name$1((s) => s, "createHTML")
+  createHTML: (s) => s
 }) : void 0;
-const identityFunction = /* @__PURE__ */ __name$1((value) => value, "identityFunction");
-const noopSanitizer = /* @__PURE__ */ __name$1((_node, _name, _type) => identityFunction, "noopSanitizer");
-const setSanitizer = /* @__PURE__ */ __name$1((newSanitizer) => {
+const identityFunction = (value) => value;
+const noopSanitizer = (_node, _name, _type) => identityFunction;
+const setSanitizer = (newSanitizer) => {
   if (sanitizerFactoryInternal !== noopSanitizer) {
     throw new Error(\`Attempted to overwrite existing lit-html security policy. setSanitizeDOMValueFactory should be called at most once.\`);
   }
   sanitizerFactoryInternal = newSanitizer;
-}, "setSanitizer");
-const _testOnlyClearSanitizerFactoryDoNotCallOrElse = /* @__PURE__ */ __name$1(() => {
+};
+const _testOnlyClearSanitizerFactoryDoNotCallOrElse = () => {
   sanitizerFactoryInternal = noopSanitizer;
-}, "_testOnlyClearSanitizerFactoryDoNotCallOrElse");
-const createSanitizer = /* @__PURE__ */ __name$1((node, name, type) => {
+};
+const createSanitizer = (node, name, type) => {
   return sanitizerFactoryInternal(node, name, type);
-}, "createSanitizer");
+};
 const boundAttributeSuffix = "$lit$";
 const marker = \`lit$\${Math.random().toFixed(9).slice(2)}$\`;
 const markerMatch = "?" + marker;
 const nodeMarker = \`<\${markerMatch}>\`;
 const d = document;
-const createMarker = /* @__PURE__ */ __name$1(() => d.createComment(""), "createMarker");
-const isPrimitive = /* @__PURE__ */ __name$1((value) => value === null || typeof value != "object" && typeof value != "function", "isPrimitive");
+const createMarker = () => d.createComment("");
+const isPrimitive = (value) => value === null || typeof value != "object" && typeof value != "function";
 const isArray = Array.isArray;
-const isIterable = /* @__PURE__ */ __name$1((value) => isArray(value) || // eslint-disable-next-line @typescript-eslint/no-explicit-any
-typeof value?.[Symbol.iterator] === "function", "isIterable");
+const isIterable = (value) => isArray(value) || // eslint-disable-next-line @typescript-eslint/no-explicit-any
+typeof value?.[Symbol.iterator] === "function";
 const SPACE_CHAR = \`[ 	
 \\f\\r]\`;
 const ATTR_VALUE_CHAR = \`[^ 	
@@ -6360,7 +6285,6 @@ const QUOTE_CHAR = 3;
 const singleQuoteAttrEndRegex = /'/g;
 const doubleQuoteAttrEndRegex = /"/g;
 const rawTextElement = /^(?:script|style|textarea|title)$/i;
-const HTML_RESULT = 1;
 const SVG_RESULT = 2;
 const MATHML_RESULT = 3;
 const ATTRIBUTE_PART = 1;
@@ -6370,26 +6294,6 @@ const BOOLEAN_ATTRIBUTE_PART = 4;
 const EVENT_PART = 5;
 const ELEMENT_PART = 6;
 const COMMENT_PART = 7;
-const tag = /* @__PURE__ */ __name$1((type) => (strings, ...values) => {
-  if (strings.some((s) => s === void 0)) {
-    console.warn("Some template strings are undefined.\\nThis is probably caused by illegal octal escape sequences.");
-  }
-  {
-    if (values.some((val) => val?.["_$litStatic$"])) {
-      issueWarning$1("", \`Static values 'literal' or 'unsafeStatic' cannot be used as values to non-static templates.
-Please use the static 'html' tag function. See https://lit.dev/docs/templates/expressions/#static-expressions\`);
-    }
-  }
-  return {
-    // This property needs to remain unminified.
-    ["_$litType$"]: type,
-    strings,
-    values
-  };
-}, "tag");
-tag(HTML_RESULT);
-tag(SVG_RESULT);
-tag(MATHML_RESULT);
 const noChange = Symbol.for("lit-noChange");
 const nothing = Symbol.for("lit-nothing");
 const templateCache = /* @__PURE__ */ new WeakMap();
@@ -6419,8 +6323,7 @@ function trustFromTemplateString(tsa, stringFromTSA) {
   }
   return policy !== void 0 ? policy.createHTML(stringFromTSA) : stringFromTSA;
 }
-__name$1(trustFromTemplateString, "trustFromTemplateString");
-const getTemplateHtml = /* @__PURE__ */ __name$1((strings, type) => {
+const getTemplateHtml = (strings, type) => {
   const l = strings.length - 1;
   const attrNames = [];
   let html2 = type === SVG_RESULT ? "<svg>" : type === MATHML_RESULT ? "<math>" : "";
@@ -6482,11 +6385,8 @@ const getTemplateHtml = /* @__PURE__ */ __name$1((strings, type) => {
   }
   const htmlResult = html2 + (strings[l] || "<?>") + (type === SVG_RESULT ? "</svg>" : type === MATHML_RESULT ? "</math>" : "");
   return [trustFromTemplateString(strings, htmlResult), attrNames];
-}, "getTemplateHtml");
+};
 class Template {
-  static {
-    __name$1(this, "Template");
-  }
   constructor({ strings, ["_$litType$"]: type }, options) {
     this.parts = [];
     let node;
@@ -6614,11 +6514,7 @@ function resolveDirective(part, value, parent = part, attributeIndex) {
   }
   return value;
 }
-__name$1(resolveDirective, "resolveDirective");
 class TemplateInstance {
-  static {
-    __name$1(this, "TemplateInstance");
-  }
   constructor(template, parent) {
     this._$parts = [];
     this._$disconnectableChildren = void 0;
@@ -6688,9 +6584,6 @@ class TemplateInstance {
   }
 }
 class ChildPart {
-  static {
-    __name$1(this, "ChildPart");
-  }
   // See comment in Disconnectable interface for why this is a getter
   get _$isConnected() {
     return this._$parent?._$isConnected ?? this.__isConnected;
@@ -6955,9 +6848,6 @@ class ChildPart {
   }
 }
 class AttributePart {
-  static {
-    __name$1(this, "AttributePart");
-  }
   get tagName() {
     return this.element.tagName;
   }
@@ -7059,9 +6949,6 @@ class AttributePart {
   }
 }
 class PropertyPart extends AttributePart {
-  static {
-    __name$1(this, "PropertyPart");
-  }
   constructor() {
     super(...arguments);
     this.type = PROPERTY_PART;
@@ -7085,9 +6972,6 @@ class PropertyPart extends AttributePart {
   }
 }
 class BooleanAttributePart extends AttributePart {
-  static {
-    __name$1(this, "BooleanAttributePart");
-  }
   constructor() {
     super(...arguments);
     this.type = BOOLEAN_ATTRIBUTE_PART;
@@ -7105,9 +6989,6 @@ class BooleanAttributePart extends AttributePart {
   }
 }
 class EventPart extends AttributePart {
-  static {
-    __name$1(this, "EventPart");
-  }
   constructor(element, name, strings, parent, options) {
     super(element, name, strings, parent, options);
     this.type = EVENT_PART;
@@ -7153,9 +7034,6 @@ class EventPart extends AttributePart {
   }
 }
 class ElementPart {
-  static {
-    __name$1(this, "ElementPart");
-  }
   constructor(element, parent, options) {
     this.element = element;
     this.type = ELEMENT_PART;
@@ -7185,7 +7063,7 @@ if (global$1.litHtmlVersions.length > 1) {
     issueWarning$1("multiple-versions", \`Multiple versions of Lit loaded. Loading multiple versions is not recommended.\`);
   });
 }
-const render = /* @__PURE__ */ __name$1((value, container, options) => {
+const render = (value, container, options) => {
   if (container == null) {
     throw new TypeError(\`The container to render into may not be \${container}\`);
   }
@@ -7214,7 +7092,7 @@ const render = /* @__PURE__ */ __name$1((value, container, options) => {
     part
   });
   return part;
-}, "render");
+};
 {
   render.setSanitizer = setSanitizer;
   render.createSanitizer = createSanitizer;
@@ -7223,25 +7101,25 @@ const render = /* @__PURE__ */ __name$1((value, container, options) => {
   }
 }
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const JSCompiler_renameProperty = /* @__PURE__ */ __name((prop, _obj) => prop, "JSCompiler_renameProperty");
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const JSCompiler_renameProperty = (prop, _obj) => prop;
 const global = globalThis;
 let issueWarning;
 {
   global.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning = /* @__PURE__ */ __name((code, warning) => {
+  issueWarning = (code, warning) => {
     warning += \` See https://lit.dev/msg/\${code} for more information.\`;
     if (!global.litIssuedWarnings.has(warning) && !global.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
 }
 class LitElement extends ReactiveElement {
-  static {
-    __name(this, "LitElement");
-  }
   constructor() {
     super(...arguments);
     this.renderOptions = { host: this };
@@ -7329,7 +7207,7 @@ class LitElement extends ReactiveElement {
   }
 }
 LitElement["_$litElement$"] = true;
-LitElement[JSCompiler_renameProperty("finalized", LitElement)] = true;
+LitElement[JSCompiler_renameProperty("finalized")] = true;
 global.litElementHydrateSupport?.({ LitElement });
 const polyfillSupport = global.litElementPolyfillSupportDevMode ;
 polyfillSupport?.({ LitElement });
@@ -7390,8 +7268,6 @@ console.log(modules_5a199c00, deps);
 exports[`css > emit > should work with emitted processed 'sourcemap-emit' css > js 1`] = `
 "'use strict';
 
-var __defProp$3 = Object.defineProperty;
-var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
 /**
  * @license
  * Copyright 2019 Google LLC
@@ -7400,12 +7276,9 @@ var __name$3 = (target, value) => __defProp$3(target, "name", { value, configura
 const NODE_MODE = false;
 const global$3 = globalThis;
 const supportsAdoptingStyleSheets = global$3.ShadowRoot && (global$3.ShadyCSS === void 0 || global$3.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
-const constructionToken = /*@__PURE__*/ Symbol();
+const constructionToken = /* @__PURE__ */ Symbol();
 const cssTagCache = /* @__PURE__ */ new WeakMap();
 class CSSResult {
-  static {
-    __name$3(this, "CSSResult");
-  }
   constructor(cssText, strings, safeToken) {
     this["_$cssResult$"] = true;
     if (safeToken !== constructionToken) {
@@ -7437,7 +7310,7 @@ class CSSResult {
     return this.cssText;
   }
 }
-const textFromCSSResult = /* @__PURE__ */ __name$3((value) => {
+const textFromCSSResult = (value) => {
   if (value["_$cssResult$"] === true) {
     return value.cssText;
   } else if (typeof value === "number") {
@@ -7445,13 +7318,13 @@ const textFromCSSResult = /* @__PURE__ */ __name$3((value) => {
   } else {
     throw new Error(\`Value passed to 'css' function must be a 'css' function result: \${value}. Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.\`);
   }
-}, "textFromCSSResult");
-const unsafeCSS = /* @__PURE__ */ __name$3((value) => new CSSResult(typeof value === "string" ? value : String(value), void 0, constructionToken), "unsafeCSS");
-const css = /* @__PURE__ */ __name$3((strings, ...values) => {
+};
+const unsafeCSS = (value) => new CSSResult(typeof value === "string" ? value : String(value), void 0, constructionToken);
+const css = (strings, ...values) => {
   const cssText = strings.length === 1 ? strings[0] : values.reduce((acc, v, idx) => acc + textFromCSSResult(v) + strings[idx + 1], strings[0]);
   return new CSSResult(cssText, strings, constructionToken);
-}, "css");
-const adoptStyles = /* @__PURE__ */ __name$3((renderRoot, styles) => {
+};
+const adoptStyles = (renderRoot, styles) => {
   if (supportsAdoptingStyleSheets) {
     renderRoot.adoptedStyleSheets = styles.map((s) => s instanceof CSSStyleSheet ? s : s.styleSheet);
   } else {
@@ -7465,18 +7338,21 @@ const adoptStyles = /* @__PURE__ */ __name$3((renderRoot, styles) => {
       renderRoot.appendChild(style);
     }
   }
-}, "adoptStyles");
-const cssResultFromStyleSheet = /* @__PURE__ */ __name$3((sheet) => {
+};
+const cssResultFromStyleSheet = (sheet) => {
   let cssText = "";
   for (const rule of sheet.cssRules) {
     cssText += rule.cssText;
   }
   return unsafeCSS(cssText);
-}, "cssResultFromStyleSheet");
+};
 const getCompatibleStyle = supportsAdoptingStyleSheets || NODE_MODE ? (s) => s : (s) => s instanceof CSSStyleSheet ? cssResultFromStyleSheet(s) : s;
 
-var __defProp$2 = Object.defineProperty;
-var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 const { is, defineProperty, getOwnPropertyDescriptor, getOwnPropertyNames, getOwnPropertySymbols, getPrototypeOf } = Object;
 const global$2 = globalThis;
 let issueWarning$2;
@@ -7485,13 +7361,13 @@ const emptyStringForBooleanAttribute = trustedTypes$1 ? trustedTypes$1.emptyScri
 const polyfillSupport$2 = global$2.reactiveElementPolyfillSupportDevMode ;
 {
   global$2.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning$2 = /* @__PURE__ */ __name$2((code, warning) => {
+  issueWarning$2 = (code, warning) => {
     warning += \` See https://lit.dev/msg/\${code} for more information.\`;
     if (!global$2.litIssuedWarnings.has(warning) && !global$2.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global$2.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
   queueMicrotask(() => {
     issueWarning$2("dev-mode", \`Lit is in dev mode. Not recommended for production!\`);
     if (global$2.ShadyDOM?.inUse && polyfillSupport$2 === void 0) {
@@ -7508,7 +7384,7 @@ const debugLogEvent$1 = (event) => {
     detail: event
   }));
 } ;
-const JSCompiler_renameProperty$1 = /* @__PURE__ */ __name$2((prop, _obj) => prop, "JSCompiler_renameProperty");
+const JSCompiler_renameProperty$1 = (prop, _obj) => prop;
 const defaultConverter = {
   toAttribute(value, type) {
     switch (type) {
@@ -7543,7 +7419,7 @@ const defaultConverter = {
     return fromValue;
   }
 };
-const notEqual = /* @__PURE__ */ __name$2((value, old) => !is(value, old), "notEqual");
+const notEqual = (value, old) => !is(value, old);
 const defaultPropertyDeclaration = {
   attribute: true,
   type: String,
@@ -7552,12 +7428,9 @@ const defaultPropertyDeclaration = {
   useDefault: false,
   hasChanged: notEqual
 };
-Symbol.metadata ??= /*@__PURE__*/ Symbol("metadata");
+Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata");
 global$2.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 class ReactiveElement extends HTMLElement {
-  static {
-    __name$2(this, "ReactiveElement");
-  }
   /**
    * Adds an initializer function to the class that is called during instance
    * construction.
@@ -7733,7 +7606,7 @@ class ReactiveElement extends HTMLElement {
    * @nocollapse
    */
   static __prepare() {
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("elementProperties", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("elementProperties"))) {
       return;
     }
     const superCtor = getPrototypeOf(this);
@@ -7755,12 +7628,12 @@ class ReactiveElement extends HTMLElement {
    * @nocollapse
    */
   static finalize() {
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("finalized", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("finalized"))) {
       return;
     }
     this.finalized = true;
     this.__prepare();
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("properties", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("properties"))) {
       const props = this.properties;
       const propKeys = [
         ...getOwnPropertyNames(props),
@@ -8281,19 +8154,19 @@ class ReactiveElement extends HTMLElement {
 }
 ReactiveElement.elementStyles = [];
 ReactiveElement.shadowRootOptions = { mode: "open" };
-ReactiveElement[JSCompiler_renameProperty$1("elementProperties", ReactiveElement)] = /* @__PURE__ */ new Map();
-ReactiveElement[JSCompiler_renameProperty$1("finalized", ReactiveElement)] = /* @__PURE__ */ new Map();
+ReactiveElement[JSCompiler_renameProperty$1("elementProperties")] = /* @__PURE__ */ new Map();
+ReactiveElement[JSCompiler_renameProperty$1("finalized")] = /* @__PURE__ */ new Map();
 polyfillSupport$2?.({ ReactiveElement });
 {
   ReactiveElement.enabledWarnings = [
     "change-in-update",
     "async-perform-update"
   ];
-  const ensureOwnWarnings = /* @__PURE__ */ __name$2(function(ctor) {
-    if (!ctor.hasOwnProperty(JSCompiler_renameProperty$1("enabledWarnings", ctor))) {
+  const ensureOwnWarnings = function(ctor) {
+    if (!ctor.hasOwnProperty(JSCompiler_renameProperty$1("enabledWarnings"))) {
       ctor.enabledWarnings = ctor.enabledWarnings.slice();
     }
-  }, "ensureOwnWarnings");
+  };
   ReactiveElement.enableWarning = function(warning) {
     ensureOwnWarnings(this);
     if (!this.enabledWarnings.includes(warning)) {
@@ -8315,8 +8188,11 @@ if (global$2.reactiveElementVersions.length > 1) {
   });
 }
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 const global$1 = globalThis;
 const debugLogEvent = (event) => {
   const shouldEmit = global$1.emitLitDebugLogEvents;
@@ -8331,13 +8207,13 @@ let debugLogRenderId = 0;
 let issueWarning$1;
 {
   global$1.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning$1 = /* @__PURE__ */ __name$1((code, warning) => {
+  issueWarning$1 = (code, warning) => {
     warning += code ? \` See https://lit.dev/msg/\${code} for more information.\` : "";
     if (!global$1.litIssuedWarnings.has(warning) && !global$1.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global$1.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
   queueMicrotask(() => {
     issueWarning$1("dev-mode", \`Lit is in dev mode. Not recommended for production!\`);
   });
@@ -8345,32 +8221,32 @@ let issueWarning$1;
 const wrap = global$1.ShadyDOM?.inUse && global$1.ShadyDOM?.noPatch === true ? global$1.ShadyDOM.wrap : (node) => node;
 const trustedTypes = global$1.trustedTypes;
 const policy = trustedTypes ? trustedTypes.createPolicy("lit-html", {
-  createHTML: /* @__PURE__ */ __name$1((s) => s, "createHTML")
+  createHTML: (s) => s
 }) : void 0;
-const identityFunction = /* @__PURE__ */ __name$1((value) => value, "identityFunction");
-const noopSanitizer = /* @__PURE__ */ __name$1((_node, _name, _type) => identityFunction, "noopSanitizer");
-const setSanitizer = /* @__PURE__ */ __name$1((newSanitizer) => {
+const identityFunction = (value) => value;
+const noopSanitizer = (_node, _name, _type) => identityFunction;
+const setSanitizer = (newSanitizer) => {
   if (sanitizerFactoryInternal !== noopSanitizer) {
     throw new Error(\`Attempted to overwrite existing lit-html security policy. setSanitizeDOMValueFactory should be called at most once.\`);
   }
   sanitizerFactoryInternal = newSanitizer;
-}, "setSanitizer");
-const _testOnlyClearSanitizerFactoryDoNotCallOrElse = /* @__PURE__ */ __name$1(() => {
+};
+const _testOnlyClearSanitizerFactoryDoNotCallOrElse = () => {
   sanitizerFactoryInternal = noopSanitizer;
-}, "_testOnlyClearSanitizerFactoryDoNotCallOrElse");
-const createSanitizer = /* @__PURE__ */ __name$1((node, name, type) => {
+};
+const createSanitizer = (node, name, type) => {
   return sanitizerFactoryInternal(node, name, type);
-}, "createSanitizer");
+};
 const boundAttributeSuffix = "$lit$";
 const marker = \`lit$\${Math.random().toFixed(9).slice(2)}$\`;
 const markerMatch = "?" + marker;
 const nodeMarker = \`<\${markerMatch}>\`;
 const d = document;
-const createMarker = /* @__PURE__ */ __name$1(() => d.createComment(""), "createMarker");
-const isPrimitive = /* @__PURE__ */ __name$1((value) => value === null || typeof value != "object" && typeof value != "function", "isPrimitive");
+const createMarker = () => d.createComment("");
+const isPrimitive = (value) => value === null || typeof value != "object" && typeof value != "function";
 const isArray = Array.isArray;
-const isIterable = /* @__PURE__ */ __name$1((value) => isArray(value) || // eslint-disable-next-line @typescript-eslint/no-explicit-any
-typeof value?.[Symbol.iterator] === "function", "isIterable");
+const isIterable = (value) => isArray(value) || // eslint-disable-next-line @typescript-eslint/no-explicit-any
+typeof value?.[Symbol.iterator] === "function";
 const SPACE_CHAR = \`[ 	
 \\f\\r]\`;
 const ATTR_VALUE_CHAR = \`[^ 	
@@ -8390,7 +8266,6 @@ const QUOTE_CHAR = 3;
 const singleQuoteAttrEndRegex = /'/g;
 const doubleQuoteAttrEndRegex = /"/g;
 const rawTextElement = /^(?:script|style|textarea|title)$/i;
-const HTML_RESULT = 1;
 const SVG_RESULT = 2;
 const MATHML_RESULT = 3;
 const ATTRIBUTE_PART = 1;
@@ -8400,26 +8275,6 @@ const BOOLEAN_ATTRIBUTE_PART = 4;
 const EVENT_PART = 5;
 const ELEMENT_PART = 6;
 const COMMENT_PART = 7;
-const tag = /* @__PURE__ */ __name$1((type) => (strings, ...values) => {
-  if (strings.some((s) => s === void 0)) {
-    console.warn("Some template strings are undefined.\\nThis is probably caused by illegal octal escape sequences.");
-  }
-  {
-    if (values.some((val) => val?.["_$litStatic$"])) {
-      issueWarning$1("", \`Static values 'literal' or 'unsafeStatic' cannot be used as values to non-static templates.
-Please use the static 'html' tag function. See https://lit.dev/docs/templates/expressions/#static-expressions\`);
-    }
-  }
-  return {
-    // This property needs to remain unminified.
-    ["_$litType$"]: type,
-    strings,
-    values
-  };
-}, "tag");
-tag(HTML_RESULT);
-tag(SVG_RESULT);
-tag(MATHML_RESULT);
 const noChange = Symbol.for("lit-noChange");
 const nothing = Symbol.for("lit-nothing");
 const templateCache = /* @__PURE__ */ new WeakMap();
@@ -8449,8 +8304,7 @@ function trustFromTemplateString(tsa, stringFromTSA) {
   }
   return policy !== void 0 ? policy.createHTML(stringFromTSA) : stringFromTSA;
 }
-__name$1(trustFromTemplateString, "trustFromTemplateString");
-const getTemplateHtml = /* @__PURE__ */ __name$1((strings, type) => {
+const getTemplateHtml = (strings, type) => {
   const l = strings.length - 1;
   const attrNames = [];
   let html2 = type === SVG_RESULT ? "<svg>" : type === MATHML_RESULT ? "<math>" : "";
@@ -8512,11 +8366,8 @@ const getTemplateHtml = /* @__PURE__ */ __name$1((strings, type) => {
   }
   const htmlResult = html2 + (strings[l] || "<?>") + (type === SVG_RESULT ? "</svg>" : type === MATHML_RESULT ? "</math>" : "");
   return [trustFromTemplateString(strings, htmlResult), attrNames];
-}, "getTemplateHtml");
+};
 class Template {
-  static {
-    __name$1(this, "Template");
-  }
   constructor({ strings, ["_$litType$"]: type }, options) {
     this.parts = [];
     let node;
@@ -8644,11 +8495,7 @@ function resolveDirective(part, value, parent = part, attributeIndex) {
   }
   return value;
 }
-__name$1(resolveDirective, "resolveDirective");
 class TemplateInstance {
-  static {
-    __name$1(this, "TemplateInstance");
-  }
   constructor(template, parent) {
     this._$parts = [];
     this._$disconnectableChildren = void 0;
@@ -8718,9 +8565,6 @@ class TemplateInstance {
   }
 }
 class ChildPart {
-  static {
-    __name$1(this, "ChildPart");
-  }
   // See comment in Disconnectable interface for why this is a getter
   get _$isConnected() {
     return this._$parent?._$isConnected ?? this.__isConnected;
@@ -8985,9 +8829,6 @@ class ChildPart {
   }
 }
 class AttributePart {
-  static {
-    __name$1(this, "AttributePart");
-  }
   get tagName() {
     return this.element.tagName;
   }
@@ -9089,9 +8930,6 @@ class AttributePart {
   }
 }
 class PropertyPart extends AttributePart {
-  static {
-    __name$1(this, "PropertyPart");
-  }
   constructor() {
     super(...arguments);
     this.type = PROPERTY_PART;
@@ -9115,9 +8953,6 @@ class PropertyPart extends AttributePart {
   }
 }
 class BooleanAttributePart extends AttributePart {
-  static {
-    __name$1(this, "BooleanAttributePart");
-  }
   constructor() {
     super(...arguments);
     this.type = BOOLEAN_ATTRIBUTE_PART;
@@ -9135,9 +8970,6 @@ class BooleanAttributePart extends AttributePart {
   }
 }
 class EventPart extends AttributePart {
-  static {
-    __name$1(this, "EventPart");
-  }
   constructor(element, name, strings, parent, options) {
     super(element, name, strings, parent, options);
     this.type = EVENT_PART;
@@ -9183,9 +9015,6 @@ class EventPart extends AttributePart {
   }
 }
 class ElementPart {
-  static {
-    __name$1(this, "ElementPart");
-  }
   constructor(element, parent, options) {
     this.element = element;
     this.type = ELEMENT_PART;
@@ -9215,7 +9044,7 @@ if (global$1.litHtmlVersions.length > 1) {
     issueWarning$1("multiple-versions", \`Multiple versions of Lit loaded. Loading multiple versions is not recommended.\`);
   });
 }
-const render = /* @__PURE__ */ __name$1((value, container, options) => {
+const render = (value, container, options) => {
   if (container == null) {
     throw new TypeError(\`The container to render into may not be \${container}\`);
   }
@@ -9244,7 +9073,7 @@ const render = /* @__PURE__ */ __name$1((value, container, options) => {
     part
   });
   return part;
-}, "render");
+};
 {
   render.setSanitizer = setSanitizer;
   render.createSanitizer = createSanitizer;
@@ -9253,25 +9082,25 @@ const render = /* @__PURE__ */ __name$1((value, container, options) => {
   }
 }
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const JSCompiler_renameProperty = /* @__PURE__ */ __name((prop, _obj) => prop, "JSCompiler_renameProperty");
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const JSCompiler_renameProperty = (prop, _obj) => prop;
 const global = globalThis;
 let issueWarning;
 {
   global.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning = /* @__PURE__ */ __name((code, warning) => {
+  issueWarning = (code, warning) => {
     warning += \` See https://lit.dev/msg/\${code} for more information.\`;
     if (!global.litIssuedWarnings.has(warning) && !global.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
 }
 class LitElement extends ReactiveElement {
-  static {
-    __name(this, "LitElement");
-  }
   constructor() {
     super(...arguments);
     this.renderOptions = { host: this };
@@ -9359,7 +9188,7 @@ class LitElement extends ReactiveElement {
   }
 }
 LitElement["_$litElement$"] = true;
-LitElement[JSCompiler_renameProperty("finalized", LitElement)] = true;
+LitElement[JSCompiler_renameProperty("finalized")] = true;
 global.litElementHydrateSupport?.({ LitElement });
 const polyfillSupport = global.litElementPolyfillSupportDevMode ;
 polyfillSupport?.({ LitElement });
@@ -9381,9 +9210,7 @@ console.log(styles);
 `;
 
 exports[`css > emit > should work with emitted processed 'sourcemap-emit' css > js 2`] = `
-"var __defProp$3 = Object.defineProperty;
-var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
-/**
+"/**
  * @license
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
@@ -9391,12 +9218,9 @@ var __name$3 = (target, value) => __defProp$3(target, "name", { value, configura
 const NODE_MODE = false;
 const global$3 = globalThis;
 const supportsAdoptingStyleSheets = global$3.ShadowRoot && (global$3.ShadyCSS === void 0 || global$3.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
-const constructionToken = /*@__PURE__*/ Symbol();
+const constructionToken = /* @__PURE__ */ Symbol();
 const cssTagCache = /* @__PURE__ */ new WeakMap();
 class CSSResult {
-  static {
-    __name$3(this, "CSSResult");
-  }
   constructor(cssText, strings, safeToken) {
     this["_$cssResult$"] = true;
     if (safeToken !== constructionToken) {
@@ -9428,7 +9252,7 @@ class CSSResult {
     return this.cssText;
   }
 }
-const textFromCSSResult = /* @__PURE__ */ __name$3((value) => {
+const textFromCSSResult = (value) => {
   if (value["_$cssResult$"] === true) {
     return value.cssText;
   } else if (typeof value === "number") {
@@ -9436,13 +9260,13 @@ const textFromCSSResult = /* @__PURE__ */ __name$3((value) => {
   } else {
     throw new Error(\`Value passed to 'css' function must be a 'css' function result: \${value}. Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.\`);
   }
-}, "textFromCSSResult");
-const unsafeCSS = /* @__PURE__ */ __name$3((value) => new CSSResult(typeof value === "string" ? value : String(value), void 0, constructionToken), "unsafeCSS");
-const css = /* @__PURE__ */ __name$3((strings, ...values) => {
+};
+const unsafeCSS = (value) => new CSSResult(typeof value === "string" ? value : String(value), void 0, constructionToken);
+const css = (strings, ...values) => {
   const cssText = strings.length === 1 ? strings[0] : values.reduce((acc, v, idx) => acc + textFromCSSResult(v) + strings[idx + 1], strings[0]);
   return new CSSResult(cssText, strings, constructionToken);
-}, "css");
-const adoptStyles = /* @__PURE__ */ __name$3((renderRoot, styles) => {
+};
+const adoptStyles = (renderRoot, styles) => {
   if (supportsAdoptingStyleSheets) {
     renderRoot.adoptedStyleSheets = styles.map((s) => s instanceof CSSStyleSheet ? s : s.styleSheet);
   } else {
@@ -9456,18 +9280,21 @@ const adoptStyles = /* @__PURE__ */ __name$3((renderRoot, styles) => {
       renderRoot.appendChild(style);
     }
   }
-}, "adoptStyles");
-const cssResultFromStyleSheet = /* @__PURE__ */ __name$3((sheet) => {
+};
+const cssResultFromStyleSheet = (sheet) => {
   let cssText = "";
   for (const rule of sheet.cssRules) {
     cssText += rule.cssText;
   }
   return unsafeCSS(cssText);
-}, "cssResultFromStyleSheet");
+};
 const getCompatibleStyle = supportsAdoptingStyleSheets || NODE_MODE ? (s) => s : (s) => s instanceof CSSStyleSheet ? cssResultFromStyleSheet(s) : s;
 
-var __defProp$2 = Object.defineProperty;
-var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 const { is, defineProperty, getOwnPropertyDescriptor, getOwnPropertyNames, getOwnPropertySymbols, getPrototypeOf } = Object;
 const global$2 = globalThis;
 let issueWarning$2;
@@ -9476,13 +9303,13 @@ const emptyStringForBooleanAttribute = trustedTypes$1 ? trustedTypes$1.emptyScri
 const polyfillSupport$2 = global$2.reactiveElementPolyfillSupportDevMode ;
 {
   global$2.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning$2 = /* @__PURE__ */ __name$2((code, warning) => {
+  issueWarning$2 = (code, warning) => {
     warning += \` See https://lit.dev/msg/\${code} for more information.\`;
     if (!global$2.litIssuedWarnings.has(warning) && !global$2.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global$2.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
   queueMicrotask(() => {
     issueWarning$2("dev-mode", \`Lit is in dev mode. Not recommended for production!\`);
     if (global$2.ShadyDOM?.inUse && polyfillSupport$2 === void 0) {
@@ -9499,7 +9326,7 @@ const debugLogEvent$1 = (event) => {
     detail: event
   }));
 } ;
-const JSCompiler_renameProperty$1 = /* @__PURE__ */ __name$2((prop, _obj) => prop, "JSCompiler_renameProperty");
+const JSCompiler_renameProperty$1 = (prop, _obj) => prop;
 const defaultConverter = {
   toAttribute(value, type) {
     switch (type) {
@@ -9534,7 +9361,7 @@ const defaultConverter = {
     return fromValue;
   }
 };
-const notEqual = /* @__PURE__ */ __name$2((value, old) => !is(value, old), "notEqual");
+const notEqual = (value, old) => !is(value, old);
 const defaultPropertyDeclaration = {
   attribute: true,
   type: String,
@@ -9543,12 +9370,9 @@ const defaultPropertyDeclaration = {
   useDefault: false,
   hasChanged: notEqual
 };
-Symbol.metadata ??= /*@__PURE__*/ Symbol("metadata");
+Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata");
 global$2.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 class ReactiveElement extends HTMLElement {
-  static {
-    __name$2(this, "ReactiveElement");
-  }
   /**
    * Adds an initializer function to the class that is called during instance
    * construction.
@@ -9724,7 +9548,7 @@ class ReactiveElement extends HTMLElement {
    * @nocollapse
    */
   static __prepare() {
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("elementProperties", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("elementProperties"))) {
       return;
     }
     const superCtor = getPrototypeOf(this);
@@ -9746,12 +9570,12 @@ class ReactiveElement extends HTMLElement {
    * @nocollapse
    */
   static finalize() {
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("finalized", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("finalized"))) {
       return;
     }
     this.finalized = true;
     this.__prepare();
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("properties", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("properties"))) {
       const props = this.properties;
       const propKeys = [
         ...getOwnPropertyNames(props),
@@ -10272,19 +10096,19 @@ class ReactiveElement extends HTMLElement {
 }
 ReactiveElement.elementStyles = [];
 ReactiveElement.shadowRootOptions = { mode: "open" };
-ReactiveElement[JSCompiler_renameProperty$1("elementProperties", ReactiveElement)] = /* @__PURE__ */ new Map();
-ReactiveElement[JSCompiler_renameProperty$1("finalized", ReactiveElement)] = /* @__PURE__ */ new Map();
+ReactiveElement[JSCompiler_renameProperty$1("elementProperties")] = /* @__PURE__ */ new Map();
+ReactiveElement[JSCompiler_renameProperty$1("finalized")] = /* @__PURE__ */ new Map();
 polyfillSupport$2?.({ ReactiveElement });
 {
   ReactiveElement.enabledWarnings = [
     "change-in-update",
     "async-perform-update"
   ];
-  const ensureOwnWarnings = /* @__PURE__ */ __name$2(function(ctor) {
-    if (!ctor.hasOwnProperty(JSCompiler_renameProperty$1("enabledWarnings", ctor))) {
+  const ensureOwnWarnings = function(ctor) {
+    if (!ctor.hasOwnProperty(JSCompiler_renameProperty$1("enabledWarnings"))) {
       ctor.enabledWarnings = ctor.enabledWarnings.slice();
     }
-  }, "ensureOwnWarnings");
+  };
   ReactiveElement.enableWarning = function(warning) {
     ensureOwnWarnings(this);
     if (!this.enabledWarnings.includes(warning)) {
@@ -10306,8 +10130,11 @@ if (global$2.reactiveElementVersions.length > 1) {
   });
 }
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 const global$1 = globalThis;
 const debugLogEvent = (event) => {
   const shouldEmit = global$1.emitLitDebugLogEvents;
@@ -10322,13 +10149,13 @@ let debugLogRenderId = 0;
 let issueWarning$1;
 {
   global$1.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning$1 = /* @__PURE__ */ __name$1((code, warning) => {
+  issueWarning$1 = (code, warning) => {
     warning += code ? \` See https://lit.dev/msg/\${code} for more information.\` : "";
     if (!global$1.litIssuedWarnings.has(warning) && !global$1.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global$1.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
   queueMicrotask(() => {
     issueWarning$1("dev-mode", \`Lit is in dev mode. Not recommended for production!\`);
   });
@@ -10336,32 +10163,32 @@ let issueWarning$1;
 const wrap = global$1.ShadyDOM?.inUse && global$1.ShadyDOM?.noPatch === true ? global$1.ShadyDOM.wrap : (node) => node;
 const trustedTypes = global$1.trustedTypes;
 const policy = trustedTypes ? trustedTypes.createPolicy("lit-html", {
-  createHTML: /* @__PURE__ */ __name$1((s) => s, "createHTML")
+  createHTML: (s) => s
 }) : void 0;
-const identityFunction = /* @__PURE__ */ __name$1((value) => value, "identityFunction");
-const noopSanitizer = /* @__PURE__ */ __name$1((_node, _name, _type) => identityFunction, "noopSanitizer");
-const setSanitizer = /* @__PURE__ */ __name$1((newSanitizer) => {
+const identityFunction = (value) => value;
+const noopSanitizer = (_node, _name, _type) => identityFunction;
+const setSanitizer = (newSanitizer) => {
   if (sanitizerFactoryInternal !== noopSanitizer) {
     throw new Error(\`Attempted to overwrite existing lit-html security policy. setSanitizeDOMValueFactory should be called at most once.\`);
   }
   sanitizerFactoryInternal = newSanitizer;
-}, "setSanitizer");
-const _testOnlyClearSanitizerFactoryDoNotCallOrElse = /* @__PURE__ */ __name$1(() => {
+};
+const _testOnlyClearSanitizerFactoryDoNotCallOrElse = () => {
   sanitizerFactoryInternal = noopSanitizer;
-}, "_testOnlyClearSanitizerFactoryDoNotCallOrElse");
-const createSanitizer = /* @__PURE__ */ __name$1((node, name, type) => {
+};
+const createSanitizer = (node, name, type) => {
   return sanitizerFactoryInternal(node, name, type);
-}, "createSanitizer");
+};
 const boundAttributeSuffix = "$lit$";
 const marker = \`lit$\${Math.random().toFixed(9).slice(2)}$\`;
 const markerMatch = "?" + marker;
 const nodeMarker = \`<\${markerMatch}>\`;
 const d = document;
-const createMarker = /* @__PURE__ */ __name$1(() => d.createComment(""), "createMarker");
-const isPrimitive = /* @__PURE__ */ __name$1((value) => value === null || typeof value != "object" && typeof value != "function", "isPrimitive");
+const createMarker = () => d.createComment("");
+const isPrimitive = (value) => value === null || typeof value != "object" && typeof value != "function";
 const isArray = Array.isArray;
-const isIterable = /* @__PURE__ */ __name$1((value) => isArray(value) || // eslint-disable-next-line @typescript-eslint/no-explicit-any
-typeof value?.[Symbol.iterator] === "function", "isIterable");
+const isIterable = (value) => isArray(value) || // eslint-disable-next-line @typescript-eslint/no-explicit-any
+typeof value?.[Symbol.iterator] === "function";
 const SPACE_CHAR = \`[ 	
 \\f\\r]\`;
 const ATTR_VALUE_CHAR = \`[^ 	
@@ -10381,7 +10208,6 @@ const QUOTE_CHAR = 3;
 const singleQuoteAttrEndRegex = /'/g;
 const doubleQuoteAttrEndRegex = /"/g;
 const rawTextElement = /^(?:script|style|textarea|title)$/i;
-const HTML_RESULT = 1;
 const SVG_RESULT = 2;
 const MATHML_RESULT = 3;
 const ATTRIBUTE_PART = 1;
@@ -10391,26 +10217,6 @@ const BOOLEAN_ATTRIBUTE_PART = 4;
 const EVENT_PART = 5;
 const ELEMENT_PART = 6;
 const COMMENT_PART = 7;
-const tag = /* @__PURE__ */ __name$1((type) => (strings, ...values) => {
-  if (strings.some((s) => s === void 0)) {
-    console.warn("Some template strings are undefined.\\nThis is probably caused by illegal octal escape sequences.");
-  }
-  {
-    if (values.some((val) => val?.["_$litStatic$"])) {
-      issueWarning$1("", \`Static values 'literal' or 'unsafeStatic' cannot be used as values to non-static templates.
-Please use the static 'html' tag function. See https://lit.dev/docs/templates/expressions/#static-expressions\`);
-    }
-  }
-  return {
-    // This property needs to remain unminified.
-    ["_$litType$"]: type,
-    strings,
-    values
-  };
-}, "tag");
-tag(HTML_RESULT);
-tag(SVG_RESULT);
-tag(MATHML_RESULT);
 const noChange = Symbol.for("lit-noChange");
 const nothing = Symbol.for("lit-nothing");
 const templateCache = /* @__PURE__ */ new WeakMap();
@@ -10440,8 +10246,7 @@ function trustFromTemplateString(tsa, stringFromTSA) {
   }
   return policy !== void 0 ? policy.createHTML(stringFromTSA) : stringFromTSA;
 }
-__name$1(trustFromTemplateString, "trustFromTemplateString");
-const getTemplateHtml = /* @__PURE__ */ __name$1((strings, type) => {
+const getTemplateHtml = (strings, type) => {
   const l = strings.length - 1;
   const attrNames = [];
   let html2 = type === SVG_RESULT ? "<svg>" : type === MATHML_RESULT ? "<math>" : "";
@@ -10503,11 +10308,8 @@ const getTemplateHtml = /* @__PURE__ */ __name$1((strings, type) => {
   }
   const htmlResult = html2 + (strings[l] || "<?>") + (type === SVG_RESULT ? "</svg>" : type === MATHML_RESULT ? "</math>" : "");
   return [trustFromTemplateString(strings, htmlResult), attrNames];
-}, "getTemplateHtml");
+};
 class Template {
-  static {
-    __name$1(this, "Template");
-  }
   constructor({ strings, ["_$litType$"]: type }, options) {
     this.parts = [];
     let node;
@@ -10635,11 +10437,7 @@ function resolveDirective(part, value, parent = part, attributeIndex) {
   }
   return value;
 }
-__name$1(resolveDirective, "resolveDirective");
 class TemplateInstance {
-  static {
-    __name$1(this, "TemplateInstance");
-  }
   constructor(template, parent) {
     this._$parts = [];
     this._$disconnectableChildren = void 0;
@@ -10709,9 +10507,6 @@ class TemplateInstance {
   }
 }
 class ChildPart {
-  static {
-    __name$1(this, "ChildPart");
-  }
   // See comment in Disconnectable interface for why this is a getter
   get _$isConnected() {
     return this._$parent?._$isConnected ?? this.__isConnected;
@@ -10976,9 +10771,6 @@ class ChildPart {
   }
 }
 class AttributePart {
-  static {
-    __name$1(this, "AttributePart");
-  }
   get tagName() {
     return this.element.tagName;
   }
@@ -11080,9 +10872,6 @@ class AttributePart {
   }
 }
 class PropertyPart extends AttributePart {
-  static {
-    __name$1(this, "PropertyPart");
-  }
   constructor() {
     super(...arguments);
     this.type = PROPERTY_PART;
@@ -11106,9 +10895,6 @@ class PropertyPart extends AttributePart {
   }
 }
 class BooleanAttributePart extends AttributePart {
-  static {
-    __name$1(this, "BooleanAttributePart");
-  }
   constructor() {
     super(...arguments);
     this.type = BOOLEAN_ATTRIBUTE_PART;
@@ -11126,9 +10912,6 @@ class BooleanAttributePart extends AttributePart {
   }
 }
 class EventPart extends AttributePart {
-  static {
-    __name$1(this, "EventPart");
-  }
   constructor(element, name, strings, parent, options) {
     super(element, name, strings, parent, options);
     this.type = EVENT_PART;
@@ -11174,9 +10957,6 @@ class EventPart extends AttributePart {
   }
 }
 class ElementPart {
-  static {
-    __name$1(this, "ElementPart");
-  }
   constructor(element, parent, options) {
     this.element = element;
     this.type = ELEMENT_PART;
@@ -11206,7 +10986,7 @@ if (global$1.litHtmlVersions.length > 1) {
     issueWarning$1("multiple-versions", \`Multiple versions of Lit loaded. Loading multiple versions is not recommended.\`);
   });
 }
-const render = /* @__PURE__ */ __name$1((value, container, options) => {
+const render = (value, container, options) => {
   if (container == null) {
     throw new TypeError(\`The container to render into may not be \${container}\`);
   }
@@ -11235,7 +11015,7 @@ const render = /* @__PURE__ */ __name$1((value, container, options) => {
     part
   });
   return part;
-}, "render");
+};
 {
   render.setSanitizer = setSanitizer;
   render.createSanitizer = createSanitizer;
@@ -11244,25 +11024,25 @@ const render = /* @__PURE__ */ __name$1((value, container, options) => {
   }
 }
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const JSCompiler_renameProperty = /* @__PURE__ */ __name((prop, _obj) => prop, "JSCompiler_renameProperty");
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const JSCompiler_renameProperty = (prop, _obj) => prop;
 const global = globalThis;
 let issueWarning;
 {
   global.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning = /* @__PURE__ */ __name((code, warning) => {
+  issueWarning = (code, warning) => {
     warning += \` See https://lit.dev/msg/\${code} for more information.\`;
     if (!global.litIssuedWarnings.has(warning) && !global.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
 }
 class LitElement extends ReactiveElement {
-  static {
-    __name(this, "LitElement");
-  }
   constructor() {
     super(...arguments);
     this.renderOptions = { host: this };
@@ -11350,7 +11130,7 @@ class LitElement extends ReactiveElement {
   }
 }
 LitElement["_$litElement$"] = true;
-LitElement[JSCompiler_renameProperty("finalized", LitElement)] = true;
+LitElement[JSCompiler_renameProperty("finalized")] = true;
 global.litElementHydrateSupport?.({ LitElement });
 const polyfillSupport = global.litElementPolyfillSupportDevMode ;
 polyfillSupport?.({ LitElement });
@@ -11374,8 +11154,6 @@ console.log(styles);
 exports[`css > emit > should work with emitted processed 'sourcemap-transform' css > js 1`] = `
 "'use strict';
 
-var __defProp$3 = Object.defineProperty;
-var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
 /**
  * @license
  * Copyright 2019 Google LLC
@@ -11384,12 +11162,9 @@ var __name$3 = (target, value) => __defProp$3(target, "name", { value, configura
 const NODE_MODE = false;
 const global$3 = globalThis;
 const supportsAdoptingStyleSheets = global$3.ShadowRoot && (global$3.ShadyCSS === void 0 || global$3.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
-const constructionToken = /*@__PURE__*/ Symbol();
+const constructionToken = /* @__PURE__ */ Symbol();
 const cssTagCache = /* @__PURE__ */ new WeakMap();
 class CSSResult {
-  static {
-    __name$3(this, "CSSResult");
-  }
   constructor(cssText, strings, safeToken) {
     this["_$cssResult$"] = true;
     if (safeToken !== constructionToken) {
@@ -11421,7 +11196,7 @@ class CSSResult {
     return this.cssText;
   }
 }
-const textFromCSSResult = /* @__PURE__ */ __name$3((value) => {
+const textFromCSSResult = (value) => {
   if (value["_$cssResult$"] === true) {
     return value.cssText;
   } else if (typeof value === "number") {
@@ -11429,13 +11204,13 @@ const textFromCSSResult = /* @__PURE__ */ __name$3((value) => {
   } else {
     throw new Error(\`Value passed to 'css' function must be a 'css' function result: \${value}. Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.\`);
   }
-}, "textFromCSSResult");
-const unsafeCSS = /* @__PURE__ */ __name$3((value) => new CSSResult(typeof value === "string" ? value : String(value), void 0, constructionToken), "unsafeCSS");
-const css = /* @__PURE__ */ __name$3((strings, ...values) => {
+};
+const unsafeCSS = (value) => new CSSResult(typeof value === "string" ? value : String(value), void 0, constructionToken);
+const css = (strings, ...values) => {
   const cssText = strings.length === 1 ? strings[0] : values.reduce((acc, v, idx) => acc + textFromCSSResult(v) + strings[idx + 1], strings[0]);
   return new CSSResult(cssText, strings, constructionToken);
-}, "css");
-const adoptStyles = /* @__PURE__ */ __name$3((renderRoot, styles) => {
+};
+const adoptStyles = (renderRoot, styles) => {
   if (supportsAdoptingStyleSheets) {
     renderRoot.adoptedStyleSheets = styles.map((s) => s instanceof CSSStyleSheet ? s : s.styleSheet);
   } else {
@@ -11449,18 +11224,21 @@ const adoptStyles = /* @__PURE__ */ __name$3((renderRoot, styles) => {
       renderRoot.appendChild(style);
     }
   }
-}, "adoptStyles");
-const cssResultFromStyleSheet = /* @__PURE__ */ __name$3((sheet) => {
+};
+const cssResultFromStyleSheet = (sheet) => {
   let cssText = "";
   for (const rule of sheet.cssRules) {
     cssText += rule.cssText;
   }
   return unsafeCSS(cssText);
-}, "cssResultFromStyleSheet");
+};
 const getCompatibleStyle = supportsAdoptingStyleSheets || NODE_MODE ? (s) => s : (s) => s instanceof CSSStyleSheet ? cssResultFromStyleSheet(s) : s;
 
-var __defProp$2 = Object.defineProperty;
-var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 const { is, defineProperty, getOwnPropertyDescriptor, getOwnPropertyNames, getOwnPropertySymbols, getPrototypeOf } = Object;
 const global$2 = globalThis;
 let issueWarning$2;
@@ -11469,13 +11247,13 @@ const emptyStringForBooleanAttribute = trustedTypes$1 ? trustedTypes$1.emptyScri
 const polyfillSupport$2 = global$2.reactiveElementPolyfillSupportDevMode ;
 {
   global$2.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning$2 = /* @__PURE__ */ __name$2((code, warning) => {
+  issueWarning$2 = (code, warning) => {
     warning += \` See https://lit.dev/msg/\${code} for more information.\`;
     if (!global$2.litIssuedWarnings.has(warning) && !global$2.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global$2.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
   queueMicrotask(() => {
     issueWarning$2("dev-mode", \`Lit is in dev mode. Not recommended for production!\`);
     if (global$2.ShadyDOM?.inUse && polyfillSupport$2 === void 0) {
@@ -11492,7 +11270,7 @@ const debugLogEvent$1 = (event) => {
     detail: event
   }));
 } ;
-const JSCompiler_renameProperty$1 = /* @__PURE__ */ __name$2((prop, _obj) => prop, "JSCompiler_renameProperty");
+const JSCompiler_renameProperty$1 = (prop, _obj) => prop;
 const defaultConverter = {
   toAttribute(value, type) {
     switch (type) {
@@ -11527,7 +11305,7 @@ const defaultConverter = {
     return fromValue;
   }
 };
-const notEqual = /* @__PURE__ */ __name$2((value, old) => !is(value, old), "notEqual");
+const notEqual = (value, old) => !is(value, old);
 const defaultPropertyDeclaration = {
   attribute: true,
   type: String,
@@ -11536,12 +11314,9 @@ const defaultPropertyDeclaration = {
   useDefault: false,
   hasChanged: notEqual
 };
-Symbol.metadata ??= /*@__PURE__*/ Symbol("metadata");
+Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata");
 global$2.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 class ReactiveElement extends HTMLElement {
-  static {
-    __name$2(this, "ReactiveElement");
-  }
   /**
    * Adds an initializer function to the class that is called during instance
    * construction.
@@ -11717,7 +11492,7 @@ class ReactiveElement extends HTMLElement {
    * @nocollapse
    */
   static __prepare() {
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("elementProperties", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("elementProperties"))) {
       return;
     }
     const superCtor = getPrototypeOf(this);
@@ -11739,12 +11514,12 @@ class ReactiveElement extends HTMLElement {
    * @nocollapse
    */
   static finalize() {
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("finalized", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("finalized"))) {
       return;
     }
     this.finalized = true;
     this.__prepare();
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("properties", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("properties"))) {
       const props = this.properties;
       const propKeys = [
         ...getOwnPropertyNames(props),
@@ -12265,19 +12040,19 @@ class ReactiveElement extends HTMLElement {
 }
 ReactiveElement.elementStyles = [];
 ReactiveElement.shadowRootOptions = { mode: "open" };
-ReactiveElement[JSCompiler_renameProperty$1("elementProperties", ReactiveElement)] = /* @__PURE__ */ new Map();
-ReactiveElement[JSCompiler_renameProperty$1("finalized", ReactiveElement)] = /* @__PURE__ */ new Map();
+ReactiveElement[JSCompiler_renameProperty$1("elementProperties")] = /* @__PURE__ */ new Map();
+ReactiveElement[JSCompiler_renameProperty$1("finalized")] = /* @__PURE__ */ new Map();
 polyfillSupport$2?.({ ReactiveElement });
 {
   ReactiveElement.enabledWarnings = [
     "change-in-update",
     "async-perform-update"
   ];
-  const ensureOwnWarnings = /* @__PURE__ */ __name$2(function(ctor) {
-    if (!ctor.hasOwnProperty(JSCompiler_renameProperty$1("enabledWarnings", ctor))) {
+  const ensureOwnWarnings = function(ctor) {
+    if (!ctor.hasOwnProperty(JSCompiler_renameProperty$1("enabledWarnings"))) {
       ctor.enabledWarnings = ctor.enabledWarnings.slice();
     }
-  }, "ensureOwnWarnings");
+  };
   ReactiveElement.enableWarning = function(warning) {
     ensureOwnWarnings(this);
     if (!this.enabledWarnings.includes(warning)) {
@@ -12299,8 +12074,11 @@ if (global$2.reactiveElementVersions.length > 1) {
   });
 }
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 const global$1 = globalThis;
 const debugLogEvent = (event) => {
   const shouldEmit = global$1.emitLitDebugLogEvents;
@@ -12315,13 +12093,13 @@ let debugLogRenderId = 0;
 let issueWarning$1;
 {
   global$1.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning$1 = /* @__PURE__ */ __name$1((code, warning) => {
+  issueWarning$1 = (code, warning) => {
     warning += code ? \` See https://lit.dev/msg/\${code} for more information.\` : "";
     if (!global$1.litIssuedWarnings.has(warning) && !global$1.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global$1.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
   queueMicrotask(() => {
     issueWarning$1("dev-mode", \`Lit is in dev mode. Not recommended for production!\`);
   });
@@ -12329,32 +12107,32 @@ let issueWarning$1;
 const wrap = global$1.ShadyDOM?.inUse && global$1.ShadyDOM?.noPatch === true ? global$1.ShadyDOM.wrap : (node) => node;
 const trustedTypes = global$1.trustedTypes;
 const policy = trustedTypes ? trustedTypes.createPolicy("lit-html", {
-  createHTML: /* @__PURE__ */ __name$1((s) => s, "createHTML")
+  createHTML: (s) => s
 }) : void 0;
-const identityFunction = /* @__PURE__ */ __name$1((value) => value, "identityFunction");
-const noopSanitizer = /* @__PURE__ */ __name$1((_node, _name, _type) => identityFunction, "noopSanitizer");
-const setSanitizer = /* @__PURE__ */ __name$1((newSanitizer) => {
+const identityFunction = (value) => value;
+const noopSanitizer = (_node, _name, _type) => identityFunction;
+const setSanitizer = (newSanitizer) => {
   if (sanitizerFactoryInternal !== noopSanitizer) {
     throw new Error(\`Attempted to overwrite existing lit-html security policy. setSanitizeDOMValueFactory should be called at most once.\`);
   }
   sanitizerFactoryInternal = newSanitizer;
-}, "setSanitizer");
-const _testOnlyClearSanitizerFactoryDoNotCallOrElse = /* @__PURE__ */ __name$1(() => {
+};
+const _testOnlyClearSanitizerFactoryDoNotCallOrElse = () => {
   sanitizerFactoryInternal = noopSanitizer;
-}, "_testOnlyClearSanitizerFactoryDoNotCallOrElse");
-const createSanitizer = /* @__PURE__ */ __name$1((node, name, type) => {
+};
+const createSanitizer = (node, name, type) => {
   return sanitizerFactoryInternal(node, name, type);
-}, "createSanitizer");
+};
 const boundAttributeSuffix = "$lit$";
 const marker = \`lit$\${Math.random().toFixed(9).slice(2)}$\`;
 const markerMatch = "?" + marker;
 const nodeMarker = \`<\${markerMatch}>\`;
 const d = document;
-const createMarker = /* @__PURE__ */ __name$1(() => d.createComment(""), "createMarker");
-const isPrimitive = /* @__PURE__ */ __name$1((value) => value === null || typeof value != "object" && typeof value != "function", "isPrimitive");
+const createMarker = () => d.createComment("");
+const isPrimitive = (value) => value === null || typeof value != "object" && typeof value != "function";
 const isArray = Array.isArray;
-const isIterable = /* @__PURE__ */ __name$1((value) => isArray(value) || // eslint-disable-next-line @typescript-eslint/no-explicit-any
-typeof value?.[Symbol.iterator] === "function", "isIterable");
+const isIterable = (value) => isArray(value) || // eslint-disable-next-line @typescript-eslint/no-explicit-any
+typeof value?.[Symbol.iterator] === "function";
 const SPACE_CHAR = \`[ 	
 \\f\\r]\`;
 const ATTR_VALUE_CHAR = \`[^ 	
@@ -12374,7 +12152,6 @@ const QUOTE_CHAR = 3;
 const singleQuoteAttrEndRegex = /'/g;
 const doubleQuoteAttrEndRegex = /"/g;
 const rawTextElement = /^(?:script|style|textarea|title)$/i;
-const HTML_RESULT = 1;
 const SVG_RESULT = 2;
 const MATHML_RESULT = 3;
 const ATTRIBUTE_PART = 1;
@@ -12384,26 +12161,6 @@ const BOOLEAN_ATTRIBUTE_PART = 4;
 const EVENT_PART = 5;
 const ELEMENT_PART = 6;
 const COMMENT_PART = 7;
-const tag = /* @__PURE__ */ __name$1((type) => (strings, ...values) => {
-  if (strings.some((s) => s === void 0)) {
-    console.warn("Some template strings are undefined.\\nThis is probably caused by illegal octal escape sequences.");
-  }
-  {
-    if (values.some((val) => val?.["_$litStatic$"])) {
-      issueWarning$1("", \`Static values 'literal' or 'unsafeStatic' cannot be used as values to non-static templates.
-Please use the static 'html' tag function. See https://lit.dev/docs/templates/expressions/#static-expressions\`);
-    }
-  }
-  return {
-    // This property needs to remain unminified.
-    ["_$litType$"]: type,
-    strings,
-    values
-  };
-}, "tag");
-tag(HTML_RESULT);
-tag(SVG_RESULT);
-tag(MATHML_RESULT);
 const noChange = Symbol.for("lit-noChange");
 const nothing = Symbol.for("lit-nothing");
 const templateCache = /* @__PURE__ */ new WeakMap();
@@ -12433,8 +12190,7 @@ function trustFromTemplateString(tsa, stringFromTSA) {
   }
   return policy !== void 0 ? policy.createHTML(stringFromTSA) : stringFromTSA;
 }
-__name$1(trustFromTemplateString, "trustFromTemplateString");
-const getTemplateHtml = /* @__PURE__ */ __name$1((strings, type) => {
+const getTemplateHtml = (strings, type) => {
   const l = strings.length - 1;
   const attrNames = [];
   let html2 = type === SVG_RESULT ? "<svg>" : type === MATHML_RESULT ? "<math>" : "";
@@ -12496,11 +12252,8 @@ const getTemplateHtml = /* @__PURE__ */ __name$1((strings, type) => {
   }
   const htmlResult = html2 + (strings[l] || "<?>") + (type === SVG_RESULT ? "</svg>" : type === MATHML_RESULT ? "</math>" : "");
   return [trustFromTemplateString(strings, htmlResult), attrNames];
-}, "getTemplateHtml");
+};
 class Template {
-  static {
-    __name$1(this, "Template");
-  }
   constructor({ strings, ["_$litType$"]: type }, options) {
     this.parts = [];
     let node;
@@ -12628,11 +12381,7 @@ function resolveDirective(part, value, parent = part, attributeIndex) {
   }
   return value;
 }
-__name$1(resolveDirective, "resolveDirective");
 class TemplateInstance {
-  static {
-    __name$1(this, "TemplateInstance");
-  }
   constructor(template, parent) {
     this._$parts = [];
     this._$disconnectableChildren = void 0;
@@ -12702,9 +12451,6 @@ class TemplateInstance {
   }
 }
 class ChildPart {
-  static {
-    __name$1(this, "ChildPart");
-  }
   // See comment in Disconnectable interface for why this is a getter
   get _$isConnected() {
     return this._$parent?._$isConnected ?? this.__isConnected;
@@ -12969,9 +12715,6 @@ class ChildPart {
   }
 }
 class AttributePart {
-  static {
-    __name$1(this, "AttributePart");
-  }
   get tagName() {
     return this.element.tagName;
   }
@@ -13073,9 +12816,6 @@ class AttributePart {
   }
 }
 class PropertyPart extends AttributePart {
-  static {
-    __name$1(this, "PropertyPart");
-  }
   constructor() {
     super(...arguments);
     this.type = PROPERTY_PART;
@@ -13099,9 +12839,6 @@ class PropertyPart extends AttributePart {
   }
 }
 class BooleanAttributePart extends AttributePart {
-  static {
-    __name$1(this, "BooleanAttributePart");
-  }
   constructor() {
     super(...arguments);
     this.type = BOOLEAN_ATTRIBUTE_PART;
@@ -13119,9 +12856,6 @@ class BooleanAttributePart extends AttributePart {
   }
 }
 class EventPart extends AttributePart {
-  static {
-    __name$1(this, "EventPart");
-  }
   constructor(element, name, strings, parent, options) {
     super(element, name, strings, parent, options);
     this.type = EVENT_PART;
@@ -13167,9 +12901,6 @@ class EventPart extends AttributePart {
   }
 }
 class ElementPart {
-  static {
-    __name$1(this, "ElementPart");
-  }
   constructor(element, parent, options) {
     this.element = element;
     this.type = ELEMENT_PART;
@@ -13199,7 +12930,7 @@ if (global$1.litHtmlVersions.length > 1) {
     issueWarning$1("multiple-versions", \`Multiple versions of Lit loaded. Loading multiple versions is not recommended.\`);
   });
 }
-const render = /* @__PURE__ */ __name$1((value, container, options) => {
+const render = (value, container, options) => {
   if (container == null) {
     throw new TypeError(\`The container to render into may not be \${container}\`);
   }
@@ -13228,7 +12959,7 @@ const render = /* @__PURE__ */ __name$1((value, container, options) => {
     part
   });
   return part;
-}, "render");
+};
 {
   render.setSanitizer = setSanitizer;
   render.createSanitizer = createSanitizer;
@@ -13237,25 +12968,25 @@ const render = /* @__PURE__ */ __name$1((value, container, options) => {
   }
 }
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const JSCompiler_renameProperty = /* @__PURE__ */ __name((prop, _obj) => prop, "JSCompiler_renameProperty");
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const JSCompiler_renameProperty = (prop, _obj) => prop;
 const global = globalThis;
 let issueWarning;
 {
   global.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning = /* @__PURE__ */ __name((code, warning) => {
+  issueWarning = (code, warning) => {
     warning += \` See https://lit.dev/msg/\${code} for more information.\`;
     if (!global.litIssuedWarnings.has(warning) && !global.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
 }
 class LitElement extends ReactiveElement {
-  static {
-    __name(this, "LitElement");
-  }
   constructor() {
     super(...arguments);
     this.renderOptions = { host: this };
@@ -13343,7 +13074,7 @@ class LitElement extends ReactiveElement {
   }
 }
 LitElement["_$litElement$"] = true;
-LitElement[JSCompiler_renameProperty("finalized", LitElement)] = true;
+LitElement[JSCompiler_renameProperty("finalized")] = true;
 global.litElementHydrateSupport?.({ LitElement });
 const polyfillSupport = global.litElementPolyfillSupportDevMode ;
 polyfillSupport?.({ LitElement });
@@ -13365,9 +13096,7 @@ console.log(styles);
 `;
 
 exports[`css > emit > should work with emitted processed 'sourcemap-transform' css > js 2`] = `
-"var __defProp$3 = Object.defineProperty;
-var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
-/**
+"/**
  * @license
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
@@ -13375,12 +13104,9 @@ var __name$3 = (target, value) => __defProp$3(target, "name", { value, configura
 const NODE_MODE = false;
 const global$3 = globalThis;
 const supportsAdoptingStyleSheets = global$3.ShadowRoot && (global$3.ShadyCSS === void 0 || global$3.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
-const constructionToken = /*@__PURE__*/ Symbol();
+const constructionToken = /* @__PURE__ */ Symbol();
 const cssTagCache = /* @__PURE__ */ new WeakMap();
 class CSSResult {
-  static {
-    __name$3(this, "CSSResult");
-  }
   constructor(cssText, strings, safeToken) {
     this["_$cssResult$"] = true;
     if (safeToken !== constructionToken) {
@@ -13412,7 +13138,7 @@ class CSSResult {
     return this.cssText;
   }
 }
-const textFromCSSResult = /* @__PURE__ */ __name$3((value) => {
+const textFromCSSResult = (value) => {
   if (value["_$cssResult$"] === true) {
     return value.cssText;
   } else if (typeof value === "number") {
@@ -13420,13 +13146,13 @@ const textFromCSSResult = /* @__PURE__ */ __name$3((value) => {
   } else {
     throw new Error(\`Value passed to 'css' function must be a 'css' function result: \${value}. Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.\`);
   }
-}, "textFromCSSResult");
-const unsafeCSS = /* @__PURE__ */ __name$3((value) => new CSSResult(typeof value === "string" ? value : String(value), void 0, constructionToken), "unsafeCSS");
-const css = /* @__PURE__ */ __name$3((strings, ...values) => {
+};
+const unsafeCSS = (value) => new CSSResult(typeof value === "string" ? value : String(value), void 0, constructionToken);
+const css = (strings, ...values) => {
   const cssText = strings.length === 1 ? strings[0] : values.reduce((acc, v, idx) => acc + textFromCSSResult(v) + strings[idx + 1], strings[0]);
   return new CSSResult(cssText, strings, constructionToken);
-}, "css");
-const adoptStyles = /* @__PURE__ */ __name$3((renderRoot, styles) => {
+};
+const adoptStyles = (renderRoot, styles) => {
   if (supportsAdoptingStyleSheets) {
     renderRoot.adoptedStyleSheets = styles.map((s) => s instanceof CSSStyleSheet ? s : s.styleSheet);
   } else {
@@ -13440,18 +13166,21 @@ const adoptStyles = /* @__PURE__ */ __name$3((renderRoot, styles) => {
       renderRoot.appendChild(style);
     }
   }
-}, "adoptStyles");
-const cssResultFromStyleSheet = /* @__PURE__ */ __name$3((sheet) => {
+};
+const cssResultFromStyleSheet = (sheet) => {
   let cssText = "";
   for (const rule of sheet.cssRules) {
     cssText += rule.cssText;
   }
   return unsafeCSS(cssText);
-}, "cssResultFromStyleSheet");
+};
 const getCompatibleStyle = supportsAdoptingStyleSheets || NODE_MODE ? (s) => s : (s) => s instanceof CSSStyleSheet ? cssResultFromStyleSheet(s) : s;
 
-var __defProp$2 = Object.defineProperty;
-var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 const { is, defineProperty, getOwnPropertyDescriptor, getOwnPropertyNames, getOwnPropertySymbols, getPrototypeOf } = Object;
 const global$2 = globalThis;
 let issueWarning$2;
@@ -13460,13 +13189,13 @@ const emptyStringForBooleanAttribute = trustedTypes$1 ? trustedTypes$1.emptyScri
 const polyfillSupport$2 = global$2.reactiveElementPolyfillSupportDevMode ;
 {
   global$2.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning$2 = /* @__PURE__ */ __name$2((code, warning) => {
+  issueWarning$2 = (code, warning) => {
     warning += \` See https://lit.dev/msg/\${code} for more information.\`;
     if (!global$2.litIssuedWarnings.has(warning) && !global$2.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global$2.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
   queueMicrotask(() => {
     issueWarning$2("dev-mode", \`Lit is in dev mode. Not recommended for production!\`);
     if (global$2.ShadyDOM?.inUse && polyfillSupport$2 === void 0) {
@@ -13483,7 +13212,7 @@ const debugLogEvent$1 = (event) => {
     detail: event
   }));
 } ;
-const JSCompiler_renameProperty$1 = /* @__PURE__ */ __name$2((prop, _obj) => prop, "JSCompiler_renameProperty");
+const JSCompiler_renameProperty$1 = (prop, _obj) => prop;
 const defaultConverter = {
   toAttribute(value, type) {
     switch (type) {
@@ -13518,7 +13247,7 @@ const defaultConverter = {
     return fromValue;
   }
 };
-const notEqual = /* @__PURE__ */ __name$2((value, old) => !is(value, old), "notEqual");
+const notEqual = (value, old) => !is(value, old);
 const defaultPropertyDeclaration = {
   attribute: true,
   type: String,
@@ -13527,12 +13256,9 @@ const defaultPropertyDeclaration = {
   useDefault: false,
   hasChanged: notEqual
 };
-Symbol.metadata ??= /*@__PURE__*/ Symbol("metadata");
+Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata");
 global$2.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 class ReactiveElement extends HTMLElement {
-  static {
-    __name$2(this, "ReactiveElement");
-  }
   /**
    * Adds an initializer function to the class that is called during instance
    * construction.
@@ -13708,7 +13434,7 @@ class ReactiveElement extends HTMLElement {
    * @nocollapse
    */
   static __prepare() {
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("elementProperties", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("elementProperties"))) {
       return;
     }
     const superCtor = getPrototypeOf(this);
@@ -13730,12 +13456,12 @@ class ReactiveElement extends HTMLElement {
    * @nocollapse
    */
   static finalize() {
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("finalized", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("finalized"))) {
       return;
     }
     this.finalized = true;
     this.__prepare();
-    if (this.hasOwnProperty(JSCompiler_renameProperty$1("properties", this))) {
+    if (this.hasOwnProperty(JSCompiler_renameProperty$1("properties"))) {
       const props = this.properties;
       const propKeys = [
         ...getOwnPropertyNames(props),
@@ -14256,19 +13982,19 @@ class ReactiveElement extends HTMLElement {
 }
 ReactiveElement.elementStyles = [];
 ReactiveElement.shadowRootOptions = { mode: "open" };
-ReactiveElement[JSCompiler_renameProperty$1("elementProperties", ReactiveElement)] = /* @__PURE__ */ new Map();
-ReactiveElement[JSCompiler_renameProperty$1("finalized", ReactiveElement)] = /* @__PURE__ */ new Map();
+ReactiveElement[JSCompiler_renameProperty$1("elementProperties")] = /* @__PURE__ */ new Map();
+ReactiveElement[JSCompiler_renameProperty$1("finalized")] = /* @__PURE__ */ new Map();
 polyfillSupport$2?.({ ReactiveElement });
 {
   ReactiveElement.enabledWarnings = [
     "change-in-update",
     "async-perform-update"
   ];
-  const ensureOwnWarnings = /* @__PURE__ */ __name$2(function(ctor) {
-    if (!ctor.hasOwnProperty(JSCompiler_renameProperty$1("enabledWarnings", ctor))) {
+  const ensureOwnWarnings = function(ctor) {
+    if (!ctor.hasOwnProperty(JSCompiler_renameProperty$1("enabledWarnings"))) {
       ctor.enabledWarnings = ctor.enabledWarnings.slice();
     }
-  }, "ensureOwnWarnings");
+  };
   ReactiveElement.enableWarning = function(warning) {
     ensureOwnWarnings(this);
     if (!this.enabledWarnings.includes(warning)) {
@@ -14290,8 +14016,11 @@ if (global$2.reactiveElementVersions.length > 1) {
   });
 }
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 const global$1 = globalThis;
 const debugLogEvent = (event) => {
   const shouldEmit = global$1.emitLitDebugLogEvents;
@@ -14306,13 +14035,13 @@ let debugLogRenderId = 0;
 let issueWarning$1;
 {
   global$1.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning$1 = /* @__PURE__ */ __name$1((code, warning) => {
+  issueWarning$1 = (code, warning) => {
     warning += code ? \` See https://lit.dev/msg/\${code} for more information.\` : "";
     if (!global$1.litIssuedWarnings.has(warning) && !global$1.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global$1.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
   queueMicrotask(() => {
     issueWarning$1("dev-mode", \`Lit is in dev mode. Not recommended for production!\`);
   });
@@ -14320,32 +14049,32 @@ let issueWarning$1;
 const wrap = global$1.ShadyDOM?.inUse && global$1.ShadyDOM?.noPatch === true ? global$1.ShadyDOM.wrap : (node) => node;
 const trustedTypes = global$1.trustedTypes;
 const policy = trustedTypes ? trustedTypes.createPolicy("lit-html", {
-  createHTML: /* @__PURE__ */ __name$1((s) => s, "createHTML")
+  createHTML: (s) => s
 }) : void 0;
-const identityFunction = /* @__PURE__ */ __name$1((value) => value, "identityFunction");
-const noopSanitizer = /* @__PURE__ */ __name$1((_node, _name, _type) => identityFunction, "noopSanitizer");
-const setSanitizer = /* @__PURE__ */ __name$1((newSanitizer) => {
+const identityFunction = (value) => value;
+const noopSanitizer = (_node, _name, _type) => identityFunction;
+const setSanitizer = (newSanitizer) => {
   if (sanitizerFactoryInternal !== noopSanitizer) {
     throw new Error(\`Attempted to overwrite existing lit-html security policy. setSanitizeDOMValueFactory should be called at most once.\`);
   }
   sanitizerFactoryInternal = newSanitizer;
-}, "setSanitizer");
-const _testOnlyClearSanitizerFactoryDoNotCallOrElse = /* @__PURE__ */ __name$1(() => {
+};
+const _testOnlyClearSanitizerFactoryDoNotCallOrElse = () => {
   sanitizerFactoryInternal = noopSanitizer;
-}, "_testOnlyClearSanitizerFactoryDoNotCallOrElse");
-const createSanitizer = /* @__PURE__ */ __name$1((node, name, type) => {
+};
+const createSanitizer = (node, name, type) => {
   return sanitizerFactoryInternal(node, name, type);
-}, "createSanitizer");
+};
 const boundAttributeSuffix = "$lit$";
 const marker = \`lit$\${Math.random().toFixed(9).slice(2)}$\`;
 const markerMatch = "?" + marker;
 const nodeMarker = \`<\${markerMatch}>\`;
 const d = document;
-const createMarker = /* @__PURE__ */ __name$1(() => d.createComment(""), "createMarker");
-const isPrimitive = /* @__PURE__ */ __name$1((value) => value === null || typeof value != "object" && typeof value != "function", "isPrimitive");
+const createMarker = () => d.createComment("");
+const isPrimitive = (value) => value === null || typeof value != "object" && typeof value != "function";
 const isArray = Array.isArray;
-const isIterable = /* @__PURE__ */ __name$1((value) => isArray(value) || // eslint-disable-next-line @typescript-eslint/no-explicit-any
-typeof value?.[Symbol.iterator] === "function", "isIterable");
+const isIterable = (value) => isArray(value) || // eslint-disable-next-line @typescript-eslint/no-explicit-any
+typeof value?.[Symbol.iterator] === "function";
 const SPACE_CHAR = \`[ 	
 \\f\\r]\`;
 const ATTR_VALUE_CHAR = \`[^ 	
@@ -14365,7 +14094,6 @@ const QUOTE_CHAR = 3;
 const singleQuoteAttrEndRegex = /'/g;
 const doubleQuoteAttrEndRegex = /"/g;
 const rawTextElement = /^(?:script|style|textarea|title)$/i;
-const HTML_RESULT = 1;
 const SVG_RESULT = 2;
 const MATHML_RESULT = 3;
 const ATTRIBUTE_PART = 1;
@@ -14375,26 +14103,6 @@ const BOOLEAN_ATTRIBUTE_PART = 4;
 const EVENT_PART = 5;
 const ELEMENT_PART = 6;
 const COMMENT_PART = 7;
-const tag = /* @__PURE__ */ __name$1((type) => (strings, ...values) => {
-  if (strings.some((s) => s === void 0)) {
-    console.warn("Some template strings are undefined.\\nThis is probably caused by illegal octal escape sequences.");
-  }
-  {
-    if (values.some((val) => val?.["_$litStatic$"])) {
-      issueWarning$1("", \`Static values 'literal' or 'unsafeStatic' cannot be used as values to non-static templates.
-Please use the static 'html' tag function. See https://lit.dev/docs/templates/expressions/#static-expressions\`);
-    }
-  }
-  return {
-    // This property needs to remain unminified.
-    ["_$litType$"]: type,
-    strings,
-    values
-  };
-}, "tag");
-tag(HTML_RESULT);
-tag(SVG_RESULT);
-tag(MATHML_RESULT);
 const noChange = Symbol.for("lit-noChange");
 const nothing = Symbol.for("lit-nothing");
 const templateCache = /* @__PURE__ */ new WeakMap();
@@ -14424,8 +14132,7 @@ function trustFromTemplateString(tsa, stringFromTSA) {
   }
   return policy !== void 0 ? policy.createHTML(stringFromTSA) : stringFromTSA;
 }
-__name$1(trustFromTemplateString, "trustFromTemplateString");
-const getTemplateHtml = /* @__PURE__ */ __name$1((strings, type) => {
+const getTemplateHtml = (strings, type) => {
   const l = strings.length - 1;
   const attrNames = [];
   let html2 = type === SVG_RESULT ? "<svg>" : type === MATHML_RESULT ? "<math>" : "";
@@ -14487,11 +14194,8 @@ const getTemplateHtml = /* @__PURE__ */ __name$1((strings, type) => {
   }
   const htmlResult = html2 + (strings[l] || "<?>") + (type === SVG_RESULT ? "</svg>" : type === MATHML_RESULT ? "</math>" : "");
   return [trustFromTemplateString(strings, htmlResult), attrNames];
-}, "getTemplateHtml");
+};
 class Template {
-  static {
-    __name$1(this, "Template");
-  }
   constructor({ strings, ["_$litType$"]: type }, options) {
     this.parts = [];
     let node;
@@ -14619,11 +14323,7 @@ function resolveDirective(part, value, parent = part, attributeIndex) {
   }
   return value;
 }
-__name$1(resolveDirective, "resolveDirective");
 class TemplateInstance {
-  static {
-    __name$1(this, "TemplateInstance");
-  }
   constructor(template, parent) {
     this._$parts = [];
     this._$disconnectableChildren = void 0;
@@ -14693,9 +14393,6 @@ class TemplateInstance {
   }
 }
 class ChildPart {
-  static {
-    __name$1(this, "ChildPart");
-  }
   // See comment in Disconnectable interface for why this is a getter
   get _$isConnected() {
     return this._$parent?._$isConnected ?? this.__isConnected;
@@ -14960,9 +14657,6 @@ class ChildPart {
   }
 }
 class AttributePart {
-  static {
-    __name$1(this, "AttributePart");
-  }
   get tagName() {
     return this.element.tagName;
   }
@@ -15064,9 +14758,6 @@ class AttributePart {
   }
 }
 class PropertyPart extends AttributePart {
-  static {
-    __name$1(this, "PropertyPart");
-  }
   constructor() {
     super(...arguments);
     this.type = PROPERTY_PART;
@@ -15090,9 +14781,6 @@ class PropertyPart extends AttributePart {
   }
 }
 class BooleanAttributePart extends AttributePart {
-  static {
-    __name$1(this, "BooleanAttributePart");
-  }
   constructor() {
     super(...arguments);
     this.type = BOOLEAN_ATTRIBUTE_PART;
@@ -15110,9 +14798,6 @@ class BooleanAttributePart extends AttributePart {
   }
 }
 class EventPart extends AttributePart {
-  static {
-    __name$1(this, "EventPart");
-  }
   constructor(element, name, strings, parent, options) {
     super(element, name, strings, parent, options);
     this.type = EVENT_PART;
@@ -15158,9 +14843,6 @@ class EventPart extends AttributePart {
   }
 }
 class ElementPart {
-  static {
-    __name$1(this, "ElementPart");
-  }
   constructor(element, parent, options) {
     this.element = element;
     this.type = ELEMENT_PART;
@@ -15190,7 +14872,7 @@ if (global$1.litHtmlVersions.length > 1) {
     issueWarning$1("multiple-versions", \`Multiple versions of Lit loaded. Loading multiple versions is not recommended.\`);
   });
 }
-const render = /* @__PURE__ */ __name$1((value, container, options) => {
+const render = (value, container, options) => {
   if (container == null) {
     throw new TypeError(\`The container to render into may not be \${container}\`);
   }
@@ -15219,7 +14901,7 @@ const render = /* @__PURE__ */ __name$1((value, container, options) => {
     part
   });
   return part;
-}, "render");
+};
 {
   render.setSanitizer = setSanitizer;
   render.createSanitizer = createSanitizer;
@@ -15228,25 +14910,25 @@ const render = /* @__PURE__ */ __name$1((value, container, options) => {
   }
 }
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const JSCompiler_renameProperty = /* @__PURE__ */ __name((prop, _obj) => prop, "JSCompiler_renameProperty");
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const JSCompiler_renameProperty = (prop, _obj) => prop;
 const global = globalThis;
 let issueWarning;
 {
   global.litIssuedWarnings ??= /* @__PURE__ */ new Set();
-  issueWarning = /* @__PURE__ */ __name((code, warning) => {
+  issueWarning = (code, warning) => {
     warning += \` See https://lit.dev/msg/\${code} for more information.\`;
     if (!global.litIssuedWarnings.has(warning) && !global.litIssuedWarnings.has(code)) {
       console.warn(warning);
       global.litIssuedWarnings.add(warning);
     }
-  }, "issueWarning");
+  };
 }
 class LitElement extends ReactiveElement {
-  static {
-    __name(this, "LitElement");
-  }
   constructor() {
     super(...arguments);
     this.renderOptions = { host: this };
@@ -15334,7 +15016,7 @@ class LitElement extends ReactiveElement {
   }
 }
 LitElement["_$litElement$"] = true;
-LitElement[JSCompiler_renameProperty("finalized", LitElement)] = true;
+LitElement[JSCompiler_renameProperty("finalized")] = true;
 global.litElementHydrateSupport?.({ LitElement });
 const polyfillSupport = global.litElementPolyfillSupportDevMode ;
 polyfillSupport?.({ LitElement });
@@ -17571,8 +17253,6 @@ const cssStyleInject = require('@visulima/css-style-inject');
 var css = "/*! tailwindcss v4.1.14 | MIT License | https://tailwindcss.com */\\n@layer properties;\\n@layer theme, base, components, utilities;\\n@layer theme;\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, var(--font-sans, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\"));\\n    font-feature-settings: var(--default-font-feature-settings, initial);\\n    font-variation-settings: var(--default-font-variation-settings, initial);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace));\\n    font-feature-settings: var(--default-mono-font-feature-settings, initial);\\n    font-variation-settings: var(--default-mono-font-variation-settings, initial);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities {\\n  .mb-3 {\\n    margin-bottom: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .transform {\\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\\n  }\\n  .rounded-xl {\\n    border-radius: var(--radius-xl, 0.75rem);\\n  }\\n  .border {\\n    border-style: var(--tw-border-style);\\n    border-width: 1px;\\n  }\\n  .border-2 {\\n    border-style: var(--tw-border-style);\\n    border-width: 2px;\\n  }\\n  .border-blue-600 {\\n    border-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .border-gray-200 {\\n    border-color: var(--color-gray-200, oklch(92.8% 0.006 264.531));\\n  }\\n  .border-gray-300 {\\n    border-color: var(--color-gray-300, oklch(87.2% 0.01 258.338));\\n  }\\n  .bg-blue-600 {\\n    background-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .bg-gray-600 {\\n    background-color: var(--color-gray-600, oklch(44.6% 0.03 256.802));\\n  }\\n  .bg-transparent {\\n    background-color: transparent;\\n  }\\n  .bg-white {\\n    background-color: var(--color-white, #fff);\\n  }\\n  .px-3 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .px-4 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 4);\\n  }\\n  .px-6 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 6);\\n  }\\n  .py-1\\\\.5 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 1.5);\\n  }\\n  .py-2 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 2);\\n  }\\n  .py-3 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .text-base {\\n    font-size: var(--text-base, 1rem);\\n    line-height: var(--tw-leading, var(--text-base--line-height, calc(1.5 / 1)));\\n  }\\n  .text-lg {\\n    font-size: var(--text-lg, 1.125rem);\\n    line-height: var(--tw-leading, var(--text-lg--line-height, calc(1.75 / 1.125)));\\n  }\\n  .text-sm {\\n    font-size: var(--text-sm, 0.875rem);\\n    line-height: var(--tw-leading, var(--text-sm--line-height, calc(1.25 / 0.875)));\\n  }\\n  .text-xl {\\n    font-size: var(--text-xl, 1.25rem);\\n    line-height: var(--tw-leading, var(--text-xl--line-height, calc(1.75 / 1.25)));\\n  }\\n  .font-medium {\\n    --tw-font-weight: var(--font-weight-medium, 500);\\n    font-weight: var(--font-weight-medium, 500);\\n  }\\n  .font-semibold {\\n    --tw-font-weight: var(--font-weight-semibold, 600);\\n    font-weight: var(--font-weight-semibold, 600);\\n  }\\n  .text-blue-600 {\\n    color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .text-gray-600 {\\n    color: var(--color-gray-600, oklch(44.6% 0.03 256.802));\\n  }\\n  .text-gray-800 {\\n    color: var(--color-gray-800, oklch(27.8% 0.033 256.848));\\n  }\\n  .text-white {\\n    color: var(--color-white, #fff);\\n  }\\n  .shadow-2xl {\\n    --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .shadow-lg {\\n    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .outline {\\n    outline-style: var(--tw-outline-style);\\n    outline-width: 1px;\\n  }\\n  .transition-all {\\n    transition-property: all;\\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n    transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  }\\n  .duration-200 {\\n    --tw-duration: 200ms;\\n    transition-duration: 200ms;\\n  }\\n  .hover\\\\:scale-105 {\\n    &:hover {\\n      @media (hover: hover) {\\n        --tw-scale-x: 105%;\\n        --tw-scale-y: 105%;\\n        --tw-scale-z: 105%;\\n        scale: var(--tw-scale-x) var(--tw-scale-y);\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-blue-600 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-blue-700 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-blue-700, oklch(48.8% 0.243 264.376));\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-gray-700 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-gray-700, oklch(37.3% 0.034 259.733));\\n      }\\n    }\\n  }\\n  .hover\\\\:text-white {\\n    &:hover {\\n      @media (hover: hover) {\\n        color: var(--color-white, #fff);\\n      }\\n    }\\n  }\\n}\\n@layer theme, base, components, utilities;\\n@layer theme;\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, var(--font-sans, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\"));\\n    font-feature-settings: var(--default-font-feature-settings, initial);\\n    font-variation-settings: var(--default-font-variation-settings, initial);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace));\\n    font-feature-settings: var(--default-mono-font-feature-settings, initial);\\n    font-variation-settings: var(--default-mono-font-variation-settings, initial);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities;\\n.button {\\n  border-radius: var(--radius-lg, 0.5rem);\\n  --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n}\\n.button:focus {\\n  --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);\\n  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  --tw-ring-color: var(--color-blue-500, oklch(62.3% 0.214 259.815));\\n  --tw-ring-offset-width: 2px;\\n  --tw-ring-offset-shadow: var(--tw-ring-inset,) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);\\n  --tw-outline-style: none;\\n  outline-style: none;\\n}\\n.button:disabled {\\n  cursor: not-allowed;\\n  opacity: 50%;\\n}\\n.card {\\n  padding: calc(var(--spacing, 0.25rem) * 6);\\n}\\n.card.elevated {\\n  transition-property: all;\\n  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n  transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  --tw-duration: 300ms;\\n  transition-duration: 300ms;\\n  --tw-ease: var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));\\n  transition-timing-function: var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));\\n}\\n.card.outlined {\\n  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;\\n  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n  transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  --tw-duration: 200ms;\\n  transition-duration: 200ms;\\n  &:hover {\\n    @media (hover: hover) {\\n      border-color: var(--color-gray-400, oklch(70.7% 0.022 261.325));\\n    }\\n  }\\n}\\n.container {\\n  max-width: 1200px;\\n  margin: 0 auto;\\n  padding: 0 1rem;\\n}\\n.button {\\n  display: inline-block;\\n  padding: 0.5rem 1rem;\\n  background-color: #3b82f6;\\n  color: white;\\n  border-radius: 0.375rem;\\n  text-decoration: none;\\n  transition: background-color 0.2s;\\n}\\n.button:hover {\\n  background-color: #2563eb;\\n}\\n.card {\\n  background: white;\\n  border-radius: 0.5rem;\\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);\\n  padding: 1.5rem;\\n}\\n.text-gradient {\\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\\n  -webkit-background-clip: text;\\n  -webkit-text-fill-color: transparent;\\n  background-clip: text;\\n}\\n.animate-fade-in {\\n  animation: fadeIn 0.5s ease-in-out;\\n}\\n@keyframes fadeIn {\\n  from {\\n    opacity: 0;\\n    transform: translateY(10px);\\n  }\\n  to {\\n    opacity: 1;\\n    transform: translateY(0);\\n  }\\n}\\n@property --tw-rotate-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-border-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-font-weight {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-inset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-ring-inset {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-offset-width {\\n  syntax: \\"<length>\\";\\n  inherits: false;\\n  initial-value: 0px;\\n}\\n@property --tw-ring-offset-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: #fff;\\n}\\n@property --tw-ring-offset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-outline-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-duration {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-scale-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-scale-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-scale-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-ease {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@layer properties {\\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\\n    *, ::before, ::after, ::backdrop {\\n      --tw-rotate-x: initial;\\n      --tw-rotate-y: initial;\\n      --tw-rotate-z: initial;\\n      --tw-skew-x: initial;\\n      --tw-skew-y: initial;\\n      --tw-border-style: solid;\\n      --tw-font-weight: initial;\\n      --tw-shadow: 0 0 #0000;\\n      --tw-shadow-color: initial;\\n      --tw-shadow-alpha: 100%;\\n      --tw-inset-shadow: 0 0 #0000;\\n      --tw-inset-shadow-color: initial;\\n      --tw-inset-shadow-alpha: 100%;\\n      --tw-ring-color: initial;\\n      --tw-ring-shadow: 0 0 #0000;\\n      --tw-inset-ring-color: initial;\\n      --tw-inset-ring-shadow: 0 0 #0000;\\n      --tw-ring-inset: initial;\\n      --tw-ring-offset-width: 0px;\\n      --tw-ring-offset-color: #fff;\\n      --tw-ring-offset-shadow: 0 0 #0000;\\n      --tw-outline-style: solid;\\n      --tw-duration: initial;\\n      --tw-scale-x: 1;\\n      --tw-scale-y: 1;\\n      --tw-scale-z: 1;\\n      --tw-ease: initial;\\n    }\\n  }\\n}\\n";
 cssStyleInject.cssStyleInject(css,{});
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
@@ -17588,10 +17268,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -17602,7 +17279,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 
@@ -17617,8 +17293,6 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'basic
 var css = "/*! tailwindcss v4.1.14 | MIT License | https://tailwindcss.com */\\n@layer properties;\\n@layer theme, base, components, utilities;\\n@layer theme;\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, var(--font-sans, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\"));\\n    font-feature-settings: var(--default-font-feature-settings, initial);\\n    font-variation-settings: var(--default-font-variation-settings, initial);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace));\\n    font-feature-settings: var(--default-mono-font-feature-settings, initial);\\n    font-variation-settings: var(--default-mono-font-variation-settings, initial);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities {\\n  .mb-3 {\\n    margin-bottom: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .transform {\\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\\n  }\\n  .rounded-xl {\\n    border-radius: var(--radius-xl, 0.75rem);\\n  }\\n  .border {\\n    border-style: var(--tw-border-style);\\n    border-width: 1px;\\n  }\\n  .border-2 {\\n    border-style: var(--tw-border-style);\\n    border-width: 2px;\\n  }\\n  .border-blue-600 {\\n    border-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .border-gray-200 {\\n    border-color: var(--color-gray-200, oklch(92.8% 0.006 264.531));\\n  }\\n  .border-gray-300 {\\n    border-color: var(--color-gray-300, oklch(87.2% 0.01 258.338));\\n  }\\n  .bg-blue-600 {\\n    background-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .bg-gray-600 {\\n    background-color: var(--color-gray-600, oklch(44.6% 0.03 256.802));\\n  }\\n  .bg-transparent {\\n    background-color: transparent;\\n  }\\n  .bg-white {\\n    background-color: var(--color-white, #fff);\\n  }\\n  .px-3 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .px-4 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 4);\\n  }\\n  .px-6 {\\n    padding-inline: calc(var(--spacing, 0.25rem) * 6);\\n  }\\n  .py-1\\\\.5 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 1.5);\\n  }\\n  .py-2 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 2);\\n  }\\n  .py-3 {\\n    padding-block: calc(var(--spacing, 0.25rem) * 3);\\n  }\\n  .text-base {\\n    font-size: var(--text-base, 1rem);\\n    line-height: var(--tw-leading, var(--text-base--line-height, calc(1.5 / 1)));\\n  }\\n  .text-lg {\\n    font-size: var(--text-lg, 1.125rem);\\n    line-height: var(--tw-leading, var(--text-lg--line-height, calc(1.75 / 1.125)));\\n  }\\n  .text-sm {\\n    font-size: var(--text-sm, 0.875rem);\\n    line-height: var(--tw-leading, var(--text-sm--line-height, calc(1.25 / 0.875)));\\n  }\\n  .text-xl {\\n    font-size: var(--text-xl, 1.25rem);\\n    line-height: var(--tw-leading, var(--text-xl--line-height, calc(1.75 / 1.25)));\\n  }\\n  .font-medium {\\n    --tw-font-weight: var(--font-weight-medium, 500);\\n    font-weight: var(--font-weight-medium, 500);\\n  }\\n  .font-semibold {\\n    --tw-font-weight: var(--font-weight-semibold, 600);\\n    font-weight: var(--font-weight-semibold, 600);\\n  }\\n  .text-blue-600 {\\n    color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n  }\\n  .text-gray-600 {\\n    color: var(--color-gray-600, oklch(44.6% 0.03 256.802));\\n  }\\n  .text-gray-800 {\\n    color: var(--color-gray-800, oklch(27.8% 0.033 256.848));\\n  }\\n  .text-white {\\n    color: var(--color-white, #fff);\\n  }\\n  .shadow-2xl {\\n    --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .shadow-lg {\\n    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .outline {\\n    outline-style: var(--tw-outline-style);\\n    outline-width: 1px;\\n  }\\n  .transition-all {\\n    transition-property: all;\\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n    transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  }\\n  .duration-200 {\\n    --tw-duration: 200ms;\\n    transition-duration: 200ms;\\n  }\\n  .hover\\\\:scale-105 {\\n    &:hover {\\n      @media (hover: hover) {\\n        --tw-scale-x: 105%;\\n        --tw-scale-y: 105%;\\n        --tw-scale-z: 105%;\\n        scale: var(--tw-scale-x) var(--tw-scale-y);\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-blue-600 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-blue-600, oklch(54.6% 0.245 262.881));\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-blue-700 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-blue-700, oklch(48.8% 0.243 264.376));\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-gray-700 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-gray-700, oklch(37.3% 0.034 259.733));\\n      }\\n    }\\n  }\\n  .hover\\\\:text-white {\\n    &:hover {\\n      @media (hover: hover) {\\n        color: var(--color-white, #fff);\\n      }\\n    }\\n  }\\n}\\n@layer theme, base, components, utilities;\\n@layer theme;\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, var(--font-sans, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\"));\\n    font-feature-settings: var(--default-font-feature-settings, initial);\\n    font-variation-settings: var(--default-font-variation-settings, initial);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace));\\n    font-feature-settings: var(--default-mono-font-feature-settings, initial);\\n    font-variation-settings: var(--default-mono-font-variation-settings, initial);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities;\\n.button {\\n  border-radius: var(--radius-lg, 0.5rem);\\n  --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n}\\n.button:focus {\\n  --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);\\n  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  --tw-ring-color: var(--color-blue-500, oklch(62.3% 0.214 259.815));\\n  --tw-ring-offset-width: 2px;\\n  --tw-ring-offset-shadow: var(--tw-ring-inset,) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);\\n  --tw-outline-style: none;\\n  outline-style: none;\\n}\\n.button:disabled {\\n  cursor: not-allowed;\\n  opacity: 50%;\\n}\\n.card {\\n  padding: calc(var(--spacing, 0.25rem) * 6);\\n}\\n.card.elevated {\\n  transition-property: all;\\n  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n  transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  --tw-duration: 300ms;\\n  transition-duration: 300ms;\\n  --tw-ease: var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));\\n  transition-timing-function: var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));\\n}\\n.card.outlined {\\n  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;\\n  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1)));\\n  transition-duration: var(--tw-duration, var(--default-transition-duration, 150ms));\\n  --tw-duration: 200ms;\\n  transition-duration: 200ms;\\n  &:hover {\\n    @media (hover: hover) {\\n      border-color: var(--color-gray-400, oklch(70.7% 0.022 261.325));\\n    }\\n  }\\n}\\n.container {\\n  max-width: 1200px;\\n  margin: 0 auto;\\n  padding: 0 1rem;\\n}\\n.button {\\n  display: inline-block;\\n  padding: 0.5rem 1rem;\\n  background-color: #3b82f6;\\n  color: white;\\n  border-radius: 0.375rem;\\n  text-decoration: none;\\n  transition: background-color 0.2s;\\n}\\n.button:hover {\\n  background-color: #2563eb;\\n}\\n.card {\\n  background: white;\\n  border-radius: 0.5rem;\\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);\\n  padding: 1.5rem;\\n}\\n.text-gradient {\\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\\n  -webkit-background-clip: text;\\n  -webkit-text-fill-color: transparent;\\n  background-clip: text;\\n}\\n.animate-fade-in {\\n  animation: fadeIn 0.5s ease-in-out;\\n}\\n@keyframes fadeIn {\\n  from {\\n    opacity: 0;\\n    transform: translateY(10px);\\n  }\\n  to {\\n    opacity: 1;\\n    transform: translateY(0);\\n  }\\n}\\n@property --tw-rotate-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-border-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-font-weight {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-inset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-ring-inset {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-offset-width {\\n  syntax: \\"<length>\\";\\n  inherits: false;\\n  initial-value: 0px;\\n}\\n@property --tw-ring-offset-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: #fff;\\n}\\n@property --tw-ring-offset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-outline-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-duration {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-scale-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-scale-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-scale-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 1;\\n}\\n@property --tw-ease {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@layer properties {\\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\\n    *, ::before, ::after, ::backdrop {\\n      --tw-rotate-x: initial;\\n      --tw-rotate-y: initial;\\n      --tw-rotate-z: initial;\\n      --tw-skew-x: initial;\\n      --tw-skew-y: initial;\\n      --tw-border-style: solid;\\n      --tw-font-weight: initial;\\n      --tw-shadow: 0 0 #0000;\\n      --tw-shadow-color: initial;\\n      --tw-shadow-alpha: 100%;\\n      --tw-inset-shadow: 0 0 #0000;\\n      --tw-inset-shadow-color: initial;\\n      --tw-inset-shadow-alpha: 100%;\\n      --tw-ring-color: initial;\\n      --tw-ring-shadow: 0 0 #0000;\\n      --tw-inset-ring-color: initial;\\n      --tw-inset-ring-shadow: 0 0 #0000;\\n      --tw-ring-inset: initial;\\n      --tw-ring-offset-width: 0px;\\n      --tw-ring-offset-color: #fff;\\n      --tw-ring-offset-shadow: 0 0 #0000;\\n      --tw-outline-style: solid;\\n      --tw-duration: initial;\\n      --tw-scale-x: 1;\\n      --tw-scale-y: 1;\\n      --tw-scale-z: 1;\\n      --tw-ease: initial;\\n    }\\n  }\\n}\\n";
 cssStyleInject(css,{});
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
@@ -17634,10 +17308,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -17648,7 +17319,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 
@@ -18438,8 +18108,6 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp$3 = Object.defineProperty;
-var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "btn font-medium transition-all duration-200";
   const variantClasses = {
@@ -18455,10 +18123,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$3(Button, "Button");
 
-var __defProp$2 = Object.defineProperty;
-var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -18469,21 +18134,14 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "card-title text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "card-content text-gray-600" }, children));
 }
-__name$2(Card, "Card");
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Header({ title, subtitle }) {
   return React.createElement("header", { className: "header bg-gradient-to-r from-blue-900 to-blue-700 text-white" }, React.createElement("div", { className: "header-container" }, React.createElement("h1", { className: "header-title text-3xl font-bold" }, title), subtitle && React.createElement("p", { className: "header-subtitle text-blue-100 text-lg" }, subtitle)));
 }
-__name$1(Header, "Header");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Footer({ links = [] }) {
   return React.createElement("footer", { className: "footer bg-gray-900 text-white py-12" }, React.createElement("div", { className: "footer-container" }, React.createElement("div", { className: "footer-content" }, React.createElement("p", { className: "footer-copyright text-gray-400" }, "© 2024 Tailwind Oxide Test. All rights reserved."), links.length > 0 && React.createElement("nav", { className: "footer-nav" }, React.createElement("ul", { className: "footer-links" }, links.map((link, index) => React.createElement("li", { key: index, className: "footer-link-item" }, React.createElement("a", { href: link.href, className: "footer-link" }, link.text))))))));
 }
-__name(Footer, "Footer");
 
 console.log("Tailwind Oxide cross-folder test loaded");
 
@@ -18495,9 +18153,7 @@ exports.Header = Header;
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross-folder-extract' css > js 2`] = `
-"var __defProp$3 = Object.defineProperty;
-var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
-function Button({ children, variant = "primary", size = "medium" }) {
+"function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "btn font-medium transition-all duration-200";
   const variantClasses = {
     primary: "bg-blue-600 hover:bg-blue-700 text-white",
@@ -18512,10 +18168,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$3(Button, "Button");
 
-var __defProp$2 = Object.defineProperty;
-var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -18526,21 +18179,14 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "card-title text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "card-content text-gray-600" }, children));
 }
-__name$2(Card, "Card");
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Header({ title, subtitle }) {
   return React.createElement("header", { className: "header bg-gradient-to-r from-blue-900 to-blue-700 text-white" }, React.createElement("div", { className: "header-container" }, React.createElement("h1", { className: "header-title text-3xl font-bold" }, title), subtitle && React.createElement("p", { className: "header-subtitle text-blue-100 text-lg" }, subtitle)));
 }
-__name$1(Header, "Header");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Footer({ links = [] }) {
   return React.createElement("footer", { className: "footer bg-gray-900 text-white py-12" }, React.createElement("div", { className: "footer-container" }, React.createElement("div", { className: "footer-content" }, React.createElement("p", { className: "footer-copyright text-gray-400" }, "© 2024 Tailwind Oxide Test. All rights reserved."), links.length > 0 && React.createElement("nav", { className: "footer-nav" }, React.createElement("ul", { className: "footer-links" }, links.map((link, index) => React.createElement("li", { key: index, className: "footer-link-item" }, React.createElement("a", { href: link.href, className: "footer-link" }, link.text))))))));
 }
-__name(Footer, "Footer");
 
 console.log("Tailwind Oxide cross-folder test loaded");
 
@@ -19331,8 +18977,6 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp$3 = Object.defineProperty;
-var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "btn font-medium transition-all duration-200";
   const variantClasses = {
@@ -19348,10 +18992,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$3(Button, "Button");
 
-var __defProp$2 = Object.defineProperty;
-var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -19362,21 +19003,14 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "card-title text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "card-content text-gray-600" }, children));
 }
-__name$2(Card, "Card");
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Header({ title, subtitle }) {
   return React.createElement("header", { className: "header bg-gradient-to-r from-blue-900 to-blue-700 text-white" }, React.createElement("div", { className: "header-container" }, React.createElement("h1", { className: "header-title text-3xl font-bold" }, title), subtitle && React.createElement("p", { className: "header-subtitle text-blue-100 text-lg" }, subtitle)));
 }
-__name$1(Header, "Header");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Footer({ links = [] }) {
   return React.createElement("footer", { className: "footer bg-gray-900 text-white py-12" }, React.createElement("div", { className: "footer-container" }, React.createElement("div", { className: "footer-content" }, React.createElement("p", { className: "footer-copyright text-gray-400" }, "© 2024 Tailwind Oxide Test. All rights reserved."), links.length > 0 && React.createElement("nav", { className: "footer-nav" }, React.createElement("ul", { className: "footer-links" }, links.map((link, index) => React.createElement("li", { key: index, className: "footer-link-item" }, React.createElement("a", { href: link.href, className: "footer-link" }, link.text))))))));
 }
-__name(Footer, "Footer");
 
 console.log("Tailwind Oxide cross-folder test loaded");
 
@@ -19388,9 +19022,7 @@ exports.Header = Header;
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross-folder-extract-sourcemap' css > js 2`] = `
-"var __defProp$3 = Object.defineProperty;
-var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
-function Button({ children, variant = "primary", size = "medium" }) {
+"function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "btn font-medium transition-all duration-200";
   const variantClasses = {
     primary: "bg-blue-600 hover:bg-blue-700 text-white",
@@ -19405,10 +19037,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$3(Button, "Button");
 
-var __defProp$2 = Object.defineProperty;
-var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -19419,21 +19048,14 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "card-title text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "card-content text-gray-600" }, children));
 }
-__name$2(Card, "Card");
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Header({ title, subtitle }) {
   return React.createElement("header", { className: "header bg-gradient-to-r from-blue-900 to-blue-700 text-white" }, React.createElement("div", { className: "header-container" }, React.createElement("h1", { className: "header-title text-3xl font-bold" }, title), subtitle && React.createElement("p", { className: "header-subtitle text-blue-100 text-lg" }, subtitle)));
 }
-__name$1(Header, "Header");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Footer({ links = [] }) {
   return React.createElement("footer", { className: "footer bg-gray-900 text-white py-12" }, React.createElement("div", { className: "footer-container" }, React.createElement("div", { className: "footer-content" }, React.createElement("p", { className: "footer-copyright text-gray-400" }, "© 2024 Tailwind Oxide Test. All rights reserved."), links.length > 0 && React.createElement("nav", { className: "footer-nav" }, React.createElement("ul", { className: "footer-links" }, links.map((link, index) => React.createElement("li", { key: index, className: "footer-link-item" }, React.createElement("a", { href: link.href, className: "footer-link" }, link.text))))))));
 }
-__name(Footer, "Footer");
 
 console.log("Tailwind Oxide cross-folder test loaded");
 
@@ -20226,8 +19848,6 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp$3 = Object.defineProperty;
-var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "btn font-medium transition-all duration-200";
   const variantClasses = {
@@ -20243,10 +19863,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$3(Button, "Button");
 
-var __defProp$2 = Object.defineProperty;
-var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -20257,21 +19874,14 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "card-title text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "card-content text-gray-600" }, children));
 }
-__name$2(Card, "Card");
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Header({ title, subtitle }) {
   return React.createElement("header", { className: "header bg-gradient-to-r from-blue-900 to-blue-700 text-white" }, React.createElement("div", { className: "header-container" }, React.createElement("h1", { className: "header-title text-3xl font-bold" }, title), subtitle && React.createElement("p", { className: "header-subtitle text-blue-100 text-lg" }, subtitle)));
 }
-__name$1(Header, "Header");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Footer({ links = [] }) {
   return React.createElement("footer", { className: "footer bg-gray-900 text-white py-12" }, React.createElement("div", { className: "footer-container" }, React.createElement("div", { className: "footer-content" }, React.createElement("p", { className: "footer-copyright text-gray-400" }, "© 2024 Tailwind Oxide Test. All rights reserved."), links.length > 0 && React.createElement("nav", { className: "footer-nav" }, React.createElement("ul", { className: "footer-links" }, links.map((link, index) => React.createElement("li", { key: index, className: "footer-link-item" }, React.createElement("a", { href: link.href, className: "footer-link" }, link.text))))))));
 }
-__name(Footer, "Footer");
 
 console.log("Tailwind Oxide cross-folder test loaded");
 
@@ -20283,9 +19893,7 @@ exports.Header = Header;
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'cross-folder-extract-sourcemap-inline' css > js 2`] = `
-"var __defProp$3 = Object.defineProperty;
-var __name$3 = (target, value) => __defProp$3(target, "name", { value, configurable: true });
-function Button({ children, variant = "primary", size = "medium" }) {
+"function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "btn font-medium transition-all duration-200";
   const variantClasses = {
     primary: "bg-blue-600 hover:bg-blue-700 text-white",
@@ -20300,10 +19908,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$3(Button, "Button");
 
-var __defProp$2 = Object.defineProperty;
-var __name$2 = (target, value) => __defProp$2(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -20314,21 +19919,14 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "card-title text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "card-content text-gray-600" }, children));
 }
-__name$2(Card, "Card");
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Header({ title, subtitle }) {
   return React.createElement("header", { className: "header bg-gradient-to-r from-blue-900 to-blue-700 text-white" }, React.createElement("div", { className: "header-container" }, React.createElement("h1", { className: "header-title text-3xl font-bold" }, title), subtitle && React.createElement("p", { className: "header-subtitle text-blue-100 text-lg" }, subtitle)));
 }
-__name$1(Header, "Header");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Footer({ links = [] }) {
   return React.createElement("footer", { className: "footer bg-gray-900 text-white py-12" }, React.createElement("div", { className: "footer-container" }, React.createElement("div", { className: "footer-content" }, React.createElement("p", { className: "footer-copyright text-gray-400" }, "© 2024 Tailwind Oxide Test. All rights reserved."), links.length > 0 && React.createElement("nav", { className: "footer-nav" }, React.createElement("ul", { className: "footer-links" }, links.map((link, index) => React.createElement("li", { key: index, className: "footer-link-item" }, React.createElement("a", { href: link.href, className: "footer-link" }, link.text))))))));
 }
-__name(Footer, "Footer");
 
 console.log("Tailwind Oxide cross-folder test loaded");
 
@@ -21044,8 +20642,6 @@ lit.css\`/*! tailwindcss v4.1.14 | MIT License | https://tailwindcss.com */
 }
 \`;
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
@@ -21061,10 +20657,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -21075,7 +20668,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 
@@ -21788,8 +21380,6 @@ css\`/*! tailwindcss v4.1.14 | MIT License | https://tailwindcss.com */
 }
 \`;
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
@@ -21805,10 +21395,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -21819,7 +21406,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 
@@ -22535,8 +22121,6 @@ lit.css\`/*! tailwindcss v4.1.14 | MIT License | https://tailwindcss.com */
 }
 \`;
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
@@ -22552,10 +22136,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -22566,7 +22147,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 
@@ -23279,8 +22859,6 @@ css\`/*! tailwindcss v4.1.14 | MIT License | https://tailwindcss.com */
 }
 \`;
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
@@ -23296,10 +22874,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -23310,7 +22885,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 
@@ -24026,8 +23600,6 @@ lit.css\`/*! tailwindcss v4.1.14 | MIT License | https://tailwindcss.com */
 }
 \`;
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
@@ -24043,10 +23615,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -24057,7 +23626,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 
@@ -24770,8 +24338,6 @@ css\`/*! tailwindcss v4.1.14 | MIT License | https://tailwindcss.com */
 }
 \`;
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
@@ -24787,10 +24353,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -24801,7 +24364,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 
@@ -25517,8 +25079,6 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extra
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
@@ -25534,10 +25094,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -25548,7 +25105,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 
@@ -25558,9 +25114,7 @@ exports.Card = Card;
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extract' css > js 2`] = `
-"var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
-function Button({ children, variant = "primary", size = "medium" }) {
+"function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
     primary: "bg-blue-600 hover:bg-blue-700 text-white",
@@ -25575,10 +25129,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -25589,7 +25140,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 
@@ -26514,8 +26064,6 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extra
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
@@ -26531,10 +26079,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -26545,7 +26090,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 
@@ -26555,9 +26099,7 @@ exports.Card = Card;
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extract-sourcemap' css > js 2`] = `
-"var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
-function Button({ children, variant = "primary", size = "medium" }) {
+"function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
     primary: "bg-blue-600 hover:bg-blue-700 text-white",
@@ -26572,10 +26114,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -26586,7 +26125,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 
@@ -27317,8 +26855,6 @@ exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extra
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
 function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
@@ -27334,10 +26870,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -27348,7 +26881,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 
@@ -27358,9 +26890,7 @@ exports.Card = Card;
 `;
 
 exports[`css > tailwind-oxide > should work with tailwind-oxide processed 'extract-sourcemap-inline' css > js 2`] = `
-"var __defProp$1 = Object.defineProperty;
-var __name$1 = (target, value) => __defProp$1(target, "name", { value, configurable: true });
-function Button({ children, variant = "primary", size = "medium" }) {
+"function Button({ children, variant = "primary", size = "medium" }) {
   const baseClasses = "button font-medium transition-all duration-200";
   const variantClasses = {
     primary: "bg-blue-600 hover:bg-blue-700 text-white",
@@ -27375,10 +26905,7 @@ function Button({ children, variant = "primary", size = "medium" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`;
   return React.createElement("button", { className: classes }, children);
 }
-__name$1(Button, "Button");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function Card({ title, children, variant = "default" }) {
   const baseClasses = "card rounded-xl shadow-lg";
   const variantClasses = {
@@ -27389,7 +26916,6 @@ function Card({ title, children, variant = "default" }) {
   const classes = \`\${baseClasses} \${variantClasses[variant]}\`;
   return React.createElement("div", { className: classes }, title && React.createElement("h3", { className: "text-xl font-semibold text-gray-800 mb-3" }, title), React.createElement("div", { className: "text-gray-600" }, children));
 }
-__name(Card, "Card");
 
 console.log("Tailwind Oxide test loaded");
 

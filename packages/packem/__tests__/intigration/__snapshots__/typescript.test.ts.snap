@@ -36,9 +36,7 @@ console.log(test2);
 exports[`packem typescript > should allow support for "allowJs" and generate proper assets > cjs code output 1`] = `
 "'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = /* @__PURE__ */ __name(() => "index", "default");
+const index = () => "index";
 
 module.exports = index;
 "
@@ -65,24 +63,19 @@ var hasRequiredUtils;
 function requireUtils () {
 	if (hasRequiredUtils) return utils;
 	hasRequiredUtils = 1;
-	var __defProp = Object.defineProperty;
-	var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 	Object.defineProperty(utils, "__esModule", { value: true });
 	utils.isDocumentToRecurOn = utils.flatten = utils.unique = void 0;
 	function unique(array) {
 	  return [...new Set(array)];
 	}
-	__name(unique, "unique");
 	utils.unique = unique;
 	function flatten(array) {
 	  return [].concat(...array);
 	}
-	__name(flatten, "flatten");
 	utils.flatten = flatten;
 	function isDocumentToRecurOn(val) {
 	  return typeof val === "object" && val !== null && !Array.isArray(val) && Object.keys(val).length;
 	}
-	__name(isDocumentToRecurOn, "isDocumentToRecurOn");
 	utils.isDocumentToRecurOn = isDocumentToRecurOn;
 	return utils;
 }
@@ -104,15 +97,13 @@ function requireDeeks () {
 	if (hasRequiredDeeks) return deeks;
 	hasRequiredDeeks = 1;
 	(function (exports) {
-		var __defProp = Object.defineProperty;
-		var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 		var __createBinding = deeks && deeks.__createBinding || (Object.create ? (function(o, m, k, k2) {
 		  if (k2 === void 0) k2 = k;
 		  var desc = Object.getOwnPropertyDescriptor(m, k);
 		  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-		    desc = { enumerable: true, get: /* @__PURE__ */ __name(function() {
+		    desc = { enumerable: true, get: function() {
 		      return m[k];
-		    }, "get") };
+		    } };
 		  }
 		  Object.defineProperty(o, k2, desc);
 		}) : (function(o, m, k, k2) {
@@ -147,7 +138,6 @@ function requireDeeks () {
 		  }
 		  return [];
 		}
-		__name(deepKeys, "deepKeys");
 		exports.deepKeys = deepKeys;
 		function deepKeysFromList(list, options) {
 		  const parsedOptions = mergeOptions(options);
@@ -158,7 +148,6 @@ function requireDeeks () {
 		    return [];
 		  });
 		}
-		__name(deepKeysFromList, "deepKeysFromList");
 		exports.deepKeysFromList = deepKeysFromList;
 		function generateDeepKeysList(heading, data, options) {
 		  const keys = Object.keys(data).map((currentKey) => {
@@ -174,7 +163,6 @@ function requireDeeks () {
 		  });
 		  return utils.flatten(keys);
 		}
-		__name(generateDeepKeysList, "generateDeepKeysList");
 		function processArrayKeys(subArray, currentKeyPath, options) {
 		  let subArrayKeys = deepKeysFromList(subArray, options);
 		  if (!subArray.length) {
@@ -191,21 +179,18 @@ function requireDeeks () {
 		    return utils.unique(utils.flatten(subArrayKeys));
 		  }
 		}
-		__name(processArrayKeys, "processArrayKeys");
 		function escapeNestedDotsIfSpecified(key, options) {
 		  if (options.escapeNestedDots) {
 		    return key.replace(/\\./g, "\\\\.");
 		  }
 		  return key;
 		}
-		__name(escapeNestedDotsIfSpecified, "escapeNestedDotsIfSpecified");
 		function buildKeyName(upperKeyName, currentKeyName) {
 		  if (upperKeyName) {
 		    return upperKeyName + "." + currentKeyName;
 		  }
 		  return currentKeyName;
 		}
-		__name(buildKeyName, "buildKeyName");
 		function mergeOptions(options) {
 		  return {
 		    arrayIndexesAsKeys: false,
@@ -216,8 +201,7 @@ function requireDeeks () {
 		    ignoreEmptyArrays: false,
 		    ...options ?? {}
 		  };
-		}
-		__name(mergeOptions, "mergeOptions"); 
+		} 
 	} (deeks));
 	return deeks;
 }
@@ -243,24 +227,19 @@ var hasRequiredUtils;
 function requireUtils () {
 	if (hasRequiredUtils) return utils;
 	hasRequiredUtils = 1;
-	var __defProp = Object.defineProperty;
-	var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 	Object.defineProperty(utils, "__esModule", { value: true });
 	utils.isDocumentToRecurOn = utils.flatten = utils.unique = void 0;
 	function unique(array) {
 	  return [...new Set(array)];
 	}
-	__name(unique, "unique");
 	utils.unique = unique;
 	function flatten(array) {
 	  return [].concat(...array);
 	}
-	__name(flatten, "flatten");
 	utils.flatten = flatten;
 	function isDocumentToRecurOn(val) {
 	  return typeof val === "object" && val !== null && !Array.isArray(val) && Object.keys(val).length;
 	}
-	__name(isDocumentToRecurOn, "isDocumentToRecurOn");
 	utils.isDocumentToRecurOn = isDocumentToRecurOn;
 	return utils;
 }
@@ -282,15 +261,13 @@ function requireDeeks () {
 	if (hasRequiredDeeks) return deeks;
 	hasRequiredDeeks = 1;
 	(function (exports) {
-		var __defProp = Object.defineProperty;
-		var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 		var __createBinding = deeks && deeks.__createBinding || (Object.create ? (function(o, m, k, k2) {
 		  if (k2 === void 0) k2 = k;
 		  var desc = Object.getOwnPropertyDescriptor(m, k);
 		  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-		    desc = { enumerable: true, get: /* @__PURE__ */ __name(function() {
+		    desc = { enumerable: true, get: function() {
 		      return m[k];
-		    }, "get") };
+		    } };
 		  }
 		  Object.defineProperty(o, k2, desc);
 		}) : (function(o, m, k, k2) {
@@ -325,7 +302,6 @@ function requireDeeks () {
 		  }
 		  return [];
 		}
-		__name(deepKeys, "deepKeys");
 		exports.deepKeys = deepKeys;
 		function deepKeysFromList(list, options) {
 		  const parsedOptions = mergeOptions(options);
@@ -336,7 +312,6 @@ function requireDeeks () {
 		    return [];
 		  });
 		}
-		__name(deepKeysFromList, "deepKeysFromList");
 		exports.deepKeysFromList = deepKeysFromList;
 		function generateDeepKeysList(heading, data, options) {
 		  const keys = Object.keys(data).map((currentKey) => {
@@ -352,7 +327,6 @@ function requireDeeks () {
 		  });
 		  return utils.flatten(keys);
 		}
-		__name(generateDeepKeysList, "generateDeepKeysList");
 		function processArrayKeys(subArray, currentKeyPath, options) {
 		  let subArrayKeys = deepKeysFromList(subArray, options);
 		  if (!subArray.length) {
@@ -369,21 +343,18 @@ function requireDeeks () {
 		    return utils.unique(utils.flatten(subArrayKeys));
 		  }
 		}
-		__name(processArrayKeys, "processArrayKeys");
 		function escapeNestedDotsIfSpecified(key, options) {
 		  if (options.escapeNestedDots) {
 		    return key.replace(/\\./g, "\\\\.");
 		  }
 		  return key;
 		}
-		__name(escapeNestedDotsIfSpecified, "escapeNestedDotsIfSpecified");
 		function buildKeyName(upperKeyName, currentKeyName) {
 		  if (upperKeyName) {
 		    return upperKeyName + "." + currentKeyName;
 		  }
 		  return currentKeyName;
 		}
-		__name(buildKeyName, "buildKeyName");
 		function mergeOptions(options) {
 		  return {
 		    arrayIndexesAsKeys: false,
@@ -394,8 +365,7 @@ function requireDeeks () {
 		    ignoreEmptyArrays: false,
 		    ...options ?? {}
 		  };
-		}
-		__name(mergeOptions, "mergeOptions"); 
+		} 
 	} (deeks));
 	return deeks;
 }
@@ -561,7 +531,6 @@ exports[`packem typescript > should support typescript decorator > cjs code outp
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 var __decorateClass = (decorators, target, key, kind) => {
   var result = void 0 ;
   for (var i = decorators.length - 1, decorator; i >= 0; i--)
@@ -576,11 +545,7 @@ function first() {
     console.log("first(): called");
   };
 }
-__name(first, "first");
 class ExampleClass {
-  static {
-    __name(this, "ExampleClass");
-  }
   value;
 }
 __decorateClass([
@@ -593,7 +558,6 @@ exports.ExampleClass = ExampleClass;
 
 exports[`packem typescript > should support typescript decorator > mjs code output 1`] = `
 "var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 var __decorateClass = (decorators, target, key, kind) => {
   var result = void 0 ;
   for (var i = decorators.length - 1, decorator; i >= 0; i--)
@@ -608,11 +572,7 @@ function first() {
     console.log("first(): called");
   };
 }
-__name(first, "first");
 class ExampleClass {
-  static {
-    __name(this, "ExampleClass");
-  }
   value;
 }
 __decorateClass([
