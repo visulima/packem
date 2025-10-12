@@ -1,3 +1,15 @@
+## @visulima/packem [2.0.0-alpha.29](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.28...@visulima/packem@2.0.0-alpha.29) (2025-10-12)
+
+### Bug Fixes
+
+* update readme ([3b5467f](https://github.com/visulima/packem/commit/3b5467f8ba57e39495582a8914d970fe455c70e8))
+
+### Miscellaneous Chores
+
+* add .cursorignore and update package.json for isolated transformers ([750e101](https://github.com/visulima/packem/commit/750e101a6d5b88f0b9a6c5952ee1223c825eb2ad))
+* update pnpm workspace and package configurations ([feacec9](https://github.com/visulima/packem/commit/feacec93d1b0cefb8ea5d2b730fc1c6918925826))
+* update TypeScript SDK path and adjust package dependencies ([b3a3661](https://github.com/visulima/packem/commit/b3a3661299bcb2343a0da19dddebb43678575750))
+
 ## @visulima/packem [2.0.0-alpha.28](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.27...@visulima/packem@2.0.0-alpha.28) (2025-10-11)
 
 ### Bug Fixes
