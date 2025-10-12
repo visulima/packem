@@ -1,0 +1,43 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem require-cjs-transformer > should transform ESM imports of CJS modules to require calls > mjs 1`] = `
+"import { createRequire as __cjs_createRequire } from "node:module";
+const __cjs_require = __cjs_createRequire(import.meta.url);
+
+// Runtime capability helpers
+const __cjs_getBuiltinModule = (module) => {
+    // Check if we're in Node.js and version supports getBuiltinModule
+    if ("object" !== "undefined" && process.versions?.node) {
+        const [major, minor] = process.versions.node.split(".").map(Number);
+        // Node.js 20.16.0+ and 22.3.0+
+        if (major > 22 || (major === 22 && minor >= 3) || (major === 20 && minor >= 16)) {
+            return process.getBuiltinModule(module);
+        }
+    }
+    // Fallback to createRequire
+    return __cjs_require(module);
+};
+
+const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
+const fs = __cjs_getBuiltinModule("fs");
+const {
+  readFileSync
+} = fs;
+const path = __cjs_getBuiltinModule("path");
+const {
+  join
+} = path;
+
+const readContent = (filePath) => {
+  return readFileSync(path.join(process.cwd(), filePath), "utf8");
+};
+const testFs = () => {
+  return fs.existsSync(".");
+};
+const testPath = (p) => {
+  return join(p, "test");
+};
+
+export { readContent, testFs, testPath };
+"
+`;
