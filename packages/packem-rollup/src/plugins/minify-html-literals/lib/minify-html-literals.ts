@@ -187,13 +187,11 @@ export interface Result {
  * @param fileName the name of the source file
  * @returns a v3 SourceMap
  */
-export const defaultGenerateSourceMap = (ms: MagicStringLike, fileName: string) => {
-    return ms.generateMap({
-        file: `${fileName}.map`,
-        hires: true,
-        source: fileName,
-    });
-}
+export const defaultGenerateSourceMap = (ms: MagicStringLike, fileName: string) => ms.generateMap({
+    file: `${fileName}.map`,
+    hires: true,
+    source: fileName,
+});
 
 /**
  * The default method to determine whether or not to minify a template. It will
@@ -206,7 +204,7 @@ export const defaultShouldMinify = (template: Template) => {
     const tag = template.tag && template.tag.toLowerCase();
 
     return !!tag && (tag.includes("html") || tag.includes("svg"));
-}
+};
 
 /**
  * The default method to determine whether or not to minify a CSS template. It
@@ -215,9 +213,7 @@ export const defaultShouldMinify = (template: Template) => {
  * @param template the template to check
  * @returns true if the template should be minified
  */
-export const defaultShouldMinifyCSS = (template: Template) => {
-    return !!template.tag && template.tag.toLowerCase().includes("css");
-}
+export const defaultShouldMinifyCSS = (template: Template) => !!template.tag && template.tag.toLowerCase().includes("css");
 
 /**
  * The default validation.

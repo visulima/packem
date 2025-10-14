@@ -1,12 +1,12 @@
 import type { Plugin } from "rollup";
 
 import createBannerPlugin from "./banner";
+import createDtsResolvePlugin from "./create-dts-resolve-plugin";
 import createDtsInputPlugin from "./dts-input";
 import createFakeJsPlugin from "./fake-js";
 import { createGeneratePlugin } from "./generate";
 import type { Options } from "./options";
 import { resolveOptions } from "./options";
-import createDtsResolvePlugin from "./create-dts-resolve-plugin";
 
 export { default as createFakeJsPlugin } from "./fake-js";
 

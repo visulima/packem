@@ -69,7 +69,9 @@ console.log(process.version);`;
 
         // Should transform the code
         expect(result).toBeDefined();
+
         expectTypeOf(result).toBeObject();
+
         expect("code" in result).toBe(true);
         expect("map" in result).toBe(true);
 

@@ -132,7 +132,6 @@
         "@csstools/css-tokenizer": "catalog:style",
         "@csstools/postcss-slow-plugins": "catalog:style",
         "@rollup/plugin-inject": "catalog:build",
-        "@rushstack/eslint-plugin-security": "catalog:lint",
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",

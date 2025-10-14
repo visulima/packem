@@ -16,7 +16,7 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
-vi.mock("@visulima/fs", () => {
+vi.mock(import("@visulima/fs"), () => {
     return { isAccessibleSync: hoisted.fs.isAccessibleSync, readFileSync: hoisted.fs.readFileSync, writeFileSync: hoisted.fs.writeFileSync };
 });
 
@@ -39,7 +39,7 @@ describe("fileCache", () => {
         // eslint-disable-next-line no-new, sonarjs/constructor-for-side-effects
         new FileCache(temporaryDirectoryPath, cacheDirectoryPath, "hash123", hoisted.logger);
 
-        expect(hoisted.logger.debug).toHaveBeenCalledWith({
+        expect(hoisted.logger.debug).toHaveBeenCalledExactlyOnceWith({
             message: `Cache path is: ${cacheDirectoryPath}`,
         });
     });
@@ -97,7 +97,7 @@ describe("fileCache", () => {
         // eslint-disable-next-line no-new, sonarjs/constructor-for-side-effects
         new FileCache(temporaryDirectoryPath, undefined, "hash123", hoisted.logger);
 
-        expect(hoisted.logger.debug).toHaveBeenCalledWith({
+        expect(hoisted.logger.debug).toHaveBeenCalledExactlyOnceWith({
             message: "Could not create cache directory.",
         });
     });

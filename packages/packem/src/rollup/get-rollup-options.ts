@@ -645,7 +645,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
             context.options.rollup.minifyHTMLLiterals && context.options.minify && minifyHTMLLiteralsPlugin({
                 ...context.options.rollup.minifyHTMLLiterals,
-                logger: context.logger
+                logger: context.logger,
             }),
 
             context.options.declaration

@@ -104,7 +104,7 @@ catalogs:
     "@anolilab/textlint-config": ^9.0.7
     "@commitlint/cli": ^20.1.0
     "@commitlint/config-conventional": ^20.0.0
-    "@rushstack/eslint-plugin-security": ^0.12.0
+    "@rushstack/eslint-plugin-security": ^0.13.0
     "@secretlint/secretlint-rule-preset-recommend": ^11.2.5
     eslint: ^9.36.0
     husky: ^9.1.7
@@ -112,7 +112,7 @@ catalogs:
     prettier: ^3.6.2
     publint: ^0.3.14
     secretlint: ^11.2.5
-    textlint: ^15.2.2
+    textlint: ^15.2.3
   markdown:
     turndown: ^7.2.1
     turndown-plugin-gfm: ^1.0.2
@@ -164,7 +164,7 @@ catalogs:
     gpt-tokenizer: ^3.2.0
     happy-dom: ^20.0.0
     hookable: 5.5.3
-    html-minifier-next: ^2.1.7
+    html-minifier-next: ^2.1.8
     is-ci: ^4.1.0
     micromatch: ^4.0.8
     mlly: 1.8.0
@@ -233,7 +233,7 @@ catalogs:
     "@types/picomatch": ^4.0.2
     "@types/postcss-modules-local-by-default": ^4.0.2
     "@types/postcss-modules-scope": ^3.0.4
-    "@types/react-dom": ^19.2.1
+    "@types/react-dom": ^19.2.2
     "@types/semver": ^7.7.1
     "@types/stylus": ^0.48.43
     "@types/turndown": ^5.0.5

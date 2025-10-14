@@ -67,7 +67,6 @@
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
-        "@rushstack/eslint-plugin-security": "catalog:lint",
         "@total-typescript/ts-reset": "catalog:tsc",
         "@types/node": "catalog:types",
         "@vitest/coverage-v8": "catalog:test",

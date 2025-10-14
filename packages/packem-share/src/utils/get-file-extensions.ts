@@ -1,7 +1,8 @@
+/* eslint-disable jsdoc/match-description */
 import type { BuildContext, Format } from "../types";
 
 /**
- * Extension mappings for better performance than switch statements
+ * Extension mappings for better performance than switch statements.
  */
 const JS_TO_DTS_MAP = new Map([
     ["cjs", "d.cts"],
@@ -16,7 +17,7 @@ const FORMAT_EXTENSIONS = {
 } as const;
 
 /**
- * Computes extension resolution strategy based on build context
+ * Computes extension resolution strategy based on build context.
  */
 const getExtensionStrategy = <T extends FileExtensionOptions>(context: BuildContext<T>) => {
     const { declaration, emitCJS, emitESM, outputExtensionMap } = context.options;
@@ -38,7 +39,7 @@ const getExtensionStrategy = <T extends FileExtensionOptions>(context: BuildCont
 };
 
 /**
- * Options interface for determining file extensions
+ * Options interface for determining file extensions.
  */
 export interface FileExtensionOptions {
     /** Declaration file generation mode */
@@ -52,8 +53,7 @@ export interface FileExtensionOptions {
 }
 
 /**
- * Determines the appropriate output extension for JavaScript files based on build configuration.
- *
+ * Determines the appropriate output extension for JavaScript files, based on build configuration.
  * Returns '.js' when:
  * - Only ESM or CJS is emitted (single format)
  * - No outputExtensionMap is configured

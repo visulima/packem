@@ -28,7 +28,7 @@ export const createContext = (): TscContext => {
     const projects = new Map<string, SourceFileToProjectMap>();
 
     return { files, programs, projects };
-}
+};
 
 export const invalidateContextFile = (context: TscContext, file: string): void => {
     file = resolve(file).replaceAll("\\", "/");
@@ -36,6 +36,6 @@ export const invalidateContextFile = (context: TscContext, file: string): void =
     context.files.delete(file);
     context.programs = context.programs.filter((program) => !program.getSourceFiles().some((sourceFile) => sourceFile.fileName === file));
     context.projects.clear();
-}
+};
 
 export const globalContext: TscContext = createContext();

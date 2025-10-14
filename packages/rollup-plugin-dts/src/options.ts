@@ -3,8 +3,8 @@ import process from "node:process";
 import { resolve } from "@visulima/path";
 import type { TsConfigJson, TsConfigJsonResolved } from "@visulima/tsconfig";
 import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
-import type { AddonFunction } from "rollup";
 import type { IsolatedDeclarationsOptions } from "rolldown/experimental";
+import type { AddonFunction } from "rollup";
 
 type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
 type MarkPartial<T, K extends keyof T> = Omit<Required<T>, K> & Partial<Pick<T, K>>;
