@@ -1,3 +1,14 @@
+## @visulima/packem-rollup [1.0.0-alpha.23](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.22...@visulima/packem-rollup@1.0.0-alpha.23) (2025-10-14)
+
+### Bug Fixes
+
+* improve require CJS transformer to use global process reference ([e599020](https://github.com/visulima/packem/commit/e599020982593875baf08b8e05805fcf0789248f))
+
+### Miscellaneous Chores
+
+* update pnpm workspace and package configurations ([feacec9](https://github.com/visulima/packem/commit/feacec93d1b0cefb8ea5d2b730fc1c6918925826))
+* update TypeScript SDK path and adjust package dependencies ([b3a3661](https://github.com/visulima/packem/commit/b3a3661299bcb2343a0da19dddebb43678575750))
+
 ## @visulima/packem-rollup [1.0.0-alpha.22](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.21...@visulima/packem-rollup@1.0.0-alpha.22) (2025-10-11)
 
 ### Bug Fixes
