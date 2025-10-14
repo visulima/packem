@@ -359,21 +359,22 @@ export const requireCJSTransformerPlugin = (userOptions: Options, logger: Pail):
                     const preamble = `import { createRequire as __cjs_createRequire } from "node:module";
 const ${REQUIRE} = __cjs_createRequire(import.meta.url);
 
+const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
+
 // Runtime capability helpers
 const __cjs_getBuiltinModule = (module) => {
     // Check if we're in Node.js and version supports getBuiltinModule
-    if (typeof process !== "undefined" && process.versions?.node) {
-        const [major, minor] = process.versions.node.split(".").map(Number);
+    if (typeof __cjs_getProcess !== "undefined" && __cjs_getProcess.versions && __cjs_getProcess.versions.node) {
+        const [major, minor] = __cjs_getProcess.versions.node.split(".").map(Number);
         // Node.js 20.16.0+ and 22.3.0+
         if (major > 22 || (major === 22 && minor >= 3) || (major === 20 && minor >= 16)) {
-            return process.getBuiltinModule(module);
+            return __cjs_getProcess.getBuiltinModule(module);
         }
     }
     // Fallback to createRequire
     return __cjs_require(module);
 };
 
-const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
 `;
 
                     logger.debug({
