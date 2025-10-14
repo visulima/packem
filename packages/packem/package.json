@@ -168,7 +168,7 @@
         "dev": "pnpm run build",
         "lint:attw": "attw --pack",
         "lint:eslint": "eslint ./src",
-        "lint:eslint:fix": "eslint . --fix",
+        "lint:eslint:fix": "eslint . --cache --concurrency auto --fix,",
         "lint:package-json": "publint --strict",
         "lint:prettier": "prettier --config=.prettierrc.cjs --check .",
         "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
