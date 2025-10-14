@@ -34,7 +34,7 @@
         "@tailwindcss/node": "4.1.13",
         "@tailwindcss/oxide": "4.1.13",
         "@types/react": "^19.2.2",
-        "@types/react-dom": "^19.2.1",
+        "@types/react-dom": "^19.2.2",
         "@visulima/css-style-inject": "workspace:*",
         "@visulima/packem": "workspace:*",
         "cssnano": "7.1.1",

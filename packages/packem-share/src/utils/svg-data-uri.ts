@@ -30,7 +30,7 @@ const dataUriPayload = (input: string): string => encodeURIComponent(input).repl
 const stripSvgComments = (input: string): string => input.replaceAll(/<!--[\s\S]*?-->/g, "");
 
 /**
- * Converts SVG to a tiny, optimized data URI for minimal size
+ * Converts SVG to a tiny, optimized data URI for minimal size.
  * @param svgString The SVG string to optimize
  * @returns Optimized SVG data URI with charset specification
  */
@@ -43,7 +43,7 @@ export const svgToTinyDataUri = (svgString: string): string => {
 };
 
 /**
- * Converts SVG to a CSS-optimized data URI for better CSS compatibility
+ * Converts SVG to a CSS-optimized data URI for better CSS compatibility.
  * @param svgString The SVG string to optimize
  * @returns CSS-optimized SVG data URI with charset specification
  */

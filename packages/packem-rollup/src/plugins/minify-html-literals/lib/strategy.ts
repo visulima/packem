@@ -48,7 +48,7 @@ const optimizationLevelFrom = (level: CleanCSS.Options["level"]) => {
     }
 
     return level as any;
-}
+};
 
 /**
  * A strategy on how to minify HTML and optionally CSS.
@@ -255,7 +255,7 @@ export const adjustMinifyCSSOptions = (options: CleanCSS.Options = {}) => {
         ...options,
         level,
     };
-}
+};
 
 const fixCleanCssTidySelectors = (original: string, result: string) => {
     const regex = /(:.+\((.*)\))\s*\{/g;
@@ -284,4 +284,4 @@ const fixCleanCssTidySelectors = (original: string, result: string) => {
     }
 
     return result;
-}
+};

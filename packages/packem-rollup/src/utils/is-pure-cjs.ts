@@ -4,7 +4,7 @@ import { readFile } from "@visulima/fs";
 import { findPackageJson } from "@visulima/package/package-json";
 import { init, parse } from "cjs-module-lexer";
 
-let initted = false;
+const initted = false;
 
 /**
  * Determines if a module is a pure CommonJS module by checking various indicators

@@ -3,7 +3,7 @@ import { describe, expect, expectTypeOf, it, vi } from "vitest";
 import tailwindcssLoader from "../../../../../src/loaders/tailwindcss-oxide";
 
 // Mock Tailwind Oxide dependencies
-vi.mock("@tailwindcss/node", () => {
+vi.mock(import("@tailwindcss/node"), () => {
     return {
         compile: vi.fn().mockResolvedValue({
             build: vi.fn(() => "compiled-css"),
@@ -36,13 +36,13 @@ vi.mock("@tailwindcss/node", () => {
     };
 });
 
-vi.mock("@tailwindcss/node/require-cache", () => {
+vi.mock(import("@tailwindcss/node/require-cache"), () => {
     return {
         clearRequireCache: vi.fn(),
     };
 });
 
-vi.mock("@tailwindcss/oxide", () => {
+vi.mock(import("@tailwindcss/oxide"), () => {
     return {
         Scanner: class {
             scan() {

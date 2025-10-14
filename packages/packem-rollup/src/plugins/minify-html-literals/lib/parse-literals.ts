@@ -39,4 +39,4 @@ export const parseLiterals = (source: string, options: ParseLiteralsOptions = {}
     });
 
     return literals;
-}
+};

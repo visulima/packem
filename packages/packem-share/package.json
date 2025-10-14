@@ -87,7 +87,6 @@
         "@arethetypeswrong/cli": "catalog:dev",
         "@rollup/plugin-alias": "catalog:build",
         "@rollup/pluginutils": "catalog:build",
-        "@rushstack/eslint-plugin-security": "catalog:lint",
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
         "@total-typescript/ts-reset": "catalog:tsc",
         "@types/node": "catalog:types",
