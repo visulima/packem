@@ -1,7 +1,7 @@
 lockfileVersion: '9.0'
 
 settings:
-  autoInstallPeers: false
+  autoInstallPeers: true
   excludeLinksFromLockfile: false
 
 catalogs:
@@ -106,7 +106,7 @@ catalogs:
       version: 0.1.25
     '@visulima/packem':
       specifier: ^2.0.0-alpha.25
-      version: 2.0.0-alpha.25
+      version: 2.0.0-alpha.30
     '@visulima/pail':
       specifier: 2.1.28
       version: 2.1.28
@@ -506,6 +506,9 @@ catalogs:
     '@total-typescript/ts-reset':
       specifier: ^0.6.1
       version: 0.6.1
+    '@ts-macro/tsc':
+      specifier: ^0.3.6
+      version: 0.3.6
     '@visulima/tsconfig':
       specifier: 1.1.22
       version: 1.1.22
@@ -2307,7 +2310,7 @@ importers:
         version: 0.0.11
       '@visulima/css-style-inject':
         specifier: 1.0.0-alpha.9
-        version: 1.0.0-alpha.9
+        version: link:../css-style-inject
       '@vitest/coverage-v8':
         specifier: catalog:test
         version: 4.0.3(vitest@4.0.3)
@@ -2415,6 +2418,9 @@ importers:
       '@babel/types':
         specifier: catalog:prod
         version: 7.28.5
+      '@ts-macro/tsc':
+        specifier: catalog:tsc
+        version: 0.3.6(rollup@4.52.5)
       '@visulima/tsconfig':
         specifier: catalog:tsc
         version: 1.1.22(yaml@2.8.1)
@@ -2448,7 +2454,7 @@ importers:
         version: 0.18.2
       '@sxzz/test-utils':
         specifier: catalog:test
-        version: 0.5.12(@volar/typescript@2.4.23)(esbuild@0.25.11)(rollup@4.52.5)(typescript@5.9.3)(vitest@4.0.3)
+        version: 0.5.12(@ts-macro/language-plugin@0.3.6(rollup@4.52.5))(@volar/typescript@2.4.23)(esbuild@0.25.11)(rollup@4.52.5)(typescript@5.9.3)(vitest@4.0.3)
       '@types/babel__generator':
         specifier: catalog:types
         version: 7.27.0
@@ -2463,7 +2469,7 @@ importers:
         version: 7.0.0-dev.20250922.1
       '@visulima/packem':
         specifier: catalog:dev
-        version: 2.0.0-alpha.25(@arethetypeswrong/core@0.18.2)(@swc/core@1.13.5(@swc/helpers@0.5.17))(@tailwindcss/node@4.1.16)(@tailwindcss/oxide@4.1.16)(@types/node@24.5.2)(cssnano@7.1.1(postcss@8.5.6))(esbuild@0.25.11)(icss-utils@5.1.0(postcss@8.5.6))(less@4.4.2)(lightningcss@1.30.2)(oxc-transform@0.95.0)(package-manager-detector@1.5.0)(postcss-load-config@6.0.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.6)(yaml@2.8.1))(postcss-modules-extract-imports@3.1.0(postcss@8.5.6))(postcss-modules-local-by-default@4.2.0(postcss@8.5.6))(postcss-modules-scope@3.2.1(postcss@8.5.6))(postcss-modules-values@4.0.0(postcss@8.5.6))(postcss-value-parser@4.2.0)(postcss@8.5.6)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sucrase@3.35.0)(typedoc-plugin-markdown@4.9.0(typedoc@0.28.13(typescript@5.9.3)))(typedoc-plugin-rename-defaults@0.7.3(typedoc@0.28.13(typescript@5.9.3)))(typedoc@0.28.13(typescript@5.9.3))(typescript@5.9.3)(yaml@2.8.1)
+        version: link:../packem
       '@visulima/path':
         specifier: catalog:node
         version: 1.4.0
@@ -5412,6 +5418,13 @@ packages:
   '@total-typescript/ts-reset@0.6.1':
     resolution: {integrity: sha512-cka47fVSo6lfQDIATYqb/vO1nvFfbPw7uWLayIXIhGETj0wcOOlrlkobOMDNQOFr9QOafegUPq13V2+6vtD7yg==}
 
+  '@ts-macro/language-plugin@0.3.6':
+    resolution: {integrity: sha512-mI9KQ6OSpP+PmPV0sAlKp6Nd0s9G8i7VEm0rsQk2fiEC1fozAmYqO5P6/axj47kJKAPm1V3QsgqGrz36OpJP+g==}
+
+  '@ts-macro/tsc@0.3.6':
+    resolution: {integrity: sha512-ev8qBPLhTc7wH7s+6igCuTCUuLwjzaYB7b7g6Zt+SsXne1tf+2elf6OfrYFzaMixL0qdcH85Mp7PxsfVnjEgrw==}
+    hasBin: true
+
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
 
@@ -5794,10 +5807,6 @@ packages:
     engines: {node: '>=18.0.0 <=23.x'}
     os: [darwin, linux, win32]
 
-  '@visulima/css-style-inject@1.0.0-alpha.9':
-    resolution: {integrity: sha512-YJ2W5L3MUy3DIxJCSptTGYHEEWW3y/0RZF0jtNxH3D0ZnJwkopkpeSZpTfi2wYG0wm2gX9MqE9grs4o9L51yBw==}
-    engines: {node: '>=20.* <=24.*'}
-
   '@visulima/error@4.4.18':
     resolution: {integrity: sha512-JSfYrRRb3LLRTaql1Fi4T7067ilTSWwxLjcLQv61zhCKOoQoUJux88C9/m4+ebXspqZV98KbAP9W9uPpIpp6Ig==}
     engines: {node: '>=18.0.0 <=23.x'}
@@ -5968,95 +5977,6 @@ packages:
       typescript:
         optional: true
 
-  '@visulima/packem@2.0.0-alpha.25':
-    resolution: {integrity: sha512-O5X3KqYTvIllYMkZdFF/DQF/jfx2FWoS21zMVSVHEjhNqBG2E2AoyvUk2Smf5sOtG5Hyx9YaTtI3qsiHgJNU6g==}
-    engines: {node: '>=20.* <=24.*'}
-    hasBin: true
-    peerDependencies:
-      '@arethetypeswrong/core': '>=0.18.2'
-      '@ckeditor/typedoc-plugins': '*'
-      '@swc/core': '>=1.11.29'
-      '@tailwindcss/node': ^4.1.14
-      '@tailwindcss/oxide': ^4.1.14
-      cssnano: '>=7.0.6'
-      esbuild: '>=0.20.2'
-      icss-utils: '>=5.1.0'
-      less: '>=4.2.0'
-      lightningcss: '>=1.27.0'
-      oxc-transform: '>=0.20.0'
-      package-manager-detector: ^1.4.0
-      postcss: '>=8.4.47'
-      postcss-load-config: '>=6.0.1'
-      postcss-modules-extract-imports: '>=3.1.0'
-      postcss-modules-local-by-default: '>=4.0.5'
-      postcss-modules-scope: '>=3.2.0'
-      postcss-modules-values: '>=4.0.0'
-      postcss-value-parser: '>=4.2.0'
-      sass: '>=1.43.4'
-      sass-embedded: '>=1.79.4'
-      stylus: '>=0.63.0'
-      sucrase: '>=3.35.0'
-      typedoc: '>=0.26.0'
-      typedoc-plugin-markdown: '>=4.2.0'
-      typedoc-plugin-rename-defaults: '>=0.7.0'
-      typescript: '>=4.5 || >=5.0'
-      which-pm-runs: '*'
-    peerDependenciesMeta:
-      '@arethetypeswrong/core':
-        optional: true
-      '@ckeditor/typedoc-plugins':
-        optional: true
-      '@swc/core':
-        optional: true
-      '@tailwindcss/node':
-        optional: true
-      '@tailwindcss/oxide':
-        optional: true
-      cssnano:
-        optional: true
-      esbuild:
-        optional: true
-      icss-utils:
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      oxc-transform:
-        optional: true
-      postcss:
-        optional: true
-      postcss-load-config:
-        optional: true
-      postcss-modules-extract-imports:
-        optional: true
-      postcss-modules-local-by-default:
-        optional: true
-      postcss-modules-scope:
-        optional: true
-      postcss-modules-values:
-        optional: true
-      postcss-value-parser:
-        optional: true
-      sass:
-        optional: true
-      sass-embedded:
-        optional: true
-      stylus:
-        optional: true
-      sucrase:
-        optional: true
-      typedoc:
-        optional: true
-      typedoc-plugin-markdown:
-        optional: true
-      typedoc-plugin-rename-defaults:
-        optional: true
-      typescript:
-        optional: true
-      which-pm-runs:
-        optional: true
-
   '@visulima/pail@2.1.25':
     resolution: {integrity: sha512-+M0KMZPV/86L1FFiZvxL4dyjfxd25euYSv4OQE1u4ZoDasT1hgCrSvYnvhGgK/jpS18Jg0z2nbESyngks0hoaw==}
     engines: {node: '>=18.0.0 <=23.x'}
@@ -6091,10 +6011,6 @@ packages:
   '@visulima/source-map@1.0.20':
     resolution: {integrity: sha512-7sdq1fBTJr2Hut6MOUHkLzmFhuem7S5UZGu2DvNqhTtSEHkXXz1D6/Mny/gYf39FZ/B19QW5y0QVAgw7cLLB/w==}
     engines: {node: '>=18.0.0 <=23.x'}
-
-  '@visulima/tabular@1.0.11':
-    resolution: {integrity: sha512-y9ZK8O3O4TtIlmWXnFxgFO8FY3Dqe8q+JzN5mlnjpSPam7b2ZApKXtEcsB/fPWN80z5Sa+ZkIkYZ431bQr22/w==}
-    engines: {node: '>=18.0.0 <=24.x'}
 
   '@visulima/tabular@2.0.2':
     resolution: {integrity: sha512-cWNikaoyUcEuDGx+CLPSo7KleiPgw/Tq3lkidpXNtWQ1+HJx1XJNbfmicPpxvlbwgXLuzv28cz3Uo8XYokJe6g==}
@@ -8050,11 +7966,6 @@ packages:
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
 
-  fsevents@2.3.3:
-    resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
-    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
-    os: [darwin]
-
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
 
@@ -8351,10 +8262,6 @@ packages:
 
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
-
-  html-minifier-next@2.1.8:
-    resolution: {integrity: sha512-mTBAQlR7XIeQwCOH0J3tx0UGyQPzD2s7VSFYooUsphMI6BWzx+rzxZS2/xHZHS+CHaQyMqHboQAId4Roy9e0Hg==}
-    hasBin: true
 
   html-minifier-next@3.0.0:
     resolution: {integrity: sha512-838dAlQkNM3HKy6ucAKQIu+mCUgyOJoIeezKpy+aAMvhRYr96Cbup1F37GgaaOdDjghuPcq4s9Vnd2Ioyx3Cjg==}
@@ -11179,6 +11086,15 @@ packages:
       rollup:
         optional: true
 
+  rollup-utils@0.0.5:
+    resolution: {integrity: sha512-Naai1vGKHGTrvrSuWOX1rSJSKodmJ8aZ3mtF0hHFP64NOtsKvnOGbxD4162fWGePdCWxAckEBNHQ/QX7S81H4g==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+
   rollup@4.46.2:
     resolution: {integrity: sha512-WMmLFI+Boh6xbop+OAGo9cQ3OgX9MIg7xOQjn+pTCwOkk+FNDAeAemXkJ3HzDJrVXleLOFVa1ipuc1AmEx1Dwg==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
@@ -12057,6 +11973,9 @@ packages:
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
 
+  ts-macro@0.3.6:
+    resolution: {integrity: sha512-0buxBZweJjozSPA+77X7ntznNouLOtGDJA8nQJgoAQBduKAltF3YLABLbDLp5N7KsDA0ssldX+L/WwI1SloJmg==}
+
   tsconfig-paths@4.2.0:
     resolution: {integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==}
     engines: {node: '>=6'}
@@ -12728,6 +12647,10 @@ packages:
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
+
+ignoredOptionalDependencies:
+  - dtrace-provider
+  - fsevents
 
 snapshots:
 
@@ -15254,12 +15177,13 @@ snapshots:
     dependencies:
       '@swc/counter': 0.1.3
 
-  '@sxzz/test-utils@0.5.12(@volar/typescript@2.4.23)(esbuild@0.25.11)(rollup@4.52.5)(typescript@5.9.3)(vitest@4.0.3)':
+  '@sxzz/test-utils@0.5.12(@ts-macro/language-plugin@0.3.6(rollup@4.52.5))(@volar/typescript@2.4.23)(esbuild@0.25.11)(rollup@4.52.5)(typescript@5.9.3)(vitest@4.0.3)':
     dependencies:
       tinyglobby: 0.2.15
       unplugin-utils: 0.3.1
       vitest: 4.0.3(@types/debug@4.1.12)(@types/node@24.5.2)(@vitest/ui@4.0.3)(happy-dom@20.0.8)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
     optionalDependencies:
+      '@ts-macro/language-plugin': 0.3.6(rollup@4.52.5)
       '@volar/typescript': 2.4.23
       esbuild: 0.25.11
       rollup: 4.52.5
@@ -15738,6 +15662,24 @@ snapshots:
 
   '@total-typescript/ts-reset@0.6.1': {}
 
+  '@ts-macro/language-plugin@0.3.6(rollup@4.52.5)':
+    dependencies:
+      '@volar/language-core': 2.4.23
+      '@volar/typescript': 2.4.23
+      jiti: 2.6.1
+      rollup-utils: 0.0.5(rollup@4.52.5)
+      ts-macro: 0.3.6
+      vscode-uri: 3.1.0
+    transitivePeerDependencies:
+      - rollup
+
+  '@ts-macro/tsc@0.3.6(rollup@4.52.5)':
+    dependencies:
+      '@ts-macro/language-plugin': 0.3.6(rollup@4.52.5)
+      '@volar/typescript': 2.4.23
+    transitivePeerDependencies:
+      - rollup
+
   '@tybys/wasm-util@0.10.1':
     dependencies:
       tslib: 2.8.1
@@ -16188,8 +16130,6 @@ snapshots:
     dependencies:
       '@visulima/is-ansi-color-supported': 2.2.14
 
-  '@visulima/css-style-inject@1.0.0-alpha.9': {}
-
   '@visulima/error@4.4.18': {}
 
   '@visulima/error@4.6.1': {}
@@ -16356,75 +16296,6 @@ snapshots:
       - rotating-file-stream
       - yaml
 
-  '@visulima/packem@2.0.0-alpha.25(@arethetypeswrong/core@0.18.2)(@swc/core@1.13.5(@swc/helpers@0.5.17))(@tailwindcss/node@4.1.16)(@tailwindcss/oxide@4.1.16)(@types/node@24.5.2)(cssnano@7.1.1(postcss@8.5.6))(esbuild@0.25.11)(icss-utils@5.1.0(postcss@8.5.6))(less@4.4.2)(lightningcss@1.30.2)(oxc-transform@0.95.0)(package-manager-detector@1.5.0)(postcss-load-config@6.0.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.6)(yaml@2.8.1))(postcss-modules-extract-imports@3.1.0(postcss@8.5.6))(postcss-modules-local-by-default@4.2.0(postcss@8.5.6))(postcss-modules-scope@3.2.1(postcss@8.5.6))(postcss-modules-values@4.0.0(postcss@8.5.6))(postcss-value-parser@4.2.0)(postcss@8.5.6)(sass-embedded@1.93.2)(sass@1.93.2)(stylus@0.64.0)(sucrase@3.35.0)(typedoc-plugin-markdown@4.9.0(typedoc@0.28.13(typescript@5.9.3)))(typedoc-plugin-rename-defaults@0.7.3(typedoc@0.28.13(typescript@5.9.3)))(typedoc@0.28.13(typescript@5.9.3))(typescript@5.9.3)(yaml@2.8.1)':
-    dependencies:
-      '@antfu/install-pkg': 1.1.0
-      '@clack/prompts': 0.11.0
-      '@rollup/pluginutils': 5.3.0(rollup@4.52.5)
-      '@visulima/cerebro': 1.1.50(yaml@2.8.1)
-      '@visulima/colorize': 1.4.23
-      '@visulima/find-cache-dir': 1.0.34(yaml@2.8.1)
-      '@visulima/fs': 3.1.8(yaml@2.8.1)
-      '@visulima/humanizer': 1.2.2
-      '@visulima/package': 4.0.0(@types/node@24.5.2)
-      '@visulima/packem-rollup': link:packages/packem-rollup
-      '@visulima/packem-share': link:packages/packem-share
-      '@visulima/pail': 2.1.28
-      '@visulima/path': 1.4.0
-      '@visulima/rollup-plugin-css': link:packages/rollup-plugin-css
-      '@visulima/source-map': 1.0.20
-      '@visulima/tabular': 1.0.11
-      '@visulima/tsconfig': 1.1.22(yaml@2.8.1)
-      browserslist: 4.26.2
-      cjs-module-lexer: 2.1.0
-      clean-css: 5.3.3
-      defu: 6.1.4
-      fastest-levenshtein: 1.0.16
-      hookable: 5.5.3
-      html-minifier-next: 2.1.8
-      jiti: 2.6.0
-      magic-string: 0.30.19
-      mlly: 1.8.0
-      package-manager-detector: 1.5.0
-      picomatch: 4.0.3
-      rollup: 4.52.5
-      semver: 7.7.2
-      tinyexec: 1.0.1
-      tinyglobby: 0.2.15
-    optionalDependencies:
-      '@arethetypeswrong/core': 0.18.2
-      '@swc/core': 1.13.5(@swc/helpers@0.5.17)
-      '@tailwindcss/node': 4.1.16
-      '@tailwindcss/oxide': 4.1.16
-      cssnano: 7.1.1(postcss@8.5.6)
-      esbuild: 0.25.11
-      icss-utils: 5.1.0(postcss@8.5.6)
-      less: 4.4.2
-      lightningcss: 1.30.2
-      oxc-transform: 0.95.0
-      postcss: 8.5.6
-      postcss-load-config: 6.0.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.6)(yaml@2.8.1)
-      postcss-modules-extract-imports: 3.1.0(postcss@8.5.6)
-      postcss-modules-local-by-default: 4.2.0(postcss@8.5.6)
-      postcss-modules-scope: 3.2.1(postcss@8.5.6)
-      postcss-modules-values: 4.0.0(postcss@8.5.6)
-      postcss-value-parser: 4.2.0
-      sass: 1.93.2
-      sass-embedded: 1.93.2
-      stylus: 0.64.0
-      sucrase: 3.35.0
-      typedoc: 0.28.13(typescript@5.9.3)
-      typedoc-plugin-markdown: 4.9.0(typedoc@0.28.13(typescript@5.9.3))
-      typedoc-plugin-rename-defaults: 0.7.3(typedoc@0.28.13(typescript@5.9.3))
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - '@75lb/nature'
-      - '@types/node'
-      - '@visulima/redact'
-      - ai
-      - rotating-file-stream
-      - yaml
-
   '@visulima/pail@2.1.25':
     dependencies:
       '@visulima/colorize': 1.4.23
@@ -16449,8 +16320,6 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       '@visulima/path': 1.4.0
-
-  '@visulima/tabular@1.0.11': {}
 
   '@visulima/tabular@2.0.2': {}
 
@@ -19015,9 +18884,6 @@ snapshots:
 
   fs.realpath@1.0.0: {}
 
-  fsevents@2.3.3:
-    optional: true
-
   function-bind@1.1.2: {}
 
   function-timeout@1.0.2: {}
@@ -19382,15 +19248,6 @@ snapshots:
   html-entities@2.6.0: {}
 
   html-escaper@2.0.2: {}
-
-  html-minifier-next@2.1.8:
-    dependencies:
-      change-case: 4.1.2
-      clean-css: 5.3.3
-      commander: 14.0.1
-      entities: 7.0.0
-      relateurl: 0.2.7
-      terser: 5.44.0
 
   html-minifier-next@3.0.0:
     dependencies:
@@ -22882,6 +22739,15 @@ snapshots:
     optionalDependencies:
       rollup: 4.52.5
 
+  rollup-utils@0.0.5(rollup@4.52.5):
+    dependencies:
+      '@types/estree': 1.0.8
+      estree-walker: 2.0.2
+      path-browserify: 1.0.1
+      picomatch: 4.0.3
+    optionalDependencies:
+      rollup: 4.52.5
+
   rollup@4.46.2:
     dependencies:
       '@types/estree': 1.0.8
@@ -22906,7 +22772,6 @@ snapshots:
       '@rollup/rollup-win32-arm64-msvc': 4.46.2
       '@rollup/rollup-win32-ia32-msvc': 4.46.2
       '@rollup/rollup-win32-x64-msvc': 4.46.2
-      fsevents: 2.3.3
 
   rollup@4.52.5:
     dependencies:
@@ -22934,7 +22799,6 @@ snapshots:
       '@rollup/rollup-win32-ia32-msvc': 4.52.5
       '@rollup/rollup-win32-x64-gnu': 4.52.5
       '@rollup/rollup-win32-x64-msvc': 4.52.5
-      fsevents: 2.3.3
 
   router@2.2.0:
     dependencies:
@@ -23948,6 +23812,10 @@ snapshots:
 
   ts-interface-checker@0.1.13: {}
 
+  ts-macro@0.3.6:
+    dependencies:
+      muggle-string: 0.4.1
+
   tsconfig-paths@4.2.0:
     dependencies:
       json5: 2.2.3
@@ -23960,8 +23828,6 @@ snapshots:
     dependencies:
       esbuild: 0.25.11
       get-tsconfig: 4.10.1
-    optionalDependencies:
-      fsevents: 2.3.3
 
   tunnel@0.0.6: {}
 
@@ -24498,7 +24364,6 @@ snapshots:
       tinyglobby: 0.2.15
     optionalDependencies:
       '@types/node': 24.5.2
-      fsevents: 2.3.3
       jiti: 2.6.0
       less: 4.4.2
       lightningcss: 1.30.2
@@ -24520,7 +24385,6 @@ snapshots:
       tinyglobby: 0.2.15
     optionalDependencies:
       '@types/node': 24.5.2
-      fsevents: 2.3.3
       jiti: 2.6.1
       less: 4.4.2
       lightningcss: 1.30.2
