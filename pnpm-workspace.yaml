@@ -8,6 +8,16 @@ packages:
   - packages/**
   - examples/**
 
+linkWorkspacePackages: true
+injectWorkspacePackages: false
+dedupeInjectedDeps: true
+preferWorkspacePackages: true
+sharedWorkspaceLockfile: true
+saveWorkspaceProtocol: true
+includeWorkspaceRoot: false
+ignoreWorkspaceCycles: false
+disallowWorkspaceCycles: true
+
 onlyBuiltDependencies:
   - "@parcel/watcher"
   - "@swc/core"
@@ -19,6 +29,21 @@ onlyBuiltDependencies:
   - oxc-resolver
   - rs-module-lexer
   - unrs-resolver
+
+# Ignored optional dependencies - skip problematic optional deps
+ignoredOptionalDependencies:
+  - fsevents
+  - dtrace-provider
+
+# Minimum release age - prefer stable packages (3 days = 4,320 minutes)
+# minimumReleaseAge: 4320
+
+# Exclusions from minimum release age - allow fresh versions for dev tools
+minimumReleaseAgeExclude:
+  - vitest
+  - '@vitest/*'
+  - typescript
+  - '@types/*'
 
 overrides:
   chrono-node@<2.2.4: ">=2.9.0"
