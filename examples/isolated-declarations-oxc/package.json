@@ -34,8 +34,8 @@
     },
     "devDependencies": {
         "@visulima/packem": "workspace:*",
-        "esbuild": "^0.25.10",
-        "oxc-transform": "^0.94.0",
+        "esbuild": "^0.25.11",
+        "oxc-transform": "^0.95.0",
         "rimraf": "^6.0.1",
         "typescript": "^5.9.3"
     },

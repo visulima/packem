@@ -413,7 +413,7 @@
         }
     },
     "engines": {
-        "node": ">=20.19 <=24.*"
+        "node": ">=20.19 <=25.*"
     },
     "publishConfig": {
         "access": "public",
