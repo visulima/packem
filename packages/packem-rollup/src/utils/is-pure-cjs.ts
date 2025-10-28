@@ -3,16 +3,18 @@ import { createRequire } from "node:module";
 import { readFile } from "@visulima/fs";
 import { findPackageJson } from "@visulima/package/package-json";
 import { init, parse } from "cjs-module-lexer";
+import type { ResolvedId } from "rollup";
 
 const initted = false;
 
 /**
- * Determines if a module is a pure CommonJS module by checking various indicators
+ * Determines if a module is a pure CommonJS module by checking various indicators.
  * @param id The module ID to check
  * @param importer The importer context (can be a file path or Rollup plugin context)
  * @param rollupResolve Optional Rollup resolve function for better module resolution
  */
-export const isPureCJS = async (id: string, importer: string, rollupResolve?: (id: string, importer?: string) => Promise<{ id: string }>): Promise<boolean> => {
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export const isPureCJS = async (id: string, importer: string, rollupResolve?: (id: string, importer?: string) => Promise<ResolvedId | null>): Promise<boolean> => {
     if (!initted) {
         await init();
     }

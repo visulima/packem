@@ -17,7 +17,7 @@ describe(requireCJSTransformerPlugin, async () => {
     });
 
     it("plugin handles CJS modules correctly", async () => {
-        expect.assertions(7);
+        expect.assertions(4);
 
         const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() });
 
@@ -42,12 +42,33 @@ export const test = 'hello';`;
         expect("code" in result).toBe(true);
         expect("map" in result).toBe(true);
 
-        // Check that the transformation happened
-        expect(result.code).toContain("__cjs_require");
-        // The generated code now includes runtime capability helpers
-        expect(result.code).toContain("const __cjs_getBuiltinModule = (module) => {");
-        expect(result.code).toContain("__cjs_getBuiltinModule(\"fs\")");
-        expect(result.code).toContain("const typescript = __cjs_require(\"typescript\")");
+        expect(result.code).toMatchInlineSnapshot(`
+          "import { createRequire as __cjs_createRequire } from "node:module";
+
+          const __cjs_require = __cjs_createRequire(import.meta.url);
+
+          const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
+
+          const __cjs_getBuiltinModule = (module) => {
+              // Check if we're in Node.js and version supports getBuiltinModule
+              if (typeof __cjs_getProcess !== "undefined" && __cjs_getProcess.versions && __cjs_getProcess.versions.node) {
+                  const [major, minor] = __cjs_getProcess.versions.node.split(".").map(Number);
+                  // Node.js 20.16.0+ and 22.3.0+
+                  if (major > 22 || (major === 22 && minor >= 3) || (major === 20 && minor >= 16)) {
+                      return __cjs_getProcess.getBuiltinModule(module);
+                  }
+              }
+              // Fallback to createRequire
+              return __cjs_require(module);
+          };
+
+          const {
+            readFileSync
+          } = __cjs_getBuiltinModule("fs");
+          const typescript = __cjs_require("typescript");
+
+          export const test = 'hello';"
+        `);
     });
 
     it("plugin handles node:process import with runtime helpers", async () => {
