@@ -3,17 +3,60 @@ import process from "node:process";
 
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
-import type { Pail } from "@visulima/pail";
 import { init } from "cjs-module-lexer";
 import MagicString from "magic-string";
 import { parseSync } from "oxc-parser";
-import type { Plugin } from "rollup";
+import type { NormalizedOutputOptions, Plugin, RenderedChunk, SourceMapInput } from "rollup";
 
 import isPureCJS from "../utils/is-pure-cjs";
 
 let initted = false;
 
 const REQUIRE = `__cjs_require`;
+
+// Helper function constants for reuse
+const CREATE_REQUIRE_IMPORT = `import { createRequire as __cjs_createRequire } from "node:module";`;
+const REQUIRE_DECLARATION = `const ${REQUIRE} = __cjs_createRequire(import.meta.url);`;
+const GET_PROCESS_DECLARATION = `const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;`;
+
+// Runtime capability helpers
+const GET_BUILTIN_MODULE_DECLARATION = `const __cjs_getBuiltinModule = (module) => {
+    // Check if we're in Node.js and version supports getBuiltinModule
+    if (typeof __cjs_getProcess !== "undefined" && __cjs_getProcess.versions && __cjs_getProcess.versions.node) {
+        const [major, minor] = __cjs_getProcess.versions.node.split(".").map(Number);
+        // Node.js 20.16.0+ and 22.3.0+
+        if (major > 22 || (major === 22 && minor >= 3) || (major === 20 && minor >= 16)) {
+            return __cjs_getProcess.getBuiltinModule(module);
+        }
+    }
+    // Fallback to createRequire
+    return __cjs_require(module);
+};`;
+
+// Helper functions to check if helpers already exist in code
+const hasCreateRequireImport = (code: string): boolean => code.includes("import { createRequire as __cjs_createRequire }") && code.includes("\"node:module\"");
+
+const hasRequireDeclaration = (code: string): boolean => code.includes(`const ${REQUIRE} = __cjs_createRequire(import.meta.url)`);
+
+const hasGetProcessDeclaration = (code: string): boolean =>
+    code.includes("const __cjs_getProcess = typeof globalThis !== \"undefined\"") && code.includes("globalThis.process !== \"undefined\"");
+
+const hasGetBuiltinModuleDeclaration = (code: string): boolean =>
+    code.includes("const __cjs_getBuiltinModule = (module) =>") && code.includes("__cjs_getProcess.getBuiltinModule(module)");
+
+// Check if helpers are used (not just declared)
+const hasRequireUsage = (code: string): boolean =>
+    // Look for __cjs_require usage (either as declaration or call)
+    // Match: const __cjs_require = or __cjs_require(
+    /const\s+__cjs_require\s*=|[^.\w]__cjs_require\s*\(/.test(code) || code.startsWith("__cjs_require(");
+const hasProcessUsage = (code: string): boolean =>
+    // Look for __cjs_getProcess usage (either as declaration or usage)
+    // Match: const __cjs_getProcess = or usage of __cjs_getProcess
+    /const\s+__cjs_getProcess\s*=|[^.\w]__cjs_getProcess[^=]|^__cjs_getProcess/.test(code);
+const hasBuiltinUsage = (code: string): boolean =>
+    // Look for __cjs_getBuiltinModule usage (either as declaration or call)
+    // Match: const __cjs_getBuiltinModule = or __cjs_getBuiltinModule(
+    /const\s+__cjs_getBuiltinModule\s*=|[^.\w]__cjs_getBuiltinModule\s*\(/.test(code) || code.startsWith("__cjs_getBuiltinModule(");
 
 type Awaitable<T> = T | Promise<T>;
 
@@ -25,6 +68,7 @@ const resolveOptions = (options: Options): OptionsResolved => {
     if (Array.isArray(options.shouldTransform)) {
         const { shouldTransform } = options;
 
+        // eslint-disable-next-line no-param-reassign
         options.shouldTransform = (id) => shouldTransform.includes(id);
     }
 
@@ -82,8 +126,9 @@ export interface Options {
     shouldTransform?: string[] | TransformFunction;
 }
 
-export const requireCJSTransformerPlugin = (userOptions: Options, logger: Pail): Plugin => {
+export const requireCJSTransformerPlugin = (userOptions: Options, logger: Console): Plugin => {
     const { builtinNodeModules, cwd, exclude, include, order, shouldTransform } = resolveOptions(userOptions);
+
     const filter = createFilter(include, exclude);
 
     return {
@@ -97,34 +142,93 @@ export const requireCJSTransformerPlugin = (userOptions: Options, logger: Pail):
         name: "packem:plugin-require-cjs",
 
         renderChunk: {
-            async handler(code, chunk, { format }) {
-                if (format !== "es") {
-                    logger.debug({
-                        message: "skip",
-                        prefix: "plugin:require-cjs-transformer",
-                    });
-
+            // eslint-disable-next-line sonarjs/cognitive-complexity
+            async handler(
+                code: string,
+                chunk: RenderedChunk,
+                options: NormalizedOutputOptions,
+            ): Promise<
+                | {
+                    code: string;
+                    map: SourceMapInput;
+                }
+                | undefined
+            > {
+                if (options.format !== "es") {
                     return;
                 }
 
-                if (!filter(chunk.fileName)) {
-                    logger.debug({
-                        message: `Skipping file (excluded by filter): ${chunk.fileName}`,
-                        prefix: "plugin:require-cjs-transformer",
-                    });
+                // Check for incomplete helpers FIRST, before any filtering
+                // Use the precise usage detection functions
+                const hasRequireCall = hasRequireUsage(code);
+                const hasProcessCall = hasProcessUsage(code);
+                const hasBuiltinCall = hasBuiltinUsage(code);
+                const hasAnyHelper = hasRequireCall || hasProcessCall || hasBuiltinCall;
 
-                    return;
+                if (hasAnyHelper) {
+                    // Remove any existing incomplete helpers first
+                    let cleanedCode = code;
+                    const s = new MagicString(code);
+
+                    // Remove incomplete require declarations (declaration without import)
+                    if (hasRequireDeclaration(cleanedCode) && !hasCreateRequireImport(cleanedCode)) {
+                        // Remove the declaration so we can add the complete helper
+                        const declRegex = /const\s+__cjs_require\s*=\s*__cjs_createRequire\(import\.meta\.url\);\s*/g;
+
+                        cleanedCode = cleanedCode.replaceAll(declRegex, "");
+                        logger.debug({
+                            message: `Removed incomplete __cjs_require declaration from ${chunk.fileName}`,
+                            prefix: "plugin:require-cjs-transformer",
+                        });
+                    }
+
+                    // Build complete preamble with all needed helpers
+                    const preambleParts: string[] = [];
+
+                    // Always add complete helpers when they're used
+                    if (hasRequireCall) {
+                        // Always add both import and declaration together to ensure completeness
+                        preambleParts.push(CREATE_REQUIRE_IMPORT, REQUIRE_DECLARATION);
+                    }
+
+                    if (hasProcessCall) {
+                        preambleParts.push(GET_PROCESS_DECLARATION);
+                    }
+
+                    if (hasBuiltinCall) {
+                        preambleParts.push(GET_BUILTIN_MODULE_DECLARATION);
+                    }
+
+                    // Add the complete helpers
+                    if (preambleParts.length > 0) {
+                        const preamble = `${preambleParts.join("\n\n")}\n\n`;
+
+                        if (cleanedCode[0] === "#") {
+                            const firstNewLineIndex = cleanedCode.indexOf("\n") + 1;
+
+                            s.appendLeft(firstNewLineIndex, preamble);
+                        } else {
+                            s.prepend(preamble);
+                        }
+
+                        logger.debug({
+                            message: `Added complete helpers to chunk: ${chunk.fileName}, added ${preambleParts.length} helper(s)`,
+                            prefix: "plugin:require-cjs-transformer",
+                        });
+
+                        return {
+                            code: s.toString(),
+                            map: s.generateMap(),
+                        };
+                    }
                 }
 
-                logger.debug({
-                    message: `Processing chunk: ${chunk.fileName}`,
-                    prefix: "plugin:require-cjs-transformer",
-                });
+                // Filter check - skip if not matching filter
+                const shouldProcess = filter(chunk.fileName);
 
-                logger.debug({
-                    message: `Code length: ${code.length} characters`,
-                    prefix: "plugin:require-cjs-transformer",
-                });
+                if (!shouldProcess) {
+                    return;
+                }
 
                 const parsed = parseSync(chunk.fileName, code, {
                     astType: "js",
@@ -136,74 +240,29 @@ export const requireCJSTransformerPlugin = (userOptions: Options, logger: Pail):
                 const s = new MagicString(code);
 
                 let usingRequire = false;
-
-                logger.debug({
-                    message: `Found ${body.length} AST statements to process`,
-                    prefix: "plugin:require-cjs-transformer",
-                });
+                let needsGetProcess = false;
+                let needsGetBuiltinModule = false;
 
                 for await (const stmt of body) {
                     if (stmt.type === "ImportDeclaration") {
                         if (stmt.importKind === "type") {
-                            logger.debug({
-                                message: `Skipping type-only import: ${stmt.source.value}`,
-                                prefix: "plugin:require-cjs-transformer",
-                            });
                             continue;
                         }
 
                         const source = stmt.source.value;
-
-                        logger.debug({
-                            message: `Processing import: ${source}`,
-                            prefix: "plugin:require-cjs-transformer",
-                        });
-
                         const isBuiltinModule = builtinNodeModules && (builtinModules.includes(source) || source.startsWith("node:"));
-
-                        logger.debug({
-                            message: `Is builtin module: ${isBuiltinModule}`,
-                            prefix: "plugin:require-cjs-transformer",
-                        });
 
                         let shouldProcess: boolean;
 
                         if (isBuiltinModule) {
                             shouldProcess = true;
-                            logger.debug({
-                                message: `Processing as builtin module`,
-                                prefix: "plugin:require-cjs-transformer",
-                            });
                         } else {
                             const transformResult = shouldTransform?.(source, cwd, this?.resolveId);
 
-                            logger.debug({
-                                message: `shouldTransform result: ${transformResult}`,
-                                prefix: "plugin:require-cjs-transformer",
-                            });
-
-                            if (transformResult === undefined) {
-                                const isPureCJSResult = await isPureCJS(source, cwd, this.resolveId?.bind(this));
-
-                                shouldProcess = isPureCJSResult;
-                                logger.debug({
-                                    message: `isPureCJS result: ${isPureCJSResult}`,
-                                    prefix: "plugin:require-cjs-transformer",
-                                });
-                            } else {
-                                shouldProcess = transformResult;
-                                logger.debug({
-                                    message: `Using shouldTransform result: ${shouldProcess}`,
-                                    prefix: "plugin:require-cjs-transformer",
-                                });
-                            }
+                            shouldProcess = transformResult === undefined ? await isPureCJS(source, cwd, this.resolveId?.bind(this)) : transformResult;
                         }
 
                         if (!shouldProcess) {
-                            logger.debug({
-                                message: `Skipping import (not a CJS module): ${source}`,
-                                prefix: "plugin:require-cjs-transformer",
-                            });
                             continue;
                         }
 
@@ -211,17 +270,9 @@ export const requireCJSTransformerPlugin = (userOptions: Options, logger: Pail):
                             // import 'cjs-module'
                             if (isBuiltinModule) {
                                 // side-effect free
-                                logger.debug({
-                                    message: `Transforming side-effect builtin import to removal: ${source}`,
-                                    prefix: "plugin:require-cjs-transformer",
-                                });
                                 s.remove(stmt.start, stmt.end);
                             } else {
                                 // require('cjs-module')
-                                logger.debug({
-                                    message: `Transforming side-effect import to require call: ${source} -> ${REQUIRE}(${JSON.stringify(source)})`,
-                                    prefix: "plugin:require-cjs-transformer",
-                                });
                                 s.overwrite(stmt.start, stmt.end, `${REQUIRE}(${JSON.stringify(source)});`);
                                 usingRequire = true;
                             }
@@ -229,30 +280,16 @@ export const requireCJSTransformerPlugin = (userOptions: Options, logger: Pail):
                             continue;
                         }
 
-                        logger.debug({
-                            message: `Processing ${stmt.specifiers.length} import specifiers`,
-                            prefix: "plugin:require-cjs-transformer",
-                        });
-
                         const mapping: [string, string][] = [];
                         let namespaceId: string | undefined;
                         let defaultId: string | undefined;
 
                         for (const specifier of stmt.specifiers) {
-                            // namespace
                             if (specifier.type === "ImportNamespaceSpecifier") {
                                 // import * as name from 'cjs-module'
                                 namespaceId = specifier.local.name;
-                                logger.debug({
-                                    message: `Found namespace import: ${namespaceId} from ${source}`,
-                                    prefix: "plugin:require-cjs-transformer",
-                                });
                             } else if (specifier.type === "ImportSpecifier") {
                                 if (specifier.importKind === "type") {
-                                    logger.debug({
-                                        message: `Skipping type-only named import: ${code.slice(specifier.imported.start, specifier.imported.end)}`,
-                                        prefix: "plugin:require-cjs-transformer",
-                                    });
                                     continue;
                                 }
 
@@ -261,19 +298,9 @@ export const requireCJSTransformerPlugin = (userOptions: Options, logger: Pail):
                                 const localName = specifier.local.name;
 
                                 mapping.push([importedName, localName]);
-
-                                logger.debug({
-                                    message: `Found named import: ${importedName} as ${localName}`,
-                                    prefix: "plugin:require-cjs-transformer",
-                                });
                             } else {
                                 // default import
                                 defaultId = specifier.local.name;
-
-                                logger.debug({
-                                    message: `Found default import: ${defaultId}`,
-                                    prefix: "plugin:require-cjs-transformer",
-                                });
                             }
                         }
 
@@ -283,140 +310,90 @@ export const requireCJSTransformerPlugin = (userOptions: Options, logger: Pail):
                             if (source === "process" || source === "node:process") {
                                 // Use the process helper
                                 requireCode = `__cjs_getProcess`;
+                                needsGetProcess = true;
                                 usingRequire = true; // Need runtime helpers for __cjs_getProcess
                             } else {
                                 // Use the builtin module helper function
                                 requireCode = `__cjs_getBuiltinModule(${JSON.stringify(source)})`;
+                                needsGetProcess = true;
+                                needsGetBuiltinModule = true;
                                 usingRequire = true; // Always use __cjs_require as fallback
                             }
-
-                            logger.debug({
-                                message: `Generated builtin require code: ${requireCode}`,
-                                prefix: "plugin:require-cjs-transformer",
-                            });
                         } else {
                             requireCode = `__cjs_require(${JSON.stringify(source)})`;
                             usingRequire = true;
-                            logger.debug({
-                                message: `Generated CJS require code: ${requireCode}`,
-                                prefix: "plugin:require-cjs-transformer",
-                            });
                         }
 
                         const codes: string[] = [];
 
                         if (namespaceId) {
                             defaultId ||= `_cjs_${namespaceId}_default`;
-                            logger.debug({
-                                message: `Generated default ID for namespace: ${defaultId}`,
-                                prefix: "plugin:require-cjs-transformer",
-                            });
                         }
 
                         if (defaultId) {
-                            // const name = require('cjs-module')
                             codes.push(`const ${defaultId} = ${requireCode};`);
-
-                            logger.debug({
-                                message: `Added default import transformation: const ${defaultId} = ${requireCode}`,
-                                prefix: "plugin:require-cjs-transformer",
-                            });
                         }
 
                         if (namespaceId) {
                             // const ns = { ...default, default }
                             codes.push(`const ${namespaceId} = { ...${defaultId}, default: ${defaultId} };`);
-
-                            logger.debug({
-                                message: `Added namespace import transformation: const ${namespaceId} = { ...${defaultId}, default: ${defaultId} }`,
-                                prefix: "plugin:require-cjs-transformer",
-                            });
                         }
 
                         if (mapping.length > 0) {
                             const destructuring = `const {\n${mapping.map(([k, v]) => `  ${k === v ? v : `${k}: ${v}`}`).join(",\n")}\n} = ${defaultId || requireCode};`;
 
                             codes.push(destructuring);
-
-                            logger.debug({
-                                message: `Added named imports transformation: ${destructuring.replaceAll("\n", " ").trim()}`,
-                                prefix: "plugin:require-cjs-transformer",
-                            });
                         }
 
                         const finalCode = codes.join("\n");
-
-                        logger.debug({
-                            message: `Final transformation for ${source}: ${finalCode}`,
-                            prefix: "plugin:require-cjs-transformer",
-                        });
 
                         s.overwrite(stmt.start, stmt.end, finalCode);
                     }
                 }
 
-                if (usingRequire) {
-                    const preamble = `import { createRequire as __cjs_createRequire } from "node:module";
-const ${REQUIRE} = __cjs_createRequire(import.meta.url);
+                // Check if code contains any helpers that need imports
+                const hasAnyHelper2 = code.includes("__cjs_require") || code.includes("__cjs_getProcess") || code.includes("__cjs_getBuiltinModule");
 
-const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
+                if (usingRequire || hasAnyHelper2) {
+                    // Build preamble with missing helpers
+                    const preambleParts: string[] = [];
 
-// Runtime capability helpers
-const __cjs_getBuiltinModule = (module) => {
-    // Check if we're in Node.js and version supports getBuiltinModule
-    if (typeof __cjs_getProcess !== "undefined" && __cjs_getProcess.versions && __cjs_getProcess.versions.node) {
-        const [major, minor] = __cjs_getProcess.versions.node.split(".").map(Number);
-        // Node.js 20.16.0+ and 22.3.0+
-        if (major > 22 || (major === 22 && minor >= 3) || (major === 20 && minor >= 16)) {
-            return __cjs_getProcess.getBuiltinModule(module);
-        }
-    }
-    // Fallback to createRequire
-    return __cjs_require(module);
-};
+                    // Always ensure complete __cjs_require helper if it's used
+                    if (usingRequire || code.includes("__cjs_require")) {
+                        if (!hasCreateRequireImport(code)) {
+                            preambleParts.push(CREATE_REQUIRE_IMPORT);
+                        }
 
-`;
-
-                    logger.debug({
-                        message: `Adding require preamble: ${preamble.replaceAll("\n", " ").trim()}`,
-                        prefix: "plugin:require-cjs-transformer",
-                    });
-
-                    if (code[0] === "#") {
-                        // skip shebang line
-                        const firstNewLineIndex = code.indexOf("\n") + 1;
-
-                        logger.debug({
-                            message: `Adding preamble after shebang at position ${firstNewLineIndex}`,
-                            prefix: "plugin:require-cjs-transformer",
-                        });
-
-                        s.appendLeft(firstNewLineIndex, preamble);
-                    } else {
-                        logger.debug({
-                            message: `Adding preamble at the beginning`,
-                            prefix: "plugin:require-cjs-transformer",
-                        });
-
-                        s.prepend(preamble);
+                        if (!hasRequireDeclaration(code)) {
+                            preambleParts.push(REQUIRE_DECLARATION);
+                        }
                     }
-                } else {
-                    logger.debug({
-                        message: `No require preamble needed`,
-                        prefix: "plugin:require-cjs-transformer",
-                    });
+
+                    // Add __cjs_getProcess if needed for process imports
+                    if ((needsGetProcess || code.includes("__cjs_getProcess")) && !hasGetProcessDeclaration(code)) {
+                        preambleParts.push(GET_PROCESS_DECLARATION);
+                    }
+
+                    // Add __cjs_getBuiltinModule if needed for builtin modules
+                    if ((needsGetBuiltinModule || code.includes("__cjs_getBuiltinModule")) && !hasGetBuiltinModuleDeclaration(code)) {
+                        preambleParts.push(GET_BUILTIN_MODULE_DECLARATION);
+                    }
+
+                    const preamble = preambleParts.join("\n\n") + (preambleParts.length > 0 ? "\n" : "");
+
+                    if (preambleParts.length > 0) {
+                        if (code[0] === "#") {
+                            // skip shebang line
+                            const firstNewLineIndex = code.indexOf("\n") + 1;
+
+                            s.appendLeft(firstNewLineIndex, preamble);
+                        } else {
+                            s.prepend(preamble);
+                        }
+                    }
                 }
 
                 const transformedCode = s.toString();
-
-                logger.debug({
-                    message: `Transformation complete for ${chunk.fileName}`,
-                    prefix: "plugin:require-cjs-transformer",
-                });
-                logger.debug({
-                    message: `Original code length: ${code.length}, Transformed code length: ${transformedCode.length}`,
-                    prefix: "plugin:require-cjs-transformer",
-                });
 
                 return {
                     code: transformedCode,

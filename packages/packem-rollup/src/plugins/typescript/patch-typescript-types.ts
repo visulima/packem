@@ -21,7 +21,7 @@ const escapeRegex = (string_: string): string => string_.replaceAll(escapeRegexR
 const unique = <T>(array: T[]): T[] => [...new Set(array)];
 
 const cleanUnnecessaryComments = (code: string) =>
-    code.replaceAll(multilineCommentsRE, (m) => licenseCommentsRE.test(m) ? "" : m).replaceAll(consecutiveNewlinesRE, "\n\n");
+    code.replaceAll(multilineCommentsRE, (m) => (licenseCommentsRE.test(m) ? "" : m)).replaceAll(consecutiveNewlinesRE, "\n\n");
 
 const calledDtsFiles = new Map<string, boolean>();
 

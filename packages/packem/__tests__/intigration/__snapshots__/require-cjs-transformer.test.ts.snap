@@ -2,11 +2,11 @@
 
 exports[`packem require-cjs-transformer > should transform ESM imports of CJS modules to require calls > mjs 1`] = `
 "import { createRequire as __cjs_createRequire } from "node:module";
+
 const __cjs_require = __cjs_createRequire(import.meta.url);
 
 const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
 
-// Runtime capability helpers
 const __cjs_getBuiltinModule = (module) => {
     // Check if we're in Node.js and version supports getBuiltinModule
     if (typeof __cjs_getProcess !== "undefined" && __cjs_getProcess.versions && __cjs_getProcess.versions.node) {
@@ -19,7 +19,6 @@ const __cjs_getBuiltinModule = (module) => {
     // Fallback to createRequire
     return __cjs_require(module);
 };
-
 const fs = __cjs_getBuiltinModule("fs");
 const {
   readFileSync
