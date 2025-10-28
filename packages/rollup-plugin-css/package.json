@@ -45,48 +45,48 @@
     "type": "module",
     "exports": {
         ".": {
-            "types": "./dist/index.d.mts",
-            "default": "./dist/index.mjs"
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
         },
         "./loader/sourcemap": {
-            "types": "./dist/loaders/sourcemap.d.mts",
-            "default": "./dist/loaders/sourcemap.mjs"
+            "types": "./dist/loaders/sourcemap.d.ts",
+            "default": "./dist/loaders/sourcemap.js"
         },
         "./loader/less": {
-            "types": "./dist/loaders/less/index.d.mts",
-            "default": "./dist/loaders/less/index.mjs"
+            "types": "./dist/loaders/less/index.d.ts",
+            "default": "./dist/loaders/less/index.js"
         },
         "./loader/postcss": {
-            "types": "./dist/loaders/postcss/index.d.mts",
-            "default": "./dist/loaders/postcss/index.mjs"
+            "types": "./dist/loaders/postcss/index.d.ts",
+            "default": "./dist/loaders/postcss/index.js"
         },
         "./loader/sass": {
-            "types": "./dist/loaders/sass/index.d.mts",
-            "default": "./dist/loaders/sass/index.mjs"
+            "types": "./dist/loaders/sass/index.d.ts",
+            "default": "./dist/loaders/sass/index.js"
         },
         "./loader/stylus": {
-            "types": "./dist/loaders/stylus/index.d.mts",
-            "default": "./dist/loaders/stylus/index.mjs"
+            "types": "./dist/loaders/stylus/index.d.ts",
+            "default": "./dist/loaders/stylus/index.js"
         },
         "./loader/lightningcss": {
-            "types": "./dist/loaders/lightningcss.d.mts",
-            "default": "./dist/loaders/lightningcss.mjs"
+            "types": "./dist/loaders/lightningcss.d.ts",
+            "default": "./dist/loaders/lightningcss.js"
         },
         "./loader/tailwindcss": {
-            "types": "./dist/loaders/tailwindcss-oxide.d.mts",
-            "default": "./dist/loaders/tailwindcss-oxide.mjs"
+            "types": "./dist/loaders/tailwindcss-oxide.d.ts",
+            "default": "./dist/loaders/tailwindcss-oxide.js"
         },
         "./minifier/cssnano": {
-            "types": "./dist/minifiers/cssnano.d.mts",
-            "default": "./dist/minifiers/cssnano.mjs"
+            "types": "./dist/minifiers/cssnano.d.ts",
+            "default": "./dist/minifiers/cssnano.js"
         },
         "./minifier/lightningcss": {
-            "types": "./dist/minifiers/lightningcss.d.mts",
-            "default": "./dist/minifiers/lightningcss.mjs"
+            "types": "./dist/minifiers/lightningcss.d.ts",
+            "default": "./dist/minifiers/lightningcss.js"
         },
         "./utils": {
-            "types": "./dist/utils/index.d.mts",
-            "default": "./dist/utils/index.mjs"
+            "types": "./dist/utils/index.d.ts",
+            "default": "./dist/utils/index.js"
         },
         "./package.json": "./package.json"
     },
@@ -96,8 +96,8 @@
         "dist"
     ],
     "scripts": {
-        "build": "../../node_modules/.bin/packem build --development",
-        "build:prod": "../../node_modules/.bin/packem build --production",
+        "build": "packem build --development",
+        "build:prod": "packem build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build --watch",
         "lint:attw": "attw --pack",
@@ -128,6 +128,7 @@
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
+        "@arethetypeswrong/core": "catalog:prod",
         "@csstools/css-parser-algorithms": "catalog:style",
         "@csstools/css-tokenizer": "catalog:style",
         "@csstools/postcss-slow-plugins": "catalog:style",
@@ -144,6 +145,7 @@
         "@types/stylus": "catalog:types",
         "@types/uglifycss": "catalog:types",
         "@visulima/css-style-inject": "1.0.0-alpha.9",
+        "@visulima/packem": "catalog:dev",
         "@vitest/coverage-v8": "catalog:test",
         "@vitest/ui": "catalog:test",
         "conventional-changelog-conventionalcommits": "catalog:dev",

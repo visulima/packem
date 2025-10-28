@@ -1,5 +1,4 @@
 import { createFilter } from "@rollup/pluginutils";
-import type { Pail } from "@visulima/pail";
 import type { Node, ObjectExpression, Property } from "estree";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { walk } from "estree-walker";
@@ -24,7 +23,7 @@ interface PropertyLiteralValue extends Property {
     };
 }
 
-export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesPlugin & { logger: Pail }): Plugin => {
+export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesPlugin & { logger: Console }): Plugin => {
     const filter = createFilter([/\.[tj]sx$/], /node_modules/);
 
     if (!Array.isArray(attributes) || attributes.length === 0) {

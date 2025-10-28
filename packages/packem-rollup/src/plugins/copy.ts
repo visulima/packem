@@ -2,7 +2,6 @@ import { stat } from "node:fs/promises";
 
 import { readFile } from "@visulima/fs";
 import { arrayify } from "@visulima/packem-share/utils";
-import type { Pail } from "@visulima/pail";
 import { basename, dirname, join, normalize, relative } from "@visulima/path";
 import globParent from "glob-parent";
 import type { Plugin, PluginContext } from "rollup";
@@ -34,7 +33,7 @@ type SingleTargetDesc = {
     src: string[] | string;
 };
 
-export const copyPlugin = (options: CopyPluginOptions, logger: Pail): Plugin => {
+export const copyPlugin = (options: CopyPluginOptions, logger: Console): Plugin => {
     const files = new Map<string, FileDesc>();
     const config = {
         copyOnce: true,
@@ -68,14 +67,14 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Pail): Plugin => 
             const results = await Promise.all(
                 (targets as SingleTargetDesc[])
                     .flatMap((target) =>
-                        Array.isArray(target.src)
+                        (Array.isArray(target.src)
                             ? target.src.map((itemSource) => {
                                   return {
                                       ...target,
                                       src: itemSource,
                                   };
                               })
-                            : target,
+                            : target),
                     )
                     .map(
                         async (target) =>

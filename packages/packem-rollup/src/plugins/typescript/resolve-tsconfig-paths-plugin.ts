@@ -5,7 +5,7 @@
  * The TypeScript license can be found here:
  * https://github.com/microsoft/TypeScript/blob/214df64e287804577afa1fea0184c18c40f7d1ca/LICENSE.txt
  */
-import type { Pail } from "@visulima/pail";
+
 import { dirname, isAbsolute, join, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
 import type { TsConfigResult } from "@visulima/tsconfig";
@@ -109,7 +109,7 @@ const patternText = ({ prefix, suffix }: Pattern): string => `${prefix}*${suffix
 const getTsconfigPaths = (
     rootDirectory: string,
     tsconfig: TsConfigResult,
-    logger?: Pail,
+    logger?: Console,
 ): {
     paths: Record<string, string[]>;
     resolvedBaseUrl: string;
@@ -153,7 +153,7 @@ export type TsconfigPathsPluginOptions = {
 export const resolveTsconfigPathsPlugin = (
     rootDirectory: string,
     tsconfig: TsConfigResult,
-    logger: Pail,
+    logger: Console,
     pluginOptions: TsconfigPathsPluginOptions,
 ): Plugin => {
     const { paths, resolvedBaseUrl } = getTsconfigPaths(rootDirectory, tsconfig, logger);

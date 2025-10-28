@@ -1779,7 +1779,7 @@ exports.result = result;
 `);
     });
 
-    it.only("should generate different files for mts and cts with same shared code", async () => {
+    it("should generate different files for mts and cts with same shared code", async () => {
         expect.assertions(4);
 
         writeFileSync(

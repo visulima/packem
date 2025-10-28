@@ -1,47 +1,47 @@
 import { versions } from "node:process";
 
 import { cyan } from "@visulima/colorize";
-import type { AliasResolverObject, ShebangOptions } from "@visulima/packem-rollup";
+import type { AliasResolverObject } from "@visulima/packem-rollup";
 import {
     alias as aliasPlugin,
     browserslistToEsbuild,
     cachingPlugin,
     chunkSplitter,
-    cjsInteropPlugin,
     commonjs as commonjsPlugin,
-    copyPlugin,
     createSplitChunks,
-    dataUriPlugin,
-    debarrelPlugin,
     dynamicImportVars as dynamicImportVariablesPlugin,
-    esmShimCjsSyntaxPlugin,
-    fixDtsDefaultCjsExportsPlugin,
     fixDynamicImportExtension,
-    isolatedDeclarationsPlugin,
-    jsonPlugin,
-    jsxRemoveAttributes,
-    licensePlugin,
     metafilePlugin,
-    minifyHTMLLiteralsPlugin,
-    nativeModulesPlugin,
     nodeResolve as nodeResolvePlugin,
     PluginPure,
     polyfillNode as polyfillPlugin,
-    preserveDirectivesPlugin,
-    rawPlugin,
-    removeShebangPlugin,
     replace as replacePlugin,
-    requireCJSTransformerPlugin,
     resolveFileUrlPlugin,
-    shebangPlugin,
-    sourcemapsPlugin,
-    urlPlugin,
     visualizer as visualizerPlugin,
     wasm as wasmPlugin,
 } from "@visulima/packem-rollup";
 import type { EsbuildPluginConfig } from "@visulima/packem-rollup/esbuild";
 import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
 import { oxcResolvePlugin } from "@visulima/packem-rollup/oxc";
+import { cjsInteropPlugin } from "@visulima/packem-rollup/plugin/cjs-interop";
+import { copyPlugin } from "@visulima/packem-rollup/plugin/copy";
+import { dataUriPlugin } from "@visulima/packem-rollup/plugin/data-uri";
+import { debarrelPlugin } from "@visulima/packem-rollup/plugin/debarrel";
+import { esmShimCjsSyntaxPlugin } from "@visulima/packem-rollup/plugin/esm-shim-cjs-syntax";
+import { fixDtsDefaultCjsExportsPlugin } from "@visulima/packem-rollup/plugin/fix-dts-default-cjs-exports";
+import { isolatedDeclarationsPlugin } from "@visulima/packem-rollup/plugin/isolated-declarations";
+import { JsonPlugin } from "@visulima/packem-rollup/plugin/json";
+import { jsxRemoveAttributes } from "@visulima/packem-rollup/plugin/jsx-remove-attributes";
+import { licensePlugin } from "@visulima/packem-rollup/plugin/license";
+import { minifyHTMLLiteralsPlugin } from "@visulima/packem-rollup/plugin/minify-html-literals";
+import { nativeModulesPlugin } from "@visulima/packem-rollup/plugin/native-modules";
+import { preserveDirectivesPlugin } from "@visulima/packem-rollup/plugin/preserve-directives";
+import { rawPlugin } from "@visulima/packem-rollup/plugin/raw";
+import { requireCJSTransformerPlugin } from "@visulima/packem-rollup/plugin/require-cjs-transformer";
+import type { ShebangOptions } from "@visulima/packem-rollup/plugin/shebang";
+import { removeShebangPlugin, shebangPlugin } from "@visulima/packem-rollup/plugin/shebang";
+import { sourcemapsPlugin } from "@visulima/packem-rollup/plugin/source-maps";
+import { urlPlugin } from "@visulima/packem-rollup/plugin/url";
 import type { SucrasePluginConfig } from "@visulima/packem-rollup/sucrase";
 import type { SwcPluginConfig } from "@visulima/packem-rollup/swc";
 import {
@@ -597,7 +597,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             }),
 
             context.options.rollup.json
-            && jsonPlugin({
+            && JsonPlugin({
                 ...context.options.rollup.json,
             }),
 
@@ -856,7 +856,7 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
             context.options.rollup.json
-            && jsonPlugin({
+            && JsonPlugin({
                 ...context.options.rollup.json,
             }),
 

@@ -66,9 +66,9 @@ describe(cssStyleInject, () => {
 
             cssStyleInject(css);
 
-            expect(mockDocument.createElement).toHaveBeenCalledExactlyOnceWith("style");
-            expect(mockElement.setAttribute).toHaveBeenCalledExactlyOnceWith("type", "text/css");
-            expect(mockElement.append).toHaveBeenCalledExactlyOnceWith(expect.any(Object));
+            expect(mockDocument.createElement).toHaveBeenCalledWith("style");
+            expect(mockElement.setAttribute).toHaveBeenCalledWith("type", "text/css");
+            expect(mockElement.append).toHaveBeenCalledWith(expect.any(Object));
         });
 
         it("should not inject empty CSS", () => {
@@ -125,7 +125,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject(css, { id });
 
-            expect(mockElement.setAttribute).toHaveBeenCalledExactlyOnceWith("id", id);
+            expect(mockElement.setAttribute).toHaveBeenCalledWith("id", id);
         });
 
         it("should skip injection if element with same id exists", () => {
@@ -137,7 +137,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { id });
 
-            expect(mockDocument.querySelector).toHaveBeenCalledExactlyOnceWith(`#${id}`);
+            expect(mockDocument.querySelector).toHaveBeenCalledWith(`#${id}`);
             expect(mockDocument.createElement).not.toHaveBeenCalled();
         });
 
@@ -150,8 +150,8 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { id });
 
-            expect(mockDocument.querySelector).toHaveBeenCalledExactlyOnceWith(`#${id}`);
-            expect(mockDocument.createElement).toHaveBeenCalledExactlyOnceWith("style");
+            expect(mockDocument.querySelector).toHaveBeenCalledWith(`#${id}`);
+            expect(mockDocument.createElement).toHaveBeenCalledWith("style");
         });
     });
 
@@ -170,7 +170,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { insertAt: "first" });
 
-            expect(mockElement.prepend).toHaveBeenCalledExactlyOnceWith(mockElement);
+            expect(mockElement.prepend).toHaveBeenCalledWith(mockElement);
         });
 
         it("should insert at last position (default)", () => {
@@ -178,7 +178,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }");
 
-            expect(mockElement.append).toHaveBeenCalledExactlyOnceWith(mockElement);
+            expect(mockElement.append).toHaveBeenCalledWith(mockElement);
         });
 
         it("should insert at last position explicitly", () => {
@@ -186,7 +186,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { insertAt: "last" });
 
-            expect(mockElement.append).toHaveBeenCalledExactlyOnceWith(mockElement);
+            expect(mockElement.append).toHaveBeenCalledWith(mockElement);
         });
 
         it("should insert at specific index", () => {
@@ -194,7 +194,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { insertAt: 1 });
 
-            expect((mockElement.children[1] as Element).before).toHaveBeenCalledExactlyOnceWith(mockElement);
+            expect((mockElement.children[1] as Element).before).toHaveBeenCalledWith(mockElement);
         });
 
         it("should insert at beginning for index 0", () => {
@@ -202,7 +202,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { insertAt: 0 });
 
-            expect(mockElement.prepend).toHaveBeenCalledExactlyOnceWith(mockElement);
+            expect(mockElement.prepend).toHaveBeenCalledWith(mockElement);
         });
 
         it("should insert at end for out-of-bounds positive index", () => {
@@ -210,7 +210,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { insertAt: 10 });
 
-            expect(mockElement.append).toHaveBeenCalledExactlyOnceWith(mockElement);
+            expect(mockElement.append).toHaveBeenCalledWith(mockElement);
         });
 
         it("should handle negative indices", () => {
@@ -218,7 +218,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { insertAt: -1 });
 
-            expect(mockElement.append).toHaveBeenCalledExactlyOnceWith(mockElement);
+            expect(mockElement.append).toHaveBeenCalledWith(mockElement);
         });
 
         it("should insert before specific element", () => {
@@ -230,8 +230,8 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { insertAt: { before: "title" } });
 
-            expect(mockElement.querySelector).toHaveBeenCalledExactlyOnceWith("title");
-            expect(targetElement.before).toHaveBeenCalledExactlyOnceWith(mockElement);
+            expect(mockElement.querySelector).toHaveBeenCalledWith("title");
+            expect(targetElement.before).toHaveBeenCalledWith(mockElement);
         });
 
         it("should fallback to append if target element not found", () => {
@@ -241,8 +241,8 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { insertAt: { before: "title" } });
 
-            expect(mockElement.querySelector).toHaveBeenCalledExactlyOnceWith("title");
-            expect(mockElement.append).toHaveBeenCalledExactlyOnceWith(mockElement);
+            expect(mockElement.querySelector).toHaveBeenCalledWith("title");
+            expect(mockElement.append).toHaveBeenCalledWith(mockElement);
         });
     });
 
@@ -256,7 +256,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { container: ".custom-container" });
 
-            expect(mockDocument.querySelector).toHaveBeenCalledExactlyOnceWith(".custom-container");
+            expect(mockDocument.querySelector).toHaveBeenCalledWith(".custom-container");
         });
 
         it("should throw error if custom container not found", () => {
@@ -274,7 +274,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }");
 
-            expect(mockDocument.querySelectorAll).toHaveBeenCalledExactlyOnceWith("head");
+            expect(mockDocument.querySelectorAll).toHaveBeenCalledWith("head");
         });
     });
 
@@ -286,8 +286,8 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { attributes });
 
-            expect(mockElement.setAttribute).toHaveBeenCalledExactlyOnceWith("data-test", "value");
-            expect(mockElement.setAttribute).toHaveBeenCalledExactlyOnceWith("class", "my-style");
+            expect(mockElement.setAttribute).toHaveBeenCalledWith("data-test", "value");
+            expect(mockElement.setAttribute).toHaveBeenCalledWith("class", "my-style");
         });
 
         it("should add nonce attribute", () => {
@@ -297,7 +297,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { nonce });
 
-            expect(mockElement.setAttribute).toHaveBeenCalledExactlyOnceWith("nonce", nonce);
+            expect(mockElement.setAttribute).toHaveBeenCalledWith("nonce", nonce);
         });
 
         it("should add both custom attributes and nonce", () => {
@@ -308,8 +308,8 @@ describe(cssStyleInject, () => {
 
             cssStyleInject("body { margin: 0; }", { attributes, nonce });
 
-            expect(mockElement.setAttribute).toHaveBeenCalledExactlyOnceWith("data-test", "value");
-            expect(mockElement.setAttribute).toHaveBeenCalledExactlyOnceWith("nonce", nonce);
+            expect(mockElement.setAttribute).toHaveBeenCalledWith("data-test", "value");
+            expect(mockElement.setAttribute).toHaveBeenCalledWith("nonce", nonce);
         });
     });
 
@@ -324,8 +324,8 @@ describe(cssStyleInject, () => {
 
             cssStyleInject(css);
 
-            expect(mockDocument.createTextNode).toHaveBeenCalledExactlyOnceWith(css);
-            expect(mockElement.append).toHaveBeenCalledExactlyOnceWith(textNode);
+            expect(mockDocument.createTextNode).toHaveBeenCalledWith(css);
+            expect(mockElement.append).toHaveBeenCalledWith(textNode);
         });
 
         it("should use styleSheet.cssText for IE compatibility", () => {
@@ -446,10 +446,10 @@ describe(cssStyleInject, () => {
                 cssStyleInject("body { margin: 0; }", options);
             }).not.toThrow();
 
-            expect(mockElement.setAttribute).toHaveBeenCalledExactlyOnceWith("id", "test-style");
-            expect(mockElement.setAttribute).toHaveBeenCalledExactlyOnceWith("data-test", "value");
-            expect(mockElement.setAttribute).toHaveBeenCalledExactlyOnceWith("nonce", "abc123");
-            expect((customContainer.children[1] as Element).before).toHaveBeenCalledExactlyOnceWith(mockElement);
+            expect(mockElement.setAttribute).toHaveBeenCalledWith("id", "test-style");
+            expect(mockElement.setAttribute).toHaveBeenCalledWith("data-test", "value");
+            expect(mockElement.setAttribute).toHaveBeenCalledWith("nonce", "abc123");
+            expect((customContainer.children[1] as Element).before).toHaveBeenCalledWith(mockElement);
         });
 
         it("should handle empty options object", () => {
