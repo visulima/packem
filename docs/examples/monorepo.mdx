@@ -67,7 +67,7 @@ my-monorepo/
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.0",
-    "@visulima/packem": "^1.28.2",
+    "@visulima/packem": "^2",
     "typescript": "^5.3.0",
     "turbo": "^1.10.0"
   },
@@ -129,7 +129,7 @@ packages:
     "packem.config.js"
   ],
   "dependencies": {
-    "@visulima/packem": "^1.28.2"
+    "@visulima/packem": "workspace:*"
   }
 }
 ```
@@ -215,7 +215,7 @@ export default createPackemConfig()
   },
   "devDependencies": {
     "@myorg/shared-config": "workspace:*",
-    "@visulima/packem": "^1.28.2",
+    "@visulima/packem": "workspace:*",
     "typescript": "^5.3.0"
   }
 }
@@ -422,7 +422,7 @@ export default createPackemConfig()
     "@myorg/shared-config": "workspace:*",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
-    "@visulima/packem": "^1.28.2",
+    "@visulima/packem": "workspace:*",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "typescript": "^5.3.0"
@@ -620,7 +620,7 @@ export default createPackemConfig({
   "devDependencies": {
     "@myorg/shared-config": "workspace:*",
     "@types/node": "^20.0.0",
-    "@visulima/packem": "^1.28.2",
+    "@visulima/packem": "workspace:*",
     "typescript": "^5.3.0"
   }
 }
