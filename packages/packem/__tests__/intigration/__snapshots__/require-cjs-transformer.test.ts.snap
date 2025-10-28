@@ -1,5 +1,50 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`packem require-cjs-transformer > should handle multiple entry points with shared chunks correctly > shared 1`] = `
+"import { createRequire as __cjs_createRequire } from "node:module";
+
+const __cjs_require = __cjs_createRequire(import.meta.url);
+
+const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
+
+const __cjs_getBuiltinModule = (module) => {
+    // Check if we're in Node.js and version supports getBuiltinModule
+    if (typeof __cjs_getProcess !== "undefined" && __cjs_getProcess.versions && __cjs_getProcess.versions.node) {
+        const [major, minor] = __cjs_getProcess.versions.node.split(".").map(Number);
+        // Node.js 20.16.0+ and 22.3.0+
+        if (major > 22 || (major === 22 && minor >= 3) || (major === 20 && minor >= 16)) {
+            return __cjs_getProcess.getBuiltinModule(module);
+        }
+    }
+    // Fallback to createRequire
+    return __cjs_require(module);
+};
+
+const {
+  join,
+  resolve
+} = __cjs_getBuiltinModule("node:path");
+const process$1 = __cjs_getProcess;
+const {
+  createRequire
+} = __cjs_getBuiltinModule("node:module");
+
+const joinPaths = (...args) => join(...args);
+const resolvePath = (p) => resolve(p);
+
+const {
+  writeFileSync,
+  readFileSync
+} = __cjs_getBuiltinModule("node:fs");
+
+console.log(writeFileSync, readFileSync);
+const getEnv = (key) => process$1.env[key];
+const getCwd = () => process$1.cwd();
+
+export { getEnv as a, getCwd as g, joinPaths as j, resolvePath as r };
+"
+`;
+
 exports[`packem require-cjs-transformer > should transform ESM imports of CJS modules to require calls > mjs 1`] = `
 "import { createRequire as __cjs_createRequire } from "node:module";
 
@@ -19,6 +64,7 @@ const __cjs_getBuiltinModule = (module) => {
     // Fallback to createRequire
     return __cjs_require(module);
 };
+
 const fs = __cjs_getBuiltinModule("fs");
 const {
   readFileSync

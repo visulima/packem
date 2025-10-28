@@ -1,7 +1,7 @@
 import type { NormalizedOutputOptions, PluginContext, RenderedChunk } from "rollup";
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 
-import { fixDtsDefaultCjsExportsPlugin } from "../../../src/plugins/fix-dts-default-cjs-exports-plugin";
+import { fixDtsDefaultCjsExportsPlugin } from "../../../src/plugins/fix-dts-default-cjs-exports";
 
 const mockWarn = vi.fn();
 
