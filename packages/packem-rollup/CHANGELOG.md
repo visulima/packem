@@ -1,3 +1,9 @@
+## @visulima/packem-rollup [1.0.0-alpha.25](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.24...@visulima/packem-rollup@1.0.0-alpha.25) (2025-10-28)
+
+### Features
+
+* enhance require-cjs-transformer with multi-entry point support ([6f0a824](https://github.com/visulima/packem/commit/6f0a824fe982bc9dc18e0e19fd9de55754ac37b3))
+
 ## @visulima/packem-rollup [1.0.0-alpha.24](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.23...@visulima/packem-rollup@1.0.0-alpha.24) (2025-10-28)
 
 ### Bug Fixes
