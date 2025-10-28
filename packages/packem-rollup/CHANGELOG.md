@@ -1,3 +1,17 @@
+## @visulima/packem-rollup [1.0.0-alpha.24](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.23...@visulima/packem-rollup@1.0.0-alpha.24) (2025-10-28)
+
+### Bug Fixes
+
+* fixed require-cjs-transformer doublication ([218cffb](https://github.com/visulima/packem/commit/218cffbb1b3667af92161e9537618bd1cd2a0fa7))
+
+### Miscellaneous Chores
+
+* update ESLint configurations across multiple packages ([1fe2d3d](https://github.com/visulima/packem/commit/1fe2d3d6e4e1139560755b538367351d2b170ad3))
+* update package configurations and dependencies ([be09695](https://github.com/visulima/packem/commit/be09695f800ee23a555c54bd92e7ddd4c88182eb))
+* update package dependencies and configurations ([8ec45ec](https://github.com/visulima/packem/commit/8ec45ec4cc34899161fed5446268c9036162d902))
+* update package dependencies and configurations ([8453e80](https://github.com/visulima/packem/commit/8453e80187d9e6212d98dbe5aaafd031a5cabdcf))
+* update package.json and pnpm-lock.yaml for @visulima/packem ([d323f2c](https://github.com/visulima/packem/commit/d323f2c3c99b6231d1c598585294babe52814375))
+
 ## @visulima/packem-rollup [1.0.0-alpha.23](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.22...@visulima/packem-rollup@1.0.0-alpha.23) (2025-10-14)
 
 ### Bug Fixes
