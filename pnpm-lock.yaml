@@ -1470,10 +1470,10 @@ importers:
         specifier: catalog:prod
         version: 4.0.0(@types/node@24.5.2)
       '@visulima/packem-rollup':
-        specifier: workspace:*
+        specifier: 1.0.0-alpha.24
         version: link:../packem-rollup
       '@visulima/packem-share':
-        specifier: workspace:*
+        specifier: 1.0.0-alpha.13
         version: link:../packem-share
       '@visulima/pail':
         specifier: catalog:prod
@@ -1482,7 +1482,7 @@ importers:
         specifier: catalog:node
         version: 1.4.0
       '@visulima/rollup-plugin-css':
-        specifier: workspace:*
+        specifier: 1.0.0-alpha.7
         version: link:../rollup-plugin-css
       '@visulima/source-map':
         specifier: catalog:prod
@@ -1843,7 +1843,7 @@ importers:
         specifier: catalog:prod
         version: 4.0.0(@types/node@24.5.2)
       '@visulima/packem-share':
-        specifier: workspace:*
+        specifier: 1.0.0-alpha.13
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:node
