@@ -96,8 +96,8 @@
         "dist"
     ],
     "scripts": {
-        "build": "packem build --development",
-        "build:prod": "packem build --production",
+        "build": "../../node_modules/.bin/packem build --development",
+        "build:prod": "../../node_modules/.bin/packem build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build --watch",
         "lint:attw": "attw --pack",
@@ -128,7 +128,6 @@
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
-        "@arethetypeswrong/core": "catalog:prod",
         "@csstools/css-parser-algorithms": "catalog:style",
         "@csstools/css-tokenizer": "catalog:style",
         "@csstools/postcss-slow-plugins": "catalog:style",
@@ -145,7 +144,6 @@
         "@types/stylus": "catalog:types",
         "@types/uglifycss": "catalog:types",
         "@visulima/css-style-inject": "1.0.0-alpha.9",
-        "@visulima/packem": "catalog:dev",
         "@vitest/coverage-v8": "catalog:test",
         "@vitest/ui": "catalog:test",
         "conventional-changelog-conventionalcommits": "catalog:dev",
