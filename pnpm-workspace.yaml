@@ -1,67 +1,26 @@
 packages:
-  - "!**/__test__/**"
-  - "!**/__tests__/**"
-  - "!packages/packem/__fixtures__/css/**"
-  - "!packages/packem/__fixtures__/package/**"
-  - "!packages/packem/__fixtures__/url/**"
+  - '!**/__test__/**'
+  - '!**/__tests__/**'
+  - '!packages/packem/__fixtures__/css/**'
+  - '!packages/packem/__fixtures__/package/**'
+  - '!packages/packem/__fixtures__/url/**'
   - packages/packem/__fixtures__/ecosystem/**
   - packages/**
   - examples/**
 
-linkWorkspacePackages: true
-injectWorkspacePackages: false
-dedupeInjectedDeps: true
-preferWorkspacePackages: true
-sharedWorkspaceLockfile: true
-saveWorkspaceProtocol: true
-includeWorkspaceRoot: false
-ignoreWorkspaceCycles: false
-disallowWorkspaceCycles: true
-
-onlyBuiltDependencies:
-  - "@parcel/watcher"
-  - "@swc/core"
-  - "@tailwindcss/oxide"
-  - esbuild
-  - node-sass
-  - nodehun
-  - nx
-  - oxc-resolver
-  - rs-module-lexer
-  - unrs-resolver
-
-# Ignored optional dependencies - skip problematic optional deps
-ignoredOptionalDependencies:
-  - fsevents
-  - dtrace-provider
-
-# Minimum release age - prefer stable packages (3 days = 4,320 minutes)
-# minimumReleaseAge: 4320
-
-# Exclusions from minimum release age - allow fresh versions for dev tools
-minimumReleaseAgeExclude:
-  - vitest
-  - "@vitest/*"
-  - typescript
-  - "@types/*"
-
-overrides:
-  chrono-node@<2.2.4: ">=2.9.0"
-  tmp@<=0.2.3: ">=0.2.5"
-  "@visulima/packem": "2.0.0-alpha.29"
 catalogs:
   build:
-    "@rollup/plugin-alias": 5.1.1
-    "@rollup/plugin-commonjs": 28.0.6
-    "@rollup/plugin-dynamic-import-vars": 2.1.5
-    "@rollup/plugin-inject": 5.0.5
-    "@rollup/plugin-json": 6.1.0
-    "@rollup/plugin-node-resolve": 16.0.1
-    "@rollup/plugin-replace": 6.0.2
-    "@rollup/plugin-wasm": 6.2.2
-    "@rollup/pluginutils": 5.3.0
-    "@visulima/packem-rollup": 1.0.0-alpha.18
-    "@visulima/rollup-plugin-css": 1.0.0-alpha.6
+    '@rollup/plugin-alias': 5.1.1
+    '@rollup/plugin-commonjs': 28.0.6
+    '@rollup/plugin-dynamic-import-vars': 2.1.5
+    '@rollup/plugin-inject': 5.0.5
+    '@rollup/plugin-json': 6.1.0
+    '@rollup/plugin-node-resolve': 16.0.1
+    '@rollup/plugin-replace': 6.0.2
+    '@rollup/plugin-wasm': 6.2.2
+    '@rollup/pluginutils': 5.3.0
+    '@visulima/packem-rollup': 1.0.0-alpha.18
+    '@visulima/rollup-plugin-css': 1.0.0-alpha.6
     esbuild: ^0.25.11
     rollup: ^4.52.5
     rollup-plugin-dts: 6.2.3
@@ -71,25 +30,24 @@ catalogs:
     rollup-plugin-pure: ^0.4.0
     rollup-plugin-visualizer: 6.0.3
   cli:
-    "@anolilab/multi-semantic-release": ^2.0.6
-    "@anolilab/semantic-release-pnpm": 2.0.4
-    "@anolilab/semantic-release-preset": ^11.0.4
+    '@anolilab/multi-semantic-release': ^2.0.6
+    '@anolilab/semantic-release-pnpm': 2.0.4
+    '@anolilab/semantic-release-preset': ^11.0.4
     commitizen: ^4.3.1
     semantic-release: ^25.0.1
     taze: ^19.8.1
   dev:
-    oxc-transform: ^0.95.0
-    "@arethetypeswrong/cli": ^0.18.2
-    "@babel/core": ^7.28.5
-    "@babel/parser": 7.28.4
-    "@mozilla/readability": ^0.6.0
-    "@oxc-parser/binding-linux-x64-gnu": 0.91.0
-    "@oxc-project/types": 0.91.0
-    "@svgr/core": ^8.1.0
-    "@swc/core": ^1.13.5
-    "@swc/types": 0.1.25
-    "@visulima/packem": ^2.0.0-alpha.30
-    "@visulima/pail": 2.1.28
+    '@arethetypeswrong/cli': ^0.18.2
+    '@babel/core': ^7.28.5
+    '@babel/parser': 7.28.4
+    '@mozilla/readability': ^0.6.0
+    '@oxc-parser/binding-linux-x64-gnu': 0.91.0
+    '@oxc-project/types': 0.91.0
+    '@svgr/core': ^8.1.0
+    '@swc/core': ^1.13.5
+    '@swc/types': 0.1.25
+    '@visulima/packem': ^2.0.0-alpha.30
+    '@visulima/pail': 2.1.28
     conventional-changelog-conventionalcommits: 9.1.0
     deeks: ^3.1.2
     detect-indent: ^7.0.2
@@ -99,6 +57,7 @@ catalogs:
     lit: ^3.3.1
     mime: ^4.1.0
     oxc-parser: 0.91.0
+    oxc-transform: ^0.95.0
     p-queue: ^9.0.0
     package-manager-detector: ^1.5.0
     picocolors: ^1.1.1
@@ -112,22 +71,22 @@ catalogs:
     typedoc: 0.28.13
     typedoc-plugin-rename-defaults: 0.7.3
   frontend:
-    "@vue/language-core": ^3.1.2
+    '@vue/language-core': ^3.1.2
     react: ^19.2.0
     react-dom: ^19.2.0
     vue: ^3.5.22
   icons:
     lucide-static: ^0.548.0
   lint:
-    "@anolilab/commitlint-config": ^6.0.6
-    "@anolilab/eslint-config": ^16.4.2
-    "@anolilab/lint-staged-config": ^3.0.37
-    "@anolilab/prettier-config": ^6.0.7
-    "@anolilab/textlint-config": ^9.0.8
-    "@commitlint/cli": ^20.1.0
-    "@commitlint/config-conventional": ^20.0.0
-    "@rushstack/eslint-plugin-security": ^0.13.0
-    "@secretlint/secretlint-rule-preset-recommend": ^11.2.5
+    '@anolilab/commitlint-config': ^6.0.6
+    '@anolilab/eslint-config': ^16.4.2
+    '@anolilab/lint-staged-config': ^3.0.37
+    '@anolilab/prettier-config': ^6.0.7
+    '@anolilab/textlint-config': ^9.0.8
+    '@commitlint/cli': ^20.1.0
+    '@commitlint/config-conventional': ^20.0.0
+    '@rushstack/eslint-plugin-security': ^0.13.0
+    '@secretlint/secretlint-rule-preset-recommend': ^11.2.5
     eslint: ^9.36.0
     husky: ^9.1.7
     lint-staged: ^16.2.6
@@ -145,11 +104,11 @@ catalogs:
     browserslist: 4.26.2
     browserslist-config-anolilab: ^6.0.6
   node:
-    "@antfu/install-pkg": 1.1.0
-    "@clack/prompts": 0.11.0
-    "@oxc-resolver/binding-linux-x64-gnu": 11.8.2
-    "@visulima/find-cache-dir": 1.0.34
-    "@visulima/path": 1.4.0
+    '@antfu/install-pkg': 1.1.0
+    '@clack/prompts': 0.11.0
+    '@oxc-resolver/binding-linux-x64-gnu': 11.8.2
+    '@visulima/find-cache-dir': 1.0.34
+    '@visulima/path': 1.4.0
     cac: ^6.7.14
     cross-env: ^10.1.0
     dts-resolver: ^2.1.2
@@ -163,19 +122,19 @@ catalogs:
   peer:
     package-manager-detector: ^1.5.0
   prod:
-    "@arethetypeswrong/core": ^0.18.2
-    "@babel/core": ^7.28.5
-    "@babel/generator": ^7.28.5
-    "@babel/parser": 7.28.4
-    "@babel/types": ^7.28.5
-    "@visulima/cerebro": 1.1.50
-    "@visulima/colorize": 1.4.23
-    "@visulima/fs": 3.1.8
-    "@visulima/humanizer": 1.2.2
-    "@visulima/package": 4.0.0
-    "@visulima/pail": 2.1.28
-    "@visulima/source-map": 1.0.20
-    "@visulima/tabular": ^2.0.2
+    '@arethetypeswrong/core': ^0.18.2
+    '@babel/core': ^7.28.5
+    '@babel/generator': ^7.28.5
+    '@babel/parser': 7.28.4
+    '@babel/types': ^7.28.5
+    '@visulima/cerebro': 1.1.50
+    '@visulima/colorize': 1.4.23
+    '@visulima/fs': 3.1.8
+    '@visulima/humanizer': 1.2.2
+    '@visulima/package': 4.0.0
+    '@visulima/pail': 2.1.28
+    '@visulima/source-map': 1.0.20
+    '@visulima/tabular': ^2.0.2
     ast-kit: ^2.1.3
     audit-ci: ^7.1.0
     birpc: ^2.6.1
@@ -200,14 +159,14 @@ catalogs:
     jiti: 2.6.0
     tsx: ^4.20.6
   style:
-    "@csstools/css-parser-algorithms": 3.0.5
-    "@csstools/css-tokenizer": 3.0.4
-    "@csstools/postcss-slow-plugins": ^2.0.0
-    "@tailwindcss/forms": ^0.5.10
-    "@tailwindcss/node": ^4.1.16
-    "@tailwindcss/oxide": ^4.1.16
-    "@tailwindcss/typography": ^0.5.19
-    "@visulima/css-style-inject": 1.0.0-alpha.7
+    '@csstools/css-parser-algorithms': 3.0.5
+    '@csstools/css-tokenizer': 3.0.4
+    '@csstools/postcss-slow-plugins': ^2.0.0
+    '@tailwindcss/forms': ^0.5.10
+    '@tailwindcss/node': ^4.1.16
+    '@tailwindcss/oxide': ^4.1.16
+    '@tailwindcss/typography': ^0.5.19
+    '@visulima/css-style-inject': 1.0.0-alpha.7
     clean-css: ^5.3.3
     cssnano: ^7.1.1
     icss-utils: ^5.1.0
@@ -226,41 +185,87 @@ catalogs:
     sass-embedded: ^1.93.2
     tailwindcss: ^4.1.16
   test:
-    "@sxzz/test-utils": ^0.5.12
-    "@vitest/coverage-v8": ^4.0.4
-    "@vitest/ui": ^4.0.4
+    '@sxzz/test-utils': ^0.5.12
+    '@vitest/coverage-v8': ^4.0.4
+    '@vitest/ui': ^4.0.4
     vitest: ^4.0.4
   tsc:
-    "@total-typescript/ts-reset": ^0.6.1
-    "@ts-macro/tsc": ^0.3.6
-    "@visulima/tsconfig": 1.1.22
-    "@volar/typescript": ^2.4.23
+    '@total-typescript/ts-reset': ^0.6.1
+    '@ts-macro/tsc': ^0.3.6
+    '@visulima/tsconfig': 1.1.22
+    '@volar/typescript': ^2.4.23
     typescript: ^5.9.3
     vue-tsc: ^3.1.2
   types:
-    "@types/babel__generator": ^7.27.0
-    "@types/bun": ^1.3.1
-    "@types/clean-css": 4.2.11
-    "@types/debug": ^4.1.12
-    "@types/estree": ^1.0.8
-    "@types/glob-parent": ^5.1.3
-    "@types/html-minifier-next": 2.1.0
-    "@types/icss-utils": ^5.1.2
-    "@types/is-glob": ^4.0.4
-    "@types/less": 3.0.8
-    "@types/micromatch": ^4.0.10
-    "@types/node": 24.5.2
-    "@types/picomatch": ^4.0.2
-    "@types/postcss-modules-local-by-default": ^4.0.2
-    "@types/postcss-modules-scope": ^3.0.4
-    "@types/react-dom": ^19.2.2
-    "@types/semver": ^7.7.1
-    "@types/stylus": ^0.48.43
-    "@types/turndown": ^5.0.6
-    "@types/uglifycss": ^0.0.11
-    "@typescript/native-preview": 7.0.0-dev.20250922.1
+    '@types/babel__generator': ^7.27.0
+    '@types/bun': ^1.3.1
+    '@types/clean-css': 4.2.11
+    '@types/debug': ^4.1.12
+    '@types/estree': ^1.0.8
+    '@types/glob-parent': ^5.1.3
+    '@types/html-minifier-next': 2.1.0
+    '@types/icss-utils': ^5.1.2
+    '@types/is-glob': ^4.0.4
+    '@types/less': 3.0.8
+    '@types/micromatch': ^4.0.10
+    '@types/node': 24.5.2
+    '@types/picomatch': ^4.0.2
+    '@types/postcss-modules-local-by-default': ^4.0.2
+    '@types/postcss-modules-scope': ^3.0.4
+    '@types/react-dom': ^19.2.2
+    '@types/semver': ^7.7.1
+    '@types/stylus': ^0.48.43
+    '@types/turndown': ^5.0.6
+    '@types/uglifycss': ^0.0.11
+    '@typescript/native-preview': 7.0.0-dev.20250922.1
   utils:
     cheerio: ^1.1.2
     defu: 6.1.4
     magic-string: 0.30.19
     semver: 7.7.2
+
+dedupeInjectedDeps: true
+
+disallowWorkspaceCycles: true
+
+ignoreWorkspaceCycles: false
+
+ignoredOptionalDependencies:
+  - fsevents
+  - dtrace-provider
+
+includeWorkspaceRoot: false
+
+injectWorkspacePackages: false
+
+linkWorkspacePackages: true
+
+minimumReleaseAgeExclude:
+  - vitest
+  - '@vitest/*'
+  - typescript
+  - '@types/*'
+
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - '@swc/core'
+  - '@tailwindcss/oxide'
+  - esbuild
+  - node-sass
+  - nodehun
+  - nx
+  - oxc-resolver
+  - rs-module-lexer
+  - unrs-resolver
+
+overrides:
+  '@visulima/packem': 2.0.0-alpha.29
+  chrono-node@<2.2.4: '>=2.9.0'
+  tmp@<=0.2.3: '>=0.2.5'
+  vite@>=7.1.0 <=7.1.10: '>=7.1.11'
+
+preferWorkspacePackages: true
+
+saveWorkspaceProtocol: true
+
+sharedWorkspaceLockfile: true
