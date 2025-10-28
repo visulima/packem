@@ -52,6 +52,7 @@
     "extends browserslist-config-anolilab"
   ],
   "dependencies": {
+    "@visulima/packem": "catalog:dev",
     "@anolilab/commitlint-config": "catalog:lint",
     "@anolilab/lint-staged-config": "catalog:lint",
     "@anolilab/multi-semantic-release": "catalog:cli",
