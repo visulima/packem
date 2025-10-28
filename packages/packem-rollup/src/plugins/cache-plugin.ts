@@ -24,7 +24,7 @@ const unwrapCachedValue = (value: any) => {
  * @param subDirectory
  * @returns
  */
-const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugin =>
+const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugin =>
     <Plugin>{
         ...plugin,
 
@@ -120,4 +120,4 @@ const cachingPlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plu
         },
     };
 
-export default cachingPlugin;
+export default cachePlugin;

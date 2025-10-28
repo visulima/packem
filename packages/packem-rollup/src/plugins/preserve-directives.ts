@@ -7,22 +7,18 @@
  */
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
-import type { Pail } from "@visulima/pail";
 import type { Node } from "estree";
 import MagicString from "magic-string";
 import type { Plugin, SourceMap } from "rollup";
 
-const preserveDirectives = ({
-    directiveRegex,
-    exclude = [],
-    include = [],
-    logger,
-}: {
+export type PreserveDirectivesPluginOptions = {
     directiveRegex: RegExp;
     exclude?: FilterPattern;
     include?: FilterPattern;
-    logger: Pail;
-}): Plugin => {
+    logger: Console;
+};
+
+export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include = [], logger }: PreserveDirectivesPluginOptions): Plugin => {
     const directives: Record<string, Set<string>> = {};
     const shebangs: Record<string, string> = {};
 
@@ -241,5 +237,3 @@ const preserveDirectives = ({
         },
     };
 };
-
-export default preserveDirectives;

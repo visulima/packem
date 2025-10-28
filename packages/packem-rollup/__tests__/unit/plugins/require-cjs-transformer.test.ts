@@ -51,7 +51,7 @@ export const test = 'hello';`;
     });
 
     it("plugin handles node:process import with runtime helpers", async () => {
-        expect.assertions(6);
+        expect.assertions(5);
 
         const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() });
 

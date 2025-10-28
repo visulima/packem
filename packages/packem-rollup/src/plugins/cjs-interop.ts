@@ -1,4 +1,3 @@
-import type { Pail } from "@visulima/pail";
 import MagicString from "magic-string";
 import type { NormalizedOutputOptions, Plugin, RenderedChunk, SourceMapInput } from "rollup";
 
@@ -10,7 +9,7 @@ export const cjsInteropPlugin = ({
     addDefaultProperty = false,
     logger,
 }: CJSInteropOptions & {
-    logger: Pail;
+    logger: Console;
 }): Plugin => {
     return {
         name: "packem:cjs-interop",

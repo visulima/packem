@@ -1,7 +1,6 @@
 import { createFilter } from "@rollup/pluginutils";
 import type { FindPackageJsonCache } from "@visulima/package";
 import { findPackageJson } from "@visulima/package/package-json";
-import type { Pail } from "@visulima/pail";
 import { dirname } from "@visulima/path";
 import { ResolverFactory } from "oxc-resolver";
 import type { Plugin } from "rollup";
@@ -12,7 +11,7 @@ let cachedResolver: ResolverFactory | undefined;
 
 const packageJsonCache: FindPackageJsonCache = new Map();
 
-const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: string, logger: Pail, tsconfigPath?: string): Plugin => {
+const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: string, logger: Console, tsconfigPath?: string): Plugin => {
     const { ignoreSideEffectsForRoot, ...userOptions } = options;
 
     let resolver = cachedResolver;
@@ -48,7 +47,6 @@ const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: string, log
                     return undefined;
                 }
 
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 let hasModuleSideEffects: (location: string) => boolean = (_: string) => false;
 
                 try {

@@ -48,10 +48,7 @@ minimumReleaseAgeExclude:
 overrides:
   chrono-node@<2.2.4: ">=2.9.0"
   tmp@<=0.2.3: ">=0.2.5"
-  "@visulima/packem-rollup": "workspace:*"
-  "@visulima/packem-share": "workspace:*"
-  "@visulima/rollup-plugin-css": "workspace:*"
-  "@visulima/rollup-plugin-dts": "workspace:*"
+  "@visulima/packem": "2.0.0-alpha.29"
 catalogs:
   build:
     "@rollup/plugin-alias": 5.1.1
@@ -91,7 +88,7 @@ catalogs:
     "@svgr/core": ^8.1.0
     "@swc/core": ^1.13.5
     "@swc/types": 0.1.25
-    "@visulima/packem": ^2.0.0-alpha.25
+    "@visulima/packem": ^2.0.0-alpha.30
     "@visulima/pail": 2.1.28
     conventional-changelog-conventionalcommits: 9.1.0
     deeks: ^3.1.1
@@ -176,8 +173,6 @@ catalogs:
     "@visulima/fs": 3.1.8
     "@visulima/humanizer": 1.2.2
     "@visulima/package": 4.0.0
-    "@visulima/packem": ^1.28.3
-    "@visulima/packem-share": 1.0.0-alpha.12
     "@visulima/pail": 2.1.28
     "@visulima/source-map": 1.0.20
     "@visulima/tabular": ^2.0.2

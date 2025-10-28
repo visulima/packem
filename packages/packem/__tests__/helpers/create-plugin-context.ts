@@ -74,7 +74,7 @@ class MockPluginContext {
         this.warnings.push(message);
     }
 
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,class-methods-use-this,@typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,class-methods-use-this
     public addWatchFile(_: string) {
         // nop
     }

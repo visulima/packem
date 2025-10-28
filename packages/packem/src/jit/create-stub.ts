@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import { getShebang, makeExecutable } from "@visulima/packem-rollup";
+import { getShebang, makeExecutable } from "@visulima/packem-rollup/plugin/shebang";
 import { DEFAULT_EXTENSIONS, ENDING_REGEX } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getDtsExtension, getOutputExtension, warn } from "@visulima/packem-share/utils";

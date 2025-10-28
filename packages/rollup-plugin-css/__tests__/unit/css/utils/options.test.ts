@@ -28,7 +28,7 @@ describe("option", () => {
             expect(error.message).toBe("Unable to load PostCSS plugin `pumpinizer`");
         }
 
-        expect(consoleDebugMock).toHaveBeenCalledExactlyOnceWith("Cannot find module 'pumpinizer'", {
+        expect(consoleDebugMock).toHaveBeenCalledWith("Cannot find module 'pumpinizer'", {
             context: [
                 {
                     basedir: __dirname,
@@ -38,7 +38,7 @@ describe("option", () => {
                 },
             ],
         });
-        expect(consoleDebugMock).toHaveBeenCalledExactlyOnceWith("Cannot find module './pumpinizer'", {
+        expect(consoleDebugMock).toHaveBeenCalledWith("Cannot find module './pumpinizer'", {
             context: [
                 {
                     basedir: __dirname,

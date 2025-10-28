@@ -34,32 +34,100 @@
     "type": "module",
     "exports": {
         ".": {
-            "types": "./dist/index.d.mts",
-            "default": "./dist/index.mjs"
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
         },
         "./esbuild": {
-            "types": "./dist/plugins/esbuild/index.d.mts",
-            "default": "./dist/plugins/esbuild/index.mjs"
+            "types": "./dist/plugins/esbuild/index.d.ts",
+            "default": "./dist/plugins/esbuild/index.js"
         },
         "./swc": {
-            "types": "./dist/plugins/swc/index.d.mts",
-            "default": "./dist/plugins/swc/index.mjs"
+            "types": "./dist/plugins/swc/index.d.ts",
+            "default": "./dist/plugins/swc/index.js"
         },
         "./typescript": {
-            "types": "./dist/plugins/typescript/index.d.mts",
-            "default": "./dist/plugins/typescript/index.mjs"
+            "types": "./dist/plugins/typescript/index.d.ts",
+            "default": "./dist/plugins/typescript/index.js"
         },
         "./oxc": {
-            "types": "./dist/plugins/oxc/index.d.mts",
-            "default": "./dist/plugins/oxc/index.mjs"
+            "types": "./dist/plugins/oxc/index.d.ts",
+            "default": "./dist/plugins/oxc/index.js"
         },
         "./sucrase": {
-            "types": "./dist/plugins/sucrase/index.d.mts",
-            "default": "./dist/plugins/sucrase/index.mjs"
+            "types": "./dist/plugins/sucrase/index.d.ts",
+            "default": "./dist/plugins/sucrase/index.js"
         },
-        "./minify-html-literals": {
-            "types": "./dist/plugins/minify-html-literals/index.d.mts",
-            "default": "./dist/plugins/minify-html-literals/index.mjs"
+        "./plugin/minify-html-literals": {
+            "types": "./dist/plugins/minify-html-literals/index.d.ts",
+            "default": "./dist/plugins/minify-html-literals/index.js"
+        },
+        "./plugin/require-cjs-transformer": {
+            "types": "./dist/plugins/require-cjs-transformer.d.ts",
+            "default": "./dist/plugins/require-cjs-transformer.js"
+        },
+        "./plugin/cjs-interop": {
+            "types": "./dist/plugins/cjs-interop.d.ts",
+            "default": "./dist/plugins/cjs-interop.js"
+        },
+        "./plugin/copy": {
+            "types": "./dist/plugins/copy.d.ts",
+            "default": "./dist/plugins/copy.js"
+        },
+        "./plugin/data-uri": {
+            "types": "./dist/plugins/data-uri.d.ts",
+            "default": "./dist/plugins/data-uri.js"
+        },
+        "./plugin/debarrel": {
+            "types": "./dist/plugins/debarrel.d.ts",
+            "default": "./dist/plugins/debarrel.js"
+        },
+        "./plugin/esm-shim-cjs-syntax": {
+            "types": "./dist/plugins/esm-shim-cjs-syntax.d.ts",
+            "default": "./dist/plugins/esm-shim-cjs-syntax.js"
+        },
+        "./plugin/fix-dts-default-cjs-exports": {
+            "types": "./dist/plugins/fix-dts-default-cjs-exports.d.ts",
+            "default": "./dist/plugins/fix-dts-default-cjs-exports.js"
+        },
+        "./plugin/isolated-declarations": {
+            "types": "./dist/plugins/isolated-declarations/index.d.ts",
+            "default": "./dist/plugins/isolated-declarations/index.js"
+        },
+        "./plugin/jsx-remove-attributes": {
+            "types": "./dist/plugins/jsx-remove-attributes.d.ts",
+            "default": "./dist/plugins/jsx-remove-attributes.js"
+        },
+        "./plugin/license": {
+            "types": "./dist/plugins/license.d.ts",
+            "default": "./dist/plugins/license.js"
+        },
+        "./plugin/native-modules": {
+            "types": "./dist/plugins/native-modules-plugin.d.ts",
+            "default": "./dist/plugins/native-modules-plugin.js"
+        },
+        "./plugin/preserve-directives": {
+            "types": "./dist/plugins/preserve-directives.d.ts",
+            "default": "./dist/plugins/preserve-directives.js"
+        },
+        "./plugin/raw": {
+            "types": "./dist/plugins/raw.d.ts",
+            "default": "./dist/plugins/raw.js"
+        },
+        "./plugin/shebang": {
+            "types": "./dist/plugins/shebang.d.ts",
+            "default": "./dist/plugins/shebang.js"
+        },
+        "./plugin/source-maps": {
+            "types": "./dist/plugins/source-maps.d.ts",
+            "default": "./dist/plugins/source-maps.js"
+        },
+        "./plugin/url": {
+            "types": "./dist/plugins/url.d.ts",
+            "default": "./dist/plugins/url.js"
+        },
+        "./plugin/json": {
+            "types": "./dist/plugins/json.d.ts",
+            "default": "./dist/plugins/json.js"
         },
         "./package.json": "./package.json"
     },
@@ -69,8 +137,8 @@
         "dist"
     ],
     "scripts": {
-        "build": "../../node_modules/.bin/packem build --development",
-        "build:prod": "../../node_modules/.bin/packem build --production",
+        "build": "packem build --development",
+        "build:prod": "packem build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build --watch",
         "lint:attw": "attw --pack",
@@ -99,7 +167,7 @@
         "@visulima/find-cache-dir": "catalog:node",
         "@visulima/fs": "catalog:prod",
         "@visulima/package": "catalog:prod",
-        "@visulima/packem-share": "1.0.0-alpha.13",
+        "@visulima/packem-share": "workspace:*",
         "@visulima/path": "catalog:node",
         "@visulima/source-map": "catalog:prod",
         "cjs-module-lexer": "catalog:prod",
@@ -125,6 +193,7 @@
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
+        "@arethetypeswrong/core": "catalog:prod",
         "@babel/core": "catalog:dev",
         "@oxc-parser/binding-linux-x64-gnu": "catalog:dev",
         "@oxc-project/types": "catalog:dev",
@@ -140,6 +209,7 @@
         "@types/is-glob": "catalog:types",
         "@types/node": "catalog:types",
         "@types/semver": "catalog:types",
+        "@visulima/packem": "catalog:dev",
         "@visulima/pail": "catalog:dev",
         "@visulima/tsconfig": "catalog:tsc",
         "@vitest/coverage-v8": "catalog:test",

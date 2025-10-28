@@ -34,20 +34,20 @@
     "type": "module",
     "exports": {
         ".": {
-            "types": "./dist/index.d.mts",
-            "default": "./dist/index.mjs"
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
         },
         "./utils": {
-            "types": "./dist/utils/index.d.mts",
-            "default": "./dist/utils/index.mjs"
+            "types": "./dist/utils/index.d.ts",
+            "default": "./dist/utils/index.js"
         },
         "./types": {
-            "types": "./dist/types/index.d.mts",
-            "default": "./dist/types/index.mjs"
+            "types": "./dist/types/index.d.ts",
+            "default": "./dist/types/index.js"
         },
         "./constants": {
-            "types": "./dist/constants/index.d.mts",
-            "default": "./dist/constants/index.mjs"
+            "types": "./dist/constants/index.d.ts",
+            "default": "./dist/constants/index.js"
         },
         "./package.json": "./package.json"
     },
@@ -57,8 +57,8 @@
         "README.md"
     ],
     "scripts": {
-        "build": "../../node_modules/.bin/packem build --development",
-        "build:prod": "../../node_modules/.bin/packem build --production",
+        "build": "packem build --development",
+        "build:prod": "packem build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build --watch",
         "lint:attw": "attw --pack",
@@ -85,11 +85,13 @@
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
+        "@arethetypeswrong/core": "catalog:prod",
         "@rollup/plugin-alias": "catalog:build",
         "@rollup/pluginutils": "catalog:build",
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
         "@total-typescript/ts-reset": "catalog:tsc",
         "@types/node": "catalog:types",
+        "@visulima/packem": "catalog:dev",
         "@visulima/pail": "catalog:dev",
         "@visulima/tsconfig": "catalog:tsc",
         "@vitest/coverage-v8": "catalog:test",

@@ -2,7 +2,6 @@
  * Modified copy of https://github.com/vitejs/vite/blob/main/packages/vite/rollup.dts.config.ts#L64
  */
 import { parse } from "@babel/parser";
-import type { Pail } from "@visulima/pail";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { walk } from "estree-walker";
 import MagicString from "magic-string";
@@ -22,7 +21,7 @@ const escapeRegex = (string_: string): string => string_.replaceAll(escapeRegexR
 const unique = <T>(array: T[]): T[] => [...new Set(array)];
 
 const cleanUnnecessaryComments = (code: string) =>
-    code.replaceAll(multilineCommentsRE, (m) => (licenseCommentsRE.test(m) ? "" : m)).replaceAll(consecutiveNewlinesRE, "\n\n");
+    code.replaceAll(multilineCommentsRE, (m) => licenseCommentsRE.test(m) ? "" : m).replaceAll(consecutiveNewlinesRE, "\n\n");
 
 const calledDtsFiles = new Map<string, boolean>();
 
@@ -31,7 +30,7 @@ const calledDtsFiles = new Map<string, boolean>();
  * confusing when showed in autocompletions. Try to replace with a better name
  */
 // eslint-disable-next-line func-style
-function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: RenderedChunk, { identifierReplacements }: PatchTypesOptions, logger: Pail) {
+function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: RenderedChunk, { identifierReplacements }: PatchTypesOptions, logger: Console) {
     const imports = findStaticImports(code);
 
     // eslint-disable-next-line guard-for-in
@@ -163,7 +162,7 @@ export type PatchTypesOptions = {
  * 3. Strip leftover internal types
  * 4. Clean unnecessary comments
  */
-export const patchTypescriptTypes = (options: PatchTypesOptions, logger: Pail): Plugin => {
+export const patchTypescriptTypes = (options: PatchTypesOptions, logger: Console): Plugin => {
     return {
         name: "packem:patch-types",
         renderChunk(code, chunk) {

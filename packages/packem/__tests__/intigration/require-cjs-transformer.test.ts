@@ -43,7 +43,9 @@ describe("packem require-cjs-transformer", () => {
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 rollup: {
-                    requireCJS: {},
+                    requireCJS: {
+                        builtinNodeModules: true,
+                    },
                 },
             },
         });

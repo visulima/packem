@@ -2,9 +2,6 @@ import type { Plugin, PluginContext, RenderedChunk } from "rollup";
 
 import fixDtsDefaultCJSExports from "./isolated-declarations/utils/fix-dts-default-cjs-exports";
 
-/**
- * Options for the `fixDtsDefaultCjsExportsPlugin`.
- */
 export type FixDtsDefaultCjsExportsPluginOptions = {
     /**
      * A function to determine if a chunk should be processed by this plugin.

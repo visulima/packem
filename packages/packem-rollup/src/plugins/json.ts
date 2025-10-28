@@ -4,7 +4,9 @@ import type { Plugin } from "rollup";
 
 const EXPORT_DEFAULT = "export default ";
 
-const JSONPlugin = (options: RollupJsonOptions): Plugin => {
+export type { RollupJsonOptions } from "@rollup/plugin-json";
+
+export const JsonPlugin = (options: RollupJsonOptions): Plugin => {
     const plugin = rollupJSONPlugin(options);
 
     return <Plugin>{
@@ -22,5 +24,3 @@ const JSONPlugin = (options: RollupJsonOptions): Plugin => {
         },
     };
 };
-
-export default JSONPlugin;

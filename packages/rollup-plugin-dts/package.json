@@ -86,6 +86,7 @@
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
+        "@arethetypeswrong/core": "catalog:prod",
         "@sxzz/test-utils": "catalog:test",
         "@types/babel__generator": "catalog:types",
         "@types/debug": "catalog:types",

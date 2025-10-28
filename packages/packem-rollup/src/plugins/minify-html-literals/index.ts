@@ -7,7 +7,6 @@
  */
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
-import type { Pail } from "@visulima/pail";
 import type { Plugin } from "rollup";
 
 import * as minify from "./lib/minify-html-literals.js";
@@ -52,7 +51,7 @@ export const minifyHTMLLiteralsPlugin = ({
     minifyHTMLLiterals,
     options,
 }: MinifyHTMLLiteralsOptions & {
-    logger: Pail;
+    logger: Console;
 }): Plugin => {
     if (!minifyHTMLLiterals) {
         // eslint-disable-next-line no-param-reassign

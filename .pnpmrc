@@ -1,7 +1,7 @@
 # PNPM Configuration for Monorepo Performance and Reliability
 
 # Node linker - isolated provides better package isolation in monorepos
-node-linker=isolated
+#node-linker=isolated
 
 # Peer dependency handling
 strict-peer-dependencies=false

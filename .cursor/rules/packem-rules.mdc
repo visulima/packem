@@ -14,7 +14,7 @@ This is a modern bundler for Node.js and TypeScript built on Rollup with support
 ### Transformer Documentation Standards
 **CRITICAL**: Only 4 transformers exist - never document more:
 1. `@visulima/packem/transformer/esbuild`
-2. `@visulima/packem/transformer/swc` 
+2. `@visulima/packem/transformer/swc`
 3. `@visulima/packem/transformer/oxc`
 4. `@visulima/packem/transformer/sucrase`
 
@@ -110,7 +110,7 @@ export default defineConfig({
 ### Package.json Exports Handling
 - **Detection**: Automatic entry point detection from exports field
 - **Validation**: Comprehensive condition validation
-- **Generation**: Multi-format output (CJS/ESM) based on exports
+- **Generation**: Multi-format out                   nut (CJS/ESM) based on exports
 - **Types**: Proper .d.ts generation with correct extensions
 
 ## Development Workflow

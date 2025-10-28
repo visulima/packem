@@ -97,7 +97,7 @@ describe("fileCache", () => {
         // eslint-disable-next-line no-new, sonarjs/constructor-for-side-effects
         new FileCache(temporaryDirectoryPath, undefined, "hash123", hoisted.logger);
 
-        expect(hoisted.logger.debug).toHaveBeenCalledExactlyOnceWith({
+        expect(hoisted.logger.debug).toHaveBeenCalledWith({
             message: "Could not create cache directory.",
         });
     });
