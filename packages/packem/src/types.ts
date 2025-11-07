@@ -205,6 +205,19 @@ export interface BuildOptions {
     transformer: TransformerFn;
     /** TypeDoc configuration for generating documentation */
     typedoc: TypeDocumentOptions | false;
+    /**
+     * If `true`, enables unbundle mode which preserves the source file structure.
+     * Instead of bundling everything into a single file, each module is output as a separate file
+     * maintaining the original directory structure.
+     * @default false
+     * @example
+     * ```typescript
+     * // With unbundle: true
+     * // src/index.ts exports from './a/indexA', './b/indexB'
+     * // Output: dist/index.js, dist/a/indexA.js, dist/b/indexB.js
+     * ```
+     */
+    unbundle?: boolean;
     /** Validation options for the build */
     validation?: ValidationOptions | false;
 }

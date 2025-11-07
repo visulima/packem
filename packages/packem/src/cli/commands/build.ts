@@ -134,6 +134,7 @@ const createBuildCommand = (cli: Cli): void => {
                         },
                         runtime: options.runtime,
                         sourcemap: options.metafile || options.analyze || options.sourcemap,
+                        unbundle: options.unbundle,
                         // validation will take the default values
                         validation: options.validation === false ? false : {},
                         ...options.typedoc
@@ -307,6 +308,11 @@ const createBuildCommand = (cli: Cli): void => {
 
                     throw new Error("Invalid runtime. Use 'node' or 'browser'.");
                 },
+            },
+            {
+                description: "Enable unbundle mode to preserve source file structure instead of bundling into a single file",
+                name: "unbundle",
+                type: Boolean,
             },
         ],
     });
