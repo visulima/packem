@@ -18,18 +18,9 @@ const validator = async (context: BuildContext<InternalBuildOptions>): Promise<v
     validatePackageFields(context);
     validatePackageEntries(context);
     
-    // JSR.io exports validation runs after build entries are populated
-    // This is called from the builder after build is complete
-};
-
-/**
- * Validates JSR.io exports after build is complete.
- * This should be called from the builder after build entries are populated.
- * 
- * JSR.io (Deno's JavaScript Registry) requires that all exports in package.json
- * reference existing files. This validator ensures compatibility with JSR.io publishing.
- */
-export const validateJsrExportsAfterBuild = async (context: BuildContext<InternalBuildOptions>): Promise<void> => {
+    // JSR.io exports validation - runs after package.json validation
+    // If buildEntries are populated (after build), validates against built files
+    // Otherwise, validates export structure and path existence
     await validateJsrExports(context);
 };
 

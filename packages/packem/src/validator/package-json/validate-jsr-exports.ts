@@ -71,17 +71,22 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
         return;
     }
 
-    // Pre-compute outDir path for built files
-    const outDirPath = resolve(rootDir, outDir);
-    
     // Get all built file paths (excluding chunks) - optimized with single pass
+    // Note: buildEntries may not be populated if validator runs before build
     const builtFiles = new Set<string>();
-    for (const entry of context.buildEntries) {
-        if (!entry.chunk && entry.type !== "chunk") {
-            const fullPath = resolve(outDirPath, entry.path);
-            const relPath = relative(rootDir, fullPath);
-            // Normalize to use forward slashes for consistency
-            builtFiles.add(relPath.replace(/\\/g, "/"));
+    const hasBuildEntries = context.buildEntries.length > 0;
+    
+    if (hasBuildEntries) {
+        // Pre-compute outDir path for built files
+        const outDirPath = resolve(rootDir, outDir);
+        
+        for (const entry of context.buildEntries) {
+            if (!entry.chunk && entry.type !== "chunk") {
+                const fullPath = resolve(outDirPath, entry.path);
+                const relPath = relative(rootDir, fullPath);
+                // Normalize to use forward slashes for consistency
+                builtFiles.add(relPath.replace(/\\/g, "/"));
+            }
         }
     }
 
@@ -136,22 +141,27 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
                         });
                     }
                 } else {
-                    // Check if any matched files are in built files
-                    let hasMatch = false;
-                    for (const file of matchedFiles) {
-                        const relativeFile = relative(rootDir, file).replace(/\\/g, "/");
-                        if (builtFiles.has(relativeFile)) {
-                            hasMatch = true;
-                            break;
+                    // Check if any matched files are in built files (only if buildEntries are available)
+                    if (hasBuildEntries) {
+                        let hasMatch = false;
+                        for (const file of matchedFiles) {
+                            const relativeFile = relative(rootDir, file).replace(/\\/g, "/");
+                            if (builtFiles.has(relativeFile)) {
+                                hasMatch = true;
+                                break;
+                            }
                         }
-                    }
 
-                    if (!hasMatch) {
-                        unmatchedExports.push({
-                            exportKey: descriptor.exportKey,
-                            path: normalizedExportPath,
-                        });
+                        if (!hasMatch) {
+                            unmatchedExports.push({
+                                exportKey: descriptor.exportKey,
+                                path: normalizedExportPath,
+                            });
+                        } else {
+                            matchedExports.add(normalizedExportPath);
+                        }
                     } else {
+                        // buildEntries not available - just validate that glob pattern matches files
                         matchedExports.add(normalizedExportPath);
                     }
                 }
@@ -176,13 +186,14 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
                 continue;
             }
 
-            // Check if it's a built file
-            if (builtFiles.has(relativePath)) {
+            // Check if it's a built file (only if buildEntries are available)
+            if (hasBuildEntries && builtFiles.has(relativePath)) {
                 matchedExports.add(normalizedExportPath);
                 checkCjsExtension(normalizedExportPath, descriptor.exportKey);
             } else {
-                // File exists but wasn't built - this is allowed if it's a valid path
-                // Check if it's a valid file (not a directory)
+                // File exists - check if it's a valid file (not a directory)
+                // If buildEntries are not available, we can't check if it was built,
+                // but we can still validate the path exists and is valid
                 try {
                     const stats = await stat(absolutePath);
                     if (stats.isDirectory()) {
@@ -192,9 +203,18 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
                             reason: "Path points to a directory, not a file",
                         });
                     } else {
-                        // Valid extra export - file exists but wasn't built
-                        // This is allowed per requirements
-                        matchedExports.add(normalizedExportPath);
+                        // Valid export - file exists
+                        // If buildEntries are available and file wasn't built, track as unmatched
+                        // If buildEntries are not available, we just validate the path exists
+                        if (hasBuildEntries && !builtFiles.has(relativePath)) {
+                            // File exists but wasn't built - track as unmatched (will warn if not allow-extra mode)
+                            unmatchedExports.push({
+                                exportKey: descriptor.exportKey,
+                                path: normalizedExportPath,
+                            });
+                        } else {
+                            matchedExports.add(normalizedExportPath);
+                        }
                         checkCjsExtension(normalizedExportPath, descriptor.exportKey);
                     }
                 } catch (error) {
@@ -209,7 +229,8 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
     }
 
     // Report warnings for unmatched exports (exports that don't match built files)
-    if (unmatchedExports.length > 0 && !isAllowExtraMode) {
+    // Only warn if buildEntries are available (after build)
+    if (hasBuildEntries && unmatchedExports.length > 0 && !isAllowExtraMode) {
         for (const { path, exportKey } of unmatchedExports) {
             warn(
                 context,
@@ -230,7 +251,8 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
     }
 
     // Check for built files that aren't exported (optional validation in strict mode)
-    if (isStrictMode && builtFiles.size > 0) {
+    // Only check if buildEntries are available (after build)
+    if (hasBuildEntries && isStrictMode && builtFiles.size > 0) {
         // Pre-compute exported absolute paths for efficient lookup
         const exportedPaths = new Set<string>();
         for (const d of exportDescriptors) {

@@ -587,11 +587,8 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
 
     await context.hooks.callHook("build:done", context);
 
-    // Validate JSR.io exports after build is complete (if enabled)
-    // This ensures buildEntries are populated before validation
-    // JSR.io requires that all exports reference existing files
-    const { validateJsrExportsAfterBuild } = await import("../validator/package-json");
-    await validateJsrExportsAfterBuild(context);
+    // JSR.io exports validation is now handled in the validator index
+    // It will automatically validate against buildEntries when they are populated
 
     // eslint-disable-next-line etc/no-internal
     return showSizeInformation(context.logger, context);

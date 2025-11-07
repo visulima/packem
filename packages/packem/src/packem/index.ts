@@ -997,6 +997,14 @@ const packem = async (
 
         await runBuilder();
 
+        // Re-run JSR exports validation after build to validate against buildEntries
+        // This ensures we can check if exports match built files
+        if (typeof context.options.validation === "object" && context.options.validation.packageJson?.jsrExports !== false) {
+            // Only re-run JSR validation (other validations don't need buildEntries)
+            const validateJsrExports = (await import("../validator/package-json/validate-jsr-exports")).default;
+            await validateJsrExports(context);
+        }
+
         await runOnsuccess();
 
         process.on("SIGINT", async () => {
