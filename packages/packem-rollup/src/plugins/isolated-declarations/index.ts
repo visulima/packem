@@ -12,7 +12,7 @@ import { readFile } from "@visulima/fs";
 import { ENDING_REGEX } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getDtsExtension } from "@visulima/packem-share/utils";
-import { basename, dirname, extname, join, relative, toNamespacedPath } from "@visulima/path";
+import { basename, dirname, extname, isAbsolute, join, relative, toNamespacedPath } from "@visulima/path";
 import { parseAsync } from "oxc-parser";
 import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginContext, PreRenderedChunk } from "rollup";
 
@@ -221,8 +221,31 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
 
             // eslint-disable-next-line prefer-const
             for await (let [filename, { ext, map, source }] of Object.entries(outputFiles)) {
+                // Normalize filename to relative path
+                let normalizedFilename: string;
+                if (isAbsolute(filename)) {
+                    // If absolute path is outside sourceDirectory, skip it
+                    if (!filename.startsWith(sourceDirectory)) {
+                        context.logger.debug({
+                            message: `Skipping file outside sourceDirectory: ${filename}`,
+                            prefix: "packem:isolated-declarations",
+                        });
+                        continue;
+                    }
+                    // Convert absolute path to relative path from sourceDirectory
+                    normalizedFilename = relative(sourceDirectory, filename);
+                } else {
+                    // Already relative, use as is
+                    normalizedFilename = filename.replace(`${sourceDirectory}/`, "");
+                }
+
+                // Remove leading slash if present
+                if (normalizedFilename.startsWith("/")) {
+                    normalizedFilename = normalizedFilename.slice(1);
+                }
+
                 if (Boolean(context.options.rollup.cjsInterop) && outputOptions.format === "cjs") {
-                    const fixedSource = fixDtsDefaultCJSExports(source, { fileName: filename, imports: [] }, { warn: this.warn });
+                    const fixedSource = fixDtsDefaultCJSExports(source, { fileName: normalizedFilename, imports: [] }, { warn: this.warn });
 
                     if (fixedSource) {
                         // eslint-disable-next-line sonarjs/updated-loop-counter
@@ -231,15 +254,15 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                 }
 
                 const quote = source.includes("from '") ? "'" : "\"";
-                const originalFileName = filename + ext;
+                const originalFileName = normalizedFilename + ext;
 
                 if ((context.options.declaration === true || context.options.declaration === "compatible") && outputOptions.format === "cjs") {
                     context.logger.debug({
-                        message: `Emit compatible dts file: ${filename}`,
+                        message: `Emit compatible dts file: ${normalizedFilename}`,
                         prefix: "packem:isolated-declarations",
                     });
 
-                    const emitName = entryFileName.replace("[name]", toNamespacedPath(filename).replace(`${sourceDirectory}/`, "")).replace(".cts", ".ts");
+                    const emitName = entryFileName.replace("[name]", toNamespacedPath(normalizedFilename)).replace(".cts", ".ts");
 
                     let compatibleSource = source;
 
@@ -267,11 +290,11 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                 }
 
                 context.logger.debug({
-                    message: `Emit dts file: ${filename}`,
+                    message: `Emit dts file: ${normalizedFilename}`,
                     prefix: "packem:isolated-declarations",
                 });
 
-                const emitName = entryFileName.replace("[name]", toNamespacedPath(filename).replace(`${sourceDirectory}/`, ""));
+                const emitName = entryFileName.replace("[name]", toNamespacedPath(normalizedFilename));
 
                 if (context.options.sourcemap && map) {
                     // eslint-disable-next-line sonarjs/updated-loop-counter

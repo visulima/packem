@@ -327,10 +327,10 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
         nodeResolver = oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, context.logger, context.tsconfig?.path);
     }
 
-    const chunking = context.options.rollup.output?.preserveModules
+    const chunking = context.options.unbundle || context.options.rollup.output?.preserveModules
         ? {
             preserveModules: true,
-            preserveModulesRoot: context.options.rollup.output.preserveModulesRoot ?? "src",
+            preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot ?? context.options.sourceDir,
         }
         : {
             manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries),
@@ -651,7 +651,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             context.options.declaration
             && context.options.rollup.isolatedDeclarations
             && context.options.isolatedDeclarationTransformer
-            && cachingPlugin(isolatedDeclarationsPlugin<InternalBuildOptions>(join(context.options.rootDir, context.options.sourceDir), context), fileCache),
+            && isolatedDeclarationsPlugin<InternalBuildOptions>(join(context.options.rootDir, context.options.sourceDir), context),
 
             context.options.rollup.requireCJS
             && context.options.emitESM
