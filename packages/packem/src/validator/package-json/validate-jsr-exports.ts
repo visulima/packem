@@ -42,8 +42,14 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
         return;
     }
 
+    // Cache frequently used values
+    const { rootDir, outDir } = context.options;
+    const isModuleType = pkg.type === "module";
+    const isStrictMode = validation.packageJson?.jsrExports === "strict";
+    const isAllowExtraMode = validation.packageJson?.jsrExports === "allow-extra";
+
     // JSR.io specific: Warn if package type is not "module" (JSR.io prefers ESM)
-    if (pkg.type !== "module" && pkg.type !== undefined) {
+    if (!isModuleType && pkg.type !== undefined) {
         warn(
             context,
             "JSR.io prefers packages with 'type': 'module' for better Deno compatibility. Consider using ESM format.",
@@ -51,7 +57,7 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
     }
 
     // Extract all export file paths from package.json
-    const packageType = pkg.type === "module" ? "esm" : "cjs";
+    const packageType = isModuleType ? "esm" : "cjs";
     const exportDescriptors = extractExportFilenames(
         pkg.exports,
         packageType,
@@ -60,24 +66,40 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
         context.options.ignoreExportKeys || [],
     );
 
-    // Get all built file paths (excluding chunks)
-    // Build entries paths are already relative to outDir, so we need to construct the full path
-    const builtFiles = new Set(
-        context.buildEntries
-            .filter((entry) => !entry.chunk && entry.type !== "chunk")
-            .map((entry) => {
-                // Entry path is relative to outDir, construct full path and get relative to rootDir
-                const fullPath = resolve(context.options.rootDir, context.options.outDir, entry.path);
-                const relPath = relative(context.options.rootDir, fullPath);
-                // Normalize to use forward slashes for consistency
-                return relPath.replace(/\\/g, "/");
-            })
-    );
+    // Early return if no exports to validate
+    if (exportDescriptors.length === 0) {
+        return;
+    }
+
+    // Pre-compute outDir path for built files
+    const outDirPath = resolve(rootDir, outDir);
+    
+    // Get all built file paths (excluding chunks) - optimized with single pass
+    const builtFiles = new Set<string>();
+    for (const entry of context.buildEntries) {
+        if (!entry.chunk && entry.type !== "chunk") {
+            const fullPath = resolve(outDirPath, entry.path);
+            const relPath = relative(rootDir, fullPath);
+            // Normalize to use forward slashes for consistency
+            builtFiles.add(relPath.replace(/\\/g, "/"));
+        }
+    }
 
     // Track which exports have been matched
     const matchedExports = new Set<string>();
     const unmatchedExports: Array<{ path: string; exportKey?: string }> = [];
     const invalidPaths: Array<{ path: string; exportKey?: string; reason: string }> = [];
+
+    // Helper function to check and warn about .cjs extension
+    const checkCjsExtension = (path: string, exportKey?: string): void => {
+        if (path.endsWith(".cjs") && isModuleType) {
+            warn(
+                context,
+                `Export "${path}"${exportKey ? ` (key: ${exportKey})` : ""} uses .cjs extension. ` +
+                `JSR.io prefers ESM format (.mjs or .js with "type": "module") for better Deno compatibility.`,
+            );
+        }
+    };
 
     // Validate each export
     for (const descriptor of exportDescriptors) {
@@ -87,14 +109,15 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
 
         const exportPath = descriptor.file;
         const normalizedExportPath = exportPath.startsWith("./") ? exportPath : `./${exportPath}`;
+        const pathWithoutPrefix = normalizedExportPath.slice(2);
+        const absolutePath = resolve(rootDir, pathWithoutPrefix);
         
         // Check if it's a dynamic pattern (glob)
         if (isDynamicPattern(normalizedExportPath)) {
             try {
                 // Expand glob pattern
-                const absolutePattern = resolve(context.options.rootDir, normalizedExportPath.slice(2));
-                const matchedFiles = globSync([absolutePattern], {
-                    cwd: context.options.rootDir,
+                const matchedFiles = globSync([absolutePath], {
+                    cwd: rootDir,
                     dot: false,
                     ignore: [
                         "**/node_modules/**",
@@ -104,8 +127,8 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
 
                 if (matchedFiles.length === 0) {
                     // No files match the pattern - validate if path pattern is valid
-                    const pathExists = existsSync(resolve(context.options.rootDir, normalizedExportPath.slice(2).split("*")[0] || ""));
-                    if (!pathExists) {
+                    const basePath = pathWithoutPrefix.split("*")[0] || "";
+                    if (basePath && !existsSync(resolve(rootDir, basePath))) {
                         invalidPaths.push({
                             exportKey: descriptor.exportKey,
                             path: normalizedExportPath,
@@ -114,10 +137,14 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
                     }
                 } else {
                     // Check if any matched files are in built files
-                    const hasMatch = matchedFiles.some((file) => {
-                        const relativeFile = relative(context.options.rootDir, file).replace(/\\/g, "/");
-                        return builtFiles.has(relativeFile);
-                    });
+                    let hasMatch = false;
+                    for (const file of matchedFiles) {
+                        const relativeFile = relative(rootDir, file).replace(/\\/g, "/");
+                        if (builtFiles.has(relativeFile)) {
+                            hasMatch = true;
+                            break;
+                        }
+                    }
 
                     if (!hasMatch) {
                         unmatchedExports.push({
@@ -137,8 +164,7 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
             }
         } else {
             // Regular file path
-            const absolutePath = resolve(context.options.rootDir, normalizedExportPath.slice(2));
-            const relativePath = relative(context.options.rootDir, absolutePath).replace(/\\/g, "/");
+            const relativePath = relative(rootDir, absolutePath).replace(/\\/g, "/");
             
             // Check if file exists
             if (!existsSync(absolutePath)) {
@@ -153,15 +179,7 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
             // Check if it's a built file
             if (builtFiles.has(relativePath)) {
                 matchedExports.add(normalizedExportPath);
-                
-                // JSR.io specific: Warn if using .cjs extension (JSR.io prefers ESM)
-                if (normalizedExportPath.endsWith(".cjs") && pkg.type === "module") {
-                    warn(
-                        context,
-                        `Export "${normalizedExportPath}"${descriptor.exportKey ? ` (key: ${descriptor.exportKey})` : ""} uses .cjs extension. ` +
-                        `JSR.io prefers ESM format (.mjs or .js with "type": "module") for better Deno compatibility.`,
-                    );
-                }
+                checkCjsExtension(normalizedExportPath, descriptor.exportKey);
             } else {
                 // File exists but wasn't built - this is allowed if it's a valid path
                 // Check if it's a valid file (not a directory)
@@ -177,15 +195,7 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
                         // Valid extra export - file exists but wasn't built
                         // This is allowed per requirements
                         matchedExports.add(normalizedExportPath);
-                        
-                        // JSR.io specific: Warn if using .cjs extension
-                        if (normalizedExportPath.endsWith(".cjs") && pkg.type === "module") {
-                            warn(
-                                context,
-                                `Export "${normalizedExportPath}"${descriptor.exportKey ? ` (key: ${descriptor.exportKey})` : ""} uses .cjs extension. ` +
-                                `JSR.io prefers ESM format for better Deno compatibility.`,
-                            );
-                        }
+                        checkCjsExtension(normalizedExportPath, descriptor.exportKey);
                     }
                 } catch (error) {
                     invalidPaths.push({
@@ -199,7 +209,7 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
     }
 
     // Report warnings for unmatched exports (exports that don't match built files)
-    if (unmatchedExports.length > 0 && validation.packageJson?.jsrExports !== "allow-extra") {
+    if (unmatchedExports.length > 0 && !isAllowExtraMode) {
         for (const { path, exportKey } of unmatchedExports) {
             warn(
                 context,
@@ -219,39 +229,48 @@ const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): 
         }
     }
 
-    // Check for built files that aren't exported (optional validation)
-    if (validation.packageJson?.jsrExports === "strict") {
-        const exportedPaths = new Set(
-            exportDescriptors
-                .filter((d) => !d.ignored)
-                .map((d) => {
-                    const path = d.file.startsWith("./") ? d.file : `./${d.file}`;
-                    return resolve(context.options.rootDir, path.slice(2));
-                })
-        );
+    // Check for built files that aren't exported (optional validation in strict mode)
+    if (isStrictMode && builtFiles.size > 0) {
+        // Pre-compute exported absolute paths for efficient lookup
+        const exportedPaths = new Set<string>();
+        for (const d of exportDescriptors) {
+            if (!d.ignored) {
+                const path = d.file.startsWith("./") ? d.file : `./${d.file}`;
+                exportedPaths.add(resolve(rootDir, path.slice(2)));
+            }
+        }
 
-        const unexportedFiles = Array.from(builtFiles).filter((file) => {
-            const absoluteFile = resolve(context.options.rootDir, file);
-            return !exportedPaths.has(absoluteFile);
-        });
+        const unexportedFiles: string[] = [];
+        for (const file of builtFiles) {
+            const absoluteFile = resolve(rootDir, file);
+            if (!exportedPaths.has(absoluteFile)) {
+                unexportedFiles.push(file);
+            }
+        }
 
         if (unexportedFiles.length > 0) {
+            const preview = unexportedFiles.slice(0, 5).join(", ");
+            const suffix = unexportedFiles.length > 5 ? "..." : "";
             warn(
                 context,
-                `Found ${unexportedFiles.length} built file(s) that are not exported in package.json: ${unexportedFiles.slice(0, 5).join(", ")}${unexportedFiles.length > 5 ? "..." : ""}`,
+                `Found ${unexportedFiles.length} built file(s) that are not exported in package.json: ${preview}${suffix}`,
             );
         }
     }
 
     // JSR.io specific: Check if type definitions are properly exported when declaration files are generated
-    if (context.options.declaration && pkg.type === "module") {
-        const hasTypesExport = exportDescriptors.some((d) => {
-            if (d.ignored) {
-                return false;
+    if (context.options.declaration && isModuleType) {
+        // Early exit optimization - check if any export has types
+        let hasTypesExport = false;
+        for (const d of exportDescriptors) {
+            if (!d.ignored) {
+                const path = d.file.toLowerCase();
+                if (path.includes(".d.ts") || path.includes(".d.mts")) {
+                    hasTypesExport = true;
+                    break;
+                }
             }
-            const path = d.file.toLowerCase();
-            return path.includes(".d.ts") || path.includes(".d.mts");
-        });
+        }
 
         if (!hasTypesExport) {
             warn(
