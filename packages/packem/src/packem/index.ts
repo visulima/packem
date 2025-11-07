@@ -512,6 +512,7 @@ const generateOptions = (
                 dependencies: true,
                 exports: true,
                 files: true,
+                jarFileExports: true,
                 main: true,
                 module: true,
                 name: true,
@@ -973,8 +974,8 @@ const packem = async (
             // TODO: Add a validation handler, to add custom validation checks
             if (typeof context.options.validation === "object") {
                 if (context.options.validation.packageJson) {
-                    // packageJsonValidator is synchronous, run immediately
-                    packageJsonValidator(context);
+                    // packageJsonValidator is now async, run with await
+                    await packageJsonValidator(context);
                 }
 
                 if (context.options.validation.attw) {

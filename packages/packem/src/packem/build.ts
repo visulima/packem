@@ -587,6 +587,11 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
 
     await context.hooks.callHook("build:done", context);
 
+    // Validate JAR file exports after build is complete (if enabled)
+    // This ensures buildEntries are populated before validation
+    const { validateJarFileExportsAfterBuild } = await import("../validator/package-json");
+    await validateJarFileExportsAfterBuild(context);
+
     // eslint-disable-next-line etc/no-internal
     return showSizeInformation(context.logger, context);
 };

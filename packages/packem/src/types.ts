@@ -320,6 +320,14 @@ export type ValidationOptions = {
         extraConditions?: string[];
         /** Whether to validate the files field */
         files?: boolean;
+        /**
+         * JAR file exports validation mode.
+         * - `false`: Disable validation
+         * - `true` or `"allow-extra"`: Validate exports match built files, but allow extra exports with valid paths
+         * - `"strict"`: Validate exports match built files and warn about unexported built files
+         * @default true
+         */
+        jarFileExports?: boolean | "allow-extra" | "strict";
         /** Whether to validate the main field */
         main?: boolean;
         /** Whether to validate the module field */
