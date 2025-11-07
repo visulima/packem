@@ -1,8 +1,8 @@
-# JAR File Exports Validation
+# JSR.io Exports Validation
 
 ## Overview
 
-This document describes the JAR file exports validation feature that validates that exports in `package.json` match the built files, while allowing extra exports with valid paths.
+This document describes the JSR.io (Deno's JavaScript Registry) exports validation feature that validates that exports in `package.json` match the built files, while allowing extra exports with valid paths. This ensures packages are compatible with JSR.io publishing requirements.
 
 ## Implementation
 
@@ -16,13 +16,13 @@ This document describes the JAR file exports validation feature that validates t
 
 ### Configuration
 
-The validation can be configured via `validation.packageJson.jarFileExports`:
+The validation can be configured via `validation.packageJson.jsrExports`:
 
 ```typescript
 {
   validation: {
     packageJson: {
-      jarFileExports: true | "allow-extra" | "strict" | false
+      jsrExports: true | "allow-extra" | "strict" | false
     }
   }
 }
@@ -304,11 +304,22 @@ await validateJarFileExportsAfterBuild(context);
 ### Release Command Integration
 If the release command doesn't perform this validation, the builder will handle it automatically. This ensures validation happens even if release steps are skipped.
 
+## JSR.io Specific Requirements
+
+JSR.io (Deno's JavaScript Registry) has specific requirements for package publishing:
+
+1. **All exports must reference existing files**: JSR.io validates that all paths in the `exports` field point to files that actually exist
+2. **File paths must be valid**: Exported paths cannot point to directories or non-existent files
+3. **Relative paths required**: All export paths must be relative (starting with `./`)
+4. **Type definitions**: If TypeScript declaration files are generated, they should be properly exported
+
+This validator ensures your package meets these requirements before publishing to JSR.io.
+
 ## Files Modified
 
-1. `packages/packem/src/validator/package-json/validate-jar-file-exports.ts` - New validator
+1. `packages/packem/src/validator/package-json/validate-jsr-exports.ts` - New validator
 2. `packages/packem/src/validator/package-json/index.ts` - Export validator function
-3. `packages/packem/src/types.ts` - Added `jarFileExports` configuration option
+3. `packages/packem/src/types.ts` - Added `jsrExports` configuration option
 4. `packages/packem/src/packem/build.ts` - Integrated validation after build
 5. `packages/packem/src/packem/index.ts` - Updated default configuration
 

@@ -10,18 +10,28 @@ import type { InternalBuildOptions, ValidationOptions } from "../../types";
 import { warn } from "@visulima/packem-share/utils";
 
 /**
- * Validates that exports in package.json match the built files.
+ * Validates that exports in package.json match the built files for JSR.io (Deno's JavaScript Registry) compatibility.
  * Allows extra exports but validates that the file paths exist.
+ * 
+ * This validator ensures that package.json exports are valid for publishing to JSR.io,
+ * which requires that all exported paths reference existing files.
+ * 
+ * JSR.io specific requirements:
+ * - All exports must reference existing files
+ * - Exports should use ESM format (.mjs or .js with "type": "module")
+ * - Type definitions should be properly exported if declaration files are generated
+ * - Relative paths are required (starting with "./")
  * 
  * @param context The build context containing validation options and build entries
  * @throws {Error} If validation fails and validation is strict
  * @see https://nodejs.org/api/packages.html#exports Official Node.js documentation for package exports
+ * @see https://jsr.io/docs/publishing-packages JSR.io publishing documentation
  */
-const validateJarFileExports = async (context: BuildContext<InternalBuildOptions>): Promise<void> => {
+const validateJsrExports = async (context: BuildContext<InternalBuildOptions>): Promise<void> => {
     const validation = context.options.validation as ValidationOptions;
     
-    // Check if JAR file export validation is enabled
-    if (validation.packageJson?.jarFileExports === false) {
+    // Check if JSR.io export validation is enabled
+    if (validation.packageJson?.jsrExports === false) {
         return;
     }
 
@@ -30,6 +40,14 @@ const validateJarFileExports = async (context: BuildContext<InternalBuildOptions
     if (!pkg.exports) {
         // No exports to validate
         return;
+    }
+
+    // JSR.io specific: Warn if package type is not "module" (JSR.io prefers ESM)
+    if (pkg.type !== "module" && pkg.type !== undefined) {
+        warn(
+            context,
+            "JSR.io prefers packages with 'type': 'module' for better Deno compatibility. Consider using ESM format.",
+        );
     }
 
     // Extract all export file paths from package.json
@@ -135,6 +153,15 @@ const validateJarFileExports = async (context: BuildContext<InternalBuildOptions
             // Check if it's a built file
             if (builtFiles.has(relativePath)) {
                 matchedExports.add(normalizedExportPath);
+                
+                // JSR.io specific: Warn if using .cjs extension (JSR.io prefers ESM)
+                if (normalizedExportPath.endsWith(".cjs") && pkg.type === "module") {
+                    warn(
+                        context,
+                        `Export "${normalizedExportPath}"${descriptor.exportKey ? ` (key: ${descriptor.exportKey})` : ""} uses .cjs extension. ` +
+                        `JSR.io prefers ESM format (.mjs or .js with "type": "module") for better Deno compatibility.`,
+                    );
+                }
             } else {
                 // File exists but wasn't built - this is allowed if it's a valid path
                 // Check if it's a valid file (not a directory)
@@ -150,6 +177,15 @@ const validateJarFileExports = async (context: BuildContext<InternalBuildOptions
                         // Valid extra export - file exists but wasn't built
                         // This is allowed per requirements
                         matchedExports.add(normalizedExportPath);
+                        
+                        // JSR.io specific: Warn if using .cjs extension
+                        if (normalizedExportPath.endsWith(".cjs") && pkg.type === "module") {
+                            warn(
+                                context,
+                                `Export "${normalizedExportPath}"${descriptor.exportKey ? ` (key: ${descriptor.exportKey})` : ""} uses .cjs extension. ` +
+                                `JSR.io prefers ESM format for better Deno compatibility.`,
+                            );
+                        }
                     }
                 } catch (error) {
                     invalidPaths.push({
@@ -163,7 +199,7 @@ const validateJarFileExports = async (context: BuildContext<InternalBuildOptions
     }
 
     // Report warnings for unmatched exports (exports that don't match built files)
-    if (unmatchedExports.length > 0 && validation.packageJson?.jarFileExports !== "allow-extra") {
+    if (unmatchedExports.length > 0 && validation.packageJson?.jsrExports !== "allow-extra") {
         for (const { path, exportKey } of unmatchedExports) {
             warn(
                 context,
@@ -184,7 +220,7 @@ const validateJarFileExports = async (context: BuildContext<InternalBuildOptions
     }
 
     // Check for built files that aren't exported (optional validation)
-    if (validation.packageJson?.jarFileExports === "strict") {
+    if (validation.packageJson?.jsrExports === "strict") {
         const exportedPaths = new Set(
             exportDescriptors
                 .filter((d) => !d.ignored)
@@ -206,6 +242,25 @@ const validateJarFileExports = async (context: BuildContext<InternalBuildOptions
             );
         }
     }
+
+    // JSR.io specific: Check if type definitions are properly exported when declaration files are generated
+    if (context.options.declaration && pkg.type === "module") {
+        const hasTypesExport = exportDescriptors.some((d) => {
+            if (d.ignored) {
+                return false;
+            }
+            const path = d.file.toLowerCase();
+            return path.includes(".d.ts") || path.includes(".d.mts");
+        });
+
+        if (!hasTypesExport) {
+            warn(
+                context,
+                "TypeScript declaration files are being generated, but no 'types' condition is found in exports. " +
+                "JSR.io recommends exporting type definitions using the 'types' condition for better TypeScript support.",
+            );
+        }
+    }
 };
 
-export default validateJarFileExports;
+export default validateJsrExports;

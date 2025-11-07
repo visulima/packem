@@ -512,7 +512,7 @@ const generateOptions = (
                 dependencies: true,
                 exports: true,
                 files: true,
-                jarFileExports: true,
+                jsrExports: true,
                 main: true,
                 module: true,
                 name: true,

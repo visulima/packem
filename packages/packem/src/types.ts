@@ -321,13 +321,15 @@ export type ValidationOptions = {
         /** Whether to validate the files field */
         files?: boolean;
         /**
-         * JAR file exports validation mode.
+         * JSR.io (Deno's JavaScript Registry) exports validation mode.
+         * Validates that exports in package.json match built files and are valid for JSR.io publishing.
          * - `false`: Disable validation
          * - `true` or `"allow-extra"`: Validate exports match built files, but allow extra exports with valid paths
          * - `"strict"`: Validate exports match built files and warn about unexported built files
          * @default true
+         * @see https://jsr.io/docs/publishing-packages JSR.io publishing documentation
          */
-        jarFileExports?: boolean | "allow-extra" | "strict";
+        jsrExports?: boolean | "allow-extra" | "strict";
         /** Whether to validate the main field */
         main?: boolean;
         /** Whether to validate the module field */
