@@ -593,6 +593,7 @@ catalogs:
 overrides:
   '@visulima/packem': 2.0.0-alpha.29
   chrono-node@<2.2.4: '>=2.9.0'
+  tar@=7.5.1: '>=7.5.2'
   tmp@<=0.2.3: '>=0.2.5'
   vite@>=7.1.0 <=7.1.10: '>=7.1.11'
 
@@ -11464,8 +11465,8 @@ packages:
     resolution: {integrity: sha512-ujeqbceABgwMZxEJnk2HDY2DlnUZ+9oEcb1KzTVfYHio0UE6dG71n60d8D2I4qNvleWrrXpmjpt7vZeF1LnMZQ==}
     engines: {node: '>=6'}
 
-  tar@7.5.1:
-    resolution: {integrity: sha512-nlGpxf+hv0v7GkWBK2V9spgactGOp0qvfWRxUMjqHyzrt3SgwE48DIv/FhqPHJYLHpgW1opq3nERbz5Anq7n1g==}
+  tar@7.5.2:
+    resolution: {integrity: sha512-7NyxrTE4Anh8km8iEy7o0QYPs+0JKBTj5ZaqHg6B39erLg0qYXN3BijtShwbsNSvQ+LN75+KV+C4QR/f6Gwnpg==}
     engines: {node: '>=18'}
 
   taze@19.8.1:
@@ -14769,7 +14770,7 @@ snapshots:
   '@tailwindcss/oxide@4.1.13':
     dependencies:
       detect-libc: 2.0.4
-      tar: 7.5.1
+      tar: 7.5.2
     optionalDependencies:
       '@tailwindcss/oxide-android-arm64': 4.1.13
       '@tailwindcss/oxide-darwin-arm64': 4.1.13
@@ -23018,7 +23019,7 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 3.6.2
 
-  tar@7.5.1:
+  tar@7.5.2:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0
