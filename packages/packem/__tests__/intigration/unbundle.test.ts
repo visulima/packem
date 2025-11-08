@@ -258,4 +258,3 @@ export { b } from './b/indexB';
         expect(existsSync(`${temporaryDirectoryPath}/dist/index.cjs`)).toBe(false);
     });
 });
-

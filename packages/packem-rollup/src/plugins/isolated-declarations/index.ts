@@ -62,6 +62,19 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
 
     // eslint-disable-next-line func-style, sonarjs/cognitive-complexity
     async function transform(this: PluginContext, code: string, id: string): Promise<undefined> {
+        // Only operate on TS/TSX sources; avoid parsing JSON and other assets
+        const isTsLike
+            = id.endsWith(".ts")
+                || id.endsWith(".cts")
+                || id.endsWith(".mts")
+                || id.endsWith(".tsx")
+                || id.endsWith(".ctsx")
+                || id.endsWith(".mtsx");
+
+        if (!isTsLike) {
+            return;
+        }
+
         if (!filter(id)) {
             return;
         }
@@ -223,6 +236,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
             for await (let [filename, { ext, map, source }] of Object.entries(outputFiles)) {
                 // Normalize filename to relative path
                 let normalizedFilename: string;
+
                 if (isAbsolute(filename)) {
                     // If absolute path is outside sourceDirectory, skip it
                     if (!filename.startsWith(sourceDirectory)) {
@@ -232,6 +246,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                         });
                         continue;
                     }
+
                     // Convert absolute path to relative path from sourceDirectory
                     normalizedFilename = relative(sourceDirectory, filename);
                 } else {

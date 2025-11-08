@@ -1,12 +1,10 @@
 import { esbuildPlugin as transformer } from "@visulima/packem-rollup/esbuild";
 
-import isolatedDeclarationTransformer from "./src/rollup/plugins/typescript/isolated-declarations-typescript-transformer";
-
 import { defineConfig } from "./src/config";
+import isolatedDeclarationTransformer from "./src/rollup/plugins/typescript/isolated-declarations-typescript-transformer";
 
 export default defineConfig({
     cjsInterop: true,
-    isolatedDeclarationTransformer,
     externals: [
         "@babel/parser",
         "@rollup/plugin-alias",
@@ -28,6 +26,7 @@ export default defineConfig({
         "oxc-parser",
         "oxc-resolver",
     ],
+    isolatedDeclarationTransformer,
     rollup: {
         license: {
             path: "./LICENSE.md",

@@ -205,6 +205,7 @@ export interface BuildOptions {
     transformer: TransformerFn;
     /** TypeDoc configuration for generating documentation */
     typedoc: TypeDocumentOptions | false;
+
     /**
      * If `true`, enables unbundle mode which preserves the source file structure.
      * Instead of bundling everything into a single file, each module is output as a separate file

@@ -1470,7 +1470,7 @@ importers:
         specifier: catalog:prod
         version: 4.0.0(@types/node@24.5.2)
       '@visulima/packem-rollup':
-        specifier: 1.0.0-alpha.24
+        specifier: 1.0.0-alpha.25
         version: link:../packem-rollup
       '@visulima/packem-share':
         specifier: 1.0.0-alpha.13
