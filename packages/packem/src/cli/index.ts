@@ -1,5 +1,6 @@
-import Cli from "@visulima/cerebro";
-import { SimpleReporter } from "@visulima/pail/reporter";
+import { createCerebro } from "@visulima/cerebro";
+import createPailLogger from "@visulima/cerebro/logger/pail";
+import { SimpleReporter } from "@visulima/pail/reporter/simple";
 
 import { name, version } from "../../package.json";
 import createAddCommand from "./commands/add";
@@ -37,7 +38,9 @@ try {
  * await cli.run(['build', '--watch']);
  * ```
  */
-const index = new Cli("packem", {
+const index = createCerebro("packem", {
+    logger: await createPailLogger(),
+    /*
     logger: {
         reporters: [
             new SimpleReporter({
@@ -50,6 +53,7 @@ const index = new Cli("packem", {
         ],
         scope: "packem",
     },
+    */
     packageName: name,
     packageVersion: version,
 });

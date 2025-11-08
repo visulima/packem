@@ -21,8 +21,13 @@ catalogs:
     '@rollup/pluginutils': 5.3.0
     '@visulima/packem-rollup': 1.0.0-alpha.18
     '@visulima/rollup-plugin-css': 1.0.0-alpha.6
+<<<<<<< HEAD
     esbuild: ^0.27.0
     rollup: ^4.53.2
+=======
+    esbuild: ^0.25.12
+    rollup: ^4.53.1
+>>>>>>> 7c1ca737 (chore: update dependencies and package versions across multiple files)
     rollup-plugin-dts: 6.2.3
     rollup-plugin-license: 3.6.0
     rollup-plugin-lit-css: ^6.0.0
@@ -44,7 +49,11 @@ catalogs:
     '@oxc-parser/binding-linux-x64-gnu': 0.91.0
     '@oxc-project/types': 0.91.0
     '@svgr/core': ^8.1.0
+<<<<<<< HEAD
     '@swc/core': ^1.15.1
+=======
+    '@swc/core': ^1.15.0
+>>>>>>> 7c1ca737 (chore: update dependencies and package versions across multiple files)
     '@swc/types': 0.1.25
     '@visulima/packem': ^2.0.0-alpha.30
     '@visulima/pail': 2.1.28
@@ -99,7 +108,11 @@ catalogs:
     turndown-plugin-gfm: ^1.0.2
     typedoc-plugin-markdown: 4.9.0
   monorepo:
+<<<<<<< HEAD
     nx: ^22.0.3
+=======
+    nx: ^22.0.2
+>>>>>>> 7c1ca737 (chore: update dependencies and package versions across multiple files)
   network:
     browserslist: 4.26.2
     browserslist-config-anolilab: ^6.0.6
@@ -127,6 +140,7 @@ catalogs:
     '@babel/generator': ^7.28.5
     '@babel/parser': 7.28.4
     '@babel/types': ^7.28.5
+<<<<<<< HEAD
     '@visulima/cerebro': 1.1.50
     '@visulima/colorize': 1.4.23
     '@visulima/fs': 3.1.8
@@ -139,11 +153,29 @@ catalogs:
     audit-ci: ^7.1.0
     birpc: ^2.8.0
     cjs-module-lexer: ^2.1.1
+=======
+    '@visulima/cerebro': 2.0.3
+    '@visulima/colorize': 1.4.27
+    '@visulima/fs': 4.0.4
+    '@visulima/humanizer': 2.0.3
+    '@visulima/package': 4.1.4
+    '@visulima/pail': 3.2.0
+    '@visulima/source-map': 2.0.3
+    '@visulima/tabular': ^3.1.1
+    ast-kit: ^2.2.0
+    audit-ci: ^7.1.0
+    birpc: ^2.7.0
+    cjs-module-lexer: ^2.1.0
+>>>>>>> 7c1ca737 (chore: update dependencies and package versions across multiple files)
     fastest-levenshtein: 1.0.16
     gpt-tokenizer: ^3.4.0
     happy-dom: ^20.0.10
     hookable: 5.5.3
+<<<<<<< HEAD
     html-minifier-next: ^4.1.0
+=======
+    html-minifier-next: ^4.0.2
+>>>>>>> 7c1ca737 (chore: update dependencies and package versions across multiple files)
     is-ci: ^4.1.0
     micromatch: ^4.0.8
     mlly: 1.8.0
@@ -192,7 +224,7 @@ catalogs:
   tsc:
     '@total-typescript/ts-reset': ^0.6.1
     '@ts-macro/tsc': ^0.3.6
-    '@visulima/tsconfig': 1.1.22
+    '@visulima/tsconfig': 2.1.0
     '@volar/typescript': ^2.4.23
     typescript: ^5.9.3
     vue-tsc: ^3.1.3
@@ -259,7 +291,6 @@ onlyBuiltDependencies:
   - unrs-resolver
 
 overrides:
-  '@visulima/packem': 2.0.0-alpha.29
   chrono-node@<2.2.4: '>=2.9.0'
   tar@=7.5.1: '>=7.5.2'
   tmp@<=0.2.3: '>=0.2.5'

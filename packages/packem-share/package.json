@@ -57,8 +57,8 @@
         "README.md"
     ],
     "scripts": {
-        "build": "../../node_modules/.bin/packem build --development",
-        "build:prod": "../../node_modules/.bin/packem build --production",
+        "build": "JITI_INTEROP_DEFAULT=1 jiti ../packem/src/cli/index.ts build --development",
+        "build:prod": "JITI_INTEROP_DEFAULT=1 jiti ../packem/src/cli/index.ts build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build --watch",
         "lint:attw": "attw --pack",

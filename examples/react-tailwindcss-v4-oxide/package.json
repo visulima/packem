@@ -31,8 +31,8 @@
         "react": "^19.2.0"
     },
     "devDependencies": {
-        "@tailwindcss/node": "4.1.13",
-        "@tailwindcss/oxide": "4.1.13",
+        "@tailwindcss/node": "4.1.17",
+        "@tailwindcss/oxide": "4.1.17",
         "@types/react": "^19.2.2",
         "@types/react-dom": "^19.2.2",
         "@visulima/css-style-inject": "workspace:*",
