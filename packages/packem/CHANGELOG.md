@@ -1,3 +1,18 @@
+## @visulima/packem [2.0.0-alpha.33](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.32...@visulima/packem@2.0.0-alpha.33) (2025-11-08)
+
+### Features
+
+* add unbundle mode to preserve source file structure ([317e992](https://github.com/visulima/packem/commit/317e9925eae1344a2459f044250e717241a1d5a5))
+
+### Miscellaneous Chores
+
+* update package.json and pnpm-lock.yaml for dependency management ([aa523ca](https://github.com/visulima/packem/commit/aa523ca16f29ba0a874a13693d1f9581acf6f8c3))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.26
+
 ## @visulima/packem [2.0.0-alpha.32](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.31...@visulima/packem@2.0.0-alpha.32) (2025-10-28)
 
 ### Features
