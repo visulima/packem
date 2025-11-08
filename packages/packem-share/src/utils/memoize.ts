@@ -5,7 +5,6 @@
  *
  * Copyright (c) 2018 these people -> https://github.com/huozhi/bunchee/graphs/contributors
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CacheKeyResolver = string | ((...arguments_: any[]) => string);
 
 /**

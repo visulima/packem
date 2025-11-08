@@ -1,7 +1,7 @@
+import { readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
-import { readdirSync } from "node:fs";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -360,7 +360,6 @@ export const mainIndex2 = () => ({
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await createPackageJson(temporaryDirectoryPath, {
-            type: "module",
             devDependencies: {
                 typescript: "*",
             },
@@ -368,6 +367,7 @@ export const mainIndex2 = () => ({
                 ".": "./dist/index.js",
                 "./index2": "./dist/index2.js",
             },
+            type: "module",
         });
         await createTsConfig(temporaryDirectoryPath, {
             compilerOptions: {
@@ -452,12 +452,12 @@ export const mainIndex2 = () => ({
         // Find the shared chunk file dynamically (filename contains hash)
         const sharedChunkDirectory = `${temporaryDirectoryPath}/dist/packem_shared`;
         const sharedChunkFiles = readdirSync(sharedChunkDirectory).filter((file) => file.startsWith("process-utils-"));
-        
-        expect(sharedChunkFiles.length).toBe(1);
+
+        expect(sharedChunkFiles).toHaveLength(1);
 
         const sharedChunkFile = sharedChunkFiles[0];
         const sharedMjsContent = readFileSync(`${sharedChunkDirectory}/${sharedChunkFile}`);
-        
+
         expect(sharedMjsContent).toMatchSnapshot("shared");
     });
 });

@@ -51,7 +51,7 @@ const shouldTransformImport = async (
     isBuiltin: boolean,
     shouldTransform: TransformFunction | undefined,
     cwd: string,
-    resolveId: ((id: string, importer?: string) => Promise<ResolvedId | null>),
+    resolveId: (id: string, importer?: string) => Promise<ResolvedId | null>,
 ): Promise<boolean> => {
     if (isBuiltin) {
         return true;
@@ -161,7 +161,7 @@ export type TransformFunction = (
     /**
      * Rollup resolve function for better module resolution
      */
-    rollupResolve: ((id: string, importer?: string) => Promise<ResolvedId | null>),
+    rollupResolve: (id: string, importer?: string) => Promise<ResolvedId | null>,
 ) => Awaitable<boolean | undefined | void>;
 
 export interface Options {
