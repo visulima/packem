@@ -44,7 +44,16 @@ export type IsolatedDeclarationsOptions = {
 };
 
 export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(sourceDirectory: string, context: BuildContext<T>): Plugin => {
-    const filter = createFilter(context.options.include, context.options.exclude);
+    // Get include/exclude from rollup.isolatedDeclarations config
+    const isolatedDeclarationsConfig = context.options.rollup.isolatedDeclarations;
+    const userInclude = isolatedDeclarationsConfig?.include;
+    const userExclude = isolatedDeclarationsConfig?.exclude;
+
+    // Create filter function for include/exclude patterns
+    // The filter is used both in the hook's filter property and inside the handler
+    // createFilter is needed to properly combine include and exclude patterns
+    const filterFn = createFilter(userInclude, userExclude);
+    const filter = (id: string) => filterFn(id);
 
     let outputFiles: Record<string, { ext: string; map?: string; source: string }> = Object.create(null);
 
@@ -63,19 +72,16 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
     // eslint-disable-next-line func-style, sonarjs/cognitive-complexity
     async function transform(this: PluginContext, code: string, id: string): Promise<undefined> {
         // Only operate on TS/TSX sources; avoid parsing JSON and other assets
-        const isTsLike
-            = id.endsWith(".ts")
-                || id.endsWith(".cts")
-                || id.endsWith(".mts")
-                || id.endsWith(".tsx")
-                || id.endsWith(".ctsx")
-                || id.endsWith(".mtsx");
+        // This is a safety check - the filter property should already filter these, but we keep it for extra safety
+        const isTsLike =
+            id.endsWith(".ts")
+            || id.endsWith(".cts")
+            || id.endsWith(".mts")
+            || id.endsWith(".tsx")
+            || id.endsWith(".ctsx")
+            || id.endsWith(".mtsx");
 
         if (!isTsLike) {
-            return;
-        }
-
-        if (!filter(id)) {
             return;
         }
 
@@ -236,7 +242,6 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
             for await (let [filename, { ext, map, source }] of Object.entries(outputFiles)) {
                 // Normalize filename to relative path
                 let normalizedFilename: string;
-
                 if (isAbsolute(filename)) {
                     // If absolute path is outside sourceDirectory, skip it
                     if (!filename.startsWith(sourceDirectory)) {
@@ -246,7 +251,6 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                         });
                         continue;
                     }
-
                     // Convert absolute path to relative path from sourceDirectory
                     normalizedFilename = relative(sourceDirectory, filename);
                 } else {
@@ -339,6 +343,11 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
             }
         },
 
-        transform,
+        transform: {
+            filter: {
+                id: filter,
+            },
+            handler: transform,
+        },
     };
 };

@@ -10,15 +10,16 @@ export interface SourcemapsPluginOptions {
 }
 
 export const sourcemapsPlugin = ({ exclude, include }: SourcemapsPluginOptions = {}): Plugin => {
-    // Create a filter function based on the include and exclude options
-    const filter = createFilter(include, exclude);
+    // createFilter handles undefined include/exclude by matching all files
+    const filterFn = createFilter(include, exclude);
+    const idFilter = (id: string) => filterFn(id);
 
     return {
-        async load(this: PluginContext, id: string) {
-            if (!filter(id)) {
-                return undefined;
-            }
-
+        load: {
+            filter: {
+                id: idFilter
+            },
+            async handler(this: PluginContext, id: string) {
             let code: string;
 
             try {
@@ -60,6 +61,7 @@ export const sourcemapsPlugin = ({ exclude, include }: SourcemapsPluginOptions =
 
             // Return the code and the map
             return { code, map };
+            },
         },
         name: "packem:sourcemaps",
     };

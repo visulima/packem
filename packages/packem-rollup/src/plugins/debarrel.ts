@@ -426,13 +426,14 @@ export const debarrelPlugin = (options: DebarrelPluginOptions, logger: Console):
     const fileCache: DebarrelContext["fileCache"] = new Map();
     const parseCache: DebarrelContext["parseCache"] = new Map();
 
+    // Create filter function for include pattern
+    const filterFn = options.include ? createFilter(options.include) : undefined;
+    const idFilter = filterFn ? ((id: string) => filterFn(id)) : undefined;
+
     const purgeCaches = () => {
         fileCache.clear();
         parseCache.clear();
     };
-
-    // Allow user to scope by include patterns if needed
-    const includeFilter: ((id: string) => boolean) | undefined = options.include ? createFilter(options.include, []) : undefined;
 
     let sourceMap = true;
 
@@ -465,14 +466,15 @@ export const debarrelPlugin = (options: DebarrelPluginOptions, logger: Console):
             return undefined;
         },
 
-        async transform(code, id) {
-            if (!isSourceFile(id)) {
-                return undefined;
-            }
-
-            if (includeFilter && !includeFilter(id)) {
-                return undefined;
-            }
+        // @ts-expect-error - Rollup's StringFilter type doesn't properly accept function types from createFilter
+        transform: options.include ? {
+            filter: {
+                id: idFilter!,
+            },
+            async handler(code, id) {
+                if (!isSourceFile(id)) {
+                    return undefined;
+                }
 
             const context: DebarrelContext = {
                 fileCache,
@@ -483,6 +485,23 @@ export const debarrelPlugin = (options: DebarrelPluginOptions, logger: Console):
             const modifications = await getDebarrelModifications(context, id, code, options, logger);
 
             return applyModifications(id, code, modifications, sourceMap);
+            },
+        } : {
+            async handler(code, id) {
+                if (!isSourceFile(id)) {
+                    return undefined;
+                }
+
+            const context: DebarrelContext = {
+                fileCache,
+                parseCache,
+                resolve: this.resolve.bind(this),
+            };
+
+            const modifications = await getDebarrelModifications(context, id, code, options, logger);
+
+            return applyModifications(id, code, modifications, sourceMap);
+            },
         },
 
         watchChange(id) {

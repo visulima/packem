@@ -119,10 +119,14 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
             return options;
         },
 
-        async resolveId(source, importer) {
-            if (source.startsWith(PREFIX) || !source.endsWith(".node")) {
-                return undefined;
-            }
+        resolveId: {
+            filter: {
+                id: /\.node$/,
+            },
+            async handler(source, importer) {
+                if (source.startsWith(PREFIX)) {
+                    return undefined;
+                }
 
             const resolvedPath = importer ? resolve(dirname(importer), source) : resolve(source);
 
@@ -152,6 +156,7 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
 
             // Return a virtual module ID containing the original path
             return PREFIX + resolvedPath;
+            },
         },
     };
 };

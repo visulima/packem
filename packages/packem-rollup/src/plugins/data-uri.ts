@@ -29,13 +29,20 @@ export type DataUriPluginOptions = {
  * - ./icon.svg?data-uri and encoding=css and srcset - CSS encoding with srcset compatibility
  */
 export const dataUriPlugin = (options: DataUriPluginOptions = {}): Plugin => {
-    const filter = createFilter(options.include ?? [/\?data-uri/], options.exclude);
+    // Create filter function for include/exclude patterns
+    const filterFn = createFilter(options.include ?? [/\?data-uri/], options.exclude);
+    const idFilter = (id: string) => filterFn(id);
 
     return {
-        async load(this: PluginContext, id: string) {
-            if (!filter(id) || !id.includes("?data-uri")) {
-                return undefined;
-            }
+        load: {
+            filter: {
+                // @ts-expect-error - Rollup's StringFilter type doesn't properly accept function types from createFilter
+                id: idFilter,
+            },
+            async handler(this: PluginContext, id: string) {
+                if (!id.includes("?data-uri")) {
+                    return undefined;
+                }
 
             // Parse query parameters
             const url = new URL(id, "file://");
@@ -61,6 +68,7 @@ export const dataUriPlugin = (options: DataUriPluginOptions = {}): Plugin => {
             const uri = `${prefix}${base64}`;
 
             return `export default "${uri}"`;
+            },
         },
         name: "packem:data-uri",
     };

@@ -76,6 +76,7 @@ const cssPlugin = async (
     alias: Record<string, string>,
 ): Promise<Plugin> => {
     const mergedAlias = { ...alias, ...options.alias };
+    // Keep filter for internal use in traverseImportedModules
     const isIncluded = createFilter(options.include, options.exclude);
 
     const sourceMap = inferSourceMapOption(options.sourceMap);
@@ -503,10 +504,15 @@ const cssPlugin = async (
             }
         },
         name: "rollup-plugin-css",
-        async transform(code, transformId) {
-            if (!isIncluded(transformId) || !loaders.isSupported(transformId)) {
-                return undefined;
-            }
+        transform: {
+            filter: {
+                id: options.include,
+                exclude: options.exclude,
+            },
+            async handler(code, transformId) {
+                if (!loaders.isSupported(transformId)) {
+                    return undefined;
+                }
 
             // Skip empty files
             if (code.replaceAll(/\s/g, "") === "") {
@@ -589,6 +595,7 @@ const cssPlugin = async (
                 },
                 moduleSideEffects: result.extracted ? true : undefined,
             };
+            },
         },
     };
 };

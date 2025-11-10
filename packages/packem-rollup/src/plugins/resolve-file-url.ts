@@ -5,12 +5,18 @@ import type { Plugin } from "rollup";
 const resolveFileUrl = (): Plugin => {
     return {
         name: "packem:resolve-file-url",
-        resolveId(id) {
-            if (id.startsWith("file://")) {
-                return fileURLToPath(id);
-            }
-
-            return undefined;
+        resolveId: {
+            filter: {
+                id: /^file:\/\//,
+            },
+            handler(id) {
+                try {
+                    return fileURLToPath(id);
+                } catch {
+                    // Invalid URL, let other plugins handle it
+                    return undefined;
+                }
+            },
         },
     };
 };

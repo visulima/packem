@@ -39,7 +39,9 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
 
     const INCLUDE_REGEXP = new RegExp(`\\.(${extensions.map((extension) => extension.slice(1)).join("|")})$`);
 
-    const filter = createFilter(include ?? INCLUDE_REGEXP, exclude);
+    // Create filter function for include/exclude patterns
+    const filterFn = createFilter(include ?? INCLUDE_REGEXP, exclude);
+    const idFilter = (id: string) => filterFn(id);
 
     let optimizeDepsResult: OptimizeDepsResult | undefined;
     let cwd = process.cwd();
@@ -88,10 +90,15 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
             return undefined;
         },
 
-        async transform(code, id) {
-            if (!filter(id) || optimizeDepsResult?.optimized.has(id)) {
-                return undefined;
-            }
+        transform: {
+            filter: {
+                // @ts-expect-error - Rollup's StringFilter type doesn't properly accept function types from createFilter
+                id: idFilter,
+            },
+            async handler(code, id) {
+                if (optimizeDepsResult?.optimized.has(id)) {
+                    return undefined;
+                }
 
             const extension = extname(id);
 
@@ -122,6 +129,7 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
             }
 
             return undefined;
+            },
         },
     };
 };

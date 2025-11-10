@@ -8,15 +8,18 @@ import { transform as sucraseTransform } from "sucrase";
 import type { TransformerFn as TransformerFunction } from "../../types";
 
 const sucraseTransformPlugin = ({ exclude, include, ...transformOptions }: SucrasePluginConfig): Plugin => {
-    const filter = createFilter(include, exclude ?? EXCLUDE_REGEXP);
+    // Create filter function for include/exclude patterns
+    const filterFn = createFilter(include, exclude ?? EXCLUDE_REGEXP);
+    const idFilter = (id: string) => filterFn(id);
 
     return <Plugin>{
         name: "packem:sucrase",
 
-        async transform(sourcecode, id) {
-            if (!filter(id)) {
-                return undefined;
-            }
+        transform: {
+            filter: {
+                id: idFilter,
+            },
+            async handler(sourcecode, id) {
 
             const { code, sourceMap: map } = sucraseTransform(sourcecode, {
                 ...transformOptions,
@@ -27,6 +30,7 @@ const sucraseTransformPlugin = ({ exclude, include, ...transformOptions }: Sucra
             });
 
             return { code, map };
+            },
         },
     };
 };

@@ -115,8 +115,9 @@ export const urlPlugin = ({
     publicPath,
     sourceDir: sourceDirectory,
 }: UrlOptions): Plugin => {
-    const filter = createFilter(include, exclude);
     const copies: Record<string, string> = {};
+
+    const filterFn = createFilter(include, exclude);
 
     return <Plugin>{
         async generateBundle(outputOptions: { dir?: string; file?: string }) {
@@ -139,10 +140,11 @@ export const urlPlugin = ({
             );
         },
 
-        async load(id: string) {
-            if (!filter(id)) {
-                return undefined;
-            }
+        load: {
+            filter: {
+                id: filterFn,
+            },
+            async handler(id: string) {
 
             this.addWatchFile(id);
 
@@ -180,6 +182,7 @@ export const urlPlugin = ({
             }
 
             return `export default "${data}"`;
+            },
         },
         name: "packem:url",
     };

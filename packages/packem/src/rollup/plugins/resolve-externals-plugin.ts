@@ -289,6 +289,28 @@ export const resolveExternalsPlugin = (context: BuildContext<InternalBuildOption
             };
         },
         resolveId: {
+            filter: {
+                // Only process potential builtins - skip virtual modules, relative imports, and absolute paths
+                id: (id: string) => {
+                    // Skip virtual modules (starting with \0)
+                    if (id.startsWith("\0")) {
+                        return false;
+                    }
+
+                    // Skip relative imports
+                    if (id.startsWith("./") || id.startsWith("../")) {
+                        return false;
+                    }
+
+                    // Skip absolute paths
+                    if (isAbsolute(id)) {
+                        return false;
+                    }
+
+                    // Process everything else (potential builtins or package names)
+                    return true;
+                },
+            },
             async handler(specifier: string, _, { isEntry }): Promise<ResolveIdResult> {
                 // Ignore entry points (they should always be resolved)
                 if (isEntry) {

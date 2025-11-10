@@ -58,14 +58,20 @@ export const minifyHTMLLiteralsPlugin = ({
         minifyHTMLLiterals = minify.minifyHTMLLiterals;
     }
 
-    const filter = createFilter(include, exclude);
-
     const minifyOptions = <minify.DefaultOptions>options || {};
+
+    // createFilter handles undefined include/exclude by matching all files
+    const filterFn = createFilter(include, exclude);
+    const idFilter = (id: string) => filterFn(id);
 
     return {
         name: "packem:minify-html-literals",
-        async transform(code: string, id: string) {
-            if (filter(id)) {
+        transform: {
+            filter: {
+                // @ts-expect-error - Rollup's StringFilter type doesn't properly accept function types from createFilter
+                id: idFilter,
+            },
+            async handler(code: string, id: string) {
                 try {
                     const result = await minifyHTMLLiterals(code, {
                         ...minifyOptions,
@@ -86,9 +92,9 @@ export const minifyHTMLLiteralsPlugin = ({
                         });
                     }
                 }
-            }
 
-            return undefined;
+                return undefined;
+            },
         },
     };
 };

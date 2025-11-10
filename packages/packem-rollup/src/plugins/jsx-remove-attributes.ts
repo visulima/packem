@@ -1,4 +1,3 @@
-import { createFilter } from "@rollup/pluginutils";
 import type { Node, ObjectExpression, Property } from "estree";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { walk } from "estree-walker";
@@ -24,18 +23,17 @@ interface PropertyLiteralValue extends Property {
 }
 
 export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesPlugin & { logger: Console }): Plugin => {
-    const filter = createFilter([/\.[tj]sx$/], /node_modules/);
-
     if (!Array.isArray(attributes) || attributes.length === 0) {
         throw new Error("[packem:jsx-remove-attributes]: attributes must be a non-empty array of strings.");
     }
 
     return {
         name: "packem:jsx-remove-attributes",
-        transform(code: string, id: string) {
-            if (!filter(id)) {
-                return undefined;
-            }
+        transform: {
+            filter: {
+                id: /\.[tj]sx$/,
+            },
+            handler(code: string, id: string) {
 
             /**
              * rollup's built-in parser returns an extended version of ESTree Node.
@@ -91,6 +89,7 @@ export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesP
             }
 
             return { code: magicString.toString(), map: magicString.generateMap({ hires: true }) };
+            },
         },
     };
 };

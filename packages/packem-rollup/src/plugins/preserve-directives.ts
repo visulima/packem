@@ -22,7 +22,8 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
     const directives: Record<string, Set<string>> = {};
     const shebangs: Record<string, string> = {};
 
-    const filter = createFilter(include, exclude);
+    const filterFn = createFilter(include, exclude);
+    const idFilter = (id: string) => filterFn(id);
 
     return {
         name: "packem:preserve-directives",
@@ -96,13 +97,14 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
         },
 
         // eslint-disable-next-line sonarjs/cognitive-complexity
-        transform(
-            code,
-            id,
-        ): { code: string; map: SourceMap | undefined; meta: { preserveDirectives: { directives: string[]; shebang: string | undefined } } } | undefined {
-            if (!filter(id)) {
-                return undefined;
-            }
+        transform: {
+            filter: {
+                id: idFilter,
+            },
+            handler(
+                code,
+                id,
+            ): { code: string; map: SourceMap | undefined; meta: { preserveDirectives: { directives: string[]; shebang: string | undefined } } } | undefined {
 
             // MagicString's `hasChanged()` is slow, so we track the change manually
             let hasChanged = false;
@@ -234,6 +236,7 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                     },
                 },
             };
+            },
         },
     };
 };
