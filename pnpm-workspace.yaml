@@ -11,7 +11,7 @@ packages:
 catalogs:
   build:
     '@rollup/plugin-alias': 5.1.1
-    '@rollup/plugin-commonjs': 28.0.6
+    '@rollup/plugin-commonjs': 29.0.0
     '@rollup/plugin-dynamic-import-vars': 2.1.5
     '@rollup/plugin-inject': 5.0.5
     '@rollup/plugin-json': 6.1.0
@@ -21,8 +21,8 @@ catalogs:
     '@rollup/pluginutils': 5.3.0
     '@visulima/packem-rollup': 1.0.0-alpha.18
     '@visulima/rollup-plugin-css': 1.0.0-alpha.6
-    esbuild: ^0.25.11
-    rollup: ^4.52.5
+    esbuild: ^0.27.0
+    rollup: ^4.53.2
     rollup-plugin-dts: 6.2.3
     rollup-plugin-license: 3.6.0
     rollup-plugin-lit-css: ^6.0.0
@@ -30,12 +30,12 @@ catalogs:
     rollup-plugin-pure: ^0.4.0
     rollup-plugin-visualizer: 6.0.3
   cli:
-    '@anolilab/multi-semantic-release': ^2.0.6
+    '@anolilab/multi-semantic-release': ^2.0.8
     '@anolilab/semantic-release-pnpm': 2.0.4
-    '@anolilab/semantic-release-preset': ^11.0.4
+    '@anolilab/semantic-release-preset': ^11.0.5
     commitizen: ^4.3.1
-    semantic-release: ^25.0.1
-    taze: ^19.8.1
+    semantic-release: ^25.0.2
+    taze: ^19.9.0
   dev:
     '@arethetypeswrong/cli': ^0.18.2
     '@babel/core': ^7.28.5
@@ -44,12 +44,12 @@ catalogs:
     '@oxc-parser/binding-linux-x64-gnu': 0.91.0
     '@oxc-project/types': 0.91.0
     '@svgr/core': ^8.1.0
-    '@swc/core': ^1.13.5
+    '@swc/core': ^1.15.1
     '@swc/types': 0.1.25
     '@visulima/packem': ^2.0.0-alpha.30
     '@visulima/pail': 2.1.28
     conventional-changelog-conventionalcommits: 9.1.0
-    deeks: ^3.1.2
+    deeks: ^3.2.0
     detect-indent: ^7.0.2
     diff: ^8.0.2
     estree-walker: ^3.0.3
@@ -57,7 +57,7 @@ catalogs:
     lit: ^3.3.1
     mime: ^4.1.0
     oxc-parser: 0.91.0
-    oxc-transform: ^0.95.0
+    oxc-transform: ^0.96.0
     p-queue: ^9.0.0
     package-manager-detector: ^1.5.0
     picocolors: ^1.1.1
@@ -71,12 +71,12 @@ catalogs:
     typedoc: 0.28.13
     typedoc-plugin-rename-defaults: 0.7.3
   frontend:
-    '@vue/language-core': ^3.1.2
+    '@vue/language-core': ^3.1.3
     react: ^19.2.0
     react-dom: ^19.2.0
-    vue: ^3.5.22
+    vue: ^3.5.24
   icons:
-    lucide-static: ^0.548.0
+    lucide-static: ^0.553.0
   lint:
     '@anolilab/commitlint-config': ^6.0.6
     '@anolilab/eslint-config': ^16.4.2
@@ -93,13 +93,13 @@ catalogs:
     prettier: ^3.6.2
     publint: ^0.3.15
     secretlint: ^11.2.5
-    textlint: ^15.2.3
+    textlint: ^15.3.0
   markdown:
     turndown: ^7.2.2
     turndown-plugin-gfm: ^1.0.2
     typedoc-plugin-markdown: 4.9.0
   monorepo:
-    nx: ^22.0.1
+    nx: ^22.0.3
   network:
     browserslist: 4.26.2
     browserslist-config-anolilab: ^6.0.6
@@ -111,12 +111,12 @@ catalogs:
     '@visulima/path': 1.4.0
     cac: ^6.7.14
     cross-env: ^10.1.0
-    dts-resolver: ^2.1.2
+    dts-resolver: ^2.1.3
     execa: ^9.6.0
     glob-parent: 6.0.2
     oxc-resolver: 11.8.2
     pkg-pr-new: ^0.0.60
-    rimraf: ^6.0.1
+    rimraf: ^6.1.0
     tinyexec: 1.0.1
     tinyglobby: 0.2.15
   peer:
@@ -134,16 +134,16 @@ catalogs:
     '@visulima/package': 4.0.0
     '@visulima/pail': 2.1.28
     '@visulima/source-map': 1.0.20
-    '@visulima/tabular': ^2.0.2
-    ast-kit: ^2.1.3
+    '@visulima/tabular': ^3.1.1
+    ast-kit: ^2.2.0
     audit-ci: ^7.1.0
-    birpc: ^2.6.1
-    cjs-module-lexer: ^2.1.0
+    birpc: ^2.8.0
+    cjs-module-lexer: ^2.1.1
     fastest-levenshtein: 1.0.16
-    gpt-tokenizer: ^3.2.0
-    happy-dom: ^20.0.8
+    gpt-tokenizer: ^3.4.0
+    happy-dom: ^20.0.10
     hookable: 5.5.3
-    html-minifier-next: ^3.1.0
+    html-minifier-next: ^4.1.0
     is-ci: ^4.1.0
     micromatch: ^4.0.8
     mlly: 1.8.0
@@ -163,12 +163,12 @@ catalogs:
     '@csstools/css-tokenizer': 3.0.4
     '@csstools/postcss-slow-plugins': ^2.0.0
     '@tailwindcss/forms': ^0.5.10
-    '@tailwindcss/node': ^4.1.16
-    '@tailwindcss/oxide': ^4.1.16
+    '@tailwindcss/node': ^4.1.17
+    '@tailwindcss/oxide': ^4.1.17
     '@tailwindcss/typography': ^0.5.19
     '@visulima/css-style-inject': 1.0.0-alpha.7
     clean-css: ^5.3.3
-    cssnano: ^7.1.1
+    cssnano: ^7.1.2
     icss-utils: ^5.1.0
     less: ^4.4.2
     lightningcss: ^1.30.2
@@ -181,24 +181,24 @@ catalogs:
     postcss-modules-scope: ^3.2.1
     postcss-modules-values: ^4.0.0
     postcss-value-parser: ^4.2.0
-    sass: ^1.93.2
-    sass-embedded: ^1.93.2
-    tailwindcss: ^4.1.16
+    sass: ^1.93.3
+    sass-embedded: ^1.93.3
+    tailwindcss: ^4.1.17
   test:
     '@sxzz/test-utils': ^0.5.12
-    '@vitest/coverage-v8': ^4.0.4
-    '@vitest/ui': ^4.0.4
-    vitest: ^4.0.4
+    '@vitest/coverage-v8': ^4.0.8
+    '@vitest/ui': ^4.0.8
+    vitest: ^4.0.8
   tsc:
     '@total-typescript/ts-reset': ^0.6.1
     '@ts-macro/tsc': ^0.3.6
     '@visulima/tsconfig': 1.1.22
     '@volar/typescript': ^2.4.23
     typescript: ^5.9.3
-    vue-tsc: ^3.1.2
+    vue-tsc: ^3.1.3
   types:
     '@types/babel__generator': ^7.27.0
-    '@types/bun': ^1.3.1
+    '@types/bun': ^1.3.2
     '@types/clean-css': 4.2.11
     '@types/debug': ^4.1.12
     '@types/estree': ^1.0.8
@@ -263,7 +263,7 @@ overrides:
   chrono-node@<2.2.4: '>=2.9.0'
   tar@=7.5.1: '>=7.5.2'
   tmp@<=0.2.3: '>=0.2.5'
-  vite@>=7.1.0 <=7.1.10: '>=7.1.11'
+  vite@>=7.1.0 <=7.1.10: '>=7.2.2'
 
 preferWorkspacePackages: true
 
