@@ -1,3 +1,9 @@
+## @visulima/packem [2.0.0-alpha.34](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.33...@visulima/packem@2.0.0-alpha.34) (2025-11-10)
+
+### Bug Fixes
+
+* update dependencies and configurations across multiple packages ([74aeb65](https://github.com/visulima/packem/commit/74aeb6569713c08d19f5581952febf9934c56024))
+
 ## @visulima/packem [2.0.0-alpha.33](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.32...@visulima/packem@2.0.0-alpha.33) (2025-11-08)
 
 ### Features
