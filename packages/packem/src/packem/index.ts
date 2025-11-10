@@ -274,10 +274,10 @@ const generateOptions = (
             isolatedDeclarations: {
                 exclude: EXCLUDE_REGEXP,
                 ignoreErrors: false,
-                include: /\.(?:[mc])?(?:[jt]sx?|d\.[mc]?ts)$/,
+                include: /\.?:[mc]?(?:[jt]sx?|d\.[mc]?ts)$/,
             },
             json: {
-                preferConst: true,
+                preferConst: false,
             },
             license: {
                 dependenciesTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
@@ -688,6 +688,13 @@ const createContext = async (
 
     if (context.options.minify) {
         context.logger.info("Minification is enabled, the output will be minified");
+    }
+
+    if (context.options.json && context.options.minify && context.options.json.preferConst === undefined) {
+        context.options.json = {
+            ...context.options.json,
+            preferConst: false,
+        };
     }
 
     warnLegacyCJS(context);
