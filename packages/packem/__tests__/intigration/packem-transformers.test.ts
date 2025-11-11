@@ -22,15 +22,11 @@ describe("packem-transformers", () => {
             "esbuild",
             `'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = /* @__PURE__ */ __name(() => "index", "default");
+const index = () => "index";
 
 module.exports = index;
 `,
-            `var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = /* @__PURE__ */ __name(() => "index", "default");
+            `const index = () => "index";
 
 export { index as default };
 `,

@@ -1029,7 +1029,7 @@ export { render };
             });
 
             it("mixed static and wildcard exports", async () => {
-                expect.assertions(4);
+                expect.assertions(5);
 
                 writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export const main = \"main\"");
                 writeFileSync(`${temporaryDirectoryPath}/src/utils/helper.ts`, "export const helper = \"helper\"");

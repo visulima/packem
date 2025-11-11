@@ -218,12 +218,12 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
 
             // Process any files that weren't processed during transform due to caching
             const inputFiles = Array.isArray(input) ? input : Object.values(input);
-            
+
             for await (const inputFile of inputFiles) {
                 if (filter(inputFile) && !outputFiles[inputFile.replace(ENDING_REGEX, "")]) {
                     try {
                         const source = await readFile(inputFile);
-                        // eslint-disable-next-line no-await-in-loop
+
                         await transform.call(this, source, inputFile);
                     } catch {
                         // Skip files that can't be read

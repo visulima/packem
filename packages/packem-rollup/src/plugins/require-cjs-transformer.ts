@@ -62,10 +62,7 @@ const shouldTransformImport = async (
     return transformResult === undefined ? await isPureCJS(source, cwd, resolveId) : transformResult;
 };
 
-const generateRequireCode = (
-    source: string,
-    isBuiltin: boolean,
-): { code: string; needsBuiltin: boolean; needsProcess: boolean; needsRequire: boolean } => {
+const generateRequireCode = (source: string, isBuiltin: boolean): { code: string; needsBuiltin: boolean; needsProcess: boolean; needsRequire: boolean } => {
     if (isBuiltin) {
         if (source === "process" || source === "node:process") {
             return {
@@ -210,11 +207,7 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
 
         renderChunk: {
             // eslint-disable-next-line sonarjs/cognitive-complexity
-            async handler(
-                code: string,
-                chunk: RenderedChunk,
-                options: NormalizedOutputOptions,
-            ): Promise<{ code: string; map: SourceMapInput } | undefined> {
+            async handler(code: string, chunk: RenderedChunk, options: NormalizedOutputOptions): Promise<{ code: string; map: SourceMapInput } | undefined> {
                 if (options.format !== "es" || !filter(chunk.fileName)) {
                     return undefined;
                 }
@@ -243,11 +236,14 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
                         continue;
                     }
 
-                    // eslint-disable-next-line unicorn/prevent-abbreviations
-                    const { code: requireCode, needsBuiltin: needsBuilt, needsProcess: needsProc, needsRequire: needsReq }
-                        = generateRequireCode(source, isBuiltin);
+                    const {
+                        code: requireCode,
+                        needsBuiltin: needsBuilt,
+                        needsProcess: needsProc,
+                        needsRequire: needsRequest,
+                    } = generateRequireCode(source, isBuiltin);
 
-                    needsRequire ||= needsReq;
+                    needsRequire ||= needsRequest;
                     needsProcess ||= needsProc;
                     needsBuiltin ||= needsBuilt;
 

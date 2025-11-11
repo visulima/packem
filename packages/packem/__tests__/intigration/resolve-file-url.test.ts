@@ -48,7 +48,7 @@ export default log`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.mjs`);
 
-        expect(mjsContent).toBe(`export { default as effect } from './packem_shared/effect-U3Biba7s.mjs';
+        expect(mjsContent).toBe(`export { default as effect } from './packem_shared/effect-CZsrY87O.mjs';
 `);
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/importer.cjs`);
