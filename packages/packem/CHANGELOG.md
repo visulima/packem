@@ -1,3 +1,14 @@
+## @visulima/packem [2.0.0-alpha.36](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.35...@visulima/packem@2.0.0-alpha.36) (2025-11-11)
+
+### Features
+
+* add migrate command to facilitate migration from other bundlers to packem ([518154f](https://github.com/visulima/packem/commit/518154f7b7fe642be22698a4c0c3d1738ca41a88))
+
+### Miscellaneous Chores
+
+* update dependencies and package versions across multiple files ([#172](https://github.com/visulima/packem/issues/172)) ([f73c1dc](https://github.com/visulima/packem/commit/f73c1dc453f55c52da98e4b7c60f44ffd637e53c))
+* update package references to use 'catalog:visulima' for consistency across multiple packages ([14ee42b](https://github.com/visulima/packem/commit/14ee42b3ae978baef4752e12115d14d6bb2ba7bc))
+
 ## @visulima/packem [2.0.0-alpha.35](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.34...@visulima/packem@2.0.0-alpha.35) (2025-11-11)
 
 ### Bug Fixes
