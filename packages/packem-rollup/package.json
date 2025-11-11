@@ -188,7 +188,6 @@
         "tinyglobby": "catalog:node"
     },
     "devDependencies": {
-        "@visulima/packem": "catalog:dev",
         "@anolilab/eslint-config": "catalog:lint",
         "@anolilab/prettier-config": "catalog:lint",
         "@anolilab/semantic-release-pnpm": "catalog:cli",
@@ -209,6 +208,7 @@
         "@types/is-glob": "catalog:types",
         "@types/node": "catalog:types",
         "@types/semver": "catalog:types",
+        "@visulima/packem": "catalog:dev",
         "@visulima/pail": "catalog:dev",
         "@visulima/tsconfig": "catalog:tsc",
         "@vitest/coverage-v8": "catalog:test",

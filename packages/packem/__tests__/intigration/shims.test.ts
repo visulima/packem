@@ -104,7 +104,7 @@ export const a = 1`,
 
           export { getDirname };
           "
-        `)
+        `);
 
         const cjsDirnameContent = readFileSync(`${temporaryDirectoryPath}/dist/dirname.cjs`);
 
