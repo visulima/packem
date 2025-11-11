@@ -214,7 +214,7 @@ catalogs:
     '@visulima/find-cache-dir': 2.0.4
     '@visulima/fs': 4.0.4
     '@visulima/humanizer': 2.0.3
-    '@visulima/packem': 2.0.0-alpha.35
+    '@visulima/packem': 2.0.0-alpha.34
     '@visulima/packem-rollup': 1.0.0-alpha.27
     '@visulima/package': 4.1.4
     '@visulima/pail': 3.2.0
