@@ -7,7 +7,7 @@ import { execaNode } from "execa";
 
 const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../dist");
 
-const execPackem = async (command: "build" | "init", flags: string[] = [], options: Options = {}) => {
+const execPackem = async (command: "build" | "init" | "migrate", flags: string[] = [], options: Options = {}) => {
     let environmentFlag: string | undefined = "--development";
 
     if (flags.includes("--production") || flags.includes("--development") || flags.includes("--no-environment")) {

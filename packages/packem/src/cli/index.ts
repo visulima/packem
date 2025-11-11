@@ -6,6 +6,7 @@ import { name, version } from "../../package.json";
 import createAddCommand from "./commands/add";
 import createBuildCommand from "./commands/build";
 import createInitCommand from "./commands/init";
+import createMigrateCommand from "./commands/migrate";
 
 /**
  * Attempts to load and enable V8 compile cache for better performance.
@@ -59,6 +60,7 @@ const index = createCerebro("packem", {
 createInitCommand(index);
 createBuildCommand(index);
 createAddCommand(index);
+createMigrateCommand(index);
 
 // Run the CLI without exiting the process
 // eslint-disable-next-line no-void

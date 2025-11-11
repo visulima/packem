@@ -488,10 +488,14 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "cjs", chunk)),
+                chunkFileNames: context.options.unbundle || context.options.rollup.output?.preserveModules
+                    ? (chunk: PreRenderedChunk) => `${chunk.name}.${getOutputExtension(context, "cjs", chunk)}`
+                    : (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "cjs", chunk)),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "cjs", chunkInfo)),
+                entryFileNames: context.options.unbundle || context.options.rollup.output?.preserveModules
+                    ? (chunkInfo: PreRenderedAsset) => `${chunkInfo.names[0]}.${getOutputExtension(context, "cjs", chunkInfo)}`
+                    : (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "cjs", chunkInfo)),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 extend: true,
@@ -523,10 +527,14 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames: (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "esm")),
+                chunkFileNames: context.options.unbundle || context.options.rollup.output?.preserveModules
+                    ? (chunk: PreRenderedChunk) => `${chunk.name}.${getOutputExtension(context, "esm")}`
+                    : (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "esm")),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "esm")),
+                entryFileNames: context.options.unbundle || context.options.rollup.output?.preserveModules
+                    ? (chunkInfo: PreRenderedAsset) => `${chunkInfo.names[0]}.${getOutputExtension(context, "esm")}`
+                    : (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "esm")),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 extend: true,

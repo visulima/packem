@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
+import type { PackageJson } from "@visulima/package";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -489,5 +490,242 @@ export { barFunction, baz };
 
         // Verify that no sourcemap files are generated
         expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.mjs.map`)).toBe(false);
+    });
+
+    describe("migrate command", () => {
+        it("should migrate from tsup to packem", async () => {
+            expect.assertions(4);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    tsup: "^8.0.0",
+                },
+                scripts: {
+                    build: "tsup src/index.ts",
+                },
+            });
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    // Simulate user input for confirmation
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Migrating `devDependencies` from tsup to @visulima/packem");
+            expect(binProcess.stdout).toContain("Migrating `build` script from tsup to packem");
+        });
+
+        it("should migrate from unbuild to packem", async () => {
+            expect.assertions(4);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    unbuild: "^2.0.0",
+                },
+                scripts: {
+                    build: "unbuild",
+                },
+            });
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Migrating `devDependencies` from unbuild to @visulima/packem");
+            expect(binProcess.stdout).toContain("Migrating `build` script from unbuild to packem");
+        });
+
+        it("should migrate from bunchee to packem", async () => {
+            expect.assertions(4);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    bunchee: "^5.0.0",
+                },
+                scripts: {
+                    build: "bunchee",
+                    dev: "bunchee --watch",
+                },
+            });
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Migrating `devDependencies` from bunchee to @visulima/packem");
+            expect(binProcess.stdout).toContain("Migrating `build` script from bunchee to packem");
+            expect(binProcess.stdout).toContain("Migrating `dev` script from bunchee to packem");
+        });
+
+        it("should migrate multiple bundlers at once", async () => {
+            expect.assertions(7);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                dependencies: {
+                    tsup: "^8.0.0",
+                },
+                devDependencies: {
+                    bunchee: "^5.0.0",
+                    unbuild: "^2.0.0",
+                },
+                scripts: {
+                    build: "tsup src/index.ts",
+                    bundle: "bunchee src/main.ts",
+                    dev: "unbuild --watch",
+                },
+            });
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Migrating `dependencies` from tsup to @visulima/packem");
+            expect(binProcess.stdout).toContain("Migrating `devDependencies` from unbuild to @visulima/packem");
+            expect(binProcess.stdout).toContain("Migrating `devDependencies` from bunchee to @visulima/packem");
+            expect(binProcess.stdout).toContain("Migrating `build` script from tsup to packem");
+            expect(binProcess.stdout).toContain("Migrating `bundle` script from bunchee to packem");
+        });
+
+        it("should handle tsup-node variant", async () => {
+            expect.assertions(4);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    "tsup-node": "^8.0.0",
+                },
+                scripts: {
+                    build: "tsup-node src/index.ts",
+                },
+            });
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Migrating `devDependencies` from tsup-node to @visulima/packem");
+            expect(binProcess.stdout).toContain("Migrating `build` script from tsup-node to packem");
+        });
+
+        it("should detect config files and warn about manual migration", async () => {
+            expect.assertions(3);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    tsup: "^8.0.0",
+                },
+                scripts: {
+                    build: "tsup src/index.ts",
+                },
+                tsup: {
+                    entry: ["src/index.ts"],
+                    format: ["cjs", "esm"],
+                },
+            });
+
+            // Create a config file
+            writeFileSync(`${temporaryDirectoryPath}/tsup.config.ts`, "export default { entry: [\"src/index.ts\"] }");
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.ts`. Consider creating packem.config.ts instead");
+        });
+
+        it("should warn when no migratable dependencies are found", async () => {
+            expect.assertions(3);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    "some-other-tool": "^1.0.0",
+                },
+                scripts: {
+                    build: "some-other-tool",
+                },
+            });
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(1);
+
+            expect(binProcess.stdout).toContain("No migratable bundler dependencies found in package.json");
+        });
+
+        it("should show dry-run changes with before/after content", async () => {
+            expect.assertions(5);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    tsup: "^8.0.0",
+                },
+                scripts: {
+                    build: "tsup src/index.ts",
+                },
+            });
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("[dry-run] package.json changes:");
+            expect(binProcess.stdout).toContain("Old content:");
+            expect(binProcess.stdout).toContain("New content:");
+            expect(binProcess.stdout).toContain("Migration completed");
+        });
     });
 });
