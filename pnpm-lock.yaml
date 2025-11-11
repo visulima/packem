@@ -628,6 +628,9 @@ importers:
       '@secretlint/secretlint-rule-preset-recommend':
         specifier: catalog:lint
         version: 11.2.5
+      '@visulima/packem':
+        specifier: catalog:visulima
+        version: 2.0.0-alpha.34(d074cda90035dbee522eabfdfdcce0c9)
       audit-ci:
         specifier: catalog:prod
         version: 7.1.0
@@ -1422,9 +1425,6 @@ importers:
       '@types/node':
         specifier: catalog:types
         version: 24.5.2
-      '@visulima/packem':
-        specifier: catalog:visulima
-        version: 2.0.0-alpha.34(77fd4c179bb939a11859d8a5e8c09566)
       '@vitest/coverage-v8':
         specifier: catalog:test
         version: 4.0.8(vitest@4.0.8)
@@ -1979,9 +1979,6 @@ importers:
       '@types/semver':
         specifier: catalog:types
         version: 7.7.1
-      '@visulima/packem':
-        specifier: catalog:visulima
-        version: 2.0.0-alpha.34(272fbd3577abab59392753dfb46d8743)
       '@visulima/pail':
         specifier: catalog:visulima
         version: 3.2.0
@@ -2097,9 +2094,6 @@ importers:
       '@types/node':
         specifier: catalog:types
         version: 24.5.2
-      '@visulima/packem':
-        specifier: catalog:visulima
-        version: 2.0.0-alpha.34(272fbd3577abab59392753dfb46d8743)
       '@visulima/pail':
         specifier: catalog:visulima
         version: 3.2.0
@@ -2322,9 +2316,6 @@ importers:
       '@visulima/css-style-inject':
         specifier: catalog:visulima
         version: link:../css-style-inject
-      '@visulima/packem':
-        specifier: catalog:visulima
-        version: 2.0.0-alpha.34(77fd4c179bb939a11859d8a5e8c09566)
       '@vitest/coverage-v8':
         specifier: catalog:test
         version: 4.0.8(vitest@4.0.8)
@@ -15839,10 +15830,10 @@ snapshots:
       - '@types/node'
       - yaml
 
-  '@visulima/package@4.0.0(@types/node@24.5.2)':
+  '@visulima/package@4.0.0(@types/node@24.10.0)':
     dependencies:
       '@antfu/install-pkg': 1.1.0
-      '@inquirer/confirm': 5.1.19(@types/node@24.5.2)
+      '@inquirer/confirm': 5.1.19(@types/node@24.10.0)
       '@visulima/fs': 3.1.9(yaml@2.8.1)
       '@visulima/path': 1.4.0
       normalize-package-data: 8.0.0
@@ -15876,7 +15867,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@visulima/packem-rollup@1.0.0-alpha.26(@swc/core@1.15.1(@swc/helpers@0.5.17))(@types/node@24.5.2)(esbuild@0.27.0)(oxc-transform@0.97.0)(p-queue@9.0.0)(picomatch@4.0.3)(rollup@4.53.2)(sucrase@3.35.0)(typescript@5.9.3)(yaml@2.8.1)':
+  '@visulima/packem-rollup@1.0.0-alpha.26(@swc/core@1.15.1(@swc/helpers@0.5.17))(@types/node@24.10.0)(esbuild@0.27.0)(oxc-transform@0.97.0)(picomatch@4.0.3)(rollup@4.53.2)(sucrase@3.35.0)(typescript@5.9.3)(yaml@2.8.1)':
     dependencies:
       '@babel/parser': 7.28.4
       '@rollup/plugin-alias': 5.1.1(rollup@4.53.2)
@@ -15890,8 +15881,8 @@ snapshots:
       '@rollup/pluginutils': 5.3.0(rollup@4.53.2)
       '@visulima/find-cache-dir': 1.0.34(yaml@2.8.1)
       '@visulima/fs': 3.1.8(yaml@2.8.1)
-      '@visulima/package': 4.0.0(@types/node@24.5.2)
-      '@visulima/packem-share': 1.0.0-alpha.13(@types/node@24.5.2)(rollup@4.53.2)(yaml@2.8.1)
+      '@visulima/package': 4.0.0(@types/node@24.10.0)
+      '@visulima/packem-share': 1.0.0-alpha.13(@types/node@24.10.0)(rollup@4.53.2)(yaml@2.8.1)
       '@visulima/path': 1.4.0
       '@visulima/source-map': 1.0.20
       cjs-module-lexer: 2.1.1
@@ -15915,7 +15906,6 @@ snapshots:
       '@swc/core': 1.15.1(@swc/helpers@0.5.17)
       esbuild: 0.27.0
       oxc-transform: 0.97.0
-      p-queue: 9.0.0
       sucrase: 3.35.0
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -15924,18 +15914,18 @@ snapshots:
       - rolldown
       - yaml
 
-  '@visulima/packem-share@1.0.0-alpha.13(@types/node@24.5.2)(rollup@4.53.2)(yaml@2.8.1)':
+  '@visulima/packem-share@1.0.0-alpha.13(@types/node@24.10.0)(rollup@4.53.2)(yaml@2.8.1)':
     dependencies:
       '@visulima/colorize': 1.4.23
       '@visulima/fs': 3.1.8(yaml@2.8.1)
-      '@visulima/package': 4.0.0(@types/node@24.5.2)
+      '@visulima/package': 4.0.0(@types/node@24.10.0)
       '@visulima/path': 1.4.0
       rollup: 4.53.2
     transitivePeerDependencies:
       - '@types/node'
       - yaml
 
-  '@visulima/packem@2.0.0-alpha.34(272fbd3577abab59392753dfb46d8743)':
+  '@visulima/packem@2.0.0-alpha.34(d074cda90035dbee522eabfdfdcce0c9)':
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@clack/prompts': 0.11.0
@@ -15945,87 +15935,12 @@ snapshots:
       '@visulima/find-cache-dir': 1.0.34(yaml@2.8.1)
       '@visulima/fs': 3.1.8(yaml@2.8.1)
       '@visulima/humanizer': 1.2.2
-      '@visulima/package': 4.0.0(@types/node@24.5.2)
-      '@visulima/packem-rollup': 1.0.0-alpha.26(@swc/core@1.15.1(@swc/helpers@0.5.17))(@types/node@24.5.2)(esbuild@0.27.0)(oxc-transform@0.97.0)(p-queue@9.0.0)(picomatch@4.0.3)(rollup@4.53.2)(sucrase@3.35.0)(typescript@5.9.3)(yaml@2.8.1)
-      '@visulima/packem-share': 1.0.0-alpha.13(@types/node@24.5.2)(rollup@4.53.2)(yaml@2.8.1)
+      '@visulima/package': 4.0.0(@types/node@24.10.0)
+      '@visulima/packem-rollup': 1.0.0-alpha.26(@swc/core@1.15.1(@swc/helpers@0.5.17))(@types/node@24.10.0)(esbuild@0.27.0)(oxc-transform@0.97.0)(picomatch@4.0.3)(rollup@4.53.2)(sucrase@3.35.0)(typescript@5.9.3)(yaml@2.8.1)
+      '@visulima/packem-share': 1.0.0-alpha.13(@types/node@24.10.0)(rollup@4.53.2)(yaml@2.8.1)
       '@visulima/pail': 2.1.28
       '@visulima/path': 1.4.0
-      '@visulima/rollup-plugin-css': 1.0.0-alpha.7(057c8daa94b3fea8599f43e56a3a7b14)
-      '@visulima/source-map': 1.0.20
-      '@visulima/tabular': 3.1.1
-      '@visulima/tsconfig': 1.1.22(yaml@2.8.1)
-      browserslist: 4.26.2
-      cjs-module-lexer: 2.1.1
-      clean-css: 5.3.3
-      defu: 6.1.4
-      fastest-levenshtein: 1.0.16
-      hookable: 5.5.3
-      html-minifier-next: 4.1.1
-      jiti: 2.6.0
-      magic-string: 0.30.19
-      mlly: 1.8.0
-      package-manager-detector: 1.5.0
-      picomatch: 4.0.3
-      rollup: 4.53.2
-      semver: 7.7.2
-      tinyexec: 1.0.1
-      tinyglobby: 0.2.15
-    optionalDependencies:
-      '@arethetypeswrong/core': 0.18.2
-      '@swc/core': 1.15.1(@swc/helpers@0.5.17)
-      '@tailwindcss/node': 4.1.17
-      '@tailwindcss/oxide': 4.1.17
-      cssnano: 7.1.2(postcss@8.5.6)
-      esbuild: 0.27.0
-      icss-utils: 5.1.0(postcss@8.5.6)
-      less: 4.4.2
-      lightningcss: 1.30.2
-      oxc-transform: 0.97.0
-      postcss: 8.5.6
-      postcss-load-config: 6.0.1(jiti@2.6.0)(postcss@8.5.6)(tsx@4.20.6)(yaml@2.8.1)
-      postcss-modules-extract-imports: 3.1.0(postcss@8.5.6)
-      postcss-modules-local-by-default: 4.2.0(postcss@8.5.6)
-      postcss-modules-scope: 3.2.1(postcss@8.5.6)
-      postcss-modules-values: 4.0.0(postcss@8.5.6)
-      postcss-value-parser: 4.2.0
-      sass: 1.94.0
-      sass-embedded: 1.93.3
-      stylus: 0.64.0
-      sucrase: 3.35.0
-      typedoc: 0.28.14(typescript@5.9.3)
-      typedoc-plugin-markdown: 4.9.0(typedoc@0.28.14(typescript@5.9.3))
-      typedoc-plugin-rename-defaults: 0.7.3(typedoc@0.28.14(typescript@5.9.3))
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - '@75lb/nature'
-      - '@csstools/css-parser-algorithms'
-      - '@csstools/css-tokenizer'
-      - '@csstools/postcss-slow-plugins'
-      - '@types/node'
-      - '@visulima/css-style-inject'
-      - '@visulima/redact'
-      - ai
-      - p-queue
-      - rolldown
-      - rotating-file-stream
-      - yaml
-
-  '@visulima/packem@2.0.0-alpha.34(77fd4c179bb939a11859d8a5e8c09566)':
-    dependencies:
-      '@antfu/install-pkg': 1.1.0
-      '@clack/prompts': 0.11.0
-      '@rollup/pluginutils': 5.3.0(rollup@4.53.2)
-      '@visulima/cerebro': 1.1.50(yaml@2.8.1)
-      '@visulima/colorize': 1.4.23
-      '@visulima/find-cache-dir': 1.0.34(yaml@2.8.1)
-      '@visulima/fs': 3.1.8(yaml@2.8.1)
-      '@visulima/humanizer': 1.2.2
-      '@visulima/package': 4.0.0(@types/node@24.5.2)
-      '@visulima/packem-rollup': 1.0.0-alpha.26(@swc/core@1.15.1(@swc/helpers@0.5.17))(@types/node@24.5.2)(esbuild@0.27.0)(oxc-transform@0.97.0)(p-queue@9.0.0)(picomatch@4.0.3)(rollup@4.53.2)(sucrase@3.35.0)(typescript@5.9.3)(yaml@2.8.1)
-      '@visulima/packem-share': 1.0.0-alpha.13(@types/node@24.5.2)(rollup@4.53.2)(yaml@2.8.1)
-      '@visulima/pail': 2.1.28
-      '@visulima/path': 1.4.0
-      '@visulima/rollup-plugin-css': 1.0.0-alpha.7(4c37b47c3207f81250ad5ae1e26f35de)
+      '@visulima/rollup-plugin-css': 1.0.0-alpha.7(c056a8cc39fdf542e394bd87a9413652)
       '@visulima/source-map': 1.0.20
       '@visulima/tabular': 3.1.1
       '@visulima/tsconfig': 1.1.22(yaml@2.8.1)
@@ -16104,7 +16019,7 @@ snapshots:
 
   '@visulima/path@2.0.3': {}
 
-  '@visulima/rollup-plugin-css@1.0.0-alpha.7(057c8daa94b3fea8599f43e56a3a7b14)':
+  '@visulima/rollup-plugin-css@1.0.0-alpha.7(c056a8cc39fdf542e394bd87a9413652)':
     dependencies:
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
@@ -16112,53 +16027,8 @@ snapshots:
       '@rollup/pluginutils': 5.3.0(rollup@4.53.2)
       '@visulima/css-style-inject': link:packages/css-style-inject
       '@visulima/fs': 3.1.8(yaml@2.8.1)
-      '@visulima/package': 4.0.0(@types/node@24.5.2)
-      '@visulima/packem-share': 1.0.0-alpha.13(@types/node@24.5.2)(rollup@4.53.2)(yaml@2.8.1)
-      '@visulima/path': 1.4.0
-      mlly: 1.8.0
-      oxc-resolver: 11.8.2
-      p-queue: 9.0.0
-      rollup: 4.53.2
-      source-map-js: 1.2.1
-    optionalDependencies:
-      '@swc/core': 1.15.1(@swc/helpers@0.5.17)
-      '@tailwindcss/node': 4.1.17
-      '@tailwindcss/oxide': 4.1.17
-      cssnano: 7.1.2(postcss@8.5.6)
-      esbuild: 0.27.0
-      icss-utils: 5.1.0(postcss@8.5.6)
-      less: 4.4.2
-      lightningcss: 1.30.2
-      oxc-transform: 0.97.0
-      postcss: 8.5.6
-      postcss-load-config: 6.0.1(jiti@2.6.0)(postcss@8.5.6)(tsx@4.20.6)(yaml@2.8.1)
-      postcss-modules-extract-imports: 3.1.0(postcss@8.5.6)
-      postcss-modules-local-by-default: 4.2.0(postcss@8.5.6)
-      postcss-modules-scope: 3.2.1(postcss@8.5.6)
-      postcss-modules-values: 4.0.0(postcss@8.5.6)
-      postcss-value-parser: 4.2.0
-      sass: 1.94.0
-      sass-embedded: 1.93.3
-      stylus: 0.64.0
-      sucrase: 3.35.0
-      typedoc: 0.28.14(typescript@5.9.3)
-      typedoc-plugin-markdown: 4.9.0(typedoc@0.28.14(typescript@5.9.3))
-      typedoc-plugin-rename-defaults: 0.7.3(typedoc@0.28.14(typescript@5.9.3))
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - '@types/node'
-      - yaml
-
-  '@visulima/rollup-plugin-css@1.0.0-alpha.7(4c37b47c3207f81250ad5ae1e26f35de)':
-    dependencies:
-      '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
-      '@csstools/css-tokenizer': 3.0.4
-      '@csstools/postcss-slow-plugins': 2.0.0(postcss@8.5.6)
-      '@rollup/pluginutils': 5.3.0(rollup@4.53.2)
-      '@visulima/css-style-inject': link:packages/css-style-inject
-      '@visulima/fs': 3.1.8(yaml@2.8.1)
-      '@visulima/package': 4.0.0(@types/node@24.5.2)
-      '@visulima/packem-share': 1.0.0-alpha.13(@types/node@24.5.2)(rollup@4.53.2)(yaml@2.8.1)
+      '@visulima/package': 4.0.0(@types/node@24.10.0)
+      '@visulima/packem-share': 1.0.0-alpha.13(@types/node@24.10.0)(rollup@4.53.2)(yaml@2.8.1)
       '@visulima/path': 1.4.0
       mlly: 1.8.0
       oxc-resolver: 11.8.2

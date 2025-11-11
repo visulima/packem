@@ -137,8 +137,8 @@
         "dist"
     ],
     "scripts": {
-        "build": "./node_modules/.bin/packem build --development",
-        "build:prod": "./node_modules/.bin/packem build --production",
+        "build": "../../node_modules/.bin/packem build --development",
+        "build:prod": "../../node_modules/.bin/packem build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build --watch",
         "lint:attw": "attw --pack",
@@ -208,7 +208,6 @@
         "@types/is-glob": "catalog:types",
         "@types/node": "catalog:types",
         "@types/semver": "catalog:types",
-        "@visulima/packem": "catalog:visulima",
         "@visulima/pail": "catalog:visulima",
         "@visulima/tsconfig": "catalog:visulima",
         "@vitest/coverage-v8": "catalog:test",
