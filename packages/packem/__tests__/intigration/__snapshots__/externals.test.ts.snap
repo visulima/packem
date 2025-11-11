@@ -1,5 +1,265 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > cjs dts output 1`] = `
+"declare const indent: string;
+
+export { indent };
+"
+`;
+
+exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const INDENT_REGEX = /^(?:( )+|\\t+)/;
+const INDENT_TYPE_SPACE = "space";
+const INDENT_TYPE_TAB = "tab";
+function shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, value) {
+  return ignoreSingleSpaces && indentType === INDENT_TYPE_SPACE && value === 1;
+}
+function makeIndentsMap(string, ignoreSingleSpaces) {
+  const indents = /* @__PURE__ */ new Map();
+  let previousSize = 0;
+  let previousIndentType;
+  let key;
+  for (const line of string.split(/\\n/g)) {
+    if (!line) {
+      continue;
+    }
+    const matches = line.match(INDENT_REGEX);
+    if (matches === null) {
+      previousSize = 0;
+      previousIndentType = "";
+    } else {
+      const indent = matches[0].length;
+      const indentType = matches[1] ? INDENT_TYPE_SPACE : INDENT_TYPE_TAB;
+      if (shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, indent)) {
+        continue;
+      }
+      if (indentType !== previousIndentType) {
+        previousSize = 0;
+      }
+      previousIndentType = indentType;
+      let use = 1;
+      let weight = 0;
+      const indentDifference = indent - previousSize;
+      previousSize = indent;
+      if (indentDifference === 0) {
+        use = 0;
+        weight = 1;
+      } else {
+        const absoluteIndentDifference = Math.abs(indentDifference);
+        if (shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, absoluteIndentDifference)) {
+          continue;
+        }
+        key = encodeIndentsKey(indentType, absoluteIndentDifference);
+      }
+      const entry = indents.get(key);
+      indents.set(key, entry === void 0 ? [1, 0] : [entry[0] + use, entry[1] + weight]);
+    }
+  }
+  return indents;
+}
+function encodeIndentsKey(indentType, indentAmount) {
+  const typeCharacter = indentType === INDENT_TYPE_SPACE ? "s" : "t";
+  return typeCharacter + String(indentAmount);
+}
+function decodeIndentsKey(indentsKey) {
+  const keyHasTypeSpace = indentsKey[0] === "s";
+  const type = keyHasTypeSpace ? INDENT_TYPE_SPACE : INDENT_TYPE_TAB;
+  const amount = Number(indentsKey.slice(1));
+  return { type, amount };
+}
+function getMostUsedKey(indents) {
+  let result;
+  let maxUsed = 0;
+  let maxWeight = 0;
+  for (const [key, [usedCount, weight]] of indents) {
+    if (usedCount > maxUsed || usedCount === maxUsed && weight > maxWeight) {
+      maxUsed = usedCount;
+      maxWeight = weight;
+      result = key;
+    }
+  }
+  return result;
+}
+function makeIndentString(type, amount) {
+  const indentCharacter = type === INDENT_TYPE_SPACE ? " " : "	";
+  return indentCharacter.repeat(amount);
+}
+function detectIndent(string) {
+  let indents = makeIndentsMap(string, true);
+  if (indents.size === 0) {
+    indents = makeIndentsMap(string, false);
+  }
+  const keyOfMostUsedIndent = getMostUsedKey(indents);
+  let type;
+  let amount = 0;
+  let indent = "";
+  if (keyOfMostUsedIndent !== void 0) {
+    ({ type, amount } = decodeIndentsKey(keyOfMostUsedIndent));
+    indent = makeIndentString(type, amount);
+  }
+  return {
+    amount,
+    type,
+    indent
+  };
+}
+
+const { indent: dIndent } = detectIndent("  file");
+const indent = dIndent;
+
+exports.indent = indent;
+"
+`;
+
+exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > dts output 1`] = `
+"declare const indent: string;
+
+export { indent };
+"
+`;
+
+exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > mjs dts output 1`] = `
+"declare const indent: string;
+
+export { indent };
+"
+`;
+
+exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > mjs output 1`] = `
+"const INDENT_REGEX = /^(?:( )+|\\t+)/;
+const INDENT_TYPE_SPACE = "space";
+const INDENT_TYPE_TAB = "tab";
+function shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, value) {
+  return ignoreSingleSpaces && indentType === INDENT_TYPE_SPACE && value === 1;
+}
+function makeIndentsMap(string, ignoreSingleSpaces) {
+  const indents = /* @__PURE__ */ new Map();
+  let previousSize = 0;
+  let previousIndentType;
+  let key;
+  for (const line of string.split(/\\n/g)) {
+    if (!line) {
+      continue;
+    }
+    const matches = line.match(INDENT_REGEX);
+    if (matches === null) {
+      previousSize = 0;
+      previousIndentType = "";
+    } else {
+      const indent = matches[0].length;
+      const indentType = matches[1] ? INDENT_TYPE_SPACE : INDENT_TYPE_TAB;
+      if (shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, indent)) {
+        continue;
+      }
+      if (indentType !== previousIndentType) {
+        previousSize = 0;
+      }
+      previousIndentType = indentType;
+      let use = 1;
+      let weight = 0;
+      const indentDifference = indent - previousSize;
+      previousSize = indent;
+      if (indentDifference === 0) {
+        use = 0;
+        weight = 1;
+      } else {
+        const absoluteIndentDifference = Math.abs(indentDifference);
+        if (shouldIgnoreSingleSpace(ignoreSingleSpaces, indentType, absoluteIndentDifference)) {
+          continue;
+        }
+        key = encodeIndentsKey(indentType, absoluteIndentDifference);
+      }
+      const entry = indents.get(key);
+      indents.set(key, entry === void 0 ? [1, 0] : [entry[0] + use, entry[1] + weight]);
+    }
+  }
+  return indents;
+}
+function encodeIndentsKey(indentType, indentAmount) {
+  const typeCharacter = indentType === INDENT_TYPE_SPACE ? "s" : "t";
+  return typeCharacter + String(indentAmount);
+}
+function decodeIndentsKey(indentsKey) {
+  const keyHasTypeSpace = indentsKey[0] === "s";
+  const type = keyHasTypeSpace ? INDENT_TYPE_SPACE : INDENT_TYPE_TAB;
+  const amount = Number(indentsKey.slice(1));
+  return { type, amount };
+}
+function getMostUsedKey(indents) {
+  let result;
+  let maxUsed = 0;
+  let maxWeight = 0;
+  for (const [key, [usedCount, weight]] of indents) {
+    if (usedCount > maxUsed || usedCount === maxUsed && weight > maxWeight) {
+      maxUsed = usedCount;
+      maxWeight = weight;
+      result = key;
+    }
+  }
+  return result;
+}
+function makeIndentString(type, amount) {
+  const indentCharacter = type === INDENT_TYPE_SPACE ? " " : "	";
+  return indentCharacter.repeat(amount);
+}
+function detectIndent(string) {
+  let indents = makeIndentsMap(string, true);
+  if (indents.size === 0) {
+    indents = makeIndentsMap(string, false);
+  }
+  const keyOfMostUsedIndent = getMostUsedKey(indents);
+  let type;
+  let amount = 0;
+  let indent = "";
+  if (keyOfMostUsedIndent !== void 0) {
+    ({ type, amount } = decodeIndentsKey(keyOfMostUsedIndent));
+    indent = makeIndentString(type, amount);
+  }
+  return {
+    amount,
+    type,
+    indent
+  };
+}
+
+const { indent: dIndent } = detectIndent("  file");
+const indent = dIndent;
+
+export { indent };
+"
+`;
+
+exports[`packem externals > should handle externals with peerDependenciesMeta > cjs output 1`] = `
+"'use strict';
+
+const a = require('peer-dep');
+const b = require('peer-dep-meta');
+
+const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
+
+const a__default = /*#__PURE__*/_interopDefaultCompat(a);
+const b__default = /*#__PURE__*/_interopDefaultCompat(b);
+
+const index = a__default + b__default;
+
+module.exports = index;
+"
+`;
+
+exports[`packem externals > should handle externals with peerDependenciesMeta > mjs output 1`] = `
+"import a from 'peer-dep';
+import b from 'peer-dep-meta';
+
+const index = a + b;
+
+export { index as default };
+"
+`;
+
 exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > cjs dts output 1`] = `
 "import * as _svgr_core from '@svgr/core';
 
@@ -65,8 +325,43 @@ export { indent };
 "
 `;
 
+exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > cjs output 1`] = `
+"'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+const detectIndentFn = require('detect-indent');
+
+const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
+
+const detectIndentFn__default = /*#__PURE__*/_interopDefaultCompat(detectIndentFn);
+
+const { indent: dIndent } = detectIndentFn__default("  file");
+const indent = dIndent;
+
+exports.indent = indent;
+"
+`;
+
+exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > dts output 1`] = `
+"declare const indent: string;
+
+export { indent };
+"
+`;
+
 exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > mjs dts output 1`] = `
 "declare const indent: string;
+
+export { indent };
+"
+`;
+
+exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > mjs output 1`] = `
+"import detectIndentFn from 'detect-indent';
+
+const { indent: dIndent } = detectIndentFn("  file");
+const indent = dIndent;
 
 export { indent };
 "

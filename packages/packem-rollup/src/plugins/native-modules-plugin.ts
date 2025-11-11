@@ -119,39 +119,44 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
             return options;
         },
 
-        async resolveId(source, importer) {
-            if (source.startsWith(PREFIX) || !source.endsWith(".node")) {
-                return undefined;
-            }
+        resolveId: {
+            filter: {
+                id: /\.node$/,
+            },
+            async handler(source, importer) {
+                if (source.startsWith(PREFIX)) {
+                    return undefined;
+                }
 
-            const resolvedPath = importer ? resolve(dirname(importer), source) : resolve(source);
+                const resolvedPath = importer ? resolve(dirname(importer), source) : resolve(source);
 
-            if (!await isAccessible(resolvedPath)) {
-                this.warn(`Native module not found: ${resolvedPath}`);
+                if (!await isAccessible(resolvedPath)) {
+                    this.warn(`Native module not found: ${resolvedPath}`);
 
-                return undefined;
-            }
+                    return undefined;
+                }
 
-            const resolvedPathBasename = basename(resolvedPath);
-            let outputName = resolvedPathBasename;
-            let counter = 1;
+                const resolvedPathBasename = basename(resolvedPath);
+                let outputName = resolvedPathBasename;
+                let counter = 1;
 
-            // Handle name collisions by checking already staged values
-            const stagedBasenames = new Set([...modulesToCopy.values()].map((p) => basename(p)));
+                // Handle name collisions by checking already staged values
+                const stagedBasenames = new Set([...modulesToCopy.values()].map((p) => basename(p)));
 
-            while (stagedBasenames.has(outputName)) {
-                const extension = extname(resolvedPathBasename);
-                const name = basename(resolvedPathBasename, extension);
+                while (stagedBasenames.has(outputName)) {
+                    const extension = extname(resolvedPathBasename);
+                    const name = basename(resolvedPathBasename, extension);
 
-                outputName = `${name}_${counter}${extension}`;
-                counter += 1;
-            }
+                    outputName = `${name}_${counter}${extension}`;
+                    counter += 1;
+                }
 
-            // We'll set the destination path in generateBundle when we have the distDirectory
-            modulesToCopy.set(resolvedPath, outputName);
+                // We'll set the destination path in generateBundle when we have the distDirectory
+                modulesToCopy.set(resolvedPath, outputName);
 
-            // Return a virtual module ID containing the original path
-            return PREFIX + resolvedPath;
+                // Return a virtual module ID containing the original path
+                return PREFIX + resolvedPath;
+            },
         },
     };
 };

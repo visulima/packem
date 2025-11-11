@@ -13,8 +13,12 @@ const initted = false;
  * @param importer The importer context (can be a file path or Rollup plugin context)
  * @param rollupResolve Optional Rollup resolve function for better module resolution
  */
-// eslint-disable-next-line sonarjs/cognitive-complexity
-export const isPureCJS = async (id: string, importer: string, rollupResolve?: (id: string, importer?: string) => Promise<ResolvedId | null>): Promise<boolean> => {
+
+export const isPureCJS = async (
+    id: string,
+    importer: string,
+    rollupResolve?: (id: string, importer?: string) => Promise<ResolvedId | null>,
+): Promise<boolean> => {
     if (!initted) {
         await init();
     }

@@ -7,7 +7,6 @@ import { dirname } from "@visulima/path";
 import type { StyleOptions } from "@visulima/rollup-plugin-css";
 
 import type { BuildConfig } from "../../src/types";
-import installPackage from "./install-package";
 
 const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../dist");
 
@@ -44,8 +43,6 @@ export const createPackemConfig = async (
     }: PackemConfigProperties = {},
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<void> => {
-    await installPackage(fixturePath, transformer === "swc" ? "@swc" : transformer === "oxc" ? "oxc-transform" : transformer);
-
     let rollupConfig = "";
 
     if (typeof config === "object" || cssLoader.length > 0 || plugins.length > 0) {
