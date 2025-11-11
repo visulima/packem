@@ -9,7 +9,7 @@ import type { ExportAllDeclaration, ExportNamedDeclaration, ImportDeclaration, S
 import type { FilterPattern } from "@rollup/pluginutils";
 import { createFilter } from "@rollup/pluginutils";
 import { readFile } from "@visulima/fs";
-import { ENDING_REGEX } from "@visulima/packem-share/constants";
+import { ENDING_REGEX, EXCLUDE_REGEXP } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getDtsExtension } from "@visulima/packem-share/utils";
 import { basename, dirname, extname, isAbsolute, join, relative, toNamespacedPath } from "@visulima/path";
@@ -40,11 +40,10 @@ type OxcImport = (ExportAllDeclaration | ExportNamedDeclaration | ImportDeclarat
 export type IsolatedDeclarationsOptions = {
     exclude?: FilterPattern;
     ignoreErrors?: boolean;
-    include?: FilterPattern;
 };
 
 export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(sourceDirectory: string, context: BuildContext<T>): Plugin => {
-    const filter = createFilter(context.options.include, context.options.exclude);
+    const filter = createFilter(/\.(?:[mc]?ts|[jt]sx?)$/, context.options.rollup.isolatedDeclarations?.exclude || EXCLUDE_REGEXP);
 
     let outputFiles: Record<string, { ext: string; map?: string; source: string }> = Object.create(null);
 
@@ -62,22 +61,14 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
 
     // eslint-disable-next-line func-style, sonarjs/cognitive-complexity
     async function transform(this: PluginContext, code: string, id: string): Promise<undefined> {
-        // Only operate on TS/TSX sources; avoid parsing JSON and other assets
-        const isTsLike
-            = id.endsWith(".ts")
-                || id.endsWith(".cts")
-                || id.endsWith(".mts")
-                || id.endsWith(".tsx")
-                || id.endsWith(".ctsx")
-                || id.endsWith(".mtsx");
-
-        if (!isTsLike) {
-            return;
-        }
-
         if (!filter(id)) {
             return;
         }
+
+        context.logger.debug({
+            message: `Processing file: ${id}`,
+            prefix: "packem:isolated-declarations",
+        });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let program: { body: any[] } | undefined;
@@ -224,6 +215,21 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                 message: `Input base:${inputBase}`,
                 prefix: "packem:isolated-declarations",
             });
+
+            // Process any files that weren't processed during transform due to caching
+            const inputFiles = Array.isArray(input) ? input : Object.values(input);
+            
+            for await (const inputFile of inputFiles) {
+                if (filter(inputFile) && !outputFiles[inputFile.replace(ENDING_REGEX, "")]) {
+                    try {
+                        const source = await readFile(inputFile);
+                        // eslint-disable-next-line no-await-in-loop
+                        await transform.call(this, source, inputFile);
+                    } catch {
+                        // Skip files that can't be read
+                    }
+                }
+            }
 
             if (typeof outputOptions.entryFileNames === "function") {
                 // eslint-disable-next-line no-param-reassign
