@@ -19,7 +19,7 @@
     "devDependencies": {
         "@visulima/css-style-inject": "workspace:*",
         "@visulima/packem": "workspace:*",
-        "cssnano": "7.1.1",
+        "cssnano": "7.1.2",
         "esbuild": "^0.27.0",
         "icss-utils": "^5.1.0",
         "less": "^4.4.2",

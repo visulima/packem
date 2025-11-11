@@ -10,10 +10,8 @@ import type { NormalizedOutputOptions, Plugin, RenderedChunk, ResolvedId, Source
 
 import isPureCJS from "../utils/is-pure-cjs";
 
-// Constants
 const REQUIRE_VAR = `__cjs_require`;
 
-// Helper function templates
 const CREATE_REQUIRE_IMPORT = `import { createRequire as __cjs_createRequire } from "node:module";`;
 const REQUIRE_DECLARATION = `const ${REQUIRE_VAR} = __cjs_createRequire(import.meta.url);`;
 const GET_PROCESS_DECLARATION = `const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;`;
@@ -31,7 +29,6 @@ const GET_BUILTIN_MODULE_DECLARATION = `const __cjs_getBuiltinModule = (module) 
     return ${REQUIRE_VAR}(module);
 };`;
 
-// Regex patterns for duplicate detection
 const REGEX_PATTERNS = {
     builtin: /const\s+__cjs_getBuiltinModule\s*=\s*\(module\)\s*=>\s*\{[\s\S]*?\};\s*/g,
     import: /import\s*\{\s*createRequire(?:\s+as\s+__cjs_createRequire)?\s*\}\s*from\s*["']node:module["'];?\s*/g,

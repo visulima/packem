@@ -47,7 +47,39 @@ const optimizationLevelFrom = (level: CleanCSS.Options["level"]) => {
         };
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return level as any;
+};
+
+const fixCleanCssTidySelectors = (original: string, result: string): string => {
+    const regex = /(:.+\((.*)\))\s*\{/g;
+
+    let match: RegExpMatchArray | null;
+
+    while ((match = regex.exec(original)) !== null) {
+        const pseudoClass = match[1] as string;
+        const parameters = match[2] as string;
+
+        if (!pseudoClass || !parameters || !/\s/.test(parameters)) {
+            continue;
+        }
+
+        const parametersWithoutSpaces = parameters.replaceAll(/\s/g, "");
+        const resultPseudoClass = pseudoClass.replace(parameters, parametersWithoutSpaces);
+        const resultStartIndex = result.indexOf(resultPseudoClass);
+
+        if (resultStartIndex === -1) {
+            continue;
+        }
+
+        const resultEndIndex = resultStartIndex + resultPseudoClass.length;
+
+        // Restore the original pseudo class with spaces
+        // eslint-disable-next-line no-param-reassign
+        result = result.slice(0, Math.max(0, resultStartIndex)) + pseudoClass + result.slice(Math.max(0, resultEndIndex));
+    }
+
+    return result;
 };
 
 /**
@@ -128,6 +160,26 @@ export const defaultMinifyOptions: HTMLOptions = {
     removeScriptTypeAttributes: true,
     removeStyleLinkTypeAttributes: true,
     useShortDoctype: true,
+};
+
+export const adjustMinifyCSSOptions = (options: CleanCSS.Options = {}): CleanCSS.Options => {
+    const level = optimizationLevelFrom(options.level);
+    const originalTransform = typeof options.level === "object" && options.level[1] && options.level[1].transform;
+
+    level[OptimizationLevel.One].transform = (property: string, value: string) => {
+        if (value.startsWith("@TEMPLATE_EXPRESSION") && !value.endsWith(";")) {
+            // The CSS minifier has removed the semicolon from the placeholder
+            // and we need to add it back.
+            return (value = `${value};`);
+        }
+
+        return originalTransform ? originalTransform(property, value) : value;
+    };
+
+    return {
+        ...options,
+        level,
+    };
 };
 
 /**
@@ -235,53 +287,4 @@ export const defaultStrategy: Strategy<HTMLOptions, CleanCSS.Options> = {
 
         return parts;
     },
-};
-
-export const adjustMinifyCSSOptions = (options: CleanCSS.Options = {}) => {
-    const level = optimizationLevelFrom(options.level);
-    const originalTransform = typeof options.level === "object" && options.level[1] && options.level[1].transform;
-
-    level[OptimizationLevel.One].transform = (property: string, value: string) => {
-        if (value.startsWith("@TEMPLATE_EXPRESSION") && !value.endsWith(";")) {
-            // The CSS minifier has removed the semicolon from the placeholder
-            // and we need to add it back.
-            return (value = `${value};`);
-        }
-
-        return originalTransform ? originalTransform(property, value) : value;
-    };
-
-    return {
-        ...options,
-        level,
-    };
-};
-
-const fixCleanCssTidySelectors = (original: string, result: string) => {
-    const regex = /(:.+\((.*)\))\s*\{/g;
-    let match: RegExpMatchArray | null;
-
-    while ((match = regex.exec(original)) != undefined) {
-        const pseudoClass = match[1];
-        const parameters = match[2];
-
-        if (!pseudoClass || !parameters || !/\s/.test(parameters)) {
-            continue;
-        }
-
-        const parametersWithoutSpaces = parameters.replaceAll(/\s/g, "");
-        const resultPseudoClass = pseudoClass.replace(parameters, parametersWithoutSpaces);
-        const resultStartIndex = result.indexOf(resultPseudoClass);
-
-        if (resultStartIndex === -1) {
-            continue;
-        }
-
-        const resultEndIndex = resultStartIndex + resultPseudoClass.length;
-
-        // Restore the original pseudo class with spaces
-        result = result.slice(0, Math.max(0, resultStartIndex)) + pseudoClass + result.slice(Math.max(0, resultEndIndex));
-    }
-
-    return result;
 };

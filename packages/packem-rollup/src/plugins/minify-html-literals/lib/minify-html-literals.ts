@@ -187,7 +187,7 @@ export interface Result {
  * @param fileName the name of the source file
  * @returns a v3 SourceMap
  */
-export const defaultGenerateSourceMap = (ms: MagicStringLike, fileName: string) =>
+export const defaultGenerateSourceMap = (ms: MagicStringLike, fileName: string): SourceMap =>
     ms.generateMap({
         file: `${fileName}.map`,
         hires: true,
@@ -201,7 +201,7 @@ export const defaultGenerateSourceMap = (ms: MagicStringLike, fileName: string) 
  * @param template the template to check
  * @returns true if the template should be minified
  */
-export const defaultShouldMinify = (template: Template) => {
+export const defaultShouldMinify = (template: Template): boolean => {
     const tag = template.tag && template.tag.toLowerCase();
 
     return !!tag && (tag.includes("html") || tag.includes("svg"));
@@ -214,18 +214,15 @@ export const defaultShouldMinify = (template: Template) => {
  * @param template the template to check
  * @returns true if the template should be minified
  */
-export const defaultShouldMinifyCSS = (template: Template) => !!template.tag && template.tag.toLowerCase().includes("css");
+export const defaultShouldMinifyCSS = (template: Template): boolean => !!template.tag && template.tag.toLowerCase().includes("css");
 
-/**
- * The default validation.
- */
 export const defaultValidation: Validation = {
-    ensureHTMLPartsValid(parts, htmlParts) {
+    ensureHTMLPartsValid(parts, htmlParts): void {
         if (parts.length !== htmlParts.length) {
             throw new Error("splitHTMLByPlaceholder() must return same number of strings as template parts");
         }
     },
-    ensurePlaceholderValid(placeholder) {
+    ensurePlaceholderValid(placeholder): void {
         if (typeof placeholder !== "string" || placeholder.length === 0) {
             throw new Error("getPlaceholder() must return a non-empty string");
         }
@@ -246,29 +243,36 @@ export async function minifyHTMLLiterals(source: string, options?: DefaultOption
  * @param options minification options
  * @returns the minified code, or null if no minification occurred.
  */
-export async function minifyHTMLLiterals<S extends Strategy>(source: string, options?: CustomOptions<S>): Promise<Result | null>;
-export async function minifyHTMLLiterals(source: string, options: Options = {}): Promise<Result | null> {
+export async function minifyHTMLLiterals<S extends Strategy>(source: string, options?: CustomOptions<S>): Promise<Result | undefined>;
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export async function minifyHTMLLiterals(source: string, options: Options = {}): Promise<Result | undefined> {
+    // eslint-disable-next-line no-param-reassign
     options.minifyOptions = {
         ...defaultMinifyOptions,
         ...options.minifyOptions,
     };
 
     if (!options.MagicString) {
+        // eslint-disable-next-line no-param-reassign
         options.MagicString = MagicString;
     }
 
     if (!options.parseLiterals) {
+        // eslint-disable-next-line no-param-reassign
         options.parseLiterals = parseLiterals;
     }
 
     if (!options.shouldMinify) {
+        // eslint-disable-next-line no-param-reassign
         options.shouldMinify = defaultShouldMinify;
     }
 
     if (!options.shouldMinifyCSS) {
+        // eslint-disable-next-line no-param-reassign
         options.shouldMinifyCSS = defaultShouldMinifyCSS;
     }
 
+    // eslint-disable-next-line no-param-reassign
     options.parseLiteralsOptions = {
         fileName: options.fileName,
         ...options.parseLiteralsOptions,
@@ -335,7 +339,7 @@ export async function minifyHTMLLiterals(source: string, options: Options = {}):
     const sourceMin = ms.toString();
 
     if (source === sourceMin) {
-        return null;
+        return undefined;
     }
 
     let map: SourceMap | undefined;
