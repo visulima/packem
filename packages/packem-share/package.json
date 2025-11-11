@@ -74,10 +74,10 @@
         "test:watch": "vitest"
     },
     "dependencies": {
-        "@visulima/colorize": "catalog:prod",
-        "@visulima/fs": "catalog:prod",
-        "@visulima/package": "catalog:prod",
-        "@visulima/path": "catalog:node"
+        "@visulima/colorize": "catalog:visulima",
+        "@visulima/fs": "catalog:visulima",
+        "@visulima/package": "catalog:visulima",
+        "@visulima/path": "catalog:visulima"
     },
     "devDependencies": {
         "@anolilab/eslint-config": "catalog:lint",
@@ -90,9 +90,9 @@
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
         "@total-typescript/ts-reset": "catalog:tsc",
         "@types/node": "catalog:types",
-        "@visulima/packem": "catalog:dev",
-        "@visulima/pail": "catalog:dev",
-        "@visulima/tsconfig": "catalog:tsc",
+        "@visulima/packem": "catalog:visulima",
+        "@visulima/pail": "catalog:visulima",
+        "@visulima/tsconfig": "catalog:visulima",
         "@vitest/coverage-v8": "catalog:test",
         "@vitest/ui": "catalog:test",
         "conventional-changelog-conventionalcommits": "catalog:dev",

@@ -60,7 +60,6 @@
     "@commitlint/cli": "catalog:lint",
     "@commitlint/config-conventional": "catalog:lint",
     "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
-    "@visulima/packem": "catalog:dev",
     "audit-ci": "catalog:prod",
     "browserslist-config-anolilab": "catalog:network",
     "commitizen": "catalog:cli",

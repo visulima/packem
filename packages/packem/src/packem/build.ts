@@ -587,7 +587,6 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
 
     await context.hooks.callHook("build:done", context);
 
-    // eslint-disable-next-line etc/no-internal
     return showSizeInformation(context.logger, context);
 };
 
