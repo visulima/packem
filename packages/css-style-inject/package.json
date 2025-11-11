@@ -69,7 +69,7 @@
         "@arethetypeswrong/cli": "catalog:dev",
         "@total-typescript/ts-reset": "catalog:tsc",
         "@types/node": "catalog:types",
-        "@visulima/packem": "catalog:dev",
+        "@visulima/packem": "catalog:visulima",
         "@vitest/coverage-v8": "catalog:test",
         "@vitest/ui": "catalog:test",
         "conventional-changelog-conventionalcommits": "catalog:dev",
