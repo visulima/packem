@@ -39,9 +39,7 @@ try {
  * ```
  */
 const index = createCerebro("packem", {
-    logger: await createPailLogger(),
-    /*
-    logger: {
+    logger: await createPailLogger({
         reporters: [
             new SimpleReporter({
                 error: {
@@ -52,15 +50,13 @@ const index = createCerebro("packem", {
             }),
         ],
         scope: "packem",
-    },
-    */
+    }),
     packageName: name,
     packageVersion: version,
 });
 
 // Register available commands
 createInitCommand(index);
-// eslint-disable-next-line etc/no-internal
 createBuildCommand(index);
 createAddCommand(index);
 

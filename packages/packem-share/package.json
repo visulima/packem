@@ -57,8 +57,8 @@
         "README.md"
     ],
     "scripts": {
-        "build": "JITI_INTEROP_DEFAULT=1 jiti ../packem/src/cli/index.ts build --development",
-        "build:prod": "JITI_INTEROP_DEFAULT=1 jiti ../packem/src/cli/index.ts build --production",
+        "build": "./node_modules/.bin/packem build --development",
+        "build:prod": "./node_modules/.bin/packem build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build --watch",
         "lint:attw": "attw --pack",
@@ -87,6 +87,7 @@
         "@arethetypeswrong/cli": "catalog:dev",
         "@rollup/plugin-alias": "catalog:build",
         "@rollup/pluginutils": "catalog:build",
+        "@visulima/packem": "catalog:dev",
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
         "@total-typescript/ts-reset": "catalog:tsc",
         "@types/node": "catalog:types",

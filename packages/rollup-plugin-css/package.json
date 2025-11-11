@@ -96,8 +96,8 @@
         "dist"
     ],
     "scripts": {
-        "build": "../../node_modules/.bin/packem build --development",
-        "build:prod": "../../node_modules/.bin/packem build --production",
+        "build": "./node_modules/.bin/packem build --development",
+        "build:prod": "./node_modules/.bin/packem build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build --watch",
         "lint:attw": "attw --pack",
@@ -132,6 +132,7 @@
         "@csstools/css-tokenizer": "catalog:style",
         "@csstools/postcss-slow-plugins": "catalog:style",
         "@rollup/plugin-inject": "catalog:build",
+        "@visulima/packem": "catalog:dev",
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
