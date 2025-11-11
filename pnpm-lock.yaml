@@ -1374,6 +1374,21 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  examples/unbundle:
+    devDependencies:
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      esbuild:
+        specifier: ^0.27.0
+        version: 0.27.0
+      rimraf:
+        specifier: ^6.1.0
+        version: 6.1.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   examples/watch:
     devDependencies:
       '@visulima/packem':
