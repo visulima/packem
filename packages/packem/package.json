@@ -419,7 +419,7 @@
         "@oxc-project/types": "0.82.2",
         "@secretlint/secretlint-rule-preset-recommend": "^11.0.2",
         "@svgr/core": "^8.1.0",
-        "@swc/core": "^1.13.3",
+        "@swc/core": "^1.15.1",
         "@swc/types": "0.1.24",
         "@total-typescript/ts-reset": "^0.6.1",
         "@types/estree": "^1.0.8",
@@ -486,7 +486,7 @@
         "vitest": "^3.2.4"
     },
     "peerDependencies": {
-        "@swc/core": ">=1.11.29",
+        "@swc/core": ">=1.15.1",
         "cssnano": ">=7.0.6",
         "esbuild": ">=0.20.2",
         "icss-utils": ">=5.1.0",
