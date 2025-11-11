@@ -1,0 +1,93 @@
+---
+title: Debug & Profiling
+description: Debug your builds and profile performance with Packem's debugging tools
+---
+
+# Debug & Profiling
+
+Learn how to debug your Packem builds and profile performance to identify bottlenecks and optimize your build process.
+
+## Build Profiling
+
+Performing a performance analysis can help you identify performance bottlenecks in your project, allowing for targeted optimization.
+
+### Node.js Profiling
+
+When Packem executes a build, it will include the runtime overhead of both JavaScript and Rust code, and the overhead of data communication between JavaScript and Rust.
+
+In general, the performance overhead on the JavaScript side will be greater than that on the Rust side. You can use Node.js profiling to analyze the overhead on the JS side, which helps to identify performance bottlenecks on the JS side.
+
+For example, to perform the CPU profiling analysis, run the following command in the root directory of your project:
+
+```bash
+# dev
+node --cpu-prof ./node_modules/@visulima/packem/bin/packem.js dev
+
+# build
+node --cpu-prof ./node_modules/@visulima/packem/bin/packem.js build
+
+# Set higher precision sampling interval
+node --cpu-prof --cpu-prof-interval=100 ./node_modules/@visulima/packem/bin/packem.js build
+```
+
+The above commands will generate a `*.cpuprofile` file. We can use [speedscope](https://www.speedscope.app/) to visualize this file:
+
+```bash
+# Install speedscope
+npm install -g speedscope
+
+# View cpuprofile content
+# Replace the name with the local file name
+speedscope CPU.date.000000.00000.0.001.cpuprofile
+```
+
+## Debug Mode
+
+Packem provides debug options to help troubleshoot build issues and get more detailed information about the build process.
+
+### Debug Build Output
+
+Packem includes a `--debug` flag that enables additional logging and debugging information during the build process:
+
+```bash
+# Enable debug logging during build
+packem build --debug
+
+# Enable debug logging in watch mode
+packem build --watch --debug
+```
+
+When debug mode is enabled, you'll see additional log messages prefixed with `packem` that provide insight into:
+
+- Configuration loading and processing
+- Plugin registration and execution
+- Build steps and file processing
+- Internal operations and decisions
+
+### Verbose Logging
+
+In debug mode, Packem will output detailed information about:
+
+- **System Information**: Node.js version, bundler version, transformer being used
+- **Configuration**: Which config files are loaded and their paths
+- **Build Process**: Entry detection, file processing, and build phases
+- **Plugin Activity**: Plugin initialization and processing details
+
+Example debug output:
+
+```bash
+$ packem build --debug
+
+00:35:12 INFO      [packem] [system] Using node 25.1.0
+00:35:12 INFO      [packem] [bundler] Using rollup 4.53.2 with browser build runtime
+00:35:12 INFO      [packem] [transformer] Using swc ^1.15.1
+00:35:12 INFO      [packem] Automatically detected entries: src/index.tsx [esm] [cjs] [dts]
+00:35:12 INFO      [packem] Using typescript version: ^5.9.3
+00:35:12 INFO      [packem] Building examples_packem_transformer_swc
+00:35:12 INFO      [packem] Cleaning dist directory: `./dist`
+00:35:12 INFO      [packem] Preparing build for browser runtime
+```
+
+### TypeDoc Debug Information
+
+When using TypeDoc for documentation generation, the debug flag also enables TypeDoc's configuration display, showing how TypeDoc is configured internally.

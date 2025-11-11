@@ -94,6 +94,11 @@
           "title": "CLI Reference",
           "href": "/docs/guide/cli",
           "description": "Complete command-line interface documentation"
+        },
+        {
+          "title": "Debug & Profiling",
+          "href": "/docs/guide/debug",
+          "description": "Debug builds and profile performance"
         }
       ]
     },
