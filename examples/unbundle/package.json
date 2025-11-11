@@ -1,0 +1,30 @@
+{
+    "name": "examples_packem_unbundle",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "sideEffects": false,
+    "files": [
+        "./dist"
+    ],
+    "scripts": {
+        "build": "packem build",
+        "clean": "rimraf node_modules dist"
+    },
+    "devDependencies": {
+        "@visulima/packem": "workspace:*",
+        "esbuild": "^0.27.0",
+        "rimraf": "^6.1.0",
+        "typescript": "^5.9.3"
+    },
+    "engines": {
+        "node": ">=20"
+    }
+}
+
