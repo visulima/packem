@@ -1,3 +1,10 @@
+## @visulima/packem-rollup [1.0.0-alpha.27](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.26...@visulima/packem-rollup@1.0.0-alpha.27) (2025-11-11)
+
+### Bug Fixes
+
+* improve isolated declarations plugin and update filtering logic ([7efdf0d](https://github.com/visulima/packem/commit/7efdf0d052805a3d46cf767447728ca3d537fc24))
+* update license files and improve plugin configurations ([6372411](https://github.com/visulima/packem/commit/6372411fefbad9cb67d912c1447994b93a9ebc6f))
+
 ## @visulima/packem-rollup [1.0.0-alpha.26](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.25...@visulima/packem-rollup@1.0.0-alpha.26) (2025-11-08)
 
 ### Features
