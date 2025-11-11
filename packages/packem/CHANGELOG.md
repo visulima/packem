@@ -1,3 +1,15 @@
+## @visulima/packem [2.0.0-alpha.35](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.34...@visulima/packem@2.0.0-alpha.35) (2025-11-11)
+
+### Bug Fixes
+
+* improve isolated declarations plugin and update filtering logic ([7efdf0d](https://github.com/visulima/packem/commit/7efdf0d052805a3d46cf767447728ca3d537fc24))
+* update license files and improve plugin configurations ([6372411](https://github.com/visulima/packem/commit/6372411fefbad9cb67d912c1447994b93a9ebc6f))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.27
+
 ## @visulima/packem [2.0.0-alpha.34](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.33...@visulima/packem@2.0.0-alpha.34) (2025-11-10)
 
 ### Bug Fixes
