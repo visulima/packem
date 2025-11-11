@@ -651,7 +651,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             context.options.declaration
             && context.options.rollup.isolatedDeclarations
             && context.options.isolatedDeclarationTransformer
-            && isolatedDeclarationsPlugin<InternalBuildOptions>(join(context.options.rootDir, context.options.sourceDir), context),
+            && cachingPlugin(isolatedDeclarationsPlugin<InternalBuildOptions>(join(context.options.rootDir, context.options.sourceDir), context), fileCache),
 
             context.options.rollup.requireCJS
             && context.options.emitESM

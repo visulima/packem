@@ -274,7 +274,6 @@ const generateOptions = (
             isolatedDeclarations: {
                 exclude: EXCLUDE_REGEXP,
                 ignoreErrors: false,
-                include: /\.?:[mc]?(?:[jt]sx?|d\.[mc]?ts)$/,
             },
             json: {
                 preferConst: false,
