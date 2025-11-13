@@ -1,3 +1,9 @@
+## @visulima/packem [2.0.0-alpha.37](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.36...@visulima/packem@2.0.0-alpha.37) (2025-11-13)
+
+### Bug Fixes
+
+* updated deps and added more cli command tests ([ddbc7fd](https://github.com/visulima/packem/commit/ddbc7fd46ca785a1e548a7b2dcdb259ac35d50bf))
+
 ## @visulima/packem [2.0.0-alpha.36](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.35...@visulima/packem@2.0.0-alpha.36) (2025-11-11)
 
 ### Features
