@@ -64,6 +64,16 @@ interface RollupDynamicImportVariablesOptions {
     warnOnError?: boolean;
 }
 
+export interface ExtendedRollupNodeResolveOptions extends RollupNodeResolveOptions {
+    /**
+     * Controls how unresolved import warnings from the node-resolve plugin are handled.
+     * - `"error"` (default): Treat unresolved imports as errors, causing the build to fail
+     * - `"warn"`: Treat unresolved imports as warnings, allowing the build to continue
+     * @default "error"
+     */
+    unresolvedImportBehavior?: "error" | "warn";
+}
+
 export interface IsolatedDeclarationsResult {
     errors: string[];
     map?: string;
@@ -73,20 +83,20 @@ export interface IsolatedDeclarationsResult {
 export type IsolatedDeclarationsTransformer = (code: string, id: string, sourceMap?: boolean) => Promise<IsolatedDeclarationsResult>;
 
 export interface PackemRollupOptions {
-    alias: RollupAliasOptions | false;
+    alias?: RollupAliasOptions | false;
     cjsInterop?: CJSInteropOptions;
-    commonjs: RollupCommonJSOptions | false;
+    commonjs?: RollupCommonJSOptions | false;
     copy?: CopyPluginOptions | false;
     dataUri?: DataUriPluginOptions | false;
     debarrel?: DebarrelPluginOptions | false;
-    dts: RollupDtsOptions;
+    dts?: RollupDtsOptions;
     dynamicVars?: RollupDynamicImportVariablesOptions | false;
     esbuild?: EsbuildOptions | false;
     experimental?: {
         resolve?: OxcResolveOptions | false;
     };
     isolatedDeclarations?: IsolatedDeclarationsOptions;
-    json: RollupJsonOptions | false;
+    json?: RollupJsonOptions | false;
     jsxRemoveAttributes?: JSXRemoveAttributesPlugin | false;
     license?: LicenseOptions | false;
     metafile?: boolean;
@@ -94,7 +104,7 @@ export interface PackemRollupOptions {
     nativeModules?: NativeModulesOptions | false;
     output?: OutputOptions;
     oxc?: Omit<OXCTransformPluginConfig, "cwd" | "sourcemap" | "target"> | false;
-    patchTypes: PatchTypesOptions | false;
+    patchTypes?: PatchTypesOptions | false;
     pluginPure?: Omit<PureAnnotationsOptions, "sourcemap"> | false;
     plugins?: RollupPlugins;
     polyfillNode?: NodePolyfillsOptions | false;
@@ -105,9 +115,9 @@ export interface PackemRollupOptions {
     };
     preserveDynamicImports?: boolean;
     raw?: RawLoaderOptions | false;
-    replace: Omit<RollupReplaceOptions, "cwd"> | false;
+    replace?: Omit<RollupReplaceOptions, "cwd"> | false;
     requireCJS?: RequireCJSPluginOptions | false;
-    resolve: RollupNodeResolveOptions | false;
+    resolve?: ExtendedRollupNodeResolveOptions | false;
     shebang?: Partial<ShebangOptions> | false;
     shim?: EsmShimCjsSyntaxOptions | false;
     sourcemap?: SourcemapsPluginOptions;

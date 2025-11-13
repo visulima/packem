@@ -1,56 +1,11 @@
 import { existsSync } from "node:fs";
-import { readFile, unlink, writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import process from "node:process";
 import { createInterface } from "node:readline/promises";
 
 import type { Cli } from "@visulima/cerebro";
 
 import pkg from "../../../package.json" with { type: "json" };
-
-/**
- * Creates and registers the migrate command with the CLI.
- * Handles migration from other bundlers (tsup, unbuild, bunchee, etc.) to packem.
- * @param cli CLI instance to register the command with
- * @example
- * ```typescript
- * // From command line:
- * // Migrate from tsup to packem:
- * // packem migrate
- *
- * // Dry run to preview changes:
- * // packem migrate --dry-run
- *
- * // Specify custom directory:
- * // packem migrate --cwd /path/to/project
- * ```
- * @internal
- */
-const createMigrateCommand = (cli: Cli): void => {
-    cli.addCommand({
-        description: "Migrate from other bundlers (tsup, unbuild, bunchee, etc.) to packem",
-        execute: async ({ logger, options }): Promise<void> => {
-            await migrate({
-                cwd: options.cwd,
-                dryRun: options.dryRun,
-                logger,
-            });
-        },
-        name: "migrate",
-        options: [
-            {
-                defaultValue: ".",
-                description: "The directory to migrate",
-                name: "cwd",
-                type: String,
-            },
-            {
-                description: "Preview changes without applying them",
-                name: "dry-run",
-                type: Boolean,
-            },
-        ],
-    });
-};
 
 /**
  * Migrates a project from other bundlers to packem.
@@ -68,7 +23,7 @@ const createMigrateCommand = (cli: Cli): void => {
  * });
  * ```
  */
-export async function migrate({
+const migrate = async ({
     cwd,
     dryRun,
     logger,
@@ -76,7 +31,7 @@ export async function migrate({
     cwd?: string;
     dryRun?: boolean;
     logger: any;
-}): Promise<void> {
+}): Promise<void> => {
     if (dryRun) {
         logger.info("Dry run enabled. No changes will be made.");
     } else {
@@ -127,7 +82,7 @@ export async function migrate({
         logger.error("No migration performed.");
         process.exitCode = 1;
     }
-}
+};
 
 /**
  * Migration mapping for dependencies from various bundlers to packem.
@@ -161,7 +116,7 @@ const DEP_FIELDS = {
  * @param logger Logger instance for output
  * @returns Whether any migration was performed
  */
-async function migratePackageJson(dryRun?: boolean, logger: any): Promise<boolean> {
+const migratePackageJson = async (dryRun?: boolean, logger: any): Promise<boolean> => {
     if (!existsSync("package.json")) {
         logger.error("No package.json found");
 
@@ -258,7 +213,7 @@ async function migratePackageJson(dryRun?: boolean, logger: any): Promise<boolea
     }
 
     return true;
-}
+};
 
 /**
  * Config files to migrate from various bundlers.
@@ -296,7 +251,7 @@ const CONFIG_FILES = [
  * @param logger Logger instance for output
  * @returns Whether any migration was performed
  */
-async function migrateConfigFiles(dryRun?: boolean, logger?: any): Promise<boolean> {
+const migrateConfigFiles = async (dryRun?: boolean, logger?: any): Promise<boolean> => {
     let found = false;
 
     for (const file of CONFIG_FILES) {
@@ -316,7 +271,7 @@ async function migrateConfigFiles(dryRun?: boolean, logger?: any): Promise<boole
     }
 
     return found;
-}
+};
 
 /**
  * Renames a key in an object while preserving key order.
@@ -326,12 +281,12 @@ async function migrateConfigFiles(dryRun?: boolean, logger?: any): Promise<boole
  * @param newValue Optional new value for the key
  * @returns The modified object
  */
-function renameKey(
+const renameKey = (
     object: Record<string, any>,
     oldKey: string,
     newKey: string,
     newValue?: any,
-): Record<string, any> {
+): Record<string, any> => {
     const newObject: Record<string, any> = {};
 
     for (const key of Object.keys(object)) {
@@ -343,6 +298,51 @@ function renameKey(
     }
 
     return newObject;
-}
+};
+
+/**
+ * Creates and registers the migrate command with the CLI.
+ * Handles migration from other bundlers (tsup, unbuild, bunchee, etc.) to packem.
+ * @param cli CLI instance to register the command with
+ * @example
+ * ```typescript
+ * // From command line:
+ * // Migrate from tsup to packem:
+ * // packem migrate
+ *
+ * // Dry run to preview changes:
+ * // packem migrate --dry-run
+ *
+ * // Specify custom directory:
+ * // packem migrate --cwd /path/to/project
+ * ```
+ * @internal
+ */
+const createMigrateCommand = (cli: Cli): void => {
+    cli.addCommand({
+        description: "Migrate from other bundlers (tsup, unbuild, bunchee, etc.) to packem",
+        execute: async ({ logger, options }): Promise<void> => {
+            await migrate({
+                cwd: options.cwd,
+                dryRun: options.dryRun,
+                logger,
+            });
+        },
+        name: "migrate",
+        options: [
+            {
+                defaultValue: ".",
+                description: "The directory to migrate",
+                name: "cwd",
+                type: String,
+            },
+            {
+                description: "Preview changes without applying them",
+                name: "dry-run",
+                type: Boolean,
+            },
+        ],
+    });
+};
 
 export default createMigrateCommand;

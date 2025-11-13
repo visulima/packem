@@ -29,4 +29,10 @@ export default createConfig(
             "unicorn/prefer-module": "off",
         },
     },
+    {
+        ignores: ["**/src/cli/commands/**"],
+        rules: {
+            "sonarjs/file-name-differ-from-class": "off",
+        }
+    }
 );
