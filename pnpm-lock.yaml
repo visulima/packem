@@ -555,8 +555,8 @@ catalogs:
       version: 7.7.2
   visulima:
     '@visulima/cerebro':
-      specifier: 2.1.0
-      version: 2.1.0
+      specifier: 2.1.3
+      version: 2.1.3
     '@visulima/colorize':
       specifier: 1.4.27
       version: 1.4.27
@@ -589,7 +589,7 @@ catalogs:
       version: 2.0.3
     '@visulima/tabular':
       specifier: ^3.1.1
-      version: 3.1.1
+      version: 3.1.2
     '@visulima/tsconfig':
       specifier: 2.1.0
       version: 2.1.0
@@ -1472,7 +1472,7 @@ importers:
         version: 5.3.0(rollup@4.53.2)
       '@visulima/cerebro':
         specifier: catalog:visulima
-        version: 2.1.0(@visulima/find-cache-dir@2.0.4)(@visulima/pail@3.2.0)(github-slugger@2.0.0)
+        version: 2.1.3(@visulima/find-cache-dir@2.0.4)(@visulima/pail@3.2.0)(github-slugger@2.0.0)
       '@visulima/colorize':
         specifier: catalog:visulima
         version: 1.4.27
@@ -1508,7 +1508,7 @@ importers:
         version: 2.0.3
       '@visulima/tabular':
         specifier: catalog:visulima
-        version: 3.1.1
+        version: 3.1.2
       '@visulima/tsconfig':
         specifier: catalog:visulima
         version: 2.1.0(yaml@2.8.1)
@@ -5577,15 +5577,15 @@ packages:
     engines: {node: '>=18.0.0 <=23.x'}
     os: [darwin, linux, win32]
 
-  '@visulima/cerebro@2.1.0':
-    resolution: {integrity: sha512-NpqhRvHaLoH792axNgmUzATn2xj4C6qzdZG0/qN2tnfGB3zuJC4Hs4X/CFzK3ThwRcpaBB55aD0HRLy2co3HQQ==}
+  '@visulima/cerebro@2.1.3':
+    resolution: {integrity: sha512-hJ055MdAqyGLtoHEVfrMB9amVchDm7t+qkWSOiVihuLyeZCPjKlLx791ceiJc+DrtPpw7sGvV3+n5DBji5vrnA==}
     engines: {node: '>=20.19 <=25.x'}
     os: [darwin, linux, win32]
     peerDependencies:
       '@bomb.sh/tab': ^0.0.7
-      '@visulima/boxen': 2.0.8
-      '@visulima/find-cache-dir': 2.0.4
-      '@visulima/pail': 3.2.0
+      '@visulima/boxen': 2.0.9
+      '@visulima/find-cache-dir': 2.0.5
+      '@visulima/pail': 3.2.1
       github-slugger: 2.0.0
     peerDependenciesMeta:
       '@bomb.sh/tab':
@@ -5606,6 +5606,11 @@ packages:
 
   '@visulima/colorize@1.4.27':
     resolution: {integrity: sha512-PERClNHAH2tDYIVu4lgxP6ie2/BxR8BRmt5Jq6ZcIXDBiAqMKpO6WQBpD9LsWNRyEFK1peewuQUzcyT9ZKbxOw==}
+    engines: {node: '>=18.0.0 <=25.x'}
+    os: [darwin, linux, win32]
+
+  '@visulima/colorize@1.4.28':
+    resolution: {integrity: sha512-8Kidi+U3k8Nyxur/Us4Yrd0u+HHsKnTU2qKs1aCAzNJuTb6soASdIj5UljOQm+J8R0DYjBGjFifhGDXO3LzXTw==}
     engines: {node: '>=18.0.0 <=25.x'}
     os: [darwin, linux, win32]
 
@@ -5681,6 +5686,11 @@ packages:
 
   '@visulima/is-ansi-color-supported@2.3.3':
     resolution: {integrity: sha512-5Rh5BXK/8hXyo6kAkHh2bPJF0Y6kjz7+51wUXpwq8EONsyvoMEturV0IgJLNlPfKN0PLwS6ASeHBY8BvBJgjhw==}
+    engines: {node: '>=18.0.0 <=25.x'}
+    os: [darwin, linux, win32]
+
+  '@visulima/is-ansi-color-supported@2.3.4':
+    resolution: {integrity: sha512-qQHqu6U5R2qrHGchBdXvZm3GsEo6S6CWucoZZr5VGhUo/rAsbxESMBDe15IUPVOKfYm4y/KdWawZdfNBrIzzSg==}
     engines: {node: '>=18.0.0 <=25.x'}
     os: [darwin, linux, win32]
 
@@ -5952,8 +5962,8 @@ packages:
     resolution: {integrity: sha512-9sHgWa4oYYYgC8bBmf033dipLhnu2rajadWCWnegTss5SZX3UYr6M3+2N2g17Shhdnd0pvYNFSPH7z6ITgJH+A==}
     engines: {node: '>=20.19 <=25.x'}
 
-  '@visulima/tabular@3.1.1':
-    resolution: {integrity: sha512-dSkB/UlAhRi1nQdsJWilC6bQHVjzI/w+xt27RD/cNvNhEF6Jmp/ci7UOYWw3LmND0xzBwWrNSrM4Dhu/ZrlviQ==}
+  '@visulima/tabular@3.1.2':
+    resolution: {integrity: sha512-/C6JgnAvTKY47DhqEWdU42phCnWzsPiy1NOGvuu6/KiZkyibCUXIUzY76GGbzanxuGLxCaGOfhpJZvemXVkB4A==}
     engines: {node: '>=20.19 <=25.x'}
 
   '@visulima/tsconfig@1.1.22':
@@ -15760,10 +15770,10 @@ snapshots:
       - rotating-file-stream
       - yaml
 
-  '@visulima/cerebro@2.1.0(@visulima/find-cache-dir@2.0.4)(@visulima/pail@3.2.0)(github-slugger@2.0.0)':
+  '@visulima/cerebro@2.1.3(@visulima/find-cache-dir@2.0.4)(@visulima/pail@3.2.0)(github-slugger@2.0.0)':
     dependencies:
-      '@visulima/colorize': 1.4.27
-      '@visulima/tabular': 3.1.1
+      '@visulima/colorize': 1.4.28
+      '@visulima/tabular': 3.1.2
       fastest-levenshtein: 1.0.16
     optionalDependencies:
       '@visulima/find-cache-dir': 2.0.4
@@ -15777,6 +15787,10 @@ snapshots:
   '@visulima/colorize@1.4.27':
     dependencies:
       '@visulima/is-ansi-color-supported': 2.3.3
+
+  '@visulima/colorize@1.4.28':
+    dependencies:
+      '@visulima/is-ansi-color-supported': 2.3.4
 
   '@visulima/error@4.6.1': {}
 
@@ -15819,6 +15833,8 @@ snapshots:
   '@visulima/is-ansi-color-supported@2.2.14': {}
 
   '@visulima/is-ansi-color-supported@2.3.3': {}
+
+  '@visulima/is-ansi-color-supported@2.3.4': {}
 
   '@visulima/package@3.6.1(@types/node@24.5.2)(yaml@2.8.1)':
     dependencies:
@@ -15942,7 +15958,7 @@ snapshots:
       '@visulima/path': 1.4.0
       '@visulima/rollup-plugin-css': 1.0.0-alpha.7(c056a8cc39fdf542e394bd87a9413652)
       '@visulima/source-map': 1.0.20
-      '@visulima/tabular': 3.1.1
+      '@visulima/tabular': 3.1.2
       '@visulima/tsconfig': 1.1.22(yaml@2.8.1)
       browserslist: 4.26.2
       cjs-module-lexer: 2.1.1
@@ -16073,7 +16089,7 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
 
-  '@visulima/tabular@3.1.1': {}
+  '@visulima/tabular@3.1.2': {}
 
   '@visulima/tsconfig@1.1.22(yaml@2.8.1)':
     dependencies:
