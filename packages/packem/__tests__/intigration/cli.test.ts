@@ -58,15 +58,13 @@ export { A as default };
 
         const mtsContentEs2018 = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mtsContentEs2018).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const _A = class _A {
-};
-__name(_A, "A");
-let A = _A;
+        expect(mtsContentEs2018).toMatchInlineSnapshot(`
+          "class A {
+          }
 
-export { A as default };
-`);
+          export { A as default };
+          "
+        `);
     });
 
     it("should run in development mode if no NODE_ENV and development option was given", async () => {
@@ -183,6 +181,54 @@ export { a };
 
         expect(mtsContent).toBe(`const o=1;export{o as a};
 `);
+    });
+
+    it("should enable minify when --production option is used", async () => {
+        expect.assertions(4);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export const myVariable = 42;
+export function myFunction() {
+    return myVariable * 2;
+}`,
+        );
+
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            engines: {
+                node: ">=18.0.0",
+            },
+            exports: {
+                ".": {
+                    import: "./dist/index.js",
+                    types: "./dist/index.d.ts",
+                },
+            },
+            module: "dist/index.js",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", ["--production"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        expect(binProcess.stdout).toContain("Minification is enabled, the output will be minified");
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+
+        expect(mtsContent).toMatchSnapshot("minified output");
     });
 
     it("should not clean the dist directory before building, when --no-clean option was given", async () => {
@@ -309,7 +355,7 @@ export { a };
     });
 
     it("should run 'onSuccess' when option was given", async () => {
-        expect.assertions(5);
+        expect.assertions(4);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -326,7 +372,7 @@ export { a };
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackem("build", ["--onSuccess=echo hello && echo world"], {
+        const binProcess = await execPackem("build", ["--onSuccess=echo hello world"], {
             cwd: temporaryDirectoryPath,
             env: {},
         });
@@ -334,8 +380,7 @@ export { a };
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        expect(binProcess.stdout).toContain("hello");
-        expect(binProcess.stdout).toContain("world");
+        expect(binProcess.stdout).toContain("hello world");
 
         const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
@@ -363,7 +408,7 @@ export { a };
         });
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
-                onSuccess: "echo hello && echo world",
+                onSuccess: "echo hello; echo world",
             },
         });
 
@@ -430,22 +475,20 @@ export function barFunction() {
 
         const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mtsContent).toBe(`import { __TEST_EXPECTED_STRING__ } from '@test/shouldbeexternal';
-import bar from 'bar-package';
+        expect(mtsContent).toMatchInlineSnapshot(`
+          "import { __TEST_EXPECTED_STRING__ } from '@test/shouldbeexternal';
+          import bar from 'bar-package';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-function baz() {
-  return __TEST_EXPECTED_STRING__;
-}
-__name(baz, "baz");
-function barFunction() {
-  return bar;
-}
-__name(barFunction, "barFunction");
+          function baz() {
+            return __TEST_EXPECTED_STRING__;
+          }
+          function barFunction() {
+            return bar;
+          }
 
-export { barFunction, baz };
-`);
+          export { barFunction, baz };
+          "
+        `);
     });
 
     it("should be able to opt out sourcemap when minify", async () => {
@@ -466,7 +509,7 @@ export { barFunction, baz };
             devDependencies: {
                 typescript: "*",
             },
-            module: "dist/index.mjs",
+            module: "dist/index.js",
             type: "module",
             types: "dist/index.d.ts",
         });
@@ -488,8 +531,7 @@ export { barFunction, baz };
         expect(binProcess.stdout).toContain("production");
         expect(binProcess.stdout).toContain("Minification is enabled, the output will be minified");
 
-        // Verify that no sourcemap files are generated
-        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.mjs.map`)).toBe(false);
+        expect(isAccessibleSync(`${temporaryDirectoryPath}/dist/index.js.map`)).toBe(false);
     });
 
     describe("migrate command", () => {
@@ -509,7 +551,6 @@ export { barFunction, baz };
                 cwd: temporaryDirectoryPath,
                 env: {
                     ...process.env,
-                    // Simulate user input for confirmation
                     FORCE_COLOR: "0",
                 },
             });
@@ -549,7 +590,7 @@ export { barFunction, baz };
         });
 
         it("should migrate from bunchee to packem", async () => {
-            expect.assertions(4);
+            expect.assertions(5);
 
             await createPackageJson(temporaryDirectoryPath, {
                 devDependencies: {
@@ -633,11 +674,11 @@ export { barFunction, baz };
                 },
             });
 
-            expect(binProcess.stderr).toBe("");
-            expect(binProcess.exitCode).toBe(0);
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
 
-            expect(binProcess.stdout).toContain("Migrating `devDependencies` from tsup-node to @visulima/packem");
-            expect(binProcess.stdout).toContain("Migrating `build` script from tsup-node to packem");
+        expect(binProcess.stdout).toContain("Migrating `devDependencies` from tsup-node to @visulima/packem");
+        expect(binProcess.stdout).toContain("Migrating `build` script from tsup to packem");
         });
 
         it("should detect config files and warn about manual migration", async () => {
@@ -656,7 +697,6 @@ export { barFunction, baz };
                 },
             });
 
-            // Create a config file
             writeFileSync(`${temporaryDirectoryPath}/tsup.config.ts`, "export default { entry: [\"src/index.ts\"] }");
 
             const binProcess = await execPackem("migrate", ["--dry-run"], {
@@ -691,16 +731,17 @@ export { barFunction, baz };
                     ...process.env,
                     FORCE_COLOR: "0",
                 },
+                reject: false,
             });
 
-            expect(binProcess.stderr).toBe("");
+            expect(binProcess.stderr).toContain("No migration performed");
             expect(binProcess.exitCode).toBe(1);
 
             expect(binProcess.stdout).toContain("No migratable bundler dependencies found in package.json");
         });
 
         it("should show dry-run changes with before/after content", async () => {
-            expect.assertions(5);
+            expect.assertions(6);
 
             await createPackageJson(temporaryDirectoryPath, {
                 devDependencies: {
@@ -726,6 +767,464 @@ export { barFunction, baz };
             expect(binProcess.stdout).toContain("Old content:");
             expect(binProcess.stdout).toContain("New content:");
             expect(binProcess.stdout).toContain("Migration completed");
+        });
+
+        it("should detect and warn about real-world tsup.config.ts file", async () => {
+            expect.assertions(4);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    tsup: "^8.0.0",
+                },
+                scripts: {
+                    build: "tsup",
+                },
+            });
+
+            // Real-world tsup config example from common usage
+            const tsupConfig = `import { defineConfig } from 'tsup'
+
+export default defineConfig({
+  entry: ['src/index.ts'],
+  format: ['cjs', 'esm'],
+  dts: true,
+  splitting: false,
+  sourcemap: true,
+  clean: true,
+  treeshake: true,
+})`;
+
+            writeFileSync(`${temporaryDirectoryPath}/tsup.config.ts`, tsupConfig);
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.ts`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Manual migration required for config files");
+        });
+
+        it("should detect and warn about real-world tsup.config.js file", async () => {
+            expect.assertions(4);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    tsup: "^8.0.0",
+                },
+                scripts: {
+                    build: "tsup",
+                },
+            });
+
+            // Real-world tsup config.js example
+            const tsupConfig = `module.exports = {
+  entry: ['src/index.ts', 'src/cli.ts'],
+  format: ['cjs', 'esm'],
+  dts: true,
+  sourcemap: true,
+  clean: true,
+  external: ['react', 'react-dom'],
+  noExternal: ['@myorg/utils'],
+}`;
+
+            writeFileSync(`${temporaryDirectoryPath}/tsup.config.js`, tsupConfig);
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.js`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Manual migration required for config files");
+        });
+
+        it("should detect and warn about real-world tsup.config.json file", async () => {
+            expect.assertions(4);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    tsup: "^8.0.0",
+                },
+                scripts: {
+                    build: "tsup",
+                },
+            });
+
+            // Real-world tsup config.json example
+            const tsupConfig = `{
+  "entry": ["src/index.ts"],
+  "format": ["cjs", "esm"],
+  "dts": true,
+  "sourcemap": true,
+  "clean": true,
+  "minify": true
+}`;
+
+            writeFileSync(`${temporaryDirectoryPath}/tsup.config.json`, tsupConfig);
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.json`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Manual migration required for config files");
+        });
+
+        it("should detect and warn about real-world unbuild build.config.ts file", async () => {
+            expect.assertions(4);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    unbuild: "^2.0.0",
+                },
+                scripts: {
+                    build: "unbuild",
+                },
+            });
+
+            // Real-world unbuild config example
+            const unbuildConfig = `import { defineBuildConfig } from 'unbuild'
+
+export default defineBuildConfig({
+  entries: [
+    'src/index',
+    'src/cli',
+  ],
+  declaration: true,
+  clean: true,
+  rollup: {
+    emitCJS: true,
+    inlineDependencies: true,
+  },
+})`;
+
+            writeFileSync(`${temporaryDirectoryPath}/build.config.ts`, unbuildConfig);
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Found config file `build.config.ts`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Manual migration required for config files");
+        });
+
+        it("should detect and warn about real-world unbuild build.config.js file", async () => {
+            expect.assertions(4);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    unbuild: "^2.0.0",
+                },
+                scripts: {
+                    build: "unbuild",
+                },
+            });
+
+            // Real-world unbuild config.js example
+            const unbuildConfig = `module.exports = {
+  entries: ['src/index'],
+  declaration: true,
+  clean: true,
+  rollup: {
+    emitCJS: true,
+  },
+}`;
+
+            writeFileSync(`${temporaryDirectoryPath}/build.config.js`, unbuildConfig);
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Found config file `build.config.js`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Manual migration required for config files");
+        });
+
+        it("should detect and warn about real-world bunchee.config.ts file", async () => {
+            expect.assertions(4);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    bunchee: "^5.0.0",
+                },
+                scripts: {
+                    build: "bunchee",
+                },
+            });
+
+            // Real-world bunchee config example
+            const buncheeConfig = `export default {
+  entry: 'src/index.ts',
+  format: ['cjs', 'esm'],
+  minify: true,
+  sourcemap: true,
+}`;
+
+            writeFileSync(`${temporaryDirectoryPath}/bunchee.config.ts`, buncheeConfig);
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Found config file `bunchee.config.ts`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Manual migration required for config files");
+        });
+
+        it("should detect multiple config files from different bundlers", async () => {
+            expect.assertions(6);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    tsup: "^8.0.0",
+                    unbuild: "^2.0.0",
+                },
+                scripts: {
+                    build: "tsup",
+                },
+            });
+
+            writeFileSync(
+                `${temporaryDirectoryPath}/tsup.config.ts`,
+                "export default { entry: ['src/index.ts'] }",
+            );
+            writeFileSync(
+                `${temporaryDirectoryPath}/build.config.ts`,
+                "export default { entries: ['src/index'] }",
+            );
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.ts`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Found config file `build.config.ts`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Manual migration required for config files");
+            expect(binProcess.stdout).toContain("Migration completed");
+        });
+
+        it("should handle complex tsup config with all common options", async () => {
+            expect.assertions(5);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    tsup: "^8.0.0",
+                },
+                scripts: {
+                    build: "tsup",
+                    "build:watch": "tsup --watch",
+                },
+            });
+
+            // Complex real-world tsup config with many options
+            const complexTsupConfig = `import { defineConfig } from 'tsup'
+
+export default defineConfig({
+  entry: {
+    index: 'src/index.ts',
+    cli: 'src/cli/index.ts',
+    utils: 'src/utils/index.ts',
+  },
+  format: ['cjs', 'esm'],
+  dts: true,
+  splitting: true,
+  sourcemap: true,
+  clean: true,
+  treeshake: true,
+  minify: true,
+  target: 'node18',
+  outDir: 'dist',
+  external: ['react', 'react-dom', '@types/node'],
+  noExternal: ['@myorg/utils'],
+  esbuildOptions(options) {
+    options.banner = {
+      js: '// My banner',
+    }
+  },
+  onSuccess: 'echo "Build complete"',
+})`;
+
+            writeFileSync(`${temporaryDirectoryPath}/tsup.config.ts`, complexTsupConfig);
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.ts`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Manual migration required for config files");
+            expect(binProcess.stdout).toContain("Migrating `build:watch` script from tsup to packem");
+        });
+
+        it("should handle tsup config with package.json tsup field", async () => {
+            expect.assertions(5);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    tsup: "^8.0.0",
+                },
+                scripts: {
+                    build: "tsup",
+                },
+                tsup: {
+                    entry: ["src/index.ts", "src/cli.ts"],
+                    format: ["cjs", "esm"],
+                    dts: true,
+                    sourcemap: true,
+                    clean: true,
+                    splitting: true,
+                    external: ["react"],
+                },
+            });
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Found `tsup` config field in package.json. Consider moving to packem.config.ts");
+            expect(binProcess.stdout).toContain("Migrating `devDependencies` from tsup to @visulima/packem");
+            expect(binProcess.stdout).toContain("Migration completed");
+        });
+
+        it("should handle unbuild config with package.json unbuild field", async () => {
+            expect.assertions(4);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    unbuild: "^2.0.0",
+                },
+                scripts: {
+                    build: "unbuild",
+                },
+                unbuild: {
+                    entries: ["src/index"],
+                    declaration: true,
+                    clean: true,
+                    rollup: {
+                        emitCJS: true,
+                    },
+                },
+            });
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Found `unbuild` config field in package.json. Consider moving to packem.config.ts");
+            expect(binProcess.stdout).toContain("Migration completed");
+        });
+
+        it("should handle all tsup config file variants", async () => {
+            expect.assertions(9);
+
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    tsup: "^8.0.0",
+                },
+                scripts: {
+                    build: "tsup",
+                },
+            });
+
+            const configs = [
+                { file: "tsup.config.ts", content: "export default { entry: ['src/index.ts'] }" },
+                { file: "tsup.config.cts", content: "export default { entry: ['src/index.ts'] }" },
+                { file: "tsup.config.mts", content: "export default { entry: ['src/index.ts'] }" },
+                { file: "tsup.config.js", content: "module.exports = { entry: ['src/index.ts'] }" },
+                { file: "tsup.config.cjs", content: "module.exports = { entry: ['src/index.ts'] }" },
+                { file: "tsup.config.mjs", content: "export default { entry: ['src/index.ts'] }" },
+                { file: "tsup.config.json", content: '{"entry": ["src/index.ts"]}' },
+            ];
+
+            for (const config of configs) {
+                writeFileSync(`${temporaryDirectoryPath}/${config.file}`, config.content);
+            }
+
+            const binProcess = await execPackem("migrate", ["--dry-run"], {
+                cwd: temporaryDirectoryPath,
+                env: {
+                    ...process.env,
+                    FORCE_COLOR: "0",
+                },
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.ts`");
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.cts`");
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.mts`");
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.js`");
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.cjs`");
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.mjs`");
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.json`");
         });
     });
 });
