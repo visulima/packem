@@ -266,6 +266,18 @@ const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "b
                 format = `${format}\n${log.stack}`;
             }
 
+            // Handle unresolved import warnings from node-resolve plugin
+            if (level === "warn" && log.plugin === "node-resolve" && format.includes("Could not resolve import")) {
+                const unresolvedImportBehavior = context.options.rollup.resolve && typeof context.options.rollup.resolve === "object"
+                    ? context.options.rollup.resolve.unresolvedImportBehavior ?? "error"
+                    : "error";
+
+                if (unresolvedImportBehavior === "error") {
+                    throw new Error(format);
+                }
+                // If "warn", fall through to the warn case below
+            }
+
             // eslint-disable-next-line default-case
             switch (level) {
                 case "info": {
