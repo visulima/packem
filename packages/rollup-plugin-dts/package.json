@@ -53,8 +53,8 @@
         "dist"
     ],
     "scripts": {
-        "build": "../../node_modules/.bin/packem build --development || exit 0",
-        "build:prod": "../../node_modules/.bin/packem build --production || exit 0",
+        "build": "../../node_modules/.bin/packem build --development",
+        "build:prod": "../../node_modules/.bin/packem build --production",
         "clean": "rimraf node_modules dist .eslintcache",
         "dev": "pnpm run build",
         "lint:attw": "attw --pack",

@@ -9,7 +9,7 @@ export default createConfig(
             "coverage",
             "__fixtures__",
             "__docs__",
-            "tests/rollup-plugin-dts/**",
+            "__tests__/fixtures/**",
             "vitest.config.ts",
             "packem.config.ts",
             ".secretlintrc.cjs",

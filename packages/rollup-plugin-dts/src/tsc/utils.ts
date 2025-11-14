@@ -8,7 +8,13 @@ import ts from "typescript";
 const stripPrivateFields: ts.TransformerFactory<ts.SourceFile | ts.Bundle> = (context) => {
     const visitor = (node: ts.Node) => {
         if (ts.isPropertySignature(node) && ts.isPrivateIdentifier(node.name)) {
-            return context.factory.updatePropertySignature(node, node.modifiers, context.factory.createStringLiteral(node.name.text), node.questionToken, node.type);
+            return context.factory.updatePropertySignature(
+                node,
+                node.modifiers,
+                context.factory.createStringLiteral(node.name.text),
+                node.questionToken,
+                node.type,
+            );
         }
 
         return ts.visitEachChild(node, visitor, context);
