@@ -1,41 +1,41 @@
-import type { Plugin } from "rollup";
+import { RE_DTS, replaceTemplateName, resolveTemplateFn } from "./filename.ts";
+import type { OptionsResolved } from "./options.ts";
+import type { Plugin } from "rolldown";
 
-import { RE_DTS, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename.js";
-
-const createDtsInputPlugin = (): Plugin => {
+export function createDtsInputPlugin({ sideEffects }: Pick<OptionsResolved, "sideEffects">): Plugin {
     return {
-        name: "rollup-plugin-dts:dts-input",
+        name: "rolldown-plugin-dts:dts-input",
 
-        options(options) {
-            return {
-                treeshake:
-                    options.treeshake === false
-                        ? false
-                        : {
-                            ...options.treeshake === true ? {} : options.treeshake,
-                            moduleSideEffects: false,
-                        },
-                ...options,
-            };
-        },
+        options:
+            sideEffects === false
+                ? (options) => {
+                      return {
+                          treeshake:
+                              options.treeshake === false
+                                  ? false
+                                  : {
+                                        ...(options.treeshake === true ? {} : options.treeshake),
+                                        moduleSideEffects: false,
+                                    },
+                          ...options,
+                      };
+                  }
+                : undefined,
 
         outputOptions(options) {
             return {
                 ...options,
                 entryFileNames(chunk) {
                     const { entryFileNames } = options;
-
                     if (entryFileNames) {
-                        const nameTemplate = resolveTemplateFunction(entryFileNames, chunk);
+                        const nameTemplate = resolveTemplateFn(entryFileNames, chunk);
 
                         const renderedName = replaceTemplateName(nameTemplate, chunk.name);
-
                         if (RE_DTS.test(renderedName)) {
                             return nameTemplate;
                         }
 
                         const renderedNameWithD = replaceTemplateName(nameTemplate, `${chunk.name}.d`);
-
                         if (RE_DTS.test(renderedNameWithD)) {
                             return renderedNameWithD;
                         }
@@ -50,12 +50,9 @@ const createDtsInputPlugin = (): Plugin => {
                     if (chunk.name.endsWith(".d")) {
                         return "[name].ts";
                     }
-
                     return "[name].d.ts";
                 },
             };
         },
     };
-};
-
-export default createDtsInputPlugin;
+}

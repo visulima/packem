@@ -1,40 +1,32 @@
-import type { Plugin } from "rollup";
+import Debug from "obug";
+import { createBannerPlugin } from "./banner.ts";
+import { createDtsInputPlugin } from "./dts-input.ts";
+import { createFakeJsPlugin } from "./fake-js.ts";
+import { createGeneratePlugin } from "./generate.ts";
+import { resolveOptions, type Options } from "./options.ts";
+import { createDtsResolvePlugin } from "./resolver.ts";
+import type { Plugin } from "rolldown";
 
-import createBannerPlugin from "./banner";
-import createDtsResolvePlugin from "./create-dts-resolve-plugin";
-import createDtsInputPlugin from "./dts-input";
-import createFakeJsPlugin from "./fake-js";
-import { createGeneratePlugin } from "./generate";
-import type { Options } from "./options";
-import { resolveOptions } from "./options";
+export { RE_CSS, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename.ts";
 
-export { default as createFakeJsPlugin } from "./fake-js";
+const debug = Debug("rolldown-plugin-dts:options");
 
-export const dts = (options: Options = {}, logger?: {
-    debug: (message: string, ...arguments_: any[]) => void;
-}): Plugin[] => {
-    logger?.debug("resolving dts options");
+export function dts(options: Options = {}): Plugin[] {
+    debug("resolving dts options");
     const resolved = resolveOptions(options);
-
-    logger?.debug("resolved dts options %o", resolved);
+    debug("resolved dts options %o", resolved);
 
     const plugins: Plugin[] = [];
-
     if (options.dtsInput) {
-        plugins.push(createDtsInputPlugin());
+        plugins.push(createDtsInputPlugin(resolved));
     } else {
         plugins.push(createGeneratePlugin(resolved));
     }
-
     plugins.push(createDtsResolvePlugin(resolved), createFakeJsPlugin(resolved));
-
     if (options.banner || options.footer) {
         plugins.push(createBannerPlugin(resolved));
     }
-
     return plugins;
-};
+}
 
-export { RE_CSS, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename";
-export { createGeneratePlugin } from "./generate";
-export { type Options, resolveOptions } from "./options";
+export { createFakeJsPlugin, createGeneratePlugin, resolveOptions, type Options };

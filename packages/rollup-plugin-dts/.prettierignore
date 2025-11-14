@@ -10,3 +10,5 @@ node_modules
 
 **/tsconfig.json
 **/jsconfig.json
+
+__tests__/fixtures/**

@@ -1,33 +1,11 @@
+import path from "node:path";
 import process from "node:process";
-
-import { resolve } from "@visulima/path";
-import type { TsConfigJson, TsConfigJsonResolved } from "@visulima/tsconfig";
-import { findTsConfig, readTsConfig } from "@visulima/tsconfig";
+import { getTsconfig, parseTsconfig, type TsConfigJson, type TsConfigJsonResolved } from "get-tsconfig";
+import type { AddonFunction } from "rolldown";
 import type { IsolatedDeclarationsOptions } from "rolldown/experimental";
-import type { AddonFunction } from "rollup";
 
-type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
-type MarkPartial<T, K extends keyof T> = Omit<Required<T>, K> & Partial<Pick<T, K>>;
-
-let warnedTsgo = false;
-
-// #region General Options
+//#region General Options
 export interface GeneralOptions {
-    /**
-     * Determines how the default export is emitted.
-     *
-     * If set to `true`, and you are only exporting a single item using `export default ...`,
-     * the output will use `export = ...` instead of the standard ES module syntax.
-     * This is useful for compatibility with CommonJS.
-     */
-    cjsDefault?: boolean;
-
-    /**
-     * Override the `compilerOptions` specified in `tsconfig.json`.
-     * @see https://www.typescriptlang.org/tsconfig/#compilerOptions
-     */
-    compilerOptions?: TsConfigJson.CompilerOptions;
-
     /**
      * The directory in which the plugin will search for the `tsconfig.json` file.
      */
@@ -48,15 +26,28 @@ export interface GeneralOptions {
     emitDtsOnly?: boolean;
 
     /**
-     * Controls whether type definitions from `node_modules` are bundled into your final `.d.ts` file or kept as external `import` statements.
+     * The path to the `tsconfig.json` file.
      *
-     * By default, dependencies are external, resulting in `import { Type } from 'some-package'`. When bundled, this `import` is removed, and the type definitions from `some-package` are copied directly into your file.
+     * If set to `false`, the plugin will ignore any `tsconfig.json` file.
+     * You can still specify `compilerOptions` directly in the options.
      *
-     * - `true`: Bundles all dependencies.
-     * - `false`: (Default) Keeps all dependencies external.
-     * - `(string | RegExp)[]`: Bundles only dependencies matching the provided strings or regular expressions (e.g. `['pkg-a', /^@scope\//]`).
+     * @default 'tsconfig.json'
      */
-    resolve?: boolean | (string | RegExp)[];
+    tsconfig?: string | boolean;
+
+    /**
+     * Pass a raw `tsconfig.json` object directly to the plugin.
+     *
+     * @see https://www.typescriptlang.org/tsconfig
+     */
+    tsconfigRaw?: Omit<TsConfigJson, "compilerOptions">;
+
+    /**
+     * Override the `compilerOptions` specified in `tsconfig.json`.
+     *
+     * @see https://www.typescriptlang.org/tsconfig/#compilerOptions
+     */
+    compilerOptions?: TsConfigJson.CompilerOptions;
 
     /**
      * If `true`, the plugin will generate declaration maps (`.d.ts.map`) for `.d.ts` files.
@@ -64,74 +55,72 @@ export interface GeneralOptions {
     sourcemap?: boolean;
 
     /**
-     * The path to the `tsconfig.json` file.
-     *
-     * If set to `false`, the plugin will ignore any `tsconfig.json` file.
-     * You can still specify `compilerOptions` directly in the options.
-     * @default 'tsconfig.json'
-     */
-    tsconfig?: string | boolean;
+   * Controls whether type definitions from `node_modules` are bundled into your final `.d.ts` file or kept as external `import` statements.
+   * 
+   * By default, dependencies are external, resulting in `import { Type } from 'some-package'`. When bundled, this `import` is removed, and the type definitions from `some-package` are copied directly into your file.
+
+   * - `true`: Bundles all dependencies.
+   * - `false`: (Default) Keeps all dependencies external.
+   * - `(string | RegExp)[]`: Bundles only dependencies matching the provided strings or regular expressions (e.g. `['pkg-a', /^@scope\//]`).
+   */
+    resolve?: boolean | (string | RegExp)[];
 
     /**
-     * Pass a raw `tsconfig.json` object directly to the plugin.
-     * @see https://www.typescriptlang.org/tsconfig
+     * Specifies a resolver to resolve type definitions, especially for `node_modules`.
+     *
+     * - `'oxc'`: Uses Oxc's module resolution, which is faster and more efficient.
+     * - `'tsc'`: Uses TypeScript's native module resolution, which may be more compatible with complex setups, but slower.
+     *
+     * @default 'oxc'
      */
-    tsconfigRaw?: Omit<TsConfigJson, "compilerOptions">;
+    resolver?: "oxc" | "tsc";
+
+    /**
+     * Determines how the default export is emitted.
+     *
+     * If set to `true`, and you are only exporting a single item using `export default ...`,
+     * the output will use `export = ...` instead of the standard ES module syntax.
+     * This is useful for compatibility with CommonJS.
+     */
+    cjsDefault?: boolean;
+
+    /**
+     * Indicates whether the generated `.d.ts` files have side effects.
+     * - If set to `true`, Rolldown will treat the `.d.ts` files as having side effects during tree-shaking.
+     * - If set to `false`, Rolldown may consider the `.d.ts` files as side-effect-free, potentially removing them if they are not imported.
+     *
+     * @default false
+     */
+    sideEffects?: boolean;
 }
 
-// #region tsc Options
+//#region tsc Options
 export interface TscOptions {
-    /**
-     * Content to be added at the top of each generated `.d.ts` file.
-     */
-    banner?: string | Promise<string> | AddonFunction;
-
     /**
      * Build mode for the TypeScript compiler:
      *
      * - If `true`, the plugin will use [`tsc -b`](https://www.typescriptlang.org/docs/handbook/project-references.html#build-mode-for-typescript) to build the project and all referenced projects before emitting `.d.ts` files.
      * - If `false`, the plugin will use [`tsc`](https://www.typescriptlang.org/docs/handbook/compiler-options.html) to emit `.d.ts` files without building referenced projects.
+     *
      * @default false
      */
     build?: boolean;
 
     /**
-     * If `true`, the plugin will prepare all files listed in `tsconfig.json` for `tsc` or `vue-tsc`.
-     *
-     * This is especially useful when you have a single `tsconfig.json` for multiple projects in a monorepo.
-     */
-    eager?: boolean;
-
-    /**
-     * If `true`, the plugin will emit `.d.ts` files for `.js` files as well.
-     * This is useful when you want to generate type definitions for JavaScript files with JSDoc comments.
-     *
-     * Enabled by default when `allowJs` in compilerOptions is `true`.
-     * This option is only used when {@link Options.oxc} is
-     * `false`.
-     */
-    emitJs?: boolean;
-
-    /**
-     * Content to be added at the bottom of each generated `.d.ts` file.
-     */
-    footer?: string | Promise<string> | AddonFunction;
-
-    /**
      * If your tsconfig.json has
      * [`references`](https://www.typescriptlang.org/tsconfig/#references) option,
-     * `rollup-plugin-dts` will use [`tsc
+     * `rolldown-plugin-dts` will use [`tsc
      * -b`](https://www.typescriptlang.org/docs/handbook/project-references.html#build-mode-for-typescript)
      * to build the project and all referenced projects before emitting `.d.ts`
      * files.
      *
-     * In such case, if this option is `true`, `rollup-plugin-dts` will write
+     * In such case, if this option is `true`, `rolldown-plugin-dts` will write
      * down all built files into your disk, including
      * [`.tsbuildinfo`](https://www.typescriptlang.org/tsconfig/#tsBuildInfoFile)
      * and other built files. This is equivalent to running `tsc -b` in your
      * project.
      *
-     * Otherwise, if this option is `false`, `rollup-plugin-dts` will write
+     * Otherwise, if this option is `false`, `rolldown-plugin-dts` will write
      * built files only into memory and leave a small footprint in your disk.
      *
      * Enabling this option will decrease the build time by caching previous build
@@ -149,15 +138,14 @@ export interface TscOptions {
     incremental?: boolean;
 
     /**
-     * If `true`, the plugin will create a new isolated context for each build,
-     * ensuring that previously generated `.d.ts` code and caches are not reused.
-     *
-     * By default, the plugin may reuse internal caches or incremental build artifacts
-     * to speed up repeated builds. Enabling this option forces a clean context,
-     * guaranteeing that all type definitions are generated from scratch.
-     * @default false
+     * If `true`, the plugin will generate `.d.ts` files using `vue-tsc`.
      */
-    newContext?: boolean;
+    vue?: boolean;
+
+    /**
+     * If `true`, the plugin will generate `.d.ts` files using `@ts-macro/tsc`.
+     */
+    tsMacro?: boolean;
 
     /**
      * If `true`, the plugin will launch a separate process for `tsc` or `vue-tsc`.
@@ -166,18 +154,46 @@ export interface TscOptions {
     parallel?: boolean;
 
     /**
-     * If `true`, the plugin will generate `.d.ts` files using `@ts-macro/tsc`.
+     * If `true`, the plugin will prepare all files listed in `tsconfig.json` for `tsc` or `vue-tsc`.
+     *
+     * This is especially useful when you have a single `tsconfig.json` for multiple projects in a monorepo.
      */
-    tsMacro?: boolean;
+    eager?: boolean;
 
     /**
-     * If `true`, the plugin will generate `.d.ts` files using `vue-tsc`.
+     * If `true`, the plugin will create a new isolated context for each build,
+     * ensuring that previously generated `.d.ts` code and caches are not reused.
+     *
+     * By default, the plugin may reuse internal caches or incremental build artifacts
+     * to speed up repeated builds. Enabling this option forces a clean context,
+     * guaranteeing that all type definitions are generated from scratch.
+     *
+     * @default false
      */
-    vue?: boolean;
+    newContext?: boolean;
+
+    /**
+     * If `true`, the plugin will emit `.d.ts` files for `.js` files as well.
+     * This is useful when you want to generate type definitions for JavaScript files with JSDoc comments.
+     *
+     * Enabled by default when `allowJs` in compilerOptions is `true`.
+     * This option is only used when {@link Options.oxc} is
+     * `false`.
+     */
+    emitJs?: boolean;
+
+    /**
+     * Content to be added at the top of each generated `.d.ts` file.
+     */
+    banner?: string | Promise<string> | AddonFunction;
+    /**
+     * Content to be added at the bottom of each generated `.d.ts` file.
+     */
+    footer?: string | Promise<string> | AddonFunction;
 }
 
 export interface Options extends GeneralOptions, TscOptions {
-    // #region Oxc
+    //#region Oxc
 
     /**
      * If `true`, the plugin will generate `.d.ts` files using Oxc,
@@ -187,7 +203,7 @@ export interface Options extends GeneralOptions, TscOptions {
      */
     oxc?: boolean | Omit<IsolatedDeclarationsOptions, "sourcemap">;
 
-    // #region TypeScript Go
+    //#region TypeScript Go
 
     /**
      * **[Experimental]** Enables DTS generation using `tsgo`.
@@ -200,57 +216,57 @@ export interface Options extends GeneralOptions, TscOptions {
     tsgo?: boolean;
 }
 
+type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
+type MarkPartial<T, K extends keyof T> = Omit<Required<T>, K> & Partial<Pick<T, K>>;
+
 export type OptionsResolved = Overwrite<
     MarkPartial<Omit<Options, "compilerOptions">, "banner" | "footer">,
     {
-        oxc: IsolatedDeclarationsOptions | false;
         tsconfig?: string;
+        oxc: IsolatedDeclarationsOptions | false;
         tsconfigRaw: TsConfigJson;
     }
 >;
 
-export const resolveOptions = ({
-    banner,
-    // tsc
-    build = false,
-    cjsDefault = false,
-    compilerOptions = {},
+let warnedTsgo = false;
+
+export function resolveOptions({
     cwd = process.cwd(),
     dtsInput = false,
-    eager = false,
     emitDtsOnly = false,
-    emitJs,
-    footer,
-    incremental = false,
-
-    newContext = false,
-    oxc,
-    parallel = false,
-    resolve = false,
-    sourcemap,
     tsconfig,
     tsconfigRaw: overriddenTsconfigRaw = {},
-    tsgo = false,
+    compilerOptions = {},
+    sourcemap,
+    resolve = false,
+    resolver = "oxc",
+    cjsDefault = false,
+    banner,
+    footer,
+    sideEffects = false,
 
-    tsMacro = false,
+    // tsc
+    build = false,
+    incremental = false,
     vue = false,
-}: Options): OptionsResolved => {
+    tsMacro = false,
+    parallel = false,
+    eager = false,
+    newContext = false,
+    emitJs,
+
+    oxc,
+    tsgo = false,
+}: Options): OptionsResolved {
     let resolvedTsconfig: TsConfigJsonResolved | undefined;
-
-    if (tsconfig === true || tsconfig == undefined) {
-        const { config, path } = findTsConfig(cwd) || {};
-
-        // eslint-disable-next-line no-param-reassign
+    if (tsconfig === true || tsconfig == null) {
+        const { config, path } = getTsconfig(cwd) || {};
         tsconfig = path;
-
         resolvedTsconfig = config;
     } else if (typeof tsconfig === "string") {
-        // eslint-disable-next-line no-param-reassign
-        tsconfig = resolve(cwd || process.cwd(), tsconfig);
-
-        resolvedTsconfig = readTsConfig(tsconfig);
+        tsconfig = path.resolve(cwd || process.cwd(), tsconfig);
+        resolvedTsconfig = parseTsconfig(tsconfig);
     } else {
-        // eslint-disable-next-line no-param-reassign
         tsconfig = undefined;
     }
 
@@ -270,11 +286,9 @@ export const resolveOptions = ({
     };
 
     oxc ??= !!(compilerOptions?.isolatedDeclarations && !vue && !tsgo && !tsMacro);
-
     if (oxc === true) {
         oxc = {};
     }
-
     if (oxc) {
         oxc.stripInternal ??= !!compilerOptions?.stripInternal;
         // @ts-expect-error omitted in user options
@@ -285,24 +299,20 @@ export const resolveOptions = ({
 
     if (tsgo) {
         if (vue) {
-            throw new Error("[rollup-plugin-dts] The `tsgo` option is not compatible with the `vue` option. Please disable one of them.");
+            throw new Error("[rolldown-plugin-dts] The `tsgo` option is not compatible with the `vue` option. Please disable one of them.");
         }
-
         if (tsMacro) {
-            throw new Error("[rollup-plugin-dts] The `tsgo` option is not compatible with the `tsMacro` option. Please disable one of them.");
+            throw new Error("[rolldown-plugin-dts] The `tsgo` option is not compatible with the `tsMacro` option. Please disable one of them.");
         }
-
         if (oxc) {
-            throw new Error("[rollup-plugin-dts] The `tsgo` option is not compatible with the `oxc` option. Please disable one of them.");
+            throw new Error("[rolldown-plugin-dts] The `tsgo` option is not compatible with the `oxc` option. Please disable one of them.");
         }
     }
-
     if (oxc && vue) {
-        throw new Error("[rollup-plugin-dts] The `oxc` option is not compatible with the `vue` option. Please disable one of them.");
+        throw new Error("[rolldown-plugin-dts] The `oxc` option is not compatible with the `vue` option. Please disable one of them.");
     }
-
     if (oxc && tsMacro) {
-        throw new Error("[rollup-plugin-dts] The `oxc` option is not compatible with the `tsMacro` option. Please disable one of them.");
+        throw new Error("[rolldown-plugin-dts] The `oxc` option is not compatible with the `tsMacro` option. Please disable one of them.");
     }
 
     if (tsgo && !warnedTsgo) {
@@ -311,28 +321,30 @@ export const resolveOptions = ({
     }
 
     return {
-        banner,
-        // tsc
-        build,
-        cjsDefault,
         cwd,
         dtsInput,
-        eager,
         emitDtsOnly,
-        emitJs,
-        footer,
-        incremental,
-
-        newContext,
-        oxc,
-        parallel,
-        resolve,
-        sourcemap,
         tsconfig,
         tsconfigRaw,
-        tsgo,
+        sourcemap,
+        resolve,
+        resolver,
+        cjsDefault,
+        banner,
+        footer,
+        sideEffects,
 
-        tsMacro,
+        // tsc
+        build,
+        incremental,
         vue,
+        tsMacro,
+        parallel,
+        eager,
+        newContext,
+        emitJs,
+
+        oxc,
+        tsgo,
     };
-};
+}

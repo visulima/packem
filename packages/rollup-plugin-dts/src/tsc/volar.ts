@@ -84,8 +84,7 @@ export function createProgramFactory(ts: typeof Ts, options: Pick<TscOptions, "v
     const tsMacroLanguageTools = options.tsMacro ? loadTsMacro() : undefined;
     const proxyCreateProgram = vueLanguageTools?.proxyCreateProgram || tsMacroLanguageTools?.proxyCreateProgram;
 
-    if (!proxyCreateProgram)
-        return ts.createProgram;
+    if (!proxyCreateProgram) return ts.createProgram;
 
     return proxyCreateProgram(ts, ts.createProgram, (ts, options) => {
         const languagePlugins = [];
