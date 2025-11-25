@@ -1,3 +1,21 @@
+## @visulima/packem-share [1.0.0-alpha.14](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.13...@visulima/packem-share@1.0.0-alpha.14) (2025-11-25)
+
+### Miscellaneous Chores
+
+* update dependencies and package versions across multiple files ([#172](https://github.com/visulima/packem/issues/172)) ([f73c1dc](https://github.com/visulima/packem/commit/f73c1dc453f55c52da98e4b7c60f44ffd637e53c))
+* update ESLint configurations across multiple packages ([1fe2d3d](https://github.com/visulima/packem/commit/1fe2d3d6e4e1139560755b538367351d2b170ad3))
+* update package configurations and dependencies ([be09695](https://github.com/visulima/packem/commit/be09695f800ee23a555c54bd92e7ddd4c88182eb))
+* update package dependencies and configurations ([8ec45ec](https://github.com/visulima/packem/commit/8ec45ec4cc34899161fed5446268c9036162d902))
+* update package dependencies and configurations ([8453e80](https://github.com/visulima/packem/commit/8453e80187d9e6212d98dbe5aaafd031a5cabdcf))
+* update package references to use 'catalog:visulima' for consistency across multiple packages ([14ee42b](https://github.com/visulima/packem/commit/14ee42b3ae978baef4752e12115d14d6bb2ba7bc))
+* update package.json and pnpm-lock.yaml for @visulima/packem ([d323f2c](https://github.com/visulima/packem/commit/d323f2c3c99b6231d1c598585294babe52814375))
+* update package.json and pnpm-lock.yaml for dependency management ([aa523ca](https://github.com/visulima/packem/commit/aa523ca16f29ba0a874a13693d1f9581acf6f8c3))
+* update pnpm workspace and package configurations ([feacec9](https://github.com/visulima/packem/commit/feacec93d1b0cefb8ea5d2b730fc1c6918925826))
+
+### Continuous Integration
+
+* fixed dep connections ([1c0807f](https://github.com/visulima/packem/commit/1c0807f92b1b6742f0da7f587226b418bd200f80))
+
 ## @visulima/packem-share [1.0.0-alpha.13](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.12...@visulima/packem-share@1.0.0-alpha.13) (2025-10-08)
 
 ### Bug Fixes
