@@ -1,3 +1,17 @@
+## @visulima/packem [2.0.0-alpha.38](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.37...@visulima/packem@2.0.0-alpha.38) (2025-11-25)
+
+### Bug Fixes
+
+* enable debarrel plugin in Rollup options ([5cde5f6](https://github.com/visulima/packem/commit/5cde5f63c043406b42cb1eea4e4245d0e34aa570))
+* enhance migrate command and update ESLint configuration ([95bfa33](https://github.com/visulima/packem/commit/95bfa33ba225cdcf8a88df0f55c781a23de746ef))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.28
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.14
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.8
+
 ## @visulima/packem [2.0.0-alpha.37](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.36...@visulima/packem@2.0.0-alpha.37) (2025-11-13)
 
 ### Bug Fixes
