@@ -603,11 +603,6 @@ overrides:
   tmp@<=0.2.3: '>=0.2.5'
   vite@>=7.1.0 <=7.1.10: '>=7.2.4'
 
-patchedDependencies:
-  oxc-parser:
-    hash: 464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76
-    path: patches/oxc-parser.patch
-
 importers:
 
   .:
@@ -668,7 +663,7 @@ importers:
         version: 22.1.1(@swc/core@1.15.3(@swc/helpers@0.5.17))
       oxc-parser:
         specifier: catalog:prod
-        version: 0.99.0(patch_hash=464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76)
+        version: 0.99.0
       pkg-pr-new:
         specifier: catalog:node
         version: 0.0.60
@@ -1709,7 +1704,7 @@ importers:
         version: 0.0.7
       oxc-parser:
         specifier: catalog:dev
-        version: 0.99.0(patch_hash=464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76)
+        version: 0.99.0
       oxc-resolver:
         specifier: catalog:node
         version: 11.8.2
@@ -1898,7 +1893,7 @@ importers:
         version: 1.8.0
       oxc-parser:
         specifier: catalog:prod
-        version: 0.99.0(patch_hash=464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76)
+        version: 0.99.0
       oxc-resolver:
         specifier: catalog:node
         version: 11.8.2
@@ -16016,7 +16011,7 @@ snapshots:
       html-minifier-next: 4.3.1
       magic-string: 0.30.19
       mlly: 1.8.0
-      oxc-parser: 0.93.0(patch_hash=464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76)
+      oxc-parser: 0.93.0
       oxc-resolver: 11.8.2
       rollup: 4.53.3
       rollup-plugin-dts: 6.2.3(rollup@4.53.3)(typescript@5.9.3)
@@ -21398,7 +21393,7 @@ snapshots:
       object-keys: 1.1.1
       safe-push-apply: 1.0.0
 
-  oxc-parser@0.93.0(patch_hash=464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76):
+  oxc-parser@0.93.0:
     dependencies:
       '@oxc-project/types': 0.93.0
     optionalDependencies:
@@ -21418,7 +21413,7 @@ snapshots:
       '@oxc-parser/binding-win32-arm64-msvc': 0.93.0
       '@oxc-parser/binding-win32-x64-msvc': 0.93.0
 
-  oxc-parser@0.99.0(patch_hash=464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76):
+  oxc-parser@0.99.0:
     dependencies:
       '@oxc-project/types': 0.99.0
     optionalDependencies:

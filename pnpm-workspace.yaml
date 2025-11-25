@@ -267,9 +267,6 @@ overrides:
   tmp@<=0.2.3: '>=0.2.5'
   vite@>=7.1.0 <=7.1.10: '>=7.2.4'
 
-patchedDependencies:
-  oxc-parser: patches/oxc-parser.patch
-
 preferWorkspacePackages: true
 
 saveWorkspaceProtocol: true
