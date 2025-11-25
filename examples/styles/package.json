@@ -30,7 +30,7 @@
         "postcss-modules-scope": "^3.2.1",
         "postcss-modules-values": "^4.0.0",
         "postcss-value-parser": "^4.2.0",
-        "rimraf": "^6.1.0",
+        "rimraf": "^6.1.2",
         "sass-embedded": "^1.93.3",
         "stylus": "^0.64.0",
         "typescript": "^5.9.3"

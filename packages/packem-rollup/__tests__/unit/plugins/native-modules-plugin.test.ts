@@ -57,7 +57,10 @@ describe("nativeModules plugin", () => {
 
         const plugin = nativeModulesPlugin(mockOptions);
 
-        const result = await plugin.resolveId.call(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const resolveIdHook = plugin.resolveId as any;
+        const handler = typeof resolveIdHook === "function" ? resolveIdHook : resolveIdHook?.handler;
+        const result = await handler?.call(
             {
                 error: () => {},
                 warn: () => {},
@@ -74,7 +77,10 @@ describe("nativeModules plugin", () => {
 
         const plugin = nativeModulesPlugin(mockOptions);
 
-        const result = await plugin.resolveId.call(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const resolveIdHook = plugin.resolveId as any;
+        const handler = typeof resolveIdHook === "function" ? resolveIdHook : resolveIdHook?.handler;
+        const result = await handler?.call(
             {
                 error: () => {},
                 warn: () => {},
@@ -91,7 +97,10 @@ describe("nativeModules plugin", () => {
 
         const plugin = nativeModulesPlugin(mockOptions);
 
-        const result = plugin.load.call(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const loadHook = plugin.load as any;
+        const handler = typeof loadHook === "function" ? loadHook : loadHook?.handler;
+        const result = handler?.call(
             {
                 error: () => {},
                 warn: () => {},
@@ -107,9 +116,13 @@ describe("nativeModules plugin", () => {
 
         const plugin = nativeModulesPlugin(mockOptions);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const generateBundleHook = plugin.generateBundle as any;
+        const handler = typeof generateBundleHook === "function" ? generateBundleHook : generateBundleHook?.handler;
+
         // This should not throw an error even with empty modulesToCopy
         await expect(
-            plugin.generateBundle.call({
+            handler?.call({
                 error: () => {},
                 warn: () => {},
             }),
@@ -121,7 +134,10 @@ describe("nativeModules plugin", () => {
 
         const plugin = nativeModulesPlugin(mockOptions);
 
-        const result = plugin.options.call(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const optionsHook = plugin.options as any;
+        const handler = typeof optionsHook === "function" ? optionsHook : optionsHook?.handler;
+        const result = handler?.call(
             {
                 error: () => {},
                 warn: () => {},
