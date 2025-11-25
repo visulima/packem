@@ -13,7 +13,7 @@ import { ENDING_REGEX, EXCLUDE_REGEXP } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getDtsExtension } from "@visulima/packem-share/utils";
 import { basename, dirname, extname, isAbsolute, join, relative, toNamespacedPath } from "@visulima/path";
-import { parseAsync } from "oxc-parser";
+import { parse } from "oxc-parser";
 import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginContext, PreRenderedChunk } from "rollup";
 
 import extendString from "./utils/extend-string";
@@ -74,7 +74,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
         let program: { body: any[] } | undefined;
 
         try {
-            const result = await parseAsync(id, code);
+            const result = await parse(id, code);
 
             program = result.program;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -57,10 +57,10 @@
     "@anolilab/multi-semantic-release": "catalog:cli",
     "@anolilab/prettier-config": "catalog:lint",
     "@anolilab/textlint-config": "catalog:lint",
-    "@visulima/packem": "catalog:visulima",
     "@commitlint/cli": "catalog:lint",
     "@commitlint/config-conventional": "catalog:lint",
     "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
+    "@visulima/packem": "catalog:visulima",
     "audit-ci": "catalog:prod",
     "browserslist-config-anolilab": "catalog:network",
     "commitizen": "catalog:cli",
@@ -84,7 +84,7 @@
     "typescript": "catalog:tsc",
     "vitest": "catalog:test"
   },
-  "packageManager": "pnpm@10.21.0",
+  "packageManager": "pnpm@10.23.0",
   "engines": {
     "node": ">=20.19.* <=25.*"
   }

@@ -16,7 +16,7 @@
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.27.0",
         "nodehun": "^3.0.2",
-        "rimraf": "^6.1.0",
+        "rimraf": "^6.1.2",
         "typescript": "^5.9.3"
     },
     "engines": {

@@ -62,11 +62,11 @@
         "react-dom": "^19.2.0"
     },
     "devDependencies": {
-        "@types/react": "^19.2.2",
-        "@types/react-dom": "^19.2.2",
+        "@types/react": "^19.2.7",
+        "@types/react-dom": "^19.2.3",
         "@visulima/packem": "workspace:*",
         "esbuild": "^0.27.0",
-        "rimraf": "^6.1.0",
+        "rimraf": "^6.1.2",
         "typescript": "^5.9.3",
         "vite": "7.2.2"
     },
