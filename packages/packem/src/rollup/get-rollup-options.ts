@@ -621,7 +621,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 ...context.options.rollup.json,
             }),
 
-            // context.options.rollup.debarrel && debarrelPlugin(context.options.rollup.debarrel, context.logger),
+            context.options.rollup.debarrel && debarrelPlugin(context.options.rollup.debarrel, context.logger),
 
             chunkSplitter(),
 
