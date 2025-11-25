@@ -1,3 +1,24 @@
+## @visulima/packem-rollup [1.0.0-alpha.28](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.27...@visulima/packem-rollup@1.0.0-alpha.28) (2025-11-25)
+
+### Bug Fixes
+
+* enhance migrate command and update ESLint configuration ([95bfa33](https://github.com/visulima/packem/commit/95bfa33ba225cdcf8a88df0f55c781a23de746ef))
+
+### Miscellaneous Chores
+
+* update dependencies and improve package configurations ([d2d2a1a](https://github.com/visulima/packem/commit/d2d2a1af0de12daae830268f063e4661c628a247))
+* update dependencies and package versions across multiple files ([#172](https://github.com/visulima/packem/issues/172)) ([f73c1dc](https://github.com/visulima/packem/commit/f73c1dc453f55c52da98e4b7c60f44ffd637e53c))
+* update package references to use 'catalog:visulima' for consistency across multiple packages ([14ee42b](https://github.com/visulima/packem/commit/14ee42b3ae978baef4752e12115d14d6bb2ba7bc))
+
+### Continuous Integration
+
+* fixed dep connections ([1c0807f](https://github.com/visulima/packem/commit/1c0807f92b1b6742f0da7f587226b418bd200f80))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.14
+
 ## @visulima/packem-rollup [1.0.0-alpha.27](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.26...@visulima/packem-rollup@1.0.0-alpha.27) (2025-11-11)
 
 ### Bug Fixes
