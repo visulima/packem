@@ -28,9 +28,9 @@ catalogs:
     rollup-plugin-pure: ^0.4.0
     rollup-plugin-visualizer: 6.0.3
   cli:
-    '@anolilab/multi-semantic-release': ^3.0.0
+    '@anolilab/multi-semantic-release': ^3.1.0
     '@anolilab/semantic-release-pnpm': 2.0.4
-    '@anolilab/semantic-release-preset': ^12.0.0
+    '@anolilab/semantic-release-preset': ^12.0.1
     commitizen: ^4.3.1
     semantic-release: ^25.0.2
     taze: ^19.9.0
