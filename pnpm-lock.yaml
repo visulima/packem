@@ -560,9 +560,6 @@ catalogs:
     '@visulima/colorize':
       specifier: 1.4.27
       version: 1.4.27
-    '@visulima/css-style-inject':
-      specifier: 1.0.0-alpha.9
-      version: 1.0.0-alpha.9
     '@visulima/find-cache-dir':
       specifier: 2.0.4
       version: 2.0.4
@@ -1492,10 +1489,10 @@ importers:
         specifier: catalog:visulima
         version: 4.1.4(@types/node@24.5.2)
       '@visulima/packem-rollup':
-        specifier: 1.0.0-alpha.27
+        specifier: 1.0.0-alpha.28
         version: link:../packem-rollup
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.13
+        specifier: 1.0.0-alpha.14
         version: link:../packem-share
       '@visulima/pail':
         specifier: catalog:visulima
@@ -1504,7 +1501,7 @@ importers:
         specifier: catalog:visulima
         version: 1.4.0
       '@visulima/rollup-plugin-css':
-        specifier: 1.0.0-alpha.7
+        specifier: 1.0.0-alpha.8
         version: link:../rollup-plugin-css
       '@visulima/source-map':
         specifier: catalog:visulima
@@ -1865,7 +1862,7 @@ importers:
         specifier: catalog:visulima
         version: 4.1.4(@types/node@24.5.2)
       '@visulima/packem-share':
-        specifier: workspace:*
+        specifier: 1.0.0-alpha.14
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
@@ -2241,7 +2238,7 @@ importers:
         specifier: catalog:visulima
         version: 4.1.4(@types/node@24.5.2)
       '@visulima/packem-share':
-        specifier: workspace:*
+        specifier: 1.0.0-alpha.14
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
@@ -2317,7 +2314,7 @@ importers:
         specifier: catalog:types
         version: 0.0.11
       '@visulima/css-style-inject':
-        specifier: catalog:visulima
+        specifier: 1.0.0-alpha.10
         version: link:../css-style-inject
       '@vitest/coverage-v8':
         specifier: catalog:test
