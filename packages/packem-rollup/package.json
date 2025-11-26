@@ -196,7 +196,6 @@
         "@babel/core": "catalog:dev",
         "@oxc-parser/binding-linux-x64-gnu": "catalog:dev",
         "@oxc-project/types": "catalog:dev",
-        "@oxc-resolver/binding-linux-x64-gnu": "catalog:node",
         "@secretlint/secretlint-rule-preset-recommend": "catalog:lint",
         "@swc/core": "catalog:dev",
         "@swc/types": "catalog:dev",
