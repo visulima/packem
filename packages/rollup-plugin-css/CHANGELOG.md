@@ -1,3 +1,5 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.9](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.8...@visulima/rollup-plugin-css@1.0.0-alpha.9) (2025-11-26)
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.7...@visulima/rollup-plugin-css@1.0.0-alpha.8) (2025-11-25)
 
 ### Miscellaneous Chores
