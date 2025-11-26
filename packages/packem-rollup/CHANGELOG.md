@@ -1,3 +1,10 @@
+## @visulima/packem-rollup [1.0.0-alpha.29](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.28...@visulima/packem-rollup@1.0.0-alpha.29) (2025-11-26)
+
+### Miscellaneous Chores
+
+* remove patched dependencies and update oxc-parser usage ([24411c1](https://github.com/visulima/packem/commit/24411c1b75bb5a69e7466446a0805c22953c5f78))
+* update oxc dependencies and add patch for oxc-parser ([a3a87fe](https://github.com/visulima/packem/commit/a3a87fe8ea10f0958ee70bc9b8c37aa666c95cb0))
+
 ## @visulima/packem-rollup [1.0.0-alpha.28](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.27...@visulima/packem-rollup@1.0.0-alpha.28) (2025-11-25)
 
 ### Bug Fixes
