@@ -102,13 +102,12 @@ catalogs:
   node:
     '@antfu/install-pkg': 1.1.0
     '@clack/prompts': 0.11.0
-    '@oxc-resolver/binding-linux-x64-gnu': 11.8.2
     cac: ^6.7.14
     cross-env: ^10.1.0
     dts-resolver: ^2.1.3
     execa: ^9.6.0
     glob-parent: 6.0.2
-    oxc-resolver: 11.8.2
+    oxc-resolver: 11.14.0
     pkg-pr-new: ^0.0.60
     rimraf: ^6.1.2
     tinyexec: 1.0.1
@@ -215,7 +214,7 @@ catalogs:
     '@visulima/fs': 4.0.4
     '@visulima/humanizer': 2.0.3
     '@visulima/package': 4.1.4
-    '@visulima/packem': 2.0.0-alpha.36
+    '@visulima/packem': 2.0.0-alpha.37
     '@visulima/packem-rollup': 1.0.0-alpha.27
     '@visulima/pail': 3.2.0
     '@visulima/path': 1.4.0
@@ -266,6 +265,12 @@ overrides:
   tar@=7.5.1: '>=7.5.2'
   tmp@<=0.2.3: '>=0.2.5'
   vite@>=7.1.0 <=7.1.10: '>=7.2.4'
+  oxc-parser: 0.99.0
+  oxc-resolver: 11.14.0
+  oxc-transform: 0.99.0
+
+patchedDependencies:
+  oxc-parser: patches/oxc-parser.patch
 
 preferWorkspacePackages: true
 
