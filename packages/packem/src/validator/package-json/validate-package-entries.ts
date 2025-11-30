@@ -37,17 +37,19 @@ const validatePackageEntries = (context: BuildContext<InternalBuildOptions>): vo
             options.dtsOnly && validation.packageJson?.main === false ? "" : context.pkg.main,
             options.dtsOnly && validation.packageJson?.module === false ? "" : context.pkg.module,
             ...validation.packageJson?.exports
-                ? extractExportFilenames(context.pkg.exports, packageType, options.declaration).map((outputDescriptor) => {
-                    if (options.dtsOnly) {
-                        if (outputDescriptor.subKey === "types") {
-                            return outputDescriptor.file;
+                ? extractExportFilenames(context.pkg.exports, packageType, options.declaration, [], options.ignoreExportKeys)
+                    .filter((outputDescriptor) => !outputDescriptor.ignored)
+                    .map((outputDescriptor) => {
+                        if (options.dtsOnly) {
+                            if (outputDescriptor.subKey === "types") {
+                                return outputDescriptor.file;
+                            }
+
+                            return undefined;
                         }
 
-                        return undefined;
-                    }
-
-                    return outputDescriptor.file;
-                })
+                        return outputDescriptor.file;
+                    })
                 : [],
         ]
             .filter(Boolean)

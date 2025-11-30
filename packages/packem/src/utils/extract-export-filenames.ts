@@ -37,7 +37,13 @@ export type OutputDescriptor = {
     type?: Format;
 };
 
-export const extractExportFilenames = (
+export const extractExportFilenames: (
+    packageExports: PackageJson["exports"],
+    packageType: "cjs" | "esm",
+    declaration: BuildOptions["declaration"],
+    conditions: string[],
+    ignoreExportKeys: string[],
+) => OutputDescriptor[] = (
     packageExports: PackageJson["exports"],
     packageType: "cjs" | "esm",
     declaration: BuildOptions["declaration"],
@@ -137,6 +143,7 @@ export const extractExportFilenames = (
                         // Mark all nested results as ignored if the parent was ignored
                         if (isNestedIgnored) {
                             nestedResults.forEach((result) => {
+                                // eslint-disable-next-line no-param-reassign
                                 result.ignored = true;
                             });
                         }
