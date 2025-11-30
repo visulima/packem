@@ -1,3 +1,15 @@
+## @visulima/packem [2.0.0-alpha.40](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.39...@visulima/packem@2.0.0-alpha.40) (2025-11-30)
+
+### Code Refactoring
+
+* enhance extractExportFilenames function and improve package entry validation ([a3674e1](https://github.com/visulima/packem/commit/a3674e15a9c2484d43d8ae658df1b018a69a62b1))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.30
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.10
+
 ## @visulima/packem [2.0.0-alpha.39](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.38...@visulima/packem@2.0.0-alpha.39) (2025-11-26)
 
 
