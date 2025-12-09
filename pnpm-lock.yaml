@@ -1597,10 +1597,10 @@ importers:
         specifier: catalog:visulima
         version: 4.1.4(@types/node@24.5.2)
       '@visulima/packem-rollup':
-        specifier: 1.0.0-alpha.30
+        specifier: 1.0.0-alpha.31
         version: link:../packem-rollup
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.14
+        specifier: 1.0.0-alpha.15
         version: link:../packem-share
       '@visulima/pail':
         specifier: catalog:visulima
@@ -1609,7 +1609,7 @@ importers:
         specifier: catalog:visulima
         version: 1.4.0
       '@visulima/rollup-plugin-css':
-        specifier: 1.0.0-alpha.10
+        specifier: 1.0.0-alpha.11
         version: link:../rollup-plugin-css
       '@visulima/source-map':
         specifier: catalog:visulima
@@ -1982,7 +1982,7 @@ importers:
         specifier: catalog:visulima
         version: 4.1.4(@types/node@24.5.2)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.14
+        specifier: 1.0.0-alpha.15
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
@@ -2358,7 +2358,7 @@ importers:
         specifier: catalog:visulima
         version: 4.1.4(@types/node@24.5.2)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.14
+        specifier: 1.0.0-alpha.15
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
@@ -2434,7 +2434,7 @@ importers:
         specifier: catalog:types
         version: 0.0.11
       '@visulima/css-style-inject':
-        specifier: 1.0.0-alpha.10
+        specifier: 1.0.0-alpha.11
         version: link:../css-style-inject
       '@vitest/coverage-v8':
         specifier: catalog:test
@@ -2865,10 +2865,6 @@ packages:
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
-    engines: {node: '>=6.9.0'}
-
-  '@babel/compat-data@7.27.2':
-    resolution: {integrity: sha512-TUtMJYRPyUb/9aU8f3K0mjmjf6M9N5Woshn2CS6nqJSeJtTtQcpLUXjGt9vbF8ZGff0El99sWkLgzwW3VXnxZQ==}
     engines: {node: '>=6.9.0'}
 
   '@babel/compat-data@7.28.5':
@@ -4095,9 +4091,6 @@ packages:
     resolution: {integrity: sha512-DmdYgtezMkh3cpU8/1uyXakv3tJRcmcXxBOcO0tbaozPwpmh4YMsnWrQm9ZmZMfa5ocbxzbFk6O4bDPEc/iAnA==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
 
-  '@jridgewell/gen-mapping@0.3.12':
-    resolution: {integrity: sha512-OuLGC46TjB5BbN1dH8JULVVZY4WTdkF7tV9Ys6wLL1rubZnCMstOhNHueU5bLCrnRuDhKPDM4g6sw4Bel5Gzqg==}
-
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
 
@@ -4164,9 +4157,6 @@ packages:
 
   '@napi-rs/wasm-runtime@0.2.4':
     resolution: {integrity: sha512-9zESzOO5aDByvhIAsOy9TbpZ0Ur2AJbUI7UT73kcUTS2mxAMHOBaa1st/jAymNoCtvrit99kkzT1FZuXVcgfIQ==}
-
-  '@napi-rs/wasm-runtime@1.0.7':
-    resolution: {integrity: sha512-SeDnOO0Tk7Okiq6DbXmmBODgOAb9dp9gjlphokTUxmt8U3liIP1ZsozBahH69j/RJv+Rfs6IwUKHTgQYJ/HBAw==}
 
   '@napi-rs/wasm-runtime@1.1.0':
     resolution: {integrity: sha512-Fq6DJW+Bb5jaWE69/qOE0D1TUN9+6uWhCeZpdnSBk14pjLcCWR7Q8n49PTSPHazM37JqrsdpEthXy2xn6jWWiA==}
@@ -13672,8 +13662,6 @@ snapshots:
       js-tokens: 4.0.0
       picocolors: 1.1.1
 
-  '@babel/compat-data@7.27.2': {}
-
   '@babel/compat-data@7.28.5': {}
 
   '@babel/core@7.28.5':
@@ -13700,7 +13688,7 @@ snapshots:
     dependencies:
       '@babel/parser': 7.28.5
       '@babel/types': 7.28.5
-      '@jridgewell/gen-mapping': 0.3.12
+      '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
       jsesc: 3.1.0
 
@@ -13710,7 +13698,7 @@ snapshots:
 
   '@babel/helper-compilation-targets@7.27.2':
     dependencies:
-      '@babel/compat-data': 7.27.2
+      '@babel/compat-data': 7.28.5
       '@babel/helper-validator-option': 7.27.1
       browserslist: 4.28.0
       lru-cache: 5.1.1
@@ -15083,11 +15071,6 @@ snapshots:
     dependencies:
       '@sinclair/typebox': 0.34.41
 
-  '@jridgewell/gen-mapping@0.3.12':
-    dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
-      '@jridgewell/trace-mapping': 0.3.31
-
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -15095,14 +15078,14 @@ snapshots:
 
   '@jridgewell/remapping@2.3.5':
     dependencies:
-      '@jridgewell/gen-mapping': 0.3.12
+      '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
   '@jridgewell/source-map@0.3.11':
     dependencies:
-      '@jridgewell/gen-mapping': 0.3.12
+      '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
@@ -15174,13 +15157,6 @@ snapshots:
       '@emnapi/core': 1.7.1
       '@emnapi/runtime': 1.7.1
       '@tybys/wasm-util': 0.9.0
-
-  '@napi-rs/wasm-runtime@1.0.7':
-    dependencies:
-      '@emnapi/core': 1.7.1
-      '@emnapi/runtime': 1.7.1
-      '@tybys/wasm-util': 0.10.1
-    optional: true
 
   '@napi-rs/wasm-runtime@1.1.0':
     dependencies:
@@ -15419,7 +15395,7 @@ snapshots:
 
   '@oxc-parser/binding-wasm32-wasi@0.99.0':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.0.7
+      '@napi-rs/wasm-runtime': 1.1.0
     optional: true
 
   '@oxc-parser/binding-win32-arm64-msvc@0.99.0':
@@ -15481,7 +15457,7 @@ snapshots:
 
   '@oxc-resolver/binding-wasm32-wasi@11.14.0':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.0.7
+      '@napi-rs/wasm-runtime': 1.1.0
     optional: true
 
   '@oxc-resolver/binding-win32-arm64-msvc@11.14.0':
@@ -15530,7 +15506,7 @@ snapshots:
 
   '@oxc-transform/binding-wasm32-wasi@0.99.0':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.0.7
+      '@napi-rs/wasm-runtime': 1.1.0
     optional: true
 
   '@oxc-transform/binding-win32-arm64-msvc@0.99.0':
@@ -24738,7 +24714,7 @@ snapshots:
 
   sucrase@3.35.1:
     dependencies:
-      '@jridgewell/gen-mapping': 0.3.12
+      '@jridgewell/gen-mapping': 0.3.13
       commander: 4.1.1
       lines-and-columns: 1.2.4
       mz: 2.7.0
