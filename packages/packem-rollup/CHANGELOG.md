@@ -1,3 +1,14 @@
+## @visulima/packem-rollup [1.0.0-alpha.31](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.30...@visulima/packem-rollup@1.0.0-alpha.31) (2025-12-09)
+
+### Features
+
+* added preset for react and solid, added babel transformer ([773b907](https://github.com/visulima/packem/commit/773b907b462985cb61a5c978c43e227f24db6706))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.15
+
 ## @visulima/packem-rollup [1.0.0-alpha.30](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.29...@visulima/packem-rollup@1.0.0-alpha.30) (2025-11-30)
 
 ## @visulima/packem-rollup [1.0.0-alpha.29](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.28...@visulima/packem-rollup@1.0.0-alpha.29) (2025-11-26)
