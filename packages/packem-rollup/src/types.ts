@@ -11,6 +11,7 @@ import type { NodePolyfillsOptions } from "rollup-plugin-polyfill-node";
 import type { PureAnnotationsOptions } from "rollup-plugin-pure";
 import type { PluginVisualizerOptions } from "rollup-plugin-visualizer";
 
+import type { BabelPluginConfig } from "./plugins/babel";
 import type { CJSInteropOptions } from "./plugins/cjs-interop";
 import type { CopyPluginOptions } from "./plugins/copy";
 import type { DataUriPluginOptions } from "./plugins/data-uri";
@@ -84,6 +85,7 @@ export type IsolatedDeclarationsTransformer = (code: string, id: string, sourceM
 
 export interface PackemRollupOptions {
     alias?: RollupAliasOptions | false;
+    babel?: BabelPluginConfig | false;
     cjsInterop?: CJSInteropOptions;
     commonjs?: RollupCommonJSOptions | false;
     copy?: CopyPluginOptions | false;

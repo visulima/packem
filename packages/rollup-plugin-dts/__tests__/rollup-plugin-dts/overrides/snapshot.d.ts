@@ -1,5 +1,5 @@
 // index.d.ts
-//#region tests/rollup-plugin-dts/overrides/index.d.ts
+// #region tests/rollup-plugin-dts/overrides/index.d.ts
 interface A {}
 interface B {}
 interface C {}
@@ -12,5 +12,5 @@ declare class Foo {
     method(c: C): D;
     method(e: E): F;
 }
-//#endregion
-export { Foo as default };
+// #endregion
+export default Foo;

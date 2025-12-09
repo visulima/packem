@@ -1,11 +1,12 @@
-import { inspect } from "util";
+import { inspect } from "node:util";
+
 import { b } from "./b";
-import * as mod from "./mod";
+import { deep } from "./mod";
 
 declare class Test {
     [inspect.custom](): string;
     [b](): string;
-    [mod.deep.deep.a]: string;
+    [deep.deep.a]: string;
 }
 
 export { Test };

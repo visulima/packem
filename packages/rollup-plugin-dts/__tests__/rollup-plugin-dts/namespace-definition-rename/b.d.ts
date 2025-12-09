@@ -1,4 +1,4 @@
-export declare function fn(arg: string): string;
-export declare namespace fn {
+export declare function function_(argument: string): string;
+export declare namespace function_ {
     var staticProp: string;
 }

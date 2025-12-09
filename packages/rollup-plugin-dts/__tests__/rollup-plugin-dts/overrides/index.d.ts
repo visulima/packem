@@ -10,4 +10,3 @@ export default class Foo {
     method(c: C): D;
     method(e: E): F;
 }
-export {};

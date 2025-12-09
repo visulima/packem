@@ -1,7 +1,7 @@
-import Foo from "./Foo";
+import type Foo from "./Foo";
 
 declare class FooManager {
-    foos: Array<Foo>;
+    foos: Foo[];
     constructor();
 }
 export default FooManager;

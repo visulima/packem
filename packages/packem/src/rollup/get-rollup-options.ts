@@ -20,6 +20,7 @@ import {
     visualizer as visualizerPlugin,
     wasm as wasmPlugin,
 } from "@visulima/packem-rollup";
+import { babelTransformPlugin } from "@visulima/packem-rollup/babel";
 import type { EsbuildPluginConfig } from "@visulima/packem-rollup/esbuild";
 import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
 import { oxcResolvePlugin } from "@visulima/packem-rollup/oxc";
@@ -268,9 +269,10 @@ const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "b
 
             // Handle unresolved import warnings from node-resolve plugin
             if (level === "warn" && log.plugin === "node-resolve" && format.includes("Could not resolve import")) {
-                const unresolvedImportBehavior = context.options.rollup.resolve && typeof context.options.rollup.resolve === "object"
-                    ? context.options.rollup.resolve.unresolvedImportBehavior ?? "error"
-                    : "error";
+                const unresolvedImportBehavior
+                    = context.options.rollup.resolve && typeof context.options.rollup.resolve === "object"
+                        ? context.options.rollup.resolve.unresolvedImportBehavior ?? "error"
+                        : "error";
 
                 if (unresolvedImportBehavior === "error") {
                     throw new Error(format);
@@ -339,15 +341,16 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
         nodeResolver = oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, context.logger, context.tsconfig?.path);
     }
 
-    const chunking = context.options.unbundle || context.options.rollup.output?.preserveModules
-        ? {
-            preserveModules: true,
-            preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot ?? context.options.sourceDir,
-        }
-        : {
-            manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries),
-            preserveModules: false,
-        };
+    const chunking
+        = context.options.unbundle || context.options.rollup.output?.preserveModules
+            ? {
+                preserveModules: true,
+                preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot ?? context.options.sourceDir,
+            }
+            : {
+                manualChunks: createSplitChunks(context.dependencyGraphMap, context.buildEntries),
+                preserveModules: false,
+            };
 
     const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "build");
 
@@ -500,14 +503,16 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames: context.options.unbundle || context.options.rollup.output?.preserveModules
-                    ? (chunk: PreRenderedChunk) => `${chunk.name}.${getOutputExtension(context, "cjs", chunk)}`
-                    : (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "cjs", chunk)),
+                chunkFileNames:
+                        context.options.unbundle || context.options.rollup.output?.preserveModules
+                            ? (chunk: PreRenderedChunk) => `${chunk.name}.${getOutputExtension(context, "cjs", chunk)}`
+                            : (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "cjs", chunk)),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: context.options.unbundle || context.options.rollup.output?.preserveModules
-                    ? (chunkInfo: PreRenderedAsset) => `${chunkInfo.names[0]}.${getOutputExtension(context, "cjs", chunkInfo)}`
-                    : (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "cjs", chunkInfo)),
+                entryFileNames:
+                        context.options.unbundle || context.options.rollup.output?.preserveModules
+                            ? (chunkInfo: PreRenderedAsset) => `${chunkInfo.names[0]}.${getOutputExtension(context, "cjs", chunkInfo)}`
+                            : (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "cjs", chunkInfo)),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 extend: true,
@@ -539,14 +544,16 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames: context.options.unbundle || context.options.rollup.output?.preserveModules
-                    ? (chunk: PreRenderedChunk) => `${chunk.name}.${getOutputExtension(context, "esm")}`
-                    : (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "esm")),
+                chunkFileNames:
+                        context.options.unbundle || context.options.rollup.output?.preserveModules
+                            ? (chunk: PreRenderedChunk) => `${chunk.name}.${getOutputExtension(context, "esm")}`
+                            : (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "esm")),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames: context.options.unbundle || context.options.rollup.output?.preserveModules
-                    ? (chunkInfo: PreRenderedAsset) => `${chunkInfo.names[0]}.${getOutputExtension(context, "esm")}`
-                    : (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "esm")),
+                entryFileNames:
+                        context.options.unbundle || context.options.rollup.output?.preserveModules
+                            ? (chunkInfo: PreRenderedAsset) => `${chunkInfo.names[0]}.${getOutputExtension(context, "esm")}`
+                            : (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "esm")),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 extend: true,
@@ -663,7 +670,9 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
             ...normalPlugins,
 
-            context.options.rollup.minifyHTMLLiterals && context.options.minify && minifyHTMLLiteralsPlugin({
+            context.options.rollup.minifyHTMLLiterals
+            && context.options.minify
+            && minifyHTMLLiteralsPlugin({
                 ...context.options.rollup.minifyHTMLLiterals,
                 logger: context.logger,
             }),
@@ -683,6 +692,18 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                     },
                     context.logger,
                 ),
+                fileCache,
+            ),
+
+            context.options.rollup.babel
+            && cachingPlugin(
+                babelTransformPlugin({
+                    // eslint-disable-next-line sonarjs/single-character-alternation
+                    include: context.options.rollup.babel.include ?? /\.(?:m|c)?(?:j|t)sx?$/,
+                    ...context.options.rollup.babel,
+                    root: context.options.rootDir,
+                    sourceMaps: context.options.rollup.babel.sourceMaps ?? context.options.sourcemap ?? false,
+                }),
                 fileCache,
             ),
 

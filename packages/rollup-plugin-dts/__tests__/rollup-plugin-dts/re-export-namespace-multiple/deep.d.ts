@@ -1,2 +1,1 @@
-import * as ns from "./defs";
-export { ns };
+export * as ns from "./defs";

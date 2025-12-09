@@ -162,7 +162,7 @@ export const data = jsContent;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`const data$1 = "const message = \\"Hello from JS file\\";\\nconsole.log(message);\\nexport default message;";
+        expect(mjsContent).toBe(String.raw`const data$1 = "const message = \"Hello from JS file\";\nconsole.log(message);\nexport default message;";
 
 const data = data$1;
 
@@ -171,11 +171,11 @@ export { data };
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
+        expect(cjsContent).toBe(String.raw`'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const data$1 = "const message = \\"Hello from JS file\\";\\nconsole.log(message);\\nexport default message;";
+const data$1 = "const message = \"Hello from JS file\";\nconsole.log(message);\nexport default message;";
 
 const data = data$1;
 

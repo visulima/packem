@@ -3,7 +3,7 @@ export interface A {}
 /** No export, but can still be imported because of "global module" */
 type B = any;
 
-declare var C: any;
+declare let C: any;
 declare let D: any;
 declare const E: any;
 

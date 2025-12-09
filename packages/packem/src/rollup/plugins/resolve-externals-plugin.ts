@@ -114,21 +114,17 @@ export const resolveExternalsPlugin = (context: BuildContext<InternalBuildOption
     const include = new Set(getRegExps([...context.options?.externals ?? []], "include", context.logger));
     const exclude = new Set(getRegExps([...resolvedExternalsOptions.exclude ?? []], "exclude", context.logger));
 
-    const dependencies: Record<string, string> = {};
-
-    Object.assign(
-        dependencies,
-        resolvedExternalsOptions.deps ? context.pkg.dependencies ?? {} : undefined,
-        resolvedExternalsOptions.devDeps ? context.pkg.devDependencies ?? {} : undefined,
-        resolvedExternalsOptions.peerDeps ? context.pkg.peerDependencies ?? {} : undefined,
-        resolvedExternalsOptions.optDeps ? context.pkg.optionalDependencies ?? {} : undefined,
-    );
+    const dependencies: Record<string, string> = {
+        ...resolvedExternalsOptions.deps ? context.pkg.dependencies ?? {} : undefined,
+        ...resolvedExternalsOptions.devDeps ? context.pkg.devDependencies ?? {} : undefined,
+        ...resolvedExternalsOptions.peerDeps ? context.pkg.peerDependencies ?? {} : undefined,
+        ...resolvedExternalsOptions.optDeps ? context.pkg.optionalDependencies ?? {} : undefined,
+    };
 
     // Add all dependencies as an include RegEx.
     const names = Object.keys(dependencies);
 
     if (names.length > 0) {
-        // eslint-disable-next-line regexp/no-empty-group
         include.add(new RegExp(`^(?:${names.join("|")})(?:/.+)?$`));
     }
 
@@ -147,7 +143,7 @@ export const resolveExternalsPlugin = (context: BuildContext<InternalBuildOption
 
     if (context.tsconfig) {
         tsconfigPathPatterns = Object.entries(context.tsconfig.config.compilerOptions?.paths ?? {}).map(([key]) =>
-            (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
+            key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`),
         );
     }
 
@@ -200,7 +196,7 @@ export const resolveExternalsPlugin = (context: BuildContext<InternalBuildOption
                     if (
                         /^(?:\0|\.{1,2}\/)/.test(id) // Ignore virtual modules and relative imports
                         || isAbsolute(id) // Ignore already resolved ids
-                        || new RegExp(`${context.options?.sourceDir}[/.*|\\.*]`).test(id) // Ignore source files
+                        || new RegExp(String.raw`${context.options?.sourceDir}[/.*|\.*]`).test(id) // Ignore source files
                         || (context.pkg.name && id.startsWith(context.pkg.name)) // Ignore self import
                     ) {
                         cacheResolved.set(id, false);

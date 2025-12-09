@@ -1,3 +1,3 @@
-type MyNum = number;
+type MyNumber = number;
 
-export type SomeNum = "100" extends `${infer U extends MyNum}` ? U : never;
+export type SomeNum = "100" extends `${infer U extends MyNumber}` ? U : never;

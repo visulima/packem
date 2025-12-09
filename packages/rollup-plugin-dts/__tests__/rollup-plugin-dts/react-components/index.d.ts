@@ -1,4 +1,5 @@
 import React from "react";
+
 export interface MyComponentProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
     foo: string;
 }

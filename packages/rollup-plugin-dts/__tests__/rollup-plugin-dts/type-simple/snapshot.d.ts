@@ -1,5 +1,5 @@
 // index.d.ts
-//#region tests/rollup-plugin-dts/type-simple/index.d.ts
+// #region tests/rollup-plugin-dts/type-simple/index.d.ts
 declare const A: "string";
 declare const B: 8;
 declare const C: void;
@@ -14,8 +14,8 @@ declare const K: undefined;
 declare const L: symbol;
 declare const M: never;
 interface N {
-    foo(): this;
+    foo: () => this;
 }
 declare const O: bigint;
-//#endregion
+// #endregion
 export { A, B, C, D, E, F, G, H, I, J, K, L, M, N, O };

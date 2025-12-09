@@ -1,2 +1,1 @@
-import * as outer from "./mod";
-export { outer };
+export * as outer from "./mod";

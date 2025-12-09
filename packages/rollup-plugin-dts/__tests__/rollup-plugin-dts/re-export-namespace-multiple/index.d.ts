@@ -1,7 +1,9 @@
-import * as ns from "./defs";
-import * as deep from "./deep";
-import * as onlyOne from "./only-one";
+import type * as ns from "./defs";
+
 export interface WithA {
     a: ns.A;
 }
-export { ns, deep, onlyOne };
+
+export * as deep from "./deep";
+export * as ns from "./defs";
+export * as onlyOne from "./only-one";

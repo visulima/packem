@@ -1,17 +1,32 @@
 import type { Jiti } from "jiti";
 
 import type { BuildConfig, BuildPreset } from "../../types";
-import autoPreset from "../preset/auto";
+import { createReactPreset } from "../preset/react";
+import { createSolidPreset } from "../preset/solid";
 
 const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<BuildConfig> => {
-    if (preset === "auto") {
-        // eslint-disable-next-line no-param-reassign
-        preset = autoPreset;
-    } else if (preset === "none") {
-        return {};
-    } else if (typeof preset === "string") {
-        // eslint-disable-next-line no-param-reassign
-        preset = await jiti.import(preset) || {};
+    switch (preset) {
+        case "none": {
+            return {};
+        }
+        case "react": {
+            // eslint-disable-next-line no-param-reassign
+            preset = createReactPreset();
+
+            break;
+        }
+        case "solid": {
+            // eslint-disable-next-line no-param-reassign
+            preset = createSolidPreset();
+
+            break;
+        }
+        default: {
+            if (typeof preset === "string") {
+                // eslint-disable-next-line no-param-reassign
+                preset = await jiti.import(preset) || {};
+            }
+        }
     }
 
     if (typeof preset === "function") {

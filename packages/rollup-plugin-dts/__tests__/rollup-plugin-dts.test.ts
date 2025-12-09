@@ -42,13 +42,14 @@ await testFixtures(
             rollupBuild(entries, [rollupDts()], undefined, {
                 entryFileNames: "[name].ts",
             }).then(({ snapshot }) => snapshot),
-        ]).catch((_error) => ((error = _error), []));
+        ]).catch((_error) => (error = _error, []));
 
         if (id.includes("error")) {
             return expect(error).toBe(true);
         }
 
-        if (error) throw error;
+        if (error)
+            throw error;
 
         await expect(rolldownSnapshot).toMatchFileSnapshot(path.resolve(dirname, "snapshot.d.ts"));
 

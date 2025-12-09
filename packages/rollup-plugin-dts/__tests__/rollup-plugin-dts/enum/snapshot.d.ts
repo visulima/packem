@@ -1,5 +1,5 @@
 // index.d.ts
-//#region tests/rollup-plugin-dts/enum/index.d.ts
+// #region tests/rollup-plugin-dts/enum/index.d.ts
 declare enum A {
     A = 0,
 }
@@ -12,5 +12,5 @@ declare const enum C {
 declare const enum D {
     D = "D",
 }
-//#endregion
+// #endregion
 export { A, B, C, D };

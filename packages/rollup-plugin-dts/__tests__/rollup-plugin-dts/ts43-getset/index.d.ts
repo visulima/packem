@@ -1,4 +1,4 @@
-import { GetT, SetT } from "./foo";
+import type { GetT, SetT } from "./foo";
 
 export interface Thing {
     get size(): GetT;

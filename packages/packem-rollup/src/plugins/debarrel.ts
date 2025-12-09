@@ -243,7 +243,7 @@ const resolveThroughBarrel = async (
 
         if (getDeclarationKind(specifiers) === "import" && /\bas\b/.test(specifiers)) {
             // Ensure we only match full identifier aliases, not prefixes
-            const regex = new RegExp(`(\\w+)\\s+as\\s+${exportName}(?!\\w)`);
+            const regex = new RegExp(String.raw`(\w+)\s+as\s+${exportName}(?!\w)`);
 
             aliasedImportName = specifiers.match(regex)?.[0];
         }

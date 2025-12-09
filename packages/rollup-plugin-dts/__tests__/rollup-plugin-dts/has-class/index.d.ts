@@ -1,4 +1,6 @@
-import { A, B, C, D, E } from "./foo";
+import type { B, C, D, E } from "./foo";
+import { A } from "./foo";
+
 export default class Foo extends A {
     b: B;
     constructor(c: C);

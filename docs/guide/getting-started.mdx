@@ -33,6 +33,34 @@ This command will:
 The init command is smart enough to detect existing configurations and suggest optimal settings for your project.
 </Callout>
 
+## Adding Features
+
+After initializing your project, you can easily add additional features using the `add` command:
+
+```bash
+# Add React preset and dependencies
+npx packem add react
+
+# Add SolidJS preset and dependencies
+npx packem add solid
+
+# Add CSS loaders (PostCSS, Sass, Less, etc.)
+npx packem add css
+
+# Add Typedoc for documentation generation
+npx packem add typedoc
+```
+
+The `add` command will:
+- Update your `packem.config.ts` with the appropriate configuration
+- Install the necessary dependencies automatically
+- For React: Automatically detect TypeScript and add type definitions, or prompt you to add TypeScript if not installed
+- Check for uncommitted git changes and ask for confirmation before making changes
+
+<Callout type="tip">
+If your git repository has uncommitted changes, the `add` command will prompt you to confirm before proceeding. This helps prevent accidental overwrites of your work.
+</Callout>
+
 ## Project Structure
 
 Packem works best with a conventional project structure:

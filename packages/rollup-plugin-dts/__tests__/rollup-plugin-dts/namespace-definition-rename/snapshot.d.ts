@@ -1,14 +1,14 @@
 // index.d.ts
-//#region tests/rollup-plugin-dts/namespace-definition-rename/a.d.ts
-declare function fn(arg: string): string;
-declare namespace fn {
+// #region tests/rollup-plugin-dts/namespace-definition-rename/a.d.ts
+declare function function_(argument: string): string;
+declare namespace function_ {
     var staticProp: string;
 }
-//#endregion
-//#region tests/rollup-plugin-dts/namespace-definition-rename/b.d.ts
-declare function fn$1(arg: string): string;
-declare namespace fn$1 {
+// #endregion
+// #region tests/rollup-plugin-dts/namespace-definition-rename/b.d.ts
+declare function function$1(argument: string): string;
+declare namespace function$1 {
     var staticProp: string;
 }
-//#endregion
-export { fn as a, fn$1 as b };
+// #endregion
+export { function_ as a, function$1 as b };

@@ -64,11 +64,11 @@ function replaceConfusingTypeNames(this: PluginContext, code: string, chunk: Ren
             // pre-emptively remove the whole named import
             if (betterId.includes(".")) {
                 // eslint-disable-next-line no-param-reassign
-                code = code.replace(new RegExp(`\\b\\w+\\b as ${regexEscapedId},?\\s?`), "");
+                code = code.replace(new RegExp(String.raw`\b\w+\b as ${regexEscapedId},?\s?`), "");
             }
 
             // eslint-disable-next-line no-param-reassign
-            code = code.replaceAll(new RegExp(`\\b${regexEscapedId}\\b`, "g"), betterId);
+            code = code.replaceAll(new RegExp(String.raw`\b${regexEscapedId}\b`, "g"), betterId);
         }
     }
 

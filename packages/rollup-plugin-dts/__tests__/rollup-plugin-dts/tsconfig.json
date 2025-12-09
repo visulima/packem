@@ -1,20 +1,19 @@
 {
-  "compilerOptions": {
-    "lib": ["es2018", "esnext", "dom"],
-    "skipDefaultLibCheck": true,
+    "compilerOptions": {
+        "lib": ["es2018", "esnext", "dom"],
+        "module": "esnext",
+        "moduleResolution": "node",
 
-    "strict": true,
+        "strict": true,
+        "declaration": true,
+        "emitDeclarationOnly": true,
 
-    "allowSyntheticDefaultImports": true,
-    "moduleResolution": "node",
-    "module": "esnext",
-    "stripInternal": true,
+        "newLine": "lf",
 
-    "newLine": "lf",
-
-    "noEmit": true,
-    "declaration": true,
-    "emitDeclarationOnly": true
+        "noEmit": true,
+        "stripInternal": true,
+        "allowSyntheticDefaultImports": true,
+        "skipDefaultLibCheck": true
     // "outDir": "./"
-  }
+    }
 }

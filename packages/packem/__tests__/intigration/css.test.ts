@@ -295,7 +295,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
 
             // Utility classes that should be generated
             expect(cssContent).toContain(".bg-blue-600");
-            expect(cssContent).toContain(`.hover\\:bg-blue-700`);
+            expect(cssContent).toContain(String.raw`.hover\:bg-blue-700`);
             expect(cssContent).toContain(".text-white");
             expect(cssContent).toContain(".transition-all");
             expect(cssContent).toContain(".duration-200");

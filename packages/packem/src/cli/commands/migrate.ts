@@ -23,15 +23,7 @@ import pkg from "../../../package.json" with { type: "json" };
  * });
  * ```
  */
-const migrate = async ({
-    cwd,
-    dryRun,
-    logger,
-}: {
-    cwd?: string;
-    dryRun?: boolean;
-    logger: any;
-}): Promise<void> => {
+const migrate = async ({ cwd, dryRun, logger }: { cwd?: string; dryRun?: boolean; logger: any }): Promise<void> => {
     if (dryRun) {
         logger.info("Dry run enabled. No changes will be made.");
     } else {
@@ -75,9 +67,7 @@ const migrate = async ({
     }
 
     if (migrated) {
-        logger.success(
-            "Migration completed. Remember to run install command with your package manager.",
-        );
+        logger.success("Migration completed. Remember to run install command with your package manager.");
     } else {
         logger.error("No migration performed.");
         process.exitCode = 1;
@@ -150,8 +140,8 @@ const migratePackageJson = async (dryRun?: boolean, logger: any): Promise<boolea
                     found = true;
                     scriptChanged = true;
                     pkg.scripts[key] = pkg.scripts[key]
-                        .replaceAll(new RegExp(`\\b${oldCmd}\\b`, "g"), "packem")
-                        .replaceAll(new RegExp(`\\b${oldCmd}-node\\b`, "g"), "packem");
+                        .replaceAll(new RegExp(String.raw`\b${oldCmd}\b`, "g"), "packem")
+                        .replaceAll(new RegExp(String.raw`\b${oldCmd}-node\b`, "g"), "packem");
                 }
             }
 
@@ -160,25 +150,21 @@ const migratePackageJson = async (dryRun?: boolean, logger: any): Promise<boolea
                 logger.info(`Migrating \`${key}\` script from tsup to packem`);
                 found = true;
                 scriptChanged = true;
-                pkg.scripts[key] = pkg.scripts[key]
-                    .replaceAll(/\btsup(?:-node)?/g, "packem build")
-                    .replaceAll(/\bbuild\b/g, "build"); // Avoid double build
+                pkg.scripts[key] = pkg.scripts[key].replaceAll(/\btsup(?:-node)?/g, "packem build").replaceAll(/\bbuild\b/g, "build"); // Avoid double build
             }
 
             if (pkg.scripts[key].includes("unbuild")) {
                 logger.info(`Migrating \`${key}\` script from unbuild to packem`);
                 found = true;
                 scriptChanged = true;
-                pkg.scripts[key] = pkg.scripts[key]
-                    .replaceAll(/\bunbuild\b/g, "packem build");
+                pkg.scripts[key] = pkg.scripts[key].replaceAll(/\bunbuild\b/g, "packem build");
             }
 
             if (pkg.scripts[key].includes("bunchee")) {
                 logger.info(`Migrating \`${key}\` script from bunchee to packem`);
                 found = true;
                 scriptChanged = true;
-                pkg.scripts[key] = pkg.scripts[key]
-                    .replaceAll(/\bbunchee\b/g, "packem build");
+                pkg.scripts[key] = pkg.scripts[key].replaceAll(/\bbunchee\b/g, "packem build");
             }
         }
     }
@@ -281,12 +267,7 @@ const migrateConfigFiles = async (dryRun?: boolean, logger?: any): Promise<boole
  * @param newValue Optional new value for the key
  * @returns The modified object
  */
-const renameKey = (
-    object: Record<string, any>,
-    oldKey: string,
-    newKey: string,
-    newValue?: any,
-): Record<string, any> => {
+const renameKey = (object: Record<string, any>, oldKey: string, newKey: string, newValue?: any): Record<string, any> => {
     const newObject: Record<string, any> = {};
 
     for (const key of Object.keys(object)) {

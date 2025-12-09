@@ -78,6 +78,14 @@
             "types": "./dist/config/index.d.ts",
             "default": "./dist/config/index.js"
         },
+        "./config/preset/react": {
+            "types": "./dist/config/preset/react.d.ts",
+            "default": "./dist/config/preset/react.js"
+        },
+        "./config/preset/solid": {
+            "types": "./dist/config/preset/solid.d.ts",
+            "default": "./dist/config/preset/solid.js"
+        },
         "./css/loader/sourcemap": {
             "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.ts",
             "default": "./dist/rollup/plugins/css/loaders/sourcemap.js"
@@ -219,6 +227,7 @@
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
         "@arethetypeswrong/core": "catalog:prod",
+        "@babel/core": "catalog:dev",
         "@babel/parser": "catalog:dev",
         "@csstools/css-parser-algorithms": "catalog:style",
         "@csstools/css-tokenizer": "catalog:style",
@@ -239,6 +248,7 @@
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
         "@total-typescript/ts-reset": "catalog:tsc",
+        "@types/babel__core": "catalog:types",
         "@types/node": "catalog:types",
         "@types/picomatch": "catalog:types",
         "@types/react-dom": "catalog:types",
@@ -331,6 +341,9 @@
     },
     "peerDependenciesMeta": {
         "@arethetypeswrong/core": {
+            "optional": true
+        },
+        "@babel/core": {
             "optional": true
         },
         "@ckeditor/typedoc-plugins": {

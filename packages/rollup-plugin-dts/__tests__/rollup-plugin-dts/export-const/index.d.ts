@@ -5,6 +5,6 @@ export declare const sLitDef: "";
 export declare const nLitDef: 0;
 export declare const sDef: string;
 export declare const nDef: number;
-export declare const aDef: Array<number>;
+export declare const aDef: number[];
 export declare const tuple: [number, string];
 export declare const unique: unique symbol;

@@ -1,6 +1,7 @@
 import type { CheckPackageOptions } from "@arethetypeswrong/core";
 import type { IsolatedDeclarationsTransformer, PackemRollupOptions, TransformerFn, TransformerName } from "@visulima/packem-rollup";
 import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
+import type { NativeModulesOptions } from "@visulima/packem-rollup/plugin/native-modules";
 import type { BuildContext, BuildHooks, Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
 import type { FileCache } from "@visulima/packem-share/utils";
 import type { StyleOptions } from "@visulima/rollup-plugin-css";
@@ -57,7 +58,7 @@ export interface AttwOptions extends CheckPackageOptions {
 export interface BuildConfig extends DeepPartial<Omit<BuildOptions, "entries">> {
     entries?: (BuildEntry | string)[];
     hooks?: Partial<BuildHooks<InternalBuildOptions>>;
-    preset?: BuildPreset | "auto" | "none" | (NonNullable<unknown> & string);
+    preset?: BuildPreset | "none" | (NonNullable<unknown> & string);
 }
 
 export type BuildPreset = BuildConfig | (() => BuildConfig);

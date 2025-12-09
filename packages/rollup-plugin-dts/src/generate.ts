@@ -1,19 +1,34 @@
-import { fork, spawn, type ChildProcess } from "node:child_process";
+import type { ChildProcess } from "node:child_process";
+import { fork, spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+
 import { parse } from "@babel/parser";
-import Debug from "obug";
-import { isolatedDeclaration as oxcIsolatedDeclaration } from "rolldown/experimental";
-import { filename_to_dts, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE, replaceTemplateName, resolveTemplateFn } from "./filename.ts";
-import { createContext, globalContext, invalidateContextFile, type TscContext } from "./tsc/context.ts";
-import type { OptionsResolved } from "./options.ts";
-import type { TscOptions, TscResult } from "./tsc/index.ts";
-import type { TscFunctions } from "./tsc/worker.ts";
 import type { TSPropertySignature } from "@babel/types";
 import type { BirpcReturn } from "birpc";
+import Debug from "obug";
 import type { Plugin, SourceMapInput } from "rolldown";
+import { isolatedDeclaration as oxcIsolatedDeclaration } from "rolldown/experimental";
+
+import {
+    filename_to_dts,
+    RE_DTS,
+    RE_DTS_MAP,
+    RE_JS,
+    RE_JSON,
+    RE_NODE_MODULES,
+    RE_TS,
+    RE_VUE,
+    replaceTemplateName,
+    resolveTemplateFn as resolveTemplateFunction,
+} from "./filename.ts";
+import type { OptionsResolved } from "./options.ts";
+import type { TscContext } from "./tsc/context.ts";
+import { createContext, globalContext, invalidateContextFile } from "./tsc/context.ts";
+import type { TscOptions, TscResult } from "./tsc/index.ts";
+import type { TscFunctions } from "./tsc/worker.ts";
 
 const debug = Debug("rolldown-plugin-dts:generate");
 
@@ -22,6 +37,7 @@ const WORKER_URL = import.meta.WORKER_URL || "./tsc/worker.ts";
 const spawnAsync = (...args: Parameters<typeof spawn>) =>
     new Promise<void>((resolve, reject) => {
         const child = spawn(...args);
+
         child.on("close", () => resolve());
         child.on("error", (error) => reject(error));
     });
@@ -37,21 +53,21 @@ export interface TsModule {
 export type DtsMap = Map<string, TsModule>;
 
 export function createGeneratePlugin({
+    build,
+    cwd,
+    eager,
+    emitDtsOnly,
+    emitJs,
+    incremental,
+    newContext,
+    oxc,
+    parallel,
+    sourcemap,
     tsconfig,
     tsconfigRaw,
-    build,
-    incremental,
-    cwd,
-    oxc,
-    emitDtsOnly,
-    vue,
-    tsMacro,
-    parallel,
-    eager,
     tsgo,
-    newContext,
-    emitJs,
-    sourcemap,
+    tsMacro,
+    vue,
 }: Pick<
     OptionsResolved,
     | "cwd"
@@ -74,7 +90,6 @@ export function createGeneratePlugin({
 
     /**
      * A map of input id to output file name
-     *
      * @example
      *
      * inputAlias = new Map([
@@ -91,7 +106,19 @@ export function createGeneratePlugin({
     let tsgoDist: string | undefined;
 
     return {
-        name: "rolldown-plugin-dts:generate",
+        async buildEnd() {
+            childProcess?.kill();
+
+            if (!debug.enabled && tsgoDist) {
+                await rm(tsgoDist, { force: true, recursive: true }).catch(() => {});
+            }
+
+            tsgoDist = undefined;
+
+            if (newContext) {
+                tscContext = undefined;
+            }
+        },
 
         async buildStart(options) {
             // isWatch = this.meta.watchMode
@@ -107,12 +134,13 @@ export function createGeneratePlugin({
                     rpc = (await import("birpc")).createBirpc<TscFunctions>(
                         {},
                         {
+                            on: (function_) => childProcess!.on("message", function_),
                             post: (data) => childProcess!.send(data),
-                            on: (fn) => childProcess!.on("message", fn),
                         },
                     );
                 } else {
                     tscModule = await import("./tsc/index.ts");
+
                     if (newContext) {
                         tscContext = createContext();
                     }
@@ -123,97 +151,52 @@ export function createGeneratePlugin({
                 for (const [name, id] of Object.entries(options.input)) {
                     debug("resolving input alias %s -> %s", name, id);
                     let resolved = await this.resolve(id);
+
                     if (!id.startsWith("./")) {
                         resolved ||= await this.resolve(`./${id}`);
                     }
+
                     const resolvedId = resolved?.id || id;
+
                     debug("resolved input alias %s -> %s", id, resolvedId);
                     inputAliasMap.set(resolvedId, name);
                 }
             }
         },
 
-        outputOptions(options) {
-            return {
-                ...options,
-                entryFileNames(chunk) {
-                    const { entryFileNames } = options;
-                    const nameTemplate = resolveTemplateFn(entryFileNames || "[name].js", chunk);
-
-                    if (chunk.name.endsWith(".d")) {
-                        if (RE_DTS.test(nameTemplate)) {
-                            return replaceTemplateName(nameTemplate, chunk.name.slice(0, -2));
-                        }
-                        if (RE_JS.test(nameTemplate)) {
-                            return nameTemplate.replace(RE_JS, ".$1ts");
-                        }
+        generateBundle: emitDtsOnly
+            ? (options, bundle) => {
+                for (const fileName of Object.keys(bundle)) {
+                    if (bundle[fileName].type === "chunk" && !RE_DTS.test(fileName) && !RE_DTS_MAP.test(fileName)) {
+                        delete bundle[fileName];
                     }
-
-                    return nameTemplate;
-                },
-            };
-        },
-
-        resolveId(id) {
-            if (dtsMap.has(id)) {
-                debug("resolve dts id %s", id);
-                return { id };
+                }
             }
-        },
-
-        transform: {
-            order: "pre",
-            filter: {
-                id: {
-                    include: [RE_JS, RE_TS, RE_VUE, RE_JSON],
-                    exclude: [RE_DTS, RE_NODE_MODULES],
-                },
-            },
-            handler(code, id) {
-                const shouldEmit = !RE_JS.test(id) || emitJs;
-
-                if (shouldEmit) {
-                    const mod = this.getModuleInfo(id);
-                    const isEntry = !!mod?.isEntry;
-                    const dtsId = filename_to_dts(id);
-                    dtsMap.set(dtsId, { code, id, isEntry });
-                    debug("register dts source: %s", id);
-
-                    if (isEntry) {
-                        const name = inputAliasMap.get(id);
-                        this.emitFile({
-                            type: "chunk",
-                            id: dtsId,
-                            name: name ? `${name}.d` : undefined,
-                        });
-                    }
-                }
-
-                if (emitDtsOnly) {
-                    if (RE_JSON.test(id)) return "{}";
-                    return "export { }";
-                }
-            },
-        },
+            : undefined,
 
         load: {
             filter: {
                 id: {
-                    include: [RE_DTS],
                     exclude: [RE_NODE_MODULES],
+                    include: [RE_DTS],
                 },
             },
             async handler(dtsId) {
-                if (!dtsMap.has(dtsId)) return;
+                if (!dtsMap.has(dtsId))
+                    return;
 
                 const { code, id } = dtsMap.get(dtsId)!;
                 let dtsCode: string | undefined;
                 let map: SourceMapInput | undefined;
+
                 debug("generate dts %s from %s", dtsId, id);
 
                 if (tsgo) {
-                    if (RE_VUE.test(id)) throw new Error("tsgo does not support Vue files.");
+                    if (RE_VUE.test(id))
+                        throw new Error("tsgo does not support Vue files.");
+
                     const dtsPath = path.resolve(tsgoDist!, path.relative(path.resolve(cwd), filename_to_dts(id)));
+
                     if (existsSync(dtsPath)) {
                         dtsCode = await readFile(dtsPath, "utf8");
                     } else {
@@ -222,46 +205,45 @@ export function createGeneratePlugin({
                     }
                 } else if (oxc && !RE_VUE.test(id)) {
                     const result = oxcIsolatedDeclaration(id, code, oxc);
-                    if (result.errors.length) {
+
+                    if (result.errors.length > 0) {
                         const [error] = result.errors;
+
                         return this.error({
-                            message: error.message,
                             frame: error.codeframe,
+                            message: error.message,
                         });
                     }
+
                     dtsCode = result.code;
+
                     if (result.map) {
                         map = result.map;
                         map.sourcesContent = undefined;
                     }
                 } else {
-                    const entries = eager
-                        ? undefined
-                        : Array.from(dtsMap.values())
-                              .filter((v) => v.isEntry)
-                              .map((v) => v.id);
+                    const entries = eager ? undefined : [...dtsMap.values()].filter((v) => v.isEntry).map((v) => v.id);
                     const options: Omit<TscOptions, "programs"> = {
-                        tsconfig,
-                        tsconfigRaw,
                         build,
-                        incremental,
+                        context: tscContext,
                         cwd,
                         entries,
                         id,
+                        incremental,
                         sourcemap,
-                        vue,
+                        tsconfig,
+                        tsconfigRaw,
                         tsMacro,
-                        context: tscContext,
+                        vue,
                     };
                     let result: TscResult;
-                    if (parallel) {
-                        result = await rpc!.tscEmit(options);
-                    } else {
-                        result = tscModule.tscEmit(options);
-                    }
+
+                    result = parallel ? await rpc!.tscEmit(options) : tscModule.tscEmit(options);
+
                     if (result.error) {
                         return this.error(result.error);
                     }
+
                     dtsCode = result.code;
                     map = result.map;
 
@@ -272,10 +254,12 @@ export function createGeneratePlugin({
                                 // patch: add named export
                                 const exports = collectJsonExports(dtsCode);
                                 let i = 0;
+
                                 dtsCode += exports
                                     .map((e) => {
                                         const valid = `_${e.replaceAll(/[^\w$]/g, "_")}${i++}`;
                                         const jsonKey = JSON.stringify(e);
+
                                         return `declare let ${valid}: typeof _exports[${jsonKey}]\nexport { ${valid} as ${jsonKey} }`;
                                     })
                                     .join("\n");
@@ -283,11 +267,10 @@ export function createGeneratePlugin({
                         } else {
                             // patch: add default export
                             const exportMap = collectJsonExportMap(dtsCode);
+
                             dtsCode += `
 declare namespace __json_default_export {
-  export { ${Array.from(exportMap.entries())
-      .map(([exported, local]) => (exported === local ? exported : `${local} as ${exported}`))
-      .join(", ")} }
+  export { ${[...exportMap.entries()].map(([exported, local]) => (exported === local ? exported : `${local} as ${exported}`)).join(", ")} }
 }
 export { __json_default_export as default }`;
                         }
@@ -301,25 +284,75 @@ export { __json_default_export as default }`;
             },
         },
 
-        generateBundle: emitDtsOnly
-            ? (options, bundle) => {
-                  for (const fileName of Object.keys(bundle)) {
-                      if (bundle[fileName].type === "chunk" && !RE_DTS.test(fileName) && !RE_DTS_MAP.test(fileName)) {
-                          delete bundle[fileName];
-                      }
-                  }
-              }
-            : undefined,
+        name: "rolldown-plugin-dts:generate",
 
-        async buildEnd() {
-            childProcess?.kill();
-            if (!debug.enabled && tsgoDist) {
-                await rm(tsgoDist, { recursive: true, force: true }).catch(() => {});
+        outputOptions(options) {
+            return {
+                ...options,
+                entryFileNames(chunk) {
+                    const { entryFileNames } = options;
+                    const nameTemplate = resolveTemplateFunction(entryFileNames || "[name].js", chunk);
+
+                    if (chunk.name.endsWith(".d")) {
+                        if (RE_DTS.test(nameTemplate)) {
+                            return replaceTemplateName(nameTemplate, chunk.name.slice(0, -2));
+                        }
+
+                        if (RE_JS.test(nameTemplate)) {
+                            return nameTemplate.replace(RE_JS, ".$1ts");
+                        }
+                    }
+
+                    return nameTemplate;
+                },
+            };
+        },
+
+        resolveId(id) {
+            if (dtsMap.has(id)) {
+                debug("resolve dts id %s", id);
+
+                return { id };
             }
-            tsgoDist = undefined;
-            if (newContext) {
-                tscContext = undefined;
-            }
+        },
+
+        transform: {
+            filter: {
+                id: {
+                    exclude: [RE_DTS, RE_NODE_MODULES],
+                    include: [RE_JS, RE_TS, RE_VUE, RE_JSON],
+                },
+            },
+            handler(code, id) {
+                const shouldEmit = !RE_JS.test(id) || emitJs;
+
+                if (shouldEmit) {
+                    const module_ = this.getModuleInfo(id);
+                    const isEntry = !!module_?.isEntry;
+                    const dtsId = filename_to_dts(id);
+
+                    dtsMap.set(dtsId, { code, id, isEntry });
+                    debug("register dts source: %s", id);
+
+                    if (isEntry) {
+                        const name = inputAliasMap.get(id);
+
+                        this.emitFile({
+                            id: dtsId,
+                            name: name ? `${name}.d` : undefined,
+                            type: "chunk",
+                        });
+                    }
+                }
+
+                if (emitDtsOnly) {
+                    if (RE_JSON.test(id))
+                        return "{}";
+
+                    return "export { }";
+                }
+            },
+            order: "pre",
         },
 
         watchChange(id) {
@@ -335,6 +368,7 @@ async function runTsgo(root: string, tsconfig?: string) {
     const { default: getExePath } = await import(new URL("lib/getExePath.js", tsgoPkg).href);
     const tsgo = getExePath();
     const tsgoDist = await mkdtemp(path.join(tmpdir(), "rolldown-plugin-dts-"));
+
     debug("[tsgo] tsgoDist", tsgoDist);
 
     await spawnAsync(
@@ -344,7 +378,7 @@ async function runTsgo(root: string, tsconfig?: string) {
             "false",
             "--declaration",
             "--emitDeclarationOnly",
-            ...(tsconfig ? ["-p", tsconfig] : []),
+            ...tsconfig ? ["-p", tsconfig] : [],
             "--outDir",
             tsgoDist,
             "--rootDir",
@@ -360,9 +394,9 @@ async function runTsgo(root: string, tsconfig?: string) {
 function collectJsonExportMap(code: string): Map<string, string> {
     const exportMap = new Map<string, string>();
     const { program } = parse(code, {
-        sourceType: "module",
-        plugins: [["typescript", { dts: true }]],
         errorRecovery: true,
+        plugins: [["typescript", { dts: true }]],
+        sourceType: "module",
     });
 
     for (const decl of program.body) {
@@ -378,7 +412,7 @@ function collectJsonExportMap(code: string): Map<string, string> {
                 } else if (decl.declaration.type === "TSModuleDeclaration" && decl.declaration.id.type === "Identifier") {
                     exportMap.set(decl.declaration.id.name, decl.declaration.id.name);
                 }
-            } else if (decl.specifiers.length) {
+            } else if (decl.specifiers.length > 0) {
                 for (const spec of decl.specifiers) {
                     if (spec.type === "ExportSpecifier" && spec.exported.type === "Identifier") {
                         // declare let _class: string
@@ -397,8 +431,8 @@ function collectJsonExportMap(code: string): Map<string, string> {
 function collectJsonExports(code: string) {
     const exports: string[] = [];
     const { program } = parse(code, {
-        sourceType: "module",
         plugins: [["typescript", { dts: true }]],
+        sourceType: "module",
     });
     const members = (program.body as any)[0].declarations[0].id.typeAnnotation.typeAnnotation.members as TSPropertySignature[];
 

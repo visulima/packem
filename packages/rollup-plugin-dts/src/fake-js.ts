@@ -2,9 +2,10 @@ import { generate } from "@babel/generator";
 import { parse } from "@babel/parser";
 import t from "@babel/types";
 import { isDeclarationType, isIdentifierOf, isTypeOf, resolveString, walkAST } from "ast-kit";
-import { filename_dts_to, filename_js_to_dts, RE_DTS, RE_DTS_MAP, replaceTemplateName, resolveTemplateFn } from "./filename.ts";
-import type { OptionsResolved } from "./options.ts";
 import type { Plugin, RenderedChunk, TransformResult } from "rolldown";
+
+import { filename_dts_to, filename_js_to_dts, RE_DTS, RE_DTS_MAP, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename.ts";
+import type { OptionsResolved } from "./options.ts";
 
 // input:
 // export declare function x(xx: X): void
@@ -21,48 +22,62 @@ type Dep = t.Expression & { replace?: (newNode: t.Node) => void };
 /**
  * A collection of type parameters grouped by parameter name
  */
-type GroupedTypeParams = Array<{
+type GroupedTypeParams = {
     name: string;
     typeParams: t.TSTypeParameter[];
-}>;
+}[];
 
 interface SymbolInfo {
-    decl: t.Declaration;
     bindings: t.Identifier[];
-    params: GroupedTypeParams;
+    decl: t.Declaration;
     deps: Dep[];
+    params: GroupedTypeParams;
 }
 
-type NamespaceMap = Map<string, { stmt: t.Statement; local: t.Identifier | t.TSQualifiedName }>;
+type NamespaceMap = Map<string, { local: t.Identifier | t.TSQualifiedName; stmt: t.Statement }>;
 
-export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<OptionsResolved, "sourcemap" | "cjsDefault" | "sideEffects">): Plugin {
-    let symbolIdx = 0;
+export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<OptionsResolved, "sourcemap" | "cjsDefault" | "sideEffects">): Plugin {
+    let symbolIndex = 0;
     const identifierMap: Record<string, number> = Object.create(null);
     const symbolMap = new Map<number /* symbol id */, SymbolInfo>();
     const commentsMap = new Map<string /* filename */, t.Comment[]>();
     const typeOnlyMap = new Map<string, string[]>();
 
     return {
+        generateBundle: sourcemap
+            ? undefined
+            : (options, bundle) => {
+                for (const chunk of Object.values(bundle)) {
+                    if (!RE_DTS_MAP.test(chunk.fileName))
+                        continue;
+
+                    delete bundle[chunk.fileName];
+                }
+            },
+
         name: "rolldown-plugin-dts:fake-js",
 
         outputOptions(options) {
             if (options.format === "cjs" || options.format === "commonjs") {
                 throw new Error("[rolldown-plugin-dts] Cannot bundle dts files with `cjs` format.");
             }
+
             const { chunkFileNames, entryFileNames } = options;
+
             return {
                 ...options,
-                sourcemap: options.sourcemap || sourcemap,
                 chunkFileNames(chunk) {
-                    const nameTemplate = resolveTemplateFn(chunk.isEntry ? entryFileNames || "[name].js" : chunkFileNames || "[name]-[hash].js", chunk);
+                    const nameTemplate = resolveTemplateFunction(chunk.isEntry ? entryFileNames || "[name].js" : chunkFileNames || "[name]-[hash].js", chunk);
 
                     if (chunk.name.endsWith(".d")) {
                         const renderedNameWithoutD = filename_js_to_dts(replaceTemplateName(nameTemplate, chunk.name.slice(0, -2)));
+
                         if (RE_DTS.test(renderedNameWithoutD)) {
                             return renderedNameWithoutD;
                         }
 
                         const renderedName = filename_js_to_dts(replaceTemplateName(nameTemplate, chunk.name));
+
                         if (RE_DTS.test(renderedName)) {
                             return renderedName;
                         }
@@ -70,36 +85,29 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
 
                     return nameTemplate;
                 },
+                sourcemap: options.sourcemap || sourcemap,
             };
         },
+        renderChunk,
 
         transform: {
             filter: { id: RE_DTS },
             handler: transform,
         },
-        renderChunk,
-
-        generateBundle: sourcemap
-            ? undefined
-            : (options, bundle) => {
-                  for (const chunk of Object.values(bundle)) {
-                      if (!RE_DTS_MAP.test(chunk.fileName)) continue;
-                      delete bundle[chunk.fileName];
-                  }
-              },
     };
 
     function transform(code: string, id: string): TransformResult {
         const file = parse(code, {
+            errorRecovery: true,
             plugins: [["typescript", { dts: true }]],
             sourceType: "module",
-            errorRecovery: true,
         });
-        const { program, comments } = file;
+        const { comments, program } = file;
         const typeOnlyIds: string[] = [];
 
         if (comments) {
             const directives = collectReferenceDirectives(comments);
+
             commentsMap.set(id, directives);
         }
 
@@ -108,12 +116,16 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
 
         for (const [i, stmt] of program.body.entries()) {
             const setStmt = (stmt: t.Statement) => (program.body[i] = stmt);
-            if (rewriteImportExport(stmt, setStmt, typeOnlyIds)) continue;
+
+            if (rewriteImportExport(stmt, setStmt, typeOnlyIds))
+                continue;
 
             const sideEffect = stmt.type === "TSModuleDeclaration" && stmt.kind !== "namespace";
+
             if (sideEffect && id.endsWith(".vue.d.ts") && code.slice(stmt.start!, stmt.end!).includes("__VLS_")) {
                 continue;
             }
+
             const isDefaultExport = stmt.type === "ExportDefaultDeclaration";
             const isDecl = isTypeOf(stmt, ["ExportNamedDeclaration", "ExportDefaultDeclaration"]) && stmt.declaration;
 
@@ -138,14 +150,17 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
             }
 
             const bindings: t.Identifier[] = [];
+
             if (decl.type === "VariableDeclaration") {
                 bindings.push(...decl.declarations.map((decl) => decl.id as t.Identifier));
             } else if ("id" in decl && decl.id) {
                 let binding = decl.id;
+
                 binding = sideEffect ? t.identifier(`_${getIdentifierIndex("")}`) : (binding as t.Identifier);
                 bindings.push(binding);
             } else {
                 const binding = t.identifier("export_default");
+
                 bindings.push(binding);
                 // @ts-expect-error
                 decl.id = binding;
@@ -160,9 +175,9 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
             }
 
             const symbolId = registerSymbol({
+                bindings,
                 decl,
                 deps,
-                bindings,
                 params,
             });
 
@@ -176,21 +191,21 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
 
             // var ${binding} = [${symbolId}, (param, ...) => [dep, ...], sideEffect()]
             const runtimeAssignment: RuntimeBindingVariableDeclration = {
-                type: "VariableDeclaration",
-                kind: "var",
                 declarations: [
                     {
-                        type: "VariableDeclarator",
                         id: { ...bindings[0], typeAnnotation: null },
                         init: runtimeArrayNode,
+                        type: "VariableDeclarator",
                     },
-                    ...bindings.slice(1).map(
-                        (binding): t.VariableDeclarator => ({
-                            type: "VariableDeclarator",
+                    ...bindings.slice(1).map((binding): t.VariableDeclarator => {
+                        return {
                             id: { ...binding, typeAnnotation: null },
-                        }),
-                    ),
+                            type: "VariableDeclarator",
+                        };
+                    }),
                 ],
+                kind: "var",
+                type: "VariableDeclaration",
             };
 
             if (isDefaultExport) {
@@ -209,15 +224,16 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
             appendStmts.push(t.expressionStatement(t.callExpression(t.identifier("sideEffect"), [])));
         }
 
-        program.body = [...Array.from(namespaceStmts.values()).map(({ stmt }) => stmt), ...program.body, ...appendStmts];
+        program.body = [...[...namespaceStmts.values()].map(({ stmt }) => stmt), ...program.body, ...appendStmts];
 
         typeOnlyMap.set(id, typeOnlyIds);
 
         const result = generate(file, {
             comments: false,
-            sourceMaps: sourcemap,
             sourceFileName: id,
+            sourceMaps: sourcemap,
         });
+
         return result;
     }
 
@@ -227,9 +243,12 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
         }
 
         const typeOnlyIds: string[] = [];
+
         for (const module of chunk.moduleIds) {
             const ids = typeOnlyMap.get(module);
-            if (ids) typeOnlyIds.push(...ids);
+
+            if (ids)
+                typeOnlyIds.push(...ids);
         }
 
         const file = parse(code, {
@@ -242,21 +261,26 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
 
         program.body = program.body
             .map((node) => {
-                if (isHelperImport(node)) return null;
-                if (node.type === "ExpressionStatement") return null;
+                if (isHelperImport(node))
+                    return null;
+
+                if (node.type === "ExpressionStatement")
+                    return null;
 
                 const newNode = patchImportExport(node, typeOnlyIds, cjsDefault);
+
                 if (newNode || newNode === false) {
                     return newNode;
                 }
 
-                if (node.type !== "VariableDeclaration") return node;
+                if (node.type !== "VariableDeclaration")
+                    return node;
 
                 if (!isRuntimeBindingVariableDeclaration(node)) {
                     return null;
                 }
 
-                const [symbolIdNode, depsFn /*, ignore sideEffect */] = node.declarations[0].init.elements;
+                const [symbolIdNode, depsFunction] = node.declarations[0].init.elements;
 
                 const symbolId = symbolIdNode.value;
                 const original = getSymbol(symbolId);
@@ -266,21 +290,25 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
                         ...decl.id,
                         typeAnnotation: original.bindings[i].typeAnnotation,
                     };
+
                     overwriteNode(original.bindings[i], transformedBinding);
                 }
 
-                const transformedParams = depsFn.params as t.Identifier[];
+                const transformedParams = depsFunction.params as t.Identifier[];
 
-                for (const [i, transformedParam] of transformedParams.entries()) {
-                    const transformedName = transformedParam.name;
-                    for (const originalTypeParam of original.params[i].typeParams) {
-                        originalTypeParam.name = transformedName;
+                for (const [i, transformedParameter] of transformedParams.entries()) {
+                    const transformedName = transformedParameter.name;
+
+                    for (const originalTypeParameter of original.params[i].typeParams) {
+                        originalTypeParameter.name = transformedName;
                     }
                 }
 
-                const transformedDeps = (depsFn.body as t.ArrayExpression).elements as t.Expression[];
+                const transformedDeps = (depsFunction.body as t.ArrayExpression).elements as t.Expression[];
+
                 for (let i = 0; i < original.deps.length; i++) {
                     const originalDep = original.deps[i];
+
                     if (originalDep.replace) {
                         originalDep.replace(transformedDeps[i]);
                     } else {
@@ -302,10 +330,13 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
 
         for (const id of chunk.moduleIds) {
             const preserveComments = commentsMap.get(id);
+
             if (preserveComments) {
                 preserveComments.forEach((c) => {
                     const id = c.type + c.value;
-                    if (commentsValue.has(id)) return;
+
+                    if (commentsValue.has(id))
+                        return;
 
                     commentsValue.add(id);
                     comments.add(c);
@@ -313,15 +344,16 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
                 commentsMap.delete(id);
             }
         }
-        if (comments.size) {
+
+        if (comments.size > 0) {
             program.body[0].leadingComments ||= [];
             program.body[0].leadingComments.unshift(...comments);
         }
 
         const result = generate(file, {
             comments: true,
-            sourceMaps: sourcemap,
             sourceFileName: chunk.fileName,
+            sourceMaps: sourcemap,
         });
 
         return result;
@@ -331,12 +363,15 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
         if (name in identifierMap) {
             return identifierMap[name]++;
         }
+
         return (identifierMap[name] = 0);
     }
 
     function registerSymbol(info: SymbolInfo) {
-        const symbolId = symbolIdx++;
+        const symbolId = symbolIndex++;
+
         symbolMap.set(symbolId, info);
+
         return symbolId;
     }
 
@@ -352,6 +387,7 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
      */
     function collectParams(node: t.Node): GroupedTypeParams {
         const typeParams: t.TSTypeParameter[] = [];
+
         walkAST(node, {
             leave(node) {
                 if ("typeParameters" in node && node.typeParameters?.type === "TSTypeParameterDeclaration") {
@@ -360,21 +396,25 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
             },
         });
 
-        const paramMap = new Map<string, t.TSTypeParameter[]>();
-        for (const typeParam of typeParams) {
-            const name = typeParam.name;
-            const group = paramMap.get(name);
+        const parameterMap = new Map<string, t.TSTypeParameter[]>();
+
+        for (const typeParameter of typeParams) {
+            const { name } = typeParameter;
+            const group = parameterMap.get(name);
+
             if (group) {
-                group.push(typeParam);
+                group.push(typeParameter);
             } else {
-                paramMap.set(name, [typeParam]);
+                parameterMap.set(name, [typeParameter]);
             }
         }
 
-        return Array.from(paramMap.entries()).map(([name, typeParams]) => ({
-            name,
-            typeParams,
-        }));
+        return [...parameterMap.entries()].map(([name, typeParams]) => {
+            return {
+                name,
+                typeParams,
+            };
+        });
     }
 
     function collectDependencies(node: t.Node, namespaceStmts: NamespaceMap): Dep[] {
@@ -394,7 +434,9 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
                         addDependency(TSEntityNameToRuntime(heritage.expression));
                     }
                 } else if (node.type === "ClassDeclaration") {
-                    if (node.superClass) addDependency(node.superClass);
+                    if (node.superClass)
+                        addDependency(node.superClass);
+
                     if (node.implements) {
                         for (const implement of node.implements) {
                             addDependency(TSEntityNameToRuntime((implement as t.TSExpressionWithTypeArguments).expression));
@@ -404,40 +446,49 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
                     if (node.computed && isReferenceId(node.key)) {
                         addDependency(node.key);
                     }
+
                     if ("value" in node && isReferenceId(node.value)) {
                         addDependency(node.value);
                     }
-                } else
+                } else {
                     switch (node.type) {
-                        case "TSTypeReference": {
-                            addDependency(TSEntityNameToRuntime(node.typeName));
-
-                            break;
-                        }
-                        case "TSTypeQuery": {
-                            if (seen.has(node.exprName)) return;
-                            if (node.exprName.type === "TSImportType") break;
-
-                            addDependency(TSEntityNameToRuntime(node.exprName));
-
-                            break;
-                        }
                         case "TSImportType": {
                             seen.add(node);
                             const source = node.argument;
                             const imported = node.qualifier;
                             const dep = importNamespace(node, imported, source, namespaceStmts);
+
                             addDependency(dep);
 
                             break;
                         }
+                        case "TSTypeQuery": {
+                            if (seen.has(node.exprName))
+                                return;
+
+                            if (node.exprName.type === "TSImportType")
+                                break;
+
+                            addDependency(TSEntityNameToRuntime(node.exprName));
+
+                            break;
+                        }
+                        case "TSTypeReference": {
+                            addDependency(TSEntityNameToRuntime(node.typeName));
+
+                            break;
+                        }
                     }
+                }
             },
         });
-        return Array.from(deps);
+
+        return [...deps];
 
         function addDependency(node: Dep) {
-            if (isThisExpression(node)) return;
+            if (isThisExpression(node))
+                return;
+
             deps.add(node);
         }
     }
@@ -451,18 +502,20 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
         } else {
             // prepend: import * as ${local} from ${source}
             namespaceStmts.set(source.value, {
-                stmt: t.importDeclaration([t.importNamespaceSpecifier(local)], source),
                 local,
+                stmt: t.importDeclaration([t.importNamespaceSpecifier(local)], source),
             });
         }
 
         if (imported) {
             const importedLeft = getIdFromTSEntityName(imported);
+
             overwriteNode(importedLeft, t.tsQualifiedName(local, { ...importedLeft }));
             local = imported;
         }
 
         let replacement: t.Node = node;
+
         if (node.typeParameters) {
             overwriteNode(node, t.tsTypeReference(local, node.typeParameters));
             replacement = local;
@@ -476,16 +529,18 @@ export function createFakeJsPlugin({ sourcemap, cjsDefault, sideEffects }: Pick<
                 overwriteNode(replacement, newNode);
             },
         };
+
         return dep;
     }
 }
 
 const REFERENCE_RE = /\/\s*<reference\s+(?:path|types)=/;
+
 function collectReferenceDirectives(comment: t.Comment[], negative = false) {
     return comment.filter((c) => REFERENCE_RE.test(c.value) !== negative);
 }
 
-//#region Runtime binding variable
+// #region Runtime binding variable
 
 /**
  * A variable declaration that declares a runtime binding variable. It represents a declaration like:
@@ -517,10 +572,10 @@ type RuntimeBindingVariableDeclration = t.VariableDeclaration & {
  */
 function isRuntimeBindingVariableDeclaration(node: t.Node | null | undefined): node is RuntimeBindingVariableDeclration {
     return (
-        t.isVariableDeclaration(node) &&
-        node.declarations.length > 0 &&
-        t.isVariableDeclarator(node.declarations[0]) &&
-        isRuntimeBindingArrayExpression(node.declarations[0].init)
+        t.isVariableDeclaration(node)
+        && node.declarations.length > 0
+        && t.isVariableDeclarator(node.declarations[0])
+        && isRuntimeBindingArrayExpression(node.declarations[0].init)
     );
 }
 
@@ -551,15 +606,16 @@ function runtimeBindingArrayExpression(elements: RuntimeBindingArrayElements): R
 /**
  * An array that represents the elements in {@link RuntimeBindingArrayExpression}
  */
-type RuntimeBindingArrayElements =
-    | [symbolId: t.NumericLiteral, deps: t.ArrowFunctionExpression]
-    | [symbolId: t.NumericLiteral, deps: t.ArrowFunctionExpression, effect: t.CallExpression];
+type RuntimeBindingArrayElements
+    = | [symbolId: t.NumericLiteral, deps: t.ArrowFunctionExpression]
+        | [symbolId: t.NumericLiteral, deps: t.ArrowFunctionExpression, effect: t.CallExpression];
 
 /**
  * Check if the given array is a {@link RuntimeBindingArrayElements}
  */
-function isRuntimeBindingArrayElements(elements: Array<t.Node | null | undefined>): elements is RuntimeBindingArrayElements {
+function isRuntimeBindingArrayElements(elements: (t.Node | null | undefined)[]): elements is RuntimeBindingArrayElements {
     const [symbolId, deps, effect] = elements;
+
     return t.isNumericLiteral(symbolId) && t.isArrowFunctionExpression(deps) && (!effect || t.isCallExpression(effect));
 }
 
@@ -573,7 +629,9 @@ function TSEntityNameToRuntime(node: t.TSEntityName): t.MemberExpression | t.Ide
     if (node.type === "Identifier") {
         return node;
     }
+
     const left = TSEntityNameToRuntime(node.left);
+
     return Object.assign(node, t.memberExpression(left, node.right));
 }
 
@@ -581,6 +639,7 @@ function getIdFromTSEntityName(node: t.TSEntityName) {
     if (node.type === "Identifier") {
         return node;
     }
+
     return getIdFromTSEntityName(node.left);
 }
 
@@ -590,9 +649,9 @@ function isReferenceId(node?: t.Node | null): node is t.Identifier | t.MemberExp
 
 function isHelperImport(node: t.Node) {
     return (
-        node.type === "ImportDeclaration" &&
-        node.specifiers.length === 1 &&
-        node.specifiers.every(
+        node.type === "ImportDeclaration"
+        && node.specifiers.length === 1
+        && node.specifiers.every(
             (spec) => spec.type === "ImportSpecifier" && spec.imported.type === "Identifier" && ["__export", "__reExport"].includes(spec.local.name),
         )
     );
@@ -602,14 +661,15 @@ function isHelperImport(node: t.Node) {
  * patch `.d.ts` suffix in import source to `.js`
  */
 function patchImportExport(node: t.Node, typeOnlyIds: string[], cjsDefault: boolean): t.Statement | false | undefined {
-    if (node.type === "ExportNamedDeclaration" && !node.declaration && !node.source && !node.specifiers.length && !node.attributes?.length) {
+    if (node.type === "ExportNamedDeclaration" && !node.declaration && !node.source && node.specifiers.length === 0 && !node.attributes?.length) {
         return false;
     }
 
     if (isTypeOf(node, ["ImportDeclaration", "ExportAllDeclaration", "ExportNamedDeclaration"])) {
-        if (node.type === "ExportNamedDeclaration" && typeOnlyIds.length) {
+        if (node.type === "ExportNamedDeclaration" && typeOnlyIds.length > 0) {
             for (const spec of node.specifiers) {
                 const name = resolveString(spec.exported);
+
                 if (typeOnlyIds.includes(name)) {
                     if (spec.type === "ExportSpecifier") {
                         spec.exportKind = "type";
@@ -622,21 +682,23 @@ function patchImportExport(node: t.Node, typeOnlyIds: string[], cjsDefault: bool
 
         if (node.source?.value && RE_DTS.test(node.source.value)) {
             node.source.value = filename_dts_to(node.source.value, "js");
+
             return node;
         }
 
         if (
-            cjsDefault &&
-            node.type === "ExportNamedDeclaration" &&
-            !node.source &&
-            node.specifiers.length === 1 &&
-            node.specifiers[0].type === "ExportSpecifier" &&
-            resolveString(node.specifiers[0].exported) === "default"
+            cjsDefault
+            && node.type === "ExportNamedDeclaration"
+            && !node.source
+            && node.specifiers.length === 1
+            && node.specifiers[0].type === "ExportSpecifier"
+            && resolveString(node.specifiers[0].exported) === "default"
         ) {
             const defaultExport = node.specifiers[0] as t.ExportSpecifier;
+
             return {
-                type: "TSExportAssignment",
                 expression: defaultExport.local,
+                type: "TSExportAssignment",
             };
         }
     }
@@ -650,32 +712,33 @@ function patchTsNamespace(nodes: t.Statement[]) {
 
     for (const [i, node] of nodes.entries()) {
         const result = handleExport(node);
-        if (!result) continue;
+
+        if (!result)
+            continue;
 
         const [binding, exports] = result;
 
         nodes[i] = {
-            type: "TSModuleDeclaration",
-            id: binding,
-            kind: "namespace",
-            declare: true,
             body: {
-                type: "TSModuleBlock",
                 body: [
                     {
-                        type: "ExportNamedDeclaration",
-                        specifiers: (exports as t.ObjectExpression).properties
-                            .filter((property) => property.type === "ObjectProperty")
-                            .map((property) => {
-                                const local = (property.value as t.ArrowFunctionExpression).body as t.Identifier;
-                                const exported = property.key as t.Identifier;
-                                return t.exportSpecifier(local, exported);
-                            }),
-                        source: null,
                         declaration: null,
+                        source: null,
+                        specifiers: (exports as t.ObjectExpression).properties.filter((property) => property.type === "ObjectProperty").map((property) => {
+                            const local = (property.value as t.ArrowFunctionExpression).body as t.Identifier;
+                            const exported = property.key as t.Identifier;
+
+                            return t.exportSpecifier(local, exported);
+                        }),
+                        type: "ExportNamedDeclaration",
                     },
                 ],
+                type: "TSModuleBlock",
             },
+            declare: true,
+            id: binding,
+            kind: "namespace",
+            type: "TSModuleDeclaration",
         };
     }
 
@@ -683,20 +746,21 @@ function patchTsNamespace(nodes: t.Statement[]) {
 
     function handleExport(node: t.Statement): false | [t.Identifier, t.ObjectExpression] {
         if (
-            node.type !== "VariableDeclaration" ||
-            node.declarations.length !== 1 ||
-            node.declarations[0].id.type !== "Identifier" ||
-            node.declarations[0].init?.type !== "CallExpression" ||
-            node.declarations[0].init.callee.type !== "Identifier" ||
-            node.declarations[0].init.callee.name !== "__export" ||
-            node.declarations[0].init.arguments.length !== 1 ||
-            node.declarations[0].init.arguments[0].type !== "ObjectExpression"
+            node.type !== "VariableDeclaration"
+            || node.declarations.length !== 1
+            || node.declarations[0].id.type !== "Identifier"
+            || node.declarations[0].init?.type !== "CallExpression"
+            || node.declarations[0].init.callee.type !== "Identifier"
+            || node.declarations[0].init.callee.name !== "__export"
+            || node.declarations[0].init.arguments.length !== 1
+            || node.declarations[0].init.arguments[0].type !== "ObjectExpression"
         ) {
             return false;
         }
 
         const source = node.declarations[0].id;
         const exports = node.declarations[0].init.arguments[0];
+
         return [source, exports] as const;
     }
 }
@@ -709,11 +773,11 @@ function patchReExport(nodes: t.Statement[]) {
 
     for (const [i, node] of nodes.entries()) {
         if (
-            node.type === "ImportDeclaration" &&
-            node.specifiers.length === 1 &&
-            node.specifiers[0].type === "ImportSpecifier" &&
-            node.specifiers[0].local.type === "Identifier" &&
-            node.specifiers[0].local.name.endsWith("_exports")
+            node.type === "ImportDeclaration"
+            && node.specifiers.length === 1
+            && node.specifiers[0].type === "ImportSpecifier"
+            && node.specifiers[0].local.type === "Identifier"
+            && node.specifiers[0].local.name.endsWith("_exports")
         ) {
             // record: import { t as a_exports } from "..."
             exportsNames.set(node.specifiers[0].local.name, node.specifiers[0].local.name);
@@ -721,13 +785,14 @@ function patchReExport(nodes: t.Statement[]) {
             // record: __reExport(a_exports, import_lib)
 
             const args = node.expression.arguments;
+
             exportsNames.set((args[0] as t.Identifier).name, (args[1] as t.Identifier).name);
         } else if (
-            node.type === "VariableDeclaration" &&
-            node.declarations.length === 1 &&
-            node.declarations[0].init?.type === "MemberExpression" &&
-            node.declarations[0].init.object.type === "Identifier" &&
-            exportsNames.has(node.declarations[0].init.object.name)
+            node.type === "VariableDeclaration"
+            && node.declarations.length === 1
+            && node.declarations[0].init?.type === "MemberExpression"
+            && node.declarations[0].init.object.type === "Identifier"
+            && exportsNames.has(node.declarations[0].init.object.name)
         ) {
             // var B = a_exports.A
             // to
@@ -735,32 +800,32 @@ function patchReExport(nodes: t.Statement[]) {
             // TODO how to support value import? currently only type import is supported
 
             nodes[i] = {
-                type: "TSTypeAliasDeclaration",
                 id: {
-                    type: "Identifier",
                     name: (node.declarations[0].id as t.Identifier).name,
+                    type: "Identifier",
                 },
+                type: "TSTypeAliasDeclaration",
                 typeAnnotation: {
                     type: "TSTypeReference",
                     typeName: {
-                        type: "TSQualifiedName",
                         left: {
-                            type: "Identifier",
                             name: exportsNames.get(node.declarations[0].init.object.name)!,
+                            type: "Identifier",
                         },
                         right: {
-                            type: "Identifier",
                             name: (node.declarations[0].init.property as t.Identifier).name,
+                            type: "Identifier",
                         },
+                        type: "TSQualifiedName",
                     },
                 },
             };
         } else if (
-            node.type === "ExportNamedDeclaration" &&
-            node.specifiers.length === 1 &&
-            node.specifiers[0].type === "ExportSpecifier" &&
-            node.specifiers[0].local.type === "Identifier" &&
-            exportsNames.has(node.specifiers[0].local.name)
+            node.type === "ExportNamedDeclaration"
+            && node.specifiers.length === 1
+            && node.specifiers[0].type === "ExportSpecifier"
+            && node.specifiers[0].local.type === "Identifier"
+            && exportsNames.has(node.specifiers[0].local.name)
         ) {
             // export { a_exports as t }
             // to
@@ -806,49 +871,61 @@ function rewriteImportExport(
         }
 
         return true;
-    } else if (node.type === "ExportAllDeclaration") {
+    }
+
+    if (node.type === "ExportAllDeclaration") {
         node.exportKind = "value";
+
         return true;
-    } else if (node.type === "TSImportEqualsDeclaration") {
+    }
+
+    if (node.type === "TSImportEqualsDeclaration") {
         if (node.moduleReference.type === "TSExternalModuleReference") {
             set({
-                type: "ImportDeclaration",
+                source: node.moduleReference.expression,
                 specifiers: [
                     {
-                        type: "ImportDefaultSpecifier",
                         local: node.id,
+                        type: "ImportDefaultSpecifier",
                     },
                 ],
-                source: node.moduleReference.expression,
+                type: "ImportDeclaration",
             });
         }
+
         return true;
-    } else if (node.type === "TSExportAssignment" && node.expression.type === "Identifier") {
+    }
+
+    if (node.type === "TSExportAssignment" && node.expression.type === "Identifier") {
         set({
-            type: "ExportNamedDeclaration",
             specifiers: [
                 {
-                    type: "ExportSpecifier",
-                    local: node.expression,
                     exported: {
-                        type: "Identifier",
                         name: "default",
+                        type: "Identifier",
                     },
+                    local: node.expression,
+                    type: "ExportSpecifier",
                 },
             ],
-        });
-        return true;
-    } else if (node.type === "ExportDefaultDeclaration" && node.declaration.type === "Identifier") {
-        set({
             type: "ExportNamedDeclaration",
+        });
+
+        return true;
+    }
+
+    if (node.type === "ExportDefaultDeclaration" && node.declaration.type === "Identifier") {
+        set({
             specifiers: [
                 {
-                    type: "ExportSpecifier",
-                    local: node.declaration,
                     exported: t.identifier("default"),
+                    local: node.declaration,
+                    type: "ExportSpecifier",
                 },
             ],
+            type: "ExportNamedDeclaration",
         });
+
         return true;
     }
 
@@ -860,7 +937,9 @@ function overwriteNode<T>(node: t.Node, newNode: T): T {
     for (const key of Object.keys(node)) {
         delete (node as any)[key];
     }
+
     Object.assign(node, newNode);
+
     return node as T;
 }
 
@@ -868,6 +947,7 @@ function inheritNodeComments<T extends t.Node>(oldNode: t.Node, newNode: T): T {
     newNode.leadingComments ||= [];
 
     const leadingComments = oldNode.leadingComments?.filter((comment) => comment.value.startsWith("#"));
+
     if (leadingComments) {
         newNode.leadingComments.unshift(...leadingComments);
     }

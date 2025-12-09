@@ -1,16 +1,18 @@
 import { bold, cyan, gray } from "@visulima/colorize";
 import { collectSync, isAccessibleSync } from "@visulima/fs";
 import type { NormalizedPackageJson } from "@visulima/package";
+import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, EXCLUDE_REGEXP } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { warn } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
 
-import type { BuildPreset, InternalBuildOptions } from "../../types";
+import type { BuildConfig, InternalBuildOptions } from "../../types";
 import inferEntries from "./utils/infer-entries";
 import overwriteWithPublishConfig from "./utils/overwrite-with-publish-config";
 
-const autoPreset: BuildPreset = {
+const autoPreset: BuildConfig = {
     hooks: {
+        // eslint-disable-next-line sonarjs/cognitive-complexity
         "build:prepare": async function (context: BuildContext<InternalBuildOptions>) {
             // For unbundle mode, always create entries for all source files
             if (context.options.unbundle) {
@@ -27,17 +29,16 @@ const autoPreset: BuildPreset = {
                     extensions: [],
                     includeDirs: false,
                     includeSymlinks: false,
-                    skip: [/.*\/node_modules\/.*/, /.*\/dist\/.*/],
+                    // eslint-disable-next-line sonarjs/slow-regex
+                    skip: [EXCLUDE_REGEXP, /.*\/dist\/.*/],
                 });
 
                 // Filter for TypeScript/JavaScript files
-                const codeFiles = sourceFiles.filter((file) =>
-                    /\.(ts|tsx|js|jsx|mts|cts|mjs|cjs)$/.test(file) && !file.endsWith(".d.ts"),
-                );
+                const codeFiles = sourceFiles.filter((file) => ALLOWED_TRANSFORM_EXTENSIONS_REGEX.test(file) && !file.endsWith(".d.ts"));
 
                 for (const file of codeFiles) {
                     const relativePath = file.replace(`${sourceDirectory}/`, "");
-                    const name = relativePath.replace(/\.(ts|tsx|js|jsx|mts|cts|mjs|cjs)$/, "").replaceAll("/", "/");
+                    const name = relativePath.replace(ALLOWED_TRANSFORM_EXTENSIONS_REGEX, "").replaceAll("/", "/");
 
                     context.options.entries.push({
                         input: file,
@@ -64,7 +65,8 @@ const autoPreset: BuildPreset = {
                 extensions: [],
                 includeDirs: false,
                 includeSymlinks: false,
-                skip: [/.*\/node_modules\/.*/, /.*\/dist\/.*/],
+                // eslint-disable-next-line sonarjs/slow-regex
+                skip: [EXCLUDE_REGEXP, /.*\/dist\/.*/],
             });
 
             if (sourceFiles.length === 0) {
@@ -89,15 +91,13 @@ const autoPreset: BuildPreset = {
                 context.logger.info("Unbundle mode detected, creating entries for all source files");
 
                 // Filter for TypeScript/JavaScript files
-                const codeFiles = sourceFiles.filter((file) =>
-                    /\.(ts|tsx|js|jsx|mts|cts|mjs|cjs)$/.test(file) && !file.endsWith(".d.ts"),
-                );
+                const codeFiles = sourceFiles.filter((file) => ALLOWED_TRANSFORM_EXTENSIONS_REGEX.test(file) && !file.endsWith(".d.ts"));
 
                 context.logger.info(`Found ${codeFiles.length} code files for unbundle mode`);
 
                 for (const file of codeFiles) {
                     const relativePath = file.replace(`${sourceDirectory}/`, "");
-                    const name = relativePath.replace(/\.(ts|tsx|js|jsx|mts|cts|mjs|cjs)$/, "").replaceAll("/", "/");
+                    const name = relativePath.replace(ALLOWED_TRANSFORM_EXTENSIONS_REGEX, "").replaceAll("/", "/");
 
                     context.logger.info(`Adding entry: ${name} -> ${file}`);
 
