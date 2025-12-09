@@ -20,9 +20,9 @@
     },
     "devDependencies": {
         "@visulima/packem": "workspace:*",
-        "esbuild": "^0.27.0",
+        "esbuild": "^0.27.1",
         "rimraf": "^6.1.2",
-        "typedoc": "0.28.14",
+        "typedoc": "0.28.15",
         "typedoc-plugin-markdown": "4.9.0",
         "typedoc-plugin-rename-defaults": "0.7.3"
     },
