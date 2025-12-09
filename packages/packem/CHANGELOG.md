@@ -1,3 +1,9 @@
+## @visulima/packem [2.0.0-alpha.42](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.41...@visulima/packem@2.0.0-alpha.42) (2025-12-09)
+
+### Features
+
+* add Vue and Svelte presets with example configurations ([5d7c0eb](https://github.com/visulima/packem/commit/5d7c0ebaac1a105a863c8c92e953623398734f5b))
+
 ## @visulima/packem [2.0.0-alpha.41](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.40...@visulima/packem@2.0.0-alpha.41) (2025-12-09)
 
 ### Features
