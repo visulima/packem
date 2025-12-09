@@ -1,3 +1,15 @@
+## @visulima/packem [2.0.0-alpha.43](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.42...@visulima/packem@2.0.0-alpha.43) (2025-12-09)
+
+### Bug Fixes
+
+* update pnpm-lock.yaml and example files for consistency ([d11dd48](https://github.com/visulima/packem/commit/d11dd4868a3cb5265035897148f81dca3b33f359))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.32
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.12
+
 ## @visulima/packem [2.0.0-alpha.42](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.41...@visulima/packem@2.0.0-alpha.42) (2025-12-09)
 
 ### Features
