@@ -1,6 +1,6 @@
 {
     "name": "@visulima/rollup-plugin-dts",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "private": true,
     "description": "A Rollup plugin to bundle dts files",
     "homepage": "https://github.com/visulima/packem/tree/main/packages/rollup-plugin-dts",
