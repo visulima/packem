@@ -59,7 +59,7 @@ import React from 'react'
 import { cn } from '../../utils/cn'
 import styles from './Button.module.css'
 
-export interface ButtonProps 
+export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
@@ -68,14 +68,14 @@ export interface ButtonProps
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ 
-    className, 
-    variant = 'primary', 
-    size = 'md', 
+  ({
+    className,
+    variant = 'primary',
+    size = 'md',
     loading = false,
     disabled,
     children,
-    ...props 
+    ...props
   }, ref) => {
     return (
       <button
@@ -388,7 +388,7 @@ export function useLocalStorage<T>(
     if (typeof window === "undefined") {
       return initialValue
     }
-    
+
     try {
       const item = window.localStorage.getItem(key)
       return item ? JSON.parse(item) : initialValue
@@ -404,7 +404,7 @@ export function useLocalStorage<T>(
       // Allow value to be a function so we have the same API as useState
       const valueToStore = value instanceof Function ? value(storedValue) : value
       setStoredValue(valueToStore)
-      
+
       // Save to localStorage
       if (typeof window !== "undefined") {
         window.localStorage.setItem(key, JSON.stringify(valueToStore))
@@ -531,7 +531,85 @@ export * from './types'
 
 ### Packem Configuration
 
-**packem.config.ts**
+**Quick Setup (Recommended):**
+
+Use the `add` command to automatically configure React:
+
+```bash
+npx packem add react
+```
+
+This will automatically set up the React preset and install all necessary dependencies.
+
+**packem.config.ts - Using String Preset**
+
+The simplest way to use the React preset is with a string:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: 'react', // Use React preset for Babel configuration
+  transformer,
+  sourcemap: true,
+  declaration: true,
+})
+```
+
+**packem.config.ts - Using Config Preset Function**
+
+For more control, use the `createReactPreset` function:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { createReactPreset } from '@visulima/packem/config/preset/react'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: createReactPreset({
+    // Enable React Compiler for automatic optimizations
+    compiler: false, // Set to true to enable React Compiler
+    
+    // Customize Babel presets (optional)
+    presets: [
+      // Additional presets can be added here
+    ],
+    
+    // Customize Babel plugins (optional)
+    plugins: [
+      // Additional plugins can be added here
+    ]
+  }),
+  transformer,
+  sourcemap: true,
+  declaration: true,
+})
+```
+
+**With React Compiler:**
+
+Enable React Compiler optimizations:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { createReactPreset } from '@visulima/packem/config/preset/react'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: createReactPreset({
+    compiler: true // Enable React Compiler optimization
+  }),
+  transformer,
+  sourcemap: true,
+  declaration: true,
+})
+```
+
+**Alternative: Manual Babel Configuration**
+
+If you need complete control, you can configure Babel manually:
+
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
 import transformer from '@visulima/packem/transformer/esbuild'
@@ -542,12 +620,13 @@ export default defineConfig({
   declaration: true,
   externals: ['react', 'react-dom'],
   rollup: {
-    css: {
-      mode: 'extract'
+    babel: {
+      presets: [
+        ['@babel/preset-react', { runtime: 'automatic' }]
+        // Note: TypeScript is handled by the transformer via parser plugins
+        // Babel only needs to parse TypeScript syntax, not transform it
+      ]
     },
-    watch: {
-      include: 'src/**'
-    }
   }
 })
 ```

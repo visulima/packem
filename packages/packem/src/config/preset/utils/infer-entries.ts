@@ -270,6 +270,20 @@ const inferEntries = async (
     // Filter out ignored outputs
     const outputs = allOutputs.filter((output) => !output.ignored);
 
+    // Check outputs to see if both ESM and CJS formats are present (dual format)
+    // This handles cases where package.json has "type": "module" but exports has both "import" and "require"
+    const hasESMOutput = outputs.some((output) => output.type === "esm");
+    const hasCJSOutput = outputs.some((output) => output.type === "cjs");
+
+    if (hasESMOutput && hasCJSOutput) {
+        context.options.emitESM = true;
+        context.options.emitCJS = true;
+    } else if (hasESMOutput) {
+        context.options.emitESM = true;
+    } else if (hasCJSOutput) {
+        context.options.emitCJS = true;
+    }
+
     if (packageJson.bin) {
         const binaries = (typeof packageJson.bin === "string" ? [packageJson.bin] : Object.values(packageJson.bin)).filter(Boolean);
 
@@ -345,7 +359,7 @@ const inferEntries = async (
         // Supported output file extensions are `.d.ts`, `.d.cts`, `.d.mts`, `.js`, `.cjs` and `.mjs`
         // But we support any file extension here in case user has extended rollup options
         const outputSlug = output.file.replace(
-            new RegExp(String.raw`(?:\*[^/\\]|\.d\.[mc]?ts|\.\w+|${[`\\.${cjsJSExtension}`, `\\.${esmJSExtension}`].join("|")})$`),
+            new RegExp(String.raw`(?:\*[^/\\]|\.d\.[mc]?ts|\.\w+|${[String.raw`\.${cjsJSExtension}`, String.raw`\.${esmJSExtension}`].join("|")})$`),
             "",
         );
 
@@ -361,7 +375,7 @@ const inferEntries = async (
         const beforeSourceRegex = "(?<=/|$)";
         const fileExtensionRegex = isDirectory
             ? ""
-            : String.raw`(\.d\.[cm]?ts|(\.[cm]?[tj]sx?)|${[`\\.${cjsJSExtension}`, `\\.${esmJSExtension}`].join("|")})$`;
+            : String.raw`(\.d\.[cm]?ts|(\.[cm]?[tj]sx?)|${[String.raw`\.${cjsJSExtension}`, String.raw`\.${esmJSExtension}`].join("|")})$`;
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if ((output.file.includes("/*") || outputSlug.includes("*")) && output.key === "exports") {

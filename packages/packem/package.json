@@ -78,6 +78,14 @@
             "types": "./dist/config/index.d.ts",
             "default": "./dist/config/index.js"
         },
+        "./config/preset/react": {
+            "types": "./dist/config/preset/react.d.ts",
+            "default": "./dist/config/preset/react.js"
+        },
+        "./config/preset/solid": {
+            "types": "./dist/config/preset/solid.d.ts",
+            "default": "./dist/config/preset/solid.js"
+        },
         "./css/loader/sourcemap": {
             "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.ts",
             "default": "./dist/rollup/plugins/css/loaders/sourcemap.js"
@@ -321,6 +329,9 @@
     },
     "peerDependenciesMeta": {
         "@arethetypeswrong/core": {
+            "optional": true
+        },
+        "@babel/core": {
             "optional": true
         },
         "@ckeditor/typedoc-plugins": {

@@ -6,6 +6,7 @@ import { resolve } from "@visulima/path";
 import { defu } from "defu";
 import { createJiti } from "jiti";
 
+import autoPreset from "../../config/preset/auto";
 import loadPackemConfig from "../../config/utils/load-packem-config";
 import loadPreset from "../../config/utils/load-preset";
 import packem from "../../packem";
@@ -87,7 +88,7 @@ const createBuildCommand = (cli: Cli): void => {
 
             logger.debug("Using packem config found at", buildConfigPath);
 
-            const preset = await loadPreset(buildConfig.preset ?? "auto", jiti);
+            const preset = await loadPreset(buildConfig.preset ?? "none", jiti);
 
             // When minify is enabled, sourcemap should be enabled by default, unless explicitly opted out
             if (options.minify && options.sourcemap === undefined) {
@@ -102,7 +103,7 @@ const createBuildCommand = (cli: Cli): void => {
                     nodeEnvironment as Environment,
                     logger,
                     options.debug,
-                    defu<BuildConfig, BuildConfig[]>(buildConfig, preset, {
+                    defu<BuildConfig, BuildConfig[]>(buildConfig, autoPreset, preset, {
                         analyze: options.analyze,
                         cjsInterop: options.cjsInterop,
                         clean: options.clean,

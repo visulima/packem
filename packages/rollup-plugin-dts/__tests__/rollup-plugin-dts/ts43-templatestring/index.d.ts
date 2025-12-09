@@ -1,1 +1,1 @@
-export declare function foo<V extends string>(arg: `*${V}*`): V;
+export declare function foo<V extends string>(argument: `*${V}*`): V;

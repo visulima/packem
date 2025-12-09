@@ -1,2 +1,4 @@
-import * as ns from "./namespace";
-export declare class Klass extends ns.Base implements ns.Iface {}
+import type { Iface } from "./namespace";
+import { Base } from "./namespace";
+
+export declare class Klass extends Base implements Iface {}

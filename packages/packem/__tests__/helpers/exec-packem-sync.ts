@@ -10,7 +10,7 @@ const distributionPath = join(dirname(fileURLToPath(import.meta.url)), "../../di
 const execPackem = async (command: "build" | "init" | "migrate", flags: string[] = [], options: Options = {}) => {
     let environmentFlag: string | undefined = "--development";
 
-    if (command !== "build" || (flags.includes("--production") || flags.includes("--development") || flags.includes("--no-environment"))) {
+    if (command !== "build" || flags.includes("--production") || flags.includes("--development") || flags.includes("--no-environment")) {
         environmentFlag = undefined;
     }
 

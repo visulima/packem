@@ -37,6 +37,10 @@
             "types": "./dist/index.d.ts",
             "default": "./dist/index.js"
         },
+        "./babel": {
+            "types": "./dist/plugins/babel/index.d.ts",
+            "default": "./dist/plugins/babel/index.js"
+        },
         "./esbuild": {
             "types": "./dist/plugins/esbuild/index.d.ts",
             "default": "./dist/plugins/esbuild/index.js"
@@ -200,6 +204,7 @@
         "@swc/core": "catalog:dev",
         "@swc/types": "catalog:dev",
         "@total-typescript/ts-reset": "catalog:tsc",
+        "@types/babel__core": "catalog:types",
         "@types/clean-css": "catalog:types",
         "@types/estree": "catalog:types",
         "@types/glob-parent": "catalog:types",
@@ -232,6 +237,7 @@
         "vitest": "catalog:test"
     },
     "peerDependencies": {
+        "@babel/core": "*",
         "@swc/core": "*",
         "esbuild": "*",
         "oxc-transform": "*",
@@ -240,6 +246,9 @@
         "typescript": "*"
     },
     "peerDependenciesMeta": {
+        "@babel/core": {
+            "optional": true
+        },
         "@swc/core": {
             "optional": true
         },

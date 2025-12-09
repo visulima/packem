@@ -1,10 +1,11 @@
-import * as mod from "./mod.js";
+import type * as module_ from "./mod.js";
+
 export declare const foo: number;
-export declare const bar: typeof mod.a;
+export declare const bar: typeof module_.a;
 type SomeType<T> = T;
 type FooType = string;
 interface Interface {}
-export declare function fn(arg0: SomeType<FooType>, opt: Interface): void;
+export declare function function_(argument0: SomeType<FooType>, opt: Interface): void;
 declare enum Enum {
     A = 0,
     B = 1,
@@ -14,4 +15,3 @@ export declare class Cls {
     foo: string;
     fn(e: Enum): void;
 }
-export {};

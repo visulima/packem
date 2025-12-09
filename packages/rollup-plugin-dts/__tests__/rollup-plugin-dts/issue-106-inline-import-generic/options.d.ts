@@ -1,5 +1,5 @@
 export interface SimpleInterface {}
 
-export type ObjectWithParam<ParamObj> = {
-    [Prop in keyof ParamObj]?: any;
+export type ObjectWithParam<ParameterObject> = {
+    [Prop in keyof ParameterObject]?: any;
 };

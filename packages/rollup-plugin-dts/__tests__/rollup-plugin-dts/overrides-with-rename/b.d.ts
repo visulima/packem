@@ -1,4 +1,4 @@
-import a from "./a";
+import type a from "./a";
 
 export default function autobind(): typeof a;
 export default function autobind(constructor: Function): void;

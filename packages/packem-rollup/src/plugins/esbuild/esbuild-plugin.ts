@@ -37,7 +37,7 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
 
     const extensions: string[] = Object.keys(loaders);
 
-    const INCLUDE_REGEXP = new RegExp(`\\.(${extensions.map((extension) => extension.slice(1)).join("|")})$`);
+    const INCLUDE_REGEXP = new RegExp(String.raw`\.(${extensions.map((extension) => extension.slice(1)).join("|")})$`);
 
     const filter = createFilter(include ?? INCLUDE_REGEXP, exclude);
 

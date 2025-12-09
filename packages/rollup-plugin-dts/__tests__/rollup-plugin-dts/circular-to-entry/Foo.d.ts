@@ -1,4 +1,4 @@
-import FooManager from ".";
+import type FooManager from ".";
 
 declare class Foo {
     manager: FooManager;

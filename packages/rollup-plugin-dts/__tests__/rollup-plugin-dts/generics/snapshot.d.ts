@@ -1,5 +1,5 @@
 // index.d.ts
-//#region tests/rollup-plugin-dts/generics/index.d.ts
+// #region tests/rollup-plugin-dts/generics/index.d.ts
 interface A {}
 interface B {}
 interface C {}
@@ -26,11 +26,12 @@ declare type Ty<T = C> = {
 };
 declare class Cl<T = E> {
     e: T;
+
     f: Gen<F>;
 }
-declare function fn<T = G>(g: T, h: Gen<H>): void;
-declare type TyFn = <T = J>(j: T, k: Gen<K>) => L;
+declare function function_<T = G>(g: T, h: Gen<H>): void;
+declare type TyFunction = <T = J>(j: T, k: Gen<K>) => L;
 declare type TyCtor = new <T = M>(m: T, n: Gen<N>) => O;
 interface I2 extends Gen<P> {}
-//#endregion
-export { Cl, I1, I2, Ty, TyCtor, TyFn, fn };
+// #endregion
+export { Cl, function_ as fn, I1, I2, Ty, TyCtor, TyFunction as TyFn };

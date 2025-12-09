@@ -21,6 +21,7 @@ import { VERSION } from "rollup";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
 
+import autoPreset from "../config/preset/auto";
 import loadPackageJson from "../config/utils/load-package-json";
 import loadTsconfig from "../config/utils/load-tsconfig";
 import prepareEntries from "../config/utils/prepare-entries";
@@ -96,7 +97,7 @@ const generateOptions = (
     const splitRuntimeVersion = runtimeVersion.split(".");
 
     // @ts-ignore TS2589 is just deeply nested and this is needed for typedoc
-    const options = defu(buildConfig, <Partial<BuildOptions>>{
+    const options = defu(autoPreset, buildConfig, <Partial<BuildOptions>>{
         alias: {},
         browserTargets: browserslist(),
         cjsInterop: false,

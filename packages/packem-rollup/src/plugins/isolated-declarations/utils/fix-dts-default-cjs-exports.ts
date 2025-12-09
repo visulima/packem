@@ -579,7 +579,7 @@ const handleNoSpecifierDefaultCJSExport = (
 
     // Case 3: Only default export (no other type/value exports)
     if (defaultAlias && valueExports.length === 0 && typeExports.length === 0) {
-        const directExportDefaultRegex = new RegExp(`^export\\\\s+default\\\\s+${defaultAlias};`, "m");
+        const directExportDefaultRegex = new RegExp(String.raw`^export\\s+default\\s+${defaultAlias};`, "m");
 
         const match = code.match(directExportDefaultRegex);
 

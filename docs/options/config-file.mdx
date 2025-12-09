@@ -34,7 +34,7 @@ import { defineConfig } from '@visulima/packem/config'
 export default defineConfig({
   // Choose your transformer
   transformer: 'esbuild',
-  
+
   // Rollup configuration
   rollup: {
     output: {
@@ -88,10 +88,10 @@ The `defineConfig` function provides full TypeScript support and validation:
 export default defineConfig({
   // Entry points (optional - auto-detected from package.json)
   entry?: string | string[] | Record<string, string>
-  
+
   // Transformer selection
   transformer?: 'esbuild' | 'swc' | 'oxc' | 'sucrase' | 'typescript'
-  
+
   // Rollup configuration
   rollup?: {
     input?: InputOption
@@ -100,7 +100,7 @@ export default defineConfig({
     external?: ExternalOption
     // ... other Rollup options
   }
-  
+
   // CSS configuration
   css?: {
     extract?: boolean
@@ -108,14 +108,14 @@ export default defineConfig({
     loaders?: CssLoader[]
     // ... other CSS options
   }
-  
+
   // Transformer-specific options
   esbuild?: EsbuildOptions
   swc?: SwcOptions
   oxc?: OxcOptions
   sucrase?: SucraseOptions
   typescript?: TypeScriptOptions
-  
+
   // Build hooks
   hooks?: {
     'build:before'?: (config) => void | Promise<void>
@@ -134,7 +134,7 @@ Configure different options based on environment:
 ```typescript
 export default defineConfig({
   transformer: process.env.NODE_ENV === 'development' ? 'esbuild' : 'swc',
-  
+
   rollup: {
     output: {
       format: 'esm',
@@ -158,10 +158,10 @@ Use a function for dynamic configuration:
 ```typescript
 export default defineConfig((env) => {
   const isProduction = env === 'production'
-  
+
   return {
     transformer: isProduction ? 'swc' : 'esbuild',
-    
+
     rollup: {
       output: {
         format: 'esm',
@@ -169,7 +169,7 @@ export default defineConfig((env) => {
         sourcemap: !isProduction
       }
     },
-    
+
     css: {
       extract: isProduction,
       modules: true
@@ -185,10 +185,10 @@ Load configuration asynchronously:
 ```typescript
 export default defineConfig(async () => {
   const packageJson = await import('./package.json')
-  
+
   return {
     transformer: 'esbuild',
-    
+
     rollup: {
       output: {
         format: packageJson.type === 'module' ? 'esm' : 'cjs',
@@ -215,7 +215,7 @@ export default defineConfig([
       }
     }
   },
-  
+
   // CJS build
   {
     transformer: 'esbuild',
@@ -226,7 +226,7 @@ export default defineConfig([
       }
     }
   },
-  
+
   // IIFE build for browsers
   {
     transformer: 'esbuild',
@@ -273,14 +273,14 @@ Access environment variables in your configuration:
 ```typescript
 export default defineConfig({
   transformer: process.env.PACKEM_TRANSFORMER || 'esbuild',
-  
+
   rollup: {
     output: {
       dir: process.env.PACKEM_OUTPUT_DIR || 'dist',
       sourcemap: process.env.NODE_ENV !== 'production'
     }
   },
-  
+
   // Custom environment variables
   define: {
     'process.env.VERSION': JSON.stringify(process.env.npm_package_version),
@@ -296,7 +296,7 @@ Packem validates your configuration and provides helpful error messages:
 ```typescript
 export default defineConfig({
   transformer: 'invalid', // ❌ TypeScript error
-  
+
   rollup: {
     output: {
       format: 'unknown' // ❌ TypeScript error
@@ -323,6 +323,196 @@ Specify a custom configuration file location:
 </Tabs>
 
 ## Configuration Presets
+
+Packem provides built-in presets for common use cases, and you can also create your own reusable configuration presets.
+
+### Built-in Presets
+
+#### React Preset
+
+The React preset configures Babel to handle React JSX transformation. Babel runs **before** your main transformer (esbuild/SWC/etc.), transforming JSX into JavaScript that the transformer can then process. TypeScript is handled by the transformer via parser plugins, not by Babel.
+
+**Quick Setup:**
+
+Use the `add` command to automatically configure React:
+
+```bash
+npx packem add react
+```
+
+This will automatically set up the React preset and install all necessary dependencies.
+
+**Basic Usage:**
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: 'react',
+  transformer,
+})
+```
+
+**With React Compiler:**
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { createReactPreset } from '@visulima/packem/config/preset/react'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: createReactPreset({
+    compiler: true
+  }),
+  transformer,
+})
+```
+
+**With React Compiler Annotation Mode:**
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { createReactPreset } from '@visulima/packem/config/preset/react'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: createReactPreset({
+    compiler: {
+      compilationMode: 'annotation',
+      panicThreshold: 'critical_errors'
+    }
+  }),
+  transformer,
+})
+```
+
+**Custom Options:**
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { createReactPreset } from '@visulima/packem/config/preset/react'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: createReactPreset({
+    compiler: true,
+    plugins: [],      // Additional Babel plugins
+    presets: []       // Additional Babel presets
+  }),
+  transformer,
+})
+```
+
+**How it works:**
+
+1. **Babel** (runs first): Transforms JSX → JS (handles JSX transformation with React Compiler if enabled)
+2. **Transformer** (esbuild/SWC/etc.): Processes the code and handles TypeScript transformation via parser plugins
+3. **Rollup plugins**: Can parse the code since it's pure JavaScript
+
+**React Preset Options:**
+
+- `compiler`: Enable React Compiler optimization
+  - `boolean`: Enable with default options
+  - `object`: Configure compiler options
+    - `compilationMode`: `"infer"` (default) or `"annotation"` - In annotation mode, only files with `"use memo"` directive are processed
+    - `panicThreshold`: `"critical_errors"` (default) or `"all_errors"`
+- `plugins`: Additional Babel plugins to include
+- `presets`: Additional Babel presets to include
+
+**Note:** The React preset automatically excludes `react` and `react-dom` from unused dependency validation, as these are typically peer dependencies. TypeScript is handled by the transformer (esbuild/SWC/etc.) via parser plugins, not by Babel. This matches the approach used by `@vitejs/plugin-react`.
+
+#### SolidJS Preset
+
+The SolidJS preset configures Babel to handle SolidJS JSX transformation. Babel runs **before** your main transformer (esbuild/SWC/etc.), transforming JSX into JavaScript that the transformer can then process. TypeScript is handled by the transformer via parser plugins, not by Babel.
+
+**Quick Setup:**
+
+Use the `add` command to automatically configure SolidJS:
+
+```bash
+npx packem add solid
+```
+
+This will automatically set up the SolidJS preset and install all necessary dependencies.
+
+**Basic Usage:**
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: 'solid',
+  transformer,
+})
+```
+
+**With Custom Solid Options:**
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { createSolidPreset } from '@visulima/packem/config/preset/solid'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: createSolidPreset({
+    solidOptions: {
+      generate: 'ssr',
+      hydratable: true,
+      moduleName: 'solid-js/web'
+    }
+  }),
+  transformer,
+})
+```
+
+**With Custom Babel Options:**
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { createSolidPreset } from '@visulima/packem/config/preset/solid'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: createSolidPreset({
+    solidOptions: {
+      generate: 'dom'
+    },
+    env: {
+      targets: 'last 2 years'
+    },
+    typescript: true
+  }),
+  transformer,
+})
+```
+
+**How it works:**
+
+1. **Babel** (runs first): Transforms JSX → JS (handles JSX transformation with Solid preset)
+2. **Transformer** (esbuild/SWC/etc.): Processes the code and handles TypeScript transformation via parser plugins
+3. **Rollup plugins**: Can parse the code since it's pure JavaScript
+
+**Solid Preset Options:**
+
+- `solidOptions`: Configure SolidJS-specific options
+  - `moduleName`: Runtime module name (default: `"solid-js/web"`)
+  - `generate`: Output mode - `"dom"` (default) or `"ssr"` for server-side rendering
+  - `hydratable`: Enable hydratable markers (default: `false`)
+  - `delegateEvents`: Enable automatic event delegation (default: `true`)
+  - `wrapConditionals`: Enable smart conditional detection (default: `true`)
+  - `contextToCustomElements`: Set render context on Custom Elements (default: `true`)
+  - `builtIns`: Array of Component exports to auto-import
+- `env`: Enable @babel/preset-env (default: `true`)
+  - `boolean`: Enable with default targets (`"last 2 years"`)
+  - `object`: Configure with custom targets
+- `plugins`: Additional Babel plugins to include
+- `presets`: Additional Babel presets to include
+
+**Note:** The Solid preset automatically excludes `solid-js`, `solid-js/web`, and `solid-js/store` from unused dependency validation, as these are typically peer dependencies. TypeScript is handled by the transformer (esbuild/SWC/etc.) via parser plugins, not by Babel.
+
+### Custom Presets
 
 Create reusable configuration presets:
 
@@ -357,11 +547,13 @@ import { libraryPreset } from './configs/presets'
 
 export default defineConfig({
   ...libraryPreset,
-  
+
   // Override specific options
-  css: {
-    extract: true,
-    modules: true
+  rollup: {
+    ...libraryPreset.rollup,
+    css: {
+      mode: 'extract'
+    }
   }
 })
 ```
@@ -400,7 +592,7 @@ import { defineConfig } from '@visulima/packem/config'
 export default defineConfig({
   // TypeScript will provide autocomplete here
   transformer: '|', // Shows: 'esbuild' | 'swc' | 'oxc' | 'sucrase' | 'typescript'
-  
+
   rollup: {
     output: {
       format: '|' // Shows: 'es' | 'cjs' | 'iife' | 'umd' | 'system'
@@ -446,7 +638,7 @@ Or programmatically:
 ```typescript
 export default defineConfig({
   debug: true, // Enable debug logging
-  
+
   transformer: 'esbuild',
   // ... rest of config
 })
@@ -459,12 +651,12 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   transformer: 'esbuild',
-  
+
   esbuild: {
     jsx: 'automatic',
     jsxImportSource: 'react'
   },
-  
+
   rollup: {
     external: ['react', 'react-dom'],
     output: [
@@ -480,7 +672,7 @@ export default defineConfig({
 ```typescript
 export default defineConfig({
   transformer: 'esbuild',
-  
+
   rollup: {
     output: {
       format: 'cjs',
@@ -507,7 +699,7 @@ export default defineConfig([
       external: ['express', 'mongoose']
     }
   },
-  
+
   // Client build
   {
     entry: 'src/client.ts',

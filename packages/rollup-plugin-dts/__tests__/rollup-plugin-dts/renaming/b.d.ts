@@ -11,8 +11,7 @@ export declare class Klass extends Parent {
 export interface Interface extends B {
     c: C;
 }
-export declare function Func(d: D): E;
+export declare function Function_(d: D): E;
 export declare type Type = {
     f: F;
 };
-export {};

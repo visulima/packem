@@ -1,9 +1,9 @@
-import { Getters, MyExclude } from "./foo";
+import type { Getters, MyExclude } from "./foo";
 
 interface Person {
-    name: string;
     age: number;
     location: string;
+    name: string;
 }
 
 export type LazyPerson = Getters<Person>;

@@ -1,5 +1,5 @@
 // index.d.ts
-//#region tests/rollup-plugin-dts/namespace-references/ns.d.ts
+// #region tests/rollup-plugin-dts/namespace-references/ns.d.ts
 interface Shadowed1 {}
 interface Shadowed2 {}
 interface Shadowed3 {}
@@ -22,5 +22,5 @@ declare namespace ns {
         export { Referenced2 as ref };
     }
 }
-//#endregion
+// #endregion
 export { ns };

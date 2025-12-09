@@ -130,10 +130,10 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
                 let type = "commonjs";
 
                 if (entry.path.endsWith(`.${cjsJSExtension}`)) {
-                    dtsPath = entry.path.replace(new RegExp(`\\.${cjsJSExtension}$`), `.${cjsDTSExtension}`);
+                    dtsPath = entry.path.replace(new RegExp(String.raw`\.${cjsJSExtension}$`), `.${cjsDTSExtension}`);
                 } else if (entry.path.endsWith(`.${esmJSExtension}`)) {
                     type = "module";
-                    dtsPath = entry.path.replace(new RegExp(`\\.${esmJSExtension}$`), `.${esmDTSExtension}`);
+                    dtsPath = entry.path.replace(new RegExp(String.raw`\.${esmJSExtension}$`), `.${esmDTSExtension}`);
                 }
 
                 const foundDts = context.buildEntries.find((bEntry) => bEntry.path.endsWith(dtsPath));

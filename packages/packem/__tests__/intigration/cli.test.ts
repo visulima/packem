@@ -2,7 +2,6 @@ import { existsSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
-import type { PackageJson } from "@visulima/package";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -674,11 +673,11 @@ export function barFunction() {
                 },
             });
 
-        expect(binProcess.stderr).toBe("");
-        expect(binProcess.exitCode).toBe(0);
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
 
-        expect(binProcess.stdout).toContain("Migrating `devDependencies` from tsup-node to @visulima/packem");
-        expect(binProcess.stdout).toContain("Migrating `build` script from tsup to packem");
+            expect(binProcess.stdout).toContain("Migrating `devDependencies` from tsup-node to @visulima/packem");
+            expect(binProcess.stdout).toContain("Migrating `build` script from tsup to packem");
         });
 
         it("should detect config files and warn about manual migration", async () => {
@@ -1024,14 +1023,8 @@ export default defineBuildConfig({
                 },
             });
 
-            writeFileSync(
-                `${temporaryDirectoryPath}/tsup.config.ts`,
-                "export default { entry: ['src/index.ts'] }",
-            );
-            writeFileSync(
-                `${temporaryDirectoryPath}/build.config.ts`,
-                "export default { entries: ['src/index'] }",
-            );
+            writeFileSync(`${temporaryDirectoryPath}/tsup.config.ts`, "export default { entry: ['src/index.ts'] }");
+            writeFileSync(`${temporaryDirectoryPath}/build.config.ts`, "export default { entries: ['src/index'] }");
 
             const binProcess = await execPackem("migrate", ["--dry-run"], {
                 cwd: temporaryDirectoryPath,
@@ -1120,13 +1113,13 @@ export default defineConfig({
                     build: "tsup",
                 },
                 tsup: {
-                    entry: ["src/index.ts", "src/cli.ts"],
-                    format: ["cjs", "esm"],
-                    dts: true,
-                    sourcemap: true,
                     clean: true,
-                    splitting: true,
+                    dts: true,
+                    entry: ["src/index.ts", "src/cli.ts"],
                     external: ["react"],
+                    format: ["cjs", "esm"],
+                    sourcemap: true,
+                    splitting: true,
                 },
             });
 
@@ -1157,9 +1150,9 @@ export default defineConfig({
                     build: "unbuild",
                 },
                 unbuild: {
-                    entries: ["src/index"],
-                    declaration: true,
                     clean: true,
+                    declaration: true,
+                    entries: ["src/index"],
                     rollup: {
                         emitCJS: true,
                     },
@@ -1194,13 +1187,13 @@ export default defineConfig({
             });
 
             const configs = [
-                { file: "tsup.config.ts", content: "export default { entry: ['src/index.ts'] }" },
-                { file: "tsup.config.cts", content: "export default { entry: ['src/index.ts'] }" },
-                { file: "tsup.config.mts", content: "export default { entry: ['src/index.ts'] }" },
-                { file: "tsup.config.js", content: "module.exports = { entry: ['src/index.ts'] }" },
-                { file: "tsup.config.cjs", content: "module.exports = { entry: ['src/index.ts'] }" },
-                { file: "tsup.config.mjs", content: "export default { entry: ['src/index.ts'] }" },
-                { file: "tsup.config.json", content: '{"entry": ["src/index.ts"]}' },
+                { content: "export default { entry: ['src/index.ts'] }", file: "tsup.config.ts" },
+                { content: "export default { entry: ['src/index.ts'] }", file: "tsup.config.cts" },
+                { content: "export default { entry: ['src/index.ts'] }", file: "tsup.config.mts" },
+                { content: "module.exports = { entry: ['src/index.ts'] }", file: "tsup.config.js" },
+                { content: "module.exports = { entry: ['src/index.ts'] }", file: "tsup.config.cjs" },
+                { content: "export default { entry: ['src/index.ts'] }", file: "tsup.config.mjs" },
+                { content: "{\"entry\": [\"src/index.ts\"]}", file: "tsup.config.json" },
             ];
 
             for (const config of configs) {

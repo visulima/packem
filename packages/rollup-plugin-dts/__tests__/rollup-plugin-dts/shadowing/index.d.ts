@@ -1,1 +1,1 @@
-export { GenericInterface, GenericKlass, genericFunction, ConditionalInfer, Mapped, GenericType, GenericExtends } from "./exports";
+export { ConditionalInfer, GenericExtends, genericFunction, GenericInterface, GenericKlass, GenericType, Mapped } from "./exports";

@@ -1,21 +1,21 @@
 // index.d.ts
-import { inspect } from "util";
+import { inspect } from "node:util";
 
-//#region tests/rollup-plugin-dts/computed-method/b.d.ts
+// #region tests/rollup-plugin-dts/computed-method/b.d.ts
 declare const b: "b";
-//#endregion
-//#region tests/rollup-plugin-dts/computed-method/mod.d.ts
+// #endregion
+// #region tests/rollup-plugin-dts/computed-method/mod.d.ts
 declare const deep: {
     deep: {
         a: "deep";
     };
 };
-//#endregion
-//#region tests/rollup-plugin-dts/computed-method/index.d.ts
+// #endregion
+// #region tests/rollup-plugin-dts/computed-method/index.d.ts
 declare class Test {
     [inspect.custom](): string;
     [b](): string;
     [deep.deep.a]: string;
 }
-//#endregion
+// #endregion
 export { Test };

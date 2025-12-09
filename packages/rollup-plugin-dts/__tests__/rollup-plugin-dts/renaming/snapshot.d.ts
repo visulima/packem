@@ -1,5 +1,5 @@
 // index.d.ts
-//#region tests/rollup-plugin-dts/renaming/a.d.ts
+// #region tests/rollup-plugin-dts/renaming/a.d.ts
 interface A$1 {}
 interface B$1 {}
 interface C$1 {}
@@ -13,12 +13,12 @@ declare class Klass extends Parent$1 {
 interface Interface extends B$1 {
     c: C$1;
 }
-declare function Func(d: D$1): E$1;
+declare function Function_(d: D$1): E$1;
 declare type Type = {
     f: F$1;
 };
-//#endregion
-//#region tests/rollup-plugin-dts/renaming/b.d.ts
+// #endregion
+// #region tests/rollup-plugin-dts/renaming/b.d.ts
 interface A {}
 interface B {}
 interface C {}
@@ -32,17 +32,17 @@ declare class Klass$1 extends Parent {
 interface Interface$1 extends B {
     c: C;
 }
-declare function Func$1(d: D): E;
+declare function Function$1(d: D): E;
 declare type Type$1 = {
     f: F;
 };
-//#endregion
+// #endregion
 export {
-    Func as AFunc,
+    Function_ as AFunc,
     Interface as AInterface,
     Klass as AKlass,
     Type as AType,
-    Func$1 as BFunc,
+    Function$1 as BFunc,
     Interface$1 as BInterface,
     Klass$1 as BKlass,
     Type$1 as BType,

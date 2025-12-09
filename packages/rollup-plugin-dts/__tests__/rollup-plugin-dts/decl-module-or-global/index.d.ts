@@ -1,5 +1,5 @@
 declare module "babel__core" {
-    var fn1: any;
+    var function1: any;
 }
 
 declare global {

@@ -2,6 +2,7 @@
     "name": "examples_packem_unbundle",
     "version": "1.0.0",
     "private": true,
+    "sideEffects": false,
     "type": "module",
     "exports": {
         ".": {
@@ -9,7 +10,6 @@
             "default": "./dist/index.js"
         }
     },
-    "sideEffects": false,
     "files": [
         "./dist"
     ],

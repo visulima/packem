@@ -15,7 +15,7 @@ export default defineConfig({
     validation: {
         dependencies: {
             hoisted: {
-                exclude: ["estree"]
+                exclude: ["estree"],
             },
             unused: {
                 exclude: ["rollup-plugin-dts"],

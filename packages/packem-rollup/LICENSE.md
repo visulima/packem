@@ -23,11 +23,14 @@ SOFTWARE.
 <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
+
 The published @visulima/packem-rollup artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
+
 ## estree-walker
+
 License: MIT
 By: Rich Harris
 Repository: https://github.com/Rich-Harris/estree-walker
@@ -40,9 +43,10 @@ Repository: https://github.com/Rich-Harris/estree-walker
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
----------------------------------------
+---
 
 ## mime
+
 License: MIT
 By: Robert Kieffer
 Repository: https://github.com/broofa/mime
@@ -315,11 +319,14 @@ Repository: git+https://github.com/visulima/visulima.git
 > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
+
 The published @visulima/packem-rollup artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
+
 ## estree-walker
+
 License: MIT
 By: Rich Harris
 Repository: https://github.com/Rich-Harris/estree-walker
@@ -332,9 +339,10 @@ Repository: https://github.com/Rich-Harris/estree-walker
 >
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
----------------------------------------
+---
 
 ## mime
+
 License: MIT
 By: Robert Kieffer
 Repository: https://github.com/broofa/mime
@@ -362,7 +370,7 @@ Repository: https://github.com/broofa/mime
 > SOFTWARE.
 
 <!-- /DEPENDENCIES -->
->
+
 > # Licenses of bundled types
 >
 > The published @visulima/tsconfig artifact additionally contains code with the following licenses:

@@ -95,7 +95,8 @@ it("tree-shaking", async () => {
             {
                 name: "external-node",
                 resolveId(id) {
-                    if (id.startsWith("node:")) return { external: true, id, moduleSideEffects: false };
+                    if (id.startsWith("node:"))
+                        return { external: true, id, moduleSideEffects: false };
                 },
             },
         ],

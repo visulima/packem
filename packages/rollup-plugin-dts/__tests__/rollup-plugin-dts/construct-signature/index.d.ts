@@ -1,3 +1,1 @@
-export interface Foo {
-    new (): any;
-}
+export type Foo = new () => any;

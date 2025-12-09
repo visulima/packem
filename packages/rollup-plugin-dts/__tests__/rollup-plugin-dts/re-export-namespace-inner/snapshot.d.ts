@@ -1,10 +1,10 @@
 // index.d.ts
-declare namespace mod_d_exports {
+declare namespace module_d_exports {
     export { inner };
 }
 declare namespace inner {
     type Ty = number;
-    const num: number;
+    const number_: number;
 }
-//#endregion
-export { mod_d_exports as outer };
+// #endregion
+export { module_d_exports as outer };

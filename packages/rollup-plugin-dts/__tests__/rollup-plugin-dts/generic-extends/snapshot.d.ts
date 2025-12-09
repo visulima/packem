@@ -1,8 +1,8 @@
 // index.d.ts
-import { ComponentPropsWithRef, ElementType, ForwardRefExoticComponent } from "react";
+import type { ComponentPropsWithRef, ElementType, ForwardRefExoticComponent } from "react";
 
-//#region tests/rollup-plugin-dts/generic-extends/index.d.ts
+// #region tests/rollup-plugin-dts/generic-extends/index.d.ts
 type AnimatedProps<T> = T;
 type AnimatedComponent<T extends ElementType> = ForwardRefExoticComponent<AnimatedProps<ComponentPropsWithRef<T>>>;
-//#endregion
+// #endregion
 export { AnimatedComponent, AnimatedProps };

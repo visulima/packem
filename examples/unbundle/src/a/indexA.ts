@@ -1,2 +1,1 @@
-export const a = 'a';
-
+export const a = "a";

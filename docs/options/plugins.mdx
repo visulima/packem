@@ -121,20 +121,151 @@ export default defineConfig({
 
 ### React
 
+**Quick Setup (Recommended):**
+
+Use the `add` command to automatically configure React:
+
+```bash
+npx packem add react
+```
+
+This will:
+- Add `preset: 'react'` to your config
+- Install React, React DOM, and Babel dependencies
+- Automatically detect TypeScript and add `@types/react` and `@types/react-dom` if TypeScript is installed
+- Prompt you to add TypeScript if not already installed
+
+**Manual Configuration:**
+
+Packem provides a built-in React preset that configures Babel for React JSX transformation:
+
 ```typescript
-import react from '@vitejs/plugin-react'
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 
 export default defineConfig({
+  preset: 'react', // Automatically configures Babel for React
+  transformer,
+})
+```
+
+**With React Compiler:**
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { createReactPreset } from '@visulima/packem/config/preset/react'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: createReactPreset({
+    compiler: true // Enable React Compiler optimization
+  }),
+  transformer,
+})
+```
+
+**Manual Babel Configuration:**
+
+If you need more control, you can configure Babel manually:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  externals: ['react', 'react-dom'],
   rollup: {
-    plugins: [
-      react({
-        jsxRuntime: 'automatic',
-        fastRefresh: true
-      })
-    ]
+    babel: {
+      presets: [
+        ['@babel/preset-react', { runtime: 'automatic' }]
+        // Note: TypeScript is handled by the transformer via parser plugins
+        // Babel only needs to parse TypeScript syntax, not transform it
+      ],
+      plugins: [
+        // Add custom Babel plugins here
+      ]
+    }
   }
 })
 ```
+
+**Note:** When using Babel with React, Babel runs **before** your main transformer (esbuild/SWC/etc.), transforming JSX into JavaScript. TypeScript is handled by the transformer via parser plugins, not by Babel. This ensures that Rollup plugins can properly parse the code.
+
+### SolidJS
+
+**Quick Setup (Recommended):**
+
+Use the `add` command to automatically configure SolidJS:
+
+```bash
+npx packem add solid
+```
+
+This will:
+- Add `preset: 'solid'` to your config
+- Install SolidJS and Babel dependencies
+
+**Manual Configuration:**
+
+Packem provides a built-in Solid preset that configures Babel for SolidJS JSX transformation:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: 'solid', // Automatically configures Babel for SolidJS
+  transformer,
+})
+```
+
+**With SSR Support:**
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { createSolidPreset } from '@visulima/packem/config/preset/solid'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: createSolidPreset({
+    solidOptions: {
+      generate: 'ssr',
+      hydratable: true
+    }
+  }),
+  transformer,
+})
+```
+
+**Manual Babel Configuration:**
+
+If you need more control, you can configure Babel manually:
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  transformer,
+  externals: ['solid-js', 'solid-js/web', 'solid-js/store'],
+  rollup: {
+    babel: {
+      presets: [
+        ['babel-preset-solid', { generate: 'dom' }],
+        ['@babel/preset-env', { bugfixes: true, targets: 'last 2 years' }]
+        // Note: TypeScript is handled by the transformer via parser plugins
+        // Babel only needs to parse TypeScript syntax, not transform it
+      ],
+      plugins: [
+        // Add custom Babel plugins here
+      ]
+    }
+  }
+})
+```
+
+**Note:** When using Babel with SolidJS, Babel runs **before** your main transformer (esbuild/SWC/etc.), transforming JSX into JavaScript. TypeScript is handled by the transformer via parser plugins, not by Babel. This ensures that Rollup plugins can properly parse the code.
 
 ### Vue
 
@@ -251,10 +382,10 @@ export default defineConfig({
 Usage examples:
 
 ```ts
-// SVG → tiny data URI (not base64), whitespace-collapsed
+// SVG ? tiny data URI (not base64), whitespace-collapsed
 import icon from './assets/icon.svg?data-uri'
 
-// Any other file → base64 data URI with appropriate mime type
+// Any other file ? base64 data URI with appropriate mime type
 import txt from './assets/readme.txt?data-uri'
 ```
 
@@ -371,18 +502,18 @@ export default defineConfig({
 function customPlugin() {
   return {
     name: 'custom-plugin',
-    
+
     buildStart() {
       console.log('Build started!')
     },
-    
+
     transform(code, id) {
       if (id.endsWith('.custom')) {
         return `export default ${JSON.stringify(code)}`
       }
       return null
     },
-    
+
     generateBundle() {
       console.log('Bundle generated!')
     }
@@ -403,15 +534,15 @@ export default defineConfig({
 ```typescript
 function advancedPlugin(options = {}) {
   const { include = '**/*.js', exclude = 'node_modules/**' } = options
-  
+
   return {
     name: 'advanced-plugin',
-    
+
     buildStart(opts) {
       // Plugin initialization
       this.addWatchFile('config.json')
     },
-    
+
     resolveId(id, importer) {
       // Custom module resolution
       if (id === 'virtual:my-module') {
@@ -419,7 +550,7 @@ function advancedPlugin(options = {}) {
       }
       return null
     },
-    
+
     load(id) {
       // Load custom modules
       if (id === 'virtual:my-module') {
@@ -427,7 +558,7 @@ function advancedPlugin(options = {}) {
       }
       return null
     },
-    
+
     transform(code, id) {
       // Transform code
       if (include.test && include.test(id) && !exclude.test(id)) {
@@ -453,13 +584,13 @@ export default defineConfig({
       // Always included
       nodeResolve(),
       commonjs(),
-      
+
       // Development only
       ...(process.env.NODE_ENV === 'development' ? [
         serve({ contentBase: 'dist' }),
         livereload()
       ] : []),
-      
+
       // Production only
       ...(process.env.NODE_ENV === 'production' ? [
         terser(),
@@ -479,14 +610,14 @@ export default defineConfig({
       nodeResolve({
         // Prefer built-in Node.js modules
         preferBuiltins: true,
-        
+
         // Include/exclude packages
         include: ['node_modules/**'],
         exclude: ['node_modules/problematic-package/**'],
-        
+
         // Custom conditions
         exportConditions: ['node', 'import'],
-        
+
         // Browser compatibility
         browser: false
       })
@@ -503,21 +634,22 @@ export default defineConfig({
     plugins: [
       // 1. Module resolution
       nodeResolve(),
-      
+
       // 2. Format conversion
       commonjs(),
-      
+
       // 3. Code transformation
       typescript(),
-      babel(),
-      
+      // Babel is configured via rollup.babel option or React preset
+      // See React section above for examples
+
       // 4. Asset processing
       postcss(),
       image(),
-      
+
       // 5. Development tools
       ...(isDev ? [serve(), livereload()] : []),
-      
+
       // 6. Production optimization
       ...(isProd ? [terser(), visualizer()] : [])
     ]
@@ -530,20 +662,25 @@ export default defineConfig({
 ### Essential Plugins
 
 ```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
-import typescript from '@rollup/plugin-typescript'
-import { babel } from '@rollup/plugin-babel'
 import replace from '@rollup/plugin-replace'
 import json from '@rollup/plugin-json'
 
 export default defineConfig({
+  transformer,
   rollup: {
+    // Babel is configured via rollup.babel option (not as a plugin)
+    // For React, use preset: 'react' instead
+    babel: {
+      presets: ['@babel/preset-env'],
+      plugins: []
+    },
     plugins: [
       nodeResolve(),
       commonjs(),
-      typescript(),
-      babel({ babelHelpers: 'bundled' }),
       replace({ preventAssignment: true }),
       json()
     ]
@@ -605,38 +742,38 @@ interface PluginOptions {
 
 function myPlugin(options: PluginOptions = {}): Plugin {
   const filter = createFilter(options.include, options.exclude)
-  
+
   return {
     name: 'my-plugin',
-    
+
     buildStart(opts) {
       // Initialize plugin
     },
-    
+
     resolveId(id, importer) {
       // Resolve imports
       return null
     },
-    
+
     load(id) {
       // Load modules
       return null
     },
-    
+
     transform(code, id) {
       if (!filter(id)) return null
-      
+
       // Transform code
       return {
         code: transformedCode,
         map: sourceMap
       }
     },
-    
+
     generateBundle(opts, bundle) {
       // Process bundle
     },
-    
+
     writeBundle(opts, bundle) {
       // After bundle written
     }
@@ -659,11 +796,11 @@ async function testPlugin() {
       })
     ]
   })
-  
+
   const { output } = await bundle.generate({
     format: 'esm'
   })
-  
+
   console.log(output[0].code)
 }
 ```
@@ -683,10 +820,10 @@ export default defineConfig({
       // Order matters - resolve conflicts by reordering
       nodeResolve(),
       commonjs(),
-      
+
       // Avoid duplicate functionality
-      // Don't use both @rollup/plugin-typescript and @rollup/plugin-babel
-      // for TypeScript transformation
+      // Note: When using Babel with React preset, Babel handles JSX transformation
+      // TypeScript is handled by the transformer (esbuild/SWC) via parser plugins
     ]
   }
 })
@@ -718,7 +855,7 @@ export default defineConfig({
       somePlugin({
         cache: true
       }),
-      
+
       // Limit plugin scope
       anotherPlugin({
         include: 'src/**',

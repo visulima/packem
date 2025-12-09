@@ -1,5 +1,5 @@
 // index.d.ts
-//#region tests/rollup-plugin-dts/ts42-abstract/index.d.ts
+// #region tests/rollup-plugin-dts/ts42-abstract/index.d.ts
 interface AbstractReturnValue {}
 interface AbstractMember {}
 declare abstract class AbstractClass {
@@ -8,5 +8,5 @@ declare abstract class AbstractClass {
     member: AbstractMember;
 }
 type AbstractConstructor<T extends AbstractClass> = abstract new (...args: any[]) => T;
-//#endregion
+// #endregion
 export { AbstractConstructor };

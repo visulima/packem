@@ -1,5 +1,5 @@
 // index.d.ts
-//#region tests/rollup-plugin-dts/type-nodes/index.d.ts
+// #region tests/rollup-plugin-dts/type-nodes/index.d.ts
 interface A {}
 interface B {}
 interface C {}
@@ -23,5 +23,5 @@ declare function operator(a: keyof K): void;
 declare function arrayAndTuple(a: [L, M]): N[];
 declare function predicate(a: any): a is O;
 declare function assertion(a: any): asserts a is P;
-//#endregion
+// #endregion
 export { arrayAndTuple, assertion, intersection, operator, parenthesized, predicate, union };

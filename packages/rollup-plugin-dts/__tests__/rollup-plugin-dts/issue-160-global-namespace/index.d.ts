@@ -1,12 +1,6 @@
-import { A, B } from "./mod";
-
 declare global {
-    namespace Named.Core {
-        export { A, B };
-    }
-    namespace Foo.Bar.Baz.Quux {
-        export { A, B };
-    }
+    namespace Named.Core {}
+    namespace Foo.Bar.Baz.Quux {}
 }
 
-export { A };
+export { A, A, A, B, B } from "./mod";
