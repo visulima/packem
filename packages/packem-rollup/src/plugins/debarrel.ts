@@ -86,7 +86,7 @@ const safeParse = async (id: string, code: string, logger: Console): Promise<Sim
 
         return output[0] as SimpleParseResult;
     } catch (error: unknown) {
-        logger.warn({
+        logger.debug({
             message: `Failed to parse ${id}:\n  ${error instanceof Error ? error.message : String(error)}`,
             prefix: "plugin:debarrel",
         });
@@ -332,7 +332,11 @@ const getDeclarationClause = (resolvedSource: ResolvedSource, importName: Import
 
 const getDebarrelModifications = async (context: DebarrelContext, id: string, code: string, options: DebarrelPluginOptions, logger: Console) => {
     const modifications: Modifications = [];
-    const { imports } = await safeParse(id, code, logger);
+    // Parse the original file content instead of transformed code
+    // rs-module-lexer is designed to parse source files (TS/JSX), not transformed code
+    // Most transformations preserve import statements, so positions should still work
+    const originalCode = await readFileCached(context, id);
+    const { imports } = await safeParse(id, originalCode, logger);
 
     await Promise.all(
         imports.map(async (imp) => {
@@ -340,7 +344,8 @@ const getDebarrelModifications = async (context: DebarrelContext, id: string, co
                 return;
             }
 
-            const specifiers = code.slice(imp.ss, imp.s);
+            // Extract specifiers from original code (positions are relative to original file)
+            const specifiers = originalCode.slice(imp.ss, imp.s);
             const importNames = getImportNames(specifiers);
 
             if (importNames.length === 0) {
@@ -384,6 +389,8 @@ const getDebarrelModifications = async (context: DebarrelContext, id: string, co
                     return;
                 }
 
+                // Apply modifications using positions from original file
+                // Most transformations preserve import statements, so positions should match
                 modifications.push([imp.ss, imp.se, replacements.join(";")]);
             } catch (error) {
                 logger.warn({
