@@ -3,6 +3,8 @@ import type { Jiti } from "jiti";
 import type { BuildConfig, BuildPreset } from "../../types";
 import { createReactPreset } from "../preset/react";
 import { createSolidPreset } from "../preset/solid";
+import { createSveltePreset } from "../preset/svelte";
+import { createVuePreset } from "../preset/vue";
 
 const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<BuildConfig> => {
     switch (preset) {
@@ -18,6 +20,18 @@ const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<Bui
         case "solid": {
             // eslint-disable-next-line no-param-reassign
             preset = createSolidPreset();
+
+            break;
+        }
+        case "svelte": {
+            // eslint-disable-next-line no-param-reassign
+            preset = createSveltePreset();
+
+            break;
+        }
+        case "vue": {
+            // eslint-disable-next-line no-param-reassign
+            preset = createVuePreset();
 
             break;
         }

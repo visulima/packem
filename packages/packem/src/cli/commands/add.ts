@@ -21,6 +21,12 @@ const reactDependencies = ["react", "react-dom"];
 const solidDevDependencies = ["@babel/core", "babel-preset-solid"];
 const solidDependencies = ["solid-js"];
 
+const vueDevDependencies = ["unplugin-vue"];
+const vueDependencies = ["vue"];
+
+const svelteDevDependencies = ["rollup-plugin-svelte"];
+const svelteDependencies = ["svelte"];
+
 interface AddFeatureContext {
     logger: Pail;
     magic: MagicString;
@@ -203,6 +209,40 @@ const addSolid = async (context: AddFeatureContext): Promise<void> => {
     await installPackages(context, solidDevDependencies, solidDependencies);
 
     logger.success("\nSolid preset added!");
+};
+
+const addVue = async (context: AddFeatureContext): Promise<void> => {
+    const { logger, packemConfig } = context;
+
+    if (checkPresetExists(packemConfig, "vue", "createVuePreset")) {
+        logger.warn("Vue preset has already been added to the packem config.");
+
+        return;
+    }
+
+    insertPreset(context, "vue");
+
+    logger.info("Adding Vue dependencies...");
+    await installPackages(context, vueDevDependencies, vueDependencies);
+
+    logger.success("\nVue preset added!");
+};
+
+const addSvelte = async (context: AddFeatureContext): Promise<void> => {
+    const { logger, packemConfig } = context;
+
+    if (checkPresetExists(packemConfig, "svelte", "createSveltePreset")) {
+        logger.warn("Svelte preset has already been added to the packem config.");
+
+        return;
+    }
+
+    insertPreset(context, "svelte");
+
+    logger.info("Adding Svelte dependencies...");
+    await installPackages(context, svelteDevDependencies, svelteDependencies);
+
+    logger.success("\nSvelte preset added!");
 };
 
 const addCss = async (context: AddFeatureContext): Promise<void> => {
@@ -425,6 +465,14 @@ const createAddCommand = (cli: Cli<Pail>): void => {
 
             if (argument.includes("solid")) {
                 await addSolid(context);
+            }
+
+            if (argument.includes("vue")) {
+                await addVue(context);
+            }
+
+            if (argument.includes("svelte")) {
+                await addSvelte(context);
             }
 
             if (argument.includes("css")) {

@@ -270,12 +270,12 @@ export default defineConfig({
 ### Vue
 
 ```typescript
-import vue from '@vitejs/plugin-vue'
+import Vue from 'unplugin-vue/rollup'
 
 export default defineConfig({
   rollup: {
     plugins: [
-      vue({
+      Vue({
         include: [/\.vue$/],
         customElement: false
       })
@@ -284,10 +284,18 @@ export default defineConfig({
 })
 ```
 
+**Note:** For Vue 3 projects, you can also use the Vue preset instead of manually configuring the plugin:
+
+```typescript
+export default defineConfig({
+  preset: 'vue'
+})
+```
+
 ### Svelte
 
 ```typescript
-import { svelte } from '@sveltejs/vite-plugin-svelte'
+import svelte from 'rollup-plugin-svelte'
 
 export default defineConfig({
   rollup: {
@@ -299,6 +307,14 @@ export default defineConfig({
       })
     ]
   }
+})
+```
+
+**Note:** For Svelte projects, you can also use the Svelte preset instead of manually configuring the plugin:
+
+```typescript
+export default defineConfig({
+  preset: 'svelte'
 })
 ```
 
