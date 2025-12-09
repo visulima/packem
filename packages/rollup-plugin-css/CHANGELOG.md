@@ -1,3 +1,9 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.12](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.11...@visulima/rollup-plugin-css@1.0.0-alpha.12) (2025-12-09)
+
+### Bug Fixes
+
+* update pnpm-lock.yaml and example files for consistency ([d11dd48](https://github.com/visulima/packem/commit/d11dd4868a3cb5265035897148f81dca3b33f359))
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.11](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.10...@visulima/rollup-plugin-css@1.0.0-alpha.11) (2025-12-09)
 
 ### Features
