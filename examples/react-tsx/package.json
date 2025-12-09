@@ -41,9 +41,9 @@
         "@types/react": "^19.2.7",
         "@types/react-dom": "^19.2.3",
         "@visulima/packem": "workspace:*",
-        "esbuild": "^0.27.0",
-        "react": "^19.2.0",
-        "react-dom": "^19.2.0",
+        "esbuild": "^0.27.1",
+        "react": "^19.2.1",
+        "react-dom": "^19.2.1",
         "rimraf": "^6.1.2",
         "typescript": "^5.9.3"
     },
