@@ -1,5 +1,6 @@
-import type { BuildConfig } from "../../types";
 import Vue from "unplugin-vue/rollup";
+
+import type { BuildConfig } from "../../types";
 
 export interface VuePresetOptions {
     /**
@@ -67,9 +68,9 @@ export const createVuePreset = (options: VuePresetOptions = {}): BuildConfig => 
                     plugin: Vue({
                         customElement: pluginOptions.customElement ?? false,
                         exclude: pluginOptions.exclude,
+                        exportMode: "default",
                         include: pluginOptions.include ?? [/\.vue$/],
                         template: pluginOptions.template,
-                        exportMode: "default",
                     }),
                 },
             ],
