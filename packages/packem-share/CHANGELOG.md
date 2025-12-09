@@ -1,3 +1,9 @@
+## @visulima/packem-share [1.0.0-alpha.15](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.14...@visulima/packem-share@1.0.0-alpha.15) (2025-12-09)
+
+### Features
+
+* added preset for react and solid, added babel transformer ([773b907](https://github.com/visulima/packem/commit/773b907b462985cb61a5c978c43e227f24db6706))
+
 ## @visulima/packem-share [1.0.0-alpha.14](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.13...@visulima/packem-share@1.0.0-alpha.14) (2025-11-25)
 
 ### Miscellaneous Chores
