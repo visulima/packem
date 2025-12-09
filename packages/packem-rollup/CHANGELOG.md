@@ -1,3 +1,13 @@
+## @visulima/packem-rollup [1.0.0-alpha.32](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.31...@visulima/packem-rollup@1.0.0-alpha.32) (2025-12-09)
+
+### Bug Fixes
+
+* update pnpm-lock.yaml and example files for consistency ([d11dd48](https://github.com/visulima/packem/commit/d11dd4868a3cb5265035897148f81dca3b33f359))
+
+### Miscellaneous Chores
+
+* update package versions and add tests for debarrel plugin ([cb4cc0a](https://github.com/visulima/packem/commit/cb4cc0ae0716f93436a875d44aed392f0592195a))
+
 ## @visulima/packem-rollup [1.0.0-alpha.31](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.30...@visulima/packem-rollup@1.0.0-alpha.31) (2025-12-09)
 
 ### Features
