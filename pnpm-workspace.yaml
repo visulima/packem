@@ -215,8 +215,8 @@ catalogs:
         "@visulima/fs": 4.0.4
         "@visulima/humanizer": 2.0.3
         "@visulima/package": 4.1.4
-        "@visulima/packem": 2.0.0-alpha.37
-        "@visulima/packem-rollup": 1.0.0-alpha.27
+        "@visulima/packem": 2.0.0-alpha.40
+        "@visulima/packem-rollup": 1.0.0-alpha.30
         "@visulima/pail": 3.2.0
         "@visulima/path": 1.4.0
         "@visulima/rollup-plugin-css": 1.0.0-alpha.7
