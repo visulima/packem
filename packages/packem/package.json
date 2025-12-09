@@ -1,6 +1,6 @@
 {
     "name": "@visulima/packem",
-    "version": "2.0.0-alpha.40",
+    "version": "2.0.0-alpha.41",
     "description": "A fast and modern bundler for Node.js and TypeScript.",
     "keywords": [
         "anolilab",
@@ -196,11 +196,11 @@
         "@visulima/fs": "catalog:visulima",
         "@visulima/humanizer": "catalog:visulima",
         "@visulima/package": "catalog:visulima",
-        "@visulima/packem-rollup": "1.0.0-alpha.30",
-        "@visulima/packem-share": "1.0.0-alpha.14",
+        "@visulima/packem-rollup": "1.0.0-alpha.31",
+        "@visulima/packem-share": "1.0.0-alpha.15",
         "@visulima/pail": "catalog:visulima",
         "@visulima/path": "catalog:visulima",
-        "@visulima/rollup-plugin-css": "1.0.0-alpha.10",
+        "@visulima/rollup-plugin-css": "1.0.0-alpha.11",
         "@visulima/source-map": "catalog:visulima",
         "@visulima/tabular": "catalog:visulima",
         "@visulima/tsconfig": "catalog:visulima",
