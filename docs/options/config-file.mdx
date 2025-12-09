@@ -512,6 +512,146 @@ export default defineConfig({
 
 **Note:** The Solid preset automatically excludes `solid-js`, `solid-js/web`, and `solid-js/store` from unused dependency validation, as these are typically peer dependencies. TypeScript is handled by the transformer (esbuild/SWC/etc.) via parser plugins, not by Babel.
 
+#### Vue Preset
+
+The Vue preset configures Rollup with `unplugin-vue` to handle Vue 3 Single File Components (SFCs). The plugin processes `.vue` files and compiles them for Rollup bundling.
+
+**Quick Setup:**
+
+Use the `add` command to automatically configure Vue:
+
+```bash
+npx packem add vue
+```
+
+This will automatically set up the Vue preset and install all necessary dependencies.
+
+**Basic Usage:**
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: 'vue',
+  transformer,
+})
+```
+
+**With Custom Options:**
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { createVuePreset } from '@visulima/packem/config/preset/vue'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: createVuePreset({
+    pluginOptions: {
+      customElement: true,
+      include: [/\.vue$/],
+      exclude: [/\.vue\.test\.vue$/],
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag.startsWith('my-')
+        }
+      }
+    }
+  }),
+  transformer,
+})
+```
+
+**How it works:**
+
+1. **Rollup Plugin** (unplugin-vue): Processes `.vue` files, extracts `<script>`, `<template>`, and `<style>` blocks
+2. **Transformer** (esbuild/SWC/etc.): Processes the compiled JavaScript and handles TypeScript transformation
+3. **CSS Processing**: Styles are handled by Packem's CSS processing pipeline
+
+**Vue Preset Options:**
+
+- `pluginOptions`: Configure the Vue plugin options
+  - `customElement`: Enable custom elements mode (default: `false`)
+  - `include`: Include patterns for Vue files (default: `[/\.vue$/]`)
+  - `exclude`: Exclude patterns for Vue files
+  - `template`: Template compiler options
+    - `compilerOptions`: Vue template compiler options
+      - `isCustomElement`: Function to determine if a tag is a custom element
+
+**Note:** The Vue preset automatically excludes `vue` from unused dependency validation, as it's typically a peer dependency.
+
+#### Svelte Preset
+
+The Svelte preset configures Rollup with `rollup-plugin-svelte` to handle Svelte components. The plugin processes `.svelte` files and compiles them for Rollup bundling.
+
+**Quick Setup:**
+
+Use the `add` command to automatically configure Svelte:
+
+```bash
+npx packem add svelte
+```
+
+This will automatically set up the Svelte preset and install all necessary dependencies.
+
+**Basic Usage:**
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: 'svelte',
+  transformer,
+})
+```
+
+**With Custom Options:**
+
+```typescript
+import { defineConfig } from '@visulima/packem/config'
+import { createSveltePreset } from '@visulima/packem/config/preset/svelte'
+import transformer from '@visulima/packem/transformer/esbuild'
+
+export default defineConfig({
+  preset: createSveltePreset({
+    pluginOptions: {
+      compilerOptions: {
+        generate: 'ssr',
+        hydratable: true,
+        customElement: false
+      },
+      include: [/\.svelte$/],
+      exclude: [/\.svelte\.test\.svelte$/],
+      preprocess: {
+        // Preprocessor options
+      }
+    }
+  }),
+  transformer,
+})
+```
+
+**How it works:**
+
+1. **Rollup Plugin** (rollup-plugin-svelte): Processes `.svelte` files, compiles components to JavaScript
+2. **Transformer** (esbuild/SWC/etc.): Processes the compiled JavaScript and handles TypeScript transformation
+3. **CSS Processing**: Styles are extracted and handled by Packem's CSS processing pipeline
+
+**Svelte Preset Options:**
+
+- `pluginOptions`: Configure the Svelte plugin options
+  - `compilerOptions`: Svelte compiler options
+    - `generate`: Output mode - `"dom"` (default) or `"ssr"` for server-side rendering
+    - `hydratable`: Enable hydratable markers (default: `false`)
+    - `customElement`: Compile components to custom elements (default: `false`)
+    - `dev`: Enable dev mode (default: `false`)
+  - `include`: Include patterns for Svelte files (default: `[/\.svelte$/]`)
+  - `exclude`: Exclude patterns for Svelte files
+  - `preprocess`: Preprocessor options for Svelte components
+
+**Note:** The Svelte preset automatically excludes `svelte` from unused dependency validation, as it's typically a peer dependency.
+
 ### Custom Presets
 
 Create reusable configuration presets:

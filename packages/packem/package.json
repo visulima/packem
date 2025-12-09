@@ -86,6 +86,14 @@
             "types": "./dist/config/preset/solid.d.ts",
             "default": "./dist/config/preset/solid.js"
         },
+        "./config/preset/svelte": {
+            "types": "./dist/config/preset/svelte.d.ts",
+            "default": "./dist/config/preset/svelte.js"
+        },
+        "./config/preset/vue": {
+            "types": "./dist/config/preset/vue.d.ts",
+            "default": "./dist/config/preset/vue.js"
+        },
         "./css/loader/sourcemap": {
             "types": "./dist/rollup/plugins/css/loaders/sourcemap.d.ts",
             "default": "./dist/rollup/plugins/css/loaders/sourcemap.js"
@@ -309,6 +317,8 @@
         "typedoc-plugin-markdown": "catalog:markdown",
         "typedoc-plugin-rename-defaults": "catalog:dev",
         "typescript": "catalog:tsc",
+        "unplugin-vue": "^7.1.0",
+        "rollup-plugin-svelte": "^7.2.3",
         "vitest": "catalog:test"
     },
     "peerDependencies": {
@@ -333,6 +343,8 @@
         "sass": ">=1.43.4",
         "sass-embedded": ">=1.79.4",
         "stylus": ">=0.63.0",
+        "unplugin-vue": ">=7",
+        "rollup-plugin-svelte": ">=7",
         "sucrase": ">=3.35.0",
         "typedoc": ">=0.26.0",
         "typedoc-plugin-markdown": ">=4.2.0",
@@ -397,6 +409,9 @@
         "postcss-value-parser": {
             "optional": true
         },
+        "rollup-plugin-svelte": {
+            "optional": true
+        },
         "sass": {
             "optional": true
         },
@@ -419,6 +434,9 @@
             "optional": true
         },
         "typescript": {
+            "optional": true
+        },
+        "unplugin-vue": {
             "optional": true
         },
         "which-pm-runs": {
