@@ -1,3 +1,15 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.11](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.10...@visulima/rollup-plugin-css@1.0.0-alpha.11) (2025-12-09)
+
+### Features
+
+* added preset for react and solid, added babel transformer ([773b907](https://github.com/visulima/packem/commit/773b907b462985cb61a5c978c43e227f24db6706))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.15
+* **@visulima/css-style-inject:** upgraded to 1.0.0-alpha.11
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.10](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.9...@visulima/rollup-plugin-css@1.0.0-alpha.10) (2025-11-30)
 
 ## @visulima/rollup-plugin-css [1.0.0-alpha.9](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.8...@visulima/rollup-plugin-css@1.0.0-alpha.9) (2025-11-26)
