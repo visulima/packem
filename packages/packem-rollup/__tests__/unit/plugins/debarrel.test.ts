@@ -1,30 +1,35 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import fs from "node:fs/promises";
+
 import type { PluginContext } from "rollup";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { debarrelPlugin } from "../../../src/plugins/debarrel";
 
 // Mock fs module
-vi.mock("node:fs/promises", () => ({
-    default: {
-        readFile: vi.fn(),
-    },
-}));
+vi.mock(import("node:fs/promises"), () => {
+    return {
+        default: {
+            readFile: vi.fn(),
+        },
+    };
+});
 
 // Mock rs-module-lexer to avoid memory issues in tests
-vi.mock("rs-module-lexer", () => ({
-    parseAsync: vi.fn().mockResolvedValue({
-        output: [
-            {
-                imports: [],
-                exports: [],
-                facade: false,
-            },
-        ],
-    }),
-}));
+vi.mock(import("rs-module-lexer"), () => {
+    return {
+        parseAsync: vi.fn().mockResolvedValue({
+            output: [
+                {
+                    exports: [],
+                    facade: false,
+                    imports: [],
+                },
+            ],
+        }),
+    };
+});
 
-import fs from "node:fs/promises";
-
-describe("debarrelPlugin", () => {
+describe(debarrelPlugin, () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -55,8 +60,8 @@ describe("debarrelPlugin", () => {
         } as unknown as PluginContext;
 
         mockResolve.mockResolvedValue({
-            id: "/test/barrel.ts",
             external: false,
+            id: "/test/barrel.ts",
         });
 
         // Call transform with transformed code
@@ -97,8 +102,8 @@ describe("debarrelPlugin", () => {
         } as unknown as PluginContext;
 
         mockResolve.mockResolvedValue({
-            id: "/test/barrel.ts",
             external: false,
+            id: "/test/barrel.ts",
         });
 
         // Call transform twice with same file

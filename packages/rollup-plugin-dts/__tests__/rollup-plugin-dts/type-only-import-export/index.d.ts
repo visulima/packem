@@ -1,6 +1,4 @@
-
-
-export {type BarType, BarValue} from "./bar";
+export { type BarType, BarValue } from "./bar";
 export type { Foo } from "./foo";
 export { default as A } from "a";
 export { type B } from "b";
@@ -8,7 +6,7 @@ export { type B as B2, type B as B3 } from "b1";
 export * as C from "c";
 export * as C1 from "c";
 export { type default as D } from "d";
-export { type E as default, type E as E2,type E as E3 } from "e";
+export { type E as default, type E as E2, type E as E3 } from "e";
 
 interface O {}
 export { O as O1 };
@@ -22,8 +20,6 @@ interface Foo {
 }
 export type { Foo as FooInlne };
 export * as F from "f";
-
-
 export { G } from "g";
 export { type G1 } from "g1";
 export { H as H1 } from "h1";

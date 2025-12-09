@@ -1,6 +1,7 @@
-import type { BuildConfig } from "../../types";
-import svelte from "rollup-plugin-svelte";
 import { DEFAULT_EXTENSIONS } from "@visulima/packem-share/constants";
+import svelte from "rollup-plugin-svelte";
+
+import type { BuildConfig } from "../../types";
 
 export interface SveltePresetOptions {
     /**
@@ -11,6 +12,8 @@ export interface SveltePresetOptions {
          * Svelte compiler options
          */
         compilerOptions?: {
+            [key: string]: unknown;
+
             /**
              * Custom element mode
              * @default false
@@ -34,8 +37,6 @@ export interface SveltePresetOptions {
              * @default false
              */
             hydratable?: boolean;
-
-            [key: string]: unknown;
         };
 
         /**
@@ -94,8 +95,8 @@ export const createSveltePreset = (options: SveltePresetOptions = {}): BuildConf
                             ...pluginOptions.compilerOptions,
                         },
                         emitCss: false,
-                        extensions: [".svelte"],
                         exclude: pluginOptions.exclude,
+                        extensions: [".svelte"],
                         include: pluginOptions.include ?? [/\.svelte$/],
                         preprocess: pluginOptions.preprocess,
                     }),
