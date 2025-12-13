@@ -2,6 +2,67 @@ import type { BabelPluginConfig } from "@visulima/packem-rollup/babel";
 
 import type { BuildConfig } from "../../types";
 
+/**
+ * Build solid preset options from user options.
+ */
+const buildSolidPresetOptions = (solidOptions: SolidPresetOptions["solidOptions"]): Record<string, unknown> => {
+    const presetOptions: Record<string, unknown> = {
+        contextToCustomElements: solidOptions?.contextToCustomElements ?? true,
+        delegateEvents: solidOptions?.delegateEvents ?? true,
+        generate: solidOptions?.generate ?? "dom",
+        hydratable: solidOptions?.hydratable ?? false,
+        moduleName: solidOptions?.moduleName ?? "solid-js/web",
+        wrapConditionals: solidOptions?.wrapConditionals ?? true,
+    };
+
+    // Only include builtIns if explicitly provided (don't set to undefined)
+    if (solidOptions?.builtIns !== undefined) {
+        presetOptions.builtIns = solidOptions.builtIns;
+    }
+
+    return presetOptions;
+};
+
+/**
+ * Merge user-provided babel options with base config.
+ */
+const mergeUserBabelOptions = (
+    baseConfig: BabelPluginConfig,
+    userBabelOptions: SolidPresetOptions["babel"],
+    basePlugins: BabelPluginConfig["plugins"],
+    basePresets: BabelPluginConfig["presets"],
+): BabelPluginConfig => {
+    if (!userBabelOptions || typeof userBabelOptions === "function") {
+        return baseConfig;
+    }
+
+    // Merge user plugins
+    let mergedPlugins = basePlugins;
+
+    if (userBabelOptions.plugins) {
+        const userPluginsArray = Array.isArray(userBabelOptions.plugins) ? userBabelOptions.plugins : [];
+
+        mergedPlugins = [...basePlugins || [], ...userPluginsArray];
+    }
+
+    // Merge user presets
+    let mergedPresets = basePresets;
+
+    if (userBabelOptions.presets) {
+        const userPresetsArray = Array.isArray(userBabelOptions.presets) ? userBabelOptions.presets : [];
+
+        mergedPresets = [...basePresets || [], ...userPresetsArray];
+    }
+
+    return {
+        ...baseConfig,
+        ...userBabelOptions,
+        plugins: mergedPlugins && mergedPlugins.length > 0 ? mergedPlugins : undefined,
+        presets: mergedPresets && mergedPresets.length > 0 ? mergedPresets : undefined,
+    };
+};
+
+
 export interface SolidPresetOptions {
     /**
      * Pass any additional babel transform options. They will be merged with
@@ -73,66 +134,6 @@ export interface SolidPresetOptions {
         wrapConditionals?: boolean;
     };
 }
-
-/**
- * Build solid preset options from user options.
- */
-const buildSolidPresetOptions = (solidOptions: SolidPresetOptions["solidOptions"]): Record<string, unknown> => {
-    const presetOptions: Record<string, unknown> = {
-        contextToCustomElements: solidOptions?.contextToCustomElements ?? true,
-        delegateEvents: solidOptions?.delegateEvents ?? true,
-        generate: solidOptions?.generate ?? "dom",
-        hydratable: solidOptions?.hydratable ?? false,
-        moduleName: solidOptions?.moduleName ?? "solid-js/web",
-        wrapConditionals: solidOptions?.wrapConditionals ?? true,
-    };
-
-    // Only include builtIns if explicitly provided (don't set to undefined)
-    if (solidOptions?.builtIns !== undefined) {
-        presetOptions.builtIns = solidOptions.builtIns;
-    }
-
-    return presetOptions;
-};
-
-/**
- * Merge user-provided babel options with base config.
- */
-const mergeUserBabelOptions = (
-    baseConfig: BabelPluginConfig,
-    userBabelOptions: SolidPresetOptions["babel"],
-    basePlugins: BabelPluginConfig["plugins"],
-    basePresets: BabelPluginConfig["presets"],
-): BabelPluginConfig => {
-    if (!userBabelOptions || typeof userBabelOptions === "function") {
-        return baseConfig;
-    }
-
-    // Merge user plugins
-    let mergedPlugins = basePlugins;
-
-    if (userBabelOptions.plugins) {
-        const userPluginsArray = Array.isArray(userBabelOptions.plugins) ? userBabelOptions.plugins : [];
-
-        mergedPlugins = [...basePlugins || [], ...userPluginsArray];
-    }
-
-    // Merge user presets
-    let mergedPresets = basePresets;
-
-    if (userBabelOptions.presets) {
-        const userPresetsArray = Array.isArray(userBabelOptions.presets) ? userBabelOptions.presets : [];
-
-        mergedPresets = [...basePresets || [], ...userPresetsArray];
-    }
-
-    return {
-        ...baseConfig,
-        ...userBabelOptions,
-        plugins: mergedPlugins && mergedPlugins.length > 0 ? mergedPlugins : undefined,
-        presets: mergedPresets && mergedPresets.length > 0 ? mergedPresets : undefined,
-    };
-};
 
 /**
  * SolidJS preset for Packem. Configures Babel with babel-preset-solid.
