@@ -18,10 +18,10 @@
         "clean": "rimraf node_modules dist"
     },
     "dependencies": {
-        "react": "^19.2.1"
+        "react": "^19.2.3"
     },
     "devDependencies": {
-        "@tailwindcss/postcss": "^4.1.17",
+        "@tailwindcss/postcss": "^4.1.18",
         "@types/react": "^19.2.7",
         "@types/react-dom": "^19.2.3",
         "@visulima/packem": "workspace:*",
@@ -34,9 +34,9 @@
         "postcss-modules-scope": "^3.2.1",
         "postcss-modules-values": "^4.0.0",
         "postcss-value-parser": "^4.2.0",
-        "react-dom": "^19.2.1",
+        "react-dom": "^19.2.3",
         "rimraf": "^6.1.2",
-        "tailwindcss": "^4.1.17",
+        "tailwindcss": "^4.1.18",
         "typescript": "^5.9.3"
     },
     "engines": {

@@ -300,6 +300,7 @@
         "rollup-plugin-lit-css": "catalog:build",
         "rollup-plugin-polyfill-node": "catalog:build",
         "rollup-plugin-pure": "catalog:build",
+        "rollup-plugin-svelte": "^7.2.3",
         "rollup-plugin-visualizer": "catalog:build",
         "rs-module-lexer": "catalog:dev",
         "sass": "catalog:style",
@@ -318,7 +319,6 @@
         "typedoc-plugin-rename-defaults": "catalog:dev",
         "typescript": "catalog:tsc",
         "unplugin-vue": "^7.1.0",
-        "rollup-plugin-svelte": "^7.2.3",
         "vitest": "catalog:test"
     },
     "peerDependencies": {
@@ -340,16 +340,16 @@
         "postcss-modules-scope": ">=3.2.0",
         "postcss-modules-values": ">=4.0.0",
         "postcss-value-parser": ">=4.2.0",
+        "rollup-plugin-svelte": ">=7",
         "sass": ">=1.43.4",
         "sass-embedded": ">=1.79.4",
         "stylus": ">=0.63.0",
-        "unplugin-vue": ">=7",
-        "rollup-plugin-svelte": ">=7",
         "sucrase": ">=3.35.0",
         "typedoc": ">=0.26.0",
         "typedoc-plugin-markdown": ">=4.2.0",
         "typedoc-plugin-rename-defaults": ">=0.7.0",
-        "typescript": ">=4.5 || >=5.0"
+        "typescript": ">=4.5 || >=5.0",
+        "unplugin-vue": ">=7"
     },
     "peerDependenciesMeta": {
         "@arethetypeswrong/core": {
