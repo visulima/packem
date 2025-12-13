@@ -23,14 +23,11 @@ SOFTWARE.
 <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/packem artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## @visulima/packem-rollup
-
 License: MIT
 By: Daniel Bannert
 Repository: git+https://github.com/visulima/packem.git
@@ -56,6 +53,8 @@ Repository: git+https://github.com/visulima/packem.git
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
+>
+>
 >
 > # Licenses of bundled dependencies
 >
@@ -107,6 +106,10 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+>
+>
+>
+>
 >
 > # Licenses of bundled types
 >
@@ -346,6 +349,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
 >
 > # Licenses of bundled dependencies
 >
@@ -397,6 +402,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+>
+>
 >
 > > # Licenses of bundled types
 > >
@@ -531,10 +538,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > > party to this document and has no duty or obligation with respect to
 > > > this CC0 or use of the Work.
 
----
+---------------------------------------
 
 ## @visulima/packem-share
-
 License: MIT
 By: Daniel Bannert
 Repository: git+https://github.com/visulima/packem.git
@@ -560,6 +566,11 @@ Repository: git+https://github.com/visulima/packem.git
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
+>
+>
+>
+>
+>
 >
 > # Licenses of bundled types
 >
@@ -595,6 +606,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
 > >
 > > # Licenses of bundled dependencies
 > >
@@ -774,6 +787,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > >
 > > > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 > >
+> > 
+> >
 > > # Licenses of bundled types
 > >
 > > The published @visulima/pail artifact additionally contains code with the following licenses:
@@ -936,6 +951,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
+> > 
 > >
 > > # Licenses of bundled types
 > >
@@ -1187,10 +1205,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
 
----
+---------------------------------------
 
 ## tree-kill
-
 License: MIT
 By: Peteris Krumins, Todd Wolfson, William Hilton, Fabrício Matté
 Repository: git://github.com/pkrumins/node-tree-kill.git
@@ -1259,14 +1276,11 @@ Repository: git+https://github.com/visulima/packem.git
 > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/packem artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## @visulima/packem-rollup
-
 License: MIT
 By: Daniel Bannert
 Repository: git+https://github.com/visulima/packem.git
@@ -1292,6 +1306,8 @@ Repository: git+https://github.com/visulima/packem.git
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
+>
+>
 >
 > # Licenses of bundled dependencies
 >
@@ -1343,6 +1359,10 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+>
+>
+>
+>
 >
 > # Licenses of bundled types
 >
@@ -1582,6 +1602,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
 >
 > # Licenses of bundled dependencies
 >
@@ -1633,6 +1655,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+>
+>
 >
 > > # Licenses of bundled types
 > >
@@ -1767,10 +1791,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > > party to this document and has no duty or obligation with respect to
 > > > this CC0 or use of the Work.
 
----
+---------------------------------------
 
 ## @visulima/packem-share
-
 License: MIT
 By: Daniel Bannert
 Repository: git+https://github.com/visulima/packem.git
@@ -1796,6 +1819,11 @@ Repository: git+https://github.com/visulima/packem.git
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
+>
+>
+>
+>
+>
 >
 > # Licenses of bundled types
 >
@@ -1831,6 +1859,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
 > >
 > > # Licenses of bundled dependencies
 > >
@@ -2010,6 +2040,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > >
 > > > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 > >
+> > 
+> >
 > > # Licenses of bundled types
 > >
 > > The published @visulima/pail artifact additionally contains code with the following licenses:
@@ -2172,6 +2204,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
+> > 
 > >
 > > # Licenses of bundled types
 > >
@@ -2423,10 +2458,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
 
----
+---------------------------------------
 
 ## tree-kill
-
 License: MIT
 By: Peteris Krumins, Todd Wolfson, William Hilton, Fabrício Matté
 Repository: git://github.com/pkrumins/node-tree-kill.git
@@ -2697,14 +2731,11 @@ Repository: git://github.com/pkrumins/node-tree-kill.git
 > > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/packem artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## @visulima/packem-rollup
-
 License: MIT
 By: Daniel Bannert
 Repository: git+https://github.com/visulima/packem.git
@@ -2730,6 +2761,8 @@ Repository: git+https://github.com/visulima/packem.git
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
+>
+>
 >
 > # Licenses of bundled dependencies
 >
@@ -2781,6 +2814,10 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+>
+>
+>
+>
 >
 > # Licenses of bundled types
 >
@@ -3020,6 +3057,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
 >
 > # Licenses of bundled dependencies
 >
@@ -3071,6 +3110,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+>
+>
 >
 > > # Licenses of bundled types
 > >
@@ -3205,10 +3246,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > > party to this document and has no duty or obligation with respect to
 > > > this CC0 or use of the Work.
 
----
+---------------------------------------
 
 ## @visulima/packem-share
-
 License: MIT
 By: Daniel Bannert
 Repository: git+https://github.com/visulima/packem.git
@@ -3234,6 +3274,11 @@ Repository: git+https://github.com/visulima/packem.git
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
+>
+>
+>
+>
+>
 >
 > # Licenses of bundled types
 >
@@ -3269,6 +3314,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
 > >
 > > # Licenses of bundled dependencies
 > >
@@ -3448,6 +3495,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > >
 > > > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 > >
+> > 
+> >
 > > # Licenses of bundled types
 > >
 > > The published @visulima/pail artifact additionally contains code with the following licenses:
@@ -3610,6 +3659,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
+> > 
 > >
 > > # Licenses of bundled types
 > >
@@ -3861,10 +3913,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
 
----
+---------------------------------------
 
 ## tree-kill
-
 License: MIT
 By: Peteris Krumins, Todd Wolfson, William Hilton, Fabrício Matté
 Repository: git://github.com/pkrumins/node-tree-kill.git
@@ -4059,14 +4110,11 @@ Repository: git+https://github.com/visulima/packem.git
 > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/packem artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## @visulima/packem-rollup
-
 License: MIT
 By: Daniel Bannert
 Repository: git+https://github.com/visulima/packem.git
@@ -4092,6 +4140,8 @@ Repository: git+https://github.com/visulima/packem.git
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
+>
+>
 >
 > # Licenses of bundled dependencies
 >
@@ -4143,6 +4193,10 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+>
+>
+>
+>
 >
 > # Licenses of bundled types
 >
@@ -4382,6 +4436,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
 >
 > # Licenses of bundled dependencies
 >
@@ -4433,6 +4489,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+>
+>
 >
 > > # Licenses of bundled types
 > >
@@ -4567,10 +4625,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > > party to this document and has no duty or obligation with respect to
 > > > this CC0 or use of the Work.
 
----
+---------------------------------------
 
 ## @visulima/packem-share
-
 License: MIT
 By: Daniel Bannert
 Repository: git+https://github.com/visulima/packem.git
@@ -4596,6 +4653,11 @@ Repository: git+https://github.com/visulima/packem.git
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
+>
+>
+>
+>
+>
 >
 > # Licenses of bundled types
 >
@@ -4631,6 +4693,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
 > >
 > > # Licenses of bundled dependencies
 > >
@@ -4810,6 +4874,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > >
 > > > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 > >
+> > 
+> >
 > > # Licenses of bundled types
 > >
 > > The published @visulima/pail artifact additionally contains code with the following licenses:
@@ -4972,6 +5038,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
+> > 
 > >
 > > # Licenses of bundled types
 > >
@@ -5223,10 +5292,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
 
----
+---------------------------------------
 
 ## tree-kill
-
 License: MIT
 By: Peteris Krumins, Todd Wolfson, William Hilton, Fabrício Matté
 Repository: git://github.com/pkrumins/node-tree-kill.git
@@ -5293,14 +5361,11 @@ Repository: git://github.com/pkrumins/node-tree-kill.git
 > > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/packem artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## @visulima/packem-rollup
-
 License: MIT
 By: Daniel Bannert
 Repository: git+https://github.com/visulima/packem.git
@@ -5326,6 +5391,8 @@ Repository: git+https://github.com/visulima/packem.git
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
+>
+>
 >
 > # Licenses of bundled dependencies
 >
@@ -5377,6 +5444,10 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+>
+>
+>
+>
 >
 > # Licenses of bundled types
 >
@@ -5616,6 +5687,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
 >
 > # Licenses of bundled dependencies
 >
@@ -5667,6 +5740,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+>
+>
 >
 > > # Licenses of bundled types
 > >
@@ -5801,10 +5876,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > > party to this document and has no duty or obligation with respect to
 > > > this CC0 or use of the Work.
 
----
+---------------------------------------
 
 ## @visulima/packem-share
-
 License: MIT
 By: Daniel Bannert
 Repository: git+https://github.com/visulima/packem.git
@@ -5830,6 +5904,11 @@ Repository: git+https://github.com/visulima/packem.git
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
+>
+>
+>
+>
+>
 >
 > # Licenses of bundled types
 >
@@ -5865,6 +5944,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
 > >
 > > # Licenses of bundled dependencies
 > >
@@ -6044,6 +6125,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > >
 > > > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 > >
+> > 
+> >
 > > # Licenses of bundled types
 > >
 > > The published @visulima/pail artifact additionally contains code with the following licenses:
@@ -6206,6 +6289,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
+> > 
 > >
 > > # Licenses of bundled types
 > >
@@ -6457,10 +6543,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
 
----
+---------------------------------------
 
 ## tree-kill
-
 License: MIT
 By: Peteris Krumins, Todd Wolfson, William Hilton, Fabrício Matté
 Repository: git://github.com/pkrumins/node-tree-kill.git
@@ -6655,14 +6740,11 @@ Repository: git://github.com/pkrumins/node-tree-kill.git
 > > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/packem artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## @visulima/packem-rollup
-
 License: MIT
 By: Daniel Bannert
 Repository: git+https://github.com/visulima/packem.git
@@ -6688,6 +6770,8 @@ Repository: git+https://github.com/visulima/packem.git
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
+>
+>
 >
 > # Licenses of bundled dependencies
 >
@@ -6739,6 +6823,10 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+>
+>
+>
+>
 >
 > # Licenses of bundled types
 >
@@ -6978,6 +7066,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
 >
 > # Licenses of bundled dependencies
 >
@@ -7029,6 +7119,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+>
+>
 >
 > > # Licenses of bundled types
 > >
@@ -7163,10 +7255,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > > party to this document and has no duty or obligation with respect to
 > > > this CC0 or use of the Work.
 
----
+---------------------------------------
 
 ## @visulima/packem-share
-
 License: MIT
 By: Daniel Bannert
 Repository: git+https://github.com/visulima/packem.git
@@ -7192,6 +7283,11 @@ Repository: git+https://github.com/visulima/packem.git
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
+>
+>
+>
+>
+>
 >
 > # Licenses of bundled types
 >
@@ -7227,6 +7323,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
 > >
 > > # Licenses of bundled dependencies
 > >
@@ -7406,6 +7504,8 @@ Repository: git+https://github.com/visulima/packem.git
 > > >
 > > > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 > >
+> > 
+> >
 > > # Licenses of bundled types
 > >
 > > The published @visulima/pail artifact additionally contains code with the following licenses:
@@ -7568,6 +7668,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
+> >
+> > 
+> > 
 > >
 > > # Licenses of bundled types
 > >
@@ -7819,10 +7922,9 @@ Repository: git+https://github.com/visulima/packem.git
 > > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > > SOFTWARE.
 
----
+---------------------------------------
 
 ## tree-kill
-
 License: MIT
 By: Peteris Krumins, Todd Wolfson, William Hilton, Fabrício Matté
 Repository: git://github.com/pkrumins/node-tree-kill.git
