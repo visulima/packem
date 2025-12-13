@@ -88,7 +88,7 @@ const checkGitDirty = async (rootDirectory: string): Promise<boolean> => {
             },
         });
 
-        return result.stdout?.trim().length > 0 ?? false;
+        return (result.stdout?.trim().length ?? 0) > 0;
     } catch {
         return false;
     }
