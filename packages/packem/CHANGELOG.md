@@ -1,3 +1,9 @@
+## @visulima/packem [2.0.0-alpha.44](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.43...@visulima/packem@2.0.0-alpha.44) (2025-12-13)
+
+### Bug Fixes
+
+* improve logic for checking Git status in add command ([bbb85c7](https://github.com/visulima/packem/commit/bbb85c7952221bb840f0697a4db85a4ba4a5327b))
+
 ## @visulima/packem [2.0.0-alpha.43](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.42...@visulima/packem@2.0.0-alpha.43) (2025-12-09)
 
 ### Bug Fixes
