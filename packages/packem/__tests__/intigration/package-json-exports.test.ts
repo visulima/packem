@@ -2487,4 +2487,415 @@ console.log("require-module-import", resolved);
         expect(binProcess.stdout).toContain("Could not find entrypoint for `./dist/icons/*`");
         expect(binProcess.exitCode).toBe(1);
     });
+
+    it("should support separate source files for browser and server patterns", async () => {
+        expect.assertions(6);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.tsx`, `export default 'index';`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.browser.tsx`, `export default 'browser';`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.server.tsx`, `export default 'server';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            preset: "solid",
+        });
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    browser: "./dist/index.browser.js",
+                    node: "./dist/index.server.js",
+                    types: "./dist/index.d.ts",
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.js`);
+
+        expect(browserContent).toContain("browser");
+
+        const serverContent = readFileSync(`${temporaryDirectoryPath}/dist/index.server.js`);
+
+        expect(serverContent).toContain("server");
+
+        // Verify separate builds by checking replace values
+        expect(browserContent).toMatch(/process\.env\.SSR.*false/);
+        expect(serverContent).toMatch(/process\.env\.SSR.*true/);
+    });
+
+    it("should support same source file with different outputs (browser/server patterns)", async () => {
+        expect.assertions(7);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.tsx`,
+            `export const env = process.env.NODE_ENV;
+export const isServer = process.env.SSR === 'true';
+export default 'index';`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            preset: "solid",
+        });
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    browser: "./dist/index.browser.js",
+                    node: "./dist/index.server.js",
+                    types: "./dist/index.d.ts",
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.js`);
+
+        expect(browserContent).toContain("index");
+        expect(browserContent).toMatch(/process\.env\.SSR.*false/);
+
+        const serverContent = readFileSync(`${temporaryDirectoryPath}/dist/index.server.js`);
+
+        expect(serverContent).toContain("index");
+        expect(serverContent).toMatch(/process\.env\.SSR.*true/);
+    });
+
+    it("should inject SolidJS environment variables using array join pattern", async () => {
+        expect.assertions(8);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.tsx`,
+            `export const isDev = process.env.DEV === 'true';
+export const isProd = process.env.PROD === 'true';
+export const isSSR = process.env.SSR === 'true';
+export const nodeEnv = process.env.NODE_ENV;
+export const importMetaDev = import.meta.env.DEV === true;
+export const importMetaProd = import.meta.env.PROD === true;
+export const importMetaSSR = import.meta.env.SSR === true;
+export default 'solid';`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            preset: "solid",
+        });
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    browser: "./dist/index.browser.js",
+                    node: "./dist/index.server.js",
+                    types: "./dist/index.d.ts",
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        // Check browser build (should have DEV=true, PROD=false, SSR=false)
+        const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.js`);
+
+        expect(browserContent).toMatch(/process\.env\.DEV.*true/);
+        expect(browserContent).toMatch(/process\.env\.PROD.*false/);
+        expect(browserContent).toMatch(/process\.env\.SSR.*false/);
+        expect(browserContent).toMatch(/import\.meta\.env\.DEV.*true/);
+        expect(browserContent).toMatch(/import\.meta\.env\.PROD.*false/);
+
+        // Check server build (should have SSR=true)
+        const serverContent = readFileSync(`${temporaryDirectoryPath}/dist/index.server.js`);
+
+        expect(serverContent).toMatch(/process\.env\.SSR.*true/);
+        expect(serverContent).toMatch(/import\.meta\.env\.SSR.*true/);
+    });
+
+    it("should support nested conditions (browser.development)", async () => {
+        expect.assertions(6);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.tsx`,
+            `export const env = process.env.NODE_ENV;
+export const isDev = process.env.DEV === 'true';
+export default 'index';`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            preset: "solid",
+        });
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    browser: {
+                        development: "./dist/index.development.js",
+                        default: "./dist/index.browser.js",
+                    },
+                    node: "./dist/index.server.js",
+                    types: "./dist/index.d.ts",
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const developmentContent = readFileSync(`${temporaryDirectoryPath}/dist/index.development.js`);
+
+        expect(developmentContent).toContain("index");
+        expect(developmentContent).toMatch(/process\.env\.NODE_ENV.*"development"/);
+        expect(developmentContent).toMatch(/process\.env\.DEV.*true/);
+
+        const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.js`);
+
+        expect(browserContent).toContain("index");
+    });
+
+    it("should support workerd condition with separate source file", async () => {
+        expect.assertions(4);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const runtime = 'node';`);
+        writeFileSync(`${temporaryDirectoryPath}/src/index.workerd.ts`, `export const runtime = 'workerd';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackemConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    workerd: "./dist/index.workerd.js",
+                    node: "./dist/index.js",
+                    types: "./dist/index.d.ts",
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const workerdContent = readFileSync(`${temporaryDirectoryPath}/dist/index.workerd.js`);
+
+        expect(workerdContent).toContain("workerd");
+
+        const nodeContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+
+        expect(nodeContent).toContain("node");
+    });
+
+    it("should not generate .d.js files for declaration-only entries", async () => {
+        expect.assertions(4);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = 'test';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackemConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: "./dist/index.mjs",
+                    require: "./dist/index.cjs",
+                    types: "./dist/index.d.ts",
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const files = readdirSync(join(temporaryDirectoryPath, "dist"));
+
+        // Should not have any .d.js files
+        const dJsFiles = files.filter((file) => file.endsWith(".d.js"));
+
+        expect(dJsFiles).toHaveLength(0);
+
+        // Should have declaration files but not .d.js files
+        expect(files.some((file) => file.endsWith(".d.ts"))).toBe(true);
+    });
+
+    it("should create separate builds for entries with different types (browser vs server)", async () => {
+        expect.assertions(8);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = 'base';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackemConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    browser: "./dist/index.browser.js",
+                    node: "./dist/index.server.js",
+                    types: "./dist/index.d.ts",
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const files = readdirSync(join(temporaryDirectoryPath, "dist"));
+
+        // Should have separate files for browser and server
+        expect(files).toContain("index.browser.js");
+        expect(files).toContain("index.server.js");
+
+        // Verify they are separate builds (should not import each other incorrectly)
+        const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.js`);
+        const serverContent = readFileSync(`${temporaryDirectoryPath}/dist/index.server.js`);
+
+        expect(browserContent).toContain("value");
+        expect(serverContent).toContain("value");
+
+        // Should not have .d.js files
+        const dJsFiles = files.filter((file) => file.endsWith(".d.js"));
+
+        expect(dJsFiles).toHaveLength(0);
+    });
+
+    it("should group entries by environment, runtime, and type correctly", async () => {
+        expect.assertions(6);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = 'test';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            preset: "solid",
+        });
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    browser: {
+                        development: "./dist/index.development.js",
+                        default: "./dist/index.browser.js",
+                    },
+                    node: "./dist/index.server.js",
+                    types: "./dist/index.d.ts",
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const files = readdirSync(join(temporaryDirectoryPath, "dist"));
+
+        // Should have separate files for each type
+        expect(files).toContain("index.development.js");
+        expect(files).toContain("index.browser.js");
+        expect(files).toContain("index.server.js");
+
+        // Verify development build has correct environment variables
+        const developmentContent = readFileSync(`${temporaryDirectoryPath}/dist/index.development.js`);
+
+        expect(developmentContent).toMatch(/process\.env\.NODE_ENV.*"development"/);
+        expect(developmentContent).toMatch(/process\.env\.DEV.*true/);
+    });
+
+    it("should not generate .d.js files even when entry names end with .d", async () => {
+        expect.assertions(3);
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = 'test';`);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+
+        await createPackemConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: "./dist/index.mjs",
+                    require: "./dist/index.cjs",
+                    types: "./dist/index.d.ts",
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const files = readdirSync(join(temporaryDirectoryPath, "dist"));
+        const dJsFiles = files.filter((file) => file.endsWith(".d.js") || file.includes(".d.js"));
+
+        // Should not have any .d.js files
+        expect(dJsFiles).toHaveLength(0);
+    });
 });

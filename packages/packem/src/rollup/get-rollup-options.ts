@@ -64,6 +64,63 @@ import type { InternalBuildOptions } from "../types";
 import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
 import resolveAliases from "./utils/resolve-aliases";
 
+/**
+ * Checks if a chunk/entry name indicates a declaration-only file that should not generate JavaScript.
+ * @param name Chunk or entry name to check
+ * @returns True if the name ends with .d (indicating declaration-only)
+ */
+const isDeclarationOnlyName = (name: string | undefined): boolean => Boolean(name?.endsWith(".d"));
+
+/**
+ * Creates a chunkFileNames function that skips declaration-only entries.
+ * @param getExtension Function to get the output extension
+ * @param usePreserveModules Whether preserveModules mode is enabled
+ * @returns chunkFileNames function for Rollup
+ */
+const createChunkFileNames = (getExtension: () => string, usePreserveModules: boolean) => {
+    if (usePreserveModules) {
+        return (chunk: PreRenderedChunk): string | undefined => {
+            if (isDeclarationOnlyName(chunk.name)) {
+                return undefined;
+            }
+            return `${chunk.name}.${getExtension()}`;
+        };
+    }
+
+    return (chunk: PreRenderedChunk): string | undefined => {
+        if (isDeclarationOnlyName(chunk.name)) {
+            return undefined;
+        }
+        return getChunkFilename(chunk, getExtension());
+    };
+};
+
+/**
+ * Creates an entryFileNames function that skips declaration-only entries.
+ * @param getExtension Function to get the output extension
+ * @param usePreserveModules Whether preserveModules mode is enabled
+ * @returns entryFileNames function for Rollup
+ */
+const createEntryFileNames = (getExtension: () => string, usePreserveModules: boolean) => {
+    if (usePreserveModules) {
+        return (chunkInfo: PreRenderedAsset): string | undefined => {
+            const name = Array.isArray(chunkInfo.names) && chunkInfo.names[0] ? chunkInfo.names[0] : chunkInfo.name;
+            if (isDeclarationOnlyName(name)) {
+                return undefined;
+            }
+            return `${name ?? "[name]"}.${getExtension()}`;
+        };
+    }
+
+    return (chunkInfo: PreRenderedAsset): string | undefined => {
+        const name = Array.isArray(chunkInfo.names) && chunkInfo.names[0] ? chunkInfo.names[0] : chunkInfo.name;
+        if (isDeclarationOnlyName(name)) {
+            return undefined;
+        }
+        return getEntryFileNames(chunkInfo, getExtension());
+    };
+};
+
 const getTransformerConfig = (
     name: InternalBuildOptions["transformerName"],
     context: BuildContext<InternalBuildOptions>,
@@ -503,16 +560,16 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames:
-                        context.options.unbundle || context.options.rollup.output?.preserveModules
-                            ? (chunk: PreRenderedChunk) => `${chunk.name}.${getOutputExtension(context, "cjs", chunk)}`
-                            : (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "cjs", chunk)),
+                chunkFileNames: createChunkFileNames(
+                    () => getOutputExtension(context, "cjs"),
+                    context.options.unbundle || context.options.rollup.output?.preserveModules === true,
+                ),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames:
-                        context.options.unbundle || context.options.rollup.output?.preserveModules
-                            ? (chunkInfo: PreRenderedAsset) => `${chunkInfo.names[0]}.${getOutputExtension(context, "cjs", chunkInfo)}`
-                            : (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "cjs", chunkInfo)),
+                entryFileNames: createEntryFileNames(
+                    () => getOutputExtension(context, "cjs"),
+                    context.options.unbundle || context.options.rollup.output?.preserveModules === true,
+                ),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 extend: true,
@@ -544,16 +601,16 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 // but make sure to adjust `hash`, `assetDir` and `publicPath`
                 // options for url handler accordingly.
                 assetFileNames: "[name]-[hash][extname]",
-                chunkFileNames:
-                        context.options.unbundle || context.options.rollup.output?.preserveModules
-                            ? (chunk: PreRenderedChunk) => `${chunk.name}.${getOutputExtension(context, "esm")}`
-                            : (chunk: PreRenderedChunk) => getChunkFilename(chunk, getOutputExtension(context, "esm")),
+                chunkFileNames: createChunkFileNames(
+                    () => getOutputExtension(context, "esm"),
+                    context.options.unbundle || context.options.rollup.output?.preserveModules === true,
+                ),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
-                entryFileNames:
-                        context.options.unbundle || context.options.rollup.output?.preserveModules
-                            ? (chunkInfo: PreRenderedAsset) => `${chunkInfo.names[0]}.${getOutputExtension(context, "esm")}`
-                            : (chunkInfo: PreRenderedAsset) => getEntryFileNames(chunkInfo, getOutputExtension(context, "esm")),
+                entryFileNames: createEntryFileNames(
+                    () => getOutputExtension(context, "esm"),
+                    context.options.unbundle || context.options.rollup.output?.preserveModules === true,
+                ),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
                 extend: true,

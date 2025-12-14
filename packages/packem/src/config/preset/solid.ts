@@ -62,7 +62,6 @@ const mergeUserBabelOptions = (
     };
 };
 
-
 export interface SolidPresetOptions {
     /**
      * Pass any additional babel transform options. They will be merged with
@@ -173,7 +172,12 @@ export interface SolidPresetOptions {
  */
 
 export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig => {
-    const { babel: userBabelOptions, plugins = [], presets = [], solidOptions = {} } = options;
+    const {
+        babel: userBabelOptions,
+        plugins = [],
+        presets = [],
+        solidOptions = {},
+    } = options;
 
     const babelPlugins: BabelPluginConfig["plugins"] = [];
     const babelPresets: BabelPluginConfig["presets"] = [];
@@ -183,9 +187,10 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
     // No need for @babel/preset-env or @babel/preset-typescript
     const solidPresetOptions = buildSolidPresetOptions(solidOptions);
 
-    const solidPreset: BabelPluginConfig["presets"][number] = ["babel-preset-solid", solidPresetOptions];
+    const solidPreset: [string, Record<string, unknown>] = ["babel-preset-solid", solidPresetOptions];
 
-    babelPresets.push(solidPreset);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    babelPresets.push(solidPreset as any);
 
     // Merge user-provided plugins and presets
     const finalPlugins = [...babelPlugins, ...Array.isArray(plugins) ? plugins : []];
@@ -205,11 +210,56 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
     // Function-based options would require babel plugin changes
     const mergedBabelConfig = mergeUserBabelOptions(babelConfig, userBabelOptions, finalPlugins, finalPresets);
 
-    return {
-        externals: ["solid-js", "solid-js/web", "solid-js/store"],
-        rollup: {
-            babel: mergedBabelConfig,
+    const rollupConfig: BuildConfig["rollup"] = {
+        babel: mergedBabelConfig,
+        resolve: {
+            exportConditions: ["solid"],
         },
+    };
+
+    const config: BuildConfig = {
+        externals: ["solid-js", "solid-js/web", "solid-js/store"],
+        hooks: {
+            "rollup:options": (context, _rollupOptions) => {
+                // Add replace/define values based on runtime and environment
+                const environment = context.environment === "development" ? "development" : "production";
+                const isDev = environment === "development";
+
+                // Get runtime from context options (set per build group)
+                // Runtime is "browser" | "node", workerd maps to node runtime
+                const runtime = context.options.runtime || "node";
+                const isServer = runtime === "node";
+
+                // Ensure replace plugin is configured
+                if (!context.options.rollup.replace) {
+                    context.options.rollup.replace = {
+                        preventAssignment: true,
+                        values: {},
+                    };
+                }
+
+                if (!context.options.rollup.replace.values) {
+                    context.options.rollup.replace.values = {};
+                }
+
+                // Add SolidJS-specific replace values
+                // Order: import.meta.env.* first, then process.env.*, alphabetically within each group
+                // Use array join pattern to prevent packem from overwriting internally
+                const replaceValues: Record<string, string> = {
+                    [["import", "meta", "env", "DEV"].join(".")]: isDev ? "true" : "false",
+                    [["import", "meta", "env", "NODE_ENV"].join(".")]: JSON.stringify(environment),
+                    [["import", "meta", "env", "PROD"].join(".")]: isDev ? "false" : "true",
+                    [["import", "meta", "env", "SSR"].join(".")]: isServer ? "true" : "false",
+                    [["process", "env", "DEV"].join(".")]: isDev ? "true" : "false",
+                    [["process", "env", "PROD"].join(".")]: isDev ? "false" : "true",
+                    [["process", "env", "SSR"].join(".")]: isServer ? "true" : "false",
+                };
+
+                // Merge replace values into existing values
+                Object.assign(context.options.rollup.replace.values, replaceValues);
+            },
+        },
+        rollup: rollupConfig,
         validation: {
             dependencies: {
                 hoisted: {
@@ -221,4 +271,6 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
             },
         },
     };
+
+    return config;
 };
