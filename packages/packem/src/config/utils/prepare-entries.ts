@@ -116,17 +116,60 @@ const prepareEntries = async (context: BuildContext<InternalBuildOptions>): Prom
         context.options.entries.splice(context.options.entries.indexOf(entry), 1);
     }
 
-    for (const entry of context.options.entries.filter((entry) => entry.fileAlias === undefined)) {
+    // Detect runtime from export keys and file aliases for entries that don't have runtime set
+    for (const entry of context.options.entries) {
+        if (entry.runtime) {
+            continue;
+        }
+
+        // Check for browser condition first (highest priority)
+        const hasBrowserExportKey = entry.exportKey && [...entry.exportKey].some((key) => key.includes("browser") || key === "browser");
+        const hasBrowserFileAlias = entry.fileAlias?.includes(".browser") ?? false;
+
+        if (hasBrowserExportKey || hasBrowserFileAlias) {
+            entry.runtime = "browser";
+        } else if (entry.exportKey) {
+            // Check for node/workerd conditions
+            for (const exportKey of entry.exportKey) {
+                if (exportKey === "node" || exportKey === "workerd" || exportKey.includes("node") || exportKey.includes("workerd")) {
+                    entry.runtime = "node";
+
+                    break;
+                }
+            }
+        }
+
+        // Check file alias for server/node/workerd patterns
+        if (!entry.runtime && entry.fileAlias && (entry.fileAlias.includes(".server") || entry.fileAlias.includes(".node") || entry.fileAlias.includes(".workerd"))) {
+            entry.runtime = "node";
+        }
+    }
+
+    // Convert fileAlias to name BEFORE extendEntry to ensure unique entry names
+    // This ensures entries with different fileAlias get different names for rollup input
+    // Entries with fileAlias should use fileAlias as their name to ensure separate builds
+    for (const entry of context.options.entries) {
+        if (entry.fileAlias) {
+            // Set name to fileAlias to ensure unique entry names for rollup
+            // This ensures entries with different fileAlias get separate builds
+            entry.name = entry.fileAlias;
+        }
+    }
+
+    // Process entries without fileAlias first
+    for (const entry of context.options.entries.filter((entry) => !entry.fileAlias)) {
         // eslint-disable-next-line no-await-in-loop
         await extendEntry(entry, context);
     }
 
-    for (const entry of context.options.entries.filter((entry) => entry.fileAlias !== undefined)) {
-        entry.name = entry.fileAlias;
-        entry.fileAlias = undefined;
-
+    // Process entries with fileAlias (name already set to fileAlias)
+    for (const entry of context.options.entries.filter((entry) => entry.fileAlias)) {
+        // Name is already set to fileAlias, extendEntry will preserve it
         // eslint-disable-next-line no-await-in-loop
         await extendEntry(entry, context);
+        // Clear fileAlias after processing (no longer needed, name is set)
+
+        entry.fileAlias = undefined;
     }
 };
 

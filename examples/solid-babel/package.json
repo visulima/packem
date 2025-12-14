@@ -5,26 +5,24 @@
     "sideEffects": false,
     "type": "module",
     "exports": {
-        ".": {
-            "import": {
+        "workerd": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.server.js"
+        },
+        "browser": {
+            "development": {
                 "types": "./dist/index.d.ts",
-                "default": "./dist/index.mjs"
+                "import": "./dist/index.development.js"
             },
-            "require": {
-                "types": "./dist/index.d.ts",
-                "default": "./dist/index.cjs"
-            }
-        }
-    },
-    "main": "./dist/index.cjs",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
-    "typesVersions": {
-        "*": {
-            ".": [
-                "./dist/index.d.ts"
-            ]
-        }
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.browser.js"
+        },
+        "node": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.server.js"
+        },
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
     },
     "files": [
         "./dist"

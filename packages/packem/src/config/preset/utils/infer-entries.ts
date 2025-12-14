@@ -81,9 +81,9 @@ const getDirectoryFiles = async (searchPath: string): Promise<string[]> => {
  * Match a file path against a wildcard pattern and return captured values
  * @param filePath File path to match (e.g., "foo/bar.ts")
  * @param pattern Wildcard pattern (e.g., "*")
- * @returns Array of captured wildcard values, or null if no match
+ * @returns Array of captured wildcard values, or undefined if no match
  */
-const matchWildcardPattern = (filePath: string, pattern: string): string[] | null => {
+const matchWildcardPattern = (filePath: string, pattern: string): string[] | undefined => {
     // Remove extension from file path for matching
     const pathWithoutExtension = filePath.replace(extensionPattern, "");
 
@@ -93,11 +93,11 @@ const matchWildcardPattern = (filePath: string, pattern: string): string[] | nul
         // For pattern "*", capture the first segment
         const segments = pathWithoutExtension.split("/");
 
-        if (segments.length > 0) {
+        if (segments.length > 0 && segments[0]) {
             return [segments[0]]; // Return the first segment
         }
 
-        return null;
+        return undefined;
     }
 
     // For other patterns, convert to regex
@@ -108,7 +108,7 @@ const matchWildcardPattern = (filePath: string, pattern: string): string[] | nul
     const regex = new RegExp(`^${regexPattern}$`);
     const match = pathWithoutExtension.match(regex);
 
-    return match ? match.slice(1) : null; // Return captured groups, excluding full match
+    return match ? match.slice(1) : undefined; // Return captured groups, excluding full match
 };
 
 /**
@@ -139,6 +139,98 @@ const getEnvironment = (output: OutputDescriptor, environment: Environment): Env
     return environment;
 };
 
+/**
+ * Detects file naming patterns from output filename (e.g., ".browser", ".server", ".development")
+ * @param outputFile Output file path (e.g., "./dist/index.browser.js")
+ * @returns Object with detected pattern and base filename, or null if no pattern detected
+ */
+const detectFilePattern = (outputFile: string): { pattern: string; baseName: string } | undefined => {
+    // Remove dist directory and extension from output file
+    const outputWithoutDist = outputFile.replace(/^\.\/dist\//, "").replace(/^dist\//, "");
+    const outputBase = outputWithoutDist.replace(/\.[^./]+$/, "");
+
+    // Extract directory and filename
+    const parts = outputBase.split("/");
+    const filename = parts[parts.length - 1] || "";
+
+    // Check if filename contains common patterns
+    const commonPatterns = [".browser", ".server", ".development", ".production", ".node", ".workerd"];
+
+    for (const pattern of commonPatterns) {
+        if (filename.includes(pattern)) {
+            const baseName = filename.replace(pattern, "");
+            const directory = parts.length > 1 ? parts.slice(0, -1).join("/") : "";
+
+            return {
+                baseName: directory ? `${directory}/${baseName}` : baseName,
+                pattern,
+            };
+        }
+    }
+
+    // Check for other patterns (e.g., index.something.js where something is not a known pattern)
+    // This handles cases like index.custom.js
+    const filenameParts = filename.split(".");
+
+    if (filenameParts.length > 2) {
+        // Has pattern: filename.pattern.ext -> filename.ext
+        const baseName = filenameParts.slice(0, -2).join(".");
+        const pattern = `.${filenameParts[filenameParts.length - 2]}`;
+        const directory = parts.length > 1 ? parts.slice(0, -1).join("/") : "";
+
+        return {
+            baseName: directory ? `${directory}/${baseName}` : baseName,
+            pattern,
+        };
+    }
+
+    return undefined;
+};
+
+/**
+ * Tries to find a source file matching a pattern (e.g., index.browser.tsx for index.browser.js)
+ * @param sourceFiles List of available source files
+ * @param baseName Base filename without extension (e.g., "index" or "src/index")
+ * @param pattern Pattern to match (e.g., ".browser")
+ * @param sourceDir Source directory path
+ * @returns Found file path or null
+ */
+const tryFindPatternFile = (
+    sourceFiles: string[],
+    baseName: string,
+    pattern: string,
+    sourceDir: string,
+): string | undefined => {
+    // Normalize baseName - remove sourceDir prefix if present
+    const normalizedBase = baseName.replace(new RegExp(`^${sourceDir}/?`), "");
+
+    // Try to find files matching the pattern with various extensions
+    const patternName = `${normalizedBase}${pattern}`;
+    const escapedPattern = patternName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const patternRegex = new RegExp(`${escapedPattern}\\.([cm]?[tj]sx?|ts|js)$`);
+
+    // Look for exact matches - check if file path ends with pattern name + extension
+    const exactMatch = sourceFiles.find((file) => {
+        const relativePath = file.replace(sourceDir, "").replace(/^\//, "");
+
+        return patternRegex.test(relativePath);
+    });
+
+    if (exactMatch) {
+        return exactMatch;
+    }
+
+    // Also try matching by base path (handles subdirectories)
+    const fullPatternPath = `${sourceDir}/${patternName}`;
+    const fullMatch = sourceFiles.find((file) => {
+        const fileBase = file.replace(/\.[^./]+$/, "");
+
+        return fileBase === fullPatternPath || fileBase.endsWith(`/${patternName}`);
+    });
+
+    return fullMatch || undefined;
+};
+
 const createOrUpdateEntry = (
     entries: BuildEntry[],
     input: string,
@@ -153,21 +245,53 @@ const createOrUpdateEntry = (
 
     let runtime: Runtime = context.options.runtime as Runtime;
 
-    for (const runtimeExportConvention of RUNTIME_EXPORT_CONVENTIONS) {
-        if (output.file.includes(`.${runtimeExportConvention}.`) || output.subKey === runtimeExportConvention) {
-            runtime = runtimeExportConvention as Runtime;
+    // Check for browser condition first (highest priority)
+    // Check export key (subKey) for browser condition
+    const isBrowserFromExportKey = output.subKey === "browser" || output.subKey?.includes("browser");
+    // Check output file for .browser pattern
+    const isBrowserFromFile = output.file.includes(".browser");
 
-            break;
+    if (isBrowserFromExportKey || isBrowserFromFile) {
+        runtime = "browser";
+    } else {
+        // Check for other runtime conventions
+        for (const runtimeExportConvention of RUNTIME_EXPORT_CONVENTIONS) {
+            if (output.file.includes(`.${runtimeExportConvention}.`) || output.subKey === runtimeExportConvention) {
+                runtime = runtimeExportConvention as Runtime;
+
+                break;
+            }
+        }
+
+        // Check for node/workerd conditions
+        if (output.subKey === "node" || output.subKey === "workerd" || output.file.includes(".node") || output.file.includes(".workerd") || output.file.includes(".server")) {
+            runtime = "node";
         }
     }
 
-    let entry: BuildEntry | undefined = entries.find((index) => index.input === input && index.environment === entryEnvironment && index.runtime === runtime);
+    // Calculate aliasName first to use in uniqueness check
+    const aliasName = output.file.replace(extname(output.file), "").replace(new RegExp(`^./${context.options.outDir.replace(/^\.\//, "")}/`), "");
+
+    // Check if input file matches the alias (if not, we need fileAlias)
+    const inputBase = input.replace(/\.[^./]+$/, "").split("/").pop() || "";
+    const aliasBase = aliasName.split("/").pop() || "";
+    const needsFileAlias = !input.includes(aliasName) && inputBase !== aliasBase;
+
+    // Include fileAlias in uniqueness check to ensure separate entries for same input with different outputs
+    let entry: BuildEntry | undefined = entries.find(
+        (index) =>
+            index.input === input &&
+            index.environment === entryEnvironment &&
+            index.runtime === runtime &&
+            index.fileAlias === (needsFileAlias ? aliasName : undefined),
+    );
 
     if (entry === undefined) {
         entry = entries[
             entries.push({
                 environment: entryEnvironment,
                 exportKey: new Set([output.exportKey].filter(Boolean)),
+                fileAlias: needsFileAlias ? aliasName : undefined,
                 input,
                 runtime,
             }) - 1
@@ -206,9 +330,9 @@ const createOrUpdateEntry = (
         }
     }
 
-    const aliasName = output.file.replace(extname(output.file), "").replace(new RegExp(`^./${context.options.outDir.replace(/^\.\//, "")}/`), "");
-
-    if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && !input.includes(aliasName)) {
+    // Set fileAlias if needed (for any export condition producing different output filename)
+    // This includes SPECIAL_EXPORT_CONVENTIONS and pattern-based outputs (e.g., .browser, .server)
+    if (needsFileAlias && !entry.fileAlias) {
         entry.fileAlias = aliasName;
     }
 };
@@ -265,7 +389,13 @@ const inferEntries = async (
     }
 
     // Come up with a list of all output files & their formats
-    const allOutputs = extractExportFilenames(packageJson.exports, packageType, context.options.declaration, [], context.options.ignoreExportKeys);
+    const allOutputs = extractExportFilenames(
+        packageJson.exports,
+        packageType,
+        context.options.declaration,
+        [],
+        context.options.ignoreExportKeys ?? [],
+    );
 
     // Filter out ignored outputs
     const outputs = allOutputs.filter((output) => !output.ignored);
@@ -447,12 +577,37 @@ const inferEntries = async (
 
         let input = sourceFiles.find((index) => SOURCE_RE.test(index));
 
-        if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string) && input === undefined) {
-            // Use a safer regex pattern to avoid backtracking issues
-            const sourceSlugWithoutExtension = sourceSlug.replace(/^(.+?)\.[^.]*$/, "$1");
-            const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlugWithoutExtension + fileExtensionRegex);
+        // If not found, try to detect file pattern and find pattern-specific file
+        if (input === undefined) {
+            const sourceDirectoryRelative = context.options.sourceDir.replace(/^\.\//, "");
+            const sourceDirectoryPath = resolve(context.options.rootDir, sourceDirectoryRelative);
 
-            input = sourceFiles.find((index) => SPECIAL_SOURCE_RE.test(index));
+            // Detect if output file has a pattern (e.g., index.browser.js)
+            const patternResult = detectFilePattern(output.file);
+
+            if (patternResult) {
+                // Try to find pattern-specific file (e.g., index.browser.tsx)
+                const patternFile = tryFindPatternFile(sourceFiles, patternResult.baseName, patternResult.pattern, sourceDirectoryPath);
+
+                if (patternFile) {
+                    input = patternFile;
+                } else {
+                    // Fall back to base file (e.g., index.tsx), fileAlias will be set in createOrUpdateEntry
+                    const baseSourceSlug = patternResult.baseName;
+                    const BASE_SOURCE_RE = new RegExp(beforeSourceRegex + baseSourceSlug + fileExtensionRegex);
+
+                    input = sourceFiles.find((index) => BASE_SOURCE_RE.test(index));
+                }
+            } else {
+                // Fallback: Try SPECIAL_EXPORT_CONVENTIONS pattern matching
+                const sourceSlugWithoutExtension = sourceSlug.replace(/^(.+?)\.[^.]*$/, "$1").replace(/\/$/, "");
+
+                if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string)) {
+                    const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlugWithoutExtension + fileExtensionRegex);
+
+                    input = sourceFiles.find((index) => SPECIAL_SOURCE_RE.test(index));
+                }
+            }
         }
 
         if (input === undefined) {

@@ -4,7 +4,7 @@ import { bold, cyan, gray, green } from "@visulima/colorize";
 import { walk } from "@visulima/fs";
 import { formatBytes } from "@visulima/humanizer";
 import type { FileCache } from "@visulima/packem-share";
-import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "@visulima/packem-share/types";
+import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry, Environment, Runtime } from "@visulima/packem-share/types";
 import { getDtsExtension, getOutputExtension } from "@visulima/packem-share/utils";
 import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
@@ -234,6 +234,123 @@ interface BuilderProperties {
 const DTS_REGEX = /\.d\.[mc]?ts$/;
 
 /**
+ * Checks if an entry name indicates a declaration-only file that should not generate JavaScript.
+ * @param name Entry name to check
+ * @returns True if the name ends with .d (indicating declaration-only)
+ */
+const isDeclarationOnlyEntry = (name: string | undefined): boolean => Boolean(name?.endsWith(".d"));
+
+/**
+ * Filters out declaration file entries from the entries array.
+ * @param entries Array of build entries to filter
+ * @returns Filtered entries excluding .d.ts files
+ */
+const filterDtsEntries = (entries: BuildEntry[]): BuildEntry[] => entries.filter((entry) => !DTS_REGEX.test(entry.input));
+
+/**
+ * Creates a formatted log message for build preparation.
+ * @param environment The build environment (e.g., "development", "production")
+ * @param runtime The build runtime (e.g., "browser", "node")
+ * @returns Formatted log message string
+ */
+const createBuildLogMessage = (environment: string, runtime: string): string => {
+    const parts: string[] = [];
+
+    if (environment !== "undefined") {
+        parts.push(`${cyan(environment)} environment`);
+    }
+
+    if (runtime !== "undefined") {
+        parts.push(`${cyan(runtime)} runtime`);
+    }
+
+    return parts.length > 0 ? `Preparing build for ${parts.join(" with ")}` : "";
+};
+
+/**
+ * Creates replace values for Rollup based on environment and runtime.
+ * @param environment The build environment (e.g., "development", "production")
+ * @param runtime The build runtime (e.g., "browser", "node")
+ * @returns Frozen object with replace values for Rollup
+ */
+const createReplaceValues = (environment: string, runtime: string): Record<string, string> => {
+    const replaceValues: Record<string, string> = {};
+
+    if (environment !== "undefined") {
+        // hack to make sure, that the replace plugin don't replace the environment
+        replaceValues[["process", "env", "NODE_ENV"].join(".")] = JSON.stringify(environment);
+    }
+
+    replaceValues[["process", "env", "EdgeRuntime"].join(".")] = JSON.stringify(runtime === "edge-light");
+
+    return Object.freeze(replaceValues);
+};
+
+/**
+ * Creates a subdirectory path based on environment and runtime.
+ * @param environment Build environment
+ * @param runtime Build runtime
+ * @returns Subdirectory path string
+ */
+const createSubDirectory = (environment: string, runtime: string): string => {
+    const parts: string[] = [];
+
+    if (environment !== "undefined") {
+        parts.push(environment);
+    }
+
+    if (runtime !== "undefined") {
+        parts.push(runtime);
+    }
+
+    return parts.length > 0 ? `${parts.join("/")}/` : "";
+};
+
+/**
+ * Creates an adjusted build context with specific emit flags and entries.
+ * @param baseContext Base build context
+ * @param emitCJS Whether to emit CJS format
+ * @param emitESM Whether to emit ESM format
+ * @param entries Filtered entries for this build
+ * @param minify Whether to minify output
+ * @param replaceValues Replace values for Rollup
+ * @returns Adjusted build context
+ */
+const createAdjustedContext = (
+    baseContext: BuildContext<InternalBuildOptions>,
+    emitCJS: boolean,
+    emitESM: boolean,
+    entries: BuildEntry[],
+    minify: boolean,
+    replaceValues: Record<string, string>,
+): BuildContext<InternalBuildOptions> => {
+    return {
+        ...baseContext,
+        options: {
+            ...baseContext.options,
+            emitCJS,
+            emitESM,
+            entries,
+            minify,
+            rollup: {
+                ...baseContext.options.rollup,
+                replace: baseContext.options.rollup.replace
+                    ? {
+                        ...baseContext.options.rollup.replace,
+                        values: baseContext.options.rollup.replace.values
+                            ? {
+                                ...(baseContext.options.rollup.replace.values as Record<string, string>),
+                                ...replaceValues,
+                            }
+                            : replaceValues,
+                    }
+                    : false,
+            },
+        },
+    };
+};
+
+/**
  * Prepares Rollup configuration for both JavaScript/TypeScript builds and type definition builds.
  * Processes entries and generates appropriate builder configurations.
  * @param context Build context containing configuration and state
@@ -249,263 +366,271 @@ const prepareRollupConfig = (
     typeBuilders: Set<BuilderProperties>;
     // eslint-disable-next-line sonarjs/cognitive-complexity
 } => {
-    const groupedEntries = groupByKeys(context.options.entries, "environment", "runtime");
+    // Group entries by environment, runtime, and type (browser, server, development, etc.)
+    // Entries with different types need separate builds even if same environment/runtime
+    // Type is extracted from fileAlias/name (e.g., "index.browser" -> "browser", "index.server" -> "server")
+    type GroupedEntries = Record<string, Record<string, Record<string, BuildEntry[]>>>;
+
+    // Extract type suffix from entry name/fileAlias (e.g., "index.browser" -> "browser", "index.server" -> "server")
+    const getEntryType = (entry: BuildEntry): string => {
+        const nameOrAlias = entry.name ?? entry.fileAlias;
+
+        if (!nameOrAlias) {
+            return "default";
+        }
+
+        // Extract type from patterns like .browser, .server, .development, .node, .workerd
+        // These patterns should appear as suffixes or before the file extension
+        const typePatterns = [".browser", ".server", ".development", ".node", ".workerd"];
+
+        for (const pattern of typePatterns) {
+            // Check if the pattern exists in the name (as a suffix or before extension)
+            // e.g., "index.browser" or "index.browser.ts" should match
+            if (nameOrAlias.includes(pattern)) {
+                return pattern.slice(1); // Remove the leading dot
+            }
+        }
+
+        // If no type pattern found, return "default" to group all entries without explicit types together
+        // This prevents creating separate builds for each unique entry name
+        return "default";
+    };
+
+    // Add a computed 'type' property to each entry for grouping
+    // We need to ensure environment and runtime are strings for grouping
+    type EntryWithType = Omit<BuildEntry, "environment" | "runtime"> & {
+        environment: string;
+        runtime: string;
+        type: string;
+    };
+    const entriesWithType: EntryWithType[] = context.options.entries.map((entry) => {
+        return {
+            ...entry,
+            environment: String(entry.environment ?? "undefined"),
+            runtime: String(entry.runtime ?? "undefined"),
+            type: getEntryType(entry),
+        };
+    });
+
+    // Use groupByKeys with 3 keys: environment, runtime, and type
+    // TypeScript needs explicit type assertion when using optional third parameter
+    const groupedEntries = (groupByKeys(entriesWithType, "environment", "runtime", "type") as Record<string, Record<string, Record<string, EntryWithType[]>>>) as unknown as GroupedEntries;
 
     const builders = new Set<BuilderProperties>();
     const typeBuilders = new Set<BuilderProperties>();
 
     for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
-        for (const [runtime, entries] of Object.entries(environmentEntries)) {
-            const environmentRuntimeContext = {
-                ...context,
-            };
+        for (const [runtime, runtimeEntries] of Object.entries(environmentEntries)) {
+            for (const [, entries] of Object.entries(runtimeEntries)) {
+                const environmentRuntimeContext = {
+                    ...context,
+                };
 
-            if (!context.options.dtsOnly && (environment !== "undefined" || runtime !== "undefined")) {
-                context.logger.info(
-                    `Preparing build for ${
-                        environment === "undefined" ? "" : `${cyan(environment)} environment${runtime === "undefined" ? "" : " with "}`
-                    }${runtime === "undefined" ? "" : `${cyan(runtime)} runtime`}`,
-                );
-            }
+                if (!context.options.dtsOnly && (environment !== "undefined" || runtime !== "undefined")) {
+                    const logMessage = createBuildLogMessage(environment, runtime);
 
-            const replaceValues: Record<string, string> = {};
+                    if (logMessage) {
+                        context.logger.info(logMessage);
+                    }
+                }
 
-            if (environmentRuntimeContext.options.rollup.replace) {
-                if (environmentRuntimeContext.options.rollup.replace.values === undefined) {
+                // Initialize replace values if replace plugin is enabled
+                const replaceValues = environmentRuntimeContext.options.rollup.replace
+                    ? createReplaceValues(environment, runtime)
+                    : {};
+
+                if (!environmentRuntimeContext.options.rollup.replace) {
+                    context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
+                } else if (environmentRuntimeContext.options.rollup.replace.values === undefined) {
                     environmentRuntimeContext.options.rollup.replace.values = {};
                 }
 
-                if (environment !== "undefined") {
-                    // hack to make sure, that the replace plugin don't replace the environment
-                    replaceValues[["process", "env", "NODE_ENV"].join(".")] = JSON.stringify(environment);
+                const subDirectory = createSubDirectory(environment, runtime);
+                // Note: fileAlias is handled separately in prepareEntries, not in subDirectory
+
+                // Determine minify setting based on environment and explicit config
+                let minify = environmentRuntimeContext.options.minify ?? false;
+
+                if (environment === "development") {
+                    minify = false;
+                } else if (environment === "production") {
+                    minify = true;
                 }
 
-                replaceValues[["process", "env", "EdgeRuntime"].join(".")] = JSON.stringify(runtime === "edge-light");
+                // Extract BuildEntry from EntryWithType (remove the 'type' property added for grouping)
+                const buildEntries: BuildEntry[] = (entries as EntryWithType[]).map((entry) => {
+                    // Destructure to exclude 'type' property that was added for grouping
+                    const { environment: env, runtime: rt, ...rest } = entry;
+                    // TypeScript: 'type' is intentionally omitted from destructuring
+                    // It was only added for grouping and is not part of BuildEntry
 
-                Object.freeze(replaceValues);
-            } else {
-                context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
-            }
-
-            let subDirectory = "";
-
-            if (environment !== "undefined") {
-                subDirectory += `${environment}/`;
-            }
-
-            if (runtime !== "undefined") {
-                subDirectory += `${runtime}/`;
-            }
-
-            let minify = false;
-
-            if (environmentRuntimeContext.options.minify !== undefined) {
-                minify = environmentRuntimeContext.options.minify;
-            }
-
-            if (environment === "development") {
-                minify = false;
-            } else if (environment === "production") {
-                minify = true;
-            }
-
-            const esmAndCjsEntries: BuildEntry[] = [];
-            const esmEntries: BuildEntry[] = [];
-            const cjsEntries: BuildEntry[] = [];
-            const dtsEntries: BuildEntry[] = [];
-
-            for (const entry of entries) {
-                if (entry.cjs && entry.esm) {
-                    esmAndCjsEntries.push(entry);
-                } else if (entry.cjs) {
-                    cjsEntries.push(entry);
-                } else if (entry.esm) {
-                    esmEntries.push(entry);
-                } else if (entry.declaration) {
-                    dtsEntries.push(entry);
-                }
-            }
-
-            if (esmAndCjsEntries.length > 0) {
-                const adjustedEsmAndCjsContext: BuildContext<InternalBuildOptions> = {
-                    ...environmentRuntimeContext,
-                    options: {
-                        ...environmentRuntimeContext.options,
-                        emitCJS: true,
-                        emitESM: true,
-                        entries: [...esmAndCjsEntries].filter((entry) => !DTS_REGEX.test(entry.input)),
-                        minify,
-                        rollup: {
-                            ...environmentRuntimeContext.options.rollup,
-                            replace: environmentRuntimeContext.options.rollup.replace
-                                ? {
-                                    ...environmentRuntimeContext.options.rollup.replace,
-                                    values: {
-                                        ...environmentRuntimeContext.options.rollup.replace.values,
-                                        ...replaceValues,
-                                    },
-                                }
-                                : false,
-                        },
-                    },
-                };
-
-                if (!context.options.dtsOnly) {
-                    builders.add({
-                        context: adjustedEsmAndCjsContext,
-                        fileCache,
-                        subDirectory,
-                    });
-                }
-
-                if (context.options.declaration) {
-                    const typedEntries = [...esmAndCjsEntries].filter((entry) => entry.declaration);
-
-                    if (typedEntries.length > 0) {
-                        typeBuilders.add({
-                            context: {
-                                ...adjustedEsmAndCjsContext,
-                                options: {
-                                    ...adjustedEsmAndCjsContext.options,
-                                    entries: typedEntries,
-                                },
-                            },
-                            fileCache,
-                            subDirectory,
-                        });
-                    }
-                }
-            }
-
-            if (esmEntries.length > 0) {
-                const adjustedEsmContext: BuildContext<InternalBuildOptions> = {
-                    ...environmentRuntimeContext,
-                    options: {
-                        ...environmentRuntimeContext.options,
-                        emitCJS: false,
-                        emitESM: true,
-                        entries: [...esmEntries].filter((entry) => !DTS_REGEX.test(entry.input)),
-                        minify,
-                        rollup: {
-                            ...environmentRuntimeContext.options.rollup,
-                            replace: environmentRuntimeContext.options.rollup.replace
-                                ? {
-                                    ...environmentRuntimeContext.options.rollup.replace,
-                                    values: {
-                                        ...environmentRuntimeContext.options.rollup.replace.values,
-                                        ...replaceValues,
-                                    },
-                                }
-                                : false,
-                        },
-                    },
-                };
-
-                if (!context.options.dtsOnly) {
-                    builders.add({
-                        context: adjustedEsmContext,
-                        fileCache,
-                        subDirectory,
-                    });
-                }
-
-                if (context.options.declaration) {
-                    const typedEntries = [...esmEntries].filter((entry) => entry.declaration);
-
-                    if (typedEntries.length > 0) {
-                        typeBuilders.add({
-                            context: {
-                                ...adjustedEsmContext,
-                                options: {
-                                    ...adjustedEsmContext.options,
-                                    entries: typedEntries,
-                                },
-                            },
-                            fileCache,
-                            subDirectory,
-                        });
-                    }
-                }
-            }
-
-            if (cjsEntries.length > 0) {
-                const adjustedCjsContext: BuildContext<InternalBuildOptions> = {
-                    ...environmentRuntimeContext,
-                    options: {
-                        ...environmentRuntimeContext.options,
-                        emitCJS: true,
-                        emitESM: false,
-                        entries: [...cjsEntries].filter((entry) => !DTS_REGEX.test(entry.input)),
-                        minify,
-                        rollup: {
-                            ...environmentRuntimeContext.options.rollup,
-                            replace: environmentRuntimeContext.options.rollup.replace
-                                ? {
-                                    ...environmentRuntimeContext.options.rollup.replace,
-                                    values: {
-                                        ...environmentRuntimeContext.options.rollup.replace.values,
-                                        ...replaceValues,
-                                    },
-                                }
-                                : false,
-                        },
-                    },
-                };
-
-                if (!context.options.dtsOnly) {
-                    builders.add({
-                        context: adjustedCjsContext,
-                        fileCache,
-                        subDirectory,
-                    });
-                }
-
-                if (context.options.declaration) {
-                    const typedEntries = [...cjsEntries].filter((entry) => entry.declaration);
-
-                    if (typedEntries.length > 0) {
-                        typeBuilders.add({
-                            context: {
-                                ...adjustedCjsContext,
-                                options: {
-                                    ...adjustedCjsContext.options,
-                                    entries: typedEntries,
-                                },
-                            },
-                            fileCache,
-                            subDirectory,
-                        });
-                    }
-                }
-            }
-
-            if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
-                typeBuilders.add({
-                    context: {
-                        ...environmentRuntimeContext,
-                        options: {
-                            ...environmentRuntimeContext.options,
-                            emitCJS: false,
-                            emitESM: false,
-                            entries: dtsEntries,
-                            minify,
-                            rollup: {
-                                ...environmentRuntimeContext.options.rollup,
-                                replace: environmentRuntimeContext.options.rollup.replace
-                                    ? {
-                                        ...environmentRuntimeContext.options.rollup.replace,
-                                        values: {
-                                            ...environmentRuntimeContext.options.rollup.replace.values,
-                                            ...replaceValues,
-                                        },
-                                    }
-                                    : false,
-                            },
-                        },
-                    },
-                    fileCache,
-                    subDirectory,
+                    return {
+                        ...rest,
+                        environment: env === "undefined" ? undefined : (env as Environment),
+                        runtime: rt === "undefined" ? undefined : (rt as Runtime),
+                    } as BuildEntry;
                 });
+
+                const esmAndCjsEntries: BuildEntry[] = [];
+                const esmEntries: BuildEntry[] = [];
+                const cjsEntries: BuildEntry[] = [];
+                const dtsEntries: BuildEntry[] = [];
+
+                for (const entry of buildEntries) {
+                    const isDeclarationOnly = isDeclarationOnlyEntry(entry.name);
+
+                    // Entries with names ending in .d are declaration-only and should not generate JavaScript files
+                    // They should only be processed in declaration builds if they have declaration: true
+                    if (isDeclarationOnly) {
+                        if (entry.declaration) {
+                            dtsEntries.push(entry);
+                        }
+                        continue;
+                    }
+
+                    // Categorize entries by their output format requirements
+                    if (entry.cjs && entry.esm) {
+                        esmAndCjsEntries.push(entry);
+                    } else if (entry.cjs) {
+                        cjsEntries.push(entry);
+                    } else if (entry.esm) {
+                        esmEntries.push(entry);
+                    } else if (entry.declaration) {
+                        dtsEntries.push(entry);
+                    }
+                }
+
+                if (esmAndCjsEntries.length > 0) {
+                    const adjustedEsmAndCjsContext = createAdjustedContext(
+                        environmentRuntimeContext,
+                        true,
+                        true,
+                        filterDtsEntries(esmAndCjsEntries),
+                        minify,
+                        replaceValues,
+                    );
+
+                    if (!context.options.dtsOnly) {
+                        builders.add({
+                            context: adjustedEsmAndCjsContext,
+                            fileCache,
+                            subDirectory,
+                        });
+                    }
+
+                    if (context.options.declaration) {
+                        // Filter entries that have declaration enabled (already filtered out .d entries above)
+                        const typedEntries = esmAndCjsEntries.filter((entry) => entry.declaration);
+
+                        if (typedEntries.length > 0) {
+                            typeBuilders.add({
+                                context: {
+                                    ...adjustedEsmAndCjsContext,
+                                    options: {
+                                        ...adjustedEsmAndCjsContext.options,
+                                        entries: typedEntries,
+                                    },
+                                },
+                                fileCache,
+                                subDirectory,
+                            });
+                        }
+                    }
+                }
+
+                if (esmEntries.length > 0) {
+                    const adjustedEsmContext = createAdjustedContext(
+                        environmentRuntimeContext,
+                        false,
+                        true,
+                        filterDtsEntries(esmEntries),
+                        minify,
+                        replaceValues,
+                    );
+
+                    if (!context.options.dtsOnly) {
+                        builders.add({
+                            context: adjustedEsmContext,
+                            fileCache,
+                            subDirectory,
+                        });
+                    }
+
+                    if (context.options.declaration) {
+                        // Filter entries that have declaration enabled (already filtered out .d entries above)
+                        const typedEntries = esmEntries.filter((entry) => entry.declaration);
+
+                        if (typedEntries.length > 0) {
+                            typeBuilders.add({
+                                context: {
+                                    ...adjustedEsmContext,
+                                    options: {
+                                        ...adjustedEsmContext.options,
+                                        entries: typedEntries,
+                                    },
+                                },
+                                fileCache,
+                                subDirectory,
+                            });
+                        }
+                    }
+                }
+
+                if (cjsEntries.length > 0) {
+                    const adjustedCjsContext = createAdjustedContext(
+                        environmentRuntimeContext,
+                        true,
+                        false,
+                        filterDtsEntries(cjsEntries),
+                        minify,
+                        replaceValues,
+                    );
+
+                    if (!context.options.dtsOnly) {
+                        builders.add({
+                            context: adjustedCjsContext,
+                            fileCache,
+                            subDirectory,
+                        });
+                    }
+
+                    if (context.options.declaration) {
+                        // Filter entries that have declaration enabled (already filtered out .d entries above)
+                        const typedEntries = cjsEntries.filter((entry) => entry.declaration);
+
+                        if (typedEntries.length > 0) {
+                            typeBuilders.add({
+                                context: {
+                                    ...adjustedCjsContext,
+                                    options: {
+                                        ...adjustedCjsContext.options,
+                                        entries: typedEntries,
+                                    },
+                                },
+                                fileCache,
+                                subDirectory,
+                            });
+                        }
+                    }
+                }
+
+                if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
+                    // dtsEntries already excludes .d entries (they're filtered out in the categorization loop above)
+                    const adjustedDtsContext = createAdjustedContext(
+                        environmentRuntimeContext,
+                        false,
+                        false,
+                        dtsEntries,
+                        minify,
+                        replaceValues,
+                    );
+
+                    typeBuilders.add({
+                        context: adjustedDtsContext,
+                        fileCache,
+                        subDirectory,
+                    });
+                }
             }
         }
     }
