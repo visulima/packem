@@ -358,14 +358,14 @@ const createAdjustedContext = (
  * @returns Object containing sets of builders for both source and type definitions
  * @internal
  */
-const prepareRollupConfig = (
+const prepareRollupConfig = async (
     context: BuildContext<InternalBuildOptions>,
     fileCache: FileCache,
-): {
+): Promise<{
     builders: Set<BuilderProperties>;
     typeBuilders: Set<BuilderProperties>;
     // eslint-disable-next-line sonarjs/cognitive-complexity
-} => {
+}> => {
     // Group entries by environment, runtime, and type (browser, server, development, etc.)
     // Entries with different types need separate builds even if same environment/runtime
     // Type is extracted from fileAlias/name (e.g., "index.browser" -> "browser", "index.server" -> "server")
@@ -424,6 +424,7 @@ const prepareRollupConfig = (
             for (const [, entries] of Object.entries(runtimeEntries)) {
                 const environmentRuntimeContext = {
                     ...context,
+                    environment: environment === "undefined" ? undefined : (environment as "development" | "production"),
                 };
 
                 if (!context.options.dtsOnly && (environment !== "undefined" || runtime !== "undefined")) {
@@ -433,6 +434,10 @@ const prepareRollupConfig = (
                         context.logger.info(logMessage);
                     }
                 }
+
+                // Call hook early to allow presets to modify replace values before createAdjustedContext
+                // Use a dummy rollup options object since we don't have rollup options yet
+                await environmentRuntimeContext.hooks.callHook("rollup:options", environmentRuntimeContext, {} as any);
 
                 // Initialize replace values if replace plugin is enabled
                 const replaceValues = environmentRuntimeContext.options.rollup.replace
@@ -657,7 +662,7 @@ const prepareRollupConfig = (
 const build = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<boolean> => {
     await context.hooks.callHook("build:before", context);
 
-    const { builders, typeBuilders } = prepareRollupConfig(context, fileCache);
+    const { builders, typeBuilders } = await prepareRollupConfig(context, fileCache);
 
     await Promise.all(
         [...builders].map(async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuild(rollupContext, cache, subDirectory)),

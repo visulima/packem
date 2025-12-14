@@ -248,11 +248,13 @@ const getTransformerConfig = (
             jsx:
                 typeof context.options.rollup.oxc.jsx === "string"
                     ? context.options.rollup.oxc.jsx
-                    : {
-                        ...context.options.rollup.oxc.jsx,
-                        // This is not needed in a library.
-                        refresh: false,
-                    },
+                    : context.options.rollup.oxc.jsx
+                        ? {
+                            ...context.options.rollup.oxc.jsx,
+                            // This is not needed in a library.
+                            refresh: false,
+                        }
+                        : undefined,
             sourcemap: context.options.sourcemap,
             typescript: context.tsconfig?.config
                 ? {

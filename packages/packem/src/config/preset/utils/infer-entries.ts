@@ -14,7 +14,7 @@ import {
 import type { BuildContext } from "@visulima/packem-share/types";
 import { extname, resolve, toNamespacedPath } from "@visulima/path";
 
-import type { BuildEntry, Environment, InferEntriesResult, InternalBuildOptions, Runtime } from "../../../types";
+import type { BuildEntry, Environment, Format, InferEntriesResult, InternalBuildOptions, Runtime } from "../../../types";
 import type { OutputDescriptor } from "../../../utils/extract-export-filenames";
 import { extractExportFilenames } from "../../../utils/extract-export-filenames";
 import { inferExportTypeFromFileName } from "../../../utils/infer-export-type";
@@ -23,6 +23,46 @@ import { inferExportTypeFromFileName } from "../../../utils/infer-export-type";
 // Key: search path, Value: promise resolving to file list
 const directoryCache = new Map<string, Promise<string[]>>();
 const extensionPattern = /\.[^./]+$/;
+
+/**
+ * Extracts the full file extension from a file path, handling:
+ * - Declaration file extensions (.d.ts, .d.mts, .d.cts) - returns full extension
+ * - Custom extensions from outputExtensionMap (e.g., .c.js, .m.js) - returns full extension
+ * - Standard extensions - falls back to extname() which returns last extension
+ *
+ * @param filePath - The file path to extract extension from
+ * @param outputExtensionMap - Optional map of custom extensions (e.g., { cjs: "c.js", esm: "m.js" })
+ * @returns The full file extension including multi-part extensions
+ *
+ * @example
+ * ```ts
+ * getFullExtension("./dist/index.d.ts") // returns ".d.ts"
+ * getFullExtension("./dist/index.c.js", { cjs: "c.js" }) // returns ".c.js"
+ * getFullExtension("./dist/index.js") // returns ".js"
+ * ```
+ */
+const getFullExtension = (filePath: string, outputExtensionMap?: Record<string, string>): string => {
+    // Check for declaration file extensions first (.d.ts, .d.mts, .d.cts)
+    // These are multi-part extensions that extname() doesn't handle correctly
+    const declarationMatch = filePath.match(/\.d\.[mc]?ts$/);
+    if (declarationMatch) {
+        return declarationMatch[0];
+    }
+
+    // Check for custom extensions from outputExtensionMap (e.g., .c.js, .m.js)
+    // These are also multi-part extensions that extname() doesn't handle correctly
+    if (outputExtensionMap) {
+        for (const ext of Object.values(outputExtensionMap)) {
+            const extWithDot = ext.startsWith(".") ? ext : `.${ext}`;
+            if (filePath.endsWith(extWithDot)) {
+                return extWithDot;
+            }
+        }
+    }
+
+    // Fall back to extname() for standard single-part extensions
+    return extname(filePath);
+};
 
 const safeReaddir = async (searchPath: string) => {
     try {
@@ -239,6 +279,7 @@ const createOrUpdateEntry = (
     output: OutputDescriptor,
     context: BuildContext<InternalBuildOptions>,
     isGlob: boolean,
+    outputs: OutputDescriptor[],
     // eslint-disable-next-line sonarjs/cognitive-complexity
 ): void => {
     const entryEnvironment = getEnvironment(output, context.environment);
@@ -270,7 +311,12 @@ const createOrUpdateEntry = (
     }
 
     // Calculate aliasName first to use in uniqueness check
-    const aliasName = output.file.replace(extname(output.file), "").replace(new RegExp(`^./${context.options.outDir.replace(/^\.\//, "")}/`), "");
+    // Use getFullExtension to handle multi-part extensions correctly (e.g., .d.ts, .c.js)
+    const fileExtension = getFullExtension(output.file, context.options.outputExtensionMap);
+    const fileWithoutExtension = output.file.replace(fileExtension, "");
+    const outDirectoryPrefix = context.options.outDir.replace(/^\.\//, "");
+    // Remove outDir prefix, handling both "./dist/" and "dist/" formats
+    const aliasName = fileWithoutExtension.replace(new RegExp(`^(\./)?${outDirectoryPrefix}/`), "");
 
     // Check if input file matches the alias (if not, we need fileAlias)
     const inputBase = input.replace(/\.[^./]+$/, "").split("/").pop() || "";
@@ -323,7 +369,35 @@ const createOrUpdateEntry = (
             entry.declaration = context.options.declaration;
         }
 
-        if (output.type === "cjs") {
+        // Handle declaration-only exports (when output.type is undefined but file is a declaration file)
+        // For .d.ts files, we need to infer the type from the condition or use both formats if dual format
+        if (output.type === undefined && /\.d\.ts$/.test(output.file)) {
+            // Check if we have both .d.mts and .d.cts outputs for the same export key (indicating dual format)
+            const hasDtsMts = outputs.some((o) =>
+                o.exportKey === output.exportKey &&
+                (o.file.includes("*") || o.file === output.file.replace(".d.ts", ".d.mts")) &&
+                o.file.endsWith(".d.mts")
+            );
+            const hasDtsCts = outputs.some((o) =>
+                o.exportKey === output.exportKey &&
+                (o.file.includes("*") || o.file === output.file.replace(".d.ts", ".d.cts")) &&
+                o.file.endsWith(".d.cts")
+            );
+
+            // If we have both .d.mts and .d.cts, we're in dual format mode
+            if (hasDtsMts && hasDtsCts) {
+                entry.cjs = true;
+                entry.esm = true;
+            } else {
+                // Infer from package type or default to esm
+                const packageType = (context.pkg?.type === "module" ? "esm" : "cjs") as Format;
+                if (packageType === "cjs") {
+                    entry.cjs = true;
+                } else {
+                    entry.esm = true;
+                }
+            }
+        } else if (output.type === "cjs") {
             entry.cjs = true;
         } else if (output.type === "esm") {
             entry.esm = true;
@@ -363,9 +437,6 @@ const inferEntries = async (
 
     // Clear directory cache to ensure fresh results for each test run
     directoryCache.clear();
-
-    const cjsJSExtension = (context.options.outputExtensionMap?.cjs ?? "cjs").replaceAll(".", String.raw`\.`);
-    const esmJSExtension = (context.options.outputExtensionMap?.esm ?? "mjs").replaceAll(".", String.raw`\.`);
 
     const warnings: string[] = [];
 
@@ -465,18 +536,58 @@ const inferEntries = async (
     const entries: BuildEntry[] = [];
 
     for await (const output of outputs) {
-        const outputExtension = extname(output.file);
+        // Handle declaration files first: .d.mts -> esm, .d.cts -> cjs, .d.ts -> infer from context
+        // Declaration files are always valid and don't need extension validation
+        const isDeclarationFile = /\.d\.[mc]?ts$/.test(output.file);
 
-        // Only javascript files are supported
-        if (outputExtension !== "" && !DEFAULT_EXTENSIONS.includes(outputExtension)) {
-            continue;
+        // Get the full extension (handles multi-part extensions like .d.ts, .c.js)
+        const outputExtension = getFullExtension(output.file, context.options.outputExtensionMap);
+
+        // Build list of valid extensions including custom ones from outputExtensionMap
+        const validExtensions = [...DEFAULT_EXTENSIONS];
+        if (context.options.outputExtensionMap) {
+            // Add custom extensions with leading dot (e.g., "c.js" -> ".c.js")
+            for (const ext of Object.values(context.options.outputExtensionMap)) {
+                const extWithDot = ext.startsWith(".") ? ext : `.${ext}`;
+                if (!validExtensions.includes(extWithDot)) {
+                    validExtensions.push(extWithDot);
+                }
+            }
         }
 
-        if (context.options.emitCJS === undefined && output.type === "cjs") {
+        // Only javascript files and declaration files are supported
+        // Declaration files are always valid, so skip extension check for them
+        if (!isDeclarationFile && outputExtension !== "" && !validExtensions.includes(outputExtension)) {
+            continue;
+        }
+        let inferredType: Format | undefined = output.type;
+
+        if (!inferredType && isDeclarationFile) {
+            if (output.file.endsWith(".d.mts")) {
+                inferredType = "esm";
+            } else if (output.file.endsWith(".d.cts")) {
+                inferredType = "cjs";
+            } else if (output.file.endsWith(".d.ts")) {
+                // For .d.ts, infer from condition or package type
+                // If we have both import and require conditions, we need both formats
+                const hasImportCondition = outputs.some((o) => o.subKey === "import" && o.file.endsWith(".d.mts"));
+                const hasRequireCondition = outputs.some((o) => o.subKey === "require" && o.file.endsWith(".d.cts"));
+
+                if (hasImportCondition && hasRequireCondition) {
+                    // Dual format - will be handled when processing those outputs
+                    inferredType = undefined;
+                } else {
+                    // Single format - infer from package type
+                    inferredType = (context.pkg?.type === "module" ? "esm" : "cjs") as Format;
+                }
+            }
+        }
+
+        if (context.options.emitCJS === undefined && (inferredType === "cjs" || output.type === "cjs")) {
             context.options.emitCJS = true;
         }
 
-        if (context.options.emitESM === undefined && output.type === "esm") {
+        if (context.options.emitESM === undefined && (inferredType === "esm" || output.type === "esm")) {
             context.options.emitESM = true;
         }
 
@@ -488,10 +599,27 @@ const inferEntries = async (
 
         // Supported output file extensions are `.d.ts`, `.d.cts`, `.d.mts`, `.js`, `.cjs` and `.mjs`
         // But we support any file extension here in case user has extended rollup options
-        const outputSlug = output.file.replace(
-            new RegExp(String.raw`(?:\*[^/\\]|\.d\.[mc]?ts|\.\w+|${[String.raw`\.${cjsJSExtension}`, String.raw`\.${esmJSExtension}`].join("|")})$`),
-            "",
-        );
+        // Check custom extensions first (before generic \.\w+) to handle multi-part extensions like .c.js, .m.js
+        let outputSlug = output.file;
+
+        // First, try to strip custom extensions if they exist
+        if (context.options.outputExtensionMap) {
+            for (const ext of Object.values(context.options.outputExtensionMap)) {
+                const extWithDot = ext.startsWith(".") ? ext : `.${ext}`;
+                if (output.file.endsWith(extWithDot)) {
+                    outputSlug = output.file.slice(0, -extWithDot.length);
+                    break;
+                }
+            }
+        }
+
+        // If no custom extension was found, use regex to strip standard extensions
+        if (outputSlug === output.file) {
+            outputSlug = output.file.replace(
+                new RegExp(String.raw`(?:\*[^/\\]|\.d\.[mc]?ts|\.\w+)$`),
+                "",
+            );
+        }
 
         const isDirectory = outputSlug.endsWith("/");
 
@@ -502,10 +630,16 @@ const inferEntries = async (
 
         const sourceSlug = outputSlug.replace(new RegExp(`(./)?${context.options.outDir}`), context.options.sourceDir).replace("./", "");
 
-        const beforeSourceRegex = "(?<=/|$)";
-        const fileExtensionRegex = isDirectory
+        // File extension regex for matching SOURCE files (not output files)
+        // Source files have extensions like .ts, .tsx, .js, .jsx, etc.
+        // Custom output extensions like .c.js and .m.js are NOT used here
+        const fileExtensionRegexPattern = isDirectory
             ? ""
-            : String.raw`(\.d\.[cm]?ts|(\.[cm]?[tj]sx?)|${[String.raw`\.${cjsJSExtension}`, String.raw`\.${esmJSExtension}`].join("|")})$`;
+            : String.raw`(\.d\.[cm]?ts|(\.[cm]?[tj]sx?))$`;
+
+        // Match source files that may or may not start with ./
+        // Use (?:^|/) to match start of string or after /
+        const beforeSourceRegex = "(?:^|/)";
 
         // @see https://nodejs.org/docs/latest-v16.x/api/packages.html#subpath-patterns
         if ((output.file.includes("/*") || outputSlug.includes("*")) && output.key === "exports") {
@@ -518,6 +652,7 @@ const inferEntries = async (
             // Determine input pattern from export key or file
             // For string exports like "./dist/runtime/*", extract pattern by removing dist prefix
             // For object exports like {"./*": "./dist/*"}, use exportKey
+            // For multiple conditions with different output paths, derive from output pattern
             let inputPattern: string;
 
             if (output.exportKey) {
@@ -541,14 +676,52 @@ const inferEntries = async (
             // Get all source files recursively
             const allSourceFiles = await getDirectoryFiles(sourceDirectoryPath);
 
+            // Count wildcards in output pattern to validate captures
+            const outputWildcardCount = (outputPattern.match(/\*/g) || []).length;
+            // Count wildcards in input pattern to check if all must match same value
+            const inputWildcardCount = (inputPattern.match(/\*/g) || []).length;
+
             // For wildcard exports, scan all source files in the source directory
             for (const relativeFilePath of allSourceFiles) {
                 // Check if this file matches the input pattern
                 const wildcardMatch = matchWildcardPattern(relativeFilePath, inputPattern);
 
                 if (wildcardMatch) {
+                    // Check if we have enough captures for all wildcards in output pattern
+                    // If output pattern has more wildcards than captures, we need to derive input pattern from output
+                    if (wildcardMatch.length < outputWildcardCount) {
+                        // Skip this match - we'll handle it in the fallback below
+                        continue;
+                    }
+
+                    // If output pattern has multiple wildcards but input pattern has fewer,
+                    // all wildcards in output must match the same value
+                    // e.g., "./*": "./dist/*/*.mjs" requires both * to be the same (foo/foo.ts matches, a/b.ts doesn't)
+                    if (outputWildcardCount > inputWildcardCount && outputWildcardCount > 1) {
+                        // Check if all captures are the same (required for multiple wildcards with single input pattern)
+                        const firstCapture = wildcardMatch[0];
+                        if (!wildcardMatch.every((capture) => capture === firstCapture)) {
+                            // Captures don't all match - skip this file
+                            continue;
+                        }
+                        // Expand captures to match output wildcard count
+                        const expandedCaptures = Array(outputWildcardCount).fill(firstCapture);
+                        const outputPath = substituteWildcards(outputPattern, expandedCaptures);
+                        matchingInputs.push({
+                            input: resolve(sourceDirectoryPath, relativeFilePath),
+                            output: outputPath,
+                        });
+                        continue;
+                    }
+
                     // Generate output path by substituting wildcards
                     const outputPath = substituteWildcards(outputPattern, wildcardMatch);
+
+                    // Validate that all wildcards were substituted
+                    if (outputPath.includes("*")) {
+                        // Still has wildcards, skip this match
+                        continue;
+                    }
 
                     matchingInputs.push({
                         input: resolve(sourceDirectoryPath, relativeFilePath),
@@ -557,23 +730,163 @@ const inferEntries = async (
                 }
             }
 
+            // If no matches found with export key pattern, or if matches had insufficient captures,
+            // try deriving input pattern from output pattern
+            // This handles cases where export key doesn't match source structure but output path does
+            // e.g., export key "./*" with output "./dist/*/*.mjs" should match "foo/foo" pattern
+            if (matchingInputs.length === 0 && outputPattern.includes("*")) {
+                const outputPath = output.file.startsWith("./") ? output.file.slice(2) : output.file;
+                // Remove dist/ prefix to get relative path (e.g., "dist/browser/*.mjs" -> "browser/*.mjs")
+                let derivedPattern = outputPath.replace(/^dist\//, "");
+                // Remove file extension to get pattern (e.g., "browser/*.mjs" -> "browser/*")
+                // For patterns like "dist/*/*.mjs", this becomes "*/*"
+                derivedPattern = derivedPattern.replace(/\.\w+$/, "");
+
+                // Count wildcards in derived pattern
+                const derivedWildcardCount = (derivedPattern.match(/\*/g) || []).length;
+
+                // Try matching with derived pattern
+                for (const relativeFilePath of allSourceFiles) {
+                    const wildcardMatch = matchWildcardPattern(relativeFilePath, derivedPattern);
+
+                    if (wildcardMatch && wildcardMatch.length >= outputWildcardCount) {
+                        // If the original input pattern had fewer wildcards than the output pattern,
+                        // all wildcards in the output must match the same value
+                        // This handles cases like "./*": "./dist/*/*.mjs" where both * must be the same
+                        // e.g., "foo/foo.ts" matches (both * = "foo"), but "a/b.ts" doesn't (a !== b)
+                        if (outputWildcardCount > 1 && inputWildcardCount < outputWildcardCount) {
+                            // When input pattern has fewer wildcards than output, all output wildcards must match same value
+                            // Check if all captures are the same
+                            const firstCapture = wildcardMatch[0];
+                            if (!wildcardMatch.every((capture) => capture === firstCapture)) {
+                                // Captures don't all match - skip this file
+                                continue;
+                            }
+                            // Expand captures to match output wildcard count
+                            const expandedCaptures = Array(outputWildcardCount).fill(firstCapture);
+                            const outputPathSubstituted = substituteWildcards(outputPattern, expandedCaptures);
+                            matchingInputs.push({
+                                input: resolve(sourceDirectoryPath, relativeFilePath),
+                                output: outputPathSubstituted,
+                            });
+                            continue;
+                        }
+
+                        // Generate output path by substituting wildcards
+                        const outputPathSubstituted = substituteWildcards(outputPattern, wildcardMatch);
+
+                        // Validate that all wildcards were substituted
+                        if (!outputPathSubstituted.includes("*")) {
+                            matchingInputs.push({
+                                input: resolve(sourceDirectoryPath, relativeFilePath),
+                                output: outputPathSubstituted,
+                            });
+                        }
+                    }
+                }
+            }
+
             if (matchingInputs.length === 0) {
-                warnings.push(`Could not find entrypoints matching pattern \`${inputPattern}\` for output \`${outputPattern}\``);
+                // For optional patterns (when there are other exports), don't add warnings
+                // Check if there are other outputs in the exports (indicating this is optional)
+                const hasOtherOutputs = outputs.length > 1;
+
+                // Only warn if this is the only export pattern (required)
+                // If there are other exports, this pattern is optional and we skip it silently
+                if (!hasOtherOutputs) {
+                    warnings.push(`Could not find entrypoints matching pattern \`${inputPattern}\` for output \`${outputPattern}\``);
+                }
+                // For optional patterns, silently skip (don't add warning, don't fail)
                 continue;
             }
 
-            // Create entries for each match
-            for (const { input, output: outputPath } of matchingInputs) {
-                // Create a modified output descriptor with the specific output path
-                const specificOutput = { ...output, file: outputPath };
+            // For declaration-only exports, create ONE entry per input file (not separate entries for each declaration output)
+            // The build process will generate all declaration files (.d.ts, .d.mts, .d.cts) based on entry flags
+            // Check if all outputs for this export key are declaration files
+            const allOutputsForExportKey = outputs.filter((o) => o.exportKey === output.exportKey);
+            const isDeclarationOnlyExport = allOutputsForExportKey.length > 0 && allOutputsForExportKey.every((o) => /\.d\.[mc]?ts$/.test(o.file));
 
-                createOrUpdateEntry(entries, input, isDirectory, outputSlug, specificOutput, context, true);
+            if (isDeclarationOnlyExport) {
+                // Only process the .d.ts output to create ONE entry
+                // Skip .d.mts and .d.cts outputs as they will be generated by the build process
+                const isWildcardPattern = output.file.includes("*");
+                const isDtsMtsOrCtsOutput = isWildcardPattern && (output.file.endsWith(".d.mts") || output.file.endsWith(".d.cts"));
+
+                // Find the .d.ts output once (cache for reuse)
+                const dtsOutput = allOutputsForExportKey.find((o) => o.file.includes("*") && o.file.endsWith(".d.ts"));
+
+                // Skip .d.mts and .d.cts outputs if .d.ts output exists
+                if (isDtsMtsOrCtsOutput && dtsOutput) {
+                    continue;
+                }
+
+                // Use the .d.ts output if found, otherwise use current output (fallback for non-wildcard or missing .d.ts)
+                const baseOutput = dtsOutput || output;
+
+                // Create ONE entry per matching input with both formats set if dual format
+                // The build process will generate all declaration files based on entry.cjs/entry.esm flags
+                for (const { input, output: outputPath } of matchingInputs) {
+                    // Ensure the outputPath is .d.ts (normalize from .d.mts/.d.cts if needed)
+                    const dtsOutputPath = outputPath.endsWith(".d.ts") ? outputPath : outputPath.replace(/\.d\.[mc]ts$/, ".d.ts");
+                    const specificOutput = {
+                        ...baseOutput,
+                        file: dtsOutputPath,
+                        type: undefined, // Let createOrUpdateEntry handle dual format detection
+                    };
+
+                    createOrUpdateEntry(entries, input, isDirectory, outputSlug, specificOutput, context, true, outputs);
+                }
+            } else {
+                // For non-declaration-only exports, create entries for each output as before
+                for (const { input, output: outputPath } of matchingInputs) {
+                    // Create a modified output descriptor with the specific output path
+                    // Infer type for declaration files if not already set
+                    let inferredType = output.type;
+                    if (!inferredType && /\.d\.[mc]?ts$/.test(outputPath)) {
+                        if (outputPath.endsWith(".d.mts")) {
+                            inferredType = "esm";
+                        } else if (outputPath.endsWith(".d.cts")) {
+                            inferredType = "cjs";
+                        } else if (outputPath.endsWith(".d.ts")) {
+                            // For .d.ts, infer from condition or package type
+                            // Check if we have both import and require conditions for declaration files
+                            const hasImportCondition = outputs.some((o) =>
+                                o.exportKey === output.exportKey &&
+                                o.subKey === "import" &&
+                                o.file.includes("*") &&
+                                o.file.endsWith(".d.mts")
+                            );
+                            const hasRequireCondition = outputs.some((o) =>
+                                o.exportKey === output.exportKey &&
+                                o.subKey === "require" &&
+                                o.file.includes("*") &&
+                                o.file.endsWith(".d.cts")
+                            );
+
+                            if (hasImportCondition && hasRequireCondition) {
+                                // Dual format - we need to create entries for both formats
+                                // Set type to undefined but we'll handle it in createOrUpdateEntry
+                                inferredType = undefined;
+                            } else {
+                                // Single format - infer from package type
+                                inferredType = (context.pkg?.type === "module" ? "esm" : "cjs") as Format;
+                            }
+                        }
+                    }
+                    const specificOutput = {
+                        ...output,
+                        file: outputPath,
+                        ...(inferredType && { type: inferredType })
+                    };
+
+                    createOrUpdateEntry(entries, input, isDirectory, outputSlug, specificOutput, context, true, outputs);
+                }
             }
 
             continue;
         }
 
-        const SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug + fileExtensionRegex);
+        const SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + fileExtensionRegexPattern);
 
         let input = sourceFiles.find((index) => SOURCE_RE.test(index));
 
@@ -594,7 +907,7 @@ const inferEntries = async (
                 } else {
                     // Fall back to base file (e.g., index.tsx), fileAlias will be set in createOrUpdateEntry
                     const baseSourceSlug = patternResult.baseName;
-                    const BASE_SOURCE_RE = new RegExp(beforeSourceRegex + baseSourceSlug + fileExtensionRegex);
+                    const BASE_SOURCE_RE = new RegExp(beforeSourceRegex + baseSourceSlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + fileExtensionRegexPattern);
 
                     input = sourceFiles.find((index) => BASE_SOURCE_RE.test(index));
                 }
@@ -603,7 +916,7 @@ const inferEntries = async (
                 const sourceSlugWithoutExtension = sourceSlug.replace(/^(.+?)\.[^.]*$/, "$1").replace(/\/$/, "");
 
                 if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string)) {
-                    const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlugWithoutExtension + fileExtensionRegex);
+                    const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlugWithoutExtension.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + fileExtensionRegexPattern);
 
                     input = sourceFiles.find((index) => SPECIAL_SOURCE_RE.test(index));
                 }
@@ -625,10 +938,10 @@ const inferEntries = async (
         const inputWithoutExtension = toNamespacedPath(input.replace(ENDING_REGEX, ""));
 
         if (isAccessibleSync(`${inputWithoutExtension}.cts`) && isAccessibleSync(`${inputWithoutExtension}.mts`)) {
-            createOrUpdateEntry(entries, `${inputWithoutExtension}.cts`, isDirectory, outputSlug, { ...output, type: "cjs" }, context, false);
-            createOrUpdateEntry(entries, `${inputWithoutExtension}.mts`, isDirectory, outputSlug, { ...output, type: "esm" }, context, false);
+            createOrUpdateEntry(entries, `${inputWithoutExtension}.cts`, isDirectory, outputSlug, { ...output, type: "cjs" }, context, false, outputs);
+            createOrUpdateEntry(entries, `${inputWithoutExtension}.mts`, isDirectory, outputSlug, { ...output, type: "esm" }, context, false, outputs);
         } else {
-            createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context, false);
+            createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context, false, outputs);
         }
     }
 
