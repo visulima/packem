@@ -17,12 +17,18 @@ const oxcTransformPlugin: TransformerFunction = ({ exclude, include, ...transfor
                 return undefined;
             }
 
-            const { code, errors, map } = transform(id, sourcecode, {
+            const result = await transform(id, sourcecode, {
                 ...transformOptions,
                 sourcemap: true,
             });
 
-            if (errors.length > 0) {
+            if (!result) {
+                return undefined;
+            }
+
+            const { code, errors = [], map } = result;
+
+            if (errors && errors.length > 0) {
                 return this.error({
                     message: ["\ntransform errors:", ...errors].join("\n\n"),
                     pluginCode: "ERR_TRANSFORM",
