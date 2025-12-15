@@ -652,10 +652,15 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             resolveExternalsPlugin(context),
 
             context.options.rollup.replace
-            && replacePlugin({
-                sourcemap: context.options.sourcemap,
-                ...context.options.rollup.replace,
-            }),
+            && (() => {
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'get-rollup-options.ts:984',message:'Replace plugin init (declaration)',data:{hasReplace:!!context.options.rollup.replace,replaceValues:Object.keys(context.options.rollup.replace?.values || {}),processEnvSSR:context.options.rollup.replace?.values?.['process.env.SSR'],preventAssignment:context.options.rollup.replace?.preventAssignment},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                // #endregion
+                return replacePlugin({
+                    sourcemap: context.options.sourcemap,
+                    ...context.options.rollup.replace,
+                });
+            })(),
 
             context.options.rollup.alias
             && aliasPlugin({
@@ -982,10 +987,15 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             resolveExternalsPlugin(context),
 
             context.options.rollup.replace
-            && replacePlugin({
-                sourcemap: context.options.sourcemap,
-                ...context.options.rollup.replace,
-            }),
+            && (() => {
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'get-rollup-options.ts:984',message:'Replace plugin init (declaration)',data:{hasReplace:!!context.options.rollup.replace,replaceValues:Object.keys(context.options.rollup.replace?.values || {}),processEnvSSR:context.options.rollup.replace?.values?.['process.env.SSR'],preventAssignment:context.options.rollup.replace?.preventAssignment},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                // #endregion
+                return replacePlugin({
+                    sourcemap: context.options.sourcemap,
+                    ...context.options.rollup.replace,
+                });
+            })(),
 
             context.options.rollup.alias
             && aliasPlugin({

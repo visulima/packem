@@ -10,6 +10,27 @@ import { Tabs, TabItem } from '../../components/Tabs'
 
 Hooks allow you to tap into Packem's build lifecycle and execute custom logic at specific points during the build process. This enables advanced customization and integration with external tools.
 
+## Hook Merging
+
+When using presets, hooks from both the preset and your configuration are automatically merged. This means:
+
+- **Hooks from presets are preserved** - Preset hooks (like Solid preset's `rollup:options` hook) are automatically included
+- **User config hooks take precedence** - If both preset and user config define the same hook, your hook will be used
+- **Multiple hooks can coexist** - Different hooks from preset and user config are all registered
+
+```typescript
+// Preset defines: hooks: { 'rollup:options': presetHook }
+// Your config defines: hooks: { 'build:before': myHook }
+
+// Result: Both hooks are registered
+// - 'rollup:options' uses presetHook
+// - 'build:before' uses myHook
+```
+
+<Callout type="tip">
+Hooks are merged automatically when using presets. You don't need to manually combine them.
+</Callout>
+
 ## Available Hooks
 
 ### Build Lifecycle
@@ -20,11 +41,11 @@ export default defineConfig({
     'build:before': async () => {
       console.log('Build starting...')
     },
-    
+
     'build:after': async () => {
       console.log('Build completed!')
     },
-    
+
     'build:error': async (error) => {
       console.error('Build failed:', error)
     }
@@ -40,11 +61,11 @@ export default defineConfig({
     'file:change': async (file, event) => {
       console.log(`File ${event}: ${file}`)
     },
-    
+
     'file:add': async (file) => {
       console.log(`File added: ${file}`)
     },
-    
+
     'file:delete': async (file) => {
       console.log(`File deleted: ${file}`)
     }
@@ -60,11 +81,11 @@ export default defineConfig({
     'bundle:start': async (options) => {
       console.log('Bundle generation started')
     },
-    
+
     'bundle:end': async (bundle) => {
       console.log('Bundle generated:', Object.keys(bundle))
     },
-    
+
     'chunk:generated': async (chunk) => {
       console.log(`Chunk generated: ${chunk.fileName}`)
     }
@@ -111,7 +132,7 @@ export default defineConfig({
       // Update version in files
       const { writeFile } = await import('fs/promises')
       const version = process.env.npm_package_version
-      
+
       await writeFile(
         'src/version.ts',
         `export const VERSION = '${version}'`
@@ -132,7 +153,7 @@ export default defineConfig({
         name,
         size: chunk.code?.length || 0
       }))
-      
+
       console.table(sizes)
     }
   }
@@ -151,7 +172,7 @@ export default defineConfig({
         // Production-only tasks
         await deployToS3()
       }
-      
+
       if (process.env.ANALYZE_BUNDLE) {
         // Optional bundle analysis
         await generateBundleReport()
@@ -171,12 +192,12 @@ export default defineConfig({
         console.log('Step 1: Clean dist')
         await cleanDist()
       },
-      
+
       async () => {
         console.log('Step 2: Generate types')
         await generateTypes()
       },
-      
+
       async () => {
         console.log('Step 3: Copy assets')
         await copyAssets()
@@ -199,11 +220,11 @@ export default defineConfig({
         // Continue build despite error
       }
     },
-    
+
     'build:error': async (error) => {
       // Send error to monitoring service
       await sendErrorReport(error)
-      
+
       // Clean up resources
       await cleanup()
     }
@@ -221,11 +242,11 @@ export default defineConfig({
     'watch:start': async () => {
       console.log('Watch mode started')
     },
-    
+
     'watch:restart': async () => {
       console.log('Restarting due to config change')
     },
-    
+
     'watch:close': async () => {
       console.log('Watch mode stopped')
       await cleanup()
@@ -244,11 +265,11 @@ export default defineConfig({
       if (file.endsWith('.graphql')) {
         await regenerateGraphQLTypes()
       }
-      
+
       if (file.includes('i18n/')) {
         await updateTranslations()
       }
-      
+
       if (file === 'package.json') {
         await updateDependencies()
       }
@@ -269,7 +290,7 @@ export default defineConfig({
         const { exec } = await import('child_process')
         const { promisify } = await import('util')
         const execAsync = promisify(exec)
-        
+
         try {
           await execAsync('npm test')
           console.log('Tests passed!')
@@ -308,13 +329,13 @@ export default defineConfig({
     'build:after': async () => {
       if (process.env.AUTO_DEPLOY === 'true') {
         console.log('Deploying to production...')
-        
+
         // Upload to CDN
         await uploadToCDN('dist')
-        
+
         // Update service
         await updateService()
-        
+
         // Send notification
         await sendDeploymentNotification()
       }
@@ -330,7 +351,7 @@ export default defineConfig({
   hooks: {
     'build:after': async () => {
       const env = process.env.DEPLOY_ENV
-      
+
       switch (env) {
         case 'staging':
           await deployToStaging()
@@ -357,12 +378,12 @@ export default defineConfig({
       // Record build start time
       global.buildStartTime = Date.now()
     },
-    
+
     'build:after': async () => {
       // Calculate build duration
       const duration = Date.now() - global.buildStartTime
       console.log(`Build completed in ${duration}ms`)
-      
+
       // Send metrics to monitoring service
       await sendMetrics({
         buildDuration: duration,
@@ -383,10 +404,10 @@ export default defineConfig({
         acc[name] = chunk.code?.length || 0
         return acc
       }, {})
-      
+
       // Track bundle size changes
       await trackBundleSizes(bundleSizes)
-      
+
       // Alert if bundle size increased significantly
       await checkBundleSizeThresholds(bundleSizes)
     }
@@ -401,17 +422,17 @@ export default defineConfig({
 ```typescript
 class HookManager {
   private hooks = new Map<string, Function[]>()
-  
+
   register(name: string, fn: Function) {
     if (!this.hooks.has(name)) {
       this.hooks.set(name, [])
     }
     this.hooks.get(name)!.push(fn)
   }
-  
+
   async execute(name: string, ...args: any[]) {
     const hooks = this.hooks.get(name) || []
-    
+
     for (const hook of hooks) {
       await hook(...args)
     }
@@ -435,7 +456,7 @@ export default defineConfig({
 function customPlugin() {
   return {
     name: 'custom-plugin',
-    
+
     buildStart() {
       // Register custom hooks
       this.emitFile({
@@ -451,7 +472,7 @@ export default defineConfig({
   rollup: {
     plugins: [customPlugin()]
   },
-  
+
   hooks: {
     'build:after': async () => {
       // Execute plugin-specific hooks
@@ -471,19 +492,19 @@ export default defineConfig({
     'build:before': async () => {
       console.log('🚀 Starting build process')
     },
-    
+
     'file:change': async (file, event) => {
       console.log(`📝 File ${event}: ${file}`)
     },
-    
+
     'bundle:end': async (bundle) => {
       console.log('📦 Bundle generated:', Object.keys(bundle))
     },
-    
+
     'build:after': async () => {
       console.log('✅ Build completed successfully')
     },
-    
+
     'build:error': async (error) => {
       console.error('❌ Build failed:', error.message)
     }

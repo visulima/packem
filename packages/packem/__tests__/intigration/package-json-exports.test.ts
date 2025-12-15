@@ -2509,14 +2509,14 @@ export default 'index';`,
         const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
-
+console.log(binProcess.stdout)
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.js`);
 
         expect(browserContent).toContain("index");
-        expect(browserContent).toMatch(/process\.env\.SSR.*false/);
+        expect(browserContent).toContain(`const isServer = "false" === "true"`);
 
         const serverContent = readFileSync(`${temporaryDirectoryPath}/dist/index.server.js`);
 
@@ -2624,7 +2624,7 @@ export default 'index';`,
         const developmentContent = readFileSync(`${temporaryDirectoryPath}/dist/index.development.js`);
 
         expect(developmentContent).toContain("index");
-        expect(developmentContent).toMatch(/process\.env\.NODE_ENV.*"development"/);
+        expect(developmentContent).toMatch('const env = "development"');
         expect(developmentContent).toMatch(/process\.env\.DEV.*true/);
 
         const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.js`);

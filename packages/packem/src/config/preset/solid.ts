@@ -224,12 +224,10 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
                 // Add replace/define values based on runtime and environment
                 const environment = context.environment === "development" ? "development" : "production";
                 const isDev = environment === "development";
-
                 // Get runtime from context options (set per build group)
                 // Runtime is "browser" | "node", workerd maps to node runtime
                 const runtime = context.options.runtime || "node";
                 const isServer = runtime === "node";
-
                 // Ensure replace plugin is configured
                 if (!context.options.rollup.replace) {
                     context.options.rollup.replace = {
@@ -245,14 +243,16 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
                 // Add SolidJS-specific replace values
                 // Order: import.meta.env.* first, then process.env.*, alphabetically within each group
                 // Use array join pattern to prevent packem from overwriting internally
+                // Values must be JSON.stringify'd strings for proper replacement
                 const replaceValues: Record<string, string> = {
-                    [["import", "meta", "env", "DEV"].join(".")]: isDev ? "true" : "false",
+                    [["import", "meta", "env", "DEV"].join(".")]: JSON.stringify(isDev),
                     [["import", "meta", "env", "NODE_ENV"].join(".")]: JSON.stringify(environment),
-                    [["import", "meta", "env", "PROD"].join(".")]: isDev ? "false" : "true",
-                    [["import", "meta", "env", "SSR"].join(".")]: isServer ? "true" : "false",
-                    [["process", "env", "DEV"].join(".")]: isDev ? "true" : "false",
-                    [["process", "env", "PROD"].join(".")]: isDev ? "false" : "true",
-                    [["process", "env", "SSR"].join(".")]: isServer ? "true" : "false",
+                    [["import", "meta", "env", "PROD"].join(".")]: JSON.stringify(!isDev),
+                    [["import", "meta", "env", "SSR"].join(".")]: JSON.stringify(isServer),
+                    [["process", "env", "DEV"].join(".")]: JSON.stringify(isDev),
+                    [["process", "env", "NODE_ENV"].join(".")]: JSON.stringify(environment),
+                    [["process", "env", "PROD"].join(".")]: JSON.stringify(!isDev),
+                    [["process", "env", "SSR"].join(".")]: JSON.stringify(isServer),
                 };
 
                 // Merge replace values into existing values
