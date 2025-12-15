@@ -14,7 +14,6 @@ import type { Pail } from "@visulima/pail";
 import { join, resolve } from "@visulima/path";
 import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
 import browserslist from "browserslist";
-import { defu } from "defu";
 import { createHooks } from "hookable";
 import { createJiti } from "jiti";
 import { VERSION } from "rollup";
@@ -28,6 +27,7 @@ import prepareEntries from "../config/utils/prepare-entries";
 import createStub from "../jit/create-stub";
 import rollupWatch from "../rollup/watch";
 import type { BuildConfig, BuildOptions, Environment, InternalBuildOptions, Mode } from "../types";
+import { createDefuWithHooksMerger } from "../utils/create-defu-with-hooks-merger";
 import cleanDistributionDirectories from "../utils/clean-distribution-directories";
 import createOrUpdateKeyStorage from "../utils/create-or-update-key-storage";
 import getPackageSideEffect from "../utils/get-package-side-effect";
@@ -96,8 +96,11 @@ const generateOptions = (
     const jsxRuntime = resolveTsconfigJsxToJsxRuntime(tsconfig?.config.compilerOptions?.jsx);
     const splitRuntimeVersion = runtimeVersion.split(".");
 
+    // Use custom defu that merges hooks instead of overwriting them
+    const customDefu = createDefuWithHooksMerger();
+
     // @ts-ignore TS2589 is just deeply nested and this is needed for typedoc
-    const options = defu(autoPreset, buildConfig, <Partial<BuildOptions>>{
+    const options = customDefu(autoPreset, buildConfig, <Partial<BuildOptions>>{
         alias: {},
         browserTargets: browserslist(),
         cjsInterop: false,
@@ -672,7 +675,17 @@ const createContext = async (
     };
 
     if (buildConfig.hooks) {
+        // #region agent log
+        const hooksBefore = (context.hooks as any)._hooks?.get?.("rollup:options");
+        const hooksCountBefore = hooksBefore ? hooksBefore.size : 0;
+        fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.ts:674',message:'Before addHooks',data:{hooksCountBefore,hooksKeys:Object.keys(buildConfig.hooks || {}),hasRollupOptionsHook:!!buildConfig.hooks?.['rollup:options']},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+        // #endregion
         context.hooks.addHooks(buildConfig.hooks);
+        // #region agent log
+        const hooksAfter = (context.hooks as any)._hooks?.get?.("rollup:options");
+        const hooksCountAfter = hooksAfter ? hooksAfter.size : 0;
+        fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.ts:680',message:'After addHooks',data:{hooksCountBefore,hooksCountAfter,hooksAdded:hooksCountAfter - hooksCountBefore},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+        // #endregion
     }
 
     // Allow to prepare and extending context

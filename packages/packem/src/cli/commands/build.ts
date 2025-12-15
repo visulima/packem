@@ -3,7 +3,7 @@ import { cwd, exit } from "node:process";
 import type { Cli } from "@visulima/cerebro";
 import { DEVELOPMENT_ENV, PRODUCTION_ENV } from "@visulima/packem-share/constants";
 import { resolve } from "@visulima/path";
-import { defu } from "defu";
+import { createDefuWithHooksMerger } from "../../utils/create-defu-with-hooks-merger";
 import { createJiti } from "jiti";
 
 import autoPreset from "../../config/preset/auto";
@@ -11,7 +11,7 @@ import loadEnvFile from "../../config/utils/load-env-file";
 import loadPackemConfig from "../../config/utils/load-packem-config";
 import loadPreset from "../../config/utils/load-preset";
 import packem from "../../packem";
-import type { BuildConfig, Environment, Mode } from "../../types";
+import type { Environment, Mode } from "../../types";
 
 /**
  * Creates and registers the build command with the CLI.
@@ -114,13 +114,9 @@ const createBuildCommand = (cli: Cli): void => {
             }
 
             try {
-                await packem(
-                    rootPath,
-                    mode,
-                    nodeEnvironment as Environment,
-                    logger,
-                    options.debug,
-                    defu<BuildConfig, BuildConfig[]>(buildConfig, autoPreset, preset, {
+                // Use custom defu that merges hooks instead of overwriting them
+                const customDefu = createDefuWithHooksMerger();
+                const mergedConfig = customDefu(buildConfig, autoPreset, preset, {
                         analyze: options.analyze,
                         cjsInterop: options.cjsInterop,
                         clean: options.clean,
@@ -162,9 +158,16 @@ const createBuildCommand = (cli: Cli): void => {
                                 },
                             }
                             : {},
-                    }),
-                    options.tsconfig ?? undefined,
-                );
+                    });
+                    await packem(
+                        rootPath,
+                        mode,
+                        nodeEnvironment as Environment,
+                        logger,
+                        options.debug,
+                        mergedConfig,
+                        options.tsconfig ?? undefined,
+                    );
             } catch (error) {
                 logger.error(error);
 

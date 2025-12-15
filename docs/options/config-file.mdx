@@ -722,6 +722,11 @@ export const libraryPreset = {
       dir: 'dist'
     },
     sourcemap: true
+  },
+  hooks: {
+    'build:before': async () => {
+      console.log('Preset hook: Preparing library build')
+    }
   }
 }
 
@@ -750,9 +755,22 @@ export default defineConfig({
     css: {
       mode: 'extract'
     }
+  },
+
+  // Hooks from preset are automatically merged
+  // You can add your own hooks or override preset hooks
+  hooks: {
+    'build:after': async () => {
+      console.log('User hook: Build completed')
+    }
+    // Preset's 'build:before' hook is still registered
   }
 })
 ```
+
+<Callout type="tip">
+Hooks from presets are automatically merged with your configuration. If you define the same hook in both, your hook will take precedence.
+</Callout>
 
 ## Configuration Composition
 
