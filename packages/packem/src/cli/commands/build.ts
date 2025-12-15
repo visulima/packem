@@ -7,6 +7,7 @@ import { defu } from "defu";
 import { createJiti } from "jiti";
 
 import autoPreset from "../../config/preset/auto";
+import loadEnvFile from "../../config/utils/load-env-file";
 import loadPackemConfig from "../../config/utils/load-packem-config";
 import loadPreset from "../../config/utils/load-preset";
 import packem from "../../packem";
@@ -43,16 +44,16 @@ const createBuildCommand = (cli: Cli): void => {
                 mode = "jit";
             }
 
-            const environments: Record<string, string> = {};
             let nodeEnvironment: string | undefined;
+            const cliEnvVars: Record<string, string> = {};
 
-            // Process environment variables
+            // Process environment variables from CLI
             if (options.env) {
                 for (const environment of options.env) {
                     if (environment.key === "NODE_ENV") {
                         nodeEnvironment = environment.value;
                     } else {
-                        environments[`process.env.${environment.key}`] = JSON.stringify(environment.value);
+                        cliEnvVars[`process.env.${environment.key}`] = JSON.stringify(environment.value);
                     }
                 }
             }
@@ -87,6 +88,22 @@ const createBuildCommand = (cli: Cli): void => {
             );
 
             logger.debug("Using packem config found at", buildConfigPath);
+
+            // Process environment variables from .env file if specified
+            // CLI options override config file options
+            const envFile = options.envFile ?? buildConfig.envFile;
+            const envPrefix = options.envPrefix ?? buildConfig.envPrefix ?? "PACKEM_";
+
+            // Start with .env file variables (if any), then CLI env vars override them
+            const environments: Record<string, string> = {};
+
+            if (envFile) {
+                const envFileVars = await loadEnvFile(envFile, rootPath, envPrefix);
+                Object.assign(environments, envFileVars);
+            }
+
+            // CLI env vars override .env file vars
+            Object.assign(environments, cliEnvVars);
 
             const preset = await loadPreset(buildConfig.preset ?? "none", jiti);
 
@@ -211,6 +228,16 @@ const createBuildCommand = (cli: Cli): void => {
                         value,
                     };
                 },
+            },
+            {
+                description: "Path to the .env file to load environment variables from",
+                name: "env-file",
+                type: String,
+            },
+            {
+                description: "Prefix for environment variables to load from .env file (default: PACKEM_)",
+                name: "env-prefix",
+                type: String,
             },
             {
                 defaultValue: false,

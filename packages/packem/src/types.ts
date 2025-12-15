@@ -57,6 +57,8 @@ export interface AttwOptions extends CheckPackageOptions {
  */
 export interface BuildConfig extends DeepPartial<Omit<BuildOptions, "entries">> {
     entries?: (BuildEntry | string)[];
+    envFile?: string;
+    envPrefix?: string;
     hooks?: Partial<BuildHooks<InternalBuildOptions>>;
     preset?: BuildPreset | "none" | (NonNullable<unknown> & string);
 }
