@@ -182,6 +182,175 @@ export { a };
 `);
     });
 
+    it("should load environment variables from .env file with prefix filter", async () => {
+        expect.assertions(3);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await installPackage(temporaryDirectoryPath, "@types/node");
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export const apiUrl = process.env.PACKEM_API_URL;
+export const version = process.env.PACKEM_VERSION;
+export const ignored = process.env.OTHER_VAR;`,
+        );
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/.env`,
+            "PACKEM_API_URL=https://api.example.com\nPACKEM_VERSION=1.0.0\nOTHER_VAR=should-be-ignored\n",
+        );
+
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "dist/index.js",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", ["--env-file", ".env", "--env-prefix", "PACKEM_"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+
+        expect(mtsContent).toContain('const apiUrl = "https://api.example.com"');
+        expect(mtsContent).toContain('const version = "1.0.0"');
+        expect(mtsContent).toContain("const ignored = process.env.OTHER_VAR");
+    });
+
+    it("should load environment variables from .env file via config file", async () => {
+        expect.assertions(2);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await installPackage(temporaryDirectoryPath, "@types/node");
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export const apiUrl = process.env.PACKEM_API_URL;
+export const version = process.env.PACKEM_VERSION;`,
+        );
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/.env`,
+            "PACKEM_API_URL=https://api.example.com\nPACKEM_VERSION=1.0.0\n",
+        );
+
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "dist/index.js",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            envFile: ".env",
+            envPrefix: "PACKEM_",
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+
+        expect(mtsContent).toContain('const apiUrl = "https://api.example.com"');
+        expect(mtsContent).toContain('const version = "1.0.0"');
+    });
+
+    it("should allow CLI env vars to override .env file vars", async () => {
+        expect.assertions(2);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await installPackage(temporaryDirectoryPath, "@types/node");
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `export const apiUrl = process.env.PACKEM_API_URL;
+export const version = process.env.PACKEM_VERSION;`,
+        );
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/.env`,
+            "PACKEM_API_URL=https://api.example.com\nPACKEM_VERSION=1.0.0\n",
+        );
+
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "dist/index.js",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem(
+            "build",
+            ["--env-file", ".env", "--env-prefix", "PACKEM_", "--env.PACKEM_VERSION=2.0.0"],
+            {
+                cwd: temporaryDirectoryPath,
+                env: {},
+            },
+        );
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+
+        expect(mtsContent).toContain('const apiUrl = "https://api.example.com"');
+        expect(mtsContent).toContain('const version = "2.0.0"'); // CLI override
+    });
+
+    it("should handle non-existent .env file gracefully", async () => {
+        expect.assertions(2);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const a = 1;`);
+
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "dist/index.js",
+            type: "module",
+            types: "dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", ["--env-file", ".env.nonexistent"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+
+        expect(mtsContent).toBe(`const a = 1;
+
+export { a };
+`);
+    });
+
     it("should enable minify when --production option is used", async () => {
         expect.assertions(4);
 

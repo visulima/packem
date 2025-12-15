@@ -289,6 +289,62 @@ export default defineConfig({
 })
 ```
 
+### Loading from .env Files
+
+You can load compile-time environment variables from `.env` files:
+
+```typescript
+export default defineConfig({
+  // Path to the .env file (relative to project root or absolute)
+  envFile: '.env',
+
+  // Prefix to filter environment variables (default: 'PACKEM_')
+  // Only variables starting with this prefix will be loaded
+  envPrefix: 'PACKEM_',
+
+  // ...
+})
+```
+
+**CLI Options:**
+
+You can also specify these via command-line flags:
+
+```bash
+# Load from .env file
+packem build --env-file .env
+
+# Custom prefix
+packem build --env-file .env --env-prefix BUILD_
+
+# CLI options override config file options
+packem build --env-file .env.production --env-prefix PROD_
+```
+
+**How it works:**
+
+1. Variables are loaded from the specified `.env` file
+2. Only variables matching the `envPrefix` are included (default: `PACKEM_`)
+3. Variables are replaced at compile-time in your source code
+4. CLI `--env.*` variables override `.env` file variables
+
+**Example:**
+
+```env
+# .env file
+PACKEM_API_URL=https://api.example.com
+PACKEM_VERSION=1.0.0
+OTHER_VAR=ignored  # Not loaded (doesn't match prefix)
+```
+
+```typescript
+// src/index.ts
+export const apiUrl = process.env.PACKEM_API_URL;
+export const version = process.env.PACKEM_VERSION;
+```
+
+After building, these will be replaced with their actual values at compile-time.
+
 ## Configuration Validation
 
 Packem validates your configuration and provides helpful error messages:

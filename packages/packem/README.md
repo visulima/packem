@@ -495,6 +495,48 @@ This will replace all instances of `process.env.NODE_ENV` with `'production'` an
 packem build --env.NODE_ENV=production
 ```
 
+#### Loading from .env files
+
+You can also load environment variables from `.env` files using the `--env-file` option:
+
+```sh
+# Load from .env file with default prefix (PACKEM_)
+packem build --env-file .env
+
+# Load from custom .env file with custom prefix
+packem build --env-file .env.production --env-prefix BUILD_
+
+# Combine .env file with CLI variables (CLI vars override .env vars)
+packem build --env-file .env --env.API_URL=https://api.example.com
+```
+
+**Configuration file:**
+
+You can also configure this in your `packem.config.ts`:
+
+```typescript
+export default defineConfig({
+  envFile: ".env",
+  envPrefix: "PACKEM_", // default: "PACKEM_"
+  // ...
+});
+```
+
+**How it works:**
+
+- Variables from `.env` files are loaded first
+- CLI `--env.*` variables override `.env` file variables
+- Only variables matching the prefix (default: `PACKEM_`) are loaded for security
+- Variables are replaced at compile-time in your code
+
+**Example .env file:**
+
+```env
+PACKEM_API_URL=https://api.example.com
+PACKEM_VERSION=1.0.0
+PACKEM_DEBUG=true
+```
+
 ## Programmatic Usage
 
 You can use Packem programmatically in your Node.js applications without the CLI:
