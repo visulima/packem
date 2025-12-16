@@ -659,11 +659,9 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
             context.options.rollup.replace
             && (() => {
-                // Create a copy of the replace config to avoid mutations
                 const replaceConfig = {
                     sourcemap: context.options.sourcemap,
                     ...context.options.rollup.replace,
-                    // Ensure values is a new object to avoid sharing
                     values: context.options.rollup.replace.values ? { ...context.options.rollup.replace.values } : {},
                 };
 
@@ -996,11 +994,9 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
 
             context.options.rollup.replace
             && (() => {
-                // Create a copy of the replace config to avoid mutations
                 const replaceConfig = {
                     sourcemap: context.options.sourcemap,
                     ...context.options.rollup.replace,
-                    // Ensure values is a new object to avoid sharing
                     values: context.options.rollup.replace.values ? { ...context.options.rollup.replace.values } : {},
                 };
 
