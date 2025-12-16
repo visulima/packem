@@ -1,3 +1,14 @@
+## @visulima/packem-rollup [1.0.0-alpha.34](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.33...@visulima/packem-rollup@1.0.0-alpha.34) (2025-12-16)
+
+### Bug Fixes
+
+* update export handling and improve entry inference logic ([4897f4f](https://github.com/visulima/packem/commit/4897f4f31b7d9ec87b3254391f4b11385478e2e6))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.17
+
 ## @visulima/packem-rollup [1.0.0-alpha.33](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.32...@visulima/packem-rollup@1.0.0-alpha.33) (2025-12-13)
 
 
