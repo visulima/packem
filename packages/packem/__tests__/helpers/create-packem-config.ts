@@ -24,6 +24,7 @@ export type PackemConfigProperties = {
         namedExport?: boolean;
         when: "after" | "before";
     }[];
+    preset?: BuildConfig["preset"];
     runtime?: "browser" | "node";
     transformer?: "esbuild" | "oxc" | "sucrase" | "swc";
 };
@@ -38,6 +39,7 @@ export const createPackemConfig = async (
         isolatedDeclarationTransformer = undefined,
         minimizer = undefined,
         plugins = [],
+        preset = undefined,
         runtime = "node",
         transformer = "esbuild",
     }: PackemConfigProperties = {},
@@ -47,6 +49,17 @@ export const createPackemConfig = async (
 
     if (typeof config === "object" || cssLoader.length > 0 || plugins.length > 0) {
         rollupConfig = "\n    rollup: {\n";
+    }
+
+    // Merge preset into config if provided
+    if (preset !== undefined) {
+        if (config === undefined || typeof config === "string") {
+            // eslint-disable-next-line no-param-reassign
+            config = { preset };
+        } else if (typeof config === "object") {
+            // eslint-disable-next-line no-param-reassign
+            config = { ...config, preset };
+        }
     }
 
     if (config === undefined) {

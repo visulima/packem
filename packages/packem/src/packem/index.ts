@@ -651,6 +651,10 @@ const createContext = async (
     tsconfig: TsConfigResult | undefined,
     nodeVersion: string,
 ): Promise<BuildContext<InternalBuildOptions>> => {
+    // Preserve hooks from buildConfig before generateOptions (which returns InternalBuildOptions without hooks)
+    // generateOptions merges hooks correctly but doesn't return them since they're not part of BuildOptions
+    const mergedHooks = buildConfig.hooks;
+    
     const options = generateOptions(logger, rootDirectory, environment, debug, buildConfig, packageJson, tsconfig, nodeVersion);
 
     ensureDirSync(join(options.rootDir, options.outDir));
@@ -674,17 +678,17 @@ const createContext = async (
         warnings: new Set(),
     };
 
-    if (buildConfig.hooks) {
+    if (mergedHooks) {
         // #region agent log
         const hooksBefore = (context.hooks as any)._hooks?.get?.("rollup:options");
         const hooksCountBefore = hooksBefore ? hooksBefore.size : 0;
-        fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.ts:674',message:'Before addHooks',data:{hooksCountBefore,hooksKeys:Object.keys(buildConfig.hooks || {}),hasRollupOptionsHook:!!buildConfig.hooks?.['rollup:options']},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.ts:677',message:'Before addHooks',data:{hooksCountBefore,hooksKeys:Object.keys(mergedHooks || {}),hasRollupOptionsHook:!!mergedHooks?.['rollup:options']},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
         // #endregion
-        context.hooks.addHooks(buildConfig.hooks);
+        context.hooks.addHooks(mergedHooks);
         // #region agent log
         const hooksAfter = (context.hooks as any)._hooks?.get?.("rollup:options");
         const hooksCountAfter = hooksAfter ? hooksAfter.size : 0;
-        fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.ts:680',message:'After addHooks',data:{hooksCountBefore,hooksCountAfter,hooksAdded:hooksCountAfter - hooksCountBefore},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.ts:683',message:'After addHooks',data:{hooksCountBefore,hooksCountAfter,hooksAdded:hooksCountAfter - hooksCountBefore},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
         // #endregion
     }
 

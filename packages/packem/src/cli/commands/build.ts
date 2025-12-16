@@ -98,14 +98,15 @@ const createBuildCommand = (cli: Cli): void => {
             const environments: Record<string, string> = {};
 
             if (envFile) {
-                const envFileVars = await loadEnvFile(envFile, rootPath, envPrefix);
-                Object.assign(environments, envFileVars);
+                const envFileVariables = await loadEnvFile(envFile, rootPath, envPrefix);
+
+                Object.assign(environments, envFileVariables);
             }
 
             // CLI env vars override .env file vars
             Object.assign(environments, cliEnvVars);
 
-            const preset = await loadPreset(buildConfig.preset ?? "none", jiti);
+                const preset = await loadPreset(buildConfig.preset ?? "none", jiti);
 
             // When minify is enabled, sourcemap should be enabled by default, unless explicitly opted out
             if (options.minify && options.sourcemap === undefined) {
@@ -166,8 +167,8 @@ const createBuildCommand = (cli: Cli): void => {
                         logger,
                         options.debug,
                         mergedConfig,
-                        options.tsconfig ?? undefined,
-                    );
+                    options.tsconfig ?? undefined,
+                );
             } catch (error) {
                 logger.error(error);
 
