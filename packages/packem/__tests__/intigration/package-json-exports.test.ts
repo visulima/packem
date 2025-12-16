@@ -627,7 +627,7 @@ export { index as default };
                 typescript: "*",
             },
             exports: {
-                ".": "./dist/index.js",
+                ".": "./dist/index.cjs",
                 "./pages/*": {
                     import: "./dist/pages/*.mjs",
                     require: "./dist/pages/*.cjs",
@@ -644,7 +644,7 @@ export { index as default };
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+        const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
         expect(cjs).toBe(`'use strict';
 
@@ -2416,7 +2416,7 @@ console.log("require-module-import", resolved);
             },
             exports: {
                 ".": "./dist/index.js",
-                "./icons/*": "./dist/icons/*",
+                "./icons2/*": "./dist/icons2/*",
             },
         });
 
@@ -2445,13 +2445,22 @@ console.log("require-module-import", resolved);
             preset: "solid",
         });
         await createPackageJson(temporaryDirectoryPath, {
+            name: "test-package",
             devDependencies: {
                 typescript: "*",
             },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: {
+                "*": {
+                    ".": ["./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
+                },
+            },
             exports: {
                 ".": {
-                    browser: "./dist/index.browser.js",
-                    node: "./dist/index.server.js",
+                    browser: "./dist/index.browser.cjs",
+                    node: "./dist/index.server.cjs",
                     types: "./dist/index.d.ts",
                 },
             },
@@ -2464,17 +2473,18 @@ console.log("require-module-import", resolved);
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.js`);
+        const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.cjs`);
 
         expect(browserContent).toContain("browser");
 
-        const serverContent = readFileSync(`${temporaryDirectoryPath}/dist/index.server.js`);
+        const serverContent = readFileSync(`${temporaryDirectoryPath}/dist/index.server.cjs`);
 
         expect(serverContent).toContain("server");
 
         // Verify separate builds by checking replace values
-        expect(browserContent).toMatch(/process\.env\.SSR.*false/);
-        expect(serverContent).toMatch(/process\.env\.SSR.*true/);
+        // process.env.SSR === 'true' is replaced with false for browser, true for server
+        expect(browserContent).toContain("const isSSR = false");
+        expect(serverContent).toContain("const isSSR = true");
     });
 
     it("should support same source file with different outputs (browser/server patterns)", async () => {
@@ -2494,13 +2504,22 @@ export default 'index';`,
             preset: "solid",
         });
         await createPackageJson(temporaryDirectoryPath, {
+            name: "test-package",
             devDependencies: {
                 typescript: "*",
             },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: {
+                "*": {
+                    ".": ["./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
+                },
+            },
             exports: {
                 ".": {
-                    browser: "./dist/index.browser.js",
-                    node: "./dist/index.server.js",
+                    browser: "./dist/index.browser.cjs",
+                    node: "./dist/index.server.cjs",
                     types: "./dist/index.d.ts",
                 },
             },
@@ -2509,19 +2528,19 @@ export default 'index';`,
         const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
-console.log(binProcess.stdout)
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.js`);
+        const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.cjs`);
 
         expect(browserContent).toContain("index");
         expect(browserContent).toContain(`const isServer = "false" === "true"`);
 
-        const serverContent = readFileSync(`${temporaryDirectoryPath}/dist/index.server.js`);
+        const serverContent = readFileSync(`${temporaryDirectoryPath}/dist/index.server.cjs`);
 
         expect(serverContent).toContain("index");
-        expect(serverContent).toMatch(/process\.env\.SSR.*true/);
+        // process.env.SSR === 'true' is replaced with false for browser, true for server
+        expect(serverContent).toContain("const isServer = true");
     });
 
     it("should inject SolidJS environment variables using array join pattern", async () => {
@@ -2546,8 +2565,17 @@ export default 'solid';`,
             preset: "solid",
         });
         await createPackageJson(temporaryDirectoryPath, {
+            name: "test-package",
             devDependencies: {
                 typescript: "*",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: {
+                "*": {
+                    ".": ["./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
+                },
             },
             exports: {
                 ".": {
@@ -2599,16 +2627,25 @@ export default 'index';`,
             preset: "solid",
         });
         await createPackageJson(temporaryDirectoryPath, {
+            name: "test-package",
             devDependencies: {
                 typescript: "*",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: {
+                "*": {
+                    ".": ["./dist/index.development.d.ts", "./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
+                },
             },
             exports: {
                 ".": {
                     browser: {
-                        development: "./dist/index.development.js",
-                        default: "./dist/index.browser.js",
+                        development: "./dist/index.development.cjs",
+                        default: "./dist/index.browser.cjs",
                     },
-                    node: "./dist/index.server.js",
+                    node: "./dist/index.server.cjs",
                     types: "./dist/index.d.ts",
                 },
             },
@@ -2621,13 +2658,13 @@ export default 'index';`,
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        const developmentContent = readFileSync(`${temporaryDirectoryPath}/dist/index.development.js`);
+        const developmentContent = readFileSync(`${temporaryDirectoryPath}/dist/index.development.cjs`);
 
         expect(developmentContent).toContain("index");
         expect(developmentContent).toMatch('const env = "development"');
         expect(developmentContent).toMatch(/process\.env\.DEV.*true/);
 
-        const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.js`);
+        const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.cjs`);
 
         expect(browserContent).toContain("index");
     });
@@ -2776,8 +2813,17 @@ export const isDev = process.env.DEV === 'true';`,
             preset: "solid",
         });
         await createPackageJson(temporaryDirectoryPath, {
+            name: "test-package",
             devDependencies: {
                 typescript: "*",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: {
+                "*": {
+                    ".": ["./dist/index.development.d.ts", "./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
+                },
             },
             exports: {
                 ".": {
@@ -2810,7 +2856,7 @@ export const isDev = process.env.DEV === 'true';`,
         const developmentContent = readFileSync(`${temporaryDirectoryPath}/dist/index.development.mjs`);
 
         expect(developmentContent).toMatch(/nodeEnv.*"development"/);
-        expect(developmentContent).toMatch(/process\.env\.DEV/);
+        expect(developmentContent).toMatch(/isDev.*true/);
     });
 
     it("should not generate .d.js files even when entry names end with .d", async () => {

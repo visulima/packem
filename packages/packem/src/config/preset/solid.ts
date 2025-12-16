@@ -226,7 +226,10 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
                 const isDev = environment === "development";
                 // Get runtime from context options (set per build group)
                 // Runtime is "browser" | "node", workerd maps to node runtime
-                const runtime = context.options.runtime || "node";
+                // The runtime is set per build group in build.ts before calling this hook
+                const runtime = context.options.runtime;
+                // isServer is true for node runtime, false for browser runtime or undefined
+                // Explicitly check for "node" runtime
                 const isServer = runtime === "node";
                 // Ensure replace plugin is configured
                 if (!context.options.rollup.replace) {

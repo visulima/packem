@@ -324,9 +324,6 @@ const createAdjustedContext = (
     minify: boolean,
     replaceValues: Record<string, string>,
 ): BuildContext<InternalBuildOptions> => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build.ts:319',message:'createAdjustedContext entry',data:{baseContextHasReplace:!!baseContext.options.rollup.replace,baseContextValues:Object.keys(baseContext.options.rollup.replace?.values || {}),replaceValuesParam:Object.keys(replaceValues),processEnvSSRBase:baseContext.options.rollup.replace?.values?.['process.env.SSR'],processEnvSSRParam:replaceValues['process.env.SSR']},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-    // #endregion
     const result = {
         ...baseContext,
         options: {
@@ -348,9 +345,6 @@ const createAdjustedContext = (
             },
         },
     };
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build.ts:347',message:'createAdjustedContext exit',data:{resultHasReplace:!!result.options.rollup.replace,resultValues:Object.keys((result.options.rollup.replace as any)?.values || {}),processEnvSSRResult:(result.options.rollup.replace as any)?.values?.['process.env.SSR']},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-    // #endregion
     return result;
 };
 
@@ -426,12 +420,29 @@ const prepareRollupConfig = async (
     for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
         for (const [runtime, runtimeEntries] of Object.entries(environmentEntries)) {
             for (const [, entries] of Object.entries(runtimeEntries)) {
-                const environmentRuntimeContext = {
-                    ...context,
-                    environment: environment === "undefined" ? undefined : (environment as "development" | "production"),
-                };
+            // Create a deep copy of the context to avoid sharing replace values between build groups
+            // Each build group (browser/server) needs its own isolated replace values
+            // Start with empty values for each build group to ensure isolation
+            const environmentRuntimeContext = {
+                ...context,
+                environment: environment === "undefined" ? undefined : (environment as "development" | "production"),
+                options: {
+                    ...context.options,
+                    rollup: {
+                        ...context.options.rollup,
+                        replace: context.options.rollup.replace
+                            ? {
+                                ...context.options.rollup.replace,
+                                // Start with empty values for each build group to ensure complete isolation
+                                // The hook will set the correct values for this specific runtime
+                                values: {},
+                            }
+                            : context.options.rollup.replace,
+                    },
+                },
+            };
 
-                if (!context.options.dtsOnly && (environment !== "undefined" || runtime !== "undefined")) {
+            if (!context.options.dtsOnly && (environment !== "undefined" || runtime !== "undefined")) {
                     const logMessage = createBuildLogMessage(environment, runtime);
 
                     if (logMessage) {
@@ -441,45 +452,27 @@ const prepareRollupConfig = async (
 
                 // Set runtime on context options so hooks can access it
                 environmentRuntimeContext.options.runtime = runtime === "undefined" ? undefined : (runtime as "browser" | "node");
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build.ts:436',message:'Before hook call',data:{environment,runtime,hasReplace:!!environmentRuntimeContext.options.rollup.replace,replaceValuesBefore:Object.keys(environmentRuntimeContext.options.rollup.replace?.values || {})},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
 
                 // Call hook early to allow presets to modify replace values before createAdjustedContext
                 // Use a dummy rollup options object since we don't have rollup options yet
-                // #region agent log
-                const hooksObj = context.hooks as any;
-                const hookHandlersBefore = hooksObj._hooks?.get?.("rollup:options");
-                const hookHandlersCountBefore = hookHandlersBefore ? hookHandlersBefore.size : 0;
-                fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build.ts:450',message:'Before hook call - check handlers',data:{hookHandlersCount:hookHandlersCountBefore,hasHooks:!!context.hooks},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
                 try {
                     await context.hooks.callHook("rollup:options", environmentRuntimeContext, {} as any);
                 } catch (error) {
                     context.logger.error(`Error calling rollup:options hook: ${error}`);
                     throw error;
                 }
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build.ts:456',message:'After hook call',data:{replaceValuesAfter:Object.keys(environmentRuntimeContext.options.rollup.replace?.values || {}),processEnvSSR:environmentRuntimeContext.options.rollup.replace?.values?.['process.env.SSR']},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build.ts:441',message:'After hook call',data:{replaceValuesAfter:Object.keys(environmentRuntimeContext.options.rollup.replace?.values || {}),processEnvSSR:environmentRuntimeContext.options.rollup.replace?.values?.['process.env.SSR']},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
 
                 // Initialize replace values if replace plugin is enabled
                 const defaultReplaceValues = environmentRuntimeContext.options.rollup.replace
                     ? createReplaceValues(environment, runtime)
                     : {};
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build.ts:445',message:'Default replace values',data:{defaultReplaceValues},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-                // #endregion
 
                 if (!environmentRuntimeContext.options.rollup.replace) {
                     context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
                 } else {
-                    if (environmentRuntimeContext.options.rollup.replace.values === undefined) {
-                        environmentRuntimeContext.options.rollup.replace.values = {};
-                    }
+                if (environmentRuntimeContext.options.rollup.replace.values === undefined) {
+                    environmentRuntimeContext.options.rollup.replace.values = {};
+                }
 
                     // Merge default replace values from createReplaceValues into existing values
                     // This allows hooks (like Solid preset) to set values first, then we add defaults
@@ -489,16 +482,10 @@ const prepareRollupConfig = async (
                     const existingValues = { ...environmentRuntimeContext.options.rollup.replace.values };
                     Object.assign(environmentRuntimeContext.options.rollup.replace.values, defaultReplaceValues);
                     Object.assign(environmentRuntimeContext.options.rollup.replace.values, existingValues);
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build.ts:458',message:'After merge defaults',data:{finalValues:Object.keys(environmentRuntimeContext.options.rollup.replace.values),processEnvSSR:environmentRuntimeContext.options.rollup.replace.values['process.env.SSR']},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-                    // #endregion
                 }
 
                 // Use merged replace values for createAdjustedContext
                 const replaceValues = environmentRuntimeContext.options.rollup.replace?.values || defaultReplaceValues;
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build.ts:462',message:'Replace values for createAdjustedContext',data:{replaceValuesKeys:Object.keys(replaceValues),processEnvSSR:replaceValues['process.env.SSR']},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-                // #endregion
 
                 const subDirectory = createSubDirectory(environment, runtime);
                 // Note: fileAlias is handled separately in prepareEntries, not in subDirectory
@@ -506,11 +493,11 @@ const prepareRollupConfig = async (
                 // Determine minify setting based on environment and explicit config
                 let minify = environmentRuntimeContext.options.minify ?? false;
 
-                if (environment === "development") {
-                    minify = false;
-                } else if (environment === "production") {
-                    minify = true;
-                }
+            if (environment === "development") {
+                minify = false;
+            } else if (environment === "production") {
+                minify = true;
+            }
 
                 // Extract BuildEntry from EntryWithType (remove the 'type' property added for grouping)
                 const buildEntries: BuildEntry[] = (entries as EntryWithType[]).map((entry) => {
@@ -526,10 +513,10 @@ const prepareRollupConfig = async (
                     } as BuildEntry;
                 });
 
-                const esmAndCjsEntries: BuildEntry[] = [];
-                const esmEntries: BuildEntry[] = [];
-                const cjsEntries: BuildEntry[] = [];
-                const dtsEntries: BuildEntry[] = [];
+            const esmAndCjsEntries: BuildEntry[] = [];
+            const esmEntries: BuildEntry[] = [];
+            const cjsEntries: BuildEntry[] = [];
+            const dtsEntries: BuildEntry[] = [];
 
                 for (const entry of buildEntries) {
                     const isDeclarationOnly = isDeclarationOnlyEntry(entry.name);
@@ -544,18 +531,18 @@ const prepareRollupConfig = async (
                     }
 
                     // Categorize entries by their output format requirements
-                    if (entry.cjs && entry.esm) {
-                        esmAndCjsEntries.push(entry);
-                    } else if (entry.cjs) {
-                        cjsEntries.push(entry);
-                    } else if (entry.esm) {
-                        esmEntries.push(entry);
-                    } else if (entry.declaration) {
-                        dtsEntries.push(entry);
-                    }
+                if (entry.cjs && entry.esm) {
+                    esmAndCjsEntries.push(entry);
+                } else if (entry.cjs) {
+                    cjsEntries.push(entry);
+                } else if (entry.esm) {
+                    esmEntries.push(entry);
+                } else if (entry.declaration) {
+                    dtsEntries.push(entry);
                 }
+            }
 
-                if (esmAndCjsEntries.length > 0) {
+            if (esmAndCjsEntries.length > 0) {
                     const adjustedEsmAndCjsContext = createAdjustedContext(
                         environmentRuntimeContext,
                         true,
@@ -565,35 +552,35 @@ const prepareRollupConfig = async (
                         replaceValues,
                     );
 
-                    if (!context.options.dtsOnly) {
-                        builders.add({
-                            context: adjustedEsmAndCjsContext,
+                if (!context.options.dtsOnly) {
+                    builders.add({
+                        context: adjustedEsmAndCjsContext,
+                        fileCache,
+                        subDirectory,
+                    });
+                }
+
+                if (context.options.declaration) {
+                        // Filter entries that have declaration enabled (already filtered out .d entries above)
+                        const typedEntries = esmAndCjsEntries.filter((entry) => entry.declaration);
+
+                    if (typedEntries.length > 0) {
+                        typeBuilders.add({
+                            context: {
+                                ...adjustedEsmAndCjsContext,
+                                options: {
+                                    ...adjustedEsmAndCjsContext.options,
+                                    entries: typedEntries,
+                                },
+                            },
                             fileCache,
                             subDirectory,
                         });
                     }
-
-                    if (context.options.declaration) {
-                        // Filter entries that have declaration enabled (already filtered out .d entries above)
-                        const typedEntries = esmAndCjsEntries.filter((entry) => entry.declaration);
-
-                        if (typedEntries.length > 0) {
-                            typeBuilders.add({
-                                context: {
-                                    ...adjustedEsmAndCjsContext,
-                                    options: {
-                                        ...adjustedEsmAndCjsContext.options,
-                                        entries: typedEntries,
-                                    },
-                                },
-                                fileCache,
-                                subDirectory,
-                            });
-                        }
-                    }
                 }
+            }
 
-                if (esmEntries.length > 0) {
+            if (esmEntries.length > 0) {
                     const adjustedEsmContext = createAdjustedContext(
                         environmentRuntimeContext,
                         false,
@@ -603,35 +590,35 @@ const prepareRollupConfig = async (
                         replaceValues,
                     );
 
-                    if (!context.options.dtsOnly) {
-                        builders.add({
-                            context: adjustedEsmContext,
+                if (!context.options.dtsOnly) {
+                    builders.add({
+                        context: adjustedEsmContext,
+                        fileCache,
+                        subDirectory,
+                    });
+                }
+
+                if (context.options.declaration) {
+                        // Filter entries that have declaration enabled (already filtered out .d entries above)
+                        const typedEntries = esmEntries.filter((entry) => entry.declaration);
+
+                    if (typedEntries.length > 0) {
+                        typeBuilders.add({
+                            context: {
+                                ...adjustedEsmContext,
+                                options: {
+                                    ...adjustedEsmContext.options,
+                                    entries: typedEntries,
+                                },
+                            },
                             fileCache,
                             subDirectory,
                         });
                     }
-
-                    if (context.options.declaration) {
-                        // Filter entries that have declaration enabled (already filtered out .d entries above)
-                        const typedEntries = esmEntries.filter((entry) => entry.declaration);
-
-                        if (typedEntries.length > 0) {
-                            typeBuilders.add({
-                                context: {
-                                    ...adjustedEsmContext,
-                                    options: {
-                                        ...adjustedEsmContext.options,
-                                        entries: typedEntries,
-                                    },
-                                },
-                                fileCache,
-                                subDirectory,
-                            });
-                        }
-                    }
                 }
+            }
 
-                if (cjsEntries.length > 0) {
+            if (cjsEntries.length > 0) {
                     const adjustedCjsContext = createAdjustedContext(
                         environmentRuntimeContext,
                         true,
@@ -641,35 +628,35 @@ const prepareRollupConfig = async (
                         replaceValues,
                     );
 
-                    if (!context.options.dtsOnly) {
-                        builders.add({
-                            context: adjustedCjsContext,
+                if (!context.options.dtsOnly) {
+                    builders.add({
+                        context: adjustedCjsContext,
+                        fileCache,
+                        subDirectory,
+                    });
+                }
+
+                if (context.options.declaration) {
+                        // Filter entries that have declaration enabled (already filtered out .d entries above)
+                        const typedEntries = cjsEntries.filter((entry) => entry.declaration);
+
+                    if (typedEntries.length > 0) {
+                        typeBuilders.add({
+                            context: {
+                                ...adjustedCjsContext,
+                                options: {
+                                    ...adjustedCjsContext.options,
+                                    entries: typedEntries,
+                                },
+                            },
                             fileCache,
                             subDirectory,
                         });
                     }
-
-                    if (context.options.declaration) {
-                        // Filter entries that have declaration enabled (already filtered out .d entries above)
-                        const typedEntries = cjsEntries.filter((entry) => entry.declaration);
-
-                        if (typedEntries.length > 0) {
-                            typeBuilders.add({
-                                context: {
-                                    ...adjustedCjsContext,
-                                    options: {
-                                        ...adjustedCjsContext.options,
-                                        entries: typedEntries,
-                                    },
-                                },
-                                fileCache,
-                                subDirectory,
-                            });
-                        }
-                    }
                 }
+            }
 
-                if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
+            if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
                     // dtsEntries already excludes .d entries (they're filtered out in the categorization loop above)
                     const adjustedDtsContext = createAdjustedContext(
                         environmentRuntimeContext,
@@ -680,11 +667,11 @@ const prepareRollupConfig = async (
                         replaceValues,
                     );
 
-                    typeBuilders.add({
+                typeBuilders.add({
                         context: adjustedDtsContext,
-                        fileCache,
-                        subDirectory,
-                    });
+                    fileCache,
+                    subDirectory,
+                });
                 }
             }
         }

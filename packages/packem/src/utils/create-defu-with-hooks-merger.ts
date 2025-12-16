@@ -16,12 +16,25 @@ import { createDefu } from "defu";
 export const createDefuWithHooksMerger = (): ReturnType<typeof createDefu> => {
     return createDefu((obj, key, value) => {
         // For hooks property, merge the hooks object instead of overwriting
-        if (key === "hooks" && typeof obj[key] === "object" && obj[key] !== null && typeof value === "object" && value !== null) {
-            // Merge hooks: spread both objects, with later hooks taking precedence
+        // This handles both cases: when obj[key] exists and when it doesn't
+        if (key === "hooks" && typeof value === "object" && value !== null && !Array.isArray(value)) {
+            // If obj[key] is undefined or null, initialize it as an empty object
+            // If obj[key] exists, use it; otherwise start with empty object
+            const existingHooks = (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])) ? obj[key] : {};
+            // Merge hooks: spread both objects, with value (source) taking precedence over existing
+            // This ensures hooks from all sources are merged
+            // Note: In defu, sources are processed from right to left, so we want to preserve
+            // hooks from earlier sources (rightmost) when merging later sources (leftmost)
             obj[key] = {
-                ...obj[key],
+                ...existingHooks,
                 ...value,
             };
+            // #region agent log
+            try {
+                const fs = require('fs');
+                fs.appendFileSync('/tmp/defu-merger-called.log', `Merger called: key=${key}, existingKeys=${Object.keys(existingHooks).join(',')}, valueKeys=${Object.keys(value).join(',')}, resultKeys=${Object.keys(obj[key]).join(',')}\n`);
+            } catch(e) {}
+            // #endregion
             return true; // Indicate custom merging was applied
         }
         return false; // Use default merging for other properties
