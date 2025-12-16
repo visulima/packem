@@ -3,7 +3,6 @@ import { cwd, exit } from "node:process";
 import type { Cli } from "@visulima/cerebro";
 import { DEVELOPMENT_ENV, PRODUCTION_ENV } from "@visulima/packem-share/constants";
 import { resolve } from "@visulima/path";
-import { createDefuWithHooksMerger } from "../../utils/create-defu-with-hooks-merger";
 import { createJiti } from "jiti";
 
 import autoPreset from "../../config/preset/auto";
@@ -12,6 +11,7 @@ import loadPackemConfig from "../../config/utils/load-packem-config";
 import loadPreset from "../../config/utils/load-preset";
 import packem from "../../packem";
 import type { Environment, Mode } from "../../types";
+import { createDefuWithHooksMerger } from "../../utils/create-defu-with-hooks-merger";
 
 /**
  * Creates and registers the build command with the CLI.
@@ -45,7 +45,7 @@ const createBuildCommand = (cli: Cli): void => {
             }
 
             let nodeEnvironment: string | undefined;
-            const cliEnvVars: Record<string, string> = {};
+            const cliEnvVariables: Record<string, string> = {};
 
             // Process environment variables from CLI
             if (options.env) {
@@ -53,7 +53,7 @@ const createBuildCommand = (cli: Cli): void => {
                     if (environment.key === "NODE_ENV") {
                         nodeEnvironment = environment.value;
                     } else {
-                        cliEnvVars[`process.env.${environment.key}`] = JSON.stringify(environment.value);
+                        cliEnvVariables[`process.env.${environment.key}`] = JSON.stringify(environment.value);
                     }
                 }
             }
@@ -104,9 +104,9 @@ const createBuildCommand = (cli: Cli): void => {
             }
 
             // CLI env vars override .env file vars
-            Object.assign(environments, cliEnvVars);
+            Object.assign(environments, cliEnvVariables);
 
-                const preset = await loadPreset(buildConfig.preset ?? "none", jiti);
+            const preset = await loadPreset(buildConfig.preset ?? "none", jiti);
 
             // When minify is enabled, sourcemap should be enabled by default, unless explicitly opted out
             if (options.minify && options.sourcemap === undefined) {
@@ -118,57 +118,50 @@ const createBuildCommand = (cli: Cli): void => {
                 // Use custom defu that merges hooks instead of overwriting them
                 const customDefu = createDefuWithHooksMerger();
                 const mergedConfig = customDefu(buildConfig, autoPreset, preset, {
-                        analyze: options.analyze,
-                        cjsInterop: options.cjsInterop,
-                        clean: options.clean,
-                        dtsOnly: options.dtsOnly,
-                        externals,
-                        killSignal: options.killSignal,
-                        minify: options.minify === undefined ? nodeEnvironment === PRODUCTION_ENV : options.minify,
-                        onSuccess: options.onSuccess,
-                        rollup: {
-                            esbuild: {
-                                target: options.target,
-                            },
-                            license: {
-                                path: options.license,
-                            },
-                            metafile: options.metafile,
-                            replace: {
-                                values: environments,
-                            },
-                            resolveExternals: options.noExternal
-                                ? {
-                                    builtins: false,
-                                    deps: false,
-                                    devDeps: false,
-                                    optDeps: false,
-                                    peerDeps: false,
-                                }
-                                : {},
+                    analyze: options.analyze,
+                    cjsInterop: options.cjsInterop,
+                    clean: options.clean,
+                    dtsOnly: options.dtsOnly,
+                    externals,
+                    killSignal: options.killSignal,
+                    minify: options.minify === undefined ? nodeEnvironment === PRODUCTION_ENV : options.minify,
+                    onSuccess: options.onSuccess,
+                    rollup: {
+                        esbuild: {
+                            target: options.target,
                         },
-                        runtime: options.runtime,
-                        sourcemap: options.metafile || options.analyze || options.sourcemap,
-                        unbundle: options.unbundle,
-                        // validation will take the default values
-                        validation: options.validation === false ? false : {},
-                        ...options.typedoc
+                        license: {
+                            path: options.license,
+                        },
+                        metafile: options.metafile,
+                        replace: {
+                            values: environments,
+                        },
+                        resolveExternals: options.noExternal
                             ? {
-                                typedoc: {
-                                    format: "html",
-                                },
+                                builtins: false,
+                                deps: false,
+                                devDeps: false,
+                                optDeps: false,
+                                peerDeps: false,
                             }
                             : {},
-                    });
-                    await packem(
-                        rootPath,
-                        mode,
-                        nodeEnvironment as Environment,
-                        logger,
-                        options.debug,
-                        mergedConfig,
-                    options.tsconfig ?? undefined,
-                );
+                    },
+                    runtime: options.runtime,
+                    sourcemap: options.metafile || options.analyze || options.sourcemap,
+                    unbundle: options.unbundle,
+                    // validation will take the default values
+                    validation: options.validation === false ? false : {},
+                    ...options.typedoc
+                        ? {
+                            typedoc: {
+                                format: "html",
+                            },
+                        }
+                        : {},
+                });
+
+                await packem(rootPath, mode, nodeEnvironment as Environment, logger, options.debug, mergedConfig, options.tsconfig ?? undefined);
             } catch (error) {
                 logger.error(error);
 

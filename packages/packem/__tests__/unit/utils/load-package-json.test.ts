@@ -195,7 +195,7 @@ describe(loadPackageJson, () => {
 
         expect(() => {
             loadPackageJson(temporaryDirectoryPath);
-        }).toThrow(`package.json not found at ${join(temporaryDirectoryPath, "package.json")}`);
+        }).toThrowError(`package.json not found at ${join(temporaryDirectoryPath, "package.json")}`);
     });
 
     it("should throw an error when directory does not exist", () => {
@@ -205,7 +205,7 @@ describe(loadPackageJson, () => {
 
         expect(() => {
             loadPackageJson(nonExistentPath);
-        }).toThrow(`package.json not found at ${join(nonExistentPath, "package.json")}`);
+        }).toThrowError(`package.json not found at ${join(nonExistentPath, "package.json")}`);
     });
 
     it("should return correct packageJsonPath", () => {

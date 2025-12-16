@@ -9,6 +9,7 @@ const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<Bui
         }
         case "react": {
             const { createReactPreset } = await import("../preset/react");
+
             // eslint-disable-next-line no-param-reassign
             preset = createReactPreset();
 
@@ -16,6 +17,7 @@ const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<Bui
         }
         case "solid": {
             const { createSolidPreset } = await import("../preset/solid");
+
             // eslint-disable-next-line no-param-reassign
             preset = createSolidPreset();
 
@@ -23,6 +25,7 @@ const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<Bui
         }
         case "svelte": {
             const { createSveltePreset } = await import("../preset/svelte");
+
             // eslint-disable-next-line no-param-reassign
             preset = createSveltePreset();
 
@@ -30,6 +33,7 @@ const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<Bui
         }
         case "vue": {
             const { createVuePreset } = await import("../preset/vue");
+
             // eslint-disable-next-line no-param-reassign
             preset = createVuePreset();
 

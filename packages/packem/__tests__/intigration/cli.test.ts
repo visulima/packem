@@ -195,10 +195,7 @@ export const version = process.env.PACKEM_VERSION;
 export const ignored = process.env.OTHER_VAR;`,
         );
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/.env`,
-            "PACKEM_API_URL=https://api.example.com\nPACKEM_VERSION=1.0.0\nOTHER_VAR=should-be-ignored\n",
-        );
+        writeFileSync(`${temporaryDirectoryPath}/.env`, "PACKEM_API_URL=https://api.example.com\nPACKEM_VERSION=1.0.0\nOTHER_VAR=should-be-ignored\n");
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -221,8 +218,8 @@ export const ignored = process.env.OTHER_VAR;`,
 
         const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mtsContent).toContain('const apiUrl = "https://api.example.com"');
-        expect(mtsContent).toContain('const version = "1.0.0"');
+        expect(mtsContent).toContain("const apiUrl = \"https://api.example.com\"");
+        expect(mtsContent).toContain("const version = \"1.0.0\"");
         expect(mtsContent).toContain("const ignored = process.env.OTHER_VAR");
     });
 
@@ -238,10 +235,7 @@ export const ignored = process.env.OTHER_VAR;`,
 export const version = process.env.PACKEM_VERSION;`,
         );
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/.env`,
-            "PACKEM_API_URL=https://api.example.com\nPACKEM_VERSION=1.0.0\n",
-        );
+        writeFileSync(`${temporaryDirectoryPath}/.env`, "PACKEM_API_URL=https://api.example.com\nPACKEM_VERSION=1.0.0\n");
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -267,8 +261,8 @@ export const version = process.env.PACKEM_VERSION;`,
 
         const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mtsContent).toContain('const apiUrl = "https://api.example.com"');
-        expect(mtsContent).toContain('const version = "1.0.0"');
+        expect(mtsContent).toContain("const apiUrl = \"https://api.example.com\"");
+        expect(mtsContent).toContain("const version = \"1.0.0\"");
     });
 
     it("should allow CLI env vars to override .env file vars", async () => {
@@ -283,10 +277,7 @@ export const version = process.env.PACKEM_VERSION;`,
 export const version = process.env.PACKEM_VERSION;`,
         );
 
-        writeFileSync(
-            `${temporaryDirectoryPath}/.env`,
-            "PACKEM_API_URL=https://api.example.com\nPACKEM_VERSION=1.0.0\n",
-        );
+        writeFileSync(`${temporaryDirectoryPath}/.env`, "PACKEM_API_URL=https://api.example.com\nPACKEM_VERSION=1.0.0\n");
 
         await createTsConfig(temporaryDirectoryPath);
         await createPackageJson(temporaryDirectoryPath, {
@@ -299,22 +290,18 @@ export const version = process.env.PACKEM_VERSION;`,
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackem(
-            "build",
-            ["--env-file", ".env", "--env-prefix", "PACKEM_", "--env.PACKEM_VERSION=2.0.0"],
-            {
-                cwd: temporaryDirectoryPath,
-                env: {},
-            },
-        );
+        const binProcess = await execPackem("build", ["--env-file", ".env", "--env-prefix", "PACKEM_", "--env.PACKEM_VERSION=2.0.0"], {
+            cwd: temporaryDirectoryPath,
+            env: {},
+        });
 
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mtsContent).toContain('const apiUrl = "https://api.example.com"');
-        expect(mtsContent).toContain('const version = "2.0.0"'); // CLI override
+        expect(mtsContent).toContain("const apiUrl = \"https://api.example.com\"");
+        expect(mtsContent).toContain("const version = \"2.0.0\""); // CLI override
     });
 
     it("should handle non-existent .env file gracefully", async () => {

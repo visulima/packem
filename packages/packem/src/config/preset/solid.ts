@@ -172,12 +172,7 @@ export interface SolidPresetOptions {
  */
 
 export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig => {
-    const {
-        babel: userBabelOptions,
-        plugins = [],
-        presets = [],
-        solidOptions = {},
-    } = options;
+    const { babel: userBabelOptions, plugins = [], presets = [], solidOptions = {} } = options;
 
     const babelPlugins: BabelPluginConfig["plugins"] = [];
     const babelPresets: BabelPluginConfig["presets"] = [];
@@ -227,10 +222,11 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
                 // Get runtime from context options (set per build group)
                 // Runtime is "browser" | "node", workerd maps to node runtime
                 // The runtime is set per build group in build.ts before calling this hook
-                const runtime = context.options.runtime;
+                const { runtime } = context.options;
                 // isServer is true for node runtime, false for browser runtime or undefined
                 // Explicitly check for "node" runtime
                 const isServer = runtime === "node";
+
                 // Ensure replace plugin is configured
                 if (!context.options.rollup.replace) {
                     context.options.rollup.replace = {
@@ -246,16 +242,21 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
                 // Add SolidJS-specific replace values
                 // Order: import.meta.env.* first, then process.env.*, alphabetically within each group
                 // Use array join pattern to prevent packem from overwriting internally
-                // Values must be JSON.stringify'd strings for proper replacement
-                const replaceValues: Record<string, string> = {
-                    [["import", "meta", "env", "DEV"].join(".")]: JSON.stringify(isDev),
+                // For @rollup/plugin-replace:
+                // - process.env.* values: Use JSON.stringify(String(value)) to get '"true"' or '"false"' (strings with quotes)
+                //   This ensures process.env.DEV === 'true' becomes "true" === 'true' which evaluates correctly
+                // - import.meta.env.* values: Pass boolean values directly (not stringified)
+                //   This ensures import.meta.env.DEV === true becomes true === true which evaluates correctly
+                // Note: The replace plugin accepts string | boolean | number | function for values
+                const replaceValues: Record<string, string | boolean> = {
+                    [["import", "meta", "env", "DEV"].join(".")]: isDev,
                     [["import", "meta", "env", "NODE_ENV"].join(".")]: JSON.stringify(environment),
-                    [["import", "meta", "env", "PROD"].join(".")]: JSON.stringify(!isDev),
-                    [["import", "meta", "env", "SSR"].join(".")]: JSON.stringify(isServer),
-                    [["process", "env", "DEV"].join(".")]: JSON.stringify(isDev),
+                    [["import", "meta", "env", "PROD"].join(".")]: !isDev,
+                    [["import", "meta", "env", "SSR"].join(".")]: isServer,
+                    [["process", "env", "DEV"].join(".")]: JSON.stringify(String(isDev)),
                     [["process", "env", "NODE_ENV"].join(".")]: JSON.stringify(environment),
-                    [["process", "env", "PROD"].join(".")]: JSON.stringify(!isDev),
-                    [["process", "env", "SSR"].join(".")]: JSON.stringify(isServer),
+                    [["process", "env", "PROD"].join(".")]: JSON.stringify(String(!isDev)),
+                    [["process", "env", "SSR"].join(".")]: JSON.stringify(String(isServer)),
                 };
 
                 // Merge replace values into existing values
