@@ -219,15 +219,9 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
                 // Add replace/define values based on runtime and environment
                 const environment = context.environment === "development" ? "development" : "production";
                 const isDev = environment === "development";
-                // Get runtime from context options (set per build group)
-                // Runtime is "browser" | "node", workerd maps to node runtime
-                // The runtime is set per build group in build.ts before calling this hook
                 const { runtime } = context.options;
-                // isServer is true for node runtime, false for browser runtime or undefined
-                // Explicitly check for "node" runtime
                 const isServer = runtime === "node";
 
-                // Ensure replace plugin is configured
                 if (!context.options.rollup.replace) {
                     context.options.rollup.replace = {
                         preventAssignment: true,
@@ -239,15 +233,6 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
                     context.options.rollup.replace.values = {};
                 }
 
-                // Add SolidJS-specific replace values
-                // Order: import.meta.env.* first, then process.env.*, alphabetically within each group
-                // Use array join pattern to prevent packem from overwriting internally
-                // For @rollup/plugin-replace:
-                // - process.env.* values: Use JSON.stringify(String(value)) to get '"true"' or '"false"' (strings with quotes)
-                //   This ensures process.env.DEV === 'true' becomes "true" === 'true' which evaluates correctly
-                // - import.meta.env.* values: Pass boolean values directly (not stringified)
-                //   This ensures import.meta.env.DEV === true becomes true === true which evaluates correctly
-                // Note: The replace plugin accepts string | boolean | number | function for values
                 const replaceValues: Record<string, string | boolean> = {
                     [["import", "meta", "env", "DEV"].join(".")]: isDev,
                     [["import", "meta", "env", "NODE_ENV"].join(".")]: JSON.stringify(environment),
@@ -259,7 +244,6 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
                     [["process", "env", "SSR"].join(".")]: JSON.stringify(String(isServer)),
                 };
 
-                // Merge replace values into existing values
                 Object.assign(context.options.rollup.replace.values, replaceValues);
             },
         },

@@ -337,9 +337,6 @@ const createAdjustedContext = (
                 replace: baseContext.options.rollup.replace
                     ? {
                         ...baseContext.options.rollup.replace,
-                        // Use the values from baseContext (which includes hook-set values from rollup:options hook)
-                        // The replaceValues parameter is only used as fallback if values don't exist
-                        // IMPORTANT: Create a new object to avoid sharing references between builds
                         values: baseContext.options.rollup.replace.values ? { ...baseContext.options.rollup.replace.values } : { ...replaceValues },
                     }
                     : false,
@@ -412,8 +409,6 @@ const prepareRollupConfig = async (
         };
     });
 
-    // Use groupByKeys with 3 keys: environment, runtime, and type
-    // TypeScript needs explicit type assertion when using optional third parameter
     const groupedEntries = groupByKeys(entriesWithType, "environment", "runtime", "type") as Record<
         string,
         Record<string, Record<string, EntryWithType[]>>
@@ -425,9 +420,6 @@ const prepareRollupConfig = async (
     for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
         for (const [runtime, runtimeEntries] of Object.entries(environmentEntries)) {
             for (const [, entries] of Object.entries(runtimeEntries)) {
-                // Create a deep copy of the context to avoid sharing replace values between build groups
-                // Each build group (browser/server) needs its own isolated replace values
-                // Start with empty values for each build group to ensure isolation
                 const environmentRuntimeContext = {
                     ...context,
                     environment: environment === "undefined" ? undefined : (environment as "development" | "production"),
@@ -438,8 +430,6 @@ const prepareRollupConfig = async (
                             replace: context.options.rollup.replace
                                 ? {
                                     ...context.options.rollup.replace,
-                                    // Start with empty values for each build group to ensure complete isolation
-                                    // The hook will set the correct values for this specific runtime
                                     values: {},
                                 }
                                 : context.options.rollup.replace,
@@ -477,11 +467,6 @@ const prepareRollupConfig = async (
                         environmentRuntimeContext.options.rollup.replace.values = {};
                     }
 
-                    // Merge default replace values from createReplaceValues into existing values
-                    // This allows hooks (like Solid preset) to set values first, then we add defaults
-                    // Hook values are already in environmentRuntimeContext.options.rollup.replace.values
-                    // Merge defaults into existing values (existing values take precedence if they exist)
-                    // Store existing values, merge defaults, then restore existing to ensure hook values win
                     const existingValues = { ...environmentRuntimeContext.options.rollup.replace.values };
 
                     Object.assign(environmentRuntimeContext.options.rollup.replace.values, defaultReplaceValues);
@@ -490,7 +475,6 @@ const prepareRollupConfig = async (
                     context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
                 }
 
-                // Use merged replace values for createAdjustedContext
                 const replaceValues = environmentRuntimeContext.options.rollup.replace?.values || defaultReplaceValues;
 
                 const subDirectory = createSubDirectory(environment, runtime);
@@ -505,12 +489,8 @@ const prepareRollupConfig = async (
                     minify = true;
                 }
 
-                // Extract BuildEntry from EntryWithType (remove the 'type' property added for grouping)
                 const buildEntries: BuildEntry[] = (entries as EntryWithType[]).map((entry) => {
-                    // Destructure to exclude 'type' property that was added for grouping
                     const { environment: env, runtime: rt, ...rest } = entry;
-                    // TypeScript: 'type' is intentionally omitted from destructuring
-                    // It was only added for grouping and is not part of BuildEntry
 
                     return {
                         ...rest,
@@ -527,8 +507,6 @@ const prepareRollupConfig = async (
                 for (const entry of buildEntries) {
                     const isDeclarationOnly = isDeclarationOnlyEntry(entry.name);
 
-                    // Entries with names ending in .d are declaration-only and should not generate JavaScript files
-                    // They should only be processed in declaration builds if they have declaration: true
                     if (isDeclarationOnly) {
                         if (entry.declaration) {
                             dtsEntries.push(entry);
@@ -537,7 +515,6 @@ const prepareRollupConfig = async (
                         continue;
                     }
 
-                    // Categorize entries by their output format requirements
                     if (entry.cjs && entry.esm) {
                         esmAndCjsEntries.push(entry);
                     } else if (entry.cjs) {
@@ -568,7 +545,6 @@ const prepareRollupConfig = async (
                     }
 
                     if (context.options.declaration) {
-                        // Filter entries that have declaration enabled (already filtered out .d entries above)
                         const typedEntries = esmAndCjsEntries.filter((entry) => entry.declaration);
 
                         if (typedEntries.length > 0) {
@@ -664,7 +640,6 @@ const prepareRollupConfig = async (
                 }
 
                 if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
-                    // dtsEntries already excludes .d entries (they're filtered out in the categorization loop above)
                     const adjustedDtsContext = createAdjustedContext(environmentRuntimeContext, false, false, dtsEntries, minify, replaceValues);
 
                     typeBuilders.add({
