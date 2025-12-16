@@ -64,7 +64,7 @@ describe(inferEntries, () => {
                 ["src/", "src/test.ts"].map((file) => join(temporaryDirectoryPath, file)),
                 { ...defaultContext, pkg: {} } as unknown as BuildContext,
             ),
-        ).rejects.toThrow("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");
+        ).rejects.toThrowError("You tried to use a `.ts`, `.cts` or `.mts` file but `typescript` was not found in your package.json.");
     });
 
     it("should recognise main and module outputs", async () => {

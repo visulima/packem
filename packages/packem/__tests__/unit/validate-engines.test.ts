@@ -89,7 +89,7 @@ describe(validateEngines, () => {
             name: "test-package",
         });
 
-        expect(() => validateEngines(context)).toThrow(
+        expect(() => validateEngines(context)).toThrowError(
             `Node.js version mismatch: Current version ${process.version} does not satisfy the required range \">=99.0.0\" specified in package.json engines.node field.`,
         );
     });

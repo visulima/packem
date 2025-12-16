@@ -83,6 +83,7 @@ const createChunkFileNames = (getExtension: () => string, usePreserveModules: bo
             if (isDeclarationOnlyName(chunk.name)) {
                 return undefined;
             }
+
             return `${chunk.name}.${getExtension()}`;
         };
     }
@@ -91,6 +92,7 @@ const createChunkFileNames = (getExtension: () => string, usePreserveModules: bo
         if (isDeclarationOnlyName(chunk.name)) {
             return undefined;
         }
+
         return getChunkFilename(chunk, getExtension());
     };
 };
@@ -105,18 +107,22 @@ const createEntryFileNames = (getExtension: () => string, usePreserveModules: bo
     if (usePreserveModules) {
         return (chunkInfo: PreRenderedAsset): string | undefined => {
             const name = Array.isArray(chunkInfo.names) && chunkInfo.names[0] ? chunkInfo.names[0] : chunkInfo.name;
+
             if (isDeclarationOnlyName(name)) {
                 return undefined;
             }
+
             return `${name ?? "[name]"}.${getExtension()}`;
         };
     }
 
     return (chunkInfo: PreRenderedAsset): string | undefined => {
         const name = Array.isArray(chunkInfo.names) && chunkInfo.names[0] ? chunkInfo.names[0] : chunkInfo.name;
+
         if (isDeclarationOnlyName(name)) {
             return undefined;
         }
+
         return getEntryFileNames(chunkInfo, getExtension());
     };
 };
@@ -250,9 +256,9 @@ const getTransformerConfig = (
                     ? context.options.rollup.oxc.jsx
                     : context.options.rollup.oxc.jsx
                         ? {
-                        ...context.options.rollup.oxc.jsx,
-                        // This is not needed in a library.
-                        refresh: false,
+                            ...context.options.rollup.oxc.jsx,
+                            // This is not needed in a library.
+                            refresh: false,
                         }
                         : undefined,
             sourcemap: context.options.sourcemap,
@@ -652,10 +658,17 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             resolveExternalsPlugin(context),
 
             context.options.rollup.replace
-            && replacePlugin({
-                sourcemap: context.options.sourcemap,
-                ...context.options.rollup.replace,
-            }),
+            && (() => {
+                // Create a copy of the replace config to avoid mutations
+                const replaceConfig = {
+                    sourcemap: context.options.sourcemap,
+                    ...context.options.rollup.replace,
+                    // Ensure values is a new object to avoid sharing
+                    values: context.options.rollup.replace.values ? { ...context.options.rollup.replace.values } : {},
+                };
+
+                return replacePlugin(replaceConfig);
+            })(),
 
             context.options.rollup.alias
             && aliasPlugin({
@@ -982,10 +995,17 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             resolveExternalsPlugin(context),
 
             context.options.rollup.replace
-            && replacePlugin({
-                sourcemap: context.options.sourcemap,
-                ...context.options.rollup.replace,
-            }),
+            && (() => {
+                // Create a copy of the replace config to avoid mutations
+                const replaceConfig = {
+                    sourcemap: context.options.sourcemap,
+                    ...context.options.rollup.replace,
+                    // Ensure values is a new object to avoid sharing
+                    values: context.options.rollup.replace.values ? { ...context.options.rollup.replace.values } : {},
+                };
+
+                return replacePlugin(replaceConfig);
+            })(),
 
             context.options.rollup.alias
             && aliasPlugin({

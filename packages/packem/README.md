@@ -516,9 +516,9 @@ You can also configure this in your `packem.config.ts`:
 
 ```typescript
 export default defineConfig({
-  envFile: ".env",
-  envPrefix: "PACKEM_", // default: "PACKEM_"
-  // ...
+    envFile: ".env",
+    envPrefix: "PACKEM_", // default: "PACKEM_"
+    // ...
 });
 ```
 

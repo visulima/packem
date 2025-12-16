@@ -29,11 +29,9 @@ const extensionPattern = /\.[^./]+$/;
  * - Declaration file extensions (.d.ts, .d.mts, .d.cts) - returns full extension
  * - Custom extensions from outputExtensionMap (e.g., .c.js, .m.js) - returns full extension
  * - Standard extensions - falls back to extname() which returns last extension
- *
- * @param filePath - The file path to extract extension from
- * @param outputExtensionMap - Optional map of custom extensions (e.g., { cjs: "c.js", esm: "m.js" })
+ * @param filePath The file path to extract extension from
+ * @param outputExtensionMap Optional map of custom extensions (e.g., { cjs: "c.js", esm: "m.js" })
  * @returns The full file extension including multi-part extensions
- *
  * @example
  * ```ts
  * getFullExtension("./dist/index.d.ts") // returns ".d.ts"
@@ -45,6 +43,7 @@ const getFullExtension = (filePath: string, outputExtensionMap?: Record<string, 
     // Check for declaration file extensions first (.d.ts, .d.mts, .d.cts)
     // These are multi-part extensions that extname() doesn't handle correctly
     const declarationMatch = filePath.match(/\.d\.[mc]?ts$/);
+
     if (declarationMatch) {
         return declarationMatch[0];
     }
@@ -52,10 +51,11 @@ const getFullExtension = (filePath: string, outputExtensionMap?: Record<string, 
     // Check for custom extensions from outputExtensionMap (e.g., .c.js, .m.js)
     // These are also multi-part extensions that extname() doesn't handle correctly
     if (outputExtensionMap) {
-        for (const ext of Object.values(outputExtensionMap)) {
-            const extWithDot = ext.startsWith(".") ? ext : `.${ext}`;
-            if (filePath.endsWith(extWithDot)) {
-                return extWithDot;
+        for (const extension of Object.values(outputExtensionMap)) {
+            const extensionWithDot = extension.startsWith(".") ? extension : `.${extension}`;
+
+            if (filePath.endsWith(extensionWithDot)) {
+                return extensionWithDot;
             }
         }
     }
@@ -184,7 +184,7 @@ const getEnvironment = (output: OutputDescriptor, environment: Environment): Env
  * @param outputFile Output file path (e.g., "./dist/index.browser.js")
  * @returns Object with detected pattern and base filename, or null if no pattern detected
  */
-const detectFilePattern = (outputFile: string): { pattern: string; baseName: string } | undefined => {
+const detectFilePattern = (outputFile: string): { baseName: string; pattern: string } | undefined => {
     // Remove dist directory and extension from output file
     const outputWithoutDist = outputFile.replace(/^\.\/dist\//, "").replace(/^dist\//, "");
     const outputBase = outputWithoutDist.replace(/\.[^./]+$/, "");
@@ -235,19 +235,14 @@ const detectFilePattern = (outputFile: string): { pattern: string; baseName: str
  * @param sourceDir Source directory path
  * @returns Found file path or null
  */
-const tryFindPatternFile = (
-    sourceFiles: string[],
-    baseName: string,
-    pattern: string,
-    sourceDir: string,
-): string | undefined => {
+const tryFindPatternFile = (sourceFiles: string[], baseName: string, pattern: string, sourceDir: string): string | undefined => {
     // Normalize baseName - remove sourceDir prefix if present
     const normalizedBase = baseName.replace(new RegExp(`^${sourceDir}/?`), "");
 
     // Try to find files matching the pattern with various extensions
     const patternName = `${normalizedBase}${pattern}`;
-    const escapedPattern = patternName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const patternRegex = new RegExp(`${escapedPattern}\\.([cm]?[tj]sx?|ts|js)$`);
+    const escapedPattern = patternName.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+    const patternRegex = new RegExp(String.raw`${escapedPattern}\.([cm]?[tj]sx?|ts|js)$`);
 
     // Look for exact matches - check if file path ends with pattern name + extension
     const exactMatch = sourceFiles.find((file) => {
@@ -305,7 +300,13 @@ const createOrUpdateEntry = (
         }
 
         // Check for node/workerd conditions
-        if (output.subKey === "node" || output.subKey === "workerd" || output.file.includes(".node") || output.file.includes(".workerd") || output.file.includes(".server")) {
+        if (
+            output.subKey === "node"
+            || output.subKey === "workerd"
+            || output.file.includes(".node")
+            || output.file.includes(".workerd")
+            || output.file.includes(".server")
+        ) {
             runtime = "node";
         }
     }
@@ -319,17 +320,21 @@ const createOrUpdateEntry = (
     const aliasName = fileWithoutExtension.replace(new RegExp(`^(\./)?${outDirectoryPrefix}/`), "");
 
     // Check if input file matches the alias (if not, we need fileAlias)
-    const inputBase = input.replace(/\.[^./]+$/, "").split("/").pop() || "";
+    const inputBase
+        = input
+            .replace(/\.[^./]+$/, "")
+            .split("/")
+            .pop() || "";
     const aliasBase = aliasName.split("/").pop() || "";
     const needsFileAlias = !input.includes(aliasName) && inputBase !== aliasBase;
 
     // Include fileAlias in uniqueness check to ensure separate entries for same input with different outputs
     let entry: BuildEntry | undefined = entries.find(
         (index) =>
-            index.input === input &&
-            index.environment === entryEnvironment &&
-            index.runtime === runtime &&
-            index.fileAlias === (needsFileAlias ? aliasName : undefined),
+            index.input === input
+            && index.environment === entryEnvironment
+            && index.runtime === runtime
+            && index.fileAlias === (needsFileAlias ? aliasName : undefined),
     );
 
     if (entry === undefined) {
@@ -373,15 +378,17 @@ const createOrUpdateEntry = (
         // For .d.ts files, we need to infer the type from the condition or use both formats if dual format
         if (output.type === undefined && /\.d\.ts$/.test(output.file)) {
             // Check if we have both .d.mts and .d.cts outputs for the same export key (indicating dual format)
-            const hasDtsMts = outputs.some((o) =>
-                o.exportKey === output.exportKey &&
-                (o.file.includes("*") || o.file === output.file.replace(".d.ts", ".d.mts")) &&
-                o.file.endsWith(".d.mts")
+            const hasDtsMts = outputs.some(
+                (o) =>
+                    o.exportKey === output.exportKey
+                    && (o.file.includes("*") || o.file === output.file.replace(".d.ts", ".d.mts"))
+                    && o.file.endsWith(".d.mts"),
             );
-            const hasDtsCts = outputs.some((o) =>
-                o.exportKey === output.exportKey &&
-                (o.file.includes("*") || o.file === output.file.replace(".d.ts", ".d.cts")) &&
-                o.file.endsWith(".d.cts")
+            const hasDtsCts = outputs.some(
+                (o) =>
+                    o.exportKey === output.exportKey
+                    && (o.file.includes("*") || o.file === output.file.replace(".d.ts", ".d.cts"))
+                    && o.file.endsWith(".d.cts"),
             );
 
             // If we have both .d.mts and .d.cts, we're in dual format mode
@@ -391,6 +398,7 @@ const createOrUpdateEntry = (
             } else {
                 // Infer from package type or default to esm
                 const packageType = (context.pkg?.type === "module" ? "esm" : "cjs") as Format;
+
                 if (packageType === "cjs") {
                     entry.cjs = true;
                 } else {
@@ -460,13 +468,7 @@ const inferEntries = async (
     }
 
     // Come up with a list of all output files & their formats
-    const allOutputs = extractExportFilenames(
-        packageJson.exports,
-        packageType,
-        context.options.declaration,
-        [],
-        context.options.ignoreExportKeys ?? [],
-    );
+    const allOutputs = extractExportFilenames(packageJson.exports, packageType, context.options.declaration, [], context.options.ignoreExportKeys ?? []);
 
     // Filter out ignored outputs
     const outputs = allOutputs.filter((output) => !output.ignored);
@@ -545,12 +547,14 @@ const inferEntries = async (
 
         // Build list of valid extensions including custom ones from outputExtensionMap
         const validExtensions = [...DEFAULT_EXTENSIONS];
+
         if (context.options.outputExtensionMap) {
             // Add custom extensions with leading dot (e.g., "c.js" -> ".c.js")
-            for (const ext of Object.values(context.options.outputExtensionMap)) {
-                const extWithDot = ext.startsWith(".") ? ext : `.${ext}`;
-                if (!validExtensions.includes(extWithDot)) {
-                    validExtensions.push(extWithDot);
+            for (const extension of Object.values(context.options.outputExtensionMap)) {
+                const extensionWithDot = extension.startsWith(".") ? extension : `.${extension}`;
+
+                if (!validExtensions.includes(extensionWithDot)) {
+                    validExtensions.push(extensionWithDot);
                 }
             }
         }
@@ -560,6 +564,7 @@ const inferEntries = async (
         if (!isDeclarationFile && outputExtension !== "" && !validExtensions.includes(outputExtension)) {
             continue;
         }
+
         let inferredType: Format | undefined = output.type;
 
         if (!inferredType && isDeclarationFile) {
@@ -604,10 +609,11 @@ const inferEntries = async (
 
         // First, try to strip custom extensions if they exist
         if (context.options.outputExtensionMap) {
-            for (const ext of Object.values(context.options.outputExtensionMap)) {
-                const extWithDot = ext.startsWith(".") ? ext : `.${ext}`;
-                if (output.file.endsWith(extWithDot)) {
-                    outputSlug = output.file.slice(0, -extWithDot.length);
+            for (const extension of Object.values(context.options.outputExtensionMap)) {
+                const extensionWithDot = extension.startsWith(".") ? extension : `.${extension}`;
+
+                if (output.file.endsWith(extensionWithDot)) {
+                    outputSlug = output.file.slice(0, -extensionWithDot.length);
                     break;
                 }
             }
@@ -615,10 +621,7 @@ const inferEntries = async (
 
         // If no custom extension was found, use regex to strip standard extensions
         if (outputSlug === output.file) {
-            outputSlug = output.file.replace(
-                new RegExp(String.raw`(?:\*[^/\\]|\.d\.[mc]?ts|\.\w+)$`),
-                "",
-            );
+            outputSlug = output.file.replace(new RegExp(String.raw`(?:\*[^/\\]|\.d\.[mc]?ts|\.\w+)$`), "");
         }
 
         const isDirectory = outputSlug.endsWith("/");
@@ -633,9 +636,7 @@ const inferEntries = async (
         // File extension regex for matching SOURCE files (not output files)
         // Source files have extensions like .ts, .tsx, .js, .jsx, etc.
         // Custom output extensions like .c.js and .m.js are NOT used here
-        const fileExtensionRegexPattern = isDirectory
-            ? ""
-            : String.raw`(\.d\.[cm]?ts|(\.[cm]?[tj]sx?))$`;
+        const fileExtensionRegexPattern = isDirectory ? "" : String.raw`(\.d\.[cm]?ts|(\.[cm]?[tj]sx?))$`;
 
         // Match source files that may or may not start with ./
         // Use (?:^|/) to match start of string or after /
@@ -700,13 +701,16 @@ const inferEntries = async (
                     if (outputWildcardCount > inputWildcardCount && outputWildcardCount > 1) {
                         // Check if all captures are the same (required for multiple wildcards with single input pattern)
                         const firstCapture = wildcardMatch[0];
+
                         if (!wildcardMatch.every((capture) => capture === firstCapture)) {
                             // Captures don't all match - skip this file
                             continue;
                         }
+
                         // Expand captures to match output wildcard count
-                        const expandedCaptures = Array(outputWildcardCount).fill(firstCapture);
+                        const expandedCaptures = new Array(outputWildcardCount).fill(firstCapture);
                         const outputPath = substituteWildcards(outputPattern, expandedCaptures);
+
                         matchingInputs.push({
                             input: resolve(sourceDirectoryPath, relativeFilePath),
                             output: outputPath,
@@ -738,6 +742,7 @@ const inferEntries = async (
                 const outputPath = output.file.startsWith("./") ? output.file.slice(2) : output.file;
                 // Remove dist/ prefix to get relative path (e.g., "dist/browser/*.mjs" -> "browser/*.mjs")
                 let derivedPattern = outputPath.replace(/^dist\//, "");
+
                 // Remove file extension to get pattern (e.g., "browser/*.mjs" -> "browser/*")
                 // For patterns like "dist/*/*.mjs", this becomes "*/*"
                 derivedPattern = derivedPattern.replace(/\.\w+$/, "");
@@ -758,13 +763,16 @@ const inferEntries = async (
                             // When input pattern has fewer wildcards than output, all output wildcards must match same value
                             // Check if all captures are the same
                             const firstCapture = wildcardMatch[0];
+
                             if (!wildcardMatch.every((capture) => capture === firstCapture)) {
                                 // Captures don't all match - skip this file
                                 continue;
                             }
+
                             // Expand captures to match output wildcard count
-                            const expandedCaptures = Array(outputWildcardCount).fill(firstCapture);
+                            const expandedCaptures = new Array(outputWildcardCount).fill(firstCapture);
                             const outputPathSubstituted = substituteWildcards(outputPattern, expandedCaptures);
+
                             matchingInputs.push({
                                 input: resolve(sourceDirectoryPath, relativeFilePath),
                                 output: outputPathSubstituted,
@@ -796,6 +804,7 @@ const inferEntries = async (
                 if (!hasOtherOutputs) {
                     warnings.push(`Could not find entrypoints matching pattern \`${inputPattern}\` for output \`${outputPattern}\``);
                 }
+
                 // For optional patterns, silently skip (don't add warning, don't fail)
                 continue;
             }
@@ -842,6 +851,7 @@ const inferEntries = async (
                     // Create a modified output descriptor with the specific output path
                     // Infer type for declaration files if not already set
                     let inferredType = output.type;
+
                     if (!inferredType && /\.d\.[mc]?ts$/.test(outputPath)) {
                         if (outputPath.endsWith(".d.mts")) {
                             inferredType = "esm";
@@ -850,17 +860,11 @@ const inferEntries = async (
                         } else if (outputPath.endsWith(".d.ts")) {
                             // For .d.ts, infer from condition or package type
                             // Check if we have both import and require conditions for declaration files
-                            const hasImportCondition = outputs.some((o) =>
-                                o.exportKey === output.exportKey &&
-                                o.subKey === "import" &&
-                                o.file.includes("*") &&
-                                o.file.endsWith(".d.mts")
+                            const hasImportCondition = outputs.some(
+                                (o) => o.exportKey === output.exportKey && o.subKey === "import" && o.file.includes("*") && o.file.endsWith(".d.mts"),
                             );
-                            const hasRequireCondition = outputs.some((o) =>
-                                o.exportKey === output.exportKey &&
-                                o.subKey === "require" &&
-                                o.file.includes("*") &&
-                                o.file.endsWith(".d.cts")
+                            const hasRequireCondition = outputs.some(
+                                (o) => o.exportKey === output.exportKey && o.subKey === "require" && o.file.includes("*") && o.file.endsWith(".d.cts"),
                             );
 
                             if (hasImportCondition && hasRequireCondition) {
@@ -873,10 +877,11 @@ const inferEntries = async (
                             }
                         }
                     }
+
                     const specificOutput = {
                         ...output,
                         file: outputPath,
-                        ...(inferredType && { type: inferredType })
+                        ...inferredType && { type: inferredType },
                     };
 
                     createOrUpdateEntry(entries, input, isDirectory, outputSlug, specificOutput, context, true, outputs);
@@ -886,7 +891,7 @@ const inferEntries = async (
             continue;
         }
 
-        const SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + fileExtensionRegexPattern);
+        const SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlug.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`) + fileExtensionRegexPattern);
 
         let input = sourceFiles.find((index) => SOURCE_RE.test(index));
 
@@ -907,7 +912,7 @@ const inferEntries = async (
                 } else {
                     // Fall back to base file (e.g., index.tsx), fileAlias will be set in createOrUpdateEntry
                     const baseSourceSlug = patternResult.baseName;
-                    const BASE_SOURCE_RE = new RegExp(beforeSourceRegex + baseSourceSlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + fileExtensionRegexPattern);
+                    const BASE_SOURCE_RE = new RegExp(beforeSourceRegex + baseSourceSlug.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`) + fileExtensionRegexPattern);
 
                     input = sourceFiles.find((index) => BASE_SOURCE_RE.test(index));
                 }
@@ -916,7 +921,9 @@ const inferEntries = async (
                 const sourceSlugWithoutExtension = sourceSlug.replace(/^(.+?)\.[^.]*$/, "$1").replace(/\/$/, "");
 
                 if (SPECIAL_EXPORT_CONVENTIONS.has(output.subKey as string)) {
-                    const SPECIAL_SOURCE_RE = new RegExp(beforeSourceRegex + sourceSlugWithoutExtension.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + fileExtensionRegexPattern);
+                    const SPECIAL_SOURCE_RE = new RegExp(
+                        beforeSourceRegex + sourceSlugWithoutExtension.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`) + fileExtensionRegexPattern,
+                    );
 
                     input = sourceFiles.find((index) => SPECIAL_SOURCE_RE.test(index));
                 }

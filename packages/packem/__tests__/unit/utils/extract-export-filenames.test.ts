@@ -171,7 +171,7 @@ describe(extractExportFilenames, () => {
 
         expect(() => {
             extractExportFilenames(packageExports, type, false);
-        }).toThrow("Exported file \"./src/index.cjs\" has an extension that does not match the package.json type \"module\".");
+        }).toThrowError("Exported file \"./src/index.cjs\" has an extension that does not match the package.json type \"module\".");
     });
 
     it.each([

@@ -1,11 +1,12 @@
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import loadEnvFile from "../../../src/config/utils/load-env-file";
 
-describe("loadEnvFile", () => {
+describe(loadEnvFile, () => {
     let tempDir: string;
 
     beforeEach(() => {
@@ -14,7 +15,7 @@ describe("loadEnvFile", () => {
 
     afterEach(() => {
         if (existsSync(tempDir)) {
-            rmSync(tempDir, { recursive: true, force: true });
+            rmSync(tempDir, { force: true, recursive: true });
         }
     });
 
@@ -22,13 +23,14 @@ describe("loadEnvFile", () => {
         expect.assertions(1);
 
         const envFile = join(tempDir, ".env");
+
         writeFileSync(envFile, "PACKEM_API_URL=https://api.example.com\nPACKEM_VERSION=1.0.0\n");
 
         const result = await loadEnvFile(".env", tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": '"https://api.example.com"',
-            "process.env.PACKEM_VERSION": '"1.0.0"',
+            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
+            "process.env.PACKEM_VERSION": "\"1.0.0\"",
         });
     });
 
@@ -36,16 +38,14 @@ describe("loadEnvFile", () => {
         expect.assertions(1);
 
         const envFile = join(tempDir, ".env");
-        writeFileSync(
-            envFile,
-            "PACKEM_API_URL=https://api.example.com\nOTHER_VAR=should-be-ignored\nPACKEM_VERSION=1.0.0\n",
-        );
+
+        writeFileSync(envFile, "PACKEM_API_URL=https://api.example.com\nOTHER_VAR=should-be-ignored\nPACKEM_VERSION=1.0.0\n");
 
         const result = await loadEnvFile(".env", tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": '"https://api.example.com"',
-            "process.env.PACKEM_VERSION": '"1.0.0"',
+            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
+            "process.env.PACKEM_VERSION": "\"1.0.0\"",
         });
     });
 
@@ -53,13 +53,14 @@ describe("loadEnvFile", () => {
         expect.assertions(1);
 
         const envFile = join(tempDir, ".env");
+
         writeFileSync(envFile, "API_URL=https://api.example.com\nVERSION=1.0.0\n");
 
         const result = await loadEnvFile(".env", tempDir, "");
 
         expect(result).toEqual({
-            "process.env.API_URL": '"https://api.example.com"',
-            "process.env.VERSION": '"1.0.0"',
+            "process.env.API_URL": "\"https://api.example.com\"",
+            "process.env.VERSION": "\"1.0.0\"",
         });
     });
 
@@ -67,13 +68,14 @@ describe("loadEnvFile", () => {
         expect.assertions(1);
 
         const envFile = join(tempDir, ".env");
-        writeFileSync(envFile, 'PACKEM_API_URL="https://api.example.com"\nPACKEM_MESSAGE=\'Hello World\'\n');
+
+        writeFileSync(envFile, "PACKEM_API_URL=\"https://api.example.com\"\nPACKEM_MESSAGE='Hello World'\n");
 
         const result = await loadEnvFile(".env", tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": '"https://api.example.com"',
-            "process.env.PACKEM_MESSAGE": '"Hello World"',
+            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
+            "process.env.PACKEM_MESSAGE": "\"Hello World\"",
         });
     });
 
@@ -81,16 +83,14 @@ describe("loadEnvFile", () => {
         expect.assertions(1);
 
         const envFile = join(tempDir, ".env");
-        writeFileSync(
-            envFile,
-            "# This is a comment\nPACKEM_API_URL=https://api.example.com\n\n# Another comment\nPACKEM_VERSION=1.0.0\n",
-        );
+
+        writeFileSync(envFile, "# This is a comment\nPACKEM_API_URL=https://api.example.com\n\n# Another comment\nPACKEM_VERSION=1.0.0\n");
 
         const result = await loadEnvFile(".env", tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": '"https://api.example.com"',
-            "process.env.PACKEM_VERSION": '"1.0.0"',
+            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
+            "process.env.PACKEM_VERSION": "\"1.0.0\"",
         });
     });
 
@@ -106,14 +106,16 @@ describe("loadEnvFile", () => {
         expect.assertions(1);
 
         const subDir = join(tempDir, "config");
+
         mkdirSync(subDir, { recursive: true });
         const envFile = join(subDir, ".env");
+
         writeFileSync(envFile, "PACKEM_API_URL=https://api.example.com\n");
 
         const result = await loadEnvFile("config/.env", tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": '"https://api.example.com"',
+            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
         });
     });
 
@@ -121,12 +123,13 @@ describe("loadEnvFile", () => {
         expect.assertions(1);
 
         const envFile = join(tempDir, ".env");
+
         writeFileSync(envFile, "PACKEM_API_URL=https://api.example.com\n");
 
         const result = await loadEnvFile(envFile, tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": '"https://api.example.com"',
+            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
         });
     });
 
@@ -134,12 +137,13 @@ describe("loadEnvFile", () => {
         expect.assertions(1);
 
         const envFile = join(tempDir, ".env");
+
         writeFileSync(envFile, "PACKEM_API_URL=https://api.example.com\nOTHER_VAR=should-be-ignored\n");
 
         const result = await loadEnvFile(".env", tempDir);
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": '"https://api.example.com"',
+            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
         });
     });
 
@@ -147,13 +151,14 @@ describe("loadEnvFile", () => {
         expect.assertions(1);
 
         const envFile = join(tempDir, ".env");
+
         writeFileSync(envFile, "PACKEM_CONFIG=key=value\nPACKEM_QUERY=param1=val1&param2=val2\n");
 
         const result = await loadEnvFile(".env", tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_CONFIG": '"key=value"',
-            "process.env.PACKEM_QUERY": '"param1=val1&param2=val2"',
+            "process.env.PACKEM_CONFIG": "\"key=value\"",
+            "process.env.PACKEM_QUERY": "\"param1=val1&param2=val2\"",
         });
     });
 
@@ -161,6 +166,7 @@ describe("loadEnvFile", () => {
         expect.assertions(1);
 
         const envFile = join(tempDir, ".env");
+
         writeFileSync(envFile, "PACKEM_MULTILINE=line1\\nline2\nPACKEM_SIMPLE=value\n");
 
         const result = await loadEnvFile(".env", tempDir, "PACKEM_");
@@ -170,4 +176,3 @@ describe("loadEnvFile", () => {
         expect(result).toHaveProperty("process.env.PACKEM_SIMPLE");
     });
 });
-

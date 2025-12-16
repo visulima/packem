@@ -339,12 +339,14 @@ const createAdjustedContext = (
                         ...baseContext.options.rollup.replace,
                         // Use the values from baseContext (which includes hook-set values from rollup:options hook)
                         // The replaceValues parameter is only used as fallback if values don't exist
-                        values: (baseContext.options.rollup.replace.values || replaceValues) as Record<string, string>,
+                        // IMPORTANT: Create a new object to avoid sharing references between builds
+                        values: baseContext.options.rollup.replace.values ? { ...baseContext.options.rollup.replace.values } : { ...replaceValues },
                     }
                     : false,
             },
         },
     };
+
     return result;
 };
 
@@ -412,7 +414,10 @@ const prepareRollupConfig = async (
 
     // Use groupByKeys with 3 keys: environment, runtime, and type
     // TypeScript needs explicit type assertion when using optional third parameter
-    const groupedEntries = (groupByKeys(entriesWithType, "environment", "runtime", "type") as Record<string, Record<string, Record<string, EntryWithType[]>>>) as unknown as GroupedEntries;
+    const groupedEntries = groupByKeys(entriesWithType, "environment", "runtime", "type") as Record<
+        string,
+        Record<string, Record<string, EntryWithType[]>>
+    > as unknown as GroupedEntries;
 
     const builders = new Set<BuilderProperties>();
     const typeBuilders = new Set<BuilderProperties>();
@@ -420,29 +425,29 @@ const prepareRollupConfig = async (
     for (const [environment, environmentEntries] of Object.entries(groupedEntries)) {
         for (const [runtime, runtimeEntries] of Object.entries(environmentEntries)) {
             for (const [, entries] of Object.entries(runtimeEntries)) {
-            // Create a deep copy of the context to avoid sharing replace values between build groups
-            // Each build group (browser/server) needs its own isolated replace values
-            // Start with empty values for each build group to ensure isolation
-            const environmentRuntimeContext = {
-                ...context,
-                environment: environment === "undefined" ? undefined : (environment as "development" | "production"),
-                options: {
-                    ...context.options,
-                    rollup: {
-                        ...context.options.rollup,
-                        replace: context.options.rollup.replace
-                            ? {
-                                ...context.options.rollup.replace,
-                                // Start with empty values for each build group to ensure complete isolation
-                                // The hook will set the correct values for this specific runtime
-                                values: {},
-                            }
-                            : context.options.rollup.replace,
+                // Create a deep copy of the context to avoid sharing replace values between build groups
+                // Each build group (browser/server) needs its own isolated replace values
+                // Start with empty values for each build group to ensure isolation
+                const environmentRuntimeContext = {
+                    ...context,
+                    environment: environment === "undefined" ? undefined : (environment as "development" | "production"),
+                    options: {
+                        ...context.options,
+                        rollup: {
+                            ...context.options.rollup,
+                            replace: context.options.rollup.replace
+                                ? {
+                                    ...context.options.rollup.replace,
+                                    // Start with empty values for each build group to ensure complete isolation
+                                    // The hook will set the correct values for this specific runtime
+                                    values: {},
+                                }
+                                : context.options.rollup.replace,
+                        },
                     },
-                },
-            };
+                };
 
-            if (!context.options.dtsOnly && (environment !== "undefined" || runtime !== "undefined")) {
+                if (!context.options.dtsOnly && (environment !== "undefined" || runtime !== "undefined")) {
                     const logMessage = createBuildLogMessage(environment, runtime);
 
                     if (logMessage) {
@@ -451,7 +456,9 @@ const prepareRollupConfig = async (
                 }
 
                 // Set runtime on context options so hooks can access it
-                environmentRuntimeContext.options.runtime = runtime === "undefined" ? undefined : (runtime as "browser" | "node");
+                const resolvedRuntime = runtime === "undefined" ? undefined : (runtime as "browser" | "node");
+
+                environmentRuntimeContext.options.runtime = resolvedRuntime;
 
                 // Call hook early to allow presets to modify replace values before createAdjustedContext
                 // Use a dummy rollup options object since we don't have rollup options yet
@@ -463,16 +470,12 @@ const prepareRollupConfig = async (
                 }
 
                 // Initialize replace values if replace plugin is enabled
-                const defaultReplaceValues = environmentRuntimeContext.options.rollup.replace
-                    ? createReplaceValues(environment, runtime)
-                    : {};
+                const defaultReplaceValues = environmentRuntimeContext.options.rollup.replace ? createReplaceValues(environment, runtime) : {};
 
-                if (!environmentRuntimeContext.options.rollup.replace) {
-                    context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
-                } else {
-                if (environmentRuntimeContext.options.rollup.replace.values === undefined) {
-                    environmentRuntimeContext.options.rollup.replace.values = {};
-                }
+                if (environmentRuntimeContext.options.rollup.replace) {
+                    if (environmentRuntimeContext.options.rollup.replace.values === undefined) {
+                        environmentRuntimeContext.options.rollup.replace.values = {};
+                    }
 
                     // Merge default replace values from createReplaceValues into existing values
                     // This allows hooks (like Solid preset) to set values first, then we add defaults
@@ -480,8 +483,11 @@ const prepareRollupConfig = async (
                     // Merge defaults into existing values (existing values take precedence if they exist)
                     // Store existing values, merge defaults, then restore existing to ensure hook values win
                     const existingValues = { ...environmentRuntimeContext.options.rollup.replace.values };
+
                     Object.assign(environmentRuntimeContext.options.rollup.replace.values, defaultReplaceValues);
                     Object.assign(environmentRuntimeContext.options.rollup.replace.values, existingValues);
+                } else {
+                    context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
                 }
 
                 // Use merged replace values for createAdjustedContext
@@ -493,11 +499,11 @@ const prepareRollupConfig = async (
                 // Determine minify setting based on environment and explicit config
                 let minify = environmentRuntimeContext.options.minify ?? false;
 
-            if (environment === "development") {
-                minify = false;
-            } else if (environment === "production") {
-                minify = true;
-            }
+                if (environment === "development") {
+                    minify = false;
+                } else if (environment === "production") {
+                    minify = true;
+                }
 
                 // Extract BuildEntry from EntryWithType (remove the 'type' property added for grouping)
                 const buildEntries: BuildEntry[] = (entries as EntryWithType[]).map((entry) => {
@@ -513,10 +519,10 @@ const prepareRollupConfig = async (
                     } as BuildEntry;
                 });
 
-            const esmAndCjsEntries: BuildEntry[] = [];
-            const esmEntries: BuildEntry[] = [];
-            const cjsEntries: BuildEntry[] = [];
-            const dtsEntries: BuildEntry[] = [];
+                const esmAndCjsEntries: BuildEntry[] = [];
+                const esmEntries: BuildEntry[] = [];
+                const cjsEntries: BuildEntry[] = [];
+                const dtsEntries: BuildEntry[] = [];
 
                 for (const entry of buildEntries) {
                     const isDeclarationOnly = isDeclarationOnlyEntry(entry.name);
@@ -527,22 +533,23 @@ const prepareRollupConfig = async (
                         if (entry.declaration) {
                             dtsEntries.push(entry);
                         }
+
                         continue;
                     }
 
                     // Categorize entries by their output format requirements
-                if (entry.cjs && entry.esm) {
-                    esmAndCjsEntries.push(entry);
-                } else if (entry.cjs) {
-                    cjsEntries.push(entry);
-                } else if (entry.esm) {
-                    esmEntries.push(entry);
-                } else if (entry.declaration) {
-                    dtsEntries.push(entry);
+                    if (entry.cjs && entry.esm) {
+                        esmAndCjsEntries.push(entry);
+                    } else if (entry.cjs) {
+                        cjsEntries.push(entry);
+                    } else if (entry.esm) {
+                        esmEntries.push(entry);
+                    } else if (entry.declaration) {
+                        dtsEntries.push(entry);
+                    }
                 }
-            }
 
-            if (esmAndCjsEntries.length > 0) {
+                if (esmAndCjsEntries.length > 0) {
                     const adjustedEsmAndCjsContext = createAdjustedContext(
                         environmentRuntimeContext,
                         true,
@@ -552,35 +559,35 @@ const prepareRollupConfig = async (
                         replaceValues,
                     );
 
-                if (!context.options.dtsOnly) {
-                    builders.add({
-                        context: adjustedEsmAndCjsContext,
-                        fileCache,
-                        subDirectory,
-                    });
-                }
-
-                if (context.options.declaration) {
-                        // Filter entries that have declaration enabled (already filtered out .d entries above)
-                        const typedEntries = esmAndCjsEntries.filter((entry) => entry.declaration);
-
-                    if (typedEntries.length > 0) {
-                        typeBuilders.add({
-                            context: {
-                                ...adjustedEsmAndCjsContext,
-                                options: {
-                                    ...adjustedEsmAndCjsContext.options,
-                                    entries: typedEntries,
-                                },
-                            },
+                    if (!context.options.dtsOnly) {
+                        builders.add({
+                            context: adjustedEsmAndCjsContext,
                             fileCache,
                             subDirectory,
                         });
                     }
-                }
-            }
 
-            if (esmEntries.length > 0) {
+                    if (context.options.declaration) {
+                        // Filter entries that have declaration enabled (already filtered out .d entries above)
+                        const typedEntries = esmAndCjsEntries.filter((entry) => entry.declaration);
+
+                        if (typedEntries.length > 0) {
+                            typeBuilders.add({
+                                context: {
+                                    ...adjustedEsmAndCjsContext,
+                                    options: {
+                                        ...adjustedEsmAndCjsContext.options,
+                                        entries: typedEntries,
+                                    },
+                                },
+                                fileCache,
+                                subDirectory,
+                            });
+                        }
+                    }
+                }
+
+                if (esmEntries.length > 0) {
                     const adjustedEsmContext = createAdjustedContext(
                         environmentRuntimeContext,
                         false,
@@ -590,35 +597,35 @@ const prepareRollupConfig = async (
                         replaceValues,
                     );
 
-                if (!context.options.dtsOnly) {
-                    builders.add({
-                        context: adjustedEsmContext,
-                        fileCache,
-                        subDirectory,
-                    });
-                }
-
-                if (context.options.declaration) {
-                        // Filter entries that have declaration enabled (already filtered out .d entries above)
-                        const typedEntries = esmEntries.filter((entry) => entry.declaration);
-
-                    if (typedEntries.length > 0) {
-                        typeBuilders.add({
-                            context: {
-                                ...adjustedEsmContext,
-                                options: {
-                                    ...adjustedEsmContext.options,
-                                    entries: typedEntries,
-                                },
-                            },
+                    if (!context.options.dtsOnly) {
+                        builders.add({
+                            context: adjustedEsmContext,
                             fileCache,
                             subDirectory,
                         });
                     }
-                }
-            }
 
-            if (cjsEntries.length > 0) {
+                    if (context.options.declaration) {
+                        // Filter entries that have declaration enabled (already filtered out .d entries above)
+                        const typedEntries = esmEntries.filter((entry) => entry.declaration);
+
+                        if (typedEntries.length > 0) {
+                            typeBuilders.add({
+                                context: {
+                                    ...adjustedEsmContext,
+                                    options: {
+                                        ...adjustedEsmContext.options,
+                                        entries: typedEntries,
+                                    },
+                                },
+                                fileCache,
+                                subDirectory,
+                            });
+                        }
+                    }
+                }
+
+                if (cjsEntries.length > 0) {
                     const adjustedCjsContext = createAdjustedContext(
                         environmentRuntimeContext,
                         true,
@@ -628,50 +635,43 @@ const prepareRollupConfig = async (
                         replaceValues,
                     );
 
-                if (!context.options.dtsOnly) {
-                    builders.add({
-                        context: adjustedCjsContext,
-                        fileCache,
-                        subDirectory,
-                    });
-                }
-
-                if (context.options.declaration) {
-                        // Filter entries that have declaration enabled (already filtered out .d entries above)
-                        const typedEntries = cjsEntries.filter((entry) => entry.declaration);
-
-                    if (typedEntries.length > 0) {
-                        typeBuilders.add({
-                            context: {
-                                ...adjustedCjsContext,
-                                options: {
-                                    ...adjustedCjsContext.options,
-                                    entries: typedEntries,
-                                },
-                            },
+                    if (!context.options.dtsOnly) {
+                        builders.add({
+                            context: adjustedCjsContext,
                             fileCache,
                             subDirectory,
                         });
                     }
+
+                    if (context.options.declaration) {
+                        // Filter entries that have declaration enabled (already filtered out .d entries above)
+                        const typedEntries = cjsEntries.filter((entry) => entry.declaration);
+
+                        if (typedEntries.length > 0) {
+                            typeBuilders.add({
+                                context: {
+                                    ...adjustedCjsContext,
+                                    options: {
+                                        ...adjustedCjsContext.options,
+                                        entries: typedEntries,
+                                    },
+                                },
+                                fileCache,
+                                subDirectory,
+                            });
+                        }
+                    }
                 }
-            }
 
-            if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
+                if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
                     // dtsEntries already excludes .d entries (they're filtered out in the categorization loop above)
-                    const adjustedDtsContext = createAdjustedContext(
-                        environmentRuntimeContext,
-                        false,
-                        false,
-                        dtsEntries,
-                        minify,
-                        replaceValues,
-                    );
+                    const adjustedDtsContext = createAdjustedContext(environmentRuntimeContext, false, false, dtsEntries, minify, replaceValues);
 
-                typeBuilders.add({
+                    typeBuilders.add({
                         context: adjustedDtsContext,
-                    fileCache,
-                    subDirectory,
-                });
+                        fileCache,
+                        subDirectory,
+                    });
                 }
             }
         }

@@ -27,8 +27,8 @@ import prepareEntries from "../config/utils/prepare-entries";
 import createStub from "../jit/create-stub";
 import rollupWatch from "../rollup/watch";
 import type { BuildConfig, BuildOptions, Environment, InternalBuildOptions, Mode } from "../types";
-import { createDefuWithHooksMerger } from "../utils/create-defu-with-hooks-merger";
 import cleanDistributionDirectories from "../utils/clean-distribution-directories";
+import { createDefuWithHooksMerger } from "../utils/create-defu-with-hooks-merger";
 import createOrUpdateKeyStorage from "../utils/create-or-update-key-storage";
 import getPackageSideEffect from "../utils/get-package-side-effect";
 import killProcess from "../utils/kill-process";
@@ -654,7 +654,7 @@ const createContext = async (
     // Preserve hooks from buildConfig before generateOptions (which returns InternalBuildOptions without hooks)
     // generateOptions merges hooks correctly but doesn't return them since they're not part of BuildOptions
     const mergedHooks = buildConfig.hooks;
-    
+
     const options = generateOptions(logger, rootDirectory, environment, debug, buildConfig, packageJson, tsconfig, nodeVersion);
 
     ensureDirSync(join(options.rootDir, options.outDir));
@@ -682,13 +682,39 @@ const createContext = async (
         // #region agent log
         const hooksBefore = (context.hooks as any)._hooks?.get?.("rollup:options");
         const hooksCountBefore = hooksBefore ? hooksBefore.size : 0;
-        fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.ts:677',message:'Before addHooks',data:{hooksCountBefore,hooksKeys:Object.keys(mergedHooks || {}),hasRollupOptionsHook:!!mergedHooks?.['rollup:options']},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+
+        fetch("http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e", {
+            body: JSON.stringify({
+                data: { hasRollupOptionsHook: !!mergedHooks?.["rollup:options"], hooksCountBefore, hooksKeys: Object.keys(mergedHooks || {}) },
+                hypothesisId: "B",
+                location: "index.ts:677",
+                message: "Before addHooks",
+                runId: "run1",
+                sessionId: "debug-session",
+                timestamp: Date.now(),
+            }),
+            headers: { "Content-Type": "application/json" },
+            method: "POST",
+        }).catch(() => {});
         // #endregion
         context.hooks.addHooks(mergedHooks);
         // #region agent log
         const hooksAfter = (context.hooks as any)._hooks?.get?.("rollup:options");
         const hooksCountAfter = hooksAfter ? hooksAfter.size : 0;
-        fetch('http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.ts:683',message:'After addHooks',data:{hooksCountBefore,hooksCountAfter,hooksAdded:hooksCountAfter - hooksCountBefore},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+
+        fetch("http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e", {
+            body: JSON.stringify({
+                data: { hooksAdded: hooksCountAfter - hooksCountBefore, hooksCountAfter, hooksCountBefore },
+                hypothesisId: "B",
+                location: "index.ts:683",
+                message: "After addHooks",
+                runId: "run1",
+                sessionId: "debug-session",
+                timestamp: Date.now(),
+            }),
+            headers: { "Content-Type": "application/json" },
+            method: "POST",
+        }).catch(() => {});
         // #endregion
     }
 

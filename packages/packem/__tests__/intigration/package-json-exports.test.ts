@@ -2445,23 +2445,23 @@ console.log("require-module-import", resolved);
             preset: "solid",
         });
         await createPackageJson(temporaryDirectoryPath, {
-            name: "test-package",
             devDependencies: {
                 typescript: "*",
-            },
-            main: "./dist/index.cjs",
-            module: "./dist/index.mjs",
-            types: "./dist/index.d.ts",
-            typesVersions: {
-                "*": {
-                    ".": ["./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
-                },
             },
             exports: {
                 ".": {
                     browser: "./dist/index.browser.cjs",
                     node: "./dist/index.server.cjs",
                     types: "./dist/index.d.ts",
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            name: "test-package",
+            types: "./dist/index.d.ts",
+            typesVersions: {
+                "*": {
+                    ".": ["./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
                 },
             },
         });
@@ -2488,7 +2488,7 @@ console.log("require-module-import", resolved);
     });
 
     it("should support same source file with different outputs (browser/server patterns)", async () => {
-        expect.assertions(7);
+        expect.assertions(6);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.tsx`,
@@ -2504,17 +2504,8 @@ export default 'index';`,
             preset: "solid",
         });
         await createPackageJson(temporaryDirectoryPath, {
-            name: "test-package",
             devDependencies: {
                 typescript: "*",
-            },
-            main: "./dist/index.cjs",
-            module: "./dist/index.mjs",
-            types: "./dist/index.d.ts",
-            typesVersions: {
-                "*": {
-                    ".": ["./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
-                },
             },
             exports: {
                 ".": {
@@ -2523,28 +2514,41 @@ export default 'index';`,
                     types: "./dist/index.d.ts",
                 },
             },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            name: "test-package",
+            types: "./dist/index.d.ts",
+            typesVersions: {
+                "*": {
+                    ".": ["./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
+                },
+            },
         });
 
         const binProcess = await execPackem("build", [], {
             cwd: temporaryDirectoryPath,
         });
+
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
         const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.cjs`);
 
         expect(browserContent).toContain("index");
-        expect(browserContent).toContain(`const isServer = "false" === "true"`);
+        // process.env.SSR === 'true' is replaced with "false" for browser, "true" for server
+        // Rollup evaluates "false" === 'true' to false, "true" === 'true' to true
+        expect(browserContent).toContain("const isServer = false");
 
         const serverContent = readFileSync(`${temporaryDirectoryPath}/dist/index.server.cjs`);
 
         expect(serverContent).toContain("index");
-        // process.env.SSR === 'true' is replaced with false for browser, true for server
+        // process.env.SSR === 'true' is replaced with "false" for browser, "true" for server
+        // Rollup evaluates "false" === 'true' to false, "true" === 'true' to true
         expect(serverContent).toContain("const isServer = true");
     });
 
     it("should inject SolidJS environment variables using array join pattern", async () => {
-        expect.assertions(9);
+        expect.assertions(12);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.tsx`,
@@ -2565,23 +2569,23 @@ export default 'solid';`,
             preset: "solid",
         });
         await createPackageJson(temporaryDirectoryPath, {
-            name: "test-package",
             devDependencies: {
                 typescript: "*",
-            },
-            main: "./dist/index.cjs",
-            module: "./dist/index.mjs",
-            types: "./dist/index.d.ts",
-            typesVersions: {
-                "*": {
-                    ".": ["./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
-                },
             },
             exports: {
                 ".": {
                     browser: "./dist/index.browser.mjs",
                     node: "./dist/index.server.mjs",
                     types: "./dist/index.d.ts",
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            name: "test-package",
+            types: "./dist/index.d.ts",
+            typesVersions: {
+                "*": {
+                    ".": ["./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
                 },
             },
         });
@@ -2594,20 +2598,25 @@ export default 'solid';`,
         expect(binProcess.exitCode).toBe(0);
 
         // Check browser build (should have DEV=true, PROD=false, SSR=false)
-        // Note: The replace plugin replaces process.env.DEV with "true", so the comparison becomes "true" === "true"
+        // The replace plugin replaces process.env.* with stringified values, which Rollup then evaluates
         const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.mjs`);
 
-        expect(browserContent).toMatch(/process\.env\.DEV/);
-        expect(browserContent).toMatch(/process\.env\.PROD/);
-        expect(browserContent).toMatch(/process\.env\.SSR/);
-        expect(browserContent).toMatch(/import\.meta\.env\.DEV/);
-        expect(browserContent).toMatch(/import\.meta\.env\.PROD/);
+        // Values are replaced and evaluated by Rollup
+        expect(browserContent).toContain("const isDev = true");
+        expect(browserContent).toContain("const isProd = false");
+        expect(browserContent).toContain("const isSSR = false");
+        expect(browserContent).toContain("const nodeEnv = \"development\"");
+        // import.meta.env values are replaced with boolean literals (not stringified)
+        expect(browserContent).toContain("const importMetaDev = true");
+        expect(browserContent).toContain("const importMetaProd = false");
+        expect(browserContent).toContain("const importMetaSSR = false");
 
         // Check server build (should have SSR=true)
         const serverContent = readFileSync(`${temporaryDirectoryPath}/dist/index.server.mjs`);
 
-        expect(serverContent).toMatch(/process\.env\.SSR/);
-        expect(serverContent).toMatch(/import\.meta\.env\.SSR/);
+        expect(serverContent).toContain("const isSSR = true");
+        expect(serverContent).toContain("const importMetaSSR = true");
+        expect(serverContent).toContain("const importMetaDev = true");
     });
 
     it("should support nested conditions (browser.development)", async () => {
@@ -2627,26 +2636,26 @@ export default 'index';`,
             preset: "solid",
         });
         await createPackageJson(temporaryDirectoryPath, {
-            name: "test-package",
             devDependencies: {
                 typescript: "*",
-            },
-            main: "./dist/index.cjs",
-            module: "./dist/index.mjs",
-            types: "./dist/index.d.ts",
-            typesVersions: {
-                "*": {
-                    ".": ["./dist/index.development.d.ts", "./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
-                },
             },
             exports: {
                 ".": {
                     browser: {
-                        development: "./dist/index.development.cjs",
                         default: "./dist/index.browser.cjs",
+                        development: "./dist/index.development.cjs",
                     },
                     node: "./dist/index.server.cjs",
                     types: "./dist/index.d.ts",
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            name: "test-package",
+            types: "./dist/index.d.ts",
+            typesVersions: {
+                "*": {
+                    ".": ["./dist/index.development.d.ts", "./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
                 },
             },
         });
@@ -2661,8 +2670,9 @@ export default 'index';`,
         const developmentContent = readFileSync(`${temporaryDirectoryPath}/dist/index.development.cjs`);
 
         expect(developmentContent).toContain("index");
-        expect(developmentContent).toMatch('const env = "development"');
-        expect(developmentContent).toMatch(/process\.env\.DEV.*true/);
+        expect(developmentContent).toMatch("const env = \"development\"");
+        // process.env.DEV is replaced and evaluated by Rollup
+        expect(developmentContent).toContain("const isDev = true");
 
         const browserContent = readFileSync(`${temporaryDirectoryPath}/dist/index.browser.cjs`);
 
@@ -2685,9 +2695,9 @@ export default 'index';`,
             },
             exports: {
                 ".": {
-                    workerd: "./dist/index.workerd.js",
                     node: "./dist/index.js",
                     types: "./dist/index.d.ts",
+                    workerd: "./dist/index.workerd.js",
                 },
             },
         });
@@ -2813,26 +2823,26 @@ export const isDev = process.env.DEV === 'true';`,
             preset: "solid",
         });
         await createPackageJson(temporaryDirectoryPath, {
-            name: "test-package",
             devDependencies: {
                 typescript: "*",
-            },
-            main: "./dist/index.cjs",
-            module: "./dist/index.mjs",
-            types: "./dist/index.d.ts",
-            typesVersions: {
-                "*": {
-                    ".": ["./dist/index.development.d.ts", "./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
-                },
             },
             exports: {
                 ".": {
                     browser: {
-                        development: "./dist/index.development.mjs",
                         default: "./dist/index.browser.mjs",
+                        development: "./dist/index.development.mjs",
                     },
                     node: "./dist/index.server.mjs",
                     types: "./dist/index.d.ts",
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            name: "test-package",
+            types: "./dist/index.d.ts",
+            typesVersions: {
+                "*": {
+                    ".": ["./dist/index.development.d.ts", "./dist/index.browser.d.ts", "./dist/index.server.d.ts", "./dist/index.d.ts"],
                 },
             },
         });
