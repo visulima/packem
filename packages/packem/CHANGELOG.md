@@ -1,3 +1,32 @@
+## @visulima/packem [2.0.0-alpha.46](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.45...@visulima/packem@2.0.0-alpha.46) (2025-12-16)
+
+### Features
+
+* add solid preset options and user babel options merging ([1b93748](https://github.com/visulima/packem/commit/1b93748f986619ed121dbc31361072421eaae74f))
+* add support for loading environment variables from .env files ([0b041c6](https://github.com/visulima/packem/commit/0b041c62cb5457095bea5a9ea68ab8dbf8b63f53))
+* enhance build configuration and environment handling ([78d4c32](https://github.com/visulima/packem/commit/78d4c32f5f12685bb09acc5c50c3200274765125))
+* enhance hooks functionality and improve documentation ([dfea61d](https://github.com/visulima/packem/commit/dfea61ddd2b286327c382b2c50b1b94cceb3d3ad))
+* enhance package.json exports and improve Solid preset handling ([ba61fb6](https://github.com/visulima/packem/commit/ba61fb6e71fbfed8ae8f66256676b5606a5dca87))
+
+### Bug Fixes
+
+* update export handling and improve entry inference logic ([4897f4f](https://github.com/visulima/packem/commit/4897f4f31b7d9ec87b3254391f4b11385478e2e6))
+
+### Miscellaneous Chores
+
+* update package dependencies and improve build configuration ([690fb64](https://github.com/visulima/packem/commit/690fb641471278110f6175e6396d5bee9352c8eb))
+
+### Code Refactoring
+
+* streamline environment variable handling and improve test coverage ([642c513](https://github.com/visulima/packem/commit/642c513d61fdc64069a7d7affc78b986ad29b9b1))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.34
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.17
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.14
+
 ## @visulima/packem [2.0.0-alpha.45](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.44...@visulima/packem@2.0.0-alpha.45) (2025-12-13)
 
 ### Bug Fixes
