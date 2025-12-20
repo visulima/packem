@@ -107,7 +107,6 @@ export interface PackemRollupOptions {
     output?: OutputOptions;
     oxc?: Omit<OXCTransformPluginConfig, "cwd" | "sourcemap" | "target"> | false;
     patchTypes?: PatchTypesOptions | false;
-    pluginPure?: Omit<PureAnnotationsOptions, "sourcemap"> | false;
     plugins?: RollupPlugins;
     polyfillNode?: NodePolyfillsOptions | false;
     preserveDirectives?: {
@@ -116,6 +115,7 @@ export interface PackemRollupOptions {
         include?: FilterPattern;
     };
     preserveDynamicImports?: boolean;
+    pure?: Omit<PureAnnotationsOptions, "sourcemap"> | false;
     raw?: RawLoaderOptions | false;
     replace?: Omit<RollupReplaceOptions, "cwd"> | false;
     requireCJS?: RequireCJSPluginOptions | false;

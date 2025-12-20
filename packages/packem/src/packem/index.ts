@@ -314,7 +314,7 @@ const generateOptions = (
                         },
             },
             patchTypes: {},
-            pluginPure: {},
+            pure: {},
             polyfillNode: {},
             preserveDirectives: {
                 include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,

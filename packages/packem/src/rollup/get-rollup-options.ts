@@ -13,8 +13,8 @@ import {
     fixDynamicImportExtension,
     metafilePlugin,
     nodeResolve as nodeResolvePlugin,
-    PluginPure,
     polyfillNode as polyfillPlugin,
+    purePlugin,
     replace as replacePlugin,
     resolveFileUrlPlugin,
     visualizer as visualizerPlugin,
@@ -422,11 +422,11 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
     // Add esm mark and interop helper if esm export is detected
     const useEsModuleMark = context.tsconfig?.config.compilerOptions?.esModuleInterop;
 
-    let purePlugin: Plugin | undefined;
+    let purePluginInstance: Plugin | undefined;
 
-    if (context.options.rollup.pluginPure) {
-        purePlugin = PluginPure({
-            ...context.options.rollup.pluginPure,
+    if (context.options.rollup.pure) {
+        purePluginInstance = purePlugin({
+            ...context.options.rollup.pure,
             functions: [
                 // Common utility functions
                 "Object.defineProperty",
@@ -548,13 +548,13 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 "Buffer.alloc",
                 "Buffer.allocUnsafe",
                 "Buffer.isBuffer",
-                ...context.options.rollup.pluginPure?.functions ?? [],
+                ...context.options.rollup.pure?.functions ?? [],
             ],
             sourcemap: context.options.sourcemap,
         });
 
         // @ts-expect-error Hacking into the plugin ignoring types, we just fixed the order
-        purePlugin.transform.order = "pre";
+        purePluginInstance.transform.order = "pre";
     }
 
     return (<RollupOptions>{
@@ -779,7 +779,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
             cachingPlugin(context.options.transformer(getTransformerConfig(context.options.transformerName, context)), fileCache),
 
-            purePlugin,
+            purePluginInstance,
 
             context.options.rollup.preserveDirectives
             && preserveDirectivesPlugin({

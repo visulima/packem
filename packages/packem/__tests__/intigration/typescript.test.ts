@@ -1053,6 +1053,9 @@ export { test };
 
     it(
         "should contain correct type file path of shared chunks",
+        {
+            retry: 3,
+        },
         async () => {
             expect.assertions(13);
 
@@ -1246,10 +1249,7 @@ declare const index = "index";
 
 export { AppContext, index };
 `);
-        },
-        {
-            retry: 3,
-        },
+        }
     );
 
     describe("isolated declarations", () => {

@@ -1,3 +1,4 @@
+/* eslint-disable no-secrets/no-secrets */
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -163,7 +164,7 @@ describe(loadEnvFile, () => {
     });
 
     it("should handle multiline values (basic support)", async () => {
-        expect.assertions(1);
+        expect.assertions(2);
 
         const envFile = join(tempDir, ".env");
 
@@ -176,3 +177,5 @@ describe(loadEnvFile, () => {
         expect(result).toHaveProperty("process.env.PACKEM_SIMPLE");
     });
 });
+
+

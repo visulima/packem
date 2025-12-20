@@ -57,7 +57,7 @@ export default log`,
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const effect = require('./packem_shared/effect-2dEibUu8.cjs');
+const effect = require('./packem_shared/effect-C-iR9ClR.cjs');
 
 
 

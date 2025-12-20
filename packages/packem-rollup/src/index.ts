@@ -27,6 +27,6 @@ export { default as nodeResolve, type RollupNodeResolveOptions } from "@rollup/p
 export { default as replace, type RollupReplaceOptions } from "@rollup/plugin-replace";
 export { type RollupWasmOptions, default as wasm } from "@rollup/plugin-wasm";
 export { default as polyfillNode, type NodePolyfillsOptions as RollupNodePolyfillsOptions } from "rollup-plugin-polyfill-node";
-export { PluginPure, type PureAnnotationsOptions as RollupPureAnnotationsOptions } from "rollup-plugin-pure";
+export { PluginPure as purePlugin, type PureAnnotationsOptions as RollupPureAnnotationsOptions } from "rollup-plugin-pure";
 export type { PluginVisualizerOptions as RollupPluginVisualizerOptions } from "rollup-plugin-visualizer";
 export { default as visualizer } from "rollup-plugin-visualizer";

@@ -12,17 +12,18 @@ import { createDefu } from "defu";
  * // hooks from all configs are now merged instead of overwritten
  * ```
  */
-export const createDefuWithHooksMerger = (): ReturnType<typeof createDefu> => createDefu((object, key, value) => {
-    if (key === "hooks" && typeof value === "object" && value !== null && !Array.isArray(value)) {
-        const existingHooks = typeof object[key] === "object" && object[key] !== null && !Array.isArray(object[key]) ? object[key] : {};
+export const createDefuWithHooksMerger = (): ReturnType<typeof createDefu> =>
+    createDefu((object, key, value) => {
+        if (key === "hooks" && typeof value === "object" && value !== null && !Array.isArray(value)) {
+            const existingHooks = typeof object[key] === "object" && object[key] !== null && !Array.isArray(object[key]) ? object[key] : {};
 
-        object[key] = {
-            ...existingHooks,
-            ...value,
-        };
+            object[key] = {
+                ...existingHooks,
+                ...value,
+            };
 
-        return true;
-    }
+            return true;
+        }
 
-    return false;
-});
+        return false;
+    });

@@ -48,14 +48,21 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext<InternalBuil
             entry.cjs = false;
         }
     } else if (entry.cjs === undefined && entry.esm === undefined) {
-        if (context.options.emitCJS !== undefined) {
-            // eslint-disable-next-line no-param-reassign
-            entry.cjs = context.options.emitCJS;
-        }
+        // Only set cjs/esm from global options if entry doesn't have declaration-only flag
+        // Declaration-only entries (only types condition) should not get cjs/esm flags even if global options are set
+        // We check if entry has declaration but no cjs/esm as a heuristic for declaration-only entries
+        const isDeclarationOnly = entry.declaration && entry.cjs === undefined && entry.esm === undefined;
 
-        if (context.options.emitESM !== undefined) {
-            // eslint-disable-next-line no-param-reassign
-            entry.esm = context.options.emitESM;
+        if (!isDeclarationOnly) {
+            if (context.options.emitCJS !== undefined) {
+                // eslint-disable-next-line no-param-reassign
+                entry.cjs = context.options.emitCJS;
+            }
+
+            if (context.options.emitESM !== undefined) {
+                // eslint-disable-next-line no-param-reassign
+                entry.esm = context.options.emitESM;
+            }
         }
     }
 
