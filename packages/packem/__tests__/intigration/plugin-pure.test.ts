@@ -50,7 +50,7 @@ export const used = "only this should remain";`,
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 rollup: {
-                    pluginPure: {},
+                    pure: {},
                 },
             },
         });
@@ -102,7 +102,7 @@ export const used = "only this should remain";`,
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 rollup: {
-                    pluginPure: {},
+                    pure: {},
                 },
             },
         });
@@ -153,7 +153,7 @@ export const used = "only this should remain";`,
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 rollup: {
-                    pluginPure: {},
+                    pure: {},
                 },
             },
         });
@@ -196,7 +196,7 @@ export const used = "this should remain";`,
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 rollup: {
-                    pluginPure: false,
+                    pure: false,
                 },
             },
         });
@@ -248,7 +248,7 @@ export const used = "only this should remain";`,
         await createPackemConfig(temporaryDirectoryPath, {
             config: {
                 rollup: {
-                    pluginPure: {
+                    pure: {
                         functions: ["customPureFunction"],
                     },
                 },

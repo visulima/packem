@@ -403,10 +403,8 @@ describe(inferEntries, () => {
         expect(result).toStrictEqual({
             entries: [
                 {
-                    cjs: true,
                     declaration: true,
                     environment: "development",
-                    esm: true,
                     exportKey: new Set<string>(["import", "require"]),
                     fileAlias: undefined,
                     input: join(temporaryDirectoryPath, "src/test.d.ts"),
@@ -440,10 +438,8 @@ describe(inferEntries, () => {
         expect(result2).toStrictEqual({
             entries: [
                 {
-                    cjs: true,
                     declaration: true,
                     environment: "development",
-                    esm: true,
                     exportKey: new Set<string>(["test"]),
                     fileAlias: undefined,
                     input: join(temporaryDirectoryPath, "src/test.d.ts"),
@@ -472,7 +468,6 @@ describe(inferEntries, () => {
         expect(result3).toStrictEqual({
             entries: [
                 {
-                    cjs: true,
                     declaration: true,
                     environment: "development",
                     exportKey: new Set<string>(["test"]),
@@ -1333,10 +1328,8 @@ describe(inferEntries, () => {
         expect(result).toStrictEqual({
             entries: [
                 {
-                    cjs: true,
                     declaration: true,
                     environment: "development",
-                    esm: true,
                     exportKey: new Set<string>(["types/*"]),
                     fileAlias: undefined,
                     input: join(temporaryDirectoryPath, "src/types/models.ts"),

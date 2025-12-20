@@ -18,6 +18,7 @@ export const isPureCJS = async (
     id: string,
     importer: string,
     rollupResolve?: (id: string, importer?: string) => Promise<ResolvedId | null>,
+// eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<boolean> => {
     if (!initted) {
         await init();

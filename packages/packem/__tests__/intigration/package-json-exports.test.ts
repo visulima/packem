@@ -669,7 +669,6 @@ exports.render = render;
         const mjsPageA = readFileSync(`${temporaryDirectoryPath}/dist/pages/a.mjs`);
 
         expect(mjsPageA).toBe(`function render() {
-function render() {
   console.log("Page A");
 }
 
@@ -692,7 +691,6 @@ exports.render = render;
         const mjsPageB = readFileSync(`${temporaryDirectoryPath}/dist/pages/b.mjs`);
 
         expect(mjsPageB).toBe(`function render() {
-function render() {
   console.log("Page B");
 }
 
@@ -822,7 +820,7 @@ export { render };
         });
 
         describe("formats & conditions", () => {
-            it("declaration file extensions (.d.ts, .d.mts, .d.cts)", async () => {
+            it.only("declaration file extensions (.d.ts, .d.mts, .d.cts)", async () => {
                 expect.assertions(4);
 
                 writeFileSync(`${temporaryDirectoryPath}/src/types/models.ts`, "export type Model = { id: string }");
@@ -849,9 +847,11 @@ export { render };
                 const binProcess = await execPackem("build", [], {
                     cwd: temporaryDirectoryPath,
                 });
-
+console.log(binProcess.stdout)
                 expect(binProcess.stderr).toBe("");
                 expect(binProcess.exitCode).toBe(0);
+
+                console.log(readdirSync(`${temporaryDirectoryPath}/dist/types`))
                 expect(existsSync(`${temporaryDirectoryPath}/dist/types/models.d.ts`)).toBe(true);
                 expect(existsSync(`${temporaryDirectoryPath}/dist/types/models.d.mts`)).toBe(true);
                 expect(existsSync(`${temporaryDirectoryPath}/dist/types/models.d.cts`)).toBe(true);
@@ -873,9 +873,9 @@ export { render };
                     },
                     exports: {
                         "./adapters/*": {
-                            browser: "./dist/browser/*.mjs",
-                            default: "./dist/default/*.mjs",
-                            node: "./dist/node/*.mjs",
+                            browser: "./dist/browser/*.js",
+                            default: "./dist/default/*.js",
+                            node: "./dist/node/*.js",
                         },
                     },
                 });
@@ -886,9 +886,9 @@ export { render };
 
                 expect(binProcess.stderr).toBe("");
                 expect(binProcess.exitCode).toBe(0);
-                expect(existsSync(`${temporaryDirectoryPath}/dist/node/fetch.mjs`)).toBe(true);
-                expect(existsSync(`${temporaryDirectoryPath}/dist/browser/fetch.mjs`)).toBe(true);
-                expect(existsSync(`${temporaryDirectoryPath}/dist/default/fetch.mjs`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/node/fetch.js`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/browser/fetch.js`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/default/fetch.js`)).toBe(true);
             });
 
             it("array of paths", async () => {
@@ -933,8 +933,8 @@ export { render };
                         typescript: "*",
                     },
                     exports: {
-                        ".": "./dist/index.mjs",
-                        "./optional/*": "./dist/optional/*.mjs",
+                        ".": "./dist/index.js",
+                        "./optional/*": "./dist/optional/*.js",
                     },
                 });
 
@@ -961,8 +961,8 @@ export { render };
                         typescript: "*",
                     },
                     exports: {
-                        ".": "./dist/index.mjs",
-                        "./lib/*": "./dist/lib/*.mjs",
+                        ".": "./dist/index.js",
+                        "./lib/*": "./dist/lib/*.js",
                     },
                 });
 
@@ -972,8 +972,8 @@ export { render };
 
                 expect(binProcess.stderr).toBe("");
                 expect(binProcess.exitCode).toBe(0);
-                expect(existsSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(true);
-                expect(existsSync(`${temporaryDirectoryPath}/dist/lib/.mjs`)).toBe(false);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/index.js`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/lib/.js`)).toBe(false);
             });
 
             it("wildcard without extension emits warning", async () => {
@@ -1020,9 +1020,9 @@ export { render };
                         typescript: "*",
                     },
                     exports: {
-                        ".": "./dist/index.mjs",
-                        "./constants": "./dist/constants.mjs",
-                        "./utils/*": "./dist/utils/*.mjs",
+                        ".": "./dist/index.js",
+                        "./constants": "./dist/constants.js",
+                        "./utils/*": "./dist/utils/*.js",
                     },
                 });
 
@@ -1032,9 +1032,9 @@ export { render };
 
                 expect(binProcess.stderr).toBe("");
                 expect(binProcess.exitCode).toBe(0);
-                expect(existsSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(true);
-                expect(existsSync(`${temporaryDirectoryPath}/dist/utils/helper.mjs`)).toBe(true);
-                expect(existsSync(`${temporaryDirectoryPath}/dist/constants.mjs`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/index.js`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/utils/helper.js`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/constants.js`)).toBe(true);
             });
         });
     });

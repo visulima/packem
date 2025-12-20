@@ -505,9 +505,9 @@ const prepareRollupConfig = async (
                 const dtsEntries: BuildEntry[] = [];
 
                 for (const entry of buildEntries) {
-                    const isDeclarationOnly = isDeclarationOnlyEntry(entry.name);
+                    const isDeclarationOnlyName = isDeclarationOnlyEntry(entry.name);
 
-                    if (isDeclarationOnly) {
+                    if (isDeclarationOnlyName) {
                         if (entry.declaration) {
                             dtsEntries.push(entry);
                         }
@@ -515,6 +515,7 @@ const prepareRollupConfig = async (
                         continue;
                     }
 
+                    // Regular entry categorization - entries can have both JS and declaration outputs
                     if (entry.cjs && entry.esm) {
                         esmAndCjsEntries.push(entry);
                     } else if (entry.cjs) {
@@ -522,6 +523,7 @@ const prepareRollupConfig = async (
                     } else if (entry.esm) {
                         esmEntries.push(entry);
                     } else if (entry.declaration) {
+                        // Entry with only declaration, no JS builds
                         dtsEntries.push(entry);
                     }
                 }
