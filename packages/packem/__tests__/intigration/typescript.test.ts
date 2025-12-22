@@ -1,7 +1,8 @@
+/* eslint-disable no-secrets/no-secrets */
 import { existsSync, symlinkSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
-import { isAccessibleSync, readFile, writeFile, writeJson } from "@visulima/fs";
+import { isAccessibleSync, readFile, readFileSync, writeFile, writeJson } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { getRegexMatches } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
@@ -519,10 +520,9 @@ export { version };
 
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(dCtsContent).toBe(`const version$1 = "0.0.1";
+        expect(dCtsContent).toBe(`var version$1 = "0.0.1";
 const pkgJson = {
-	version: version$1
-};
+	version: version$1};
 
 const version = pkgJson.version;
 
@@ -572,9 +572,7 @@ export = _default;
 
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(dCtsContent).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = /* @__PURE__ */ __name(() => "index", "default");
+        expect(dCtsContent).toBe(`const index = () => "index";
 
 export { index as default };
 `);
@@ -627,9 +625,7 @@ export = _default;
 
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(dCtsContent).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = /* @__PURE__ */ __name(() => "index", "default");
+        expect(dCtsContent).toBe(`const index = () => "index";
 
 export { index as default };
 `);
@@ -672,9 +668,7 @@ export { index as default };
 
         const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = /* @__PURE__ */ __name(() => "index", "default");
+        expect(mjsContent).toBe(`const index = () => "index";
 
 export { index as default };
 `);
@@ -799,12 +793,9 @@ export { _default as default };
 
         const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-async function getOne() {
+        expect(mjsContent).toBe(`async function getOne() {
   return await import('./packem_chunks/one.mjs').then((m) => m.one);
 }
-__name(getOne, "getOne");
 
 export { getOne };
 `);
@@ -822,12 +813,9 @@ export { getOne };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 async function getOne() {
   return await import('./packem_chunks/one.cjs').then((m) => m.one);
 }
-__name(getOne, "getOne");
 
 exports.getOne = getOne;
 `);
@@ -903,13 +891,10 @@ export { getOne };
    }
  }
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 async function getOne() {
   const path = "one";
   return await __variableDynamicImportRuntime0__(\`./utils/\${path}.ts\`).then((m) => m.one);
 }
-__name(getOne, "getOne");
 
 export { getOne };
 `);
@@ -939,13 +924,10 @@ function __variableDynamicImportRuntime0__(path) {
    }
  }
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 async function getOne() {
   const path = "one";
   return await __variableDynamicImportRuntime0__(\`./utils/\${path}.ts\`).then((m) => m.one);
 }
-__name(getOne, "getOne");
 
 exports.getOne = getOne;
 `);
@@ -1010,12 +992,9 @@ export { getOne };
 
         const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-async function test() {
+        expect(mjsContent).toBe(`async function test() {
   return await import('@eslint-community/eslint-plugin-eslint-comments');
 }
-__name(test, "test");
 
 export { test };
 `);
@@ -1033,12 +1012,9 @@ export { test };
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 async function test() {
   return await import('@eslint-community/eslint-plugin-eslint-comments');
 }
-__name(test, "test");
 
 exports.test = test;
 `);
@@ -1139,12 +1115,9 @@ export { index };
 
             const mjsChunk1Content = await readFile(`${temporaryDirectoryPath}/dist/${(mjsMatches[0] as string).replace("from './", "").replace("';", "")}`);
 
-            expect(mjsChunk1Content).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-function sharedApi() {
+            expect(mjsChunk1Content).toBe(`function sharedApi() {
   return "common:shared";
 }
-__name(sharedApi, "sharedApi");
 
 export { sharedApi };
 `);
@@ -1187,12 +1160,9 @@ exports.index = index;
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 function sharedApi() {
   return "common:shared";
 }
-__name(sharedApi, "sharedApi");
 
 exports.sharedApi = sharedApi;
 `);
@@ -1353,7 +1323,7 @@ export declare let num: Num;
             },
         );
 
-        it.todo.each(["typescript", "oxc", "swc"])(
+        it.each(["typescript", "oxc", "swc"])(
             "should work with '%s' isolated declarations transformer and add missing index suffix to import paths",
             async (isolatedDeclarationTransformer) => {
                 expect.assertions(7);
@@ -1891,9 +1861,7 @@ export default a;
 
         expect(cjsContent).toBe(`'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const index = /* @__PURE__ */ __name(() => "index", "default");
+const index = () => "index";
 
 module.exports = index;
 `);
@@ -1950,11 +1918,9 @@ export { test2, test as default };
 
 Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const test = /* @__PURE__ */ __name(() => {
+const test = () => {
   return "this should be in final bundle, test function";
-}, "test");
+};
 const test2 = "this should be in final bundle, test2 string";
 
 module.exports = test;
@@ -2050,11 +2016,9 @@ export { test2 };
 
 Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const test = /* @__PURE__ */ __name(() => {
+const test = () => {
   return "this should be in final bundle, test function";
-}, "test");
+};
 const test2 = "this should be in final bundle, test2 string";
 
 module.exports = test;
@@ -2145,11 +2109,9 @@ export default test;
 
         expect(cjsContent).toBe(`'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const test = /* @__PURE__ */ __name(() => {
+const test = () => {
   return "this should be in final bundle, test function";
-}, "test");
+};
 
 module.exports = test;
 `);
@@ -2776,18 +2738,14 @@ export const test = "this should be in final bundle, test2 string";`,
 
         expect(cjs).toBe(`'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const config = /* @__PURE__ */ __name(() => "config", "default");
+const config = () => "config";
 
 module.exports = config;
 `);
 
         const mjs = await readFile(`${temporaryDirectoryPath}/dist/config.mjs`);
 
-        expect(mjs).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const config = /* @__PURE__ */ __name(() => "config", "default");
+        expect(mjs).toBe(`const config = () => "config";
 
 export { config as default };
 `);
@@ -2854,7 +2812,7 @@ declare function deepKeys(object: object, options?: DeeksOptions): string[];
  * @param options
  * @returns Array[Array[String]]
  */
-declare function deepKeysFromList(list: object[], options?: DeeksOptions): string[][];
+declare function deepKeysFromList(list: object[], options?: DeeksOptions, visited?: WeakSet<object>): string[][];
 
 export { deepKeys, deepKeysFromList };
 export type { DeeksOptions as DeepKeysOptions };
@@ -2890,7 +2848,7 @@ declare function deepKeys(object: object, options?: DeeksOptions): string[];
  * @param options
  * @returns Array[Array[String]]
  */
-declare function deepKeysFromList(list: object[], options?: DeeksOptions): string[][];
+declare function deepKeysFromList(list: object[], options?: DeeksOptions, visited?: WeakSet<object>): string[][];
 
 export { deepKeys, deepKeysFromList };
 export type { DeeksOptions as DeepKeysOptions };

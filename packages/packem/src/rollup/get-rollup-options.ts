@@ -382,6 +382,8 @@ const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "b
             }
         },
 
+        preserveEntrySignatures: "strict",
+
         treeshake: {
             // preserve side-effect-only imports:
             moduleSideEffects: true,
@@ -777,9 +779,9 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 fileCache,
             ),
 
-            cachingPlugin(context.options.transformer(getTransformerConfig(context.options.transformerName, context)), fileCache),
-
             purePluginInstance,
+
+            cachingPlugin(context.options.transformer(getTransformerConfig(context.options.transformerName, context)), fileCache),
 
             context.options.rollup.preserveDirectives
             && preserveDirectivesPlugin({

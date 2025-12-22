@@ -403,6 +403,8 @@ describe(inferEntries, () => {
         expect(result).toStrictEqual({
             entries: [
                 {
+                    esm: true,
+                    cjs: true,
                     declaration: true,
                     environment: "development",
                     exportKey: new Set<string>(["import", "require"]),
@@ -438,6 +440,8 @@ describe(inferEntries, () => {
         expect(result2).toStrictEqual({
             entries: [
                 {
+                    esm: true,
+                    cjs: true,
                     declaration: true,
                     environment: "development",
                     exportKey: new Set<string>(["test"]),

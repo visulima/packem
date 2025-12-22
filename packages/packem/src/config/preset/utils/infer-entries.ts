@@ -440,16 +440,27 @@ const createOrUpdateEntry = (
                 }
             }
 
-            // For declaration-only exports, we should NOT set entry.cjs/entry.esm flags
-            // because those trigger JavaScript builds. Instead, we rely on the global
-            // context.options.emitCJS/emitESM flags (set above) to determine which
-            // declaration formats (.d.ts, .d.mts, .d.cts) to generate.
-            // The build process uses these global flags to generate declaration files.
-            if (isDeclarationOnlyExport && entry.cjs === undefined && entry.esm === undefined) {
-                // This entry is truly declaration-only, so ensure cjs/esm are not set
-                // The global flags (context.options.emitCJS/emitESM) will control declaration generation
-                delete entry.cjs;
-                delete entry.esm;
+            // For declaration-only exports, we need to set entry.cjs/entry.esm flags
+            // to tell the build process which declaration formats to generate
+            // (.d.mts requires esm: true, .d.cts requires cjs: true)
+            if (isDeclarationOnlyExport) {
+                // Check all declaration outputs to see which formats are needed
+                // Multiple export keys (e.g., "import" and "require") can map to the same input
+                // We need to check all outputs, not just the current export key
+                const allDeclarationOutputs = outputs.filter((o) => /\.d\.[mc]?ts$/.test(o.file));
+
+                // Check which declaration formats are needed across all declaration outputs
+                const hasImportCondition = allDeclarationOutputs.some((o) => /\.d\.mts$/.test(o.file));
+                const hasRequireCondition = allDeclarationOutputs.some((o) => /\.d\.cts$/.test(o.file));
+
+                // Set flags based on which declaration formats are needed
+                // Don't override if already set (might be set from a previous call for same entry)
+                if (hasRequireCondition) {
+                    entry.cjs = true;
+                }
+                if (hasImportCondition) {
+                    entry.esm = true;
+                }
             }
             // For regular declaration files (not declaration-only), don't delete cjs/esm as they might be set by JS outputs
         } else {
@@ -514,21 +525,21 @@ const inferEntries = async (
 
     // Filter out ignored outputs
     const outputs = allOutputs.filter((output) => !output.ignored);
-    
+
     // Check for declaration-only exports and set flags BEFORE setting default declaration
     // This ensures flags are set correctly for declaration-only exports
     const declarationOnlyExports = new Set<string>();
     for (const output of outputs) {
         const allOutputsForExportKey = outputs.filter((o) => o.exportKey === output.exportKey);
         const isDeclarationOnlyExport = allOutputsForExportKey.length > 0 && allOutputsForExportKey.every((o) => /\.d\.[mc]?ts$/.test(o.file));
-        
+
         if (isDeclarationOnlyExport && !declarationOnlyExports.has(output.exportKey)) {
             declarationOnlyExports.add(output.exportKey);
-            
+
             const hasDts = allOutputsForExportKey.some((o) => o.file.endsWith(".d.ts"));
             const hasDmts = allOutputsForExportKey.some((o) => o.file.endsWith(".d.mts"));
             const hasDcts = allOutputsForExportKey.some((o) => o.file.endsWith(".d.cts"));
-            
+
             // Set global flags EARLY so the build process knows which declaration formats to generate
             if (hasDmts && hasDcts) {
                 // Generate all three formats: .d.ts, .d.mts, .d.cts
@@ -1245,7 +1256,7 @@ const inferEntries = async (
             const hasDts = allOutputsForExportKey.some((o) => o.file.endsWith(".d.ts"));
             const hasDmts = allOutputsForExportKey.some((o) => o.file.endsWith(".d.mts"));
             const hasDcts = allOutputsForExportKey.some((o) => o.file.endsWith(".d.cts"));
-            
+
             // Set global flags EARLY so the build process knows which declaration formats to generate
             if (hasDmts && hasDcts) {
                 // Generate all three formats: .d.ts, .d.mts, .d.cts
@@ -1267,7 +1278,7 @@ const inferEntries = async (
                 }
                 context.options.emitESM = true;
             }
-            
+
             // For declaration-only exports, ensure type is undefined and subKey is types
             const declarationOutput = {
                 ...output,
