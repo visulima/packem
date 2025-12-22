@@ -22,15 +22,25 @@ import lowestCommonAncestor from "./utils/lowest-common-ancestor";
 
 const appendMapUrl = (map: string, filename: string) => `${map}\n//# sourceMappingURL=${basename(filename)}.map\n`;
 
-const generateDtsMap = (mappings: string, source: string, dts: string): string =>
-    JSON.stringify({
+const generateDtsMap = (mappings: string, source: string, dts: string, sourceExt?: string): string => {
+    // Reconstruct the full source path with extension if needed
+    // The source might be stored without extension in outputFiles
+    let sourcePath = source;
+    
+    // If source doesn't have an extension and we have the extension, add it
+    if (!extname(sourcePath) && sourceExt) {
+        sourcePath = `${sourcePath}${sourceExt}`;
+    }
+    
+    return JSON.stringify({
         file: basename(dts),
         mappings,
         names: [],
         sourceRoot: "",
-        sources: [relative(dirname(dts), source)],
+        sources: [relative(dirname(dts), sourcePath)],
         version: 3,
     });
+};
 
 type OxcImport = (ExportAllDeclaration | ExportNamedDeclaration | ImportDeclaration) & {
     source: StringLiteral;
@@ -142,6 +152,13 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
             return this.error(errors[0] as string);
         }
 
+        // Ensure sourceText is defined before proceeding
+        if (!sourceText) {
+            this.warn(`No source text generated for ${id}`);
+
+            return;
+        }
+
         addOutput(id, { map, source: sourceText });
 
         if (!program) {
@@ -242,6 +259,8 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
             for await (let [filename, { ext, map, source }] of Object.entries(outputFiles)) {
                 // Normalize filename to relative path
                 let normalizedFilename: string;
+                // Keep original filename for sourcemap generation (needs full path including sourceDir)
+                const originalSourcePath = filename;
 
                 if (isAbsolute(filename)) {
                     // If absolute path is outside sourceDirectory, skip it
@@ -293,7 +312,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                         this.emitFile({
                             fileName: `${emitName}.map`,
                             originalFileName,
-                            source: generateDtsMap(map, originalFileName, join(outputOptions.dir as string, emitName)),
+                            source: generateDtsMap(map, originalSourcePath, join(outputOptions.dir as string, emitName), ext),
                             type: "asset",
                         });
                     }
@@ -324,7 +343,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                     this.emitFile({
                         fileName: `${emitName}.map`,
                         originalFileName,
-                        source: generateDtsMap(map, originalFileName, join(outputOptions.dir as string, emitName)),
+                        source: generateDtsMap(map, originalSourcePath, join(outputOptions.dir as string, emitName), ext),
                         type: "asset",
                     });
                 }

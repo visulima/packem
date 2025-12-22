@@ -96,7 +96,7 @@ var hasRequiredDeeks;
 function requireDeeks () {
 	if (hasRequiredDeeks) return deeks;
 	hasRequiredDeeks = 1;
-	(function (exports) {
+	(function (exports$1) {
 		var __createBinding = deeks && deeks.__createBinding || (Object.create ? (function(o, m, k, k2) {
 		  if (k2 === void 0) k2 = k;
 		  var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -127,44 +127,83 @@ function requireDeeks () {
 		var __exportStar = deeks && deeks.__exportStar || function(m, exports2) {
 		  for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p)) __createBinding(exports2, m, p);
 		};
-		Object.defineProperty(exports, "__esModule", { value: true });
-		exports.deepKeysFromList = exports.deepKeys = void 0;
+		Object.defineProperty(exports$1, "__esModule", { value: true });
+		exports$1.deepKeysFromList = exports$1.deepKeys = void 0;
 		const utils = __importStar(requireUtils());
-		__exportStar(requireTypes(), exports);
+		__exportStar(requireTypes(), exports$1);
 		function deepKeys(object, options) {
 		  const parsedOptions = mergeOptions(options);
+		  const visited = /* @__PURE__ */ new WeakSet();
 		  if (typeof object === "object" && object !== null) {
-		    return generateDeepKeysList("", object, parsedOptions);
+		    return generateDeepKeysList("", object, parsedOptions, visited);
 		  }
 		  return [];
 		}
-		exports.deepKeys = deepKeys;
-		function deepKeysFromList(list, options) {
+		exports$1.deepKeys = deepKeys;
+		function deepKeysFromList(list, options, visited) {
 		  const parsedOptions = mergeOptions(options);
+		  const localVisited = visited ?? /* @__PURE__ */ new WeakSet();
 		  return list.map((document) => {
 		    if (typeof document === "object" && document !== null) {
-		      return deepKeys(document, parsedOptions);
+		      if (localVisited.has(document)) {
+		        return [];
+		      }
+		      return generateDeepKeysList("", document, parsedOptions, localVisited);
 		    }
 		    return [];
 		  });
 		}
-		exports.deepKeysFromList = deepKeysFromList;
-		function generateDeepKeysList(heading, data, options) {
-		  const keys = Object.keys(data).map((currentKey) => {
-		    const keyName = buildKeyName(heading, escapeNestedDotsIfSpecified(currentKey, options));
-		    if (options.expandNestedObjects && utils.isDocumentToRecurOn(data[currentKey]) || options.arrayIndexesAsKeys && Array.isArray(data[currentKey]) && data[currentKey].length) {
-		      return generateDeepKeysList(keyName, data[currentKey], options);
-		    } else if (options.expandArrayObjects && Array.isArray(data[currentKey])) {
-		      return processArrayKeys(data[currentKey], keyName, options);
-		    } else if (options.ignoreEmptyArrays && Array.isArray(data[currentKey]) && !data[currentKey].length) {
-		      return [];
+		exports$1.deepKeysFromList = deepKeysFromList;
+		function generateDeepKeysList(heading, data, options, visited) {
+		  const result = [];
+		  const rootKeys = Object.keys(data);
+		  visited.add(data);
+		  const stack = [{ obj: data, keys: rootKeys, i: 0, basePath: heading }];
+		  while (stack.length) {
+		    const frame = stack[stack.length - 1];
+		    if (frame.i >= frame.keys.length) {
+		      stack.pop();
+		      continue;
 		    }
-		    return keyName;
-		  });
-		  return utils.flatten(keys);
+		    const currentKey = frame.keys[frame.i++];
+		    const value = frame.obj[currentKey];
+		    const keyName = buildKeyName(frame.basePath, escapeNestedDotsIfSpecified(currentKey, options));
+		    if (options.expandNestedObjects && utils.isDocumentToRecurOn(value) || options.arrayIndexesAsKeys && Array.isArray(value) && value.length) {
+		      if (options.arrayIndexesAsKeys && Array.isArray(value)) {
+		        const arr = value;
+		        for (let idx = arr.length - 1; idx >= 0; idx--) {
+		          const elem = arr[idx];
+		          const elemPath = buildKeyName(keyName, String(idx));
+		          if (typeof elem === "object" && elem !== null && !Array.isArray(elem)) {
+		            if (!visited.has(elem)) {
+		              visited.add(elem);
+		              stack.push({ obj: elem, keys: Object.keys(elem), i: 0, basePath: elemPath });
+		            }
+		          } else {
+		            result.push(elemPath);
+		          }
+		        }
+		      } else {
+		        if (!visited.has(value)) {
+		          visited.add(value);
+		          stack.push({ obj: value, keys: Object.keys(value), i: 0, basePath: keyName });
+		        }
+		      }
+		    } else if (options.expandArrayObjects && Array.isArray(value)) {
+		      const subKeys = processArrayKeys(value, keyName, options, visited);
+		      for (const k of subKeys) {
+		        result.push(k);
+		      }
+		    } else if (options.ignoreEmptyArrays && Array.isArray(value) && !value.length) {
+		      continue;
+		    } else {
+		      result.push(keyName);
+		    }
+		  }
+		  return utils.unique(result);
 		}
-		function processArrayKeys(subArray, currentKeyPath, options) {
-		  let subArrayKeys = deepKeysFromList(subArray, options);
+		function processArrayKeys(subArray, currentKeyPath, options, visited) {
+		  let subArrayKeys = deepKeysFromList(subArray, options, visited);
 		  if (!subArray.length) {
 		    return options.ignoreEmptyArraysWhenExpanding ? [] : [currentKeyPath];
 		  } else if (subArray.length && utils.flatten(subArrayKeys).length === 0) {
@@ -260,7 +299,7 @@ var hasRequiredDeeks;
 function requireDeeks () {
 	if (hasRequiredDeeks) return deeks;
 	hasRequiredDeeks = 1;
-	(function (exports) {
+	(function (exports$1) {
 		var __createBinding = deeks && deeks.__createBinding || (Object.create ? (function(o, m, k, k2) {
 		  if (k2 === void 0) k2 = k;
 		  var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -291,44 +330,83 @@ function requireDeeks () {
 		var __exportStar = deeks && deeks.__exportStar || function(m, exports2) {
 		  for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p)) __createBinding(exports2, m, p);
 		};
-		Object.defineProperty(exports, "__esModule", { value: true });
-		exports.deepKeysFromList = exports.deepKeys = void 0;
+		Object.defineProperty(exports$1, "__esModule", { value: true });
+		exports$1.deepKeysFromList = exports$1.deepKeys = void 0;
 		const utils = __importStar(requireUtils());
-		__exportStar(requireTypes(), exports);
+		__exportStar(requireTypes(), exports$1);
 		function deepKeys(object, options) {
 		  const parsedOptions = mergeOptions(options);
+		  const visited = /* @__PURE__ */ new WeakSet();
 		  if (typeof object === "object" && object !== null) {
-		    return generateDeepKeysList("", object, parsedOptions);
+		    return generateDeepKeysList("", object, parsedOptions, visited);
 		  }
 		  return [];
 		}
-		exports.deepKeys = deepKeys;
-		function deepKeysFromList(list, options) {
+		exports$1.deepKeys = deepKeys;
+		function deepKeysFromList(list, options, visited) {
 		  const parsedOptions = mergeOptions(options);
+		  const localVisited = visited ?? /* @__PURE__ */ new WeakSet();
 		  return list.map((document) => {
 		    if (typeof document === "object" && document !== null) {
-		      return deepKeys(document, parsedOptions);
+		      if (localVisited.has(document)) {
+		        return [];
+		      }
+		      return generateDeepKeysList("", document, parsedOptions, localVisited);
 		    }
 		    return [];
 		  });
 		}
-		exports.deepKeysFromList = deepKeysFromList;
-		function generateDeepKeysList(heading, data, options) {
-		  const keys = Object.keys(data).map((currentKey) => {
-		    const keyName = buildKeyName(heading, escapeNestedDotsIfSpecified(currentKey, options));
-		    if (options.expandNestedObjects && utils.isDocumentToRecurOn(data[currentKey]) || options.arrayIndexesAsKeys && Array.isArray(data[currentKey]) && data[currentKey].length) {
-		      return generateDeepKeysList(keyName, data[currentKey], options);
-		    } else if (options.expandArrayObjects && Array.isArray(data[currentKey])) {
-		      return processArrayKeys(data[currentKey], keyName, options);
-		    } else if (options.ignoreEmptyArrays && Array.isArray(data[currentKey]) && !data[currentKey].length) {
-		      return [];
+		exports$1.deepKeysFromList = deepKeysFromList;
+		function generateDeepKeysList(heading, data, options, visited) {
+		  const result = [];
+		  const rootKeys = Object.keys(data);
+		  visited.add(data);
+		  const stack = [{ obj: data, keys: rootKeys, i: 0, basePath: heading }];
+		  while (stack.length) {
+		    const frame = stack[stack.length - 1];
+		    if (frame.i >= frame.keys.length) {
+		      stack.pop();
+		      continue;
 		    }
-		    return keyName;
-		  });
-		  return utils.flatten(keys);
+		    const currentKey = frame.keys[frame.i++];
+		    const value = frame.obj[currentKey];
+		    const keyName = buildKeyName(frame.basePath, escapeNestedDotsIfSpecified(currentKey, options));
+		    if (options.expandNestedObjects && utils.isDocumentToRecurOn(value) || options.arrayIndexesAsKeys && Array.isArray(value) && value.length) {
+		      if (options.arrayIndexesAsKeys && Array.isArray(value)) {
+		        const arr = value;
+		        for (let idx = arr.length - 1; idx >= 0; idx--) {
+		          const elem = arr[idx];
+		          const elemPath = buildKeyName(keyName, String(idx));
+		          if (typeof elem === "object" && elem !== null && !Array.isArray(elem)) {
+		            if (!visited.has(elem)) {
+		              visited.add(elem);
+		              stack.push({ obj: elem, keys: Object.keys(elem), i: 0, basePath: elemPath });
+		            }
+		          } else {
+		            result.push(elemPath);
+		          }
+		        }
+		      } else {
+		        if (!visited.has(value)) {
+		          visited.add(value);
+		          stack.push({ obj: value, keys: Object.keys(value), i: 0, basePath: keyName });
+		        }
+		      }
+		    } else if (options.expandArrayObjects && Array.isArray(value)) {
+		      const subKeys = processArrayKeys(value, keyName, options, visited);
+		      for (const k of subKeys) {
+		        result.push(k);
+		      }
+		    } else if (options.ignoreEmptyArrays && Array.isArray(value) && !value.length) {
+		      continue;
+		    } else {
+		      result.push(keyName);
+		    }
+		  }
+		  return utils.unique(result);
 		}
-		function processArrayKeys(subArray, currentKeyPath, options) {
-		  let subArrayKeys = deepKeysFromList(subArray, options);
+		function processArrayKeys(subArray, currentKeyPath, options, visited) {
+		  let subArrayKeys = deepKeysFromList(subArray, options, visited);
 		  if (!subArray.length) {
 		    return options.ignoreEmptyArraysWhenExpanding ? [] : [currentKeyPath];
 		  } else if (subArray.length && utils.flatten(subArrayKeys).length === 0) {
@@ -513,15 +591,6 @@ for (let index = 0; index < 128; index++) {
 }
 
 export { isDigitCode, isLowerCode, isUpperCode };
-"
-`;
-
-exports[`packem typescript > should compile only a type file > .d.ts type code output 1`] = `
-"declare global {
-    interface String {
-
-    }
-}
 "
 `;
 

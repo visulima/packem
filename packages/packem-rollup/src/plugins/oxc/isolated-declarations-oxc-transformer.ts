@@ -12,7 +12,7 @@ const isolatedDeclarationsOxcTransformer = (
     const result = isolatedDeclaration(id, code, { ...transformOptions, sourcemap: sourceMap });
 
     return {
-        errors: result.errors.map((error) => error.message),
+        errors: result.errors?.map((error) => error.message) ?? [],
         map: result.map?.mappings,
         sourceText: result.code,
     };

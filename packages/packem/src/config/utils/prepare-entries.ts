@@ -163,7 +163,14 @@ const prepareEntries = async (context: BuildContext<InternalBuildOptions>): Prom
         if (entry.fileAlias) {
             // Set name to fileAlias to ensure unique entry names for rollup
             // This ensures entries with different fileAlias get separate builds
-            entry.name = entry.fileAlias;
+            // Sanitize the name by removing path prefixes (./, ../) as Rollup's [name] placeholder
+            // doesn't accept absolute or relative paths
+            let sanitizedName = entry.fileAlias;
+            // Remove leading ./ or ../
+            while (sanitizedName.startsWith("./") || sanitizedName.startsWith("../")) {
+                sanitizedName = sanitizedName.replace(/^\.\.?\//, "");
+            }
+            entry.name = sanitizedName;
         }
     }
 
