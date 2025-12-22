@@ -86,9 +86,9 @@
         "react-dom": "^19.2.3"
     },
     "devDependencies": {
-        "@types/node": "24.10.2",
+        "@types/node": "25.0.3",
         "@visulima/packem": "workspace:*",
-        "esbuild": "^0.27.1",
+        "esbuild": "^0.27.2",
         "rimraf": "^6.1.2",
         "typescript": "^5.9.3"
     },

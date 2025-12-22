@@ -33,12 +33,16 @@ describe("packem node exports", () => {
                 type: "commonjs",
                 types: "./dist/index.d.ts",
             });
-            await createPackemConfig(temporaryDirectoryPath);
+            await createPackemConfig(temporaryDirectoryPath, {
+                config: {
+                    cjsInterop: true,
+                },
+            });
             await createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: { rootDir: "./src" },
             });
 
-            const binProcess = await execPackem("build", ["--env NODE_ENV=development", "--cjsInterop"], {
+            const binProcess = await execPackem("build", [], {
                 cwd: temporaryDirectoryPath,
             });
 
@@ -47,9 +51,7 @@ describe("packem node exports", () => {
 
             const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-            expect(mjsContent).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const test = /* @__PURE__ */ __name(() => "this should be in final bundle", "test");
+            expect(mjsContent).toBe(`const test = () => "this should be in final bundle";
 
 export { test as default };
 `);
@@ -58,9 +60,7 @@ export { test as default };
 
             expect(cjsContent).toBe(`'use strict';
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const test = /* @__PURE__ */ __name(() => "this should be in final bundle", "test");
+const test = () => "this should be in final bundle";
 
 module.exports = test;
 `);
@@ -110,12 +110,16 @@ export { test2, test as default };`,
                 type: "commonjs",
                 types: "./dist/index.d.ts",
             });
-            await createPackemConfig(temporaryDirectoryPath);
+            await createPackemConfig(temporaryDirectoryPath, {
+                config: {
+                    cjsInterop: true,
+                },
+            });
             await createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: { rootDir: "./src" },
             });
 
-            const binProcess = await execPackem("build", ["--env NODE_ENV=development", "--cjsInterop"], {
+            const binProcess = await execPackem("build", [], {
                 cwd: temporaryDirectoryPath,
             });
 
@@ -169,12 +173,16 @@ export { test2, test3, test4, test5, test as default };`,
                 type: "commonjs",
                 types: "./dist/index.d.ts",
             });
-            await createPackemConfig(temporaryDirectoryPath);
+            await createPackemConfig(temporaryDirectoryPath, {
+                config: {
+                    cjsInterop: true,
+                },
+            });
             await createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: { rootDir: "./src" },
             });
 
-            const binProcess = await execPackem("build", ["--env NODE_ENV=development", "--cjsInterop"], {
+            const binProcess = await execPackem("build", [], {
                 cwd: temporaryDirectoryPath,
             });
 
@@ -479,7 +487,7 @@ export class Child extends Parent {
         await createPackemConfig(temporaryDirectoryPath);
         await createTsConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackem("build", ["--env NODE_ENV=production", "--minify"], {
+        const binProcess = await execPackem("build", ["--production", "--minify"], {
             cwd: temporaryDirectoryPath,
         });
 
@@ -550,9 +558,7 @@ export class Child extends Parent {
 
         const mjsPackageContent = readFileSync(`${temporaryDirectoryPath}/dist/package.mjs`);
 
-        expect(mjsPackageContent).toBe(`var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const packageA = /* @__PURE__ */ __name(() => "This is a named export", "packageA");
+        expect(mjsPackageContent).toBe(`const packageA = () => "This is a named export";
 const d = "This is a default export";
 
 export { d as default, packageA };
@@ -568,9 +574,7 @@ export { d as default, packageA };
 
 Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-const packageA = /* @__PURE__ */ __name(() => "This is a named export", "packageA");
+const packageA = () => "This is a named export";
 const d = "This is a default export";
 
 exports.default = d;

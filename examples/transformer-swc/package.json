@@ -37,7 +37,7 @@
         "react-dom": "^19.2.3"
     },
     "devDependencies": {
-        "@swc/core": "^1.15.5",
+        "@swc/core": "^1.15.7",
         "@swc/helpers": "^0.5.17",
         "@types/react": "^19.2.7",
         "@types/react-dom": "^19.2.3",

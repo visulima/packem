@@ -868,6 +868,8 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 title: "Packem Visualizer",
             }),
         ].filter(Boolean),
+
+        preserveEntrySignatures: "strict",
     }) as RollupOptions;
 };
 
