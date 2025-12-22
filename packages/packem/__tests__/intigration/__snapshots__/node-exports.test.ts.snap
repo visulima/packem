@@ -327,28 +327,7 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > cjs output 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-class Parent {
-  constructor() {
-  }
-}
-class Feature {
-  constructor() {
-  }
-}
-class Child extends Parent {
-  feature = new Feature();
-  constructor() {
-    console.log("before");
-    super();
-    console.log("after");
-  }
-}
-
-exports.Child = Child;
+""use strict";var o=Object.defineProperty;var e=(t,r)=>o(t,"name",{value:r,configurable:!0});Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});var c=Object.defineProperty,s=e((t,r)=>c(t,"name",{value:r,configurable:!0}),"o");class a{static{e(this,"t")}static{s(this,"Parent")}constructor(){}}class l{static{e(this,"c")}static{s(this,"Feature")}constructor(){}}class i extends a{static{e(this,"Child")}static{s(this,"Child")}feature=new l;constructor(){console.log("before"),super(),console.log("after")}}exports.Child=i;
 //# sourceMappingURL=index.cjs.map
 "
 `;
@@ -386,24 +365,7 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > mjs output 1`] = `
-"class Parent {
-  constructor() {
-  }
-}
-class Feature {
-  constructor() {
-  }
-}
-class Child extends Parent {
-  feature = new Feature();
-  constructor() {
-    console.log("before");
-    super();
-    console.log("after");
-  }
-}
-
-export { Child };
+"var c=Object.defineProperty;var e=(t,s)=>c(t,"name",{value:s,configurable:!0});var o=Object.defineProperty,r=e((t,s)=>o(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{r(this,"Parent")}constructor(){}}class l{static{e(this,"c")}static{r(this,"Feature")}constructor(){}}class i extends a{static{e(this,"Child")}static{r(this,"Child")}feature=new l;constructor(){console.log("before"),super(),console.log("after")}}export{i as Child};
 //# sourceMappingURL=index.mjs.map
 "
 `;

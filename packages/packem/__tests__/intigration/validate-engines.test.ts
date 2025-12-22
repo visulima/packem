@@ -27,6 +27,7 @@ describe("packem validate engines", () => {
         expect.assertions(4);
 
         await createPackageJson(temporaryDirectoryPath, {
+            engines: {},
             exports: {
                 ".": {
                     import: "./dist/index.mjs",
@@ -118,7 +119,7 @@ describe("packem validate engines", () => {
 
             await createPackageJson(temporaryDirectoryPath, {
                 engines: {
-                    node: ">=25.0.0", // This should not satisfy Node.js 20.x-24.x
+                    node: ">=26.0.0", // This should not satisfy Node.js 20.x-25.x
                 },
                 exports: {
                     ".": {
@@ -140,7 +141,7 @@ describe("packem validate engines", () => {
 
             expect(binProcess.stderr).toContain("Node.js version mismatch");
             expect(binProcess.stderr).toContain("does not satisfy the required range");
-            expect(binProcess.stderr).toContain(">=25.0.0");
+            expect(binProcess.stderr).toContain(">=26.0.0");
             expect(binProcess.exitCode).toBe(1);
         },
     );
@@ -214,7 +215,7 @@ describe("packem validate engines", () => {
 
         await createPackageJson(temporaryDirectoryPath, {
             engines: {
-                node: "^18.0.0 || ^20.0.0 || ^22.0.0 || ^24.0.0", // This should satisfy Node.js 18.x+
+                node: "^18.0.0 || ^20.0.0 || ^22.0.0 || ^24.0.0 || ^25.0.0", // This should satisfy Node.js 18.x+
             },
             exports: {
                 ".": {

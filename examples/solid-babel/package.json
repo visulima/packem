@@ -40,7 +40,7 @@
         "@babel/preset-typescript": "^7.28.5",
         "@visulima/packem": "workspace:*",
         "babel-preset-solid": "^1.9.10",
-        "esbuild": "^0.27.1",
+        "esbuild": "^0.27.2",
         "rimraf": "^6.1.2",
         "typescript": "^5.9.3"
     },

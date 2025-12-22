@@ -99,7 +99,7 @@ describe(validateEngines, () => {
 
         const context = createMockContext({
             engines: {
-                node: "^20.0.0 || ^21.0.0", // This should satisfy Node.js 20.x
+                node: "^20.0.0 || ^21.0.0 || ^22.0.0 || ^24.0.0 || ^25.0.0", // This should satisfy Node.js 20.x+
             },
             name: "test-package",
         });

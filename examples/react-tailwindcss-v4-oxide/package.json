@@ -31,14 +31,14 @@
         "react": "^19.2.3"
     },
     "devDependencies": {
-        "@tailwindcss/node": "4.1.17",
-        "@tailwindcss/oxide": "4.1.17",
+        "@tailwindcss/node": "4.1.18",
+        "@tailwindcss/oxide": "4.1.18",
         "@types/react": "^19.2.7",
         "@types/react-dom": "^19.2.3",
         "@visulima/css-style-inject": "workspace:*",
         "@visulima/packem": "workspace:*",
         "cssnano": "7.1.2",
-        "esbuild": "^0.27.1",
+        "esbuild": "^0.27.2",
         "react-dom": "^19.2.3",
         "rimraf": "^6.1.2",
         "tailwindcss": "^4.1.18",
