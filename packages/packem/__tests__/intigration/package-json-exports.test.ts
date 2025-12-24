@@ -820,7 +820,7 @@ export { render };
         });
 
         describe("formats & conditions", () => {
-            it.only("declaration file extensions (.d.ts, .d.mts, .d.cts)", async () => {
+            it("declaration file extensions (.d.ts, .d.mts, .d.cts)", async () => {
                 expect.assertions(4);
 
                 writeFileSync(`${temporaryDirectoryPath}/src/types/models.ts`, "export type Model = { id: string }");
@@ -847,11 +847,14 @@ export { render };
                 const binProcess = await execPackem("build", [], {
                     cwd: temporaryDirectoryPath,
                 });
-console.log(binProcess.stdout)
+
+                console.log(binProcess.stdout);
+
                 expect(binProcess.stderr).toBe("");
                 expect(binProcess.exitCode).toBe(0);
 
-                console.log(readdirSync(`${temporaryDirectoryPath}/dist/types`))
+                console.log(readdirSync(`${temporaryDirectoryPath}/dist/types`));
+
                 expect(existsSync(`${temporaryDirectoryPath}/dist/types/models.d.ts`)).toBe(true);
                 expect(existsSync(`${temporaryDirectoryPath}/dist/types/models.d.mts`)).toBe(true);
                 expect(existsSync(`${temporaryDirectoryPath}/dist/types/models.d.cts`)).toBe(true);

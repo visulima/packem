@@ -427,6 +427,7 @@ const createOrUpdateEntry = (
             } else if (hasRequireCondition) {
                 // Generate .d.cts files
                 context.options.emitCJS = true;
+
                 // Also generate .d.ts if declaration is compatible
                 if (context.options.declaration === undefined || context.options.declaration === "node16") {
                     context.options.declaration = "compatible";
@@ -434,6 +435,7 @@ const createOrUpdateEntry = (
             } else if (hasImportCondition) {
                 // Generate .d.mts files
                 context.options.emitESM = true;
+
                 // Also generate .d.ts if declaration is compatible
                 if (context.options.declaration === undefined || context.options.declaration === "node16") {
                     context.options.declaration = "compatible";
@@ -458,6 +460,7 @@ const createOrUpdateEntry = (
                 if (hasRequireCondition) {
                     entry.cjs = true;
                 }
+
                 if (hasImportCondition) {
                     entry.esm = true;
                 }
@@ -520,8 +523,8 @@ const inferEntries = async (
 
     // Come up with a list of all output files & their formats
     // Use a temporary declaration value to extract outputs, we'll adjust it later if needed
-    const tempDeclaration = context.options.declaration ?? "node16";
-    const allOutputs = extractExportFilenames(packageJson.exports, packageType, tempDeclaration, [], context.options.ignoreExportKeys ?? []);
+    const temporaryDeclaration = context.options.declaration ?? "node16";
+    const allOutputs = extractExportFilenames(packageJson.exports, packageType, temporaryDeclaration, [], context.options.ignoreExportKeys ?? []);
 
     // Filter out ignored outputs
     const outputs = allOutputs.filter((output) => !output.ignored);
@@ -529,6 +532,7 @@ const inferEntries = async (
     // Check for declaration-only exports and set flags BEFORE setting default declaration
     // This ensures flags are set correctly for declaration-only exports
     const declarationOnlyExports = new Set<string>();
+
     for (const output of outputs) {
         const allOutputsForExportKey = outputs.filter((o) => o.exportKey === output.exportKey);
         const isDeclarationOnlyExport = allOutputsForExportKey.length > 0 && allOutputsForExportKey.every((o) => /\.d\.[mc]?ts$/.test(o.file));
@@ -546,6 +550,7 @@ const inferEntries = async (
                 if (context.options.declaration === undefined || context.options.declaration === "node16") {
                     context.options.declaration = "compatible";
                 }
+
                 context.options.emitCJS = true;
                 context.options.emitESM = true;
             } else if (hasDcts) {
@@ -553,12 +558,14 @@ const inferEntries = async (
                 if (context.options.declaration === undefined || context.options.declaration === "node16") {
                     context.options.declaration = "compatible";
                 }
+
                 context.options.emitCJS = true;
             } else if (hasDmts) {
                 // Generate .d.mts and .d.ts
                 if (context.options.declaration === undefined || context.options.declaration === "node16") {
                     context.options.declaration = "compatible";
                 }
+
                 context.options.emitESM = true;
             }
         }
@@ -796,7 +803,10 @@ const inferEntries = async (
             // But skip warning if the pattern matches the input structure (e.g., "./*": "./*")
             const hasFileExtension = outputPattern.match(/\.\w+$/);
             // Check if output pattern matches input structure by comparing normalized patterns
-            const outputPatternNormalized = outputPattern.replace(/^\.\//, "").replace(/^dist\//, "").replace(/\.\w+$/, "");
+            const outputPatternNormalized = outputPattern
+                .replace(/^\.\//, "")
+                .replace(/^dist\//, "")
+                .replace(/\.\w+$/, "");
             const inputPatternNormalized = inputPattern.replace(/^\.\//, "");
             const isMatchingInputStructure = inputPatternNormalized === outputPatternNormalized;
 
@@ -1099,6 +1109,7 @@ const inferEntries = async (
                     if (context.options.declaration === undefined || context.options.declaration === "node16") {
                         context.options.declaration = "compatible";
                     }
+
                     context.options.emitCJS = true;
                     context.options.emitESM = true;
                 } else if (hasDcts) {
@@ -1106,12 +1117,14 @@ const inferEntries = async (
                     if (context.options.declaration === undefined || context.options.declaration === "node16") {
                         context.options.declaration = "compatible";
                     }
+
                     context.options.emitCJS = true;
                 } else if (hasDmts) {
                     // Generate .d.mts and .d.ts
                     if (context.options.declaration === undefined || context.options.declaration === "node16") {
                         context.options.declaration = "compatible";
                     }
+
                     context.options.emitESM = true;
                 }
 
@@ -1119,7 +1132,11 @@ const inferEntries = async (
                 // Skip if we've already processed this export key (check if entry already exists)
                 const dtsOutput = allOutputsForExportKey.find((o) => o.file.endsWith(".d.ts"));
                 // If no .d.ts, use .d.mts or .d.cts as fallback
-                const baseOutput = dtsOutput || allOutputsForExportKey.find((o) => o.file.endsWith(".d.mts")) || allOutputsForExportKey.find((o) => o.file.endsWith(".d.cts")) || output;
+                const baseOutput
+                    = dtsOutput
+                        || allOutputsForExportKey.find((o) => o.file.endsWith(".d.mts"))
+                        || allOutputsForExportKey.find((o) => o.file.endsWith(".d.cts"))
+                        || output;
 
                 // Only process if this is the .d.ts output (or the first one if no .d.ts)
                 // This ensures we only create ONE entry per export key
@@ -1136,12 +1153,14 @@ const inferEntries = async (
                     // Use the .d.ts output path if available, otherwise normalize to .d.ts
                     // The build process will generate .d.mts and .d.cts based on flags
                     let dtsOutputPath = outputPath;
+
                     if (outputPath.endsWith(".d.mts") || outputPath.endsWith(".d.cts")) {
                         // Replace .d.mts or .d.cts with .d.ts for the entry
                         dtsOutputPath = outputPath.replace(/\.d\.[mc]ts$/, ".d.ts");
                     } else if (!outputPath.endsWith(".d.ts")) {
                         // If it's a wildcard pattern, try to find the .d.ts version
                         const dtsPattern = outputPath.replace(/\.d\.[mc]ts$/, ".d.ts");
+
                         if (hasDts) {
                             dtsOutputPath = dtsPattern;
                         }
@@ -1270,6 +1289,7 @@ const inferEntries = async (
                 if (context.options.declaration === undefined || context.options.declaration === "node16") {
                     context.options.declaration = "compatible";
                 }
+
                 context.options.emitCJS = true;
                 context.options.emitESM = true;
             } else if (hasDcts) {
@@ -1277,12 +1297,14 @@ const inferEntries = async (
                 if (context.options.declaration === undefined || context.options.declaration === "node16") {
                     context.options.declaration = "compatible";
                 }
+
                 context.options.emitCJS = true;
             } else if (hasDmts) {
                 // Generate .d.mts and .d.ts
                 if (context.options.declaration === undefined || context.options.declaration === "node16") {
                     context.options.declaration = "compatible";
                 }
+
                 context.options.emitESM = true;
             }
 

@@ -22,16 +22,16 @@ import lowestCommonAncestor from "./utils/lowest-common-ancestor";
 
 const appendMapUrl = (map: string, filename: string) => `${map}\n//# sourceMappingURL=${basename(filename)}.map\n`;
 
-const generateDtsMap = (mappings: string, source: string, dts: string, sourceExt?: string): string => {
+const generateDtsMap = (mappings: string, source: string, dts: string, sourceExtension?: string): string => {
     // Reconstruct the full source path with extension if needed
     // The source might be stored without extension in outputFiles
     let sourcePath = source;
-    
+
     // If source doesn't have an extension and we have the extension, add it
-    if (!extname(sourcePath) && sourceExt) {
-        sourcePath = `${sourcePath}${sourceExt}`;
+    if (!extname(sourcePath) && sourceExtension) {
+        sourcePath = `${sourcePath}${sourceExtension}`;
     }
-    
+
     return JSON.stringify({
         file: basename(dts),
         mappings,

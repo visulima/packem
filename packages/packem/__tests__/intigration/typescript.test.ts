@@ -2,7 +2,7 @@
 import { existsSync, symlinkSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
-import { isAccessibleSync, readFile, readFileSync, writeFile, writeJson } from "@visulima/fs";
+import { isAccessibleSync, readFile, writeFile, writeJson } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { getRegexMatches } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
@@ -908,7 +908,6 @@ export { getOne };
 
         const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        // eslint-disable-next-line no-secrets/no-secrets
         expect(cjsContent).toBe(`'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
@@ -1219,7 +1218,7 @@ declare const index = "index";
 
 export { AppContext, index };
 `);
-        }
+        },
     );
 
     describe("isolated declarations", () => {
@@ -2206,7 +2205,6 @@ export { test as default };
 }`);
         });
 
-        // eslint-disable-next-line no-secrets/no-secrets
         it("should generate a node10 typesVersions field in package.json when node10Compatibility.writeToPackageJson is true", async () => {
             expect.assertions(5);
 

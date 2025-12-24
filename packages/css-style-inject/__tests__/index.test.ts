@@ -266,7 +266,7 @@ describe(cssStyleInject, () => {
 
             expect(() => {
                 cssStyleInject("body { margin: 0; }", { container: ".non-existent" });
-            }).toThrow("Unable to find container element");
+            }).toThrowError("Unable to find container element");
         });
 
         it("should use head as default container", () => {
@@ -417,7 +417,7 @@ describe(cssStyleInject, () => {
 
             expect(() => {
                 cssStyleInject("body { margin: 0; }");
-            }).toThrow("Unable to find container element");
+            }).toThrowError("Unable to find container element");
         });
 
         it("should handle all options together", () => {
@@ -444,7 +444,7 @@ describe(cssStyleInject, () => {
 
             expect(() => {
                 cssStyleInject("body { margin: 0; }", options);
-            }).not.toThrow();
+            }).not.toThrowError();
 
             expect(mockElement.setAttribute).toHaveBeenCalledWith("id", "test-style");
             expect(mockElement.setAttribute).toHaveBeenCalledWith("data-test", "value");
@@ -460,7 +460,7 @@ describe(cssStyleInject, () => {
 
             expect(() => {
                 cssStyleInject("body { margin: 0; }", {});
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("should handle no options parameter", () => {
@@ -471,7 +471,7 @@ describe(cssStyleInject, () => {
 
             expect(() => {
                 cssStyleInject("body { margin: 0; }");
-            }).not.toThrow();
+            }).not.toThrowError();
         });
     });
 });

@@ -166,6 +166,7 @@ const prepareEntries = async (context: BuildContext<InternalBuildOptions>): Prom
             // Sanitize the name by removing path prefixes (./, ../) as Rollup's [name] placeholder
             // doesn't accept absolute or relative paths
             let sanitizedName = entry.fileAlias;
+
             // Remove leading ./ or ../
             while (sanitizedName.startsWith("./") || sanitizedName.startsWith("../")) {
                 sanitizedName = sanitizedName.replace(/^\.\.?\//, "");

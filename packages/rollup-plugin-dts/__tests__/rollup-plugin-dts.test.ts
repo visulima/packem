@@ -76,8 +76,8 @@ await testFixtures(
         } else if (isUpdateEnabled) {
             await Promise.all([unlink(diffPath).catch(() => {}), unlink(knownDiffPath).catch(() => {})]);
         } else {
-            await expect(access(diffPath)).rejects.toThrow();
-            await expect(access(knownDiffPath)).rejects.toThrow();
+            await expect(access(diffPath)).rejects.toThrowError();
+            await expect(access(knownDiffPath)).rejects.toThrowError();
         }
     },
     { snapshot: false },

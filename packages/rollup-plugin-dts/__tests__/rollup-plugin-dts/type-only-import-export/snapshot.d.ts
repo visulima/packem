@@ -1,9 +1,5 @@
 // index.d.ts
 
-
-import * as C from "c";
-import { E as E3 } from "e";
-
 export { default as A } from "a";
 export { type B } from "b";
 
@@ -23,23 +19,13 @@ interface Foo$1 {
 }
 // #endregion
 
-export {
-    
-    
-    BarType,
-    BarValue,
-    C,
-    C as C1,
-    type E3 as E2,
-    E3,
-    type Foo,
-    type Foo$1 as FooInlne,
-    O$1 as O1,
-    type X,
-};
+export { BarType, BarValue, type Foo, type Foo$1 as FooInlne, O$1 as O1, type X };
 
+export { type B as B2, type B as B3 } from "b1";
+export * as C from "c";
+export * as C1 from "c";
 export { type default as D } from "d";
-export { E as default } from "e";
+export { E as default, type E as E2, E as E3 } from "e";
 export { E as E4 } from "e3";
 export * as F from "f";
 export { G } from "g";
@@ -53,5 +39,3 @@ export { type L } from "l";
 export { type M as M1 } from "m1";
 export * from "n";
 export * as O from "o";
-
-export {type B as B2, type B as B3} from "b1";

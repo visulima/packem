@@ -314,12 +314,12 @@ const generateOptions = (
                         },
             },
             patchTypes: {},
-            pure: {},
             polyfillNode: {},
             preserveDirectives: {
                 include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
             },
             preserveDynamicImports: true,
+            pure: {},
             raw: {
                 exclude: EXCLUDE_REGEXP,
                 include: [/\.(md|txt|htm|html|data)$/],

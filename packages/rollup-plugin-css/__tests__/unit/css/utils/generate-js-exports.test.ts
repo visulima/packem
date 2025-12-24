@@ -261,7 +261,7 @@ describe(generateJsExports, () => {
                     modulesExports,
                     supportModules: true,
                 });
-            }).toThrow("`inject` keyword is reserved when using `inject.treeshakeable` option");
+            }).toThrowError("`inject` keyword is reserved when using `inject.treeshakeable` option");
         });
     });
 });
