@@ -1,3 +1,13 @@
+## @visulima/packem-share [1.0.0-alpha.18](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.17...@visulima/packem-share@1.0.0-alpha.18) (2025-12-24)
+
+### Miscellaneous Chores
+
+* update dependencies and improve configuration ([aa5ea19](https://github.com/visulima/packem/commit/aa5ea194b5add7df38a8855e618736fea0ae37fe))
+
+### Code Refactoring
+
+* improve environment variable handling and enhance entry inference ([c21e7b9](https://github.com/visulima/packem/commit/c21e7b9537a77fe835ef25d5bc4b4d0898e89b35))
+
 ## @visulima/packem-share [1.0.0-alpha.17](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.16...@visulima/packem-share@1.0.0-alpha.17) (2025-12-16)
 
 ## @visulima/packem-share [1.0.0-alpha.16](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.15...@visulima/packem-share@1.0.0-alpha.16) (2025-12-13)
