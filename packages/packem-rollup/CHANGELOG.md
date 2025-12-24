@@ -1,3 +1,19 @@
+## @visulima/packem-rollup [1.0.0-alpha.35](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.34...@visulima/packem-rollup@1.0.0-alpha.35) (2025-12-24)
+
+### Miscellaneous Chores
+
+* update dependencies and improve configuration ([aa5ea19](https://github.com/visulima/packem/commit/aa5ea194b5add7df38a8855e618736fea0ae37fe))
+
+### Code Refactoring
+
+* enhance type inference and improve test coverage ([80fbf41](https://github.com/visulima/packem/commit/80fbf41b90595fa1c95133f0f18cd5c2ca48787c))
+* simplify JSX component definitions and update test cases ([14fd836](https://github.com/visulima/packem/commit/14fd8367b5164aecff0c39d28cc096a83fb1ca78))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.18
+
 ## @visulima/packem-rollup [1.0.0-alpha.34](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.33...@visulima/packem-rollup@1.0.0-alpha.34) (2025-12-16)
 
 ### Bug Fixes
