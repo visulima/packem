@@ -675,6 +675,13 @@ const inferEntries = async (
             continue;
         }
 
+        // Skip TypeScript source file extensions (.ts, .tsx, .cts, .mts)
+        // These are source files and should not be exported directly in package.json exports
+        // Declaration files (.d.ts, .d.mts, .d.cts) are already handled above
+        if (!isDeclarationFile && /\.(tsx?|cts|mts)$/.test(output.file)) {
+            continue;
+        }
+
         let inferredType: Format | undefined = output.type;
 
         if (!inferredType && isDeclarationFile) {

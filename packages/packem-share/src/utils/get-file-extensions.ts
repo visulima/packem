@@ -20,7 +20,7 @@ const FORMAT_EXTENSIONS = {
  * Computes extension resolution strategy based on build context.
  */
 const getExtensionStrategy = <T extends FileExtensionOptions>(context: BuildContext<T>) => {
-    const { declaration, emitCJS, emitESM, outputExtensionMap } = context.options;
+    const { declaration, emitCJS, emitESM, node10Compatibility, outputExtensionMap } = context.options;
 
     // Check if we're in a dual format scenario
     // This can happen when:
@@ -29,9 +29,12 @@ const getExtensionStrategy = <T extends FileExtensionOptions>(context: BuildCont
     const isDualFormat = Boolean(emitCJS && emitESM);
     const isSingleFormat = !isDualFormat && ((emitCJS && !emitESM) || (emitESM && !emitCJS));
 
+    // When node10Compatibility is false and single format, use .js extension even if declaration is true
+    const shouldUseModernExtensions = node10Compatibility === false && isSingleFormat;
+
     return {
         hasOutputMap: Boolean(outputExtensionMap),
-        isCompatible: declaration === "compatible" || declaration === true,
+        isCompatible: (declaration === "compatible" || declaration === true) && !shouldUseModernExtensions,
         isDualFormat,
         isSingleFormat,
         outputExtensionMap,
@@ -48,6 +51,8 @@ export interface FileExtensionOptions {
     emitCJS?: boolean;
     /** Whether to emit ESM format */
     emitESM?: boolean;
+    /** Node.js 10 compatibility options */
+    node10Compatibility?: { typeScriptVersion?: string; writeToPackageJson?: boolean } | false;
     /** Map of format to file extension */
     outputExtensionMap?: Record<Format, string>;
 }
@@ -57,11 +62,11 @@ export interface FileExtensionOptions {
  * Returns '.js' when:
  * - Only ESM or CJS is emitted (single format)
  * - No outputExtensionMap is configured
- * - Declaration is not in compatible mode
+ * - Declaration is not in compatible mode OR node10Compatibility is false
  *
  * Returns '.cjs'/'.mjs' when:
  * - Both ESM and CJS are emitted (dual format)
- * - Declaration is in compatible mode
+ * - Declaration is in compatible mode (and node10Compatibility is not false)
  * - outputExtensionMap is configured
  * @param context Build context
  * @param format Target format ('esm' or 'cjs')
@@ -120,7 +125,7 @@ export const getDtsExtension = <T extends FileExtensionOptions>(context: BuildCo
         return "d.ts";
     }
 
-    // Use traditional extensions if Node.js 10 compatibility is enabled or dual format
+    // Use traditional extensions if compatible declaration mode (and node10Compatibility is not false) or dual format
     if (strategy.isCompatible || strategy.isDualFormat) {
         return FORMAT_EXTENSIONS.traditionalDts[format];
     }

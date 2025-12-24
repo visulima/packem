@@ -1,10 +1,11 @@
 import { existsSync } from "node:fs";
+import { parseEnv } from "node:util";
 
 import { resolve } from "@visulima/path";
 
 /**
  * Loads environment variables from a .env file with optional prefix filtering.
- * Uses Node.js built-in `process.loadEnvFile` to load the file, then filters variables by prefix.
+ * Uses Node.js built-in `util.parseEnv` to parse the file content without modifying `process.env`.
  * @param envFilePath Path to the .env file (relative to rootDirectory or absolute)
  * @param rootDirectory Root directory for resolving relative paths
  * @param prefix Optional prefix to filter environment variables (e.g., "PACKEM_")
@@ -22,53 +23,41 @@ const loadEnvFile = async (envFilePath: string, rootDirectory: string, prefix: s
         return {};
     }
 
+    const { readFile } = await import("node:fs/promises");
+    const content = await readFile(resolvedPath, "utf-8");
     const envVariables: Record<string, string> = {};
 
-    // Use Node.js built-in process.loadEnvFile if available (Node.js >= 20.6.0)
-    if (typeof process.loadEnvFile === "function") {
+    // Use Node.js built-in util.parseEnv if available (Node.js >= 20.12.0)
+    // This parses the file content without modifying process.env
+    if (typeof parseEnv === "function") {
         try {
-            // Capture current env state before loading
-            const beforeEnv = new Set(Object.keys(process.env));
+            const parsed = parseEnv(content);
 
-            // Load the .env file (this modifies process.env)
-            process.loadEnvFile(resolvedPath);
-
-            // Extract variables that were added and match the prefix
-            for (const [key, value] of Object.entries(process.env)) {
-                if (!beforeEnv.has(key) && (!prefix || key.startsWith(prefix))) {
+            // Filter by prefix and format keys for Rollup replace plugin
+            for (const [key, value] of Object.entries(parsed)) {
+                if (!prefix || key.startsWith(prefix)) {
                     envVariables[`process.env.${key}`] = JSON.stringify(value);
                 }
             }
-
-            // Clean up: remove variables that were added by loadEnvFile
-            // Note: This is a best-effort cleanup. Some variables might have been
-            // overwritten if they already existed, which we can't restore perfectly.
-            for (const key of Object.keys(process.env)) {
-                if (!beforeEnv.has(key)) {
-                    delete process.env[key];
-                }
-            }
         } catch {
-            // If loadEnvFile fails, fall back to manual parsing
-            return loadEnvFileManually(resolvedPath, prefix);
+            // If parseEnv fails, fall back to manual parsing
+            return loadEnvFileManually(content, prefix);
         }
     } else {
         // Fallback to manual parsing for older Node.js versions
-        return loadEnvFileManually(resolvedPath, prefix);
+        return loadEnvFileManually(content, prefix);
     }
 
     return envVariables;
 };
 
 /**
- * Manually parses a .env file and extracts environment variables.
- * @param filePath Path to the .env file
+ * Manually parses .env file content and extracts environment variables.
+ * @param content The content of the .env file
  * @param prefix Optional prefix to filter environment variables
  * @returns Record of environment variables with keys formatted as "process.env.KEY"
  */
-const loadEnvFileManually = async (filePath: string, prefix: string = "PACKEM_"): Promise<Record<string, string>> => {
-    const { readFile } = await import("node:fs/promises");
-    const content = await readFile(filePath, "utf-8");
+const loadEnvFileManually = (content: string, prefix: string = "PACKEM_"): Record<string, string> => {
     const envVariables: Record<string, string> = {};
 
     // Parse .env file line by line
@@ -103,6 +92,7 @@ const loadEnvFileManually = async (filePath: string, prefix: string = "PACKEM_")
 };
 
 export default loadEnvFile;
+
 
 
 

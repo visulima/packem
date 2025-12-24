@@ -290,7 +290,7 @@ export const version = process.env.PACKEM_VERSION;`,
         });
         await createPackemConfig(temporaryDirectoryPath);
 
-        const binProcess = await execPackem("build", ["--env-file", ".env", "--env-prefix", "PACKEM_", "--env.PACKEM_VERSION=2.0.0"], {
+        const binProcess = await execPackem("build", ["--env-file", ".env", "--env-prefix", "PACKEM_", "--env", "PACKEM_VERSION=2.0.0"], {
             cwd: temporaryDirectoryPath,
             env: {},
         });

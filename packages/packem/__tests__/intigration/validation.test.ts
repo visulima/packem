@@ -65,6 +65,12 @@ describe("packem validation", () => {
                 },
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
+                types: "./dist/index.d.ts",
+                typesVersions: {
+                    "*": {
+                        ".": ["./dist/index.d.ts"],
+                    },
+                },
             });
             await createTsConfig(temporaryDirectoryPath);
             await createPackemConfig(temporaryDirectoryPath, {
@@ -138,6 +144,12 @@ describe("packem validation", () => {
                 },
                 main: "./dist/index.cjs",
                 module: "./dist/index.mjs",
+                types: "./dist/index.d.ts",
+                typesVersions: {
+                    "*": {
+                        ".": ["./dist/index.d.ts"],
+                    },
+                },
             });
             await createTsConfig(temporaryDirectoryPath);
             await createPackemConfig(temporaryDirectoryPath, {
@@ -161,7 +173,7 @@ describe("packem validation", () => {
 
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
-            expect(binProcess.stdout).toContain("Total file size exceeds the limit: 57 Bytes / 1.00 Bytes");
+            expect(binProcess.stdout).toContain("Total file size exceeds the limit: 96 Bytes / 1.00 Bytes");
         });
     });
 });

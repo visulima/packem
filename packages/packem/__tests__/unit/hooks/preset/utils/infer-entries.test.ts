@@ -484,6 +484,136 @@ describe(inferEntries, () => {
         } satisfies InferEntriesResult);
     });
 
+    it("should skip TypeScript source file extensions in exports (.ts, .tsx, .cts, .mts)", async () => {
+        expect.assertions(4);
+
+        createFiles(["src/index.ts", "src/utils.ts", "src/component.tsx", "src/config.cts", "src/module.mts"], temporaryDirectoryPath);
+
+        // Test that .ts exports are skipped
+        const result1 = await inferEntries(
+            {
+                exports: {
+                    ".": "./dist/index.ts",
+                    "./utils": "./dist/utils.ts",
+                },
+            },
+            ["src/", "src/index.ts", "src/utils.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            defaultContext,
+        );
+
+        expect(result1).toStrictEqual({
+            entries: [],
+            warnings: [],
+        } satisfies InferEntriesResult);
+
+        // Test that .tsx exports are skipped
+        const result2 = await inferEntries(
+            {
+                exports: {
+                    "./component": "./dist/component.tsx",
+                },
+            },
+            ["src/", "src/component.tsx"].map((file) => join(temporaryDirectoryPath, file)),
+            defaultContext,
+        );
+
+        expect(result2).toStrictEqual({
+            entries: [],
+            warnings: [],
+        } satisfies InferEntriesResult);
+
+        // Test that .cts and .mts exports are skipped
+        const result3 = await inferEntries(
+            {
+                exports: {
+                    "./config": "./dist/config.cts",
+                    "./module": "./dist/module.mts",
+                },
+            },
+            ["src/", "src/config.cts", "src/module.mts"].map((file) => join(temporaryDirectoryPath, file)),
+            defaultContext,
+        );
+
+        expect(result3).toStrictEqual({
+            entries: [],
+            warnings: [],
+        } satisfies InferEntriesResult);
+
+        // Test that declaration files (.d.ts, .d.mts, .d.cts) are still processed
+        createFiles(["src/types.d.ts"], temporaryDirectoryPath);
+
+        const result4 = await inferEntries(
+            {
+                exports: {
+                    "./types": {
+                        types: "./dist/types.d.ts",
+                    },
+                },
+            },
+            ["src/", "src/types.d.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            {
+                environment: defaultContext.environment,
+                options: { ...defaultContext.options, declaration: true },
+                pkg: defaultContext.pkg,
+            } as unknown as BuildContext,
+        );
+
+        expect(result4).toStrictEqual({
+            entries: [
+                {
+                    declaration: true,
+                    environment: "development",
+                    exportKey: new Set<string>(["types"]),
+                    fileAlias: undefined,
+                    input: join(temporaryDirectoryPath, "src/types.d.ts"),
+                    runtime: "node",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+    });
+
+    it("should process valid exports and skip TypeScript source files in mixed exports", async () => {
+        expect.assertions(1);
+
+        createFiles(["src/index.ts", "src/utils.ts", "src/valid.ts"], temporaryDirectoryPath);
+
+        // Test that valid .js/.mjs/.cjs exports are processed, but .ts exports are skipped
+        const result = await inferEntries(
+            {
+                exports: {
+                    ".": "./dist/index.mjs",
+                    "./utils": "./dist/utils.ts", // Should be skipped
+                    "./valid": "./dist/valid.cjs", // Should be processed
+                },
+            },
+            ["src/", "src/index.ts", "src/utils.ts", "src/valid.ts"].map((file) => join(temporaryDirectoryPath, file)),
+            defaultContext,
+        );
+
+        expect(result).toStrictEqual({
+            entries: [
+                {
+                    esm: true,
+                    environment: "development",
+                    exportKey: new Set<string>(["."]),
+                    fileAlias: undefined,
+                    input: join(temporaryDirectoryPath, "src/index.ts"),
+                    runtime: "node",
+                },
+                {
+                    cjs: true,
+                    environment: "development",
+                    exportKey: new Set<string>(["valid"]),
+                    fileAlias: undefined,
+                    input: join(temporaryDirectoryPath, "src/valid.ts"),
+                    runtime: "node",
+                },
+            ],
+            warnings: [],
+        } satisfies InferEntriesResult);
+    });
+
     it("should gracefully handles unknown entries", async () => {
         expect.assertions(1);
 

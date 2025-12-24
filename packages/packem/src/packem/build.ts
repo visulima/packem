@@ -469,8 +469,8 @@ const prepareRollupConfig = async (
 
                     const existingValues = { ...environmentRuntimeContext.options.rollup.replace.values };
 
-                    Object.assign(environmentRuntimeContext.options.rollup.replace.values, defaultReplaceValues);
-                    Object.assign(environmentRuntimeContext.options.rollup.replace.values, existingValues);
+                    // Merge values: default values first, then user-provided values override them
+                    Object.assign(environmentRuntimeContext.options.rollup.replace.values, defaultReplaceValues, existingValues);
                 } else {
                     context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
                 }
