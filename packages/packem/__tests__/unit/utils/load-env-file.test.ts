@@ -177,8 +177,3 @@ describe(loadEnvFile, () => {
         expect(result).toHaveProperty("process.env.PACKEM_SIMPLE");
     });
 });
-
-
-
-
-

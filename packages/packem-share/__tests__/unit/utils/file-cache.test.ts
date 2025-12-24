@@ -120,7 +120,7 @@ describe("fileCache", () => {
 
         const fileCache = new FileCache(temporaryDirectoryPath, cacheDirectoryPath, "hash123", hoisted.logger);
 
-        expect(() => fileCache.set("testFile", undefined)).not.toThrow();
+        expect(() => fileCache.set("testFile", undefined)).not.toThrowError();
     });
 
     it("should return false if cache is disabled in has method", () => {

@@ -416,7 +416,7 @@ it("should error when file import cannot be found", async () => {
                 emitDtsOnly: true,
             }),
         ]),
-    ).rejects.toThrow("Could not resolve './missing-file'");
+    ).rejects.toThrowError("Could not resolve './missing-file'");
 });
 
 it("banner", async () => {
