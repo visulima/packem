@@ -134,9 +134,13 @@ const createBuildCommand = (cli: Cli): void => {
                             path: options.license,
                         },
                         metafile: options.metafile,
-                        replace: {
-                            values: environments,
-                        },
+                        ...(Object.keys(environments).length > 0 || Object.keys(cliEnvVariables).length > 0
+                            ? {
+                                replace: {
+                                    values: environments,
+                                },
+                            }
+                            : {}),
                         resolveExternals: options.noExternal
                             ? {
                                 builtins: false,
