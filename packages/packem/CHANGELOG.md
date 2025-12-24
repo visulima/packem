@@ -1,3 +1,23 @@
+## @visulima/packem [2.0.0-alpha.47](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.46...@visulima/packem@2.0.0-alpha.47) (2025-12-24)
+
+### Miscellaneous Chores
+
+* update dependencies and improve configuration ([aa5ea19](https://github.com/visulima/packem/commit/aa5ea194b5add7df38a8855e618736fea0ae37fe))
+* update package dependencies and improve configuration ([a7dd729](https://github.com/visulima/packem/commit/a7dd729e75a08380ebb70bffb629ec1df3c2bb7f))
+
+### Code Refactoring
+
+* enhance type inference and improve test coverage ([80fbf41](https://github.com/visulima/packem/commit/80fbf41b90595fa1c95133f0f18cd5c2ca48787c))
+* improve environment variable handling and enhance entry inference ([c21e7b9](https://github.com/visulima/packem/commit/c21e7b9537a77fe835ef25d5bc4b4d0898e89b35))
+* simplify JSX component definitions and update test cases ([14fd836](https://github.com/visulima/packem/commit/14fd8367b5164aecff0c39d28cc096a83fb1ca78))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.35
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.18
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.15
+
 ## @visulima/packem [2.0.0-alpha.46](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.45...@visulima/packem@2.0.0-alpha.46) (2025-12-16)
 
 ### Features
