@@ -220,6 +220,108 @@ describe("packem typescript", () => {
 
             expect(content).toBe("console.log(1);\n");
         });
+
+        it("should prefer .ts over .js in source code", async () => {
+            expect.assertions(4);
+
+            // In source code, TypeScript files should be preferred over JavaScript
+            // when both exist for the same import specifier
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { value } from \"./file.js\"; console.log(value);");
+            // Both files exist, .ts should be preferred
+            await writeFile(`${temporaryDirectoryPath}/src/file.ts`, "export const value = \"from-typescript\";");
+            await writeFile(`${temporaryDirectoryPath}/src/file.js`, "export const value = \"from-javascript\";");
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
+                },
+                main: "./dist/index.js",
+                type: "module",
+            });
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackemConfig(temporaryDirectoryPath);
+
+            const binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
+
+            // Should prefer .ts when both exist in source code
+            expect(content).toMatch("from-typescript");
+            expect(content).not.toMatch("from-javascript");
+        });
+
+        it("should prefer .js over .ts in node_modules (esbuild behavior)", async () => {
+            expect.assertions(5);
+
+            // Tests esbuild's resolution behavior where .js is preferred over .ts
+            // in node_modules to avoid issues with:
+            // 1. Packages that accidentally ship both .js and .ts
+            // 2. Missing or unpublished tsconfig.json
+            //
+            // Resolution order:
+            // - Source code: .ts before .js
+            // - node_modules: .js before .ts
+            await writeFile(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                `import { fromBoth } from 'pkg-with-both';
+import { fromTs } from 'pkg-with-only-ts';
+console.log(fromBoth, fromTs);
+`,
+            );
+
+            await writeJson(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "package.json"), {
+                main: "./index.js",
+                name: "pkg-with-both",
+                type: "module",
+            });
+            // Entry point imports from a relative file
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "index.js"), "export { fromBoth } from \"./file.js\";");
+            // Package accidentally ships both .js and .ts for the same file
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.js"), "export const fromBoth = \"compiled-js\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.ts"), "export const fromBoth: string = \"source-ts\";");
+
+            await writeJson(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "package.json"), {
+                main: "./index.js",
+                name: "pkg-with-only-ts",
+                type: "module",
+            });
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "index.js"), "export { fromTs } from \"./file.js\";");
+            // Package only ships .ts (forgot to compile or .npmignore misconfigured)
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "file.ts"), "export const fromTs: string = \"only-ts\";");
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
+                },
+                main: "./dist/index.js",
+                type: "module",
+            });
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackemConfig(temporaryDirectoryPath);
+
+            const binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
+
+            // Should prefer .js when both exist in node_modules
+            expect(content).toMatch("compiled-js");
+            expect(content).not.toMatch("source-ts");
+
+            // Should use .ts when only .ts exists in node_modules
+            expect(content).toMatch("only-ts");
+        });
     });
 
     describe("resolve-typescript-tsconfig-paths plugin", () => {
