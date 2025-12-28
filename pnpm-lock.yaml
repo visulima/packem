@@ -1746,6 +1746,9 @@ importers:
       '@babel/parser':
         specifier: catalog:dev
         version: 7.28.5
+      '@babel/preset-react':
+        specifier: ^7.28.5
+        version: 7.28.5(@babel/core@7.28.5)
       '@csstools/css-parser-algorithms':
         specifier: catalog:style
         version: 3.0.5(@csstools/css-tokenizer@3.0.4)
@@ -1824,6 +1827,9 @@ importers:
       '@vitest/ui':
         specifier: catalog:test
         version: 4.0.16(vitest@4.0.16)
+      babel-plugin-transform-hook-names:
+        specifier: ^1.0.2
+        version: 1.0.2(@babel/core@7.28.5)
       conventional-changelog-conventionalcommits:
         specifier: catalog:dev
         version: 9.1.0
@@ -1905,6 +1911,9 @@ importers:
       postcss-value-parser:
         specifier: catalog:style
         version: 4.2.0
+      preact:
+        specifier: ^10.28.1
+        version: 10.28.1
       prettier:
         specifier: catalog:lint
         version: 3.7.4
@@ -2401,6 +2410,12 @@ importers:
       typescript:
         specifier: catalog:tsc
         version: 5.9.3
+
+  packages/packem/__fixtures__/shared-module-cross-boundary:
+    dependencies:
+      react:
+        specifier: '*'
+        version: 19.2.3
 
   packages/rollup-plugin-css:
     dependencies:
