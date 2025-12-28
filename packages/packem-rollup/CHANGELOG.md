@@ -1,3 +1,13 @@
+## @visulima/packem-rollup [1.0.0-alpha.37](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.36...@visulima/packem-rollup@1.0.0-alpha.37) (2025-12-28)
+
+### Features
+
+* **shared-module:** add cross-boundary shared module support and integration tests ([59c2635](https://github.com/visulima/packem/commit/59c2635e1e84132b7157f78f191b49b4e180b7b1))
+
+### Miscellaneous Chores
+
+* update package dependencies and improve configurations ([e942f98](https://github.com/visulima/packem/commit/e942f9833920f04e112daa232bbe7bdb3628e039))
+
 ## @visulima/packem-rollup [1.0.0-alpha.36](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.35...@visulima/packem-rollup@1.0.0-alpha.36) (2025-12-28)
 
 ### Features
