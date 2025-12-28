@@ -62,6 +62,7 @@ import { minVersion } from "semver";
 
 import type { InternalBuildOptions } from "../types";
 import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
+import resolveImplicitExternalsPlugin from "./plugins/resolve-implicit-externals";
 import resolveAliases from "./utils/resolve-aliases";
 
 /**
@@ -657,6 +658,8 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 fileCache,
             ),
 
+            resolveImplicitExternalsPlugin(context),
+
             resolveExternalsPlugin(context),
 
             context.options.rollup.replace
@@ -993,6 +996,8 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
                 resolveTsconfigPathsPlugin(context.options.rootDir, context.tsconfig, context.logger, context.options.rollup.tsconfigPaths),
                 fileCache,
             ),
+
+            resolveImplicitExternalsPlugin(context),
 
             resolveExternalsPlugin(context),
 
