@@ -9,12 +9,18 @@ import { getDtsExtension, getOutputExtension } from "@visulima/packem-share/util
 import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
 
+import runWithConcurrency from "../lib/concurrency";
 import rollupBuild from "../rollup/build";
 import rollupBuildTypes from "../rollup/build-types";
 import type { BuildEntry, InternalBuildOptions } from "../types";
 import brotliSize from "./utils/brotli-size";
 import groupByKeys from "./utils/group-by-keys";
 import gzipSize from "./utils/gzip-size";
+
+// Default concurrency limit for DTS generation to prevent memory overflow.
+// Each rollup-plugin-dts instance holds TypeScript program state in memory.
+// Limiting concurrency allows V8 to GC between builds.
+const DEFAULT_DTS_CONCURRENCY = 2;
 
 /**
  * Displays size information for build outputs including entries, chunks, and assets.
@@ -678,12 +684,26 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
 
     const { builders, typeBuilders } = await prepareRollupConfig(context, fileCache);
 
-    await Promise.all(
-        [...builders].map(async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuild(rollupContext, cache, subDirectory)),
-    );
-    await Promise.all(
-        [...typeBuilders].map(async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuildTypes(rollupContext, cache, subDirectory)),
-    );
+    // Run JS bundling in parallel (fast and memory-efficient)
+    if (builders.size > 0) {
+        await Promise.all(
+            [...builders].map(async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuild(rollupContext, cache, subDirectory)),
+        );
+    }
+
+    // Run DTS generation with limited concurrency to prevent memory overflow.
+    // Each rollup-plugin-dts instance holds TypeScript program state in memory.
+    // Limiting concurrency allows V8 to garbage collect between builds.
+    if (typeBuilders.size > 0) {
+        await runWithConcurrency(
+            [...typeBuilders].map(
+                ({ context: rollupContext, fileCache: cache, subDirectory }) =>
+                    () =>
+                        rollupBuildTypes(rollupContext, cache, subDirectory),
+            ),
+            DEFAULT_DTS_CONCURRENCY,
+        );
+    }
 
     context.logger.success(green(context.options.name ? `Build succeeded for ${context.options.name}` : "Build succeeded"));
 
