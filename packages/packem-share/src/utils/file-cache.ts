@@ -1,5 +1,6 @@
 import { isAccessibleSync, readFileSync, writeFileSync } from "@visulima/fs";
 import { join, toNamespacedPath } from "@visulima/path";
+import stringify from "safe-stable-stringify";
 
 import type { RollupLogger } from "./create-rollup-logger";
 
@@ -151,7 +152,7 @@ class FileCache {
 
         if (typeof data === "object" || typeof data === "number" || typeof data === "boolean") {
             // eslint-disable-next-line no-param-reassign
-            data = JSON.stringify(data);
+            data = stringify(data);
         }
 
         writeFileSync(filePath, data, {

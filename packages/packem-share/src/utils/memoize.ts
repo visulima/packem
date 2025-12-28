@@ -5,6 +5,8 @@
  *
  * Copyright (c) 2018 these people -> https://github.com/huozhi/bunchee/graphs/contributors
  */
+import stringify from "safe-stable-stringify";
+
 type CacheKeyResolver = string | ((...arguments_: any[]) => string);
 
 /**
@@ -24,7 +26,7 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
 
     return ((...arguments_: Parameters<T>) => {
         // eslint-disable-next-line sonarjs/no-nested-conditional, @stylistic/no-extra-parens
-        const key = cacheKey ? (typeof cacheKey === "function" ? cacheKey(...arguments_) : cacheKey) : JSON.stringify({ args: arguments_ });
+        const key = cacheKey ? (typeof cacheKey === "function" ? cacheKey(...arguments_) : cacheKey) : stringify({ args: arguments_ });
         const existing = cache.get(key);
 
         if (existing !== undefined) {

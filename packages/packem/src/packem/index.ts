@@ -1,3 +1,4 @@
+/* eslint-disable no-secrets/no-secrets */
 import process from "node:process";
 
 import { bold, cyan } from "@visulima/colorize";
@@ -73,9 +74,7 @@ const resolveTsconfigJsxToJsxRuntime = (jsx?: TsConfigJson.CompilerOptions.JSX):
  * @param rootDirectory Root directory of the project
  * @param environment Build environment (development/production)
  * @param debug Enable debug mode
- * @param inputConfig User provided build configuration
  * @param buildConfig Resolved build configuration
- * @param preset Build preset configuration
  * @param packageJson Package.json contents
  * @param tsconfig TypeScript configuration
  * @param runtimeVersion Node.js runtime version
@@ -812,7 +811,6 @@ const getMode = (mode: Mode): string => {
  * @param mode Build mode (build/watch)
  * @param environment Build environment (development/production)
  * @param logger Logger instance for output
- * @param inputConfig User provided build configuration and options
  * @example
  * ```typescript
  * import packem from 'packem';

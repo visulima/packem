@@ -77,7 +77,8 @@
         "@visulima/colorize": "catalog:visulima",
         "@visulima/fs": "catalog:visulima",
         "@visulima/package": "catalog:visulima",
-        "@visulima/path": "catalog:visulima"
+        "@visulima/path": "catalog:visulima",
+        "safe-stable-stringify": "^2.5.0"
     },
     "devDependencies": {
         "@anolilab/eslint-config": "catalog:lint",
