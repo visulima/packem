@@ -31,6 +31,14 @@ const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<Bui
 
             break;
         }
+        case "preact": {
+            const { createPreactPreset } = await import("../preset/preact");
+
+            // eslint-disable-next-line no-param-reassign
+            preset = createPreactPreset();
+
+            break;
+        }
         case "vue": {
             const { createVuePreset } = await import("../preset/vue");
 

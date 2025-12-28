@@ -2907,4 +2907,83 @@ export const isDev = process.env.DEV === 'true';`,
         // Should not have any .d.js files
         expect(dJsFiles).toHaveLength(0);
     });
+
+    it("should work with preact preset and alias React imports to preact/compat", async () => {
+        expect.assertions(4);
+
+        writeFileSync(
+            `${temporaryDirectoryPath}/src/index.tsx`,
+            `import { useState, useEffect } from "react";
+import { createRoot } from "react-dom/client";
+
+export function App() {
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+        console.log("Mounted");
+    }, []);
+
+    return <div>Count: {count}</div>;
+}
+
+export function renderApp(element: HTMLElement) {
+    const root = createRoot(element);
+    root.render(<App />);
+    return root;
+}
+
+export default App;`,
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await installPackage(temporaryDirectoryPath, "preact");
+        await installPackage(temporaryDirectoryPath, "@babel/core");
+        await installPackage(temporaryDirectoryPath, "@babel/preset-react");
+        await installPackage(temporaryDirectoryPath, "babel-plugin-transform-hook-names");
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                jsx: "react-jsx",
+                jsxImportSource: "preact",
+            },
+        });
+
+        await createPackemConfig(temporaryDirectoryPath, {
+            preset: "preact",
+        });
+        await createPackageJson(temporaryDirectoryPath, {
+            dependencies: {
+                preact: "*",
+            },
+            devDependencies: {
+                "@babel/core": "*",
+                "@babel/preset-react": "*",
+                "babel-plugin-transform-hook-names": "*",
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: "./dist/index.mjs",
+                    require: "./dist/index.cjs",
+                    types: "./dist/index.d.ts",
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            name: "test-package",
+            types: "./dist/index.d.ts",
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        // Verify React imports are aliased to preact/compat
+        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toContain("from \"preact/compat\"");
+        expect(mjsContent).not.toContain("from \"react\"");
+    });
 });

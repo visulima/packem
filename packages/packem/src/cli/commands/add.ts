@@ -21,6 +21,9 @@ const reactDependencies = ["react", "react-dom"];
 const solidDevDependencies = ["@babel/core", "babel-preset-solid"];
 const solidDependencies = ["solid-js"];
 
+const preactDevDependencies = ["@babel/core", "@babel/preset-react", "babel-plugin-transform-hook-names"];
+const preactDependencies = ["preact"];
+
 const vueDevDependencies = ["unplugin-vue"];
 const vueDependencies = ["vue"];
 
@@ -209,6 +212,46 @@ const addSolid = async (context: AddFeatureContext): Promise<void> => {
     await installPackages(context, solidDevDependencies, solidDependencies);
 
     logger.success("\nSolid preset added!");
+};
+
+const getPreactTypeDependencies = async (rootDirectory: string): Promise<{ devPackages: string[]; packages: string[] }> => {
+    const hasTypescript = await checkTypeScriptInstalled(rootDirectory);
+    const packages: string[] = [...preactDependencies];
+    const devPackages: string[] = [...preactDevDependencies];
+
+    if (hasTypescript) {
+        devPackages.push("@types/preact");
+    } else {
+        const useTypescript = (await confirm({
+            initialValue: false,
+            message: "Do you want to use TypeScript?",
+        })) as boolean;
+
+        if (useTypescript) {
+            devPackages.push("typescript", "@types/preact");
+        }
+    }
+
+    return { devPackages, packages };
+};
+
+const addPreact = async (context: AddFeatureContext): Promise<void> => {
+    const { logger, packemConfig } = context;
+
+    if (checkPresetExists(packemConfig, "preact", "createPreactPreset")) {
+        logger.warn("Preact preset has already been added to the packem config.");
+
+        return;
+    }
+
+    insertPreset(context, "preact");
+
+    const { devPackages, packages } = await getPreactTypeDependencies(context.rootDirectory);
+
+    logger.info("Adding Preact dependencies...");
+    await installPackages(context, devPackages, packages);
+
+    logger.success("\nPreact preset added!");
 };
 
 const addVue = async (context: AddFeatureContext): Promise<void> => {
@@ -465,6 +508,10 @@ const createAddCommand = (cli: Cli<Pail>): void => {
 
             if (argument.includes("solid")) {
                 await addSolid(context);
+            }
+
+            if (argument.includes("preact")) {
+                await addPreact(context);
             }
 
             if (argument.includes("vue")) {
