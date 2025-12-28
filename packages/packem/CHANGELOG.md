@@ -1,3 +1,15 @@
+## @visulima/packem [2.0.0-alpha.48](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.47...@visulima/packem@2.0.0-alpha.48) (2025-12-28)
+
+### Features
+
+* **preact:** add Preact and React compatibility examples with Babel support ([0b77282](https://github.com/visulima/packem/commit/0b77282b802ed3d7c5df0733c1d7f5e2156df721))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.36
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.16
+
 ## @visulima/packem [2.0.0-alpha.47](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.46...@visulima/packem@2.0.0-alpha.47) (2025-12-24)
 
 ### Miscellaneous Chores
