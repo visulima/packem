@@ -1,6 +1,7 @@
 import { rm } from "node:fs/promises";
 
-import { readFile, writeFile } from "@visulima/fs";
+import { readFile, writeFile, writeJson } from "@visulima/fs";
+import { join } from "@visulima/path";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -266,5 +267,53 @@ export const transform = svgrTransform;
         const dContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dContent).toMatchSnapshot("dts output");
+    });
+
+    it("should not resolve .js to .ts in externalized dependency", async () => {
+        expect.assertions(4);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `import "dep/file.js";
+
+export const foo = "bar";
+`,
+        );
+        await writeFile(
+            join(temporaryDirectoryPath, "node_modules", "dep", "file.js"),
+            "module.exports.foo = function() {};",
+        );
+        await writeJson(join(temporaryDirectoryPath, "node_modules", "dep", "package.json"), {
+            name: "dep",
+            version: "1.0.0",
+        });
+        await createPackageJson(temporaryDirectoryPath, {
+            dependencies: {
+                dep: "*",
+            },
+            devDependencies: {
+                typescript: "^4.4.3",
+            },
+            main: "./dist/index.js",
+            type: "module",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { rootDir: "./src" },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.exitCode).toBe(0);
+        expect(binProcess.stderr).toBe("");
+
+        const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
+
+        // Should import from .js, not .ts
+        expect(content).toMatch(/import ['"]dep\/file\.js['"]/);
+        expect(content).not.toMatch("file.ts");
     });
 });
