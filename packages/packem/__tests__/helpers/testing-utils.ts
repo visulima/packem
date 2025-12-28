@@ -21,9 +21,7 @@ export interface CreateJobResult {
 /**
  * Create a test job by copying a test directory and building it.
  */
-export const createJob = async (
-    options: CreateJobOptions,
-): Promise<CreateJobResult> => {
+export const createJob = async (options: CreateJobOptions): Promise<CreateJobResult> => {
     const tempDir = temporaryDirectory();
     const currentFile = fileURLToPath(import.meta.url);
     const helpersDir = dirname(currentFile);
@@ -71,9 +69,7 @@ export const createJob = async (
 /**
  * Get file names from a directory.
  */
-export const getFileNamesFromDirectory = async (
-    directory: string,
-): Promise<string[]> => {
+export const getFileNamesFromDirectory = async (directory: string): Promise<string[]> => {
     const files: string[] = [];
 
     const walkDir = (dir: string, baseDir: string = dir): void => {
@@ -99,9 +95,7 @@ export const getFileNamesFromDirectory = async (
 /**
  * Get file contents from a directory as a map of filename -> content.
  */
-export const getFileContents = async (
-    directory: string,
-): Promise<Record<string, string>> => {
+export const getFileContents = async (directory: string): Promise<Record<string, string>> => {
     const files = await getFileNamesFromDirectory(directory);
     const contents: Record<string, string> = {};
 

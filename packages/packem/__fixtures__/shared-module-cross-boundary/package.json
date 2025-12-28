@@ -1,13 +1,13 @@
 {
-  "name": "shared-module-cross-boundary",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+    "name": "shared-module-cross-boundary",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "dependencies": {
+        "react": "*"
     }
-  },
-  "dependencies": {
-    "react": "*"
-  }
 }

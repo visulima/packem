@@ -55,32 +55,32 @@ const createPreactAliasTransformPlugin = (): Plugin => {
             let transformedCode = code;
 
             // Rewrite react imports to preact/compat
-            if (transformedCode.includes('from "react"') || transformedCode.includes("from 'react'")) {
-                transformedCode = transformedCode.replaceAll(/from\s+["']react["']/g, 'from "preact/compat"');
+            if (transformedCode.includes("from \"react\"") || transformedCode.includes("from 'react'")) {
+                transformedCode = transformedCode.replaceAll(/from\s+["']react["']/g, "from \"preact/compat\"");
                 modified = true;
             }
 
             // Rewrite react-dom imports to preact/compat
-            if (transformedCode.includes('from "react-dom"') || transformedCode.includes("from 'react-dom'")) {
-                transformedCode = transformedCode.replaceAll(/from\s+["']react-dom["']/g, 'from "preact/compat"');
+            if (transformedCode.includes("from \"react-dom\"") || transformedCode.includes("from 'react-dom'")) {
+                transformedCode = transformedCode.replaceAll(/from\s+["']react-dom["']/g, "from \"preact/compat\"");
                 modified = true;
             }
 
             // Rewrite react-dom/test-utils imports to preact/test-utils
-            if (transformedCode.includes('from "react-dom/test-utils"') || transformedCode.includes("from 'react-dom/test-utils'")) {
-                transformedCode = transformedCode.replaceAll(/from\s+["']react-dom\/test-utils["']/g, 'from "preact/test-utils"');
+            if (transformedCode.includes("from \"react-dom/test-utils\"") || transformedCode.includes("from 'react-dom/test-utils'")) {
+                transformedCode = transformedCode.replaceAll(/from\s+["']react-dom\/test-utils["']/g, "from \"preact/test-utils\"");
                 modified = true;
             }
 
             // Rewrite react-dom/client imports to preact/compat
-            if (transformedCode.includes('from "react-dom/client"') || transformedCode.includes("from 'react-dom/client'")) {
-                transformedCode = transformedCode.replaceAll(/from\s+["']react-dom\/client["']/g, 'from "preact/compat"');
+            if (transformedCode.includes("from \"react-dom/client\"") || transformedCode.includes("from 'react-dom/client'")) {
+                transformedCode = transformedCode.replaceAll(/from\s+["']react-dom\/client["']/g, "from \"preact/compat\"");
                 modified = true;
             }
 
             // Rewrite react/jsx-runtime imports to preact/jsx-runtime
-            if (transformedCode.includes('from "react/jsx-runtime"') || transformedCode.includes("from 'react/jsx-runtime'")) {
-                transformedCode = transformedCode.replaceAll(/from\s+["']react\/jsx-runtime["']/g, 'from "preact/jsx-runtime"');
+            if (transformedCode.includes("from \"react/jsx-runtime\"") || transformedCode.includes("from 'react/jsx-runtime'")) {
+                transformedCode = transformedCode.replaceAll(/from\s+["']react\/jsx-runtime["']/g, "from \"preact/jsx-runtime\"");
                 modified = true;
             }
 
@@ -152,13 +152,15 @@ export const createPreactPreset = (options: PreactPresetOptions = {}): BuildConf
     const { devtoolsInProd: devtoolsInProduction = false, plugins = [], presets = [] } = options;
 
     const babelPlugins: BabelPluginConfig["plugins"] = [];
-    const babelPresets: BabelPluginConfig["presets"] = [[
-        "@babel/preset-react",
-        {
-            importSource: "preact",
-            runtime: "automatic",
-        },
-    ]];
+    const babelPresets: BabelPluginConfig["presets"] = [
+        [
+            "@babel/preset-react",
+            {
+                importSource: "preact",
+                runtime: "automatic",
+            },
+        ],
+    ];
 
     // Add hook names plugin in development mode for better Devtools experience
     // This plugin enhances Preact Devtools by adding hook names
@@ -187,8 +189,14 @@ export const createPreactPreset = (options: PreactPresetOptions = {}): BuildConf
                 // Add alias transform plugin (runs early to rewrite imports in source code)
                 const aliasTransformPlugin = createPreactAliasTransformPlugin();
                 const aliasTransformExists = rollupOptions.plugins.some(
-                    (p: unknown) => (typeof p === "object" && p !== null && "name" in p && (p as { name: string }).name === "packem:preact-alias-transform")
-                        || (Array.isArray(p) && p[0] && typeof p[0] === "object" && p[0] !== null && "name" in p[0] && (p[0] as { name: string }).name === "packem:preact-alias-transform"),
+                    (p: unknown) =>
+                        (typeof p === "object" && p !== null && "name" in p && (p as { name: string }).name === "packem:preact-alias-transform")
+                        || (Array.isArray(p)
+                            && p[0]
+                            && typeof p[0] === "object"
+                            && p[0] !== null
+                            && "name" in p[0]
+                            && (p[0] as { name: string }).name === "packem:preact-alias-transform"),
                 );
 
                 if (!aliasTransformExists) {
@@ -199,8 +207,14 @@ export const createPreactPreset = (options: PreactPresetOptions = {}): BuildConf
                 // Create devtools plugin with current environment
                 const devtoolsPlugin = createPreactDevtoolsPlugin(devtoolsInProduction, isProduction);
                 const devtoolsExists = rollupOptions.plugins.some(
-                    (p: unknown) => (typeof p === "object" && p !== null && "name" in p && (p as { name: string }).name === "packem:preact-devtools")
-                        || (Array.isArray(p) && p[0] && typeof p[0] === "object" && p[0] !== null && "name" in p[0] && (p[0] as { name: string }).name === "packem:preact-devtools"),
+                    (p: unknown) =>
+                        (typeof p === "object" && p !== null && "name" in p && (p as { name: string }).name === "packem:preact-devtools")
+                        || (Array.isArray(p)
+                            && p[0]
+                            && typeof p[0] === "object"
+                            && p[0] !== null
+                            && "name" in p[0]
+                            && (p[0] as { name: string }).name === "packem:preact-devtools"),
                 );
 
                 if (!devtoolsExists) {

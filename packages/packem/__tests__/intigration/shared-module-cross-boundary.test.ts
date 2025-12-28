@@ -2,15 +2,11 @@ import { rm } from "node:fs/promises";
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import {
-    createJob,
-    getFileContents,
-    getFileNamesFromDirectory,
-} from "../helpers/testing-utils";
+import { createJob, getFileContents, getFileNamesFromDirectory } from "../helpers/testing-utils";
 
 describe("integration - shared-module-cross-boundary", () => {
     let distDirectory: string;
-    let tempDirectory: string;
+    let temporaryDirectory: string;
 
     beforeEach(async () => {
         const result = await createJob({
@@ -18,12 +14,12 @@ describe("integration - shared-module-cross-boundary", () => {
         });
 
         distDirectory = result.distDir;
-        tempDirectory = result.tempDir;
+        temporaryDirectory = result.tempDir;
     });
 
     afterEach(async () => {
-        if (tempDirectory) {
-            await rm(tempDirectory, { recursive: true });
+        if (temporaryDirectory) {
+            await rm(temporaryDirectory, { recursive: true });
         }
     });
 
@@ -37,13 +33,7 @@ describe("integration - shared-module-cross-boundary", () => {
         // The shared module should NOT be inlined into either client or server chunks
         // The chunk name pattern is: shared-{hash}.js (where hash is based on the layers)
         // Chunks are in packem_shared/ directory
-        const crossBoundarySharedChunks = jsFiles.filter(
-            (f) =>
-                f.includes("shared-")
-                && !f.includes("client")
-                && !f.includes("server")
-                && f.endsWith(".js"),
-        );
+        const crossBoundarySharedChunks = jsFiles.filter((f) => f.includes("shared-") && !f.includes("client") && !f.includes("server") && f.endsWith(".js"));
 
         // There should be exactly one cross-boundary shared chunk created
         expect(crossBoundarySharedChunks).toHaveLength(1);
@@ -69,13 +59,8 @@ describe("integration - shared-module-cross-boundary", () => {
 
         // Verify client and server chunks exist
         // Chunks are named after exports due to chunkSplitter plugin
-        const clientChunks = jsFiles.filter(
-            (f) =>
-                (f.includes("ClientComponent") || f.includes("ClientComponent2")) && f.endsWith(".js"),
-        );
-        const serverChunks = jsFiles.filter(
-            (f) => f.includes("serverAction") && f.endsWith(".js"),
-        );
+        const clientChunks = jsFiles.filter((f) => (f.includes("ClientComponent") || f.includes("ClientComponent2")) && f.endsWith(".js"));
+        const serverChunks = jsFiles.filter((f) => f.includes("serverAction") && f.endsWith(".js"));
 
         expect(clientChunks).toHaveLength(2); // ClientComponent and ClientComponent2
         expect(serverChunks).toHaveLength(1);
@@ -112,12 +97,7 @@ describe("integration - shared-module-cross-boundary", () => {
         // Find the cross-boundary shared chunk filename (shared between client and server)
         // Chunks are in packem_shared/ directory
         const crossBoundarySharedChunk = Object.keys(fileContents).find(
-            (f) =>
-                f.includes("shared-")
-                && !f.includes("client")
-                && !f.includes("server")
-                && f.endsWith(".js")
-                && !f.endsWith(".d.ts"),
+            (f) => f.includes("shared-") && !f.includes("client") && !f.includes("server") && f.endsWith(".js") && !f.endsWith(".d.ts"),
         );
 
         // eslint-disable-next-line vitest/no-conditional-in-test
@@ -136,15 +116,9 @@ describe("integration - shared-module-cross-boundary", () => {
 
         // Find client and server boundary chunks (named after exports)
         const clientChunk = Object.keys(fileContents).find(
-            (f) =>
-                f.includes("ClientComponent")
-                && !f.includes("ClientComponent2")
-                && f.endsWith(".js")
-                && !f.endsWith(".d.ts"),
+            (f) => f.includes("ClientComponent") && !f.includes("ClientComponent2") && f.endsWith(".js") && !f.endsWith(".d.ts"),
         );
-        const serverChunk = Object.keys(fileContents).find(
-            (f) => f.includes("serverAction") && f.endsWith(".js") && !f.endsWith(".d.ts"),
-        );
+        const serverChunk = Object.keys(fileContents).find((f) => f.includes("serverAction") && f.endsWith(".js") && !f.endsWith(".d.ts"));
 
         // eslint-disable-next-line vitest/no-conditional-in-test
         if (!clientChunk) {
@@ -183,14 +157,9 @@ describe("integration - shared-module-cross-boundary", () => {
 
         // Find client and server boundary chunks (named after exports)
         const clientChunks = Object.keys(fileContents).filter(
-            (f) =>
-                (f.includes("ClientComponent") || f.includes("ClientComponent2"))
-                && f.endsWith(".js")
-                && !f.endsWith(".d.ts"),
+            (f) => (f.includes("ClientComponent") || f.includes("ClientComponent2")) && f.endsWith(".js") && !f.endsWith(".d.ts"),
         );
-        const serverChunk = Object.keys(fileContents).find(
-            (f) => f.includes("serverAction") && f.endsWith(".js") && !f.endsWith(".d.ts"),
-        );
+        const serverChunk = Object.keys(fileContents).find((f) => f.includes("serverAction") && f.endsWith(".js") && !f.endsWith(".d.ts"));
 
         expect(clientChunks.length).toBeGreaterThan(0);
 
@@ -210,16 +179,10 @@ describe("integration - shared-module-cross-boundary", () => {
         expect.assertions(8);
 
         const fileContents = await getFileContents(distDirectory);
-        const jsFiles = Object.keys(fileContents).filter(
-            (f) => f.endsWith(".js") && !f.endsWith(".d.ts"),
-        );
+        const jsFiles = Object.keys(fileContents).filter((f) => f.endsWith(".js") && !f.endsWith(".d.ts"));
 
         // Find client chunks (named after exports)
-        const clientChunk = jsFiles.find(
-            (f) =>
-                f.includes("ClientComponent")
-                && !f.includes("ClientComponent2"),
-        );
+        const clientChunk = jsFiles.find((f) => f.includes("ClientComponent") && !f.includes("ClientComponent2"));
         const client2Chunk = jsFiles.find((f) => f.includes("ClientComponent2"));
 
         // eslint-disable-next-line vitest/no-conditional-in-test
@@ -257,10 +220,7 @@ describe("integration - shared-module-cross-boundary", () => {
         const allClientContent = clientChunkContent + client2ChunkContent;
 
         // Check for the import of client-only-shared chunk or the function name
-        expect(
-            allClientContent.includes("client-only-shared") ||
-            allClientContent.includes("clientOnlyUtil"),
-        ).toBe(true);
+        expect(allClientContent.includes("client-only-shared") || allClientContent.includes("clientOnlyUtil")).toBe(true);
 
         // Both client chunks should import from the client-only-shared chunk
         // (or one could have it inlined, but both importing is also valid)
