@@ -6,3 +6,4 @@ export { default as MockPluginContext } from "./create-plugin-context";
 export { default as createTsConfig } from "./create-ts-config";
 export { default as execPackem } from "./exec-packem-sync";
 export { default as installPackage } from "./install-package";
+export * from "./testing-utils";
