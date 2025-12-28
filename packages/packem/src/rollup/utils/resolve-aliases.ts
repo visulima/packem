@@ -15,11 +15,11 @@ const resolveAliases = (packageJson: PackageJson, options: InternalBuildOptions)
         ...options.alias,
     };
 
-    if (options.rollup.alias) {
+    if (options.rollup.alias && options.rollup.alias.entries) {
         if (Array.isArray(options.rollup.alias.entries)) {
             Object.assign(aliases, Object.fromEntries((options.rollup.alias.entries as Alias[]).map((entry: Alias) => [entry.find, entry.replacement])));
         } else {
-            Object.assign(aliases, options.rollup.alias.entries ?? options.rollup.alias);
+            Object.assign(aliases, options.rollup.alias.entries);
         }
     }
 

@@ -891,6 +891,62 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  examples/preact-babel:
+    dependencies:
+      preact:
+        specifier: ^10.28.1
+        version: 10.28.1
+    devDependencies:
+      '@babel/core':
+        specifier: ^7.28.5
+        version: 7.28.5
+      '@babel/preset-react':
+        specifier: ^7.28.5
+        version: 7.28.5(@babel/core@7.28.5)
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      babel-plugin-transform-hook-names:
+        specifier: ^1.0.2
+        version: 1.0.2(@babel/core@7.28.5)
+      esbuild:
+        specifier: ^0.27.2
+        version: 0.27.2
+      rimraf:
+        specifier: ^6.1.2
+        version: 6.1.2
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  examples/preact-react-compat:
+    dependencies:
+      preact:
+        specifier: ^10.28.1
+        version: 10.28.1
+    devDependencies:
+      '@babel/core':
+        specifier: ^7.28.5
+        version: 7.28.5
+      '@babel/preset-react':
+        specifier: ^7.28.5
+        version: 7.28.5(@babel/core@7.28.5)
+      '@visulima/packem':
+        specifier: workspace:*
+        version: link:../../packages/packem
+      babel-plugin-transform-hook-names:
+        specifier: ^1.0.2
+        version: 1.0.2(@babel/core@7.28.5)
+      esbuild:
+        specifier: ^0.27.2
+        version: 0.27.2
+      rimraf:
+        specifier: ^6.1.2
+        version: 6.1.2
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   examples/react-compiler-babel:
     dependencies:
       react:
@@ -1597,10 +1653,10 @@ importers:
         specifier: catalog:visulima
         version: 4.1.7(@types/node@24.10.4)
       '@visulima/packem-rollup':
-        specifier: 1.0.0-alpha.34
+        specifier: 1.0.0-alpha.35
         version: link:../packem-rollup
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.17
+        specifier: 1.0.0-alpha.18
         version: link:../packem-share
       '@visulima/pail':
         specifier: catalog:visulima
@@ -1609,7 +1665,7 @@ importers:
         specifier: catalog:visulima
         version: 2.0.5
       '@visulima/rollup-plugin-css':
-        specifier: 1.0.0-alpha.14
+        specifier: 1.0.0-alpha.15
         version: link:../rollup-plugin-css
       '@visulima/source-map':
         specifier: catalog:visulima
@@ -1982,7 +2038,7 @@ importers:
         specifier: catalog:visulima
         version: 4.1.7(@types/node@24.10.4)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.17
+        specifier: 1.0.0-alpha.18
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
@@ -2358,7 +2414,7 @@ importers:
         specifier: catalog:visulima
         version: 4.1.7(@types/node@24.10.4)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.17
+        specifier: 1.0.0-alpha.18
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
@@ -2434,7 +2490,7 @@ importers:
         specifier: catalog:types
         version: 0.0.11
       '@visulima/css-style-inject':
-        specifier: 1.0.0-alpha.13
+        specifier: 1.0.0-alpha.14
         version: link:../css-style-inject
       '@vitest/coverage-v8':
         specifier: catalog:test
@@ -6869,6 +6925,11 @@ packages:
   babel-plugin-react-compiler@1.0.0:
     resolution: {integrity: sha512-Ixm8tFfoKKIPYdCCKYTsqv+Fd4IJ0DQqMyEimo+pxUOMUR9cVPlwTrFt9Avu+3cb6Zp3mAzl+t1MrG2fxxKsxw==}
 
+  babel-plugin-transform-hook-names@1.0.2:
+    resolution: {integrity: sha512-5gafyjyyBTTdX/tQQ0hRgu4AhNHG/hqWi0ZZmg2xvs2FgRkJXzDNKBZCyoYqgFkovfDrgM8OoKg8karoUvWeCw==}
+    peerDependencies:
+      '@babel/core': ^7.12.10
+
   babel-preset-solid@1.9.10:
     resolution: {integrity: sha512-HCelrgua/Y+kqO8RyL04JBWS/cVdrtUv/h45GntgQY+cJl4eBcKkCDV3TdMjtKx1nXwRaR9QXslM/Npm1dxdZQ==}
     peerDependencies:
@@ -11128,6 +11189,9 @@ packages:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
 
+  preact@10.28.1:
+    resolution: {integrity: sha512-u1/ixq/lVQI0CakKNvLDEcW5zfCjUQfZdK9qqWuIJtsezuyG6pk9TWj75GMuI/EzRSZB/VAE43sNWWZfiy8psw==}
+
   preline@3.2.3:
     resolution: {integrity: sha512-S13MFdC/1FWFz3S+oW1PlyZ6Alo0SZxJ9HwaZRg5IQZjcbKqCFIOXAbAhQeX0izauqWJXIQdKofhfCWBizwleQ==}
 
@@ -13025,6 +13089,7 @@ packages:
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-mimetype@3.0.0:
     resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
@@ -17620,6 +17685,10 @@ snapshots:
   babel-plugin-react-compiler@1.0.0:
     dependencies:
       '@babel/types': 7.28.5
+
+  babel-plugin-transform-hook-names@1.0.2(@babel/core@7.28.5):
+    dependencies:
+      '@babel/core': 7.28.5
 
   babel-preset-solid@1.9.10(@babel/core@7.28.5)(solid-js@1.9.10):
     dependencies:
@@ -22675,6 +22744,8 @@ snapshots:
       nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  preact@10.28.1: {}
 
   preline@3.2.3:
     dependencies:
