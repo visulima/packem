@@ -320,8 +320,8 @@ catalogs:
       specifier: 6.0.1
       version: 6.0.1
     html-minifier-next:
-      specifier: 4.15.2
-      version: 4.15.2
+      specifier: 4.16.3
+      version: 4.16.3
     is-ci:
       specifier: ^4.1.0
       version: 4.1.0
@@ -626,7 +626,7 @@ importers:
         version: 11.2.5
       '@visulima/packem':
         specifier: catalog:visulima
-        version: 2.0.0-alpha.40(2836d238245cb153b24d6fefa489c1ec)
+        version: 2.0.0-alpha.40(4ed122010015af5031b9658f32c94a91)
       audit-ci:
         specifier: catalog:prod
         version: 7.1.0
@@ -653,7 +653,7 @@ importers:
         version: 16.2.7
       nx:
         specifier: catalog:monorepo
-        version: 22.3.3(@swc/core@1.15.7(@swc/helpers@0.5.17))
+        version: 22.3.3(@swc/core@1.15.7(@swc/helpers@0.5.18))
       oxc-parser:
         specifier: 0.99.0
         version: 0.99.0(patch_hash=464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76)
@@ -788,7 +788,7 @@ importers:
     devDependencies:
       '@swc/core':
         specifier: ^1.15.7
-        version: 1.15.7(@swc/helpers@0.5.17)
+        version: 1.15.7(@swc/helpers@0.5.18)
       '@visulima/packem':
         specifier: workspace:*
         version: link:../../packages/packem
@@ -1353,8 +1353,8 @@ importers:
   examples/svelte-basic:
     dependencies:
       svelte:
-        specifier: ^5.46.0
-        version: 5.46.0
+        specifier: ^5.46.1
+        version: 5.46.1
     devDependencies:
       '@visulima/packem':
         specifier: workspace:*
@@ -1367,7 +1367,7 @@ importers:
         version: 6.1.2
       rollup-plugin-svelte:
         specifier: ^7.2.3
-        version: 7.2.3(rollup@4.54.0)(svelte@5.46.0)
+        version: 7.2.3(rollup@4.54.0)(svelte@5.46.1)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -1455,10 +1455,10 @@ importers:
     devDependencies:
       '@swc/core':
         specifier: ^1.15.7
-        version: 1.15.7(@swc/helpers@0.5.17)
+        version: 1.15.7(@swc/helpers@0.5.18)
       '@swc/helpers':
-        specifier: ^0.5.17
-        version: 0.5.17
+        specifier: ^0.5.18
+        version: 0.5.18
       '@types/react':
         specifier: ^19.2.7
         version: 19.2.7
@@ -1653,7 +1653,7 @@ importers:
         specifier: catalog:visulima
         version: 4.1.7(@types/node@24.10.4)
       '@visulima/packem-rollup':
-        specifier: 1.0.0-alpha.35
+        specifier: 1.0.0-alpha.36
         version: link:../packem-rollup
       '@visulima/packem-share':
         specifier: 1.0.0-alpha.18
@@ -1665,7 +1665,7 @@ importers:
         specifier: catalog:visulima
         version: 2.0.5
       '@visulima/rollup-plugin-css':
-        specifier: 1.0.0-alpha.15
+        specifier: 1.0.0-alpha.16
         version: link:../rollup-plugin-css
       '@visulima/source-map':
         specifier: catalog:visulima
@@ -1696,7 +1696,7 @@ importers:
         version: 6.0.1
       html-minifier-next:
         specifier: catalog:prod
-        version: 4.15.2(@swc/core@1.15.7(@swc/helpers@0.5.17))
+        version: 4.16.3(@swc/core@1.15.7(@swc/helpers@0.5.18))
       jiti:
         specifier: catalog:script
         version: 2.6.1
@@ -1793,7 +1793,7 @@ importers:
         version: 8.1.0(typescript@5.9.3)
       '@swc/core':
         specifier: catalog:dev
-        version: 1.15.7(@swc/helpers@0.5.17)
+        version: 1.15.7(@swc/helpers@0.5.18)
       '@swc/types':
         specifier: catalog:dev
         version: 0.1.25
@@ -1946,7 +1946,7 @@ importers:
         version: 0.4.0(rollup@4.54.0)
       rollup-plugin-svelte:
         specifier: ^7.2.3
-        version: 7.2.3(rollup@4.54.0)(svelte@5.46.0)
+        version: 7.2.3(rollup@4.54.0)(svelte@5.46.1)
       rollup-plugin-visualizer:
         specifier: catalog:build
         version: 6.0.5(rolldown@1.0.0-beta.53)(rollup@4.54.0)
@@ -2066,7 +2066,7 @@ importers:
         version: 6.0.2
       html-minifier-next:
         specifier: catalog:prod
-        version: 4.15.2(@swc/core@1.15.7(@swc/helpers@0.5.17))
+        version: 4.16.3(@swc/core@1.15.7(@swc/helpers@0.5.18))
       magic-string:
         specifier: catalog:utils
         version: 0.30.21
@@ -2133,7 +2133,7 @@ importers:
         version: 11.2.5
       '@swc/core':
         specifier: catalog:dev
-        version: 1.15.7(@swc/helpers@0.5.17)
+        version: 1.15.7(@swc/helpers@0.5.18)
       '@swc/types':
         specifier: catalog:dev
         version: 0.1.25
@@ -2154,7 +2154,7 @@ importers:
         version: 5.1.3
       '@types/html-minifier-next':
         specifier: catalog:types
-        version: 4.1.0(@swc/core@1.15.7(@swc/helpers@0.5.17))
+        version: 4.1.0(@swc/core@1.15.7(@swc/helpers@0.5.18))
       '@types/is-glob':
         specifier: catalog:types
         version: 4.0.4
@@ -5466,8 +5466,8 @@ packages:
   '@swc/helpers@0.2.14':
     resolution: {integrity: sha512-wpCQMhf5p5GhNg2MmGKXzUNwxe7zRiCsmqYsamez2beP7mKPCSiu+BjZcdN95yYSzO857kr0VfQewmGpS77nqA==}
 
-  '@swc/helpers@0.5.17':
-    resolution: {integrity: sha512-5IKx/Y13RsYd+sauPb2x+U/xZikHjolzfuDgTAl/Tdf3Q8rslRvC19NKDLgAJQ6wsqADk10ntlv08nPFw/gO/A==}
+  '@swc/helpers@0.5.18':
+    resolution: {integrity: sha512-TXTnIcNJQEKwThMMqBXsZ4VGAza6bvN4pa41Rkqoio6QBKMvo+5lexeTMScGCIxtzgQJzElcvIltani+adC5PQ==}
 
   '@swc/types@0.1.25':
     resolution: {integrity: sha512-iAoY/qRhNH8a/hBvm3zKj9qQ4oc2+3w1unPJa2XvTK3XjeLXtzcCingVPw/9e5mn1+0yPqxcBGp9Jf0pkfMb1g==}
@@ -8830,8 +8830,8 @@ packages:
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
 
-  html-minifier-next@4.15.2:
-    resolution: {integrity: sha512-YcRhMjUQcKDHxk1obKpBhxGfDp5+uOFGGiFYFdu/MrXMhkcJhdor5mDvQsPfFczQWvUir2VANbfpQdxUfUtP5w==}
+  html-minifier-next@4.16.3:
+    resolution: {integrity: sha512-pdol4+GcphzuO58xsxWZDLxrVh2CoinH7fRXEZUTSjsGUiwydGKYY86M3h8MBnj6LIVeydnwmPnbrykqajkuzQ==}
     hasBin: true
     peerDependencies:
       '@swc/core': ^1.15.7
@@ -12255,8 +12255,8 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  svelte@5.46.0:
-    resolution: {integrity: sha512-ZhLtvroYxUxr+HQJfMZEDRsGsmU46x12RvAv/zi9584f5KOX7bUrEbhPJ7cKFmUvZTJXi/CFZUYwDC6M1FigPw==}
+  svelte@5.46.1:
+    resolution: {integrity: sha512-ynjfCHD3nP2el70kN5Pmg37sSi0EjOm9FgHYQdC4giWG/hzO3AatzXXJJgP305uIhGQxSufJLuYWtkY8uK/8RA==}
     engines: {node: '>=18'}
 
   svgo@4.0.0:
@@ -16075,7 +16075,7 @@ snapshots:
   '@swc/core-win32-x64-msvc@1.15.7':
     optional: true
 
-  '@swc/core@1.15.7(@swc/helpers@0.5.17)':
+  '@swc/core@1.15.7(@swc/helpers@0.5.18)':
     dependencies:
       '@swc/counter': 0.1.3
       '@swc/types': 0.1.25
@@ -16090,13 +16090,13 @@ snapshots:
       '@swc/core-win32-arm64-msvc': 1.15.7
       '@swc/core-win32-ia32-msvc': 1.15.7
       '@swc/core-win32-x64-msvc': 1.15.7
-      '@swc/helpers': 0.5.17
+      '@swc/helpers': 0.5.18
 
   '@swc/counter@0.1.3': {}
 
   '@swc/helpers@0.2.14': {}
 
-  '@swc/helpers@0.5.17':
+  '@swc/helpers@0.5.18':
     dependencies:
       tslib: 2.8.1
 
@@ -16627,9 +16627,9 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
-  '@types/html-minifier-next@4.1.0(@swc/core@1.15.7(@swc/helpers@0.5.17))':
+  '@types/html-minifier-next@4.1.0(@swc/core@1.15.7(@swc/helpers@0.5.18))':
     dependencies:
-      html-minifier-next: 4.15.2(@swc/core@1.15.7(@swc/helpers@0.5.17))
+      html-minifier-next: 4.16.3(@swc/core@1.15.7(@swc/helpers@0.5.18))
     transitivePeerDependencies:
       - '@swc/core'
 
@@ -17019,7 +17019,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@visulima/packem-rollup@1.0.0-alpha.30(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@25.0.3)(esbuild@0.27.2)(oxc-transform@0.99.0)(picomatch@4.0.3)(rolldown@1.0.0-beta.53)(rollup@4.54.0)(sucrase@3.35.1)(typescript@5.9.3)(yaml@2.8.2)':
+  '@visulima/packem-rollup@1.0.0-alpha.30(@swc/core@1.15.7(@swc/helpers@0.5.18))(@types/node@25.0.3)(esbuild@0.27.2)(oxc-transform@0.99.0)(picomatch@4.0.3)(rolldown@1.0.0-beta.53)(rollup@4.54.0)(sucrase@3.35.1)(typescript@5.9.3)(yaml@2.8.2)':
     dependencies:
       '@babel/parser': 7.28.4
       '@rollup/plugin-alias': 5.1.1(rollup@4.54.0)
@@ -17040,7 +17040,7 @@ snapshots:
       cjs-module-lexer: 2.1.1
       clean-css: 5.3.3
       glob-parent: 6.0.2
-      html-minifier-next: 4.15.2(@swc/core@1.15.7(@swc/helpers@0.5.17))
+      html-minifier-next: 4.16.3(@swc/core@1.15.7(@swc/helpers@0.5.18))
       magic-string: 0.30.19
       mlly: 1.8.0
       oxc-parser: 0.99.0(patch_hash=464e0cefd2bae3f7a527fabae09e8a09eebf136536deca6618bab07303294d76)
@@ -17055,7 +17055,7 @@ snapshots:
       semver: 7.7.2
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@swc/core': 1.15.7(@swc/helpers@0.5.17)
+      '@swc/core': 1.15.7(@swc/helpers@0.5.18)
       esbuild: 0.27.2
       oxc-transform: 0.99.0
       sucrase: 3.35.1
@@ -17077,7 +17077,7 @@ snapshots:
       - '@types/node'
       - yaml
 
-  '@visulima/packem@2.0.0-alpha.40(2836d238245cb153b24d6fefa489c1ec)':
+  '@visulima/packem@2.0.0-alpha.40(4ed122010015af5031b9658f32c94a91)':
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@clack/prompts': 0.11.0
@@ -17088,11 +17088,11 @@ snapshots:
       '@visulima/fs': 4.0.4(yaml@2.8.2)
       '@visulima/humanizer': 2.0.3
       '@visulima/package': 4.1.4(@types/node@25.0.3)
-      '@visulima/packem-rollup': 1.0.0-alpha.30(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@25.0.3)(esbuild@0.27.2)(oxc-transform@0.99.0)(picomatch@4.0.3)(rolldown@1.0.0-beta.53)(rollup@4.54.0)(sucrase@3.35.1)(typescript@5.9.3)(yaml@2.8.2)
+      '@visulima/packem-rollup': 1.0.0-alpha.30(@swc/core@1.15.7(@swc/helpers@0.5.18))(@types/node@25.0.3)(esbuild@0.27.2)(oxc-transform@0.99.0)(picomatch@4.0.3)(rolldown@1.0.0-beta.53)(rollup@4.54.0)(sucrase@3.35.1)(typescript@5.9.3)(yaml@2.8.2)
       '@visulima/packem-share': 1.0.0-alpha.14(@types/node@25.0.3)(rollup@4.54.0)(yaml@2.8.2)
       '@visulima/pail': 3.2.0
       '@visulima/path': 1.4.0
-      '@visulima/rollup-plugin-css': 1.0.0-alpha.10(58315be5fa61f3754066d26ebc886d49)
+      '@visulima/rollup-plugin-css': 1.0.0-alpha.10(a3a8237932795c2c707140a8bd748f60)
       '@visulima/source-map': 2.0.3
       '@visulima/tabular': 3.1.3
       '@visulima/tsconfig': 2.1.0(yaml@2.8.2)
@@ -17102,7 +17102,7 @@ snapshots:
       defu: 6.1.4
       fastest-levenshtein: 1.0.16
       hookable: 5.5.3
-      html-minifier-next: 4.15.2(@swc/core@1.15.7(@swc/helpers@0.5.17))
+      html-minifier-next: 4.16.3(@swc/core@1.15.7(@swc/helpers@0.5.18))
       jiti: 2.6.0
       magic-string: 0.30.19
       mlly: 1.8.0
@@ -17114,7 +17114,7 @@ snapshots:
       tinyglobby: 0.2.15
     optionalDependencies:
       '@arethetypeswrong/core': 0.18.2
-      '@swc/core': 1.15.7(@swc/helpers@0.5.17)
+      '@swc/core': 1.15.7(@swc/helpers@0.5.18)
       '@tailwindcss/node': 4.1.18
       '@tailwindcss/oxide': 4.1.18
       cssnano: 7.1.2(postcss@8.5.6)
@@ -17169,7 +17169,7 @@ snapshots:
 
   '@visulima/path@2.0.5': {}
 
-  '@visulima/rollup-plugin-css@1.0.0-alpha.10(58315be5fa61f3754066d26ebc886d49)':
+  '@visulima/rollup-plugin-css@1.0.0-alpha.10(a3a8237932795c2c707140a8bd748f60)':
     dependencies:
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
@@ -17186,7 +17186,7 @@ snapshots:
       rollup: 4.54.0
       source-map-js: 1.2.1
     optionalDependencies:
-      '@swc/core': 1.15.7(@swc/helpers@0.5.17)
+      '@swc/core': 1.15.7(@swc/helpers@0.5.18)
       '@tailwindcss/node': 4.1.18
       '@tailwindcss/oxide': 4.1.18
       cssnano: 7.1.2(postcss@8.5.6)
@@ -19904,7 +19904,7 @@ snapshots:
 
   html-escaper@2.0.2: {}
 
-  html-minifier-next@4.15.2(@swc/core@1.15.7(@swc/helpers@0.5.17)):
+  html-minifier-next@4.16.3(@swc/core@1.15.7(@swc/helpers@0.5.18)):
     dependencies:
       '@types/relateurl': 0.2.33
       change-case: 4.1.2
@@ -19914,7 +19914,7 @@ snapshots:
       relateurl: 0.2.7
       terser: 5.44.1
     optionalDependencies:
-      '@swc/core': 1.15.7(@swc/helpers@0.5.17)
+      '@swc/core': 1.15.7(@swc/helpers@0.5.18)
 
   htmlparser2@10.0.0:
     dependencies:
@@ -22001,7 +22001,7 @@ snapshots:
     dependencies:
       boolbase: 1.0.0
 
-  nx@22.3.3(@swc/core@1.15.7(@swc/helpers@0.5.17)):
+  nx@22.3.3(@swc/core@1.15.7(@swc/helpers@0.5.18)):
     dependencies:
       '@napi-rs/wasm-runtime': 0.2.4
       '@yarnpkg/lockfile': 1.1.0
@@ -22049,7 +22049,7 @@ snapshots:
       '@nx/nx-linux-x64-musl': 22.3.3
       '@nx/nx-win32-arm64-msvc': 22.3.3
       '@nx/nx-win32-x64-msvc': 22.3.3
-      '@swc/core': 1.15.7(@swc/helpers@0.5.17)
+      '@swc/core': 1.15.7(@swc/helpers@0.5.18)
     transitivePeerDependencies:
       - debug
 
@@ -23299,12 +23299,12 @@ snapshots:
       rollup: 4.54.0
       unplugin-utils: 0.2.5
 
-  rollup-plugin-svelte@7.2.3(rollup@4.54.0)(svelte@5.46.0):
+  rollup-plugin-svelte@7.2.3(rollup@4.54.0)(svelte@5.46.1):
     dependencies:
       '@rollup/pluginutils': 4.2.1
       resolve.exports: 2.0.3
       rollup: 4.54.0
-      svelte: 5.46.0
+      svelte: 5.46.1
 
   rollup-plugin-visualizer@6.0.3(rolldown@1.0.0-beta.53)(rollup@4.54.0):
     dependencies:
@@ -24053,7 +24053,7 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svelte@5.46.0:
+  svelte@5.46.1:
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@jridgewell/sourcemap-codec': 1.5.5

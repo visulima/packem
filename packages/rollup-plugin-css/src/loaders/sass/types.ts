@@ -15,11 +15,14 @@ export type SassLoaderContext = {
     rootContext: string;
 };
 
-export type SassLoaderOptions = (Omit<SassEmbeddedStringOptions<"sync">, "charset" | "indentedSyntax"> | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">) & {
+export type SassLoaderOptions = {
     additionalData:
         | string
         | ((content: string | Buffer, loaderContext: SassLoaderContext) => Promise<string>)
         | ((content: string | Buffer, loaderContext: SassLoaderContext) => string);
     implementation?: "sass-embedded" | "sass";
     warnRuleAsWarning?: boolean;
-};
+} & (
+    | Omit<SassEmbeddedStringOptions<"sync">, "charset" | "indentedSyntax">
+    | Omit<SassStringOptions<"sync">, "charset" | "indentedSyntax">
+);

@@ -7,7 +7,5 @@
             "require": "./require.cjs"
         },
         "default": "./module.js"
-    },
-    "dependencies": {},
-    "devDependencies": {}
+    }
 }

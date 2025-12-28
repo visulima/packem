@@ -31,11 +31,7 @@ const hashTo3Char = memoize((input: string): string => {
  * Get the effective layer of a module by walking up the importer chain.
  * A module inherits the layer of its importer if it doesn't have its own layer.
  */
-const getEffectiveModuleLayer = (
-    id: string,
-    getModuleInfo: GetModuleInfo,
-    visited: Set<string> = new Set(),
-): string | undefined => {
+const getEffectiveModuleLayer = (id: string, getModuleInfo: GetModuleInfo, visited: Set<string> = new Set()): string | undefined => {
     if (visited.has(id)) {
         return undefined;
     }
@@ -57,11 +53,7 @@ const getEffectiveModuleLayer = (
 
     // Otherwise, inherit layer from importers
     for (const importerId of moduleInfo.importers) {
-        const importerLayer = getEffectiveModuleLayer(
-            importerId,
-            getModuleInfo,
-            visited,
-        );
+        const importerLayer = getEffectiveModuleLayer(importerId, getModuleInfo, visited);
 
         if (importerLayer) {
             return importerLayer;
@@ -75,10 +67,7 @@ const getEffectiveModuleLayer = (
  * Check if a module is imported by modules with different boundary layers.
  * Returns the set of unique layers if there are multiple, otherwise undefined.
  */
-const getImporterLayers = (
-    id: string,
-    getModuleInfo: GetModuleInfo,
-): Set<string> => {
+const getImporterLayers = (id: string, getModuleInfo: GetModuleInfo): Set<string> => {
     const moduleInfo = getModuleInfo(id);
 
     if (!moduleInfo) {
@@ -101,11 +90,7 @@ const getImporterLayers = (
             layers.add(importerOwnLayer);
         } else {
             // If the importer doesn't have a layer, get its effective layer
-            const effectiveLayer = getEffectiveModuleLayer(
-                importerId,
-                getModuleInfo,
-                new Set([id]),
-            );
+            const effectiveLayer = getEffectiveModuleLayer(importerId, getModuleInfo, new Set([id]));
 
             if (effectiveLayer) {
                 layers.add(effectiveLayer);
