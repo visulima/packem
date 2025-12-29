@@ -1,3 +1,9 @@
+## @visulima/css-style-inject [1.0.0-alpha.15](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.14...@visulima/css-style-inject@1.0.0-alpha.15) (2025-12-29)
+
+### Miscellaneous Chores
+
+* update package dependencies and improve configurations ([e942f98](https://github.com/visulima/packem/commit/e942f9833920f04e112daa232bbe7bdb3628e039))
+
 ## @visulima/css-style-inject [1.0.0-alpha.14](https://github.com/visulima/packem/compare/@visulima/css-style-inject@1.0.0-alpha.13...@visulima/css-style-inject@1.0.0-alpha.14) (2025-12-24)
 
 ### Miscellaneous Chores
