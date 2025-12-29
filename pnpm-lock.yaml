@@ -1653,7 +1653,7 @@ importers:
         specifier: catalog:visulima
         version: 4.1.7(@types/node@24.10.4)
       '@visulima/packem-rollup':
-        specifier: 1.0.0-alpha.36
+        specifier: 1.0.0-alpha.37
         version: link:../packem-rollup
       '@visulima/packem-share':
         specifier: 1.0.0-alpha.18
@@ -1665,7 +1665,7 @@ importers:
         specifier: catalog:visulima
         version: 2.0.5
       '@visulima/rollup-plugin-css':
-        specifier: 1.0.0-alpha.16
+        specifier: 1.0.0-alpha.17
         version: link:../rollup-plugin-css
       '@visulima/source-map':
         specifier: catalog:visulima
