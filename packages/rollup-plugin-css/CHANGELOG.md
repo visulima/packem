@@ -1,3 +1,19 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.18](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.17...@visulima/rollup-plugin-css@1.0.0-alpha.18) (2025-12-29)
+
+### Features
+
+* **packem:** enhance external dependency resolution and add new tests ([397c914](https://github.com/visulima/packem/commit/397c9147611f9def319ea81e3fc0546a2300b8ec))
+
+### Miscellaneous Chores
+
+* update pnpm workspace and lockfile configurations ([121fa13](https://github.com/visulima/packem/commit/121fa1399bff3738bc6dbeac310aaff04ead670d))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.19
+* **@visulima/css-style-inject:** upgraded to 1.0.0-alpha.15
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.17](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.16...@visulima/rollup-plugin-css@1.0.0-alpha.17) (2025-12-28)
 
 ### Miscellaneous Chores
