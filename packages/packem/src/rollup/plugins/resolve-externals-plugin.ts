@@ -287,6 +287,7 @@ export const resolveExternalsPlugin = (context: BuildContext<InternalBuildOption
                             id: specifier,
                         };
                     }
+
                     // If from node_modules, let Node-resolver handle it
                     return undefined;
                 }

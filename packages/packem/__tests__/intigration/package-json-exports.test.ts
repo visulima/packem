@@ -2971,13 +2971,11 @@ export default App;`,
             module: "./dist/index.mjs",
             name: "test-package",
             types: "./dist/index.d.ts",
-            "typesVersions": {
+            typesVersions: {
                 "*": {
-                    ".": [
-                        "./dist/index.d.ts"
-                    ]
-                }
-            }
+                    ".": ["./dist/index.d.ts"],
+                },
+            },
         });
 
         const binProcess = await execPackem("build", [], {
