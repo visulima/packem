@@ -282,10 +282,7 @@ export const transform = svgrTransform;
 export const foo = "bar";
 `,
         );
-        await writeFile(
-            join(temporaryDirectoryPath, "node_modules", "dep", "file.js"),
-            "module.exports.foo = function() {};",
-        );
+        await writeFile(join(temporaryDirectoryPath, "node_modules", "dep", "file.js"), "module.exports.foo = function() {};");
         await writeJson(join(temporaryDirectoryPath, "node_modules", "dep", "package.json"), {
             name: "dep",
             version: "1.0.0",

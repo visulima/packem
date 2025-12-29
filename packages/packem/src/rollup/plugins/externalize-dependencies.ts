@@ -61,10 +61,7 @@ export type ExternalizeDependenciesOptions = {
  * - devDependencies ONLY: error if not resolvable, bundle if resolvable
  * - unlisted: warn and bundle (only when imported from source, not node_modules)
  */
-export const externalizeDependencies = (
-    packageJson: PackageJson,
-    pluginOptions?: ExternalizeDependenciesOptions,
-): Plugin => {
+export const externalizeDependencies = (packageJson: PackageJson, pluginOptions?: ExternalizeDependenciesOptions): Plugin => {
     // Resolve to canonical path to handle Windows 8.3 short paths
     const { devDependencies } = packageJson;
     const cwd = fs.realpathSync.native(process.cwd());
@@ -159,9 +156,7 @@ export const externalizeDependencies = (
 
             // 3. Not listed → warn and bundle (only when imported from source)
             if (importer && !isFromNodeModules(importer, cwd) && !pluginOptions?.skipUnlistedWarnings) {
-                console.warn(
-                    `"${packageName}" imported by "${importer}" but not declared in package.json. Will be bundled to prevent failure at runtime.`,
-                );
+                console.warn(`"${packageName}" imported by "${importer}" but not declared in package.json. Will be bundled to prevent failure at runtime.`);
             }
 
             return undefined;

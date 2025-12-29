@@ -19,16 +19,21 @@ const tryResolveImplicit = async (basePath: string): Promise<string | undefined>
     // Try exact path first
     try {
         const stats = await stat(basePath);
+
         if (stats.isFile()) {
             return basePath;
         }
+
         if (stats.isDirectory()) {
             // Try directory resolution: index.js, then index.json
             const indexJs = join(basePath, "index.js");
+
             if (await isAccessible(indexJs)) {
                 return indexJs;
             }
+
             const indexJson = join(basePath, "index.json");
+
             if (await isAccessible(indexJson)) {
                 return indexJson;
             }
@@ -39,12 +44,14 @@ const tryResolveImplicit = async (basePath: string): Promise<string | undefined>
 
     // Try with .js extension
     const jsPath = `${basePath}.js`;
+
     if (await isAccessible(jsPath)) {
         return jsPath;
     }
 
     // Try with .json extension
     const jsonPath = `${basePath}.json`;
+
     if (await isAccessible(jsonPath)) {
         return jsonPath;
     }
@@ -61,16 +68,17 @@ const findPackageJson = async (startDirectory: string, packageName: string): Pro
 
     while (currentDirectory !== root && currentDirectory !== dirname(currentDirectory)) {
         const packageJsonPath = join(currentDirectory, "node_modules", packageName, "package.json");
+
         // eslint-disable-next-line no-await-in-loop
         if (await isAccessible(packageJsonPath)) {
             return packageJsonPath;
         }
+
         currentDirectory = dirname(currentDirectory);
     }
 
     return undefined;
 };
-
 
 /**
  * Resolve implicit extensions for externalized package imports.
@@ -95,12 +103,15 @@ const resolveImplicitExternalsPlugin = (context: BuildContext<InternalBuildOptio
 
     // Build set of external packages once
     const externalPackages = new Set<string>();
+
     if (context.pkg.dependencies) {
         Object.keys(context.pkg.dependencies).forEach((pkg) => externalPackages.add(pkg));
     }
+
     if (context.pkg.peerDependencies) {
         Object.keys(context.pkg.peerDependencies).forEach((pkg) => externalPackages.add(pkg));
     }
+
     if (context.pkg.optionalDependencies) {
         Object.keys(context.pkg.optionalDependencies).forEach((pkg) => externalPackages.add(pkg));
     }
@@ -121,16 +132,20 @@ const resolveImplicitExternalsPlugin = (context: BuildContext<InternalBuildOptio
             const matches: { importId: string; quoteEnd: number; quoteStart: number }[] = [];
 
             let regexMatch;
+
             // eslint-disable-next-line no-cond-assign
             while ((regexMatch = fromRegex.exec(code)) !== null) {
                 const importId = regexMatch[1];
+
                 if (!importId || !isBareSpecifier(importId)) {
                     continue;
                 }
 
                 const [packageName, subpath] = parseSpecifier(importId);
+
                 if (subpath && packageName && isExternalPackage(packageName)) {
                     const quoteStart = regexMatch.index + regexMatch[0].indexOf(importId);
+
                     matches.push({
                         importId,
                         quoteEnd: quoteStart + importId.length,
@@ -148,6 +163,7 @@ const resolveImplicitExternalsPlugin = (context: BuildContext<InternalBuildOptio
             const resolutions = await Promise.all(
                 matches.map(async (matchItem) => {
                     const [packageName, subpath] = parseSpecifier(matchItem.importId);
+
                     if (!subpath) {
                         return undefined;
                     }
@@ -156,19 +172,23 @@ const resolveImplicitExternalsPlugin = (context: BuildContext<InternalBuildOptio
 
                     // Check cache first
                     const cached = resolutionCache.get(cacheKey);
+
                     if (cached !== undefined) {
                         return cached ? { ...matchItem, resolvedId: cached } : undefined;
                     }
 
                     // Find package.json
                     const packageJsonPath = await findPackageJson(startDirectory, packageName);
+
                     if (!packageJsonPath) {
                         resolutionCache.set(cacheKey, undefined);
+
                         return undefined;
                     }
 
                     // Read and cache package.json
                     let pkgJson = packageJsonCache.get(packageJsonPath);
+
                     if (pkgJson === undefined) {
                         try {
                             pkgJson = parsePackageJsonSync(packageJsonPath, {
@@ -178,18 +198,21 @@ const resolveImplicitExternalsPlugin = (context: BuildContext<InternalBuildOptio
                         } catch {
                             packageJsonCache.set(packageJsonPath, undefined);
                             resolutionCache.set(cacheKey, undefined);
+
                             return undefined;
                         }
                     }
 
                     if (!pkgJson) {
                         resolutionCache.set(cacheKey, undefined);
+
                         return undefined;
                     }
 
                     // If package has exports field, let Node.js handle resolution (even if subpath not defined)
                     if (pkgJson.exports) {
                         resolutionCache.set(cacheKey, undefined);
+
                         return undefined;
                     }
 
@@ -200,11 +223,13 @@ const resolveImplicitExternalsPlugin = (context: BuildContext<InternalBuildOptio
 
                     if (!resolvedPath) {
                         resolutionCache.set(cacheKey, undefined);
+
                         return undefined;
                     }
 
                     const relativePath = relative(packageDirectory, resolvedPath);
                     const resolvedId = `${packageName}/${relativePath}`;
+
                     resolutionCache.set(cacheKey, resolvedId);
 
                     return { ...matchItem, resolvedId };
@@ -213,11 +238,13 @@ const resolveImplicitExternalsPlugin = (context: BuildContext<InternalBuildOptio
 
             // Apply changes
             const validResolutions = resolutions.filter((r): r is NonNullable<typeof r> => r !== undefined);
+
             if (validResolutions.length === 0) {
                 return undefined;
             }
 
             const magicString = new MagicString(code);
+
             for (const { quoteEnd, quoteStart, resolvedId } of validResolutions) {
                 magicString.overwrite(quoteStart, quoteEnd, resolvedId);
                 this.debug(`[resolve-implicit-externals] Rewriting ${code.slice(quoteStart, quoteEnd)} -> ${resolvedId} in ${id}`);

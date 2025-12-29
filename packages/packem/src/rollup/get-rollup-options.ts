@@ -978,8 +978,8 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
             externalizeDependencies(context.pkg, {
-                skipUnlistedWarnings: true,
                 forTypes: true,
+                skipUnlistedWarnings: true,
             }),
 
             context.options.rollup.json

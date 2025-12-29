@@ -20,26 +20,20 @@ const resolveTypescriptMjsCts = (): Plugin => {
     return {
         name: "packem:resolve-typescript-mjs-cjs",
         async resolveId(id, importer, options) {
-            if (
-                importer
-                && isJs.test(id)
-            ) {
+            if (importer && isJs.test(id)) {
                 // For source code: try .ts first (default behavior)
                 if (!importer.includes("/node_modules/")) {
                     const tsId = id.replace(/js(x?)$/, "ts$1");
+
                     return this.resolve(tsId, importer, options);
                 }
 
                 // For node_modules: try .js first, only use .ts if .js doesn't exist
                 // First check if .js exists
-                const jsResolved = await this.resolve(
-                    id,
-                    importer,
-                    {
-                        ...options,
-                        skipSelf: true,
-                    },
-                );
+                const jsResolved = await this.resolve(id, importer, {
+                    ...options,
+                    skipSelf: true,
+                });
 
                 if (jsResolved) {
                     return jsResolved;
@@ -47,14 +41,10 @@ const resolveTypescriptMjsCts = (): Plugin => {
 
                 // .js doesn't exist, try .ts
                 const tsId = id.replace(/js(x?)$/, "ts$1");
-                const tsResolved = await this.resolve(
-                    tsId,
-                    importer,
-                    {
-                        ...options,
-                        skipSelf: true,
-                    },
-                );
+                const tsResolved = await this.resolve(tsId, importer, {
+                    ...options,
+                    skipSelf: true,
+                });
 
                 if (tsResolved) {
                     return tsResolved;

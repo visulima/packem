@@ -9,9 +9,7 @@ import { isAbsolute, relative } from "@visulima/path";
  * - '@org/pkg' → ['@org/pkg', undefined]
  * - '@org/pkg/sub' → ['@org/pkg', 'sub']
  */
-export const parseSpecifier = (
-    specifier: string,
-): [packageName: string, subpath: string | undefined] => {
+export const parseSpecifier = (specifier: string): [packageName: string, subpath: string | undefined] => {
     const firstSlash = specifier.indexOf("/");
 
     if (firstSlash === -1) {
@@ -21,9 +19,11 @@ export const parseSpecifier = (
     if (specifier[0] === "@") {
         // Scoped package: @org/package[/subpath]
         const secondSlash = specifier.indexOf("/", firstSlash + 1);
+
         if (secondSlash === -1) {
             return [specifier, undefined];
         }
+
         return [specifier.slice(0, secondSlash), specifier.slice(secondSlash + 1)];
     }
 
@@ -36,12 +36,8 @@ export const parseSpecifier = (
  */
 export const isBareSpecifier = (id: string): boolean => {
     const firstCharacter = id[0];
-    return !(
-        firstCharacter === "."
-        || firstCharacter === "/"
-        || firstCharacter === "#"
-        || isAbsolute(id)
-    );
+
+    return !(firstCharacter === "." || firstCharacter === "/" || firstCharacter === "#" || isAbsolute(id));
 };
 
 /**
@@ -50,11 +46,9 @@ export const isBareSpecifier = (id: string): boolean => {
  * @param cwd Current working directory (defaults to process.cwd())
  * @returns true if path contains node_modules directory
  */
-export const isFromNodeModules = (
-    filePath: string,
-    cwd: string = process.cwd(),
-): boolean => {
+export const isFromNodeModules = (filePath: string, cwd: string = process.cwd()): boolean => {
     const relativePath = relative(cwd, filePath);
     const pathSegments = relativePath.split("/");
+
     return pathSegments.includes("node_modules");
 };
