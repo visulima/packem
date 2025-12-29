@@ -1,3 +1,19 @@
+## @visulima/packem-rollup [1.0.0-alpha.38](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.37...@visulima/packem-rollup@1.0.0-alpha.38) (2025-12-29)
+
+### Features
+
+* **packem:** enhance external dependency resolution and add new tests ([397c914](https://github.com/visulima/packem/commit/397c9147611f9def319ea81e3fc0546a2300b8ec))
+* **packem:** enhance package.json imports handling and update integration tests ([6449db0](https://github.com/visulima/packem/commit/6449db0f134cafd514849e4c739c0f882f87f6ba))
+
+### Miscellaneous Chores
+
+* update pnpm workspace and lockfile configurations ([121fa13](https://github.com/visulima/packem/commit/121fa1399bff3738bc6dbeac310aaff04ead670d))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.19
+
 ## @visulima/packem-rollup [1.0.0-alpha.37](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.36...@visulima/packem-rollup@1.0.0-alpha.37) (2025-12-28)
 
 ### Features
