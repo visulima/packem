@@ -5,26 +5,31 @@ exports[`packem package.json imports > should resolve package.json imports with 
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const x = 2;
+const _x_ts = require('#x.ts');
 
-const x$1 = /*#__PURE__*/Object.defineProperty({
-	__proto__: null,
-	x
-}, Symbol.toStringTag, { value: 'Module' });
+function _interopNamespaceCompat(e) {
+	if (e && typeof e === 'object' && 'default' in e) return e;
+	const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
+	if (e) {
+		for (const k in e) {
+			n[k] = e[k];
+		}
+	}
+	n.default = e;
+	return n;
+}
 
-exports.warns = x$1;
+const _x_ts__namespace = /*#__PURE__*/_interopNamespaceCompat(_x_ts);
+
+
+
+exports.warns = _x_ts__namespace;
 "
 `;
 
 exports[`packem package.json imports > should resolve package.json imports with a * and esbuild transformer > mjs output 1`] = `
-"const x = 2;
-
-const x$1 = /*#__PURE__*/Object.defineProperty({
-	__proto__: null,
-	x
-}, Symbol.toStringTag, { value: 'Module' });
-
-export { x$1 as warns };
+"import * as _x_ts from '#x.ts';
+export { _x_ts as warns };
 "
 `;
 
@@ -33,26 +38,31 @@ exports[`packem package.json imports > should resolve package.json imports with 
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const x = 2;
+const _x_ts = require('#x.ts');
 
-const x$1 = /*#__PURE__*/Object.defineProperty({
-	__proto__: null,
-	x
-}, Symbol.toStringTag, { value: 'Module' });
+function _interopNamespaceCompat(e) {
+	if (e && typeof e === 'object' && 'default' in e) return e;
+	const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
+	if (e) {
+		for (const k in e) {
+			n[k] = e[k];
+		}
+	}
+	n.default = e;
+	return n;
+}
 
-exports.warns = x$1;
+const _x_ts__namespace = /*#__PURE__*/_interopNamespaceCompat(_x_ts);
+
+
+
+exports.warns = _x_ts__namespace;
 "
 `;
 
 exports[`packem package.json imports > should resolve package.json imports with a * and oxc transformer > mjs output 1`] = `
-"const x = 2;
-
-const x$1 = /*#__PURE__*/Object.defineProperty({
-	__proto__: null,
-	x
-}, Symbol.toStringTag, { value: 'Module' });
-
-export { x$1 as warns };
+"import * as _x_ts from '#x.ts';
+export { _x_ts as warns };
 "
 `;
 
@@ -61,26 +71,31 @@ exports[`packem package.json imports > should resolve package.json imports with 
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const x = 2;
+const _x_ts = require('#x.ts');
 
-const x$1 = /*#__PURE__*/Object.defineProperty({
-	__proto__: null,
-	x
-}, Symbol.toStringTag, { value: 'Module' });
+function _interopNamespaceCompat(e) {
+	if (e && typeof e === 'object' && 'default' in e) return e;
+	const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
+	if (e) {
+		for (const k in e) {
+			n[k] = e[k];
+		}
+	}
+	n.default = e;
+	return n;
+}
 
-exports.warns = x$1;
+const _x_ts__namespace = /*#__PURE__*/_interopNamespaceCompat(_x_ts);
+
+
+
+exports.warns = _x_ts__namespace;
 "
 `;
 
 exports[`packem package.json imports > should resolve package.json imports with a * and sucrase transformer > mjs output 1`] = `
-"const x = 2;
-
-const x$1 = /*#__PURE__*/Object.defineProperty({
-	__proto__: null,
-	x
-}, Symbol.toStringTag, { value: 'Module' });
-
-export { x$1 as warns };
+"import * as _x_ts from '#x.ts';
+export { _x_ts as warns };
 "
 `;
 
@@ -89,25 +104,30 @@ exports[`packem package.json imports > should resolve package.json imports with 
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-var x = 2;
+const _x_ts = require('#x.ts');
 
-const x$1 = /*#__PURE__*/Object.defineProperty({
-	__proto__: null,
-	x
-}, Symbol.toStringTag, { value: 'Module' });
+function _interopNamespaceCompat(e) {
+	if (e && typeof e === 'object' && 'default' in e) return e;
+	const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
+	if (e) {
+		for (const k in e) {
+			n[k] = e[k];
+		}
+	}
+	n.default = e;
+	return n;
+}
 
-exports.warns = x$1;
+const _x_ts__namespace = /*#__PURE__*/_interopNamespaceCompat(_x_ts);
+
+
+
+exports.warns = _x_ts__namespace;
 "
 `;
 
 exports[`packem package.json imports > should resolve package.json imports with a * and swc transformer > mjs output 1`] = `
-"var x = 2;
-
-const x$1 = /*#__PURE__*/Object.defineProperty({
-	__proto__: null,
-	x
-}, Symbol.toStringTag, { value: 'Module' });
-
-export { x$1 as warns };
+"import * as _x_ts from '#x.ts';
+export { _x_ts as warns };
 "
 `;

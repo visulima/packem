@@ -1,16 +1,14 @@
-import { readdirSync } from "node:fs";
-
 import { cyan } from "@visulima/colorize";
-import { ENDING_REGEX } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getPackageName } from "@visulima/packem-share/utils";
 import type { Pail } from "@visulima/pail";
-import { isAbsolute, join } from "@visulima/path";
+import { isAbsolute } from "@visulima/path";
 import { resolveAlias } from "@visulima/path/utils";
 import { isNodeBuiltin, parseNodeModulePath } from "mlly";
 import type { InputOptions, Plugin, ResolveIdResult } from "rollup";
 
 import type { InternalBuildOptions } from "../../types";
+import { isFromNodeModules } from "../../utils/import-specifier.js";
 import resolveAliases from "../utils/resolve-aliases";
 
 type MaybeFalsy<T> = T | false | null | undefined;
@@ -106,7 +104,6 @@ export type ResolveExternalsPluginOptions = {
 };
 
 export const resolveExternalsPlugin = (context: BuildContext<InternalBuildOptions>): Plugin => {
-    const cachedGlobFiles = new Map<string, string[]>();
     const cacheResolved = new Map<string, boolean>();
     const resolvedExternalsOptions = context.options?.rollup?.resolveExternals ?? {};
 
@@ -216,47 +213,13 @@ export const resolveExternalsPlugin = (context: BuildContext<InternalBuildOption
                         return result;
                     }
 
-                    // package.json imports are not externals
-                    if (id[0] === "#" && context.pkg.imports) {
-                        for (const [key, value] of Object.entries(context.pkg.imports)) {
-                            if (key[0] !== "#") {
-                                context.logger.debug({
-                                    message: `Ignoring package.json import "${cyan(key)}" because it does not start with "#".`,
-                                    prefix: "plugin:packem:resolve-externals",
-                                });
+                    // package.json imports (# imports) are handled by resolveId hook
+                    // Skip them here to avoid conflicts - resolveId hook externalizes them from source
+                    if (id[0] === "#" && !id.startsWith("#/")) {
+                        // Let resolveId hook handle # imports
+                        cacheResolved.set(id, false);
 
-                                continue;
-                            }
-
-                            if (key === id) {
-                                cacheResolved.set(id, false);
-
-                                return false;
-                            }
-
-                            // if a glob is used, we need to check if the id matches the files in the source directory
-                            if (key.includes("*")) {
-                                let files: string[];
-
-                                if (cachedGlobFiles.has(key)) {
-                                    files = cachedGlobFiles.get(key) as string[];
-                                } else {
-                                    files = readdirSync(join(context.options.rootDir, (value as string).replace("/*", "")), { withFileTypes: true })
-                                        .filter((dirent) => dirent.isFile())
-                                        .map((dirent) => dirent.name);
-
-                                    cachedGlobFiles.set(key, files);
-                                }
-
-                                for (const file of files) {
-                                    if (file.replace(ENDING_REGEX, "") === id.replace(ENDING_REGEX, "").replace("#", "")) {
-                                        cacheResolved.set(id, false);
-
-                                        return false;
-                                    }
-                                }
-                            }
-                        }
+                        return false;
                     }
 
                     if (tsconfigPathPatterns.length > 0) {
@@ -286,7 +249,7 @@ export const resolveExternalsPlugin = (context: BuildContext<InternalBuildOption
         },
         resolveId: {
             filter: {
-                // Only process potential builtins - skip virtual modules, relative imports, and absolute paths
+                // Process potential builtins and # imports - skip virtual modules, relative imports, and absolute paths
                 id: (id: string) => {
                     // Skip virtual modules (starting with \0)
                     if (id.startsWith("\0")) {
@@ -303,13 +266,28 @@ export const resolveExternalsPlugin = (context: BuildContext<InternalBuildOption
                         return false;
                     }
 
-                    // Process everything else (potential builtins or package names)
+                    // Process # imports (package.json imports) and everything else (potential builtins or package names)
                     return true;
                 },
             },
-            async handler(specifier: string, _, { isEntry }): Promise<ResolveIdResult> {
+            async handler(specifier: string, importer, { isEntry }): Promise<ResolveIdResult> {
                 // Ignore entry points (they should always be resolved)
                 if (isEntry) {
+                    return undefined;
+                }
+
+                // Handle package.json imports (# imports) - externalize from source, not from node_modules
+                // #/ patterns are typically tsconfig path aliases, not package.json imports
+                if (specifier[0] === "#" && !specifier.startsWith("#/") && context.pkg.imports) {
+                    if (importer && !isFromNodeModules(importer, context.options.rootDir)) {
+                        // Import is from current package source, externalize it
+                        // This allows Node.js to resolve it at runtime using package.json#imports
+                        return {
+                            external: true,
+                            id: specifier,
+                        };
+                    }
+                    // If from node_modules, let Node-resolver handle it
                     return undefined;
                 }
 
