@@ -1,3 +1,26 @@
+## @visulima/packem [2.0.0-alpha.50](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.49...@visulima/packem@2.0.0-alpha.50) (2025-12-29)
+
+### Features
+
+* **packem:** add TypeScript resolution plugins and enhance integration tests ([fabe2aa](https://github.com/visulima/packem/commit/fabe2aadc0fb1df947c4f0c70df3357bbbac63d1))
+* **packem:** enhance external dependency resolution and add new tests ([397c914](https://github.com/visulima/packem/commit/397c9147611f9def319ea81e3fc0546a2300b8ec))
+* **packem:** enhance package.json imports handling and update integration tests ([6449db0](https://github.com/visulima/packem/commit/6449db0f134cafd514849e4c739c0f882f87f6ba))
+
+### Miscellaneous Chores
+
+* update pnpm workspace and lockfile configurations ([121fa13](https://github.com/visulima/packem/commit/121fa1399bff3738bc6dbeac310aaff04ead670d))
+
+### Tests
+
+* add integration test for externalized dependency resolution ([30fac39](https://github.com/visulima/packem/commit/30fac399113e835a6cde48e5c3b297ff965ee518))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.38
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.19
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.18
+
 ## @visulima/packem [2.0.0-alpha.49](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.48...@visulima/packem@2.0.0-alpha.49) (2025-12-28)
 
 ### Features
