@@ -2971,6 +2971,13 @@ export default App;`,
             module: "./dist/index.mjs",
             name: "test-package",
             types: "./dist/index.d.ts",
+            "typesVersions": {
+                "*": {
+                    ".": [
+                        "./dist/index.d.ts"
+                    ]
+                }
+            }
         });
 
         const binProcess = await execPackem("build", [], {
@@ -2983,7 +2990,7 @@ export default App;`,
         // Verify React imports are aliased to preact/compat
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toContain("from \"preact/compat\"");
-        expect(mjsContent).not.toContain("from \"react\"");
+        expect(mjsContent).toContain("from 'preact/compat'");
+        expect(mjsContent).not.toContain("from 'react'");
     });
 });

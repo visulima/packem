@@ -61,10 +61,9 @@ import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupL
 import { minVersion } from "semver";
 
 import type { InternalBuildOptions } from "../types";
-import externalPkgImports from "./plugins/external-pkg-imports";
+import { externalizeDependencies } from "./plugins/externalize-dependencies";
 import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
 import resolveImplicitExternalsPlugin from "./plugins/resolve-implicit-externals";
-import resolveJsToTs from "./plugins/resolve-js-to-ts";
 import resolveAliases from "./utils/resolve-aliases";
 
 /**
@@ -652,8 +651,8 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
         plugins: [
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
 
-            externalPkgImports(),
-            resolveJsToTs(),
+            externalizeDependencies(context.pkg),
+            resolveTypescriptMjsCtsPlugin(),
 
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
             context.tsconfig
@@ -978,9 +977,10 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
-            externalPkgImports(),
-
-            resolveJsToTs(),
+            externalizeDependencies(context.pkg, {
+                skipUnlistedWarnings: true,
+                forTypes: true,
+            }),
 
             context.options.rollup.json
             && JsonPlugin({
