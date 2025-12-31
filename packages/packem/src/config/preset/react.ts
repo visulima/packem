@@ -93,6 +93,29 @@ export const createReactPreset = (options: ReactPresetOptions = {}): BuildConfig
     const finalPresets = [...babelPresets, ...Array.isArray(presets) ? presets : []];
 
     return {
+        hooks: {
+            "rollup:options": (context, _rollupOptions) => {
+                const babelConfig = context.options.rollup.babel;
+
+                if (babelConfig && typeof babelConfig === "object" && babelConfig.presets) {
+                    const presetIndex = babelConfig.presets.findIndex(
+                        (preset) => Array.isArray(preset) && preset[0] === "@babel/preset-react",
+                    );
+
+                    if (presetIndex !== -1) {
+                        const preset = babelConfig.presets[presetIndex] as [string, Record<string, unknown>];
+
+                        babelConfig.presets[presetIndex] = [
+                            preset[0],
+                            {
+                                ...(typeof preset[1] === "object" && preset[1] !== null ? preset[1] : {}),
+                                development: context.environment === "development",
+                            },
+                        ];
+                    }
+                }
+            },
+        },
         rollup: {
             babel: {
                 plugins: finalPlugins.length > 0 ? finalPlugins : undefined,
