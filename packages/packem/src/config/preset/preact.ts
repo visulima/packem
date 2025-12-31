@@ -172,13 +172,32 @@ export const createPreactPreset = (options: PreactPresetOptions = {}): BuildConf
     return {
         hooks: {
             "rollup:options": (context, rollupOptions) => {
+                const babelConfig = context.options.rollup.babel;
+
+                const isProduction = context.environment === "production";
+
+                if (babelConfig && typeof babelConfig === "object" && babelConfig.presets) {
+                    const presetIndex = babelConfig.presets.findIndex(
+                        (preset) => Array.isArray(preset) && preset[0] === "@babel/preset-react",
+                    );
+
+                    if (presetIndex !== -1) {
+                        const preset = babelConfig.presets[presetIndex] as [string, Record<string, unknown>];
+                        babelConfig.presets[presetIndex] = [
+                            preset[0],
+                            {
+                                ...(typeof preset[1] === "object" && preset[1] !== null ? preset[1] : {}),
+                                development: !isProduction,
+                            },
+                        ];
+                    }
+                }
+
                 // Only add plugin when we have actual rollup options (not the dummy object)
                 // Check if rollupOptions has meaningful properties
                 if (!rollupOptions.input && !rollupOptions.plugins) {
                     return;
                 }
-
-                const isProduction = context.environment === "production";
 
                 // Add to plugins array
                 if (!Array.isArray(rollupOptions.plugins)) {

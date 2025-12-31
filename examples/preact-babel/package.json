@@ -23,7 +23,7 @@
         "./dist"
     ],
     "scripts": {
-        "build": "packem build",
+        "build": "packem build --development",
         "clean": "rimraf node_modules dist"
     },
     "dependencies": {
