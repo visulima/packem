@@ -1,3 +1,9 @@
+## @visulima/packem [2.0.0-alpha.51](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.50...@visulima/packem@2.0.0-alpha.51) (2025-12-31)
+
+### Features
+
+* **packem:** enhance Preact and React presets for development mode ([4cf7b15](https://github.com/visulima/packem/commit/4cf7b154bab6b67adb1f0f253004c62e4e1d6079))
+
 ## @visulima/packem [2.0.0-alpha.50](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.49...@visulima/packem@2.0.0-alpha.50) (2025-12-29)
 
 ### Features
