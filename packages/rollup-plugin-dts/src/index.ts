@@ -1,19 +1,19 @@
-import Debug from "obug";
+import { createDebug } from "obug";
 import type { Plugin } from "rolldown";
 
-import { createBannerPlugin } from "./banner.ts";
-import { createDtsInputPlugin } from "./dts-input.ts";
-import { createFakeJsPlugin } from "./fake-js.ts";
-import { createGeneratePlugin } from "./generate.ts";
-import type { Options } from "./options.ts";
-import { resolveOptions } from "./options.ts";
-import { createDtsResolvePlugin } from "./resolver.ts";
+import createBannerPlugin from "./banner";
+import createDtsInputPlugin from "./dts-input";
+import createFakeJsPlugin from "./fake-js";
+import { createGeneratePlugin } from "./generate";
+import type { Options } from "./options";
+import { resolveOptions } from "./options";
+import createDtsResolvePlugin from "./resolver";
 
-export { createFakeJsPlugin } from "./fake-js.ts";
+export { default as createFakeJsPlugin } from "./fake-js";
 
-const debug = Debug("rolldown-plugin-dts:options");
+const debug = createDebug("rolldown-plugin-dts:options");
 
-export function dts(options: Options = {}): Plugin[] {
+export const dts = (options: Options = {}): Plugin[] => {
     debug("resolving dts options");
     const resolved = resolveOptions(options);
 
@@ -34,8 +34,8 @@ export function dts(options: Options = {}): Plugin[] {
     }
 
     return plugins;
-}
+};
 
-export { RE_CSS, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename.ts";
-export { createGeneratePlugin } from "./generate.ts";
-export { type Options, resolveOptions } from "./options.ts";
+export { RE_CSS, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename";
+export { createGeneratePlugin } from "./generate";
+export { type Options, resolveOptions } from "./options";

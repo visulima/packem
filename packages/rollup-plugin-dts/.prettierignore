@@ -12,3 +12,4 @@ node_modules
 **/jsconfig.json
 
 __tests__/fixtures/**
+__tests__/__snapshots__/**

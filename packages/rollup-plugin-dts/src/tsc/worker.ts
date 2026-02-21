@@ -6,7 +6,8 @@ import { tscEmit } from "./index.js";
 
 const functions: { tscEmit: typeof tscEmit } = { tscEmit };
 
-export type TscFunctions = typeof functions;
+type TscFunctions = typeof functions;
+export type { TscFunctions as default };
 
 createBirpc(functions, {
     on: (function_) => process.on("message", function_),

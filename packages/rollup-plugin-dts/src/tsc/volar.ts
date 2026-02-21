@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import Debug from "debug";
+import { createDebug } from "obug";
 import type Ts from "typescript";
 
 import type { TscOptions } from "./types.js";
 
 const loadVueLanguageTools = () => {
-    const debug = Debug("rollup-plugin-dts:vue");
+    const debug = createDebug("rollup-plugin-dts:vue");
 
     debug("loading vue language tools");
 
@@ -25,12 +25,10 @@ const loadVueLanguageTools = () => {
             const $rootDir = options.options.$rootDir as string;
             const $configRaw = options.options.$configRaw as (Ts.TsConfigSourceFile & { vueCompilerOptions?: any }) | undefined;
 
-            const resolver = new vue.CompilerOptionsResolver(ts.sys.fileExists);
+            const resolver = new vue.CompilerOptionsResolver(ts, ts.sys.readFile);
 
             resolver.addConfig($configRaw?.vueCompilerOptions ?? {}, $rootDir);
             const vueOptions = resolver.build();
-
-            vue.writeGlobalTypes(vueOptions, ts.sys.writeFile);
 
             return vue.createVueLanguagePlugin<string>(ts, options.options, vueOptions, (id) => id);
         };
@@ -43,7 +41,7 @@ const loadVueLanguageTools = () => {
 };
 
 const loadTsMacro = () => {
-    const debug = Debug("rollup-plugin-dts:ts-macro");
+    const debug = createDebug("rollup-plugin-dts:ts-macro");
 
     debug("loading ts-macro language tools");
 
@@ -79,13 +77,12 @@ const loadTsMacro = () => {
 };
 
 // credits: https://github.com/vuejs/language-tools/blob/25f40ead59d862b3bd7011f2dd2968f47dfcf629/packages/tsc/index.ts
-export function createProgramFactory(ts: typeof Ts, options: Pick<TscOptions, "vue" | "tsMacro">): typeof Ts.createProgram {
+const createProgramFactory = (ts: typeof Ts, options: Pick<TscOptions, "vue" | "tsMacro">): typeof Ts.createProgram => {
     const vueLanguageTools = options.vue ? loadVueLanguageTools() : undefined;
     const tsMacroLanguageTools = options.tsMacro ? loadTsMacro() : undefined;
     const proxyCreateProgram = vueLanguageTools?.proxyCreateProgram || tsMacroLanguageTools?.proxyCreateProgram;
 
-    if (!proxyCreateProgram)
-        return ts.createProgram;
+    if (!proxyCreateProgram) return ts.createProgram;
 
     return proxyCreateProgram(ts, ts.createProgram, (ts, options) => {
         const languagePlugins = [];
@@ -100,4 +97,6 @@ export function createProgramFactory(ts: typeof Ts, options: Pick<TscOptions, "v
 
         return { languagePlugins };
     });
-}
+};
+
+export default createProgramFactory;

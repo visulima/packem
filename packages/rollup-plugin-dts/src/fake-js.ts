@@ -1,11 +1,12 @@
 import { generate } from "@babel/generator";
+import { isIdentifierName } from "@babel/helper-validator-identifier";
 import { parse } from "@babel/parser";
 import t from "@babel/types";
 import { isDeclarationType, isIdentifierOf, isTypeOf, resolveString, walkAST } from "ast-kit";
 import type { Plugin, RenderedChunk, TransformResult } from "rolldown";
 
-import { filename_dts_to, filename_js_to_dts, RE_DTS, RE_DTS_MAP, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename.ts";
-import type { OptionsResolved } from "./options.ts";
+import { filename_dts_to, filename_js_to_dts, RE_DTS, RE_DTS_MAP, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename";
+import type { OptionsResolved } from "./options";
 
 // input:
 // export declare function x(xx: X): void
@@ -36,7 +37,7 @@ interface SymbolInfo {
 
 type NamespaceMap = Map<string, { local: t.Identifier | t.TSQualifiedName; stmt: t.Statement }>;
 
-export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<OptionsResolved, "sourcemap" | "cjsDefault" | "sideEffects">): Plugin {
+const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<OptionsResolved, "sourcemap" | "cjsDefault" | "sideEffects">): Plugin => {
     let symbolIndex = 0;
     const identifierMap: Record<string, number> = Object.create(null);
     const symbolMap = new Map<number /* symbol id */, SymbolInfo>();
@@ -47,13 +48,12 @@ export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<
         generateBundle: sourcemap
             ? undefined
             : (options, bundle) => {
-                for (const chunk of Object.values(bundle)) {
-                    if (!RE_DTS_MAP.test(chunk.fileName))
-                        continue;
+                  for (const chunk of Object.values(bundle)) {
+                      if (!RE_DTS_MAP.test(chunk.fileName)) continue;
 
-                    delete bundle[chunk.fileName];
-                }
-            },
+                      delete bundle[chunk.fileName];
+                  }
+              },
 
         name: "rolldown-plugin-dts:fake-js",
 
@@ -117,8 +117,7 @@ export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<
         for (const [i, stmt] of program.body.entries()) {
             const setStmt = (stmt: t.Statement) => (program.body[i] = stmt);
 
-            if (rewriteImportExport(stmt, setStmt, typeOnlyIds))
-                continue;
+            if (rewriteImportExport(stmt, setStmt, typeOnlyIds)) continue;
 
             const sideEffect = stmt.type === "TSModuleDeclaration" && stmt.kind !== "namespace";
 
@@ -247,8 +246,7 @@ export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<
         for (const module of chunk.moduleIds) {
             const ids = typeOnlyMap.get(module);
 
-            if (ids)
-                typeOnlyIds.push(...ids);
+            if (ids) typeOnlyIds.push(...ids);
         }
 
         const file = parse(code, {
@@ -261,11 +259,9 @@ export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<
 
         program.body = program.body
             .map((node) => {
-                if (isHelperImport(node))
-                    return null;
+                if (isHelperImport(node)) return null;
 
-                if (node.type === "ExpressionStatement")
-                    return null;
+                if (node.type === "ExpressionStatement") return null;
 
                 const newNode = patchImportExport(node, typeOnlyIds, cjsDefault);
 
@@ -273,8 +269,7 @@ export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<
                     return newNode;
                 }
 
-                if (node.type !== "VariableDeclaration")
-                    return node;
+                if (node.type !== "VariableDeclaration") return node;
 
                 if (!isRuntimeBindingVariableDeclaration(node)) {
                     return null;
@@ -335,8 +330,7 @@ export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<
                 preserveComments.forEach((c) => {
                     const id = c.type + c.value;
 
-                    if (commentsValue.has(id))
-                        return;
+                    if (commentsValue.has(id)) return;
 
                     commentsValue.add(id);
                     comments.add(c);
@@ -417,12 +411,50 @@ export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<
         });
     }
 
+    function collectInferredNames(node: t.Node): string[] {
+        const inferred: string[] = [];
+
+        walkAST(node, {
+            enter(node) {
+                if (node.type === "TSInferType" && node.typeParameter) {
+                    inferred.push(node.typeParameter.name as string);
+                }
+            },
+        });
+
+        return inferred;
+    }
+
     function collectDependencies(node: t.Node, namespaceStmts: NamespaceMap): Dep[] {
         const deps = new Set<Dep>();
         const seen = new Set<t.Node>();
 
+        const inferredStack: string[][] = [];
+        let currentInferred = new Set<string>();
+
+        function isInferred(node: t.Node): boolean {
+            return node.type === "Identifier" && currentInferred.has((node as t.Identifier).name);
+        }
+
         walkAST(node, {
-            leave(node) {
+            enter(node) {
+                if (node.type === "TSConditionalType") {
+                    const inferred = collectInferredNames(node.extendsType);
+
+                    inferredStack.push(inferred);
+                }
+            },
+            leave(node, parent) {
+                if (node.type === "TSConditionalType") {
+                    inferredStack.pop();
+                } else if (parent?.type === "TSConditionalType") {
+                    const trueBranch = (parent as t.TSConditionalType).trueType === node;
+
+                    currentInferred = new Set<string>((trueBranch ? inferredStack : inferredStack.slice(0, -1)).flat());
+                } else {
+                    currentInferred = new Set<string>();
+                }
+
                 if (node.type === "ExportNamedDeclaration") {
                     for (const specifier of node.specifiers) {
                         if (specifier.type === "ExportSpecifier") {
@@ -434,8 +466,7 @@ export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<
                         addDependency(TSEntityNameToRuntime(heritage.expression));
                     }
                 } else if (node.type === "ClassDeclaration") {
-                    if (node.superClass)
-                        addDependency(node.superClass);
+                    if (node.superClass) addDependency(node.superClass);
 
                     if (node.implements) {
                         for (const implement of node.implements) {
@@ -463,11 +494,9 @@ export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<
                             break;
                         }
                         case "TSTypeQuery": {
-                            if (seen.has(node.exprName))
-                                return;
+                            if (seen.has(node.exprName)) return;
 
-                            if (node.exprName.type === "TSImportType")
-                                break;
+                            if (node.exprName.type === "TSImportType") break;
 
                             addDependency(TSEntityNameToRuntime(node.exprName));
 
@@ -486,8 +515,7 @@ export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<
         return [...deps];
 
         function addDependency(node: Dep) {
-            if (isThisExpression(node))
-                return;
+            if (isThisExpression(node) || isInferred(node)) return;
 
             deps.add(node);
         }
@@ -495,7 +523,8 @@ export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<
 
     function importNamespace(node: t.TSImportType, imported: t.TSEntityName | null | undefined, source: t.StringLiteral, namespaceStmts: NamespaceMap): Dep {
         const sourceText = source.value.replaceAll(/\W/g, "_");
-        let local: t.Identifier | t.TSQualifiedName = t.identifier(`${sourceText}${getIdentifierIndex(sourceText)}`);
+        const localName = isIdentifierName(source.value) ? source.value : `${sourceText}${getIdentifierIndex(sourceText)}`;
+        let local: t.Identifier | t.TSQualifiedName = t.identifier(localName);
 
         if (namespaceStmts.has(source.value)) {
             local = namespaceStmts.get(source.value)!.local;
@@ -532,13 +561,13 @@ export function createFakeJsPlugin({ cjsDefault, sideEffects, sourcemap }: Pick<
 
         return dep;
     }
-}
+};
 
 const REFERENCE_RE = /\/\s*<reference\s+(?:path|types)=/;
 
-function collectReferenceDirectives(comment: t.Comment[], negative = false) {
+const collectReferenceDirectives = (comment: t.Comment[], negative = false) => {
     return comment.filter((c) => REFERENCE_RE.test(c.value) !== negative);
-}
+};
 
 // #region Runtime binding variable
 
@@ -570,14 +599,14 @@ type RuntimeBindingVariableDeclration = t.VariableDeclaration & {
 /**
  * Check if the given node is a {@link RuntimeBindingVariableDeclration}
  */
-function isRuntimeBindingVariableDeclaration(node: t.Node | null | undefined): node is RuntimeBindingVariableDeclration {
+const isRuntimeBindingVariableDeclaration = (node: t.Node | null | undefined): node is RuntimeBindingVariableDeclration => {
     return (
-        t.isVariableDeclaration(node)
-        && node.declarations.length > 0
-        && t.isVariableDeclarator(node.declarations[0])
-        && isRuntimeBindingArrayExpression(node.declarations[0].init)
+        t.isVariableDeclaration(node) &&
+        node.declarations.length > 0 &&
+        t.isVariableDeclarator(node.declarations[0]) &&
+        isRuntimeBindingArrayExpression(node.declarations[0].init)
     );
-}
+};
 
 /**
  * A array expression that contains {@link RuntimeBindingArrayElements}
@@ -595,37 +624,37 @@ type RuntimeBindingArrayExpression = t.ArrayExpression & {
 /**
  * Check if the given node is a {@link RuntimeBindingArrayExpression}
  */
-function isRuntimeBindingArrayExpression(node: t.Node | null | undefined): node is RuntimeBindingArrayExpression {
+const isRuntimeBindingArrayExpression = (node: t.Node | null | undefined): node is RuntimeBindingArrayExpression => {
     return t.isArrayExpression(node) && isRuntimeBindingArrayElements(node.elements);
-}
+};
 
-function runtimeBindingArrayExpression(elements: RuntimeBindingArrayElements): RuntimeBindingArrayExpression {
+const runtimeBindingArrayExpression = (elements: RuntimeBindingArrayElements): RuntimeBindingArrayExpression => {
     return t.arrayExpression(elements) as RuntimeBindingArrayExpression;
-}
+};
 
 /**
  * An array that represents the elements in {@link RuntimeBindingArrayExpression}
  */
-type RuntimeBindingArrayElements
-    = | [symbolId: t.NumericLiteral, deps: t.ArrowFunctionExpression]
-        | [symbolId: t.NumericLiteral, deps: t.ArrowFunctionExpression, effect: t.CallExpression];
+type RuntimeBindingArrayElements =
+    | [symbolId: t.NumericLiteral, deps: t.ArrowFunctionExpression]
+    | [symbolId: t.NumericLiteral, deps: t.ArrowFunctionExpression, effect: t.CallExpression];
 
 /**
  * Check if the given array is a {@link RuntimeBindingArrayElements}
  */
-function isRuntimeBindingArrayElements(elements: (t.Node | null | undefined)[]): elements is RuntimeBindingArrayElements {
+const isRuntimeBindingArrayElements = (elements: (t.Node | null | undefined)[]): elements is RuntimeBindingArrayElements => {
     const [symbolId, deps, effect] = elements;
 
     return t.isNumericLiteral(symbolId) && t.isArrowFunctionExpression(deps) && (!effect || t.isCallExpression(effect));
-}
+};
 
 // #endregion
 
-function isThisExpression(node: t.Node): boolean {
+const isThisExpression = (node: t.Node): boolean => {
     return isIdentifierOf(node, "this") || (node.type === "MemberExpression" && isThisExpression(node.object));
-}
+};
 
-function TSEntityNameToRuntime(node: t.TSEntityName): t.MemberExpression | t.Identifier {
+const TSEntityNameToRuntime = (node: t.TSEntityName): t.MemberExpression | t.Identifier => {
     if (node.type === "Identifier") {
         return node;
     }
@@ -633,34 +662,34 @@ function TSEntityNameToRuntime(node: t.TSEntityName): t.MemberExpression | t.Ide
     const left = TSEntityNameToRuntime(node.left);
 
     return Object.assign(node, t.memberExpression(left, node.right));
-}
+};
 
-function getIdFromTSEntityName(node: t.TSEntityName) {
+const getIdFromTSEntityName = (node: t.TSEntityName) => {
     if (node.type === "Identifier") {
         return node;
     }
 
     return getIdFromTSEntityName(node.left);
-}
+};
 
-function isReferenceId(node?: t.Node | null): node is t.Identifier | t.MemberExpression {
+const isReferenceId = (node?: t.Node | null): node is t.Identifier | t.MemberExpression => {
     return isTypeOf(node, ["Identifier", "MemberExpression"]);
-}
+};
 
-function isHelperImport(node: t.Node) {
+const isHelperImport = (node: t.Node) => {
     return (
-        node.type === "ImportDeclaration"
-        && node.specifiers.length === 1
-        && node.specifiers.every(
+        node.type === "ImportDeclaration" &&
+        node.specifiers.length === 1 &&
+        node.specifiers.every(
             (spec) => spec.type === "ImportSpecifier" && spec.imported.type === "Identifier" && ["__export", "__reExport"].includes(spec.local.name),
         )
     );
-}
+};
 
 /**
  * patch `.d.ts` suffix in import source to `.js`
  */
-function patchImportExport(node: t.Node, typeOnlyIds: string[], cjsDefault: boolean): t.Statement | false | undefined {
+const patchImportExport = (node: t.Node, typeOnlyIds: string[], cjsDefault: boolean): t.Statement | false | undefined => {
     if (node.type === "ExportNamedDeclaration" && !node.declaration && !node.source && node.specifiers.length === 0 && !node.attributes?.length) {
         return false;
     }
@@ -687,12 +716,12 @@ function patchImportExport(node: t.Node, typeOnlyIds: string[], cjsDefault: bool
         }
 
         if (
-            cjsDefault
-            && node.type === "ExportNamedDeclaration"
-            && !node.source
-            && node.specifiers.length === 1
-            && node.specifiers[0].type === "ExportSpecifier"
-            && resolveString(node.specifiers[0].exported) === "default"
+            cjsDefault &&
+            node.type === "ExportNamedDeclaration" &&
+            !node.source &&
+            node.specifiers.length === 1 &&
+            node.specifiers[0].type === "ExportSpecifier" &&
+            resolveString(node.specifiers[0].exported) === "default"
         ) {
             const defaultExport = node.specifiers[0] as t.ExportSpecifier;
 
@@ -702,19 +731,18 @@ function patchImportExport(node: t.Node, typeOnlyIds: string[], cjsDefault: bool
             };
         }
     }
-}
+};
 
 /**
  * Handle `__export` call
  */
-function patchTsNamespace(nodes: t.Statement[]) {
+const patchTsNamespace = (nodes: t.Statement[]) => {
     const removed = new Set<t.Node>();
 
     for (const [i, node] of nodes.entries()) {
         const result = handleExport(node);
 
-        if (!result)
-            continue;
+        if (!result) continue;
 
         const [binding, exports] = result;
 
@@ -724,12 +752,14 @@ function patchTsNamespace(nodes: t.Statement[]) {
                     {
                         declaration: null,
                         source: null,
-                        specifiers: (exports as t.ObjectExpression).properties.filter((property) => property.type === "ObjectProperty").map((property) => {
-                            const local = (property.value as t.ArrowFunctionExpression).body as t.Identifier;
-                            const exported = property.key as t.Identifier;
+                        specifiers: (exports as t.ObjectExpression).properties
+                            .filter((property) => property.type === "ObjectProperty")
+                            .map((property) => {
+                                const local = (property.value as t.ArrowFunctionExpression).body as t.Identifier;
+                                const exported = property.key as t.Identifier;
 
-                            return t.exportSpecifier(local, exported);
-                        }),
+                                return t.exportSpecifier(local, exported);
+                            }),
                         type: "ExportNamedDeclaration",
                     },
                 ],
@@ -746,14 +776,14 @@ function patchTsNamespace(nodes: t.Statement[]) {
 
     function handleExport(node: t.Statement): false | [t.Identifier, t.ObjectExpression] {
         if (
-            node.type !== "VariableDeclaration"
-            || node.declarations.length !== 1
-            || node.declarations[0].id.type !== "Identifier"
-            || node.declarations[0].init?.type !== "CallExpression"
-            || node.declarations[0].init.callee.type !== "Identifier"
-            || node.declarations[0].init.callee.name !== "__export"
-            || node.declarations[0].init.arguments.length !== 1
-            || node.declarations[0].init.arguments[0].type !== "ObjectExpression"
+            node.type !== "VariableDeclaration" ||
+            node.declarations.length !== 1 ||
+            node.declarations[0].id.type !== "Identifier" ||
+            node.declarations[0].init?.type !== "CallExpression" ||
+            node.declarations[0].init.callee.type !== "Identifier" ||
+            node.declarations[0].init.callee.name !== "__export" ||
+            node.declarations[0].init.arguments.length !== 1 ||
+            node.declarations[0].init.arguments[0].type !== "ObjectExpression"
         ) {
             return false;
         }
@@ -763,21 +793,21 @@ function patchTsNamespace(nodes: t.Statement[]) {
 
         return [source, exports] as const;
     }
-}
+};
 
 /**
  * Handle `__reExport` call
  */
-function patchReExport(nodes: t.Statement[]) {
+const patchReExport = (nodes: t.Statement[]) => {
     const exportsNames = new Map<string, string>();
 
     for (const [i, node] of nodes.entries()) {
         if (
-            node.type === "ImportDeclaration"
-            && node.specifiers.length === 1
-            && node.specifiers[0].type === "ImportSpecifier"
-            && node.specifiers[0].local.type === "Identifier"
-            && node.specifiers[0].local.name.endsWith("_exports")
+            node.type === "ImportDeclaration" &&
+            node.specifiers.length === 1 &&
+            node.specifiers[0].type === "ImportSpecifier" &&
+            node.specifiers[0].local.type === "Identifier" &&
+            node.specifiers[0].local.name.endsWith("_exports")
         ) {
             // record: import { t as a_exports } from "..."
             exportsNames.set(node.specifiers[0].local.name, node.specifiers[0].local.name);
@@ -788,11 +818,11 @@ function patchReExport(nodes: t.Statement[]) {
 
             exportsNames.set((args[0] as t.Identifier).name, (args[1] as t.Identifier).name);
         } else if (
-            node.type === "VariableDeclaration"
-            && node.declarations.length === 1
-            && node.declarations[0].init?.type === "MemberExpression"
-            && node.declarations[0].init.object.type === "Identifier"
-            && exportsNames.has(node.declarations[0].init.object.name)
+            node.type === "VariableDeclaration" &&
+            node.declarations.length === 1 &&
+            node.declarations[0].init?.type === "MemberExpression" &&
+            node.declarations[0].init.object.type === "Identifier" &&
+            exportsNames.has(node.declarations[0].init.object.name)
         ) {
             // var B = a_exports.A
             // to
@@ -821,11 +851,11 @@ function patchReExport(nodes: t.Statement[]) {
                 },
             };
         } else if (
-            node.type === "ExportNamedDeclaration"
-            && node.specifiers.length === 1
-            && node.specifiers[0].type === "ExportSpecifier"
-            && node.specifiers[0].local.type === "Identifier"
-            && exportsNames.has(node.specifiers[0].local.name)
+            node.type === "ExportNamedDeclaration" &&
+            node.specifiers.length === 1 &&
+            node.specifiers[0].type === "ExportSpecifier" &&
+            node.specifiers[0].local.type === "Identifier" &&
+            exportsNames.has(node.specifiers[0].local.name)
         ) {
             // export { a_exports as t }
             // to
@@ -835,7 +865,7 @@ function patchReExport(nodes: t.Statement[]) {
     }
 
     return nodes;
-}
+};
 
 // fix:
 // - import type { ... } from '...'
@@ -846,11 +876,11 @@ function patchReExport(nodes: t.Statement[]) {
 // - import Foo = require("./bar")
 // - export = Foo
 // - export default x
-function rewriteImportExport(
+const rewriteImportExport = (
     node: t.Node,
     set: (node: t.Statement) => void,
     typeOnlyIds: string[],
-): node is t.ImportDeclaration | t.ExportAllDeclaration | t.TSImportEqualsDeclaration {
+): node is t.ImportDeclaration | t.ExportAllDeclaration | t.TSImportEqualsDeclaration => {
     if (node.type === "ImportDeclaration" || (node.type === "ExportNamedDeclaration" && !node.declaration)) {
         for (const specifier of node.specifiers) {
             if (("exportKind" in specifier && specifier.exportKind === "type") || ("exportKind" in node && node.exportKind === "type")) {
@@ -930,9 +960,9 @@ function rewriteImportExport(
     }
 
     return false;
-}
+};
 
-function overwriteNode<T>(node: t.Node, newNode: T): T {
+const overwriteNode = <T>(node: t.Node, newNode: T): T => {
     // clear object keys
     for (const key of Object.keys(node)) {
         delete (node as any)[key];
@@ -941,9 +971,9 @@ function overwriteNode<T>(node: t.Node, newNode: T): T {
     Object.assign(node, newNode);
 
     return node as T;
-}
+};
 
-function inheritNodeComments<T extends t.Node>(oldNode: t.Node, newNode: T): T {
+const inheritNodeComments = <T extends t.Node>(oldNode: t.Node, newNode: T): T => {
     newNode.leadingComments ||= [];
 
     const leadingComments = oldNode.leadingComments?.filter((comment) => comment.value.startsWith("#"));
@@ -955,4 +985,6 @@ function inheritNodeComments<T extends t.Node>(oldNode: t.Node, newNode: T): T {
     newNode.leadingComments = collectReferenceDirectives(newNode.leadingComments, true);
 
     return newNode;
-}
+};
+
+export default createFakeJsPlugin;

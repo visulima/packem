@@ -1,8 +1,8 @@
 import path from "node:path";
 import process from "node:process";
 
-import type { TsConfigJson, TsConfigJsonResolved } from "get-tsconfig";
-import { getTsconfig, parseTsconfig } from "get-tsconfig";
+import type { TsConfigJson, TsConfigJsonResolved } from "@visulima/tsconfig";
+import { findTsConfigSync, readTsConfig } from "@visulima/tsconfig";
 import type { AddonFunction } from "rolldown";
 import type { IsolatedDeclarationsOptions } from "rolldown/experimental";
 
@@ -208,8 +208,10 @@ export interface Options extends GeneralOptions, TscOptions {
      *
      * **Note:** This option is not yet recommended for production environments.
      * `tsconfigRaw` and `isolatedDeclarations` options will be ignored when this option is enabled.
+     *
+     * Pass `true` to use the bundled tsgo binary, or an object with `path` to specify a custom binary path.
      */
-    tsgo?: boolean;
+    tsgo?: boolean | { path?: string };
 }
 
 type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
@@ -221,12 +223,13 @@ export type OptionsResolved = Overwrite<
         oxc: IsolatedDeclarationsOptions | false;
         tsconfig?: string;
         tsconfigRaw: TsConfigJson;
+        tsgo: { path?: string } | false;
     }
 >;
 
 let warnedTsgo = false;
 
-export function resolveOptions({
+export const resolveOptions = ({
     banner,
     // tsc
     build = false,
@@ -249,21 +252,25 @@ export function resolveOptions({
     sourcemap,
     tsconfig,
     tsconfigRaw: overriddenTsconfigRaw = {},
-    tsgo = false,
+    tsgo: tsgoOption = false,
 
     tsMacro = false,
     vue = false,
-}: Options): OptionsResolved {
+}: Options): OptionsResolved => {
     let resolvedTsconfig: TsConfigJsonResolved | undefined;
 
     if (tsconfig === true || tsconfig == undefined) {
-        const { config, path } = getTsconfig(cwd) || {};
+        try {
+            const result = findTsConfigSync(cwd);
 
-        tsconfig = path;
-        resolvedTsconfig = config;
+            tsconfig = result.path;
+            resolvedTsconfig = result.config;
+        } catch {
+            tsconfig = undefined;
+        }
     } else if (typeof tsconfig === "string") {
         tsconfig = path.resolve(cwd || process.cwd(), tsconfig);
-        resolvedTsconfig = parseTsconfig(tsconfig);
+        resolvedTsconfig = readTsConfig(tsconfig);
     } else {
         tsconfig = undefined;
     }
@@ -282,6 +289,13 @@ export function resolveOptions({
         ...overriddenTsconfigRaw,
         compilerOptions,
     };
+
+    // Normalize tsgo: true → {} so downstream code can always treat it as an object or false.
+    let tsgo: { path?: string } | false = false;
+
+    if (tsgoOption) {
+        tsgo = tsgoOption === true ? {} : tsgoOption;
+    }
 
     oxc ??= !!(compilerOptions?.isolatedDeclarations && !vue && !tsgo && !tsMacro);
 
@@ -351,4 +365,4 @@ export function resolveOptions({
         tsMacro,
         vue,
     };
-}
+};

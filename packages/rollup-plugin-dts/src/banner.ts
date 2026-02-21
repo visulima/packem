@@ -1,10 +1,10 @@
 import MagicString from "magic-string";
 import type { Plugin } from "rolldown";
 
-import { RE_DTS } from "./filename.ts";
-import type { OptionsResolved } from "./options.ts";
+import { RE_DTS } from "./filename";
+import type { OptionsResolved } from "./options";
 
-export function createBannerPlugin({ banner, footer }: Pick<OptionsResolved, "banner" | "footer">): Plugin {
+const createBannerPlugin = ({ banner, footer }: Pick<OptionsResolved, "banner" | "footer">): Plugin => {
     return {
         name: "rolldown-plugin-dts:banner",
         async renderChunk(code: string, chunk) {
@@ -17,15 +17,13 @@ export function createBannerPlugin({ banner, footer }: Pick<OptionsResolved, "ba
             if (banner) {
                 const code = await (typeof banner === "function" ? banner(chunk) : banner);
 
-                if (code)
-                    s.prepend(`${code}\n`);
+                if (code) s.prepend(`${code}\n`);
             }
 
             if (footer) {
                 const code = await (typeof footer === "function" ? footer(chunk) : footer);
 
-                if (code)
-                    s.append(`\n${code}`);
+                if (code) s.append(`\n${code}`);
             }
 
             return {
@@ -40,4 +38,6 @@ export function createBannerPlugin({ banner, footer }: Pick<OptionsResolved, "ba
             };
         },
     };
-}
+};
+
+export default createBannerPlugin;

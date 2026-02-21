@@ -8,21 +8,23 @@ export const RE_NODE_MODULES: RegExp = /[\\/]node_modules[\\/]/;
 export const RE_CSS: RegExp = /\.css$/;
 export const RE_VUE: RegExp = /\.vue$/;
 export const RE_JSON: RegExp = /\.json$/;
+// Rolldown's internal runtime module — must never be transformed by dts plugins
+export const RE_ROLLDOWN_RUNTIME: RegExp = /^\0rolldown\/runtime\.js$/;
 
-export function filename_js_to_dts(id: string): string {
+export const filename_js_to_dts = (id: string): string => {
     return id.replace(RE_JS, ".d.$1ts");
-}
-export function filename_to_dts(id: string): string {
-    return id.replace(RE_VUE, ".vue.ts").replace(RE_TS, ".d.$1ts").replace(RE_JS, ".d.$1ts").replace(RE_JSON, ".d.ts");
-}
-export function filename_dts_to(id: string, extension: "js" | "ts"): string {
+};
+export const filename_to_dts = (id: string): string => {
+    return id.replace(RE_VUE, ".vue.ts").replace(RE_TS, ".d.$1ts").replace(RE_JS, ".d.$1ts").replace(RE_JSON, ".json.d.ts");
+};
+export const filename_dts_to = (id: string, extension: "js" | "ts"): string => {
     return id.replace(RE_DTS, `.$1${extension}`);
-}
+};
 
-export function resolveTemplateFn(function_: string | ChunkFileNamesFunction, chunk: PreRenderedChunk): string {
+export const resolveTemplateFn = (function_: string | ChunkFileNamesFunction, chunk: PreRenderedChunk): string => {
     return typeof function_ === "function" ? function_(chunk) : function_;
-}
+};
 
-export function replaceTemplateName(template: string, name: string): string {
+export const replaceTemplateName = (template: string, name: string): string => {
     return template.replaceAll("[name]", name);
-}
+};
