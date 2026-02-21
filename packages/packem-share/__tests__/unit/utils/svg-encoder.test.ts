@@ -25,8 +25,8 @@ describe(svgEncoder, () => {
     it("should remove class attributes", () => {
         expect.assertions(1);
 
-        const svgInput = "<svg class=\"my-class\"><path class=\"another-class\" d=\"M0 0 H10 V10 H0 Z\"/></svg>";
-        const cleanedSvg = "<svg><path d=\"M0 0 H10 V10 H0 Z\"/></svg>";
+        const svgInput = '<svg class="my-class"><path class="another-class" d="M0 0 H10 V10 H0 Z"/></svg>';
+        const cleanedSvg = '<svg><path d="M0 0 H10 V10 H0 Z"/></svg>';
         const expectedOutput = Buffer.from(cleanedSvg).toString("base64");
 
         expect(svgEncoder(Buffer.from(svgInput, "utf8"))).toBe(expectedOutput);
@@ -35,8 +35,8 @@ describe(svgEncoder, () => {
     it("should remove class attributes with double quotes", () => {
         expect.assertions(1);
 
-        const svgInput = "<svg class=\"my-class\"><path class=\"another-class\" d=\"M0 0 H10 V10 H0 Z\"/></svg>";
-        const cleanedSvg = "<svg><path d=\"M0 0 H10 V10 H0 Z\"/></svg>";
+        const svgInput = '<svg class="my-class"><path class="another-class" d="M0 0 H10 V10 H0 Z"/></svg>';
+        const cleanedSvg = '<svg><path d="M0 0 H10 V10 H0 Z"/></svg>';
         const expectedOutput = Buffer.from(cleanedSvg).toString("base64");
 
         expect(svgEncoder(Buffer.from(svgInput, "utf8"))).toBe(expectedOutput);
@@ -81,7 +81,7 @@ describe(svgEncoder, () => {
                 />
             </svg>
         `;
-        const cleanedSvg = "<svg version=\"1.1\"> <rect x=\"0\" y=\"0\" width=\"100\" height=\"100\" /> <path d=\"M10 10 H 90 V 90 H 10 L 10 10\" /> </svg>";
+        const cleanedSvg = '<svg version="1.1"> <rect x="0" y="0" width="100" height="100" /> <path d="M10 10 H 90 V 90 H 10 L 10 10" /> </svg>';
         const expectedOutput = Buffer.from(cleanedSvg).toString("base64");
 
         expect(svgEncoder(Buffer.from(svgInput, "utf8"))).toBe(expectedOutput);
@@ -131,7 +131,7 @@ describe(svgEncoder, () => {
     it("should handle class attributes with special characters", () => {
         expect.assertions(1);
 
-        const svgInput = "<svg class=\"my-class_123 another-class.dot\"><path class=\"special@chars!\" d='M0 0'/></svg>";
+        const svgInput = '<svg class="my-class_123 another-class.dot"><path class="special@chars!" d=\'M0 0\'/></svg>';
         const cleanedSvg = "<svg><path d='M0 0'/></svg>";
         const expectedOutput = Buffer.from(cleanedSvg).toString("base64");
 
@@ -194,8 +194,8 @@ describe(svgEncoder, () => {
         expect.assertions(1);
 
         // Only actual class attributes should be removed, not class-like strings in other attributes
-        const svgInput = "<svg data-content=\"not-a-class-attr\"><path data-info=\"also-not-class\" d='M0 0'/></svg>";
-        const cleanedSvg = "<svg data-content=\"not-a-class-attr\"><path data-info=\"also-not-class\" d='M0 0'/></svg>";
+        const svgInput = '<svg data-content="not-a-class-attr"><path data-info="also-not-class" d=\'M0 0\'/></svg>';
+        const cleanedSvg = '<svg data-content="not-a-class-attr"><path data-info="also-not-class" d=\'M0 0\'/></svg>';
         const expectedOutput = Buffer.from(cleanedSvg).toString("base64");
 
         expect(svgEncoder(Buffer.from(svgInput, "utf8"))).toBe(expectedOutput);
