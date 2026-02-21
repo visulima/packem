@@ -58,17 +58,17 @@
         "clean": "rimraf node_modules dist"
     },
     "dependencies": {
-        "react": "^19.2.3",
-        "react-dom": "^19.2.3"
+        "react": "^19.2.4",
+        "react-dom": "^19.2.4"
     },
     "devDependencies": {
-        "@types/react": "^19.2.7",
+        "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
         "@visulima/packem": "workspace:*",
-        "esbuild": "^0.27.2",
-        "rimraf": "^6.1.2",
+        "esbuild": "^0.27.3",
+        "rimraf": "^6.1.3",
         "typescript": "^5.9.3",
-        "vite": "7.3.0"
+        "vite": "7.3.1"
     },
     "engines": {
         "node": ">=20"
