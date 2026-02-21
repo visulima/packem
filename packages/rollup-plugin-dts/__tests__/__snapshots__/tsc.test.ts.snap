@@ -2,19 +2,15 @@
 
 exports[`tsc > arktype 1`] = `
 "// arktype.d.ts
-import * as arktype_internal_methods_object_ts0 from "arktype/internal/methods/object.ts";
-
-//#region tests/fixtures/arktype.d.ts
-declare const test: arktype_internal_methods_object_ts0.ObjectType<{
-  test: string;
-}, {}>;
+//#region __tests__/fixtures/arktype.d.ts
+declare const test: any;
 //#endregion
 export { test };"
 `;
 
 exports[`tsc > compiler project sourcemap (build: false) 2`] = `
 "// index.d.ts
-//#region tests/fixtures/deep-source-map/src/index.d.ts
+//#region __tests__/fixtures/deep-source-map/src/index.d.ts
 declare const a = 1;
 //#endregion
 export { a };
@@ -22,19 +18,19 @@ export { a };
 // index.d.ts.map
 {"version":3,"file":"index.d.ts","names":[],"sources":["../src/index.ts"],"sourcesContent":[],"mappings":";cAAa,CAAA"}
 // index.js
-//#region tests/fixtures/deep-source-map/src/index.ts
+//#region __tests__/fixtures/deep-source-map/src/index.ts
 const a = 1;
 
 //#endregion
 export { a };
 //# sourceMappingURL=index.js.map
 // index.js.map
-{"version":3,"file":"index.js","names":[],"sources":["../src/index.ts"],"sourcesContent":["export const a = 1\\n"],"mappings":";AAAA,MAAa,IAAI"}"
+{"version":3,"file":"index.js","names":[],"sources":["../src/index.ts"],"sourcesContent":["export const a = 1;\\n"],"mappings":";AAAA,MAAa,IAAI"}"
 `;
 
 exports[`tsc > compiler project sourcemap (build: true) 2`] = `
 "// index.d.ts
-//#region tests/fixtures/deep-source-map/src/index.d.ts
+//#region __tests__/fixtures/deep-source-map/src/index.d.ts
 declare const a = 1;
 //#endregion
 export { a };
@@ -42,35 +38,35 @@ export { a };
 // index.d.ts.map
 {"version":3,"file":"index.d.ts","names":["a"],"sources":["../src/index.d.ts"],"sourcesContent":["export declare const a = 1;\\n"],"mappings":";cAAqBA,CAAAA"}
 // index.js
-//#region tests/fixtures/deep-source-map/src/index.ts
+//#region __tests__/fixtures/deep-source-map/src/index.ts
 const a = 1;
 
 //#endregion
 export { a };
 //# sourceMappingURL=index.js.map
 // index.js.map
-{"version":3,"file":"index.js","names":[],"sources":["../src/index.ts"],"sourcesContent":["export const a = 1\\n"],"mappings":";AAAA,MAAa,IAAI"}"
+{"version":3,"file":"index.js","names":[],"sources":["../src/index.ts"],"sourcesContent":["export const a = 1;\\n"],"mappings":";AAAA,MAAa,IAAI"}"
 `;
 
 exports[`tsc > composite references 1`] = `
 "// input1.d.ts
-//#region tests/fixtures/composite-refs/dir1/input1.d.ts
+//#region __tests__/fixtures/composite-refs/dir1/input1.d.ts
 declare const input1 = "input1";
 //#endregion
 export { input1 };
 // input1.js
-//#region tests/fixtures/composite-refs/dir1/input1.ts
+//#region __tests__/fixtures/composite-refs/dir1/input1.ts
 const input1 = "input1";
 
 //#endregion
 export { input1 };
 // input2.d.ts
-//#region tests/fixtures/composite-refs/dir2/input2.d.ts
+//#region __tests__/fixtures/composite-refs/dir2/input2.d.ts
 declare const input2 = "input2";
 //#endregion
 export { input2 };
 // input2.js
-//#region tests/fixtures/composite-refs/dir2/input2.ts
+//#region __tests__/fixtures/composite-refs/dir2/input2.ts
 const input2 = "input2";
 
 //#endregion
@@ -79,23 +75,23 @@ export { input2 };"
 
 exports[`tsc > composite references incremental 1`] = `
 "// input1.d.ts
-//#region tests/fixtures/composite-refs-incremental/dir1/input1.d.ts
+//#region __tests__/fixtures/composite-refs-incremental/dir1/input1.d.ts
 declare const input1 = "input1";
 //#endregion
 export { input1 };
 // input1.js
-//#region tests/fixtures/composite-refs-incremental/dir1/input1.ts
+//#region __tests__/fixtures/composite-refs-incremental/dir1/input1.ts
 const input1 = "input1";
 
 //#endregion
 export { input1 };
 // input2.d.ts
-//#region tests/fixtures/composite-refs-incremental/dir2/input2.d.ts
+//#region __tests__/fixtures/composite-refs-incremental/dir2/input2.d.ts
 declare const input2 = "input2";
 //#endregion
 export { input2 };
 // input2.js
-//#region tests/fixtures/composite-refs-incremental/dir2/input2.ts
+//#region __tests__/fixtures/composite-refs-incremental/dir2/input2.ts
 const input2 = "input2";
 
 //#endregion
@@ -104,54 +100,32 @@ export { input2 };"
 
 exports[`tsc > import JSON 1`] = `
 "// index.d.ts
-declare namespace foo_d_exports {
-  export { age, name };
-}
+declare const _exports: string[];
 declare let name: string;
 declare let age: number;
-declare namespace bar_d_exports {
-  export { _exports as default };
+declare namespace __json_default_export {
+  export { name, age };
 }
-declare const _exports: string[];
 //#endregion
-export { age, _exports as bar, bar_d_exports as barNs, foo_d_exports as fooNs, name };"
+export { age, _exports as bar, bar_json_d_exports as barNs, foo_json_d_exports as fooNs, name };"
 `;
 
 exports[`tsc > jsdoc 1`] = `
 "// jsdoc.d.ts
 import { Plugin } from "rolldown";
 
-//#region tests/fixtures/jsdoc.d.ts
-
-/**
- * with imports
- */
+//#region __tests__/fixtures/jsdoc.d.ts
 interface RollupMdiFontminOptions extends Plugin {}
-/**
- * named export
- */
 declare function fn(): number;
-/**
- * options
- */
 interface Options {
-  /**
-   * interface member
-   */
   foo: string;
 }
-/**
- * type alias
- */
 type Foo = string;
-/**
- * default export
- */
 declare const _default: number;
 //#endregion
 export { Foo, Options, RollupMdiFontminOptions, _default as default, fn };
 // jsdoc.js
-//#region tests/fixtures/jsdoc.ts
+//#region __tests__/fixtures/jsdoc.ts
 /**
 * named export
 */
@@ -169,33 +143,60 @@ export { jsdoc_default as default, fn };"
 
 exports[`tsc > multi declarations 1`] = `
 "// index.d.ts
-//#region tests/fixtures/multi-decls/mod.d.ts
+//#region __tests__/fixtures/multi-decls/mod.d.ts
 declare const a: 1, b: 2;
 //#endregion
-//#region tests/fixtures/multi-decls/index.d.ts
-declare const a$1 = 3,
-  b$1 = 3;
+//#region __tests__/fixtures/multi-decls/index.d.ts
+declare const a$1 = 3;
+declare const b$1 = 3;
 //#endregion
 export { a, b, a$1 as c, b$1 as d };"
 `;
 
 exports[`tsc > references 1`] = `
 "// index.d.ts
-//#region tests/fixtures/refs/src/index.d.ts
+//#region __tests__/fixtures/refs/src/index.d.ts
 declare const a = 1;
 //#endregion
 export { a };
 // index.js
-//#region tests/fixtures/refs/src/index.ts
+//#region __tests__/fixtures/refs/src/index.ts
 const a = 1;
 
 //#endregion
 export { a };"
 `;
 
+exports[`tsc > rename infer 1`] = `
+"// infer-renaming.d.ts
+import { infer } from "zod";
+
+//#region __tests__/fixtures/infer-renaming.d.ts
+declare const productSchema: any;
+declare const product: infer<typeof productSchema>;
+//#endregion
+export { product, productSchema };"
+`;
+
+exports[`tsc > resolve paths > resolver: oxc 1`] = `
+"// index.d.ts
+//#region __tests__/fixtures/paths/mod.d.ts
+declare const foo = 42;
+//#endregion
+export { foo };"
+`;
+
+exports[`tsc > resolve paths > resolver: tsc 1`] = `
+"// index.d.ts
+//#region __tests__/fixtures/paths/mod.d.ts
+declare const foo = 42;
+//#endregion
+export { foo };"
+`;
+
 exports[`tsc > ts-macro w/ ts-compiler 1`] = `
 "// main.d.ts
-//#region tests/fixtures/ts-macro/main.d.ts
+//#region __tests__/fixtures/ts-macro/main.d.ts
 declare function defineStyle(style: string): string;
 //#endregion
 export { defineStyle as default };"
@@ -207,7 +208,7 @@ exports[`tsc > typescript compiler 1`] = `
 declare const str = "foo";
 declare const num = 42;
 declare const bool = true;
-declare function fn(arg: typeof str): "foo" | 1;
+declare function fn(argument: typeof str): "foo" | 1;
 //#endregion
 export { bool, fn, num, str };
 // entry2.d.ts
@@ -221,9 +222,9 @@ export { Unused };"
 
 exports[`tsc > vue-sfc w/ ts-compiler 1`] = `
 "// main.d.ts
-import * as vue0 from "vue";
+import * as vue from "vue";
 
-//#region tests/fixtures/vue-sfc/App.vue.d.ts
+//#region __tests__/fixtures/vue-sfc/App.vue.d.ts
 type __VLS_Props = {
   foo: string;
 };
@@ -232,7 +233,7 @@ declare global {
     foo: string;
   }
 }
-declare const __VLS_export: vue0.DefineComponent<__VLS_Props, {}, {}, {}, {}, vue0.ComponentOptionsMixin, vue0.ComponentOptionsMixin, {}, string, vue0.PublicProps, Readonly<__VLS_Props> & Readonly<{}>, {}, {}, {}, {}, string, vue0.ComponentProvideOptions, false, {}, any>;
+declare const __VLS_export: vue.DefineComponent<__VLS_Props, {}, {}, {}, {}, vue.ComponentOptionsMixin, vue.ComponentOptionsMixin, {}, string, vue.PublicProps, Readonly<__VLS_Props> & Readonly<{}>, {}, {}, {}, {}, string, vue.ComponentProvideOptions, false, {}, any>;
 declare const _default: typeof __VLS_export;
 //#endregion
 export { _default as App };"
@@ -240,20 +241,22 @@ export { _default as App };"
 
 exports[`tsc > vue-sfc w/ ts-compiler w/ vueCompilerOptions in tsconfig 1`] = `
 "// main.d.ts
-import * as vue0 from "vue";
+import * as vue from "vue";
 
-//#region tests/fixtures/vue-sfc-fallthrough/App.vue.d.ts
-declare const __VLS_export: vue0.DefineComponent<{
+//#region __tests__/fixtures/vue-sfc-fallthrough/App.vue.d.ts
+declare const __VLS_export: vue.DefineComponent<{
   foo: string;
   bar?: string;
   innerHTML?: string | undefined;
   class?: any;
-  style?: vue0.StyleValue | undefined;
+  style?: vue.StyleValue | undefined;
   accesskey?: string | undefined;
   contenteditable?: (boolean | "true" | "false") | "inherit" | "plaintext-only" | undefined;
   contextmenu?: string | undefined;
   dir?: string | undefined;
   draggable?: (boolean | "true" | "false") | undefined;
+  enterkeyhint?: "enter" | "done" | "go" | "next" | "previous" | "search" | "send" | undefined;
+  enterKeyHint?: vue.HTMLAttributes["enterkeyhint"];
   hidden?: (boolean | "true" | "false") | "" | "hidden" | "until-found" | undefined;
   id?: string | undefined;
   inert?: (boolean | "true" | "false") | undefined;
@@ -287,6 +290,8 @@ declare const __VLS_export: vue0.DefineComponent<{
   unselectable?: "on" | "off" | undefined;
   inputmode?: "none" | "text" | "tel" | "url" | "email" | "numeric" | "decimal" | "search" | undefined;
   is?: string | undefined;
+  exportparts?: string;
+  part?: string;
   'aria-activedescendant'?: string | undefined;
   'aria-atomic'?: (boolean | "true" | "false") | undefined;
   'aria-autocomplete'?: "none" | "inline" | "list" | "both" | undefined;
@@ -430,26 +435,28 @@ declare const __VLS_export: vue0.DefineComponent<{
   onTransitionrun?: (payload: TransitionEvent) => void;
   onTransitionstart?: (payload: TransitionEvent) => void;
   key?: PropertyKey | undefined;
-  ref?: vue0.VNodeRef | undefined;
+  ref?: vue.VNodeRef | undefined;
   ref_for?: boolean | undefined;
   ref_key?: string | undefined;
-  onVnodeBeforeMount?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
-  onVnodeMounted?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
-  onVnodeBeforeUpdate?: ((vnode: vue0.VNode, oldVNode: vue0.VNode) => void) | ((vnode: vue0.VNode, oldVNode: vue0.VNode) => void)[];
-  onVnodeUpdated?: ((vnode: vue0.VNode, oldVNode: vue0.VNode) => void) | ((vnode: vue0.VNode, oldVNode: vue0.VNode) => void)[];
-  onVnodeBeforeUnmount?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
-  onVnodeUnmounted?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
-}, {}, {}, {}, {}, vue0.ComponentOptionsMixin, vue0.ComponentOptionsMixin, {}, string, vue0.PublicProps, Readonly<{
+  onVnodeBeforeMount?: ((vnode: vue.VNode) => void) | ((vnode: vue.VNode) => void)[];
+  onVnodeMounted?: ((vnode: vue.VNode) => void) | ((vnode: vue.VNode) => void)[];
+  onVnodeBeforeUpdate?: ((vnode: vue.VNode, oldVNode: vue.VNode) => void) | ((vnode: vue.VNode, oldVNode: vue.VNode) => void)[];
+  onVnodeUpdated?: ((vnode: vue.VNode, oldVNode: vue.VNode) => void) | ((vnode: vue.VNode, oldVNode: vue.VNode) => void)[];
+  onVnodeBeforeUnmount?: ((vnode: vue.VNode) => void) | ((vnode: vue.VNode) => void)[];
+  onVnodeUnmounted?: ((vnode: vue.VNode) => void) | ((vnode: vue.VNode) => void)[];
+}, {}, {}, {}, {}, vue.ComponentOptionsMixin, vue.ComponentOptionsMixin, {}, string, vue.PublicProps, Readonly<{
   foo: string;
   bar?: string;
   innerHTML?: string | undefined;
   class?: any;
-  style?: vue0.StyleValue | undefined;
+  style?: vue.StyleValue | undefined;
   accesskey?: string | undefined;
   contenteditable?: (boolean | "true" | "false") | "inherit" | "plaintext-only" | undefined;
   contextmenu?: string | undefined;
   dir?: string | undefined;
   draggable?: (boolean | "true" | "false") | undefined;
+  enterkeyhint?: "enter" | "done" | "go" | "next" | "previous" | "search" | "send" | undefined;
+  enterKeyHint?: vue.HTMLAttributes["enterkeyhint"];
   hidden?: (boolean | "true" | "false") | "" | "hidden" | "until-found" | undefined;
   id?: string | undefined;
   inert?: (boolean | "true" | "false") | undefined;
@@ -483,6 +490,8 @@ declare const __VLS_export: vue0.DefineComponent<{
   unselectable?: "on" | "off" | undefined;
   inputmode?: "none" | "text" | "tel" | "url" | "email" | "numeric" | "decimal" | "search" | undefined;
   is?: string | undefined;
+  exportparts?: string;
+  part?: string;
   'aria-activedescendant'?: string | undefined;
   'aria-atomic'?: (boolean | "true" | "false") | undefined;
   'aria-autocomplete'?: "none" | "inline" | "list" | "both" | undefined;
@@ -626,16 +635,16 @@ declare const __VLS_export: vue0.DefineComponent<{
   onTransitionrun?: (payload: TransitionEvent) => void;
   onTransitionstart?: (payload: TransitionEvent) => void;
   key?: PropertyKey | undefined;
-  ref?: vue0.VNodeRef | undefined;
+  ref?: vue.VNodeRef | undefined;
   ref_for?: boolean | undefined;
   ref_key?: string | undefined;
-  onVnodeBeforeMount?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
-  onVnodeMounted?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
-  onVnodeBeforeUpdate?: ((vnode: vue0.VNode, oldVNode: vue0.VNode) => void) | ((vnode: vue0.VNode, oldVNode: vue0.VNode) => void)[];
-  onVnodeUpdated?: ((vnode: vue0.VNode, oldVNode: vue0.VNode) => void) | ((vnode: vue0.VNode, oldVNode: vue0.VNode) => void)[];
-  onVnodeBeforeUnmount?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
-  onVnodeUnmounted?: ((vnode: vue0.VNode) => void) | ((vnode: vue0.VNode) => void)[];
-}> & Readonly<{}>, {}, {}, {}, {}, string, vue0.ComponentProvideOptions, false, {}, any>;
+  onVnodeBeforeMount?: ((vnode: vue.VNode) => void) | ((vnode: vue.VNode) => void)[];
+  onVnodeMounted?: ((vnode: vue.VNode) => void) | ((vnode: vue.VNode) => void)[];
+  onVnodeBeforeUpdate?: ((vnode: vue.VNode, oldVNode: vue.VNode) => void) | ((vnode: vue.VNode, oldVNode: vue.VNode) => void)[];
+  onVnodeUpdated?: ((vnode: vue.VNode, oldVNode: vue.VNode) => void) | ((vnode: vue.VNode, oldVNode: vue.VNode) => void)[];
+  onVnodeBeforeUnmount?: ((vnode: vue.VNode) => void) | ((vnode: vue.VNode) => void)[];
+  onVnodeUnmounted?: ((vnode: vue.VNode) => void) | ((vnode: vue.VNode) => void)[];
+}> & Readonly<{}>, {}, {}, {}, {}, string, vue.ComponentProvideOptions, false, {}, any>;
 declare const _default: typeof __VLS_export;
 //#endregion
 export { _default as App };"
@@ -643,9 +652,9 @@ export { _default as App };"
 
 exports[`tsc > vue-sfc w/ ts-macro w/ ts-compiler 1`] = `
 "// main.d.ts
-import * as vue0 from "vue";
+import * as vue from "vue";
 
-//#region tests/fixtures/vue-sfc-with-ts-macro/App.vue.d.ts
+//#region __tests__/fixtures/vue-sfc-with-ts-macro/App.vue.d.ts
 type __VLS_Props = {
   foo: string;
 };
@@ -654,10 +663,10 @@ declare global {
     foo: string;
   }
 }
-declare const __VLS_export: vue0.DefineComponent<__VLS_Props, {}, {}, {}, {}, vue0.ComponentOptionsMixin, vue0.ComponentOptionsMixin, {}, string, vue0.PublicProps, Readonly<__VLS_Props> & Readonly<{}>, {}, {}, {}, {}, string, vue0.ComponentProvideOptions, false, {}, any>;
+declare const __VLS_export: vue.DefineComponent<__VLS_Props, {}, {}, {}, {}, vue.ComponentOptionsMixin, vue.ComponentOptionsMixin, {}, string, vue.PublicProps, Readonly<__VLS_Props> & Readonly<{}>, {}, {}, {}, {}, string, vue.ComponentProvideOptions, false, {}, any>;
 declare const _default: typeof __VLS_export;
 //#endregion
-//#region tests/fixtures/vue-sfc-with-ts-macro/main.d.ts
+//#region __tests__/fixtures/vue-sfc-with-ts-macro/main.d.ts
 declare function defineStyle(style: string): any;
 //#endregion
 export { _default as App, defineStyle };"

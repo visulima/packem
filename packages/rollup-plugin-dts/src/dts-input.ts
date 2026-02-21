@@ -1,26 +1,26 @@
 import type { Plugin } from "rolldown";
 
-import { RE_DTS, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename.ts";
-import type { OptionsResolved } from "./options.ts";
+import { RE_DTS, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename";
+import type { OptionsResolved } from "./options";
 
-export function createDtsInputPlugin({ sideEffects }: Pick<OptionsResolved, "sideEffects">): Plugin {
+const createDtsInputPlugin = ({ sideEffects }: Pick<OptionsResolved, "sideEffects">): Plugin => {
     return {
         name: "rolldown-plugin-dts:dts-input",
 
         options:
             sideEffects === false
                 ? (options) => {
-                    return {
-                        treeshake:
+                      return {
+                          treeshake:
                               options.treeshake === false
                                   ? false
                                   : {
-                                      ...options.treeshake === true ? {} : options.treeshake,
-                                      moduleSideEffects: false,
-                                  },
-                        ...options,
-                    };
-                }
+                                        ...(options.treeshake === true ? {} : options.treeshake),
+                                        moduleSideEffects: false,
+                                    },
+                          ...options,
+                      };
+                  }
                 : undefined,
 
         outputOptions(options) {
@@ -60,4 +60,6 @@ export function createDtsInputPlugin({ sideEffects }: Pick<OptionsResolved, "sid
             };
         },
     };
-}
+};
+
+export default createDtsInputPlugin;

@@ -1,5 +1,5 @@
 import { dirname } from "@visulima/path";
-import Debug from "debug";
+import { createDebug } from "obug";
 import type { ExistingRawSourceMap } from "rollup";
 import ts from "typescript";
 
@@ -7,9 +7,9 @@ import { globalContext } from "./context.js";
 import { createFsSystem } from "./system.js";
 import type { TscModule, TscOptions, TscResult } from "./types.js";
 import { customTransformers, formatHost, setSourceMapRoot } from "./utils.js";
-import { createProgramFactory } from "./volar.js";
+import createProgramFactory from "./volar.js";
 
-const debug = Debug("rollup-plugin-dts:tsc-compiler");
+const debug = createDebug("rollup-plugin-dts:tsc-compiler");
 
 const defaultCompilerOptions: ts.CompilerOptions = {
     checkJs: false,
@@ -92,7 +92,7 @@ const createTsProgramFromParsedConfig = ({
         $rootDir: baseDir,
     };
 
-    const rootNames = [...new Set([id, ...entries || parsedConfig.fileNames].map((f) => fsSystem.resolvePath(f)))];
+    const rootNames = [...new Set([id, ...(entries || parsedConfig.fileNames)].map((f) => fsSystem.resolvePath(f)))];
 
     const host = ts.createCompilerHost(compilerOptions, true);
 
@@ -135,7 +135,7 @@ const createTsProgramFromParsedConfig = ({
 };
 
 // Emit file using `tsc` mode (without `--build` flag).
-export function tscEmitCompiler(tscOptions: TscOptions): TscResult {
+const tscEmitCompiler = (tscOptions: TscOptions): TscResult => {
     debug(`running tscEmitCompiler ${tscOptions.id}`);
 
     const module = createOrGetTsModule(tscOptions);
@@ -178,4 +178,6 @@ export function tscEmitCompiler(tscOptions: TscOptions): TscResult {
     }
 
     return { code: dtsCode, map };
-}
+};
+
+export default tscEmitCompiler;

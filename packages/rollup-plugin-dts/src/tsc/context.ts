@@ -1,8 +1,8 @@
 import { resolve } from "@visulima/path";
-import Debug from "debug";
+import { createDebug } from "obug";
 import type ts from "typescript";
 
-const debug = Debug("rollup-plugin-dts:tsc-context");
+const debug = createDebug("rollup-plugin-dts:tsc-context");
 
 // A parsed tsconfig file with its path.
 export interface ParsedProject {

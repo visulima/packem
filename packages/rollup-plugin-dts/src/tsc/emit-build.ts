@@ -1,4 +1,4 @@
-import Debug from "debug";
+import { createDebug } from "obug";
 import type { ExistingRawSourceMap } from "rollup";
 import ts from "typescript";
 
@@ -8,7 +8,7 @@ import { createFsSystem, createMemorySystem } from "./system.js";
 import type { TscOptions, TscResult } from "./types.js";
 import { customTransformers, formatHost, setSourceMapRoot } from "./utils.js";
 
-const debug = Debug("rollup-plugin-dts:tsc-build");
+const debug = createDebug("rollup-plugin-dts:tsc-build");
 
 const getOrBuildProjects = (context: TscContext, fsSystem: ts.System, tsconfig: string, force: boolean, sourcemap: boolean): SourceFileToProjectMap => {
     let projectMap = context.projects.get(tsconfig);
@@ -77,18 +77,15 @@ const collectProjectGraph = (rootTsconfigPath: string, fsSystem: ts.System, forc
     while (true) {
         const tsconfigPath = stack.pop();
 
-        if (!tsconfigPath)
-            break;
+        if (!tsconfigPath) break;
 
-        if (seen.has(tsconfigPath))
-            continue;
+        if (seen.has(tsconfigPath)) continue;
 
         seen.add(tsconfigPath);
 
         const parsedConfig = parseTsconfig(tsconfigPath, fsSystem);
 
-        if (!parsedConfig)
-            continue;
+        if (!parsedConfig) continue;
 
         parsedConfig.options = patchCompilerOptions(parsedConfig.options, {
             force,
@@ -177,7 +174,7 @@ const createProgramWithPatchedCompilerOptions: ts.CreateProgram<ts.EmitAndSemant
     ts.createEmitAndSemanticDiagnosticsBuilderProgram(rootNames, patchCompilerOptions(options ?? {}, null), ...arguments_);
 
 // Emit file using `tsc --build` mode.
-export const tscEmitBuild = (tscOptions: TscOptions): TscResult => {
+const tscEmitBuild = (tscOptions: TscOptions): TscResult => {
     const { context = globalContext, id, incremental, sourcemap, tsconfig } = tscOptions;
 
     debug(`running tscEmitBuild id: ${id}, tsconfig: ${tsconfig}, incremental: ${incremental}`);
@@ -273,3 +270,5 @@ export const tscEmitBuild = (tscOptions: TscOptions): TscResult => {
         error: `Unable to build .d.ts file for ${id}; This seems like a bug of rollup-plugin-dts. Please report this issue to https://github.com/sxzz/rollup-plugin-dts/issues`,
     };
 };
+
+export default tscEmitBuild;

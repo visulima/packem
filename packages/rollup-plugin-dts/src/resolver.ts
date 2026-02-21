@@ -4,21 +4,21 @@ import { createResolver } from "dts-resolver";
 import type { Plugin, ResolvedId } from "rolldown";
 import { ResolverFactory } from "rolldown/experimental";
 
-import { filename_to_dts, RE_CSS, RE_DTS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename.ts";
-import type { OptionsResolved } from "./options.ts";
+import { filename_to_dts, RE_CSS, RE_DTS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename";
+import type { OptionsResolved } from "./options";
 
-function isSourceFile(id: string) {
+const isSourceFile = (id: string) => {
     return RE_TS.test(id) || RE_VUE.test(id) || RE_JSON.test(id);
-}
+};
 
-export function createDtsResolvePlugin({
+const createDtsResolvePlugin = ({
     cwd,
     resolve,
     resolver,
     sideEffects,
     tsconfig,
     tsconfigRaw,
-}: Pick<OptionsResolved, "cwd" | "tsconfig" | "tsconfigRaw" | "resolve" | "resolver" | "sideEffects">): Plugin {
+}: Pick<OptionsResolved, "cwd" | "tsconfig" | "tsconfigRaw" | "resolve" | "resolver" | "sideEffects">): Plugin => {
     const baseDtsResolver = createResolver({
         resolveNodeModules: !!resolve,
         ResolverFactory,
@@ -62,11 +62,11 @@ export function createDtsResolvePlugin({
                 // Externalize non-bundled node_modules dependencies
                 if (
                     // request resolved to inside node_modules
-                    RE_NODE_MODULES.test(dtsResolution)
+                    RE_NODE_MODULES.test(dtsResolution) &&
                     // User doesn't want to bundle this module
-                    && !shouldBundleNodeModule(id)
+                    !shouldBundleNodeModule(id) &&
                     // The importer is not in node_modules, or if it is, the module is marked as external by Rolldown
-                    && (!RE_NODE_MODULES.test(importer) || rolldownResolution?.external)
+                    (!RE_NODE_MODULES.test(importer) || rolldownResolution?.external)
                 ) {
                     return external;
                 }
@@ -96,8 +96,7 @@ export function createDtsResolvePlugin({
     };
 
     function shouldBundleNodeModule(id: string) {
-        if (typeof resolve === "boolean")
-            return resolve;
+        if (typeof resolve === "boolean") return resolve;
 
         return resolve.some((pattern) => (typeof pattern === "string" ? id === pattern : pattern.test(id)));
     }
@@ -106,7 +105,7 @@ export function createDtsResolvePlugin({
         let dtsPath: string | undefined | null;
 
         if (resolver === "tsc") {
-            const { tscResolve } = await import("./tsc/resolver.ts");
+            const { default: tscResolve } = await import("./tsc/resolver.ts");
 
             dtsPath = tscResolve(
                 id,
@@ -134,8 +133,10 @@ export function createDtsResolvePlugin({
 
         return dtsPath;
     }
-}
+};
 
-function isFilePath(id: string) {
+const isFilePath = (id: string) => {
     return id.startsWith(".") || path.isAbsolute(id);
-}
+};
+
+export default createDtsResolvePlugin;

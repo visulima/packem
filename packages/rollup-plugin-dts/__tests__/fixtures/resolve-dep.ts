@@ -1,2 +1,2 @@
-export { TsConfigResult } from "get-tsconfig";
+export { TsConfigResult } from "@visulima/tsconfig";
 export { build } from "rolldown";

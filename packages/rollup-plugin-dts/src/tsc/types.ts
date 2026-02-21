@@ -1,4 +1,4 @@
-import type { TsConfigJson } from "get-tsconfig";
+import type { TsConfigJson } from "@visulima/tsconfig";
 import type { SourceMapInput } from "rollup";
 import type ts from "typescript";
 
