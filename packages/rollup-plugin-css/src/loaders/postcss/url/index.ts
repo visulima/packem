@@ -25,7 +25,7 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
         resolve: urlResolve,
         ...userOptions,
     };
-    const placeholder = options.hash ?? true ? typeof options.hash === "string" ? options.hash : placeholderHashDefault : placeholderNoHashDefault;
+    const placeholder = (options.hash ?? true) ? (typeof options.hash === "string" ? options.hash : placeholderHashDefault) : placeholderNoHashDefault;
 
     return {
         async Once(css, { result }) {
@@ -162,8 +162,8 @@ const plugin: PluginCreator<UrlOptions> = (userOptions) => {
 
                     usedNames.set(to, from);
 
-                    const resolvedPublicPath
-                        = typeof options.publicPath === "string"
+                    const resolvedPublicPath =
+                        typeof options.publicPath === "string"
                             ? options.publicPath + (/[/\\]$/.test(options.publicPath) ? "" : "/") + basename(to)
                             : `${defaultPublicPath}${basename(to)}`;
 

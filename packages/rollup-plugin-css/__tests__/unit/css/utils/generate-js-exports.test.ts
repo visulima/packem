@@ -16,7 +16,7 @@ describe(generateJsExports, () => {
 
             const result = generateJsExports(baseOptions);
 
-            expect(result.code).toContain("var css = \"body { color: red; }\";");
+            expect(result.code).toContain('var css = "body { color: red; }";');
             expect(result.code).toContain("export default css;");
             expect(result.moduleSideEffects).toBe("no-treeshake");
         });
@@ -62,7 +62,7 @@ describe(generateJsExports, () => {
                 supportModules: true,
             });
 
-            expect(result.code).toContain("{\"button\":\"button_abc123\",\"container\":\"container_def456\"}");
+            expect(result.code).toContain('{"button":"button_abc123","container":"container_def456"}');
             expect(result.code).toContain("export default");
         });
 
@@ -100,7 +100,7 @@ describe(generateJsExports, () => {
                 namedExports: true,
             });
 
-            expect(result.code).toContain("var button = \"button_abc123\";");
+            expect(result.code).toContain('var button = "button_abc123";');
             expect(result.code).toContain("export {");
             expect(result.code).toContain("  css,");
             expect(result.code).toContain("  button");
@@ -121,7 +121,7 @@ describe(generateJsExports, () => {
                 namedExports: customNamedExports,
             });
 
-            expect(result.code).toContain("var my_button = \"button_abc123\";");
+            expect(result.code).toContain('var my_button = "button_abc123";');
             expect(result.code).toContain("export {");
             expect(result.code).toContain("  my_button");
         });
@@ -140,7 +140,7 @@ describe(generateJsExports, () => {
                 namedExports: true,
             });
 
-            expect(result.types).toContain("declare const button: \"button_abc123\";");
+            expect(result.types).toContain('declare const button: "button_abc123";');
             expect(result.types).toContain("export {");
             expect(result.types).toContain("  button");
         });
@@ -156,7 +156,7 @@ describe(generateJsExports, () => {
             });
 
             expect(result.code).toContain("import { cssStyleInject as");
-            expect(result.code).toContain("from \"@visulima/css-style-inject\"");
+            expect(result.code).toContain('from "@visulima/css-style-inject"');
             expect(result.code).toContain("(css,{});");
         });
 
@@ -169,8 +169,8 @@ describe(generateJsExports, () => {
             });
 
             expect(result.code).toContain("import { cssStyleInject as");
-            expect(result.code).toContain("from \"@visulima/css-style-inject\"");
-            expect(result.code).toContain("(css,{\"insertAt\":\"top\"});");
+            expect(result.code).toContain('from "@visulima/css-style-inject"');
+            expect(result.code).toContain('(css,{"insertAt":"top"});');
         });
 
         it("should handle treeshakeable injection", () => {
@@ -196,7 +196,7 @@ describe(generateJsExports, () => {
                 inject: customInject,
             });
 
-            expect(result.code).toContain("console.log(\"Injecting css from test.css\");");
+            expect(result.code).toContain('console.log("Injecting css from test.css");');
         });
     });
 
@@ -224,9 +224,9 @@ describe(generateJsExports, () => {
                 css: cssWithNewlines,
             });
 
-            expect(result.code).toContain("var css = \"body {");
+            expect(result.code).toContain('var css = "body {');
             expect(result.code).toContain("color: red;");
-            expect(result.code).toContain("}\";");
+            expect(result.code).toContain('}";');
         });
 
         it("should handle reserved JavaScript keywords", () => {
@@ -242,7 +242,7 @@ describe(generateJsExports, () => {
                 namedExports: true,
             });
 
-            expect(result.code).toContain("var _css = \"css_abc123\";");
+            expect(result.code).toContain('var _css = "css_abc123";');
         });
     });
 

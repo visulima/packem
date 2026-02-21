@@ -58,7 +58,7 @@ class TailwindRoot {
         const requiresBuildPromise = this.requiresBuild();
         const inputBase = dirname(pathResolve(inputPath));
 
-        if (!this.compiler || !this.scanner || await requiresBuildPromise) {
+        if (!this.compiler || !this.scanner || (await requiresBuildPromise)) {
             clearRequireCache([...this.buildDependencies.keys()]);
 
             this.buildDependencies.clear();
@@ -113,10 +113,10 @@ class TailwindRoot {
 
         // Check if compiler has required features using bitwise operations
 
-        const hasRequiredFeatures
-            = this.compiler.features
+        const hasRequiredFeatures =
+            this.compiler.features &
             // eslint-disable-next-line no-bitwise
-                & (Features.AtApply | Features.JsPluginCompat | Features.ThemeFunction | Features.Utilities);
+            (Features.AtApply | Features.JsPluginCompat | Features.ThemeFunction | Features.Utilities);
 
         this.logger.debug({
             data: {
@@ -428,7 +428,11 @@ const tailwindcssLoader: Loader = {
         };
 
         // Create or get the Tailwind root for this file
-        const root = new TailwindRoot(this.id, this.sourceDir || process.cwd(), this.useSourcemap, customCssResolver, customJsResolver, this.logger);
+        // Resolve an absolute scanner base: prefer joining the absolute cwd with sourceDir,
+        // fall back to sourceDir alone (may be relative) or process.cwd() as last resort.
+        const scannerBase = this.cwd ? (this.sourceDir ? join(this.cwd, this.sourceDir) : this.cwd) : this.sourceDir || process.cwd();
+
+        const root = new TailwindRoot(this.id, scannerBase, this.useSourcemap, customCssResolver, customJsResolver, this.logger);
 
         let result = await root.generate(code, (file) => this.deps.add(normalize(file)));
 

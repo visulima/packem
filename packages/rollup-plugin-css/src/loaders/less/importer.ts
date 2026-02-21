@@ -8,7 +8,7 @@ import { getUrlOfPartial, normalizeUrl } from "../../utils/url";
 const extensions = [".less", ".css"];
 
 const getStylesFileManager = (less: LessStatic, aliases: Record<string, string>): Less.FileManager =>
-    new class extends less.FileManager implements Less.FileManager {
+    new (class extends less.FileManager implements Less.FileManager {
         // eslint-disable-next-line class-methods-use-this
         public override supports(): boolean {
             return true;
@@ -32,7 +32,7 @@ const getStylesFileManager = (less: LessStatic, aliases: Record<string, string>)
 
             return { contents: readFileSync(id), filename: id };
         }
-    }();
+    })();
 
 const importer = (alias: Record<string, string>): Less.Plugin => {
     return {

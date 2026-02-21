@@ -42,35 +42,33 @@ const concat = async (extracted: Extracted[]): Promise<Concatenated> => {
 
     for await (const { css, map } of extracted) {
         content.push(css);
-        const mapModifier = mm(map);
 
+        const mapModifier = mm(map);
         const data = mapModifier.toObject();
 
-        if (!data) {
-            continue;
-        }
+        if (data) {
+            const consumer = mapModifier.toConsumer();
 
-        const consumer = mapModifier.toConsumer();
+            if (consumer) {
+                consumer.eachMapping((item) => {
+                    sm.addMapping({
+                        generated: { column: item.generatedColumn, line: offset + item.generatedLine },
+                        name: item.name,
+                        original: { column: item.originalColumn as number, line: item.originalLine as number },
+                        source: item.source,
+                    });
+                });
 
-        if (!consumer) {
-            continue;
-        }
-
-        consumer.eachMapping((item) => {
-            sm.addMapping({
-                generated: { column: item.generatedColumn, line: offset + item.generatedLine },
-                name: item.name,
-                original: { column: item.originalColumn as number, line: item.originalLine as number },
-                source: item.source,
-            });
-        });
-
-        if (data.sourcesContent) {
-            for (const source of data.sources) {
-                sm.setSourceContent(source, consumer.sourceContentFor(source, true));
+                if (data.sourcesContent) {
+                    for (const source of data.sources) {
+                        sm.setSourceContent(source, consumer.sourceContentFor(source, true));
+                    }
+                }
             }
         }
 
+        // Always advance the offset so subsequent chunks get correct line numbers,
+        // regardless of whether this chunk had a source map.
         offset += css.split("\n").length;
     }
 
