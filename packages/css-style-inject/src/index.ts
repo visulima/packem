@@ -57,8 +57,8 @@ export const cssStyleInject = (
     const singleTag = options.singleTag === true;
     const insertAt = options.insertAt ?? "last";
 
-    const container
-        = typeof options.container === "string" ? (document.querySelector(options.container) as HTMLElement | undefined) : document.querySelectorAll("head")[0];
+    const container =
+        typeof options.container === "string" ? (document.querySelector(options.container) as HTMLElement | undefined) : document.querySelectorAll("head")[0];
 
     if (!container) {
         throw new Error("Unable to find container element");
