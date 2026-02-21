@@ -1,3 +1,10 @@
+## @visulima/packem-share [1.0.0-alpha.20](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.19...@visulima/packem-share@1.0.0-alpha.20) (2026-02-21)
+
+### Miscellaneous Chores
+
+* **packem-share:** update source and tests ([e84f359](https://github.com/visulima/packem/commit/e84f3596a8ff4b99868886497e13f97143f84737))
+* remove empty optionalDependencies sections from package.json files ([a4aecaa](https://github.com/visulima/packem/commit/a4aecaaacb33d1ffcc8731cfc5247e5f7fa79cf0))
+
 ## @visulima/packem-share [1.0.0-alpha.19](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.18...@visulima/packem-share@1.0.0-alpha.19) (2025-12-29)
 
 ### Features
