@@ -1,3 +1,18 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.19](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.18...@visulima/rollup-plugin-css@1.0.0-alpha.19) (2026-02-21)
+
+### Bug Fixes
+
+* **rollup-plugin-css:** restore named exports override for treeshakeable mode ([e51edb4](https://github.com/visulima/packem/commit/e51edb4c98e9aafaf06ac44f924e26c855bac5ff))
+
+### Miscellaneous Chores
+
+* remove empty optionalDependencies sections from package.json files ([a4aecaa](https://github.com/visulima/packem/commit/a4aecaaacb33d1ffcc8731cfc5247e5f7fa79cf0))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.20
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.18](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.17...@visulima/rollup-plugin-css@1.0.0-alpha.18) (2025-12-29)
 
 ### Features
