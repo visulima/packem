@@ -33,25 +33,25 @@ const createStub = async (context: BuildContext<InternalBuildOptions>): Promise<
         undefined,
         2,
     ).replace(
-        "\"__$BABEL_PLUGINS\"",
+        '"__$BABEL_PLUGINS"',
         Array.isArray(babelPlugins)
             ? `[${babelPlugins
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .map((plugin: any[] | string, index: number): string => {
-                    if (Array.isArray(plugin)) {
-                        // eslint-disable-next-line @typescript-eslint/naming-convention
-                        const [name, ...arguments_] = plugin;
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  .map((plugin: any[] | string, index: number): string => {
+                      if (Array.isArray(plugin)) {
+                          // eslint-disable-next-line @typescript-eslint/naming-convention
+                          const [name, ...arguments_] = plugin;
 
-                        importedBabelPlugins.push(name as string);
+                          importedBabelPlugins.push(name as string);
 
-                        return `[${[`plugin${index}`, ...arguments_.map((value) => JSON.stringify(value))].join(", ")}]`;
-                    }
+                          return `[${[`plugin${index}`, ...arguments_.map((value) => JSON.stringify(value))].join(", ")}]`;
+                      }
 
-                    importedBabelPlugins.push(plugin as string);
+                      importedBabelPlugins.push(plugin as string);
 
-                    return `plugin${index}`;
-                })
-                .join(",")}]`
+                      return `plugin${index}`;
+                  })
+                  .join(",")}]`
             : "[]",
     );
 
@@ -99,36 +99,36 @@ const createStub = async (context: BuildContext<InternalBuildOptions>): Promise<
 
             writeFileSync(
                 `${output}.${getOutputExtension(context, "esm")}`,
-                shebang
-                + [
-                    `import { createJiti } from "${jitiESMPath}";`,
+                shebang +
+                    [
+                        `import { createJiti } from "${jitiESMPath}";`,
 
-                    ...importedBabelPlugins.map((plugin, index) => `import plugin${index} from "${plugin}";`),
-                    "",
-                    `const jiti = createJiti(import.meta.url, ${serializedJitiOptions});`,
-                    "",
-                    `/** @type {import("${typePath}")} */`,
+                        ...importedBabelPlugins.map((plugin, index) => `import plugin${index} from "${plugin}";`),
+                        "",
+                        `const jiti = createJiti(import.meta.url, ${serializedJitiOptions});`,
+                        "",
+                        `/** @type {import("${typePath}")} */`,
 
-                    `const _module = await jiti.import("${resolvedEntry}");`,
-                    ...hasDefaultExport ? [`export default _module?.default ?? _module;`] : [],
-                    ...namedExports
-                        .filter((name) => name !== "default")
-                        .map((name, index) => {
-                            if (IDENTIFIER_REGEX.test(name)) {
-                                return `export const ${name} = _module.${name};`;
-                            }
+                        `const _module = await jiti.import("${resolvedEntry}");`,
+                        ...(hasDefaultExport ? [`export default _module?.default ?? _module;`] : []),
+                        ...namedExports
+                            .filter((name) => name !== "default")
+                            .map((name, index) => {
+                                if (IDENTIFIER_REGEX.test(name)) {
+                                    return `export const ${name} = _module.${name};`;
+                                }
 
-                            // For arbitrary module namespace identifiers (non-identifier strings),
-                            // we need to use a temporary variable and then export with the string literal
-                            const temporaryVariable = `__packem_export_${index}`;
+                                // For arbitrary module namespace identifiers (non-identifier strings),
+                                // we need to use a temporary variable and then export with the string literal
+                                const temporaryVariable = `__packem_export_${index}`;
 
-                            // If the name is already quoted (starts and ends with quotes), use it directly
-                            // Otherwise, wrap it in JSON.stringify
-                            const propertyAccess = name.startsWith("'") && name.endsWith("'") ? `_module[${name}]` : `_module[${JSON.stringify(name)}]`;
+                                // If the name is already quoted (starts and ends with quotes), use it directly
+                                // Otherwise, wrap it in JSON.stringify
+                                const propertyAccess = name.startsWith("'") && name.endsWith("'") ? `_module[${name}]` : `_module[${JSON.stringify(name)}]`;
 
-                            return `const ${temporaryVariable} = ${propertyAccess};\nexport { ${temporaryVariable} as ${JSON.stringify(name)} };`;
-                        }),
-                ].join("\n"),
+                                return `const ${temporaryVariable} = ${propertyAccess};\nexport { ${temporaryVariable} as ${JSON.stringify(name)} };`;
+                            }),
+                    ].join("\n"),
             );
 
             // DTS Stub
@@ -154,18 +154,18 @@ const createStub = async (context: BuildContext<InternalBuildOptions>): Promise<
 
             writeFileSync(
                 `${output}.${getOutputExtension(context, "cjs")}`,
-                shebang
-                + [
-                    `const { createJiti } = require("${jitiCJSPath}");`,
+                shebang +
+                    [
+                        `const { createJiti } = require("${jitiCJSPath}");`,
 
-                    ...importedBabelPlugins.map((plugin, index) => `const plugin${index} = require(${JSON.stringify(plugin)})`),
-                    "",
-                    `const jiti = createJiti(__filename, ${serializedJitiOptions});`,
-                    "",
-                    `/** @type {import("${typePath}")} */`,
+                        ...importedBabelPlugins.map((plugin, index) => `const plugin${index} = require(${JSON.stringify(plugin)})`),
+                        "",
+                        `const jiti = createJiti(__filename, ${serializedJitiOptions});`,
+                        "",
+                        `/** @type {import("${typePath}")} */`,
 
-                    `module.exports = jiti("${resolvedEntry}")`,
-                ].join("\n"),
+                        `module.exports = jiti("${resolvedEntry}")`,
+                    ].join("\n"),
             );
 
             // DTS Stub

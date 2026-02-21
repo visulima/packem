@@ -59,24 +59,24 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
                         decimals: 2,
                     }),
                 )}`,
-                entry.size?.brotli
-                && `brotli size: ${cyan(
-                    formatBytes(entry.size.brotli, {
-                        decimals: 2,
-                    }),
-                )}`,
-                entry.size?.gzip
-                && `gzip size: ${cyan(
-                    formatBytes(entry.size.gzip, {
-                        decimals: 2,
-                    }),
-                )}`,
-                chunkBytes !== 0
-                && `chunk size: ${cyan(
-                    formatBytes(chunkBytes, {
-                        decimals: 2,
-                    }),
-                )}`,
+                entry.size?.brotli &&
+                    `brotli size: ${cyan(
+                        formatBytes(entry.size.brotli, {
+                            decimals: 2,
+                        }),
+                    )}`,
+                entry.size?.gzip &&
+                    `gzip size: ${cyan(
+                        formatBytes(entry.size.gzip, {
+                            decimals: 2,
+                        }),
+                    )}`,
+                chunkBytes !== 0 &&
+                    `chunk size: ${cyan(
+                        formatBytes(chunkBytes, {
+                            decimals: 2,
+                        }),
+                    )}`,
             ]
                 .filter(Boolean)
                 .join(", ")})`;
@@ -92,8 +92,8 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
                             `  └─ ${rPath(p)}${bold(
                                 chunk.bytes
                                     ? ` (${formatBytes(chunk?.bytes, {
-                                        decimals: 2,
-                                    })})`
+                                          decimals: 2,
+                                      })})`
                                     : "",
                             )}`,
                         );
@@ -115,8 +115,8 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
                             `  📦 ${rPath(m.id)}${bold(
                                 m.bytes
                                     ? ` (${formatBytes(m.bytes, {
-                                        decimals: 2,
-                                    })})`
+                                          decimals: 2,
+                                      })})`
                                     : "",
                             )}`,
                         ),
@@ -342,9 +342,9 @@ const createAdjustedContext = (
                 ...baseContext.options.rollup,
                 replace: baseContext.options.rollup.replace
                     ? {
-                        ...baseContext.options.rollup.replace,
-                        values: baseContext.options.rollup.replace.values ? { ...baseContext.options.rollup.replace.values } : { ...replaceValues },
-                    }
+                          ...baseContext.options.rollup.replace,
+                          values: baseContext.options.rollup.replace.values ? { ...baseContext.options.rollup.replace.values } : { ...replaceValues },
+                      }
                     : false,
             },
         },
@@ -435,9 +435,9 @@ const prepareRollupConfig = async (
                             ...context.options.rollup,
                             replace: context.options.rollup.replace
                                 ? {
-                                    ...context.options.rollup.replace,
-                                    values: {},
-                                }
+                                      ...context.options.rollup.replace,
+                                      values: {},
+                                  }
                                 : context.options.rollup.replace,
                         },
                     },
@@ -473,10 +473,11 @@ const prepareRollupConfig = async (
                         environmentRuntimeContext.options.rollup.replace.values = {};
                     }
 
-                    const existingValues = { ...environmentRuntimeContext.options.rollup.replace.values };
+                    // Use the ORIGINAL context's user-provided values (not the reset ones in environmentRuntimeContext)
+                    const userValues = { ...(context.options.rollup.replace?.values ?? {}) };
 
                     // Merge values: default values first, then user-provided values override them
-                    Object.assign(environmentRuntimeContext.options.rollup.replace.values, defaultReplaceValues, existingValues);
+                    Object.assign(environmentRuntimeContext.options.rollup.replace.values, defaultReplaceValues, userValues);
                 } else {
                     context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
                 }
@@ -648,7 +649,20 @@ const prepareRollupConfig = async (
                 }
 
                 if (environmentRuntimeContext.options.declaration && dtsEntries.length > 0) {
-                    const adjustedDtsContext = createAdjustedContext(environmentRuntimeContext, false, false, dtsEntries, minify, replaceValues);
+                    // Check per-entry declaration format requirements (set by declaration-only exports)
+                    const needsCjsDecl = dtsEntries.some((entry) => entry.declarationCjs);
+                    const needsEsmDecl = dtsEntries.some((entry) => entry.declarationEsm);
+                    // Entries with only plain `declaration` (no format-specific flags) need .d.ts output.
+                    // Setting emitCJS=true in single-format mode causes getDtsExtension to return "d.ts".
+                    const needsPlainDts = dtsEntries.some((entry) => entry.declaration && !entry.declarationCjs && !entry.declarationEsm);
+                    const adjustedDtsContext = createAdjustedContext(
+                        environmentRuntimeContext,
+                        needsCjsDecl || needsPlainDts,
+                        needsEsmDecl,
+                        dtsEntries,
+                        minify,
+                        replaceValues,
+                    );
 
                     typeBuilders.add({
                         context: adjustedDtsContext,

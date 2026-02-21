@@ -113,7 +113,7 @@ describe("packem typescript", () => {
         it("should resolve .jsx -> .tsx", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import \"./file.jsx\";");
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.jsx";');
             await writeFile(`${temporaryDirectoryPath}/src/file.tsx`, "console.log(1);");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -142,7 +142,7 @@ describe("packem typescript", () => {
         it("should resolve .jsx -> .js", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.js`, "import \"./file.jsx\";");
+            await writeFile(`${temporaryDirectoryPath}/src/index.js`, 'import "./file.jsx";');
             await writeFile(`${temporaryDirectoryPath}/src/file.jsx`, "console.log(1);");
 
             await createPackageJson(temporaryDirectoryPath, {
@@ -166,7 +166,7 @@ describe("packem typescript", () => {
         it("should resolve .mjs -> .ts", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import \"./file.mjs\";");
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.mjs";');
             await writeFile(`${temporaryDirectoryPath}/src/file.mjs`, "console.log(1);");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -195,7 +195,7 @@ describe("packem typescript", () => {
         it("should resolve .cjs -> .ts", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import \"./file.cjs\";");
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.cjs";');
             await writeFile(`${temporaryDirectoryPath}/src/file.cjs`, "console.log(1);");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -226,10 +226,10 @@ describe("packem typescript", () => {
 
             // In source code, TypeScript files should be preferred over JavaScript
             // when both exist for the same import specifier
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { value } from \"./file.js\"; console.log(value);");
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { value } from "./file.js"; console.log(value);');
             // Both files exist, .ts should be preferred
-            await writeFile(`${temporaryDirectoryPath}/src/file.ts`, "export const value = \"from-typescript\";");
-            await writeFile(`${temporaryDirectoryPath}/src/file.js`, "export const value = \"from-javascript\";");
+            await writeFile(`${temporaryDirectoryPath}/src/file.ts`, 'export const value = "from-typescript";');
+            await writeFile(`${temporaryDirectoryPath}/src/file.js`, 'export const value = "from-javascript";');
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -281,19 +281,19 @@ console.log(fromBoth, fromTs);
                 type: "module",
             });
             // Entry point imports from a relative file
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "index.js"), "export { fromBoth } from \"./file.js\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "index.js"), 'export { fromBoth } from "./file.js";');
             // Package accidentally ships both .js and .ts for the same file
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.js"), "export const fromBoth = \"compiled-js\";");
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.ts"), "export const fromBoth: string = \"source-ts\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.js"), 'export const fromBoth = "compiled-js";');
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.ts"), 'export const fromBoth: string = "source-ts";');
 
             await writeJson(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "package.json"), {
                 main: "./index.js",
                 name: "pkg-with-only-ts",
                 type: "module",
             });
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "index.js"), "export { fromTs } from \"./file.js\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "index.js"), 'export { fromTs } from "./file.js";');
             // Package only ships .ts (forgot to compile or .npmignore misconfigured)
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "file.ts"), "export const fromTs: string = \"only-ts\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "file.ts"), 'export const fromTs: string = "only-ts";');
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -332,7 +332,7 @@ console.log(fromBoth, fromTs);
 
             await writeFile(
                 `${temporaryDirectoryPath}/src/index.ts`,
-                "import \"components:Test\";\n import { test2 } from \"components:Test2\";\n\nconsole.log(test2);",
+                'import "components:Test";\n import { test2 } from "components:Test2";\n\nconsole.log(test2);',
             );
             await writeFile(`${temporaryDirectoryPath}/src/components/Test.ts`, "console.log(1);");
             await writeFile(`${temporaryDirectoryPath}/src/components/Test2.ts`, "export const test2 = 'test'");
@@ -436,9 +436,9 @@ console.log(1);
 
             await installPackage(temporaryDirectoryPath, "typescript");
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { b } from \"./bb\";\n\nconsole.log(b);");
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { b } from "./bb";\n\nconsole.log(b);');
             await writeFile(`${temporaryDirectoryPath}/tt/a/aa.ts`, "export const a = 1;");
-            await writeFile(`${temporaryDirectoryPath}/tt/b/bb.ts`, "import { a } from \"./aa\";\nnconsole.log(a);\n\nexport const b = 2;");
+            await writeFile(`${temporaryDirectoryPath}/tt/b/bb.ts`, 'import { a } from "./aa";\nnconsole.log(a);\n\nexport const b = 2;');
 
             await createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: {
@@ -537,7 +537,7 @@ export class ExampleClass {
         expect(cjs).toMatchSnapshot("cjs code output");
     });
 
-    it("should allow support for \"allowJs\" and generate proper assets", async () => {
+    it('should allow support for "allowJs" and generate proper assets', async () => {
         expect.assertions(4);
 
         await writeFile(`${temporaryDirectoryPath}/src/index.js`, `export default () => 'index';`);
@@ -1329,7 +1329,7 @@ export { AppContext, index };
             async (isolatedDeclarationTransformer) => {
                 expect.assertions(7);
 
-                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : "\"";
+                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : '"';
 
                 await writeFile(
                     `${temporaryDirectoryPath}/src/index.ts`,
@@ -1427,7 +1427,9 @@ export declare let num: Num;
         it.each(["typescript", "oxc", "swc"])(
             "should work with '%s' isolated declarations transformer and add missing index suffix to import paths",
             async (isolatedDeclarationTransformer) => {
-                expect.assertions(7);
+                expect.assertions(9);
+
+                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : '"';
 
                 await writeFile(`${temporaryDirectoryPath}/src/index.ts`, `export type Bar = string;`);
                 await writeFile(
@@ -1504,15 +1506,15 @@ export const test = "test";`,
 
                 const mainDCtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/main.d.cts`);
 
-                expect(mainDCtsTypesContent).toBe(`export type { Foo } from './foo/index.d.cts';
-export type { Bar } from './index.d.cts';
+                expect(mainDCtsTypesContent).toBe(`export type { Foo } from ${quote}./foo/index.d.cts${quote};
+export type { Bar } from ${quote}./index.d.cts${quote};
 export declare const test = "test";
 `);
 
                 const mainDtsTypesContent = await readFile(`${temporaryDirectoryPath}/dist/main.d.ts`);
 
-                expect(mainDtsTypesContent).toBe(`export type { Foo } from './foo/index.d.cts';
-export type { Bar } from './index.d.cts';
+                expect(mainDtsTypesContent).toBe(`export type { Foo } from ${quote}./foo/index.d.ts${quote};
+export type { Bar } from ${quote}./index.d.ts${quote};
 export declare const test = "test";
 `);
             },
@@ -1523,7 +1525,7 @@ export declare const test = "test";
             async (isolatedDeclarationTransformer) => {
                 expect.assertions(10);
 
-                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : "\"";
+                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : '"';
 
                 await writeFile(
                     `${temporaryDirectoryPath}/src/index.ts`,
@@ -1625,7 +1627,7 @@ export declare let num: Num;
                     case "typescript": {
                         // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dCtsMapContent).toBe(
-                            `{"file":"index.d.ts","mappings":"AAAA,OAAO,EAAE,KAAK,GAAG,EAAE,MAAM,SAAS,CAAA;AAClC,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA;AAExB,wBAAgB,KAAK,CAAC,CAAC,EAAE,GAAG,GAAG,GAAG,CAEjC;AAED,eAAO,IAAI,GAAG,EAAE,GAAO,CAAA","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
+                            `{"file":"index.d.ts","mappings":"AAAA,OAAO,EAAE,KAAK,GAAG,EAAE,MAAM,YAAY,CAAA;AACrC,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA;AAExB,wBAAgB,KAAK,CAAC,CAAC,EAAE,GAAG,GAAG,GAAG,CAEjC;AAED,eAAO,IAAI,GAAG,EAAE,GAAO,CAAA","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
 
                         break;
@@ -1665,7 +1667,7 @@ export declare let num: Num;
                     case "typescript": {
                         // eslint-disable-next-line vitest/no-conditional-expect
                         expect(dtsMapContent).toBe(
-                            `{"file":"index.d.ts","mappings":"AAAA,OAAO,EAAE,KAAK,GAAG,EAAE,MAAM,SAAS,CAAA;AAClC,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA;AAExB,wBAAgB,KAAK,CAAC,CAAC,EAAE,GAAG,GAAG,GAAG,CAEjC;AAED,eAAO,IAAI,GAAG,EAAE,GAAO,CAAA","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
+                            `{"file":"index.d.ts","mappings":"AAAA,OAAO,EAAE,KAAK,GAAG,EAAE,MAAM,YAAY,CAAA;AACrC,MAAM,MAAM,GAAG,GAAG,MAAM,CAAA;AAExB,wBAAgB,KAAK,CAAC,CAAC,EAAE,GAAG,GAAG,GAAG,CAEjC;AAED,eAAO,IAAI,GAAG,EAAE,GAAO,CAAA","names":[],"sourceRoot":"","sources":["../src/index.ts"],"version":3}`,
                         );
 
                         break;
@@ -1748,7 +1750,7 @@ export declare let num: Num;
             async (isolatedDeclarationTransformer) => {
                 expect.assertions(5);
 
-                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : "\"";
+                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : '"';
 
                 await writeFile(
                     `${temporaryDirectoryPath}/src/index.ts`,
@@ -1834,7 +1836,7 @@ export declare let num: Num;
         it.each(["typescript", "oxc", "swc"])("should resolve aliases with '%s' isolated declarations transformer", async (isolatedDeclarationTransformer) => {
             expect.assertions(10);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { a } from \"utils/a\";\nexport default a;");
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { a } from "utils/a";\nexport default a;');
             await writeFile(`${temporaryDirectoryPath}/src/utils/a.ts`, "export const a: number = 1;");
 
             await installPackage(temporaryDirectoryPath, "typescript");

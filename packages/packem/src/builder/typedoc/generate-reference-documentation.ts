@@ -73,15 +73,15 @@ const generateReferenceDocumentation = async (options: TypeDocumentOptions, entr
             hideGenerator: true,
             out: outputDirectory,
             plugin: plugins,
-            ...format === "inline"
+            ...(format === "inline"
                 ? {
-                    hideBreadcrumbs: true,
-                    hidePageHeader: true,
-                    navigation: false,
-                    outputFileStrategy: "modules",
-                    useCodeBlocks: true,
-                }
-                : {},
+                      hideBreadcrumbs: true,
+                      hidePageHeader: true,
+                      navigation: false,
+                      outputFileStrategy: "modules",
+                      useCodeBlocks: true,
+                  }
+                : {}),
             // we dont need the default loader
         },
         [],

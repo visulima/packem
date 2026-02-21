@@ -283,13 +283,13 @@ const generateOptions = (
             },
             license: {
                 dependenciesTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
-                    `\n# Licenses of bundled dependencies\n`
-                    + `The published ${pName} artifact additionally contains code with the following licenses:\n${
+                    `\n# Licenses of bundled dependencies\n` +
+                    `The published ${pName} artifact additionally contains code with the following licenses:\n${
                         licenses.length > 0 ? `${licenses.join(", ")}\n\n` : "\n"
                     }# Bundled dependencies:\n${dependencyLicenseTexts}`,
                 dtsTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
-                    `\n# Licenses of bundled types\n`
-                    + `The published ${pName} artifact additionally contains code with the following licenses:\n${
+                    `\n# Licenses of bundled types\n` +
+                    `The published ${pName} artifact additionally contains code with the following licenses:\n${
                         licenses.length > 0 ? `${licenses.join(", ")}\n\n` : "\n"
                     }# Bundled types:\n${dependencyLicenseTexts}`,
             },
@@ -303,14 +303,14 @@ const generateOptions = (
                     jsxRuntime === "preserve"
                         ? "preserve"
                         : {
-                            development: environment !== "production",
-                            pragma: tsconfig?.config.compilerOptions?.jsxFactory,
-                            pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
-                            pure: true,
-                            runtime: jsxRuntime === "transform" || jsxRuntime === "automatic" ? "automatic" : "classic",
-                            useBuiltIns: true,
-                            useSpread: true,
-                        },
+                              development: environment !== "production",
+                              pragma: tsconfig?.config.compilerOptions?.jsxFactory,
+                              pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
+                              pure: true,
+                              runtime: jsxRuntime === "transform" || jsxRuntime === "automatic" ? "automatic" : "classic",
+                              useBuiltIns: true,
+                              useSpread: true,
+                          },
             },
             patchTypes: {},
             polyfillNode: {},
@@ -366,17 +366,17 @@ const generateOptions = (
                 injectCreateRequireForImportRequire: false,
                 preserveDynamicImport: true,
                 production: environment === PRODUCTION_ENV,
-                ...tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
+                ...(tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
                     ? {
-                        jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
-                        jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
-                        jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
-                        jsxRuntime,
-                        transforms: ["typescript", "jsx", ...tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : []],
-                    }
+                          jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
+                          jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
+                          jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
+                          jsxRuntime,
+                          transforms: ["typescript", "jsx", ...(tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : [])],
+                      }
                     : {
-                        transforms: ["typescript", ...tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : []],
-                    },
+                          transforms: ["typescript", ...(tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : [])],
+                      }),
             },
             swc: {
                 include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
@@ -766,9 +766,9 @@ const createContext = async (
     }
 
     if (
-        context.options.declaration
-        && (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript)
-        && !context.tsconfig?.config.compilerOptions?.isolatedModules
+        context.options.declaration &&
+        (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript) &&
+        !context.tsconfig?.config.compilerOptions?.isolatedModules
     ) {
         context.logger.warn(
             `'compilerOptions.isolatedModules' is not enabled in tsconfig.\nBecause none of the third-party transpiler, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.\nTo mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.`,
@@ -858,8 +858,8 @@ const packem = async (
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type,@typescript-eslint/no-explicit-any
     let onSuccessCleanup: (() => any) | undefined | void;
 
-    const cacheKey
-        = getHash(
+    const cacheKey =
+        getHash(
             JSON.stringify({
                 version: packageJson.version,
                 ...packageJson.dependencies,
@@ -950,13 +950,13 @@ const packem = async (
 
                 // Capture the spawned process locally to avoid race conditions with cleanup
                 // eslint-disable-next-line no-multi-assign
-                const executedProcess = onSuccessProcess = exec(context.options.onSuccess, [], {
+                const executedProcess = (onSuccessProcess = exec(context.options.onSuccess, [], {
                     nodeOptions: {
                         shell: true,
                         stdio: "inherit",
                         timeout,
                     },
-                });
+                }));
 
                 await executedProcess;
 

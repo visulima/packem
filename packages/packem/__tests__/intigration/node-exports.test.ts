@@ -341,7 +341,7 @@ export = test;
     });
 
     it("should split shared module into one chunk layer", async () => {
-        expect.assertions(4);
+        expect.assertions(5);
 
         await writeFile(
             `${temporaryDirectoryPath}/src/index.js`,
@@ -370,16 +370,10 @@ export const value = dep
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const dep = "polyfill-dep";
-
-const value = dep;
-
-exports.value = value;
-`);
+        // #dep imports (package.json imports field) are kept as runtime dependencies
+        // rather than bundled inline, allowing Node.js to resolve them via package.json#imports
+        expect(cjsContent).toContain("exports.value = value");
+        expect(cjsContent).toContain("#dep");
     });
 
     it("should output 'class' with 'extends correctly", async () => {

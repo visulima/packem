@@ -263,7 +263,7 @@ const createInitCommand = (cli: Cli): void => {
                 cssLoaders.push(...extraCssLoaders);
 
                 const shouldInstall = await confirm({
-                    message: `Do you want to install "${cssLoaders.join("\", \"")}"?`,
+                    message: `Do you want to install "${cssLoaders.join('", "')}"?`,
                 });
 
                 if (shouldInstall) {

@@ -77,7 +77,7 @@ const loadEnvFileManually = (content: string, prefix: string = "PACKEM_"): Recor
             let value = match[2].trim();
 
             // Remove quotes if present
-            if ((value.startsWith("\"") && value.endsWith("\"")) || (value.startsWith("'") && value.endsWith("'"))) {
+            if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
                 value = value.slice(1, -1);
             }
 

@@ -42,7 +42,7 @@ describe("packem watch", () => {
         // Start watch with a quick onSuccess command that prints a marker
         const proc = execaNode(
             join(distributionPath, "cli/index.js"),
-            ["build", "--development", "--watch", "--onSuccess=node -e \"console.log('ON_SUCCESS_OK')\"", "--no-validation"],
+            ["build", "--development", "--watch", "--onSuccess=echo ON_SUCCESS_OK", "--no-validation"],
             {
                 cwd: temporaryDirectoryPath,
                 reject: false,
@@ -62,8 +62,8 @@ describe("packem watch", () => {
 
             while (Date.now() - start < 10_000) {
                 if (
-                    (stdout.includes("Rebuild finished") || stdout.includes("Build run in") || stdout.includes("Build succeeded"))
-                    && stdout.includes("ON_SUCCESS_OK")
+                    (stdout.includes("Rebuild finished") || stdout.includes("Build run in") || stdout.includes("Build succeeded")) &&
+                    stdout.includes("ON_SUCCESS_OK")
                 ) {
                     return;
                 }

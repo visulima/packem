@@ -15,12 +15,12 @@ import type { KillSignal } from "../types";
  * @see https://github.com/egoist/tsup/issues/976
  */
 const isTaskKillCmdProcessNotFoundError = (error: Error) =>
-    process.platform === "win32"
-    && "cmd" in error
-    && "code" in error
-    && typeof error.cmd === "string"
-    && error.cmd.startsWith("taskkill")
-    && error.code === 128;
+    process.platform === "win32" &&
+    "cmd" in error &&
+    "code" in error &&
+    typeof error.cmd === "string" &&
+    error.cmd.startsWith("taskkill") &&
+    error.code === 128;
 
 /**
  * Terminates a process with the specified signal.

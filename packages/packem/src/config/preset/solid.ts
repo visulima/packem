@@ -42,7 +42,7 @@ const mergeUserBabelOptions = (
     if (userBabelOptions.plugins) {
         const userPluginsArray = Array.isArray(userBabelOptions.plugins) ? userBabelOptions.plugins : [];
 
-        mergedPlugins = [...basePlugins || [], ...userPluginsArray];
+        mergedPlugins = [...(basePlugins || []), ...userPluginsArray];
     }
 
     // Merge user presets
@@ -51,7 +51,7 @@ const mergeUserBabelOptions = (
     if (userBabelOptions.presets) {
         const userPresetsArray = Array.isArray(userBabelOptions.presets) ? userBabelOptions.presets : [];
 
-        mergedPresets = [...basePresets || [], ...userPresetsArray];
+        mergedPresets = [...(basePresets || []), ...userPresetsArray];
     }
 
     return {
@@ -188,8 +188,8 @@ export const createSolidPreset = (options: SolidPresetOptions = {}): BuildConfig
     babelPresets.push(solidPreset as any);
 
     // Merge user-provided plugins and presets
-    const finalPlugins = [...babelPlugins, ...Array.isArray(plugins) ? plugins : []];
-    const finalPresets = [...babelPresets, ...Array.isArray(presets) ? presets : []];
+    const finalPlugins = [...babelPlugins, ...(Array.isArray(plugins) ? plugins : [])];
+    const finalPresets = [...babelPresets, ...(Array.isArray(presets) ? presets : [])];
 
     // Build base babel config (matching vite-plugin-solid structure)
     const babelConfig: BabelPluginConfig = {

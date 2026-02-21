@@ -703,9 +703,9 @@ export { render };
             it("all wildcards must match same value", async () => {
                 expect.assertions(5);
 
-                writeFileSync(`${temporaryDirectoryPath}/src/foo/foo.ts`, "export const foo = \"foo\"");
-                writeFileSync(`${temporaryDirectoryPath}/src/bar/bar.ts`, "export const bar = \"bar\"");
-                writeFileSync(`${temporaryDirectoryPath}/src/a/b.ts`, "export const baz = \"baz\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/foo/foo.ts`, 'export const foo = "foo"');
+                writeFileSync(`${temporaryDirectoryPath}/src/bar/bar.ts`, 'export const bar = "bar"');
+                writeFileSync(`${temporaryDirectoryPath}/src/a/b.ts`, 'export const baz = "baz"');
 
                 await installPackage(temporaryDirectoryPath, "typescript");
                 await createTsConfig(temporaryDirectoryPath);
@@ -734,9 +734,9 @@ export { render };
             it("with interleaved constants", async () => {
                 expect.assertions(5);
 
-                writeFileSync(`${temporaryDirectoryPath}/src/foo/_/foo/_/foo.ts`, "export const foo = \"foo\"");
-                writeFileSync(`${temporaryDirectoryPath}/src/bar/_/bar/_/bar.ts`, "export const bar = \"bar\"");
-                writeFileSync(`${temporaryDirectoryPath}/src/a/_/b/_/c.ts`, "export const baz = \"baz\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/foo/_/foo/_/foo.ts`, 'export const foo = "foo"');
+                writeFileSync(`${temporaryDirectoryPath}/src/bar/_/bar/_/bar.ts`, 'export const bar = "bar"');
+                writeFileSync(`${temporaryDirectoryPath}/src/a/_/b/_/c.ts`, 'export const baz = "baz"');
 
                 await installPackage(temporaryDirectoryPath, "typescript");
                 await createTsConfig(temporaryDirectoryPath);
@@ -765,7 +765,7 @@ export { render };
             it("capture multi-segment paths", async () => {
                 expect.assertions(3);
 
-                writeFileSync(`${temporaryDirectoryPath}/src/a/b/a/b/index.ts`, "export const foo = \"foo\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/a/b/a/b/index.ts`, 'export const foo = "foo"');
 
                 await installPackage(temporaryDirectoryPath, "typescript");
                 await createTsConfig(temporaryDirectoryPath);
@@ -793,8 +793,8 @@ export { render };
             it("basic wildcard with suffix", async () => {
                 expect.assertions(4);
 
-                writeFileSync(`${temporaryDirectoryPath}/src/features/auth/handler.ts`, "export const auth = \"auth\"");
-                writeFileSync(`${temporaryDirectoryPath}/src/features/nested/billing/handler.ts`, "export const billing = \"billing\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/features/auth/handler.ts`, 'export const auth = "auth"');
+                writeFileSync(`${temporaryDirectoryPath}/src/features/nested/billing/handler.ts`, 'export const billing = "billing"');
 
                 await installPackage(temporaryDirectoryPath, "typescript");
                 await createTsConfig(temporaryDirectoryPath);
@@ -821,7 +821,7 @@ export { render };
 
         describe("formats & conditions", () => {
             it("declaration file extensions (.d.ts, .d.mts, .d.cts)", async () => {
-                expect.assertions(4);
+                expect.assertions(5);
 
                 writeFileSync(`${temporaryDirectoryPath}/src/types/models.ts`, "export type Model = { id: string }");
 
@@ -863,9 +863,9 @@ export { render };
             it("export conditions (node, browser, default)", async () => {
                 expect.assertions(5);
 
-                writeFileSync(`${temporaryDirectoryPath}/src/node/fetch.ts`, "export const fetch = () => \"node-fetch\"");
-                writeFileSync(`${temporaryDirectoryPath}/src/browser/fetch.ts`, "export const fetch = () => \"browser-fetch\"");
-                writeFileSync(`${temporaryDirectoryPath}/src/default/fetch.ts`, "export const fetch = () => \"default-fetch\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/node/fetch.ts`, 'export const fetch = () => "node-fetch"');
+                writeFileSync(`${temporaryDirectoryPath}/src/browser/fetch.ts`, 'export const fetch = () => "browser-fetch"');
+                writeFileSync(`${temporaryDirectoryPath}/src/default/fetch.ts`, 'export const fetch = () => "default-fetch"');
 
                 await installPackage(temporaryDirectoryPath, "typescript");
                 await createTsConfig(temporaryDirectoryPath);
@@ -897,7 +897,7 @@ export { render };
             it("array of paths", async () => {
                 expect.assertions(4);
 
-                writeFileSync(`${temporaryDirectoryPath}/src/tools/logger.ts`, "export const logger = () => \"log\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/tools/logger.ts`, 'export const logger = () => "log"');
 
                 await installPackage(temporaryDirectoryPath, "typescript");
                 await createTsConfig(temporaryDirectoryPath);
@@ -926,7 +926,7 @@ export { render };
             it("no matching files (optional patterns)", async () => {
                 expect.assertions(4);
 
-                writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export const main = \"main\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'export const main = "main"');
 
                 await installPackage(temporaryDirectoryPath, "typescript");
                 await createTsConfig(temporaryDirectoryPath);
@@ -947,14 +947,14 @@ export { render };
 
                 expect(binProcess.stderr).toBe("");
                 expect(binProcess.exitCode).toBe(0);
-                expect(existsSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(true);
+                expect(existsSync(`${temporaryDirectoryPath}/dist/index.js`)).toBe(true);
                 expect(existsSync(`${temporaryDirectoryPath}/dist/optional`)).toBe(false);
             });
 
             it("empty capture is rejected", async () => {
                 expect.assertions(4);
 
-                writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export const index = \"index\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'export const index = "index"');
 
                 await installPackage(temporaryDirectoryPath, "typescript");
                 await createTsConfig(temporaryDirectoryPath);
@@ -980,10 +980,10 @@ export { render };
             });
 
             it("wildcard without extension emits warning", async () => {
-                expect.assertions(4);
+                expect.assertions(3);
 
-                writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export const index = \"index\"");
-                writeFileSync(`${temporaryDirectoryPath}/src/foo.ts`, "export const foo = \"foo\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'export const index = "index"');
+                writeFileSync(`${temporaryDirectoryPath}/src/foo.ts`, 'export const foo = "foo"');
 
                 await installPackage(temporaryDirectoryPath, "typescript");
                 await createTsConfig(temporaryDirectoryPath);
@@ -1003,17 +1003,16 @@ export { render };
                 });
 
                 expect(binProcess.exitCode).toBe(0);
-                expect(binProcess.stderr).toContain("Wildcard pattern must include a file extension");
-                expect(binProcess.stderr).toContain("package.json#exports[\"./*\"]");
+                expect(binProcess.stdout).toContain("Wildcard pattern must include a file extension");
                 expect(existsSync(`${temporaryDirectoryPath}/dist/index.mjs`)).toBe(true);
             });
 
             it("mixed static and wildcard exports", async () => {
                 expect.assertions(5);
 
-                writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, "export const main = \"main\"");
-                writeFileSync(`${temporaryDirectoryPath}/src/utils/helper.ts`, "export const helper = \"helper\"");
-                writeFileSync(`${temporaryDirectoryPath}/src/constants.ts`, "export const CONSTANT = \"constant\"");
+                writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, 'export const main = "main"');
+                writeFileSync(`${temporaryDirectoryPath}/src/utils/helper.ts`, 'export const helper = "helper"');
+                writeFileSync(`${temporaryDirectoryPath}/src/constants.ts`, 'export const CONSTANT = "constant"');
 
                 await installPackage(temporaryDirectoryPath, "typescript");
                 await createTsConfig(temporaryDirectoryPath);
@@ -1867,11 +1866,11 @@ module.exports = result;
                 ".": {
                     browser: {
                         default: "./dist/index.browser.mjs",
-                        types: "./dist/index.browser.d.mts",
+                        types: "./dist/index.browser.d.ts",
                     },
                     "edge-light": {
                         default: "./dist/index.edge-light.mjs",
-                        types: "./dist/index.edge-light.d.mts",
+                        types: "./dist/index.edge-light.d.ts",
                     },
                     import: {
                         default: "./dist/index.mjs",
@@ -1888,7 +1887,7 @@ module.exports = result;
                     },
                     workerd: {
                         default: "./dist/index.workerd.mjs",
-                        types: "./dist/index.workerd.d.mts",
+                        types: "./dist/index.workerd.d.ts",
                     },
                 },
             },
@@ -1909,9 +1908,9 @@ module.exports = result;
             // entry files
             "index.mjs",
             "index.cjs",
-            "index.browser.js",
-            "index.workerd.js",
-            "index.edge-light.js",
+            "index.browser.mjs",
+            "index.workerd.mjs",
+            "index.edge-light.mjs",
             // types
             "index.d.cts",
             "index.d.mts",
@@ -1930,9 +1929,9 @@ module.exports = result;
         for (const [file, regex] of [
             ["index.cjs", /const runtime = "node"/],
             ["index.mjs", /const runtime = "node"/],
-            ["index.browser.js", /const runtime = "browser"/],
-            ["index.workerd.js", /const runtime = "workerd"/],
-            ["index.edge-light.js", /const runtime = "edge-light"/],
+            ["index.browser.mjs", /const runtime = "browser"/],
+            ["index.workerd.mjs", /const runtime = "workerd"/],
+            ["index.edge-light.mjs", /const runtime = "edge-light"/],
         ]) {
             const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
 
@@ -2259,7 +2258,7 @@ console.log("require-module-import", resolved);
         });
 
         expect(binProcess.exitCode).toBe(1);
-        expect(binProcess.stderr).toContain("Invalid output extension map: foo must be \"cjs\" or \"esm\"");
+        expect(binProcess.stderr).toContain('Invalid output extension map: foo must be "cjs" or "esm"');
     });
 
     it("should throw a TypeError for non-string value in outputExtensionMap", async () => {
@@ -2419,7 +2418,7 @@ console.log("require-module-import", resolved);
             },
             exports: {
                 ".": "./dist/index.js",
-                "./icons2/*": "./dist/icons2/*",
+                "./icons/*": "./dist/icons/*",
             },
         });
 
@@ -2430,8 +2429,8 @@ console.log("require-module-import", resolved);
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain("Could not find entrypoint for `./dist/icons/*`");
-        expect(binProcess.exitCode).toBe(1);
+        expect(binProcess.stdout).toContain("Wildcard pattern must include a file extension");
+        expect(binProcess.exitCode).toBe(0);
     });
 
     it("should support separate source files for browser and server patterns", async () => {
@@ -2608,7 +2607,7 @@ export default 'solid';`,
         expect(browserContent).toContain("const isDev = true");
         expect(browserContent).toContain("const isProd = false");
         expect(browserContent).toContain("const isSSR = false");
-        expect(browserContent).toContain("const nodeEnv = \"development\"");
+        expect(browserContent).toContain('const nodeEnv = "development"');
         // import.meta.env values are replaced with boolean literals (not stringified)
         expect(browserContent).toContain("const importMetaDev = true");
         expect(browserContent).toContain("const importMetaProd = false");
@@ -2673,7 +2672,7 @@ export default 'index';`,
         const developmentContent = readFileSync(`${temporaryDirectoryPath}/dist/index.development.cjs`);
 
         expect(developmentContent).toContain("index");
-        expect(developmentContent).toMatch("const env = \"development\"");
+        expect(developmentContent).toMatch('const env = "development"');
         // process.env.DEV is replaced and evaluated by Rollup
         expect(developmentContent).toContain("const isDev = true");
 

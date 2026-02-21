@@ -80,6 +80,10 @@ export type BuildEntry = {
     cjs?: boolean;
     /** TypeScript declaration file generation mode */
     declaration?: boolean | "compatible" | "node16";
+    /** Whether to generate .d.cts declaration file without triggering CJS JS build */
+    declarationCjs?: boolean;
+    /** Whether to generate .d.mts declaration file without triggering ESM JS build */
+    declarationEsm?: boolean;
     /** Build environment for this entry */
     environment?: Environment;
     /** Whether to generate ESM output for this entry */
@@ -310,11 +314,11 @@ export type ValidationOptions = {
     /** Dependency validation options */
     dependencies:
         | {
-            /** Hoisted dependency validation with exclusions */
-            hoisted: { exclude: string[] } | false;
-            /** Unused dependency validation with exclusions */
-            unused: { exclude: string[] } | false;
-        }
+              /** Hoisted dependency validation with exclusions */
+              hoisted: { exclude: string[] } | false;
+              /** Unused dependency validation with exclusions */
+              unused: { exclude: string[] } | false;
+          }
         | false;
     /** Package.json validation options */
     packageJson?: {

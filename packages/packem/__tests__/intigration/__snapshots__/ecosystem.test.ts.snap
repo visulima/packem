@@ -36,7 +36,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { EventEmitter } from 'events';
 import { encode } from 'gpt-tokenizer/model/gpt-4o';
-import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-Moyz8Jun.js';
+import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-DHdmMMmW.js';
 
 function toArr(any) {
   return any == null ? [] : Array.isArray(any) ? any : [any];
@@ -1041,6 +1041,10 @@ class PQueue extends EventEmitter {
   #intervalEnd = 0;
   #intervalId;
   #timeoutId;
+  #strict;
+  // Circular buffer implementation for better performance
+  #strictTicks = [];
+  #strictTicksStartIndex = 0;
   #queue;
   #queueClass;
   #pending = 0;
@@ -1066,6 +1070,7 @@ class PQueue extends EventEmitter {
       concurrency: Number.POSITIVE_INFINITY,
       autoStart: true,
       queueClass: PriorityQueue,
+      strict: false,
       ...options
     };
     if (!(typeof options.intervalCap === "number" && options.intervalCap >= 1)) {
@@ -1078,6 +1083,7 @@ class PQueue extends EventEmitter {
     this.#isIntervalIgnored = options.intervalCap === Number.POSITIVE_INFINITY || options.interval === 0;
     this.#intervalCap = options.intervalCap;
     this.#interval = options.interval;
+    this.#strict = options.strict;
     this.#queue = new options.queueClass();
     this.#queueClass = options.queueClass;
     this.concurrency = options.concurrency;
@@ -1085,8 +1091,49 @@ class PQueue extends EventEmitter {
     this.#throwOnTimeout = options.throwOnTimeout === true;
     this.#isPaused = options.autoStart === false;
   }
+  #cleanupStrictTicks(now) {
+    while (this.#strictTicksStartIndex < this.#strictTicks.length) {
+      const oldestTick = this.#strictTicks[this.#strictTicksStartIndex];
+      if (oldestTick !== void 0 && now - oldestTick >= this.#interval) {
+        this.#strictTicksStartIndex++;
+      } else {
+        break;
+      }
+    }
+    const shouldCompact = this.#strictTicksStartIndex > 100 && this.#strictTicksStartIndex > this.#strictTicks.length / 2 || this.#strictTicksStartIndex === this.#strictTicks.length;
+    if (shouldCompact) {
+      this.#strictTicks = this.#strictTicks.slice(this.#strictTicksStartIndex);
+      this.#strictTicksStartIndex = 0;
+    }
+  }
+  // Helper methods for interval consumption
+  #consumeIntervalSlot(now) {
+    if (this.#strict) {
+      this.#strictTicks.push(now);
+    } else {
+      this.#intervalCount++;
+    }
+  }
+  #rollbackIntervalSlot() {
+    if (this.#strict) {
+      if (this.#strictTicks.length > this.#strictTicksStartIndex) {
+        this.#strictTicks.pop();
+      }
+    } else if (this.#intervalCount > 0) {
+      this.#intervalCount--;
+    }
+  }
+  #getActiveTicksCount() {
+    return this.#strictTicks.length - this.#strictTicksStartIndex;
+  }
   get #doesIntervalAllowAnother() {
-    return this.#isIntervalIgnored || this.#intervalCount < this.#intervalCap;
+    if (this.#isIntervalIgnored) {
+      return true;
+    }
+    if (this.#strict) {
+      return this.#getActiveTicksCount() < this.#intervalCap;
+    }
+    return this.#intervalCount < this.#intervalCap;
   }
   get #doesConcurrentAllowAnother() {
     return this.#pending < this.#concurrency;
@@ -1102,16 +1149,25 @@ class PQueue extends EventEmitter {
     this.emit("next");
   }
   #onResumeInterval() {
+    this.#timeoutId = void 0;
     this.#onInterval();
     this.#initializeIntervalIfNeeded();
-    this.#timeoutId = void 0;
   }
-  get #isIntervalPaused() {
-    const now = Date.now();
+  #isIntervalPausedAt(now) {
+    if (this.#strict) {
+      this.#cleanupStrictTicks(now);
+      const activeTicksCount = this.#getActiveTicksCount();
+      if (activeTicksCount >= this.#intervalCap) {
+        const oldestTick = this.#strictTicks[this.#strictTicksStartIndex];
+        const delay = this.#interval - (now - oldestTick);
+        this.#createIntervalTimeout(delay);
+        return true;
+      }
+      return false;
+    }
     if (this.#intervalId === void 0) {
       const delay = this.#intervalEnd - now;
       if (delay < 0) {
-<<<<<<< HEAD
         this.#intervalCount = this.#carryoverConcurrencyCount ? this.#pending : 0;
       } else {
         if (this.#timeoutId === void 0) {
@@ -1132,6 +1188,7 @@ class PQueue extends EventEmitter {
       this.#intervalId = void 0;
       this.emit("empty");
       if (this.#pending === 0) {
+<<<<<<< HEAD
         this.emit("idle");
       }
       return false;
@@ -1140,7 +1197,8 @@ class PQueue extends EventEmitter {
     let taskStarted = false;
 >>>>>>> 397c91476 (feat(packem): enhance external dependency resolution and add new tests)
     if (!this.#isPaused) {
-      const canInitializeInterval = !this.#isIntervalPaused;
+      const now = Date.now();
+      const canInitializeInterval = !this.#isIntervalPausedAt(now);
       if (this.#doesIntervalAllowAnother && this.#doesConcurrentAllowAnother) {
         const job = this.#queue.dequeue();
 <<<<<<< HEAD
@@ -1159,6 +1217,9 @@ class PQueue extends EventEmitter {
   }
   #initializeIntervalIfNeeded() {
     if (this.#isIntervalIgnored || this.#intervalId !== void 0) {
+      return;
+    }
+    if (this.#strict) {
       return;
     }
     this.#intervalId = setInterval(() => {
@@ -1201,7 +1262,6 @@ class PQueue extends EventEmitter {
     this.#queue.setPriority(id, priority);
   }
   async add(function_, options = {}) {
-    options.id ??= (this.#idAssigner++).toString();
     options = {
       timeout: this.timeout,
       throwOnTimeout: this.#throwOnTimeout,
@@ -1365,9 +1425,31 @@ class PQueue extends EventEmitter {
       this.#updateRateLimitState();
     });
   }
+  #rollbackIntervalConsumption() {
+    if (this.#isIntervalIgnored) {
+      return;
+    }
+    this.#rollbackIntervalSlot();
+    this.#scheduleRateLimitUpdate();
+  }
   #updateRateLimitState() {
     const previous = this.#rateLimitedInInterval;
-    const shouldBeRateLimited = !this.#isIntervalIgnored && this.#intervalCount >= this.#intervalCap && this.#queue.size > 0;
+    if (this.#isIntervalIgnored || this.#queue.size === 0) {
+      if (previous) {
+        this.#rateLimitedInInterval = false;
+        this.emit("rateLimitCleared");
+      }
+      return;
+    }
+    let count;
+    if (this.#strict) {
+      const now = Date.now();
+      this.#cleanupStrictTicks(now);
+      count = this.#getActiveTicksCount();
+    } else {
+      count = this.#intervalCount;
+    }
+    const shouldBeRateLimited = count >= this.#intervalCap;
     if (shouldBeRateLimited !== previous) {
       this.#rateLimitedInInterval = shouldBeRateLimited;
       this.emit(shouldBeRateLimited ? "rateLimit" : "rateLimitCleared");

@@ -15,10 +15,10 @@ const cleanDistributionDirectories = async (context: BuildContext<InternalBuildO
                 .toSorted() as unknown as Set<string>,
         )) {
             if (
-                directory === context.options.rootDir
-                || directory === context.options.sourceDir
-                || context.options.rootDir.startsWith(directory.endsWith("/") ? directory : `${directory}/`)
-                || cleanedDirectories.some((c) => directory.startsWith(c))
+                directory === context.options.rootDir ||
+                directory === context.options.sourceDir ||
+                context.options.rootDir.startsWith(directory.endsWith("/") ? directory : `${directory}/`) ||
+                cleanedDirectories.some((c) => directory.startsWith(c))
             ) {
                 continue;
             }

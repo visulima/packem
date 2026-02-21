@@ -16,7 +16,7 @@ describe("packem validate engines", () => {
 
         // Create a basic src/index.js file for the build to work
         mkdirSync(join(temporaryDirectoryPath, "src"), { recursive: true });
-        writeFileSync(join(temporaryDirectoryPath, "src", "index.js"), "export const foo = \"bar\";");
+        writeFileSync(join(temporaryDirectoryPath, "src", "index.js"), 'export const foo = "bar";');
     });
 
     afterEach(async () => {

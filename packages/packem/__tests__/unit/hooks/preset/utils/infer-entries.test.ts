@@ -1462,10 +1462,10 @@ describe(inferEntries, () => {
         expect(result).toStrictEqual({
             entries: [
                 {
-                    cjs: true,
                     declaration: true,
+                    declarationCjs: true,
+                    declarationEsm: true,
                     environment: "development",
-                    esm: true,
                     exportKey: new Set<string>(["types/*"]),
                     fileAlias: undefined,
                     input: join(temporaryDirectoryPath, "src/types/models.ts"),

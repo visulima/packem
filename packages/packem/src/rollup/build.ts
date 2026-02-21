@@ -20,10 +20,10 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
     }
 
     // Check if we have cached dependencies available
-    const hasCachedDependencies
-        = context.options.validation
-            && context.options.validation.dependencies !== false
-            && !!fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
+    const hasCachedDependencies =
+        context.options.validation &&
+        context.options.validation.dependencies !== false &&
+        !!fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
 
     // Use bundle cache only if we have cached dependencies (to avoid stale cache issues)
     const loadCache = !context.options.validation || context.options.validation.dependencies === false || hasCachedDependencies;

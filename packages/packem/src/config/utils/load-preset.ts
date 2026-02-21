@@ -50,7 +50,7 @@ const loadPreset = async (preset: BuildPreset | string, jiti: Jiti): Promise<Bui
         default: {
             if (typeof preset === "string") {
                 // eslint-disable-next-line no-param-reassign
-                preset = await jiti.import(preset) || {};
+                preset = (await jiti.import(preset)) || {};
             }
         }
     }

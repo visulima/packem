@@ -42,7 +42,7 @@ describe(validateEngines, () => {
 
         expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
             context,
-            "The 'engines.node' field is missing in your package.json. Consider adding \"engines\": { \"node\": \">=18.0.0\" } to specify Node.js version requirements.",
+            'The \'engines.node\' field is missing in your package.json. Consider adding "engines": { "node": ">=18.0.0" } to specify Node.js version requirements.',
         );
     });
 
@@ -75,7 +75,7 @@ describe(validateEngines, () => {
 
         expect(mockedWarn).toHaveBeenCalledExactlyOnceWith(
             context,
-            "Invalid Node.js version range \"invalid-version-range\" in engines.node field. Please use a valid semver range like \">=18.0.0\".",
+            'Invalid Node.js version range "invalid-version-range" in engines.node field. Please use a valid semver range like ">=18.0.0".',
         );
     });
 

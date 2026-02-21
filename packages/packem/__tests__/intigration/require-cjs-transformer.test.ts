@@ -254,8 +254,8 @@ export const test = () => {
 
         // Check that Node.js built-in modules are transformed with runtime helpers
         expect(mjsContent).toContain("const __cjs_getBuiltinModule = (module) => {");
-        expect(mjsContent).toContain("__cjs_getBuiltinModule(\"fs\")");
-        expect(mjsContent).toContain("__cjs_getBuiltinModule(\"path\")");
+        expect(mjsContent).toContain('__cjs_getBuiltinModule("fs")');
+        expect(mjsContent).toContain('__cjs_getBuiltinModule("path")');
 
         // Check that the output contains the expected export
         expect(mjsContent).toContain("export { test };");
@@ -418,8 +418,8 @@ export const mainIndex2 = () => ({
           };
 
           const {
-            writeFileSync,
-            readFileSync
+            readFileSync,
+            writeFileSync
           } = __cjs_getBuiltinModule("node:fs");
           import { g as getCwd, a as getEnv, j as joinPaths } from './packem_shared/process-utils-D1raRETv.js';
 

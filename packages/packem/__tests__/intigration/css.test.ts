@@ -35,11 +35,11 @@ type StringWriteData = BaseWriteData & {
     styleOptions?: string;
 };
 
-type WriteData
-    = | StringWriteData
-        | (BaseWriteData & {
-            styleOptions?: StyleOptions;
-        });
+type WriteData =
+    | StringWriteData
+    | (BaseWriteData & {
+          styleOptions?: StyleOptions;
+      });
 
 interface WriteFailResult {
     exitCode: number;
@@ -79,12 +79,12 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         await createPackemConfig(temporaryDirectoryPath, {
             config: data.outputOpts
                 ? {
-                    rollup: {
-                        output: {
-                            ...data.outputOpts,
-                        },
-                    },
-                }
+                      rollup: {
+                          output: {
+                              ...data.outputOpts,
+                          },
+                      },
+                  }
                 : undefined,
             cssLoader: loaders ?? ["postcss", "less", "stylus", "sass", "sourcemap"],
             cssOptions: typeof data.styleOptions === "string" ? data.styleOptions : otherOptions,
@@ -155,7 +155,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         const files: string[] = foundFiles
             .filter((dirent) => dirent.isFile())
             // @TODO: Change this readdir to @visulima/fs readdir
-            .map((dirent) => join(dirent.path, dirent.name));
+            .map((dirent) => join(dirent.parentPath, dirent.name));
 
         const css = files.filter((file) => file.endsWith(".css"));
         const cssMap = files.filter((file) => file.endsWith(".css.map"));
@@ -209,8 +209,8 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         }
 
         const optionMode: StyleOptions["mode"] = typeof data.styleOptions === "object" ? data.styleOptions.mode : (data as StringWriteData).mode;
-        const optionSourceMap: StyleOptions["sourceMap"]
-            = typeof data.styleOptions === "object" ? data.styleOptions.sourceMap : (data as StringWriteData).sourceMap;
+        const optionSourceMap: StyleOptions["sourceMap"] =
+            typeof data.styleOptions === "object" ? data.styleOptions.sourceMap : (data as StringWriteData).sourceMap;
 
         const mode = inferModeOption(optionMode ?? "inject");
 
@@ -256,8 +256,8 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         }
 
         const optionMode: StyleOptions["mode"] = typeof data.styleOptions === "object" ? data.styleOptions.mode : (data as StringWriteData).mode;
-        const optionSourceMap: StyleOptions["sourceMap"]
-            = typeof data.styleOptions === "object" ? data.styleOptions.sourceMap : (data as StringWriteData).sourceMap;
+        const optionSourceMap: StyleOptions["sourceMap"] =
+            typeof data.styleOptions === "object" ? data.styleOptions.sourceMap : (data as StringWriteData).sourceMap;
 
         const mode = inferModeOption(optionMode ?? "inject");
 
@@ -859,7 +859,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 input: "simple/index.js",
                 styleOptions:
                     // eslint-disable-next-line no-template-curly-in-string
-                    "mode: [\"inject\", (varname, id) => `console.log(${varname},${JSON.stringify(id.replace(\"__REPLACE__\", \"\"))})`],",
+                    'mode: ["inject", (varname, id) => `console.log(${varname},${JSON.stringify(id.replace("__REPLACE__", ""))})`],',
                 title: "function",
             },
         ] as WriteData[])("should work with injected processed $title css", async ({ title, ...data }: WriteData) => {
@@ -1429,6 +1429,7 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 title: "named-exports",
             },
             {
+                errorMessage: '"css" is not exported by',
                 input: "named-exports/index.js",
                 shouldFail: true,
                 styleOptions: {

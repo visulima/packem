@@ -3,7 +3,6 @@ import { collectSync, isAccessibleSync } from "@visulima/fs";
 import type { NormalizedPackageJson } from "@visulima/package";
 import { ALLOWED_TRANSFORM_EXTENSIONS_REGEX, EXCLUDE_REGEXP } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
-import { warn } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
 
 import type { BuildConfig, InternalBuildOptions } from "../../types";
@@ -110,7 +109,7 @@ const autoPreset: BuildConfig = {
                 const result = await inferEntries(packageJson, sourceFiles, context);
 
                 for (const message of result.warnings) {
-                    warn(context, message);
+                    context.logger.warn(message);
                 }
 
                 context.options.entries.push(...result.entries);

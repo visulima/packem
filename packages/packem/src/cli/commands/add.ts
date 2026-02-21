@@ -43,12 +43,12 @@ interface AddFeatureContext {
 }
 
 const checkPresetExists = (config: string, presetName: string, importName: string): boolean =>
-    config.includes(`preset: '${presetName}'`)
-    || config.includes(`preset: "${presetName}"`)
-    || config.includes(`preset: '${presetName}',`)
-    || config.includes(`preset: "${presetName}",`)
-    || config.includes(importName)
-    || config.includes(`@visulima/packem/config/preset/${presetName}`);
+    config.includes(`preset: '${presetName}'`) ||
+    config.includes(`preset: "${presetName}"`) ||
+    config.includes(`preset: '${presetName}',`) ||
+    config.includes(`preset: "${presetName}",`) ||
+    config.includes(importName) ||
+    config.includes(`@visulima/packem/config/preset/${presetName}`);
 
 const insertPreset = (context: AddFeatureContext, presetName: string): void => {
     const { logger, magic, packemConfig } = context;
