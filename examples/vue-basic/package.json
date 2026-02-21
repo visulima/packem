@@ -34,14 +34,14 @@
         "clean": "rimraf node_modules dist"
     },
     "dependencies": {
-        "vue": "^3.5.26"
+        "vue": "^3.5.28"
     },
     "devDependencies": {
         "@visulima/packem": "workspace:*",
-        "esbuild": "^0.27.2",
-        "rimraf": "^6.1.2",
+        "esbuild": "^0.27.3",
+        "rimraf": "^6.1.3",
         "typescript": "^5.9.3",
-        "unplugin-vue": "^7.1.0"
+        "unplugin-vue": "^7.1.1"
     },
     "engines": {
         "node": ">=20"
