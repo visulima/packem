@@ -134,21 +134,21 @@ const createBuildCommand = (cli: Cli): void => {
                             path: options.license,
                         },
                         metafile: options.metafile,
-                        ...Object.keys(environments).length > 0 || Object.keys(cliEnvVariables).length > 0
+                        ...(Object.keys(environments).length > 0 || Object.keys(cliEnvVariables).length > 0
                             ? {
-                                replace: {
-                                    values: environments,
-                                },
-                            }
-                            : {},
+                                  replace: {
+                                      values: environments,
+                                  },
+                              }
+                            : {}),
                         resolveExternals: options.noExternal
                             ? {
-                                builtins: false,
-                                deps: false,
-                                devDeps: false,
-                                optDeps: false,
-                                peerDeps: false,
-                            }
+                                  builtins: false,
+                                  deps: false,
+                                  devDeps: false,
+                                  optDeps: false,
+                                  peerDeps: false,
+                              }
                             : {},
                     },
                     runtime: options.runtime,
@@ -156,13 +156,13 @@ const createBuildCommand = (cli: Cli): void => {
                     unbundle: options.unbundle,
                     // validation will take the default values
                     validation: options.validation === false ? false : {},
-                    ...options.typedoc
+                    ...(options.typedoc
                         ? {
-                            typedoc: {
-                                format: "html",
-                            },
-                        }
-                        : {},
+                              typedoc: {
+                                  format: "html",
+                              },
+                          }
+                        : {}),
                 });
 
                 await packem(rootPath, mode, nodeEnvironment as Environment, logger, options.debug, mergedConfig, options.tsconfig ?? undefined);
@@ -305,7 +305,7 @@ const createBuildCommand = (cli: Cli): void => {
                 type: String,
             },
             {
-                description: "Signal to kill child process, \"SIGTERM\" or \"SIGKILL\"",
+                description: 'Signal to kill child process, "SIGTERM" or "SIGKILL"',
                 name: "killSignal",
                 type: (input: string) => {
                     if (input === "SIGTERM" || input === "SIGKILL") {

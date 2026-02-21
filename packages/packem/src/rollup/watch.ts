@@ -148,7 +148,7 @@ const watch = async (
                 "**/.git/**",
                 "**/node_modules/**",
                 "**/test-results/**", // Playwright
-                ...rollupOptions.watch.chokidar?.ignored ?? [],
+                ...(rollupOptions.watch.chokidar?.ignored ?? []),
             ],
         };
     }

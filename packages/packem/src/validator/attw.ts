@@ -93,20 +93,17 @@ const profiles: Record<Required<AttwOptions>["profile"], string[]> = {
  */
 const fixPnpmStdout = (stdout: string) => {
     // If starts with `{`, it's likely a valid JSON
-    if (stdout.startsWith("{"))
-        return stdout;
+    if (stdout.startsWith("{")) return stdout;
 
     // Otherwise try to find its usual output format, `{\n  "name": ...`
     const usualStartIndex = /\{\s*"name"/.exec(stdout)?.index;
 
-    if (usualStartIndex != undefined)
-        return stdout.slice(usualStartIndex);
+    if (usualStartIndex != undefined) return stdout.slice(usualStartIndex);
 
     // Otherwise, simply try to find the first `{` character
     const firstBraceIndex = stdout.indexOf("{");
 
-    if (firstBraceIndex !== -1)
-        return stdout.slice(firstBraceIndex);
+    if (firstBraceIndex !== -1) return stdout.slice(firstBraceIndex);
 
     // If all fails, return the original stdout
     return stdout;
@@ -123,8 +120,7 @@ const fixYarnStdout = (stdout: string): string => {
     let fixedStdout = "[";
 
     for (const line of lines) {
-        if (line)
-            fixedStdout += `${line},`;
+        if (line) fixedStdout += `${line},`;
     }
 
     // Remove trailing slash
@@ -275,13 +271,13 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
 
         const parsed = JSON.parse(stdout) as
             | {
-                filename: string;
-                files: {
-                    path: string;
-                }[];
-                name: string;
-                version: string;
-            }
+                  filename: string;
+                  files: {
+                      path: string;
+                  }[];
+                  name: string;
+                  version: string;
+              }
             | undefined;
 
         if (!parsed?.filename) {
@@ -326,8 +322,8 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
                 const moduleResult = entrypoint.isWildcard
                     ? "(wildcard)"
                     : `OK ${
-                        moduleKinds[analysis.programInfo[getResolutionOption(resolutionKind)].moduleKinds?.[resolution?.fileName ?? ""]?.detectedKind || ""]
-                    }`;
+                          moduleKinds[analysis.programInfo[getResolutionOption(resolutionKind)].moduleKinds?.[resolution?.fileName ?? ""]?.detectedKind || ""]
+                      }`;
 
                 return ignoredPrefix + (resolution?.isJson ? jsonResult : moduleResult);
             });

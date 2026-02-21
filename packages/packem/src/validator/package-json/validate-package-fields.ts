@@ -239,7 +239,7 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
             const conditionKeys = keys.filter((key) => !key.startsWith("."));
 
             if (subpathKeys.length > 0 && conditionKeys.length > 0) {
-                warn(context, "Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with \".\") or conditions, not both");
+                warn(context, 'Mixed subpaths and conditions in exports object. Use either subpaths (keys starting with ".") or conditions, not both');
 
                 return;
             }
@@ -247,7 +247,7 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
             if (subpathKeys.length > 0) {
                 // Subpaths exports
                 if (!keys.includes(".")) {
-                    warn(context, "Missing main export \".\". Subpaths exports should include a main export entry");
+                    warn(context, 'Missing main export ".". Subpaths exports should include a main export entry');
                 }
 
                 // Validate subpath patterns
@@ -412,10 +412,10 @@ const validatePackageFields = (context: BuildContext<InternalBuildOptions>): voi
         }
 
         if (
-            (context.options.declaration === true || context.options.declaration === "compatible")
-            && showWarning
-            && validation.packageJson?.typesVersions !== false
-            && (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
+            (context.options.declaration === true || context.options.declaration === "compatible") &&
+            showWarning &&
+            validation.packageJson?.typesVersions !== false &&
+            (pkg.typesVersions === undefined || Object.keys(pkg.typesVersions).length === 0)
         ) {
             warn(
                 context,

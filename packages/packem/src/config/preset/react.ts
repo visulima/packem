@@ -10,18 +10,18 @@ export interface ReactPresetOptions {
     compiler?:
         | boolean
         | {
-            /**
-             * React Compiler compilation mode
-             * @default "infer"
-             */
-            compilationMode?: "infer" | "annotation";
+              /**
+               * React Compiler compilation mode
+               * @default "infer"
+               */
+              compilationMode?: "infer" | "annotation";
 
-            /**
-             * React Compiler panic threshold
-             * @default "critical_errors"
-             */
-            panicThreshold?: "critical_errors" | "all_errors";
-        };
+              /**
+               * React Compiler panic threshold
+               * @default "critical_errors"
+               */
+              panicThreshold?: "critical_errors" | "all_errors";
+          };
 
     /**
      * Custom Babel plugins to add
@@ -89,8 +89,8 @@ export const createReactPreset = (options: ReactPresetOptions = {}): BuildConfig
         },
     ]);
 
-    const finalPlugins = [...babelPlugins, ...Array.isArray(plugins) ? plugins : []];
-    const finalPresets = [...babelPresets, ...Array.isArray(presets) ? presets : []];
+    const finalPlugins = [...babelPlugins, ...(Array.isArray(plugins) ? plugins : [])];
+    const finalPresets = [...babelPresets, ...(Array.isArray(presets) ? presets : [])];
 
     return {
         hooks: {
@@ -98,9 +98,7 @@ export const createReactPreset = (options: ReactPresetOptions = {}): BuildConfig
                 const babelConfig = context.options.rollup.babel;
 
                 if (babelConfig && typeof babelConfig === "object" && babelConfig.presets) {
-                    const presetIndex = babelConfig.presets.findIndex(
-                        (preset) => Array.isArray(preset) && preset[0] === "@babel/preset-react",
-                    );
+                    const presetIndex = babelConfig.presets.findIndex((preset) => Array.isArray(preset) && preset[0] === "@babel/preset-react");
 
                     if (presetIndex !== -1) {
                         const preset = babelConfig.presets[presetIndex] as [string, Record<string, unknown>];

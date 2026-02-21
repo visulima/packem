@@ -81,7 +81,7 @@ describe(extractExportFilenames, () => {
         ]);
     });
 
-    it("should infer the export type as \"esm\" when condition is \"import\"", () => {
+    it('should infer the export type as "esm" when condition is "import"', () => {
         expect.assertions(1);
 
         const packageExports = {
@@ -114,7 +114,7 @@ describe(extractExportFilenames, () => {
         ]);
     });
 
-    it("should infer the export type as \"esm\" when condition is \"import\" and \"cjs\" when condition is \"require\"", () => {
+    it('should infer the export type as "esm" when condition is "import" and "cjs" when condition is "require"', () => {
         expect.assertions(1);
 
         const packageExports = {
@@ -163,7 +163,7 @@ describe(extractExportFilenames, () => {
         ]);
     });
 
-    it("should throw an error and exit with code 1 when inferredType does not match the package.json \"type\" field", () => {
+    it('should throw an error and exit with code 1 when inferredType does not match the package.json "type" field', () => {
         expect.assertions(1);
 
         const packageExports = "./src/index.cjs";
@@ -171,7 +171,7 @@ describe(extractExportFilenames, () => {
 
         expect(() => {
             extractExportFilenames(packageExports, type, false);
-        }).toThrowError("Exported file \"./src/index.cjs\" has an extension that does not match the package.json type \"module\".");
+        }).toThrowError('Exported file "./src/index.cjs" has an extension that does not match the package.json type "module".');
     });
 
     it.each([

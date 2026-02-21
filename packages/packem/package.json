@@ -458,5 +458,6 @@
     "publishConfig": {
         "access": "public",
         "provenance": true
-    }
+    },
+    "optionalDependencies": {}
 }

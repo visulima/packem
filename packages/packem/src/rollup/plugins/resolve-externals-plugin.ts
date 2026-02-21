@@ -108,14 +108,14 @@ export const resolveExternalsPlugin = (context: BuildContext<InternalBuildOption
     const resolvedExternalsOptions = context.options?.rollup?.resolveExternals ?? {};
 
     // Map the include and exclude options to arrays of regexes.
-    const include = new Set(getRegExps([...context.options?.externals ?? []], "include", context.logger));
-    const exclude = new Set(getRegExps([...resolvedExternalsOptions.exclude ?? []], "exclude", context.logger));
+    const include = new Set(getRegExps([...(context.options?.externals ?? [])], "include", context.logger));
+    const exclude = new Set(getRegExps([...(resolvedExternalsOptions.exclude ?? [])], "exclude", context.logger));
 
     const dependencies: Record<string, string> = {
-        ...resolvedExternalsOptions.deps ? context.pkg.dependencies ?? {} : undefined,
-        ...resolvedExternalsOptions.devDeps ? context.pkg.devDependencies ?? {} : undefined,
-        ...resolvedExternalsOptions.peerDeps ? context.pkg.peerDependencies ?? {} : undefined,
-        ...resolvedExternalsOptions.optDeps ? context.pkg.optionalDependencies ?? {} : undefined,
+        ...(resolvedExternalsOptions.deps ? (context.pkg.dependencies ?? {}) : undefined),
+        ...(resolvedExternalsOptions.devDeps ? (context.pkg.devDependencies ?? {}) : undefined),
+        ...(resolvedExternalsOptions.peerDeps ? (context.pkg.peerDependencies ?? {}) : undefined),
+        ...(resolvedExternalsOptions.optDeps ? (context.pkg.optionalDependencies ?? {}) : undefined),
     };
 
     // Add all dependencies as an include RegEx.
@@ -167,23 +167,23 @@ export const resolveExternalsPlugin = (context: BuildContext<InternalBuildOption
                 }
 
                 // Try to guess package name of id
-                const packageName
-                    = (resolvedId && parseNodeModulePath(resolvedId)?.name) || parseNodeModulePath(originalId)?.name || getPackageName(originalId);
+                const packageName =
+                    (resolvedId && parseNodeModulePath(resolvedId)?.name) || parseNodeModulePath(originalId)?.name || getPackageName(originalId);
 
                 if (packageName && !packageName.startsWith(".") && !isNodeBuiltin(packageName)) {
                     context.usedDependencies.add(packageName);
 
                     if (
                         // Only treat as hoisted if the importer is source
-                        (!importer || !importer.includes("/node_modules/"))
-                        && !Object.keys(context.pkg.dependencies ?? {}).includes(packageName)
-                        && !Object.keys(context.pkg.devDependencies ?? {}).includes(packageName)
-                        && !Object.keys(context.pkg.peerDependencies ?? {}).includes(packageName)
-                        && !Object.keys(context.pkg.optionalDependencies ?? {}).includes(packageName)
-                        && context.options.validation
-                        && context.options.validation.dependencies !== false
-                        && context.options.validation.dependencies.hoisted !== false
-                        && !context.options.validation.dependencies.hoisted?.exclude.includes(packageName)
+                        (!importer || !importer.includes("/node_modules/")) &&
+                        !Object.keys(context.pkg.dependencies ?? {}).includes(packageName) &&
+                        !Object.keys(context.pkg.devDependencies ?? {}).includes(packageName) &&
+                        !Object.keys(context.pkg.peerDependencies ?? {}).includes(packageName) &&
+                        !Object.keys(context.pkg.optionalDependencies ?? {}).includes(packageName) &&
+                        context.options.validation &&
+                        context.options.validation.dependencies !== false &&
+                        context.options.validation.dependencies.hoisted !== false &&
+                        !context.options.validation.dependencies.hoisted?.exclude.includes(packageName)
                     ) {
                         context.hoistedDependencies.add(packageName);
                     }
@@ -191,10 +191,10 @@ export const resolveExternalsPlugin = (context: BuildContext<InternalBuildOption
 
                 for (const id of [originalId, resolvedId].filter(Boolean)) {
                     if (
-                        /^(?:\0|\.{1,2}\/)/.test(id) // Ignore virtual modules and relative imports
-                        || isAbsolute(id) // Ignore already resolved ids
-                        || new RegExp(String.raw`${context.options?.sourceDir}[/.*|\.*]`).test(id) // Ignore source files
-                        || (context.pkg.name && id.startsWith(context.pkg.name)) // Ignore self import
+                        /^(?:\0|\.{1,2}\/)/.test(id) || // Ignore virtual modules and relative imports
+                        isAbsolute(id) || // Ignore already resolved ids
+                        new RegExp(String.raw`${context.options?.sourceDir}[/.*|\.*]`).test(id) || // Ignore source files
+                        (context.pkg.name && id.startsWith(context.pkg.name)) // Ignore self import
                     ) {
                         cacheResolved.set(id, false);
 

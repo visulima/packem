@@ -103,7 +103,7 @@ export const extractExportFilenames: (
                     file: packageExport,
                     key: "exports",
                     type: inferExportType(exportKey, conditions, packageType, packageExport),
-                    ...isIgnored && { ignored: true },
+                    ...(isIgnored && { ignored: true }),
                 } as OutputDescriptor);
             } else if (typeof packageExport === "object" && packageExport !== undefined) {
                 for (const [condition, entryExport] of Object.entries(packageExport as Record<string, string[] | string | null>)) {
@@ -118,19 +118,19 @@ export const extractExportFilenames: (
                             exportKey: key.replace("./", ""),
                             file: entryExport,
                             key: "exports",
-                            ...runtimeExportConventions.has(condition)
+                            ...(runtimeExportConventions.has(condition)
                                 ? {
-                                    subKey: condition as OutputDescriptor["subKey"],
-                                }
-                                : {},
+                                      subKey: condition as OutputDescriptor["subKey"],
+                                  }
+                                : {}),
                             type: inferExportType(condition, conditions, packageType, entryExport),
-                            ...isIgnored && { ignored: true },
+                            ...(isIgnored && { ignored: true }),
                         } as OutputDescriptor);
                     } else {
                         // For nested exports, we need to check if the parent export key should be ignored
                         const nestedKey = key.replace("./", "");
-                        const isNestedIgnored
-                            = isIgnored || ignoreExportKeys.some((ignoredKey) => nestedKey === ignoredKey || nestedKey.startsWith(`${ignoredKey}/`));
+                        const isNestedIgnored =
+                            isIgnored || ignoreExportKeys.some((ignoredKey) => nestedKey === ignoredKey || nestedKey.startsWith(`${ignoredKey}/`));
 
                         const nestedResults = extractExportFilenames(
                             { [key]: entryExport } as PackageJson["exports"],

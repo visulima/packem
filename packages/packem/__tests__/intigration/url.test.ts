@@ -113,7 +113,7 @@ describe("url", () => {
         await build("svg", { limit: 10 * 1024 }, [join(temporaryDirectoryPath, "/dist/svg.cjs"), join(temporaryDirectoryPath, "/dist/svg.mjs")]);
     });
 
-    it("inline \"large\" files", async () => {
+    it('inline "large" files', async () => {
         expect.assertions(5);
 
         await build("svg", { limit: 10 }, [
@@ -142,7 +142,7 @@ describe("url", () => {
         ]);
     });
 
-    it("copy \"large\" binary files, limit: 10", async () => {
+    it('copy "large" binary files, limit: 10', async () => {
         expect.assertions(5);
 
         await build("svg", { emitFiles: true, limit: 10 }, [

@@ -36,27 +36,27 @@ const validatePackageEntries = (context: BuildContext<InternalBuildOptions>): vo
             ...bin,
             options.dtsOnly && validation.packageJson?.main === false ? "" : context.pkg.main,
             options.dtsOnly && validation.packageJson?.module === false ? "" : context.pkg.module,
-            ...validation.packageJson?.exports
+            ...(validation.packageJson?.exports
                 ? extractExportFilenames(context.pkg.exports, packageType, options.declaration, [], options.ignoreExportKeys)
-                    .filter((outputDescriptor) => !outputDescriptor.ignored)
-                    .map((outputDescriptor) => {
-                        if (options.dtsOnly) {
-                            if (outputDescriptor.subKey === "types") {
-                                return outputDescriptor.file;
-                            }
+                      .filter((outputDescriptor) => !outputDescriptor.ignored)
+                      .map((outputDescriptor) => {
+                          if (options.dtsOnly) {
+                              if (outputDescriptor.subKey === "types") {
+                                  return outputDescriptor.file;
+                              }
 
-                            return undefined;
-                        }
+                              return undefined;
+                          }
 
-                        return outputDescriptor.file;
-                    })
-                : [],
+                          return outputDescriptor.file;
+                      })
+                : []),
         ]
             .filter(Boolean)
             .map(
                 (index) =>
-                    index
-                    && resolve(
+                    index &&
+                    resolve(
                         options.rootDir,
 
                         index.replace(/\/[^*/]*\*[^\n\r/\u2028\u2029]*(?:[\n\r\u2028\u2029][^*/]*\*[^\n\r/\u2028\u2029]*)*(?:\/.*)?$/, ""),

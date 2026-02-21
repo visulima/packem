@@ -15,10 +15,10 @@ const loadPackemConfig = async (
 }> => {
     const packemConfigFilePath = await findPackemFile(rootDirectory, configPath);
 
-    let buildConfig = (await jiti.import(packemConfigFilePath, {
+    let buildConfig = ((await jiti.import(packemConfigFilePath, {
         default: true,
         try: true,
-    }) || {}) as BuildConfig | BuildConfigFunction;
+    })) || {}) as BuildConfig | BuildConfigFunction;
 
     if (typeof buildConfig === "function") {
         buildConfig = await buildConfig(environment, mode);

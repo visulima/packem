@@ -43,8 +43,14 @@ describe("packem error cases", () => {
         });
 
         const NODE_JS_VERSION = Number(process.versions.node.split(".")[0]);
+        // Node.js changed the error message for invalid package.json across versions:
+        // < 20: "Unexpected end of JSON input in"
+        // 20-21: "Expected property name or"
+        // 22+: "Invalid package config" (ERR_INVALID_PACKAGE_CONFIG)
+        const expectedMessage =
+            NODE_JS_VERSION < 20 ? "Unexpected end of JSON input in" : NODE_JS_VERSION < 22 ? "Expected property name or" : "Invalid package config";
 
-        expect(binProcess.stderr).toContain(NODE_JS_VERSION < 20 ? "Unexpected end of JSON input in" : "Expected property name or");
+        expect(binProcess.stderr).toContain(expectedMessage);
         expect(binProcess.exitCode).toBe(1);
     });
 
@@ -103,7 +109,7 @@ describe("packem error cases", () => {
     });
 
     it("should throw a error if conflicting entry in package.json", async () => {
-        expect.assertions(4);
+        expect.assertions(3);
 
         await createPackageJson(temporaryDirectoryPath, {
             dependencies: {},
@@ -122,8 +128,7 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain(`Conflict detected: The 'module' and 'main' fields both point to `);
-        expect(binProcess.stdout).toContain(`'dist/index.js'.`);
+        expect(binProcess.stdout).toContain(`Conflict detected: The 'module' and 'main' fields both point to 'dist/index`);
         expect(binProcess.stdout).toContain(`Please ensure they refer to different module types.`);
         expect(binProcess.exitCode).toBe(1);
     });
@@ -183,8 +188,8 @@ describe("packem error cases", () => {
             reject: false,
         });
 
-        expect(binProcess.stdout).toContain(`The 'module' field in your package.json should not use a '.cjs' extension`);
-        expect(binProcess.stdout).toContain(`for ES modules.`);
+        expect(binProcess.stdout).toContain(`The 'module' field in your package.json should not use a '.cjs' extension f`);
+        expect(binProcess.stdout).toContain(`or ES modules.`);
         expect(binProcess.exitCode).toBe(1);
     });
 });

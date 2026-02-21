@@ -27,6 +27,14 @@ const execPackem = async (command: "build" | "init" | "migrate", flags: string[]
     return await execaNode(join(distributionPath, "cli/index.js"), [command, environmentFlag, ...flags].filter(Boolean) as string[], {
         cleanup: true,
         ...options,
+        env: {
+            ...(options.env as Record<string, string> | undefined),
+            // Prevent the pail logger from line-wrapping output in subprocess tests.
+            // Without a TTY, pail defaults to 80 columns which breaks assertions
+            // that check for full log messages longer than 80 characters.
+            COLUMNS: "10000",
+            LINES: "1000",
+        },
     });
 };
 

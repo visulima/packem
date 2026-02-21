@@ -594,6 +594,15 @@ export { isDigitCode, isLowerCode, isUpperCode };
 "
 `;
 
+exports[`packem typescript > should compile only a type file > .d.ts type code output 1`] = `
+"declare global {
+    interface String {
+
+    }
+}
+"
+`;
+
 exports[`packem typescript > should support typescript decorator > cjs code output 1`] = `
 "'use strict';
 

@@ -72,13 +72,13 @@ const extendEntry = async (entry: BuildEntry, context: BuildContext<InternalBuil
 
 const prepareEntries = async (context: BuildContext<InternalBuildOptions>): Promise<void> => {
     context.options.entries = context.options.entries.map((entry) =>
-        (typeof entry === "string"
+        typeof entry === "string"
             ? { input: entry, isGlob: isDynamicPattern(entry) }
             : {
                   ...entry,
                   exportKey: entry.exportKey ?? new Set(),
                   isGlob: isDynamicPattern(entry.input),
-              }),
+              },
     );
 
     for (const entry of context.options.entries.filter((entry) => entry.isGlob)) {
@@ -148,9 +148,9 @@ const prepareEntries = async (context: BuildContext<InternalBuildOptions>): Prom
 
         // Check file alias for server/node/workerd patterns
         if (
-            !entry.runtime
-            && entry.fileAlias
-            && (entry.fileAlias.includes(".server") || entry.fileAlias.includes(".node") || entry.fileAlias.includes(".workerd"))
+            !entry.runtime &&
+            entry.fileAlias &&
+            (entry.fileAlias.includes(".server") || entry.fileAlias.includes(".node") || entry.fileAlias.includes(".workerd"))
         ) {
             entry.runtime = "node";
         }

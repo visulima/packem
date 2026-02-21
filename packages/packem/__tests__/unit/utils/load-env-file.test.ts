@@ -30,8 +30,8 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(".env", tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
-            "process.env.PACKEM_VERSION": "\"1.0.0\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
+            "process.env.PACKEM_VERSION": '"1.0.0"',
         });
     });
 
@@ -45,8 +45,8 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(".env", tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
-            "process.env.PACKEM_VERSION": "\"1.0.0\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
+            "process.env.PACKEM_VERSION": '"1.0.0"',
         });
     });
 
@@ -60,8 +60,8 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(".env", tempDir, "");
 
         expect(result).toEqual({
-            "process.env.API_URL": "\"https://api.example.com\"",
-            "process.env.VERSION": "\"1.0.0\"",
+            "process.env.API_URL": '"https://api.example.com"',
+            "process.env.VERSION": '"1.0.0"',
         });
     });
 
@@ -75,8 +75,8 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(".env", tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
-            "process.env.PACKEM_MESSAGE": "\"Hello World\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
+            "process.env.PACKEM_MESSAGE": '"Hello World"',
         });
     });
 
@@ -90,8 +90,8 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(".env", tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
-            "process.env.PACKEM_VERSION": "\"1.0.0\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
+            "process.env.PACKEM_VERSION": '"1.0.0"',
         });
     });
 
@@ -116,7 +116,7 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile("config/.env", tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
         });
     });
 
@@ -130,7 +130,7 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(envFile, tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
         });
     });
 
@@ -144,7 +144,7 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(".env", tempDir);
 
         expect(result).toEqual({
-            "process.env.PACKEM_API_URL": "\"https://api.example.com\"",
+            "process.env.PACKEM_API_URL": '"https://api.example.com"',
         });
     });
 
@@ -158,8 +158,8 @@ describe(loadEnvFile, () => {
         const result = await loadEnvFile(".env", tempDir, "PACKEM_");
 
         expect(result).toEqual({
-            "process.env.PACKEM_CONFIG": "\"key=value\"",
-            "process.env.PACKEM_QUERY": "\"param1=val1&param2=val2\"",
+            "process.env.PACKEM_CONFIG": '"key=value"',
+            "process.env.PACKEM_QUERY": '"param1=val1&param2=val2"',
         });
     });
 

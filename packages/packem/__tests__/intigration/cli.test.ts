@@ -183,7 +183,7 @@ export { a };
     });
 
     it("should load environment variables from .env file with prefix filter", async () => {
-        expect.assertions(3);
+        expect.assertions(5);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "@types/node");
@@ -218,13 +218,13 @@ export const ignored = process.env.OTHER_VAR;`,
 
         const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mtsContent).toContain("const apiUrl = \"https://api.example.com\"");
-        expect(mtsContent).toContain("const version = \"1.0.0\"");
+        expect(mtsContent).toContain('const apiUrl = "https://api.example.com"');
+        expect(mtsContent).toContain('const version = "1.0.0"');
         expect(mtsContent).toContain("const ignored = process.env.OTHER_VAR");
     });
 
     it("should load environment variables from .env file via config file", async () => {
-        expect.assertions(2);
+        expect.assertions(4);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "@types/node");
@@ -247,8 +247,10 @@ export const version = process.env.PACKEM_VERSION;`,
             types: "dist/index.d.ts",
         });
         await createPackemConfig(temporaryDirectoryPath, {
-            envFile: ".env",
-            envPrefix: "PACKEM_",
+            config: {
+                envFile: ".env",
+                envPrefix: "PACKEM_",
+            },
         });
 
         const binProcess = await execPackem("build", [], {
@@ -261,12 +263,12 @@ export const version = process.env.PACKEM_VERSION;`,
 
         const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mtsContent).toContain("const apiUrl = \"https://api.example.com\"");
-        expect(mtsContent).toContain("const version = \"1.0.0\"");
+        expect(mtsContent).toContain('const apiUrl = "https://api.example.com"');
+        expect(mtsContent).toContain('const version = "1.0.0"');
     });
 
     it("should allow CLI env vars to override .env file vars", async () => {
-        expect.assertions(2);
+        expect.assertions(4);
 
         await installPackage(temporaryDirectoryPath, "typescript");
         await installPackage(temporaryDirectoryPath, "@types/node");
@@ -300,12 +302,17 @@ export const version = process.env.PACKEM_VERSION;`,
 
         const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mtsContent).toContain("const apiUrl = \"https://api.example.com\"");
-        expect(mtsContent).toContain("const version = \"2.0.0\""); // CLI override
+        expect(mtsContent).toContain('const apiUrl = "https://api.example.com"');
+        expect(mtsContent).toContain('const version = "2.0.0"'); // CLI override
     });
 
     it("should handle non-existent .env file gracefully", async () => {
-        expect.assertions(2);
+        // On Node.js v20+, --env-file is a Node.js CLI option that fails with exit 9
+        // when the file doesn't exist, before the script even runs.
+        // On Node.js < 20, packem handles missing env files gracefully (exit 0).
+        const NODE_VERSION = Number(process.versions.node.split(".")[0]);
+
+        expect.assertions(NODE_VERSION >= 20 ? 2 : 3);
 
         await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -325,17 +332,24 @@ export const version = process.env.PACKEM_VERSION;`,
         const binProcess = await execPackem("build", ["--env-file", ".env.nonexistent"], {
             cwd: temporaryDirectoryPath,
             env: {},
+            reject: false,
         });
 
-        expect(binProcess.stderr).toBe("");
-        expect(binProcess.exitCode).toBe(0);
+        if (NODE_VERSION >= 20) {
+            // Node.js v20+ processes --env-file before the script runs and fails for missing files
+            expect(binProcess.exitCode).toBe(9);
+            expect(binProcess.stderr).toContain(".env.nonexistent");
+        } else {
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
 
-        const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+            const mtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mtsContent).toBe(`const a = 1;
+            expect(mtsContent).toBe(`const a = 1;
 
 export { a };
 `);
+        }
     });
 
     it("should enable minify when --production option is used", async () => {
@@ -852,7 +866,7 @@ export function barFunction() {
                 },
             });
 
-            writeFileSync(`${temporaryDirectoryPath}/tsup.config.ts`, "export default { entry: [\"src/index.ts\"] }");
+            writeFileSync(`${temporaryDirectoryPath}/tsup.config.ts`, 'export default { entry: ["src/index.ts"] }');
 
             const binProcess = await execPackem("migrate", ["--dry-run"], {
                 cwd: temporaryDirectoryPath,
@@ -865,7 +879,7 @@ export function barFunction() {
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            expect(binProcess.stdout).toContain("Found config file `tsup.config.ts`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.ts`. Consider creating packem.config.ts instead.");
         });
 
         it("should warn when no migratable dependencies are found", async () => {
@@ -962,7 +976,7 @@ export default defineConfig({
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            expect(binProcess.stdout).toContain("Found config file `tsup.config.ts`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.ts`. Consider creating packem.config.ts instead.");
             expect(binProcess.stdout).toContain("Manual migration required for config files");
         });
 
@@ -1002,7 +1016,7 @@ export default defineConfig({
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            expect(binProcess.stdout).toContain("Found config file `tsup.config.js`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.js`. Consider creating packem.config.ts instead.");
             expect(binProcess.stdout).toContain("Manual migration required for config files");
         });
 
@@ -1041,7 +1055,7 @@ export default defineConfig({
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            expect(binProcess.stdout).toContain("Found config file `tsup.config.json`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.json`. Consider creating packem.config.ts instead.");
             expect(binProcess.stdout).toContain("Manual migration required for config files");
         });
 
@@ -1086,7 +1100,7 @@ export default defineBuildConfig({
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            expect(binProcess.stdout).toContain("Found config file `build.config.ts`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Found config file `build.config.ts`. Consider creating packem.config.ts instead.");
             expect(binProcess.stdout).toContain("Manual migration required for config files");
         });
 
@@ -1125,7 +1139,7 @@ export default defineBuildConfig({
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            expect(binProcess.stdout).toContain("Found config file `build.config.js`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Found config file `build.config.js`. Consider creating packem.config.ts instead.");
             expect(binProcess.stdout).toContain("Manual migration required for config files");
         });
 
@@ -1162,7 +1176,7 @@ export default defineBuildConfig({
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            expect(binProcess.stdout).toContain("Found config file `bunchee.config.ts`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Found config file `bunchee.config.ts`. Consider creating packem.config.ts instead.");
             expect(binProcess.stdout).toContain("Manual migration required for config files");
         });
 
@@ -1193,8 +1207,8 @@ export default defineBuildConfig({
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            expect(binProcess.stdout).toContain("Found config file `tsup.config.ts`. Consider creating packem.config.ts instead");
-            expect(binProcess.stdout).toContain("Found config file `build.config.ts`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.ts`. Consider creating packem.config.ts instead.");
+            expect(binProcess.stdout).toContain("Found config file `build.config.ts`. Consider creating packem.config.ts instead.");
             expect(binProcess.stdout).toContain("Manual migration required for config files");
             expect(binProcess.stdout).toContain("Migration completed");
         });
@@ -1253,7 +1267,7 @@ export default defineConfig({
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
 
-            expect(binProcess.stdout).toContain("Found config file `tsup.config.ts`. Consider creating packem.config.ts instead");
+            expect(binProcess.stdout).toContain("Found config file `tsup.config.ts`. Consider creating packem.config.ts instead.");
             expect(binProcess.stdout).toContain("Manual migration required for config files");
             expect(binProcess.stdout).toContain("Migrating `build:watch` script from tsup to packem");
         });
@@ -1349,7 +1363,7 @@ export default defineConfig({
                 { content: "module.exports = { entry: ['src/index.ts'] }", file: "tsup.config.js" },
                 { content: "module.exports = { entry: ['src/index.ts'] }", file: "tsup.config.cjs" },
                 { content: "export default { entry: ['src/index.ts'] }", file: "tsup.config.mjs" },
-                { content: "{\"entry\": [\"src/index.ts\"]}", file: "tsup.config.json" },
+                { content: '{"entry": ["src/index.ts"]}', file: "tsup.config.json" },
             ];
 
             for (const config of configs) {
