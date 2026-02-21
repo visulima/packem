@@ -1,3 +1,20 @@
+## @visulima/packem [2.0.0-alpha.52](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.51...@visulima/packem@2.0.0-alpha.52) (2026-02-21)
+
+### Bug Fixes
+
+* **packem:** fix integration test failures and update source ([64673f1](https://github.com/visulima/packem/commit/64673f1e7c631ed0e454c13579bb9f71d0f9b3b9))
+
+### Miscellaneous Chores
+
+* remove empty optionalDependencies sections from package.json files ([a4aecaa](https://github.com/visulima/packem/commit/a4aecaaacb33d1ffcc8731cfc5247e5f7fa79cf0))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.39
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.20
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.19
+
 ## @visulima/packem [2.0.0-alpha.51](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.50...@visulima/packem@2.0.0-alpha.51) (2025-12-31)
 
 ### Features
