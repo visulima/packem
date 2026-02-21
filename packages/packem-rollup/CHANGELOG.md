@@ -1,3 +1,18 @@
+## @visulima/packem-rollup [1.0.0-alpha.39](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.38...@visulima/packem-rollup@1.0.0-alpha.39) (2026-02-21)
+
+### Features
+
+* **packem-rollup:** add pure new expression plugin and update source ([48c4f00](https://github.com/visulima/packem/commit/48c4f0088d60ec5511f8a81645d4573f7deb38d5))
+
+### Miscellaneous Chores
+
+* remove empty optionalDependencies sections from package.json files ([a4aecaa](https://github.com/visulima/packem/commit/a4aecaaacb33d1ffcc8731cfc5247e5f7fa79cf0))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.20
+
 ## @visulima/packem-rollup [1.0.0-alpha.38](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.37...@visulima/packem-rollup@1.0.0-alpha.38) (2025-12-29)
 
 ### Features
