@@ -1,3 +1,5 @@
+import { stat } from "node:fs/promises";
+
 import { findMonorepoRoot, findPackageRoot } from "@visulima/package";
 import type { Environment } from "@visulima/packem-share/types";
 import type { RollupLogger } from "@visulima/packem-share/utils";
@@ -8,7 +10,9 @@ import postcssrc from "postcss-load-config";
 import type { PostCSSConfigLoaderOptions } from "../../types";
 import { ensurePCSSOption, ensurePCSSPlugins } from "../../utils/options";
 
-let configCache: Result | undefined;
+// Cache keyed by config file path, storing the loaded result and the mtime
+// at the time it was cached so watch-mode changes are detected.
+const configCache = new Map<string, { mtime: number; result: Result }>();
 
 const loadConfig = async (
     id: string,
@@ -44,8 +48,49 @@ const loadConfig = async (
     try {
         let postcssConfig: Result;
 
-        if (configCache) {
-            postcssConfig = configCache;
+        const cached = configCache.get(searchPath);
+
+        if (cached) {
+            // Re-validate the cached entry against the config file's current mtime.
+            let currentMtime = 0;
+
+            try {
+                const stats = await stat(cached.result.file);
+
+                currentMtime = stats.mtimeMs;
+            } catch {
+                // Config file disappeared — fall through to reload.
+            }
+
+            if (currentMtime > 0 && currentMtime <= cached.mtime) {
+                postcssConfig = cached.result;
+            } else {
+                // File changed or disappeared, clear and reload below.
+                configCache.delete(searchPath);
+                postcssConfig = await postcssrc(
+                    {
+                        cwd,
+                        env: environment,
+                        ...options.ctx,
+                    },
+                    searchPath,
+                    {
+                        stopDir: stopDirectory,
+                    },
+                );
+
+                let mtime = 0;
+
+                try {
+                    const stats = await stat(postcssConfig.file);
+
+                    mtime = stats.mtimeMs;
+                } catch {
+                    // No config file on disk (e.g. programmatic config).
+                }
+
+                configCache.set(searchPath, { mtime, result: postcssConfig });
+            }
         } else {
             postcssConfig = await postcssrc(
                 {
@@ -59,7 +104,17 @@ const loadConfig = async (
                 },
             );
 
-            configCache = postcssConfig;
+            let mtime = 0;
+
+            try {
+                const stats = await stat(postcssConfig.file);
+
+                mtime = stats.mtimeMs;
+            } catch {
+                // No config file on disk (e.g. programmatic config).
+            }
+
+            configCache.set(searchPath, { mtime, result: postcssConfig });
         }
 
         const result: Result = {

@@ -207,6 +207,10 @@ const cssPlugin = async (
          * - Logs plugin initialization information
          */
         async buildStart() {
+            // Reset extracted CSS on every build so deleted files don't leave phantom
+            // entries that would be emitted in the next generateBundle call.
+            extracted = [];
+
             logger = createRollupLogger(this, "css");
 
             if (hasPostCssLoader && loaderOptions.postcss) {
@@ -274,8 +278,8 @@ const cssPlugin = async (
             const emittedList: [string, string[]][] = [];
 
             const getExtractedData = async (name: string, ids: string[]): Promise<ExtractedData> => {
-                const fileName
-                    = typeof loaderOptions.extract === "string" ? normalize(loaderOptions.extract).replace(/^\.[/\\]/, "") : normalize(`${name}.css`);
+                const fileName =
+                    typeof loaderOptions.extract === "string" ? normalize(loaderOptions.extract).replace(/^\.[/\\]/, "") : normalize(`${name}.css`);
 
                 if (isAbsolute(fileName)) {
                     this.error(["Extraction path must be relative to the output directory,", `which is ${relative(cwd, directory)}`].join("\n"));
