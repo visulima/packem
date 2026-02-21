@@ -68,10 +68,10 @@ export const jsxRemoveAttributes = ({ attributes, logger }: JSXRemoveAttributesP
                             for (const object of filteredArguments) {
                                 for (const property of object.properties) {
                                     if (
-                                        property.type === "Property"
-                                        && property.key.type === "Literal"
-                                        && property.value.type === "Literal"
-                                        && attributes.includes(property.key.value as string)
+                                        property.type === "Property" &&
+                                        property.key.type === "Literal" &&
+                                        property.value.type === "Literal" &&
+                                        attributes.includes(property.key.value as string)
                                     ) {
                                         // -2 to remove the comma and the space before the property
                                         magicString.overwrite((property as PropertyLiteralValue).start - 2, (property as PropertyLiteralValue).end, "");

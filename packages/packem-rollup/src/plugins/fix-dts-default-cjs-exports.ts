@@ -30,13 +30,13 @@ export type FixDtsDefaultCjsExportsPluginOptions = {
 export const fixDtsDefaultCjsExportsPlugin = (options: FixDtsDefaultCjsExportsPluginOptions = {}): Plugin => {
     const {
         matcher = (info: RenderedChunk) =>
-            (info.type === "chunk" || info.type === "asset")
-            && info.exports?.length > 0
+            (info.type === "chunk" || info.type === "asset") &&
+            info.exports?.length > 0 &&
             // We should process the file if it's a d.ts entry,
             // and allow the main plugin logic to decide if default exports need fixing
             // OR if it's a pure type-only export block (e.g., `export { type Foo, type Bar };`).
-            && /\.d\.c?ts$/.test(info.fileName)
-            && info.isEntry,
+            /\.d\.c?ts$/.test(info.fileName) &&
+            info.isEntry,
     } = options;
 
     return {

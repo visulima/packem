@@ -158,13 +158,13 @@ interface Export {
 }
 
 /** Oxc AST declaration node types that the plugin handles. */
-type Declaration
-    = | import("oxc-parser").Class
-        | import("oxc-parser").Function
-        | import("oxc-parser").TSEnumDeclaration
-        | import("oxc-parser").TSInterfaceDeclaration
-        | import("oxc-parser").TSTypeAliasDeclaration
-        | import("oxc-parser").VariableDeclaration;
+type Declaration =
+    | import("oxc-parser").Class
+    | import("oxc-parser").Function
+    | import("oxc-parser").TSEnumDeclaration
+    | import("oxc-parser").TSInterfaceDeclaration
+    | import("oxc-parser").TSTypeAliasDeclaration
+    | import("oxc-parser").VariableDeclaration;
 
 /**
  * Prepares a declaration node by extracting its name and span, and adds it to the declarations map.
@@ -382,8 +382,8 @@ const handleDefaultCJSExportAsDefault = (code: string, parsedExportsInfo: Parsed
         // Logic for when defaultImport IS present
         let replacementCode = "";
 
-        replacementCode
-            = exportList.length === 0
+        replacementCode =
+            exportList.length === 0
                 ? `export = ${defaultImport.defaultImport};`
                 : `// @ts-ignore\nexport = ${defaultImport.defaultImport};\nexport { ${exportList.join(", ")} } from '${defaultExport.specifier}'`;
 
@@ -482,7 +482,7 @@ const handleDefaultNamedCJSExport = (
     const importStatement = `import { ${defaultAlias} } from '${defaultExport.specifier}';\n`;
     let modifiedCode = code;
 
-    const lastExistingImportEnd = originalStaticImports.length > 0 ? originalStaticImports.at(-1)?.end ?? 0 : 0;
+    const lastExistingImportEnd = originalStaticImports.length > 0 ? (originalStaticImports.at(-1)?.end ?? 0) : 0;
 
     const ms = new MagicString(modifiedCode);
 
@@ -648,11 +648,11 @@ const fixDtsDefaultCJSExports = (
                 // This input type should also go through the full handling to preserve other imports etc.
                 resultString = handleDefaultCJSExportAsDefault(code, parsedExports, defaultImport);
             } else if (
-                defaultAlias === "default"
-                && defaultExport.specifier
-                && exportList.length === 0
-                && defaultExportNodeExports
-                && /\bas\s+default\b/.test(defaultExportNodeExports)
+                defaultAlias === "default" &&
+                defaultExport.specifier &&
+                exportList.length === 0 &&
+                defaultExportNodeExports &&
+                /\bas\s+default\b/.test(defaultExportNodeExports)
             ) {
                 // Case 2: export { default as default } from 'some-module'; (Warning case)
                 if (parsedImports.find((imp) => imp.specifier === defaultExport.specifier)?.defaultImport) {
@@ -673,18 +673,18 @@ const fixDtsDefaultCJSExports = (
                 // eslint-disable-next-line no-secrets/no-secrets
                 // If handleDefaultNamedCJSExport warned and returned undefined because the specific named import was missing,
                 // we should honor that and not proceed to the general noSpecifier fallback.
-                const wasSpecificNamedExportWarning
-                    = defaultImport // An import for the module existed
-                        && parsedExports.defaultExport.specifier // It was a re-export
-                        && defaultAlias !== "default" // It was a named alias to default
-                        && (!defaultImport.namedImports || defaultImport.namedImports[defaultAlias] !== defaultAlias); // And the specific alias wasn't found in the import
+                const wasSpecificNamedExportWarning =
+                    defaultImport && // An import for the module existed
+                    parsedExports.defaultExport.specifier && // It was a re-export
+                    defaultAlias !== "default" && // It was a named alias to default
+                    (!defaultImport.namedImports || defaultImport.namedImports[defaultAlias] !== defaultAlias); // And the specific alias wasn't found in the import
 
                 if (resultString === undefined && wasSpecificNamedExportWarning) {
                     // Do nothing here. resultString is already undefined, and we want to propagate that.
                     // This prevents the generic fallback below from kicking in for this specific warning scenario.
                 } else if (
-                    resultString === undefined
-                    && !(defaultAlias === "default" && exportList.length === 0 && defaultExportNodeExports && /\bas\s+default\b/.test(defaultExportNodeExports))
+                    resultString === undefined &&
+                    !(defaultAlias === "default" && exportList.length === 0 && defaultExportNodeExports && /\bas\s+default\b/.test(defaultExportNodeExports))
                 ) {
                     // Fallback if none of the above specific specifier cases match, or if they returned undefined (and it wasn't the specific named export warning case).
                     // Avoid re-processing the explicit warning case that sets resultString to undefined.
@@ -712,10 +712,10 @@ const fixDtsDefaultCJSExports = (
         const lastStatement = ast.program.body.at(-1);
 
         if (
-            lastStatement?.type === "ExportNamedDeclaration"
-            && !lastStatement.declaration
-            && lastStatement.specifiers.length > 0
-            && lastStatement.specifiers.every((s) => s.exportKind === "type")
+            lastStatement?.type === "ExportNamedDeclaration" &&
+            !lastStatement.declaration &&
+            lastStatement.specifiers.length > 0 &&
+            lastStatement.specifiers.every((s) => s.exportKind === "type")
         ) {
             isPureTypeExportBlock = true;
             typeExportNames = lastStatement.specifiers.map((s) => (s.local.type === "Identifier" ? s.local.name : "")).filter(Boolean);

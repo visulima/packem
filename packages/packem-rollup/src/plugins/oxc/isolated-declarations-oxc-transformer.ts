@@ -1,5 +1,5 @@
 import type { IsolatedDeclarationsOptions } from "oxc-transform";
-import { isolatedDeclaration } from "oxc-transform";
+import { isolatedDeclarationSync } from "oxc-transform";
 
 import type { IsolatedDeclarationsResult } from "../../types";
 
@@ -9,7 +9,7 @@ const isolatedDeclarationsOxcTransformer = (
     sourceMap?: boolean,
     transformOptions?: Omit<IsolatedDeclarationsOptions, "sourcemap">,
 ): IsolatedDeclarationsResult => {
-    const result = isolatedDeclaration(id, code, { ...transformOptions, sourcemap: sourceMap });
+    const result = isolatedDeclarationSync(id, code, { ...transformOptions, sourcemap: sourceMap });
 
     return {
         errors: result.errors?.map((error) => error.message) ?? [],

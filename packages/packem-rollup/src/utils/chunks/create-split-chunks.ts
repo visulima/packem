@@ -192,11 +192,11 @@ const createSplitChunks = (
 
         // If current module has a layer, and it's not an entry
         if (
-            moduleLayer
-            && !isEntry // If the module is imported by the entry:
+            moduleLayer &&
+            !isEntry && // If the module is imported by the entry:
             // when the module layer is same as entry layer, keep it as part of entry and don't split it;
             // when the module layer is different from entry layer, split the module into a separate chunk as a separate boundary.
-            && dependencyGraphMap.has(id)
+            dependencyGraphMap.has(id)
         ) {
             const parentModuleIds = [...(dependencyGraphMap.get(id) as Set<[string, string]>)];
             const isImportFromOtherEntry = parentModuleIds.some(([pid]) => {

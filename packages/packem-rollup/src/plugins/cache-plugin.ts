@@ -6,7 +6,7 @@ import type { ObjectHook, Plugin } from "rollup";
 import { getHash } from "../utils";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getHandler = (plugin: ObjectHook<any> | ((...arguments_: any[]) => any)): (...arguments_: any[]) => any => plugin.handler || plugin;
+const getHandler = (plugin: ObjectHook<any> | ((...arguments_: any[]) => any)): ((...arguments_: any[]) => any) => plugin.handler || plugin;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const unwrapCachedValue = (value: any) => {
@@ -71,8 +71,8 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             const result = await getHandler(plugin.load).call(this, id);
 
             // Store raw plugin results in a wrapped form to avoid type coercion issues
-            const toStore
-                = result && typeof result === "object" && "code" in (result as Record<string, unknown>) ? result : { __packem_cache_wrapped: true, data: result };
+            const toStore =
+                result && typeof result === "object" && "code" in (result as Record<string, unknown>) ? result : { __packem_cache_wrapped: true, data: result };
 
             cache.set(cacheKey, toStore, pluginPath);
 
@@ -109,12 +109,51 @@ const cachePlugin = (plugin: Plugin, cache: FileCache, subDirectory = ""): Plugi
             const cacheKey = join("transform", getHash(id), getHash(code));
 
             if (cache.has(cacheKey, pluginPath)) {
-                return unwrapCachedValue(await cache.get(cacheKey, pluginPath));
+                const cached = unwrapCachedValue(await cache.get(cacheKey, pluginPath));
+
+                // Replay any addWatchFile calls that were captured during the original transform.
+                // This ensures rollup knows to invalidate this cached result when source
+                // dependencies (e.g. JSX/TSX files scanned by Tailwind) change.
+                if (cached !== null && typeof cached === "object" && Array.isArray((cached as { __packem_watch_files?: unknown }).__packem_watch_files)) {
+                    const entry = cached as { __packem_watch_files: string[]; result: unknown };
+
+                    for (const watchFile of entry.__packem_watch_files) {
+                        this.addWatchFile(watchFile);
+                    }
+
+                    return unwrapCachedValue(entry.result);
+                }
+
+                return cached;
             }
 
-            const result = await getHandler(plugin.transform).call(this, code, id);
+            // Intercept addWatchFile calls so we can store them alongside the cached result.
+            const watchFiles: string[] = [];
+            const pluginContext = this;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const contextWithWatcher = new Proxy(this as any, {
+                get(target, prop, receiver) {
+                    if (prop === "addWatchFile") {
+                        return (file: string) => {
+                            watchFiles.push(file);
+                            pluginContext.addWatchFile(file);
+                        };
+                    }
 
-            cache.set(cacheKey, result, pluginPath);
+                    const value = Reflect.get(target, prop, receiver);
+
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+                    return typeof value === "function" ? value.bind(target) : value;
+                },
+            });
+
+            const result = await getHandler(plugin.transform).call(contextWithWatcher, code, id);
+
+            if (watchFiles.length > 0) {
+                cache.set(cacheKey, { __packem_watch_files: watchFiles, result }, pluginPath);
+            } else {
+                cache.set(cacheKey, result, pluginPath);
+            }
 
             return result;
         },

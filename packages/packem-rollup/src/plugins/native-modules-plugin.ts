@@ -130,7 +130,7 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
 
                 const resolvedPath = importer ? resolve(dirname(importer), source) : resolve(source);
 
-                if (!await isAccessible(resolvedPath)) {
+                if (!(await isAccessible(resolvedPath))) {
                     this.warn(`Native module not found: ${resolvedPath}`);
 
                     return undefined;
