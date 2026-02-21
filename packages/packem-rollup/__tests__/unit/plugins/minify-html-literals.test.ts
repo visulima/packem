@@ -46,7 +46,7 @@ describe(minifyHTMLLiteralsPlugin, () => {
             const result = await transform(code, "test.js");
 
             expect(result).toBeDefined();
-            expect(result!.code).toContain("<div class=\"container\"><h1>Hello World</h1><p>This is a test</p></div>");
+            expect(result!.code).toContain('<div class="container"><h1>Hello World</h1><p>This is a test</p></div>');
         });
 
         it("should minify CSS in tagged template literals", async () => {

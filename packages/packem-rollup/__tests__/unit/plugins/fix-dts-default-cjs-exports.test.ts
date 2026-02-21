@@ -352,15 +352,15 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             const plugin = fixDtsDefaultCjsExportsPlugin();
             const mockContext = { warn: vi.fn() } as unknown as PluginContext;
 
-            const result
-                = typeof plugin.renderChunk === "function"
+            const result =
+                typeof plugin.renderChunk === "function"
                     ? plugin.renderChunk.call(
-                        mockContext,
-                        code,
-                        chunkInfo as RenderedChunk,
-                        {} as NormalizedOutputOptions,
-                        { chunks: {} } as { chunks: Record<string, RenderedChunk> },
-                    )
+                          mockContext,
+                          code,
+                          chunkInfo as RenderedChunk,
+                          {} as NormalizedOutputOptions,
+                          { chunks: {} } as { chunks: Record<string, RenderedChunk> },
+                      )
                     : undefined;
 
             expect(result).toBeUndefined();
@@ -380,15 +380,15 @@ describe(fixDtsDefaultCjsExportsPlugin, () => {
             const plugin = fixDtsDefaultCjsExportsPlugin();
             const mockContext = { warn: vi.fn() } as unknown as PluginContext;
 
-            const result
-                = typeof plugin.renderChunk === "function"
+            const result =
+                typeof plugin.renderChunk === "function"
                     ? plugin.renderChunk.call(
-                        mockContext,
-                        code,
-                        chunkInfo as RenderedChunk,
-                        {} as NormalizedOutputOptions,
-                        { chunks: {} } as { chunks: Record<string, RenderedChunk> },
-                    )
+                          mockContext,
+                          code,
+                          chunkInfo as RenderedChunk,
+                          {} as NormalizedOutputOptions,
+                          { chunks: {} } as { chunks: Record<string, RenderedChunk> },
+                      )
                     : undefined;
 
             expect(result).toBeUndefined();

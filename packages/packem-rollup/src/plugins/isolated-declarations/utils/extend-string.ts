@@ -33,7 +33,7 @@ const extendString = (baseString: string, referenceString: string): string => {
     const missingPart = referenceParts.slice(referenceIndex).join("/");
 
     if (!commonBase.startsWith(".") || commonBase === "") {
-        commonBase = `./${commonBase}`;
+        commonBase = commonBase ? `./${commonBase}` : ".";
     }
 
     return commonBase + (missingPart ? `/${missingPart}` : "");

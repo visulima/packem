@@ -14,10 +14,10 @@ export const GLOBAL_REQUIRE_REGEX: RegExp = /(?:^|[^.\w'"`])require(\.resolve)?\
 const CJSToESM = (code: string, shim: (hasFilename: boolean, hasDirname: boolean, hasGlobalRequire: boolean) => string) => {
     // INTERNAL_PACKEM_BUILD is set to "1" when building packem itself
     if (
-        env.INTERNAL_PACKEM_BUILD !== "1"
-        && (code.includes("// -- packem CommonJS __filename shim")
-            || code.includes("// -- packem CommonJS __dirname shim")
-            || code.includes("// -- packem CommonJS require shim"))
+        env.INTERNAL_PACKEM_BUILD !== "1" &&
+        (code.includes("// -- packem CommonJS __filename shim") ||
+            code.includes("// -- packem CommonJS __dirname shim") ||
+            code.includes("// -- packem CommonJS require shim"))
     ) {
         return undefined;
     }

@@ -19,9 +19,9 @@ export const cjsInteropPlugin = ({
             options: NormalizedOutputOptions,
         ): Promise<
             | {
-                code: string;
-                map: SourceMapInput;
-            }
+                  code: string;
+                  map: SourceMapInput;
+              }
             | undefined
         > => {
             if (chunk.type !== "chunk" || !chunk.isEntry) {

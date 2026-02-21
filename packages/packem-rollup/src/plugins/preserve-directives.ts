@@ -228,7 +228,7 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                 map: magicString.generateMap({ hires: true }),
                 meta: {
                     preserveDirectives: {
-                        directives: [...directives[id] ?? []],
+                        directives: [...(directives[id] ?? [])],
 
                         shebang: shebangs[id] ?? undefined,
                     },

@@ -20,7 +20,7 @@ const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: string, log
         // eslint-disable-next-line no-multi-assign
         resolver = cachedResolver = new ResolverFactory({
             ...userOptions,
-            roots: [...userOptions.roots ?? [], rootDirectory],
+            roots: [...(userOptions.roots ?? []), rootDirectory],
             tsconfig: tsconfigPath ? { configFile: tsconfigPath, references: "auto" } : undefined,
         });
     }

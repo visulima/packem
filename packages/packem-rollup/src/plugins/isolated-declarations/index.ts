@@ -65,7 +65,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
 
     if (context.tsconfig?.config.compilerOptions) {
         tsconfigPathPatterns = Object.entries(context.tsconfig.config.compilerOptions.paths ?? {}).map(([key]) =>
-            (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
+            key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`),
         );
     }
 
@@ -102,7 +102,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
             );
 
             for await (const node of imports) {
-                if (basename(node.source.value).includes(".")) {
+                if (extname(node.source.value) !== "") {
                     continue;
                 }
 
@@ -113,12 +113,12 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                 }
 
                 if (
-                    resolved.id.endsWith(".ts")
-                    || resolved.id.endsWith(".cts")
-                    || resolved.id.endsWith(".mts")
-                    || resolved.id.endsWith(".tsx")
-                    || resolved.id.endsWith(".ctsx")
-                    || resolved.id.endsWith(".mtsx")
+                    resolved.id.endsWith(".ts") ||
+                    resolved.id.endsWith(".cts") ||
+                    resolved.id.endsWith(".mts") ||
+                    resolved.id.endsWith(".tsx") ||
+                    resolved.id.endsWith(".ctsx") ||
+                    resolved.id.endsWith(".mtsx")
                 ) {
                     const resolvedId = resolved.id.replace(`${sourceDirectory}/`, "");
 
@@ -128,8 +128,12 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                         extendedSourceValue = `./${node.source.value}`;
                     }
 
+                    const extended = extendString(extendedSourceValue, resolvedId);
+
                     // eslint-disable-next-line no-param-reassign
-                    code = code.replaceAll(`from "${node.source.value}"`, `from "${extendString(extendedSourceValue, resolvedId)}"`);
+                    code = code.replaceAll(`from "${node.source.value}"`, `from "${extended}"`);
+                    // eslint-disable-next-line no-param-reassign
+                    code = code.replaceAll(`from '${node.source.value}'`, `from '${extended}'`);
                 }
             }
         }
@@ -180,15 +184,15 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
 
             if (node.type === "ImportDeclaration") {
                 return (
-                    node.specifiers
-                    && node.specifiers.every((spec: { importKind: string; type: string }) => spec.type === "ImportSpecifier" && spec.importKind === "type")
+                    node.specifiers &&
+                    node.specifiers.every((spec: { importKind: string; type: string }) => spec.type === "ImportSpecifier" && spec.importKind === "type")
                 );
             }
 
             return (
-                node.type === "ExportNamedDeclaration"
-                && node.specifiers
-                && node.specifiers.every((spec: { exportKind: string; type: string }) => spec.exportKind === "type")
+                node.type === "ExportNamedDeclaration" &&
+                node.specifiers &&
+                node.specifiers.every((spec: { exportKind: string; type: string }) => spec.exportKind === "type")
             );
         });
 
@@ -226,7 +230,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
 
         // eslint-disable-next-line sonarjs/cognitive-complexity
         async renderStart(outputOptions: NormalizedOutputOptions, { input }: NormalizedInputOptions): Promise<void> {
-            const inputBase = lowestCommonAncestor(...Array.isArray(input) ? input : Object.values(input));
+            const inputBase = lowestCommonAncestor(...(Array.isArray(input) ? input : Object.values(input)));
 
             context.logger.debug({
                 message: `Input base:${inputBase}`,
@@ -293,7 +297,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                     }
                 }
 
-                const quote = source.includes("from '") ? "'" : "\"";
+                const quote = source.includes("from '") ? "'" : '"';
                 const originalFileName = normalizedFilename + ext;
 
                 if ((context.options.declaration === true || context.options.declaration === "compatible") && outputOptions.format === "cjs") {

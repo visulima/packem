@@ -229,7 +229,7 @@ export const requireCJSTransformerPlugin = (userOptions: Options, _logger: Conso
                     const isBuiltin = isBuiltinModule(source, builtinNodeModules);
                     const resolveId = this.resolve;
 
-                    if (!await shouldTransformImport(source, isBuiltin, shouldTransform, cwd, resolveId)) {
+                    if (!(await shouldTransformImport(source, isBuiltin, shouldTransform, cwd, resolveId))) {
                         continue;
                     }
 

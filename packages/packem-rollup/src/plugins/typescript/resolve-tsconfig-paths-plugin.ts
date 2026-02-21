@@ -43,9 +43,9 @@ const tryParsePattern = (pattern: string): Pattern | undefined => {
     return indexOfStar === -1
         ? undefined
         : {
-            prefix: pattern.slice(0, indexOfStar),
-            suffix: pattern.slice(indexOfStar + 1),
-        };
+              prefix: pattern.slice(0, indexOfStar),
+              suffix: pattern.slice(indexOfStar + 1),
+          };
 };
 
 const isPatternMatch = ({ prefix, suffix }: Pattern, candidate: string) =>

@@ -27,7 +27,7 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
     });
 
     if (!cacheDir) {
-        throw new Error("[packem:optimize-deps]: failed to find or create cache directory \"node_modules/.cache/packem/optimize_deps\".");
+        throw new Error('[packem:optimize-deps]: failed to find or create cache directory "node_modules/.cache/packem/optimize_deps".');
     }
 
     await esbuildBuild({
@@ -94,7 +94,7 @@ const optimizeDeps = async (options: OptimizeDepsOptions): Promise<OptimizeDepsR
                     });
                 },
             },
-            ...options.esbuildOptions?.plugins ?? [],
+            ...(options.esbuildOptions?.plugins ?? []),
         ],
     });
 
