@@ -23,18 +23,19 @@ const getExtensionStrategy = <T extends FileExtensionOptions>(context: BuildCont
     const { declaration, emitCJS, emitESM, node10Compatibility, outputExtensionMap } = context.options;
 
     // Check if we're in a dual format scenario
-    // This can happen when:
-    // 1. Both emitCJS and emitESM are enabled
-    // 2. Declaration is in compatible mode (indicates dual format support needed)
     const isDualFormat = Boolean(emitCJS && emitESM);
     const isSingleFormat = !isDualFormat && ((emitCJS && !emitESM) || (emitESM && !emitCJS));
 
-    // When node10Compatibility is false and single format, use .js extension even if declaration is true
-    const shouldUseModernExtensions = node10Compatibility === false && isSingleFormat;
+    // Compatible mode requires CJS to be emitted AND node10Compatibility not explicitly false.
+    // It indicates a dual-format-aware package that needs .mjs/.cjs and .d.mts/.d.cts extensions
+    // for Node.js module disambiguation.
+    // When only ESM is emitted (no CJS), even with "compatible" declaration, .js is the correct output.
+    // When node10Compatibility is explicitly false, the user wants plain .js for single-format builds.
+    const isCompatible = Boolean(emitCJS) && (declaration === "compatible" || declaration === true) && node10Compatibility !== false;
 
     return {
         hasOutputMap: Boolean(outputExtensionMap),
-        isCompatible: (declaration === "compatible" || declaration === true) && !shouldUseModernExtensions,
+        isCompatible,
         isDualFormat,
         isSingleFormat,
         outputExtensionMap,
@@ -125,7 +126,7 @@ export const getDtsExtension = <T extends FileExtensionOptions>(context: BuildCo
         return "d.ts";
     }
 
-    // Use traditional extensions if compatible declaration mode (and node10Compatibility is not false) or dual format
+    // Use traditional extensions if compatible declaration mode or dual format
     if (strategy.isCompatible || strategy.isDualFormat) {
         return FORMAT_EXTENSIONS.traditionalDts[format];
     }

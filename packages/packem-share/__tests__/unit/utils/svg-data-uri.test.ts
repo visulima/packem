@@ -46,7 +46,7 @@ describe(svgToTinyDataUri, () => {
     it("should replace double quotes with single quotes", () => {
         expect.assertions(2);
 
-        const svgWithQuotes = "<svg viewBox=\"0 0 100 100\"><path d=\"M0 0\"/></svg>";
+        const svgWithQuotes = '<svg viewBox="0 0 100 100"><path d="M0 0"/></svg>';
         const result = svgToTinyDataUri(svgWithQuotes);
 
         expect(result).toContain("viewBox='0 0 100 100'");
@@ -56,7 +56,7 @@ describe(svgToTinyDataUri, () => {
     it("should handle special hex encoding", () => {
         expect.assertions(1);
 
-        const svgWithSpecialChars = "<svg><path d=\"M0 0 H10 V10\"/></svg>";
+        const svgWithSpecialChars = '<svg><path d="M0 0 H10 V10"/></svg>';
         const result = svgToTinyDataUri(svgWithSpecialChars);
 
         // Should encode spaces and special characters properly
@@ -145,14 +145,14 @@ describe(svgToCssDataUri, () => {
     it("should preserve double quotes", () => {
         expect.assertions(2);
 
-        const svgWithQuotes = "<svg viewBox=\"0 0 100 100\"><path d=\"M0 0\"/></svg>";
+        const svgWithQuotes = '<svg viewBox="0 0 100 100"><path d="M0 0"/></svg>';
         const result = svgToCssDataUri(svgWithQuotes);
 
         // Decode the data URI to check the content
         const decoded = decodeURIComponent(result.replace(/^data:image\/svg\+xml;charset=utf-8,/, ""));
 
-        expect(decoded).toContain("viewBox=\"0 0 100 100\"");
-        expect(decoded).toContain("d=\"M0 0\"");
+        expect(decoded).toContain('viewBox="0 0 100 100"');
+        expect(decoded).toContain('d="M0 0"');
     });
 
     it("should handle complex SVG with all transformations", () => {
@@ -181,8 +181,8 @@ describe(svgToCssDataUri, () => {
         // Decode the data URI to check the content
         const decoded = decodeURIComponent(result.replace(/^data:image\/svg\+xml;charset=utf-8,/, ""));
 
-        expect(decoded).toContain("viewBox=\"0 0 24 24\"");
-        expect(decoded).toContain("d=\"M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z\"");
+        expect(decoded).toContain('viewBox="0 0 24 24"');
+        expect(decoded).toContain('d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"');
     });
 
     it("should handle empty SVG", () => {
@@ -206,7 +206,7 @@ describe("sVG data URI functions comparison", () => {
     it("should produce different results for the same SVG", () => {
         expect.assertions(1);
 
-        const svg = "<svg viewBox=\"0 0 100 100\"><path d=\"M0 0 H10 V10\"/></svg>";
+        const svg = '<svg viewBox="0 0 100 100"><path d="M0 0 H10 V10"/></svg>';
         const tinyResult = svgToTinyDataUri(svg);
         const cssResult = svgToCssDataUri(svg);
 
