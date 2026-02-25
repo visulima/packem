@@ -69,7 +69,7 @@
         "publint": "^0.3.12",
         "rimraf": "6.0.1",
         "secretlint": "11.0.2",
-        "semantic-release": "^24.2.7",
+        "semantic-release": "^24.2.9",
         "sort-package-json": "^3.4.0",
         "taze": "^19.1.0",
         "textlint": "^15.2.1",
