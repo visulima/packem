@@ -49,7 +49,7 @@
     ],
     "dependencies": {
         "@anolilab/commitlint-config": "^6.0.2",
-        "@anolilab/lint-staged-config": "^3.0.27",
+        "@anolilab/lint-staged-config": "^3.1.1",
         "@anolilab/multi-semantic-release": "^2.0.3",
         "@anolilab/textlint-config": "^9.0.4",
         "@babel/core": "^7.28.3",
@@ -59,24 +59,24 @@
         "audit-ci": "^7.1.0",
         "browserslist-config-anolilab": "^6.0.2",
         "commitizen": "^4.3.1",
-        "cross-env": "^10.0.0",
+        "cross-env": "^10.1.0",
         "husky": "^9.1.7",
         "is-ci": "^4.1.0",
-        "lint-staged": "^16.1.5",
+        "lint-staged": "^16.2.7",
         "nx": "^21.4.0",
         "pkg-pr-new": "^0.0.55",
         "plop": "^4.0.1",
         "publint": "^0.3.12",
-        "rimraf": "6.0.1",
+        "rimraf": "6.1.3",
         "secretlint": "11.0.2",
         "semantic-release": "^24.2.7",
-        "sort-package-json": "^3.4.0",
-        "taze": "^19.1.0",
+        "sort-package-json": "^3.6.1",
+        "taze": "^19.9.2",
         "textlint": "^15.2.1",
         "typescript": "^5.9.2",
         "vitest": "^3.2.4"
     },
-    "packageManager": "pnpm@10.14.0",
+    "packageManager": "pnpm@10.30.2",
     "engines": {
         "node": ">=18.* <=24.*"
     },
@@ -91,13 +91,13 @@
             "unrs-resolver"
         ],
         "overrides": {
-            "@eslint/plugin-kit@<0.3.4": ">=0.3.4",
+            "@eslint/plugin-kit@<0.3.4": ">=0.6.0",
             "@octokit/plugin-paginate-rest@>=1.0.0 <11.4.1": ">=11.4.1",
             "@octokit/request@>=1.0.0 <9.2.1": ">=9.2.1",
-            "chrono-node@<2.2.4": ">=2.2.4",
+            "chrono-node@<2.2.4": ">=2.9.0",
             "form-data@>=4.0.0 <4.0.4": ">=4.0.4",
             "tmp@<=0.2.3": ">=0.2.4",
-            "undici@>=6.0.0 <6.21.2": ">=7.18.2"
+            "undici@>=6.0.0 <6.21.2": ">=7.22.0"
         }
     }
 }
