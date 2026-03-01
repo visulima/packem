@@ -398,7 +398,7 @@
         "oxc-parser": "0.82.2",
         "oxc-resolver": "11.6.1",
         "picomatch": "^4.0.3",
-        "rollup": "4.46.2",
+        "rollup": "4.59.0",
         "rollup-plugin-dts": "6.2.3",
         "rollup-plugin-license": "3.6.0",
         "rollup-plugin-polyfill-node": "0.13.0",
