@@ -2,8 +2,6 @@
 
 ```ts
 declare const foo: number;
-//#endregion
-//#region __tests__/fixtures/source-map/index.d.ts
 declare const a: string;
 declare const b: string;
 type Str = string;
@@ -22,13 +20,19 @@ declare namespace Ns {
     id: string;
   };
 }
-//#endregion
-export { mod_d_exports as Mod, Ns, Obj, a, b, fn };
+export { mod_d as Mod, Ns, Obj, a, b, fn };
 //# sourceMappingURL=index.d.ts.map
+
 ```
 
 ## index.d.ts.map
 
 ```map
-{"version":3,"file":"index.d.ts","names":[],"sources":["../../fixtures/source-map/mod.ts","../../fixtures/source-map/index.ts"],"sourcesContent":[],"mappings":"cAAa;;;cCAA;cAEA;KAIR,GAAA;iBACW,EAAA,QAAU;UAIT,GAAA;;;;;;;kBAQA,EAAA;;gBAEM"}
+{"version":3,"file":"index.d.ts","sources":["../../fixtures/source-map/mod.ts","../../fixtures/source-map/index.ts"],"names":[],"mappings":"AAAa,cAAA,GAAA,EAAA,MAAA;AAAA,cCAA,CDAA,EAAA,MAAA;cCEA;KAIRA,GAAA;iBACWC,UAAUD;UAITE,GAAA;;;EAXjB,CAAA;EAEAC,MAAa,EAAA,EAAA;EAAA,SAIR,EAAA,MAAA;AACL;AAIiB,kBAQAC,EAAA,CARA;EAQjB,KAAiBJ,GAAA,SAAA;gBAEMK;;;;;"}
+```
+
+## index.js.map
+
+```map
+{"version":3,"file":"index.js","sources":[],"sourcesContent":[],"names":[],"mappings":""}
 ```

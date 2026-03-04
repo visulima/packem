@@ -1,12 +1,12 @@
 import MagicString from "magic-string";
-import type { Plugin } from "rolldown";
+import type { Plugin } from "rollup";
 
 import { RE_DTS } from "./filename";
 import type { OptionsResolved } from "./options";
 
 const createBannerPlugin = ({ banner, footer }: Pick<OptionsResolved, "banner" | "footer">): Plugin => {
     return {
-        name: "rolldown-plugin-dts:banner",
+        name: "rollup-plugin-dts:banner",
         async renderChunk(code: string, chunk) {
             if (!RE_DTS.test(chunk.fileName)) {
                 return;
@@ -17,13 +17,15 @@ const createBannerPlugin = ({ banner, footer }: Pick<OptionsResolved, "banner" |
             if (banner) {
                 const code = await (typeof banner === "function" ? banner(chunk) : banner);
 
-                if (code) s.prepend(`${code}\n`);
+                if (code)
+                    s.prepend(`${code}\n`);
             }
 
             if (footer) {
                 const code = await (typeof footer === "function" ? footer(chunk) : footer);
 
-                if (code) s.append(`\n${code}`);
+                if (code)
+                    s.append(`\n${code}`);
             }
 
             return {

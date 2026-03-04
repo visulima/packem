@@ -3,8 +3,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { SourceMapConsumer } from "@jridgewell/source-map";
-import { expectFilesSnapshot, rolldownBuild } from "@sxzz/test-utils";
-import { build } from "rolldown";
+import { expectFilesSnapshot, rollupBuild as rolldownBuild } from "@sxzz/test-utils";
+import { rollup } from "rollup";
 import { beforeAll, expect, it } from "vitest";
 
 import { dts } from "../src/index.js";
@@ -39,10 +39,8 @@ function validateSourceMap(sourcemap: string) {
 
 it("oxc", async () => {
     const dir = path.join(tempDir, "source-map-oxc");
-
-    await build({
+    const bundle = await rollup({
         input,
-        output: { dir },
         plugins: [
             dts({
                 emitDtsOnly: true,
@@ -51,8 +49,9 @@ it("oxc", async () => {
                 tsconfig,
             }),
         ],
-        write: true,
     });
+
+    await bundle.write({ dir, sourcemap: true });
     await expectFilesSnapshot(dir, "__snapshots__/source-map-oxc.md");
     const sourcemap = await readFile(path.resolve(dir, "index.d.ts.map"), "utf8");
 
@@ -61,10 +60,8 @@ it("oxc", async () => {
 
 it("tsc", async () => {
     const dir = path.join(tempDir, "source-map-tsc");
-
-    await build({
+    const bundle = await rollup({
         input,
-        output: { dir },
         plugins: [
             dts({
                 emitDtsOnly: true,
@@ -73,8 +70,9 @@ it("tsc", async () => {
                 tsconfig,
             }),
         ],
-        write: true,
     });
+
+    await bundle.write({ dir, sourcemap: true });
     await expectFilesSnapshot(dir, "__snapshots__/source-map-tsc.md");
     const sourcemap = await readFile(path.resolve(dir, "index.d.ts.map"), "utf8");
 
@@ -83,10 +81,8 @@ it("tsc", async () => {
 
 it("tsgo", async () => {
     const dir = path.join(tempDir, "source-map-tsgo");
-
-    await build({
+    const bundle = await rollup({
         input,
-        output: { dir },
         plugins: [
             dts({
                 emitDtsOnly: true,
@@ -95,8 +91,9 @@ it("tsgo", async () => {
                 tsgo: true,
             }),
         ],
-        write: true,
     });
+
+    await bundle.write({ dir, sourcemap: true });
     await expectFilesSnapshot(dir, "__snapshots__/source-map-tsgo.md");
     const sourcemap = await readFile(path.resolve(dir, "index.d.ts.map"), "utf8");
 
@@ -105,13 +102,10 @@ it("tsgo", async () => {
 
 it("disable dts source map only", async () => {
     const { chunks } = await rolldownBuild(input, [dts({ sourcemap: false })], {}, { sourcemap: true });
+    const fileNames = chunks.map((chunk) => chunk.fileName);
 
-    expect(chunks.map((chunk) => chunk.fileName)).toMatchInlineSnapshot(`
-    [
-      "index.d.ts",
-      "index.js",
-      "chunk-BYypO7fO.js",
-      "index.js.map",
-    ]
-  `);
+    expect(fileNames).toContain("index.d.ts");
+    expect(fileNames).toContain("index.js");
+    expect(fileNames).toContain("index.js.map");
+    expect(fileNames).not.toContain("index.d.ts.map");
 });

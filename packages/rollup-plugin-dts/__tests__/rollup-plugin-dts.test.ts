@@ -2,7 +2,7 @@ import { access, readFile, unlink } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 
-import { rolldownBuild, rollupBuild, testFixtures } from "@sxzz/test-utils";
+import { rollupBuild as rolldownBuild, rollupBuild, testFixtures } from "@sxzz/test-utils";
 import { createPatch } from "diff";
 import { dts as rollupDts } from "rollup-plugin-dts";
 import { glob } from "tinyglobby";
@@ -14,7 +14,7 @@ const isUpdateEnabled = process.env.npm_lifecycle_script?.includes("-u") || proc
 
 await testFixtures(
     "tests/rollup-plugin-dts/**/{index,main-a}.d.ts",
-    async (arguments_, id) => {
+    async (_arguments, id) => {
         const dirname = path.dirname(id);
 
         let entries = [id];
@@ -42,13 +42,14 @@ await testFixtures(
             rollupBuild(entries, [rollupDts()], undefined, {
                 entryFileNames: "[name].ts",
             }).then(({ snapshot }) => snapshot),
-        ]).catch((_error) => ((error = _error), []));
+        ]).catch((_error) => (error = _error, []));
 
         if (id.includes("error")) {
             return expect(error).toBe(true);
         }
 
-        if (error) throw error;
+        if (error)
+            throw error;
 
         await expect(rolldownSnapshot).toMatchFileSnapshot(path.resolve(dirname, "snapshot.d.ts"));
 

@@ -1,7 +1,6 @@
 {
     "name": "@visulima/rollup-plugin-dts",
-    "version": "0.0.1",
-    "private": true,
+    "version": "0.0.0",
     "description": "A Rollup plugin to bundle dts files",
     "homepage": "https://github.com/visulima/packem/tree/main/packages/rollup-plugin-dts",
     "bugs": {
@@ -80,15 +79,16 @@
         "birpc": "catalog:prod",
         "dts-resolver": "catalog:node",
         "magic-string": "catalog:utils",
-        "obug": "catalog:prod"
+        "obug": "catalog:prod",
+        "oxc-transform": "catalog:dev"
     },
     "devDependencies": {
-        "@jridgewell/source-map": "catalog:test",
         "@anolilab/eslint-config": "catalog:lint",
         "@anolilab/prettier-config": "catalog:lint",
         "@anolilab/semantic-release-pnpm": "catalog:cli",
         "@anolilab/semantic-release-preset": "catalog:cli",
         "@arethetypeswrong/cli": "catalog:dev",
+        "@jridgewell/source-map": "catalog:test",
         "@sxzz/test-utils": "catalog:test",
         "@types/babel__generator": "catalog:types",
         "@types/debug": "catalog:types",
@@ -103,7 +103,6 @@
         "estree-walker": "catalog:dev",
         "prettier": "catalog:lint",
         "publint": "catalog:lint",
-        "rolldown": "catalog:build",
         "rollup": "catalog:build",
         "rollup-plugin-dts": "catalog:build",
         "tinyglobby": "catalog:node",
@@ -116,16 +115,12 @@
     "peerDependencies": {
         "@ts-macro/tsc": "catalog:tsc",
         "@typescript/native-preview": ">=7.0.0-dev.20250601.1",
-        "rolldown": ">=1.0.0-rc.0",
         "rollup": ">=4.0.0",
         "typescript": "catalog:tsc",
         "vue-tsc": "catalog:tsc"
     },
     "peerDependenciesMeta": {
         "@typescript/native-preview": {
-            "optional": true
-        },
-        "rolldown": {
             "optional": true
         },
         "rollup": {

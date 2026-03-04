@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { rolldownBuild } from "@sxzz/test-utils";
+import { rollupBuild as rolldownBuild } from "@sxzz/test-utils";
 import { glob } from "tinyglobby";
 import { describe, expect, it } from "vitest";
 
@@ -128,6 +128,7 @@ describe("tsc", () => {
 
         const sourcemap = findSourceMapChunk(chunks, "index.d.ts.map");
         const sources = sourcemap.sources || [];
+
         // Cross-project source must always appear; entry re-export file may be omitted by newer TypeScript
         expect(sources).toEqual(expect.arrayContaining(["../../src/types.ts"]));
         expect(sourcemap.sourcesContent).toBeOneOf([undefined, []]);

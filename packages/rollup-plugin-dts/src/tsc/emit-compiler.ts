@@ -92,7 +92,7 @@ const createTsProgramFromParsedConfig = ({
         $rootDir: baseDir,
     };
 
-    const rootNames = [...new Set([id, ...(entries || parsedConfig.fileNames)].map((f) => fsSystem.resolvePath(f)))];
+    const rootNames = [...new Set([id, ...entries || parsedConfig.fileNames].map((f) => fsSystem.resolvePath(f)))];
 
     const host = ts.createCompilerHost(compilerOptions, true);
 

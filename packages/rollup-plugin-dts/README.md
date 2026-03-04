@@ -1,17 +1,17 @@
-# rolldown-plugin-dts
+# @visulima/rollup-plugin-dts
 
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
-[![Unit Test][unit-test-src]][unit-test-href]
+[![License][license-src]][license-href]
 
-A Rolldown plugin to generate and bundle dts files.
+A Rollup plugin to generate and bundle TypeScript declaration (`.d.ts`) files.
 
 ## Install
 
-Requires **`rolldown@1.0.0-beta.9`** or later.
+Requires **`rollup@4.0.0`** or later.
 
 ```bash
-npm i -D rolldown-plugin-dts
+npm i -D @visulima/rollup-plugin-dts
 
 npm i -D typescript # install TypeScript if isolatedDeclarations is not enabled
 npm i -D @typescript/native-preview # install TypeScript Go if tsgo is enabled
@@ -19,11 +19,11 @@ npm i -D @typescript/native-preview # install TypeScript Go if tsgo is enabled
 
 ## Usage
 
-Add the plugin to your `rolldown.config.js`:
+Add the plugin to your `rollup.config.js`:
 
 ```js
-// rolldown.config.js
-import { dts } from "rolldown-plugin-dts";
+// rollup.config.js
+import { dts } from "@visulima/rollup-plugin-dts";
 
 export default {
     input: "./src/index.ts",
@@ -31,8 +31,6 @@ export default {
     output: [{ dir: "dist", format: "es" }],
 };
 ```
-
-You can find an example in [here](./rolldown.config.ts).
 
 ## Options
 
@@ -91,6 +89,15 @@ By default, dependencies are external, resulting in `import { Type } from 'some-
 - `false`: (Default) Keeps all dependencies external.
 - `(string | RegExp)[]`: Bundles only dependencies matching the provided strings or regular expressions (e.g. `['pkg-a', /^@scope\//]`).
 
+#### `resolver`
+
+Specifies a resolver to resolve type definitions, especially for `node_modules`.
+
+- `'oxc'`: (Default) Uses Oxc's module resolution, which is faster and more efficient.
+- `'tsc'`: Uses TypeScript's native module resolution, which may be more compatible with complex setups, but slower.
+
+**Default:** `'oxc'`
+
 #### `cjsDefault`
 
 Determines how the default export is emitted.
@@ -99,10 +106,27 @@ If set to `true`, and you are only exporting a single item using `export default
 the output will use `export = ...` instead of the standard ES module syntax.
 This is useful for compatibility with CommonJS.
 
+#### `sideEffects`
+
+Indicates whether the generated `.d.ts` files have side effects.
+
+- If `true`, Rollup will treat the `.d.ts` files as having side effects during tree-shaking.
+- If `false`, Rollup may consider the `.d.ts` files as side-effect-free, potentially removing them if they are not imported.
+
+**Default:** `false`
+
 ### `tsc` Options
 
 > [!NOTE]
 > These options are only applicable when `oxc` and `tsgo` are not enabled.
+
+#### `banner`
+
+Content to be added at the top of each generated `.d.ts` file.
+
+#### `footer`
+
+Content to be added at the bottom of each generated `.d.ts` file.
 
 #### `build`
 
@@ -128,6 +152,10 @@ Enabling this option can speed up builds by caching previous results, which is h
 
 If `true`, the plugin will generate `.d.ts` files using `vue-tsc`.
 
+#### `tsMacro`
+
+If `true`, the plugin will generate `.d.ts` files using `@ts-macro/tsc`.
+
 #### `parallel`
 
 If `true`, the plugin will launch a separate process for `tsc` or `vue-tsc`, enabling parallel processing of multiple projects.
@@ -147,10 +175,10 @@ By default, the plugin may reuse internal caches or incremental build artifacts
 to speed up repeated builds. Enabling this option forces a clean context,
 guaranteeing that all type definitions are generated from scratch.
 
-`invalidateContextFile` API can be used to clear invalidated files from the context.
+The `invalidateContextFile` API can be used to clear invalidated files from the context:
 
 ```ts
-import { globalContext, invalidateContextFile } from "rolldown-plugin-dts/tsc";
+import { globalContext, invalidateContextFile } from "@visulima/rollup-plugin-dts/tsc";
 invalidateContextFile(globalContext, "src/foo.ts");
 ```
 
@@ -191,7 +219,7 @@ offering significantly faster performance compared to the `typescript` compiler.
 
 ### Single Build for ESM
 
-`rolldown-plugin-dts` generates separate chunks for `.d.ts` files, enabling both source code (`.js`)
+`@visulima/rollup-plugin-dts` generates separate chunks for `.d.ts` files, enabling both source code (`.js`)
 and type definition files (`.d.ts`) to be produced in a single build process.
 
 However, this functionality is limited to ESM output format. Consequently,
@@ -201,28 +229,20 @@ In such cases, the `emitDtsOnly` option can be particularly helpful.
 
 ## Credits
 
-The project is inspired by [rollup-plugin-dts](https://github.com/Swatinem/rollup-plugin-dts)
-but has been independently implemented.
+This project is a Rollup adaptation of [rolldown-plugin-dts](https://github.com/sxzz/rolldown-plugin-dts)
+and is inspired by [rollup-plugin-dts](https://github.com/Swatinem/rollup-plugin-dts).
 We extend our gratitude to the original creators for their contributions.
-Furthermore, the test suite is authorized by them and distributed under the MIT license.
-
-## Sponsors
-
-<p align="center">
-  <a href="https://cdn.jsdelivr.net/gh/sxzz/sponsors/sponsors.svg">
-    <img src='https://cdn.jsdelivr.net/gh/sxzz/sponsors/sponsors.svg'/>
-  </a>
-</p>
+The test suite is authorized by them and distributed under the MIT license.
 
 ## License
 
-[MIT](./LICENSE) License © 2025 [三咲智子 Kevin Deng](https://github.com/sxzz)
+[MIT](./LICENSE) License © 2025-present [Daniel Bannert](https://github.com/prisis)
 
 <!-- Badges -->
 
-[npm-version-src]: https://img.shields.io/npm/v/rolldown-plugin-dts.svg
-[npm-version-href]: https://npmjs.com/package/rolldown-plugin-dts
-[npm-downloads-src]: https://img.shields.io/npm/dm/rolldown-plugin-dts
-[npm-downloads-href]: https://www.npmcharts.com/compare/rolldown-plugin-dts?interval=30
-[unit-test-src]: https://github.com/sxzz/rolldown-plugin-dts/actions/workflows/unit-test.yml/badge.svg
-[unit-test-href]: https://github.com/sxzz/rolldown-plugin-dts/actions/workflows/unit-test.yml
+[npm-version-src]: https://img.shields.io/npm/v/@visulima/rollup-plugin-dts.svg?style=flat-square
+[npm-version-href]: https://npmjs.com/package/@visulima/rollup-plugin-dts
+[npm-downloads-src]: https://img.shields.io/npm/dm/@visulima/rollup-plugin-dts.svg?style=flat-square
+[npm-downloads-href]: https://www.npmcharts.com/compare/@visulima/rollup-plugin-dts?interval=30
+[license-src]: https://img.shields.io/npm/l/@visulima/rollup-plugin-dts.svg?style=flat-square
+[license-href]: https://npmjs.com/package/@visulima/rollup-plugin-dts

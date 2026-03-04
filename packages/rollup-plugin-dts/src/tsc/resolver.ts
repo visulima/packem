@@ -3,7 +3,7 @@ import path from "node:path";
 import { createDebug } from "obug";
 import ts from "typescript";
 
-const debug = createDebug("rolldown-plugin-dts:tsc-resolver");
+const debug = createDebug("rollup-plugin-dts:tsc-resolver");
 
 const tscResolve = (
     id: string,
