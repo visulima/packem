@@ -58,7 +58,7 @@ class TailwindRoot {
         const requiresBuildPromise = this.requiresBuild();
         const inputBase = dirname(pathResolve(inputPath));
 
-        if (!this.compiler || !this.scanner || (await requiresBuildPromise)) {
+        if (!this.compiler || !this.scanner || await requiresBuildPromise) {
             clearRequireCache([...this.buildDependencies.keys()]);
 
             this.buildDependencies.clear();
@@ -113,10 +113,10 @@ class TailwindRoot {
 
         // Check if compiler has required features using bitwise operations
 
-        const hasRequiredFeatures =
-            this.compiler.features &
+        const hasRequiredFeatures
+            = this.compiler.features
             // eslint-disable-next-line no-bitwise
-            (Features.AtApply | Features.JsPluginCompat | Features.ThemeFunction | Features.Utilities);
+                & (Features.AtApply | Features.JsPluginCompat | Features.ThemeFunction | Features.Utilities);
 
         this.logger.debug({
             data: {
@@ -184,7 +184,7 @@ class TailwindRoot {
             } else {
                 this.logger.debug({
                     data: {
-                        hasScanMethod: Boolean(this.scanner && typeof this.scanner.scan === "function"),
+                        hasScanMethod: Boolean(this.scanner && typeof (this.scanner as any).scan === "function"),
                         scannerType: typeof this.scanner,
                     },
                     message: "Scanner not available or missing scan method",
@@ -310,11 +310,14 @@ class TailwindRoot {
         const map = sourceMap?.raw;
 
         if (map) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const mapObj = map as any;
+
             this.logger.debug({
                 data: {
-                    hasMappings: Boolean(map.mappings),
+                    hasMappings: Boolean(mapObj.mappings),
                     mapSize: JSON.stringify(map).length,
-                    sourcesCount: map.sources?.length || 0,
+                    sourcesCount: mapObj.sources?.length || 0,
                 },
                 message: "Source map generated",
             });
@@ -430,7 +433,7 @@ const tailwindcssLoader: Loader = {
         // Create or get the Tailwind root for this file
         // Resolve an absolute scanner base: prefer joining the absolute cwd with sourceDir,
         // fall back to sourceDir alone (may be relative) or process.cwd() as last resort.
-        const scannerBase = this.cwd ? (this.sourceDir ? join(this.cwd, this.sourceDir) : this.cwd) : this.sourceDir || process.cwd();
+        const scannerBase = this.cwd ? this.sourceDir ? join(this.cwd, this.sourceDir) : this.cwd : this.sourceDir || process.cwd();
 
         const root = new TailwindRoot(this.id, scannerBase, this.useSourcemap, customCssResolver, customJsResolver, this.logger);
 
@@ -503,6 +506,7 @@ const tailwindcssLoader: Loader = {
             icssDependencies: [], // Tailwind Oxide doesn't support CSS modules by default
             id: this.id,
             inject: this.inject,
+            inline: this.inline,
             logger: this.logger,
             map: result.map,
             modulesExports: {}, // Tailwind Oxide doesn't support CSS modules by default
