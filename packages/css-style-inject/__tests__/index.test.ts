@@ -337,7 +337,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject(css);
 
-            expect((mockElement.styleSheet as CSSStyleSheet).cssText).toBe(css);
+            expect((mockElement.styleSheet as any).cssText).toBe(css);
         });
 
         it("should append to existing styleSheet.cssText", () => {
@@ -350,7 +350,7 @@ describe(cssStyleInject, () => {
 
             cssStyleInject(newCss);
 
-            expect((mockElement.styleSheet as CSSStyleSheet).cssText).toBe(existingCss + newCss);
+            expect((mockElement.styleSheet as any).cssText).toBe(existingCss + newCss);
         });
     });
 
@@ -449,7 +449,7 @@ describe(cssStyleInject, () => {
             expect(mockElement.setAttribute).toHaveBeenCalledWith("id", "test-style");
             expect(mockElement.setAttribute).toHaveBeenCalledWith("data-test", "value");
             expect(mockElement.setAttribute).toHaveBeenCalledWith("nonce", "abc123");
-            expect((customContainer.children[1] as Element).before).toHaveBeenCalledWith(mockElement);
+            expect((customContainer.children[1] as any).before).toHaveBeenCalledWith(mockElement);
         });
 
         it("should handle empty options object", () => {
