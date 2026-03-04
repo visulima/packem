@@ -26,7 +26,7 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
 
     return ((...arguments_: Parameters<T>) => {
         // eslint-disable-next-line sonarjs/no-nested-conditional, @stylistic/no-extra-parens
-        const key = cacheKey ? (typeof cacheKey === "function" ? cacheKey(...arguments_) : cacheKey) : stringify({ args: arguments_ });
+        const key = cacheKey ? (typeof cacheKey === "function" ? cacheKey(...arguments_) : cacheKey) : (stringify({ args: arguments_ }) ?? JSON.stringify(arguments_));
         const existing = cache.get(key);
 
         if (existing !== undefined) {
@@ -47,7 +47,7 @@ export const memoize = <T extends (...arguments_: any[]) => any>(
  * @returns A function that returns memoized versions with optional cache key
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const memoizeByKey = <T extends (...arguments_: any[]) => any>(function_: T): ((cacheKey?: CacheKeyResolver) => T) => {
+export const memoizeByKey = <T extends (...arguments_: any[]) => any>(function_: T): (cacheKey?: CacheKeyResolver) => T => {
     const cache = new Map<string, ReturnType<T>>();
 
     return (cacheKey?: CacheKeyResolver) => memoize(function_, cacheKey, cache);

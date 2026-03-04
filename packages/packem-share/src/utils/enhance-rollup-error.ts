@@ -30,7 +30,6 @@ const extractStack = (error: RollupError): string | undefined => {
  * @returns The normalized frame
  */
 const normalizeCodeFrame = (frame: string): string => {
-    // eslint-disable-next-line sonarjs/anchor-precedence
     const trimmedPadding = frame.replaceAll(/^\n|\n$/g, "");
 
     return `\n${trimmedPadding}\n`;
