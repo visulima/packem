@@ -227,16 +227,16 @@ const parseStyles = async (
         if (isImportStatement(stmt) && stmt.stylesheet) {
             if (charset && stmt.stylesheet.charset && charset.params.toLowerCase() !== stmt.stylesheet.charset.params.toLowerCase()) {
                 throw stmt.stylesheet.charset.error(
-                    "Incompatible @charset statements:\n" +
-                        `  ${stmt.stylesheet.charset.params} specified in ${stmt.stylesheet.charset.source?.input.file}\n` +
-                        `  ${charset.params} specified in ${charset.source?.input.file}`,
+                    "Incompatible @charset statements:\n"
+                    + `  ${stmt.stylesheet.charset.params} specified in ${stmt.stylesheet.charset.source?.input.file}\n`
+                    + `  ${charset.params} specified in ${charset.source?.input.file}`,
                 );
             } else if (!charset && stmt.stylesheet.charset) {
                 charset = stmt.stylesheet.charset;
             }
 
             statements.splice(index, 1, ...stmt.stylesheet.statements);
-            // eslint-disable-next-line sonarjs/updated-loop-counter
+
             index -= 1;
         }
     }

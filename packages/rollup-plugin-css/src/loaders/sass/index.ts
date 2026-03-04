@@ -38,6 +38,7 @@ const loader: Loader<SassLoaderOptions> = {
             this.useSourcemap,
         );
 
+        options.importers ??= [];
         options.importers.push(modernImporter(this.id, this.debug ?? false));
 
         let result;
@@ -65,16 +66,14 @@ const loader: Loader<SassLoaderOptions> = {
         }
 
         if ((result as CompileResult).loadedUrls) {
-            (result as CompileResult).loadedUrls
-                .filter((loadedUrl) => loadedUrl.protocol === "file:")
-                .forEach((includedFile) => {
-                    const normalizedIncludedFile = fileURLToPath(includedFile);
+            (result as CompileResult).loadedUrls.filter((loadedUrl) => loadedUrl.protocol === "file:").forEach((includedFile) => {
+                const normalizedIncludedFile = fileURLToPath(includedFile);
 
-                    // Custom `importer` can return only `contents` so includedFile will be relative
-                    if (isAbsolute(normalizedIncludedFile)) {
-                        this.deps.add(normalizedIncludedFile);
-                    }
-                });
+                // Custom `importer` can return only `contents` so includedFile will be relative
+                if (isAbsolute(normalizedIncludedFile)) {
+                    this.deps.add(normalizedIncludedFile);
+                }
+            });
         }
 
         return {
