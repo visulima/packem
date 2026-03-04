@@ -212,7 +212,8 @@ export const defaultStrategy: Strategy<HTMLOptions, CleanCSS.Options> = {
             throw new Error(output.errors.join("\n\n"));
         }
 
-        if (adjustedOptions.level[OptimizationLevel.One].tidySelectors) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((adjustedOptions.level as any)?.[OptimizationLevel.One]?.tidySelectors) {
             output.styles = fixCleanCssTidySelectors(css, output.styles);
         }
 
@@ -262,7 +263,8 @@ export const defaultStrategy: Strategy<HTMLOptions, CleanCSS.Options> = {
             }
         }
 
-        if (adjustedMinifyCSSOptions && adjustedMinifyCSSOptions.level[OptimizationLevel.One].tidySelectors) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (adjustedMinifyCSSOptions && (adjustedMinifyCSSOptions.level as any)?.[OptimizationLevel.One]?.tidySelectors) {
             // Fix https://github.com/jakubpawlowicz/clean-css/issues/996
             result = fixCleanCssTidySelectors(html, result);
         }

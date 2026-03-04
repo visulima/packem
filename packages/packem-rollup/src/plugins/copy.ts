@@ -67,14 +67,14 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Console): Plugin 
             const results = await Promise.all(
                 (targets as SingleTargetDesc[])
                     .flatMap((target) =>
-                        Array.isArray(target.src)
+                        (Array.isArray(target.src)
                             ? target.src.map((itemSource) => {
                                   return {
                                       ...target,
                                       src: itemSource,
                                   };
                               })
-                            : target,
+                            : target),
                     )
                     .map(
                         async (target) =>
@@ -119,7 +119,7 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Console): Plugin 
             });
 
             await Promise.all(
-                [...files].map(async ([fileName, fileDesc]) => {
+                Array.from(files, async ([fileName, fileDesc]) => {
                     let source: Uint8Array | undefined;
 
                     try {

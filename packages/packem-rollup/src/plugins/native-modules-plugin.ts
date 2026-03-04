@@ -2,7 +2,7 @@ import { copyFile } from "node:fs/promises";
 
 import { ensureDir, isAccessible } from "@visulima/fs";
 import { basename, dirname, extname, join, resolve } from "@visulima/path";
-import type { Plugin } from "rollup";
+import type { NormalizedOutputOptions, Plugin } from "rollup";
 
 const PREFIX = "\0natives:";
 
@@ -30,15 +30,13 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
             modulesToCopy.clear();
         },
 
-        generateBundle: async (options) => {
+        generateBundle: async (options: NormalizedOutputOptions) => {
             // Try to get output directory from generateBundle options if not set yet
             if (!distributionDirectory) {
-                const output = Array.isArray(options) ? options[0] : options;
-
-                if (output && output.dir) {
-                    distributionDirectory = output.dir;
-                } else if (output && output.file) {
-                    distributionDirectory = dirname(output.file);
+                if (options.dir) {
+                    distributionDirectory = options.dir;
+                } else if (options.file) {
+                    distributionDirectory = dirname(options.file);
                 }
             }
 
@@ -47,9 +45,7 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
             }
 
             if (!distributionDirectory) {
-                this.error("Output directory not detected. Please ensure Rollup output options are configured.");
-
-                return undefined;
+                throw new Error("Output directory not detected. Please ensure Rollup output options are configured.");
             }
 
             const nativeLibsDirectory = join(distributionDirectory, nativesDirectory);
@@ -58,7 +54,7 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
 
             // Copy all staged files in parallel.
             await Promise.all(
-                [...modulesToCopy.entries()].map(([source, outputName]) => {
+                Array.from(modulesToCopy.entries(), ([source, outputName]) => {
                     const destination = join(nativeLibsDirectory, outputName);
 
                     return copyFile(source, destination);
@@ -130,7 +126,7 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
 
                 const resolvedPath = importer ? resolve(dirname(importer), source) : resolve(source);
 
-                if (!(await isAccessible(resolvedPath))) {
+                if (!await isAccessible(resolvedPath)) {
                     this.warn(`Native module not found: ${resolvedPath}`);
 
                     return undefined;
@@ -141,7 +137,7 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
                 let counter = 1;
 
                 // Handle name collisions by checking already staged values
-                const stagedBasenames = new Set([...modulesToCopy.values()].map((p) => basename(p)));
+                const stagedBasenames = new Set(Array.from(modulesToCopy.values(), (p) => basename(p)));
 
                 while (stagedBasenames.has(outputName)) {
                     const extension = extname(resolvedPathBasename);

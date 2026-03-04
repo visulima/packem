@@ -64,7 +64,7 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                         prefix: "plugin:preserve-directives",
                     });
 
-                    magicString.prepend(`${[...outputDirectives].map((directive) => `'${directive}';`).join("\n")}\n`);
+                    magicString.prepend(`${Array.from(outputDirectives, (directive) => `'${directive}';`).join("\n")}\n`);
                 }
 
                 let shebang: string | undefined;
@@ -228,7 +228,7 @@ export const preserveDirectivesPlugin = ({ directiveRegex, exclude = [], include
                 map: magicString.generateMap({ hires: true }),
                 meta: {
                     preserveDirectives: {
-                        directives: [...(directives[id] ?? [])],
+                        directives: [...directives[id] ?? []],
 
                         shebang: shebangs[id] ?? undefined,
                     },

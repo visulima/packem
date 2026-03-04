@@ -2,7 +2,8 @@
     "$schema": "https://json.schemastore.org/tsconfig",
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "moduleResolution": "bundler"
+        "moduleResolution": "bundler",
+        "skipLibCheck": true
     },
     "include": ["src/**/*", "*.d.ts", "__tests__/unit/utils/is-pure-cjs.test.ts", "__tests__/unit/plugins/require-cjs-transformer.test.ts"]
 }

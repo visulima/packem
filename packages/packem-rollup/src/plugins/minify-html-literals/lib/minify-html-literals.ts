@@ -235,7 +235,7 @@ export const defaultValidation: Validation = {
  * @param options minification options
  * @returns the minified code, or null if no minification occurred.
  */
-export async function minifyHTMLLiterals(source: string, options?: DefaultOptions): Promise<Result | null>;
+export async function minifyHTMLLiterals(source: string, options?: DefaultOptions): Promise<Result | null | undefined>;
 
 /**
  * Minifies all HTML template literals in the provided source string.

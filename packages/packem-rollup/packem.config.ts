@@ -18,7 +18,7 @@ export default defineConfig({
                 exclude: ["estree"],
             },
             unused: {
-                exclude: ["rollup-plugin-dts"],
+                exclude: ["@visulima/rollup-plugin-dts"],
             },
         },
     },

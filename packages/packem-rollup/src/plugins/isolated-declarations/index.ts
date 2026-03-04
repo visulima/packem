@@ -113,12 +113,12 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                 }
 
                 if (
-                    resolved.id.endsWith(".ts") ||
-                    resolved.id.endsWith(".cts") ||
-                    resolved.id.endsWith(".mts") ||
-                    resolved.id.endsWith(".tsx") ||
-                    resolved.id.endsWith(".ctsx") ||
-                    resolved.id.endsWith(".mtsx")
+                    resolved.id.endsWith(".ts")
+                    || resolved.id.endsWith(".cts")
+                    || resolved.id.endsWith(".mts")
+                    || resolved.id.endsWith(".tsx")
+                    || resolved.id.endsWith(".ctsx")
+                    || resolved.id.endsWith(".mtsx")
                 ) {
                     const resolvedId = resolved.id.replace(`${sourceDirectory}/`, "");
 
@@ -184,15 +184,15 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
 
             if (node.type === "ImportDeclaration") {
                 return (
-                    node.specifiers &&
-                    node.specifiers.every((spec: { importKind: string; type: string }) => spec.type === "ImportSpecifier" && spec.importKind === "type")
+                    node.specifiers
+                    && node.specifiers.every((spec: { importKind: string; type: string }) => spec.type === "ImportSpecifier" && spec.importKind === "type")
                 );
             }
 
             return (
-                node.type === "ExportNamedDeclaration" &&
-                node.specifiers &&
-                node.specifiers.every((spec: { exportKind: string; type: string }) => spec.exportKind === "type")
+                node.type === "ExportNamedDeclaration"
+                && node.specifiers
+                && node.specifiers.every((spec: { exportKind: string; type: string }) => spec.exportKind === "type")
             );
         });
 
@@ -230,7 +230,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
 
         // eslint-disable-next-line sonarjs/cognitive-complexity
         async renderStart(outputOptions: NormalizedOutputOptions, { input }: NormalizedInputOptions): Promise<void> {
-            const inputBase = lowestCommonAncestor(...(Array.isArray(input) ? input : Object.values(input)));
+            const inputBase = lowestCommonAncestor(...Array.isArray(input) ? input : Object.values(input));
 
             context.logger.debug({
                 message: `Input base:${inputBase}`,
@@ -292,12 +292,11 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                     const fixedSource = fixDtsDefaultCJSExports(source, { fileName: normalizedFilename, imports: [] }, { warn: this.warn });
 
                     if (fixedSource) {
-                        // eslint-disable-next-line sonarjs/updated-loop-counter
                         source = fixedSource.code;
                     }
                 }
 
-                const quote = source.includes("from '") ? "'" : '"';
+                const quote = source.includes("from '") ? "'" : "\"";
                 const originalFileName = normalizedFilename + ext;
 
                 if ((context.options.declaration === true || context.options.declaration === "compatible") && outputOptions.format === "cjs") {
@@ -341,7 +340,6 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                 const emitName = entryFileName.replace("[name]", toNamespacedPath(normalizedFilename));
 
                 if (context.options.sourcemap && map) {
-                    // eslint-disable-next-line sonarjs/updated-loop-counter
                     source = appendMapUrl(source.trim(), emitName);
 
                     this.emitFile({

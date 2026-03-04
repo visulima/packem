@@ -69,7 +69,7 @@ const isPossibleBarrelSpecifier = (id: string, options: DebarrelPluginOptions) =
     return false;
 };
 
-const getDeclarationKind = (specifiers: string) => (IS_EXPORT_PREFIXED.test(specifiers) ? "export" : "import");
+const getDeclarationKind = (specifiers: string) => IS_EXPORT_PREFIXED.test(specifiers) ? "export" : "import";
 
 const { parseAsync } = rsModuleLexer;
 
@@ -156,7 +156,7 @@ const getImportNames = (specifiers: string): ImportName[] => {
     let token: RegExpExecArray | null;
 
     // eslint-disable-next-line no-cond-assign
-    while ((token = importNamesTokenizer.exec(specifiers))) {
+    while (token = importNamesTokenizer.exec(specifiers)) {
         if (token[1]) {
             continue; // types
         }
@@ -284,7 +284,7 @@ const resolveThroughBarrel = async (
             return { exportName, id, resolved: false };
         }
 
-        const inner = await resolveThroughBarrel(context, resolveId, exportName, options);
+        const inner = await resolveThroughBarrel(context, resolveId, exportName, options, logger);
 
         if (inner.resolved) {
             return inner;
@@ -299,7 +299,7 @@ const resolveThroughBarrel = async (
                     return undefined;
                 }
 
-                return resolveThroughBarrel(context, resolveId, exportName, options);
+                return resolveThroughBarrel(context, resolveId, exportName, options, logger);
             }),
         );
 
@@ -330,7 +330,7 @@ const getDeclarationClause = (resolvedSource: ResolvedSource, importName: Import
     return `{${isLocallyAliased ? `${exportName} as ${local}` : exportName}}`;
 };
 
-const getDebarrelModifications = async (context: DebarrelContext, id: string, code: string, options: DebarrelPluginOptions, logger: Console) => {
+const getDebarrelModifications = async (context: DebarrelContext, id: string, _code: string, options: DebarrelPluginOptions, logger: Console) => {
     const modifications: Modifications = [];
     // Parse the original file content instead of transformed code
     // rs-module-lexer is designed to parse source files (TS/JSX), not transformed code
@@ -372,7 +372,7 @@ const getDebarrelModifications = async (context: DebarrelContext, id: string, co
             try {
                 const replacements = await Promise.all(
                     importNames.map(async (importName) => {
-                        const debarrelled = await resolveThroughBarrel(context, resolvedId, importName.imported, options);
+                        const debarrelled = await resolveThroughBarrel(context, resolvedId, importName.imported, options, logger);
 
                         if (!debarrelled) {
                             return undefined;
@@ -397,7 +397,7 @@ const getDebarrelModifications = async (context: DebarrelContext, id: string, co
                     context: {
                         error,
                     },
-                    message: error.toString(),
+                    message: String(error),
                     prefix: "plugin:debarrel",
                 });
             }
@@ -461,9 +461,8 @@ export const debarrelPlugin = (options: DebarrelPluginOptions, logger: Console):
 
         // align sourcemap behavior with Rollup options
         options(inputOptions) {
-            // @ts-expect-error rollup types
-            const sm =
-                inputOptions.output && (Array.isArray(inputOptions.output) ? inputOptions.output[0]?.sourcemap : (inputOptions.output as any)?.sourcemap);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const sm = (inputOptions as any).output && (Array.isArray((inputOptions as any).output) ? (inputOptions as any).output[0]?.sourcemap : (inputOptions as any)?.output?.sourcemap);
 
             if (sm === false) {
                 sourceMap = false;

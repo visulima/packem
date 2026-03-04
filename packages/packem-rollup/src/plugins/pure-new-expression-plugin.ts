@@ -16,10 +16,6 @@ export const pureNewExpressionPlugin = (options: { constructors: string[]; sourc
     return {
         name: "packem:pure-new-expression",
         transform: {
-            // Use "post" order so this runs AFTER TypeScript transformers (esbuild/swc/oxc).
-            // If we use "pre", `this.parse()` will fail on TypeScript-specific syntax
-            // (type annotations, `as` casts, etc.) before the code is transpiled to plain JS.
-            order: "post",
             handler(code: string) {
                 if (constructorSet.size === 0) {
                     return undefined;
@@ -48,21 +44,25 @@ export const pureNewExpressionPlugin = (options: { constructors: string[]; sourc
                     return undefined;
                 }
 
+                if (!ast) {
+                    return undefined;
+                }
+
                 const s = new MagicString(code);
                 let hasChanges = false;
 
                 walk(ast, {
-                    // eslint-disable-next-line sonarjs/cognitive-complexity
+
                     enter(rawNode) {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const node = rawNode as any;
 
                         if (
-                            node.type === "NewExpression" &&
-                            node.callee.type === "Identifier" &&
-                            constructorSet.has(node.callee.name) &&
+                            node.type === "NewExpression"
+                            && node.callee.type === "Identifier"
+                            && constructorSet.has(node.callee.name)
                             // Don't double-annotate if rollup already has a pure annotation
-                            !node._rollupAnnotations?.some((a: { type: string }) => a.type === "pure")
+                            && !node._rollupAnnotations?.some((a: { type: string }) => a.type === "pure")
                         ) {
                             s.prependLeft(node.start, "/* @__PURE__ */ ");
                             hasChanges = true;
@@ -79,6 +79,10 @@ export const pureNewExpressionPlugin = (options: { constructors: string[]; sourc
                     map: options.sourcemap ? s.generateMap({ hires: true }) : undefined,
                 };
             },
+            // Use "post" order so this runs AFTER TypeScript transformers (esbuild/swc/oxc).
+            // If we use "pre", `this.parse()` will fail on TypeScript-specific syntax
+            // (type annotations, `as` casts, etc.) before the code is transpiled to plain JS.
+            order: "post",
         },
     };
 };

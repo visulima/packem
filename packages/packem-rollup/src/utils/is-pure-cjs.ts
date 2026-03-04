@@ -25,7 +25,8 @@ export const isPureCJS = async (
     }
 
     // ignore Node.js built-in modules, as their performance is comparable
-    if (id.startsWith("node:")) return false;
+    if (id.startsWith("node:"))
+        return false;
 
     // Check if it's a .cjs file
     if (id.endsWith(".cjs")) {
@@ -41,7 +42,7 @@ export const isPureCJS = async (
             try {
                 const resolved = await rollupResolve(id, importer);
 
-                resolvedPath = resolved.id;
+                resolvedPath = resolved?.id;
             } catch {
                 // Fall back to require.resolve if Rollup resolution fails
             }
