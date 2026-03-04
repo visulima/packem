@@ -6,11 +6,11 @@ describe("esm-shim-cjs-syntax", () => {
     const match = (code: string) => GLOBAL_REQUIRE_REGEX.test(code);
 
     it.each([
-        ['require("foo")', true],
-        ['require(\n"foo"\n)', true],
+        ["require(\"foo\")", true],
+        ["require(\n\"foo\"\n)", true],
         ["require(`mod`)", true],
         ["require.resolve('mod')", true],
-        ['foo.require("foo")', false],
+        ["foo.require(\"foo\")", false],
         ["\"require('module')\"", false],
         ["`require('module')`", false],
         [`require.resolve(impl)`, true],

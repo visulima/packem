@@ -3,6 +3,7 @@ export { default as chunkSplitter } from "./plugins/chunk-splitter";
 export { default as browserslistToEsbuild } from "./plugins/esbuild/browserslist-to-esbuild";
 export { default as fixDynamicImportExtension } from "./plugins/fix-dynamic-import-extension";
 export { default as metafilePlugin } from "./plugins/metafile";
+export { pureNewExpressionPlugin } from "./plugins/pure-new-expression-plugin";
 export { default as resolveFileUrlPlugin } from "./plugins/resolve-file-url";
 export type {
     ExtendedRollupNodeResolveOptions,
@@ -28,6 +29,5 @@ export { default as replace, type RollupReplaceOptions } from "@rollup/plugin-re
 export { type RollupWasmOptions, default as wasm } from "@rollup/plugin-wasm";
 export { default as polyfillNode, type NodePolyfillsOptions as RollupNodePolyfillsOptions } from "rollup-plugin-polyfill-node";
 export { PluginPure as purePlugin, type PureAnnotationsOptions as RollupPureAnnotationsOptions } from "rollup-plugin-pure";
-export { pureNewExpressionPlugin } from "./plugins/pure-new-expression-plugin";
 export type { PluginVisualizerOptions as RollupPluginVisualizerOptions } from "rollup-plugin-visualizer";
 export { default as visualizer } from "rollup-plugin-visualizer";
