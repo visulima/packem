@@ -2,8 +2,6 @@
 
 ```ts
 declare const foo: number;
-//#endregion
-//#region __tests__/fixtures/source-map/index.d.ts
 declare const a: string;
 declare const b: string;
 type Str = string;
@@ -22,13 +20,19 @@ declare namespace Ns {
     id: string;
   };
 }
-//#endregion
-export { mod_d_exports as Mod, Ns, Obj, a, b, fn };
+export { mod_d as Mod, Ns, Obj, a, b, fn };
 //# sourceMappingURL=index.d.ts.map
+
 ```
 
 ## index.d.ts.map
 
 ```map
-{"version":3,"file":"index.d.ts","names":[],"sources":["../..[CWD]/__tests__/fixtures/source-map/mod.ts","../..[CWD]/__tests__/fixtures/source-map/index.ts"],"sourcesContent":[],"mappings":"cAAa;;;cCAA;cAEA;KAIR,GAAA;iBACW,EAAA,QAAU;UAIT,GAAA;;;;;;;kBAQA,EAAA;;gBAEM"}
+{"version":3,"file":"index.d.ts","sources":["../..[CWD]/packages/rollup-plugin-dts/__tests__/fixtures/source-map/mod.ts","../..[CWD]/packages/rollup-plugin-dts/__tests__/fixtures/source-map/index.ts"],"names":[],"mappings":"AAA6B,cAAhBA,GAAgB,EAAA,MAAA;AAAA,cCAhBC,CDAgB,EAAA,MAAA;cCEhBC;KAIRC,GAAG;iBACQC,EAAEA,QAAQD;UAITE,GAAG;;;EAXPJ,CAAc;EAEdC,MAAc,EAAA,MAAA;EAItBC,SAAG,EAAA;AACR;AAIoB,kBAQHG,EAAE,CARC;EAQHA,KAAEH,MAAA,MAEK;gBAADI;;;;;"}
+```
+
+## index.js.map
+
+```map
+{"version":3,"file":"index.js","sources":[],"sourcesContent":[],"names":[],"mappings":""}
 ```

@@ -1,5 +1,5 @@
 import { createDebug } from "obug";
-import type { Plugin } from "rolldown";
+import type { Plugin } from "rollup";
 
 import createBannerPlugin from "./banner";
 import createDtsInputPlugin from "./dts-input";
@@ -11,7 +11,7 @@ import createDtsResolvePlugin from "./resolver";
 
 export { default as createFakeJsPlugin } from "./fake-js";
 
-const debug = createDebug("rolldown-plugin-dts:options");
+const debug = createDebug("rollup-plugin-dts:options");
 
 export const dts = (options: Options = {}): Plugin[] => {
     debug("resolving dts options");

@@ -77,15 +77,18 @@ const collectProjectGraph = (rootTsconfigPath: string, fsSystem: ts.System, forc
     while (true) {
         const tsconfigPath = stack.pop();
 
-        if (!tsconfigPath) break;
+        if (!tsconfigPath)
+            break;
 
-        if (seen.has(tsconfigPath)) continue;
+        if (seen.has(tsconfigPath))
+            continue;
 
         seen.add(tsconfigPath);
 
         const parsedConfig = parseTsconfig(tsconfigPath, fsSystem);
 
-        if (!parsedConfig) continue;
+        if (!parsedConfig)
+            continue;
 
         parsedConfig.options = patchCompilerOptions(parsedConfig.options, {
             force,

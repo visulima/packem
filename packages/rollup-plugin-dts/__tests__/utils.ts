@@ -1,9 +1,9 @@
-import type { ExistingRawSourceMap, RolldownOutput } from "rolldown";
+import type { ExistingRawSourceMap, RollupOutput } from "rollup";
 
 /**
  * Find and parse a source map from the output chunks
  */
-export function findSourceMapChunk(chunks: RolldownOutput["output"], fileName: string): ExistingRawSourceMap {
+export function findSourceMapChunk(chunks: RollupOutput["output"], fileName: string): ExistingRawSourceMap {
     const chunk = chunks.find((chunk) => chunk.fileName === fileName);
 
     if (!chunk) {

@@ -82,7 +82,8 @@ const createProgramFactory = (ts: typeof Ts, options: Pick<TscOptions, "vue" | "
     const tsMacroLanguageTools = options.tsMacro ? loadTsMacro() : undefined;
     const proxyCreateProgram = vueLanguageTools?.proxyCreateProgram || tsMacroLanguageTools?.proxyCreateProgram;
 
-    if (!proxyCreateProgram) return ts.createProgram;
+    if (!proxyCreateProgram)
+        return ts.createProgram;
 
     return proxyCreateProgram(ts, ts.createProgram, (ts, options) => {
         const languagePlugins = [];

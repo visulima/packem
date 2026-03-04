@@ -1,4 +1,4 @@
-import type { Plugin } from "rolldown";
+import type { Plugin } from "rollup";
 
 /**
  * with imports
