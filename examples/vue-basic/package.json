@@ -34,7 +34,7 @@
         "clean": "rimraf node_modules dist"
     },
     "dependencies": {
-        "vue": "^3.5.28"
+        "vue": "^3.5.29"
     },
     "devDependencies": {
         "@visulima/packem": "workspace:*",
