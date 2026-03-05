@@ -1,3 +1,20 @@
+## @visulima/packem-rollup [1.0.0-alpha.40](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.39...@visulima/packem-rollup@1.0.0-alpha.40) (2026-03-05)
+
+### Bug Fixes
+
+* resolve test failures in packem-rollup and ecosystem tests ([2a43db8](https://github.com/visulima/packem/commit/2a43db81e52ec956e78e3c1ce70038fb40e28345))
+
+### Miscellaneous Chores
+
+* **packem-rollup:** update source, tests and build configuration ([1285190](https://github.com/visulima/packem/commit/1285190f6dd67de092a68ca69f6d4c190af0a87e))
+* update dependencies, fix linting and improve code formatting ([d78b132](https://github.com/visulima/packem/commit/d78b1325ce79dbd14deeb6311a74d81f7172a81e))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.21
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.1
+
 ## @visulima/packem-rollup [1.0.0-alpha.39](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.38...@visulima/packem-rollup@1.0.0-alpha.39) (2026-02-21)
 
 ### Features
