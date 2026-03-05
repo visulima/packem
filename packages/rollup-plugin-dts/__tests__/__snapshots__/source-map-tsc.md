@@ -28,7 +28,7 @@ export { mod_d as Mod, Ns, Obj, a, b, fn };
 ## index.d.ts.map
 
 ```map
-{"version":3,"file":"index.d.ts","sources":["../../fixtures/source-map/mod.ts","../../fixtures/source-map/index.ts"],"names":[],"mappings":"AAA6B,cAAhBA,GAAgB,EAAA,MAAA;AAAA,cCAhBC,CDAgB,EAAA,MAAA;cCEhBC;KAIRC,GAAG;iBACQC,EAAEA,QAAQD;UAITE,GAAG;;;EAXPJ,CAAc;EAEdC,MAAc,EAAA,MAAA;EAItBC,SAAG,EAAA;AACR;AAIoB,kBAQHG,EAAE,CARC;EAQHA,KAAEH,MAAA,MAEK;gBAADI;;;;;"}
+{"version":3,"file":"index.d.ts","sources":["../../fixtures/source-map/mod.ts","../../fixtures/source-map/index.ts"],"names":[],"mappings":"cAAaA,GAAgB;AAAA,cCAhBC,CAAc;AAAA,cAEdC,CAAc;AAAA,KAItBC,GAAG;AAAA,iBACQC,EAAEA,CAACC,KAAU,EAAHF,GAAG;AAAA,UAIZG,GAAG;EAClBC,MAAM;IACJC,GAAG;EAAA;EAELC,MAAM;EACN,SAAS;AAAA;AAAA,kBAGMC,EAAE;EAAA,KACLP,GAAG;EAAA,KACHQ,GAAG,MAAMC,CAAC;EAAA,KACVN,GAAG;IACbO,EAAE;EAAA;AAAA;"}
 ```
 
 ## index.js.map
