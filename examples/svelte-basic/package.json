@@ -34,7 +34,7 @@
         "clean": "rimraf node_modules dist"
     },
     "dependencies": {
-        "svelte": "^5.53.0"
+        "svelte": "^5.53.7"
     },
     "devDependencies": {
         "@visulima/packem": "workspace:*",
