@@ -344,7 +344,9 @@ const createAdjustedContext = (
                     ? {
                         ...baseContext.options.rollup.replace,
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        values: (baseContext.options.rollup.replace as any).values ? { ...(baseContext.options.rollup.replace as any).values } : { ...replaceValues },
+                        values: (baseContext.options.rollup.replace as any).values
+                            ? { ...(baseContext.options.rollup.replace as any).values }
+                            : { ...replaceValues },
                     }
                     : false,
             },
@@ -485,8 +487,9 @@ const prepareRollupConfig = async (
                     context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
                 }
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const replaceValues = (environmentRuntimeContext.options.rollup.replace && (environmentRuntimeContext.options.rollup.replace as any).values) || defaultReplaceValues;
+                const replaceValues
+                    = (environmentRuntimeContext.options.rollup.replace && (environmentRuntimeContext.options.rollup.replace as any).values)
+                        || defaultReplaceValues;
 
                 const subDirectory = createSubDirectory(environment, runtime);
                 // Note: fileAlias is handled separately in prepareEntries, not in subDirectory
@@ -714,9 +717,12 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
     // Limiting concurrency allows V8 to garbage collect between builds.
     if (typeBuilders.size > 0) {
         await runWithConcurrency(
-            Array.from(typeBuilders, ({ context: rollupContext, fileCache: cache, subDirectory }) =>
-                () =>
-                    rollupBuildTypes(rollupContext, cache, subDirectory)),
+            Array.from(
+                typeBuilders,
+                ({ context: rollupContext, fileCache: cache, subDirectory }) =>
+                    () =>
+                        rollupBuildTypes(rollupContext, cache, subDirectory),
+            ),
             DEFAULT_DTS_CONCURRENCY,
         );
     }

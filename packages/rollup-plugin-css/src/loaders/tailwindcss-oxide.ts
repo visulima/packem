@@ -311,13 +311,13 @@ class TailwindRoot {
 
         if (map) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const mapObj = map as any;
+            const mapObject = map as any;
 
             this.logger.debug({
                 data: {
-                    hasMappings: Boolean(mapObj.mappings),
+                    hasMappings: Boolean(mapObject.mappings),
                     mapSize: JSON.stringify(map).length,
-                    sourcesCount: mapObj.sources?.length || 0,
+                    sourcesCount: mapObject.sources?.length || 0,
                 },
                 message: "Source map generated",
             });

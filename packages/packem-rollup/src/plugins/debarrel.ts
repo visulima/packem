@@ -69,7 +69,7 @@ const isPossibleBarrelSpecifier = (id: string, options: DebarrelPluginOptions) =
     return false;
 };
 
-const getDeclarationKind = (specifiers: string) => IS_EXPORT_PREFIXED.test(specifiers) ? "export" : "import";
+const getDeclarationKind = (specifiers: string) => (IS_EXPORT_PREFIXED.test(specifiers) ? "export" : "import");
 
 const { parseAsync } = rsModuleLexer;
 
@@ -461,8 +461,9 @@ export const debarrelPlugin = (options: DebarrelPluginOptions, logger: Console):
 
         // align sourcemap behavior with Rollup options
         options(inputOptions) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const sm = (inputOptions as any).output && (Array.isArray((inputOptions as any).output) ? (inputOptions as any).output[0]?.sourcemap : (inputOptions as any)?.output?.sourcemap);
+            const sm
+                = (inputOptions as any).output
+                    && (Array.isArray((inputOptions as any).output) ? (inputOptions as any).output[0]?.sourcemap : (inputOptions as any)?.output?.sourcemap);
 
             if (sm === false) {
                 sourceMap = false;

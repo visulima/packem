@@ -52,7 +52,6 @@ export const pureNewExpressionPlugin = (options: { constructors: string[]; sourc
                 let hasChanges = false;
 
                 walk(ast, {
-
                     enter(rawNode) {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const node = rawNode as any;

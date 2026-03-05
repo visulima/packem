@@ -7,7 +7,15 @@ import t from "@babel/types";
 import { isDeclarationType, isIdentifierOf, isTypeOf, resolveString, walkAST } from "ast-kit";
 import type { Plugin, RenderedChunk, TransformPluginContext, TransformResult } from "rollup";
 
-import { filename_dts_to, filename_js_to_dts, filename_to_dts, RE_DTS, RE_DTS_MAP, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename";
+import {
+    filename_dts_to,
+    filename_js_to_dts,
+    filename_to_dts,
+    RE_DTS,
+    RE_DTS_MAP,
+    replaceTemplateName,
+    resolveTemplateFn as resolveTemplateFunction,
+} from "./filename";
 import type { OptionsResolved } from "./options";
 
 // input:
@@ -44,7 +52,7 @@ interface DeclarationInfo {
 type NamespaceMap = Map<string, { local: t.Identifier | t.TSQualifiedName; stmt: t.Statement }>;
 
 const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<OptionsResolved, "sourcemap" | "cjsDefault" | "sideEffects">): Plugin => {
-    let declarationIdx = 0;
+    let declarationIndex = 0;
     const declarationMap = new Map<number /* declaration id */, DeclarationInfo>();
     const commentsMap = new Map<string /* filename */, t.Comment[]>();
     const typeOnlyMap = new Map<string, string[]>();
@@ -249,7 +257,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
             const childrenSet = new Set<t.Node>();
             const deps = collectDependencies(decl, namespaceStmts, childrenSet, identifierMap);
-            const children = Array.from(childrenSet).filter((child) => bindings.every((b) => child !== b));
+            const children = [...childrenSet].filter((child) => bindings.every((b) => child !== b));
 
             if (decl !== stmt) {
                 decl.leadingComments = stmt.leadingComments;
@@ -270,19 +278,19 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 t.arrayExpression(deps),
             );
             const childrenNode = t.arrayExpression(
-                children.map((node) => ({
-                    end: node.end,
-                    loc: node.loc,
-                    start: node.start,
-                    type: "StringLiteral",
-                    value: "",
-                })),
+                children.map((node) => {
+                    return {
+                        end: node.end,
+                        loc: node.loc,
+                        start: node.start,
+                        type: "StringLiteral",
+                        value: "",
+                    };
+                }),
             );
             const sideEffectNode = sideEffect && t.callExpression(t.identifier("sideEffect"), [bindings[0]]);
             const runtimeArrayNode = runtimeBindingArrayExpression(
-                sideEffectNode
-                    ? [declarationIdNode, depsNode, childrenNode, sideEffectNode]
-                    : [declarationIdNode, depsNode, childrenNode],
+                sideEffectNode ? [declarationIdNode, depsNode, childrenNode, sideEffectNode] : [declarationIdNode, depsNode, childrenNode],
             );
 
             // var ${binding} = [${declarationId}, (param, ...) => [dep, ...], [children], sideEffect()]
@@ -376,7 +384,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     return null;
                 }
 
-                const [declarationIdNode, depsFn, children] = node.declarations[0].init.elements;
+                const [declarationIdNode, depsFunction, children] = node.declarations[0].init.elements;
 
                 const declarationId = declarationIdNode.value;
                 const declaration = getDeclaration(declarationId);
@@ -406,7 +414,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     });
                 }
 
-                const transformedParams = depsFn.params as t.Identifier[];
+                const transformedParams = depsFunction.params as t.Identifier[];
 
                 for (const [i, transformedParameter] of transformedParams.entries()) {
                     const transformedName = transformedParameter.name;
@@ -416,13 +424,17 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     }
                 }
 
-                const transformedDeps = (depsFn.body as t.ArrayExpression).elements as t.Expression[];
+                const transformedDeps = (depsFunction.body as t.ArrayExpression).elements as t.Expression[];
 
                 for (let i = 0; i < declaration.deps.length; i++) {
                     const originalDep = declaration.deps[i];
                     let transformedDep = transformedDeps[i];
 
-                    if (transformedDep && (transformedDep as t.UnaryExpression).type === "UnaryExpression" && (transformedDep as t.UnaryExpression).operator === "void") {
+                    if (
+                        transformedDep
+                        && (transformedDep as t.UnaryExpression).type === "UnaryExpression"
+                        && (transformedDep as t.UnaryExpression).operator === "void"
+                    ) {
                         transformedDep = {
                             ...t.identifier("undefined"),
                             end: transformedDep.end,
@@ -495,7 +507,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
     }
 
     function registerDeclaration(info: DeclarationInfo) {
-        const declarationId = declarationIdx++;
+        const declarationId = declarationIndex++;
 
         declarationMap.set(declarationId, info);
 
@@ -762,8 +774,7 @@ const isRuntimeBindingVariableDeclaration = (node: t.Node | null | undefined): n
     t.isVariableDeclaration(node)
     && node.declarations.length > 0
     && t.isVariableDeclarator(node.declarations[0])
-    && isRuntimeBindingArrayExpression(node.declarations[0].init)
-    ;
+    && isRuntimeBindingArrayExpression(node.declarations[0].init);
 
 /**
  * A array expression that contains {@link RuntimeBindingArrayElements}
@@ -784,20 +795,15 @@ type RuntimeBindingArrayExpression = t.ArrayExpression & {
 const isRuntimeBindingArrayExpression = (node: t.Node | null | undefined): node is RuntimeBindingArrayExpression =>
     t.isArrayExpression(node) && isRuntimeBindingArrayElements(node.elements);
 
-const runtimeBindingArrayExpression = (elements: RuntimeBindingArrayElements): RuntimeBindingArrayExpression => t.arrayExpression(elements) as RuntimeBindingArrayExpression;
+const runtimeBindingArrayExpression = (elements: RuntimeBindingArrayElements): RuntimeBindingArrayExpression =>
+    t.arrayExpression(elements) as RuntimeBindingArrayExpression;
 
-type RuntimeBindingArrayElementsBase = [
-    declarationId: t.NumericLiteral,
-    deps: t.ArrowFunctionExpression,
-    children: t.ArrayExpression,
-];
+type RuntimeBindingArrayElementsBase = [declarationId: t.NumericLiteral, deps: t.ArrowFunctionExpression, children: t.ArrayExpression];
 
 /**
  * An array that represents the elements in {@link RuntimeBindingArrayExpression}
  */
-type RuntimeBindingArrayElements =
-    | RuntimeBindingArrayElementsBase
-    | [...RuntimeBindingArrayElementsBase, effect: t.CallExpression];
+type RuntimeBindingArrayElements = RuntimeBindingArrayElementsBase | [...RuntimeBindingArrayElementsBase, effect: t.CallExpression];
 
 /**
  * Check if the given array is a {@link RuntimeBindingArrayElements}
@@ -816,9 +822,7 @@ const isRuntimeBindingArrayElements = (elements: (t.Node | null | undefined)[]):
 // #endregion
 
 const isThisExpression = (node: t.Node): boolean =>
-    isIdentifierOf(node, "this")
-    || node.type === "ThisExpression"
-    || (node.type === "MemberExpression" && isThisExpression(node.object));
+    isIdentifierOf(node, "this") || node.type === "ThisExpression" || (node.type === "MemberExpression" && isThisExpression(node.object));
 
 const TSEntityNameToRuntime = (node: t.TSEntityName): t.MemberExpression | t.Identifier => {
     if (node.type === "Identifier") {
@@ -845,8 +849,7 @@ const isHelperImport = (node: t.Node) =>
     && node.specifiers.length === 1
     && node.specifiers.every(
         (spec) => spec.type === "ImportSpecifier" && spec.imported.type === "Identifier" && ["__export", "__reExport"].includes(spec.local.name),
-    )
-    ;
+    );
 
 /**
  * patch `.d.ts` suffix in import source to `.js`
@@ -911,7 +914,7 @@ const patchTsNamespace = (nodes: t.Statement[]) => {
 
         const [binding, exports] = result;
 
-        if (!(exports as t.ObjectExpression).properties.length)
+        if ((exports as t.ObjectExpression).properties.length === 0)
             continue;
 
         nodes[i] = {

@@ -61,7 +61,6 @@ export const packem = async (rootDirectory: string, options: PackemOptions = {})
         ...options,
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pail = createPail({
         reporters: [
             new SimpleReporter({

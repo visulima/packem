@@ -67,14 +67,14 @@ export const copyPlugin = (options: CopyPluginOptions, logger: Console): Plugin 
             const results = await Promise.all(
                 (targets as SingleTargetDesc[])
                     .flatMap((target) =>
-                        (Array.isArray(target.src)
+                        Array.isArray(target.src)
                             ? target.src.map((itemSource) => {
                                   return {
                                       ...target,
                                       src: itemSource,
                                   };
                               })
-                            : target),
+                            : target,
                     )
                     .map(
                         async (target) =>

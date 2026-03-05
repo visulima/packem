@@ -110,7 +110,7 @@ const createChunkFileNames = (getExtension: () => string, usePreserveModules: bo
 const createEntryFileNames = (getExtension: (chunk: PreRenderedChunk) => string, usePreserveModules: boolean) => {
     if (usePreserveModules) {
         return (chunkInfo: PreRenderedChunk): string | undefined => {
-            const name = chunkInfo.name;
+            const { name } = chunkInfo;
 
             if (isDeclarationOnlyName(name)) {
                 return undefined;
@@ -121,7 +121,7 @@ const createEntryFileNames = (getExtension: (chunk: PreRenderedChunk) => string,
     }
 
     return (chunkInfo: PreRenderedChunk): string | undefined => {
-        const name = chunkInfo.name;
+        const { name } = chunkInfo;
 
         if (isDeclarationOnlyName(name)) {
             return undefined;
@@ -571,7 +571,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 "WeakMap",
                 "WeakSet",
                 "WeakRef",
-                ...(context.options.rollup.pure?.functions?.filter((f: string | RegExp) => typeof f === "string" && !f.includes(".")) ?? []) as string[],
+                ...((context.options.rollup.pure?.functions?.filter((f: string | RegExp) => typeof f === "string" && !f.includes(".")) ?? []) as string[]),
             ],
             sourcemap: context.options.sourcemap,
         });

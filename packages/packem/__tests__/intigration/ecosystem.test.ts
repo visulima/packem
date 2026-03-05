@@ -17,9 +17,9 @@ const ecosystemConfigs = {
     "advanced-tailwind": {
         // isolatedDeclarationTransformer: "typescript",
         config: { declaration: false },
-        cssLoader: ["tailwindcss"] as ("tailwindcss")[],
-        runtime: "browser" as "browser",
-        transformer: "esbuild" as "esbuild",
+        cssLoader: ["tailwindcss"] as "tailwindcss"[],
+        runtime: "browser" as const,
+        transformer: "esbuild" as const,
     },
     sitefetch: {
         isolatedDeclarationTransformer: "typescript",

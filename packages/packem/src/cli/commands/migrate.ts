@@ -303,10 +303,11 @@ const renameKey = (object: Record<string, any>, oldKey: string, newKey: string, 
 const createMigrateCommand = (cli: Cli<Console>): void => {
     cli.addCommand({
         description: "Migrate from other bundlers (tsup, unbuild, bunchee, etc.) to packem",
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         execute: async ({ logger, options: rawOptions }): Promise<void> => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const options = rawOptions as Record<string, any>;
+
             await migrate({
                 cwd: options.cwd,
                 dryRun: options.dryRun,

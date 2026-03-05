@@ -19,7 +19,12 @@ describe(requireCJSTransformerPlugin, async () => {
     it("plugin handles CJS modules correctly", async () => {
         expect.assertions(4);
 
-        const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() } as unknown as Console);
+        const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, {
+            debug: vi.fn(),
+            error: vi.fn(),
+            info: vi.fn(),
+            warn: vi.fn(),
+        } as unknown as Console);
 
         // Mock chunk with CJS import
         const code = `import { readFileSync } from 'fs';
@@ -32,7 +37,12 @@ export const test = 'hello';`;
             debug: vi.fn(),
         };
 
-        const result = await (typeof plugin.renderChunk === "function" ? plugin.renderChunk : (plugin.renderChunk as any)?.handler)?.call({ debug: mockLogger.debug }, code, { fileName: "test.js" }, { format: "es" });
+        const result = await (typeof plugin.renderChunk === "function" ? plugin.renderChunk : (plugin.renderChunk as any)?.handler)?.call(
+            { debug: mockLogger.debug },
+            code,
+            { fileName: "test.js" },
+            { format: "es" },
+        );
 
         // Should transform the code
         expect(result).toBeDefined();
@@ -74,7 +84,12 @@ export const test = 'hello';`;
     it("plugin handles node:process import with runtime helpers", async () => {
         expect.assertions(5);
 
-        const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() } as unknown as Console);
+        const plugin = requireCJSTransformerPlugin({ builtinNodeModules: true }, {
+            debug: vi.fn(),
+            error: vi.fn(),
+            info: vi.fn(),
+            warn: vi.fn(),
+        } as unknown as Console);
 
         // Mock chunk with node:process import
         const code = `import process from 'node:process';
@@ -86,7 +101,12 @@ console.log(process.version);`;
             debug: vi.fn(),
         };
 
-        const result = await (typeof plugin.renderChunk === "function" ? plugin.renderChunk : (plugin.renderChunk as any)?.handler)?.call({ debug: mockLogger.debug }, code, { fileName: "test.js" }, { format: "es" });
+        const result = await (typeof plugin.renderChunk === "function" ? plugin.renderChunk : (plugin.renderChunk as any)?.handler)?.call(
+            { debug: mockLogger.debug },
+            code,
+            { fileName: "test.js" },
+            { format: "es" },
+        );
 
         // Should transform the code
         expect(result).toBeDefined();

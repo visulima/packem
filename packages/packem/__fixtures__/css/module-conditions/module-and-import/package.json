@@ -6,5 +6,6 @@
             "import": "./import.js"
         },
         "default": "./module.js"
-    }
+    },
+    "devDependencies": {}
 }
