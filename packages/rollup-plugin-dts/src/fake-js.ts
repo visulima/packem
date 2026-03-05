@@ -1,11 +1,13 @@
+import path from "node:path";
+
 import { generate } from "@babel/generator";
 import { isIdentifierName } from "@babel/helper-validator-identifier";
 import { parse } from "@babel/parser";
 import t from "@babel/types";
 import { isDeclarationType, isIdentifierOf, isTypeOf, resolveString, walkAST } from "ast-kit";
-import type { Plugin, RenderedChunk, TransformResult } from "rollup";
+import type { Plugin, RenderedChunk, TransformPluginContext, TransformResult } from "rollup";
 
-import { filename_dts_to, filename_js_to_dts, RE_DTS, RE_DTS_MAP, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename";
+import { filename_dts_to, filename_js_to_dts, filename_to_dts, RE_DTS, RE_DTS_MAP, replaceTemplateName, resolveTemplateFn as resolveTemplateFunction } from "./filename";
 import type { OptionsResolved } from "./options";
 
 // input:
@@ -19,6 +21,8 @@ import type { OptionsResolved } from "./options";
 // export declare function x$1(xx: X$1): void
 
 type Dep = t.Expression & { replace?: (newNode: t.Node) => void };
+
+const CROSS_CHUNK_PLACEHOLDER = "__rollup_dts_resolve__:";
 
 /**
  * A collection of type parameters grouped by parameter name
@@ -34,6 +38,7 @@ interface DeclarationInfo {
     decl: t.Declaration;
     deps: Dep[];
     params: TypeParams;
+    resolvedModuleId?: string;
 }
 
 type NamespaceMap = Map<string, { local: t.Identifier | t.TSQualifiedName; stmt: t.Statement }>;
@@ -45,16 +50,63 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
     const typeOnlyMap = new Map<string, string[]>();
 
     return {
-        generateBundle: sourcemap
-            ? undefined
-            : (_options, bundle) => {
-                for (const chunk of Object.values(bundle)) {
-                    if (!RE_DTS_MAP.test(chunk.fileName))
+        generateBundle(_options, bundle) {
+            // Build moduleId → chunk.fileName mapping
+            const moduleToChunk = new Map<string, string>();
+
+            for (const chunk of Object.values(bundle)) {
+                if (chunk.type !== "chunk")
+                    continue;
+
+                for (const moduleId of chunk.moduleIds) {
+                    moduleToChunk.set(moduleId, chunk.fileName);
+                }
+            }
+
+            // Rewrite `declare module` placeholders to output chunk paths
+            const placeholderRe = new RegExp(`"${CROSS_CHUNK_PLACEHOLDER}(.+?)"`, "g");
+
+            for (const chunk of Object.values(bundle)) {
+                if (chunk.type !== "chunk" || !RE_DTS.test(chunk.fileName))
+                    continue;
+
+                if (!chunk.code.includes(CROSS_CHUNK_PLACEHOLDER))
+                    continue;
+
+                chunk.code = chunk.code.replaceAll(placeholderRe, (_match, resolvedId: string) => {
+                    const targetFileName = moduleToChunk.get(resolvedId);
+
+                    if (!targetFileName)
+                        return _match;
+
+                    let specifier = path.posix.relative(path.posix.dirname(chunk.fileName), targetFileName);
+
+                    if (!specifier.startsWith("."))
+                        specifier = `./${specifier}`;
+
+                    specifier = filename_dts_to(specifier, "js");
+
+                    return JSON.stringify(specifier);
+                });
+            }
+
+            for (const chunk of Object.values(bundle)) {
+                if (!RE_DTS_MAP.test(chunk.fileName))
+                    continue;
+
+                if (sourcemap) {
+                    if (chunk.type === "chunk" || typeof (chunk as { source?: unknown }).source !== "string")
                         continue;
 
+                    const map = JSON.parse((chunk as { source: string }).source);
+
+                    map.sourcesContent = undefined;
+                    (chunk as any).source = JSON.stringify(map);
+                } else {
                     delete bundle[chunk.fileName];
                 }
-            },
+            }
+        },
 
         name: "rollup-plugin-dts:fake-js",
 
@@ -92,15 +144,15 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         },
         renderChunk,
 
-        transform(code: string, id: string) {
+        async transform(code: string, id: string) {
             if (!RE_DTS.test(id))
                 return;
 
-            return transform(code, id);
+            return transform.call(this as unknown as TransformPluginContext, code, id);
         },
     };
 
-    function transform(code: string, id: string): TransformResult {
+    async function transform(this: TransformPluginContext, code: string, id: string): Promise<TransformResult> {
         const identifierMap: Record<string, number> = Object.create(null);
 
         const file = parse(code, {
@@ -129,11 +181,20 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
             const sideEffect = stmt.type === "TSModuleDeclaration" && stmt.kind !== "namespace";
 
-            if (sideEffect && stmt.id.type === "StringLiteral" && (stmt.id as t.StringLiteral).value[0] === ".") {
-                // eslint-disable-next-line no-console
-                console.warn(
-                    `\`declare module ${JSON.stringify((stmt.id as t.StringLiteral).value)}\` will be kept as-is in the output. Relative module declaration may cause unexpected issues. Found in ${id}.`,
-                );
+            // Resolve local `declare module './foo'` targets so that specifiers
+            // can be rewritten to point to the correct output chunk.
+            let resolvedModuleId: string | undefined;
+
+            if (sideEffect && stmt.id.type === "StringLiteral") {
+                const resolved = await this.resolve((stmt.id as t.StringLiteral).value, id);
+
+                if (resolved && !resolved.external) {
+                    resolvedModuleId = RE_DTS.test(resolved.id) ? resolved.id : filename_to_dts(resolved.id);
+                } else if ((stmt.id as t.StringLiteral).value[0] === ".") {
+                    this.warn(
+                        `\`declare module ${JSON.stringify((stmt.id as t.StringLiteral).value)}\` will be kept as-is in the output. Relative module declaration may cause unexpected issues. Found in ${id}.`,
+                    );
+                }
             }
 
             if (sideEffect && id.endsWith(".vue.d.ts") && code.slice(stmt.start!, stmt.end!).includes("__VLS_")) {
@@ -200,6 +261,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 decl,
                 deps,
                 params,
+                resolvedModuleId,
             });
 
             const declarationIdNode = t.numericLiteral(declarationId);
@@ -374,6 +436,11 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     } else {
                         Object.assign(originalDep, transformedDep);
                     }
+                }
+
+                // Rewrite local `declare module` specifier → placeholder for generateBundle
+                if (declaration.decl.type === "TSModuleDeclaration" && declaration.resolvedModuleId) {
+                    (declaration.decl.id as t.StringLiteral).value = CROSS_CHUNK_PLACEHOLDER + declaration.resolvedModuleId;
                 }
 
                 return inheritNodeComments(node, declaration.decl);

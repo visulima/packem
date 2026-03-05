@@ -1,5 +1,1382 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`packem ecosystem > should work with provided 'advanced-tailwind' ecosystem suite 1`] = `
+[
+  "var jsxRuntime = {exports: {}};
+
+var reactJsxRuntime_development = {};
+
+var react = {exports: {}};
+
+var react_development = {exports: {}};
+
+var hasRequiredReact_development;
+
+function requireReact_development () {
+	if (hasRequiredReact_development) return react_development.exports;
+	hasRequiredReact_development = 1;
+	(function (module, exports$1) {
+		/**
+		 * @license React
+		 * react.development.js
+		 *
+		 * Copyright (c) Meta Platforms, Inc. and affiliates.
+		 *
+		 * This source code is licensed under the MIT license found in the
+		 * LICENSE file in the root directory of this source tree.
+		 */
+		(function() {
+		  function defineDeprecationWarning(methodName, info) {
+		    Object.defineProperty(Component.prototype, methodName, {
+		      get: function() {
+		        console.warn(
+		          "%s(...) is deprecated in plain JavaScript React classes. %s",
+		          info[0],
+		          info[1]
+		        );
+		      }
+		    });
+		  }
+		  function getIteratorFn(maybeIterable) {
+		    if (null === maybeIterable || "object" !== typeof maybeIterable)
+		      return null;
+		    maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
+		    return "function" === typeof maybeIterable ? maybeIterable : null;
+		  }
+		  function warnNoop(publicInstance, callerName) {
+		    publicInstance = (publicInstance = publicInstance.constructor) && (publicInstance.displayName || publicInstance.name) || "ReactClass";
+		    var warningKey = publicInstance + "." + callerName;
+		    didWarnStateUpdateForUnmountedComponent[warningKey] || (console.error(
+		      "Can't call %s on a component that is not yet mounted. This is a no-op, but it might indicate a bug in your application. Instead, assign to \`this.state\` directly or define a \`state = {};\` class property with the desired state in the %s component.",
+		      callerName,
+		      publicInstance
+		    ), didWarnStateUpdateForUnmountedComponent[warningKey] = true);
+		  }
+		  function Component(props, context, updater) {
+		    this.props = props;
+		    this.context = context;
+		    this.refs = emptyObject;
+		    this.updater = updater || ReactNoopUpdateQueue;
+		  }
+		  function ComponentDummy() {
+		  }
+		  function PureComponent(props, context, updater) {
+		    this.props = props;
+		    this.context = context;
+		    this.refs = emptyObject;
+		    this.updater = updater || ReactNoopUpdateQueue;
+		  }
+		  function noop() {
+		  }
+		  function testStringCoercion(value) {
+		    return "" + value;
+		  }
+		  function checkKeyStringCoercion(value) {
+		    try {
+		      var JSCompiler_inline_result = false;
+		    } catch (e) {
+		      JSCompiler_inline_result = true;
+		    }
+		    if (JSCompiler_inline_result) {
+		      JSCompiler_inline_result = console;
+		      var JSCompiler_temp_const = JSCompiler_inline_result.error;
+		      var JSCompiler_inline_result$jscomp$0 = "function" === typeof Symbol && Symbol.toStringTag && value[Symbol.toStringTag] || value.constructor.name || "Object";
+		      JSCompiler_temp_const.call(
+		        JSCompiler_inline_result,
+		        "The provided key is an unsupported type %s. This value must be coerced to a string before using it here.",
+		        JSCompiler_inline_result$jscomp$0
+		      );
+		      return testStringCoercion(value);
+		    }
+		  }
+		  function getComponentNameFromType(type) {
+		    if (null == type) return null;
+		    if ("function" === typeof type)
+		      return type.$$typeof === REACT_CLIENT_REFERENCE ? null : type.displayName || type.name || null;
+		    if ("string" === typeof type) return type;
+		    switch (type) {
+		      case REACT_FRAGMENT_TYPE:
+		        return "Fragment";
+		      case REACT_PROFILER_TYPE:
+		        return "Profiler";
+		      case REACT_STRICT_MODE_TYPE:
+		        return "StrictMode";
+		      case REACT_SUSPENSE_TYPE:
+		        return "Suspense";
+		      case REACT_SUSPENSE_LIST_TYPE:
+		        return "SuspenseList";
+		      case REACT_ACTIVITY_TYPE:
+		        return "Activity";
+		    }
+		    if ("object" === typeof type)
+		      switch ("number" === typeof type.tag && console.error(
+		        "Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue."
+		      ), type.$$typeof) {
+		        case REACT_PORTAL_TYPE:
+		          return "Portal";
+		        case REACT_CONTEXT_TYPE:
+		          return type.displayName || "Context";
+		        case REACT_CONSUMER_TYPE:
+		          return (type._context.displayName || "Context") + ".Consumer";
+		        case REACT_FORWARD_REF_TYPE:
+		          var innerType = type.render;
+		          type = type.displayName;
+		          type || (type = innerType.displayName || innerType.name || "", type = "" !== type ? "ForwardRef(" + type + ")" : "ForwardRef");
+		          return type;
+		        case REACT_MEMO_TYPE:
+		          return innerType = type.displayName || null, null !== innerType ? innerType : getComponentNameFromType(type.type) || "Memo";
+		        case REACT_LAZY_TYPE:
+		          innerType = type._payload;
+		          type = type._init;
+		          try {
+		            return getComponentNameFromType(type(innerType));
+		          } catch (x) {
+		          }
+		      }
+		    return null;
+		  }
+		  function getTaskName(type) {
+		    if (type === REACT_FRAGMENT_TYPE) return "<>";
+		    if ("object" === typeof type && null !== type && type.$$typeof === REACT_LAZY_TYPE)
+		      return "<...>";
+		    try {
+		      var name = getComponentNameFromType(type);
+		      return name ? "<" + name + ">" : "<...>";
+		    } catch (x) {
+		      return "<...>";
+		    }
+		  }
+		  function getOwner() {
+		    var dispatcher = ReactSharedInternals.A;
+		    return null === dispatcher ? null : dispatcher.getOwner();
+		  }
+		  function UnknownOwner() {
+		    return Error("react-stack-top-frame");
+		  }
+		  function hasValidKey(config) {
+		    if (hasOwnProperty.call(config, "key")) {
+		      var getter = Object.getOwnPropertyDescriptor(config, "key").get;
+		      if (getter && getter.isReactWarning) return false;
+		    }
+		    return void 0 !== config.key;
+		  }
+		  function defineKeyPropWarningGetter(props, displayName) {
+		    function warnAboutAccessingKey() {
+		      specialPropKeyWarningShown || (specialPropKeyWarningShown = true, console.error(
+		        "%s: \`key\` is not a prop. Trying to access it will result in \`undefined\` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://react.dev/link/special-props)",
+		        displayName
+		      ));
+		    }
+		    warnAboutAccessingKey.isReactWarning = true;
+		    Object.defineProperty(props, "key", {
+		      get: warnAboutAccessingKey,
+		      configurable: true
+		    });
+		  }
+		  function elementRefGetterWithDeprecationWarning() {
+		    var componentName = getComponentNameFromType(this.type);
+		    didWarnAboutElementRef[componentName] || (didWarnAboutElementRef[componentName] = true, console.error(
+		      "Accessing element.ref was removed in React 19. ref is now a regular prop. It will be removed from the JSX Element type in a future release."
+		    ));
+		    componentName = this.props.ref;
+		    return void 0 !== componentName ? componentName : null;
+		  }
+		  function ReactElement(type, key, props, owner, debugStack, debugTask) {
+		    var refProp = props.ref;
+		    type = {
+		      $$typeof: REACT_ELEMENT_TYPE,
+		      type,
+		      key,
+		      props,
+		      _owner: owner
+		    };
+		    null !== (void 0 !== refProp ? refProp : null) ? Object.defineProperty(type, "ref", {
+		      enumerable: false,
+		      get: elementRefGetterWithDeprecationWarning
+		    }) : Object.defineProperty(type, "ref", { enumerable: false, value: null });
+		    type._store = {};
+		    Object.defineProperty(type._store, "validated", {
+		      configurable: false,
+		      enumerable: false,
+		      writable: true,
+		      value: 0
+		    });
+		    Object.defineProperty(type, "_debugInfo", {
+		      configurable: false,
+		      enumerable: false,
+		      writable: true,
+		      value: null
+		    });
+		    Object.defineProperty(type, "_debugStack", {
+		      configurable: false,
+		      enumerable: false,
+		      writable: true,
+		      value: debugStack
+		    });
+		    Object.defineProperty(type, "_debugTask", {
+		      configurable: false,
+		      enumerable: false,
+		      writable: true,
+		      value: debugTask
+		    });
+		    Object.freeze && (Object.freeze(type.props), Object.freeze(type));
+		    return type;
+		  }
+		  function cloneAndReplaceKey(oldElement, newKey) {
+		    newKey = ReactElement(
+		      oldElement.type,
+		      newKey,
+		      oldElement.props,
+		      oldElement._owner,
+		      oldElement._debugStack,
+		      oldElement._debugTask
+		    );
+		    oldElement._store && (newKey._store.validated = oldElement._store.validated);
+		    return newKey;
+		  }
+		  function validateChildKeys(node) {
+		    isValidElement(node) ? node._store && (node._store.validated = 1) : "object" === typeof node && null !== node && node.$$typeof === REACT_LAZY_TYPE && ("fulfilled" === node._payload.status ? isValidElement(node._payload.value) && node._payload.value._store && (node._payload.value._store.validated = 1) : node._store && (node._store.validated = 1));
+		  }
+		  function isValidElement(object) {
+		    return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
+		  }
+		  function escape(key) {
+		    var escaperLookup = { "=": "=0", ":": "=2" };
+		    return "$" + key.replace(/[=:]/g, function(match) {
+		      return escaperLookup[match];
+		    });
+		  }
+		  function getElementKey(element, index) {
+		    return "object" === typeof element && null !== element && null != element.key ? (checkKeyStringCoercion(element.key), escape("" + element.key)) : index.toString(36);
+		  }
+		  function resolveThenable(thenable) {
+		    switch (thenable.status) {
+		      case "fulfilled":
+		        return thenable.value;
+		      case "rejected":
+		        throw thenable.reason;
+		      default:
+		        switch ("string" === typeof thenable.status ? thenable.then(noop, noop) : (thenable.status = "pending", thenable.then(
+		          function(fulfilledValue) {
+		            "pending" === thenable.status && (thenable.status = "fulfilled", thenable.value = fulfilledValue);
+		          },
+		          function(error) {
+		            "pending" === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+		          }
+		        )), thenable.status) {
+		          case "fulfilled":
+		            return thenable.value;
+		          case "rejected":
+		            throw thenable.reason;
+		        }
+		    }
+		    throw thenable;
+		  }
+		  function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
+		    var type = typeof children;
+		    if ("undefined" === type || "boolean" === type) children = null;
+		    var invokeCallback = false;
+		    if (null === children) invokeCallback = true;
+		    else
+		      switch (type) {
+		        case "bigint":
+		        case "string":
+		        case "number":
+		          invokeCallback = true;
+		          break;
+		        case "object":
+		          switch (children.$$typeof) {
+		            case REACT_ELEMENT_TYPE:
+		            case REACT_PORTAL_TYPE:
+		              invokeCallback = true;
+		              break;
+		            case REACT_LAZY_TYPE:
+		              return invokeCallback = children._init, mapIntoArray(
+		                invokeCallback(children._payload),
+		                array,
+		                escapedPrefix,
+		                nameSoFar,
+		                callback
+		              );
+		          }
+		      }
+		    if (invokeCallback) {
+		      invokeCallback = children;
+		      callback = callback(invokeCallback);
+		      var childKey = "" === nameSoFar ? "." + getElementKey(invokeCallback, 0) : nameSoFar;
+		      isArrayImpl(callback) ? (escapedPrefix = "", null != childKey && (escapedPrefix = childKey.replace(userProvidedKeyEscapeRegex, "$&/") + "/"), mapIntoArray(callback, array, escapedPrefix, "", function(c) {
+		        return c;
+		      })) : null != callback && (isValidElement(callback) && (null != callback.key && (invokeCallback && invokeCallback.key === callback.key || checkKeyStringCoercion(callback.key)), escapedPrefix = cloneAndReplaceKey(
+		        callback,
+		        escapedPrefix + (null == callback.key || invokeCallback && invokeCallback.key === callback.key ? "" : ("" + callback.key).replace(
+		          userProvidedKeyEscapeRegex,
+		          "$&/"
+		        ) + "/") + childKey
+		      ), "" !== nameSoFar && null != invokeCallback && isValidElement(invokeCallback) && null == invokeCallback.key && invokeCallback._store && !invokeCallback._store.validated && (escapedPrefix._store.validated = 2), callback = escapedPrefix), array.push(callback));
+		      return 1;
+		    }
+		    invokeCallback = 0;
+		    childKey = "" === nameSoFar ? "." : nameSoFar + ":";
+		    if (isArrayImpl(children))
+		      for (var i = 0; i < children.length; i++)
+		        nameSoFar = children[i], type = childKey + getElementKey(nameSoFar, i), invokeCallback += mapIntoArray(
+		          nameSoFar,
+		          array,
+		          escapedPrefix,
+		          type,
+		          callback
+		        );
+		    else if (i = getIteratorFn(children), "function" === typeof i)
+		      for (i === children.entries && (didWarnAboutMaps || console.warn(
+		        "Using Maps as children is not supported. Use an array of keyed ReactElements instead."
+		      ), didWarnAboutMaps = true), children = i.call(children), i = 0; !(nameSoFar = children.next()).done; )
+		        nameSoFar = nameSoFar.value, type = childKey + getElementKey(nameSoFar, i++), invokeCallback += mapIntoArray(
+		          nameSoFar,
+		          array,
+		          escapedPrefix,
+		          type,
+		          callback
+		        );
+		    else if ("object" === type) {
+		      if ("function" === typeof children.then)
+		        return mapIntoArray(
+		          resolveThenable(children),
+		          array,
+		          escapedPrefix,
+		          nameSoFar,
+		          callback
+		        );
+		      array = String(children);
+		      throw Error(
+		        "Objects are not valid as a React child (found: " + ("[object Object]" === array ? "object with keys {" + Object.keys(children).join(", ") + "}" : array) + "). If you meant to render a collection of children, use an array instead."
+		      );
+		    }
+		    return invokeCallback;
+		  }
+		  function mapChildren(children, func, context) {
+		    if (null == children) return children;
+		    var result = [], count = 0;
+		    mapIntoArray(children, result, "", "", function(child) {
+		      return func.call(context, child, count++);
+		    });
+		    return result;
+		  }
+		  function lazyInitializer(payload) {
+		    if (-1 === payload._status) {
+		      var ioInfo = payload._ioInfo;
+		      null != ioInfo && (ioInfo.start = ioInfo.end = performance.now());
+		      ioInfo = payload._result;
+		      var thenable = ioInfo();
+		      thenable.then(
+		        function(moduleObject) {
+		          if (0 === payload._status || -1 === payload._status) {
+		            payload._status = 1;
+		            payload._result = moduleObject;
+		            var _ioInfo = payload._ioInfo;
+		            null != _ioInfo && (_ioInfo.end = performance.now());
+		            void 0 === thenable.status && (thenable.status = "fulfilled", thenable.value = moduleObject);
+		          }
+		        },
+		        function(error) {
+		          if (0 === payload._status || -1 === payload._status) {
+		            payload._status = 2;
+		            payload._result = error;
+		            var _ioInfo2 = payload._ioInfo;
+		            null != _ioInfo2 && (_ioInfo2.end = performance.now());
+		            void 0 === thenable.status && (thenable.status = "rejected", thenable.reason = error);
+		          }
+		        }
+		      );
+		      ioInfo = payload._ioInfo;
+		      if (null != ioInfo) {
+		        ioInfo.value = thenable;
+		        var displayName = thenable.displayName;
+		        "string" === typeof displayName && (ioInfo.name = displayName);
+		      }
+		      -1 === payload._status && (payload._status = 0, payload._result = thenable);
+		    }
+		    if (1 === payload._status)
+		      return ioInfo = payload._result, void 0 === ioInfo && console.error(
+		        "lazy: Expected the result of a dynamic import() call. Instead received: %s\\n\\nYour code should look like: \\n  const MyComponent = lazy(() => import('./MyComponent'))\\n\\nDid you accidentally put curly braces around the import?",
+		        ioInfo
+		      ), "default" in ioInfo || console.error(
+		        "lazy: Expected the result of a dynamic import() call. Instead received: %s\\n\\nYour code should look like: \\n  const MyComponent = lazy(() => import('./MyComponent'))",
+		        ioInfo
+		      ), ioInfo.default;
+		    throw payload._result;
+		  }
+		  function resolveDispatcher() {
+		    var dispatcher = ReactSharedInternals.H;
+		    null === dispatcher && console.error(
+		      "Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:\\n1. You might have mismatching versions of React and the renderer (such as React DOM)\\n2. You might be breaking the Rules of Hooks\\n3. You might have more than one copy of React in the same app\\nSee https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem."
+		    );
+		    return dispatcher;
+		  }
+		  function releaseAsyncTransition() {
+		    ReactSharedInternals.asyncTransitions--;
+		  }
+		  function enqueueTask(task) {
+		    if (null === enqueueTaskImpl)
+		      try {
+		        var requireString = ("require" + Math.random()).slice(0, 7);
+		        enqueueTaskImpl = (module && module[requireString]).call(
+		          module,
+		          "timers"
+		        ).setImmediate;
+		      } catch (_err) {
+		        enqueueTaskImpl = function(callback) {
+		          false === didWarnAboutMessageChannel && (didWarnAboutMessageChannel = true, "undefined" === typeof MessageChannel && console.error(
+		            "This browser does not have a MessageChannel implementation, so enqueuing tasks via await act(async () => ...) will fail. Please file an issue at https://github.com/facebook/react/issues if you encounter this warning."
+		          ));
+		          var channel = new MessageChannel();
+		          channel.port1.onmessage = callback;
+		          channel.port2.postMessage(void 0);
+		        };
+		      }
+		    return enqueueTaskImpl(task);
+		  }
+		  function aggregateErrors(errors) {
+		    return 1 < errors.length && "function" === typeof AggregateError ? new AggregateError(errors) : errors[0];
+		  }
+		  function popActScope(prevActQueue, prevActScopeDepth) {
+		    prevActScopeDepth !== actScopeDepth - 1 && console.error(
+		      "You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one. "
+		    );
+		    actScopeDepth = prevActScopeDepth;
+		  }
+		  function recursivelyFlushAsyncActWork(returnValue, resolve, reject) {
+		    var queue = ReactSharedInternals.actQueue;
+		    if (null !== queue)
+		      if (0 !== queue.length)
+		        try {
+		          flushActQueue(queue);
+		          enqueueTask(function() {
+		            return recursivelyFlushAsyncActWork(returnValue, resolve, reject);
+		          });
+		          return;
+		        } catch (error) {
+		          ReactSharedInternals.thrownErrors.push(error);
+		        }
+		      else ReactSharedInternals.actQueue = null;
+		    0 < ReactSharedInternals.thrownErrors.length ? (queue = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, reject(queue)) : resolve(returnValue);
+		  }
+		  function flushActQueue(queue) {
+		    if (!isFlushing) {
+		      isFlushing = true;
+		      var i = 0;
+		      try {
+		        for (; i < queue.length; i++) {
+		          var callback = queue[i];
+		          do {
+		            ReactSharedInternals.didUsePromise = false;
+		            var continuation = callback(false);
+		            if (null !== continuation) {
+		              if (ReactSharedInternals.didUsePromise) {
+		                queue[i] = callback;
+		                queue.splice(0, i);
+		                return;
+		              }
+		              callback = continuation;
+		            } else break;
+		          } while (1);
+		        }
+		        queue.length = 0;
+		      } catch (error) {
+		        queue.splice(0, i + 1), ReactSharedInternals.thrownErrors.push(error);
+		      } finally {
+		        isFlushing = false;
+		      }
+		    }
+		  }
+		  "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
+		  var REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, didWarnStateUpdateForUnmountedComponent = {}, ReactNoopUpdateQueue = {
+		    isMounted: function() {
+		      return false;
+		    },
+		    enqueueForceUpdate: function(publicInstance) {
+		      warnNoop(publicInstance, "forceUpdate");
+		    },
+		    enqueueReplaceState: function(publicInstance) {
+		      warnNoop(publicInstance, "replaceState");
+		    },
+		    enqueueSetState: function(publicInstance) {
+		      warnNoop(publicInstance, "setState");
+		    }
+		  }, assign = Object.assign, emptyObject = {};
+		  Object.freeze(emptyObject);
+		  Component.prototype.isReactComponent = {};
+		  Component.prototype.setState = function(partialState, callback) {
+		    if ("object" !== typeof partialState && "function" !== typeof partialState && null != partialState)
+		      throw Error(
+		        "takes an object of state variables to update or a function which returns an object of state variables."
+		      );
+		    this.updater.enqueueSetState(this, partialState, callback, "setState");
+		  };
+		  Component.prototype.forceUpdate = function(callback) {
+		    this.updater.enqueueForceUpdate(this, callback, "forceUpdate");
+		  };
+		  var deprecatedAPIs = {
+		    isMounted: [
+		      "isMounted",
+		      "Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks."
+		    ],
+		    replaceState: [
+		      "replaceState",
+		      "Refactor your code to use setState instead (see https://github.com/facebook/react/issues/3236)."
+		    ]
+		  };
+		  for (fnName in deprecatedAPIs)
+		    deprecatedAPIs.hasOwnProperty(fnName) && defineDeprecationWarning(fnName, deprecatedAPIs[fnName]);
+		  ComponentDummy.prototype = Component.prototype;
+		  deprecatedAPIs = PureComponent.prototype = new ComponentDummy();
+		  deprecatedAPIs.constructor = PureComponent;
+		  assign(deprecatedAPIs, Component.prototype);
+		  deprecatedAPIs.isPureReactComponent = true;
+		  var isArrayImpl = Array.isArray, REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference"), ReactSharedInternals = {
+		    H: null,
+		    A: null,
+		    T: null,
+		    S: null,
+		    actQueue: null,
+		    asyncTransitions: 0,
+		    isBatchingLegacy: false,
+		    didScheduleLegacyUpdate: false,
+		    didUsePromise: false,
+		    thrownErrors: [],
+		    getCurrentStack: null,
+		    recentlyCreatedOwnerStacks: 0
+		  }, hasOwnProperty = Object.prototype.hasOwnProperty, createTask = console.createTask ? console.createTask : function() {
+		    return null;
+		  };
+		  deprecatedAPIs = {
+		    react_stack_bottom_frame: function(callStackForError) {
+		      return callStackForError();
+		    }
+		  };
+		  var specialPropKeyWarningShown, didWarnAboutOldJSXRuntime;
+		  var didWarnAboutElementRef = {};
+		  var unknownOwnerDebugStack = deprecatedAPIs.react_stack_bottom_frame.bind(
+		    deprecatedAPIs,
+		    UnknownOwner
+		  )();
+		  var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
+		  var didWarnAboutMaps = false, userProvidedKeyEscapeRegex = /\\/+/g, reportGlobalError = "function" === typeof reportError ? reportError : function(error) {
+		    if ("object" === typeof window && "function" === typeof window.ErrorEvent) {
+		      var event = new window.ErrorEvent("error", {
+		        bubbles: true,
+		        cancelable: true,
+		        message: "object" === typeof error && null !== error && "string" === typeof error.message ? String(error.message) : String(error),
+		        error
+		      });
+		      if (!window.dispatchEvent(event)) return;
+		    } else if ("function" === typeof process.emit) {
+		      process.emit("uncaughtException", error);
+		      return;
+		    }
+		    console.error(error);
+		  }, didWarnAboutMessageChannel = false, enqueueTaskImpl = null, actScopeDepth = 0, didWarnNoAwaitAct = false, isFlushing = false, queueSeveralMicrotasks = "function" === typeof queueMicrotask ? function(callback) {
+		    queueMicrotask(function() {
+		      return queueMicrotask(callback);
+		    });
+		  } : enqueueTask;
+		  deprecatedAPIs = Object.freeze({
+		    __proto__: null,
+		    c: function(size) {
+		      return resolveDispatcher().useMemoCache(size);
+		    }
+		  });
+		  var fnName = {
+		    map: mapChildren,
+		    forEach: function(children, forEachFunc, forEachContext) {
+		      mapChildren(
+		        children,
+		        function() {
+		          forEachFunc.apply(this, arguments);
+		        },
+		        forEachContext
+		      );
+		    },
+		    count: function(children) {
+		      var n = 0;
+		      mapChildren(children, function() {
+		        n++;
+		      });
+		      return n;
+		    },
+		    toArray: function(children) {
+		      return mapChildren(children, function(child) {
+		        return child;
+		      }) || [];
+		    },
+		    only: function(children) {
+		      if (!isValidElement(children))
+		        throw Error(
+		          "React.Children.only expected to receive a single React element child."
+		        );
+		      return children;
+		    }
+		  };
+		  exports$1.Activity = REACT_ACTIVITY_TYPE;
+		  exports$1.Children = fnName;
+		  exports$1.Component = Component;
+		  exports$1.Fragment = REACT_FRAGMENT_TYPE;
+		  exports$1.Profiler = REACT_PROFILER_TYPE;
+		  exports$1.PureComponent = PureComponent;
+		  exports$1.StrictMode = REACT_STRICT_MODE_TYPE;
+		  exports$1.Suspense = REACT_SUSPENSE_TYPE;
+		  exports$1.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = ReactSharedInternals;
+		  exports$1.__COMPILER_RUNTIME = deprecatedAPIs;
+		  exports$1.act = function(callback) {
+		    var prevActQueue = ReactSharedInternals.actQueue, prevActScopeDepth = actScopeDepth;
+		    actScopeDepth++;
+		    var queue = ReactSharedInternals.actQueue = null !== prevActQueue ? prevActQueue : [], didAwaitActCall = false;
+		    try {
+		      var result = callback();
+		    } catch (error) {
+		      ReactSharedInternals.thrownErrors.push(error);
+		    }
+		    if (0 < ReactSharedInternals.thrownErrors.length)
+		      throw popActScope(prevActQueue, prevActScopeDepth), callback = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, callback;
+		    if (null !== result && "object" === typeof result && "function" === typeof result.then) {
+		      var thenable = result;
+		      queueSeveralMicrotasks(function() {
+		        didAwaitActCall || didWarnNoAwaitAct || (didWarnNoAwaitAct = true, console.error(
+		          "You called act(async () => ...) without await. This could lead to unexpected testing behaviour, interleaving multiple act calls and mixing their scopes. You should - await act(async () => ...);"
+		        ));
+		      });
+		      return {
+		        then: function(resolve, reject) {
+		          didAwaitActCall = true;
+		          thenable.then(
+		            function(returnValue) {
+		              popActScope(prevActQueue, prevActScopeDepth);
+		              if (0 === prevActScopeDepth) {
+		                try {
+		                  flushActQueue(queue), enqueueTask(function() {
+		                    return recursivelyFlushAsyncActWork(
+		                      returnValue,
+		                      resolve,
+		                      reject
+		                    );
+		                  });
+		                } catch (error$0) {
+		                  ReactSharedInternals.thrownErrors.push(error$0);
+		                }
+		                if (0 < ReactSharedInternals.thrownErrors.length) {
+		                  var _thrownError = aggregateErrors(
+		                    ReactSharedInternals.thrownErrors
+		                  );
+		                  ReactSharedInternals.thrownErrors.length = 0;
+		                  reject(_thrownError);
+		                }
+		              } else resolve(returnValue);
+		            },
+		            function(error) {
+		              popActScope(prevActQueue, prevActScopeDepth);
+		              0 < ReactSharedInternals.thrownErrors.length ? (error = aggregateErrors(
+		                ReactSharedInternals.thrownErrors
+		              ), ReactSharedInternals.thrownErrors.length = 0, reject(error)) : reject(error);
+		            }
+		          );
+		        }
+		      };
+		    }
+		    var returnValue$jscomp$0 = result;
+		    popActScope(prevActQueue, prevActScopeDepth);
+		    0 === prevActScopeDepth && (flushActQueue(queue), 0 !== queue.length && queueSeveralMicrotasks(function() {
+		      didAwaitActCall || didWarnNoAwaitAct || (didWarnNoAwaitAct = true, console.error(
+		        "A component suspended inside an \`act\` scope, but the \`act\` call was not awaited. When testing React components that depend on asynchronous data, you must await the result:\\n\\nawait act(() => ...)"
+		      ));
+		    }), ReactSharedInternals.actQueue = null);
+		    if (0 < ReactSharedInternals.thrownErrors.length)
+		      throw callback = aggregateErrors(ReactSharedInternals.thrownErrors), ReactSharedInternals.thrownErrors.length = 0, callback;
+		    return {
+		      then: function(resolve, reject) {
+		        didAwaitActCall = true;
+		        0 === prevActScopeDepth ? (ReactSharedInternals.actQueue = queue, enqueueTask(function() {
+		          return recursivelyFlushAsyncActWork(
+		            returnValue$jscomp$0,
+		            resolve,
+		            reject
+		          );
+		        })) : resolve(returnValue$jscomp$0);
+		      }
+		    };
+		  };
+		  exports$1.cache = function(fn) {
+		    return function() {
+		      return fn.apply(null, arguments);
+		    };
+		  };
+		  exports$1.cacheSignal = function() {
+		    return null;
+		  };
+		  exports$1.captureOwnerStack = function() {
+		    var getCurrentStack = ReactSharedInternals.getCurrentStack;
+		    return null === getCurrentStack ? null : getCurrentStack();
+		  };
+		  exports$1.cloneElement = function(element, config, children) {
+		    if (null === element || void 0 === element)
+		      throw Error(
+		        "The argument must be a React element, but you passed " + element + "."
+		      );
+		    var props = assign({}, element.props), key = element.key, owner = element._owner;
+		    if (null != config) {
+		      var JSCompiler_inline_result;
+		      a: {
+		        if (hasOwnProperty.call(config, "ref") && (JSCompiler_inline_result = Object.getOwnPropertyDescriptor(
+		          config,
+		          "ref"
+		        ).get) && JSCompiler_inline_result.isReactWarning) {
+		          JSCompiler_inline_result = false;
+		          break a;
+		        }
+		        JSCompiler_inline_result = void 0 !== config.ref;
+		      }
+		      JSCompiler_inline_result && (owner = getOwner());
+		      hasValidKey(config) && (checkKeyStringCoercion(config.key), key = "" + config.key);
+		      for (propName in config)
+		        !hasOwnProperty.call(config, propName) || "key" === propName || "__self" === propName || "__source" === propName || "ref" === propName && void 0 === config.ref || (props[propName] = config[propName]);
+		    }
+		    var propName = arguments.length - 2;
+		    if (1 === propName) props.children = children;
+		    else if (1 < propName) {
+		      JSCompiler_inline_result = Array(propName);
+		      for (var i = 0; i < propName; i++)
+		        JSCompiler_inline_result[i] = arguments[i + 2];
+		      props.children = JSCompiler_inline_result;
+		    }
+		    props = ReactElement(
+		      element.type,
+		      key,
+		      props,
+		      owner,
+		      element._debugStack,
+		      element._debugTask
+		    );
+		    for (key = 2; key < arguments.length; key++)
+		      validateChildKeys(arguments[key]);
+		    return props;
+		  };
+		  exports$1.createContext = function(defaultValue) {
+		    defaultValue = {
+		      $$typeof: REACT_CONTEXT_TYPE,
+		      _currentValue: defaultValue,
+		      _currentValue2: defaultValue,
+		      _threadCount: 0,
+		      Provider: null,
+		      Consumer: null
+		    };
+		    defaultValue.Provider = defaultValue;
+		    defaultValue.Consumer = {
+		      $$typeof: REACT_CONSUMER_TYPE,
+		      _context: defaultValue
+		    };
+		    defaultValue._currentRenderer = null;
+		    defaultValue._currentRenderer2 = null;
+		    return defaultValue;
+		  };
+		  exports$1.createElement = function(type, config, children) {
+		    for (var i = 2; i < arguments.length; i++)
+		      validateChildKeys(arguments[i]);
+		    i = {};
+		    var key = null;
+		    if (null != config)
+		      for (propName in didWarnAboutOldJSXRuntime || !("__self" in config) || "key" in config || (didWarnAboutOldJSXRuntime = true, console.warn(
+		        "Your app (or one of its dependencies) is using an outdated JSX transform. Update to the modern JSX transform for faster performance: https://react.dev/link/new-jsx-transform"
+		      )), hasValidKey(config) && (checkKeyStringCoercion(config.key), key = "" + config.key), config)
+		        hasOwnProperty.call(config, propName) && "key" !== propName && "__self" !== propName && "__source" !== propName && (i[propName] = config[propName]);
+		    var childrenLength = arguments.length - 2;
+		    if (1 === childrenLength) i.children = children;
+		    else if (1 < childrenLength) {
+		      for (var childArray = Array(childrenLength), _i = 0; _i < childrenLength; _i++)
+		        childArray[_i] = arguments[_i + 2];
+		      Object.freeze && Object.freeze(childArray);
+		      i.children = childArray;
+		    }
+		    if (type && type.defaultProps)
+		      for (propName in childrenLength = type.defaultProps, childrenLength)
+		        void 0 === i[propName] && (i[propName] = childrenLength[propName]);
+		    key && defineKeyPropWarningGetter(
+		      i,
+		      "function" === typeof type ? type.displayName || type.name || "Unknown" : type
+		    );
+		    var propName = 1e4 > ReactSharedInternals.recentlyCreatedOwnerStacks++;
+		    return ReactElement(
+		      type,
+		      key,
+		      i,
+		      getOwner(),
+		      propName ? Error("react-stack-top-frame") : unknownOwnerDebugStack,
+		      propName ? createTask(getTaskName(type)) : unknownOwnerDebugTask
+		    );
+		  };
+		  exports$1.createRef = function() {
+		    var refObject = { current: null };
+		    Object.seal(refObject);
+		    return refObject;
+		  };
+		  exports$1.forwardRef = function(render) {
+		    null != render && render.$$typeof === REACT_MEMO_TYPE ? console.error(
+		      "forwardRef requires a render function but received a \`memo\` component. Instead of forwardRef(memo(...)), use memo(forwardRef(...))."
+		    ) : "function" !== typeof render ? console.error(
+		      "forwardRef requires a render function but was given %s.",
+		      null === render ? "null" : typeof render
+		    ) : 0 !== render.length && 2 !== render.length && console.error(
+		      "forwardRef render functions accept exactly two parameters: props and ref. %s",
+		      1 === render.length ? "Did you forget to use the ref parameter?" : "Any additional parameter will be undefined."
+		    );
+		    null != render && null != render.defaultProps && console.error(
+		      "forwardRef render functions do not support defaultProps. Did you accidentally pass a React component?"
+		    );
+		    var elementType = { $$typeof: REACT_FORWARD_REF_TYPE, render }, ownName;
+		    Object.defineProperty(elementType, "displayName", {
+		      enumerable: false,
+		      configurable: true,
+		      get: function() {
+		        return ownName;
+		      },
+		      set: function(name) {
+		        ownName = name;
+		        render.name || render.displayName || (Object.defineProperty(render, "name", { value: name }), render.displayName = name);
+		      }
+		    });
+		    return elementType;
+		  };
+		  exports$1.isValidElement = isValidElement;
+		  exports$1.lazy = function(ctor) {
+		    ctor = { _status: -1, _result: ctor };
+		    var lazyType = {
+		      $$typeof: REACT_LAZY_TYPE,
+		      _payload: ctor,
+		      _init: lazyInitializer
+		    }, ioInfo = {
+		      name: "lazy",
+		      start: -1,
+		      end: -1,
+		      value: null,
+		      owner: null,
+		      debugStack: Error("react-stack-top-frame"),
+		      debugTask: console.createTask ? console.createTask("lazy()") : null
+		    };
+		    ctor._ioInfo = ioInfo;
+		    lazyType._debugInfo = [{ awaited: ioInfo }];
+		    return lazyType;
+		  };
+		  exports$1.memo = function(type, compare) {
+		    null == type && console.error(
+		      "memo: The first argument must be a component. Instead received: %s",
+		      null === type ? "null" : typeof type
+		    );
+		    compare = {
+		      $$typeof: REACT_MEMO_TYPE,
+		      type,
+		      compare: void 0 === compare ? null : compare
+		    };
+		    var ownName;
+		    Object.defineProperty(compare, "displayName", {
+		      enumerable: false,
+		      configurable: true,
+		      get: function() {
+		        return ownName;
+		      },
+		      set: function(name) {
+		        ownName = name;
+		        type.name || type.displayName || (Object.defineProperty(type, "name", { value: name }), type.displayName = name);
+		      }
+		    });
+		    return compare;
+		  };
+		  exports$1.startTransition = function(scope) {
+		    var prevTransition = ReactSharedInternals.T, currentTransition = {};
+		    currentTransition._updatedFibers = /* @__PURE__ */ new Set();
+		    ReactSharedInternals.T = currentTransition;
+		    try {
+		      var returnValue = scope(), onStartTransitionFinish = ReactSharedInternals.S;
+		      null !== onStartTransitionFinish && onStartTransitionFinish(currentTransition, returnValue);
+		      "object" === typeof returnValue && null !== returnValue && "function" === typeof returnValue.then && (ReactSharedInternals.asyncTransitions++, returnValue.then(releaseAsyncTransition, releaseAsyncTransition), returnValue.then(noop, reportGlobalError));
+		    } catch (error) {
+		      reportGlobalError(error);
+		    } finally {
+		      null === prevTransition && currentTransition._updatedFibers && (scope = currentTransition._updatedFibers.size, currentTransition._updatedFibers.clear(), 10 < scope && console.warn(
+		        "Detected a large number of updates inside startTransition. If this is due to a subscription please re-write it to use React provided hooks. Otherwise concurrent mode guarantees are off the table."
+		      )), null !== prevTransition && null !== currentTransition.types && (null !== prevTransition.types && prevTransition.types !== currentTransition.types && console.error(
+		        "We expected inner Transitions to have transferred the outer types set and that you cannot add to the outer Transition while inside the inner.This is a bug in React."
+		      ), prevTransition.types = currentTransition.types), ReactSharedInternals.T = prevTransition;
+		    }
+		  };
+		  exports$1.unstable_useCacheRefresh = function() {
+		    return resolveDispatcher().useCacheRefresh();
+		  };
+		  exports$1.use = function(usable) {
+		    return resolveDispatcher().use(usable);
+		  };
+		  exports$1.useActionState = function(action, initialState, permalink) {
+		    return resolveDispatcher().useActionState(
+		      action,
+		      initialState,
+		      permalink
+		    );
+		  };
+		  exports$1.useCallback = function(callback, deps) {
+		    return resolveDispatcher().useCallback(callback, deps);
+		  };
+		  exports$1.useContext = function(Context) {
+		    var dispatcher = resolveDispatcher();
+		    Context.$$typeof === REACT_CONSUMER_TYPE && console.error(
+		      "Calling useContext(Context.Consumer) is not supported and will cause bugs. Did you mean to call useContext(Context) instead?"
+		    );
+		    return dispatcher.useContext(Context);
+		  };
+		  exports$1.useDebugValue = function(value, formatterFn) {
+		    return resolveDispatcher().useDebugValue(value, formatterFn);
+		  };
+		  exports$1.useDeferredValue = function(value, initialValue) {
+		    return resolveDispatcher().useDeferredValue(value, initialValue);
+		  };
+		  exports$1.useEffect = function(create, deps) {
+		    null == create && console.warn(
+		      "React Hook useEffect requires an effect callback. Did you forget to pass a callback to the hook?"
+		    );
+		    return resolveDispatcher().useEffect(create, deps);
+		  };
+		  exports$1.useEffectEvent = function(callback) {
+		    return resolveDispatcher().useEffectEvent(callback);
+		  };
+		  exports$1.useId = function() {
+		    return resolveDispatcher().useId();
+		  };
+		  exports$1.useImperativeHandle = function(ref, create, deps) {
+		    return resolveDispatcher().useImperativeHandle(ref, create, deps);
+		  };
+		  exports$1.useInsertionEffect = function(create, deps) {
+		    null == create && console.warn(
+		      "React Hook useInsertionEffect requires an effect callback. Did you forget to pass a callback to the hook?"
+		    );
+		    return resolveDispatcher().useInsertionEffect(create, deps);
+		  };
+		  exports$1.useLayoutEffect = function(create, deps) {
+		    null == create && console.warn(
+		      "React Hook useLayoutEffect requires an effect callback. Did you forget to pass a callback to the hook?"
+		    );
+		    return resolveDispatcher().useLayoutEffect(create, deps);
+		  };
+		  exports$1.useMemo = function(create, deps) {
+		    return resolveDispatcher().useMemo(create, deps);
+		  };
+		  exports$1.useOptimistic = function(passthrough, reducer) {
+		    return resolveDispatcher().useOptimistic(passthrough, reducer);
+		  };
+		  exports$1.useReducer = function(reducer, initialArg, init) {
+		    return resolveDispatcher().useReducer(reducer, initialArg, init);
+		  };
+		  exports$1.useRef = function(initialValue) {
+		    return resolveDispatcher().useRef(initialValue);
+		  };
+		  exports$1.useState = function(initialState) {
+		    return resolveDispatcher().useState(initialState);
+		  };
+		  exports$1.useSyncExternalStore = function(subscribe, getSnapshot, getServerSnapshot) {
+		    return resolveDispatcher().useSyncExternalStore(
+		      subscribe,
+		      getSnapshot,
+		      getServerSnapshot
+		    );
+		  };
+		  exports$1.useTransition = function() {
+		    return resolveDispatcher().useTransition();
+		  };
+		  exports$1.version = "19.2.4";
+		  "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
+		})(); 
+	} (react_development, react_development.exports));
+	return react_development.exports;
+}
+
+var hasRequiredReact;
+
+function requireReact () {
+	if (hasRequiredReact) return react.exports;
+	hasRequiredReact = 1;
+	{
+	  react.exports = requireReact_development();
+	}
+	return react.exports;
+}
+
+var hasRequiredReactJsxRuntime_development;
+
+function requireReactJsxRuntime_development () {
+	if (hasRequiredReactJsxRuntime_development) return reactJsxRuntime_development;
+	hasRequiredReactJsxRuntime_development = 1;
+	/**
+	 * @license React
+	 * react-jsx-runtime.development.js
+	 *
+	 * Copyright (c) Meta Platforms, Inc. and affiliates.
+	 *
+	 * This source code is licensed under the MIT license found in the
+	 * LICENSE file in the root directory of this source tree.
+	 */
+	(function() {
+	  function getComponentNameFromType(type) {
+	    if (null == type) return null;
+	    if ("function" === typeof type)
+	      return type.$$typeof === REACT_CLIENT_REFERENCE ? null : type.displayName || type.name || null;
+	    if ("string" === typeof type) return type;
+	    switch (type) {
+	      case REACT_FRAGMENT_TYPE:
+	        return "Fragment";
+	      case REACT_PROFILER_TYPE:
+	        return "Profiler";
+	      case REACT_STRICT_MODE_TYPE:
+	        return "StrictMode";
+	      case REACT_SUSPENSE_TYPE:
+	        return "Suspense";
+	      case REACT_SUSPENSE_LIST_TYPE:
+	        return "SuspenseList";
+	      case REACT_ACTIVITY_TYPE:
+	        return "Activity";
+	    }
+	    if ("object" === typeof type)
+	      switch ("number" === typeof type.tag && console.error(
+	        "Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue."
+	      ), type.$$typeof) {
+	        case REACT_PORTAL_TYPE:
+	          return "Portal";
+	        case REACT_CONTEXT_TYPE:
+	          return type.displayName || "Context";
+	        case REACT_CONSUMER_TYPE:
+	          return (type._context.displayName || "Context") + ".Consumer";
+	        case REACT_FORWARD_REF_TYPE:
+	          var innerType = type.render;
+	          type = type.displayName;
+	          type || (type = innerType.displayName || innerType.name || "", type = "" !== type ? "ForwardRef(" + type + ")" : "ForwardRef");
+	          return type;
+	        case REACT_MEMO_TYPE:
+	          return innerType = type.displayName || null, null !== innerType ? innerType : getComponentNameFromType(type.type) || "Memo";
+	        case REACT_LAZY_TYPE:
+	          innerType = type._payload;
+	          type = type._init;
+	          try {
+	            return getComponentNameFromType(type(innerType));
+	          } catch (x) {
+	          }
+	      }
+	    return null;
+	  }
+	  function testStringCoercion(value) {
+	    return "" + value;
+	  }
+	  function checkKeyStringCoercion(value) {
+	    try {
+	      var JSCompiler_inline_result = false;
+	    } catch (e) {
+	      JSCompiler_inline_result = true;
+	    }
+	    if (JSCompiler_inline_result) {
+	      JSCompiler_inline_result = console;
+	      var JSCompiler_temp_const = JSCompiler_inline_result.error;
+	      var JSCompiler_inline_result$jscomp$0 = "function" === typeof Symbol && Symbol.toStringTag && value[Symbol.toStringTag] || value.constructor.name || "Object";
+	      JSCompiler_temp_const.call(
+	        JSCompiler_inline_result,
+	        "The provided key is an unsupported type %s. This value must be coerced to a string before using it here.",
+	        JSCompiler_inline_result$jscomp$0
+	      );
+	      return testStringCoercion(value);
+	    }
+	  }
+	  function getTaskName(type) {
+	    if (type === REACT_FRAGMENT_TYPE) return "<>";
+	    if ("object" === typeof type && null !== type && type.$$typeof === REACT_LAZY_TYPE)
+	      return "<...>";
+	    try {
+	      var name = getComponentNameFromType(type);
+	      return name ? "<" + name + ">" : "<...>";
+	    } catch (x) {
+	      return "<...>";
+	    }
+	  }
+	  function getOwner() {
+	    var dispatcher = ReactSharedInternals.A;
+	    return null === dispatcher ? null : dispatcher.getOwner();
+	  }
+	  function UnknownOwner() {
+	    return Error("react-stack-top-frame");
+	  }
+	  function hasValidKey(config) {
+	    if (hasOwnProperty.call(config, "key")) {
+	      var getter = Object.getOwnPropertyDescriptor(config, "key").get;
+	      if (getter && getter.isReactWarning) return false;
+	    }
+	    return void 0 !== config.key;
+	  }
+	  function defineKeyPropWarningGetter(props, displayName) {
+	    function warnAboutAccessingKey() {
+	      specialPropKeyWarningShown || (specialPropKeyWarningShown = true, console.error(
+	        "%s: \`key\` is not a prop. Trying to access it will result in \`undefined\` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://react.dev/link/special-props)",
+	        displayName
+	      ));
+	    }
+	    warnAboutAccessingKey.isReactWarning = true;
+	    Object.defineProperty(props, "key", {
+	      get: warnAboutAccessingKey,
+	      configurable: true
+	    });
+	  }
+	  function elementRefGetterWithDeprecationWarning() {
+	    var componentName = getComponentNameFromType(this.type);
+	    didWarnAboutElementRef[componentName] || (didWarnAboutElementRef[componentName] = true, console.error(
+	      "Accessing element.ref was removed in React 19. ref is now a regular prop. It will be removed from the JSX Element type in a future release."
+	    ));
+	    componentName = this.props.ref;
+	    return void 0 !== componentName ? componentName : null;
+	  }
+	  function ReactElement(type, key, props, owner, debugStack, debugTask) {
+	    var refProp = props.ref;
+	    type = {
+	      $$typeof: REACT_ELEMENT_TYPE,
+	      type,
+	      key,
+	      props,
+	      _owner: owner
+	    };
+	    null !== (void 0 !== refProp ? refProp : null) ? Object.defineProperty(type, "ref", {
+	      enumerable: false,
+	      get: elementRefGetterWithDeprecationWarning
+	    }) : Object.defineProperty(type, "ref", { enumerable: false, value: null });
+	    type._store = {};
+	    Object.defineProperty(type._store, "validated", {
+	      configurable: false,
+	      enumerable: false,
+	      writable: true,
+	      value: 0
+	    });
+	    Object.defineProperty(type, "_debugInfo", {
+	      configurable: false,
+	      enumerable: false,
+	      writable: true,
+	      value: null
+	    });
+	    Object.defineProperty(type, "_debugStack", {
+	      configurable: false,
+	      enumerable: false,
+	      writable: true,
+	      value: debugStack
+	    });
+	    Object.defineProperty(type, "_debugTask", {
+	      configurable: false,
+	      enumerable: false,
+	      writable: true,
+	      value: debugTask
+	    });
+	    Object.freeze && (Object.freeze(type.props), Object.freeze(type));
+	    return type;
+	  }
+	  function jsxDEVImpl(type, config, maybeKey, isStaticChildren, debugStack, debugTask) {
+	    var children = config.children;
+	    if (void 0 !== children)
+	      if (isStaticChildren)
+	        if (isArrayImpl(children)) {
+	          for (isStaticChildren = 0; isStaticChildren < children.length; isStaticChildren++)
+	            validateChildKeys(children[isStaticChildren]);
+	          Object.freeze && Object.freeze(children);
+	        } else
+	          console.error(
+	            "React.jsx: Static children should always be an array. You are likely explicitly calling React.jsxs or React.jsxDEV. Use the Babel transform instead."
+	          );
+	      else validateChildKeys(children);
+	    if (hasOwnProperty.call(config, "key")) {
+	      children = getComponentNameFromType(type);
+	      var keys = Object.keys(config).filter(function(k) {
+	        return "key" !== k;
+	      });
+	      isStaticChildren = 0 < keys.length ? "{key: someKey, " + keys.join(": ..., ") + ": ...}" : "{key: someKey}";
+	      didWarnAboutKeySpread[children + isStaticChildren] || (keys = 0 < keys.length ? "{" + keys.join(": ..., ") + ": ...}" : "{}", console.error(
+	        'A props object containing a "key" prop is being spread into JSX:\\n  let props = %s;\\n  <%s {...props} />\\nReact keys must be passed directly to JSX without using spread:\\n  let props = %s;\\n  <%s key={someKey} {...props} />',
+	        isStaticChildren,
+	        children,
+	        keys,
+	        children
+	      ), didWarnAboutKeySpread[children + isStaticChildren] = true);
+	    }
+	    children = null;
+	    void 0 !== maybeKey && (checkKeyStringCoercion(maybeKey), children = "" + maybeKey);
+	    hasValidKey(config) && (checkKeyStringCoercion(config.key), children = "" + config.key);
+	    if ("key" in config) {
+	      maybeKey = {};
+	      for (var propName in config)
+	        "key" !== propName && (maybeKey[propName] = config[propName]);
+	    } else maybeKey = config;
+	    children && defineKeyPropWarningGetter(
+	      maybeKey,
+	      "function" === typeof type ? type.displayName || type.name || "Unknown" : type
+	    );
+	    return ReactElement(
+	      type,
+	      children,
+	      maybeKey,
+	      getOwner(),
+	      debugStack,
+	      debugTask
+	    );
+	  }
+	  function validateChildKeys(node) {
+	    isValidElement(node) ? node._store && (node._store.validated = 1) : "object" === typeof node && null !== node && node.$$typeof === REACT_LAZY_TYPE && ("fulfilled" === node._payload.status ? isValidElement(node._payload.value) && node._payload.value._store && (node._payload.value._store.validated = 1) : node._store && (node._store.validated = 1));
+	  }
+	  function isValidElement(object) {
+	    return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
+	  }
+	  var React = requireReact(), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference"), ReactSharedInternals = React.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, hasOwnProperty = Object.prototype.hasOwnProperty, isArrayImpl = Array.isArray, createTask = console.createTask ? console.createTask : function() {
+	    return null;
+	  };
+	  React = {
+	    react_stack_bottom_frame: function(callStackForError) {
+	      return callStackForError();
+	    }
+	  };
+	  var specialPropKeyWarningShown;
+	  var didWarnAboutElementRef = {};
+	  var unknownOwnerDebugStack = React.react_stack_bottom_frame.bind(
+	    React,
+	    UnknownOwner
+	  )();
+	  var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
+	  var didWarnAboutKeySpread = {};
+	  reactJsxRuntime_development.Fragment = REACT_FRAGMENT_TYPE;
+	  reactJsxRuntime_development.jsx = function(type, config, maybeKey) {
+	    var trackActualOwner = 1e4 > ReactSharedInternals.recentlyCreatedOwnerStacks++;
+	    return jsxDEVImpl(
+	      type,
+	      config,
+	      maybeKey,
+	      false,
+	      trackActualOwner ? Error("react-stack-top-frame") : unknownOwnerDebugStack,
+	      trackActualOwner ? createTask(getTaskName(type)) : unknownOwnerDebugTask
+	    );
+	  };
+	  reactJsxRuntime_development.jsxs = function(type, config, maybeKey) {
+	    var trackActualOwner = 1e4 > ReactSharedInternals.recentlyCreatedOwnerStacks++;
+	    return jsxDEVImpl(
+	      type,
+	      config,
+	      maybeKey,
+	      true,
+	      trackActualOwner ? Error("react-stack-top-frame") : unknownOwnerDebugStack,
+	      trackActualOwner ? createTask(getTaskName(type)) : unknownOwnerDebugTask
+	    );
+	  };
+	})();
+	return reactJsxRuntime_development;
+}
+
+var hasRequiredJsxRuntime;
+
+function requireJsxRuntime () {
+	if (hasRequiredJsxRuntime) return jsxRuntime.exports;
+	hasRequiredJsxRuntime = 1;
+	{
+	  jsxRuntime.exports = requireReactJsxRuntime_development();
+	}
+	return jsxRuntime.exports;
+}
+
+var jsxRuntimeExports = requireJsxRuntime();
+
+const containers = [];
+const styleTags = [];
+const SSR_INJECT_ID = "__styleInject_SSR_MODULES";
+const cssStyleInject = (css, options = {}) => {
+  if (typeof document === "undefined") {
+    if (globalThis) {
+      globalThis[SSR_INJECT_ID] = globalThis[SSR_INJECT_ID] || [];
+      globalThis[SSR_INJECT_ID].push({ css, id: options.id });
+    }
+    return;
+  }
+  if (options.id && document.querySelector(\`#\${options.id}\`)) {
+    return;
+  }
+  const singleTag = options.singleTag === true;
+  const insertAt = options.insertAt ?? "last";
+  const container = typeof options.container === "string" ? document.querySelector(options.container) : document.querySelectorAll("head")[0];
+  if (!container) {
+    throw new Error("Unable to find container element");
+  }
+  const createStyleTag = () => {
+    const styleTag2 = document.createElement("style");
+    styleTag2.setAttribute("type", "text/css");
+    if (options.id) {
+      styleTag2.setAttribute("id", options.id);
+    }
+    if (options.attributes) {
+      Object.entries(options.attributes).forEach(([key, value]) => {
+        styleTag2.setAttribute(key, value);
+      });
+    }
+    if (typeof insertAt === "object" && "before" in insertAt) {
+      const targetElement = container.querySelector(insertAt.before);
+      if (targetElement) {
+        targetElement.before(styleTag2);
+      } else {
+        container.append(styleTag2);
+      }
+    } else if (typeof insertAt === "number") {
+      const children = [...container.children];
+      const index = insertAt < 0 ? Math.max(0, children.length + insertAt + 1) : insertAt;
+      if (index <= 0) {
+        container.prepend(styleTag2);
+      } else if (index >= children.length) {
+        container.append(styleTag2);
+      } else if (children[index]) {
+        children[index].before(styleTag2);
+      }
+    } else if (insertAt === "first") {
+      container.prepend(styleTag2);
+    } else {
+      container.append(styleTag2);
+    }
+    return styleTag2;
+  };
+  let styleTag;
+  if (singleTag) {
+    let id = containers.indexOf(container);
+    if (id === -1) {
+      id = containers.push(container) - 1;
+      styleTags[id] = {};
+    }
+    const insertKey = typeof insertAt === "object" ? \`before_\${insertAt.before}\` : insertAt;
+    if (!styleTags[id][insertKey]) {
+      styleTags[id][insertKey] = createStyleTag();
+    }
+    styleTag = styleTags[id][insertKey];
+  } else {
+    styleTag = createStyleTag();
+  }
+  if (options.nonce) {
+    styleTag.setAttribute("nonce", options.nonce);
+  }
+  if (styleTag.styleSheet && typeof styleTag.styleSheet.cssText === "string") {
+    styleTag.styleSheet.cssText += css;
+  } else {
+    styleTag.append(document.createTextNode(css));
+  }
+};
+
+var css = "/*! tailwindcss v4.2.1 | MIT License | https://tailwindcss.com */\\n@layer properties;\\n@layer theme, base, components, utilities;\\n@layer theme {\\n  :root, :host {\\n    --font-sans: ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\",\\n      \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\";\\n    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\",\\n      \\"Courier New\\", monospace;\\n    --color-red-500: oklch(63.7% 0.237 25.331);\\n    --color-red-600: oklch(57.7% 0.245 27.325);\\n    --color-green-600: oklch(62.7% 0.194 149.214);\\n    --color-blue-500: oklch(62.3% 0.214 259.815);\\n    --color-blue-600: oklch(54.6% 0.245 262.881);\\n    --color-blue-700: oklch(48.8% 0.243 264.376);\\n    --color-gray-100: oklch(96.7% 0.003 264.542);\\n    --color-gray-200: oklch(92.8% 0.006 264.531);\\n    --color-gray-300: oklch(87.2% 0.01 258.338);\\n    --color-gray-500: oklch(55.1% 0.027 264.364);\\n    --color-gray-600: oklch(44.6% 0.03 256.802);\\n    --color-gray-700: oklch(37.3% 0.034 259.733);\\n    --color-gray-800: oklch(27.8% 0.033 256.848);\\n    --color-gray-900: oklch(21% 0.034 264.665);\\n    --color-neutral-200: oklch(92.2% 0 0);\\n    --color-neutral-300: oklch(87% 0 0);\\n    --color-neutral-400: oklch(70.8% 0 0);\\n    --color-neutral-500: oklch(55.6% 0 0);\\n    --color-neutral-600: oklch(43.9% 0 0);\\n    --color-neutral-700: oklch(37.1% 0 0);\\n    --color-neutral-800: oklch(26.9% 0 0);\\n    --color-neutral-900: oklch(20.5% 0 0);\\n    --color-black: #000;\\n    --color-white: #fff;\\n    --spacing: 0.25rem;\\n    --text-xs: 0.75rem;\\n    --text-xs--line-height: calc(1 / 0.75);\\n    --text-sm: 0.875rem;\\n    --text-sm--line-height: calc(1.25 / 0.875);\\n    --font-weight-medium: 500;\\n    --font-weight-semibold: 600;\\n    --radius-xs: 0.125rem;\\n    --radius-md: 0.375rem;\\n    --radius-lg: 0.5rem;\\n    --radius-xl: 0.75rem;\\n    --animate-spin: spin 1s linear infinite;\\n    --default-transition-duration: 150ms;\\n    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);\\n    --default-font-family: var(--font-sans);\\n    --default-mono-font-family: var(--font-mono);\\n  }\\n}\\n@layer base {\\n  *, ::after, ::before, ::backdrop, ::file-selector-button {\\n    box-sizing: border-box;\\n    margin: 0;\\n    padding: 0;\\n    border: 0 solid;\\n  }\\n  html, :host {\\n    line-height: 1.5;\\n    -webkit-text-size-adjust: 100%;\\n    tab-size: 4;\\n    font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, \\"Apple Color Emoji\\", \\"Segoe UI Emoji\\", \\"Segoe UI Symbol\\", \\"Noto Color Emoji\\");\\n    font-feature-settings: var(--default-font-feature-settings, normal);\\n    font-variation-settings: var(--default-font-variation-settings, normal);\\n    -webkit-tap-highlight-color: transparent;\\n  }\\n  hr {\\n    height: 0;\\n    color: inherit;\\n    border-top-width: 1px;\\n  }\\n  abbr:where([title]) {\\n    -webkit-text-decoration: underline dotted;\\n    text-decoration: underline dotted;\\n  }\\n  h1, h2, h3, h4, h5, h6 {\\n    font-size: inherit;\\n    font-weight: inherit;\\n  }\\n  a {\\n    color: inherit;\\n    -webkit-text-decoration: inherit;\\n    text-decoration: inherit;\\n  }\\n  b, strong {\\n    font-weight: bolder;\\n  }\\n  code, kbd, samp, pre {\\n    font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\", \\"Courier New\\", monospace);\\n    font-feature-settings: var(--default-mono-font-feature-settings, normal);\\n    font-variation-settings: var(--default-mono-font-variation-settings, normal);\\n    font-size: 1em;\\n  }\\n  small {\\n    font-size: 80%;\\n  }\\n  sub, sup {\\n    font-size: 75%;\\n    line-height: 0;\\n    position: relative;\\n    vertical-align: baseline;\\n  }\\n  sub {\\n    bottom: -0.25em;\\n  }\\n  sup {\\n    top: -0.5em;\\n  }\\n  table {\\n    text-indent: 0;\\n    border-color: inherit;\\n    border-collapse: collapse;\\n  }\\n  :-moz-focusring {\\n    outline: auto;\\n  }\\n  progress {\\n    vertical-align: baseline;\\n  }\\n  summary {\\n    display: list-item;\\n  }\\n  ol, ul, menu {\\n    list-style: none;\\n  }\\n  img, svg, video, canvas, audio, iframe, embed, object {\\n    display: block;\\n    vertical-align: middle;\\n  }\\n  img, video {\\n    max-width: 100%;\\n    height: auto;\\n  }\\n  button, input, select, optgroup, textarea, ::file-selector-button {\\n    font: inherit;\\n    font-feature-settings: inherit;\\n    font-variation-settings: inherit;\\n    letter-spacing: inherit;\\n    color: inherit;\\n    border-radius: 0;\\n    background-color: transparent;\\n    opacity: 1;\\n  }\\n  :where(select:is([multiple], [size])) optgroup {\\n    font-weight: bolder;\\n  }\\n  :where(select:is([multiple], [size])) optgroup option {\\n    padding-inline-start: 20px;\\n  }\\n  ::file-selector-button {\\n    margin-inline-end: 4px;\\n  }\\n  ::placeholder {\\n    opacity: 1;\\n  }\\n  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {\\n    ::placeholder {\\n      color: currentcolor;\\n      @supports (color: color-mix(in lab, red, red)) {\\n        color: color-mix(in oklab, currentcolor 50%, transparent);\\n      }\\n    }\\n  }\\n  textarea {\\n    resize: vertical;\\n  }\\n  ::-webkit-search-decoration {\\n    -webkit-appearance: none;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1lh;\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {\\n    padding-block: 0;\\n  }\\n  ::-webkit-calendar-picker-indicator {\\n    line-height: 1;\\n  }\\n  :-moz-ui-invalid {\\n    box-shadow: none;\\n  }\\n  button, input:where([type=\\"button\\"], [type=\\"reset\\"], [type=\\"submit\\"]), ::file-selector-button {\\n    appearance: button;\\n  }\\n  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {\\n    height: auto;\\n  }\\n  [hidden]:where(:not([hidden=\\"until-found\\"])) {\\n    display: none !important;\\n  }\\n}\\n@layer utilities {\\n  .collapse {\\n    visibility: collapse;\\n  }\\n  .invisible {\\n    visibility: hidden;\\n  }\\n  .visible {\\n    visibility: visible;\\n  }\\n  .sr-only {\\n    position: absolute;\\n    width: 1px;\\n    height: 1px;\\n    padding: 0;\\n    margin: -1px;\\n    overflow: hidden;\\n    clip-path: inset(50%);\\n    white-space: nowrap;\\n    border-width: 0;\\n  }\\n  .absolute {\\n    position: absolute;\\n  }\\n  .fixed {\\n    position: fixed;\\n  }\\n  .relative {\\n    position: relative;\\n  }\\n  .static {\\n    position: static;\\n  }\\n  .sticky {\\n    position: sticky;\\n  }\\n  .inset-0 {\\n    inset: calc(var(--spacing) * 0);\\n  }\\n  .start {\\n    inset-inline-start: var(--spacing);\\n  }\\n  .start-2 {\\n    inset-inline-start: calc(var(--spacing) * 2);\\n  }\\n  .end {\\n    inset-inline-end: var(--spacing);\\n  }\\n  .end-2 {\\n    inset-inline-end: calc(var(--spacing) * 2);\\n  }\\n  .top-0 {\\n    top: calc(var(--spacing) * 0);\\n  }\\n  .top-1\\\\/2 {\\n    top: calc(1 / 2 * 100%);\\n  }\\n  .top-2 {\\n    top: calc(var(--spacing) * 2);\\n  }\\n  .top-full {\\n    top: 100%;\\n  }\\n  .bottom-full {\\n    bottom: 100%;\\n  }\\n  .z-50 {\\n    z-index: 50;\\n  }\\n  .col-span-1 {\\n    grid-column: span 1 / span 1;\\n  }\\n  .col-span-3 {\\n    grid-column: span 3 / span 3;\\n  }\\n  .container {\\n    width: 100%;\\n    @media (width >= 40rem) {\\n      max-width: 40rem;\\n    }\\n    @media (width >= 48rem) {\\n      max-width: 48rem;\\n    }\\n    @media (width >= 64rem) {\\n      max-width: 64rem;\\n    }\\n    @media (width >= 80rem) {\\n      max-width: 80rem;\\n    }\\n    @media (width >= 96rem) {\\n      max-width: 96rem;\\n    }\\n  }\\n  .mx-1\\\\.5 {\\n    margin-inline: calc(var(--spacing) * 1.5);\\n  }\\n  .mx-4 {\\n    margin-inline: calc(var(--spacing) * 4);\\n  }\\n  .my-2 {\\n    margin-block: calc(var(--spacing) * 2);\\n  }\\n  .\\\\!ms-auto {\\n    margin-inline-start: auto !important;\\n  }\\n  .ms-0\\\\.5 {\\n    margin-inline-start: calc(var(--spacing) * 0.5);\\n  }\\n  .ms-2 {\\n    margin-inline-start: calc(var(--spacing) * 2);\\n  }\\n  .\\\\!me-1\\\\.5 {\\n    margin-inline-end: calc(var(--spacing) * 1.5) !important;\\n  }\\n  .mt-2 {\\n    margin-top: calc(var(--spacing) * 2);\\n  }\\n  .mb-1 {\\n    margin-bottom: calc(var(--spacing) * 1);\\n  }\\n  .mb-2 {\\n    margin-bottom: calc(var(--spacing) * 2);\\n  }\\n  .\\\\!flex {\\n    display: flex !important;\\n  }\\n  .block {\\n    display: block;\\n  }\\n  .contents {\\n    display: contents;\\n  }\\n  .flex {\\n    display: flex;\\n  }\\n  .grid {\\n    display: grid;\\n  }\\n  .hidden {\\n    display: none;\\n  }\\n  .inline {\\n    display: inline;\\n  }\\n  .inline-block {\\n    display: inline-block;\\n  }\\n  .inline-flex {\\n    display: inline-flex;\\n  }\\n  .table {\\n    display: table;\\n  }\\n  .size-3 {\\n    width: calc(var(--spacing) * 3);\\n    height: calc(var(--spacing) * 3);\\n  }\\n  .size-3\\\\.5 {\\n    width: calc(var(--spacing) * 3.5);\\n    height: calc(var(--spacing) * 3.5);\\n  }\\n  .size-4 {\\n    width: calc(var(--spacing) * 4);\\n    height: calc(var(--spacing) * 4);\\n  }\\n  .size-5 {\\n    width: calc(var(--spacing) * 5);\\n    height: calc(var(--spacing) * 5);\\n  }\\n  .size-6 {\\n    width: calc(var(--spacing) * 6);\\n    height: calc(var(--spacing) * 6);\\n  }\\n  .size-8 {\\n    width: calc(var(--spacing) * 8);\\n    height: calc(var(--spacing) * 8);\\n  }\\n  .\\\\!h-2\\\\.5 {\\n    height: calc(var(--spacing) * 2.5) !important;\\n  }\\n  .h-2 {\\n    height: calc(var(--spacing) * 2);\\n  }\\n  .h-32 {\\n    height: calc(var(--spacing) * 32);\\n  }\\n  .max-h-60 {\\n    max-height: calc(var(--spacing) * 60);\\n  }\\n  .max-h-72 {\\n    max-height: calc(var(--spacing) * 72);\\n  }\\n  .\\\\!w-2\\\\.5 {\\n    width: calc(var(--spacing) * 2.5) !important;\\n  }\\n  .w-10 {\\n    width: calc(var(--spacing) * 10);\\n  }\\n  .w-20 {\\n    width: calc(var(--spacing) * 20);\\n  }\\n  .w-32 {\\n    width: calc(var(--spacing) * 32);\\n  }\\n  .w-\\\\[calc\\\\(100\\\\%-32px\\\\)\\\\] {\\n    width: calc(100% - 32px);\\n  }\\n  .w-full {\\n    width: 100%;\\n  }\\n  .max-w-75 {\\n    max-width: calc(var(--spacing) * 75);\\n  }\\n  .max-w-full {\\n    max-width: 100%;\\n  }\\n  .min-w-24 {\\n    min-width: calc(var(--spacing) * 24);\\n  }\\n  .shrink-0 {\\n    flex-shrink: 0;\\n  }\\n  .-translate-y-1\\\\/2 {\\n    --tw-translate-y: calc(calc(1 / 2 * 100%) * -1);\\n    translate: var(--tw-translate-x) var(--tw-translate-y);\\n  }\\n  .transform {\\n    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);\\n  }\\n  .animate-spin {\\n    animation: var(--animate-spin);\\n  }\\n  .cursor-pointer {\\n    cursor: pointer;\\n  }\\n  .resize {\\n    resize: both;\\n  }\\n  .grid-cols-5 {\\n    grid-template-columns: repeat(5, minmax(0, 1fr));\\n  }\\n  .flex-col {\\n    flex-direction: column;\\n  }\\n  .flex-nowrap {\\n    flex-wrap: nowrap;\\n  }\\n  .items-center {\\n    align-items: center;\\n  }\\n  .\\\\!justify-between {\\n    justify-content: space-between !important;\\n  }\\n  .justify-between {\\n    justify-content: space-between;\\n  }\\n  .justify-center {\\n    justify-content: center;\\n  }\\n  .justify-end {\\n    justify-content: flex-end;\\n  }\\n  .space-y-0\\\\.5 {\\n    :where(& > :not(:last-child)) {\\n      --tw-space-y-reverse: 0;\\n      margin-block-start: calc(calc(var(--spacing) * 0.5) * var(--tw-space-y-reverse));\\n      margin-block-end: calc(calc(var(--spacing) * 0.5) * calc(1 - var(--tw-space-y-reverse)));\\n    }\\n  }\\n  .gap-x-1 {\\n    column-gap: calc(var(--spacing) * 1);\\n  }\\n  .gap-x-2 {\\n    column-gap: calc(var(--spacing) * 2);\\n  }\\n  .gap-x-3 {\\n    column-gap: calc(var(--spacing) * 3);\\n  }\\n  .self-center {\\n    align-self: center;\\n  }\\n  .truncate {\\n    overflow: hidden;\\n    text-overflow: ellipsis;\\n    white-space: nowrap;\\n  }\\n  .overflow-hidden {\\n    overflow: hidden;\\n  }\\n  .overflow-x-auto {\\n    overflow-x: auto;\\n  }\\n  .overflow-y-auto {\\n    overflow-y: auto;\\n  }\\n  .\\\\!rounded-xs {\\n    border-radius: var(--radius-xs) !important;\\n  }\\n  .rounded-\\\\[999px\\\\] {\\n    border-radius: 999px;\\n  }\\n  .rounded-full {\\n    border-radius: calc(infinity * 1px);\\n  }\\n  .rounded-lg {\\n    border-radius: var(--radius-lg);\\n  }\\n  .rounded-md {\\n    border-radius: var(--radius-md);\\n  }\\n  .rounded-xl {\\n    border-radius: var(--radius-xl);\\n  }\\n  .rounded-t-lg {\\n    border-top-left-radius: var(--radius-lg);\\n    border-top-right-radius: var(--radius-lg);\\n  }\\n  .border {\\n    border-style: var(--tw-border-style);\\n    border-width: 1px;\\n  }\\n  .border-3 {\\n    border-style: var(--tw-border-style);\\n    border-width: 3px;\\n  }\\n  .border-solid {\\n    --tw-border-style: solid;\\n    border-style: solid;\\n  }\\n  .\\\\!border-gray-200 {\\n    border-color: var(--color-gray-200) !important;\\n  }\\n  .border-current {\\n    border-color: currentcolor;\\n  }\\n  .border-gray-200 {\\n    border-color: var(--color-gray-200);\\n  }\\n  .border-gray-300 {\\n    border-color: var(--color-gray-300);\\n  }\\n  .border-transparent {\\n    border-color: transparent;\\n  }\\n  .border-t-transparent {\\n    border-top-color: transparent;\\n  }\\n  .\\\\!bg-white {\\n    background-color: var(--color-white) !important;\\n  }\\n  .bg-blue-600 {\\n    background-color: var(--color-blue-600);\\n  }\\n  .bg-gray-200 {\\n    background-color: var(--color-gray-200);\\n  }\\n  .bg-gray-900\\\\/50 {\\n    background-color: color-mix(in srgb, oklch(21% 0.034 264.665) 50%, transparent);\\n    @supports (color: color-mix(in lab, red, red)) {\\n      background-color: color-mix(in oklab, var(--color-gray-900) 50%, transparent);\\n    }\\n  }\\n  .bg-red-500 {\\n    background-color: var(--color-red-500);\\n  }\\n  .bg-white {\\n    background-color: var(--color-white);\\n  }\\n  .fill-black {\\n    fill: var(--color-black);\\n  }\\n  .fill-gray-200 {\\n    fill: var(--color-gray-200);\\n  }\\n  .p-1 {\\n    padding: calc(var(--spacing) * 1);\\n  }\\n  .p-2 {\\n    padding: calc(var(--spacing) * 2);\\n  }\\n  .p-3 {\\n    padding: calc(var(--spacing) * 3);\\n  }\\n  .p-4 {\\n    padding: calc(var(--spacing) * 4);\\n  }\\n  .px-2 {\\n    padding-inline: calc(var(--spacing) * 2);\\n  }\\n  .px-3 {\\n    padding-inline: calc(var(--spacing) * 3);\\n  }\\n  .px-4 {\\n    padding-inline: calc(var(--spacing) * 4);\\n  }\\n  .\\\\!py-0\\\\.5 {\\n    padding-block: calc(var(--spacing) * 0.5) !important;\\n  }\\n  .py-1 {\\n    padding-block: calc(var(--spacing) * 1);\\n  }\\n  .py-2 {\\n    padding-block: calc(var(--spacing) * 2);\\n  }\\n  .py-3 {\\n    padding-block: calc(var(--spacing) * 3);\\n  }\\n  .pe-6 {\\n    padding-inline-end: calc(var(--spacing) * 6);\\n  }\\n  .pt-3 {\\n    padding-top: calc(var(--spacing) * 3);\\n  }\\n  .pb-3 {\\n    padding-bottom: calc(var(--spacing) * 3);\\n  }\\n  .text-center {\\n    text-align: center;\\n  }\\n  .text-end {\\n    text-align: end;\\n  }\\n  .text-start {\\n    text-align: start;\\n  }\\n  .align-bottom {\\n    vertical-align: bottom;\\n  }\\n  .\\\\!text-sm {\\n    font-size: var(--text-sm) !important;\\n    line-height: var(--tw-leading, var(--text-sm--line-height)) !important;\\n  }\\n  .text-sm {\\n    font-size: var(--text-sm);\\n    line-height: var(--tw-leading, var(--text-sm--line-height));\\n  }\\n  .text-xs {\\n    font-size: var(--text-xs);\\n    line-height: var(--tw-leading, var(--text-xs--line-height));\\n  }\\n  .\\\\!font-medium {\\n    --tw-font-weight: var(--font-weight-medium) !important;\\n    font-weight: var(--font-weight-medium) !important;\\n  }\\n  .font-medium {\\n    --tw-font-weight: var(--font-weight-medium);\\n    font-weight: var(--font-weight-medium);\\n  }\\n  .font-semibold {\\n    --tw-font-weight: var(--font-weight-semibold);\\n    font-weight: var(--font-weight-semibold);\\n  }\\n  .text-nowrap {\\n    text-wrap: nowrap;\\n  }\\n  .whitespace-nowrap {\\n    white-space: nowrap;\\n  }\\n  .text-blue-600 {\\n    color: var(--color-blue-600);\\n  }\\n  .text-gray-500 {\\n    color: var(--color-gray-500);\\n  }\\n  .text-gray-800 {\\n    color: var(--color-gray-800);\\n  }\\n  .text-green-600 {\\n    color: var(--color-green-600);\\n  }\\n  .text-red-600 {\\n    color: var(--color-red-600);\\n  }\\n  .text-white {\\n    color: var(--color-white);\\n  }\\n  .lowercase {\\n    text-transform: lowercase;\\n  }\\n  .uppercase {\\n    text-transform: uppercase;\\n  }\\n  .opacity-0 {\\n    opacity: 0%;\\n  }\\n  .opacity-100 {\\n    opacity: 100%;\\n  }\\n  .shadow-lg {\\n    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .shadow-md {\\n    --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));\\n    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  .outline {\\n    outline-style: var(--tw-outline-style);\\n    outline-width: 1px;\\n  }\\n  .blur {\\n    --tw-blur: blur(8px);\\n    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);\\n  }\\n  .filter {\\n    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);\\n  }\\n  .transition {\\n    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;\\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\\n    transition-duration: var(--tw-duration, var(--default-transition-duration));\\n  }\\n  .transition-all {\\n    transition-property: all;\\n    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\\n    transition-duration: var(--tw-duration, var(--default-transition-duration));\\n  }\\n  .duration-500 {\\n    --tw-duration: 500ms;\\n    transition-duration: 500ms;\\n  }\\n  .before\\\\:absolute {\\n    &::before {\\n      content: var(--tw-content);\\n      position: absolute;\\n    }\\n  }\\n  .before\\\\:inset-0 {\\n    &::before {\\n      content: var(--tw-content);\\n      inset: calc(var(--spacing) * 0);\\n    }\\n  }\\n  .before\\\\:z-1 {\\n    &::before {\\n      content: var(--tw-content);\\n      z-index: 1;\\n    }\\n  }\\n  .hover\\\\:bg-blue-700 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-blue-700);\\n      }\\n    }\\n  }\\n  .hover\\\\:bg-gray-100 {\\n    &:hover {\\n      @media (hover: hover) {\\n        background-color: var(--color-gray-100);\\n      }\\n    }\\n  }\\n  .hover\\\\:text-gray-600 {\\n    &:hover {\\n      @media (hover: hover) {\\n        color: var(--color-gray-600);\\n      }\\n    }\\n  }\\n  .hover\\\\:text-gray-800 {\\n    &:hover {\\n      @media (hover: hover) {\\n        color: var(--color-gray-800);\\n      }\\n    }\\n  }\\n  .focus\\\\:border-blue-500 {\\n    &:focus {\\n      border-color: var(--color-blue-500);\\n    }\\n  }\\n  .focus\\\\:bg-gray-100 {\\n    &:focus {\\n      background-color: var(--color-gray-100);\\n    }\\n  }\\n  .focus\\\\:text-gray-600 {\\n    &:focus {\\n      color: var(--color-gray-600);\\n    }\\n  }\\n  .focus\\\\:ring-blue-500 {\\n    &:focus {\\n      --tw-ring-color: var(--color-blue-500);\\n    }\\n  }\\n  .focus\\\\:outline-hidden {\\n    &:focus {\\n      --tw-outline-style: none;\\n      outline-style: none;\\n      @media (forced-colors: active) {\\n        outline: 2px solid transparent;\\n        outline-offset: 2px;\\n      }\\n    }\\n  }\\n  .disabled\\\\:pointer-events-none {\\n    &:disabled {\\n      pointer-events: none;\\n    }\\n  }\\n  .disabled\\\\:opacity-50 {\\n    &:disabled {\\n      opacity: 50%;\\n    }\\n  }\\n  .sm\\\\:flex {\\n    @media (width >= 40rem) {\\n      display: flex;\\n    }\\n  }\\n  .dark\\\\:\\\\!border-neutral-700 {\\n    &:where(.dark, .dark *) {\\n      border-color: var(--color-neutral-700) !important;\\n    }\\n  }\\n  .dark\\\\:border-neutral-600 {\\n    &:where(.dark, .dark *) {\\n      border-color: var(--color-neutral-600);\\n    }\\n  }\\n  .dark\\\\:border-neutral-700 {\\n    &:where(.dark, .dark *) {\\n      border-color: var(--color-neutral-700);\\n    }\\n  }\\n  .dark\\\\:\\\\!bg-neutral-800 {\\n    &:where(.dark, .dark *) {\\n      background-color: var(--color-neutral-800) !important;\\n    }\\n  }\\n  .dark\\\\:bg-blue-500 {\\n    &:where(.dark, .dark *) {\\n      background-color: var(--color-blue-500);\\n    }\\n  }\\n  .dark\\\\:bg-neutral-700 {\\n    &:where(.dark, .dark *) {\\n      background-color: var(--color-neutral-700);\\n    }\\n  }\\n  .dark\\\\:bg-neutral-800 {\\n    &:where(.dark, .dark *) {\\n      background-color: var(--color-neutral-800);\\n    }\\n  }\\n  .dark\\\\:bg-neutral-900 {\\n    &:where(.dark, .dark *) {\\n      background-color: var(--color-neutral-900);\\n    }\\n  }\\n  .dark\\\\:bg-neutral-900\\\\/80 {\\n    &:where(.dark, .dark *) {\\n      background-color: color-mix(in srgb, oklch(20.5% 0 0) 80%, transparent);\\n      @supports (color: color-mix(in lab, red, red)) {\\n        background-color: color-mix(in oklab, var(--color-neutral-900) 80%, transparent);\\n      }\\n    }\\n  }\\n  .dark\\\\:fill-neutral-200 {\\n    &:where(.dark, .dark *) {\\n      fill: var(--color-neutral-200);\\n    }\\n  }\\n  .dark\\\\:text-blue-500 {\\n    &:where(.dark, .dark *) {\\n      color: var(--color-blue-500);\\n    }\\n  }\\n  .dark\\\\:text-neutral-200 {\\n    &:where(.dark, .dark *) {\\n      color: var(--color-neutral-200);\\n    }\\n  }\\n  .dark\\\\:text-neutral-400 {\\n    &:where(.dark, .dark *) {\\n      color: var(--color-neutral-400);\\n    }\\n  }\\n  .dark\\\\:text-neutral-500 {\\n    &:where(.dark, .dark *) {\\n      color: var(--color-neutral-500);\\n    }\\n  }\\n  .dark\\\\:text-white {\\n    &:where(.dark, .dark *) {\\n      color: var(--color-white);\\n    }\\n  }\\n  .dark\\\\:hover\\\\:bg-neutral-800 {\\n    &:where(.dark, .dark *) {\\n      &:hover {\\n        @media (hover: hover) {\\n          background-color: var(--color-neutral-800);\\n        }\\n      }\\n    }\\n  }\\n  .dark\\\\:hover\\\\:text-neutral-200 {\\n    &:where(.dark, .dark *) {\\n      &:hover {\\n        @media (hover: hover) {\\n          color: var(--color-neutral-200);\\n        }\\n      }\\n    }\\n  }\\n  .dark\\\\:hover\\\\:text-neutral-300 {\\n    &:where(.dark, .dark *) {\\n      &:hover {\\n        @media (hover: hover) {\\n          color: var(--color-neutral-300);\\n        }\\n      }\\n    }\\n  }\\n  .dark\\\\:focus\\\\:bg-neutral-800 {\\n    &:where(.dark, .dark *) {\\n      &:focus {\\n        background-color: var(--color-neutral-800);\\n      }\\n    }\\n  }\\n  .dark\\\\:focus\\\\:text-neutral-300 {\\n    &:where(.dark, .dark *) {\\n      &:focus {\\n        color: var(--color-neutral-300);\\n      }\\n    }\\n  }\\n  .hs-selected\\\\:block {\\n    &.selected {\\n      display: block;\\n    }\\n    .selected & {\\n      display: block;\\n    }\\n  }\\n  .hs-selected\\\\:bg-gray-100 {\\n    &.selected {\\n      background-color: var(--color-gray-100);\\n    }\\n    .selected & {\\n      background-color: var(--color-gray-100);\\n    }\\n  }\\n  .dark\\\\:hs-selected\\\\:bg-gray-700 {\\n    &:where(.dark, .dark *) {\\n      &.selected {\\n        background-color: var(--color-gray-700);\\n      }\\n      .selected & {\\n        background-color: var(--color-gray-700);\\n      }\\n    }\\n  }\\n  .dark\\\\:hs-selected\\\\:bg-neutral-800 {\\n    &:where(.dark, .dark *) {\\n      &.selected {\\n        background-color: var(--color-neutral-800);\\n      }\\n      .selected & {\\n        background-color: var(--color-neutral-800);\\n      }\\n    }\\n  }\\n  .hs-select-disabled\\\\:pointer-events-none {\\n    &.disabled {\\n      pointer-events: none;\\n    }\\n    .disabled & {\\n      pointer-events: none;\\n    }\\n  }\\n  .hs-select-disabled\\\\:opacity-50 {\\n    &.disabled {\\n      opacity: 50%;\\n    }\\n    .disabled & {\\n      opacity: 50%;\\n    }\\n  }\\n  .hs-combo-box-selected\\\\:block {\\n    &.selected {\\n      display: block;\\n    }\\n    .selected & {\\n      display: block;\\n    }\\n  }\\n  .hs-file-upload-complete\\\\:bg-green-600 {\\n    &.complete {\\n      background-color: var(--color-green-600);\\n    }\\n    .complete & {\\n      background-color: var(--color-green-600);\\n    }\\n  }\\n  .\\\\[\\\\&\\\\:\\\\:-webkit-scrollbar\\\\]\\\\:w-2 {\\n    &::-webkit-scrollbar {\\n      width: calc(var(--spacing) * 2);\\n    }\\n  }\\n  .\\\\[\\\\&\\\\:\\\\:-webkit-scrollbar-thumb\\\\]\\\\:rounded-full {\\n    &::-webkit-scrollbar-thumb {\\n      border-radius: calc(infinity * 1px);\\n    }\\n  }\\n  .\\\\[\\\\&\\\\:\\\\:-webkit-scrollbar-thumb\\\\]\\\\:bg-gray-300 {\\n    &::-webkit-scrollbar-thumb {\\n      background-color: var(--color-gray-300);\\n    }\\n  }\\n  .dark\\\\:\\\\[\\\\&\\\\:\\\\:-webkit-scrollbar-thumb\\\\]\\\\:bg-neutral-500 {\\n    &:where(.dark, .dark *) {\\n      &::-webkit-scrollbar-thumb {\\n        background-color: var(--color-neutral-500);\\n      }\\n    }\\n  }\\n  .\\\\[\\\\&\\\\:\\\\:-webkit-scrollbar-track\\\\]\\\\:bg-gray-100 {\\n    &::-webkit-scrollbar-track {\\n      background-color: var(--color-gray-100);\\n    }\\n  }\\n  .dark\\\\:\\\\[\\\\&\\\\:\\\\:-webkit-scrollbar-track\\\\]\\\\:bg-neutral-700 {\\n    &:where(.dark, .dark *) {\\n      &::-webkit-scrollbar-track {\\n        background-color: var(--color-neutral-700);\\n      }\\n    }\\n  }\\n}\\n@layer base {\\n  input:where([type='text']),input:where(:not([type])),input:where([type='email']),input:where([type='url']),input:where([type='password']),input:where([type='number']),input:where([type='date']),input:where([type='datetime-local']),input:where([type='month']),input:where([type='search']),input:where([type='tel']),input:where([type='time']),input:where([type='week']),select:where([multiple]),textarea,select {\\n    appearance: none;\\n    background-color: #fff;\\n    border-color: oklch(55.1% 0.027 264.364);\\n    border-width: 1px;\\n    border-radius: 0px;\\n    padding-top: 0.5rem;\\n    padding-right: 0.75rem;\\n    padding-bottom: 0.5rem;\\n    padding-left: 0.75rem;\\n    font-size: 1rem;\\n    line-height: 1.5rem;\\n    --tw-shadow: 0 0 #0000;\\n    &:focus {\\n      outline: 2px solid transparent;\\n      outline-offset: 2px;\\n      --tw-ring-inset: var(--tw-empty,/*!*/ /*!*/);\\n      --tw-ring-offset-width: 0px;\\n      --tw-ring-offset-color: #fff;\\n      --tw-ring-color: oklch(54.6% 0.245 262.881);\\n      --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);\\n      --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);\\n      box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n      border-color: oklch(54.6% 0.245 262.881);\\n    }\\n  }\\n  input::placeholder,textarea::placeholder {\\n    color: oklch(55.1% 0.027 264.364);\\n    opacity: 1;\\n  }\\n  ::-webkit-datetime-edit-fields-wrapper {\\n    padding: 0;\\n  }\\n  ::-webkit-date-and-time-value {\\n    min-height: 1.5em;\\n  }\\n  ::-webkit-date-and-time-value {\\n    text-align: inherit;\\n  }\\n  ::-webkit-datetime-edit {\\n    display: inline-flex;\\n  }\\n  ::-webkit-datetime-edit,::-webkit-datetime-edit-year-field,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute-field,::-webkit-datetime-edit-second-field,::-webkit-datetime-edit-millisecond-field,::-webkit-datetime-edit-meridiem-field {\\n    padding-top: 0;\\n    padding-bottom: 0;\\n  }\\n  select {\\n    background-image: url(\\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='oklch(55.1%25 0.027 264.364)' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\\");\\n    background-position: right 0.5rem center;\\n    background-repeat: no-repeat;\\n    background-size: 1.5em 1.5em;\\n    padding-right: 2.5rem;\\n    print-color-adjust: exact;\\n  }\\n  select:where([multiple]),select:where([size]:not([size=\\"1\\"])) {\\n    background-image: initial;\\n    background-position: initial;\\n    background-repeat: unset;\\n    background-size: initial;\\n    padding-right: 0.75rem;\\n    print-color-adjust: unset;\\n  }\\n  input:where([type='checkbox']),input:where([type='radio']) {\\n    appearance: none;\\n    padding: 0;\\n    print-color-adjust: exact;\\n    display: inline-block;\\n    vertical-align: middle;\\n    background-origin: border-box;\\n    user-select: none;\\n    flex-shrink: 0;\\n    height: 1rem;\\n    width: 1rem;\\n    color: oklch(54.6% 0.245 262.881);\\n    background-color: #fff;\\n    border-color: oklch(55.1% 0.027 264.364);\\n    border-width: 1px;\\n    --tw-shadow: 0 0 #0000;\\n  }\\n  input:where([type='checkbox']) {\\n    border-radius: 0px;\\n  }\\n  input:where([type='radio']) {\\n    border-radius: 100%;\\n  }\\n  input:where([type='checkbox']):focus,input:where([type='radio']):focus {\\n    outline: 2px solid transparent;\\n    outline-offset: 2px;\\n    --tw-ring-inset: var(--tw-empty,/*!*/ /*!*/);\\n    --tw-ring-offset-width: 2px;\\n    --tw-ring-offset-color: #fff;\\n    --tw-ring-color: oklch(54.6% 0.245 262.881);\\n    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);\\n    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);\\n    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);\\n  }\\n  input:where([type='checkbox']):checked,input:where([type='radio']):checked {\\n    border-color: transparent;\\n    background-color: currentColor;\\n    background-size: 100% 100%;\\n    background-position: center;\\n    background-repeat: no-repeat;\\n  }\\n  input:where([type='checkbox']):checked {\\n    background-image: url(\\"data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e\\");\\n    @media (forced-colors: active) {\\n      appearance: auto;\\n    }\\n  }\\n  input:where([type='radio']):checked {\\n    background-image: url(\\"data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e\\");\\n    @media (forced-colors: active) {\\n      appearance: auto;\\n    }\\n  }\\n  input:where([type='checkbox']):checked:hover,input:where([type='checkbox']):checked:focus,input:where([type='radio']):checked:hover,input:where([type='radio']):checked:focus {\\n    border-color: transparent;\\n    background-color: currentColor;\\n  }\\n  input:where([type='checkbox']):indeterminate {\\n    background-image: url(\\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'%3e%3cpath stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8h8'/%3e%3c/svg%3e\\");\\n    border-color: transparent;\\n    background-color: currentColor;\\n    background-size: 100% 100%;\\n    background-position: center;\\n    background-repeat: no-repeat;\\n    @media (forced-colors: active) {\\n      appearance: auto;\\n    }\\n  }\\n  input:where([type='checkbox']):indeterminate:hover,input:where([type='checkbox']):indeterminate:focus {\\n    border-color: transparent;\\n    background-color: currentColor;\\n  }\\n  input:where([type='file']) {\\n    background: unset;\\n    border-color: inherit;\\n    border-width: 0;\\n    border-radius: 0;\\n    padding: 0;\\n    font-size: unset;\\n    line-height: inherit;\\n  }\\n  input:where([type='file']):focus {\\n    outline: 1px solid ButtonText;\\n    outline: 1px auto -webkit-focus-ring-color;\\n  }\\n}\\n@property --tw-translate-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0;\\n}\\n@property --tw-translate-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0;\\n}\\n@property --tw-translate-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0;\\n}\\n@property --tw-rotate-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-rotate-z {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-x {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-skew-y {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-space-y-reverse {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0;\\n}\\n@property --tw-border-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-font-weight {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-inset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-inset-ring-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-inset-ring-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-ring-inset {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-ring-offset-width {\\n  syntax: \\"<length>\\";\\n  inherits: false;\\n  initial-value: 0px;\\n}\\n@property --tw-ring-offset-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: #fff;\\n}\\n@property --tw-ring-offset-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: 0 0 #0000;\\n}\\n@property --tw-outline-style {\\n  syntax: \\"*\\";\\n  inherits: false;\\n  initial-value: solid;\\n}\\n@property --tw-blur {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-brightness {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-contrast {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-grayscale {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-hue-rotate {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-invert {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-opacity {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-saturate {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-sepia {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-drop-shadow {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-drop-shadow-color {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-drop-shadow-alpha {\\n  syntax: \\"<percentage>\\";\\n  inherits: false;\\n  initial-value: 100%;\\n}\\n@property --tw-drop-shadow-size {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-duration {\\n  syntax: \\"*\\";\\n  inherits: false;\\n}\\n@property --tw-content {\\n  syntax: \\"*\\";\\n  initial-value: \\"\\";\\n  inherits: false;\\n}\\n@keyframes spin {\\n  to {\\n    transform: rotate(360deg);\\n  }\\n}\\n@layer properties {\\n  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {\\n    *, ::before, ::after, ::backdrop {\\n      --tw-translate-x: 0;\\n      --tw-translate-y: 0;\\n      --tw-translate-z: 0;\\n      --tw-rotate-x: initial;\\n      --tw-rotate-y: initial;\\n      --tw-rotate-z: initial;\\n      --tw-skew-x: initial;\\n      --tw-skew-y: initial;\\n      --tw-space-y-reverse: 0;\\n      --tw-border-style: solid;\\n      --tw-font-weight: initial;\\n      --tw-shadow: 0 0 #0000;\\n      --tw-shadow-color: initial;\\n      --tw-shadow-alpha: 100%;\\n      --tw-inset-shadow: 0 0 #0000;\\n      --tw-inset-shadow-color: initial;\\n      --tw-inset-shadow-alpha: 100%;\\n      --tw-ring-color: initial;\\n      --tw-ring-shadow: 0 0 #0000;\\n      --tw-inset-ring-color: initial;\\n      --tw-inset-ring-shadow: 0 0 #0000;\\n      --tw-ring-inset: initial;\\n      --tw-ring-offset-width: 0px;\\n      --tw-ring-offset-color: #fff;\\n      --tw-ring-offset-shadow: 0 0 #0000;\\n      --tw-outline-style: solid;\\n      --tw-blur: initial;\\n      --tw-brightness: initial;\\n      --tw-contrast: initial;\\n      --tw-grayscale: initial;\\n      --tw-hue-rotate: initial;\\n      --tw-invert: initial;\\n      --tw-opacity: initial;\\n      --tw-saturate: initial;\\n      --tw-sepia: initial;\\n      --tw-drop-shadow: initial;\\n      --tw-drop-shadow-color: initial;\\n      --tw-drop-shadow-alpha: 100%;\\n      --tw-drop-shadow-size: initial;\\n      --tw-duration: initial;\\n      --tw-content: \\"\\";\\n    }\\n  }\\n}\\n";
+cssStyleInject(css,{});
+
+const Container = () => {
+  return jsxRuntimeExports.jsx("div", { className: "bg-red-500 h-32", children: jsxRuntimeExports.jsx("h1", { children: "Hello World" }) });
+};
+
+export { Container as default };
+//# sourceMappingURL=index.js.map
+",
+  "{"version":3,"file":"index.js","sources":[],"sourcesContent":[],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"}",
+]
+`;
+
 exports[`packem ecosystem > should work with provided 'sitefetch' ecosystem suite 1`] = `
 [
   "export {};
