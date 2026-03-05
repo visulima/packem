@@ -440,7 +440,7 @@
         "@types/uglifycss": "^0.0.11",
         "@vitest/coverage-v8": "^3.2.4",
         "@vitest/ui": "^3.2.4",
-        "conventional-changelog-conventionalcommits": "9.1.0",
+        "conventional-changelog-conventionalcommits": "9.2.0",
         "cross-env": "^10.0.0",
         "cssnano": "7.1.0",
         "deeks": "^3.1.1",
