@@ -14,7 +14,7 @@ export { a };
 //# sourceMappingURL=index.d.ts.map
 
 // index.d.ts.map
-{"version":3,"file":"index.d.ts","sources":["../src/index.ts"],"names":[],"mappings":"AAAc,cAADA,CAAC,GAAA,CAAA;"}
+{"version":3,"file":"index.d.ts","sources":["../src/index.ts"],"names":[],"mappings":"cAAaA,CAAC;"}
 // index.js
 const a = 1;
 
@@ -32,7 +32,7 @@ export { a };
 //# sourceMappingURL=index.d.ts.map
 
 // index.d.ts.map
-{"version":3,"file":"index.d.ts","sources":["../src/index.d.ts"],"names":[],"mappings":"AAAsB,cAADA,CAAC,GAAA,CAAA;"}
+{"version":3,"file":"index.d.ts","sources":["../src/index.d.ts"],"names":[],"mappings":"cAAqBA,CAAC;"}
 // index.js
 const a = 1;
 

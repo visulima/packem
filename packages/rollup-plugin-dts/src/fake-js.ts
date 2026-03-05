@@ -23,24 +23,24 @@ type Dep = t.Expression & { replace?: (newNode: t.Node) => void };
 /**
  * A collection of type parameters grouped by parameter name
  */
-type GroupedTypeParams = {
+type TypeParams = {
     name: string;
     typeParams: t.TSTypeParameter[];
 }[];
 
-interface SymbolInfo {
+interface DeclarationInfo {
     bindings: t.Identifier[];
+    children: t.Node[];
     decl: t.Declaration;
     deps: Dep[];
-    params: GroupedTypeParams;
+    params: TypeParams;
 }
 
 type NamespaceMap = Map<string, { local: t.Identifier | t.TSQualifiedName; stmt: t.Statement }>;
 
 const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<OptionsResolved, "sourcemap" | "cjsDefault" | "sideEffects">): Plugin => {
-    let symbolIndex = 0;
-    const identifierMap: Record<string, number> = Object.create(null);
-    const symbolMap = new Map<number /* symbol id */, SymbolInfo>();
+    let declarationIdx = 0;
+    const declarationMap = new Map<number /* declaration id */, DeclarationInfo>();
     const commentsMap = new Map<string /* filename */, t.Comment[]>();
     const typeOnlyMap = new Map<string, string[]>();
 
@@ -101,7 +101,10 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
     };
 
     function transform(code: string, id: string): TransformResult {
+        const identifierMap: Record<string, number> = Object.create(null);
+
         const file = parse(code, {
+            createParenthesizedExpressions: true,
             errorRecovery: true,
             plugins: [["typescript", { dts: true }]],
             sourceType: "module",
@@ -125,6 +128,13 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 continue;
 
             const sideEffect = stmt.type === "TSModuleDeclaration" && stmt.kind !== "namespace";
+
+            if (sideEffect && stmt.id.type === "StringLiteral" && (stmt.id as t.StringLiteral).value[0] === ".") {
+                // eslint-disable-next-line no-console
+                console.warn(
+                    `\`declare module ${JSON.stringify((stmt.id as t.StringLiteral).value)}\` will be kept as-is in the output. Relative module declaration may cause unexpected issues. Found in ${id}.`,
+                );
+            }
 
             if (sideEffect && id.endsWith(".vue.d.ts") && code.slice(stmt.start!, stmt.end!).includes("__VLS_")) {
                 continue;
@@ -160,8 +170,12 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             } else if ("id" in decl && decl.id) {
                 let binding = decl.id;
 
-                binding = sideEffect ? t.identifier(`_${getIdentifierIndex("")}`) : (binding as t.Identifier);
-                bindings.push(binding);
+                if ((binding as t.Node).type === "TSQualifiedName") {
+                    binding = getIdFromTSEntityName(binding as unknown as t.TSEntityName) as unknown as typeof binding;
+                }
+
+                binding = sideEffect ? t.identifier(`_${getIdentifierIndex(identifierMap, "")}`) : (binding as t.Identifier);
+                bindings.push(binding as t.Identifier);
             } else {
                 const binding = t.identifier("export_default");
 
@@ -170,30 +184,46 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 decl.id = binding;
             }
 
-            const params: GroupedTypeParams = collectParams(decl);
+            const params: TypeParams = collectParams(decl);
 
-            const deps = collectDependencies(decl, namespaceStmts);
+            const childrenSet = new Set<t.Node>();
+            const deps = collectDependencies(decl, namespaceStmts, childrenSet, identifierMap);
+            const children = Array.from(childrenSet).filter((child) => bindings.every((b) => child !== b));
 
             if (decl !== stmt) {
                 decl.leadingComments = stmt.leadingComments;
             }
 
-            const symbolId = registerSymbol({
+            const declarationId = registerDeclaration({
                 bindings,
+                children,
                 decl,
                 deps,
                 params,
             });
 
-            const symbolIdNode = t.numericLiteral(symbolId);
+            const declarationIdNode = t.numericLiteral(declarationId);
             const depsNode = t.arrowFunctionExpression(
                 params.map(({ name }) => t.identifier(name)),
                 t.arrayExpression(deps),
             );
+            const childrenNode = t.arrayExpression(
+                children.map((node) => ({
+                    end: node.end,
+                    loc: node.loc,
+                    start: node.start,
+                    type: "StringLiteral",
+                    value: "",
+                })),
+            );
             const sideEffectNode = sideEffect && t.callExpression(t.identifier("sideEffect"), [bindings[0]]);
-            const runtimeArrayNode = runtimeBindingArrayExpression(sideEffectNode ? [symbolIdNode, depsNode, sideEffectNode] : [symbolIdNode, depsNode]);
+            const runtimeArrayNode = runtimeBindingArrayExpression(
+                sideEffectNode
+                    ? [declarationIdNode, depsNode, childrenNode, sideEffectNode]
+                    : [declarationIdNode, depsNode, childrenNode],
+            );
 
-            // var ${binding} = [${symbolId}, (param, ...) => [dep, ...], sideEffect()]
+            // var ${binding} = [${declarationId}, (param, ...) => [dep, ...], [children], sideEffect()]
             const runtimeAssignment: RuntimeBindingVariableDeclration = {
                 declarations: [
                     {
@@ -284,43 +314,69 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     return null;
                 }
 
-                const [symbolIdNode, depsFunction] = node.declarations[0].init.elements;
+                const [declarationIdNode, depsFn, children] = node.declarations[0].init.elements;
 
-                const symbolId = symbolIdNode.value;
-                const original = getSymbol(symbolId);
+                const declarationId = declarationIdNode.value;
+                const declaration = getDeclaration(declarationId);
+
+                walkAST<t.Node | t.Comment>(declaration.decl, {
+                    enter(node) {
+                        if (node.type === "CommentBlock") {
+                            return;
+                        }
+
+                        delete node.loc;
+                    },
+                });
 
                 for (const [i, decl] of node.declarations.entries()) {
                     const transformedBinding = {
                         ...decl.id,
-                        typeAnnotation: original.bindings[i].typeAnnotation,
+                        typeAnnotation: declaration.bindings[i].typeAnnotation,
                     };
 
-                    overwriteNode(original.bindings[i], transformedBinding);
+                    overwriteNode(declaration.bindings[i], transformedBinding);
                 }
 
-                const transformedParams = depsFunction.params as t.Identifier[];
+                for (const [i, child] of (children.elements as t.StringLiteral[]).entries()) {
+                    Object.assign(declaration.children[i], {
+                        loc: child.loc,
+                    });
+                }
+
+                const transformedParams = depsFn.params as t.Identifier[];
 
                 for (const [i, transformedParameter] of transformedParams.entries()) {
                     const transformedName = transformedParameter.name;
 
-                    for (const originalTypeParameter of original.params[i].typeParams) {
+                    for (const originalTypeParameter of declaration.params[i].typeParams) {
                         originalTypeParameter.name = transformedName;
                     }
                 }
 
-                const transformedDeps = (depsFunction.body as t.ArrayExpression).elements as t.Expression[];
+                const transformedDeps = (depsFn.body as t.ArrayExpression).elements as t.Expression[];
 
-                for (let i = 0; i < original.deps.length; i++) {
-                    const originalDep = original.deps[i];
+                for (let i = 0; i < declaration.deps.length; i++) {
+                    const originalDep = declaration.deps[i];
+                    let transformedDep = transformedDeps[i];
+
+                    if (transformedDep && (transformedDep as t.UnaryExpression).type === "UnaryExpression" && (transformedDep as t.UnaryExpression).operator === "void") {
+                        transformedDep = {
+                            ...t.identifier("undefined"),
+                            end: transformedDep.end,
+                            loc: transformedDep.loc,
+                            start: transformedDep.start,
+                        };
+                    }
 
                     if (originalDep.replace) {
-                        originalDep.replace(transformedDeps[i]);
+                        originalDep.replace(transformedDep);
                     } else {
-                        Object.assign(originalDep, transformedDeps[i]);
+                        Object.assign(originalDep, transformedDep);
                     }
                 }
 
-                return inheritNodeComments(node, original.decl);
+                return inheritNodeComments(node, declaration.decl);
             })
             .filter((node) => !!node);
 
@@ -363,7 +419,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         return result;
     }
 
-    function getIdentifierIndex(name: string) {
+    function getIdentifierIndex(identifierMap: Record<string, number>, name: string) {
         if (name in identifierMap) {
             return identifierMap[name]++;
         }
@@ -371,16 +427,16 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         return (identifierMap[name] = 0);
     }
 
-    function registerSymbol(info: SymbolInfo) {
-        const symbolId = symbolIndex++;
+    function registerDeclaration(info: DeclarationInfo) {
+        const declarationId = declarationIdx++;
 
-        symbolMap.set(symbolId, info);
+        declarationMap.set(declarationId, info);
 
-        return symbolId;
+        return declarationId;
     }
 
-    function getSymbol(symbolId: number) {
-        return symbolMap.get(symbolId)!;
+    function getDeclaration(declarationId: number) {
+        return declarationMap.get(declarationId)!;
     }
 
     /**
@@ -389,7 +445,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
      * names will be used as the parameter name in the generated JavaScript
      * dependency function.
      */
-    function collectParams(node: t.Node): GroupedTypeParams {
+    function collectParams(node: t.Node): TypeParams {
         const typeParams: t.TSTypeParameter[] = [];
 
         walkAST(node, {
@@ -435,7 +491,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         return inferred;
     }
 
-    function collectDependencies(node: t.Node, namespaceStmts: NamespaceMap): Dep[] {
+    function collectDependencies(node: t.Node, namespaceStmts: NamespaceMap, children: Set<t.Node>, identifierMap: Record<string, number>): Dep[] {
         const deps = new Set<Dep>();
         const seen = new Set<t.Node>();
 
@@ -481,6 +537,10 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
                     if (node.implements) {
                         for (const implement of node.implements) {
+                            if ((implement as t.Node).type === "ClassImplements") {
+                                continue;
+                            }
+
                             addDependency(TSEntityNameToRuntime((implement as t.TSExpressionWithTypeArguments).expression));
                         }
                     }
@@ -498,7 +558,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                             seen.add(node);
                             const source = node.argument;
                             const imported = node.qualifier;
-                            const dep = importNamespace(node, imported, source, namespaceStmts);
+                            const dep = importNamespace(node, imported, source, namespaceStmts, identifierMap);
 
                             addDependency(dep);
 
@@ -522,6 +582,10 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                         }
                     }
                 }
+
+                if (parent && !deps.has(node as Dep) && isChildSymbol(node, parent)) {
+                    children.add(node);
+                }
             },
         });
 
@@ -535,9 +599,15 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         }
     }
 
-    function importNamespace(node: t.TSImportType, imported: t.TSEntityName | null | undefined, source: t.StringLiteral, namespaceStmts: NamespaceMap): Dep {
+    function importNamespace(
+        node: t.TSImportType,
+        imported: t.TSEntityName | null | undefined,
+        source: t.StringLiteral,
+        namespaceStmts: NamespaceMap,
+        identifierMap: Record<string, number>,
+    ): Dep {
         const sourceText = source.value.replaceAll(/\W/g, "_");
-        const localName = isIdentifierName(source.value) ? source.value : `${sourceText}${getIdentifierIndex(sourceText)}`;
+        const localName = isIdentifierName(source.value) ? source.value : `${sourceText}${getIdentifierIndex(identifierMap, sourceText)}`;
         let local: t.Identifier | t.TSQualifiedName = t.identifier(localName);
 
         if (namespaceStmts.has(source.value)) {
@@ -577,6 +647,16 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
     }
 };
 
+function isChildSymbol(node: t.Node, parent: t.Node): boolean {
+    if (node.type === "Identifier")
+        return true;
+
+    if (isTypeOf(parent, ["TSPropertySignature", "TSMethodSignature"]) && (parent as t.TSPropertySignature | t.TSMethodSignature).key === node)
+        return true;
+
+    return false;
+}
+
 const REFERENCE_RE = /\/\s*<reference\s+(?:path|types)=/;
 
 const collectReferenceDirectives = (comment: t.Comment[], negative = false) => comment.filter((c) => REFERENCE_RE.test(c.value) !== negative);
@@ -587,7 +667,7 @@ const collectReferenceDirectives = (comment: t.Comment[], negative = false) => c
  * A variable declaration that declares a runtime binding variable. It represents a declaration like:
  *
  * ```js
- * var binding = [symbolId, (param, ...) => [dep, ...], sideEffect()]
+ * var binding = [declarationId, (param, ...) => [dep, ...], [children], sideEffect()]
  * ```
  *
  * For an more concrete example, the following TypeScript declaration:
@@ -599,7 +679,7 @@ const collectReferenceDirectives = (comment: t.Comment[], negative = false) => c
  * Will be transformed to the following JavaScript code:
  *
  * ```js
- * const Bar = [123, () => [Foo]]
+ * const Bar = [123, () => [Foo], []]
  * ```
  *
  * Which will be represented by this type.
@@ -624,7 +704,7 @@ const isRuntimeBindingVariableDeclaration = (node: t.Node | null | undefined): n
  * It can be used to represent the following JavaScript code:
  *
  * ```js
- * [symbolId, (param, ...) => [dep, ...], sideEffect()]
+ * [declarationId, (param, ...) => [dep, ...], [children], sideEffect()]
  * ```
  */
 type RuntimeBindingArrayExpression = t.ArrayExpression & {
@@ -634,29 +714,44 @@ type RuntimeBindingArrayExpression = t.ArrayExpression & {
 /**
  * Check if the given node is a {@link RuntimeBindingArrayExpression}
  */
-const isRuntimeBindingArrayExpression = (node: t.Node | null | undefined): node is RuntimeBindingArrayExpression => t.isArrayExpression(node) && isRuntimeBindingArrayElements(node.elements);
+const isRuntimeBindingArrayExpression = (node: t.Node | null | undefined): node is RuntimeBindingArrayExpression =>
+    t.isArrayExpression(node) && isRuntimeBindingArrayElements(node.elements);
 
 const runtimeBindingArrayExpression = (elements: RuntimeBindingArrayElements): RuntimeBindingArrayExpression => t.arrayExpression(elements) as RuntimeBindingArrayExpression;
+
+type RuntimeBindingArrayElementsBase = [
+    declarationId: t.NumericLiteral,
+    deps: t.ArrowFunctionExpression,
+    children: t.ArrayExpression,
+];
 
 /**
  * An array that represents the elements in {@link RuntimeBindingArrayExpression}
  */
-type RuntimeBindingArrayElements
-    = | [symbolId: t.NumericLiteral, deps: t.ArrowFunctionExpression]
-        | [symbolId: t.NumericLiteral, deps: t.ArrowFunctionExpression, effect: t.CallExpression];
+type RuntimeBindingArrayElements =
+    | RuntimeBindingArrayElementsBase
+    | [...RuntimeBindingArrayElementsBase, effect: t.CallExpression];
 
 /**
  * Check if the given array is a {@link RuntimeBindingArrayElements}
  */
 const isRuntimeBindingArrayElements = (elements: (t.Node | null | undefined)[]): elements is RuntimeBindingArrayElements => {
-    const [symbolId, deps, effect] = elements;
+    const [declarationId, deps, children, effect] = elements;
 
-    return t.isNumericLiteral(symbolId) && t.isArrowFunctionExpression(deps) && (!effect || t.isCallExpression(effect));
+    return (
+        declarationId?.type === "NumericLiteral"
+        && deps?.type === "ArrowFunctionExpression"
+        && children?.type === "ArrayExpression"
+        && (!effect || effect.type === "CallExpression")
+    );
 };
 
 // #endregion
 
-const isThisExpression = (node: t.Node): boolean => isIdentifierOf(node, "this") || (node.type === "MemberExpression" && isThisExpression(node.object));
+const isThisExpression = (node: t.Node): boolean =>
+    isIdentifierOf(node, "this")
+    || node.type === "ThisExpression"
+    || (node.type === "MemberExpression" && isThisExpression(node.object));
 
 const TSEntityNameToRuntime = (node: t.TSEntityName): t.MemberExpression | t.Identifier => {
     if (node.type === "Identifier") {
@@ -668,7 +763,7 @@ const TSEntityNameToRuntime = (node: t.TSEntityName): t.MemberExpression | t.Ide
     return Object.assign(node, t.memberExpression(left, node.right));
 };
 
-const getIdFromTSEntityName = (node: t.TSEntityName) => {
+const getIdFromTSEntityName = (node: t.TSEntityName): t.Identifier => {
     if (node.type === "Identifier") {
         return node;
     }
@@ -748,6 +843,9 @@ const patchTsNamespace = (nodes: t.Statement[]) => {
             continue;
 
         const [binding, exports] = result;
+
+        if (!(exports as t.ObjectExpression).properties.length)
+            continue;
 
         nodes[i] = {
             body: {

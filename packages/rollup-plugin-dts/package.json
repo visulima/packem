@@ -77,9 +77,9 @@
         "@visulima/tsconfig": "catalog:visulima",
         "ast-kit": "catalog:prod",
         "birpc": "catalog:prod",
-        "dts-resolver": "catalog:node",
         "magic-string": "catalog:utils",
         "obug": "catalog:prod",
+        "oxc-resolver": "catalog:node",
         "oxc-transform": "catalog:dev"
     },
     "devDependencies": {

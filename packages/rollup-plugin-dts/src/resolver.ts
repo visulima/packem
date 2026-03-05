@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { createResolver } from "dts-resolver";
+import { ResolverFactory } from "oxc-resolver";
 import type { Plugin, ResolvedId } from "rollup";
 
 import { filename_to_dts, RE_CSS, RE_DTS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename";
@@ -16,9 +16,10 @@ const createDtsResolvePlugin = ({
     tsconfig,
     tsconfigRaw,
 }: Pick<OptionsResolved, "cwd" | "tsconfig" | "tsconfigRaw" | "resolve" | "resolver" | "sideEffects">): Plugin => {
-    const baseDtsResolver = createResolver({
-        resolveNodeModules: !!resolve,
-        tsconfig,
+    const dtsResolver = new ResolverFactory({
+        conditionNames: ["types", "typings", "import", "require"],
+        mainFields: ["types", "typings", "module", "main"],
+        tsconfig: tsconfig ? { configFile: tsconfig, references: "auto" } : undefined,
     });
     const moduleSideEffects = sideEffects ? true : null;
 
@@ -45,6 +46,12 @@ const createDtsResolvePlugin = ({
 
                 // Get Rollup's resolution first for fallback and policy checks
                 const rollupResolution = await this.resolve(id, importer, options);
+
+                // If rollup already marked the resolution as external, respect it
+                if (rollupResolution?.external) {
+                    return external;
+                }
+
                 const dtsResolution = await resolveDtsPath(id, importer, rollupResolution);
 
                 // If resolution failed, error or externalize
@@ -113,7 +120,9 @@ const createDtsResolvePlugin = ({
                 // TODO reference
             );
         } else {
-            dtsPath = baseDtsResolver(id, importer);
+            const result = dtsResolver.resolveDtsSync(importer, id);
+
+            dtsPath = result.path;
         }
 
         if (dtsPath) {
