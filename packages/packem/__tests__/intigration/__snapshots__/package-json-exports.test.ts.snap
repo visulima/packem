@@ -54,7 +54,6 @@ exports.value = value;
 
 exports[`packem package.json exports > should generate proper assets with custom extensions from outputExtensionMap > dts output 1`] = `
 "declare const value = "index";
-
 export { value };
 "
 `;

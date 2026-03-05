@@ -314,11 +314,11 @@ export type ValidationOptions = {
     /** Dependency validation options */
     dependencies:
         | {
-              /** Hoisted dependency validation with exclusions */
-              hoisted: { exclude: string[] } | false;
-              /** Unused dependency validation with exclusions */
-              unused: { exclude: string[] } | false;
-          }
+            /** Hoisted dependency validation with exclusions */
+            hoisted: { exclude: string[] } | false;
+            /** Unused dependency validation with exclusions */
+            unused: { exclude: string[] } | false;
+        }
         | false;
     /** Package.json validation options */
     packageJson?: {

@@ -2,7 +2,6 @@
 
 exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > cjs dts output 1`] = `
 "declare const indent: string;
-
 export { indent };
 "
 `;
@@ -117,14 +116,12 @@ exports.indent = indent;
 
 exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > dts output 1`] = `
 "declare const indent: string;
-
 export { indent };
 "
 `;
 
 exports[`packem externals > should bundle 'devDependencies' that are used inside the code and are not marked as external > mjs dts output 1`] = `
 "declare const indent: string;
-
 export { indent };
 "
 `;
@@ -261,13 +258,11 @@ export { index as default };
 `;
 
 exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > cjs dts output 1`] = `
-"import * as _svgr_core from '@svgr/core';
-
+"import * as _svgr_core0 from '@svgr/core';
 declare const transform: {
-    (code: string, config?: _svgr_core.Config, state?: Partial<_svgr_core.State>): Promise<string>;
-    sync(code: string, config?: _svgr_core.Config, state?: Partial<_svgr_core.State>): string;
+  (code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): Promise<string>;
+  sync(code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): string;
 };
-
 export { transform };
 "
 `;
@@ -286,25 +281,21 @@ exports.transform = transform;
 `;
 
 exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > dts output 1`] = `
-"import * as _svgr_core from '@svgr/core';
-
+"import * as _svgr_core0 from '@svgr/core';
 declare const transform: {
-    (code: string, config?: _svgr_core.Config, state?: Partial<_svgr_core.State>): Promise<string>;
-    sync(code: string, config?: _svgr_core.Config, state?: Partial<_svgr_core.State>): string;
+  (code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): Promise<string>;
+  sync(code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): string;
 };
-
 export { transform };
 "
 `;
 
 exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > mjs dts output 1`] = `
-"import * as _svgr_core from '@svgr/core';
-
+"import * as _svgr_core0 from '@svgr/core';
 declare const transform: {
-    (code: string, config?: _svgr_core.Config, state?: Partial<_svgr_core.State>): Promise<string>;
-    sync(code: string, config?: _svgr_core.Config, state?: Partial<_svgr_core.State>): string;
+  (code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): Promise<string>;
+  sync(code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): string;
 };
-
 export { transform };
 "
 `;
@@ -320,7 +311,6 @@ export { transform };
 
 exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > cjs dts output 1`] = `
 "declare const indent: string;
-
 export { indent };
 "
 `;
@@ -345,14 +335,12 @@ exports.indent = indent;
 
 exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > dts output 1`] = `
 "declare const indent: string;
-
 export { indent };
 "
 `;
 
 exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > mjs dts output 1`] = `
 "declare const indent: string;
-
 export { indent };
 "
 `;

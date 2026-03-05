@@ -129,7 +129,7 @@ describe("packem validation", () => {
             });
 
             expect(binProcess.exitCode).toBe(1);
-            expect(binProcess.stdout).toContain("Total file size exceeds the limit: 96 Bytes / 1.00 Bytes");
+            expect(binProcess.stdout).toContain("Total file size exceeds the limit: 93 Bytes / 1.00 Bytes");
         });
 
         it("should throw a warning if the size of the bundle extends the bundle limit and allowFail is enabled", async () => {
@@ -173,7 +173,7 @@ describe("packem validation", () => {
 
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
-            expect(binProcess.stdout).toContain("Total file size exceeds the limit: 96 Bytes / 1.00 Bytes");
+            expect(binProcess.stdout).toContain("Total file size exceeds the limit: 93 Bytes / 1.00 Bytes");
         });
     });
 });

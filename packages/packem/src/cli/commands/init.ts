@@ -9,11 +9,14 @@ import { join, resolve } from "@visulima/path";
 
 import cssLoaderDependencies from "./utils/css-loader-dependencies";
 
-const createInitCommand = (cli: Cli): void => {
+const createInitCommand = (cli: Cli<Console>): void => {
     cli.addCommand({
         description: "Initialize packem configuration",
         // eslint-disable-next-line sonarjs/cognitive-complexity
-        execute: async ({ logger, options }): Promise<void> => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        execute: async ({ logger, options: rawOptions }): Promise<void> => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const options = rawOptions as Record<string, any>;
             intro("Welcome to packem setup");
 
             if (isAccessibleSync(join(options.dir, "packem.config.ts"))) {
@@ -154,12 +157,13 @@ const createInitCommand = (cli: Cli): void => {
 
             if (options.isolatedDeclarationTransformer === undefined) {
                 // eslint-disable-next-line no-param-reassign
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 options.isolatedDeclarationTransformer = await select({
                     message: "Pick a isolated declaration transformer",
                     options: [
-                        { label: "Typescript", value: "typescript" },
-                        { label: "swc", value: "swc" },
-                        { label: "OXC", value: "oxc" },
+                        { label: "Typescript", value: "typescript" as any },
+                        { label: "swc", value: "swc" as any },
+                        { label: "OXC", value: "oxc" as any },
                         { label: "None", value: undefined },
                     ],
                 });
@@ -263,7 +267,7 @@ const createInitCommand = (cli: Cli): void => {
                 cssLoaders.push(...extraCssLoaders);
 
                 const shouldInstall = await confirm({
-                    message: `Do you want to install "${cssLoaders.join('", "')}"?`,
+                    message: `Do you want to install "${cssLoaders.join("\", \"")}"?`,
                 });
 
                 if (shouldInstall) {

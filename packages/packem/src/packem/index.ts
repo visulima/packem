@@ -148,41 +148,24 @@ const generateOptions = (
                     baseUrl: tsconfig?.config.compilerOptions?.baseUrl ?? ".",
                     // Avoid extra work
                     checkJs: false,
-
-                    /**
-                     * https://github.com/privatenumber/pkgroll/pull/54
-                     *
-                     * I think this is necessary because TypeScript's composite requires
-                     * that all files are passed in via `include`. However, it seems that
-                     * rollup-plugin-dts doesn't read or relay the `include` option in tsconfig.
-                     *
-                     * For now, simply disabling composite does the trick since it doesn't seem
-                     * necessary for dts bundling.
-                     *
-                     * One concern here is that this overwrites the compilerOptions. According to
-                     * the rollup-plugin-dts docs, it reads from baseUrl and paths.
-                     */
+                    // Disable composite to avoid requiring all files via `include`
                     composite: false,
                     // Ensure ".d.ts" modules are generated
                     declaration: true,
-                    // This plugin doesn't support declaration maps
                     declarationMap: false,
                     emitDeclarationOnly: true,
-                    // error TS5074: Option '--incremental' can only be specified using tsconfig, emitting to single
-                    // file or when option '--tsBuildInfoFile' is specified.
+                    // Handled via plugin-level `incremental` option instead
                     incremental: false,
                     moduleResolution: 100, // Bundler,
                     // Skip ".js" generation
                     noEmit: false,
                     // Skip code generation when error occurs
                     noEmitOnError: true,
-                    // https://github.com/Swatinem/rollup-plugin-dts/issues/143
                     preserveSymlinks: false,
                     skipLibCheck: true,
                     // Ensure we can parse the latest code
                     target: 99, // ESNext
                 },
-                respectExternal: true,
             },
             dynamicVars: {
                 errorWhenNoFilesFound: true,
@@ -283,13 +266,13 @@ const generateOptions = (
             },
             license: {
                 dependenciesTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
-                    `\n# Licenses of bundled dependencies\n` +
-                    `The published ${pName} artifact additionally contains code with the following licenses:\n${
+                    `\n# Licenses of bundled dependencies\n`
+                    + `The published ${pName} artifact additionally contains code with the following licenses:\n${
                         licenses.length > 0 ? `${licenses.join(", ")}\n\n` : "\n"
                     }# Bundled dependencies:\n${dependencyLicenseTexts}`,
                 dtsTemplate: (licenses: string[], dependencyLicenseTexts: string, pName: string) =>
-                    `\n# Licenses of bundled types\n` +
-                    `The published ${pName} artifact additionally contains code with the following licenses:\n${
+                    `\n# Licenses of bundled types\n`
+                    + `The published ${pName} artifact additionally contains code with the following licenses:\n${
                         licenses.length > 0 ? `${licenses.join(", ")}\n\n` : "\n"
                     }# Bundled types:\n${dependencyLicenseTexts}`,
             },
@@ -303,14 +286,14 @@ const generateOptions = (
                     jsxRuntime === "preserve"
                         ? "preserve"
                         : {
-                              development: environment !== "production",
-                              pragma: tsconfig?.config.compilerOptions?.jsxFactory,
-                              pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
-                              pure: true,
-                              runtime: jsxRuntime === "transform" || jsxRuntime === "automatic" ? "automatic" : "classic",
-                              useBuiltIns: true,
-                              useSpread: true,
-                          },
+                            development: environment !== "production",
+                            pragma: tsconfig?.config.compilerOptions?.jsxFactory,
+                            pragmaFrag: tsconfig?.config.compilerOptions?.jsxFragmentFactory,
+                            pure: true,
+                            runtime: jsxRuntime === "transform" || jsxRuntime === "automatic" ? "automatic" : "classic",
+                            useBuiltIns: true,
+                            useSpread: true,
+                        },
             },
             patchTypes: {},
             polyfillNode: {},
@@ -366,17 +349,17 @@ const generateOptions = (
                 injectCreateRequireForImportRequire: false,
                 preserveDynamicImport: true,
                 production: environment === PRODUCTION_ENV,
-                ...(tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
+                ...tsconfig?.config.compilerOptions?.jsx && ["react", "react-jsx", "react-jsxdev"].includes(tsconfig.config.compilerOptions.jsx)
                     ? {
-                          jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
-                          jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
-                          jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
-                          jsxRuntime,
-                          transforms: ["typescript", "jsx", ...(tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : [])],
-                      }
+                        jsxFragmentPragma: tsconfig.config.compilerOptions.jsxFragmentFactory,
+                        jsxImportSource: tsconfig.config.compilerOptions.jsxImportSource,
+                        jsxPragma: tsconfig.config.compilerOptions.jsxFactory,
+                        jsxRuntime,
+                        transforms: ["typescript", "jsx", ...tsconfig.config.compilerOptions.esModuleInterop ? ["imports"] : []],
+                    }
                     : {
-                          transforms: ["typescript", ...(tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : [])],
-                      }),
+                        transforms: ["typescript", ...tsconfig?.config.compilerOptions?.esModuleInterop ? ["imports"] : []],
+                    },
             },
             swc: {
                 include: ALLOWED_TRANSFORM_EXTENSIONS_REGEX,
@@ -664,7 +647,8 @@ const createContext = async (
         dependencyGraphMap: new Map<string, Set<[string, string]>>(),
         environment,
         hoistedDependencies: new Set(),
-        hooks: createHooks<InternalBuildOptions>(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        hooks: createHooks<InternalBuildOptions>() as any,
         implicitDependencies: new Set(),
         // Create shared jiti instance for context
         jiti: createJiti(options.rootDir, options.jiti),
@@ -732,9 +716,12 @@ const createContext = async (
         context.logger.info("Minification is enabled, the output will be minified");
     }
 
-    if (context.options.json && context.options.minify && context.options.json.preferConst === undefined) {
-        context.options.json = {
-            ...context.options.json,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((context.options as any).json && context.options.minify && (context.options as any).json.preferConst === undefined) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (context.options as any).json = {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ...(context.options as any).json,
             preferConst: false,
         };
     }
@@ -766,9 +753,9 @@ const createContext = async (
     }
 
     if (
-        context.options.declaration &&
-        (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript) &&
-        !context.tsconfig?.config.compilerOptions?.isolatedModules
+        context.options.declaration
+        && (packageJson.dependencies?.typescript || packageJson.devDependencies?.typescript)
+        && !context.tsconfig?.config.compilerOptions?.isolatedModules
     ) {
         context.logger.warn(
             `'compilerOptions.isolatedModules' is not enabled in tsconfig.\nBecause none of the third-party transpiler, packem uses under the hood is type-aware, some techniques or features often used in TypeScript are not properly checked and can cause mis-compilation or even runtime errors.\nTo mitigate this, you should set the isolatedModules option to true in tsconfig and let your IDE warn you when such incompatible constructs are used.`,
@@ -858,8 +845,8 @@ const packem = async (
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type,@typescript-eslint/no-explicit-any
     let onSuccessCleanup: (() => any) | undefined | void;
 
-    const cacheKey =
-        getHash(
+    const cacheKey
+        = getHash(
             JSON.stringify({
                 version: packageJson.version,
                 ...packageJson.dependencies,
@@ -925,7 +912,9 @@ const packem = async (
                 });
             } else if (onSuccessCleanup !== undefined) {
                 try {
-                    await onSuccessCleanup();
+                    if (typeof onSuccessCleanup === "function") {
+                        await (onSuccessCleanup as () => Promise<void>)();
+                    }
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (error: any) {
                     throw new Error(`onSuccess function cleanup failed: ${error.message}`, { cause: error });
@@ -950,13 +939,13 @@ const packem = async (
 
                 // Capture the spawned process locally to avoid race conditions with cleanup
                 // eslint-disable-next-line no-multi-assign
-                const executedProcess = (onSuccessProcess = exec(context.options.onSuccess, [], {
+                const executedProcess = onSuccessProcess = exec(context.options.onSuccess, [], {
                     nodeOptions: {
                         shell: true,
                         stdio: "inherit",
                         timeout,
                     },
-                }));
+                });
 
                 await executedProcess;
 

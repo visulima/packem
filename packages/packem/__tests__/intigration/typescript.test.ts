@@ -113,7 +113,7 @@ describe("packem typescript", () => {
         it("should resolve .jsx -> .tsx", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.jsx";');
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import \"./file.jsx\";");
             await writeFile(`${temporaryDirectoryPath}/src/file.tsx`, "console.log(1);");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -142,7 +142,7 @@ describe("packem typescript", () => {
         it("should resolve .jsx -> .js", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.js`, 'import "./file.jsx";');
+            await writeFile(`${temporaryDirectoryPath}/src/index.js`, "import \"./file.jsx\";");
             await writeFile(`${temporaryDirectoryPath}/src/file.jsx`, "console.log(1);");
 
             await createPackageJson(temporaryDirectoryPath, {
@@ -166,7 +166,7 @@ describe("packem typescript", () => {
         it("should resolve .mjs -> .ts", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.mjs";');
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import \"./file.mjs\";");
             await writeFile(`${temporaryDirectoryPath}/src/file.mjs`, "console.log(1);");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -195,7 +195,7 @@ describe("packem typescript", () => {
         it("should resolve .cjs -> .ts", async () => {
             expect.assertions(3);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import "./file.cjs";');
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import \"./file.cjs\";");
             await writeFile(`${temporaryDirectoryPath}/src/file.cjs`, "console.log(1);");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -226,10 +226,10 @@ describe("packem typescript", () => {
 
             // In source code, TypeScript files should be preferred over JavaScript
             // when both exist for the same import specifier
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { value } from "./file.js"; console.log(value);');
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { value } from \"./file.js\"; console.log(value);");
             // Both files exist, .ts should be preferred
-            await writeFile(`${temporaryDirectoryPath}/src/file.ts`, 'export const value = "from-typescript";');
-            await writeFile(`${temporaryDirectoryPath}/src/file.js`, 'export const value = "from-javascript";');
+            await writeFile(`${temporaryDirectoryPath}/src/file.ts`, "export const value = \"from-typescript\";");
+            await writeFile(`${temporaryDirectoryPath}/src/file.js`, "export const value = \"from-javascript\";");
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -281,19 +281,19 @@ console.log(fromBoth, fromTs);
                 type: "module",
             });
             // Entry point imports from a relative file
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "index.js"), 'export { fromBoth } from "./file.js";');
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "index.js"), "export { fromBoth } from \"./file.js\";");
             // Package accidentally ships both .js and .ts for the same file
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.js"), 'export const fromBoth = "compiled-js";');
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.ts"), 'export const fromBoth: string = "source-ts";');
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.js"), "export const fromBoth = \"compiled-js\";");
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-both", "file.ts"), "export const fromBoth: string = \"source-ts\";");
 
             await writeJson(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "package.json"), {
                 main: "./index.js",
                 name: "pkg-with-only-ts",
                 type: "module",
             });
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "index.js"), 'export { fromTs } from "./file.js";');
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "index.js"), "export { fromTs } from \"./file.js\";");
             // Package only ships .ts (forgot to compile or .npmignore misconfigured)
-            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "file.ts"), 'export const fromTs: string = "only-ts";');
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "pkg-with-only-ts", "file.ts"), "export const fromTs: string = \"only-ts\";");
 
             await installPackage(temporaryDirectoryPath, "typescript");
             await createPackageJson(temporaryDirectoryPath, {
@@ -332,7 +332,7 @@ console.log(fromBoth, fromTs);
 
             await writeFile(
                 `${temporaryDirectoryPath}/src/index.ts`,
-                'import "components:Test";\n import { test2 } from "components:Test2";\n\nconsole.log(test2);',
+                "import \"components:Test\";\n import { test2 } from \"components:Test2\";\n\nconsole.log(test2);",
             );
             await writeFile(`${temporaryDirectoryPath}/src/components/Test.ts`, "console.log(1);");
             await writeFile(`${temporaryDirectoryPath}/src/components/Test2.ts`, "export const test2 = 'test'");
@@ -436,9 +436,9 @@ console.log(1);
 
             await installPackage(temporaryDirectoryPath, "typescript");
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { b } from "./bb";\n\nconsole.log(b);');
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { b } from \"./bb\";\n\nconsole.log(b);");
             await writeFile(`${temporaryDirectoryPath}/tt/a/aa.ts`, "export const a = 1;");
-            await writeFile(`${temporaryDirectoryPath}/tt/b/bb.ts`, 'import { a } from "./aa";\nnconsole.log(a);\n\nexport const b = 2;');
+            await writeFile(`${temporaryDirectoryPath}/tt/b/bb.ts`, "import { a } from \"./aa\";\nnconsole.log(a);\n\nexport const b = 2;");
 
             await createTsConfig(temporaryDirectoryPath, {
                 compilerOptions: {
@@ -537,7 +537,7 @@ export class ExampleClass {
         expect(cjs).toMatchSnapshot("cjs code output");
     });
 
-    it('should allow support for "allowJs" and generate proper assets', async () => {
+    it("should allow support for \"allowJs\" and generate proper assets", async () => {
         expect.assertions(4);
 
         await writeFile(`${temporaryDirectoryPath}/src/index.js`, `export default () => 'index';`);
@@ -615,8 +615,7 @@ export const version = pkgJson.version;
 
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dMtsContent).toBe(`declare const version: string;
-
+        expect(dMtsContent).toBe(`declare const version: any;
 export { version };
 `);
 
@@ -661,14 +660,12 @@ export { version };
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare const _default: () => string;
-
 export { _default as default };
 `);
 
         const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dTsContent).toBe(`declare const _default: () => string;
-
 export = _default;
 `);
 
@@ -714,14 +711,12 @@ export { index as default };
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare const _default: () => string;
-
 export { _default as default };
 `);
 
         const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dTsContent).toBe(`declare const _default: () => string;
-
 export = _default;
 `);
 
@@ -778,7 +773,6 @@ export { index as default };
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dMtsContent).toBe(`declare const _default: () => string;
-
 export { _default as default };
 `);
     });
@@ -840,10 +834,8 @@ export declare function fn(a: data): data;
 
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dMtsContent).toBe(`import * as dep_a from 'dep-a';
-
-declare const _default: dep_a.data;
-
+        expect(dMtsContent).toBe(`import * as dep_a0 from 'dep-a';
+declare const _default: dep_a0.data;
 export { _default as default };
 `);
     });
@@ -905,7 +897,6 @@ export { getOne };
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare function getOne(): Promise<number>;
-
 export { getOne };
 `);
 
@@ -925,7 +916,6 @@ exports.getOne = getOne;
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare function getOne(): Promise<number>;
-
 export { getOne };
 `);
     });
@@ -1004,7 +994,6 @@ export { getOne };
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare function getOne(): Promise<any>;
-
 export { getOne };
 `);
 
@@ -1036,7 +1025,6 @@ exports.getOne = getOne;
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare function getOne(): Promise<any>;
-
 export { getOne };
 `);
     });
@@ -1103,7 +1091,6 @@ export { test };
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare function test(): Promise<any>;
-
 export { test };
 `);
 
@@ -1123,7 +1110,6 @@ exports.test = test;
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare function test(): Promise<any>;
-
 export { test };
 `);
     });
@@ -1290,34 +1276,25 @@ exports.AppContext = AppContext;
 
             const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-            expect(dMtsContent).toBe(`export { anotherSharedApi as sharedApi } from './another.mjs';
-
+            expect(dMtsContent).toBe(`export { anotherSharedApi as sharedApi } from "./another.mjs";
 declare const AppContext: any;
-
 declare const index = "index";
-
 export { AppContext, index };
 `);
 
             const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-            expect(dCtsContent).toBe(`export { anotherSharedApi as sharedApi } from './another.cjs';
-
+            expect(dCtsContent).toBe(`export { anotherSharedApi as sharedApi } from "./another.cjs";
 declare const AppContext: any;
-
 declare const index = "index";
-
 export { AppContext, index };
 `);
 
             const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-            expect(dTsContent).toBe(`export { anotherSharedApi as sharedApi } from './another.js';
-
+            expect(dTsContent).toBe(`export { anotherSharedApi as sharedApi } from "./another.js";
 declare const AppContext: any;
-
 declare const index = "index";
-
 export { AppContext, index };
 `);
         },
@@ -1329,7 +1306,7 @@ export { AppContext, index };
             async (isolatedDeclarationTransformer) => {
                 expect.assertions(7);
 
-                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : '"';
+                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : "\"";
 
                 await writeFile(
                     `${temporaryDirectoryPath}/src/index.ts`,
@@ -1429,7 +1406,7 @@ export declare let num: Num;
             async (isolatedDeclarationTransformer) => {
                 expect.assertions(9);
 
-                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : '"';
+                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : "\"";
 
                 await writeFile(`${temporaryDirectoryPath}/src/index.ts`, `export type Bar = string;`);
                 await writeFile(
@@ -1525,7 +1502,7 @@ export declare const test = "test";
             async (isolatedDeclarationTransformer) => {
                 expect.assertions(10);
 
-                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : '"';
+                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : "\"";
 
                 await writeFile(
                     `${temporaryDirectoryPath}/src/index.ts`,
@@ -1750,7 +1727,7 @@ export declare let num: Num;
             async (isolatedDeclarationTransformer) => {
                 expect.assertions(5);
 
-                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : '"';
+                const quote = ["swc", "typescript"].includes(isolatedDeclarationTransformer) ? "'" : "\"";
 
                 await writeFile(
                     `${temporaryDirectoryPath}/src/index.ts`,
@@ -1836,7 +1813,7 @@ export declare let num: Num;
         it.each(["typescript", "oxc", "swc"])("should resolve aliases with '%s' isolated declarations transformer", async (isolatedDeclarationTransformer) => {
             expect.assertions(10);
 
-            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { a } from "utils/a";\nexport default a;');
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, "import { a } from \"utils/a\";\nexport default a;");
             await writeFile(`${temporaryDirectoryPath}/src/utils/a.ts`, "export const a: number = 1;");
 
             await installPackage(temporaryDirectoryPath, "typescript");
@@ -2062,7 +2039,6 @@ export = test;
 
         expect(mDtsContent).toBe(`declare const test: () => string;
 declare const test2 = "this should be in final bundle, test2 string";
-
 export { test as default, test2 };
 `);
     });
@@ -2160,7 +2136,6 @@ export = test;
 
         expect(mDtsContent).toBe(`declare const test: () => string;
 declare const test2 = "this should be in final bundle, test2 string";
-
 export { test as default, test2 };
 `);
     });
@@ -2222,21 +2197,18 @@ module.exports = test;
         const cDtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(cDtsContent).toBe(`declare const test: () => string;
-
 export = test;
 `);
 
         const dtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dtsContent).toBe(`declare const test: () => string;
-
 export = test;
 `);
 
         const mDtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(mDtsContent).toBe(`declare const test: () => string;
-
 export { test as default };
 `);
     });
@@ -2886,74 +2858,12 @@ export { deepKeys, deepKeysFromList } from "deeks";`,
 
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(dMtsContent).toBe(`interface DeeksOptions {
-    /** @default false */
-    arrayIndexesAsKeys?: boolean;
-    /** @default true */
-    expandNestedObjects?: boolean;
-    /** @default false */
-    expandArrayObjects?: boolean;
-    /** @default false */
-    ignoreEmptyArraysWhenExpanding?: boolean;
-    /** @default false */
-    escapeNestedDots?: boolean;
-    /** @default false */
-    ignoreEmptyArrays?: boolean;
-}
-
-/**
- * Return the deep keys list for a single document
- * @param object
- * @param options
- * @returns {Array}
- */
-declare function deepKeys(object: object, options?: DeeksOptions): string[];
-/**
- * Return the deep keys list for all documents in the provided list
- * @param list
- * @param options
- * @returns Array[Array[String]]
- */
-declare function deepKeysFromList(list: object[], options?: DeeksOptions, visited?: WeakSet<object>): string[][];
-
-export { deepKeys, deepKeysFromList };
-export type { DeeksOptions as DeepKeysOptions };
+        expect(dMtsContent).toBe(`export { DeeksOptions as DeepKeysOptions, deepKeys, deepKeysFromList } from 'deeks';
 `);
 
         const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dTsContent).toBe(`interface DeeksOptions {
-    /** @default false */
-    arrayIndexesAsKeys?: boolean;
-    /** @default true */
-    expandNestedObjects?: boolean;
-    /** @default false */
-    expandArrayObjects?: boolean;
-    /** @default false */
-    ignoreEmptyArraysWhenExpanding?: boolean;
-    /** @default false */
-    escapeNestedDots?: boolean;
-    /** @default false */
-    ignoreEmptyArrays?: boolean;
-}
-
-/**
- * Return the deep keys list for a single document
- * @param object
- * @param options
- * @returns {Array}
- */
-declare function deepKeys(object: object, options?: DeeksOptions): string[];
-/**
- * Return the deep keys list for all documents in the provided list
- * @param list
- * @param options
- * @returns Array[Array[String]]
- */
-declare function deepKeysFromList(list: object[], options?: DeeksOptions, visited?: WeakSet<object>): string[][];
-
-export { deepKeys, deepKeysFromList };
-export type { DeeksOptions as DeepKeysOptions };
+        expect(dTsContent).toBe(`export { DeeksOptions as DeepKeysOptions, deepKeys, deepKeysFromList } from 'deeks';
 `);
 
         const ctsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);

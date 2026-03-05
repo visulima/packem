@@ -1,6 +1,6 @@
 import type { ConstructorOptions } from "@visulima/pail";
 import { createPail } from "@visulima/pail";
-import { SimpleReporter } from "@visulima/pail/reporter";
+import { SimpleReporter } from "@visulima/pail/reporter/simple";
 
 import internalPackem from "./packem";
 import type { BuildConfig, Environment, Mode } from "./types";
@@ -61,6 +61,7 @@ export const packem = async (rootDirectory: string, options: PackemOptions = {})
         ...options,
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pail = createPail({
         reporters: [
             new SimpleReporter({
@@ -73,7 +74,7 @@ export const packem = async (rootDirectory: string, options: PackemOptions = {})
         ],
         scope: "packem",
         ...logger,
-    });
+    } as any);
 
     await internalPackem(rootDirectory, mode, environment, pail, debug, inputConfig as BuildConfig, tsconfigPath);
 };

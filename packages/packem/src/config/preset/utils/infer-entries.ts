@@ -207,7 +207,7 @@ const detectFilePattern = (outputFile: string): { baseName: string; pattern: str
 
     // Extract directory and filename
     const parts = outputBase.split("/");
-    const filename = parts[parts.length - 1] || "";
+    const filename = parts.at(-1) || "";
 
     // Check if filename contains common patterns
     const commonPatterns = [".browser", ".server", ".development", ".production", ".node", ".workerd"];
@@ -299,7 +299,7 @@ const createOrUpdateEntry = (
 
     // Check for browser condition first (highest priority)
     // Check export key (subKey) for browser condition
-    const isBrowserFromExportKey = output.subKey === "browser" || output.subKey?.includes("browser");
+    const isBrowserFromExportKey = output.subKey === "browser" || (output.subKey as any)?.includes("browser");
     // Check output file for .browser pattern
     const isBrowserFromFile = output.file.includes(".browser");
 
@@ -317,11 +317,11 @@ const createOrUpdateEntry = (
 
         // Check for node/workerd conditions
         if (
-            output.subKey === "node" ||
-            output.subKey === "workerd" ||
-            output.file.includes(".node") ||
-            output.file.includes(".workerd") ||
-            output.file.includes(".server")
+            output.subKey === "node"
+            || output.subKey === "workerd"
+            || output.file.includes(".node")
+            || output.file.includes(".workerd")
+            || output.file.includes(".server")
         ) {
             runtime = "node";
         }
@@ -336,8 +336,8 @@ const createOrUpdateEntry = (
     const aliasName = fileWithoutExtension.replace(new RegExp(`^(\./)?${outDirectoryPrefix}/`), "");
 
     // Check if input file matches the alias (if not, we need fileAlias)
-    const inputBase =
-        input
+    const inputBase
+        = input
             .replace(/\.[^./]+$/, "")
             .split("/")
             .pop() || "";
@@ -347,10 +347,10 @@ const createOrUpdateEntry = (
     // Include fileAlias in uniqueness check to ensure separate entries for same input with different outputs
     let entry: BuildEntry | undefined = entries.find(
         (index) =>
-            index.input === input &&
-            index.environment === entryEnvironment &&
-            index.runtime === runtime &&
-            index.fileAlias === (needsFileAlias ? aliasName : undefined),
+            index.input === input
+            && index.environment === entryEnvironment
+            && index.runtime === runtime
+            && index.fileAlias === (needsFileAlias ? aliasName : undefined),
     );
 
     if (entry === undefined) {
@@ -677,9 +677,11 @@ const inferEntries = async (
         const hasExplicitJs = outputs.some((o) => !o.isExecutable && !/\.d\.[mc]?ts$/.test(o.file) && o.file.endsWith(".js"));
 
         if (hasExplicitMjs && !hasExplicitCjs && !hasExplicitJs) {
-            context.options.outputExtensionMap = { esm: "mjs" };
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            context.options.outputExtensionMap = { esm: "mjs" } as any;
         } else if (hasExplicitCjs && !hasExplicitMjs && !hasExplicitJs) {
-            context.options.outputExtensionMap = { cjs: "cjs" };
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            context.options.outputExtensionMap = { cjs: "cjs" } as any;
         }
     }
 
@@ -1038,17 +1040,17 @@ const inferEntries = async (
 
                             if (templateParts.length >= 2) {
                                 const escapedParts = templateParts.map((p) => p.replaceAll(/[.+?^${}()|[\]\\]/g, String.raw`\$&`));
-                                let regexStr = `${escapedParts[0]}(.+)`;
+                                let regexString = `${escapedParts[0]}(.+)`;
 
                                 for (let i = 1; i < escapedParts.length; i++) {
-                                    regexStr += escapedParts[i];
+                                    regexString += escapedParts[i];
 
                                     if (i < escapedParts.length - 1) {
-                                        regexStr += String.raw`\1`;
+                                        regexString += String.raw`\1`;
                                     }
                                 }
 
-                                const backrefRegex = new RegExp(`^${regexStr}$`);
+                                const backrefRegex = new RegExp(`^${regexString}$`);
                                 const backrefMatch = sourceRelPath.match(backrefRegex);
 
                                 if (backrefMatch) {
@@ -1155,11 +1157,11 @@ const inferEntries = async (
                 // Skip if we've already processed this export key (check if entry already exists)
                 const dtsOutput = allOutputsForExportKey.find((o) => o.file.endsWith(".d.ts"));
                 // If no .d.ts, use .d.mts or .d.cts as fallback
-                const baseOutput =
-                    dtsOutput ||
-                    allOutputsForExportKey.find((o) => o.file.endsWith(".d.mts")) ||
-                    allOutputsForExportKey.find((o) => o.file.endsWith(".d.cts")) ||
-                    output;
+                const baseOutput
+                    = dtsOutput
+                        || allOutputsForExportKey.find((o) => o.file.endsWith(".d.mts"))
+                        || allOutputsForExportKey.find((o) => o.file.endsWith(".d.cts"))
+                        || output;
 
                 // Only process if this is the .d.ts output (or the first one if no .d.ts)
                 // This ensures we only create ONE entry per export key
@@ -1232,7 +1234,7 @@ const inferEntries = async (
                         ...output,
                         file: outputPath,
                         // Don't set type for declaration files - they should not trigger JS builds
-                        ...(!isOutputDeclarationFile && inferredType && { type: inferredType }),
+                        ...!isOutputDeclarationFile && inferredType && { type: inferredType },
                     };
 
                     createOrUpdateEntry(entries, input, false, outputSlug, specificOutput, context, true, outputs);

@@ -95,9 +95,11 @@ export const createSveltePreset = (options: SveltePresetOptions = {}): BuildConf
                             ...pluginOptions.compilerOptions,
                         },
                         emitCss: false,
-                        exclude: pluginOptions.exclude,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        exclude: pluginOptions.exclude as any,
                         extensions: [".svelte"],
-                        include: pluginOptions.include ?? [/\.svelte$/],
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        include: (pluginOptions.include ?? [/\.svelte$/]) as any,
                         preprocess: pluginOptions.preprocess,
                     }),
                 },

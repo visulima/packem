@@ -4,7 +4,7 @@ import { warn } from "@visulima/packem-share/utils";
 
 import type { InternalBuildOptions, ValidationOptions } from "../../types";
 
-const joinWarnings = (warnings: Set<string> | string[]): string => [...warnings].map((id) => yellow(id)).join(", ");
+const joinWarnings = (warnings: Set<string> | string[]): string => Array.from(warnings, (id) => yellow(id)).join(", ");
 
 const validateDependencies = (context: BuildContext<InternalBuildOptions>): void => {
     if (context.hoistedDependencies.size > 0) {

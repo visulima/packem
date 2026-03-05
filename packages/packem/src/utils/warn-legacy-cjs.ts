@@ -28,7 +28,8 @@ const warnLegacyCJS = (context: BuildContext<InternalBuildOptions>): void => {
     }
 
     // 2) transformer explicit targets if already provided
-    const esbuildTargets = arrayify(context.options.rollup.esbuild?.target ?? []) as string[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const esbuildTargets = arrayify((context.options.rollup.esbuild as any)?.target ?? []) as string[];
 
     for (const t of esbuildTargets) {
         if (typeof t === "string" && t.startsWith("node")) {

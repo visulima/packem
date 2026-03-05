@@ -18,7 +18,7 @@ import groupByKeys from "./utils/group-by-keys";
 import gzipSize from "./utils/gzip-size";
 
 // Default concurrency limit for DTS generation to prevent memory overflow.
-// Each rollup-plugin-dts instance holds TypeScript program state in memory.
+// Each @visulima/rollup-plugin-dts instance holds TypeScript program state in memory.
 // Limiting concurrency allows V8 to GC between builds.
 const DEFAULT_DTS_CONCURRENCY = 2;
 
@@ -59,24 +59,24 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
                         decimals: 2,
                     }),
                 )}`,
-                entry.size?.brotli &&
-                    `brotli size: ${cyan(
-                        formatBytes(entry.size.brotli, {
-                            decimals: 2,
-                        }),
-                    )}`,
-                entry.size?.gzip &&
-                    `gzip size: ${cyan(
-                        formatBytes(entry.size.gzip, {
-                            decimals: 2,
-                        }),
-                    )}`,
-                chunkBytes !== 0 &&
-                    `chunk size: ${cyan(
-                        formatBytes(chunkBytes, {
-                            decimals: 2,
-                        }),
-                    )}`,
+                entry.size?.brotli
+                && `brotli size: ${cyan(
+                    formatBytes(entry.size.brotli, {
+                        decimals: 2,
+                    }),
+                )}`,
+                entry.size?.gzip
+                && `gzip size: ${cyan(
+                    formatBytes(entry.size.gzip, {
+                        decimals: 2,
+                    }),
+                )}`,
+                chunkBytes !== 0
+                && `chunk size: ${cyan(
+                    formatBytes(chunkBytes, {
+                        decimals: 2,
+                    }),
+                )}`,
             ]
                 .filter(Boolean)
                 .join(", ")})`;
@@ -92,8 +92,8 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
                             `  └─ ${rPath(p)}${bold(
                                 chunk.bytes
                                     ? ` (${formatBytes(chunk?.bytes, {
-                                          decimals: 2,
-                                      })})`
+                                        decimals: 2,
+                                    })})`
                                     : "",
                             )}`,
                         );
@@ -115,8 +115,8 @@ const showSizeInformation = (logger: Pail, context: BuildContext<InternalBuildOp
                             `  📦 ${rPath(m.id)}${bold(
                                 m.bytes
                                     ? ` (${formatBytes(m.bytes, {
-                                          decimals: 2,
-                                      })})`
+                                        decimals: 2,
+                                    })})`
                                     : "",
                             )}`,
                         ),
@@ -342,15 +342,17 @@ const createAdjustedContext = (
                 ...baseContext.options.rollup,
                 replace: baseContext.options.rollup.replace
                     ? {
-                          ...baseContext.options.rollup.replace,
-                          values: baseContext.options.rollup.replace.values ? { ...baseContext.options.rollup.replace.values } : { ...replaceValues },
-                      }
+                        ...baseContext.options.rollup.replace,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        values: (baseContext.options.rollup.replace as any).values ? { ...(baseContext.options.rollup.replace as any).values } : { ...replaceValues },
+                    }
                     : false,
             },
         },
     };
 
-    return result;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return result as any;
 };
 
 /**
@@ -435,9 +437,9 @@ const prepareRollupConfig = async (
                             ...context.options.rollup,
                             replace: context.options.rollup.replace
                                 ? {
-                                      ...context.options.rollup.replace,
-                                      values: {},
-                                  }
+                                    ...context.options.rollup.replace,
+                                    values: {},
+                                }
                                 : context.options.rollup.replace,
                         },
                     },
@@ -474,7 +476,8 @@ const prepareRollupConfig = async (
                     }
 
                     // Use the ORIGINAL context's user-provided values (not the reset ones in environmentRuntimeContext)
-                    const userValues = { ...(context.options.rollup.replace?.values ?? {}) };
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const userValues = context.options.rollup.replace ? { ...(context.options.rollup.replace as any).values } : {};
 
                     // Merge values: default values first, then user-provided values override them
                     Object.assign(environmentRuntimeContext.options.rollup.replace.values, defaultReplaceValues, userValues);
@@ -482,7 +485,8 @@ const prepareRollupConfig = async (
                     context.logger.warn("'replace' plugin is disabled. You should enable it to replace 'process.env.*' environments.");
                 }
 
-                const replaceValues = environmentRuntimeContext.options.rollup.replace?.values || defaultReplaceValues;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const replaceValues = (environmentRuntimeContext.options.rollup.replace && (environmentRuntimeContext.options.rollup.replace as any).values) || defaultReplaceValues;
 
                 const subDirectory = createSubDirectory(environment, runtime);
                 // Note: fileAlias is handled separately in prepareEntries, not in subDirectory
@@ -701,20 +705,18 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
     // Run JS bundling in parallel (fast and memory-efficient)
     if (builders.size > 0) {
         await Promise.all(
-            [...builders].map(async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuild(rollupContext, cache, subDirectory)),
+            Array.from(builders, async ({ context: rollupContext, fileCache: cache, subDirectory }) => await rollupBuild(rollupContext, cache, subDirectory)),
         );
     }
 
     // Run DTS generation with limited concurrency to prevent memory overflow.
-    // Each rollup-plugin-dts instance holds TypeScript program state in memory.
+    // Each @visulima/rollup-plugin-dts instance holds TypeScript program state in memory.
     // Limiting concurrency allows V8 to garbage collect between builds.
     if (typeBuilders.size > 0) {
         await runWithConcurrency(
-            [...typeBuilders].map(
-                ({ context: rollupContext, fileCache: cache, subDirectory }) =>
-                    () =>
-                        rollupBuildTypes(rollupContext, cache, subDirectory),
-            ),
+            Array.from(typeBuilders, ({ context: rollupContext, fileCache: cache, subDirectory }) =>
+                () =>
+                    rollupBuildTypes(rollupContext, cache, subDirectory)),
             DEFAULT_DTS_CONCURRENCY,
         );
     }

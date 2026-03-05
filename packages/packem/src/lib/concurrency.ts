@@ -24,7 +24,7 @@ const runWithConcurrency = async <T>(tasks: (() => Promise<T>)[], limit: number)
         }
     };
     // Start up to `limit` workers
-    const workers = Array.from({ length: Math.min(concurrencyLimit, tasks.length) }, () => runNext());
+    const workers = Array.from({ length: Math.min(concurrencyLimit, tasks.length) }).fill(runNext());
 
     await Promise.all(workers);
 

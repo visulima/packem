@@ -177,21 +177,18 @@ module.exports = Tr;
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare const Tr: () => any;
-
 export = Tr;
 `);
 
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare const Tr: () => any;
-
 export { Tr as default };
 `);
 
         const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dContent).toBe(`declare const Tr: () => any;
-
 export = Tr;
 `);
     });

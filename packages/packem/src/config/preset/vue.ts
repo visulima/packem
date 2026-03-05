@@ -68,7 +68,6 @@ export const createVuePreset = (options: VuePresetOptions = {}): BuildConfig => 
                     plugin: Vue({
                         customElement: pluginOptions.customElement ?? false,
                         exclude: pluginOptions.exclude,
-                        exportMode: "default",
                         include: pluginOptions.include ?? [/\.vue$/],
                         template: pluginOptions.template,
                     }),

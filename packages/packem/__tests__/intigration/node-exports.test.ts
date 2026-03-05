@@ -68,21 +68,18 @@ module.exports = test;
             const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
             expect(dCtsContent).toBe(`declare const test: () => string;
-
 export = test;
 `);
 
             const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
             expect(dMtsContent).toBe(`declare const test: () => string;
-
 export { test as default };
 `);
 
             const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
             expect(dContent).toBe(`declare const test: () => string;
-
 export = test;
 `);
         });
@@ -257,21 +254,18 @@ module.exports = test;
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare const test = "this should be in final bundle";
-
 export = test;
 `);
 
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare const test = "this should be in final bundle";
-
 export { test as default };
 `);
 
         const dContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
         expect(dContent).toBe(`declare const test = "this should be in final bundle";
-
 export = test;
 `);
     });
@@ -321,21 +315,18 @@ module.exports = test;
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.d.cts`);
 
         expect(dCtsContent).toBe(`declare const test = "this should be in final bundle";
-
 export = test;
 `);
 
         const dMtsContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.d.mts`);
 
         expect(dMtsContent).toBe(`declare const test = "this should be in final bundle";
-
 export { test as default };
 `);
 
         const dContent = readFileSync(`${temporaryDirectoryPath}/dist/test/index.d.ts`);
 
         expect(dContent).toBe(`declare const test = "this should be in final bundle";
-
 export = test;
 `);
     });
