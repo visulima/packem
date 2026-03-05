@@ -47,8 +47,8 @@ describe("packem error cases", () => {
         // < 20: "Unexpected end of JSON input in"
         // 20-21: "Expected property name or"
         // 22+: "Invalid package config" (ERR_INVALID_PACKAGE_CONFIG)
-        const expectedMessage =
-            NODE_JS_VERSION < 20 ? "Unexpected end of JSON input in" : NODE_JS_VERSION < 22 ? "Expected property name or" : "Invalid package config";
+        const expectedMessage
+            = NODE_JS_VERSION < 20 ? "Unexpected end of JSON input in" : NODE_JS_VERSION < 22 ? "Expected property name or" : "Invalid package config";
 
         expect(binProcess.stderr).toContain(expectedMessage);
         expect(binProcess.exitCode).toBe(1);

@@ -10,18 +10,18 @@ export interface ReactPresetOptions {
     compiler?:
         | boolean
         | {
-              /**
-               * React Compiler compilation mode
-               * @default "infer"
-               */
-              compilationMode?: "infer" | "annotation";
+            /**
+             * React Compiler compilation mode
+             * @default "infer"
+             */
+            compilationMode?: "infer" | "annotation";
 
-              /**
-               * React Compiler panic threshold
-               * @default "critical_errors"
-               */
-              panicThreshold?: "critical_errors" | "all_errors";
-          };
+            /**
+             * React Compiler panic threshold
+             * @default "critical_errors"
+             */
+            panicThreshold?: "critical_errors" | "all_errors";
+        };
 
     /**
      * Custom Babel plugins to add
@@ -89,8 +89,8 @@ export const createReactPreset = (options: ReactPresetOptions = {}): BuildConfig
         },
     ]);
 
-    const finalPlugins = [...babelPlugins, ...(Array.isArray(plugins) ? plugins : [])];
-    const finalPresets = [...babelPresets, ...(Array.isArray(presets) ? presets : [])];
+    const finalPlugins = [...babelPlugins, ...Array.isArray(plugins) ? plugins : []];
+    const finalPresets = [...babelPresets, ...Array.isArray(presets) ? presets : []];
 
     return {
         hooks: {
@@ -106,7 +106,7 @@ export const createReactPreset = (options: ReactPresetOptions = {}): BuildConfig
                         babelConfig.presets[presetIndex] = [
                             preset[0],
                             {
-                                ...(typeof preset[1] === "object" && preset[1] !== null ? preset[1] : {}),
+                                ...typeof preset[1] === "object" && preset[1] !== null ? preset[1] : {},
                                 development: context.environment === "development",
                             },
                         ];

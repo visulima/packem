@@ -62,8 +62,8 @@ describe("packem watch", () => {
 
             while (Date.now() - start < 10_000) {
                 if (
-                    (stdout.includes("Rebuild finished") || stdout.includes("Build run in") || stdout.includes("Build succeeded")) &&
-                    stdout.includes("ON_SUCCESS_OK")
+                    (stdout.includes("Rebuild finished") || stdout.includes("Build run in") || stdout.includes("Build succeeded"))
+                    && stdout.includes("ON_SUCCESS_OK")
                 ) {
                     return;
                 }

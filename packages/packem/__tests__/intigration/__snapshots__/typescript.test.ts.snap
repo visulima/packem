@@ -44,7 +44,6 @@ module.exports = index;
 
 exports[`packem typescript > should allow support for "allowJs" and generate proper assets > ts type code output 1`] = `
 "declare function _default(): string;
-
 export = _default;
 "
 `;
@@ -457,79 +456,55 @@ exports.deepKeysFromList = deeksExports.deepKeysFromList;
 
 exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts > .d.cts type code output 1`] = `
 "declare global {
-    interface String {
-
-    }
+  interface String {}
 }
-
 type NativeStringTypes = string;
-
-export type { NativeStringTypes };
+export { NativeStringTypes };
 "
 `;
 
 exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts > .d.mts type code output 1`] = `
 "declare global {
-    interface String {
-
-    }
+  interface String {}
 }
-
 type NativeStringTypes = string;
-
-export type { NativeStringTypes };
+export { NativeStringTypes };
 "
 `;
 
 exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts > .d.ts type code output 1`] = `
 "declare global {
-    interface String {
-
-    }
+  interface String {}
 }
-
 type NativeStringTypes = string;
-
-export type { NativeStringTypes };
+export { NativeStringTypes };
 "
 `;
 
 exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > .d.cts type code output 1`] = `
 "declare global {
-    interface String {
-
-    }
+  interface String {}
 }
-
 type NativeStringTypes = string;
-
-export type { NativeStringTypes };
+export { NativeStringTypes };
 "
 `;
 
 exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > .d.mts type code output 1`] = `
 "declare global {
-    interface String {
-
-    }
+  interface String {}
 }
-
 type NativeStringTypes = string;
-
-export type { NativeStringTypes };
+export { NativeStringTypes };
 "
 `;
 
 exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > .d.ts type code output 1`] = `
 "declare global {
-    interface String {
-
-    }
+  interface String {}
 }
-
 type NativeStringTypes = string;
-
-export type { NativeStringTypes };
+export { NativeStringTypes };
 "
 `;
 
@@ -557,7 +532,6 @@ exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts,
 "declare const isUpperCode: Uint8Array<ArrayBuffer>;
 declare const isLowerCode: Uint8Array<ArrayBuffer>;
 declare const isDigitCode: Uint8Array<ArrayBuffer>;
-
 export { isDigitCode, isLowerCode, isUpperCode };
 "
 `;
@@ -566,7 +540,6 @@ exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts,
 "declare const isUpperCode: Uint8Array<ArrayBuffer>;
 declare const isLowerCode: Uint8Array<ArrayBuffer>;
 declare const isDigitCode: Uint8Array<ArrayBuffer>;
-
 export { isDigitCode, isLowerCode, isUpperCode };
 "
 `;
@@ -575,7 +548,6 @@ exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts,
 "declare const isUpperCode: Uint8Array<ArrayBuffer>;
 declare const isLowerCode: Uint8Array<ArrayBuffer>;
 declare const isDigitCode: Uint8Array<ArrayBuffer>;
-
 export { isDigitCode, isLowerCode, isUpperCode };
 "
 `;
@@ -596,9 +568,7 @@ export { isDigitCode, isLowerCode, isUpperCode };
 
 exports[`packem typescript > should compile only a type file > .d.ts type code output 1`] = `
 "declare global {
-    interface String {
-
-    }
+  interface String {}
 }
 "
 `;

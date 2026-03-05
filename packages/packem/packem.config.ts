@@ -19,7 +19,7 @@ export default defineConfig({
         "rollup-plugin-visualizer",
         "rollup-plugin-polyfill-node",
         "rollup-plugin-pure",
-        "rollup-plugin-dts",
+        "@visulima/rollup-plugin-dts",
         "rollup-plugin-license",
         "rs-module-lexer",
         "glob-parent",

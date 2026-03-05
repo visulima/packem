@@ -4,22 +4,21 @@
     "description": "Test fixture for advanced Tailwind CSS features",
     "type": "module",
     "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
     "scripts": {
         "build": "packem build",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "tailwindcss": "catalog:style",
-        "@tailwindcss/typography": "catalog:style",
         "@tailwindcss/forms": "catalog:style",
-        "preline": "catalog:prod"
+        "@tailwindcss/typography": "catalog:style",
+        "preline": "catalog:prod",
+        "tailwindcss": "catalog:style"
     },
     "devDependencies": {
-        "@visulima/packem": "workspace:*",
-        "typescript": "catalog:tsc",
         "@tailwindcss/node": "catalog:style",
         "@tailwindcss/oxide": "catalog:style",
-        "esbuild": "catalog:build"
+        "@visulima/packem": "workspace:*",
+        "esbuild": "catalog:build",
+        "typescript": "catalog:tsc"
     }
 }

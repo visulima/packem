@@ -33,9 +33,9 @@ const migrate = async ({ cwd, dryRun, logger }: { cwd?: string; dryRun?: boolean
         });
 
         logger.warn(
-            `\n\n` +
-                `Before proceeding, review the migration guide at https://www.visulima.com/docs/package/packem, as this process will modify your files.\n` +
-                `Uncommitted changes will be lost. Use the --dry-run flag to preview changes without applying them.`,
+            `\n\n`
+            + `Before proceeding, review the migration guide at https://www.visulima.com/docs/package/packem, as this process will modify your files.\n`
+            + `Uncommitted changes will be lost. Use the --dry-run flag to preview changes without applying them.`,
         );
         const input = await rl.question(`Continue? (Y/n) `);
 
@@ -51,7 +51,8 @@ const migrate = async ({ cwd, dryRun, logger }: { cwd?: string; dryRun?: boolean
         }
     }
 
-    if (cwd) process.chdir(cwd);
+    if (cwd)
+        process.chdir(cwd);
 
     let migrated = false;
 
@@ -105,7 +106,7 @@ const DEP_FIELDS = {
  * @param logger Logger instance for output
  * @returns Whether any migration was performed
  */
-const migratePackageJson = async (dryRun?: boolean, logger: any): Promise<boolean> => {
+const migratePackageJson = async (dryRun: boolean | undefined, logger: any): Promise<boolean> => {
     if (!existsSync("package.json")) {
         logger.error("No package.json found");
 
@@ -113,7 +114,8 @@ const migratePackageJson = async (dryRun?: boolean, logger: any): Promise<boolea
     }
 
     const pkgRaw = await readFile("package.json", "utf8");
-    const pkg = JSON.parse(pkgRaw);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pkg = JSON.parse(pkgRaw) as any;
     let found = false;
 
     // Migrate dependencies
@@ -240,7 +242,8 @@ const migrateConfigFiles = async (dryRun?: boolean, logger?: any): Promise<boole
     let found = false;
 
     for (const file of CONFIG_FILES) {
-        if (!existsSync(file)) continue;
+        if (!existsSync(file))
+            continue;
 
         logger.info(`Found config file \`${file}\`. Consider creating packem.config.ts instead.`);
         logger.warn(`Manual migration required for config files. See https://www.visulima.com/docs/package/packem`);
@@ -297,10 +300,13 @@ const renameKey = (object: Record<string, any>, oldKey: string, newKey: string, 
  * ```
  * @internal
  */
-const createMigrateCommand = (cli: Cli): void => {
+const createMigrateCommand = (cli: Cli<Console>): void => {
     cli.addCommand({
         description: "Migrate from other bundlers (tsup, unbuild, bunchee, etc.) to packem",
-        execute: async ({ logger, options }): Promise<void> => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        execute: async ({ logger, options: rawOptions }): Promise<void> => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const options = rawOptions as Record<string, any>;
             await migrate({
                 cwd: options.cwd,
                 dryRun: options.dryRun,
