@@ -1,3 +1,10 @@
+## @visulima/packem-share [1.0.0-alpha.21](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.20...@visulima/packem-share@1.0.0-alpha.21) (2026-03-05)
+
+### Miscellaneous Chores
+
+* **packem-share:** update source and tests ([751862a](https://github.com/visulima/packem/commit/751862abb19a001b158b3ad39557f2e85bcb1135))
+* update dependencies, fix linting and improve code formatting ([d78b132](https://github.com/visulima/packem/commit/d78b1325ce79dbd14deeb6311a74d81f7172a81e))
+
 ## @visulima/packem-share [1.0.0-alpha.20](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.19...@visulima/packem-share@1.0.0-alpha.20) (2026-02-21)
 
 ### Miscellaneous Chores
