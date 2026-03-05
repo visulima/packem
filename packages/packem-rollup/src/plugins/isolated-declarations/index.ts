@@ -65,7 +65,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
 
     if (context.tsconfig?.config.compilerOptions) {
         tsconfigPathPatterns = Object.entries(context.tsconfig.config.compilerOptions.paths ?? {}).map(([key]) =>
-            key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`),
+            (key.endsWith("*") ? new RegExp(`^${key.replace("*", "(.*)")}$`) : new RegExp(`^${key}$`)),
         );
     }
 

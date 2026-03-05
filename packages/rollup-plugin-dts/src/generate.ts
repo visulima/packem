@@ -161,7 +161,8 @@ export const createGeneratePlugin = ({
             for (const fileName of Object.keys(bundle)) {
                 const chunk = bundle[fileName];
 
-                if (!chunk) continue;
+                if (!chunk)
+                    continue;
 
                 // Strip names and sourcesContent from DTS sourcemap assets (works for both generate() and write())
                 if (chunk.type === "asset" && RE_DTS_MAP.test(fileName) && typeof (chunk as { source: unknown }).source === "string") {
@@ -285,7 +286,7 @@ export const createGeneratePlugin = ({
 
                             dtsCode += `
 declare namespace __json_default_export {
-  export { ${Array.from(exportMap.entries(), ([exported, local]) => exported === local ? exported : `${local} as ${exported}`).join(", ")} }
+  export { ${Array.from(exportMap.entries(), ([exported, local]) => (exported === local ? exported : `${local} as ${exported}`)).join(", ")} }
 }
 export { __json_default_export as default }`;
                         }

@@ -12,11 +12,11 @@ import cssLoaderDependencies from "./utils/css-loader-dependencies";
 const createInitCommand = (cli: Cli<Console>): void => {
     cli.addCommand({
         description: "Initialize packem configuration",
-        // eslint-disable-next-line sonarjs/cognitive-complexity
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         execute: async ({ logger, options: rawOptions }): Promise<void> => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const options = rawOptions as Record<string, any>;
+
             intro("Welcome to packem setup");
 
             if (isAccessibleSync(join(options.dir, "packem.config.ts"))) {
@@ -50,7 +50,6 @@ const createInitCommand = (cli: Cli<Console>): void => {
             const packagesToInstall: string[] = [];
 
             if (options.typescript === undefined && !hasTypescript) {
-                // eslint-disable-next-line no-param-reassign
                 options.typescript = await confirm({
                     message: "Do you want to install TypeScript?",
                 });
@@ -101,7 +100,6 @@ const createInitCommand = (cli: Cli<Console>): void => {
             }
 
             if (options.runtime === undefined) {
-                // eslint-disable-next-line no-param-reassign
                 options.runtime = await select({
                     message: "Pick a build runtime",
                     options: [
@@ -112,18 +110,14 @@ const createInitCommand = (cli: Cli<Console>): void => {
             }
 
             if (packages.includes("esbuild")) {
-                // eslint-disable-next-line no-param-reassign
                 options.transformer = "esbuild";
             } else if (packages.includes("@swc/core")) {
-                // eslint-disable-next-line no-param-reassign
                 options.transformer = "swc";
             } else if (packages.includes("sucrase")) {
-                // eslint-disable-next-line no-param-reassign
                 options.transformer = "sucrase";
             }
 
             if (options.transformer === undefined) {
-                // eslint-disable-next-line no-param-reassign
                 options.transformer = await select({
                     message: "Pick a transformer",
                     options: [
@@ -148,7 +142,6 @@ const createInitCommand = (cli: Cli<Console>): void => {
             }
 
             if (options.isolatedDeclarationTransformer === undefined) {
-                // eslint-disable-next-line no-param-reassign
                 options.isolatedDeclarationTransformer = (await confirm({
                     message: "Do you want to use an isolated declaration types?",
                     initialValue: false,
@@ -156,8 +149,6 @@ const createInitCommand = (cli: Cli<Console>): void => {
             }
 
             if (options.isolatedDeclarationTransformer === undefined) {
-                // eslint-disable-next-line no-param-reassign
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 options.isolatedDeclarationTransformer = await select({
                     message: "Pick a isolated declaration transformer",
                     options: [
@@ -205,7 +196,6 @@ const createInitCommand = (cli: Cli<Console>): void => {
             }
 
             if (options.css === undefined) {
-                // eslint-disable-next-line no-param-reassign
                 options.css = (await confirm({
                     message: "Do you want to use css in your project?",
                     initialValue: false,
@@ -280,7 +270,6 @@ const createInitCommand = (cli: Cli<Console>): void => {
             }
 
             if (options.cssMinifier === undefined) {
-                // eslint-disable-next-line no-param-reassign
                 options.cssMinifier = (await confirm({
                     message: "Do you want to minify your css?",
                     initialValue: false,

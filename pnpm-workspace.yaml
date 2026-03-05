@@ -4,13 +4,20 @@ packages:
     - "!packages/packem/__fixtures__/css/**"
     - "!packages/packem/__fixtures__/package/**"
     - "!packages/packem/__fixtures__/url/**"
-    - "packages/packem/__fixtures__/ecosystem/**"
-    - "packages/**"
-    - "examples/**"
+    - packages/packem/__fixtures__/ecosystem/**
+    - packages/**
+    - examples/**
+
+auditConfig:
+    ignoreCves:
+        - GHSA-23c5-xmqv-rm74
+        - GHSA-7r86-cg39-jmmj
+        - GHSA-23c5-xmqv-rm74
+
 catalogs:
     build:
         "@rollup/plugin-alias": 6.0.0
-        "@rollup/plugin-commonjs": 29.0.0
+        "@rollup/plugin-commonjs": 29.0.1
         "@rollup/plugin-dynamic-import-vars": 2.1.5
         "@rollup/plugin-inject": 5.0.5
         "@rollup/plugin-json": 6.1.0
@@ -25,7 +32,7 @@ catalogs:
         rollup: 4.59.0
         rollup-plugin-dts: 6.3.0
         rollup-plugin-license: 3.7.0
-        rollup-plugin-lit-css: ^6.0.0
+        rollup-plugin-lit-css: 6.0.1
         rollup-plugin-polyfill-node: 0.13.0
         rollup-plugin-pure: ^0.4.0
         rollup-plugin-svelte: ^7.2.3
@@ -54,7 +61,7 @@ catalogs:
         "@swc/helpers": 0.5.19
         "@swc/types": 0.1.25
         babel-preset-solid: ^1.9.10
-        conventional-changelog-conventionalcommits: 9.2.0
+        conventional-changelog-conventionalcommits: 9.3.0
         deeks: ^3.2.0
         detect-indent: ^7.0.2
         diff: 8.0.3
@@ -149,7 +156,7 @@ catalogs:
         gpt-tokenizer: ^3.4.0
         happy-dom: 20.8.3
         hookable: 6.0.1
-        html-minifier-next: 5.1.5
+        html-minifier-next: 5.1.6
         is-ci: ^4.1.0
         micromatch: ^4.0.8
         mlly: 1.8.1
@@ -251,6 +258,7 @@ catalogs:
         "@visulima/source-map": 2.0.5
         "@visulima/tabular": ^3.1.3
         "@visulima/tsconfig": 2.1.3
+
 dedupeInjectedDeps: true
 
 disallowWorkspaceCycles: true
@@ -287,6 +295,7 @@ onlyBuiltDependencies:
     - unrs-resolver
 
 overrides:
+    "@hono/node-server@<1.19.10": ">=1.19.10"
     ajv@<6.14.0: ">=6.14.0"
     ajv@>=7.0.0-alpha.0 <8.18.0: ">=8.18.0"
     axios@>=1.0.0 <=1.13.4: ">=1.13.5"
@@ -294,15 +303,21 @@ overrides:
     diff@>=5.0.0 <5.2.2: ">=5.2.2"
     glob@>=10.2.0 <10.5.0: ">=13.0.0"
     glob@>=11.0.0 <11.1.0: ">=13.0.0"
+    hono@<4.12.4: ">=4.12.4"
+    hono@>=4.12.0 <4.12.2: ">=4.12.2"
+    immutable@>=5.0.0 <5.1.5: ">=5.1.5"
     js-yaml@>=4.0.0 <4.1.1: ">=4.1.1"
     lodash@>=4.0.0 <=4.17.22: ">=4.17.23"
     markdown-it@>=13.0.0 <14.1.1: ">=14.1.1"
     minimatch@<10.2.1: ">=10.2.1"
+    minimatch@>=10.0.0 <10.2.3: ">=10.2.3"
     oxc-parser: 0.99.0
     oxc-resolver: 11.19.1
     oxc-transform: 0.99.0
     qs@<6.14.1: ">=6.14.1"
     qs@>=6.7.0 <=6.14.1: ">=6.14.2"
+    rollup@>=4.0.0 <4.59.0: ">=4.59.0"
+    svgo@=4.0.0: ">=4.0.1"
     tar@=7.5.1: ">=7.5.2"
     tmp@<=0.2.3: ">=0.2.5"
     undici@<6.23.0: ">=6.23.0"

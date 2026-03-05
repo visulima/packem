@@ -34,8 +34,7 @@ import { createDefuWithHooksMerger } from "../../utils/create-defu-with-hooks-me
 const createBuildCommand = (cli: Cli<Console>): void => {
     cli.addCommand({
         description: "Demonstrate options required",
-        // eslint-disable-next-line sonarjs/cognitive-complexity
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         execute: async ({ logger, options: rawOptions }): Promise<void> => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const options = rawOptions as Record<string, any>;
@@ -113,7 +112,6 @@ const createBuildCommand = (cli: Cli<Console>): void => {
 
             // When minify is enabled, sourcemap should be enabled by default, unless explicitly opted out
             if (options.minify && options.sourcemap === undefined) {
-                // eslint-disable-next-line no-param-reassign
                 options.sourcemap = true;
             }
 

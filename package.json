@@ -5,7 +5,8 @@
     "license": "MIT",
     "type": "module",
     "workspaces": [
-        "packages/*"
+        "packages/*",
+        "examples/*"
     ],
     "scripts": {
         "audit": "audit-ci --config ./audit-ci.jsonc",
