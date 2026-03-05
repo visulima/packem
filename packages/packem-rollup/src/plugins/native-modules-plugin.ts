@@ -31,6 +31,10 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
         },
 
         generateBundle: async (options: NormalizedOutputOptions) => {
+            if (modulesToCopy.size === 0) {
+                return;
+            }
+
             // Try to get output directory from generateBundle options if not set yet
             if (!distributionDirectory) {
                 if (options.dir) {
@@ -38,10 +42,6 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
                 } else if (options.file) {
                     distributionDirectory = dirname(options.file);
                 }
-            }
-
-            if (modulesToCopy.size === 0) {
-                return;
             }
 
             if (!distributionDirectory) {

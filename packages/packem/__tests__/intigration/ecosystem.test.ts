@@ -16,9 +16,10 @@ const ecosystemSuites = readdirSync(ecosystemPath, { withFileTypes: true })
 const ecosystemConfigs = {
     "advanced-tailwind": {
         // isolatedDeclarationTransformer: "typescript",
-        cssLoader: ["tailwindcss"],
-        runtime: "browser",
-        transformer: "esbuild",
+        config: { declaration: false },
+        cssLoader: ["tailwindcss"] as ("tailwindcss")[],
+        runtime: "browser" as "browser",
+        transformer: "esbuild" as "esbuild",
     },
     sitefetch: {
         isolatedDeclarationTransformer: "typescript",
