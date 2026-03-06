@@ -1,3 +1,5 @@
+## @visulima/packem-share [1.0.0-alpha.22](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.21...@visulima/packem-share@1.0.0-alpha.22) (2026-03-06)
+
 ## @visulima/packem-share [1.0.0-alpha.21](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.20...@visulima/packem-share@1.0.0-alpha.21) (2026-03-05)
 
 ### Miscellaneous Chores
