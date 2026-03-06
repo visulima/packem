@@ -1,6 +1,7 @@
 {
     "name": "examples_packem_mixed",
     "version": "1.0.0",
+    "private": true,
     "description": "",
     "type": "commonjs",
     "exports": {
