@@ -213,7 +213,7 @@
         "@visulima/pail": "catalog:visulima",
         "@visulima/path": "catalog:visulima",
         "@visulima/rollup-plugin-css": "1.0.0-alpha.20",
-        "@visulima/rollup-plugin-dts": "1.0.0-alpha.1",
+        "@visulima/rollup-plugin-dts": "workspace:*",
         "@visulima/tabular": "catalog:visulima",
         "@visulima/tsconfig": "catalog:visulima",
         "browserslist": "catalog:network",
