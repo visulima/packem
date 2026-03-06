@@ -173,7 +173,7 @@
         "@visulima/package": "catalog:visulima",
         "@visulima/packem-share": "1.0.0-alpha.21",
         "@visulima/path": "catalog:visulima",
-        "@visulima/rollup-plugin-dts": "1.0.0-alpha.1",
+        "@visulima/rollup-plugin-dts": "workspace:*",
         "@visulima/source-map": "catalog:visulima",
         "cjs-module-lexer": "catalog:prod",
         "clean-css": "catalog:style",
