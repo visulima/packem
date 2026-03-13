@@ -11,7 +11,7 @@ overrides:
   chrono-node@<2.2.4: '>=2.2.4'
   form-data@>=4.0.0 <4.0.4: '>=4.0.4'
   tmp@<=0.2.3: '>=0.2.4'
-  undici@>=6.0.0 <6.21.2: '>=7.18.2'
+  undici@>=6.0.0 <6.21.2: '>=7.24.0'
 
 importers:
 
@@ -10562,8 +10562,8 @@ packages:
     resolution: {integrity: sha512-l+zSMssRqrzDcb3fjMkjjLGmuiiK2pMIcV++mJaAc9vhjSGpvM7h43QgP+OAMb1GImHmbPyG2tBXeuyG5iY4gA==}
     engines: {node: '>=20.18.1'}
 
-  undici@7.22.0:
-    resolution: {integrity: sha512-RqslV2Us5BrllB+JeiZnK4peryVTndy9Dnqq62S3yYRRTj0tFQCwEniUy2167skdGOy3vqRzEvl1Dm4sV2ReDg==}
+  undici@7.24.1:
+    resolution: {integrity: sha512-5xoBibbmnjlcR3jdqtY2Lnx7WbrD/tHlT01TmvqZUFVc9Q1w4+j5hbnapTqbcXITMH1ovjq/W7BkqBilHiVAaA==}
     engines: {node: '>=20.18.1'}
 
   unherit@3.0.1:
@@ -12080,7 +12080,7 @@ snapshots:
       '@octokit/plugin-paginate-rest': 13.1.1(@octokit/core@5.2.1)
       '@octokit/plugin-rest-endpoint-methods': 10.4.1(@octokit/core@5.2.1)
       '@octokit/types': 12.6.0
-      undici: 7.22.0
+      undici: 7.24.1
 
   '@octokit/auth-action@4.1.0':
     dependencies:
@@ -21787,7 +21787,7 @@ snapshots:
 
   undici@7.13.0: {}
 
-  undici@7.22.0: {}
+  undici@7.24.1: {}
 
   unherit@3.0.1: {}
 
