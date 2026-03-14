@@ -1,3 +1,15 @@
+## @visulima/packem-rollup [1.0.0-alpha.42](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.41...@visulima/packem-rollup@1.0.0-alpha.42) (2026-03-14)
+
+### Miscellaneous Chores
+
+* **packem-rollup:** update LICENSE formatting ([545a4f1](https://github.com/visulima/packem/commit/545a4f11c4a523972eb5ad2e9b04d875e011275b))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.23
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.3
+
 ## @visulima/packem-rollup [1.0.0-alpha.41](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.40...@visulima/packem-rollup@1.0.0-alpha.41) (2026-03-06)
 
 ### Bug Fixes
