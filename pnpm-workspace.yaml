@@ -294,6 +294,7 @@ overrides:
   minimatch@>=10.0.0 <10.2.3: '>=10.2.3'
   tmp@<=0.2.3: '>=0.2.4'
   undici@<6.23.0: '>=6.23.0'
+  hono@<4.12.7: '>=4.12.7'
   undici@<6.24.0: '>=6.24.0'
 
 patchedDependencies:
