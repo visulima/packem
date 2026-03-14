@@ -23,14 +23,11 @@ SOFTWARE.
 <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/rollup-plugin-css artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## mime
-
 License: MIT
 By: Robert Kieffer
 Repository: https://github.com/broofa/mime
@@ -119,14 +116,11 @@ Repository: git+https://github.com/visulima/visulima.git
 > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/rollup-plugin-css artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## mime
-
 License: MIT
 By: Robert Kieffer
 Repository: https://github.com/broofa/mime
@@ -188,14 +182,11 @@ Repository: git+https://github.com/visulima/visulima.git
 > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/rollup-plugin-css artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## mime
-
 License: MIT
 By: Robert Kieffer
 Repository: https://github.com/broofa/mime
