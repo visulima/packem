@@ -1,3 +1,17 @@
+## @visulima/packem [2.0.0-alpha.55](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.54...@visulima/packem@2.0.0-alpha.55) (2026-03-14)
+
+### Miscellaneous Chores
+
+* **packem:** update dependencies and clean up fixture package.json files ([9cf26d1](https://github.com/visulima/packem/commit/9cf26d177534aaa692971a630145273b87912ef0))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.42
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.23
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.22
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.3
+
 ## @visulima/packem [2.0.0-alpha.54](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.53...@visulima/packem@2.0.0-alpha.54) (2026-03-06)
 
 ### Bug Fixes
