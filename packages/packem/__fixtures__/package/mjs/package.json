@@ -4,6 +4,5 @@
     "type": "module",
     "dependencies": {
         "@visulima/packem": "workspace:*"
-    },
-    "devDependencies": {}
+    }
 }
