@@ -23,14 +23,11 @@ SOFTWARE.
 <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/packem artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## tree-kill
-
 License: MIT
 By: Peteris Krumins, Todd Wolfson, William Hilton, Fabrício Matté
 Repository: git://github.com/pkrumins/node-tree-kill.git
@@ -99,14 +96,11 @@ Repository: git+https://github.com/visulima/packem.git
 > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/packem artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## tree-kill
-
 License: MIT
 By: Peteris Krumins, Todd Wolfson, William Hilton, Fabrício Matté
 Repository: git://github.com/pkrumins/node-tree-kill.git
@@ -377,14 +371,11 @@ Repository: git://github.com/pkrumins/node-tree-kill.git
 > > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/packem artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## tree-kill
-
 License: MIT
 By: Peteris Krumins, Todd Wolfson, William Hilton, Fabrício Matté
 Repository: git://github.com/pkrumins/node-tree-kill.git
@@ -579,14 +570,11 @@ Repository: git+https://github.com/visulima/packem.git
 > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/packem artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## tree-kill
-
 License: MIT
 By: Peteris Krumins, Todd Wolfson, William Hilton, Fabrício Matté
 Repository: git://github.com/pkrumins/node-tree-kill.git
@@ -653,14 +641,11 @@ Repository: git://github.com/pkrumins/node-tree-kill.git
 > > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/packem artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## tree-kill
-
 License: MIT
 By: Peteris Krumins, Todd Wolfson, William Hilton, Fabrício Matté
 Repository: git://github.com/pkrumins/node-tree-kill.git
@@ -855,14 +840,11 @@ Repository: git://github.com/pkrumins/node-tree-kill.git
 > > <!-- DEPENDENCIES -->
 
 # Licenses of bundled dependencies
-
 The published @visulima/packem artifact additionally contains code with the following licenses:
 MIT
 
 # Bundled dependencies:
-
 ## tree-kill
-
 License: MIT
 By: Peteris Krumins, Todd Wolfson, William Hilton, Fabrício Matté
 Repository: git://github.com/pkrumins/node-tree-kill.git

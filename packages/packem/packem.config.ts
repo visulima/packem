@@ -43,7 +43,7 @@ export default defineConfig({
                 exclude: ["estree"],
             },
             unused: {
-                exclude: ["@rollup/plugin-inject"],
+                exclude: ["oxc-transform", "@rollup/plugin-inject"],
             },
         },
     },
