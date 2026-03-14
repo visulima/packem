@@ -1,3 +1,14 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.22](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.21...@visulima/rollup-plugin-css@1.0.0-alpha.22) (2026-03-14)
+
+### Miscellaneous Chores
+
+* **rollup-plugin-css:** update LICENSE and improve SassLoaderOptions type formatting ([8fa7a43](https://github.com/visulima/packem/commit/8fa7a435a57b92466da283000fde33e7211ec749))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.23
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.21](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.20...@visulima/rollup-plugin-css@1.0.0-alpha.21) (2026-03-06)
 
 ### Bug Fixes
