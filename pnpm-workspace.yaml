@@ -4,20 +4,14 @@ packages:
     - "!packages/packem/__fixtures__/css/**"
     - "!packages/packem/__fixtures__/package/**"
     - "!packages/packem/__fixtures__/url/**"
-    - packages/packem/__fixtures__/ecosystem/**
-    - packages/**
-    - examples/**
-
-auditConfig:
-    ignoreCves:
-        - GHSA-23c5-xmqv-rm74
-        - GHSA-7r86-cg39-jmmj
-        - GHSA-23c5-xmqv-rm74
+    - "packages/packem/__fixtures__/ecosystem/**"
+    - "packages/**"
+    - "examples/**"
 
 catalogs:
     build:
         "@rollup/plugin-alias": 6.0.0
-        "@rollup/plugin-commonjs": 29.0.1
+        "@rollup/plugin-commonjs": 29.0.2
         "@rollup/plugin-dynamic-import-vars": 2.1.5
         "@rollup/plugin-inject": 5.0.5
         "@rollup/plugin-json": 6.1.0
@@ -27,10 +21,10 @@ catalogs:
         "@rollup/pluginutils": 5.3.0
         "@visulima/packem-rollup": 1.0.0-alpha.37
         "@visulima/rollup-plugin-css": 1.0.0-alpha.17
-        esbuild: 0.27.3
+        esbuild: 0.27.4
         rolldown: 1.0.0-rc.5
         rollup: 4.59.0
-        rollup-plugin-dts: 6.3.0
+        rollup-plugin-dts: 6.4.0
         rollup-plugin-license: 3.7.0
         rollup-plugin-lit-css: 6.0.1
         rollup-plugin-polyfill-node: 0.13.0
@@ -38,7 +32,7 @@ catalogs:
         rollup-plugin-svelte: ^7.2.3
         rollup-plugin-visualizer: 7.0.1
         unplugin-vue: 7.1.1
-        vite: 7.3.1
+        vite: 8.0.0
     cli:
         "@anolilab/multi-semantic-release": 4.1.1
         "@anolilab/semantic-release-pnpm": 5.0.0
@@ -46,20 +40,18 @@ catalogs:
         commitizen: ^4.3.1
         semantic-release: 25.0.3
         taze: 19.10.0
-    database:
-        babel-plugin-transform-hook-names: ^1.0.2
-        oxc-transform: 0.116.0
     dev:
         "@arethetypeswrong/cli": ^0.18.2
         "@babel/core": 7.29.0
         "@babel/parser": 7.29.0
         "@mozilla/readability": ^0.6.0
-        "@oxc-parser/binding-linux-x64-gnu": 0.116.0
-        "@oxc-project/types": 0.116.0
+        "@oxc-parser/binding-linux-x64-gnu": 0.119.0
+        "@oxc-project/types": 0.119.0
         "@svgr/core": ^8.1.0
         "@swc/core": 1.15.18
         "@swc/helpers": 0.5.19
         "@swc/types": 0.1.25
+        babel-plugin-transform-hook-names: ^1.0.2
         babel-preset-solid: ^1.9.10
         conventional-changelog-conventionalcommits: 9.3.0
         deeks: ^3.2.0
@@ -70,8 +62,8 @@ catalogs:
         lit: 3.3.2
         mime: ^4.1.0
         nodehun: ^3.0.2
-        oxc-parser: 0.116.0
-        oxc-transform: 0.116.0
+        oxc-parser: 0.119.0
+        oxc-transform: 0.119.0
         p-queue: 9.1.0
         package-manager-detector: ^1.6.0
         picocolors: ^1.1.1
@@ -91,11 +83,11 @@ catalogs:
         "@radix-ui/react-tooltip": ^1.2.8
         "@vue/language-core": 3.2.5
         babel-plugin-react-compiler: 1.0.0
-        preact: 10.28.4
+        preact: 10.29.0
         react: 19.2.4
         react-dom: 19.2.4
-        svelte: 5.53.7
-        vue: 3.5.29
+        svelte: 5.53.12
+        vue: 3.5.30
     icons:
         lucide-static: 0.577.0
     lint:
@@ -104,12 +96,12 @@ catalogs:
         "@anolilab/lint-staged-config": 6.0.1
         "@anolilab/prettier-config": 9.1.1
         "@anolilab/textlint-config": 12.1.2
-        "@commitlint/cli": 20.4.3
-        "@commitlint/config-conventional": 20.4.3
+        "@commitlint/cli": 20.4.4
+        "@commitlint/config-conventional": 20.4.4
         "@secretlint/secretlint-rule-preset-recommend": 11.3.1
-        eslint: 10.0.2
+        eslint: 10.0.3
         husky: ^9.1.7
-        lint-staged: 16.3.2
+        lint-staged: 16.4.0
         prettier: 3.8.1
         publint: 0.3.18
         secretlint: 11.3.1
@@ -133,9 +125,9 @@ catalogs:
         execa: ^9.6.1
         glob-parent: 6.0.2
         oxc-resolver: 11.19.1
-        pkg-pr-new: 0.0.65
+        pkg-pr-new: 0.0.66
         rimraf: 6.1.3
-        tinyexec: 1.0.2
+        tinyexec: 1.0.4
         tinyglobby: 0.2.15
     peer:
         package-manager-detector: ^1.6.0
@@ -154,14 +146,14 @@ catalogs:
         fastest-levenshtein: 1.0.16
         get-tsconfig: 4.13.6
         gpt-tokenizer: ^3.4.0
-        happy-dom: 20.8.3
+        happy-dom: 20.8.4
         hookable: 6.0.1
-        html-minifier-next: 5.1.6
+        html-minifier-next: 5.2.0
         is-ci: ^4.1.0
         micromatch: ^4.0.8
         mlly: 1.8.1
         obug: 2.1.1
-        oxc-parser: 0.116.0
+        oxc-parser: 0.119.0
         p-queue: 9.1.0
         picomatch: 4.0.3
         plop: 4.0.5
@@ -186,10 +178,10 @@ catalogs:
         "@tailwindcss/typography": ^0.5.19
         "@visulima/css-style-inject": 1.0.0-alpha.14
         clean-css: ^5.3.3
-        cssnano: 7.1.2
+        cssnano: 7.1.3
         icss-utils: ^5.1.0
-        less: ^4.5.1
-        lightningcss: 1.31.1
+        less: 4.6.4
+        lightningcss: 1.32.0
         minireset.css: 0.0.7
         postcss: 8.5.8
         postcss-custom-properties: 15.0.1
@@ -200,15 +192,15 @@ catalogs:
         postcss-modules-scope: ^3.2.1
         postcss-modules-values: ^4.0.0
         postcss-value-parser: ^4.2.0
-        sass: 1.97.3
-        sass-embedded: 1.97.3
+        sass: 1.98.0
+        sass-embedded: 1.98.0
         tailwindcss: 4.2.1
     test:
         "@jridgewell/source-map": ^0.3.11
         "@sxzz/test-utils": 0.5.15
-        "@vitest/coverage-v8": 4.0.18
-        "@vitest/ui": 4.0.18
-        vitest: 4.0.18
+        "@vitest/coverage-v8": 4.1.0
+        "@vitest/ui": 4.1.0
+        vitest: 4.1.0
     tsc:
         "@babel/preset-typescript": ^7.28.5
         "@total-typescript/ts-reset": ^0.6.1
@@ -229,7 +221,7 @@ catalogs:
         "@types/is-glob": ^4.0.4
         "@types/less": 3.0.8
         "@types/micromatch": ^4.0.10
-        "@types/node": 25.3.3
+        "@types/node": 25.5.0
         "@types/picomatch": ^4.0.2
         "@types/postcss-modules-local-by-default": ^4.0.2
         "@types/postcss-modules-scope": ^3.0.4
@@ -259,21 +251,25 @@ catalogs:
         "@visulima/tabular": ^3.1.3
         "@visulima/tsconfig": 2.1.3
 
+# --- Workspace settings ---
+
+autoInstallPeers: true
+dedupePeerDependents: true
 dedupeInjectedDeps: true
-
 disallowWorkspaceCycles: true
+linkWorkspacePackages: true
+saveWorkspaceProtocol: true
+strictPeerDependencies: false
 
-ignoreWorkspaceCycles: false
+publicHoistPattern:
+    - "*eslint*"
+    - "@prettier/plugin-*"
+    - "*prettier-plugin-*"
+    - "*textlint-*"
 
 ignoredOptionalDependencies:
     - fsevents
     - dtrace-provider
-
-includeWorkspaceRoot: false
-
-injectWorkspacePackages: false
-
-linkWorkspacePackages: true
 
 minimumReleaseAgeExclude:
     - vitest
@@ -326,8 +322,7 @@ overrides:
 patchedDependencies:
     oxc-parser: patches/oxc-parser.patch
 
-preferWorkspacePackages: true
-
-saveWorkspaceProtocol: true
-
-sharedWorkspaceLockfile: true
+auditConfig:
+    ignoreCves:
+        - GHSA-23c5-xmqv-rm74
+        - GHSA-7r86-cg39-jmmj
