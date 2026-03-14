@@ -25,7 +25,7 @@
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
         "@visulima/packem": "workspace:*",
-        "esbuild": "^0.27.3",
+        "esbuild": "^0.27.4",
         "postcss": "^8.5.8",
         "postcss-load-config": "^6.0.1",
         "postcss-modules": "6.0.1",
