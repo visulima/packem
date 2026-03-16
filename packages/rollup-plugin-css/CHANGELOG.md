@@ -1,3 +1,10 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.23](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.22...@visulima/rollup-plugin-css@1.0.0-alpha.23) (2026-03-16)
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.24
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.22](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.21...@visulima/rollup-plugin-css@1.0.0-alpha.22) (2026-03-14)
 
 ### Miscellaneous Chores
