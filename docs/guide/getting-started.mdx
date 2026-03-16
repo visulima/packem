@@ -1,88 +1,72 @@
 ---
 title: Getting Started
-description: Install Packem and create your first bundle in minutes
+description: Install Packem and create your first bundle in under five minutes
 ---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
 # Getting Started
 
-Get up and running with Packem in just a few minutes. This guide will walk you through installation, basic configuration, and your first build.
+This guide takes you from zero to a published-ready bundle. You will install Packem, configure your `package.json`, and run your first build.
 
-## Installation
+## Install Packem
 
-Install Packem as a development dependency in your project:
+Add Packem as a dev dependency:
 
 ```bash
 npm install --save-dev @visulima/packem
 ```
 
-## Quick Setup
+## Scaffold your project
 
-The fastest way to get started is using the interactive setup:
+The quickest way to set up is the interactive init command:
 
 ```bash
 npx packem init
 ```
 
-This command will:
-- Analyze your project structure
-- Ask about your preferences (transformer, CSS preprocessor, etc.)
-- Generate a `packem.config.ts` file
-- Update your `package.json` with recommended settings
+It will analyze your project, ask about your preferences (transformer, CSS preprocessor, etc.), generate a `packem.config.ts`, and update your `package.json` with recommended settings.
 
 <Callout type="info">
-The init command is smart enough to detect existing configurations and suggest optimal settings for your project.
+The init command detects existing configurations and suggests optimal settings for your project.
 </Callout>
 
-## Adding Features
+## Add optional features
 
-After initializing your project, you can easily add additional features using the `add` command:
+After init, you can enable additional presets:
 
 ```bash
-# Add React preset and dependencies
-npx packem add react
-
-# Add SolidJS preset and dependencies
-npx packem add solid
-
-# Add CSS loaders (PostCSS, Sass, Less, etc.)
-npx packem add css
-
-# Add Typedoc for documentation generation
-npx packem add typedoc
+npx packem add react     # React preset and dependencies
+npx packem add solid     # SolidJS preset and dependencies
+npx packem add css       # CSS loaders (PostCSS, Sass, Less, etc.)
+npx packem add typedoc   # TypeDoc documentation generation
 ```
 
-The `add` command will:
-- Update your `packem.config.ts` with the appropriate configuration
-- Install the necessary dependencies automatically
-- For React: Automatically detect TypeScript and add type definitions, or prompt you to add TypeScript if not installed
-- Check for uncommitted git changes and ask for confirmation before making changes
+Each command updates your config and installs the necessary dependencies.
 
-<Callout type="tip">
-If your git repository has uncommitted changes, the `add` command will prompt you to confirm before proceeding. This helps prevent accidental overwrites of your work.
-</Callout>
+## Project structure
 
-## Project Structure
-
-Packem works best with a conventional project structure:
+Packem expects a conventional layout:
 
 ```
 my-package/
 ├── src/
 │   ├── index.ts          # Main entry point
-│   ├── cli.ts           # CLI entry (if building a CLI tool)
+│   ├── cli.ts            # CLI entry (optional)
 │   └── utils/
 │       └── helper.ts
 ├── package.json
-├── packem.config.ts     # Packem configuration
-└── tsconfig.json        # TypeScript configuration
+├── packem.config.ts
+└── tsconfig.json
 ```
 
 ## Configure package.json
 
-Packem uses your `package.json` to determine what to build and how. Here's a basic setup:
+Packem reads your `package.json` to decide what to build and how. Pick the pattern that matches your use case:
 
-<Tabs>
-  <TabItem label="ESM Library">
+<Tabs items={["ESM Library", "Dual Package (ESM + CJS)", "CLI Tool"]}>
+  <Tab value="ESM Library">
     ```json
     {
       "name": "my-package",
@@ -103,8 +87,8 @@ Packem uses your `package.json` to determine what to build and how. Here's a bas
       }
     }
     ```
-  </TabItem>
-  <TabItem label="Dual Package (ESM + CJS)">
+  </Tab>
+  <Tab value="Dual Package (ESM + CJS)">
     ```json
     {
       "name": "my-package",
@@ -119,7 +103,7 @@ Packem uses your `package.json` to determine what to build and how. Here's a bas
             "default": "./dist/index.mjs"
           },
           "require": {
-            "types": "./dist/index.d.cts", 
+            "types": "./dist/index.d.cts",
             "default": "./dist/index.cjs"
           }
         }
@@ -130,8 +114,8 @@ Packem uses your `package.json` to determine what to build and how. Here's a bas
       }
     }
     ```
-  </TabItem>
-  <TabItem label="CLI Tool">
+  </Tab>
+  <Tab value="CLI Tool">
     ```json
     {
       "name": "my-cli",
@@ -150,58 +134,50 @@ Packem uses your `package.json` to determine what to build and how. Here's a bas
       }
     }
     ```
-  </TabItem>
+  </Tab>
 </Tabs>
 
-<Callout type="tip">
-Packem automatically detects your entry points from the `exports`, `main`, `module`, and `bin` fields in package.json.
-</Callout>
+Packem detects entry points from the `exports`, `main`, `module`, and `bin` fields automatically — no duplicate configuration needed.
 
-## Basic Configuration
+## Write your config
 
-Create a `packem.config.ts` file in your project root:
+Create `packem.config.ts` in the project root:
 
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
 import transformer from '@visulima/packem/transformer/esbuild'
 
 export default defineConfig({
-  // Choose your transformer
-  transformer, // esbuild, swc, oxc, sucrase, or typescript
-  
-  // Enable development features
+  transformer,
   sourcemap: true,
-  
-  rollup: {
-    watch: {
-      include: 'src/**'
-    }
-  }
 })
 ```
 
-## Your First Build
-
-Now you're ready to build your project:
+## Run the build
 
 ```bash
-# Single build
 npm run build
+```
 
-# Watch mode for development  
+Packem will find your source files in `src/`, transform them with esbuild, and write the output to `dist/`:
+
+```
+my-package/
+├── dist/
+│   ├── index.js       # Bundled JavaScript
+│   └── index.d.ts     # TypeScript declarations
+└── ...
+```
+
+For development, use watch mode so Packem rebuilds on every save:
+
+```bash
 npm run dev
 ```
 
-Packem will:
-- Analyze your `package.json` exports
-- Find matching source files in the `src` directory
-- Transform your code using the selected transformer
-- Generate optimized bundles in the `dist` directory
-- Create TypeScript declaration files
+## Full example
 
-## Example: Simple Library
-
-Let's create a simple utility library:
+Here is a minimal library from scratch:
 
 **src/index.ts**
 ```typescript
@@ -211,11 +187,6 @@ export function greet(name: string): string {
 
 export function add(a: number, b: number): number {
   return a + b
-}
-
-export default {
-  greet,
-  add
 }
 ```
 
@@ -247,78 +218,23 @@ import transformer from '@visulima/packem/transformer/esbuild'
 export default defineConfig({
   transformer,
   sourcemap: true,
-  rollup: {
-    watch: {
-      include: 'src/**'
-    }
-  }
 })
 ```
 
-Run the build:
+Run `npm run build` and you are done.
 
-```bash
-npm run build
-```
+## Troubleshooting
 
-Output:
-```
-my-utils/
-├── dist/
-│   ├── index.js      # Bundled JavaScript
-│   └── index.d.ts    # TypeScript declarations
-└── ...
-```
+**Entry points not found** — Make sure your `package.json` has `exports`, `main`, or `module` fields and that the matching source files exist in `src/`.
 
-## Next Steps
+**TypeScript errors** — Verify you have a valid `tsconfig.json` and TypeScript installed.
 
-Congratulations! You've successfully set up Packem and created your first bundle. Here's what to explore next:
+**Build failing** — Run `packem build --verbose` for detailed error output.
 
-<Cards>
-  <Card href="/docs/guide/configuration" title="Configuration">
-    Learn about advanced configuration options
-  </Card>
-  
-  <Card href="/docs/guide/transformers" title="Transformers">
-    Choose the right transformer for your needs
-  </Card>
-  
-  <Card href="/docs/guide/typescript" title="TypeScript">
-    Advanced TypeScript features and configuration
-  </Card>
-  
-  <Card href="/docs/guide/css" title="CSS Processing">
-    Add CSS, Sass, and styling to your builds
-  </Card>
-</Cards>
+Need more help? [Open an issue](https://github.com/visulima/packem/issues) on GitHub.
 
-## Common Issues
+## Next steps
 
-### Entry Points Not Found
-
-If Packem can't find your entry points, make sure:
-- Your `package.json` has proper `exports`, `main`, or `module` fields
-- The corresponding source files exist in the `src` directory
-- File extensions match (`.ts` for TypeScript, `.js` for JavaScript)
-
-### TypeScript Errors
-
-For TypeScript projects, ensure:
-- You have a valid `tsconfig.json`
-- TypeScript is installed as a dependency
-- Your source files have proper TypeScript syntax
-
-### Build Failing
-
-Check that:
-- All dependencies are installed
-- Your transformer is properly configured
-- There are no syntax errors in your source files
-
-<Callout type="info">
-Use `packem build --verbose` to get detailed build information and error messages.
-</Callout>
-
----
-
-Need help? Check out our [troubleshooting guide](/docs/guide/troubleshooting) or [open an issue](https://github.com/visulima/packem/issues) on GitHub.
+- [Configuration](/docs/guide/configuration) — Customize entry points, output, and build behavior.
+- [Transformers](/docs/guide/transformers) — Pick the right compiler for your project.
+- [CSS Processing](/docs/guide/css) — Add Sass, Less, PostCSS, and CSS Modules.

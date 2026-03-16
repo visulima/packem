@@ -1,118 +1,52 @@
 ---
-title: Packem - Fast and Modern Bundler
-description: A fast and modern bundler for Node.js and TypeScript with multiple transformer support
+title: Packem
+description: A fast, zero-config bundler for Node.js and TypeScript libraries. Built on Rollup with esbuild, swc, OXC, and sucrase support.
 ---
 
 # Packem
 
-The Fast and Modern Bundler — built on top of Rollup, combined with your preferred transformer like esbuild, swc, OXC, or sucrase. Supports multiple runtimes, shared modules, server components, dynamic import, wasm, css, and more.
-
-## Why Packem?
-
-Packem is designed to be the ultimate bundling solution for modern JavaScript and TypeScript projects. It combines the power of Rollup with cutting-edge transformers to deliver exceptional performance and developer experience.
-
-- **Blazing Fast** — Built on top of Rollup with optimized transformers like esbuild, swc, and OXC for maximum performance.
-- **Zero Config** — Works out of the box with sensible defaults while remaining fully configurable for advanced use cases.
-- **TypeScript First** — Full TypeScript support with isolated declarations, type bundling, and .d.ts generation.
-- **CSS Everything** — Support for CSS, Sass, Less, Stylus, PostCSS, and CSS Modules with built-in optimization.
-- **React Ready** — Built-in support for React Server Components, client components, and server actions.
-- **Multi-Runtime** — Target multiple runtimes including Node.js, browser, edge-light, and react-server.
-
-## Quick Start
-
-Get started with Packem in seconds:
+A bundler for Node.js and TypeScript libraries. Point it at your `package.json` and get optimized ESM, CJS, and IIFE bundles — with TypeScript declarations, CSS processing, and tree shaking out of the box.
 
 ```bash
-# Install Packem
 npm install --save-dev @visulima/packem
-
-# Initialize configuration
 npx packem init
-
-# Build your project
 npx packem build
 ```
 
-## Key Features
+## Why Packem?
 
-### Performance First
+- **Zero config** — Reads entry points, output formats, and types from your `package.json`. No duplicate configuration.
+- **Fast** — Choose between esbuild, swc, OXC, or sucrase. Switch compilers with one config change.
+- **TypeScript first** — Generates `.d.ts` declarations automatically, including isolated declarations.
+- **CSS included** — Sass, Less, Stylus, PostCSS, and CSS Modules work without extra plugins.
+- **React ready** — Server Components, Client Components, and server actions are supported.
+- **Multi-runtime** — Target Node.js, browser, edge-light, and react-server from a single build.
 
-- Built on Rollup with optimized plugins
-- Support for multiple high-performance transformers
-- Parallel processing and caching
-- Bundle analysis and visualization
+## Pick a transformer
 
-### Package.json Exports
+| Transformer | Speed | Decorators | Type checking |
+|-------------|-------|------------|---------------|
+| esbuild | Fastest | No | No |
+| swc | Very fast | Yes | No |
+| OXC | Very fast | Partial | No |
+| sucrase | Fast | No | No |
+| TypeScript | Moderate | Yes | Yes |
 
-- Automatic entry point detection from `package.json#exports`
-- Support for `main`, `module`, and `types` fields
-- Multiple export conditions (import/require, development/production)
-- Automatic Node.js 10 compatibility generation
-
-### Multiple Transformers
-
-- **esbuild** — Lightning fast JavaScript/TypeScript transformer
-- **swc** — Rust-based super-fast compiler
-- **OXC** — Next-generation JavaScript toolchain
-- **sucrase** — Fast alternative to Babel
-- **TypeScript** — Official TypeScript compiler
-
-### Advanced Plugins
-
-- **require-cjs-transformer** — Transform ESM imports of CJS packages for better performance
-- **CSS Modules** — Scoped CSS with automatic class name generation
-- **React Server Components** — Server and client component support
-
-### CSS Processing
-
-- **Sass** (.scss/.sass files)
-- **Less** (.less files)
-- **Stylus** (.styl files)
-- **PostCSS** with plugin ecosystem
-- **CSS Modules** with scoped styling
-- **Lightning CSS** for optimization
-- **cssnano** for minification
-
-### React Integration
-
-- Server Components with `"use server"`
-- Client Components with `"use client"`
-- Automatic chunk splitting for boundaries
-- Shared modules across runtimes
-
-### Developer Experience
-
-- Watch mode for development
-- Source maps support
-- TypeDoc documentation generation
-- ESM / CJS interoperability
-- Environment variable injection
+Most projects should start with **esbuild**. See [Transformers](/docs/guide/transformers) for details.
 
 ## Packages
 
-Packem is built as a collection of focused packages:
-
 | Package | Description |
 |---------|-------------|
-| `@visulima/packem` | Main bundler package with CLI |
-| `@visulima/packem-rollup` | Rollup plugins and transformers |
+| `@visulima/packem` | Bundler core and CLI |
+| `@visulima/packem-rollup` | Rollup plugins and transformer integrations |
 | `@visulima/rollup-plugin-css` | CSS processing and optimization |
 | `@visulima/css-style-inject` | Runtime CSS injection utility |
-| `@visulima/packem-share` | Shared types and utilities |
+| `@visulima/packem-share` | Shared types and constants |
 
-## What's Next?
+## Next steps
 
-- [Getting Started](/docs/guide/getting-started) — Learn the basics and set up your first project
-- [Configuration](/docs/guide/configuration) — Customize Packem for your specific needs
-- [Examples](/docs/examples/) — Explore real-world usage examples
-- [API Reference](/docs/api/) — Detailed API documentation for all packages
-
----
-
-## Community and Support
-
-Packem is open source and maintained by [Daniel Bannert](https://github.com/prisis) and the community.
-
-- [GitHub Repository](https://github.com/visulima/packem)
-- [Report Issues](https://github.com/visulima/packem/issues)
-- [Sponsor Development](https://github.com/sponsors/prisis)
+- [Getting Started](/docs/guide/getting-started) — Install Packem and build your first library.
+- [Configuration](/docs/guide/configuration) — Customize your build for production.
+- [Examples](/docs/examples/) — Copy-and-paste starters for common setups.
+- [API Reference](/docs/api/) — Programmatic usage, hooks, and plugin development.
