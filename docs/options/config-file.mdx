@@ -3,8 +3,8 @@ title: Config File
 description: Set up and configure Packem using configuration files
 ---
 
-import { Callout } from '../../components/Callout'
-import { Tabs, TabItem } from '../../components/Tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
 # Config File
 
@@ -365,17 +365,17 @@ export default defineConfig({
 
 Specify a custom configuration file location:
 
-<Tabs>
-  <TabItem label="CLI Flag">
+<Tabs items={['CLI Flag', 'Environment Variable']}>
+  <Tab value="CLI Flag">
     ```bash
     packem build --config ./configs/packem.config.ts
     ```
-  </TabItem>
-  <TabItem label="Environment Variable">
+  </Tab>
+  <Tab value="Environment Variable">
     ```bash
     PACKEM_CONFIG=./configs/packem.config.ts packem build
     ```
-  </TabItem>
+  </Tab>
 </Tabs>
 
 ## Configuration Presets

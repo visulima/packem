@@ -3,9 +3,8 @@ title: CSS Processing
 description: Comprehensive CSS, Sass, Less, Stylus, PostCSS, and CSS Modules support in Packem
 ---
 
-import { Callout } from '../../components/Callout'
-import { Tabs, TabItem } from '../../components/Tabs'
-import { FeatureGrid } from '../../components/FeatureGrid'
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
 # CSS Processing
 
@@ -13,47 +12,47 @@ Packem provides first-class support for CSS and all major CSS preprocessors. Fro
 
 ## Supported CSS Technologies
 
-<FeatureGrid>
+<div className="feature-grid">
   <div className="feature-card">
-    <h3>🎨 CSS</h3>
+    <h3>CSS</h3>
     <p>Standard CSS with PostCSS processing and optimization</p>
   </div>
-  
+
   <div className="feature-card">
-    <h3>🔧 Sass/SCSS</h3>
+    <h3>Sass/SCSS</h3>
     <p>Sass and SCSS preprocessing with Dart Sass or Embedded Sass</p>
   </div>
-  
+
   <div className="feature-card">
-    <h3>📦 Less</h3>
+    <h3>Less</h3>
     <p>Less preprocessing with full feature support</p>
   </div>
-  
+
   <div className="feature-card">
-    <h3>🎯 Stylus</h3>
+    <h3>Stylus</h3>
     <p>Stylus preprocessing with expressive syntax</p>
   </div>
-  
+
   <div className="feature-card">
-    <h3>🔄 PostCSS</h3>
+    <h3>PostCSS</h3>
     <p>PostCSS with autoprefixer and plugin ecosystem</p>
   </div>
-  
+
   <div className="feature-card">
-    <h3>📋 CSS Modules</h3>
+    <h3>CSS Modules</h3>
     <p>Scoped CSS with automatic class name generation</p>
   </div>
-  
+
   <div className="feature-card">
-    <h3>⚡ Lightning CSS</h3>
+    <h3>Lightning CSS</h3>
     <p>Fast CSS parsing, transformation, and minification</p>
   </div>
-  
+
   <div className="feature-card">
-    <h3>🗜️ cssnano</h3>
+    <h3>cssnano</h3>
     <p>Advanced CSS minification and optimization</p>
   </div>
-</FeatureGrid>
+</div>
 
 ## Basic CSS Support
 
@@ -120,17 +119,17 @@ Packem supports both Sass and SCSS syntax with Dart Sass or Embedded Sass.
 
 ### Installation
 
-<Tabs>
-  <TabItem label="Dart Sass">
+<Tabs items={['Dart Sass', 'Embedded Sass']}>
+  <Tab value="Dart Sass">
     ```bash
     npm install --save-dev sass
     ```
-  </TabItem>
-  <TabItem label="Embedded Sass">
+  </Tab>
+  <Tab value="Embedded Sass">
     ```bash
     npm install --save-dev sass-embedded
     ```
-  </TabItem>
+  </Tab>
 </Tabs>
 
 ### Usage
