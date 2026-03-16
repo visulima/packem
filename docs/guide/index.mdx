@@ -1,192 +1,27 @@
 ---
 title: Guide
-description: Learn how to use Packem effectively
+description: Learn how to install, configure, and ship production bundles with Packem.
 ---
 
-# Packem Guide
+# Guide
 
-Complete guide to mastering Packem, from basic usage to advanced techniques.
+Whether you are publishing your first npm package or maintaining a monorepo with dozens of libraries, these guides walk you through every step — from installation to production builds.
 
-## Quick Navigation
+## Recommended reading order
 
-<Cards>
-  <Card href="/docs/guide/introduction" title="Introduction">
-    What is Packem and why should you use it?
-  </Card>
-  
-  <Card href="/docs/guide/getting-started" title="Getting Started">
-    Install Packem and build your first bundle
-  </Card>
-  
-  <Card href="/docs/guide/configuration" title="Configuration">
-    Complete guide to configuring Packem for your needs
-  </Card>
-  
-  <Card href="/docs/guide/transformers" title="Transformers">
-    Choose between esbuild, SWC, OXC, Sucrase, and TypeScript
-  </Card>
-  
-  <Card href="/docs/guide/css" title="CSS Processing">
-    Complete guide to CSS, Sass, Less, and PostCSS
-  </Card>
-</Cards>
+If you are new to Packem, start at the top and work your way down. Each guide builds on the previous one.
 
-## What is Packem?
+1. [Introduction](/docs/guide/introduction) — What Packem is, how it works, and when to use it.
+2. [Getting Started](/docs/guide/getting-started) — Install Packem and create your first bundle in under five minutes.
+3. [Configuration](/docs/guide/configuration) — Customize entry points, output formats, and build behavior.
+4. [Transformers](/docs/guide/transformers) — Pick the right compiler (esbuild, swc, OXC, sucrase, or TypeScript).
+5. [CSS Processing](/docs/guide/css) — Add support for CSS, Sass, Less, Stylus, PostCSS, and CSS Modules.
+6. [Debug and Profiling](/docs/guide/debug) — Diagnose build issues and measure performance.
 
-Packem is a fast and modern bundler for Node.js and TypeScript projects. Built on top of Rollup, it combines the power of proven bundling technology with cutting-edge transformers like esbuild, swc, OXC, and sucrase.
+## Already familiar with Packem?
 
-### Key Features
+Jump straight to the reference material:
 
-- **🚀 Fast Builds**: Multiple high-performance transformers (esbuild, swc, OXC)
-- **📦 Zero Config**: Works out of the box with automatic entry detection
-- **🎯 Modern Output**: ESM, CJS, IIFE, and UMD formats
-- **🎨 CSS Support**: Complete CSS processing pipeline with modules support
-- **⚡ TypeScript**: First-class TypeScript support with declaration generation
-- **🔄 Watch Mode**: Fast rebuilds during development
-- **📊 Bundle Analysis**: Built-in tools for optimizing bundle size
-
-## Getting Started Path
-
-New to Packem? Follow this learning path:
-
-1. **[Introduction](/docs/guide/introduction)** - Learn what Packem is and its core concepts
-2. **[Getting Started](/docs/guide/getting-started)** - Install Packem and create your first bundle
-3. **[Configuration](/docs/guide/configuration)** - Understand configuration options and patterns
-4. **[Transformers](/docs/guide/transformers)** - Choose the right transformer for your project
-5. **[CSS Processing](/docs/guide/css)** - Add styling support to your builds
-
-## Core Concepts
-
-### Package.json Driven
-
-Packem uses your `package.json` as the source of truth for builds:
-
-```json
-{
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js", 
-      "require": "./dist/index.cjs"
-    }
-  }
-}
-```
-
-### Transformer Architecture
-
-Choose from multiple transformers based on your needs:
-
-- **esbuild** - Fastest compilation, great for most projects
-- **swc** - Rust-powered with excellent performance
-- **OXC** - Next-generation toolchain (experimental)
-- **TypeScript** - Official compiler with full type checking
-- **sucrase** - Lightweight and simple
-
-### Modern JavaScript Support
-
-- ES2015+ syntax transformation
-- JSX and TSX support
-- Dynamic imports and code splitting
-- Tree shaking for optimal bundle size
-
-## Use Cases
-
-### Library Development
-
-Perfect for creating npm packages:
-
-```typescript
-// Automatic dual package support
-export function myLibrary() {
-  return 'Hello from my library!'
-}
-```
-
-### Component Libraries
-
-Build React, Vue, or framework-agnostic components:
-
-```typescript
-// React component with CSS modules
-import styles from './Button.module.css'
-
-export function Button({ children, ...props }) {
-  return <button className={styles.button} {...props}>{children}</button>
-}
-```
-
-### CLI Tools
-
-Create command-line tools with proper bundling:
-
-```typescript
-#!/usr/bin/env node
-import { program } from 'commander'
-
-program
-  .command('build')
-  .action(() => {
-    console.log('Building...')
-  })
-```
-
-### Node.js Modules
-
-Build server-side libraries and utilities:
-
-```typescript
-// Server utilities with proper externals
-export { createServer } from './server'
-export { database } from './db'
-```
-
-## Why Choose Packem?
-
-### Performance First
-
-- **Fast Transforms**: Multiple high-performance transformers
-- **Incremental Builds**: Only rebuild what's changed
-- **Parallel Processing**: Leverage all CPU cores
-
-### Developer Experience
-
-- **Zero Configuration**: Works immediately with sensible defaults
-- **Rich Diagnostics**: Clear error messages and warnings
-- **Watch Mode**: Fast rebuilds during development
-
-### Modern Tooling
-
-- **TypeScript Native**: First-class TypeScript support
-- **CSS Pipeline**: Complete styling solution
-- **Tree Shaking**: Automatic dead code elimination
-
-### Ecosystem Integration
-
-- **Rollup Compatible**: Use any Rollup plugin
-- **Framework Agnostic**: Works with React, Vue, Svelte, and more
-- **Monorepo Friendly**: Perfect for multi-package workspaces
-
-## Community and Support
-
-- **Documentation**: Comprehensive guides and examples
-- **GitHub**: [Open source on GitHub](https://github.com/visulima/packem)
-- **Issues**: Report bugs and feature requests
-- **Discussions**: Community help and showcase
-
-<Callout type="info">
-Packem is actively maintained and continuously improved based on community feedback and modern JavaScript ecosystem developments.
-</Callout>
-
-## What's Next?
-
-Ready to start building? Check out:
-
-- **[Getting Started Guide](/docs/guide/getting-started)** - Your first Packem project
-- **[Examples Collection](/docs/examples)** - Real-world usage patterns
-- **[Configuration Reference](/docs/options)** - All configuration options
-- **[API Documentation](/docs/api)** - Programmatic usage
+- [Configuration Options](/docs/options) — Every option explained with examples.
+- [API Reference](/docs/api) — Programmatic usage, hooks, and plugin development.
+- [Examples](/docs/examples) — Copy-and-paste starter projects for common setups.

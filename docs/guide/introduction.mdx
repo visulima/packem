@@ -1,107 +1,75 @@
 ---
 title: Introduction
-description: Packem - The Fast and Modern Bundler for Node.js and TypeScript
+description: What Packem is, how it works, and when to use it
 ---
 
 # Introduction
 
-**Packem** is _The Fast and Modern Bundler_ for Node.js and TypeScript projects. Designed with performance and developer experience in mind, it provides a seamless and efficient way to bundle your TypeScript and JavaScript libraries. Whether you're building a small utility or a complex library, Packem empowers you to focus on your code while it handles the bundling process with elegance and speed.
+Packem is a bundler for Node.js and TypeScript libraries. It reads your `package.json` exports, picks the right entry points, and produces optimized ESM, CJS, or IIFE bundles — with TypeScript declarations, CSS processing, and tree shaking included.
 
-## Why Packem?
+Under the hood it uses Rollup for bundling and lets you swap in the compiler that fits your project: esbuild, swc, OXC, sucrase, or the official TypeScript compiler.
 
-Packem is built on top of Rollup, a proven and battle-tested bundler, combined with cutting-edge transformers like esbuild, swc, OXC, and sucrase. While Rollup is a powerful and general-purpose tool, Packem takes it a step further by providing a **complete out-of-the-box solution** for modern library development.
+## How Packem differs from plain Rollup
 
-### Key Differences Between Packem and Plain Rollup
+Rollup is a powerful general-purpose bundler, but shipping a library still requires wiring up dozens of plugins and options. Packem handles that for you:
 
-- **Zero Configuration**: Packem minimizes the need for complex configurations by offering sensible defaults tailored for library development. It provides a streamlined experience, so you can focus on your code rather than the bundling process.
-- **Library-Specific Features**: Unlike plain Rollup, which requires extensive configuration, Packem is optimized specifically for building libraries. It includes features like automatic TypeScript declaration generation, multiple output formats, and package.json-driven builds.
-- **Multiple Transformers**: Choose from esbuild, swc, OXC, sucrase, or TypeScript compiler based on your performance and feature requirements.
-- **Advanced CSS Support**: Built-in support for CSS, Sass, Less, Stylus, PostCSS, and CSS Modules with optimization.
-- **Multi-Runtime Ready**: Target multiple runtimes including Node.js, browser, edge-light, and react-server with conditional exports.
+- **Package.json driven** — Entry points, output formats, and declaration paths are read directly from your `package.json` exports. No duplicate configuration.
+- **Built-in TypeScript declarations** — Generate `.d.ts` files automatically, including isolated declarations.
+- **Multiple transformers** — Switch compilers with a single config change instead of swapping plugin chains.
+- **CSS pipeline included** — Sass, Less, Stylus, PostCSS, and CSS Modules work without extra setup.
+- **Multi-runtime exports** — Target Node.js, browser, edge-light, and react-server from one build.
 
-## Transformer Ecosystem
+## What it bundles
 
-Packem supports multiple high-performance transformers, giving you the flexibility to choose the best tool for your needs:
+Packem handles everything a modern library needs:
 
-- **esbuild** - Lightning-fast JavaScript/TypeScript transformer written in Go
-- **swc** - Rust-based super-fast compiler with advanced features
-- **OXC** - Next-generation JavaScript toolchain for maximum performance
-- **sucrase** - Fast alternative to Babel for simple transformations
-- **TypeScript** - Official TypeScript compiler for maximum compatibility
+- **TypeScript and JavaScript** — `.ts`, `.tsx`, `.js`, and `.jsx` files with modern syntax support.
+- **Type declarations** — `.d.ts` generation with isolated declaration support.
+- **Multiple output formats** — ESM, CJS, and IIFE in a single build.
+- **CSS and preprocessors** — CSS, Sass, Less, Stylus, PostCSS, and CSS Modules.
+- **React components** — Server Components, Client Components, and server actions.
+- **Assets** — JSON, WASM, text files, and Node.js native addons.
+- **Dynamic imports** — Code splitting with shared modules across entry points.
 
-For more details, refer to the [Transformers documentation](/docs/guide/transformers).
+Tree shaking, minification, source maps, and bundle analysis are built in.
 
-## What Can It Bundle?
+## Choosing a transformer
 
-Packem is designed to handle all the essentials for modern library development and more:
+Each transformer makes a different trade-off between speed and feature coverage:
 
-- **TypeScript and JavaScript**: Seamlessly bundle `.ts`, `.tsx`, `.js`, and `.jsx` files with support for modern syntax and features.
-- **TypeScript Declarations**: Automatically generate declaration files (`.d.ts`) for your library with support for isolated declarations.
-- **Multiple Output Formats**: Generate `esm`, `cjs`, and `iife` bundles to ensure compatibility across different environments.
-- **CSS and Preprocessors**: Process CSS, Sass, Less, Stylus files with PostCSS plugins and CSS Modules support.
-- **React Components**: Built-in support for React Server Components, Client Components, and server actions.
-- **Native Modules**: Automatic handling of Node.js native addons (.node files) with platform-aware copying.
-- **Assets**: Include and process non-code assets like `.json`, `.wasm`, `.txt`, and `.data` files.
-- **Dynamic Imports**: Code splitting with dynamic imports and shared modules.
+| Transformer | Speed | TypeScript | JSX | Decorators |
+|-------------|-------|------------|-----|------------|
+| esbuild | Fastest | Yes | Yes | No |
+| swc | Very fast | Yes | Yes | Yes |
+| OXC | Very fast | Yes | Yes | Partial |
+| sucrase | Fast | Yes | Yes | No |
+| TypeScript | Moderate | Full type checking | Yes | Yes |
 
-With its built-in support for tree shaking, minification, source maps, and bundle analysis, Packem ensures your library is optimized for production.
+Most projects should start with **esbuild**. Switch to **swc** if you need decorator support, or to **TypeScript** if you need full type checking during the build. See [Transformers](/docs/guide/transformers) for configuration details.
 
-## Fast and Modern
+## Package.json as the source of truth
 
-Packem is built to be **fast**. By leveraging Rollup's proven architecture combined with high-performance transformers like esbuild, swc, and OXC, it delivers blazing-fast builds even for large projects. At the same time, it is **modern**—offering support for the latest JavaScript and TypeScript features, React Server Components, and multi-runtime deployment.
-
-## Package.json Driven
-
-Packem uses your `package.json` exports configuration to automatically determine:
+Packem reads your `package.json` to determine:
 
 - Entry points from `exports`, `main`, `module`, and `bin` fields
-- Output formats (ESM/CJS) based on export conditions
-- TypeScript declaration generation from `types` field
+- Output formats (ESM/CJS) from export conditions
+- Declaration output from the `types` field
 - Build targets and compatibility requirements
 
-This approach ensures your build configuration stays in sync with your package's public API.
-
-## Getting Started
-
-Ready to dive in? Check out the [Getting Started guide](/docs/guide/getting-started) to set up your first project with Packem.
-
-Want to use Packem from your own scripts? See [Programmatic Usage](/docs/guide/programmatic-usage).
+This keeps your build configuration and your package's public API in sync.
 
 ## Credits
 
-Packem is made possible by the open-source community and the many innovative tools in the JavaScript and TypeScript ecosystem. We extend our gratitude to all contributors and maintainers whose work has laid the foundation for this project.
+Packem builds on the work of the open-source community. In particular:
 
-### Prior Arts
+- **Rollup** — The bundling engine and plugin system that powers Packem.
+- **esbuild** — Demonstrated what fast native compilation looks like.
+- **tsup** — Inspired the out-of-the-box developer experience and many CLI options.
+- **unbuild** — Inspired the hooks system and configuration patterns.
+- **swc** and **OXC** — Pushing the limits of JavaScript compilation performance.
 
-- **Rollup**: Provided the original inspiration for modern JavaScript bundling and a robust plugin system that powers Packem.
-- **esbuild**: Demonstrated the power of fast, native bundling and influenced the pursuit of performance in build tools.
-- **tsup**: Inspired the out-of-the-box developer experience and many CLI options, as well as some implementation details.
-- **unbuild**: Inspired the flexible hooks system and configuration patterns now available in Packem.
-- **swc**: Rust-based compilation that enables incredible performance for large codebases.
-- **OXC**: Next-generation toolchain that pushes the boundaries of JavaScript/TypeScript processing speed.
+## Next steps
 
----
-
-## What's Next?
-
-<div className="next-steps">
-  <a href="/docs/guide/getting-started" className="next-step-card">
-    <h3>🚀 Getting Started</h3>
-    <p>Install Packem and create your first bundle</p>
-  </a>
-  
-  <a href="/docs/guide/transformers" className="next-step-card">
-    <h3>🔄 Choose a Transformer</h3>
-    <p>Select the best transformer for your project</p>
-  </a>
-  
-  <a href="/docs/guide/css" className="next-step-card">
-    <h3>🎨 CSS Processing</h3>
-    <p>Learn about CSS, Sass, and styling support</p>
-  </a>
-  
-  <a href="/docs/examples/" className="next-step-card">
-    <h3>💡 Examples</h3>
-    <p>Explore practical examples and use cases</p>
-  </a>
-</div>
+- [Getting Started](/docs/guide/getting-started) — Install Packem and create your first bundle.
+- [Configuration](/docs/guide/configuration) — Customize your build for production.
+- [Examples](/docs/examples/) — Copy-and-paste starters for common setups.
