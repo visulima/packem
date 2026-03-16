@@ -3,6 +3,8 @@ title: require-cjs-transformer Plugin
 description: Transform ESM imports of CJS-only packages to require calls for better performance
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout'
+
 # require-cjs-transformer Plugin
 
 The `require-cjs-transformer` plugin automatically transforms ESM imports of CommonJS-only packages into `require()` calls. This optimization improves Node.js performance by skipping the expensive cjs-module-lexer overhead for packages that only provide CJS builds.

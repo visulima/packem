@@ -3,8 +3,8 @@ title: Declaration Files (dts)
 description: TypeScript declaration file generation and isolated declarations in Packem
 ---
 
-import { Callout } from '../../components/Callout'
-import { Tabs, TabItem } from '../../components/Tabs'
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
 # Declaration Files (dts)
 
@@ -92,37 +92,37 @@ export default defineConfig({
 
 ### Available Isolated Declaration Transformers
 
-<Tabs>
-  <TabItem label="TypeScript (Recommended)">
+<Tabs items={['TypeScript (Recommended)', 'swc', 'OXC']}>
+  <Tab value="TypeScript (Recommended)">
     ```typescript
     import isolatedDeclarations from '@visulima/packem/dts/isolated/transformer/typescript'
-    
+
     export default defineConfig({
       isolatedDeclarationTransformer: isolatedDeclarations,
       transformer: 'esbuild'
     })
     ```
-  </TabItem>
-  <TabItem label="swc">
+  </Tab>
+  <Tab value="swc">
     ```typescript
     import isolatedDeclarations from '@visulima/packem/dts/isolated/transformer/swc'
-    
+
     export default defineConfig({
       isolatedDeclarationTransformer: isolatedDeclarations,
       transformer: 'swc'
     })
     ```
-  </TabItem>
-  <TabItem label="OXC">
+  </Tab>
+  <Tab value="OXC">
     ```typescript
     import isolatedDeclarations from '@visulima/packem/dts/isolated/transformer/oxc'
-    
+
     export default defineConfig({
       isolatedDeclarationTransformer: isolatedDeclarations,
       transformer: 'oxc'
     })
     ```
-  </TabItem>
+  </Tab>
 </Tabs>
 
 ### Isolated Declarations Requirements
