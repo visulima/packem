@@ -1,3 +1,15 @@
+## @visulima/packem-rollup [1.0.0-alpha.46](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.45...@visulima/packem-rollup@1.0.0-alpha.46) (2026-03-24)
+
+### Miscellaneous Chores
+
+* allow typescript 5 and 6 in peerDependencies and examples ([de6362d](https://github.com/visulima/packem/commit/de6362d402f593c11a9eedd04d756d69bade4ac5))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.27
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.7
+
 ## @visulima/packem-rollup [1.0.0-alpha.45](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.44...@visulima/packem-rollup@1.0.0-alpha.45) (2026-03-24)
 
 
