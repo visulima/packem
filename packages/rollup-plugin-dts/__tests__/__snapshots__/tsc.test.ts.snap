@@ -148,9 +148,9 @@ export { a };
 
 exports[`tsc > rename infer 1`] = `
 "// infer-renaming.d.ts
-import { infer } from 'zod';
+import { infer as __Infer } from 'zod';
 declare const productSchema: any;
-declare const product: infer<typeof productSchema>;
+declare const product: __Infer<typeof productSchema>;
 export { product, productSchema };
 "
 `;

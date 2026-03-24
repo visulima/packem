@@ -382,6 +382,15 @@ it("declare module", async () => {
     expect(snapshot).toMatchSnapshot();
 });
 
+// https://github.com/sxzz/rolldown-plugin-dts/issues/209
+it("function overloads", async () => {
+    const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/function-overloads.ts"), [dts({ emitDtsOnly: true })]);
+
+    expect(snapshot).toMatchSnapshot();
+    expect(snapshot).toContain("declare function useConfig(): Config");
+    expect(snapshot).toContain("declare function useConfig<T>");
+});
+
 it("should error when file import cannot be found", async () => {
     await expect(() =>
         rolldownBuild(path.resolve(dirname, "fixtures/unresolved-import/ts.ts"), [
@@ -519,6 +528,14 @@ it("real css imports are externalized", async () => {
     expect(snapshot).not.toContain(".main");
 });
 
+it("scss imports are externalized", async () => {
+    const root = path.resolve(dirname, "fixtures/css-scss");
+    const { snapshot } = await rolldownBuild(path.resolve(root, "index.ts"), [dts({ emitDtsOnly: true })]);
+
+    expect(snapshot).toMatchSnapshot();
+    expect(snapshot).not.toContain(".main");
+});
+
 it("sub namespace", async () => {
     const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/sub-namespace.ts"), [dts({ emitDtsOnly: true })]);
 
@@ -544,4 +561,10 @@ it("deterministic namespace import index", async () => {
     expect(results[1]).toBe(results[2]);
     expect(results[0]).toMatch(/import \* as stub_lib from ['"]stub_lib['"]/u);
     expect(results[0]).not.toContain("stub_lib0");
+});
+
+it("decorators", async () => {
+    const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/decorator.ts"), [dts({ emitDtsOnly: true })]);
+
+    expect(snapshot).toMatchSnapshot();
 });
