@@ -568,3 +568,30 @@ it("decorators", async () => {
 
     expect(snapshot).toMatchSnapshot();
 });
+
+// https://github.com/sxzz/rolldown-plugin-dts/issues/225
+it("export * preserves type modifiers from re-exports", async () => {
+    const root = path.resolve(dirname, "fixtures/type-only-star-export");
+    const { snapshot } = await rolldownBuild(path.resolve(root, "index.ts"), [dts({ emitDtsOnly: true })]);
+
+    expect(snapshot).toMatchSnapshot();
+    // TaskWrapper is a class but re-exported via `export { type TaskWrapper }` — must have type modifier
+    expect(snapshot).toMatch(/export\s*\{[^}]*type\s+TaskWrapper/u);
+    // Task is an interface re-exported via `export { type Task }` — must have type modifier
+    expect(snapshot).toMatch(/export\s*\{[^}]*type\s+Task\b/u);
+});
+
+// https://github.com/sxzz/rolldown-plugin-dts/issues/225
+it("export * preserves type modifiers from re-exports (tsc)", async () => {
+    const root = path.resolve(dirname, "fixtures/type-only-star-export");
+    const { snapshot } = await rolldownBuild(path.resolve(root, "index.ts"), [
+        dts({
+            compilerOptions: { isolatedDeclarations: false },
+            emitDtsOnly: true,
+        }),
+    ]);
+
+    expect(snapshot).toMatchSnapshot();
+    expect(snapshot).toMatch(/export\s*\{[^}]*type\s+TaskWrapper/u);
+    expect(snapshot).toMatch(/export\s*\{[^}]*type\s+Task\b/u);
+});

@@ -263,6 +263,30 @@ export { Input2, input2 };
 "
 `;
 
+exports[`export * preserves type modifiers from re-exports (tsc) 1`] = `
+"// index.d.ts
+declare class TaskWrapper {
+  run(): void;
+}
+interface Task {
+  title: string;
+}
+export { type Task, type TaskWrapper };
+"
+`;
+
+exports[`export * preserves type modifiers from re-exports 1`] = `
+"// index.d.ts
+declare class TaskWrapper {
+  run(): void;
+}
+interface Task {
+  title: string;
+}
+export { type Task, type TaskWrapper };
+"
+`;
+
 exports[`function overloads 1`] = `
 "// function-overloads.d.ts
 interface Config {
