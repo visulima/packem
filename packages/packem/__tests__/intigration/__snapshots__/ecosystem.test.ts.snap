@@ -22,7 +22,6 @@ const Container = /* @__PURE__ */ __name(() => {
 export { Container as default };
 //# sourceMappingURL=index.js.map
 ",
-<<<<<<< HEAD
 ]
 `;
 
@@ -35,7 +34,7 @@ exports[`packem ecosystem > should work with provided 'sitefetch' ecosystem suit
 import path from 'node:path';
 import fs from 'node:fs';
 import { encode } from 'gpt-tokenizer/model/gpt-4o';
-import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-DHdmMMmW.js';
+import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-9sCCgNFr.js';
 
 function toArr(any) {
   return any == null ? [] : Array.isArray(any) ? any : [any];
@@ -694,6 +693,7 @@ cli.parse();
 export declare function fetchSite(url: string, options: Options): Promise<FetchSiteResult>;
 export declare function serializePages(pages: FetchSiteResult, format: "json" | "text"): string;
 ",
+<<<<<<< HEAD
   "export { f as fetchSite, s as serializePages } from './packem_shared/index-CpMQ4hPi.mjs';
 import 'happy-dom';
 import 'cheerio';
