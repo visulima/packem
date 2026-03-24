@@ -1,3 +1,19 @@
+## @visulima/packem-rollup [1.0.0-alpha.47](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.46...@visulima/packem-rollup@1.0.0-alpha.47) (2026-03-24)
+
+### Features
+
+* **packem, packem-rollup:** import attributes, TS resolution, build/watch improvements ([7fa91de](https://github.com/visulima/packem/commit/7fa91de8ea6b9fff47cd0a3fd5874d94592ae5ea))
+
+### Code Refactoring
+
+* **packem-rollup:** use native Rollup hook filtering in esbuild plugin ([57b3d6b](https://github.com/visulima/packem/commit/57b3d6b7f585e409f0c1d260077cf63620b6a7d1))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.28
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.8
+
 ## @visulima/packem-rollup [1.0.0-alpha.46](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.45...@visulima/packem-rollup@1.0.0-alpha.46) (2026-03-24)
 
 ### Miscellaneous Chores
