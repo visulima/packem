@@ -613,3 +613,23 @@ it("JSDoc comments in types are preserved when tsc emits them", async () => {
     expect(snapshot).toContain("/** Comment A2 */");
     expect(snapshot).toContain("/** Comment B1 */");
 });
+
+it("triple-slash directives are preserved and deduplicated in dtsInput mode", async () => {
+    const root = path.resolve(dirname, "fixtures/triple-slash-directives");
+    const { snapshot } = await rolldownBuild(path.resolve(root, "input.d.ts"), [
+        dts({
+            dtsInput: true,
+            emitDtsOnly: true,
+            sourcemap: false,
+            tsconfig: false,
+        }),
+    ]);
+
+    expect(snapshot).toMatchSnapshot();
+    // Directive should appear in the output
+    expect(snapshot).toContain('/// <reference types="node" />');
+    // Should be deduplicated — only one occurrence despite both input.d.ts and types-input.d.ts having it
+    const matches = snapshot.match(/\/\/\/ <reference types="node" \/>/g);
+
+    expect(matches).toHaveLength(1);
+});

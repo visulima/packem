@@ -504,6 +504,25 @@ export { type A };
 "
 `;
 
+exports[`triple-slash directives are preserved and deduplicated 1`] = `
+"// index.d.ts
+declare function readConfig(path: string): Buffer;
+declare function resolve(p: string): string;
+declare function getVersion(): string;
+export { getVersion, readConfig, resolve };
+"
+`;
+
+exports[`triple-slash directives are preserved and deduplicated in dtsInput mode 1`] = `
+"// input.d.ts
+/// <reference types="node" />
+declare function readConfig(path: string): Buffer;
+declare function resolve(p: string): string;
+declare function getVersion(): string;
+export { getVersion, readConfig, resolve };
+"
+`;
+
 exports[`tsgo with custom path 1`] = `
 "// basic.d.ts
 declare const foo: number;
