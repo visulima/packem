@@ -633,3 +633,29 @@ it("triple-slash directives are preserved and deduplicated in dtsInput mode", as
 
     expect(matches).toHaveLength(1);
 });
+
+it("module augmentation files preserve export {} to remain modules", async () => {
+    const root = path.resolve(dirname, "fixtures/module-augmentation");
+    const { snapshot } = await rolldownBuild(path.resolve(root, "index.ts"), [dts({ emitDtsOnly: true })]);
+
+    expect(snapshot).toMatchSnapshot();
+    // The declare module augmentation must be present
+    expect(snapshot).toContain("declare module");
+    expect(snapshot).toContain("ButtonPropsSizeOverrides");
+    // The chunk containing the augmentation must have export {} or another export to be a module
+    // Without it, TypeScript won't apply the module augmentation
+    expect(snapshot).toMatch(/export\s*\{/u);
+});
+
+it("module augmentation-only file preserves export {} as module marker", async () => {
+    const { snapshot } = await rolldownBuild(
+        path.resolve(dirname, "fixtures/module-augmentation-only.ts"),
+        [dts({ emitDtsOnly: true })],
+    );
+
+    expect(snapshot).toMatchSnapshot();
+    expect(snapshot).toContain("declare module");
+    expect(snapshot).toContain("ButtonPropsSizeOverrides");
+    // Must have export {} to be treated as a module by TypeScript
+    expect(snapshot).toMatch(/export\s*\{/u);
+});

@@ -610,6 +610,25 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             return "export { };";
         }
 
+        // Ensure files with side-effect declarations (like `declare module` augmentations)
+        // retain an `export {}` so TypeScript treats them as modules.
+        // Without it, module augmentations are ignored.
+        const hasExport = program.body.some(
+            (node) => node.type === "ExportNamedDeclaration" || node.type === "ExportDefaultDeclaration" || node.type === "ExportAllDeclaration",
+        );
+        const hasSideEffectDecl = program.body.some(
+            (node) => node.type === "TSModuleDeclaration" && (node as t.TSModuleDeclaration).kind !== "namespace",
+        );
+
+        if (!hasExport && hasSideEffectDecl) {
+            program.body.push({
+                declaration: null,
+                source: null,
+                specifiers: [],
+                type: "ExportNamedDeclaration",
+            } as unknown as t.Statement);
+        }
+
         // recover comments
         const comments = new Set<t.Comment>();
         const commentsValue = new Set<string>(); // deduplicate
