@@ -508,7 +508,6 @@ import "./mod.js";
 declare global {
   let sideEffectExecuted: boolean;
 }
-export {};
 "
 `;
 

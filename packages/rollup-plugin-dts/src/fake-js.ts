@@ -610,17 +610,19 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             return "export { };";
         }
 
-        // Ensure files with side-effect declarations (like `declare module` augmentations)
-        // retain an `export {}` so TypeScript treats them as modules.
-        // Without it, module augmentations are ignored.
+        // Ensure files with `declare module '...'` augmentations retain an `export {}`
+        // so TypeScript treats them as modules. Without it, module augmentations are ignored.
+        // `declare global` does NOT require this — it works in both scripts and modules.
         const hasExport = program.body.some(
             (node) => node.type === "ExportNamedDeclaration" || node.type === "ExportDefaultDeclaration" || node.type === "ExportAllDeclaration",
         );
-        const hasSideEffectDecl = program.body.some(
-            (node) => node.type === "TSModuleDeclaration" && (node as t.TSModuleDeclaration).kind !== "namespace",
+        const hasModuleAugmentation = program.body.some(
+            (node) =>
+                node.type === "TSModuleDeclaration"
+                && (node as t.TSModuleDeclaration).id.type === "StringLiteral",
         );
 
-        if (!hasExport && hasSideEffectDecl) {
+        if (!hasExport && hasModuleAugmentation) {
             program.body.push({
                 declaration: null,
                 source: null,
