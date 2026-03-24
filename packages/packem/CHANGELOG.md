@@ -1,3 +1,23 @@
+## @visulima/packem [2.0.0-alpha.60](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.59...@visulima/packem@2.0.0-alpha.60) (2026-03-24)
+
+### Features
+
+* **packem, packem-rollup:** import attributes, TS resolution, build/watch improvements ([7fa91de](https://github.com/visulima/packem/commit/7fa91de8ea6b9fff47cd0a3fd5874d94592ae5ea))
+* **packem:** add rollup-plugin-import-trace for build error diagnostics ([304cb0d](https://github.com/visulima/packem/commit/304cb0d54c19a95ca3df82b7cc52d4d289973d4e))
+
+### Miscellaneous Chores
+
+* update test ([bad6c42](https://github.com/visulima/packem/commit/bad6c427f898f88aad4f66969fa18c3e6fc89208))
+* updated test snap ([1887e4c](https://github.com/visulima/packem/commit/1887e4ca83efe950a27f8f60480af67e4ea03c4d))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.47
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.28
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.27
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.8
+
 ## @visulima/packem [2.0.0-alpha.59](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.58...@visulima/packem@2.0.0-alpha.59) (2026-03-24)
 
 ### Miscellaneous Chores
