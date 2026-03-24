@@ -139,6 +139,7 @@ declare module "virtual" {
   const _default: string;
   export default _default;
 }
+export {};
 "
 `;
 
@@ -421,6 +422,29 @@ export { shared1 as s };
 "
 `;
 
+exports[`module augmentation files preserve export {} to remain modules 1`] = `
+"// index.d.ts
+declare module '@mui/material/Button' {
+  interface ButtonPropsSizeOverrides {
+    xsmall: true;
+  }
+}
+declare const Button = "button";
+export { Button };
+"
+`;
+
+exports[`module augmentation-only file preserves export {} as module marker 1`] = `
+"// module-augmentation-only.d.ts
+declare module '@mui/material/Button' {
+  interface ButtonPropsSizeOverrides {
+    xsmall: true;
+  }
+}
+export {};
+"
+`;
+
 exports[`paths 1`] = `
 "// index.d.ts
 declare const foo = 42;
@@ -484,6 +508,7 @@ import "./mod.js";
 declare global {
   let sideEffectExecuted: boolean;
 }
+export {};
 "
 `;
 
