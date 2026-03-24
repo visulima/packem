@@ -4,7 +4,10 @@ import type Ts from "typescript";
 
 import type { TscOptions } from "./types.js";
 
-const loadVueLanguageTools = () => {
+const loadVueLanguageTools = (): {
+    getLanguagePlugin: (ts: typeof Ts, options: Ts.CreateProgramOptions) => ReturnType<typeof import("@vue/language-core").createVueLanguagePlugin<string>>;
+    proxyCreateProgram: typeof import("@volar/typescript").proxyCreateProgram;
+} => {
     const debug = createDebug("rollup-plugin-dts:vue");
 
     debug("loading vue language tools");

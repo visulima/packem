@@ -117,7 +117,7 @@
         "@ts-macro/tsc": "catalog:tsc",
         "@typescript/native-preview": ">=7.0.0-dev.20250601.1",
         "rollup": ">=4.0.0",
-        "typescript": "catalog:tsc",
+        "typescript": "^5.0.0 || ^6.0.0-beta",
         "vue-tsc": "catalog:tsc"
     },
     "peerDependenciesMeta": {
