@@ -595,3 +595,21 @@ it("export * preserves type modifiers from re-exports (tsc)", async () => {
     expect(snapshot).toMatch(/export\s*\{[^}]*type\s+TaskWrapper/u);
     expect(snapshot).toMatch(/export\s*\{[^}]*type\s+Task\b/u);
 });
+
+it("JSDoc comments in types are preserved when tsc emits them", async () => {
+    const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/jsdoc-type-comments.ts"), [
+        dts({
+            compilerOptions: {
+                isolatedDeclarations: false,
+                removeComments: false,
+            },
+            emitDtsOnly: true,
+        }),
+    ]);
+
+    expect(snapshot).toMatchSnapshot();
+    // Each JSDoc comment should be preserved on its own line before the property
+    expect(snapshot).toContain("/** Comment A1 */");
+    expect(snapshot).toContain("/** Comment A2 */");
+    expect(snapshot).toContain("/** Comment B1 */");
+});

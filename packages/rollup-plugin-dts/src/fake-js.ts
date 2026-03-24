@@ -457,7 +457,12 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                             return;
                         }
 
-                        delete node.loc;
+                        // Preserve loc on nodes with leading comments so @babel/generator
+                        // places JSDoc comments on their own line instead of appending them
+                        // to the previous line (especially in type alias bodies).
+                        if (!(node as t.Node).leadingComments?.length) {
+                            delete node.loc;
+                        }
                     },
                 });
 

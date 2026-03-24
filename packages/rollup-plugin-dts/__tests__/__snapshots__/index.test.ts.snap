@@ -1,5 +1,55 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`JSDoc comments in types are not misplaced 1`] = `
+"// jsdoc-type-comments.d.ts
+declare const foo = "foo";
+interface A {
+  AA?: string;
+  AB?: string;
+  AC?: string;
+}
+type B = {
+  BA?: string;
+  BB?: string;
+  BC?: string;
+};
+declare function something(): {
+  a: A;
+  b: B;
+};
+declare function fn(): void;
+export { fn, foo, something };
+"
+`;
+
+exports[`JSDoc comments in types are preserved when tsc emits them 1`] = `
+"// jsdoc-type-comments.d.ts
+declare const foo = "foo";
+interface A {
+  /** Comment A1 */
+  AA?: string;
+  /** Comment A2 */
+  AB?: string;
+  /** Comment A3 */
+  AC?: string;
+}
+type B = {
+  /** Comment B1 */
+  BA?: string;
+  /** Comment B2 */
+  BB?: string;
+  /** Comment B3 */
+  BC?: string;
+};
+declare function something(): {
+  a: A;
+  b: B;
+};
+declare function fn(): void;
+export { fn, foo, something };
+"
+`;
+
 exports[`banner 1`] = `
 "// minimal.d.ts
 /* My Banner */
