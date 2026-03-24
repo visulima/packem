@@ -140,6 +140,64 @@ describe("packem typescript", () => {
             expect(content).toBe("console.log(1);\n");
         });
 
+        it("should resolve .jsx -> .ts when .tsx does not exist", async () => {
+            expect.assertions(3);
+
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { value } from "./utils.jsx";\nconsole.log(value);');
+            await writeFile(`${temporaryDirectoryPath}/src/utils.ts`, 'export const value = "from-ts-via-jsx";');
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
+                },
+                main: "./dist/index.js",
+                type: "module",
+            });
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackemConfig(temporaryDirectoryPath);
+
+            const binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
+
+            expect(content).toMatch("from-ts-via-jsx");
+        });
+
+        it("should resolve .js -> .tsx when .ts does not exist", async () => {
+            expect.assertions(3);
+
+            await writeFile(`${temporaryDirectoryPath}/src/index.ts`, 'import { Component } from "./component.js";\nconsole.log(Component);');
+            await writeFile(`${temporaryDirectoryPath}/src/component.tsx`, 'export const Component = "tsx-component";');
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    typescript: "*",
+                },
+                main: "./dist/index.js",
+                type: "module",
+            });
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackemConfig(temporaryDirectoryPath);
+
+            const binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
+
+            expect(content).toMatch("tsx-component");
+        });
+
         it("should resolve .jsx -> .js", async () => {
             expect.assertions(3);
 
@@ -321,6 +379,221 @@ console.log(fromBoth, fromTs);
             expect(content).not.toMatch("source-ts");
 
             // Should use .ts when only .ts exists in node_modules
+            expect(content).toMatch("only-ts");
+        });
+
+        it("should resolve bare specifier .js through exports map with wildcards", async () => {
+            expect.assertions(3);
+
+            await writeFile(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                `import { value } from 'dep-wildcard/utils.js';
+console.log(value);
+`,
+            );
+
+            await writeJson(join(temporaryDirectoryPath, "node_modules", "dep-wildcard", "package.json"), {
+                exports: {
+                    "./*.js": "./dist/*.js",
+                    "./*": "./dist/*.js",
+                },
+                name: "dep-wildcard",
+                type: "module",
+            });
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-wildcard", "dist", "utils.js"), 'export const value = "hello";');
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    "dep-wildcard": "*",
+                    typescript: "*",
+                },
+                main: "./dist/index.js",
+                type: "module",
+            });
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackemConfig(temporaryDirectoryPath);
+
+            const binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
+
+            expect(content).toMatch("hello");
+        });
+
+        it("should resolve scoped bare specifier .js through exports map with wildcards", async () => {
+            expect.assertions(3);
+
+            await writeFile(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                `import { value } from '@scope/dep-wildcard/utils.js';
+console.log(value);
+`,
+            );
+
+            await writeJson(join(temporaryDirectoryPath, "node_modules", "@scope", "dep-wildcard", "package.json"), {
+                exports: {
+                    "./*.js": "./dist/*.js",
+                    "./*": "./dist/*.js",
+                },
+                name: "@scope/dep-wildcard",
+                type: "module",
+            });
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "@scope", "dep-wildcard", "dist", "utils.js"), 'export const value = "scoped-hello";');
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    "@scope/dep-wildcard": "*",
+                    typescript: "*",
+                },
+                main: "./dist/index.js",
+                type: "module",
+            });
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackemConfig(temporaryDirectoryPath);
+
+            const binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
+
+            expect(content).toMatch("scoped-hello");
+        });
+
+        it("should resolve .mjs bare specifier through exports map with wildcards", async () => {
+            expect.assertions(3);
+
+            await writeFile(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                `import { value } from 'dep-mjs/utils.mjs';
+console.log(value);
+`,
+            );
+
+            await writeJson(join(temporaryDirectoryPath, "node_modules", "dep-mjs", "package.json"), {
+                exports: {
+                    "./*": "./dist/*",
+                },
+                name: "dep-mjs",
+                type: "module",
+            });
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-mjs", "dist", "utils.mjs"), 'export const value = "from-mjs";');
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    "dep-mjs": "*",
+                    typescript: "*",
+                },
+                main: "./dist/index.js",
+                type: "module",
+            });
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackemConfig(temporaryDirectoryPath);
+
+            const binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
+
+            expect(content).toMatch("from-mjs");
+        });
+
+        it("should prefer .js over .ts for bare specifier imports", async () => {
+            expect.assertions(4);
+
+            await writeFile(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                `import { value } from 'dep-both/file.js';
+console.log(value);
+`,
+            );
+
+            await writeJson(join(temporaryDirectoryPath, "node_modules", "dep-both", "package.json"), {
+                main: "./index.js",
+                name: "dep-both",
+                type: "module",
+            });
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-both", "file.js"), 'export const value = "compiled-js";');
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-both", "file.ts"), 'export const value: string = "source-ts";');
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    "dep-both": "*",
+                    typescript: "*",
+                },
+                main: "./dist/index.js",
+                type: "module",
+            });
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackemConfig(temporaryDirectoryPath);
+
+            const binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
+
+            expect(content).toMatch("compiled-js");
+            expect(content).not.toMatch("source-ts");
+        });
+
+        it("should fallback bare specifier .js to .ts when only .ts exists", async () => {
+            expect.assertions(3);
+
+            await writeFile(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                `import { value } from 'dep-ts-only/file.js';
+console.log(value);
+`,
+            );
+
+            await writeJson(join(temporaryDirectoryPath, "node_modules", "dep-ts-only", "package.json"), {
+                main: "./index.js",
+                name: "dep-ts-only",
+                type: "module",
+            });
+            await writeFile(join(temporaryDirectoryPath, "node_modules", "dep-ts-only", "file.ts"), 'export const value: string = "only-ts";');
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createPackageJson(temporaryDirectoryPath, {
+                devDependencies: {
+                    "dep-ts-only": "*",
+                    typescript: "*",
+                },
+                main: "./dist/index.js",
+                type: "module",
+            });
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackemConfig(temporaryDirectoryPath);
+
+            const binProcess = await execPackem("build", [], {
+                cwd: temporaryDirectoryPath,
+            });
+
+            expect(binProcess.stderr).toBe("");
+            expect(binProcess.exitCode).toBe(0);
+
+            const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
+
             expect(content).toMatch("only-ts");
         });
     });

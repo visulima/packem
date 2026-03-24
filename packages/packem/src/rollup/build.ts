@@ -44,68 +44,72 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
 
     const buildResult = await rollup(rollupOptions);
 
-    if (loadCache) {
-        fileCache.set(BUNDLE_CACHE_KEY, buildResult.cache, subDirectory);
-    }
-
-    // Always cache dependency information when validation is enabled
-    if (context.options.validation && context.options.validation.dependencies !== false) {
-        fileCache.set(
-            DEPENDENCIES_CACHE_KEY,
-            {
-                hoisted: [...context.hoistedDependencies],
-                used: [...context.usedDependencies],
-            },
-            subDirectory,
-        );
-    }
-
-    await context.hooks.callHook("rollup:build", context, buildResult);
-
-    const assets = new Map<string, BuildContextBuildAssetAndChunk | BuildContextBuildEntry>();
-
-    for (const outputOptions of rollupOptions.output as OutputOptions[]) {
-        // eslint-disable-next-line no-await-in-loop
-        const { output } = await buildResult.write(outputOptions);
-        const outputChunks = output.filter((fOutput) => fOutput.type === "chunk" && fOutput.isEntry) as OutputChunk[];
-
-        for (const entry of outputChunks) {
-            context.buildEntries.push({
-                chunks: entry.imports.filter((index) => outputChunks.find((c) => c.fileName === index)),
-                dynamicImports: entry.dynamicImports,
-                exports: entry.exports,
-                modules: Object.entries(entry.modules).map(([id, module_]) => {
-                    return {
-                        bytes: module_.renderedLength,
-                        id,
-                    };
-                }),
-                path: entry.fileName,
-                size: {
-                    bytes: Buffer.byteLength(entry.code, "utf8"),
-                },
-                type: "entry",
-            });
+    try {
+        if (loadCache) {
+            fileCache.set(BUNDLE_CACHE_KEY, buildResult.cache, subDirectory);
         }
 
-        const outputAssets = output.filter((fOutput) => fOutput.type === "asset") as OutputAsset[];
+        // Always cache dependency information when validation is enabled
+        if (context.options.validation && context.options.validation.dependencies !== false) {
+            fileCache.set(
+                DEPENDENCIES_CACHE_KEY,
+                {
+                    hoisted: [...context.hoistedDependencies],
+                    used: [...context.usedDependencies],
+                },
+                subDirectory,
+            );
+        }
 
-        for (const entry of outputAssets) {
-            if (assets.has(entry.fileName)) {
-                continue;
+        await context.hooks.callHook("rollup:build", context, buildResult);
+
+        const assets = new Map<string, BuildContextBuildAssetAndChunk | BuildContextBuildEntry>();
+
+        for (const outputOptions of rollupOptions.output as OutputOptions[]) {
+            // eslint-disable-next-line no-await-in-loop
+            const { output } = await buildResult.write(outputOptions);
+            const outputChunks = output.filter((fOutput) => fOutput.type === "chunk" && fOutput.isEntry) as OutputChunk[];
+
+            for (const entry of outputChunks) {
+                context.buildEntries.push({
+                    chunks: entry.imports.filter((index) => outputChunks.find((c) => c.fileName === index)),
+                    dynamicImports: entry.dynamicImports,
+                    exports: entry.exports,
+                    modules: Object.entries(entry.modules).map(([id, module_]) => {
+                        return {
+                            bytes: module_.renderedLength,
+                            id,
+                        };
+                    }),
+                    path: entry.fileName,
+                    size: {
+                        bytes: Buffer.byteLength(entry.code, "utf8"),
+                    },
+                    type: "entry",
+                });
             }
 
-            assets.set(entry.fileName, {
-                path: entry.fileName,
-                size: {
-                    bytes: Buffer.byteLength(entry.source, "utf8"),
-                },
-                type: "asset",
-            });
-        }
-    }
+            const outputAssets = output.filter((fOutput) => fOutput.type === "asset") as OutputAsset[];
 
-    context.buildEntries.push(...assets.values());
+            for (const entry of outputAssets) {
+                if (assets.has(entry.fileName)) {
+                    continue;
+                }
+
+                assets.set(entry.fileName, {
+                    path: entry.fileName,
+                    size: {
+                        bytes: Buffer.byteLength(entry.source, "utf8"),
+                    },
+                    type: "asset",
+                });
+            }
+        }
+
+        context.buildEntries.push(...assets.values());
+    } finally {
+        await buildResult.close();
+    }
 };
 
 export default build;

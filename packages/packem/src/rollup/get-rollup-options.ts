@@ -30,6 +30,7 @@ import { cjsInteropPlugin } from "@visulima/packem-rollup/plugin/cjs-interop";
 import { copyPlugin } from "@visulima/packem-rollup/plugin/copy";
 import { dataUriPlugin } from "@visulima/packem-rollup/plugin/data-uri";
 import { debarrelPlugin } from "@visulima/packem-rollup/plugin/debarrel";
+import { importAttributesPlugin } from "@visulima/packem-rollup/plugin/import-attributes";
 import { esmShimCjsSyntaxPlugin } from "@visulima/packem-rollup/plugin/esm-shim-cjs-syntax";
 import { fixDtsDefaultCjsExportsPlugin } from "@visulima/packem-rollup/plugin/fix-dts-default-cjs-exports";
 import { isolatedDeclarationsPlugin } from "@visulima/packem-rollup/plugin/isolated-declarations";
@@ -711,6 +712,8 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
         plugins: [
             importTrace(),
+
+            importAttributesPlugin(),
 
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
 
