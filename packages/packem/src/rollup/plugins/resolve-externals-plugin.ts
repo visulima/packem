@@ -103,13 +103,32 @@ export type ResolveExternalsPluginOptions = {
     peerDeps?: boolean;
 };
 
-export const resolveExternalsPlugin = (context: BuildContext<InternalBuildOptions>): Plugin => {
+export const resolveExternalsPlugin = (
+    context: BuildContext<InternalBuildOptions>,
+    options?: { dtsResolve?: boolean | (string | RegExp)[] },
+): Plugin => {
     const cacheResolved = new Map<string, boolean>();
     const resolvedExternalsOptions = context.options?.rollup?.resolveExternals ?? {};
 
     // Map the include and exclude options to arrays of regexes.
     const include = new Set(getRegExps([...context.options?.externals ?? []], "include", context.logger));
     const exclude = new Set(getRegExps([...resolvedExternalsOptions.exclude ?? []], "exclude", context.logger));
+
+    // When dtsResolve is set, add matching patterns to exclude so the DTS plugin can inline their types
+    if (options?.dtsResolve) {
+        if (options.dtsResolve === true) {
+            // Exclude everything — DTS plugin will inline all types
+            exclude.add(/.*/);
+        } else {
+            for (const pattern of options.dtsResolve) {
+                if (typeof pattern === "string") {
+                    exclude.add(new RegExp(`^${pattern.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)}(?:/.+)?$`));
+                } else {
+                    exclude.add(pattern);
+                }
+            }
+        }
+    }
 
     const dependencies: Record<string, string> = {
         ...resolvedExternalsOptions.deps ? context.pkg.dependencies ?? {} : undefined,

@@ -931,7 +931,74 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
     }) as RollupOptions;
 };
 
-const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>): Promise<Plugin[]> => {
+/**
+ * Compute the effective `resolve` list for the DTS build.
+ *
+ * Automatically includes:
+ * - `optionalDependencies` — consumers may not install these
+ * - Peer dependencies marked as optional in `peerDependenciesMeta` — consumers
+ *   only install the ones they need (e.g. multi-framework libraries like unplugin)
+ *
+ * The user can extend or override via `rollup.dts.resolve`:
+ * - `false` → disable auto-resolution, keep all deps external in .d.ts
+ * - `true`  → inline ALL node_modules types
+ * - `(string | RegExp)[]` → merged with the auto-detected list
+ */
+const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): boolean | (string | RegExp)[] => {
+    const userResolve = context.options.rollup.dts?.resolve;
+
+    // User explicitly disabled → respect it
+    if (userResolve === false) {
+        return false;
+    }
+
+    // User wants everything → no need to compute
+    if (userResolve === true) {
+        return true;
+    }
+
+    // Auto-detect packages whose types should be inlined
+    const autoResolve: string[] = [...Object.keys(context.pkg.optionalDependencies ?? {})];
+
+    // Include peer deps that are marked as optional in peerDependenciesMeta
+    // (only if they're actually listed in peerDependencies)
+    const peerDeps = context.pkg.peerDependencies ?? {};
+
+    if (context.pkg.peerDependenciesMeta) {
+        for (const [name, meta] of Object.entries(context.pkg.peerDependenciesMeta)) {
+            if (meta && typeof meta === "object" && "optional" in meta && meta.optional && name in peerDeps) {
+                autoResolve.push(name);
+            }
+        }
+    }
+
+    if (autoResolve.length === 0 && !userResolve) {
+        return false;
+    }
+
+    // Merge and deduplicate auto-detected with user-provided patterns
+    const merged = [...autoResolve, ...(userResolve ?? [])];
+    const seen = new Set<string>();
+    const deduped: (string | RegExp)[] = [];
+
+    for (const entry of merged) {
+        if (typeof entry === "string") {
+            if (!seen.has(entry)) {
+                seen.add(entry);
+                deduped.push(entry);
+            }
+        } else {
+            deduped.push(entry);
+        }
+    }
+
+    return deduped;
+};
+
+const createDtsPlugin = async (
+    context: BuildContext<InternalBuildOptions>,
+    dtsResolve?: boolean | (string | RegExp)[],
+): Promise<Plugin[]> => {
     const { dts } = await import("@visulima/rollup-plugin-dts");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -951,6 +1018,9 @@ const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>): Pro
         // The generate plugin also handles direct .d.ts entries (without .ts sources)
         // by adding them to dtsMap and emitting them as chunks in emitDtsOnly mode.
         emitDtsOnly: true,
+        // Use pre-computed resolve that auto-includes optional peer/optional deps.
+        // This overrides any userDtsOptions.resolve from the spread above.
+        resolve: dtsResolve ?? false,
         tsconfig: context.tsconfig?.path,
     }) as unknown as Plugin[];
 };
@@ -962,6 +1032,7 @@ const memoizeDtsPluginByKey = memoizeByKey<typeof createDtsPlugin>(createDtsPlug
 export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
     const compilerOptions = context.tsconfig?.config.compilerOptions;
+    const dtsResolve = computeDtsResolve(context);
 
     delete compilerOptions?.lib;
 
@@ -1037,6 +1108,7 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
             externalizeDependencies(context.pkg, {
+                dtsResolve,
                 forTypes: true,
                 skipUnlistedWarnings: true,
             }),
@@ -1067,7 +1139,7 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
 
             resolveImplicitExternalsPlugin(context),
 
-            resolveExternalsPlugin(context),
+            resolveExternalsPlugin(context, { dtsResolve }),
 
             context.options.rollup.replace
             && (() => {
@@ -1096,7 +1168,7 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
 
             ...normalPlugins,
 
-            ...await memoizeDtsPluginByKey(uniqueProcessId)(context),
+            ...await memoizeDtsPluginByKey(uniqueProcessId)(context, dtsResolve),
 
             context.options.emitCJS && fixDtsDefaultCjsExportsPlugin(),
 

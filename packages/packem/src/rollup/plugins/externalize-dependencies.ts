@@ -42,6 +42,13 @@ const dependencyTypes = ["peerDependencies", "dependencies", "optionalDependenci
 
 export type ExternalizeDependenciesOptions = {
     /**
+     * Packages matching these patterns should NOT be externalized,
+     * allowing the DTS plugin's resolve option to inline their types.
+     * Uses the same format as rollup-plugin-dts's `resolve` option.
+     */
+    dtsResolve?: boolean | (string | RegExp)[];
+
+    /**
      * Whether this is for types builds.
      * When true, enables @types package warnings.
      */
@@ -92,6 +99,20 @@ export const externalizeDependencies = (packageJson: PackageJson, pluginOptions?
         }
     }
 
+    const shouldResolveForDts = (id: string): boolean => {
+        const { dtsResolve } = pluginOptions ?? {};
+
+        if (!dtsResolve) {
+            return false;
+        }
+
+        if (typeof dtsResolve === "boolean") {
+            return dtsResolve;
+        }
+
+        return dtsResolve.some((pattern) => (typeof pattern === "string" ? id === pattern : pattern.test(id)));
+    };
+
     return {
         name: "externalize-dependencies",
         async resolveId(id, importer, options) {
@@ -104,6 +125,11 @@ export const externalizeDependencies = (packageJson: PackageJson, pluginOptions?
             const [packageName] = parseSpecifier(id);
 
             // 1. External dependencies → externalize (always, even from node_modules)
+            //    UNLESS dtsResolve is set and matches this package (let DTS plugin inline its types)
+            if (runtimeDependencies.has(packageName) && shouldResolveForDts(packageName)) {
+                return undefined;
+            }
+
             if (runtimeDependencies.has(packageName)) {
                 // Check if @types package is in devDependencies while runtime package is externalized
                 // Only warn when building types (not for JS-only builds)
