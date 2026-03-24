@@ -1,3 +1,9 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.6...@visulima/rollup-plugin-dts@1.0.0-alpha.7) (2026-03-24)
+
+### Miscellaneous Chores
+
+* allow typescript 5 and 6 in peerDependencies and examples ([de6362d](https://github.com/visulima/packem/commit/de6362d402f593c11a9eedd04d756d69bade4ac5))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.6](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.5...@visulima/rollup-plugin-dts@1.0.0-alpha.6) (2026-03-24)
 
 ### Bug Fixes
