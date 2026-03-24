@@ -1,3 +1,15 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.6](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.5...@visulima/rollup-plugin-dts@1.0.0-alpha.6) (2026-03-24)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** only add export {} for declare module augmentations, not declare global ([c53e3db](https://github.com/visulima/packem/commit/c53e3dbce725ac2579eaa0fdca30e52fc8b43b89))
+* **rollup-plugin-dts:** preserve export {} in module augmentation files ([43c7975](https://github.com/visulima/packem/commit/43c7975cdf1300fbd0e0c949f6b5c3851e5a937c))
+* **rollup-plugin-dts:** preserve JSDoc comment positioning in type aliases ([436f8dc](https://github.com/visulima/packem/commit/436f8dcb4a6ce025a2eb7b537ee7f868f4bbed01))
+
+### Tests
+
+* **rollup-plugin-dts:** add triple-slash directive preservation test ([eacac81](https://github.com/visulima/packem/commit/eacac81d49d7ef5917cd7aaf10762dfdac040a0d))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.4...@visulima/rollup-plugin-dts@1.0.0-alpha.5) (2026-03-24)
 
 ### Features
