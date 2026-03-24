@@ -39,7 +39,8 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
 
     const INCLUDE_REGEXP = new RegExp(String.raw`\.(${extensions.map((extension) => extension.slice(1)).join("|")})$`);
 
-    const filter = createFilter(include ?? INCLUDE_REGEXP, exclude);
+    // Used for custom include/exclude patterns when provided by the user
+    const userFilter = include || exclude ? createFilter(include ?? INCLUDE_REGEXP, exclude) : undefined;
 
     let optimizeDepsResult: OptimizeDepsResult | undefined;
     let cwd = process.cwd();
@@ -88,40 +89,51 @@ const esbuildTransformer = ({ exclude, include, loaders: _loaders, logger, optim
             return undefined;
         },
 
-        async transform(code, id) {
-            if (!filter(id) || optimizeDepsResult?.optimized.has(id)) {
+        // Native Rollup hook filtering (Rollup 4.38.0+) lets Rollup skip
+        // calling this hook entirely for non-matching file extensions.
+        transform: {
+            filter: {
+                id: INCLUDE_REGEXP,
+            },
+            async handler(code, id) {
+                if (userFilter && !userFilter(id)) {
+                    return undefined;
+                }
+
+                if (optimizeDepsResult?.optimized.has(id)) {
+                    return undefined;
+                }
+
+                const extension = extname(id);
+
+                const loader = loaders[extension];
+
+                logger.debug("transforming %s with %s loader", id, loader);
+
+                if (!loader) {
+                    return undefined;
+                }
+
+                const result = await transform(code, {
+                    format: (["base64", "binary", "dataurl", "text", "json"] satisfies Loader[] as Loader[]).includes(loader) ? "esm" : undefined,
+                    loader,
+                    // @see https://github.com/evanw/esbuild/issues/1932#issuecomment-1013380565
+                    sourcefile: id.replace(/\.[cm]ts/, ".ts"),
+                    sourcemap: sourceMap,
+                    ...esbuildOptions,
+                });
+
+                await warn(this, result.warnings);
+
+                if (result.code) {
+                    return {
+                        code: result.code,
+                        map: result.map || undefined,
+                    };
+                }
+
                 return undefined;
-            }
-
-            const extension = extname(id);
-
-            const loader = loaders[extension];
-
-            logger.debug("transforming %s with %s loader", id, loader);
-
-            if (!loader) {
-                return undefined;
-            }
-
-            const result = await transform(code, {
-                format: (["base64", "binary", "dataurl", "text", "json"] satisfies Loader[] as Loader[]).includes(loader) ? "esm" : undefined,
-                loader,
-                // @see https://github.com/evanw/esbuild/issues/1932#issuecomment-1013380565
-                sourcefile: id.replace(/\.[cm]ts/, ".ts"),
-                sourcemap: sourceMap,
-                ...esbuildOptions,
-            });
-
-            await warn(this, result.warnings);
-
-            if (result.code) {
-                return {
-                    code: result.code,
-                    map: result.map || undefined,
-                };
-            }
-
-            return undefined;
+            },
         },
     };
 };
