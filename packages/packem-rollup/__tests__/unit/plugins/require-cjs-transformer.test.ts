@@ -75,7 +75,7 @@ export const test = 'hello';`;
           const {
             readFileSync
           } = __cjs_getBuiltinModule("fs");
-          import typescript from 'typescript';
+          const typescript = __cjs_require("typescript");
 
           export const test = 'hello';"
         `);
