@@ -40,12 +40,29 @@ type TypeParams = {
     typeParams: t.TSTypeParameter[];
 }[];
 
+interface OverloadInfo {
+    children: t.Node[];
+    childrenOffset: number;
+    decl: t.Declaration;
+    deps: Dep[];
+    depsOffset: number;
+    params: TypeParams;
+    paramsOffset: number;
+}
+
 interface DeclarationInfo {
     bindings: t.Identifier[];
     children: t.Node[];
     decl: t.Declaration;
     deps: Dep[];
+    overloads?: OverloadInfo[];
     params: TypeParams;
+    /** Number of children belonging to the primary declaration (before merging overloads) */
+    primaryChildrenCount?: number;
+    /** Number of deps belonging to the primary declaration (before merging overloads) */
+    primaryDepsCount?: number;
+    /** Number of params belonging to the primary declaration (before merging overloads) */
+    primaryParamsCount?: number;
     resolvedModuleId?: string;
 }
 
@@ -166,7 +183,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         const file = parse(code, {
             createParenthesizedExpressions: true,
             errorRecovery: true,
-            plugins: [["typescript", { dts: true }]],
+            plugins: [["typescript", { dts: true }], "decoratorAutoAccessors"],
             sourceType: "module",
         });
         const { comments, program } = file;
@@ -180,6 +197,9 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
         const appendStmts: t.Statement[] = [];
         const namespaceStmts: NamespaceMap = new Map();
+        // Track binding names to their declaration IDs for function overload merging
+        const bindingToDeclarationId = new Map<string, number>();
+        const stmtsToRemove = new Set<number>();
 
         for (const [i, stmt] of program.body.entries()) {
             const setStmt = (stmt: t.Statement) => (program.body[i] = stmt);
@@ -263,6 +283,41 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 decl.leadingComments = stmt.leadingComments;
             }
 
+            // Handle function overloads: merge into existing declaration
+            if (
+                decl.type === "TSDeclareFunction"
+                && bindings.length === 1
+                && bindingToDeclarationId.has(bindings[0].name)
+            ) {
+                const existingId = bindingToDeclarationId.get(bindings[0].name)!;
+                const existing = getDeclaration(existingId);
+
+                if (!existing.overloads) {
+                    existing.overloads = [];
+                    existing.primaryDepsCount = existing.deps.length;
+                    existing.primaryParamsCount = existing.params.length;
+                    existing.primaryChildrenCount = existing.children.length;
+                }
+
+                existing.overloads.push({
+                    children,
+                    childrenOffset: existing.children.length,
+                    decl,
+                    deps,
+                    depsOffset: existing.deps.length,
+                    params,
+                    paramsOffset: existing.params.length,
+                });
+                // Merge deps, params, and children into the primary so they go through
+                // Rolldown's identifier renaming pipeline
+                existing.deps.push(...deps);
+                existing.params.push(...params);
+                existing.children.push(...children);
+                stmtsToRemove.add(i);
+
+                continue;
+            }
+
             const declarationId = registerDeclaration({
                 bindings,
                 children,
@@ -271,6 +326,11 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 params,
                 resolvedModuleId,
             });
+
+            // Track binding name for potential overload merging
+            if (decl.type === "TSDeclareFunction" && bindings.length === 1) {
+                bindingToDeclarationId.set(bindings[0].name, declarationId);
+            }
 
             const declarationIdNode = t.numericLiteral(declarationId);
             const depsNode = t.arrowFunctionExpression(
@@ -328,7 +388,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             appendStmts.push(t.expressionStatement(t.callExpression(t.identifier("sideEffect"), [])));
         }
 
-        program.body = [...Array.from(namespaceStmts.values(), ({ stmt }) => stmt), ...program.body, ...appendStmts];
+        program.body = [...Array.from(namespaceStmts.values(), ({ stmt }) => stmt), ...program.body.filter((_, idx) => !stmtsToRemove.has(idx)), ...appendStmts];
 
         typeOnlyMap.set(id, typeOnlyIds);
 
@@ -364,24 +424,26 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         program.body = patchReExport(program.body);
 
         program.body = program.body
-            .map((node) => {
+            .flatMap((node) => {
                 if (isHelperImport(node))
-                    return null;
+                    return [];
 
                 if (node.type === "ExpressionStatement")
-                    return null;
+                    return [];
 
                 const newNode = patchImportExport(node, typeOnlyIds, cjsDefault);
 
-                if (newNode || newNode === false) {
-                    return newNode;
-                }
+                if (newNode === false)
+                    return [];
+
+                if (newNode)
+                    return [newNode];
 
                 if (node.type !== "VariableDeclaration")
-                    return node;
+                    return [node];
 
                 if (!isRuntimeBindingVariableDeclaration(node)) {
-                    return null;
+                    return [];
                 }
 
                 const [declarationIdNode, depsFunction, children] = node.declarations[0].init.elements;
@@ -408,7 +470,13 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     overwriteNode(declaration.bindings[i], transformedBinding);
                 }
 
-                for (const [i, child] of (children.elements as t.StringLiteral[]).entries()) {
+                const primaryChildrenCount = declaration.primaryChildrenCount ?? declaration.children.length;
+                const primaryParamsCount = declaration.primaryParamsCount ?? declaration.params.length;
+                const primaryDepsCount = declaration.primaryDepsCount ?? declaration.deps.length;
+
+                for (let i = 0; i < primaryChildrenCount; i++) {
+                    const child = (children.elements as t.StringLiteral[])[i];
+
                     Object.assign(declaration.children[i], {
                         loc: child.loc,
                     });
@@ -416,7 +484,8 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
                 const transformedParams = depsFunction.params as t.Identifier[];
 
-                for (const [i, transformedParameter] of transformedParams.entries()) {
+                for (let i = 0; i < primaryParamsCount; i++) {
+                    const transformedParameter = transformedParams[i];
                     const transformedName = transformedParameter.name;
 
                     for (const originalTypeParameter of declaration.params[i].typeParams) {
@@ -426,7 +495,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
 
                 const transformedDeps = (depsFunction.body as t.ArrayExpression).elements as t.Expression[];
 
-                for (let i = 0; i < declaration.deps.length; i++) {
+                for (let i = 0; i < primaryDepsCount; i++) {
                     const originalDep = declaration.deps[i];
                     let transformedDep = transformedDeps[i];
 
@@ -441,6 +510,8 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                             loc: transformedDep.loc,
                             start: transformedDep.start,
                         };
+                    } else if (isInfer(transformedDep)) {
+                        transformedDep.name = "__Infer";
                     }
 
                     if (originalDep.replace) {
@@ -455,7 +526,78 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     (declaration.decl.id as t.StringLiteral).value = CROSS_CHUNK_PLACEHOLDER + declaration.resolvedModuleId;
                 }
 
-                return inheritNodeComments(node, declaration.decl);
+                // Restore overloaded declarations before the primary declaration
+                const overloadDecls: t.Statement[] = [];
+
+                if (declaration.overloads) {
+                    for (const overload of declaration.overloads) {
+                        walkAST<t.Node | t.Comment>(overload.decl, {
+                            enter(node) {
+                                if (node.type === "CommentBlock")
+                                    return;
+
+                                delete node.loc;
+                            },
+                        });
+
+                        // Use the transformed binding name from the primary declaration
+                        if ("id" in overload.decl && overload.decl.id) {
+                            overwriteNode(overload.decl.id, { ...declaration.bindings[0] });
+                        }
+
+                        // Patch overload children locations from the merged children array
+                        for (const [i, child] of overload.children.entries()) {
+                            const mergedChild = (children.elements as t.StringLiteral[])[overload.childrenOffset + i];
+
+                            if (mergedChild) {
+                                Object.assign(child, { loc: mergedChild.loc });
+                            }
+                        }
+
+                        // Patch overload type params from the merged params array
+                        for (const [i, param] of overload.params.entries()) {
+                            const mergedParam = transformedParams[overload.paramsOffset + i];
+
+                            if (mergedParam) {
+                                for (const typeParam of param.typeParams) {
+                                    typeParam.name = mergedParam.name;
+                                }
+                            }
+                        }
+
+                        // Patch overload deps from the merged deps array
+                        for (const [i, originalDep] of overload.deps.entries()) {
+                            let transformedDep = transformedDeps[overload.depsOffset + i];
+
+                            if (!transformedDep)
+                                continue;
+
+                            if (
+                                (transformedDep as t.UnaryExpression).type === "UnaryExpression"
+                                && (transformedDep as t.UnaryExpression).operator === "void"
+                            ) {
+                                transformedDep = {
+                                    ...t.identifier("undefined"),
+                                    end: transformedDep.end,
+                                    loc: transformedDep.loc,
+                                    start: transformedDep.start,
+                                };
+                            } else if (isInfer(transformedDep)) {
+                                transformedDep.name = "__Infer";
+                            }
+
+                            if (originalDep.replace) {
+                                originalDep.replace(transformedDep);
+                            } else {
+                                Object.assign(originalDep, transformedDep);
+                            }
+                        }
+
+                        overloadDecls.push(overload.decl as t.Statement);
+                    }
+                }
+
+                return [inheritNodeComments(node, declaration.decl), ...overloadDecls];
             })
             .filter((node) => !!node);
 
@@ -821,6 +963,8 @@ const isRuntimeBindingArrayElements = (elements: (t.Node | null | undefined)[]):
 
 // #endregion
 
+const isInfer = (node: t.Node): node is t.Identifier => isIdentifierOf(node, "infer");
+
 const isThisExpression = (node: t.Node): boolean =>
     isIdentifierOf(node, "this") || node.type === "ThisExpression" || (node.type === "MemberExpression" && isThisExpression(node.object));
 
@@ -854,9 +998,17 @@ const isHelperImport = (node: t.Node) =>
 /**
  * patch `.d.ts` suffix in import source to `.js`
  */
-const patchImportExport = (node: t.Node, typeOnlyIds: string[], cjsDefault: boolean): t.Statement | false | undefined => {
+const patchImportExport = (node: t.Statement, typeOnlyIds: string[], cjsDefault: boolean): t.Statement | false | undefined => {
     if (node.type === "ExportNamedDeclaration" && !node.declaration && !node.source && node.specifiers.length === 0 && !node.attributes?.length) {
         return false;
+    }
+
+    if (node.type === "ImportDeclaration" && node.specifiers.length) {
+        for (const specifier of node.specifiers) {
+            if (isInfer(specifier.local)) {
+                specifier.local.name = "__Infer";
+            }
+        }
     }
 
     if (isTypeOf(node, ["ImportDeclaration", "ExportAllDeclaration", "ExportNamedDeclaration"])) {
