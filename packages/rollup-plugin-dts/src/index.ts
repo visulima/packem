@@ -38,4 +38,4 @@ export const dts = (options: Options = {}): Plugin[] => {
 
 export { RE_CSS, RE_DTS, RE_DTS_MAP, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename";
 export { createGeneratePlugin } from "./generate";
-export { type Options, resolveOptions } from "./options";
+export { type FilterPattern, type Options, resolveOptions } from "./options";

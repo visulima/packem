@@ -6,6 +6,8 @@ import { findTsConfigSync, readTsConfig } from "@visulima/tsconfig";
 import type { IsolatedDeclarationsOptions } from "oxc-transform";
 import type { AddonFunction } from "rollup";
 
+export type FilterPattern = ReadonlyArray<string | RegExp> | string | RegExp | null;
+
 // #region General Options
 export interface GeneralOptions {
     /**
@@ -16,6 +18,15 @@ export interface GeneralOptions {
      * This is useful for compatibility with CommonJS.
      */
     cjsDefault?: boolean;
+
+    /**
+     * A pattern (or array of patterns) specifying files to exclude from DTS generation.
+     * Files matching this pattern will be skipped by the transform hook and will not have
+     * `.d.ts` files generated.
+     *
+     * Accepts minimatch glob patterns, regular expressions, or arrays of either.
+     */
+    exclude?: FilterPattern;
 
     /**
      * Override the `compilerOptions` specified in `tsconfig.json`.
@@ -41,6 +52,15 @@ export interface GeneralOptions {
      * This is especially useful when generating `.d.ts` files for the CommonJS format as part of a separate build step.
      */
     emitDtsOnly?: boolean;
+
+    /**
+     * A pattern (or array of patterns) specifying files to include in DTS generation.
+     * Only files matching this pattern will have `.d.ts` files generated.
+     *
+     * By default, all TypeScript and Vue files are included.
+     * Accepts minimatch glob patterns, regular expressions, or arrays of either.
+     */
+    include?: FilterPattern;
 
     /**
      * Controls whether type definitions from `node_modules` are bundled into your final `.d.ts` file or kept as external `import` statements.
@@ -220,6 +240,8 @@ type MarkPartial<T, K extends keyof T> = Omit<Required<T>, K> & Partial<Pick<T, 
 export type OptionsResolved = Overwrite<
     MarkPartial<Omit<Options, "compilerOptions">, "banner" | "footer">,
     {
+        exclude: FilterPattern;
+        include: FilterPattern;
         oxc: IsolatedDeclarationsOptions | false;
         tsconfig?: string;
         tsconfigRaw: TsConfigJson;
@@ -240,7 +262,9 @@ export const resolveOptions = ({
     eager = false,
     emitDtsOnly = false,
     emitJs,
+    exclude = null,
     footer,
+    include = null,
     incremental = false,
     newContext = false,
     oxc,
@@ -348,7 +372,9 @@ export const resolveOptions = ({
         eager,
         emitDtsOnly,
         emitJs,
+        exclude,
         footer,
+        include,
         incremental,
         newContext,
         oxc,

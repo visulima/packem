@@ -74,6 +74,7 @@
         "@babel/helper-validator-identifier": "catalog:prod",
         "@babel/parser": "catalog:prod",
         "@babel/types": "catalog:prod",
+        "@rollup/pluginutils": "catalog:build",
         "@visulima/tsconfig": "catalog:visulima",
         "ast-kit": "catalog:prod",
         "birpc": "catalog:prod",
