@@ -161,6 +161,10 @@ export const config: { apiUrl: string } = {
 Isolated declarations require explicit type annotations on all exported declarations. This is a TypeScript compiler requirement, not a Packem limitation.
 </Callout>
 
+<Callout type="info">
+**JSDoc comments and isolated declarations:** OXC and swc do not preserve JSDoc comments when generating `.d.ts` files via isolated declarations. If your library's API documentation relies on JSDoc comments in declaration files, use the **TypeScript** isolated declarations transformer or disable isolated declarations entirely (which uses `tsc` under the hood). Also ensure `removeComments` is not set to `true` in your `tsconfig.json`.
+</Callout>
+
 ## Declaration File Formats
 
 Packem generates declaration files that match your output formats:
@@ -497,6 +501,22 @@ Ensure your `tsconfig.json` paths are correctly configured:
     }
   },
   "include": ["src/**/*"]
+}
+```
+
+### Missing JSDoc Comments in Declaration Files
+
+If JSDoc comments are missing from your generated `.d.ts` files:
+
+1. **Check `removeComments`**: Ensure `removeComments` is not `true` in your `tsconfig.json`. TypeScript strips all comments (including JSDoc) from declaration output when this is enabled.
+2. **Check your declaration transformer**: OXC and swc isolated declaration transformers do not preserve JSDoc comments. Switch to the TypeScript transformer or disable isolated declarations.
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "removeComments": false
+  }
 }
 ```
 
