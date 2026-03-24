@@ -92,6 +92,15 @@ declare module "virtual" {
 "
 `;
 
+exports[`decorators 1`] = `
+"// decorator.d.ts
+declare class Product {
+  accessor price: number;
+}
+export { Product };
+"
+`;
+
 exports[`deterministic namespace import index 1`] = `
 "// a.d.ts
 import * as stub_lib from 'stub_lib';
@@ -254,6 +263,18 @@ export { Input2, input2 };
 "
 `;
 
+exports[`function overloads 1`] = `
+"// function-overloads.d.ts
+interface Config {
+  name: string;
+  version: number;
+}
+declare function useConfig(): Config;
+declare function useConfig<T>(selector: (config: Config) => T): T;
+export { useConfig };
+"
+`;
+
 exports[`infer false branch 1`] = `
 "// index.d.ts
 type U$1 = 'mod';
@@ -370,6 +391,14 @@ export { Foo };
 
 // index.js
 
+"
+`;
+
+exports[`scss imports are externalized 1`] = `
+"// index.d.ts
+import './styles.scss';
+declare const foo: number;
+export { foo };
 "
 `;
 
