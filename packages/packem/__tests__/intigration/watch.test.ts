@@ -1,8 +1,9 @@
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
-import { writeFileSync } from "@visulima/fs";
+import { readFileSync, writeFileSync } from "@visulima/fs";
 import { execaNode } from "execa";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -105,5 +106,76 @@ describe("packem watch", () => {
         expect(stdout).not.toContain("Cannot read properties of undefined (reading 'exitCode')");
         // Process terminated by our SIGINT is acceptable
         expect(result.signal === "SIGINT" || result.exitCode === 0).toBe(true);
+    });
+
+    it("should rebuild with new entry points when package.json changes", { timeout: 30_000 }, async () => {
+        expect.assertions(3);
+
+        // Start with a single entry
+        writeFileSync(`${temporaryDirectoryPath}/src/utils.js`, `export const b = 2;\n`);
+
+        const proc = execaNode(
+            join(distributionPath, "cli/index.js"),
+            ["build", "--development", "--watch", "--no-validation"],
+            {
+                cwd: temporaryDirectoryPath,
+                reject: false,
+            },
+        );
+
+        let stdout = "";
+
+        proc.stdout?.on("data", (chunk) => {
+            stdout += String(chunk);
+        });
+
+        // Wait for initial build
+        const waitFor = async (pattern: string, timeoutMs = 15_000) => {
+            const start = Date.now();
+
+            while (Date.now() - start < timeoutMs) {
+                if (stdout.includes(pattern)) {
+                    return;
+                }
+
+                await sleep(100);
+            }
+
+            throw new Error(`Timed out waiting for: ${pattern}\nstdout so far:\n${stdout}`);
+        };
+
+        await waitFor("Rebuild finished");
+
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.js`)).toBe(true);
+
+        // Update package.json with a new entry point
+        stdout = ""; // Reset to detect new messages
+
+        await createPackageJson(temporaryDirectoryPath, {
+            exports: {
+                ".": {
+                    import: "./dist/index.js",
+                },
+                "./utils": {
+                    import: "./dist/utils.js",
+                },
+            },
+            files: ["dist"],
+            name: "pkg",
+            type: "module",
+        });
+
+        // Wait for the restart message and rebuild
+        await waitFor("package.json changed");
+        await waitFor("Rebuild finished");
+
+        expect(existsSync(`${temporaryDirectoryPath}/dist/index.js`)).toBe(true);
+
+        const utilsContent = readFileSync(`${temporaryDirectoryPath}/dist/utils.js`);
+
+        expect(utilsContent).toContain("2");
+
+        proc.kill("SIGINT");
+        await proc;
     });
 });

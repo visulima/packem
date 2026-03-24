@@ -33,45 +33,49 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
 
     const typesBuild = await rollup(rollupTypeOptions);
 
-    fileCache.set(DTS_CACHE_KEY, typesBuild.cache, subDirectory);
+    try {
+        fileCache.set(DTS_CACHE_KEY, typesBuild.cache, subDirectory);
 
-    await context.hooks.callHook("rollup:dts:build", context, typesBuild);
+        await context.hooks.callHook("rollup:dts:build", context, typesBuild);
 
-    context.logger.info({
-        message: "Building declaration files...",
-        prefix: "dts",
-    });
-
-    if (context.options.emitCJS) {
-        const cjsDTSExtension = getDtsExtension(context, "cjs");
-
-        await typesBuild.write({
-            chunkFileNames: (chunk) => getChunkFilename(chunk, cjsDTSExtension),
-            dir: resolve(context.options.rootDir, context.options.outDir),
-            entryFileNames: `[name].${cjsDTSExtension}`,
+        context.logger.info({
+            message: "Building declaration files...",
+            prefix: "dts",
         });
+
+        if (context.options.emitCJS) {
+            const cjsDTSExtension = getDtsExtension(context, "cjs");
+
+            await typesBuild.write({
+                chunkFileNames: (chunk) => getChunkFilename(chunk, cjsDTSExtension),
+                dir: resolve(context.options.rootDir, context.options.outDir),
+                entryFileNames: `[name].${cjsDTSExtension}`,
+            });
+        }
+
+        if (context.options.emitESM) {
+            const esmDTSExtension = getDtsExtension(context, "esm");
+
+            await typesBuild.write({
+                chunkFileNames: (chunk) => getChunkFilename(chunk, esmDTSExtension),
+                dir: resolve(context.options.rootDir, context.options.outDir),
+                entryFileNames: `[name].${esmDTSExtension}`,
+            });
+        }
+
+        // .d.ts for node10 compatibility (TypeScript version < 4.7)
+        if (context.options.declaration === true || context.options.declaration === "compatible") {
+            await typesBuild.write({
+                chunkFileNames: (chunk) => getChunkFilename(chunk, "d.ts"),
+                dir: resolve(context.options.rootDir, context.options.outDir),
+                entryFileNames: "[name].d.ts",
+            });
+        }
+
+        await context.hooks.callHook("rollup:dts:done", context);
+    } finally {
+        await typesBuild.close();
     }
-
-    if (context.options.emitESM) {
-        const esmDTSExtension = getDtsExtension(context, "esm");
-
-        await typesBuild.write({
-            chunkFileNames: (chunk) => getChunkFilename(chunk, esmDTSExtension),
-            dir: resolve(context.options.rootDir, context.options.outDir),
-            entryFileNames: `[name].${esmDTSExtension}`,
-        });
-    }
-
-    // .d.ts for node10 compatibility (TypeScript version < 4.7)
-    if (context.options.declaration === true || context.options.declaration === "compatible") {
-        await typesBuild.write({
-            chunkFileNames: (chunk) => getChunkFilename(chunk, "d.ts"),
-            dir: resolve(context.options.rootDir, context.options.outDir),
-            entryFileNames: "[name].d.ts",
-        });
-    }
-
-    await context.hooks.callHook("rollup:dts:done", context);
 };
 
 export default buildTypes;

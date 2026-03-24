@@ -129,6 +129,10 @@
             "types": "./dist/plugins/url.d.ts",
             "default": "./dist/plugins/url.js"
         },
+        "./plugin/import-attributes": {
+            "types": "./dist/plugins/import-attributes.d.ts",
+            "default": "./dist/plugins/import-attributes.js"
+        },
         "./plugin/json": {
             "types": "./dist/plugins/json.d.ts",
             "default": "./dist/plugins/json.js"

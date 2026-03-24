@@ -175,6 +175,9 @@ const generateOptions = (
             },
             esbuild: {
                 charset: "utf8",
+                supported: {
+                    "import-attributes": true,
+                },
                 jsx: jsxRuntime,
                 jsxDev: tsconfig?.config.compilerOptions?.jsx === "react-jsxdev",
                 jsxFactory: tsconfig?.config.compilerOptions?.jsxFactory,
