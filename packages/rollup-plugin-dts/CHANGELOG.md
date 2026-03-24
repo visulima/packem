@@ -1,3 +1,5 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.7...@visulima/rollup-plugin-dts@1.0.0-alpha.8) (2026-03-24)
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.6...@visulima/rollup-plugin-dts@1.0.0-alpha.7) (2026-03-24)
 
 ### Miscellaneous Chores
