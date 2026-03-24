@@ -257,100 +257,12 @@ export { index as default };
 "
 `;
 
-exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > cjs dts output 1`] = `
+exports[`packem externals > should inline types from namespaced optional peer dependencies in DTS output automatically > dts output 1`] = `
 "import * as _svgr_core0 from '@svgr/core';
 declare const transform: {
   (code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): Promise<string>;
   sync(code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): string;
 };
 export { transform };
-"
-`;
-
-exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > cjs output 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const core = require('@svgr/core');
-
-const transform = core.transform;
-
-exports.transform = transform;
-"
-`;
-
-exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > dts output 1`] = `
-"import * as _svgr_core0 from '@svgr/core';
-declare const transform: {
-  (code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): Promise<string>;
-  sync(code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): string;
-};
-export { transform };
-"
-`;
-
-exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > mjs dts output 1`] = `
-"import * as _svgr_core0 from '@svgr/core';
-declare const transform: {
-  (code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): Promise<string>;
-  sync(code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): string;
-};
-export { transform };
-"
-`;
-
-exports[`packem externals > should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > mjs output 1`] = `
-"import { transform as transform$1 } from '@svgr/core';
-
-const transform = transform$1;
-
-export { transform };
-"
-`;
-
-exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > cjs dts output 1`] = `
-"declare const indent: string;
-export { indent };
-"
-`;
-
-exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > cjs output 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const detectIndentFn = require('detect-indent');
-
-const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
-
-const detectIndentFn__default = /*#__PURE__*/_interopDefaultCompat(detectIndentFn);
-
-const { indent: dIndent } = detectIndentFn__default("  file");
-const indent = dIndent;
-
-exports.indent = indent;
-"
-`;
-
-exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > dts output 1`] = `
-"declare const indent: string;
-export { indent };
-"
-`;
-
-exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > mjs dts output 1`] = `
-"declare const indent: string;
-export { indent };
-"
-`;
-
-exports[`packem externals > should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta' > mjs output 1`] = `
-"import detectIndentFn from 'detect-indent';
-
-const { indent: dIndent } = detectIndentFn("  file");
-const indent = dIndent;
-
-export { indent };
 "
 `;

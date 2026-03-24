@@ -269,6 +269,52 @@ export default defineConfig({
 
 Patterns accept minimatch glob strings, regular expressions, or arrays of either. When neither `include` nor `exclude` is specified, all source files are processed.
 
+## Inlining Types from External Packages
+
+Packem automatically inlines types from **optional peer dependencies** and **optional dependencies** into your `.d.ts` output, while keeping them external for JS. This prevents `TS2307` errors for consumers who don't install all your optional peers.
+
+### Automatic Behavior
+
+Types are automatically inlined for:
+- Packages in `optionalDependencies`
+- Packages in `peerDependencies` that are marked as optional in `peerDependenciesMeta`
+
+```json
+{
+  "peerDependencies": {
+    "webpack": "^5.0.0",
+    "vite": "^5.0.0",
+    "react": "^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "webpack": { "optional": true },
+    "vite": { "optional": true }
+  }
+}
+```
+
+With this config, types from `webpack` and `vite` are automatically inlined in `.d.ts` output (since they're optional), while `react` stays external (since it's a required peer).
+
+### Manual Configuration
+
+Use `rollup.dts.resolve` to add extra packages or override the automatic behavior:
+
+```typescript
+export default defineConfig({
+  rollup: {
+    dts: {
+      // Add extra packages on top of auto-detected ones
+      resolve: ['some-extra-package', /^@farmfe\//]
+    }
+  }
+})
+```
+
+Options:
+- `true` — inline types from all node\_modules
+- `false` — disable auto-resolution, keep all dependencies external in `.d.ts`
+- `(string | RegExp)[]` — merged with auto-detected optional peers/deps
+
 ## Multiple Entry Points
 
 Generate declarations for multiple entry points:

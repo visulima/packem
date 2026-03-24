@@ -137,7 +137,7 @@ export const indent = dIndent;
         expect(dContent).toMatchSnapshot("dts output");
     });
 
-    it("should not bundle 'devDependencies' that are used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta'", async () => {
+    it("should inline types from optional peer dependencies in DTS output automatically", async () => {
         expect.assertions(8);
 
         await installPackage(temporaryDirectoryPath, "typescript");
@@ -182,30 +182,33 @@ export const indent = dIndent;
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        expect(binProcess.stdout).not.toContain("Inlined implicit external");
-
+        // JS output should still have the external import (peer dep stays external for JS)
         const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toMatchSnapshot("mjs output");
+        expect(mjsContent).toContain("detect-indent");
 
         const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toMatchSnapshot("cjs output");
+        expect(cjsContent).toContain("detect-indent");
 
+        // DTS output should NOT have an import from detect-indent (types are auto-inlined for optional peers)
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(dCtsContent).toMatchSnapshot("cjs dts output");
+        expect(dCtsContent).not.toContain("detect-indent");
 
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(dMtsContent).toMatchSnapshot("mjs dts output");
+        expect(dMtsContent).not.toContain("detect-indent");
 
         const dContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dContent).toMatchSnapshot("dts output");
+        expect(dContent).not.toContain("detect-indent");
+
+        // The inlined type should be present
+        expect(dMtsContent).toContain("indent");
     });
 
-    it("should not bundle 'devDependencies' that are namespaced and used inside the code and are marked as external with 'peerDependencies' and 'peerDependenciesMeta'", async () => {
+    it("should inline types from namespaced optional peer dependencies in DTS output automatically", async () => {
         expect.assertions(8);
 
         await installPackage(temporaryDirectoryPath, "typescript");
@@ -248,23 +251,26 @@ export const transform = svgrTransform;
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        expect(binProcess.stdout).not.toContain("Inlined implicit external");
-
+        // JS output should still have the external import
         const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toMatchSnapshot("mjs output");
+        expect(mjsContent).toContain("@svgr/core");
 
         const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toMatchSnapshot("cjs output");
+        expect(cjsContent).toContain("@svgr/core");
 
+        // DTS output should have the transform type inlined (not just `import type` from @svgr/core)
         const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(dCtsContent).toMatchSnapshot("cjs dts output");
+        expect(dCtsContent).toContain("transform");
 
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(dMtsContent).toMatchSnapshot("mjs dts output");
+        expect(dMtsContent).toContain("transform");
+
+        // DTS should contain resolved type signatures, not just a re-export
+        expect(dMtsContent).toMatch(/declare const transform/u);
 
         const dContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
@@ -663,5 +669,83 @@ console.log(TagsFilePlugin);
         // Should add explicit .js extension to postgraphile/plugins import
         // postgraphile doesn't have exports field for /plugins subpath, so the plugin should rewrite it
         expect(content).toMatch(/import.*['"]postgraphile\/plugins\.js['"]/);
+    });
+
+    it("should inline types from peer dependencies when rollup.dts.resolve is configured", async () => {
+        expect.assertions(12);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await installPackage(temporaryDirectoryPath, "detect-indent");
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `import detectIndentFn from "detect-indent";
+
+const { indent: dIndent } = detectIndentFn("  file");
+
+export const indent = dIndent;
+`,
+        );
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "detect-indent": "^7.0.1",
+                typescript: "^4.4.3",
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            peerDependencies: {
+                "detect-indent": "*",
+            },
+            types: "./dist/index.d.ts",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                rollup: {
+                    dts: {
+                        resolve: ["detect-indent"],
+                    },
+                },
+            },
+        });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                moduleResolution: "bundler",
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        // JS output should still have the external import (peer dep stays external for JS)
+        const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        expect(mjsContent).toContain("detect-indent");
+
+        const cjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
+
+        expect(cjsContent).toContain("detect-indent");
+
+        // ESM DTS output should NOT have an import from detect-indent (types are inlined)
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(dMtsContent).not.toContain("from 'detect-indent'");
+        expect(dMtsContent).not.toContain('from "detect-indent"');
+        expect(dMtsContent).toContain("indent");
+
+        // CJS DTS output should NOT have an import from detect-indent (types are inlined)
+        const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(dCtsContent).not.toContain("from 'detect-indent'");
+        expect(dCtsContent).not.toContain('from "detect-indent"');
+        expect(dCtsContent).toContain("indent");
+
+        // Default DTS output should NOT have an import from detect-indent (types are inlined)
+        const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
+
+        expect(dTsContent).not.toContain("from 'detect-indent'");
+        expect(dTsContent).not.toContain('from "detect-indent"');
     });
 });
