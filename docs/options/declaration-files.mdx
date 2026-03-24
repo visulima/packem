@@ -578,6 +578,25 @@ export default defineConfig({
 
 ---
 
+## Known Limitations
+
+### Isolated Declarations (OXC / swc)
+
+- **JSDoc comments are not preserved.** OXC and swc strip all comments during isolated declaration generation. Use the TypeScript transformer or disable isolated declarations if your library relies on JSDoc in `.d.ts` files.
+- **Triple-slash directives are not preserved.** `/// <reference types="..." />` directives in source files are stripped by OXC and swc. They are preserved when using the `dtsInput` mode with pre-generated `.d.ts` files.
+
+### TypeScript Compiler (tsc)
+
+- **JSDoc comments are stripped when `removeComments: true`** in your `tsconfig.json`. Ensure this is set to `false` if you want JSDoc comments in your declaration output.
+- **Triple-slash directives are not always emitted.** TypeScript only includes `/// <reference>` directives in `.d.ts` output when it determines they are necessary for the output types. Source-level directives may be omitted.
+
+### DTS Bundling
+
+- **Namespace imports for complex types.** When inlining types from external packages via `rollup.dts.resolve`, packages with complex type dependencies may produce namespace imports (`import * as pkg from 'pkg'`) in the output rather than fully inlining all type definitions.
+- **`@babel/generator` is used for code generation.** Any upstream Babel bugs with TypeScript AST nodes may affect the bundled `.d.ts` output.
+
+---
+
 ## Related Options
 
 - [Transformers](/docs/options/transformers) - Choose compatible transformers
