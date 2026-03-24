@@ -34,6 +34,7 @@ catalogs:
     rolldown: 1.0.0-rc.5
     rollup: 4.60.0
     rollup-plugin-dts: 6.4.1
+    rollup-plugin-import-trace: 1.0.1
     rollup-plugin-license: 3.7.0
     rollup-plugin-lit-css: 6.0.1
     rollup-plugin-polyfill-node: 0.13.0

@@ -18,6 +18,7 @@ import browserslist from "browserslist";
 import { createHooks } from "hookable";
 import { createJiti } from "jiti";
 import { VERSION } from "rollup";
+import { patchErrorWithTrace } from "rollup-plugin-import-trace";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
 
@@ -1046,6 +1047,7 @@ const packem = async (
     } catch (error: any) {
         logger.raw("\n");
 
+        patchErrorWithTrace(error);
         enhanceRollupError(error);
 
         throw error;

@@ -6,6 +6,7 @@ import { isAccessibleSync, readFile, writeFile, writeJson } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { getRegexMatches } from "@visulima/packem-share/utils";
 import { join } from "@visulima/path";
+import { execa } from "execa";
 import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -3070,5 +3071,56 @@ export { isUpperCode, isLowerCode, isDigitCode };
         const dMtsIndexContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
         expect(dMtsIndexContent).toMatchSnapshot("d.mts content");
+    });
+
+    it("should preserve sourcemap line mappings with comments and blank lines", async () => {
+        expect.assertions(4);
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            `// Line 1
+// Line 2
+// Line 3
+// Line 4
+// Line 5
+// Line 6
+// Line 7
+// Line 8
+throw new Error('line 9');
+`,
+        );
+
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "*",
+            },
+            module: "dist/index.mjs",
+            type: "module",
+        });
+        await createPackemConfig(temporaryDirectoryPath, {
+            config: {
+                sourcemap: true,
+            },
+        });
+        await createTsConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        // Run the built output with --enable-source-maps and verify the stack trace shows the correct source line
+        const { stderr } = await execa("node", ["--enable-source-maps", "dist/index.mjs"], {
+            cwd: temporaryDirectoryPath,
+            reject: false,
+        });
+
+        // Stack trace should reference line 9, not line 1 (which would happen if sourcemaps were missing from the TS transform step)
+        expect(stderr).toMatch(/index\.ts:9/);
+        expect(stderr).not.toMatch(/index\.ts:1[^0-9]/);
     });
 });

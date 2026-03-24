@@ -60,6 +60,7 @@ import { join, relative, resolve } from "@visulima/path";
 import { cssModulesTypesPlugin, rollupCssPlugin } from "@visulima/rollup-plugin-css";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
+import { importTrace } from "rollup-plugin-import-trace";
 import { minVersion } from "semver";
 
 import type { InternalBuildOptions } from "../types";
@@ -308,12 +309,17 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalBuildOpt
     // eslint-disable-next-line no-secrets/no-secrets
     // @see https:// github.com/rollup/rollup/blob/5abe71bd5bae3423b4e2ee80207c871efde20253/cli/run/batchWarnings.ts#L236
     if (warning.code === "UNRESOLVED_IMPORT") {
-        throw new Error(
+        const error: Error & { id?: string } = new Error(
             `Failed to resolve the module "${warning.exporter as string}" imported by "${cyan(relative(resolve(), warning.id as string))}"`
             + `\nIs the module installed? Note:`
             + `\n ↳ to inline a module into your bundle, install it to "devDependencies".`
             + `\n ↳ to depend on a module via import/require, install it to "dependencies".`,
         );
+
+        // Preserve the file id so rollup-plugin-import-trace can build the import chain
+        error.id = warning.id as string;
+
+        throw error;
     }
 
     if (warning.code === "MODULE_LEVEL_DIRECTIVE") {
@@ -344,7 +350,14 @@ const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "b
                         : "error";
 
                 if (unresolvedImportBehavior === "error") {
-                    throw new Error(format);
+                    const error: Error & { id?: string } = new Error(format);
+
+                    // Preserve the file id so rollup-plugin-import-trace can build the import chain
+                    if (log.id) {
+                        error.id = log.id;
+                    }
+
+                    throw error;
                 }
                 // If "warn", fall through to the warn case below
             }
@@ -697,6 +710,8 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
         ].filter(Boolean),
 
         plugins: [
+            importTrace(),
+
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
 
             externalizeDependencies(context.pkg),
@@ -1104,6 +1119,8 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
         ].filter(Boolean),
 
         plugins: [
+            importTrace(),
+
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
