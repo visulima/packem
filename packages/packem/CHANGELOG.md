@@ -1,3 +1,22 @@
+## @visulima/packem [2.0.0-alpha.57](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.56...@visulima/packem@2.0.0-alpha.57) (2026-03-24)
+
+### Features
+
+* **packem:** support DTS-specific dependency inlining ([8b234c6](https://github.com/visulima/packem/commit/8b234c6fe25890250485c9aa3e81745601a7f6bd))
+* **rollup-plugin-dts:** add include/exclude filter support ([5d76867](https://github.com/visulima/packem/commit/5d76867939d95c1d75469f85a59b9504f3c3f1e4))
+
+### Bug Fixes
+
+* updated deps ([a50675d](https://github.com/visulima/packem/commit/a50675d7f9a98236edd89bc39bc35b8cb4db1565))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.44
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.25
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.24
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.5
+
 ## @visulima/packem [2.0.0-alpha.56](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.55...@visulima/packem@2.0.0-alpha.56) (2026-03-16)
 
 
