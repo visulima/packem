@@ -934,10 +934,13 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 const createDtsPlugin = async (context: BuildContext<InternalBuildOptions>): Promise<Plugin[]> => {
     const { dts } = await import("@visulima/rollup-plugin-dts");
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userDtsOptions = (context.options.rollup.dts as any) ?? {};
+
     return dts({
+        ...userDtsOptions,
         compilerOptions: {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...(context.options.rollup.dts as any)?.compilerOptions,
+            ...userDtsOptions.compilerOptions,
             incremental: undefined,
             inlineSources: undefined,
             sourceMap: undefined,

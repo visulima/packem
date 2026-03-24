@@ -9,6 +9,7 @@ import type { TSPropertySignature } from "@babel/types";
 import type { BirpcReturn } from "birpc";
 import { createDebug } from "obug";
 import { isolatedDeclarationSync, transformSync } from "oxc-transform";
+import { createFilter } from "@rollup/pluginutils";
 import type { Plugin, SourceMapInput } from "rollup";
 
 import {
@@ -50,6 +51,8 @@ export const createGeneratePlugin = ({
     eager,
     emitDtsOnly,
     emitJs,
+    exclude,
+    include,
     incremental,
     newContext,
     oxc,
@@ -77,7 +80,10 @@ export const createGeneratePlugin = ({
     | "newContext"
     | "emitJs"
     | "sourcemap"
+    | "include"
+    | "exclude"
 >): Plugin => {
+    const filter = include || exclude ? createFilter(include, exclude) : null;
     const dtsMap: DtsMap = new Map<string, TsModule>();
 
     /**
@@ -400,6 +406,9 @@ export { __json_default_export as default }`;
         transform: {
             handler(code, id) {
                 if (RE_DTS.test(id) || RE_NODE_MODULES.test(id))
+                    return;
+
+                if (filter && !filter(id))
                     return;
 
                 const shouldEmit = !RE_JS.test(id) || emitJs;

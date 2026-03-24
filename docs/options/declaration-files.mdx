@@ -247,6 +247,28 @@ export default defineConfig({
 })
 ```
 
+## Include/Exclude Filters
+
+Control which source files have `.d.ts` declarations generated using `include` and `exclude` patterns.
+This is useful when you want to skip declaration generation for specific files (e.g., test utilities, internal helpers).
+
+```typescript
+export default defineConfig({
+  declaration: true,
+
+  rollup: {
+    dts: {
+      // Only generate declarations for files in src/
+      include: ['src/**/*.ts'],
+      // Skip test files and internal modules
+      exclude: ['src/**/*.test.ts', 'src/internal/**']
+    }
+  }
+})
+```
+
+Patterns accept minimatch glob strings, regular expressions, or arrays of either. When neither `include` nor `exclude` is specified, all source files are processed.
+
 ## Multiple Entry Points
 
 Generate declarations for multiple entry points:
@@ -436,7 +458,7 @@ Ensure your `tsconfig.json` paths are correctly configured:
 
 1. **Use isolated declarations** for large projects
 2. **Enable incremental compilation** in TypeScript
-3. **Exclude test files** from declaration generation
+3. **Exclude test files** from declaration generation using `rollup.dts.exclude`
 4. **Use declaration bundling** to reduce file count
 
 ## Examples
