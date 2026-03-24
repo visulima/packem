@@ -1,3 +1,4 @@
+import { readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 import { readFileSync, writeFileSync } from "@visulima/fs";
@@ -449,8 +450,8 @@ export { getFilename } from "./filename.js";`,
         `);
     });
 
-    it.todo("should include esm shim only once per file on the same dir level, if dirname, filename or require are found", async () => {
-        expect.assertions(4);
+    it("should include esm shim only once per file on the same dir level, if dirname, filename or require are found", async () => {
+        expect.assertions(14);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/level2/filename.js`,
@@ -480,40 +481,36 @@ export { getFilename } from "./level2/filename.js";`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mjsContent).toMatchInlineSnapshot(`import __cjs_url__ from "node:url"; // -- packem CommonJS __filename shim --
-import __cjs_path__ from "node:path"; // -- packem CommonJS __dirname shim --
-const __filename = __cjs_url__.fileURLToPath(import.meta.url);
-const __dirname = __cjs_path__.dirname(__filename);
-export { getFilename } from './packem_shared/getFilename-CyjjIqAi.js';
+        // Verify entry shims are present and the chunk is re-exported (hash-independent check)
+        expect(mjsContent).toContain('import __cjs_url__ from "node:url"');
+        expect(mjsContent).toContain('import __cjs_path__ from "node:path"');
+        expect(mjsContent).toContain("const __dirname = __cjs_path__.dirname(__filename);");
+        expect(mjsContent).toContain("export { getFilename }");
+        expect(mjsContent).toContain("export { getDirname }");
 
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-function getDirname() {
-  return __dirname;
-}
-__name(getDirname, "getDirname");
+        // Verify each shim import appears exactly once in the entry file
+        const entryUrlShimCount = mjsContent.match(/import __cjs_url__/g);
+        const entryPathShimCount = mjsContent.match(/import __cjs_path__/g);
 
-export { getDirname };
-`);
+        expect(entryUrlShimCount).toHaveLength(1);
+        expect(entryPathShimCount).toHaveLength(1);
 
-        const mjsFilenameContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/getFilename-CyjjIqAi.js`);
+        // Find the chunk file dynamically (hash changes across builds)
+        const sharedDir = `${temporaryDirectoryPath}/dist/packem_shared`;
+        const chunkFile = readdirSync(sharedDir).find((f) => f.startsWith("getFilename-"));
 
-        expect(mjsFilenameContent).toMatchInlineSnapshot(`
-// -- pack CommonJS Shims --
-import __cjs_url__ from "node:url";
-import __cjs_path__ from "node:path";
-import __cjs_mod__ from "node:module";
-const __filename = __cjs_url__.fileURLToPath(import.meta.url);
-const __dirname = __cjs_path__.dirname(__filename);
-const require = __cjs_mod__.createRequire(import.meta.url);
-var __defProp = Object.defineProperty;
-var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-function getFilename() {
-  return __filename;
-}
-__name(getFilename, "getFilename");
+        expect(chunkFile).toBeDefined();
 
-export { getFilename };
-`);
+        const mjsFilenameContent = readFileSync(`${sharedDir}/${chunkFile}`);
+
+        // Verify the chunk has its own shim for __filename (not duplicated from entry)
+        expect(mjsFilenameContent).toContain('import __cjs_url__ from "node:url"');
+        expect(mjsFilenameContent).toContain("const __filename = __cjs_url__.fileURLToPath(import.meta.url)");
+        expect(mjsFilenameContent).toContain("export { getFilename }");
+
+        // Verify the chunk shim appears exactly once
+        const chunkUrlShimCount = mjsFilenameContent.match(/import __cjs_url__/g);
+
+        expect(chunkUrlShimCount).toHaveLength(1);
     });
 });
