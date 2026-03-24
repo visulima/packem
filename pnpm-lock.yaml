@@ -42,6 +42,9 @@ catalogs:
     rollup-plugin-dts:
       specifier: 6.4.1
       version: 6.4.1
+    rollup-plugin-import-trace:
+      specifier: 1.0.1
+      version: 1.0.1
     rollup-plugin-license:
       specifier: 3.7.0
       version: 3.7.0
@@ -1747,6 +1750,9 @@ importers:
       rollup:
         specifier: catalog:build
         version: 4.60.0
+      rollup-plugin-import-trace:
+        specifier: catalog:build
+        version: 1.0.1(rollup@4.60.0)(vite@8.0.0(@types/node@25.5.0)(esbuild@0.27.4)(jiti@2.6.1)(less@4.6.4)(sass-embedded@1.98.0)(sass@1.98.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))
       semver:
         specifier: catalog:utils
         version: 7.7.4
@@ -12752,6 +12758,18 @@ packages:
     peerDependencies:
       rollup: ^3.29.4 || ^4
       typescript: ^4.5 || ^5.0 || ^6.0
+
+  rollup-plugin-import-trace@1.0.1:
+    resolution: {integrity: sha512-dWOKrdYba2BXDJh82kkuM4pAR3M6r7WFp6vbVxAgvLfug2WniMFAg2uZ5sNQ/8CoQWo5l2N5EXDG8+QClKk1YQ==}
+    engines: {node: '>=20.20.0'}
+    peerDependencies:
+      rollup: ^3.0.0 || ^4.0.0
+      vite: ^5.0.0 || ^6.0.0 || ^7.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+      vite:
+        optional: true
 
   rollup-plugin-license@3.6.0:
     resolution: {integrity: sha512-1ieLxTCaigI5xokIfszVDRoy6c/Wmlot1fDEnea7Q/WXSR8AqOjYljHDLObAx7nFxHC2mbxT3QnTSPhaic2IYw==}
@@ -25493,6 +25511,11 @@ snapshots:
       typescript: 6.0.2
     optionalDependencies:
       '@babel/code-frame': 7.29.0
+
+  rollup-plugin-import-trace@1.0.1(rollup@4.60.0)(vite@8.0.0(@types/node@25.5.0)(esbuild@0.27.4)(jiti@2.6.1)(less@4.6.4)(sass-embedded@1.98.0)(sass@1.98.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)):
+    optionalDependencies:
+      rollup: 4.60.0
+      vite: 8.0.0(@types/node@25.5.0)(esbuild@0.27.4)(jiti@2.6.1)(less@4.6.4)(sass-embedded@1.98.0)(sass@1.98.0)(stylus@0.64.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
 
   rollup-plugin-license@3.6.0(picomatch@4.0.3)(rollup@4.60.0):
     dependencies:

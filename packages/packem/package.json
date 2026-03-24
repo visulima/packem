@@ -226,6 +226,7 @@
         "oxc-transform": "catalog:dev",
         "picomatch": "catalog:prod",
         "rollup": "catalog:build",
+        "rollup-plugin-import-trace": "catalog:build",
         "semver": "catalog:utils",
         "tinyexec": "catalog:node",
         "tinyglobby": "catalog:node"
