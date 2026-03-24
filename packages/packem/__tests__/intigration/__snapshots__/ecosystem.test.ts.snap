@@ -1385,7 +1385,7 @@ exports[`packem ecosystem > should work with provided 'sitefetch' ecosystem suit
 import path from 'node:path';
 import fs from 'node:fs';
 import { encode } from 'gpt-tokenizer/model/gpt-4o';
-import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-DHdmMMmW.js';
+import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-9sCCgNFr.js';
 
 function toArr(any) {
   return any == null ? [] : Array.isArray(any) ? any : [any];
@@ -2043,7 +2043,7 @@ cli.parse();
 export declare function fetchSite(url: string, options: Options): Promise<FetchSiteResult>;
 export declare function serializePages(pages: FetchSiteResult, format: "json" | "text"): string;
 ",
-  "export { f as fetchSite, s as serializePages } from './packem_shared/index-DHdmMMmW.js';
+  "export { f as fetchSite, s as serializePages } from './packem_shared/index-9sCCgNFr.js';
 import 'happy-dom';
 import 'cheerio';
 ",
@@ -2083,8 +2083,8 @@ import { gfm } from 'turndown-plugin-gfm';
 import { load } from 'cheerio';
 import micromatch from 'micromatch';
 
-function getDefaultExportFromCjs (x) {
-	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+function getDefaultExportFromCjs(x) {
+  return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
 }
 
 var eventemitter3 = {exports: {}};
