@@ -2047,6 +2047,18 @@ export declare function serializePages(pages: FetchSiteResult, format: "json" | 
 import 'happy-dom';
 import 'cheerio';
 ",
+  "type LoggerLevel = "silent" | "warn";
+declare class Logger {
+    private level?;
+    setLevel(level: LoggerLevel): void;
+    info(...args: any[]): void;
+    warn(...args: any[]): void;
+}
+export declare const logger: Logger;
+export {};
+",
+  "export declare function toMarkdown(html: string): string;
+",
   "export type Options = {
     /** How many requests can be made at the same time */
     concurrency?: number;
@@ -2076,6 +2088,10 @@ export type Page = {
     content: string;
 };
 export type FetchSiteResult = Map<string, Page>;
+",
+  "export declare function formatNumber(num: number): string;
+export declare function matchPath(path: string, pattern: string | string[]): boolean;
+export declare function ensureArray<T>(input: T | T[]): T[];
 ",
   "import { Window } from 'happy-dom';
 import Turndown from 'turndown';
