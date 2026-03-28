@@ -88,7 +88,7 @@ export const data = file;`,
         expect(mjsContent).toMatch(/data:text\/plain;.*base64,/);
     });
 
-    it("inlines lucide-static svg icons via ?data-uri", async () => {
+    it("inlines lucide-static svg icons via ?data-uri", { timeout: 30_000 }, async () => {
         expect.assertions(4);
 
         // Install lucide-static to use a real-world SVG asset

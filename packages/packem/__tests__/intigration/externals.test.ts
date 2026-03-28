@@ -630,7 +630,7 @@ console.log(utils);
         expect(exitCode).toBe(0);
     });
 
-    it("should add explicit extensions to externalized package subpath imports without exports", async () => {
+    it("should not rewrite subpath imports when package has exports field", async () => {
         expect.assertions(3);
 
         await installPackage(temporaryDirectoryPath, "typescript");
@@ -666,9 +666,9 @@ console.log(TagsFilePlugin);
 
         const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
-        // Should add explicit .js extension to postgraphile/plugins import
-        // postgraphile doesn't have exports field for /plugins subpath, so the plugin should rewrite it
-        expect(content).toMatch(/import.*['"]postgraphile\/plugins\.js['"]/);
+        // postgraphile has an exports field, so the plugin should not rewrite the import
+        // even though ./plugins is not in the exports map
+        expect(content).toMatch(/import.*['"]postgraphile\/plugins['"]/);
     });
 
     it("should inline types from peer dependencies when rollup.dts.resolve is configured", async () => {

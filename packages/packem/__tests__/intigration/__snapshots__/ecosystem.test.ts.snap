@@ -693,7 +693,6 @@ cli.parse();
 export declare function fetchSite(url: string, options: Options): Promise<FetchSiteResult>;
 export declare function serializePages(pages: FetchSiteResult, format: "json" | "text"): string;
 ",
-<<<<<<< HEAD
   "export { f as fetchSite, s as serializePages } from './packem_shared/index-CpMQ4hPi.mjs';
 import 'happy-dom';
 import 'cheerio';
@@ -744,6 +743,7 @@ export type FetchSiteResult = Map<string, Page>;
 export declare function matchPath(path: string, pattern: string | string[]): boolean;
 export declare function ensureArray<T>(input: T | T[]): T[];
 ",
+<<<<<<< HEAD
 		var has = Object.prototype.hasOwnProperty;
 		var prefix = "~";
 		function Events() {
