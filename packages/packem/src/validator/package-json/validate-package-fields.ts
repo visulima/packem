@@ -246,7 +246,11 @@ const validateExports = (context: BuildContext<InternalBuildOptions>, exports: u
 
             if (subpathKeys.length > 0) {
                 // Subpaths exports
-                if (!keys.includes(".")) {
+                // Skip the "." requirement when the package only has bin entries and exports only contains "./package.json"
+                const nonDotKeys = subpathKeys.filter((key) => key !== ".");
+                const isBinOnlyPackage = context.pkg.bin !== undefined && nonDotKeys.length <= 1 && nonDotKeys.every((key) => key === "./package.json");
+
+                if (!keys.includes(".") && !isBinOnlyPackage) {
                     warn(context, "Missing main export \".\". Subpaths exports should include a main export entry");
                 }
 
