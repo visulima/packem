@@ -58,7 +58,7 @@ interface ParsedExports {
  * @returns Parsed export information, or undefined if no default export is found or parsing fails.
  */
 const extractExports = (code: string, info: CodeInfo, options: Options): ParsedExports | undefined => {
-    const defaultExportCandidate = findExports(code).find((esmExport) => esmExport.names.includes("default"));
+    const defaultExportCandidate = findExports(code).find((esmExport) => esmExport.names?.includes("default"));
 
     // Check for `export default identifier;` which mlly doesn't pick up as a named export of 'default'
     const directDefaultMatch = code.match(/^export\s+default\s+(\w+);/m);
