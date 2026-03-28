@@ -1,3 +1,18 @@
+## @visulima/packem [2.0.0-alpha.61](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.60...@visulima/packem@2.0.0-alpha.61) (2026-03-28)
+
+### Bug Fixes
+
+* dont throw a error if only bin with package.json is used ([8a95946](https://github.com/visulima/packem/commit/8a95946677565894980104a05d6cff8effc99b79))
+* **packem:** fix data-uri timeout and externals test for postgraphile v5 ([03bb96d](https://github.com/visulima/packem/commit/03bb96d5cad3e92b7d228e2b28f643c4408934a2))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.48
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.29
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.28
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.9
+
 ## @visulima/packem [2.0.0-alpha.60](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.59...@visulima/packem@2.0.0-alpha.60) (2026-03-24)
 
 ### Features
