@@ -1,3 +1,15 @@
+## @visulima/packem-rollup [1.0.0-alpha.48](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.47...@visulima/packem-rollup@1.0.0-alpha.48) (2026-03-28)
+
+### Bug Fixes
+
+* **packem-rollup:** guard against undefined names in findExports result ([231f4cd](https://github.com/visulima/packem/commit/231f4cd3dece55d7afd8dac1e2ec2bb16e39f505))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.29
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.9
+
 ## @visulima/packem-rollup [1.0.0-alpha.47](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.46...@visulima/packem-rollup@1.0.0-alpha.47) (2026-03-24)
 
 ### Features
