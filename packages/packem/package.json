@@ -387,7 +387,7 @@
         "@visulima/source-map": "1.0.20",
         "@visulima/tsconfig": "1.1.19",
         "browserslist": "4.25.2",
-        "defu": "6.1.4",
+        "defu": "6.1.5",
         "es-module-lexer": "1.7.0",
         "fastest-levenshtein": "1.0.16",
         "glob-parent": "6.0.2",
