@@ -8,6 +8,6 @@ on: # yamllint disable-line rule:truthy
 
 jobs:
     cleanup-branch-cache:
-        uses: "anolilab/workflows/.github/workflows/cleanup-branch-cache.yml@main"
+        uses: "anolilab/workflows/.github/workflows/cleanup-branch-cache.yml@2bffe2e3dd252dcd89e8357cceafd4ecc6cd55a2" # main
         with:
             target-repo: "visulima/packem"
