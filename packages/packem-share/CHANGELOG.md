@@ -1,3 +1,9 @@
+## @visulima/packem-share [1.0.0-alpha.30](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.29...@visulima/packem-share@1.0.0-alpha.30) (2026-04-16)
+
+### Miscellaneous Chores
+
+* bump node engines to ^22.14.0 || >=24.10.0 ([32f705a](https://github.com/visulima/packem/commit/32f705aa866f9daea6a094df74ef66aa8088e2c6))
+
 ## @visulima/packem-share [1.0.0-alpha.29](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.28...@visulima/packem-share@1.0.0-alpha.29) (2026-03-28)
 
 ## @visulima/packem-share [1.0.0-alpha.28](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.27...@visulima/packem-share@1.0.0-alpha.28) (2026-03-24)
