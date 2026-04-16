@@ -573,4 +573,201 @@ describe("resolve-externals-plugin", () => {
 
         expect((rollupInputConfig as ExternalRollupInputOptions).external("alias-test", undefined, false)).toBe(true);
     });
+
+    describe("windows paths", () => {
+        // Previously, Rollup-passed Windows absolute paths like "D:\\a\\…\\src\\index.ts" were
+        // split by getPackageName on "/" only, so the whole path ended up in hoistedDependencies
+        // and failed the build with "These dependencies are shamefully hoisted: D:, D:\\…".
+        const windowsAbsolutePaths = [
+            String.raw`D:\a\visulima\visulima\packages\filesystem\path\src\index.ts`,
+            String.raw`D:\a\visulima\visulima\packages\filesystem\path\src\utils.ts`,
+            String.raw`D:`,
+            String.raw`C:\Users\runner\work\proj\src\file.ts`,
+            String.raw`\\server\share\src\file.ts`,
+        ];
+
+        it("should not treat windows absolute paths as hoisted dependencies", () => {
+            expect.assertions(windowsAbsolutePaths.length + 1);
+
+            const hoistedDependencies = new Set<string>();
+            const usedDependencies = new Set<string>();
+            const context = new MockPluginContext(
+                resolveExternalsPlugin({
+                    externals: [],
+                    hoistedDependencies,
+                    implicitDependencies: new Set(),
+                    logger: mockedLogger,
+                    options: {
+                        alias: {},
+                        rollup: { resolveExternals: defaultPluginConfig },
+                        rootDir: "/",
+                        sourceDir: "src",
+                        validation: {
+                            dependencies: {
+                                hoisted: { exclude: [] },
+                                unused: { exclude: [] },
+                            },
+                        },
+                    } as unknown as InternalBuildOptions,
+                    pkg: { dependencies: {}, name: "externals" },
+                    tsconfig: undefined,
+                    usedDependencies,
+                }),
+            );
+
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            for (const specifier of windowsAbsolutePaths) {
+                expect(
+                    (rollupInputConfig as ExternalRollupInputOptions).external(specifier, String.raw`D:\a\visulima\visulima\packages\filesystem\path\src\index.ts`, false),
+                    `Failed on: ${specifier}`,
+                ).toBe(false);
+            }
+
+            expect(hoistedDependencies.size, `Unexpected hoisted entries: ${[...hoistedDependencies].join(", ")}`).toBe(0);
+        });
+
+        it("should not record windows source paths as used dependencies", () => {
+            expect.assertions(1);
+
+            const usedDependencies = new Set<string>();
+            const context = new MockPluginContext(
+                resolveExternalsPlugin({
+                    externals: [],
+                    hoistedDependencies: new Set(),
+                    implicitDependencies: new Set(),
+                    logger: mockedLogger,
+                    options: {
+                        alias: {},
+                        rollup: { resolveExternals: defaultPluginConfig },
+                        rootDir: "/",
+                        sourceDir: "src",
+                    } as unknown as InternalBuildOptions,
+                    pkg: { dependencies: { "test-dep": "*" }, name: "externals" },
+                    tsconfig: undefined,
+                    usedDependencies,
+                }),
+            );
+
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            for (const specifier of windowsAbsolutePaths) {
+                (rollupInputConfig as ExternalRollupInputOptions).external(specifier, undefined, false);
+            }
+
+            expect([...usedDependencies], `Leaked entries: ${[...usedDependencies].join(", ")}`).toStrictEqual([]);
+        });
+
+        it("should still detect real hoisted dependencies when importer uses windows separators", () => {
+            expect.assertions(1);
+
+            const hoistedDependencies = new Set<string>();
+            const context = new MockPluginContext(
+                resolveExternalsPlugin({
+                    externals: [],
+                    hoistedDependencies,
+                    implicitDependencies: new Set(),
+                    logger: mockedLogger,
+                    options: {
+                        alias: {},
+                        rollup: { resolveExternals: defaultPluginConfig },
+                        rootDir: "/",
+                        sourceDir: "src",
+                        validation: {
+                            dependencies: {
+                                hoisted: { exclude: [] },
+                                unused: { exclude: [] },
+                            },
+                        },
+                    } as unknown as InternalBuildOptions,
+                    pkg: { dependencies: {}, name: "externals" },
+                    tsconfig: undefined,
+                    usedDependencies: new Set(),
+                }),
+            );
+
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            (rollupInputConfig as ExternalRollupInputOptions).external(
+                "binary-extensions",
+                String.raw`D:\a\visulima\visulima\packages\filesystem\path\src\utils.ts`,
+                false,
+            );
+
+            expect([...hoistedDependencies]).toStrictEqual(["binary-extensions"]);
+        });
+
+        it("should not flag a dep as hoisted when the importer lives under node_modules (windows separators)", () => {
+            expect.assertions(1);
+
+            const hoistedDependencies = new Set<string>();
+            const context = new MockPluginContext(
+                resolveExternalsPlugin({
+                    externals: [],
+                    hoistedDependencies,
+                    implicitDependencies: new Set(),
+                    logger: mockedLogger,
+                    options: {
+                        alias: {},
+                        rollup: { resolveExternals: defaultPluginConfig },
+                        rootDir: "/",
+                        sourceDir: "src",
+                        validation: {
+                            dependencies: {
+                                hoisted: { exclude: [] },
+                                unused: { exclude: [] },
+                            },
+                        },
+                    } as unknown as InternalBuildOptions,
+                    pkg: { dependencies: {}, name: "externals" },
+                    tsconfig: undefined,
+                    usedDependencies: new Set(),
+                }),
+            );
+
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            (rollupInputConfig as ExternalRollupInputOptions).external(
+                "binary-extensions",
+                String.raw`D:\a\proj\node_modules\some-pkg\index.js`,
+                false,
+            );
+
+            expect([...hoistedDependencies]).toStrictEqual([]);
+        });
+
+        it("should treat windows relative specifiers (.\\, ..\\) as internal", () => {
+            expect.assertions(2);
+
+            const context = getMockPluginContext({});
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external(String.raw`.\sibling.ts`, undefined, false)).toBe(false);
+            expect((rollupInputConfig as ExternalRollupInputOptions).external(String.raw`..\parent.ts`, undefined, false)).toBe(false);
+        });
+
+        it("should treat windows source-dir paths as internal", () => {
+            expect.assertions(2);
+
+            const context = getMockPluginContext({
+                buildOptions: { sourceDir: "src" } as unknown as InternalBuildOptions,
+            });
+            const rollupInputConfig: InputOptions = {};
+
+            context.options(rollupInputConfig);
+
+            expect((rollupInputConfig as ExternalRollupInputOptions).external(String.raw`src\utils.ts`, undefined, false)).toBe(false);
+            expect((rollupInputConfig as ExternalRollupInputOptions).external("src/utils.ts", undefined, false)).toBe(false);
+        });
+    });
 });

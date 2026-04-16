@@ -3,12 +3,12 @@ import type { BuildContext } from "@visulima/packem-share/types";
 import { getPackageName } from "@visulima/packem-share/utils";
 import type { Pail } from "@visulima/pail";
 import { isAbsolute } from "@visulima/path";
-import { resolveAlias } from "@visulima/path/utils";
+import { resolveAlias, toPath } from "@visulima/path/utils";
 import { isNodeBuiltin, parseNodeModulePath } from "mlly";
 import type { InputOptions, Plugin, ResolveIdResult } from "rollup";
 
 import type { InternalBuildOptions } from "../../types";
-import { isFromNodeModules } from "../../utils/import-specifier.js";
+import { isBareSpecifier, isFromNodeModules } from "../../utils/import-specifier.js";
 import resolveAliases from "../utils/resolve-aliases";
 
 type MaybeFalsy<T> = T | false | null | undefined;
@@ -41,6 +41,13 @@ const logExternalMessage = (originalId: string, logger: Pail): void => {
 };
 
 const prefixedBuiltins = new Set(["node:sqlite", "node:test"]);
+
+// npm package names can never contain `:` or `\`, so anything with either is
+// a misidentified filesystem path (typically a Windows drive letter or a
+// backslash-separated source path that slipped past the bare-specifier check).
+const INVALID_PACKAGE_NAME_CHAR_RE = /[\\:]/;
+
+const isValidPackageName = (name: string): boolean => name.length > 0 && !INVALID_PACKAGE_NAME_CHAR_RE.test(name);
 
 export type ResolveExternalsPluginOptions = {
     /**
@@ -170,7 +177,14 @@ export const resolveExternalsPlugin = (
         options: (rollupOptions: InputOptions) => {
             // This function takes an id and returns true (external) or false (not external),
             // eslint-disable-next-line no-param-reassign, sonarjs/cognitive-complexity
-            rollupOptions.external = (originalId: string, importer) => {
+            rollupOptions.external = (rawOriginalId: string, rawImporter) => {
+                // Normalize Windows-style separators to POSIX up front so every downstream
+                // check (regex, .includes, .startsWith) can assume forward slashes. We only
+                // compare against these locals — we never hand them back to Rollup, so this
+                // has no effect on the external flag we return.
+                const originalId = toPath(rawOriginalId);
+                const importer = rawImporter ? toPath(rawImporter) : rawImporter;
+
                 if (cacheResolved.has(originalId)) {
                     return cacheResolved.get(originalId);
                 }
@@ -185,16 +199,24 @@ export const resolveExternalsPlugin = (
                     }
                 }
 
-                // Try to guess package name of id
-                const packageName
-                    = (resolvedId && parseNodeModulePath(resolvedId)?.name) || parseNodeModulePath(originalId)?.name || getPackageName(originalId);
+                // Try to guess package name of id — but only from IDs that are actually bare
+                // specifiers. Absolute / relative / virtual / self-import IDs are source files,
+                // not dependencies, and feeding them to getPackageName produces garbage names
+                // (e.g. "D:" or the whole path) that then get reported as "shamefully hoisted".
+                // isValidPackageName rejects the few remaining Windows edge cases like a bare
+                // "D:" drive letter that slipped past isBareSpecifier.
+                const parsedName
+                    = (resolvedId && isBareSpecifier(resolvedId) && parseNodeModulePath(resolvedId)?.name)
+                    || (isBareSpecifier(originalId) && parseNodeModulePath(originalId)?.name)
+                    || (isBareSpecifier(originalId) ? getPackageName(originalId) : "");
+                const packageName = parsedName && isBareSpecifier(parsedName) && isValidPackageName(parsedName) ? parsedName : "";
 
                 if (packageName && !packageName.startsWith(".") && !isNodeBuiltin(packageName)) {
                     context.usedDependencies.add(packageName);
 
                     if (
-                        // Only treat as hoisted if the importer is source
-                        (!importer || !importer.includes("/node_modules/"))
+                        // Only treat as hoisted if the importer is source (not a nested dep).
+                        (!importer || !isFromNodeModules(importer, context.options.rootDir))
                         && !Object.keys(context.pkg.dependencies ?? {}).includes(packageName)
                         && !Object.keys(context.pkg.devDependencies ?? {}).includes(packageName)
                         && !Object.keys(context.pkg.peerDependencies ?? {}).includes(packageName)
@@ -208,11 +230,15 @@ export const resolveExternalsPlugin = (
                     }
                 }
 
+                const sourceDirPattern = context.options?.sourceDir
+                    ? new RegExp(String.raw`(?:^|/)${context.options.sourceDir.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)}/`)
+                    : undefined;
+
                 for (const id of [originalId, resolvedId].filter(Boolean)) {
                     if (
                         /^(?:\0|\.{1,2}\/)/.test(id) // Ignore virtual modules and relative imports
-                        || isAbsolute(id) // Ignore already resolved ids
-                        || new RegExp(String.raw`${context.options?.sourceDir}[/.*|\.*]`).test(id) // Ignore source files
+                        || isAbsolute(id) // Ignore already resolved ids (drive letters, UNC, leading slash)
+                        || (sourceDirPattern?.test(id) ?? false) // Ignore source files
                         || (context.pkg.name && id.startsWith(context.pkg.name)) // Ignore self import
                     ) {
                         cacheResolved.set(id, false);
