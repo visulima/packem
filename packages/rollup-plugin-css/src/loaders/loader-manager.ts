@@ -152,8 +152,14 @@ class LoaderManager {
                     const process = await this.workQueue.add(loader.process.bind(loaderContext, payload));
 
                     if (process) {
+                        // Preserve meta and extracted across loaders: if a loader does
+                        // not return them, don't wipe what an earlier loader produced.
                         // eslint-disable-next-line no-param-reassign
-                        payload = process;
+                        payload = {
+                            ...process,
+                            extracted: process.extracted ?? payload.extracted,
+                            meta: process.meta ?? payload.meta,
+                        };
 
                         this.logger.debug({
                             message: `Completed ${name} loader for ${loaderContext.id}`,

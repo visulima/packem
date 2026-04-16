@@ -808,7 +808,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             context.options.rollup.css
             && context.options.rollup.css.loaders
             && context.options.rollup.css.loaders.length > 0
-            && context.options.declaration
+            && (context.options.declaration || context.options.rollup.css.dts)
             && cssModulesTypesPlugin(context.options.rollup.css, context.options.rootDir),
 
             context.options.rollup.raw && cachingPlugin(rawPlugin(context.options.rollup.raw), fileCache),

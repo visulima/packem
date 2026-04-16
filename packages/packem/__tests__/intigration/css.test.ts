@@ -48,7 +48,9 @@ interface WriteFailResult {
 
 interface WriteResult {
     css: () => string[];
+    dts: () => string[];
     isCss: () => boolean;
+    isDts: () => boolean;
     isFile: (file: string) => boolean;
     isMap: () => boolean;
     js: () => string[];
@@ -162,9 +164,24 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
         const cjs = files.filter((file) => file.endsWith(".cjs"));
         const mjs = files.filter((file) => file.endsWith(".mjs"));
 
+        // CSS module .d.ts files are written next to the source CSS,
+        // so they live in the temp dir (not dist).
+        const sourceFiles: Dirent[] = await readdir(temporaryDirectoryPath, {
+            recursive: true,
+            withFileTypes: true,
+        });
+        const dts = sourceFiles
+            .filter((dirent) => dirent.isFile())
+            .map((dirent) => join(dirent.parentPath, dirent.name))
+            .filter((file) => /\.css\.d\.ts$/.test(file) && !file.includes(`${temporaryDirectoryPath}/dist/`))
+            .sort();
+
         return {
             css(): string[] {
                 return css.map((file) => readFileSync(file));
+            },
+            dts(): string[] {
+                return dts.map((file) => readFileSync(file));
             },
             isCss(): boolean {
                 if (css.length === 0) {
@@ -172,6 +189,13 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 }
 
                 return css.map((file) => isAccessibleSync(file)).every(Boolean);
+            },
+            isDts(): boolean {
+                if (dts.length === 0) {
+                    return false;
+                }
+
+                return dts.map((file) => isAccessibleSync(file)).every(Boolean);
             },
             isFile(file: string): boolean {
                 return isAccessibleSync(join(distributionPath, file));
@@ -232,6 +256,17 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
             }
         } else {
             expect(result.isMap()).toBe(false);
+        }
+
+        const optionDts: boolean | undefined
+            = typeof data.styleOptions === "object" ? (data.styleOptions as StyleOptions).dts : undefined;
+
+        if (optionDts) {
+            expect(result.isDts()).toBe(true);
+
+            for (const f of result.dts()) {
+                expect(f).toMatchSnapshot("dts");
+            }
         }
 
         for (const file of data.files ?? []) {
@@ -1019,23 +1054,21 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "sass - data",
             },
-            // @TODO Fix this test
-            // {
-            //     input: "sass-import/index.js",
-            //     styleOptions: {
-            //         sass: {
-            //             implementation: "sass",
-            //         },
-            //     },
-            //     title: "sass - import",
-            // },
+            {
+                input: "sass-import/index.js",
+                styleOptions: {
+                    sass: {
+                        implementation: "sass",
+                    },
+                },
+                title: "sass - import",
+            },
         ] as WriteData[])("should work with sass/scss processed $title css", async ({ title, ...data }) => {
             await validate(data);
         });
     });
 
-    // eslint-disable-next-line vitest/no-disabled-tests
-    describe.skip("stylus", () => {
+    describe("stylus", () => {
         // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
         it.each([
             {
@@ -1047,6 +1080,49 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 styleOptions: { mode: "extract", sourceMap: true },
                 title: "sourcemap",
             },
+            {
+                input: "stylus-options/index.js",
+                styleOptions: {
+                    stylus: {
+                        additionalData: "primary-color = #bada55\nsecondary-color = #111\nmy-z-index = 5",
+                    },
+                },
+                title: "additional-data-string",
+            },
+            {
+                input: "stylus-options/index.js",
+                styleOptions: {
+                    stylus: {
+                        additionalData: "@import '_data'",
+                    },
+                },
+                title: "additional-data-import",
+            },
+            {
+                // Numeric define value — stylus JS strings render as quoted literals,
+                // so use a number here to keep the snapshot clean. Color definitions
+                // are better expressed via `additionalData` or by passing a stylus
+                // Color node.
+                input: "stylus-options/index.js",
+                styleOptions: {
+                    stylus: {
+                        additionalData: "primary-color = red\nsecondary-color = blue",
+                        define: {
+                            "my-z-index": 99,
+                        },
+                    },
+                },
+                title: "define",
+            },
+            {
+                input: "stylus-options/index.js",
+                styleOptions: {
+                    stylus: {
+                        import: ["./_data"],
+                    },
+                },
+                title: "import-option",
+            },
         ] as WriteData[])("should work with stylus processed $title css", async ({ title, ...data }: WriteData) => {
             await validate(data);
         });
@@ -1055,16 +1131,15 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
     describe("less", () => {
         // eslint-disable-next-line vitest/expect-expect,vitest/prefer-expect-assertions
         it.each([
-            // @TODO Fix this test
-            // {
-            //     input: "less-import/index.js",
-            //     title: "import",
-            // },
-            // {
-            //     input: "less-import/index.js",
-            //     styleOptions: { mode: "extract", sourceMap: true },
-            //     title: "sourcemap",
-            // },
+            {
+                input: "less-import/index.js",
+                title: "import",
+            },
+            {
+                input: "less-import/index.js",
+                styleOptions: { mode: "extract", sourceMap: true },
+                title: "sourcemap",
+            },
             {
                 input: "less-paths/index.js",
                 styleOptions: {
@@ -1410,14 +1485,17 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "inject-treeshakeable-keyword-fail",
             },
-            // @TODO Add dts
-            // {
-            //     input: "modules/index.js",
-            //     styleOptions: { dts: true, mode: ["inject", { treeshakeable: true }], postcss: {
-            //             modules: true,
-            //         }, },
-            //     title: "inject-treeshakeable-dts",
-            // },
+            {
+                input: "modules/index.js",
+                styleOptions: {
+                    dts: true,
+                    mode: ["inject", { treeshakeable: true }],
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "inject-treeshakeable-dts",
+            },
             {
                 input: "modules-duplication/index.js",
                 styleOptions: `modules: { generateScopedName: (name) => \`\${name}hacked\` }`,
@@ -1452,14 +1530,17 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                 },
                 title: "treeshake-module",
             },
-            // @TODO Add dts
-            // {
-            //     input: "named-exports/index.js",
-            //     styleOptions: { dts: true, postcss: {
-            //             modules: true,
-            //         }, namedExports: true },
-            //     title: "named-exports-dts",
-            // },
+            {
+                input: "named-exports/index.js",
+                styleOptions: {
+                    dts: true,
+                    namedExports: true,
+                    postcss: {
+                        modules: true,
+                    },
+                },
+                title: "named-exports-dts",
+            },
             {
                 input: "named-exports/index.js",
                 styleOptions: `
@@ -1593,6 +1674,40 @@ describe.skipIf(process.env.PACKEM_PRODUCTION_BUILD)("css", () => {
                     },
                 },
                 title: "duplication",
+            },
+            {
+                input: "named-exports/index.js",
+                styleOptions: {
+                    // Use [name]_[local] so the generated class names do not
+                    // depend on the temp directory path (which changes per run).
+                    lightningcss: {
+                        modules: { pattern: "[name]_[local]" },
+                    },
+                    loaders: ["lightningcss", "sourcemap"],
+                },
+                title: "lightningcss-modules",
+            },
+            {
+                input: "named-exports/index.js",
+                styleOptions: {
+                    dts: true,
+                    lightningcss: {
+                        modules: { pattern: "[name]_[local]" },
+                    },
+                    loaders: ["lightningcss", "sourcemap"],
+                },
+                title: "lightningcss-modules-dts",
+            },
+            {
+                input: "named-exports/index.js",
+                styleOptions: {
+                    lightningcss: {
+                        modules: { pattern: "[name]_[local]" },
+                    },
+                    loaders: ["lightningcss", "sourcemap"],
+                    namedExports: true,
+                },
+                title: "lightningcss-modules-named-exports",
             },
         ] as WriteData[])("should work with processed modules $title css", async ({ title, ...data }: WriteData) => {
             await validate(data);
