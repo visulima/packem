@@ -466,6 +466,7 @@ describe(validatePackageFields, () => {
 
             const context = {
                 options: {
+                    rootDir: "/test/project",
                     validation: {
                         packageJson: {
                             exports: true,
@@ -490,6 +491,7 @@ describe(validatePackageFields, () => {
 
             const context = {
                 options: {
+                    rootDir: "/test/project",
                     validation: {
                         packageJson: {
                             exports: true,
@@ -808,7 +810,7 @@ describe(validatePackageFields, () => {
             expect.assertions(4);
 
             const context = {
-                options: { validation: { packageJson: { exports: true } } },
+                options: { rootDir: "/test/project", validation: { packageJson: { exports: true } } },
                 pkg: {
                     sideEffects: false,
                     exports: {
