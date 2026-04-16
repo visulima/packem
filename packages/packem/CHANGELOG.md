@@ -1,3 +1,25 @@
+## @visulima/packem [2.0.0-alpha.62](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.61...@visulima/packem@2.0.0-alpha.62) (2026-04-16)
+
+### Bug Fixes
+
+* fixed windows handling of externals, update deps ([095f18a](https://github.com/visulima/packem/commit/095f18a6eb16ff3d510be98ed533d67d550728d5))
+
+### Miscellaneous Chores
+
+* bump node engines to ^22.14.0 || >=24.10.0 ([32f705a](https://github.com/visulima/packem/commit/32f705aa866f9daea6a094df74ef66aa8088e2c6))
+
+### Tests
+
+* fixed test ([89838c1](https://github.com/visulima/packem/commit/89838c1f11dfc5b6af8f235622de603d90dd781f))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.49
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.30
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.29
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.10
+
 ## @visulima/packem [2.0.0-alpha.61](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.60...@visulima/packem@2.0.0-alpha.61) (2026-03-28)
 
 ### Bug Fixes
