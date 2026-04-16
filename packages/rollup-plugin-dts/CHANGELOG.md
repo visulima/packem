@@ -1,3 +1,9 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.10](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.9...@visulima/rollup-plugin-dts@1.0.0-alpha.10) (2026-04-16)
+
+### Miscellaneous Chores
+
+* bump node engines to ^22.14.0 || >=24.10.0 ([32f705a](https://github.com/visulima/packem/commit/32f705aa866f9daea6a094df74ef66aa8088e2c6))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.9](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.8...@visulima/rollup-plugin-dts@1.0.0-alpha.9) (2026-03-28)
 
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.7...@visulima/rollup-plugin-dts@1.0.0-alpha.8) (2026-03-24)
