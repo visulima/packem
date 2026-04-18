@@ -1,3 +1,15 @@
+## @visulima/packem-rollup [1.0.0-alpha.50](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.49...@visulima/packem-rollup@1.0.0-alpha.50) (2026-04-18)
+
+### Bug Fixes
+
+* **packem-rollup:** normalize Windows paths in isolated-declarations plugin ([6658f50](https://github.com/visulima/packem/commit/6658f50ee50acf8e518f0a3f7d898246ec85b767))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.31
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.11
+
 ## @visulima/packem-rollup [1.0.0-alpha.49](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.48...@visulima/packem-rollup@1.0.0-alpha.49) (2026-04-16)
 
 ### Miscellaneous Chores
