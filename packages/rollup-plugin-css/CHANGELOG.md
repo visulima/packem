@@ -1,3 +1,14 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.30](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.29...@visulima/rollup-plugin-css@1.0.0-alpha.30) (2026-04-18)
+
+### Features
+
+* **css:** extend stylus, fix lightningcss modules, add dts coverage ([302f01f](https://github.com/visulima/packem/commit/302f01f087a2a4e91e22a6da75bd280410923aa6))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.31
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.29](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.28...@visulima/rollup-plugin-css@1.0.0-alpha.29) (2026-04-16)
 
 ### Miscellaneous Chores
