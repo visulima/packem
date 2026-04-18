@@ -12,7 +12,7 @@ import { readFile } from "@visulima/fs";
 import { ENDING_REGEX, EXCLUDE_REGEXP } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { getDtsExtension } from "@visulima/packem-share/utils";
-import { basename, dirname, extname, isAbsolute, join, relative, toNamespacedPath } from "@visulima/path";
+import { basename, dirname, extname, isAbsolute, join, relative, sep, toNamespacedPath } from "@visulima/path";
 import { parseSync } from "oxc-parser";
 import type { NormalizedInputOptions, NormalizedOutputOptions, Plugin, PluginContext, PreRenderedChunk } from "rollup";
 
@@ -52,8 +52,16 @@ export type IsolatedDeclarationsOptions = {
     ignoreErrors?: boolean;
 };
 
+// Rollup resolves module ids using the host OS separator, so on Windows both `sourceDirectory`
+// and `resolved.id` arrive with backslashes. Splicing those into rewritten import specifiers
+// produces strings like `../util/D:\a\...\src\util\normalize-lf.ts`, which TypeScript's scanner
+// interprets as Unicode escapes (`\u` + non-hex → TS1125). Normalizing to POSIX slashes before
+// any path comparison or string splice keeps the output cross-platform safe.
+const toPosix = (value: string): string => (sep === "/" ? value : value.split(sep).join("/"));
+
 export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(sourceDirectory: string, context: BuildContext<T>): Plugin => {
     const filter = createFilter(/\.(?:[mc]?ts|[jt]sx?)$/, context.options.rollup.isolatedDeclarations?.exclude || EXCLUDE_REGEXP);
+    const posixSourceDirectory = toPosix(sourceDirectory);
 
     let outputFiles: Record<string, { ext: string; map?: string; source: string }> = Object.create(null);
 
@@ -120,7 +128,7 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                     || resolved.id.endsWith(".ctsx")
                     || resolved.id.endsWith(".mtsx")
                 ) {
-                    const resolvedId = resolved.id.replace(`${sourceDirectory}/`, "");
+                    const resolvedId = toPosix(resolved.id).replace(`${posixSourceDirectory}/`, "");
 
                     let extendedSourceValue = node.source.value;
 
@@ -267,8 +275,10 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                 const originalSourcePath = filename;
 
                 if (isAbsolute(filename)) {
+                    const posixFilename = toPosix(filename);
+
                     // If absolute path is outside sourceDirectory, skip it
-                    if (!filename.startsWith(sourceDirectory)) {
+                    if (!posixFilename.startsWith(posixSourceDirectory)) {
                         context.logger.debug({
                             message: `Skipping file outside sourceDirectory: ${filename}`,
                             prefix: "packem:isolated-declarations",
@@ -277,10 +287,10 @@ export const isolatedDeclarationsPlugin = <T extends Record<string, any>>(source
                     }
 
                     // Convert absolute path to relative path from sourceDirectory
-                    normalizedFilename = relative(sourceDirectory, filename);
+                    normalizedFilename = toPosix(relative(sourceDirectory, filename));
                 } else {
                     // Already relative, use as is
-                    normalizedFilename = filename.replace(`${sourceDirectory}/`, "");
+                    normalizedFilename = toPosix(filename).replace(`${posixSourceDirectory}/`, "");
                 }
 
                 // Remove leading slash if present
