@@ -1717,10 +1717,10 @@ importers:
         specifier: catalog:visulima
         version: 4.1.7(@types/node@25.6.0)
       '@visulima/packem-rollup':
-        specifier: 1.0.0-alpha.48
+        specifier: 1.0.0-alpha.49
         version: link:../packem-rollup
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.29
+        specifier: 1.0.0-alpha.30
         version: link:../packem-share
       '@visulima/pail':
         specifier: catalog:visulima
@@ -1729,10 +1729,10 @@ importers:
         specifier: catalog:visulima
         version: 2.0.5
       '@visulima/rollup-plugin-css':
-        specifier: 1.0.0-alpha.28
+        specifier: 1.0.0-alpha.29
         version: link:../rollup-plugin-css
       '@visulima/rollup-plugin-dts':
-        specifier: 1.0.0-alpha.9
+        specifier: 1.0.0-alpha.10
         version: link:../rollup-plugin-dts
       '@visulima/tabular':
         specifier: catalog:visulima
@@ -1762,8 +1762,8 @@ importers:
         specifier: catalog:prod
         version: 1.8.2
       oxc-transform:
-        specifier: catalog:dev
-        version: 0.126.0
+        specifier: '>=0.20.0'
+        version: 0.119.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
       picomatch:
         specifier: catalog:prod
         version: 4.0.4
@@ -2126,13 +2126,13 @@ importers:
         specifier: catalog:visulima
         version: 4.1.7(@types/node@25.6.0)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.29
+        specifier: 1.0.0-alpha.30
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
         version: 2.0.5
       '@visulima/rollup-plugin-dts':
-        specifier: 1.0.0-alpha.9
+        specifier: 1.0.0-alpha.10
         version: link:../rollup-plugin-dts
       '@visulima/source-map':
         specifier: catalog:visulima
@@ -2511,7 +2511,7 @@ importers:
         specifier: catalog:visulima
         version: 4.1.7(@types/node@25.6.0)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.29
+        specifier: 1.0.0-alpha.30
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
