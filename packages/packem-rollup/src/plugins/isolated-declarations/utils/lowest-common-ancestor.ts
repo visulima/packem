@@ -13,7 +13,7 @@ const lowestCommonAncestor = (...filepaths: string[]): string => {
     }
 
     if (filepaths.length === 1) {
-        return dirname(filepaths[0] as string);
+        return dirname(filepaths[0] as string).split(sep).join("/");
     }
 
     // Normalize paths to use forward slashes
@@ -41,10 +41,11 @@ const lowestCommonAncestor = (...filepaths: string[]): string => {
         ancestor = ancestor.slice(0, index);
     }
 
-    // Convert back to platform-specific separator
-    const result = ancestor.length <= 1 && ancestor[0] === "" ? `/${ancestor[0]}` : ancestor.join("/");
-
-    return result.split("/").join(sep);
+    // Always return POSIX-style paths so downstream plugin logic can safely splice
+    // resolved ids into rewritten TypeScript import specifiers. Windows separators
+    // like `\u` (from `\util`) would be scanned by TypeScript as Unicode escapes
+    // (TS1125) when dropped into string literals.
+    return ancestor.length <= 1 && ancestor[0] === "" ? `/${ancestor[0]}` : ancestor.join("/");
 };
 
 export default lowestCommonAncestor;
