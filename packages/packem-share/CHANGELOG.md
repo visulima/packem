@@ -1,3 +1,9 @@
+## @visulima/packem-share [1.0.0-alpha.34](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.33...@visulima/packem-share@1.0.0-alpha.34) (2026-04-23)
+
+### Bug Fixes
+
+* **packem-share:** emit .d.mts/.d.cts for split dual-format contexts ([eecc05f](https://github.com/visulima/packem/commit/eecc05f65e727ad2fdf4bc9cd454144334d7ae3c))
+
 ## @visulima/packem-share [1.0.0-alpha.33](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.32...@visulima/packem-share@1.0.0-alpha.33) (2026-04-23)
 
 ## @visulima/packem-share [1.0.0-alpha.32](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.31...@visulima/packem-share@1.0.0-alpha.32) (2026-04-23)
