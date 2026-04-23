@@ -439,7 +439,10 @@ describe(getDtsExtension, () => {
             expect(getDtsExtension(context, "cjs")).toBe("d.cts");
         });
 
-        it("should not use traditional extensions when emitCJS is false", () => {
+        it("should still use traditional .d.mts when emitCJS is false but declaration is compatible", () => {
+            // Per-entry build contexts can have emitCJS=false even when the parent package is
+            // dual-format. The package.json still references .d.mts, so the ESM-only context
+            // must emit .d.mts, not .d.ts.
             expect.assertions(1);
 
             const context = createOptions({
@@ -448,7 +451,7 @@ describe(getDtsExtension, () => {
                 emitESM: true,
             });
 
-            expect(getDtsExtension(context, "esm")).toBe("d.ts");
+            expect(getDtsExtension(context, "esm")).toBe("d.mts");
         });
     });
 
