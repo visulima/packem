@@ -148,7 +148,7 @@ exports.ModernFeatures = ModernFeatures.ModernFeatures;
 exports[`packem swc > should handle modern TypeScript syntax with SWC transformer > modern features index.d.ts output 1`] = `
 "declare class ModernFeatures {
   useResource(): {
-    [Symbol.dispose]: () => any;
+    [Symbol.dispose]: () => void;
   };
   processData(): Promise<{
     name: string;
