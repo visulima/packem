@@ -9,6 +9,7 @@ import { getDtsExtension, getOutputExtension } from "@visulima/packem-share/util
 import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
 
+import { buildExe } from "../exe";
 import runWithConcurrency from "../lib/concurrency";
 import rollupBuild from "../rollup/build";
 import rollupBuildTypes from "../rollup/build-types";
@@ -769,6 +770,10 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
         if (!entry.size.gzip) {
             entry.size.gzip = await gzipSize(filePath);
         }
+    }
+
+    if (context.options.exe) {
+        await buildExe(context);
     }
 
     await context.hooks.callHook("build:done", context);

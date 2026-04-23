@@ -9,6 +9,7 @@ import type { JitiOptions } from "jiti";
 import type { Plugin } from "rollup";
 import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
+import type { ExeOptions } from "./exe";
 import type { Node10CompatibilityOptions } from "./packem/node10-compatibility";
 import type { ResolveExternalsPluginOptions } from "./rollup/plugins/resolve-externals-plugin";
 
@@ -149,6 +150,16 @@ export interface BuildOptions {
     emitESM?: boolean;
     /** Build entry points */
     entries: BuildEntry[];
+
+    /**
+     * Bundle the build output into a single standalone executable via Node.js SEA.
+     * Set to `true` to build for the current platform, or pass an options object
+     * for fine-grained control (cross-platform targets, SEA config, custom output name).
+     *
+     * Requires Node.js >= 25.7.0 at build time. Not supported in Bun or Deno.
+     * Automatically enforces a single entry point.
+     */
+    exe?: boolean | ExeOptions;
     /** Experimental features configuration */
     experimental?: {
         /**
