@@ -1,3 +1,13 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.12](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.11...@visulima/rollup-plugin-dts@1.0.0-alpha.12) (2026-04-23)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** sync fixes from upstream rolldown-plugin-dts ([449794f](https://github.com/visulima/packem/commit/449794ff6b57e71957c8647c09c7d9145a07f3d0)), closes [sxzz/rolldown-plugin-dts#191](https://github.com/sxzz/rolldown-plugin-dts/issues/191)
+
+### Miscellaneous Chores
+
+* **rollup-plugin-dts:** restore isolatedDeclarationTransformer in build config ([46d54f4](https://github.com/visulima/packem/commit/46d54f4f590529abd88b998ab2ade4cd4a861571))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.11](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.10...@visulima/rollup-plugin-dts@1.0.0-alpha.11) (2026-04-18)
 
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.10](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.9...@visulima/rollup-plugin-dts@1.0.0-alpha.10) (2026-04-16)
