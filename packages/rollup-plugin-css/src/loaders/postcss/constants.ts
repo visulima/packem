@@ -14,7 +14,7 @@
  * // - .postcssrc.cjs
  * ```
  */
-export const POSTCSS_EXTENSIONS = [".js", ".mjs", ".cjs"];
+export const POSTCSS_EXTENSIONS: string[] = [".js", ".mjs", ".cjs"];
 
 export const HASH_REGEXP: RegExp = /\[hash(?::(\d+))?\]/;
 
