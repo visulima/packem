@@ -108,13 +108,13 @@ catalogs:
     "@anolilab/textlint-config": 13.0.0
     "@commitlint/cli": 20.5.0
     "@commitlint/config-conventional": 20.5.0
-    "@secretlint/secretlint-rule-preset-recommend": 11.7.1
+    "@secretlint/secretlint-rule-preset-recommend": 12.2.0
     eslint: 10.2.0
     husky: ^9.1.7
     lint-staged: 16.4.0
     prettier: 3.8.3
     publint: 0.3.18
-    secretlint: 11.7.1
+    secretlint: 12.2.0
     textlint: 15.5.4
   markdown:
     turndown: 7.2.4
@@ -163,7 +163,7 @@ catalogs:
     micromatch: ^4.0.8
     mlly: 1.8.2
     obug: 2.1.1
-    oxc-parser: 0.126.0
+    oxc-parser: 0.127.0
     p-queue: 9.1.2
     picomatch: 4.0.4
     plop: 4.0.5
@@ -210,13 +210,13 @@ catalogs:
     "@sxzz/test-utils": 0.5.16
     "@vitest/coverage-v8": 4.1.4
     "@vitest/ui": 4.1.4
-    vitest: 4.1.4
+    vitest: 4.1.5
   tsc:
     "@babel/preset-typescript": ^7.28.5
     "@total-typescript/ts-reset": ^0.6.1
     "@ts-macro/tsc": 0.3.7
     "@volar/typescript": 2.4.28
-    typescript: 6.0.2
+    typescript: 6.0.3
     vue-tsc: 3.2.6
   types:
     "@types/babel__core": ^7.20.5
@@ -248,18 +248,19 @@ catalogs:
     magic-string: 0.30.21
     semver: 7.7.4
   visulima:
-    "@visulima/cerebro": 2.1.5
-    "@visulima/colorize": 1.4.29
-    "@visulima/find-cache-dir": 2.0.7
-    "@visulima/fs": 4.1.0
-    "@visulima/humanizer": 2.0.5
-    "@visulima/package": 4.1.7
-    "@visulima/packem": 2.0.0-alpha.40
-    "@visulima/pail": 3.2.2
-    "@visulima/path": 2.0.5
-    "@visulima/source-map": 2.0.5
-    "@visulima/tabular": ^3.1.3
-    "@visulima/tsconfig": 2.1.3
+    "@visulima/cerebro": 3.0.0-alpha.11
+    "@visulima/colorize": 2.0.0-alpha.10
+    "@visulima/find-cache-dir": 3.0.0-alpha.9
+    "@visulima/fs": 5.0.0-alpha.12
+    "@visulima/humanizer": 3.0.0-alpha.11
+    "@visulima/package": 5.0.0-alpha.11
+    "@visulima/packem": 2.0.0-alpha.62
+    "@visulima/pail": 4.0.0-alpha.11
+    "@visulima/path": 3.0.0-alpha.10
+    "@visulima/source-map": 3.0.0-alpha.9
+    "@visulima/tabular": 4.0.0-alpha.11
+    "@visulima/tsconfig": 3.0.0-alpha.11
+
 dedupeInjectedDeps: true
 dedupePeerDependents: true
 disallowWorkspaceCycles: true
@@ -315,11 +316,61 @@ overrides:
   tmp@<=0.2.3: '>=0.2.4'
   undici@<6.23.0: '>=6.23.0'
   undici@<6.24.0: '>=6.24.0'
+  # Force a single typescript version across the whole dep graph. Without this, deps that pin
+  # an older 6.0.x (e.g. @anolilab/eslint-config, @sxzz/test-utils) pull typescript@6.0.2 while
+  # the workspace uses 6.0.3 — and @volar/typescript's proxyCreateProgram surface-types clash
+  # because of new private properties between 6.0.2 and 6.0.3.
+  typescript: 6.0.3
   vite@>=8.0.0 <=8.0.4: '>=8.0.5'
   yaml@>=2.0.0 <2.8.3: '>=2.8.3'
 
 patchedDependencies:
   oxc-parser: patches/oxc-parser.patch
+
+peerDependencyRules:
+  # vite is an optional peer of vitest/@vitest/mocker and rollup-plugin-import-trace.
+  # packem itself is a rollup plugin, not a vite consumer — vite gets pulled in transitively.
+  ignoreMissing:
+    - vite
+
+  allowedVersions:
+    # vite 8 not yet in rollup-plugin-import-trace's peer range
+    "rollup-plugin-import-trace>vite": "^8.0.0"
+
+    # @anolilab/* configs pin exact prettier/secretlint/textlint; widen to current catalog
+    "@anolilab/lint-staged-config>prettier": "^3.8.0"
+    "@anolilab/lint-staged-config>secretlint": "^12.0.0"
+    "@anolilab/prettier-config>prettier": "^3.8.0"
+    "@anolilab/textlint-config>textlint": "^15.5.0"
+
+    # typedoc / @sxzz/test-utils not yet published with typescript 6 support
+    "typedoc>typescript": "^6.0.0"
+    "@sxzz/test-utils>typescript": "^6.0.0"
+
+    # eslint 10 + typescript 6: plugins haven't updated peer ranges yet
+    "eslint-plugin-no-for-of-array>eslint": "^10.0.0"
+    "eslint-plugin-no-for-of-array>typescript": "^6.0.0"
+    "eslint-plugin-promise>eslint": "^10.0.0"
+    "@anolilab/eslint-config>@eslint/css": "^1.0.0"
+    "@anolilab/eslint-config>tailwind-csstree": "^0.1.0"
+
+    # postgraphile stack is pulled in only by packem's externals integration test
+    "@dataplan/pg>graphql": "^15.0.0"
+    "@dataplan/pg>pg-sql2": "^4.0.0"
+    "grafast>graphql": "^15.0.0"
+    "grafserv>graphql": "^15.0.0"
+    "ruru>graphql": "^15.0.0"
+    "ruru-types>graphql": "^15.0.0"
+    "postgraphile>graphql": "^15.0.0"
+    "postgraphile>pg-sql2": "^4.0.0"
+    "postgraphile>graphile-build": "^4.0.0"
+    "postgraphile>graphile-build-pg": "^4.0.0"
+    "postgraphile>graphile-config": "^1.0.0"
+    "postgraphile>@dataplan/pg": "^1.0.0"
+    "postgraphile>grafast": "^1.0.0"
+    "graphile-utils>graphql": "^15.0.0"
+    "graphile-utils>graphile-build": "^4.0.0"
+    "graphile-utils>graphile-build-pg": "^4.0.0"
 
 publicHoistPattern:
   - "*eslint*"
