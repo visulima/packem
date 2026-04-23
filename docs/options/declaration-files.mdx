@@ -72,7 +72,7 @@ export default defineConfig({
 
 ## Isolated Declarations
 
-Isolated declarations are a TypeScript 5.5+ feature that dramatically improves declaration generation performance by avoiding expensive type inference.
+Isolated declarations are a TypeScript 5.5+ feature that dramatically improves declaration generation performance by avoiding expensive type inference. Packem's DTS pipeline (powered by [`@visulima/rollup-plugin-dts`](https://github.com/visulima/packem/tree/main/packages/rollup-plugin-dts)) detects isolated declarations automatically and uses the fast oxc-based generator when available, falling back to `tsc` otherwise.
 
 <Callout type="info">
 Isolated declarations can be 10-100x faster than traditional declaration generation for large projects.
@@ -80,50 +80,26 @@ Isolated declarations can be 10-100x faster than traditional declaration generat
 
 ### Enable Isolated Declarations
 
+Add `"isolatedDeclarations": true` to your `tsconfig.json`. Packem picks it up automatically — there is no Packem-level option for it.
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "isolatedDeclarations": true
+  }
+}
+```
+
+Your `packem.config.ts` stays minimal:
+
 ```typescript
 import { defineConfig } from '@visulima/packem/config'
-import isolatedDeclarations from '@visulima/packem/dts/isolated/transformer/typescript'
 
 export default defineConfig({
-  isolatedDeclarationTransformer: isolatedDeclarations,
   transformer: 'esbuild'
 })
 ```
-
-### Available Isolated Declaration Transformers
-
-<Tabs items={['TypeScript (Recommended)', 'swc', 'OXC']}>
-  <Tab value="TypeScript (Recommended)">
-    ```typescript
-    import isolatedDeclarations from '@visulima/packem/dts/isolated/transformer/typescript'
-
-    export default defineConfig({
-      isolatedDeclarationTransformer: isolatedDeclarations,
-      transformer: 'esbuild'
-    })
-    ```
-  </Tab>
-  <Tab value="swc">
-    ```typescript
-    import isolatedDeclarations from '@visulima/packem/dts/isolated/transformer/swc'
-
-    export default defineConfig({
-      isolatedDeclarationTransformer: isolatedDeclarations,
-      transformer: 'swc'
-    })
-    ```
-  </Tab>
-  <Tab value="OXC">
-    ```typescript
-    import isolatedDeclarations from '@visulima/packem/dts/isolated/transformer/oxc'
-
-    export default defineConfig({
-      isolatedDeclarationTransformer: isolatedDeclarations,
-      transformer: 'oxc'
-    })
-    ```
-  </Tab>
-</Tabs>
 
 ### Isolated Declarations Requirements
 
@@ -162,7 +138,7 @@ Isolated declarations require explicit type annotations on all exported declarat
 </Callout>
 
 <Callout type="info">
-**JSDoc comments and isolated declarations:** OXC and swc do not preserve JSDoc comments when generating `.d.ts` files via isolated declarations. If your library's API documentation relies on JSDoc comments in declaration files, use the **TypeScript** isolated declarations transformer or disable isolated declarations entirely (which uses `tsc` under the hood). Also ensure `removeComments` is not set to `true` in your `tsconfig.json`.
+**JSDoc comments:** The oxc-based generator does not preserve JSDoc comments. If your library's API documentation relies on JSDoc in `.d.ts` output, turn off `isolatedDeclarations` in tsconfig so Packem falls back to `tsc` (which preserves comments when `removeComments` is not `true`).
 </Callout>
 
 ## Declaration File Formats
@@ -420,14 +396,20 @@ export default defineConfig({
 
 ### Use Isolated Declarations
 
-For maximum performance, use isolated declarations:
+For maximum performance, enable isolated declarations in your `tsconfig.json`. Packem uses the oxc-based fast path automatically:
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "isolatedDeclarations": true
+  }
+}
+```
 
 ```typescript
 export default defineConfig({
-  // Use isolated declarations for speed
-  isolatedDeclarationTransformer: isolatedDeclarations,
-  
-  // Use fast transformer for JavaScript
+  // Use a fast transformer for JavaScript
   transformer: 'esbuild'
 })
 ```
@@ -509,7 +491,7 @@ Ensure your `tsconfig.json` paths are correctly configured:
 If JSDoc comments are missing from your generated `.d.ts` files:
 
 1. **Check `removeComments`**: Ensure `removeComments` is not `true` in your `tsconfig.json`. TypeScript strips all comments (including JSDoc) from declaration output when this is enabled.
-2. **Check your declaration transformer**: OXC and swc isolated declaration transformers do not preserve JSDoc comments. Switch to the TypeScript transformer or disable isolated declarations.
+2. **Isolated declarations strip comments**: The oxc-based fast path used when `isolatedDeclarations: true` is set does not preserve JSDoc. Turn off `isolatedDeclarations` in tsconfig to fall back to `tsc`, which preserves comments.
 
 ```json
 // tsconfig.json
@@ -562,13 +544,21 @@ export default defineConfig({
 
 ### High-Performance Library
 
-```typescript
-import isolatedDeclarations from '@visulima/packem/dts/isolated/transformer/typescript'
+Enable isolated declarations in `tsconfig.json` and let Packem use the fast oxc-based generator:
 
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "isolatedDeclarations": true
+  }
+}
+```
+
+```typescript
 export default defineConfig({
-  isolatedDeclarationTransformer: isolatedDeclarations,
   transformer: 'esbuild',
-  
+
   declaration: {
     enabled: true,
     parallel: true
@@ -580,10 +570,10 @@ export default defineConfig({
 
 ## Known Limitations
 
-### Isolated Declarations (OXC / swc)
+### Isolated Declarations (oxc fast path)
 
-- **JSDoc comments are not preserved.** OXC and swc strip all comments during isolated declaration generation. Use the TypeScript transformer or disable isolated declarations if your library relies on JSDoc in `.d.ts` files.
-- **Triple-slash directives are not preserved.** `/// <reference types="..." />` directives in source files are stripped by OXC and swc. They are preserved when using the `dtsInput` mode with pre-generated `.d.ts` files.
+- **JSDoc comments are not preserved.** The oxc-based generator strips all comments. Turn off `isolatedDeclarations` in tsconfig (to fall back to `tsc`) if your library relies on JSDoc in `.d.ts` files.
+- **Triple-slash directives are not preserved.** `/// <reference types="..." />` directives in source files are stripped by oxc. They are preserved when using the `dtsInput` mode with pre-generated `.d.ts` files.
 
 ### TypeScript Compiler (tsc)
 

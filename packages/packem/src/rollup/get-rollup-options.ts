@@ -275,7 +275,7 @@ const getTransformerConfig = (
                     jsxPragma: context.tsconfig.config.compilerOptions?.jsxFactory,
                     jsxPragmaFrag: context.tsconfig.config.compilerOptions?.jsxFragmentFactory,
                     onlyRemoveTypeImports: true,
-                    // Our declaration is handled by the isolated declaration transformer
+                    // Declaration generation is handled by @visulima/rollup-plugin-dts
                     rewriteImportExtensions: false,
                 }
                 : undefined,
