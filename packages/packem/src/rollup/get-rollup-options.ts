@@ -350,6 +350,13 @@ const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "b
         logLevel: context.options.debug ? "debug" : "info",
 
         onLog: (level, log) => {
+            // DTS builds run in emitDtsOnly mode, so the JS chunk for every entry is empty
+            // by design. Suppress the EMPTY_BUNDLE warnings here — onwarn already filters them
+            // but onLog runs first and would otherwise log every empty entry.
+            if (type === "dts" && log.code === "EMPTY_BUNDLE") {
+                return;
+            }
+
             let format = log.message;
 
             if (log.stack) {
