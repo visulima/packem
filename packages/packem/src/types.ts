@@ -1,5 +1,5 @@
 import type { CheckPackageOptions } from "@arethetypeswrong/core";
-import type { IsolatedDeclarationsTransformer, PackemRollupOptions, TransformerFn, TransformerName } from "@visulima/packem-rollup";
+import type { PackemRollupOptions, TransformerFn, TransformerName } from "@visulima/packem-rollup";
 import type { InternalOXCTransformPluginConfig } from "@visulima/packem-rollup/oxc";
 import type { NativeModulesOptions } from "@visulima/packem-rollup/plugin/native-modules";
 import type { BuildContext, BuildHooks, Environment, Format, Mode, Runtime } from "@visulima/packem-share/types";
@@ -169,12 +169,6 @@ export interface BuildOptions {
      * @example ["images", "assets", "icons"]
      */
     ignoreExportKeys?: string[];
-
-    /**
-     * Isolated declaration transformer for TypeScript declaration generation
-     * @experimental
-     */
-    isolatedDeclarationTransformer?: IsolatedDeclarationsTransformer;
 
     /**
      * Jiti options, where [jiti](https://github.com/unjs/jiti) is used to load the entry files.

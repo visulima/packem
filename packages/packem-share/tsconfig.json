@@ -6,7 +6,8 @@
         "module": "ESNext",
         "moduleResolution": "bundler",
         "noEmit": false,
-        "outDir": "dist"
+        "outDir": "dist",
+        "types": ["node"]
     },
     "include": ["src/**/*", "*.d.ts"]
 }

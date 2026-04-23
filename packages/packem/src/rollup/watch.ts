@@ -176,8 +176,8 @@ const watch = async (
     let useCache = true;
 
     // TODO: find a way to remove this hack
-    // This is a hack to prevent caching when using isolated declarations or css loaders
-    if (context.options.rollup.isolatedDeclarations || context.options.isolatedDeclarationTransformer || context.options.rollup.css) {
+    // This is a hack to prevent caching when using css loaders
+    if (context.options.rollup.css) {
         useCache = false;
     }
 
@@ -223,12 +223,7 @@ const watch = async (
 
         watchers.push(bundleWatcher);
 
-        if (context.options.declaration && context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer) {
-            context.logger.info({
-                message: "Using isolated declaration transformer to generate declaration files...",
-                prefix: "dts",
-            });
-        } else if (context.options.declaration) {
+        if (context.options.declaration) {
             const rollupDtsOptions = await getRollupDtsOptions(context, fileCache);
 
             if (useCache) {

@@ -79,7 +79,7 @@ export const packem = async (rootDirectory: string, options: PackemOptions = {})
 };
 
 export type { BuildEntry, BuildOptions, RollupBuildOptions } from "./types";
-export type { IsolatedDeclarationsTransformer, TransformerFn, TransformerName } from "@visulima/packem-rollup";
+export type { TransformerFn, TransformerName } from "@visulima/packem-rollup";
 export type {
     BuildContext,
     BuildContextBuildAssetAndChunk,

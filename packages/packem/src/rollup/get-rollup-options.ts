@@ -33,7 +33,6 @@ import { debarrelPlugin } from "@visulima/packem-rollup/plugin/debarrel";
 import { importAttributesPlugin } from "@visulima/packem-rollup/plugin/import-attributes";
 import { esmShimCjsSyntaxPlugin } from "@visulima/packem-rollup/plugin/esm-shim-cjs-syntax";
 import { fixDtsDefaultCjsExportsPlugin } from "@visulima/packem-rollup/plugin/fix-dts-default-cjs-exports";
-import { isolatedDeclarationsPlugin } from "@visulima/packem-rollup/plugin/isolated-declarations";
 import { JsonPlugin } from "@visulima/packem-rollup/plugin/json";
 import { jsxRemoveAttributes } from "@visulima/packem-rollup/plugin/jsx-remove-attributes";
 import { licensePlugin } from "@visulima/packem-rollup/plugin/license";
@@ -789,7 +788,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             && cachingPlugin(
                 await rollupCssPlugin(
                     {
-                        dts: Boolean(context.options.declaration) || context.options.isolatedDeclarationTransformer !== undefined,
+                        dts: Boolean(context.options.declaration),
                         sourceMap: context.options.sourcemap,
                         ...context.options.rollup.css,
                     },
@@ -823,11 +822,6 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 ...context.options.rollup.minifyHTMLLiterals,
                 logger: context.logger,
             }),
-
-            context.options.declaration
-            && context.options.rollup.isolatedDeclarations
-            && context.options.isolatedDeclarationTransformer
-            && cachingPlugin(isolatedDeclarationsPlugin<InternalBuildOptions>(join(context.options.rootDir, context.options.sourceDir), context), fileCache),
 
             context.options.rollup.requireCJS
             && context.options.emitESM

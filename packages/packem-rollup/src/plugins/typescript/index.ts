@@ -1,4 +1,3 @@
-export { default as isolatedDeclarationsTypescriptTransformer } from "./isolated-declarations-typescript-transformer";
 export type { PatchTypesOptions } from "./patch-typescript-types";
 export { patchTypescriptTypes } from "./patch-typescript-types";
 export { patchTypescriptTypes as patchTypescriptTypesPlugin } from "./patch-typescript-types";

@@ -7,8 +7,6 @@ export { pureNewExpressionPlugin } from "./plugins/pure-new-expression-plugin";
 export { default as resolveFileUrlPlugin } from "./plugins/resolve-file-url";
 export type {
     ExtendedRollupNodeResolveOptions,
-    IsolatedDeclarationsResult,
-    IsolatedDeclarationsTransformer,
     PackemRollupOptions,
     RollupPlugins,
     TransformerFn,

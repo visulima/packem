@@ -258,10 +258,10 @@ export { index as default };
 `;
 
 exports[`packem externals > should inline types from namespaced optional peer dependencies in DTS output automatically > dts output 1`] = `
-"import * as _svgr_core0 from '@svgr/core';
+"import * as _$_svgr_core0 from '@svgr/core';
 declare const transform: {
-  (code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): Promise<string>;
-  sync(code: string, config?: _svgr_core0.Config, state?: Partial<_svgr_core0.State>): string;
+  (code: string, config?: _$_svgr_core0.Config, state?: Partial<_$_svgr_core0.State>): Promise<string>;
+  sync(code: string, config?: _$_svgr_core0.Config, state?: Partial<_$_svgr_core0.State>): string;
 };
 export { transform };
 "

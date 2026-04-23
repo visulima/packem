@@ -153,7 +153,6 @@ export const defaultMinifyOptions: HTMLOptions = {
     decodeEntities: true,
     minifyCSS: defaultMinifyCSSOptions,
     minifyJS: true,
-    processConditionalComments: true,
     removeAttributeQuotes: false,
     removeComments: true,
     removeEmptyAttributes: true,

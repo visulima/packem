@@ -1,6 +1,6 @@
 import type { Plugin, PluginContext, RenderedChunk } from "rollup";
 
-import fixDtsDefaultCJSExports from "./isolated-declarations/utils/fix-dts-default-cjs-exports";
+import fixDtsDefaultCJSExports from "./fix-dts-default-cjs-exports-util";
 
 export type FixDtsDefaultCjsExportsPluginOptions = {
     /**

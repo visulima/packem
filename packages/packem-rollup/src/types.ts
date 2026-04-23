@@ -18,7 +18,6 @@ import type { DataUriPluginOptions } from "./plugins/data-uri";
 import type { DebarrelPluginOptions } from "./plugins/debarrel";
 import type { EsbuildPluginConfig, Options as EsbuildOptions } from "./plugins/esbuild/types";
 import type { EsmShimCjsSyntaxOptions } from "./plugins/esm-shim-cjs-syntax";
-import type { IsolatedDeclarationsOptions } from "./plugins/isolated-declarations";
 import type { JSXRemoveAttributesPlugin } from "./plugins/jsx-remove-attributes";
 import type { LicenseOptions } from "./plugins/license";
 import type { MinifyHTMLLiteralsOptions } from "./plugins/minify-html-literals";
@@ -75,14 +74,6 @@ export interface ExtendedRollupNodeResolveOptions extends RollupNodeResolveOptio
     unresolvedImportBehavior?: "error" | "warn";
 }
 
-export interface IsolatedDeclarationsResult {
-    errors: string[];
-    map?: string;
-    sourceText: string;
-}
-
-export type IsolatedDeclarationsTransformer = (code: string, id: string, sourceMap?: boolean) => Promise<IsolatedDeclarationsResult>;
-
 export interface PackemRollupOptions {
     alias?: RollupAliasOptions | false;
     babel?: BabelPluginConfig | false;
@@ -97,7 +88,6 @@ export interface PackemRollupOptions {
     experimental?: {
         resolve?: OxcResolveOptions | false;
     };
-    isolatedDeclarations?: IsolatedDeclarationsOptions;
     json?: RollupJsonOptions | false;
     jsxRemoveAttributes?: JSXRemoveAttributesPlugin | false;
     license?: LicenseOptions | false;
