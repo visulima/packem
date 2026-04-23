@@ -1,3 +1,14 @@
+## @visulima/rollup-plugin-css [1.0.0-alpha.31](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.30...@visulima/rollup-plugin-css@1.0.0-alpha.31) (2026-04-23)
+
+### Miscellaneous Chores
+
+* **rollup-plugin-css:** restore isolatedDeclarationTransformer and annotate POSTCSS_EXTENSIONS ([5a0752e](https://github.com/visulima/packem/commit/5a0752ecad1376fe4f693cc00bf4231833842848))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.32
+
 ## @visulima/rollup-plugin-css [1.0.0-alpha.30](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-css@1.0.0-alpha.29...@visulima/rollup-plugin-css@1.0.0-alpha.30) (2026-04-18)
 
 ### Features
