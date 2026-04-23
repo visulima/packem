@@ -143,6 +143,53 @@ export {};
 "
 `;
 
+exports[`declare relative module 1`] = `
+"// main-bar.d.ts
+interface FooBar {
+  foobar: string;
+}
+declare module "./main-bar.js" {
+  interface FooBar {
+    foobar2: string;
+  }
+}
+declare module "./main-bar.js" {
+  interface Bar {
+    bar2: string;
+  }
+}
+interface FooBaz {
+  foobaz: string;
+}
+declare module "./main-foo.js" {
+  interface Foo {
+    foo2: string;
+  }
+}
+interface Bar {
+  bar: string;
+}
+export { Bar, FooBar, FooBaz };
+
+// main-baz/index.d.ts
+declare module "../main-foo.js" {
+  interface Foo {
+    baz: string;
+  }
+}
+interface Baz {
+  baz: string;
+}
+export { Baz };
+
+// main-foo.d.ts
+interface Foo {
+  foo: string;
+}
+export { Foo };
+"
+`;
+
 exports[`decorators 1`] = `
 "// decorator.d.ts
 declare class Product {
@@ -154,54 +201,54 @@ export { Product };
 
 exports[`deterministic namespace import index 1`] = `
 "// a.d.ts
-import * as stub_lib from 'stub_lib';
-type MyTypeA = stub_lib.LibType;
+import * as _$stub_lib from 'stub_lib';
+type MyTypeA = _$stub_lib.LibType;
 export { MyTypeA };
 
 // b.d.ts
-import * as stub_lib from 'stub_lib';
-type MyTypeB = stub_lib.LibType;
+import * as _$stub_lib from 'stub_lib';
+type MyTypeB = _$stub_lib.LibType;
 export { MyTypeB };
 
 // c.d.ts
-import * as stub_lib from 'stub_lib';
-type MyTypeC = stub_lib.LibType;
+import * as _$stub_lib from 'stub_lib';
+type MyTypeC = _$stub_lib.LibType;
 export { MyTypeC };
 "
 `;
 
 exports[`deterministic namespace import index 2`] = `
 "// a.d.ts
-import * as stub_lib from 'stub_lib';
-type MyTypeA = stub_lib.LibType;
+import * as _$stub_lib from 'stub_lib';
+type MyTypeA = _$stub_lib.LibType;
 export { MyTypeA };
 
 // b.d.ts
-import * as stub_lib from 'stub_lib';
-type MyTypeB = stub_lib.LibType;
+import * as _$stub_lib from 'stub_lib';
+type MyTypeB = _$stub_lib.LibType;
 export { MyTypeB };
 
 // c.d.ts
-import * as stub_lib from 'stub_lib';
-type MyTypeC = stub_lib.LibType;
+import * as _$stub_lib from 'stub_lib';
+type MyTypeC = _$stub_lib.LibType;
 export { MyTypeC };
 "
 `;
 
 exports[`deterministic namespace import index 3`] = `
 "// a.d.ts
-import * as stub_lib from 'stub_lib';
-type MyTypeA = stub_lib.LibType;
+import * as _$stub_lib from 'stub_lib';
+type MyTypeA = _$stub_lib.LibType;
 export { MyTypeA };
 
 // b.d.ts
-import * as stub_lib from 'stub_lib';
-type MyTypeB = stub_lib.LibType;
+import * as _$stub_lib from 'stub_lib';
+type MyTypeB = _$stub_lib.LibType;
 export { MyTypeB };
 
 // c.d.ts
-import * as stub_lib from 'stub_lib';
-type MyTypeC = stub_lib.LibType;
+import * as _$stub_lib from 'stub_lib';
+type MyTypeC = _$stub_lib.LibType;
 export { MyTypeC };
 "
 `;

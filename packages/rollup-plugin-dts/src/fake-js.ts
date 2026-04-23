@@ -2,7 +2,7 @@ import path from "node:path";
 
 import { generate } from "@babel/generator";
 import { isIdentifierName } from "@babel/helper-validator-identifier";
-import { parse } from "@babel/parser";
+import { parse, type ParseResult } from "@babel/parser";
 import t from "@babel/types";
 import { isDeclarationType, isIdentifierOf, isTypeOf, resolveString, walkAST } from "ast-kit";
 import type { Plugin, RenderedChunk, TransformPluginContext, TransformResult } from "rollup";
@@ -180,12 +180,22 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
     async function transform(this: TransformPluginContext, code: string, id: string): Promise<TransformResult> {
         const identifierMap: Record<string, number> = Object.create(null);
 
-        const file = parse(code, {
-            createParenthesizedExpressions: true,
-            errorRecovery: true,
-            plugins: [["typescript", { dts: true }], "decoratorAutoAccessors"],
-            sourceType: "module",
-        });
+        let file: ParseResult;
+
+        try {
+            file = parse(code, {
+                createParenthesizedExpressions: true,
+                errorRecovery: true,
+                plugins: [["typescript", { dts: true }], "decoratorAutoAccessors"],
+                sourceType: "module",
+            });
+        } catch (error) {
+            throw new Error(
+                `Failed to parse ${id}. This may be caused by a syntax error in the declaration file or a bug in the plugin. Please report this issue to https://github.com/visulima/packem\n${error}`,
+                { cause: error },
+            );
+        }
+
         const { comments, program } = file;
         const typeOnlyIds: string[] = [];
 
@@ -415,9 +425,19 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 typeOnlyIds.push(...ids);
         }
 
-        const file = parse(code, {
-            sourceType: "module",
-        });
+        let file: ParseResult;
+
+        try {
+            file = parse(code, {
+                sourceType: "module",
+            });
+        } catch (error) {
+            throw new Error(
+                `Failed to parse generated code for chunk ${chunk.fileName}. This may be caused by a bug in the plugin. Please report this issue to https://github.com/visulima/packem\n${error}`,
+                { cause: error },
+            );
+        }
+
         const { program } = file;
 
         program.body = patchTsNamespace(program.body);
@@ -854,7 +874,7 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
         identifierMap: Record<string, number>,
     ): Dep {
         const sourceText = source.value.replaceAll(/\W/g, "_");
-        const localName = isIdentifierName(source.value) ? source.value : `${sourceText}${getIdentifierIndex(identifierMap, sourceText)}`;
+        const localName = `_$${isIdentifierName(source.value) ? source.value : `${sourceText}${getIdentifierIndex(identifierMap, sourceText)}`}`;
         let local: t.Identifier | t.TSQualifiedName = t.identifier(localName);
 
         if (namespaceStmts.has(source.value)) {
