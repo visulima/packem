@@ -176,4 +176,63 @@ describe("packem validation", () => {
             expect(binProcess.stdout).toContain("Total file size exceeds the limit: 93 Bytes / 1.00 Bytes");
         });
     });
+
+    describe("unused dependencies", () => {
+        it("should not flag a dependency imported only via `import type` as unused", async () => {
+            expect.assertions(2);
+
+            // Stand up a fake "type-only" package directly in the fixture's node_modules so
+            // TypeScript can resolve the type import without needing the package linked into
+            // the workspace. The validator only inspects package.json vs observed imports.
+            const typesOnlyRoot = `${temporaryDirectoryPath}/node_modules/fake-type-only`;
+
+            writeFileSync(`${typesOnlyRoot}/package.json`, JSON.stringify({ name: "fake-type-only", types: "./index.d.ts", version: "1.0.0" }));
+            writeFileSync(`${typesOnlyRoot}/index.d.ts`, `export interface Shape { name: string }\n`);
+
+            writeFileSync(
+                `${temporaryDirectoryPath}/src/index.ts`,
+                `import type { Shape } from "fake-type-only";\n\nexport const nameOf = (s: Shape): string => s.name;\n`,
+            );
+
+            await installPackage(temporaryDirectoryPath, "typescript");
+            await createPackageJson(temporaryDirectoryPath, {
+                dependencies: {
+                    "fake-type-only": "*",
+                },
+                devDependencies: {
+                    typescript: "*",
+                },
+                exports: {
+                    ".": {
+                        import: {
+                            default: "./dist/index.mjs",
+                            types: "./dist/index.d.mts",
+                        },
+                        require: {
+                            default: "./dist/index.cjs",
+                            types: "./dist/index.d.cts",
+                        },
+                    },
+                },
+                main: "./dist/index.cjs",
+                module: "./dist/index.mjs",
+                types: "./dist/index.d.ts",
+                typesVersions: {
+                    "*": {
+                        ".": ["./dist/index.d.ts"],
+                    },
+                },
+            });
+            await createTsConfig(temporaryDirectoryPath);
+            await createPackemConfig(temporaryDirectoryPath);
+
+            const binProcess = await execPackem("build", ["--validation"], {
+                cwd: temporaryDirectoryPath,
+                reject: false,
+            });
+
+            expect(binProcess.stdout + binProcess.stderr).not.toContain("These dependencies are listed in package.json but not used");
+            expect(binProcess.exitCode).toBe(0);
+        });
+    });
 });

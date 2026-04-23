@@ -394,6 +394,20 @@ const createOrUpdateEntry = (
 
         if (isDeclarationFile && context.options.declaration !== false) {
             entry.declaration = context.options.declaration;
+
+            // Record the exact declaration extension this entry needs so the DTS build
+            // can emit only what package.json actually references. Without this, a global
+            // `declaration: "compatible"` would over-emit .d.mts for entries whose
+            // exports map only references .d.ts (e.g. environment-specific entries like
+            // browser.types = "./dist/index.browser.d.ts").
+            const declarationExtension = output.file.endsWith(".d.mts")
+                ? "d.mts"
+                : output.file.endsWith(".d.cts")
+                    ? "d.cts"
+                    : "d.ts";
+
+            entry.declarationExtensions ??= new Set();
+            entry.declarationExtensions.add(declarationExtension);
         }
 
         if (isDeclarationFile || isDeclarationOnlyExport) {

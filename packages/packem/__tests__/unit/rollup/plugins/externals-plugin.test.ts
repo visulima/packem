@@ -4,8 +4,8 @@ import type { TsConfigResult } from "@visulima/tsconfig";
 import type { InputOptions, NullValue } from "rollup";
 import { describe, expect, it, vi } from "vitest";
 
-import type { ResolveExternalsPluginOptions } from "../../../../src/rollup/plugins/resolve-externals-plugin";
-import { resolveExternalsPlugin } from "../../../../src/rollup/plugins/resolve-externals-plugin";
+import type { ResolveExternalsPluginOptions } from "../../../../src/rollup/plugins/externals-plugin";
+import { externalsPlugin } from "../../../../src/rollup/plugins/externals-plugin";
 import type { InternalBuildOptions } from "../../../../src/types";
 import { MockPluginContext } from "../../../helpers";
 
@@ -30,7 +30,7 @@ type ExternalRollupInputOptions = InputOptions & {
     external: (source: string, importer: string | undefined, isResolved: boolean) => NullValue | boolean;
 };
 
-describe("resolve-externals-plugin", () => {
+describe("externals-plugin", () => {
     const getMockPluginContext = ({
         buildOptions,
         logger = mockedLogger,
@@ -58,7 +58,8 @@ describe("resolve-externals-plugin", () => {
         tsconfig?: TsConfigResult;
     }) =>
         new MockPluginContext(
-            resolveExternalsPlugin({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            externalsPlugin({
                 externals: [],
                 hoistedDependencies: new Set(),
                 implicitDependencies: new Set(),
@@ -78,7 +79,7 @@ describe("resolve-externals-plugin", () => {
                 pkg: { name: "externals", ...packageJson } as PackageJson,
                 tsconfig,
                 usedDependencies: new Set(),
-            }),
+            } as any),
         );
 
     describe("buildins", () => {
@@ -592,7 +593,7 @@ describe("resolve-externals-plugin", () => {
             const hoistedDependencies = new Set<string>();
             const usedDependencies = new Set<string>();
             const context = new MockPluginContext(
-                resolveExternalsPlugin({
+                externalsPlugin({
                     externals: [],
                     hoistedDependencies,
                     implicitDependencies: new Set(),
@@ -634,7 +635,7 @@ describe("resolve-externals-plugin", () => {
 
             const usedDependencies = new Set<string>();
             const context = new MockPluginContext(
-                resolveExternalsPlugin({
+                externalsPlugin({
                     externals: [],
                     hoistedDependencies: new Set(),
                     implicitDependencies: new Set(),
@@ -667,7 +668,7 @@ describe("resolve-externals-plugin", () => {
 
             const hoistedDependencies = new Set<string>();
             const context = new MockPluginContext(
-                resolveExternalsPlugin({
+                externalsPlugin({
                     externals: [],
                     hoistedDependencies,
                     implicitDependencies: new Set(),
@@ -708,7 +709,7 @@ describe("resolve-externals-plugin", () => {
 
             const hoistedDependencies = new Set<string>();
             const context = new MockPluginContext(
-                resolveExternalsPlugin({
+                externalsPlugin({
                     externals: [],
                     hoistedDependencies,
                     implicitDependencies: new Set(),

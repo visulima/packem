@@ -64,8 +64,7 @@ import { importTrace } from "rollup-plugin-import-trace";
 import { minVersion } from "semver";
 
 import type { InternalBuildOptions } from "../types";
-import { externalizeDependencies } from "./plugins/externalize-dependencies";
-import { resolveExternalsPlugin } from "./plugins/resolve-externals-plugin";
+import { externalsPlugin } from "./plugins/externals-plugin";
 import resolveImplicitExternalsPlugin from "./plugins/resolve-implicit-externals";
 import resolveAliases from "./utils/resolve-aliases";
 
@@ -728,7 +727,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
 
-            externalizeDependencies(context.pkg),
+            externalsPlugin(context),
             resolveTypescriptMjsCtsPlugin(),
 
             context.tsconfig && cachingPlugin(resolveTsconfigRootDirectoriesPlugin(context.options.rootDir, context.logger, context.tsconfig), fileCache),
@@ -740,8 +739,6 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             ),
 
             resolveImplicitExternalsPlugin(context),
-
-            resolveExternalsPlugin(context),
 
             context.options.rollup.replace
             && (() => {
@@ -1122,7 +1119,7 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             cachingPlugin(resolveFileUrlPlugin(), fileCache),
             cachingPlugin(resolveTypescriptMjsCtsPlugin(), fileCache),
 
-            externalizeDependencies(context.pkg, {
+            externalsPlugin(context, {
                 dtsResolve,
                 forTypes: true,
                 skipUnlistedWarnings: true,
@@ -1156,8 +1153,6 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             ),
 
             resolveImplicitExternalsPlugin(context),
-
-            resolveExternalsPlugin(context, { dtsResolve }),
 
             context.options.rollup.replace
             && (() => {
