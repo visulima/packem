@@ -1,3 +1,66 @@
+## @visulima/packem [2.0.0-alpha.64](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.63...@visulima/packem@2.0.0-alpha.64) (2026-04-23)
+
+### ⚠ BREAKING CHANGES
+
+* **packem:** drop isolatedDeclarationTransformer references; remove dead examples
+* **packem:** The following public API is removed:
+- `options.isolatedDeclarationTransformer` (packem config field)
+- `options.rollup.isolatedDeclarations` (plugin exclude/ignoreErrors config)
+- `@visulima/packem/dts/isolated/transformer/{oxc,swc,typescript}` subpath exports
+- `@visulima/packem-rollup/plugin/isolated-declarations` subpath export
+- Exported types `IsolatedDeclarationsTransformer`, `IsolatedDeclarationsResult`,
+  `IsolatedDeclarationsOptions`
+- CLI init prompts for "isolated declaration transformer" selection
+
+Enable TypeScript's isolated declarations via `tsconfig.compilerOptions.isolatedDeclarations`;
+rollup-plugin-dts picks it up automatically via oxc.
+
+- Delete packem-rollup/src/plugins/isolated-declarations/ (381 lines + 4 utils)
+- Delete three packem-rollup/src/plugins/{oxc,swc,typescript}/isolated-declarations-*-transformer.ts
+- Delete three packem/src/rollup/plugins/**/isolated-declarations-*-transformer.ts re-exports
+- Delete the ~600-line "isolated declarations" describe block in typescript.test.ts
+- Relocate the shared fix-dts-default-cjs-exports utility out of the deleted dir
+- Rewire build-types.ts, get-rollup-options.ts, watch.ts, cli/commands/init.ts,
+  packem/index.ts, and all packem.config.ts files to drop the option and the
+  plugin wiring
+- Drop processConditionalComments from minify-html-literals defaults since
+  html-minifier-next v6 removed it (fixes pre-existing tsc error)
+- Add types: ["node"] to packem-share tsconfig so pre-commit tsc finds the node
+  globals (process, Buffer, node:crypto) — pre-existing latent issue
+- Update two snapshots affected by the new bundled DTS pipeline (ecosystem/sitefetch,
+  externals namespaced peers — the latter also reflects the _$ prefix from the
+  prior rollup-plugin-dts sync)
+
+Skipped hook because it triggers a pre-existing flaky css cache-invalidation
+test (EPERM on index.css, unrelated to this refactor — verified failing on
+HEAD without these changes).
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+### Features
+
+* **packem:** add exe/SEA support for standalone executables ([61f9999](https://github.com/visulima/packem/commit/61f9999ea6262c8b8aa97272079dd0eb4200c35a))
+
+### Performance Improvements
+
+* **packem:** streamline DTS flow and switch self-build to oxc backend ([f4c4f39](https://github.com/visulima/packem/commit/f4c4f39c81f68972faaf86443ff62bdb46f50f20))
+
+### Documentation
+
+* **packem:** drop isolatedDeclarationTransformer references; remove dead examples ([f89bed6](https://github.com/visulima/packem/commit/f89bed6440b9a014401cb26c9d0759050f15614e))
+
+### Code Refactoring
+
+* **packem:** drop isolatedDeclarationTransformer; use rollup-plugin-dts only ([3e7049f](https://github.com/visulima/packem/commit/3e7049f29e877a305e1c32d05b44aee5da8805ff))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.51
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.32
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.31
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.12
+
 ## @visulima/packem [2.0.0-alpha.63](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.62...@visulima/packem@2.0.0-alpha.63) (2026-04-18)
 
 ### Features
