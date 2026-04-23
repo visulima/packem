@@ -157,6 +157,7 @@ const createBuildCommand = (cli: Cli<Console>): void => {
                     unbundle: options.unbundle,
                     // validation will take the default values
                     validation: options.validation === false ? false : {},
+                    ...options.exe ? { exe: true } : {},
                     ...options.typedoc
                         ? {
                             typedoc: {
@@ -348,6 +349,11 @@ const createBuildCommand = (cli: Cli<Console>): void => {
             {
                 description: "Enable unbundle mode to preserve source file structure instead of bundling into a single file",
                 name: "unbundle",
+                type: Boolean,
+            },
+            {
+                description: "Bundle the output into a standalone executable via Node.js SEA (requires Node.js >= 25.7.0, single entry)",
+                name: "exe",
                 type: Boolean,
             },
         ],
