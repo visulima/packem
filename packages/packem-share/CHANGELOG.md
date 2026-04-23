@@ -1,3 +1,45 @@
+## @visulima/packem-share [1.0.0-alpha.32](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.31...@visulima/packem-share@1.0.0-alpha.32) (2026-04-23)
+
+### ⚠ BREAKING CHANGES
+
+* **packem:** The following public API is removed:
+- `options.isolatedDeclarationTransformer` (packem config field)
+- `options.rollup.isolatedDeclarations` (plugin exclude/ignoreErrors config)
+- `@visulima/packem/dts/isolated/transformer/{oxc,swc,typescript}` subpath exports
+- `@visulima/packem-rollup/plugin/isolated-declarations` subpath export
+- Exported types `IsolatedDeclarationsTransformer`, `IsolatedDeclarationsResult`,
+  `IsolatedDeclarationsOptions`
+- CLI init prompts for "isolated declaration transformer" selection
+
+Enable TypeScript's isolated declarations via `tsconfig.compilerOptions.isolatedDeclarations`;
+rollup-plugin-dts picks it up automatically via oxc.
+
+- Delete packem-rollup/src/plugins/isolated-declarations/ (381 lines + 4 utils)
+- Delete three packem-rollup/src/plugins/{oxc,swc,typescript}/isolated-declarations-*-transformer.ts
+- Delete three packem/src/rollup/plugins/**/isolated-declarations-*-transformer.ts re-exports
+- Delete the ~600-line "isolated declarations" describe block in typescript.test.ts
+- Relocate the shared fix-dts-default-cjs-exports utility out of the deleted dir
+- Rewire build-types.ts, get-rollup-options.ts, watch.ts, cli/commands/init.ts,
+  packem/index.ts, and all packem.config.ts files to drop the option and the
+  plugin wiring
+- Drop processConditionalComments from minify-html-literals defaults since
+  html-minifier-next v6 removed it (fixes pre-existing tsc error)
+- Add types: ["node"] to packem-share tsconfig so pre-commit tsc finds the node
+  globals (process, Buffer, node:crypto) — pre-existing latent issue
+- Update two snapshots affected by the new bundled DTS pipeline (ecosystem/sitefetch,
+  externals namespaced peers — the latter also reflects the _$ prefix from the
+  prior rollup-plugin-dts sync)
+
+Skipped hook because it triggers a pre-existing flaky css cache-invalidation
+test (EPERM on index.css, unrelated to this refactor — verified failing on
+HEAD without these changes).
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+### Code Refactoring
+
+* **packem:** drop isolatedDeclarationTransformer; use rollup-plugin-dts only ([3e7049f](https://github.com/visulima/packem/commit/3e7049f29e877a305e1c32d05b44aee5da8805ff))
+
 ## @visulima/packem-share [1.0.0-alpha.31](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.30...@visulima/packem-share@1.0.0-alpha.31) (2026-04-18)
 
 ## @visulima/packem-share [1.0.0-alpha.30](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.29...@visulima/packem-share@1.0.0-alpha.30) (2026-04-16)
