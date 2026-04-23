@@ -26,6 +26,9 @@ export default defineConfig({
         "oxc-resolver",
     ],
     rollup: {
+        dts: {
+            oxc: true,
+        },
         license: {
             path: "./LICENSE.md",
         },

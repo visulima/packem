@@ -9,7 +9,7 @@ const createOrUpdateKeyStorage = (hashKey: string, storePath: string, logger: Pa
         const keyStorePath = join(storePath, "keystore.json");
 
         if (shouldUpdate && isAccessibleSync(keyStorePath)) {
-            keyStore = readJsonSync(keyStorePath);
+            keyStore = readJsonSync(keyStorePath) as Record<string, string>;
         }
 
         if (keyStore[hashKey] === undefined) {
