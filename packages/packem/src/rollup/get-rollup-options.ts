@@ -56,7 +56,7 @@ import {
 import type { BuildContext, FileCache } from "@visulima/packem-share";
 import { arrayify, memoizeByKey } from "@visulima/packem-share";
 import { getChunkFilename, getDtsExtension, getEntryFileNames, getOutputExtension, sortUserPlugins } from "@visulima/packem-share/utils";
-import { join, relative, resolve } from "@visulima/path";
+import { relative, resolve } from "@visulima/path";
 import { cssModulesTypesPlugin, rollupCssPlugin } from "@visulima/rollup-plugin-css";
 import type { TsConfigResult } from "@visulima/tsconfig";
 import type { OutputOptions, Plugin, PreRenderedAsset, PreRenderedChunk, RollupLog, RollupOptions } from "rollup";
@@ -300,6 +300,20 @@ const getTransformerConfig = (
     throw new Error(`A Unknown transformer was provided`);
 };
 
+const createNodeResolver = (context: BuildContext<InternalBuildOptions>): Plugin | undefined => {
+    if (context.options.rollup.resolve && context.options.experimental?.oxcResolve !== true) {
+        return nodeResolvePlugin({
+            ...context.options.rollup.resolve,
+        });
+    }
+
+    if (context.options.experimental?.oxcResolve && context.options.rollup.experimental?.resolve) {
+        return oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, context.logger, context.tsconfig?.path);
+    }
+
+    return undefined;
+};
+
 const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalBuildOptions>): boolean => {
     // If the circular dependency warning is from node_modules, ignore it
     if (warning.code === "CIRCULAR_DEPENDENCY" && /Circular dependency:[\s\S]*node_modules/.test(warning.message)) {
@@ -414,16 +428,7 @@ const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "b
 // eslint-disable-next-line import/exports-last
 export const getRollupOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
-
-    let nodeResolver;
-
-    if (context.options.rollup.resolve && context.options.experimental?.oxcResolve !== true) {
-        nodeResolver = nodeResolvePlugin({
-            ...context.options.rollup.resolve,
-        });
-    } else if (context.options.experimental?.oxcResolve && context.options.rollup.experimental?.resolve) {
-        nodeResolver = oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, context.logger, context.tsconfig?.path);
-    }
+    const nodeResolver = createNodeResolver(context);
 
     const chunking
         = context.options.unbundle || context.options.rollup.output?.preserveModules
@@ -1009,7 +1014,7 @@ const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): boolean
 
 const createDtsPlugin = async (
     context: BuildContext<InternalBuildOptions>,
-    dtsResolve?: boolean | (string | RegExp)[],
+    dtsResolve: boolean | (string | RegExp)[],
 ): Promise<Plugin[]> => {
     const { dts } = await import("@visulima/rollup-plugin-dts");
 
@@ -1022,6 +1027,7 @@ const createDtsPlugin = async (
             ...userDtsOptions.compilerOptions,
             incremental: undefined,
             inlineSources: undefined,
+            lib: undefined,
             sourceMap: undefined,
             tsBuildInfoFile: undefined,
         },
@@ -1032,7 +1038,7 @@ const createDtsPlugin = async (
         emitDtsOnly: true,
         // Use pre-computed resolve that auto-includes optional peer/optional deps.
         // This overrides any userDtsOptions.resolve from the spread above.
-        resolve: dtsResolve ?? false,
+        resolve: dtsResolve,
         tsconfig: context.tsconfig?.path,
     }) as unknown as Plugin[];
 };
@@ -1043,20 +1049,8 @@ const memoizeDtsPluginByKey = memoizeByKey<typeof createDtsPlugin>(createDtsPlug
 
 export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
-    const compilerOptions = context.tsconfig?.config.compilerOptions;
     const dtsResolve = computeDtsResolve(context);
-
-    delete compilerOptions?.lib;
-
-    let nodeResolver;
-
-    if (context.options.rollup.resolve && context.options.experimental?.oxcResolve !== true) {
-        nodeResolver = nodeResolvePlugin({
-            ...context.options.rollup.resolve,
-        });
-    } else if (context.options.experimental?.oxcResolve && context.options.rollup.experimental?.resolve) {
-        nodeResolver = oxcResolvePlugin(context.options.rollup.experimental.resolve, context.options.rootDir, context.logger, context.tsconfig?.path);
-    }
+    const nodeResolver = createNodeResolver(context);
 
     // Each process should be unique
     // Each package build should be unique
@@ -1127,14 +1121,17 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
                 skipUnlistedWarnings: true,
             }),
 
-            context.options.rollup.json
-            && JsonPlugin({
-                ...context.options.rollup.json,
-            }),
+            // JSON handling is delegated to @visulima/rollup-plugin-dts: its transform returns
+            // "{}" for JSON files and its load hook patches the generated .d.ts with the correct
+            // exports shape (see generate.ts). Running @rollup/plugin-json here would duplicate
+            // work that gets discarded in emitDtsOnly mode.
 
+            // Prevent rollup from loading non-source files (e.g. raw data, images, styles)
+            // imported from TS during the DTS build — the DTS plugin short-circuits everything
+            // through its transform hook, but load runs first and needs a stub for other ids.
             <Plugin>{
                 load(id) {
-                    if (!/\.(?:js|cjs|mjs|jsx|ts|tsx|ctsx|mtsx|mts|json)$/.test(id)) {
+                    if (!/\.(?:[cm]?jsx?|[cm]?tsx?|json)$/.test(id)) {
                         return "";
                     }
 

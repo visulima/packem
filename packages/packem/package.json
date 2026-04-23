@@ -211,7 +211,7 @@
         "jiti": "catalog:script",
         "magic-string": "catalog:utils",
         "mlly": "catalog:prod",
-        "oxc-transform": ">=0.20.0",
+        "oxc-transform": "0.127.0",
         "picomatch": "catalog:prod",
         "rollup": "catalog:build",
         "rollup-plugin-import-trace": "catalog:build",
@@ -332,7 +332,6 @@
         "icss-utils": ">=5.1.0",
         "less": ">=4.2.0",
         "lightningcss": ">=1.27.0",
-        "oxc-transform": ">=0.20.0",
         "package-manager-detector": "catalog:peer",
         "postcss": ">=8.4.47",
         "postcss-load-config": ">=6.0.1",
@@ -384,9 +383,6 @@
             "optional": true
         },
         "lightningcss": {
-            "optional": true
-        },
-        "oxc-transform": {
             "optional": true
         },
         "postcss": {
