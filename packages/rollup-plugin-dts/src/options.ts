@@ -1,8 +1,11 @@
+import { existsSync } from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import process from "node:process";
 
 import type { TsConfigJson, TsConfigJsonResolved } from "@visulima/tsconfig";
 import { findTsConfigSync, readTsConfig } from "@visulima/tsconfig";
+import ts from "typescript";
 import type { IsolatedDeclarationsOptions } from "oxc-transform";
 import type { AddonFunction } from "rollup";
 
@@ -251,6 +254,87 @@ export type OptionsResolved = Overwrite<
 
 let warnedTsgo = false;
 
+type RawTsconfig = {
+    compilerOptions?: {
+        incremental?: boolean;
+        tsBuildInfoFile?: string;
+        [key: string]: unknown;
+    };
+    extends?: string | string[];
+    [key: string]: unknown;
+};
+
+// Detects *explicit* user intent to persist build info to disk by reading raw
+// tsconfig JSON (via `ts.readConfigFile`, which skips TypeScript's compiler-option
+// normalization — unlike `@visulima/tsconfig.readTsConfig`, which auto-adds
+// `incremental: true` when `composite: true` is set). Walks the `extends` chain
+// and checks each layer for a user-authored `incremental` / `tsBuildInfoFile`.
+//
+// Returns `true` iff any layer explicitly sets `compilerOptions.incremental === true`
+// OR a `compilerOptions.tsBuildInfoFile` string. `incremental: false` anywhere in
+// the chain wins over later `true` values from extensions (user explicit opt-out).
+const hasExplicitIncrementalInTsconfig = (tsconfigPath: string, seen = new Set<string>()): boolean => {
+    if (seen.has(tsconfigPath)) {
+        return false;
+    }
+
+    seen.add(tsconfigPath);
+
+    const result = ts.readConfigFile(tsconfigPath, (p) => (existsSync(p) ? ts.sys.readFile(p) : undefined));
+
+    if (result.error || !result.config) {
+        return false;
+    }
+
+    const config = result.config as RawTsconfig;
+    const compilerOptions = config.compilerOptions;
+
+    if (compilerOptions) {
+        // Explicit opt-out wins anywhere in the chain.
+        if (compilerOptions.incremental === false) {
+            return false;
+        }
+
+        if (compilerOptions.incremental === true || typeof compilerOptions.tsBuildInfoFile === "string") {
+            return true;
+        }
+    }
+
+    if (!config.extends) {
+        return false;
+    }
+
+    const extendsList = Array.isArray(config.extends) ? config.extends : [config.extends];
+    const baseDir = path.dirname(tsconfigPath);
+
+    for (const extend of extendsList) {
+        if (typeof extend !== "string") {
+            continue;
+        }
+
+        let extendedPath: string | undefined;
+
+        if (extend.startsWith(".")) {
+            extendedPath = path.resolve(baseDir, extend.endsWith(".json") ? extend : `${extend}.json`);
+        } else {
+            // Resolve bare specifiers (e.g. `@tsconfig/node20/tsconfig.json`) via
+            // node's resolver, scoped to the importing tsconfig's directory.
+            // Failures are ignored; the chain is best-effort.
+            try {
+                extendedPath = createRequire(path.join(baseDir, "package.json")).resolve(extend);
+            } catch {
+                extendedPath = undefined;
+            }
+        }
+
+        if (extendedPath && hasExplicitIncrementalInTsconfig(extendedPath, seen)) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
 export const resolveOptions = ({
     banner,
     // tsc
@@ -299,12 +383,30 @@ export const resolveOptions = ({
         tsconfig = undefined;
     }
 
+    // Capture user's plugin-level compilerOptions BEFORE merging with the resolved
+    // tsconfig — needed below to honor explicit incremental opt-in via the plugin
+    // option without confusing it with the `composite ??= incremental` auto-fill.
+    const pluginCompilerOptions = compilerOptions;
+
     compilerOptions = {
         ...resolvedTsconfig?.compilerOptions,
         ...compilerOptions,
     };
 
-    incremental ||= compilerOptions.incremental || !!compilerOptions.tsBuildInfoFile;
+    // Disk-writing incremental mode is opt-in. Trigger only on signals that reflect
+    // *user intent*, not parser-normalized defaults:
+    //   1. The plugin's own `compilerOptions.incremental` / `tsBuildInfoFile`
+    //      (explicitly passed to dts()).
+    //   2. An explicit `incremental: true` / `tsBuildInfoFile` in the tsconfig
+    //      file's raw JSON (or any of its `extends` ancestors).
+    //
+    // We can't trust the merged `compilerOptions.incremental` because both
+    // TypeScript's parser and `@visulima/tsconfig` auto-add `incremental: true`
+    // whenever `composite: true` is set, which would otherwise force every
+    // composite project into disk mode and leave `.tsbuildinfo` files behind.
+    incremental ||= pluginCompilerOptions.incremental === true
+        || typeof pluginCompilerOptions.tsBuildInfoFile === "string"
+        || (typeof tsconfig === "string" && hasExplicitIncrementalInTsconfig(tsconfig));
     sourcemap ??= !!compilerOptions.declarationMap;
     compilerOptions.declarationMap = sourcemap;
 
