@@ -15,7 +15,6 @@ export type PackemConfigProperties = {
     cssLoader?: ("less" | "lightningcss" | "postcss" | "sass" | "sourcemap" | "stylus" | "tailwindcss")[];
     cssOptions?: StyleOptions | string | undefined;
     experimental?: Record<string, boolean>;
-    isolatedDeclarationTransformer?: "oxc" | "swc" | "typescript" | undefined;
     minimizer?: "cssnano" | "lightningcss" | undefined;
     plugins?: {
         code: string;
@@ -36,7 +35,6 @@ export const createPackemConfig = async (
         cssLoader = [],
         cssOptions = undefined,
         experimental = {},
-        isolatedDeclarationTransformer = undefined,
         minimizer = undefined,
         plugins = [],
         preset = undefined,
@@ -117,14 +115,13 @@ export const createPackemConfig = async (
         join(fixturePath, "packem.config.ts"),
         `import { defineConfig } from "${distributionPath}/config";
 import transformer from "${distributionPath}/rollup/plugins/${transformer}/${transformer === "swc" ? "swc-plugin" : transformer === "oxc" ? "oxc-transformer" : "index"}";
-${isolatedDeclarationTransformer ? `import isolatedDeclarationTransformer from "${distributionPath}/rollup/plugins/${isolatedDeclarationTransformer}/isolated-declarations-${isolatedDeclarationTransformer}-transformer";` : ""}
 ${cssLoader.map((loader) => `import ${loader}Loader from "${distributionPath}/rollup/plugins/css/loaders/${loader}";`).join("\n")}
 ${minimizer ? `import ${minimizer} from "${distributionPath}/rollup/plugins/css/minifiers/${minimizer}";` : ""}${pluginImports.join("\n")}
 // eslint-disable-next-line import/no-unused-modules
 export default defineConfig({
     runtime: "${runtime}",
     experimental: ${JSON.stringify(experimental, undefined, 4)},
-    transformer,${isolatedDeclarationTransformer ? `\n    isolatedDeclarationTransformer,` : ""}${config as string}${rollupConfig}
+    transformer,${config as string}${rollupConfig}
 });
 `,
         {

@@ -674,26 +674,7 @@ export default defineConfig({
 
 ### Isolated declaration types (in TypeScript 5.5)
 
-> Generating .d.ts files with the default `rollup-plugin-dts` is slow because the TypeScript compiler must perform costly type inference, but these files streamline type checking by removing unnecessary details, and while shipping raw TypeScript files could simplify workflows, it is impractical due to ecosystem assumptions and performance trade-offs, which isolated declarations aim to address.
-
-You need to choose of the supported transformer to use isolated declaration types.
-
-- [oxc](https://github.com/oxc-project/oxc)
-- [@swc/core](https://github.com/swc-project/swc)
-- [typescript](https://github.com/microsoft/TypeScript)
-
-Default is `typescript`.
-
-```ts
-import { defineConfig } from "@visulima/packem/config";
-import isolatedDeclarationTransformer from "@visulima/packem/dts/isolated/transformer/typescript";
-import transformer from "@visulima/packem/transformer/esbuild";
-
-export default defineConfig({
-    isolatedDeclarationTransformer,
-    transformer,
-});
-```
+Declaration generation runs on top of [`@visulima/rollup-plugin-dts`](../rollup-plugin-dts). Enable TypeScript's isolated declarations feature in your `tsconfig.json` (`"isolatedDeclarations": true`) and packem will use oxc's `isolatedDeclarationSync` to emit `.d.ts` files without running full type inference — no extra config required.
 
 <!-- Modified copy of https://github.com/Anidetrix/rollup-plugin-styles/blob/main/README.md -->
 

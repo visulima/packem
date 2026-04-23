@@ -15,15 +15,12 @@ const ecosystemSuites = readdirSync(ecosystemPath, { withFileTypes: true })
 
 const ecosystemConfigs = {
     "advanced-tailwind": {
-        // isolatedDeclarationTransformer: "typescript",
         config: { declaration: false },
         cssLoader: ["tailwindcss"] as "tailwindcss"[],
         runtime: "browser" as const,
         transformer: "esbuild" as const,
     },
-    sitefetch: {
-        isolatedDeclarationTransformer: "typescript",
-    },
+    sitefetch: {},
 };
 
 describe("packem ecosystem", () => {
@@ -73,7 +70,6 @@ describe("packem ecosystem", () => {
             experimental: {
                 oxcResolve: true,
             },
-            isolatedDeclarationTransformer: "typescript",
             transformer: "esbuild",
         });
 

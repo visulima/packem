@@ -11,15 +11,6 @@ import { getRollupDtsOptions } from "./get-rollup-options";
 const DTS_CACHE_KEY = "rollup-dts.json";
 
 const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, subDirectory: string): Promise<void> => {
-    if (context.options.declaration && context.options.rollup.isolatedDeclarations && context.options.isolatedDeclarationTransformer) {
-        context.logger.info({
-            message: "Using isolated declaration transformer to generate declaration files...",
-            prefix: "dts",
-        });
-
-        return;
-    }
-
     const rollupTypeOptions = await getRollupDtsOptions(context, fileCache);
 
     await context.hooks.callHook("rollup:dts:options", context, rollupTypeOptions);

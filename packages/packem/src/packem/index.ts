@@ -260,11 +260,6 @@ const generateOptions = (
                     ],
                 },
             },
-            // https://github.com/microsoft/TypeScript/issues/58944
-            isolatedDeclarations: {
-                exclude: EXCLUDE_REGEXP,
-                ignoreErrors: false,
-            },
             json: {
                 preferConst: false,
             },

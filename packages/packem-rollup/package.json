@@ -93,10 +93,6 @@
             "types": "./dist/plugins/fix-dts-default-cjs-exports.d.ts",
             "default": "./dist/plugins/fix-dts-default-cjs-exports.js"
         },
-        "./plugin/isolated-declarations": {
-            "types": "./dist/plugins/isolated-declarations/index.d.ts",
-            "default": "./dist/plugins/isolated-declarations/index.js"
-        },
         "./plugin/jsx-remove-attributes": {
             "types": "./dist/plugins/jsx-remove-attributes.d.ts",
             "default": "./dist/plugins/jsx-remove-attributes.js"

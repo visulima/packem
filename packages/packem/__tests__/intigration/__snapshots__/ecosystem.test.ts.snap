@@ -31,13 +31,11 @@ export { Container as default };
 >>>>>>> 2a43db81e (fix: resolve test failures in packem-rollup and ecosystem tests)
 exports[`packem ecosystem > should work with provided 'sitefetch' ecosystem suite 1`] = `
 [
-  "export {};
-",
   "#!/usr/bin/env node
 import path from 'node:path';
 import fs from 'node:fs';
 import { encode } from 'gpt-tokenizer/model/gpt-4o';
-import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-BBsHEs5N.js';
+import { l as logger, f as fetchSite, a as formatNumber, s as serializePages, e as ensureArray } from './packem_shared/index-iyOkp14B.js';
 
 function toArr(any) {
   return any == null ? [] : Array.isArray(any) ? any : [any];
@@ -1295,7 +1293,6 @@ class PQueue extends EventEmitter {
       ...options
     };
     return new Promise((resolve, reject) => {
-<<<<<<< HEAD
       this.#queue.enqueue(async () => {
         this.#pending++;
         this.#intervalCount++;
@@ -2111,6 +2108,7 @@ async function fetchSite(url, options) {
   const fetcher = new Fetcher(options);
   return fetcher.fetchSite(url);
 }
+<<<<<<< HEAD
 __name(fetchSite, "fetchSite");
   #pages = /* @__PURE__ */ new Map();
   #fetched = /* @__PURE__ */ new Set();

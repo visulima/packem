@@ -1,7 +1,7 @@
 import { cwd } from "node:process";
 
 import { installPackage } from "@antfu/install-pkg";
-import { cancel, confirm, intro, log, multiselect, outro, select, spinner } from "@clack/prompts";
+import { confirm, intro, log, multiselect, outro, select, spinner } from "@clack/prompts";
 import type { Cli } from "@visulima/cerebro";
 import { isAccessibleSync, writeFileSync, writeJsonSync } from "@visulima/fs";
 import { parsePackageJson } from "@visulima/package/package-json";
@@ -141,60 +141,6 @@ const createInitCommand = (cli: Cli<Console>): void => {
                 log.message(`Transformer ${options.transformer} is already installed.`);
             }
 
-            if (options.isolatedDeclarationTransformer === undefined) {
-                options.isolatedDeclarationTransformer = (await confirm({
-                    message: "Do you want to use an isolated declaration types?",
-                    initialValue: false,
-                })) as boolean;
-            }
-
-            if (options.isolatedDeclarationTransformer === undefined) {
-                options.isolatedDeclarationTransformer = await select({
-                    message: "Pick a isolated declaration transformer",
-                    options: [
-                        { label: "Typescript", value: "typescript" as any },
-                        { label: "swc", value: "swc" as any },
-                        { label: "OXC", value: "oxc" as any },
-                        { label: "None", value: undefined },
-                    ],
-                });
-
-                if (options.isolatedDeclarationTransformer !== undefined) {
-                    let packageName: string | undefined;
-
-                    switch (options.isolatedDeclarationTransformer) {
-                        case "oxc": {
-                            packageName = "oxc-transform";
-
-                            break;
-                        }
-                        case "swc": {
-                            packageName = "@swc/core";
-
-                            break;
-                        }
-                        case "typescript": {
-                            packageName = "typescript";
-
-                            break;
-                        }
-                        default: {
-                            cancel("Invalid isolated declaration transformer");
-                        }
-                    }
-
-                    if (packageName !== undefined && !packages.includes(packageName as string)) {
-                        const shouldInstall = await confirm({
-                            message: `Do you want to install ${packageName}?`,
-                        });
-
-                        if (shouldInstall) {
-                            packagesToInstall.push(packageName);
-                        }
-                    }
-                }
-            }
-
             if (options.css === undefined) {
                 options.css = (await confirm({
                     message: "Do you want to use css in your project?",
@@ -301,10 +247,6 @@ const createInitCommand = (cli: Cli<Console>): void => {
             let template = "";
             let packemConfig = "";
 
-            if (options.isolatedDeclarationTransformer) {
-                packemConfig += ",\n    isolatedDeclarationTransformer";
-            }
-
             if (options.css || options.cssMinifier) {
                 packemConfig += ",\n    rollup: {\n        css: {";
             }
@@ -335,10 +277,6 @@ const createInitCommand = (cli: Cli<Console>): void => {
             if (hasTypescript || packageJson.type === "module") {
                 let imports = "";
 
-                if (options.isolatedDeclarationTransformer) {
-                    imports += `import isolatedDeclarationTransformer from "@visulima/packem/dts/isolated/transformer/${options.isolatedDeclarationTransformer as string}";\n`;
-                }
-
                 if (options.css) {
                     for (let loader of cssLoaders) {
                         if (loader === "sass-embedded" || loader === "node-sass") {
@@ -363,10 +301,6 @@ export default defineConfig({
 `;
             } else {
                 let imports = "";
-
-                if (options.isolatedDeclarationTransformer) {
-                    imports += `const isolatedDeclarationTransformer = require("@visulima/packem/dts/isolated/transformer/${options.isolatedDeclarationTransformer as string}");\n`;
-                }
 
                 if (options.css) {
                     for (let loader of cssLoaders) {
@@ -429,17 +363,6 @@ module.exports = defineConfig({
                     }
 
                     throw new Error("Invalid transformer, please choose one of 'swc', 'sucrase' or 'esbuild'");
-                },
-            },
-            {
-                description: "Choose a isolated declaration transformer",
-                name: "isolated-declaration-transformer",
-                type: (value: unknown) => {
-                    if (typeof value === "string" && ["none", "oxc", "swc", "typescript"].includes(value)) {
-                        return value;
-                    }
-
-                    throw new Error("Invalid isolated declaration isolated declaration, please choose one of 'none', 'oxc', 'swc' or 'typescript'");
                 },
             },
             {
