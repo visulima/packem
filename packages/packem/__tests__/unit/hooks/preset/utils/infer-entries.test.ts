@@ -291,6 +291,7 @@ describe(inferEntries, () => {
                 {
                     cjs: true,
                     declaration: true,
+                    declarationExtensions: new Set<string>(["d.ts"]),
                     environment: "development",
                     esm: true,
                     exportKey: new Set<string>(),
@@ -321,6 +322,7 @@ describe(inferEntries, () => {
                 {
                     cjs: true,
                     declaration: true,
+                    declarationExtensions: new Set<string>(["d.ts"]),
                     environment: "development",
                     esm: true,
                     exportKey: new Set<string>(),
@@ -364,6 +366,7 @@ describe(inferEntries, () => {
                 {
                     cjs: true,
                     declaration: true,
+                    declarationExtensions: new Set<string>(["d.mts", "d.cts"]),
                     environment: "development",
                     esm: true,
                     exportKey: new Set<string>(["import", "require"]),
@@ -405,6 +408,7 @@ describe(inferEntries, () => {
                 {
                     cjs: true,
                     declaration: true,
+                    declarationExtensions: new Set<string>(["d.mts", "d.cts"]),
                     environment: "development",
                     esm: true,
                     exportKey: new Set<string>(["import", "require"]),
@@ -442,6 +446,7 @@ describe(inferEntries, () => {
                 {
                     cjs: true,
                     declaration: true,
+                    declarationExtensions: new Set<string>(["d.mts", "d.cts"]),
                     environment: "development",
                     esm: true,
                     exportKey: new Set<string>(["test"]),
@@ -473,6 +478,7 @@ describe(inferEntries, () => {
             entries: [
                 {
                     declaration: true,
+                    declarationExtensions: new Set<string>(["d.ts"]),
                     environment: "development",
                     exportKey: new Set<string>(["test"]),
                     fileAlias: undefined,
@@ -562,6 +568,7 @@ describe(inferEntries, () => {
             entries: [
                 {
                     declaration: true,
+                    declarationExtensions: new Set<string>(["d.ts"]),
                     environment: "development",
                     exportKey: new Set<string>(["types"]),
                     fileAlias: undefined,
@@ -964,6 +971,7 @@ describe(inferEntries, () => {
                 {
                     cjs: true,
                     declaration: true,
+                    declarationExtensions: new Set<string>(["d.mts", "d.cts"]),
                     environment: "development",
                     exportKey: new Set<string>(["import", "require"]),
                     fileAlias: undefined,
@@ -972,6 +980,7 @@ describe(inferEntries, () => {
                 },
                 {
                     declaration: true,
+                    declarationExtensions: new Set<string>(["d.mts", "d.cts"]),
                     environment: "development",
                     esm: true,
                     exportKey: new Set<string>(["import", "require"]),
@@ -1465,6 +1474,7 @@ describe(inferEntries, () => {
                     declaration: true,
                     declarationCjs: true,
                     declarationEsm: true,
+                    declarationExtensions: new Set<string>(["d.ts"]),
                     environment: "development",
                     exportKey: new Set<string>(["types/*"]),
                     fileAlias: undefined,

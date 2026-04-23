@@ -11,7 +11,7 @@ import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
 import type { ExeOptions } from "./exe";
 import type { Node10CompatibilityOptions } from "./packem/node10-compatibility";
-import type { ResolveExternalsPluginOptions } from "./rollup/plugins/resolve-externals-plugin";
+import type { ResolveExternalsPluginOptions } from "./rollup/plugins/externals-plugin";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -83,6 +83,14 @@ export type BuildEntry = {
     declaration?: boolean | "compatible" | "node16";
     /** Whether to generate .d.cts declaration file without triggering CJS JS build */
     declarationCjs?: boolean;
+    /**
+     * Set of declaration file extensions package.json's exports map references for
+     * this entry (e.g. `{ "d.mts", "d.cts" }`). Derived by infer-entries from the
+     * actual type file paths in exports; used by the DTS build to emit exactly the
+     * files package.json consumers will resolve. Takes precedence over the global
+     * `emitCJS`/`emitESM` + `declaration` flags when present.
+     */
+    declarationExtensions?: Set<"d.cts" | "d.mts" | "d.ts">;
     /** Whether to generate .d.mts declaration file without triggering ESM JS build */
     declarationEsm?: boolean;
     /** Build environment for this entry */

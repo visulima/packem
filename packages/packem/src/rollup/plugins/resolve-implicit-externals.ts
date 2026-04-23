@@ -83,7 +83,7 @@ const findPackageJson = async (startDirectory: string, packageName: string): Pro
 /**
  * Resolve implicit extensions for externalized package imports.
  *
- * This plugin runs BEFORE resolveExternalsPlugin to check if externalized
+ * This plugin runs BEFORE the externals plugin to check if externalized
  * imports need explicit extensions added for Node.js compatibility.
  *
  * For packages without `exports`, Node.js doesn't support extensionless imports:

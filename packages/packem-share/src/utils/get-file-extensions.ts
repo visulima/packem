@@ -122,22 +122,13 @@ export const getDtsExtension = <T extends FileExtensionOptions>(context: BuildCo
         return FORMAT_EXTENSIONS.traditionalDts[format];
     }
 
-    // DTS extensions decouple from the JS-centric isCompatible flag: a dual-format package
-    // is split into per-entry build contexts (see build.ts createAdjustedContext) where
-    // emitCJS or emitESM is flipped to false. The package.json still references
-    // .d.mts/.d.cts, so the ESM-only context must still emit .d.mts. declaration
-    // === "compatible" (set in infer-entries when a package is dual-format) is the signal
-    // that traditional extensions are expected regardless of the per-context emit flags.
-    // "node16" (default for genuinely single-format packages) keeps the .d.ts fallthrough.
-    const { declaration, node10Compatibility } = context.options;
-    const compatibleDts = (declaration === "compatible" || declaration === true) && node10Compatibility !== false;
-
-    if (compatibleDts || strategy.isCompatible || strategy.isDualFormat) {
-        return FORMAT_EXTENSIONS.traditionalDts[format];
+    if (strategy.isSingleFormat && !strategy.isCompatible) {
+        return "d.ts";
     }
 
-    if (strategy.isSingleFormat) {
-        return "d.ts";
+    // Use traditional extensions if compatible declaration mode or dual format
+    if (strategy.isCompatible || strategy.isDualFormat) {
+        return FORMAT_EXTENSIONS.traditionalDts[format];
     }
 
     // Default to .d.ts for single format builds
