@@ -382,6 +382,20 @@ it("declare module", async () => {
     expect(snapshot).toMatchSnapshot();
 });
 
+it("declare relative module", async () => {
+    const fixture = path.resolve(dirname, "fixtures/declare-relative-module");
+    const { snapshot } = await rolldownBuild(
+        {
+            "main-bar": path.resolve(fixture, "bar.ts"),
+            "main-baz/index": path.resolve(fixture, "baz/index.ts"),
+            "main-foo": path.resolve(fixture, "foo.ts"),
+        },
+        [dts({ emitDtsOnly: true })],
+    );
+
+    expect(snapshot).toMatchSnapshot();
+});
+
 // https://github.com/sxzz/rolldown-plugin-dts/issues/209
 it("function overloads", async () => {
     const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/function-overloads.ts"), [dts({ emitDtsOnly: true })]);
@@ -559,8 +573,8 @@ it("deterministic namespace import index", async () => {
 
     expect(results[0]).toBe(results[1]);
     expect(results[1]).toBe(results[2]);
-    expect(results[0]).toMatch(/import \* as stub_lib from ['"]stub_lib['"]/u);
-    expect(results[0]).not.toContain("stub_lib0");
+    expect(results[0]).toMatch(/import \* as _\$stub_lib from ['"]stub_lib['"]/u);
+    expect(results[0]).not.toContain("_$stub_lib0");
 });
 
 it("decorators", async () => {
