@@ -1,3 +1,17 @@
+## @visulima/packem [2.0.0-alpha.66](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.65...@visulima/packem@2.0.0-alpha.66) (2026-04-23)
+
+### Bug Fixes
+
+* **packem-share:** emit .d.mts/.d.cts for split dual-format contexts ([eecc05f](https://github.com/visulima/packem/commit/eecc05f65e727ad2fdf4bc9cd454144334d7ae3c))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.53
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.34
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.33
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.14
+
 ## @visulima/packem [2.0.0-alpha.65](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.64...@visulima/packem@2.0.0-alpha.65) (2026-04-23)
 
 
