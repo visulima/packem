@@ -519,6 +519,14 @@ export const externalsPlugin = (context: BuildContext<InternalBuildOptions>, opt
                     );
                 }
 
+                // DTS build fallback: an unclassified bare specifier imported from inside
+                // `node_modules` (i.e. a transitive dep of a package we're inlining) must
+                // not be routed through `node-resolve` — types-only transitive deps would
+                // crash on the missing JS entry. Let the consumer resolve these themselves.
+                if (options?.forTypes && importer && isFromNodeModules(importer, cwd)) {
+                    return { external: true, id, moduleSideEffects: false };
+                }
+
                 return undefined;
             },
             order: "pre",
