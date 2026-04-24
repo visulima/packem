@@ -1,3 +1,5 @@
+## @visulima/packem-share [1.0.0-alpha.43](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.42...@visulima/packem-share@1.0.0-alpha.43) (2026-04-24)
+
 ## @visulima/packem-share [1.0.0-alpha.42](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.41...@visulima/packem-share@1.0.0-alpha.42) (2026-04-24)
 
 ## @visulima/packem-share [1.0.0-alpha.41](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.40...@visulima/packem-share@1.0.0-alpha.41) (2026-04-24)
