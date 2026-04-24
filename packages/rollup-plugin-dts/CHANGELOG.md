@@ -1,3 +1,9 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.16](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.15...@visulima/rollup-plugin-dts@1.0.0-alpha.16) (2026-04-24)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** inline bundled-package types in emitted .d.ts ([ce4c00d](https://github.com/visulima/packem/commit/ce4c00d24ebf14b25c799dc51f3b5f8939a9fae3))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.15](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.14...@visulima/rollup-plugin-dts@1.0.0-alpha.15) (2026-04-24)
 
 ### Bug Fixes
