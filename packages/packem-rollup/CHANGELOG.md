@@ -1,3 +1,16 @@
+## @visulima/packem-rollup [1.0.0-alpha.54](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.53...@visulima/packem-rollup@1.0.0-alpha.54) (2026-04-24)
+
+### Miscellaneous Chores
+
+* **packem-rollup:** drop orphan isolated-declarations tests ([bc0ec35](https://github.com/visulima/packem/commit/bc0ec35e3664ea2a2700c8772f089932c888120f))
+* refresh test snapshots for environment drift ([0a2e9a6](https://github.com/visulima/packem/commit/0a2e9a654937f4b91b79644561d2fb680b08f198))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.35
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.15
+
 ## @visulima/packem-rollup [1.0.0-alpha.53](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.52...@visulima/packem-rollup@1.0.0-alpha.53) (2026-04-23)
 
 
