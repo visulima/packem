@@ -1,3 +1,17 @@
+## @visulima/packem [2.0.0-alpha.74](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.73...@visulima/packem@2.0.0-alpha.74) (2026-04-24)
+
+### Bug Fixes
+
+* **packem:** externalize transitive bare specifiers from workspace-sibling .d.ts ([b9e9fb9](https://github.com/visulima/packem/commit/b9e9fb942a7db26d2a0df14117be0fef6cb89fe8))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.61
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.42
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.41
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.22
+
 ## @visulima/packem [2.0.0-alpha.73](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.72...@visulima/packem@2.0.0-alpha.73) (2026-04-24)
 
 ### Bug Fixes
