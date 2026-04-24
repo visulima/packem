@@ -1,3 +1,9 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.24](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.23...@visulima/rollup-plugin-dts@1.0.0-alpha.24) (2026-04-24)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** map cached `.d.ts` entries back to all source extensions ([5d8f670](https://github.com/visulima/packem/commit/5d8f670954806c6111eb90cff42e0faeef59dea1))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.23](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.22...@visulima/rollup-plugin-dts@1.0.0-alpha.23) (2026-04-24)
 
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.22](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.21...@visulima/rollup-plugin-dts@1.0.0-alpha.22) (2026-04-24)
