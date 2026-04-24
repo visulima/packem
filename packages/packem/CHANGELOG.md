@@ -1,3 +1,17 @@
+## @visulima/packem [2.0.0-alpha.71](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.70...@visulima/packem@2.0.0-alpha.71) (2026-04-24)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** sibling .d.ts fallback for string-form exports ([2a26b69](https://github.com/visulima/packem/commit/2a26b69b322375061cdcd55a14c72301085606ef))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.58
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.39
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.38
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.19
+
 ## @visulima/packem [2.0.0-alpha.70](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.69...@visulima/packem@2.0.0-alpha.70) (2026-04-24)
 
 ### Bug Fixes
