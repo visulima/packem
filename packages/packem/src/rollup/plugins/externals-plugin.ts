@@ -10,7 +10,7 @@ import { isNodeBuiltin, parseNodeModulePath } from "mlly";
 import type { InputOptions, Plugin, ResolveIdResult } from "rollup";
 
 import type { InternalBuildOptions } from "../../types";
-import { isBareSpecifier, isFromNodeModules, parseSpecifier } from "../../utils/import-specifier.js";
+import { isBareSpecifier, isFromNodeModules, isOutsideProject, parseSpecifier } from "../../utils/import-specifier.js";
 import resolveAliases from "../utils/resolve-aliases";
 
 type MaybeFalsy<T> = T | false | null | undefined;
@@ -519,11 +519,18 @@ export const externalsPlugin = (context: BuildContext<InternalBuildOptions>, opt
                     );
                 }
 
-                // DTS build fallback: an unclassified bare specifier imported from inside
-                // `node_modules` (i.e. a transitive dep of a package we're inlining) must
-                // not be routed through `node-resolve` — types-only transitive deps would
-                // crash on the missing JS entry. Let the consumer resolve these themselves.
-                if (options?.forTypes && importer && isFromNodeModules(importer, cwd)) {
+                // DTS build fallback: unclassified bare specifier imported from a file
+                // that is NOT part of this project's source — i.e. a transitive dep of
+                // a package we're inlining (pnpm workspace sibling's `dist/`, npm install
+                // under `node_modules/`, …). Route it to external instead of node-resolve,
+                // which would crash for types-only transitive deps with no JS entry in
+                // `exports` (e.g. `type-fest`, `tagged-tag`). Two signals:
+                //   • traditional `node_modules/` path (isFromNodeModules), or
+                //   • importer outside `cwd` entirely (pnpm workspace dep resolved via
+                //     symlink follows the realpath out of the project; from cerebro, pail's
+                //     `dist/*.d.ts` is at `../../error-debugging/pail/dist/...` — no
+                //     `node_modules` segment, but not this project's source either).
+                if (options?.forTypes && importer && isOutsideProject(importer, cwd)) {
                     return { external: true, id, moduleSideEffects: false };
                 }
 

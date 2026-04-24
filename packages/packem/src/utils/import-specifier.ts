@@ -52,3 +52,24 @@ export const isFromNodeModules = (filePath: string, cwd: string = process.cwd())
 
     return pathSegments.includes("node_modules");
 };
+
+/**
+ * Check if a file path is outside this project (i.e. third-party).
+ *
+ * Returns true for both traditional `node_modules/` paths and for files that
+ * escape `cwd` — pnpm workspace siblings resolve via symlinks to their real
+ * path (e.g. `../../other-pkg/dist/index.d.ts`), which isn't under
+ * `node_modules/` but isn't this project's source either.
+ * @param filePath Absolute file path to check
+ * @param cwd Current working directory (defaults to process.cwd())
+ * @returns true if the path escapes the project tree or sits inside node_modules
+ */
+export const isOutsideProject = (filePath: string, cwd: string = process.cwd()): boolean => {
+    const relativePath = relative(cwd, filePath);
+
+    if (relativePath.startsWith("..")) {
+        return true;
+    }
+
+    return relativePath.split("/").includes("node_modules");
+};
