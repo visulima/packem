@@ -959,6 +959,12 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
  * - `optionalDependencies` — consumers may not install these
  * - Peer dependencies marked as optional in `peerDependenciesMeta` — consumers
  *   only install the ones they need (e.g. multi-framework libraries like unplugin)
+ * - `devDependencies` that the JS build actually bundled — the JS build inlines
+ *   devDeps by default (`resolveExternals.devDeps: false`), so the emitted .d.ts
+ *   must follow suit. Without this, value-and-type re-exports like
+ *   `export { type X, default as y } from "some-devdep"` stay external in the
+ *   .d.ts while the .js inlines `y` into the bundle, leaving consumers' builds
+ *   to chase transitive specifiers that aren't runtime deps of the package.
  *
  * The user can extend or override via `rollup.dts.resolve`:
  * - `false` → disable auto-resolution, keep all deps external in .d.ts
@@ -988,6 +994,19 @@ const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): boolean
     if (context.pkg.peerDependenciesMeta) {
         for (const [name, meta] of Object.entries(context.pkg.peerDependenciesMeta)) {
             if (meta && typeof meta === "object" && "optional" in meta && meta.optional && name in peerDeps) {
+                autoResolve.push(name);
+            }
+        }
+    }
+
+    // Include devDeps the JS build bundled. usedDependencies is populated by the
+    // externals plugin during the JS build (which runs before DTS), so we only
+    // inline devDeps that actually appeared in the bundled JS — skipping the
+    // long tail of build-time-only devDeps (typescript, eslint, type-fest used
+    // purely as local casts, …) that would otherwise bloat the emitted .d.ts.
+    if (context.options.rollup.resolveExternals?.devDeps !== true) {
+        for (const name of Object.keys(context.pkg.devDependencies ?? {})) {
+            if (context.usedDependencies.has(name)) {
                 autoResolve.push(name);
             }
         }

@@ -2497,7 +2497,7 @@ export { config as default };
 
     // This test is connected to the caching of the @rollup/plugin-node-resolve
     it("should bundle deeks package", async () => {
-        expect.assertions(6);
+        expect.assertions(9);
 
         await writeFile(
             `${temporaryDirectoryPath}/src/index.ts`,
@@ -2528,13 +2528,17 @@ export { deepKeys, deepKeysFromList } from "deeks";`,
 
         const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
 
-        expect(dMtsContent).toBe(`export { DeeksOptions as DeepKeysOptions, deepKeys, deepKeysFromList } from 'deeks';
-`);
+        // deeks is a devDep the JS build bundles, so packem auto-inlines its types into
+        // the emitted .d.ts (matching the JS bundling decision — see computeDtsResolve).
+        // Consumers shouldn't need `deeks` in their own node_modules to type-check.
+        expect(dMtsContent).toMatch(/^interface DeeksOptions\b/m);
+        expect(dMtsContent).toMatch(/declare function deepKeys\b/);
+        expect(dMtsContent).toMatch(/declare function deepKeysFromList\b/);
+        expect(dMtsContent).not.toMatch(/from ["']deeks["']/);
 
         const dTsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
-        expect(dTsContent).toBe(`export { DeeksOptions as DeepKeysOptions, deepKeys, deepKeysFromList } from 'deeks';
-`);
+        expect(dTsContent).toBe(dMtsContent);
 
         const ctsContent = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
 
@@ -2791,5 +2795,161 @@ throw new Error('line 9');
         // Stack trace should reference line 9, not line 1 (which would happen if sourcemaps were missing from the TS transform step)
         expect(stderr).toMatch(/index\.ts:9/);
         expect(stderr).not.toMatch(/index\.ts:1[^0-9]/);
+    });
+
+    it("should inline a devDep's types in .d.ts when the JS build bundles the devDep", async () => {
+        expect.assertions(4);
+
+        // Reproduces the @visulima/string vs @visulima/tabular interaction: packem bundles
+        // devDeps in the JS build by default, but historically the DTS build kept them
+        // external — so `export { type X, default as y } from "some-devdep"` produced a .js
+        // that inlines `y` from packem_shared/ while the paired .d.ts still points at
+        // "some-devdep". Consumers then pull the transitive specifier into their own build
+        // and get "Inlined implicit external" / "shamefully hoisted" warnings for packages
+        // that are not runtime deps of the package they imported from.
+        const devDepRoot = `${temporaryDirectoryPath}/node_modules/fake-bundled-devdep`;
+
+        await writeFile(
+            `${devDepRoot}/package.json`,
+            // `types` must be listed before `default` — Node.js exports resolution picks the
+            // first matching condition in object order, so if default comes first we'd get
+            // `./index.js` back even when asking for the types condition.
+            JSON.stringify({
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
+                main: "./index.js",
+                name: "fake-bundled-devdep",
+                types: "./index.d.ts",
+                version: "1.0.0",
+            }),
+        );
+        await writeFile(`${devDepRoot}/index.js`, "export default function work(value) { return value; }\n");
+        await writeFile(
+            `${devDepRoot}/index.d.ts`,
+            "export interface WorkOptions { verbose?: boolean }\ndeclare function work(value: string): string;\nexport default work;\n",
+        );
+
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            'export { type WorkOptions, default as work } from "fake-bundled-devdep";\n',
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "fake-bundled-devdep": "*",
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
+                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: { "*": { ".": ["./dist/index.d.ts"] } },
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        // The devDep's types must be inlined — no bare specifier left in the emitted .d.ts.
+        expect(dMtsContent).not.toContain('from "fake-bundled-devdep"');
+        expect(dMtsContent).not.toContain("from 'fake-bundled-devdep'");
+        // The re-exported symbols should still be present (inlined, not dropped).
+        expect(dMtsContent).toMatch(/WorkOptions/);
+    });
+
+    it("should keep unused devDep types external in .d.ts (build-time-only devDeps are not auto-inlined)", async () => {
+        expect.assertions(3);
+
+        // Counterpart to the test above: devDeps that the JS build never bundles
+        // (because src never imports them) must not be auto-inlined. If they were,
+        // build-time-only devDeps like typescript/eslint/type-fest used for local
+        // casts would leak into every emitted .d.ts. We only inline devDeps that
+        // show up in `context.usedDependencies` — i.e. the JS build actually reached
+        // them — to match the JS build's bundling decisions.
+        const usedDepRoot = `${temporaryDirectoryPath}/node_modules/fake-used-devdep`;
+
+        await writeFile(
+            `${usedDepRoot}/package.json`,
+            JSON.stringify({
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
+                main: "./index.js",
+                name: "fake-used-devdep",
+                types: "./index.d.ts",
+                version: "1.0.0",
+            }),
+        );
+        await writeFile(`${usedDepRoot}/index.js`, "export default function used(value) { return value; }\n");
+        await writeFile(
+            `${usedDepRoot}/index.d.ts`,
+            "export interface UsedOptions { verbose?: boolean }\ndeclare function used(value: string): string;\nexport default used;\n",
+        );
+
+        // Declared but never imported anywhere — simulates the "long tail" of
+        // build-time-only devDeps (typescript, eslint, type-fest used only for casts …).
+        const unusedDepRoot = `${temporaryDirectoryPath}/node_modules/fake-unused-devdep`;
+
+        await writeFile(
+            `${unusedDepRoot}/package.json`,
+            JSON.stringify({
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
+                main: "./index.js",
+                name: "fake-unused-devdep",
+                types: "./index.d.ts",
+                version: "1.0.0",
+            }),
+        );
+        await writeFile(`${unusedDepRoot}/index.js`, "export default function unused(value) { return value; }\n");
+        await writeFile(
+            `${unusedDepRoot}/index.d.ts`,
+            "export interface UnusedOptions { verbose?: boolean }\ndeclare function unused(value: string): string;\nexport default unused;\n",
+        );
+
+        // src only uses fake-used-devdep; fake-unused-devdep is declared but never imported.
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            'export { type UsedOptions, default as used } from "fake-used-devdep";\n',
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "fake-unused-devdep": "*",
+                "fake-used-devdep": "*",
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
+                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: { "*": { ".": ["./dist/index.d.ts"] } },
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        // fake-used-devdep is bundled by JS → its types are inlined in .d.mts.
+        expect(dMtsContent).not.toMatch(/from ["']fake-used-devdep["']/);
+        // fake-unused-devdep is declared but never imported → never ends up in the auto-inline list.
+        // This guards against regressions where we'd iterate pkg.devDependencies unconditionally.
+        expect(dMtsContent).not.toMatch(/fake-unused-devdep/);
     });
 });
