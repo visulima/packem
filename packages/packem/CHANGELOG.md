@@ -1,3 +1,17 @@
+## @visulima/packem [2.0.0-alpha.70](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.69...@visulima/packem@2.0.0-alpha.70) (2026-04-24)
+
+### Bug Fixes
+
+* **packem:** stale dtsResolve cache + transitive bare-specifier crash ([f45c262](https://github.com/visulima/packem/commit/f45c262e24db950d1ae6eda99a9a885ee872fe55))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.57
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.38
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.37
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.18
+
 ## @visulima/packem [2.0.0-alpha.69](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.68...@visulima/packem@2.0.0-alpha.69) (2026-04-24)
 
 ### Bug Fixes
