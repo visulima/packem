@@ -3313,6 +3313,86 @@ throw new Error('line 9');
         expect(dMtsContent).toMatch(/\bWorkOptions\b/);
     });
 
+    it("should externalize transitive bare specifiers when bundling a workspace sibling's .d.ts (realpath outside cwd)", async () => {
+        expect.assertions(3);
+
+        // Repro for the cerebro → @visulima/pail → type-fest crash: pnpm symlinks a
+        // workspace dep's `node_modules/@org/pkg` to its real path elsewhere in the
+        // repo (e.g. `../../other-pkg/dist`). Rollup follows the realpath, so the
+        // importer isn't under `cwd/node_modules/` — it escapes cwd with `..`. The
+        // original `isFromNodeModules` check missed that shape; the `isOutsideProject`
+        // check now covers both node_modules and workspace-sibling realpaths.
+        //
+        // We simulate the realpath by creating a SIBLING directory next to the
+        // fixture cwd and pointing the import there via an absolute path baked
+        // into the consumer's source.
+        const sharedPackageDir = `${temporaryDirectoryPath}-workspace-sibling/fake-workspace-dep/dist`;
+
+        await writeFile(
+            `${sharedPackageDir}/index.d.ts`,
+            [
+                // Transitive bare specifier from inside the workspace sibling's dist.
+                "import type { Helper } from \"fake-workspace-transitive\";",
+                "export interface WorkOptions { verbose?: boolean; helper?: Helper }",
+                "export declare function work(value: string): string;",
+                "",
+            ].join("\n"),
+        );
+        await writeFile(`${sharedPackageDir}/index.js`, "export function work(v) { return v; }\n");
+        await writeFile(
+            `${sharedPackageDir}/../package.json`,
+            JSON.stringify({
+                exports: { ".": { types: "./dist/index.d.ts", default: "./dist/index.js" } },
+                main: "./dist/index.js",
+                name: "fake-workspace-dep",
+                types: "./dist/index.d.ts",
+                version: "1.0.0",
+            }),
+        );
+
+        // Install the workspace dep into the fixture's node_modules as a symlink
+        // pointing to the sibling real directory — exactly what pnpm does.
+        // Seed an anchor file so the node_modules directory exists before symlinking.
+        await writeFile(`${temporaryDirectoryPath}/node_modules/.anchor`, "");
+        symlinkSync(`${temporaryDirectoryPath}-workspace-sibling/fake-workspace-dep`, `${temporaryDirectoryPath}/node_modules/fake-workspace-dep`);
+
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            'export { type WorkOptions, work } from "fake-workspace-dep";\n',
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "fake-workspace-dep": "*",
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
+                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: { "*": { ".": ["./dist/index.d.ts"] } },
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        // Transitive bare specifier stays external even though the importer escapes cwd.
+        expect(dMtsContent).toMatch(/from ["']fake-workspace-transitive["']/);
+        // The workspace dep's types are inlined.
+        expect(dMtsContent).toMatch(/\bWorkOptions\b/);
+    });
+
     it("should emit a single export for TS declaration-merging patterns (function+namespace, interface+const)", async () => {
         expect.assertions(6);
 
