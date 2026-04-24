@@ -1,3 +1,15 @@
+## @visulima/packem-rollup [1.0.0-alpha.60](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.59...@visulima/packem-rollup@1.0.0-alpha.60) (2026-04-24)
+
+### Bug Fixes
+
+* forward resolveId options + silence DTS-only circular warnings ([eaf1798](https://github.com/visulima/packem/commit/eaf1798e711bbf1ee0aeb50a20a8aa018c4526ac))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.41
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.21
+
 ## @visulima/packem-rollup [1.0.0-alpha.59](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.58...@visulima/packem-rollup@1.0.0-alpha.59) (2026-04-24)
 
 
