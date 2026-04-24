@@ -1083,8 +1083,14 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
     // Each process should be unique
     // Each package build should be unique
     // Composing above factors into a unique cache key to retrieve the memoized dts plugin with tsconfigs
-
-    const uniqueProcessId = `dts-plugin:${process.pid}${(context.tsconfig as TsConfigResult).path}` as string;
+    //
+    // Include `dtsResolve` in the key: sibling builds (e.g. browser + node runtimes) share
+    // the same process.pid + tsconfig path but can see different `usedDependencies` snapshots
+    // when `computeDtsResolve` runs. Without this, the first build's stale list is cached and
+    // re-used for later builds, which breaks direct-bypass inlining for devDeps that only
+    // showed up after the first build finished.
+    const resolveKey = typeof dtsResolve === "boolean" ? String(dtsResolve) : dtsResolve.map((p) => (p instanceof RegExp ? p.source : p)).sort().join(",");
+    const uniqueProcessId = `dts-plugin:${process.pid}${(context.tsconfig as TsConfigResult).path}:${resolveKey}` as string;
 
     const [prePlugins, normalPlugins, postPlugins] = sortUserPlugins(context.options.rollup.plugins, "dts");
 

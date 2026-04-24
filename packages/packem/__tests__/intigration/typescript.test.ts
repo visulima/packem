@@ -3082,7 +3082,10 @@ throw new Error('line 9');
             types: "./dist/index.d.ts",
             typesVersions: { "*": { ".": ["./dist/index.d.ts"] } },
         });
-        await createPackemConfig(temporaryDirectoryPath);
+        // `dts.oxc: true` mirrors the real-world config that triggered the regression
+        // (e.g. @visulima/inspector) — `type-fest`-style types-only packages must not
+        // be routed through the JS node-resolve path in either resolver mode.
+        await createPackemConfig(temporaryDirectoryPath, { config: { rollup: { dts: { oxc: true } } } });
 
         const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
 
@@ -3095,6 +3098,150 @@ throw new Error('line 9');
         expect(dMtsContent).toMatch(/from ["']fake-types-only["']/);
         // Used type chain survives.
         expect(dMtsContent).toMatch(/\bColor\b/);
+    });
+
+    it("should pass the correct dtsResolve list to each build when usedDependencies changes mid-run", async () => {
+        expect.assertions(3);
+
+        // Repro for the memoization bug: `createDtsPlugin` was cached by
+        // `${process.pid}:${tsconfigPath}` alone. Sibling DTS builds in the same
+        // process (e.g. inspector's browser+node runtimes) share the same key but
+        // can see different `usedDependencies` snapshots when `computeDtsResolve`
+        // runs — the first build's stale list was re-used, so direct-bypass never
+        // fired for devDeps the JS build discovered later.
+        //
+        // Emitting dual CJS+ESM is enough to trip the original cache (two DTS
+        // outputs, same tsconfig) — the fix hashes `dtsResolve` into the key.
+        const devDepRoot = `${temporaryDirectoryPath}/node_modules/fake-dual-dep`;
+
+        await writeFile(
+            `${devDepRoot}/package.json`,
+            JSON.stringify({
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
+                main: "./index.js",
+                name: "fake-dual-dep",
+                types: "./index.d.ts",
+                version: "1.0.0",
+            }),
+        );
+        await writeFile(`${devDepRoot}/index.js`, "export function sign(v) { return v; }\n");
+        await writeFile(
+            `${devDepRoot}/index.d.ts`,
+            "export interface DualOptions { verbose?: boolean }\nexport declare function sign(value: string): string;\n",
+        );
+
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            'export { type DualOptions, sign } from "fake-dual-dep";\n',
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "fake-dual-dep": "*",
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
+                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: { "*": { ".": ["./dist/index.d.ts"] } },
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        // Both DTS outputs must inline the devDep's types — if the cached plugin
+        // carried a stale (empty) resolve list for the second build, the second
+        // output would keep the bare specifier.
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+        const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        expect(dMtsContent).not.toMatch(/from ["']fake-dual-dep["']/);
+        expect(dCtsContent).not.toMatch(/from ["']fake-dual-dep["']/);
+    });
+
+    it("should externalize transitive bare specifiers when bundling a node_modules .d.ts", async () => {
+        expect.assertions(3);
+
+        // Repro for the type-fest → tagged-tag crash: when the DTS build inlines
+        // a package's types and that package's `.d.ts` pulls in its OWN transitive
+        // imports (often types-only themselves), those specifiers must be
+        // externalized — we can't route them through node-resolve because the
+        // transitive package may not be installed at the consumer or may have no
+        // JS entry in its exports. The importer-is-in-node_modules check is what
+        // flags these cases.
+        const bundledRoot = `${temporaryDirectoryPath}/node_modules/fake-bundled-with-transitive`;
+
+        await writeFile(
+            `${bundledRoot}/package.json`,
+            JSON.stringify({
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
+                main: "./index.js",
+                name: "fake-bundled-with-transitive",
+                types: "./index.d.ts",
+                version: "1.0.0",
+            }),
+        );
+        await writeFile(`${bundledRoot}/index.js`, "export function work(v) { return v; }\n");
+        await writeFile(
+            `${bundledRoot}/index.d.ts`,
+            // Transitive bare specifier from INSIDE the package's own .d.ts —
+            // mimics type-fest re-exporting `tagged-tag`'s symbols.
+            [
+                "import type { SomeHelper } from \"fake-transitive-helper\";",
+                "export interface WorkOptions { verbose?: boolean; helper?: SomeHelper }",
+                "export declare function work(value: string): string;",
+                "",
+            ].join("\n"),
+        );
+
+        // Note: fake-transitive-helper is NOT installed — if packem ran node-resolve
+        // on it, the build would crash. It must be silently externalized.
+
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            'export { type WorkOptions, work } from "fake-bundled-with-transitive";\n',
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "fake-bundled-with-transitive": "*",
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
+                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: { "*": { ".": ["./dist/index.d.ts"] } },
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        // Transitive bare specifier stays external in the emitted .d.ts.
+        expect(dMtsContent).toMatch(/from ["']fake-transitive-helper["']/);
+        // The package itself is inlined (WorkOptions present).
+        expect(dMtsContent).toMatch(/\bWorkOptions\b/);
     });
 
     it("should emit a single export for TS declaration-merging patterns (function+namespace, interface+const)", async () => {
