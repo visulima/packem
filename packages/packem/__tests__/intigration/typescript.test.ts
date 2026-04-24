@@ -3169,6 +3169,75 @@ throw new Error('line 9');
         expect(dCtsContent).not.toMatch(/from ["']fake-dual-dep["']/);
     });
 
+    it("should inline types for a bundled devDep whose package.json has `exports: \"./index.js\"` (no types condition)", async () => {
+        expect.assertions(3);
+
+        // Repro for @visulima/string's `indent-string`/`redent`/`strip-indent`
+        // interaction with @visulima/tabular: old-style sindresorhus packages
+        // ship ESM with just `exports: "./index.js"` (a string, no types
+        // condition) + a sibling `index.d.ts`. The JS build happily inlines
+        // them, but oxc-resolver's DTS pass (conditions [types, typings,
+        // import, require]) falls through to the .js file because the exports
+        // string doesn't go through conditional resolution — leaving the
+        // emitted .d.ts to import the bare specifier, which then triggers
+        // "shamefully hoisted" warnings at downstream consumers.
+        const devDepRoot = `${temporaryDirectoryPath}/node_modules/fake-exports-string`;
+
+        await writeFile(
+            `${devDepRoot}/package.json`,
+            // Exact shape of the sindresorhus packages: string exports, no types
+            // condition, sibling `index.d.ts` by convention.
+            JSON.stringify({
+                exports: "./index.js",
+                main: "./index.js",
+                name: "fake-exports-string",
+                type: "module",
+                version: "1.0.0",
+            }),
+        );
+        await writeFile(`${devDepRoot}/index.js`, "export default function work(value) { return value; }\n");
+        await writeFile(
+            `${devDepRoot}/index.d.ts`,
+            "export interface WorkOptions { verbose?: boolean }\ndeclare function work(value: string): string;\nexport default work;\n",
+        );
+
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            'export { type WorkOptions, default as work } from "fake-exports-string";\n',
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "fake-exports-string": "*",
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
+                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: { "*": { ".": ["./dist/index.d.ts"] } },
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        // Sibling .d.ts types inlined — no bare specifier in the emitted .d.ts.
+        expect(dMtsContent).not.toMatch(/from ["']fake-exports-string["']/);
+        // Inlined symbols survive.
+        expect(dMtsContent).toMatch(/\bWorkOptions\b/);
+    });
+
     it("should externalize transitive bare specifiers when bundling a node_modules .d.ts", async () => {
         expect.assertions(3);
 

@@ -3,7 +3,9 @@ import path from "node:path";
 import { ResolverFactory } from "oxc-resolver";
 import type { Plugin, ResolvedId } from "rollup";
 
-import { filename_to_dts, RE_CSS, RE_DTS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename";
+import { existsSync, readFileSync } from "node:fs";
+
+import { filename_js_to_dts, filename_to_dts, RE_CSS, RE_DTS, RE_JS, RE_JSON, RE_NODE_MODULES, RE_TS, RE_VUE } from "./filename";
 import type { OptionsResolved } from "./options";
 
 const isSourceFile = (id: string) => RE_TS.test(id) || RE_VUE.test(id) || RE_JSON.test(id);
@@ -182,6 +184,28 @@ const createDtsResolvePlugin = ({
             dtsPath = path.normalize(dtsPath);
         }
 
+        // Packages that ship ESM with `exports: "./index.js"` (a string form, no
+        // types condition) and a sibling `index.d.ts` — e.g. `indent-string@5`,
+        // `redent`, `strip-indent`: oxc-resolver falls through to the .js file
+        // because string-form `exports` doesn't go through conditional resolution.
+        // The JS build inlines these, so the emitted .d.ts must too. Try the
+        // sibling `.d.ts` before giving up.
+        //
+        // Narrow this to string-form `exports` specifically: packages with
+        // object-form `exports` that omit a `types` condition (e.g. they only list
+        // `import`/`require` or `default`) are typically larger libraries that
+        // bring their own transitive concerns — pulling their `.d.ts` into the
+        // bundle can drag in node-subpath imports (`#utils`) that downstream
+        // consumers would not have resolvable. Users who want those inlined can
+        // pass an explicit `resolve: [...]` list.
+        if (dtsPath && RE_JS.test(dtsPath) && hasStringExports(dtsPath)) {
+            const siblingDts = filename_js_to_dts(dtsPath);
+
+            if (existsSync(siblingDts)) {
+                return siblingDts;
+            }
+        }
+
         if (!dtsPath || !isSourceFile(dtsPath)) {
             if (rollupResolution && isFilePath(rollupResolution.id) && isSourceFile(rollupResolution.id) && !rollupResolution.external) {
                 return rollupResolution.id;
@@ -195,5 +219,45 @@ const createDtsResolvePlugin = ({
 };
 
 const isFilePath = (id: string) => id.startsWith(".") || path.isAbsolute(id);
+
+// Walk up from a resolved JS path to the owning `package.json` and return true
+// if its `exports` field is a string (shorthand). Used to narrow the sibling-
+// `.d.ts` fallback to packages that genuinely lack conditional type resolution.
+const stringExportsCache = new Map<string, boolean>();
+const hasStringExports = (resolvedJsPath: string): boolean => {
+    let directory = path.dirname(resolvedJsPath);
+
+    while (true) {
+        const pkgPath = path.join(directory, "package.json");
+
+        if (stringExportsCache.has(pkgPath)) {
+            return stringExportsCache.get(pkgPath)!;
+        }
+
+        if (existsSync(pkgPath)) {
+            let result = false;
+
+            try {
+                const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as { exports?: unknown };
+
+                result = typeof pkg.exports === "string";
+            } catch {
+                result = false;
+            }
+
+            stringExportsCache.set(pkgPath, result);
+
+            return result;
+        }
+
+        const parent = path.dirname(directory);
+
+        if (parent === directory) {
+            return false;
+        }
+
+        directory = parent;
+    }
+};
 
 export default createDtsResolvePlugin;
