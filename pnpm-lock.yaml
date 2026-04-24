@@ -1664,10 +1664,10 @@ importers:
         specifier: catalog:visulima
         version: 5.0.0-alpha.11(ini@6.0.0)(jsonc-parser@3.3.1)(smol-toml@1.6.1)
       '@visulima/packem-rollup':
-        specifier: 1.0.0-alpha.55
+        specifier: 1.0.0-alpha.56
         version: link:../packem-rollup
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.36
+        specifier: 1.0.0-alpha.37
         version: link:../packem-share
       '@visulima/pail':
         specifier: catalog:visulima
@@ -1676,10 +1676,10 @@ importers:
         specifier: catalog:visulima
         version: 3.0.0-alpha.10
       '@visulima/rollup-plugin-css':
-        specifier: 1.0.0-alpha.35
+        specifier: 1.0.0-alpha.36
         version: link:../rollup-plugin-css
       '@visulima/rollup-plugin-dts':
-        specifier: 1.0.0-alpha.16
+        specifier: 1.0.0-alpha.17
         version: link:../rollup-plugin-dts
       '@visulima/tabular':
         specifier: catalog:visulima
@@ -2073,13 +2073,13 @@ importers:
         specifier: catalog:visulima
         version: 5.0.0-alpha.11(ini@6.0.0)(jsonc-parser@3.3.1)(smol-toml@1.6.1)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.36
+        specifier: 1.0.0-alpha.37
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
         version: 3.0.0-alpha.10
       '@visulima/rollup-plugin-dts':
-        specifier: 1.0.0-alpha.16
+        specifier: 1.0.0-alpha.17
         version: link:../rollup-plugin-dts
       '@visulima/source-map':
         specifier: catalog:visulima
@@ -2458,7 +2458,7 @@ importers:
         specifier: catalog:visulima
         version: 5.0.0-alpha.11(ini@6.0.0)(jsonc-parser@3.3.1)(smol-toml@1.6.1)
       '@visulima/packem-share':
-        specifier: 1.0.0-alpha.36
+        specifier: 1.0.0-alpha.37
         version: link:../packem-share
       '@visulima/path':
         specifier: catalog:visulima
