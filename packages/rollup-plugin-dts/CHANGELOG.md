@@ -1,3 +1,9 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.20](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.19...@visulima/rollup-plugin-dts@1.0.0-alpha.20) (2026-04-24)
+
+### Code Refactoring
+
+* **rollup-plugin-dts:** improve sibling-dts fallback helper ([1df7353](https://github.com/visulima/packem/commit/1df735325914ced9ab7e2b73d6980e3243a43838))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.19](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.18...@visulima/rollup-plugin-dts@1.0.0-alpha.19) (2026-04-24)
 
 ### Bug Fixes
