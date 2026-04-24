@@ -367,6 +367,19 @@ export const externalsPlugin = (context: BuildContext<InternalBuildOptions>, opt
                         return false;
                     }
 
+                    // A declared dependency (deps / peerDeps / optDeps / user externals)
+                    // must win over any tsconfig `paths` entry. Consumers sometimes use a
+                    // catch-all `"*": ["./*"]` paths mapping for TS type-checking fallback
+                    // — without this ordering, every bare specifier including declared
+                    // peerDeps (e.g. `vite`) would match the catch-all and skip
+                    // externalization, letting rollup load the peer's source through the
+                    // commonjs plugin and into esbuild, which blows up on vite 8's chunks.
+                    if (isIncluded(candidate) && !isExcluded(candidate)) {
+                        cacheResolved.set(rawOriginalId, true);
+
+                        return true;
+                    }
+
                     if (tsconfigPathPatterns.some((rx) => rx.test(candidate))) {
                         cacheResolved.set(rawOriginalId, false);
 
@@ -379,12 +392,6 @@ export const externalsPlugin = (context: BuildContext<InternalBuildOptions>, opt
                         cacheResolved.set(rawOriginalId, false);
 
                         return false;
-                    }
-
-                    if (isIncluded(candidate) && !isExcluded(candidate)) {
-                        cacheResolved.set(rawOriginalId, true);
-
-                        return true;
                     }
                 }
 
