@@ -293,12 +293,14 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 decl.leadingComments = stmt.leadingComments;
             }
 
-            // Handle function overloads: merge into existing declaration
-            if (
-                decl.type === "TSDeclareFunction"
-                && bindings.length === 1
-                && bindingToDeclarationId.has(bindings[0].name)
-            ) {
+            // Handle TypeScript declaration merging: a later declaration with the
+            // same bound name (function overloads, function+namespace, class+namespace,
+            // interface+const, interface+interface, ...) is attached to the primary as
+            // an "overload" so we emit only one `export { X }` at the fake-JS level —
+            // rollup's assertUniqueExportName rejects two exports of the same local name.
+            // Both declaration bodies are still rendered in renderChunk, and TypeScript's
+            // local declaration-merging rules reunite them via the single final export.
+            if (bindings.length === 1 && bindingToDeclarationId.has(bindings[0].name)) {
                 const existingId = bindingToDeclarationId.get(bindings[0].name)!;
                 const existing = getDeclaration(existingId);
 
@@ -337,8 +339,9 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                 resolvedModuleId,
             });
 
-            // Track binding name for potential overload merging
-            if (decl.type === "TSDeclareFunction" && bindings.length === 1) {
+            // Track this binding so a subsequent declaration with the same name can be
+            // merged as an overload (see the duplicate-binding branch above).
+            if (bindings.length === 1) {
                 bindingToDeclarationId.set(bindings[0].name, declarationId);
             }
 

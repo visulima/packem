@@ -405,6 +405,36 @@ it("function overloads", async () => {
     expect(snapshot).toContain("declare function useConfig<T>");
 });
 
+// TypeScript declaration merging: same-name function/class/interface/const + namespace or value.
+// Repro for yaml (function `visit` + `namespace visit`) and zod (interface `ZodError` + const `ZodError`).
+// Rollup's `assertUniqueExportName` rejects two `export { X }` for the same name, so the plugin
+// must emit exactly one export per bound name and render the merge partners as non-exported
+// declarations that still merge via TS's local declaration-merging rules.
+it("declaration merging emits one export per bound name", async () => {
+    const { snapshot } = await rolldownBuild(path.resolve(dirname, "fixtures/declaration-merging.ts"), [dts({ emitDtsOnly: true })]);
+
+    expect(snapshot).toMatchSnapshot();
+
+    // Each merged name appears in exactly one `export { ... }` specifier.
+    const countExported = (name: string) => {
+        const exportBlocks = snapshot.match(/export\s*\{[^}]*\}/g) ?? [];
+
+        return exportBlocks.reduce((acc, block) => acc + (block.match(new RegExp(`\\b${name}\\b`, "g"))?.length ?? 0), 0);
+    };
+
+    expect(countExported("visit")).toBe(1);
+    expect(countExported("ZodError")).toBe(1);
+    expect(countExported("Box")).toBe(1);
+
+    // Both declaration partners are still rendered in the output (merge semantics preserved).
+    expect(snapshot).toContain("declare function visit");
+    expect(snapshot).toContain("namespace visit");
+    expect(snapshot).toContain("interface ZodError");
+    expect(snapshot).toContain("declare const ZodError");
+    expect(snapshot).toContain("declare class Box");
+    expect(snapshot).toContain("namespace Box");
+});
+
 it("should error when file import cannot be found", async () => {
     await expect(() =>
         rolldownBuild(path.resolve(dirname, "fixtures/unresolved-import/ts.ts"), [

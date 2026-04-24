@@ -133,6 +133,30 @@ export * from './file.css';
 "
 `;
 
+exports[`declaration merging emits one export per bound name 1`] = `
+"// declaration-merging.d.ts
+declare function visit(node: unknown, visitor: (n: unknown) => void): void;
+declare namespace visit {
+  const BREAK: unique symbol;
+  const SKIP: unique symbol;
+  const REMOVE: unique symbol;
+}
+interface ZodError<T = unknown> {
+  issues: T[];
+  format(): string;
+}
+declare const ZodError: new <T>(issues: T[]) => ZodError<T>;
+declare class Box<T> {
+  value: T;
+  constructor(value: T);
+}
+declare namespace Box {
+  const empty: Box<null>;
+}
+export { Box, ZodError, visit };
+"
+`;
+
 exports[`declare module 1`] = `
 "// declare-module.d.ts
 declare module "virtual" {

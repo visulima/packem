@@ -2952,4 +2952,228 @@ throw new Error('line 9');
         // This guards against regressions where we'd iterate pkg.devDependencies unconditionally.
         expect(dMtsContent).not.toMatch(/fake-unused-devdep/);
     });
+
+    it("should keep a devDep+peerDep external in .d.ts (JS externalizes peer deps, so DTS must match)", async () => {
+        expect.assertions(4);
+
+        // Repro for the zod-in-connect / yaml-in-fs failure: when a package declares the
+        // same name in BOTH devDependencies (needed for local build) AND peerDependencies
+        // (consumer provides at install-time), the JS build externalizes it. The emitted
+        // .d.ts must externalize it too — otherwise we bundle the dep's .d.ts, which can
+        // hit TS declaration-merging patterns (e.g. `export interface X` + `export const X`)
+        // that produce duplicate ES-module exports rollup rejects.
+        const peerDepRoot = `${temporaryDirectoryPath}/node_modules/fake-peer-devdep`;
+
+        await writeFile(
+            `${peerDepRoot}/package.json`,
+            JSON.stringify({
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
+                main: "./index.js",
+                name: "fake-peer-devdep",
+                types: "./index.d.ts",
+                version: "1.0.0",
+            }),
+        );
+        await writeFile(`${peerDepRoot}/index.js`, "export function parse(value) { return value; }\n");
+        await writeFile(
+            `${peerDepRoot}/index.d.ts`,
+            "export declare function parse(value: string): string;\nexport declare namespace parse { const FLAG: unique symbol; }\n",
+        );
+
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            'export { parse } from "fake-peer-devdep";\n',
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "fake-peer-devdep": "*",
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
+                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            peerDependencies: {
+                "fake-peer-devdep": "*",
+            },
+            types: "./dist/index.d.ts",
+            typesVersions: { "*": { ".": ["./dist/index.d.ts"] } },
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        // peer-devdep types must stay external — consumer installs the package, gets types from there.
+        expect(dMtsContent).toMatch(/from ["']fake-peer-devdep["']/);
+        // Primary symbol is re-exported, not inlined.
+        expect(dMtsContent).toMatch(/\bparse\b/);
+        // And no evidence of the dep's types being bundled in.
+        expect(dMtsContent).not.toMatch(/declare namespace parse/);
+    });
+
+    it("should externalize a types-only devDep (no JS entry in exports) in .d.ts build", async () => {
+        expect.assertions(4);
+
+        // Repro for type-fest in @visulima/inspector: devDep that ships only `.d.ts` files
+        // (no JS entry in its `exports` field). Pre-fix, the externals plugin tried to
+        // node-resolve its JS entry in DTS mode and blew up because no JS entry exists.
+        // The DTS resolver is meant to handle types-only packages by externalizing them —
+        // the consumer installs the package from npm, TypeScript finds the .d.ts there.
+        const typesOnlyRoot = `${temporaryDirectoryPath}/node_modules/fake-types-only`;
+
+        await writeFile(
+            `${typesOnlyRoot}/package.json`,
+            // No `default`/`import`/`require` — only types. This is the type-fest shape.
+            JSON.stringify({
+                exports: { ".": { types: "./index.d.ts" } },
+                name: "fake-types-only",
+                types: "./index.d.ts",
+                version: "1.0.0",
+            }),
+        );
+        await writeFile(
+            `${typesOnlyRoot}/index.d.ts`,
+            "export type LiteralUnion<T extends string, U extends string = string> = T | (U & Record<never, never>);\n",
+        );
+
+        // Type-only import from .ts source — the JS build drops it (erased at transform),
+        // so `context.usedDependencies` never sees the package. The DTS build still needs
+        // to emit a reference to it and must not try to bundle the non-existent JS entry.
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            [
+                'import type { LiteralUnion } from "fake-types-only";',
+                "",
+                'export type Color = LiteralUnion<"red" | "green" | "blue">;',
+                "",
+                "export function render(color: Color): string {",
+                "    return String(color);",
+                "}",
+                "",
+            ].join("\n"),
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "fake-types-only": "*",
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
+                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: { "*": { ".": ["./dist/index.d.ts"] } },
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(binProcess.exitCode).toBe(0);
+        expect(binProcess.stderr).not.toContain("Could not resolve import");
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        // Externalized — specifier preserved in the emitted .d.ts.
+        expect(dMtsContent).toMatch(/from ["']fake-types-only["']/);
+        // Used type chain survives.
+        expect(dMtsContent).toMatch(/\bColor\b/);
+    });
+
+    it("should emit a single export for TS declaration-merging patterns (function+namespace, interface+const)", async () => {
+        expect.assertions(6);
+
+        // Repro for the rollup "Duplicate export X" crash when a bundled devDep contains
+        // TypeScript declaration merging — two top-level declarations with the same name
+        // (e.g. yaml's `function visit` + `namespace visit`, zod's `interface ZodError`
+        // + `const ZodError`). The plugin must fold the companion into the primary so
+        // fake-JS emits exactly one `export { X }` while still rendering both declaration
+        // bodies in the final .d.ts.
+        const mergedDepRoot = `${temporaryDirectoryPath}/node_modules/fake-merged-devdep`;
+
+        await writeFile(
+            `${mergedDepRoot}/package.json`,
+            JSON.stringify({
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
+                main: "./index.js",
+                name: "fake-merged-devdep",
+                types: "./index.d.ts",
+                version: "1.0.0",
+            }),
+        );
+        await writeFile(
+            `${mergedDepRoot}/index.js`,
+            "export function visit(node, visitor) { visitor(node); }\nvisit.BREAK = Symbol('BREAK');\nexport const ZodError = class { constructor(issues) { this.issues = issues; } };\n",
+        );
+        await writeFile(
+            `${mergedDepRoot}/index.d.ts`,
+            [
+                "export declare function visit(node: unknown, visitor: (n: unknown) => void): void;",
+                "export declare namespace visit {",
+                "    const BREAK: unique symbol;",
+                "}",
+                "export interface ZodError<T = unknown> {",
+                "    issues: T[];",
+                "}",
+                "export declare const ZodError: new <T>(issues: T[]) => ZodError<T>;",
+                "",
+            ].join("\n"),
+        );
+
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            'export { visit, ZodError } from "fake-merged-devdep";\n',
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                "fake-merged-devdep": "*",
+                typescript: "*",
+            },
+            exports: {
+                ".": {
+                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
+                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+            types: "./dist/index.d.ts",
+            typesVersions: { "*": { ".": ["./dist/index.d.ts"] } },
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        // The build must not crash on the duplicate export — that's the actual regression.
+        expect(binProcess.exitCode).toBe(0);
+        expect(binProcess.stderr).not.toContain("Duplicate export");
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        // Both declaration partners must survive in the emitted .d.ts (merge semantics preserved).
+        expect(dMtsContent).toMatch(/declare function visit/);
+        expect(dMtsContent).toMatch(/namespace visit/);
+        expect(dMtsContent).toMatch(/interface ZodError/);
+        expect(dMtsContent).toMatch(/declare const ZodError/);
+    });
 });
