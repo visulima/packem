@@ -1,3 +1,17 @@
+## @visulima/packem [2.0.0-alpha.75](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.74...@visulima/packem@2.0.0-alpha.75) (2026-04-24)
+
+### Bug Fixes
+
+* **packem:** declared deps win over tsconfig `paths` catch-all ([28450bf](https://github.com/visulima/packem/commit/28450bfe6339b1f077e14c911898936d1ce0f733))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.62
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.43
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.42
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.23
+
 ## @visulima/packem [2.0.0-alpha.74](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.73...@visulima/packem@2.0.0-alpha.74) (2026-04-24)
 
 ### Bug Fixes
