@@ -3393,6 +3393,62 @@ throw new Error('line 9');
         expect(dMtsContent).toMatch(/\bWorkOptions\b/);
     });
 
+    it("should rebuild successfully on a second run when an entry is a .tsx file (DTS cache re-resolution)", async () => {
+        expect.assertions(4);
+
+        // Repro for api-platform's "Could not resolve entry module src/index-browser.d.ts"
+        // on the SECOND build: the DTS plugin's cache-re-resolution hook mapped
+        // `.d.ts` → `.ts` only, so if the real source is `.tsx` (or `.mts`/`.cts`),
+        // the map lookup failed on cache restore and rollup couldn't find the entry.
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.tsx`,
+            [
+                "export interface ComponentProps { label: string }",
+                "export const Component = (props: ComponentProps) => props.label;",
+                "",
+            ].join("\n"),
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: { jsx: "react-jsx", moduleResolution: "bundler" },
+        });
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: { typescript: "*" },
+            exports: {
+                ".": {
+                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
+                },
+            },
+            main: "./dist/index.mjs",
+            module: "./dist/index.mjs",
+            type: "module",
+            types: "./dist/index.d.mts",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        // Run 1 — cold cache, should succeed.
+        const first = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(first.exitCode).toBe(0);
+
+        const firstDts = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(firstDts).toMatch(/\bComponent\b/);
+
+        // Run 2 — warm cache. The previous bug surfaced here: rollup restored its
+        // module graph from rollup-dts.json, tried to re-resolve the `.d.ts` entry,
+        // the cache-re-resolution hook tried `.d.ts` → `.ts` but the real source is
+        // `.tsx`, and the entry silently failed to resolve.
+        const second = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(second.exitCode).toBe(0);
+
+        const secondDts = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+
+        expect(secondDts).toMatch(/\bComponent\b/);
+    });
+
     it("should emit a single export for TS declaration-merging patterns (function+namespace, interface+const)", async () => {
         expect.assertions(6);
 

@@ -362,15 +362,32 @@ export { __json_default_export as default }`;
             // The id may be absolute or relative (rollup may store relative paths in cache).
             if (!importer && RE_DTS.test(id) && !RE_NODE_MODULES.test(id)) {
                 const absoluteId = path.isAbsolute(id) ? id : path.resolve(cwd, id);
-                const tsId = absoluteId.replace(RE_DTS, ".$1ts");
+                // Map `.d.ts` / `.d.mts` / `.d.cts` back to ALL plausible source extensions.
+                // A `.d.ts` entry may come from `.ts`, `.tsx`, `.mts`, or `.cts` — the naive
+                // replace(`.d.$1ts`, `.$1ts`) only preserves the original modifier (none / m / c)
+                // and misses `.tsx`, which is a legitimate React/JSX source extension that the
+                // inferred-entries pipeline maps to `.d.ts`.
+                const stripped = absoluteId.replace(RE_DTS, "");
+                const candidates = [
+                    absoluteId.replace(RE_DTS, ".$1ts"),
+                    `${stripped}.tsx`,
+                    `${stripped}.ts`,
+                    `${stripped}.mts`,
+                    `${stripped}.cts`,
+                ];
 
-                if (!dtsMap.has(absoluteId) && existsSync(tsId)) {
-                    // Rollup may skip transform hook for cached modules whose source hasn't changed.
-                    // Populate dtsMap directly from the source file so the load hook can serve it.
-                    const code = readFileSync(tsId, "utf8");
+                if (!dtsMap.has(absoluteId)) {
+                    for (const tsId of candidates) {
+                        if (existsSync(tsId)) {
+                            // Rollup may skip transform hook for cached modules whose source hasn't changed.
+                            // Populate dtsMap directly from the source file so the load hook can serve it.
+                            const code = readFileSync(tsId, "utf8");
 
-                    dtsMap.set(absoluteId, { code, id: tsId, isEntry: true });
-                    debug("populated dtsMap from source for cached re-resolution: %s", absoluteId);
+                            dtsMap.set(absoluteId, { code, id: tsId, isEntry: true });
+                            debug("populated dtsMap from source for cached re-resolution: %s (via %s)", absoluteId, tsId);
+                            break;
+                        }
+                    }
                 }
 
                 if (dtsMap.has(absoluteId)) {
