@@ -1,3 +1,9 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.19](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.18...@visulima/rollup-plugin-dts@1.0.0-alpha.19) (2026-04-24)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** sibling .d.ts fallback for string-form exports ([2a26b69](https://github.com/visulima/packem/commit/2a26b69b322375061cdcd55a14c72301085606ef))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.18](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.17...@visulima/rollup-plugin-dts@1.0.0-alpha.18) (2026-04-24)
 
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.17](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.16...@visulima/rollup-plugin-dts@1.0.0-alpha.17) (2026-04-24)
