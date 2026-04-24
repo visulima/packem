@@ -1,3 +1,17 @@
+## @visulima/packem [2.0.0-alpha.69](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.68...@visulima/packem@2.0.0-alpha.69) (2026-04-24)
+
+### Bug Fixes
+
+* correctly handle peer-dep/types-only/merged-declaration edge cases in DTS ([42b6f7c](https://github.com/visulima/packem/commit/42b6f7c0888b6e51f7755a1afca5954b1e8ba1d3))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.56
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.37
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.36
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.17
+
 ## @visulima/packem [2.0.0-alpha.68](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.67...@visulima/packem@2.0.0-alpha.68) (2026-04-24)
 
 ### Bug Fixes
