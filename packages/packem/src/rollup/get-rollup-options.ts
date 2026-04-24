@@ -1004,9 +1004,14 @@ const computeDtsResolve = (context: BuildContext<InternalBuildOptions>): boolean
     // inline devDeps that actually appeared in the bundled JS — skipping the
     // long tail of build-time-only devDeps (typescript, eslint, type-fest used
     // purely as local casts, …) that would otherwise bloat the emitted .d.ts.
+    //
+    // Exclude devDeps that are also declared as peerDependencies: the JS build
+    // externalizes peer deps (consumer provides the runtime), so the emitted
+    // .d.ts must match and keep them external too. Optional peer deps are
+    // still inlined above to cover the multi-framework case.
     if (context.options.rollup.resolveExternals?.devDeps !== true) {
         for (const name of Object.keys(context.pkg.devDependencies ?? {})) {
-            if (context.usedDependencies.has(name)) {
+            if (context.usedDependencies.has(name) && !(name in peerDeps)) {
                 autoResolve.push(name);
             }
         }

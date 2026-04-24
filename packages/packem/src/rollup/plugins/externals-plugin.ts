@@ -454,13 +454,25 @@ export const externalsPlugin = (context: BuildContext<InternalBuildOptions>, opt
                         return undefined;
                     }
 
-                    // DTS build: a devDep the user asked to inline in .d.ts (via `dtsResolve`)
-                    // must be handed off to the DTS resolver so it picks the `.d.ts` through
-                    // the right conditions. Resolving here would go through the JS
-                    // node-resolve conditions and return the package's `.js` entry, erasing
-                    // the types before the DTS pipeline sees them.
-                    if (options?.dtsResolve && shouldResolveForDts(specifierPkg)) {
-                        return undefined;
+                    // DTS build: the DTS resolver owns type resolution entirely.
+                    //
+                    // For devDeps on the `dtsResolve` inline list, returning undefined hands
+                    // off to the DTS resolver which picks the `.d.ts` through the types
+                    // condition. Resolving here would go through the JS node-resolve
+                    // conditions and return the package's `.js` entry, erasing the types
+                    // before the DTS pipeline sees them.
+                    //
+                    // For devDeps NOT on the inline list, externalize directly. Going
+                    // through node-resolve would blow up for types-only packages that have
+                    // no `.js` entry in their `exports` field (e.g. `type-fest`, `@types/*`)
+                    // — the package is meant to be externalized anyway, so there's no
+                    // reason to look up a non-existent JS entry.
+                    if (options?.forTypes) {
+                        if (options.dtsResolve && shouldResolveForDts(specifierPkg)) {
+                            return undefined;
+                        }
+
+                        return { external: true, id, moduleSideEffects: false };
                     }
 
                     const resolved = await this.resolve(id, importer, { skipSelf: true });
