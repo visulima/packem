@@ -402,8 +402,8 @@ export const externalsPlugin = (context: BuildContext<InternalBuildOptions>, opt
             filter: {
                 id: (id: string) => !id.startsWith("\0"),
             },
-            async handler(id: string, importer: string | undefined, { isEntry }): Promise<ResolveIdResult> {
-                if (isEntry) {
+            async handler(id: string, importer: string | undefined, resolveOptions): Promise<ResolveIdResult> {
+                if (resolveOptions.isEntry) {
                     return undefined;
                 }
 
@@ -475,7 +475,7 @@ export const externalsPlugin = (context: BuildContext<InternalBuildOptions>, opt
                         return { external: true, id, moduleSideEffects: false };
                     }
 
-                    const resolved = await this.resolve(id, importer, { skipSelf: true });
+                    const resolved = await this.resolve(id, importer, { skipSelf: true, ...resolveOptions });
 
                     if (!resolved) {
                         throw new Error(`Could not resolve "${id}" even though it's declared in package.json. Try re-installing node_modules.`);

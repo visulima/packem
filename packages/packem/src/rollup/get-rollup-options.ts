@@ -1106,6 +1106,15 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
                 return;
             }
 
+            // Circular type references (`Node ↔ Alias`, `Document ↔ Schema`, …)
+            // are standard in richly-typed packages like yaml. TypeScript resolves
+            // these natively; rollup only flags them because its default bundler
+            // heuristic is JS-focused. Skip them in the DTS build specifically —
+            // the JS build still surfaces real circular-runtime issues.
+            if (warning.code === "CIRCULAR_DEPENDENCY") {
+                return;
+            }
+
             rollupWarn(warning);
         },
 

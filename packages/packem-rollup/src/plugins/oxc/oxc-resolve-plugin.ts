@@ -28,7 +28,8 @@ const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: string, log
     return <Plugin>{
         name: "oxc-resolve",
         resolveId: {
-            async handler(source, importer, { isEntry }) {
+            async handler(source, importer, resolveOptions) {
+                const { isEntry } = resolveOptions;
                 const resolveDirectory = isEntry || !importer ? dirname(source) : dirname(importer);
 
                 const { error, path: id } = await resolver.async(resolveDirectory, source);
@@ -97,6 +98,7 @@ const oxcResolvePlugin = (options: OxcResolveOptions, rootDirectory: string, log
 
                 const rollupResolvedResult = await this.resolve(id as string, importer, {
                     skipSelf: true,
+                    ...resolveOptions,
                 });
 
                 if (rollupResolvedResult) {
