@@ -1,3 +1,17 @@
+## @visulima/packem [2.0.0-alpha.76](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.75...@visulima/packem@2.0.0-alpha.76) (2026-04-24)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** map cached `.d.ts` entries back to all source extensions ([5d8f670](https://github.com/visulima/packem/commit/5d8f670954806c6111eb90cff42e0faeef59dea1))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.63
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.44
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.43
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.24
+
 ## @visulima/packem [2.0.0-alpha.75](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.74...@visulima/packem@2.0.0-alpha.75) (2026-04-24)
 
 ### Bug Fixes
