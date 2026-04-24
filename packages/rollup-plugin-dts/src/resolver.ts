@@ -198,7 +198,7 @@ const createDtsResolvePlugin = ({
         // bundle can drag in node-subpath imports (`#utils`) that downstream
         // consumers would not have resolvable. Users who want those inlined can
         // pass an explicit `resolve: [...]` list.
-        if (dtsPath && RE_JS.test(dtsPath) && hasStringExports(dtsPath)) {
+        if (dtsPath && RE_JS.test(dtsPath) && canFallBackToSiblingDts(dtsPath)) {
             const siblingDts = filename_js_to_dts(dtsPath);
 
             if (existsSync(siblingDts)) {
@@ -220,44 +220,71 @@ const createDtsResolvePlugin = ({
 
 const isFilePath = (id: string) => id.startsWith(".") || path.isAbsolute(id);
 
-// Walk up from a resolved JS path to the owning `package.json` and return true
-// if its `exports` field is a string (shorthand). Used to narrow the sibling-
-// `.d.ts` fallback to packages that genuinely lack conditional type resolution.
-const stringExportsCache = new Map<string, boolean>();
-const hasStringExports = (resolvedJsPath: string): boolean => {
-    let directory = path.dirname(resolvedJsPath);
+// Walk up from a resolved JS path to the owning `package.json` and decide
+// whether the sibling-`.d.ts` fallback is safe to apply.
+//
+// NOTE: oxc-resolver cannot do this lookup itself. It implements the Node.js
+// module-resolution spec faithfully: string-form `exports` is unconditional
+// (no condition can redirect it to types), and post-resolution extension
+// substitution only applies to specifier rewriting (`./foo.js` → `./foo.ts`),
+// not to results that came from `exports`/`main`. The "find a sibling .d.ts"
+// behavior is a TypeScript-compiler convention that lives above the resolver;
+// TSC does it internally, but it is not part of the oxc contract. Users who
+// want the TSC path can set `resolver: "tsc"`; until oxc exposes a fallback
+// option upstream, this helper encodes the same heuristic in ~40 LOC.
+//
+// Safe when `exports` is missing or a string — both mean no conditional type
+// resolution exists, so the sindresorhus-style / old `main`+`types` packages
+// where `.d.ts` sits next to the JS entry need this fallback to avoid a
+// mismatch with the JS build (which inlines the `.js`).
+//
+// Unsafe when `exports` is an object. Those packages either route types via
+// a `types` condition we already honored, or they deliberately omit types
+// from conditional resolution — typically larger libraries whose `.d.ts`
+// drags in transitive concerns (node-subpath `#*` imports, declaration
+// merges) that trip the fake-js plugin once bundled. Users who want those
+// inlined can pass an explicit `resolve: [...]` list.
+//
+// Cache keyed by the starting directory so deep paths don't re-walk the tree
+// on every call, including miss walks for intermediate directories that
+// don't own a `package.json`.
+const siblingFallbackCache = new Map<string, boolean>();
+const canFallBackToSiblingDts = (resolvedJsPath: string): boolean => {
+    const start = path.dirname(resolvedJsPath);
 
-    while (true) {
+    if (siblingFallbackCache.has(start)) {
+        return siblingFallbackCache.get(start) as boolean;
+    }
+
+    let directory = start;
+
+    while (directory !== path.dirname(directory)) {
         const pkgPath = path.join(directory, "package.json");
-
-        if (stringExportsCache.has(pkgPath)) {
-            return stringExportsCache.get(pkgPath)!;
-        }
 
         if (existsSync(pkgPath)) {
             let result = false;
 
             try {
-                const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as { exports?: unknown };
+                const { exports: exportsField } = JSON.parse(readFileSync(pkgPath, "utf8")) as { exports?: unknown };
 
-                result = typeof pkg.exports === "string";
+                // Apply the fallback when there's no conditional type resolution:
+                // exports missing (classic `main`+`types` layout) or string-form shorthand.
+                result = exportsField === undefined || typeof exportsField === "string";
             } catch {
-                result = false;
+                /* malformed package.json → don't apply the fallback */
             }
 
-            stringExportsCache.set(pkgPath, result);
+            siblingFallbackCache.set(start, result);
 
             return result;
         }
 
-        const parent = path.dirname(directory);
-
-        if (parent === directory) {
-            return false;
-        }
-
-        directory = parent;
+        directory = path.dirname(directory);
     }
+
+    siblingFallbackCache.set(start, false);
+
+    return false;
 };
 
 export default createDtsResolvePlugin;
