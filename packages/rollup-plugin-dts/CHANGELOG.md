@@ -1,3 +1,9 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.17](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.16...@visulima/rollup-plugin-dts@1.0.0-alpha.17) (2026-04-24)
+
+### Bug Fixes
+
+* correctly handle peer-dep/types-only/merged-declaration edge cases in DTS ([42b6f7c](https://github.com/visulima/packem/commit/42b6f7c0888b6e51f7755a1afca5954b1e8ba1d3))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.16](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.15...@visulima/rollup-plugin-dts@1.0.0-alpha.16) (2026-04-24)
 
 ### Bug Fixes
