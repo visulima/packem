@@ -397,10 +397,17 @@ export { __json_default_export as default }`;
         },
 
         shouldTransformCachedModule({ id }) {
-            // Force re-transformation for DTS modules so plugin state (e.g. typeOnlyMap in
-            // the fake-js plugin) is always populated during renderChunk, even when rollup
-            // would normally skip the transform hook because the module is cached.
-            return RE_DTS.test(id) && !RE_NODE_MODULES.test(id);
+            // Force re-transformation for ALL .d.ts modules so the fake-js plugin's
+            // internal `declarationMap` / `typeOnlyMap` is re-populated on every
+            // build. fake-js's `renderChunk` reads state that only its `transform`
+            // populates; if rollup serves a cached transform result, the state is
+            // empty and renderChunk crashes with `Cannot read properties of
+            // undefined (reading 'decl')`. That previously slipped through for
+            // inlined node_modules .d.ts — e.g. yaml / indent-string — because the
+            // old exclusion kept them cached. Re-transforming .d.ts is cheap (no
+            // TS compilation, just a single parse + AST walk) and correctness
+            // matters more than the skip here.
+            return RE_DTS.test(id);
         },
 
         transform: {
