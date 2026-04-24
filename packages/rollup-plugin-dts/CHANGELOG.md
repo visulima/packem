@@ -1,3 +1,9 @@
+## @visulima/rollup-plugin-dts [1.0.0-alpha.21](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.20...@visulima/rollup-plugin-dts@1.0.0-alpha.21) (2026-04-24)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** force re-transform for node_modules .d.ts too ([c93d34e](https://github.com/visulima/packem/commit/c93d34e588956920f9cc5958dcffe7eb0ffb3ee9))
+
 ## @visulima/rollup-plugin-dts [1.0.0-alpha.20](https://github.com/visulima/packem/compare/@visulima/rollup-plugin-dts@1.0.0-alpha.19...@visulima/rollup-plugin-dts@1.0.0-alpha.20) (2026-04-24)
 
 ### Code Refactoring
