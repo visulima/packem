@@ -748,4 +748,62 @@ export const indent = dIndent;
         expect(dTsContent).not.toContain("from 'detect-indent'");
         expect(dTsContent).not.toContain('from "detect-indent"');
     });
+
+    it("should externalize a declared peerDep even when tsconfig `paths` has a catch-all `*` entry", async () => {
+        expect.assertions(3);
+
+        // Repro for dev-toolbar → vite: consumers sometimes use `"paths": { "*": ["./*"] }`
+        // in tsconfig as a TS type-check fallback. The old externals-plugin check order
+        // tested tsconfig path patterns BEFORE classified-deps, so the catch-all matched
+        // every bare specifier — including declared peerDeps like `vite` — and returned
+        // `external: false`. Rollup then tried to load the peer's source, which
+        // cascaded through the commonjs plugin + esbuild and blew up on vite 8's chunks.
+        //
+        // Declared dependencies (deps / peerDeps / optDeps / user `externals`) must win
+        // over `paths` catch-alls.
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await installPackage(temporaryDirectoryPath, "detect-indent");
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.ts`,
+            "import detectIndent from \"detect-indent\";\nexport default detectIndent;\n",
+        );
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: {
+                typescript: "^4.4.3",
+            },
+            exports: {
+                ".": {
+                    import: "./dist/index.mjs",
+                    require: "./dist/index.cjs",
+                },
+            },
+            // detect-indent declared as peerDep — the external decision MUST honor this
+            // regardless of the catch-all path alias below.
+            peerDependencies: {
+                "detect-indent": "*",
+            },
+        });
+        await createTsConfig(temporaryDirectoryPath, {
+            compilerOptions: {
+                moduleResolution: "bundler",
+                paths: {
+                    "@/*": ["./src/*"],
+                    "*": ["./*"],
+                },
+            },
+        });
+
+        const binProcess = await execPackem("build", [], {
+            cwd: temporaryDirectoryPath,
+        });
+
+        expect(binProcess.exitCode).toBe(0);
+
+        const mjsContent = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
+
+        // Peer dep stays external — the catch-all path must not clobber the peerDep classification.
+        expect(mjsContent).toMatch(/from ["']detect-indent["']/);
+        // And it wasn't silently bundled via the "implicit external" warn path either.
+        expect(binProcess.stdout).not.toContain("Inlined implicit external");
+    });
 });
