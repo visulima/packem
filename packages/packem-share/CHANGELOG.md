@@ -1,3 +1,13 @@
+## @visulima/packem-share [1.0.0-alpha.35](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.34...@visulima/packem-share@1.0.0-alpha.35) (2026-04-24)
+
+### ⚠ BREAKING CHANGES
+
+* **packem:** unify externals plugins, track per-entry DTS extensions
+
+### Features
+
+* **packem:** unify externals plugins, track per-entry DTS extensions ([22647ba](https://github.com/visulima/packem/commit/22647ba5d10c220051e71a3bfaa55baa59957d6e))
+
 ## @visulima/packem-share [1.0.0-alpha.34](https://github.com/visulima/packem/compare/@visulima/packem-share@1.0.0-alpha.33...@visulima/packem-share@1.0.0-alpha.34) (2026-04-23)
 
 ### Bug Fixes
