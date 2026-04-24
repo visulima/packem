@@ -1,3 +1,25 @@
+## @visulima/packem [2.0.0-alpha.67](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.66...@visulima/packem@2.0.0-alpha.67) (2026-04-24)
+
+### ⚠ BREAKING CHANGES
+
+* **packem:** unify externals plugins, track per-entry DTS extensions
+
+### Features
+
+* **packem:** unify externals plugins, track per-entry DTS extensions ([22647ba](https://github.com/visulima/packem/commit/22647ba5d10c220051e71a3bfaa55baa59957d6e))
+
+### Miscellaneous Chores
+
+* refresh test snapshots for environment drift ([0a2e9a6](https://github.com/visulima/packem/commit/0a2e9a654937f4b91b79644561d2fb680b08f198))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.54
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.35
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.34
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.15
+
 ## @visulima/packem [2.0.0-alpha.66](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.65...@visulima/packem@2.0.0-alpha.66) (2026-04-23)
 
 ### Bug Fixes
