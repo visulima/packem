@@ -1,3 +1,17 @@
+## @visulima/packem [2.0.0-alpha.68](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.67...@visulima/packem@2.0.0-alpha.68) (2026-04-24)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** inline bundled-package types in emitted .d.ts ([ce4c00d](https://github.com/visulima/packem/commit/ce4c00d24ebf14b25c799dc51f3b5f8939a9fae3))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.55
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.36
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.35
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.16
+
 ## @visulima/packem [2.0.0-alpha.67](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.66...@visulima/packem@2.0.0-alpha.67) (2026-04-24)
 
 ### ⚠ BREAKING CHANGES
