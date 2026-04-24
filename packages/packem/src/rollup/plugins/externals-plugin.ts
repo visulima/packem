@@ -454,6 +454,15 @@ export const externalsPlugin = (context: BuildContext<InternalBuildOptions>, opt
                         return undefined;
                     }
 
+                    // DTS build: a devDep the user asked to inline in .d.ts (via `dtsResolve`)
+                    // must be handed off to the DTS resolver so it picks the `.d.ts` through
+                    // the right conditions. Resolving here would go through the JS
+                    // node-resolve conditions and return the package's `.js` entry, erasing
+                    // the types before the DTS pipeline sees them.
+                    if (options?.dtsResolve && shouldResolveForDts(specifierPkg)) {
+                        return undefined;
+                    }
+
                     const resolved = await this.resolve(id, importer, { skipSelf: true });
 
                     if (!resolved) {

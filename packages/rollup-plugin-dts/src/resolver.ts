@@ -44,6 +44,29 @@ const createDtsResolvePlugin = ({
                     return external;
                 }
 
+                // Bare specifier of a user-bundled package (via `resolve` option): resolve the
+                // .d.ts directly without going through rollup's resolver chain. Rollup's
+                // resolution loop re-enters this handler with the package's absolute `.js` path,
+                // where `this.resolve` falls back to `external: "absolute"` — that would
+                // short-circuit as external before `resolveDtsPath` gets a chance to pick
+                // the actual `.d.ts` through the types condition.
+                if (!isFilePath(id) && shouldBundleNodeModule(id)) {
+                    const directDtsResolution = await resolveDtsPath(id, importer, null);
+
+                    if (directDtsResolution && RE_DTS.test(directDtsResolution)) {
+                        return { id: directDtsResolution, moduleSideEffects };
+                    }
+
+                    if (directDtsResolution && isSourceFile(directDtsResolution)) {
+                        await this.load({ id: directDtsResolution });
+
+                        return { id: filename_to_dts(directDtsResolution), moduleSideEffects };
+                    }
+
+                    // Couldn't find types despite being on the bundle list — fall through
+                    // to the regular path so the normal "unresolvable → external" logic runs.
+                }
+
                 // Get Rollup's resolution first for fallback and policy checks
                 const rollupResolution = await this.resolve(id, importer, options);
 
@@ -56,18 +79,20 @@ const createDtsResolvePlugin = ({
 
                 // If resolution failed, error or externalize
                 if (!dtsResolution) {
-                    const isFileImport = isFilePath(id);
-
                     // Auto-export unresolvable packages
-                    return isFileImport ? null : external;
+                    return isFilePath(id) ? null : external;
                 }
 
-                // Externalize non-bundled node_modules dependencies
+                // Externalize non-bundled node_modules dependencies. Relative imports
+                // issued from inside a node_modules file we're already bundling (e.g. a
+                // package's internal `./types` re-export) must follow the bundle decision
+                // of the containing package — otherwise the emitted .d.ts ends up with a
+                // dangling `import {...} from './types'` that points nowhere at the
+                // consumer's install path.
                 if (
-                    // request resolved to inside node_modules
                     RE_NODE_MODULES.test(dtsResolution)
-                    // User doesn't want to bundle this module
                     && !shouldBundleNodeModule(id)
+                    && !(isFilePath(id) && RE_NODE_MODULES.test(importer) && shouldBundleImporterPackage(importer))
                 ) {
                     return external;
                 }
@@ -103,6 +128,34 @@ const createDtsResolvePlugin = ({
             return resolve;
 
         return resolve.some((pattern) => (typeof pattern === "string" ? id === pattern : pattern.test(id)));
+    }
+
+    // Given a node_modules importer path, extract its npm package name and check whether
+    // the user asked to bundle it via `resolve`. Used to follow relative imports inside
+    // a bundled package (e.g. `./types` from `node_modules/deeks/index.d.ts`). pnpm paths
+    // look like `…/node_modules/.pnpm/deeks@X/node_modules/deeks/…` so we match the LAST
+    // `node_modules/<pkg>` segment — the first one would return `.pnpm`.
+    function shouldBundleImporterPackage(importer: string) {
+        const normalized = importer.replace(/\\/g, "/");
+        const marker = "/node_modules/";
+        const lastIdx = normalized.lastIndexOf(marker);
+
+        if (lastIdx < 0)
+            return false;
+
+        const after = normalized.slice(lastIdx + marker.length);
+        const firstSlash = after.indexOf("/");
+        let packageName = firstSlash === -1 ? after : after.slice(0, firstSlash);
+
+        if (packageName.startsWith("@")) {
+            const scopedRest = after.slice(packageName.length + 1);
+            const scopedSlash = scopedRest.indexOf("/");
+            const subName = scopedSlash === -1 ? scopedRest : scopedRest.slice(0, scopedSlash);
+
+            packageName = `${packageName}/${subName}`;
+        }
+
+        return shouldBundleNodeModule(packageName);
     }
 
     async function resolveDtsPath(id: string, importer: string, rollupResolution: ResolvedId | null): Promise<string | null> {
