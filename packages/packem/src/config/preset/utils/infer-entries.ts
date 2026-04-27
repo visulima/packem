@@ -317,11 +317,11 @@ const createOrUpdateEntry = (
 
         // Check for node/workerd conditions
         if (
-            output.subKey === "node"
-            || output.subKey === "workerd"
-            || output.file.includes(".node")
-            || output.file.includes(".workerd")
-            || output.file.includes(".server")
+            output.subKey === "node" ||
+            output.subKey === "workerd" ||
+            output.file.includes(".node") ||
+            output.file.includes(".workerd") ||
+            output.file.includes(".server")
         ) {
             runtime = "node";
         }
@@ -336,8 +336,8 @@ const createOrUpdateEntry = (
     const aliasName = fileWithoutExtension.replace(new RegExp(`^(\./)?${outDirectoryPrefix}/`), "");
 
     // Check if input file matches the alias (if not, we need fileAlias)
-    const inputBase
-        = input
+    const inputBase =
+        input
             .replace(/\.[^./]+$/, "")
             .split("/")
             .pop() || "";
@@ -347,10 +347,10 @@ const createOrUpdateEntry = (
     // Include fileAlias in uniqueness check to ensure separate entries for same input with different outputs
     let entry: BuildEntry | undefined = entries.find(
         (index) =>
-            index.input === input
-            && index.environment === entryEnvironment
-            && index.runtime === runtime
-            && index.fileAlias === (needsFileAlias ? aliasName : undefined),
+            index.input === input &&
+            index.environment === entryEnvironment &&
+            index.runtime === runtime &&
+            index.fileAlias === (needsFileAlias ? aliasName : undefined),
     );
 
     if (entry === undefined) {
@@ -400,11 +400,7 @@ const createOrUpdateEntry = (
             // `declaration: "compatible"` would over-emit .d.mts for entries whose
             // exports map only references .d.ts (e.g. environment-specific entries like
             // browser.types = "./dist/index.browser.d.ts").
-            const declarationExtension = output.file.endsWith(".d.mts")
-                ? "d.mts"
-                : output.file.endsWith(".d.cts")
-                    ? "d.cts"
-                    : "d.ts";
+            const declarationExtension = output.file.endsWith(".d.mts") ? "d.mts" : output.file.endsWith(".d.cts") ? "d.cts" : "d.ts";
 
             entry.declarationExtensions ??= new Set();
             entry.declarationExtensions.add(declarationExtension);
@@ -1171,11 +1167,11 @@ const inferEntries = async (
                 // Skip if we've already processed this export key (check if entry already exists)
                 const dtsOutput = allOutputsForExportKey.find((o) => o.file.endsWith(".d.ts"));
                 // If no .d.ts, use .d.mts or .d.cts as fallback
-                const baseOutput
-                    = dtsOutput
-                        || allOutputsForExportKey.find((o) => o.file.endsWith(".d.mts"))
-                        || allOutputsForExportKey.find((o) => o.file.endsWith(".d.cts"))
-                        || output;
+                const baseOutput =
+                    dtsOutput ||
+                    allOutputsForExportKey.find((o) => o.file.endsWith(".d.mts")) ||
+                    allOutputsForExportKey.find((o) => o.file.endsWith(".d.cts")) ||
+                    output;
 
                 // Only process if this is the .d.ts output (or the first one if no .d.ts)
                 // This ensures we only create ONE entry per export key
@@ -1248,7 +1244,7 @@ const inferEntries = async (
                         ...output,
                         file: outputPath,
                         // Don't set type for declaration files - they should not trigger JS builds
-                        ...!isOutputDeclarationFile && inferredType && { type: inferredType },
+                        ...(!isOutputDeclarationFile && inferredType && { type: inferredType }),
                     };
 
                     createOrUpdateEntry(entries, input, false, outputSlug, specificOutput, context, true, outputs);
@@ -1358,9 +1354,25 @@ const inferEntries = async (
         } else {
             const inputWithoutExtension = toNamespacedPath(input.replace(ENDING_REGEX, ""));
 
-            if (isAccessibleSync(`${inputWithoutExtension}.cts`) && isAccessibleSync(`${inputWithoutExtension}.mts`)) {
-                createOrUpdateEntry(entries, `${inputWithoutExtension}.cts`, isDirectory, outputSlug, { ...output, type: "cjs" }, context, false, outputs);
-                createOrUpdateEntry(entries, `${inputWithoutExtension}.mts`, isDirectory, outputSlug, { ...output, type: "esm" }, context, false, outputs);
+            const ctsPath = `${inputWithoutExtension}.cts`;
+            const mtsPath = `${inputWithoutExtension}.mts`;
+
+            const ctsExists = isAccessibleSync(ctsPath);
+            const mtsExists = isAccessibleSync(mtsPath);
+            // When the output has a format-specific extension (.mjs/.d.mts or .cjs/.d.cts), only
+            // emit an entry for the matching source. Without this, the CJS DTS build would emit
+            // a `.d.mts` from the `.cts` source (and vice-versa), and the second build to write
+            // would clobber the correct file with the wrong-source content.
+            const wantsMts = output.file.endsWith(".d.mts") || output.file.endsWith(".mjs");
+            const wantsCts = output.file.endsWith(".d.cts") || output.file.endsWith(".cjs");
+
+            if (wantsMts && mtsExists) {
+                createOrUpdateEntry(entries, mtsPath, isDirectory, outputSlug, { ...output, type: "esm" }, context, false, outputs);
+            } else if (wantsCts && ctsExists) {
+                createOrUpdateEntry(entries, ctsPath, isDirectory, outputSlug, { ...output, type: "cjs" }, context, false, outputs);
+            } else if (ctsExists && mtsExists) {
+                createOrUpdateEntry(entries, ctsPath, isDirectory, outputSlug, { ...output, type: "cjs" }, context, false, outputs);
+                createOrUpdateEntry(entries, mtsPath, isDirectory, outputSlug, { ...output, type: "esm" }, context, false, outputs);
             } else {
                 createOrUpdateEntry(entries, input, isDirectory, outputSlug, output, context, false, outputs);
             }

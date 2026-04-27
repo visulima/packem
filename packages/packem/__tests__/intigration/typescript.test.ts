@@ -3528,4 +3528,66 @@ throw new Error('line 9');
         expect(dMtsContent).toMatch(/interface ZodError/);
         expect(dMtsContent).toMatch(/declare const ZodError/);
     });
+
+    it("should route .d.mts/.d.cts outputs to the matching .mts/.cts source when both exist", async () => {
+        expect.assertions(8);
+
+        // Mirrors the @visulima/colorize layout: separate .cts and .mts source files
+        // (no .ts) where each variant exports a different shape. Without per-output
+        // source matching, the CJS DTS run would (re)write index.d.mts from the
+        // .cts source and clobber the correct ESM-source content.
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.mts`,
+            [
+                "export const fromMts = 'mts-only';",
+                "export type MtsType = { kind: 'mts' };",
+                "const value: MtsType = { kind: 'mts' };",
+                "export default value;",
+                "",
+            ].join("\n"),
+        );
+        await writeFile(
+            `${temporaryDirectoryPath}/src/index.cts`,
+            [
+                "export const fromCts = 'cts-only';",
+                "export type CtsType = { kind: 'cts' };",
+                "const value: CtsType = { kind: 'cts' };",
+                "export default value;",
+                "",
+            ].join("\n"),
+        );
+
+        await installPackage(temporaryDirectoryPath, "typescript");
+        await createTsConfig(temporaryDirectoryPath);
+        await createPackageJson(temporaryDirectoryPath, {
+            devDependencies: { typescript: "*" },
+            exports: {
+                ".": {
+                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
+                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                },
+            },
+            main: "./dist/index.cjs",
+            module: "./dist/index.mjs",
+        });
+        await createPackemConfig(temporaryDirectoryPath);
+
+        const binProcess = await execPackem("build", [], { cwd: temporaryDirectoryPath });
+
+        expect(binProcess.stderr).toBe("");
+        expect(binProcess.exitCode).toBe(0);
+
+        const dMtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.mts`);
+        const dCtsContent = await readFile(`${temporaryDirectoryPath}/dist/index.d.cts`);
+
+        // index.d.mts must reflect the .mts source — not the .cts source.
+        expect(dMtsContent).toMatch(/fromMts/);
+        expect(dMtsContent).toMatch(/MtsType/);
+        expect(dMtsContent).not.toMatch(/fromCts/);
+
+        // index.d.cts must reflect the .cts source — not the .mts source.
+        expect(dCtsContent).toMatch(/fromCts/);
+        expect(dCtsContent).toMatch(/CtsType/);
+        expect(dCtsContent).not.toMatch(/fromMts/);
+    });
 });
