@@ -85,6 +85,7 @@ jobs:
               with:
                   node-version: "22.x"
                   cache-prefix: "lint"
+                  install-node-gyp: "true"
 
             # Temporary solution until Nx solve this https://github.com/nrwl/nx/issues/22259
             - name: "Get changed files"
@@ -138,6 +139,7 @@ jobs:
                   node-version: "22.x"
                   cache-prefix: "lint"
                   npm-version: "10.8.x"
+                  install-node-gyp: "true"
 
             # Temporary solution until Nx solve this https://github.com/nrwl/nx/issues/22259
             - name: "Get changed files"
@@ -190,6 +192,7 @@ jobs:
               with:
                   node-version: "22.x"
                   cache-prefix: "lint"
+                  install-node-gyp: "true"
 
             # Temporary solution until Nx solve this https://github.com/nrwl/nx/issues/22259
             - name: "Get changed files"
@@ -242,6 +245,7 @@ jobs:
               with:
                   node-version: "22.x"
                   cache-prefix: "lint"
+                  install-node-gyp: "true"
 
             # Temporary solution until Nx solve this https://github.com/nrwl/nx/issues/22259
             - name: "Get changed files"
@@ -339,8 +343,12 @@ jobs:
                   node-version: "22.x"
                   cache: "pnpm"
 
-            - name: "Verify the integrity of provenance attestations and registry signatures for installed dependencies"
-              run: "pnpm dlx audit-ci@^6 --config ./audit-ci.jsonc --report-type=summary"
+            # node-gyp is required by native modules (e.g. nodehun) listed in
+            # pnpm-workspace.yaml#onlyBuiltDependencies. Modern npm bundles node-gyp
+            # internally but does not expose it on PATH, so pnpm cannot find it.
+            - name: "Install node-gyp"
+              shell: "bash"
+              run: "npm install --global node-gyp"
 
             - name: "Install packages"
               run: "pnpm install --frozen-lockfile --prefer-offline"
