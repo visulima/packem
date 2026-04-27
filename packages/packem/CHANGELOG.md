@@ -1,3 +1,17 @@
+## @visulima/packem [2.0.0-alpha.77](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.76...@visulima/packem@2.0.0-alpha.77) (2026-04-27)
+
+### Bug Fixes
+
+* **packem:** route .d.mts/.d.cts outputs to matching .mts/.cts source ([3ae5815](https://github.com/visulima/packem/commit/3ae5815520771522002f527a14904a1dc8f1ba6b))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.64
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.45
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.44
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.25
+
 ## @visulima/packem [2.0.0-alpha.76](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.75...@visulima/packem@2.0.0-alpha.76) (2026-04-24)
 
 ### Bug Fixes
