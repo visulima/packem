@@ -61,6 +61,7 @@ jobs:
               with:
                   node-version: "22.x"
                   cache-prefix: "semantic-release"
+                  install-node-gyp: "true"
 
             - name: "Build Production"
               run: "pnpm run build:prod:packages"

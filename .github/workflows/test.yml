@@ -97,6 +97,7 @@ jobs:
               with:
                   node-version: "${{ matrix.node_version }}"
                   install-packages: "false"
+                  install-node-gyp: "true"
 
             - name: "Remove node-sass from unsupported node versions"
               shell: "bash"
