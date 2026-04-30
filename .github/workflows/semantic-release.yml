@@ -29,12 +29,12 @@ jobs:
 
         steps:
             - name: "Harden Runner"
-              uses: "step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0" # v2.12.0
+              uses: "step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40" # v2.19.0
               with:
                   egress-policy: "audit"
 
             - name: "Wait for workflows to succeed"
-              uses: "lewagon/wait-on-check-action@ccfb013c15c8afb7bf2b7c028fb74dc5a068cccc" # v1.3.4
+              uses: "lewagon/wait-on-check-action@9312864dfbc9fd208e9c0417843430751c042800" # v1.7.0
               timeout-minutes: 20
               with:
                   ref: "${{ github.event.pull_request.head.sha || github.sha }}"
@@ -45,7 +45,7 @@ jobs:
                   ignore-checks: "lock-closed / lock-closed, Socket Security: Pull Request Alerts, Dependabot"
 
             - name: "Git checkout"
-              uses: "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683" # v4.2.2
+              uses: "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5" # v4.3.1
               with:
                   fetch-depth: 0
                   persist-credentials: false
@@ -56,7 +56,7 @@ jobs:
 
             - name: "Setup resources and environment"
               id: "setup"
-              uses: "anolilab/workflows/step/setup@main"
+              uses: "anolilab/workflows/step/setup@586b057a4dfe3733a4b434f36f4de5f69c2e0bbd" # main
               with:
                   node-version: "20.x"
                   cache-prefix: "semantic-release"
@@ -75,7 +75,7 @@ jobs:
               run: "tar -cf - .nx/cache | lz4 > /tmp/nx_cache.tar.lz4" # compress nx cache
 
             - name: "Upload code coverage to codecov"
-              uses: "anolilab/workflows/step/codecov@main"
+              uses: "anolilab/workflows/step/codecov@586b057a4dfe3733a4b434f36f4de5f69c2e0bbd" # main
               with:
                   run-lint: "false"
                   codecov-token: "${{ secrets.CODECOV_TOKEN }}"
