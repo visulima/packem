@@ -120,4 +120,33 @@ console.log(process.version);`;
         expect(result.code).toContain("const process = __cjs_getProcess");
         expect(result.code).toContain("const __cjs_getProcess =");
     });
+
+    it("deduplicates __cjs_require declarations that use Rollup-renamed createRequire helpers", async () => {
+        expect.assertions(4);
+
+        const plugin = requireCJSTransformerPlugin({ shouldTransform: ["typescript"] }, {
+            debug: vi.fn(),
+            error: vi.fn(),
+            info: vi.fn(),
+            warn: vi.fn(),
+        } as unknown as Console);
+
+        const code = `import { createRequire as createRequire$1 } from "node:module";
+const __cjs_require = createRequire$1(import.meta.url);
+import typescript from "typescript";
+
+export const test = typescript.version;`;
+
+        const result = await (typeof plugin.renderChunk === "function" ? plugin.renderChunk : (plugin.renderChunk as any)?.handler)?.call(
+            { debug: vi.fn() },
+            code,
+            { fileName: "test.js" },
+            { format: "es" },
+        );
+
+        expect(result).toBeDefined();
+        expect(result.code).toContain("const typescript = __cjs_require(\"typescript\");");
+        expect(result.code).not.toContain("createRequire$1(import.meta.url)");
+        expect(result.code.match(/const\s+__cjs_require\s*=/g)).toHaveLength(1);
+    });
 });

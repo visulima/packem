@@ -33,7 +33,7 @@ const REGEX_PATTERNS = {
     builtin: /const\s+__cjs_getBuiltinModule\s*=\s*\(module\)\s*=>\s*\{[\s\S]*?\};\s*/g,
     import: /import\s*\{\s*createRequire(?:\s+as\s+__cjs_createRequire)?\s*\}\s*from\s*["']node:module["'];?\s*/g,
     process: /const\s+__cjs_getProcess\s*=\s*typeof\s+globalThis[^;]*;\s*/g,
-    require: /const\s+__cjs_require\s*=\s*(?:__cjs_)?createRequire\s*\([^)]*\);\s*/g,
+    require: /const\s+__cjs_require\s*=\s*(?:(?:__cjs_)?createRequire|createRequire\$\d+)\s*\([^)]*\);\s*/g,
 } as const;
 
 // Global state
