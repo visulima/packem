@@ -291,6 +291,8 @@ onlyBuiltDependencies:
 overrides:
   '@hono/node-server@<1.19.13': '>=1.19.13'
   axios@>=1.0.0 <1.15.0: '>=1.15.0'
+  axios@>=1.0.0 <1.15.1: '>=1.15.1'
+  axios@>=1.0.0 <1.15.2: '>=1.15.2'
   brace-expansion@<1.1.13: '>=1.1.13'
   brace-expansion@>=2.0.0 <2.0.3: '>=2.0.3'
   brace-expansion@>=4.0.0 <5.0.5: '>=5.0.5'
@@ -301,8 +303,10 @@ overrides:
   handlebars@>=4.0.0 <=4.7.8: '>=4.7.9'
   happy-dom@>=15.10.0 <=20.8.7: '>=20.8.8'
   hono@<4.12.12: '>=4.12.12'
+  hono@<4.12.16: '>=4.12.16'
   hono@<4.12.7: '>=4.12.7'
   hono@>=4.0.0 <=4.12.11: '>=4.12.12'
+  ip-address@<=10.1.0: '>=10.1.1'
   lodash-es@<=4.17.23: '>=4.18.0'
   lodash-es@>=4.0.0 <=4.17.23: '>=4.18.0'
   lodash@<=4.17.23: '>=4.18.0'
@@ -314,13 +318,13 @@ overrides:
   picomatch@<2.3.2: '>=2.3.2'
   picomatch@>=4.0.0 <4.0.4: '>=4.0.4'
   tmp@<=0.2.3: '>=0.2.4'
-  undici@<6.23.0: '>=6.23.0'
-  undici@<6.24.0: '>=6.24.0'
   # Force a single typescript version across the whole dep graph. Without this, deps that pin
   # an older 6.0.x (e.g. @anolilab/eslint-config, @sxzz/test-utils) pull typescript@6.0.2 while
   # the workspace uses 6.0.3 — and @volar/typescript's proxyCreateProgram surface-types clash
   # because of new private properties between 6.0.2 and 6.0.3.
   typescript: 6.0.3
+  undici@<6.23.0: '>=6.23.0'
+  undici@<6.24.0: '>=6.24.0'
   vite@>=8.0.0 <=8.0.4: '>=8.0.5'
   yaml@>=2.0.0 <2.8.3: '>=2.8.3'
 
@@ -330,12 +334,11 @@ patchedDependencies:
 peerDependencyRules:
   # vite is an optional peer of vitest/@vitest/mocker and rollup-plugin-import-trace.
   # packem itself is a rollup plugin, not a vite consumer — vite gets pulled in transitively.
-  ignoreMissing:
-    - vite
-
+  
   allowedVersions:
     # vite 8 not yet in rollup-plugin-import-trace's peer range
-    "rollup-plugin-import-trace>vite": "^8.0.0"
+    "@anolilab/eslint-config>@eslint/css": "^1.0.0"
+    "@anolilab/eslint-config>tailwind-csstree": "^0.1.0"
 
     # @anolilab/* configs pin exact prettier/secretlint/textlint; widen to current catalog
     "@anolilab/lint-staged-config>prettier": "^3.8.0"
@@ -343,34 +346,35 @@ peerDependencyRules:
     "@anolilab/prettier-config>prettier": "^3.8.0"
     "@anolilab/textlint-config>textlint": "^15.5.0"
 
-    # typedoc / @sxzz/test-utils not yet published with typescript 6 support
-    "typedoc>typescript": "^6.0.0"
+    # postgraphile stack is pulled in only by packem's externals integration test
+    "@dataplan/pg>graphql": "^15.0.0"
+    "@dataplan/pg>pg-sql2": "^4.0.0"
     "@sxzz/test-utils>typescript": "^6.0.0"
 
     # eslint 10 + typescript 6: plugins haven't updated peer ranges yet
     "eslint-plugin-no-for-of-array>eslint": "^10.0.0"
     "eslint-plugin-no-for-of-array>typescript": "^6.0.0"
     "eslint-plugin-promise>eslint": "^10.0.0"
-    "@anolilab/eslint-config>@eslint/css": "^1.0.0"
-    "@anolilab/eslint-config>tailwind-csstree": "^0.1.0"
-
-    # postgraphile stack is pulled in only by packem's externals integration test
-    "@dataplan/pg>graphql": "^15.0.0"
-    "@dataplan/pg>pg-sql2": "^4.0.0"
     "grafast>graphql": "^15.0.0"
     "grafserv>graphql": "^15.0.0"
-    "ruru>graphql": "^15.0.0"
-    "ruru-types>graphql": "^15.0.0"
-    "postgraphile>graphql": "^15.0.0"
-    "postgraphile>pg-sql2": "^4.0.0"
+    "graphile-utils>graphile-build": "^4.0.0"
+    "graphile-utils>graphile-build-pg": "^4.0.0"
+    "graphile-utils>graphql": "^15.0.0"
+    "postgraphile>@dataplan/pg": "^1.0.0"
+    "postgraphile>grafast": "^1.0.0"
     "postgraphile>graphile-build": "^4.0.0"
     "postgraphile>graphile-build-pg": "^4.0.0"
     "postgraphile>graphile-config": "^1.0.0"
-    "postgraphile>@dataplan/pg": "^1.0.0"
-    "postgraphile>grafast": "^1.0.0"
-    "graphile-utils>graphql": "^15.0.0"
-    "graphile-utils>graphile-build": "^4.0.0"
-    "graphile-utils>graphile-build-pg": "^4.0.0"
+    "postgraphile>graphql": "^15.0.0"
+    "postgraphile>pg-sql2": "^4.0.0"
+    "rollup-plugin-import-trace>vite": "^8.0.0"
+    "ruru-types>graphql": "^15.0.0"
+    "ruru>graphql": "^15.0.0"
+
+    # typedoc / @sxzz/test-utils not yet published with typescript 6 support
+    "typedoc>typescript": "^6.0.0"
+  ignoreMissing:
+    - vite
 
 publicHoistPattern:
   - "*eslint*"
