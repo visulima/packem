@@ -4,7 +4,13 @@ import type { RollupBuild } from "rollup";
 
 import { getRollupOptions } from "../rollup/get-rollup-options";
 import type { InternalBuildOptions } from "../types";
+import type { BuildOutputItem } from "../utils/collect-build-entries";
+import { collectBuildEntries } from "../utils/collect-build-entries";
 import { getRolldownBuild } from "./get-rolldown";
+
+type RolldownBundle = {
+    write: (options: unknown) => Promise<{ output: BuildOutputItem[] }>;
+};
 
 const build = async (
     context: BuildContext<InternalBuildOptions>,
@@ -22,21 +28,7 @@ const build = async (
     }
 
     const rolldown = await getRolldownBuild();
-    const bundle = await rolldown(rollupLikeOptions as unknown as Record<string, unknown>) as unknown as {
-        write: (options: unknown) => Promise<{
-            output: {
-                code?: string;
-                dynamicImports?: string[];
-                exports?: string[];
-                fileName: string;
-                imports?: string[];
-                isEntry?: boolean;
-                modules?: Record<string, { renderedLength: number }>;
-                source?: string;
-                type: string;
-            }[];
-        }>;
-    };
+    const bundle = await rolldown(rollupLikeOptions as unknown as Record<string, unknown>) as unknown as RolldownBundle;
 
     await context.hooks.callHook("rollup:build", context, bundle as unknown as RollupBuild);
 
@@ -44,43 +36,8 @@ const build = async (
 
     for (const outputOptions of rollupLikeOptions.output as unknown as Record<string, unknown>[]) {
         // eslint-disable-next-line no-await-in-loop
-        const result = await bundle.write(outputOptions);
-        const output = result.output;
-
-        const outputChunks = output.filter((f) => f.type === "chunk" && f.isEntry);
-
-        for (const entry of outputChunks) {
-            context.buildEntries.push({
-                chunks: (entry.imports ?? []).filter((index) => outputChunks.find((c) => c.fileName === index)),
-                dynamicImports: entry.dynamicImports ?? [],
-                exports: entry.exports ?? [],
-                modules: Object.entries(entry.modules ?? {}).map(([id, module_]) => ({
-                    bytes: module_.renderedLength,
-                    id,
-                })),
-                path: entry.fileName,
-                size: {
-                    bytes: Buffer.byteLength(entry.code ?? "", "utf8"),
-                },
-                type: "entry",
-            });
-        }
-
-        const outputAssets = output.filter((f) => f.type === "asset");
-
-        for (const entry of outputAssets) {
-            if (assets.has(entry.fileName)) {
-                continue;
-            }
-
-            assets.set(entry.fileName, {
-                path: entry.fileName,
-                size: {
-                    bytes: Buffer.byteLength((entry.source as string) ?? "", "utf8"),
-                },
-                type: "asset",
-            });
-        }
+        const { output } = await bundle.write(outputOptions);
+        collectBuildEntries(output, context, assets);
     }
 
     context.buildEntries.push(...assets.values());
