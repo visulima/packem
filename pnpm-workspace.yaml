@@ -263,7 +263,7 @@ catalogs:
 
 dedupeInjectedDeps: true
 dedupePeerDependents: true
-disallowWorkspaceCycles: true
+disallowWorkspaceCycles: false
 
 ignoredOptionalDependencies:
   - fsevents
