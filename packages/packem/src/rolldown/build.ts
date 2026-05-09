@@ -4,13 +4,8 @@ import type { RollupBuild } from "rollup";
 
 import { getRollupOptions } from "../rollup/get-rollup-options";
 import type { InternalBuildOptions } from "../types";
-import type { BuildOutputItem } from "../utils/collect-build-entries";
 import { collectBuildEntries } from "../utils/collect-build-entries";
 import { getRolldownBuild } from "./get-rolldown";
-
-type RolldownBundle = {
-    write: (options: unknown) => Promise<{ output: BuildOutputItem[] }>;
-};
 
 const build = async (
     context: BuildContext<InternalBuildOptions>,
@@ -28,16 +23,20 @@ const build = async (
     }
 
     const rolldown = await getRolldownBuild();
-    const bundle = await rolldown(rollupLikeOptions as unknown as Record<string, unknown>) as unknown as RolldownBundle;
+    const bundle = await rolldown(rollupLikeOptions as unknown as Record<string, unknown>);
 
     await context.hooks.callHook("rollup:build", context, bundle as unknown as RollupBuild);
 
     const assets = new Map<string, BuildContextBuildAssetAndChunk | BuildContextBuildEntry>();
 
-    for (const outputOptions of rollupLikeOptions.output as unknown as Record<string, unknown>[]) {
-        // eslint-disable-next-line no-await-in-loop
-        const { output } = await bundle.write(outputOptions);
-        collectBuildEntries(output, context, assets);
+    try {
+        for (const outputOptions of rollupLikeOptions.output as unknown as Record<string, unknown>[]) {
+            // eslint-disable-next-line no-await-in-loop
+            const { output } = await bundle.write(outputOptions);
+            collectBuildEntries(output, context, assets);
+        }
+    } finally {
+        await bundle.close?.();
     }
 
     context.buildEntries.push(...assets.values());

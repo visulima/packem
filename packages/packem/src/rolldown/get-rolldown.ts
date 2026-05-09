@@ -1,25 +1,28 @@
 import type { BuildOutputItem } from "../utils/collect-build-entries";
 
-export type RolldownBuildResult = {
-    output: BuildOutputItem[];
+export type RolldownBundle = {
+    close?: () => Promise<void>;
+    generate: (options?: unknown) => Promise<{ output: BuildOutputItem[] }>;
+    write: (options?: unknown) => Promise<{ output: BuildOutputItem[] }>;
 };
 
-export type RolldownBuild = (options: unknown) => Promise<RolldownBuildResult>;
+export type RolldownBuild = (options: unknown) => Promise<RolldownBundle>;
 
 const tryImport = async (load: () => Promise<unknown>): Promise<RolldownBuild | undefined> => {
     try {
-        const mod = (await load()) as { build?: RolldownBuild };
+        const mod = (await load()) as { rolldown?: RolldownBuild };
 
-        return typeof mod.build === "function" ? mod.build : undefined;
+        return typeof mod.rolldown === "function" ? mod.rolldown : undefined;
     } catch {
         return undefined;
     }
 };
 
 /**
- * Resolve Rolldown's build function from either '@rolldown/node' (preferred)
- * or 'rolldown'. Both packages are optional peer deps so they're not declared
- * in package.json — type imports are suppressed via ts-ignore.
+ * Resolve Rolldown's `rolldown()` factory from either '@rolldown/node' (preferred)
+ * or 'rolldown'. The factory returns a bundle with `.write()` / `.generate()` —
+ * matching Rollup's two-step API. The top-level `build()` is a one-shot helper
+ * that returns the output directly and is not what we want here.
  */
 export async function getRolldownBuild(): Promise<RolldownBuild> {
     // Literal-string imports keep packem's own bundler (rollup-plugin-dynamic-import-vars)
