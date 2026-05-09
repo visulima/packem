@@ -146,7 +146,40 @@ const createSplitChunks = (
 
         // Collect the sub modules of the entry, if they're having layer, and the same layer with the entry, push them to the dependencyGraphMap.
         if (isEntry) {
-            const subModuleIds = context.getModuleIds();
+            const subModuleIds: Iterable<string>
+                // Rollup exposes `getModuleIds()` returning every module in the build.
+                // Rolldown's `manualChunks` context only exposes `getModuleInfo`, so we
+                // fall back to a graph walk from the entry via `importedIds`.
+                = typeof (context as { getModuleIds?: () => Iterable<string> }).getModuleIds === "function"
+                    ? (context as { getModuleIds: () => Iterable<string> }).getModuleIds()
+                    : (() => {
+                        const visited = new Set<string>();
+                        const stack: string[] = [id];
+
+                        while (stack.length > 0) {
+                            const current = stack.pop() as string;
+
+                            if (visited.has(current)) {
+                                continue;
+                            }
+
+                            visited.add(current);
+
+                            const info = context.getModuleInfo(current);
+
+                            if (!info) {
+                                continue;
+                            }
+
+                            for (const next of info.importedIds) {
+                                if (!visited.has(next)) {
+                                    stack.push(next);
+                                }
+                            }
+                        }
+
+                        return visited;
+                    })();
 
             for (const subId of subModuleIds) {
                 const subModuleInfo = context.getModuleInfo(subId);

@@ -22,8 +22,11 @@ export const importAttributesPlugin = (): Plugin => {
     return {
         name: "packem:import-attributes",
 
-        async resolveId(source, importer, { attributes }) {
-            if (attributes.type !== "text" && attributes.type !== "bytes") {
+        async resolveId(source, importer, options) {
+            const attributes = options?.attributes;
+            const type = attributes?.type;
+
+            if (type !== "text" && type !== "bytes") {
                 // eslint-disable-next-line unicorn/no-null
                 return null;
             }
@@ -35,7 +38,7 @@ export const importAttributesPlugin = (): Plugin => {
 
             const resolved = resolve(dirname(importer), source);
 
-            attributeTypes.set(resolved, attributes.type);
+            attributeTypes.set(resolved, type);
 
             return resolved;
         },
