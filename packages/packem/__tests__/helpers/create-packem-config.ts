@@ -29,10 +29,14 @@ export type PackemConfigProperties = {
     transformer?: "esbuild" | "oxc" | "sucrase" | "swc";
 };
 
+const ENV_BUNDLER = process.env.PACKEM_TEST_BUNDLER;
+const envBundler: PackemConfigProperties["bundler"]
+    = ENV_BUNDLER === "rollup" || ENV_BUNDLER === "rolldown" ? ENV_BUNDLER : undefined;
+
 export const createPackemConfig = async (
     fixturePath: string,
     {
-        bundler = undefined,
+        bundler = envBundler,
         config = undefined,
         cssLoader = [],
         cssOptions = undefined,

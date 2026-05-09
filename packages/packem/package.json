@@ -182,7 +182,10 @@
         "lint:prettier:fix": "prettier --config=.prettierrc.cjs --write .",
         "lint:types": "tsc --noEmit",
         "test": "vitest run --cache",
+        "test:bundlers": "pnpm run test:rollup && pnpm run test:rolldown",
         "test:coverage": "vitest run --cache --coverage",
+        "test:rolldown": "cross-env PACKEM_TEST_BUNDLER=rolldown vitest run --cache __tests__/intigration",
+        "test:rollup": "cross-env PACKEM_TEST_BUNDLER=rollup vitest run --cache __tests__/intigration",
         "test:ui": "vitest --cache --ui --coverage.enabled=true",
         "test:watch": "vitest"
     },
@@ -282,6 +285,7 @@
         "react": "^19.2.6",
         "react-dom": "^19.2.6",
         "rimraf": "^6.1.3",
+        "rolldown": "catalog:build",
         "rollup-plugin-dts": "6.4.1",
         "rollup-plugin-license": "3.7.1",
         "rollup-plugin-lit-css": "^6.0.1",
