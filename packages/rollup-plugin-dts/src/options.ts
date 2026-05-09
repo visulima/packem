@@ -7,7 +7,9 @@ import type { TsConfigJson, TsConfigJsonResolved } from "@visulima/tsconfig";
 import { findTsConfigSync, readTsConfig } from "@visulima/tsconfig";
 import ts from "typescript";
 import type { IsolatedDeclarationsOptions } from "oxc-transform";
-import type { AddonFunction } from "rollup";
+import type { RenderedChunk } from "rollup";
+
+type AddonFunction = (chunk: RenderedChunk) => string | Promise<string>;
 
 export type FilterPattern = ReadonlyArray<string | RegExp> | string | RegExp | null;
 

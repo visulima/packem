@@ -273,7 +273,13 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
                     binding = getIdFromTSEntityName(binding as unknown as t.TSEntityName) as unknown as typeof binding;
                 }
 
-                binding = sideEffect ? t.identifier(`_${getIdentifierIndex(identifierMap, "")}`) : (binding as t.Identifier);
+                // Only rename when the original id can't be used as a JS identifier
+                // (e.g. `declare module './foo'` — StringLiteral). `declare global { }`
+                // and `declare module Foo { }` already have valid Identifier ids and
+                // must keep their names so renderChunk emits the correct keyword.
+                binding = sideEffect && (binding as t.Node).type !== "Identifier"
+                    ? t.identifier(`_${getIdentifierIndex(identifierMap, "")}`)
+                    : (binding as t.Identifier);
                 bindings.push(binding as t.Identifier);
             } else {
                 const binding = t.identifier("export_default");
