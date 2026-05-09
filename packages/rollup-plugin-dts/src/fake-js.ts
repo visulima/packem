@@ -217,6 +217,15 @@ const createFakeJsPlugin = ({ cjsDefault, sideEffects, sourcemap }: Pick<Options
             if (rewriteImportExport(stmt, setStmt, typeOnlyIds))
                 continue;
 
+            // `export as namespace X;` is a TypeScript UMD global declaration with no
+            // JS equivalent. Strip it — leaving it in the output makes rollup's parser
+            // fail on the unknown `export as` syntax.
+            if (stmt.type === "TSNamespaceExportDeclaration") {
+                stmtsToRemove.add(i);
+
+                continue;
+            }
+
             const sideEffect = stmt.type === "TSModuleDeclaration" && stmt.kind !== "namespace";
 
             // Resolve local `declare module './foo'` targets so that specifiers
