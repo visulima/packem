@@ -32,10 +32,7 @@ const uniqueNestedValues = (object: Partial<Record<string, Partial<Record<string
         }),
     );
 
-export type Node10CompatibilityOptions = {
-    typeScriptVersion?: string;
-    writeToPackageJson?: boolean;
-};
+export type { Node10CompatibilityOptions } from "./node10-compatibility-options";
 
 export const node10Compatibility = async (
     logger: BuildContext<InternalBuildOptions>["logger"],
