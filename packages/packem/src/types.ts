@@ -11,7 +11,6 @@ import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
 import type { ExeOptions } from "./exe";
 import type { Node10CompatibilityOptions } from "./packem/node10-compatibility";
-import type { ResolveExternalsPluginOptions } from "./rollup/plugins/externals-plugin";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 
@@ -258,8 +257,6 @@ export type KillSignal = "SIGKILL" | "SIGTERM";
 export interface RollupBuildOptions extends PackemRollupOptions {
     /** CSS processing options or false to disable */
     css?: StyleOptions | false;
-    /** External dependency resolution plugin options */
-    resolveExternals?: ResolveExternalsPluginOptions;
 }
 
 export type RollupPlugins = {

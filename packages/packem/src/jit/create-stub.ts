@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from "@visulima/fs";
+import { resolveAliases } from "@visulima/packem-rollup";
 import { getShebang, makeExecutable } from "@visulima/packem-rollup/plugin/shebang";
 import { DEFAULT_EXTENSIONS, ENDING_REGEX } from "@visulima/packem-share/constants";
 import type { BuildContext } from "@visulima/packem-share/types";
@@ -6,7 +7,6 @@ import { getDtsExtension, getOutputExtension, warn } from "@visulima/packem-shar
 import { dirname, relative, resolve } from "@visulima/path";
 import { fileURLToPath, pathToFileURL, resolveModuleExportNames, resolvePath } from "mlly";
 
-import resolveAliases from "../rollup/utils/resolve-aliases";
 import type { InternalBuildOptions } from "../types";
 
 const IDENTIFIER_REGEX = /^[_$a-z\u00A0-\uFFFF][\w$\u00A0-\uFFFF]*$/iu;

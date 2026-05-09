@@ -18,6 +18,7 @@ import type { DataUriPluginOptions } from "./plugins/data-uri";
 import type { DebarrelPluginOptions } from "./plugins/debarrel";
 import type { EsbuildPluginConfig, Options as EsbuildOptions } from "./plugins/esbuild/types";
 import type { EsmShimCjsSyntaxOptions } from "./plugins/esm-shim-cjs-syntax";
+import type { ResolveExternalsPluginOptions } from "./plugins/externals-options";
 import type { JSXRemoveAttributesPlugin } from "./plugins/jsx-remove-attributes";
 import type { LicenseOptions } from "./plugins/license";
 import type { MinifyHTMLLiteralsOptions } from "./plugins/minify-html-literals";
@@ -110,6 +111,7 @@ export interface PackemRollupOptions {
     replace?: Omit<RollupReplaceOptions, "cwd"> | false;
     requireCJS?: RequireCJSPluginOptions | false;
     resolve?: ExtendedRollupNodeResolveOptions | false;
+    resolveExternals?: ResolveExternalsPluginOptions;
     shebang?: Partial<ShebangOptions> | false;
     shim?: EsmShimCjsSyntaxOptions | false;
     sourcemap?: SourcemapsPluginOptions;

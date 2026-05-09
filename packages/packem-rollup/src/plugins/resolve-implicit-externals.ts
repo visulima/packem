@@ -4,12 +4,10 @@ import { isAccessible } from "@visulima/fs";
 import type { PackageJson } from "@visulima/package";
 import { parsePackageJsonSync } from "@visulima/package/package-json";
 import type { BuildContext } from "@visulima/packem-share/types";
+import { isBareSpecifier, parseSpecifier } from "@visulima/packem-share/utils";
 import { dirname, join, relative, resolve } from "@visulima/path";
 import MagicString from "magic-string";
 import type { Plugin, TransformResult } from "rollup";
-
-import type { InternalBuildOptions } from "../../types";
-import { isBareSpecifier, parseSpecifier } from "../../utils/import-specifier";
 
 /**
  * Try to resolve a file with implicit extensions (.js, .json)
@@ -96,7 +94,7 @@ const findPackageJson = async (startDirectory: string, packageName: string): Pro
  * 3. If no exports, resolves the file with implicit extensions
  * 4. Rewrites the import to include the explicit path.
  */
-const resolveImplicitExternalsPlugin = (context: BuildContext<InternalBuildOptions>): Plugin => {
+const resolveImplicitExternalsPlugin = <T = unknown>(context: BuildContext<T>): Plugin => {
     // Cache for package.json reads and resolution results
     const packageJsonCache = new Map<string, PackageJson | undefined>();
     const resolutionCache = new Map<string, string | undefined>();
@@ -127,7 +125,6 @@ const resolveImplicitExternalsPlugin = (context: BuildContext<InternalBuildOptio
             }
 
             // Find all import/export statements with bare specifiers
-            // Match import/export statements by finding 'from' keyword and extracting the module specifier
             const fromRegex = /\bfrom\s+['"`]([^'"`]+)['"`]/g;
             const matches: { importId: string; quoteEnd: number; quoteStart: number }[] = [];
 

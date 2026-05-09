@@ -133,6 +133,14 @@
             "types": "./dist/plugins/json.d.ts",
             "default": "./dist/plugins/json.js"
         },
+        "./plugin/externals": {
+            "types": "./dist/plugins/externals.d.ts",
+            "default": "./dist/plugins/externals.js"
+        },
+        "./plugin/resolve-implicit-externals": {
+            "types": "./dist/plugins/resolve-implicit-externals.d.ts",
+            "default": "./dist/plugins/resolve-implicit-externals.js"
+        },
         "./package.json": "./package.json"
     },
     "files": [
@@ -168,6 +176,7 @@
         "@rollup/plugin-replace": "catalog:build",
         "@rollup/plugin-wasm": "catalog:build",
         "@rollup/pluginutils": "catalog:build",
+        "@visulima/colorize": "catalog:visulima",
         "@visulima/find-cache-dir": "catalog:visulima",
         "@visulima/fs": "catalog:visulima",
         "@visulima/package": "catalog:visulima",

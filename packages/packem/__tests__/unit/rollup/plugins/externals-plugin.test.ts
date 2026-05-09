@@ -4,8 +4,8 @@ import type { TsConfigResult } from "@visulima/tsconfig";
 import type { InputOptions, NullValue } from "rollup";
 import { describe, expect, it, vi } from "vitest";
 
-import type { ResolveExternalsPluginOptions } from "../../../../src/rollup/plugins/externals-plugin";
-import { externalsPlugin } from "../../../../src/rollup/plugins/externals-plugin";
+import type { ResolveExternalsPluginOptions } from "@visulima/packem-rollup/plugin/externals";
+import { externalsPlugin } from "@visulima/packem-rollup/plugin/externals";
 import type { InternalBuildOptions } from "../../../../src/types";
 import { MockPluginContext } from "../../../helpers";
 

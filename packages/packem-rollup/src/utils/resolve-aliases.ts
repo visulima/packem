@@ -1,9 +1,20 @@
+import type { Alias, RollupAliasOptions } from "@rollup/plugin-alias";
 import type { PackageJson } from "@visulima/package";
-import type { Alias } from "@visulima/packem-rollup";
 
-import type { InternalBuildOptions } from "../../types";
+/**
+ * Subset of build options that `resolveAliases` consumes. Defined here so the
+ * helper can live in `@visulima/packem-rollup` without depending on packem
+ * core's `InternalBuildOptions`.
+ */
+export type ResolveAliasesOptions = {
+    alias?: Record<string, string>;
+    rollup: {
+        alias?: RollupAliasOptions | false;
+    };
+    rootDir: string;
+};
 
-const resolveAliases = (packageJson: PackageJson, options: InternalBuildOptions): Record<string, string> => {
+const resolveAliases = (packageJson: PackageJson, options: ResolveAliasesOptions): Record<string, string> => {
     let aliases: Record<string, string> = {};
 
     if (packageJson.name) {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isFromNodeModules, isOutsideProject } from "../../../src/utils/import-specifier";
+import { isFromNodeModules, isOutsideProject } from "@visulima/packem-share/utils";
 
 describe("isFromNodeModules", () => {
     const cwd = "/home/user/project";

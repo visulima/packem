@@ -2,16 +2,15 @@ import fs from "node:fs";
 
 import { cyan } from "@visulima/colorize";
 import type { BuildContext } from "@visulima/packem-share/types";
-import { getPackageName } from "@visulima/packem-share/utils";
+import { getPackageName, isBareSpecifier, isFromNodeModules, isOutsideProject, parseSpecifier } from "@visulima/packem-share/utils";
 import type { Pail } from "@visulima/pail";
 import { isAbsolute } from "@visulima/path";
 import { resolveAlias, toPath } from "@visulima/path/utils";
 import { isNodeBuiltin, parseNodeModulePath } from "mlly";
 import type { InputOptions, Plugin, ResolveIdResult } from "rollup";
 
-import type { InternalBuildOptions } from "../../types";
-import { isBareSpecifier, isFromNodeModules, isOutsideProject, parseSpecifier } from "../../utils/import-specifier.js";
 import resolveAliases from "../utils/resolve-aliases";
+import type { ExternalsBuildOptions, ExternalsPluginOptions } from "./externals-options";
 
 type MaybeFalsy<T> = T | false | null | undefined;
 
@@ -77,72 +76,7 @@ const getOriginalPackageName = (typePackageName: string): string => {
 
 const dependencyTypes = ["peerDependencies", "dependencies", "optionalDependencies"] as const;
 
-/**
- * User-facing configuration for externals classification, mirrored at
- * `packem.config.ts` → `rollup.resolveExternals`.
- */
-export type ResolveExternalsPluginOptions = {
-    /**
-     * Mark node built-in modules like `path`, `fs`... as external.
-     *
-     * Set to `false` to use shims/polyfills instead.
-     * @default true
-     */
-    builtins?: boolean;
-
-    /**
-     * `node:` prefix handling for imports of Node builtins:
-     * - `'add'`    turns `'path'` into `'node:path'`
-     * - `'strip'`  turns `'node:path'` into `'path'`
-     * - `'ignore'` leaves names as written
-     * @default "add"
-     */
-    builtinsPrefix?: "add" | "ignore" | "strip";
-
-    /** Mark `dependencies` as external. @default true */
-    deps?: boolean;
-
-    /** Mark `devDependencies` as external. @default false */
-    devDeps?: boolean;
-
-    /**
-     * Force exclude these ids from the external list, regardless of other
-     * settings. @default []
-     */
-    exclude?: MaybeFalsy<RegExp | string>[];
-
-    /** Mark `optionalDependencies` as external. @default true */
-    optDeps?: boolean;
-
-    /** Mark `peerDependencies` as external. @default true */
-    peerDeps?: boolean;
-};
-
-export type ExternalsPluginOptions = {
-    /**
-     * Patterns whose types the DTS plugin should inline rather than leaving as
-     * external imports. Matched specifiers return `undefined` from resolveId
-     * and are added to the `exclude` list for `options.external` so later
-     * plugins (including the DTS resolver) can load them, but they are still
-     * recorded in `usedDependencies` when declared in package.json.
-     * Uses the same format as rollup-plugin-dts's `resolve` option. Only
-     * meaningful for DTS builds.
-     */
-    dtsResolve?: boolean | (string | RegExp)[];
-
-    /**
-     * Enables recommendation warnings for @types/X vs X dependency-placement
-     * mismatches. Enabled for DTS builds.
-     */
-    forTypes?: boolean;
-
-    /**
-     * Suppresses the "imported but not declared in package.json" warning.
-     * Enabled for DTS builds where type imports may legitimately reach
-     * packages that are not runtime deps.
-     */
-    skipUnlistedWarnings?: boolean;
-};
+export type { ExternalsBuildOptions, ExternalsPluginOptions, ResolveExternalsPluginOptions } from "./externals-options";
 
 /**
  * Unified externals plugin.
@@ -164,7 +98,7 @@ export type ExternalsPluginOptions = {
  * handles cases that need plugin context — `this.resolve`/`this.error` for
  * devDeps, `#` imports, and node builtin prefix handling.
  */
-export const externalsPlugin = (context: BuildContext<InternalBuildOptions>, options?: ExternalsPluginOptions): Plugin => {
+export const externalsPlugin = <T extends ExternalsBuildOptions>(context: BuildContext<T>, options?: ExternalsPluginOptions): Plugin => {
     const cwd = fs.realpathSync.native(process.cwd());
     const { pkg } = context;
 
@@ -225,7 +159,7 @@ export const externalsPlugin = (context: BuildContext<InternalBuildOptions>, opt
         return dtsResolve.some((pattern) => (typeof pattern === "string" ? id === pattern : pattern.test(id)));
     };
 
-    const classifiedDeps: Record<string, string> = {
+    const classifiedDeps: Record<string, string | undefined> = {
         ...resolvedExternalsOptions.deps ? pkg.dependencies ?? {} : undefined,
         ...resolvedExternalsOptions.devDeps ? pkg.devDependencies ?? {} : undefined,
         ...resolvedExternalsOptions.peerDeps ? pkg.peerDependencies ?? {} : undefined,
@@ -319,7 +253,7 @@ export const externalsPlugin = (context: BuildContext<InternalBuildOptions>, opt
                         importerFromSource
                         && !declared
                         && context.options.validation
-                        && context.options.validation.dependencies !== false
+                        && context.options.validation.dependencies
                         && context.options.validation.dependencies.hoisted !== false
                         && !context.options.validation.dependencies.hoisted?.exclude.includes(packageName)
                     ) {
@@ -547,4 +481,3 @@ export const externalsPlugin = (context: BuildContext<InternalBuildOptions>, opt
         },
     };
 };
-

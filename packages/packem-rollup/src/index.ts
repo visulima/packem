@@ -15,6 +15,7 @@ export type {
 export { default as createSplitChunks } from "./utils/chunks/create-split-chunks";
 export { default as getCustomModuleLayer } from "./utils/chunks/get-custom-module-layer";
 export { default as getModuleLayer } from "./utils/chunks/get-module-layer";
+export { default as resolveAliases, type ResolveAliasesOptions } from "./utils/resolve-aliases";
 export type { Alias, ResolverObject as AliasResolverObject, ResolvedAlias, RollupAliasOptions } from "@rollup/plugin-alias";
 export { default as alias } from "@rollup/plugin-alias";
 export type { RollupCommonJSOptions } from "@rollup/plugin-commonjs";
