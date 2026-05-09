@@ -5,7 +5,7 @@ import { createInterface } from "node:readline/promises";
 
 import type { Cli } from "@visulima/cerebro";
 
-import pkg from "../../../package.json" with { type: "json" };
+import pkg from "../../../package.json";
 
 /**
  * Migrates a project from other bundlers to packem.

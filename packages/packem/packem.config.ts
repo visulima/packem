@@ -6,6 +6,7 @@ export default defineConfig({
     cjsInterop: true,
     externals: [
         "@babel/parser",
+        "@rolldown/node",
         "@rollup/plugin-alias",
         "@rollup/plugin-commonjs",
         "@rollup/plugin-dynamic-import-vars",
@@ -15,6 +16,7 @@ export default defineConfig({
         "@rollup/plugin-replace",
         "@rollup/plugin-wasm",
         "@rollup/pluginutils",
+        "rolldown",
         "rollup-plugin-visualizer",
         "rollup-plugin-polyfill-node",
         "rollup-plugin-pure",
@@ -41,7 +43,7 @@ export default defineConfig({
     validation: {
         dependencies: {
             hoisted: {
-                exclude: ["estree"],
+                exclude: ["estree", "@rolldown/node", "rolldown"],
             },
             unused: {
                 exclude: ["oxc-transform", "@rollup/plugin-inject"],
