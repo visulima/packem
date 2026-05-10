@@ -18,23 +18,24 @@ export = test;
 `;
 
 exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > cjs output 1`] = `
-"'use strict';
-
-Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
-
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region src/index.ts
 const test = () => {
-  return "this should be in final bundle";
+	return "this should be in final bundle";
 };
 const test2 = "this should be in final bundle";
 const test3 = "this should be in final bundle";
 const test4 = "this should be in final bundle";
 const test5 = "this should be in final bundle";
-
-module.exports = test;
-module.exports.test2 = test2;
-module.exports.test3 = test3;
-module.exports.test4 = test4;
-module.exports.test5 = test5;
+//#endregion
+exports.default = test;
+exports.test2 = test2;
+exports.test3 = test3;
+exports.test4 = test4;
+exports.test5 = test5;
 "
 `;
 
@@ -66,14 +67,15 @@ export { test as default, test2, test3, test4, test5 };
 `;
 
 exports[`packem node exports > cjs-interop > should output 'default export with multi named export' correctly when cjsInterop > mjs output 1`] = `
-"const test = () => {
-  return "this should be in final bundle";
+"//#region src/index.ts
+const test = () => {
+	return "this should be in final bundle";
 };
 const test2 = "this should be in final bundle";
 const test3 = "this should be in final bundle";
 const test4 = "this should be in final bundle";
 const test5 = "this should be in final bundle";
-
+//#endregion
 export { test as default, test2, test3, test4, test5 };
 "
 `;
@@ -93,17 +95,18 @@ export = test;
 `;
 
 exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > cjs output 1`] = `
-"'use strict';
-
-Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
-
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region src/index.ts
 const test = () => {
-  return "this should be in final bundle";
+	return "this should be in final bundle";
 };
 const test2 = "this should be in final bundle";
-
-module.exports = test;
-module.exports.test2 = test2;
+//#endregion
+exports.default = test;
+exports.test2 = test2;
 "
 `;
 
@@ -129,11 +132,12 @@ export { test as default, test2 };
 `;
 
 exports[`packem node exports > cjs-interop > should output 'default export with named export' correctly when cjsInterop > mjs output 1`] = `
-"const test = () => {
-  return "this should be in final bundle";
+"//#region src/index.ts
+const test = () => {
+	return "this should be in final bundle";
 };
 const test2 = "this should be in final bundle";
-
+//#endregion
 export { test as default, test2 };
 "
 `;
@@ -146,9 +150,7 @@ export { test as default };
 `;
 
 exports[`packem node exports > cjs-interop > should output 'default export' correctly and dont transform dts when cjsInterop 2`] = `
-"'use strict';
-
-const test = () => "this should be in final bundle";
+"const test = () => "this should be in final bundle";
 
 module.exports = test;
 "
@@ -163,15 +165,16 @@ export { d as default, packageA };
 `;
 
 exports[`packem node exports > should generate correct chunks names, when chunk per export is generated 2`] = `
-"export { packageA } from './package.mjs';
+"import { packageA } from './package.mjs';
+export { packageA };
 "
 `;
 
 exports[`packem node exports > should generate correct chunks names, when chunk per export is generated 3`] = `
-"'use strict';
-
-Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
-
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
 const packageA = () => "This is a named export";
 const d = "This is a default export";
 
@@ -181,13 +184,9 @@ exports.packageA = packageA;
 `;
 
 exports[`packem node exports > should generate correct chunks names, when chunk per export is generated 4`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const _package = require('./package.cjs');
-
-exports.packageA = _package.packageA;
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const require_package = require('./package.cjs');
+exports.packageA = require_package.packageA;
 "
 `;
 
@@ -198,10 +197,9 @@ export = test;
 `;
 
 exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension > cjs output 1`] = `
-"'use strict';
-
+"//#region src/index.ts
 const test = "test content";
-
+//#endregion
 module.exports = test;
 "
 `;
@@ -219,8 +217,9 @@ export { test as default };
 `;
 
 exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension > mjs output 1`] = `
-"const test = "test content";
-
+"//#region src/index.ts
+const test = "test content";
+//#endregion
 export { test as default };
 "
 `;
@@ -232,10 +231,9 @@ export = test;
 `;
 
 exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension - case 2 > cjs output 1`] = `
-"'use strict';
-
+"//#region src/index.ts
 const test = "test content";
-
+//#endregion
 module.exports = test;
 "
 `;
@@ -253,8 +251,9 @@ export { test as default };
 `;
 
 exports[`packem node exports > should only find the correct export file, if files with the same name exist but with different extension - case 2 > mjs output 1`] = `
-"const test = "test content";
-
+"//#region src/index.ts
+const test = "test content";
+//#endregion
 export { test as default };
 "
 `;
@@ -275,27 +274,23 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly > cjs output 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-class Parent {
-  constructor() {
-  }
-}
-class Feature {
-  constructor() {
-  }
-}
-class Child extends Parent {
-  feature = new Feature();
-  constructor() {
-    console.log("before");
-    super();
-    console.log("after");
-  }
-}
-
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/index.ts
+var Parent = class {
+	constructor() {}
+};
+var Feature = class {
+	constructor() {}
+};
+var Child = class extends Parent {
+	constructor() {
+		console.log("before");
+		super();
+		this.feature = new Feature();
+		console.log("after");
+	}
+};
+//#endregion
 exports.Child = Child;
 "
 `;
@@ -331,23 +326,22 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly > mjs output 1`] = `
-"class Parent {
-  constructor() {
-  }
-}
-class Feature {
-  constructor() {
-  }
-}
-class Child extends Parent {
-  feature = new Feature();
-  constructor() {
-    console.log("before");
-    super();
-    console.log("after");
-  }
-}
-
+"//#region src/index.ts
+var Parent = class {
+	constructor() {}
+};
+var Feature = class {
+	constructor() {}
+};
+var Child = class extends Parent {
+	constructor() {
+		console.log("before");
+		super();
+		this.feature = new Feature();
+		console.log("after");
+	}
+};
+//#endregion
 export { Child };
 "
 `;
@@ -368,9 +362,98 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > cjs output 1`] = `
-""use strict";var o=Object.defineProperty;var e=(t,r)=>o(t,"name",{value:r,configurable:!0});Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});var c=Object.defineProperty,s=e((t,r)=>c(t,"name",{value:r,configurable:!0}),"o");class a{static{e(this,"t")}static{s(this,"Parent")}constructor(){}}class l{static{e(this,"c")}static{s(this,"Feature")}constructor(){}}class i extends a{static{e(this,"Child")}static{s(this,"Child")}feature=new l;constructor(){console.log("before"),super(),console.log("after")}}exports.Child=i;
-//# sourceMappingURL=index.cjs.map
-"
+"var g = Object.defineProperty;
+var u = (e, r) => g(e, "name", {
+	value: r,
+	configurable: !0
+});
+Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+var b = Object.defineProperty, t = u((e, r) => b(e, "name", {
+	value: r,
+	configurable: !0
+}), "o$1"), h = Object.create, i = Object.defineProperty;
+t((e, r) => i(e, "name", {
+	value: r,
+	configurable: !0
+}), "__name");
+var P = Object.getOwnPropertyDescriptor, f = Object.getOwnPropertyNames, O = Object.getPrototypeOf, d = Object.prototype.hasOwnProperty;
+t((e, r) => function() {
+	return e && (r = (0, e[f(e)[0]])(e = 0)), r;
+}, "__esm");
+t((e, r) => () => (e && (r = e(e = 0)), r), "__esmMin");
+t((e, r) => function() {
+	return r || ((0, e[f(e)[0]])((r = { exports: {} }).exports, r), e = null), r.exports;
+}, "__commonJS");
+t((e, r) => () => (r || (e((r = { exports: {} }).exports, r), e = null), r.exports), "__commonJSMin");
+t((e, r) => {
+	let o = {};
+	for (var a in e) i(o, a, {
+		get: e[a],
+		enumerable: !0
+	});
+	return r || i(o, Symbol.toStringTag, { value: "Module" }), o;
+}, "__exportAll");
+var v = t((e, r, o, a) => {
+	if (r && typeof r == "object" || typeof r == "function") for (var l = f(r), n = 0, s = l.length, _; n < s; n++) _ = l[n], !d.call(e, _) && _ !== o && i(e, _, {
+		get: ((c) => r[c]).bind(null, _),
+		enumerable: !(a = P(r, _)) || a.enumerable
+	});
+	return e;
+}, "__copyProps");
+t((e, r, o) => (v(e, r, "default"), o && v(o, r, "default")), "__reExport");
+t((e, r, o) => (o = e != null ? h(O(e)) : {}, v(r || !e || !e.__esModule ? i(o, "default", {
+	value: e,
+	enumerable: !0
+}) : o, e)), "__toESM");
+t((e) => d.call(e, "module.exports") ? e["module.exports"] : v(i({}, "__esModule", { value: !0 }), e), "__toCommonJS");
+t((e) => new Uint8Array(Buffer.from(e, "base64")), "__toBinaryNode");
+(() => {
+	for (var e = new Uint8Array(128), r = 0; r < 64; r++) e[r < 26 ? r + 65 : r < 52 ? r + 71 : r < 62 ? r - 4 : r * 4 - 205] = r;
+	return (o) => {
+		for (var a = o.length, l = new Uint8Array((a - (o[a - 1] == "=") - (o[a - 2] == "=")) * 3 / 4 | 0), n = 0, s = 0; n < a;) {
+			var _ = e[o.charCodeAt(n++)], c = e[o.charCodeAt(n++)], m = e[o.charCodeAt(n++)], y = e[o.charCodeAt(n++)];
+			l[s++] = _ << 2 | c >> 4, l[s++] = c << 4 | m >> 2, l[s++] = m << 6 | y;
+		}
+		return l;
+	};
+})();
+((e) => typeof require < "u" ? require : typeof Proxy < "u" ? new Proxy(e, { get: t((r, o) => (typeof require < "u" ? require : r)[o], "get") }) : e)(function(e) {
+	if (typeof require < "u") return require.apply(this, arguments);
+	throw Error("Calling \`require\` for \\"" + e + "\\" in an environment that doesn't expose the \`require\` function. See https://rolldown.rs/in-depth/bundling-cjs#require-external-modules for more details.");
+});
+var x = Object.defineProperty, p = u((e, r) => x(e, "name", {
+	value: r,
+	configurable: !0
+}), "o"), w = class {
+	static {
+		u(this, "t");
+	}
+	static {
+		p(this, "Parent");
+	}
+	constructor() {}
+}, S = class {
+	static {
+		u(this, "c");
+	}
+	static {
+		p(this, "Feature");
+	}
+	constructor() {}
+}, j = class extends w {
+	static {
+		u(this, "Child");
+	}
+	static {
+		p(this, "Child");
+	}
+	constructor() {
+		this.feature = new S(), console.log("before"), super(), console.log("after");
+	}
+};
+exports.Child = j;
+
+//# sourceMappingURL=index.cjs.map"
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > dts output 1`] = `
@@ -404,9 +487,96 @@ export { Child };
 `;
 
 exports[`packem node exports > should output 'class' with 'extends correctly when minify is used > mjs output 1`] = `
-"var c=Object.defineProperty;var e=(t,s)=>c(t,"name",{value:s,configurable:!0});var o=Object.defineProperty,r=e((t,s)=>o(t,"name",{value:s,configurable:!0}),"o");class a{static{e(this,"t")}static{r(this,"Parent")}constructor(){}}class l{static{e(this,"c")}static{r(this,"Feature")}constructor(){}}class i extends a{static{e(this,"Child")}static{r(this,"Child")}feature=new l;constructor(){console.log("before"),super(),console.log("after")}}export{i as Child};
-//# sourceMappingURL=index.mjs.map
-"
+"var g = Object.defineProperty;
+var u = (e, r) => g(e, "name", {
+	value: r,
+	configurable: !0
+}), b = Object.defineProperty, t = u((e, r) => b(e, "name", {
+	value: r,
+	configurable: !0
+}), "o$1"), h = Object.create, i = Object.defineProperty;
+t((e, r) => i(e, "name", {
+	value: r,
+	configurable: !0
+}), "__name");
+var x = Object.getOwnPropertyDescriptor, v = Object.getOwnPropertyNames, P = Object.getPrototypeOf, d = Object.prototype.hasOwnProperty;
+t((e, r) => function() {
+	return e && (r = (0, e[v(e)[0]])(e = 0)), r;
+}, "__esm");
+t((e, r) => () => (e && (r = e(e = 0)), r), "__esmMin");
+t((e, r) => function() {
+	return r || ((0, e[v(e)[0]])((r = { exports: {} }).exports, r), e = null), r.exports;
+}, "__commonJS");
+t((e, r) => () => (r || (e((r = { exports: {} }).exports, r), e = null), r.exports), "__commonJSMin");
+t((e, r) => {
+	let o = {};
+	for (var a in e) i(o, a, {
+		get: e[a],
+		enumerable: !0
+	});
+	return r || i(o, Symbol.toStringTag, { value: "Module" }), o;
+}, "__exportAll");
+var p = t((e, r, o, a) => {
+	if (r && typeof r == "object" || typeof r == "function") for (var l = v(r), n = 0, s = l.length, _; n < s; n++) _ = l[n], !d.call(e, _) && _ !== o && i(e, _, {
+		get: ((c) => r[c]).bind(null, _),
+		enumerable: !(a = x(r, _)) || a.enumerable
+	});
+	return e;
+}, "__copyProps");
+t((e, r, o) => (p(e, r, "default"), o && p(o, r, "default")), "__reExport");
+t((e, r, o) => (o = e != null ? h(P(e)) : {}, p(r || !e || !e.__esModule ? i(o, "default", {
+	value: e,
+	enumerable: !0
+}) : o, e)), "__toESM");
+t((e) => d.call(e, "module.exports") ? e["module.exports"] : p(i({}, "__esModule", { value: !0 }), e), "__toCommonJS");
+t((e) => new Uint8Array(Buffer.from(e, "base64")), "__toBinaryNode");
+(() => {
+	for (var e = new Uint8Array(128), r = 0; r < 64; r++) e[r < 26 ? r + 65 : r < 52 ? r + 71 : r < 62 ? r - 4 : r * 4 - 205] = r;
+	return (o) => {
+		for (var a = o.length, l = new Uint8Array((a - (o[a - 1] == "=") - (o[a - 2] == "=")) * 3 / 4 | 0), n = 0, s = 0; n < a;) {
+			var _ = e[o.charCodeAt(n++)], c = e[o.charCodeAt(n++)], m = e[o.charCodeAt(n++)], y = e[o.charCodeAt(n++)];
+			l[s++] = _ << 2 | c >> 4, l[s++] = c << 4 | m >> 2, l[s++] = m << 6 | y;
+		}
+		return l;
+	};
+})();
+((e) => typeof require < "u" ? require : typeof Proxy < "u" ? new Proxy(e, { get: t((r, o) => (typeof require < "u" ? require : r)[o], "get") }) : e)(function(e) {
+	if (typeof require < "u") return require.apply(this, arguments);
+	throw Error("Calling \`require\` for \\"" + e + "\\" in an environment that doesn't expose the \`require\` function. See https://rolldown.rs/in-depth/bundling-cjs#require-external-modules for more details.");
+});
+var O = Object.defineProperty, f = u((e, r) => O(e, "name", {
+	value: r,
+	configurable: !0
+}), "o"), w = class {
+	static {
+		u(this, "t");
+	}
+	static {
+		f(this, "Parent");
+	}
+	constructor() {}
+}, S = class {
+	static {
+		u(this, "c");
+	}
+	static {
+		f(this, "Feature");
+	}
+	constructor() {}
+}, $ = class extends w {
+	static {
+		u(this, "Child");
+	}
+	static {
+		f(this, "Child");
+	}
+	constructor() {
+		this.feature = new S(), console.log("before"), super(), console.log("after");
+	}
+};
+export { $ as Child };
+
+//# sourceMappingURL=index.mjs.map"
 `;
 
 exports[`packem node exports > should output 'default export' correctly 1`] = `
@@ -417,9 +587,7 @@ export { test as default };
 `;
 
 exports[`packem node exports > should output 'default export' correctly 2`] = `
-"'use strict';
-
-const test = "this should be in final bundle";
+"const test = "this should be in final bundle";
 
 module.exports = test;
 "
@@ -433,9 +601,7 @@ export { test as default };
 `;
 
 exports[`packem node exports > should output 'default export' for nested folder correctly 2`] = `
-"'use strict';
-
-const test = "this should be in final bundle";
+"const test = "this should be in final bundle";
 
 module.exports = test;
 "

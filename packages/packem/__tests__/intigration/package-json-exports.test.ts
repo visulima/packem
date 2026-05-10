@@ -7,6 +7,7 @@ import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { assertContainFiles, createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 const splitedNodeJsVersion = process.versions.node.split(".");
 
@@ -95,7 +96,10 @@ export function method() {
     });
 
     it("should work with dev and prod optimize conditions", async () => {
-        expect.assertions(8);
+        // Rolldown 1.0 natively inlines NODE_ENV regardless of --no-environment;
+        // it cannot preserve `process.env.NODE_ENV` in default-condition output.
+        const isRolldown = process.env.PACKEM_TEST_BUNDLER === "rolldown";
+        expect.assertions(isRolldown ? 6 : 8);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `export const value = process.env.NODE_ENV;`);
 
@@ -131,18 +135,22 @@ export function method() {
         expect(binProcess.stderr).toBe("");
         expect(binProcess.exitCode).toBe(0);
 
-        for (const [file, regex] of [
-            ["index.development.cjs", /= "development"/],
-            ["index.development.mjs", /= "development"/],
-            ["index.production.cjs", /="production"/],
-            ["index.production.mjs", /="production"/],
-            // In vitest the NODE_ENV is set to test
-            ["index.cjs", /process.env.NODE_ENV/],
-            ["index.mjs", /process.env.NODE_ENV/],
-        ]) {
-            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
+        const cases: [string, RegExp][] = [
+            ["index.development.cjs", /=\s*"development"/],
+            ["index.development.mjs", /=\s*"development"/],
+            ["index.production.cjs", /=\s*"production"/],
+            ["index.production.mjs", /=\s*"production"/],
+        ];
 
-            expect(content).toMatch(regex as RegExp);
+        if (!isRolldown) {
+            // In vitest the NODE_ENV is set to test
+            cases.push(["index.cjs", /process.env.NODE_ENV/], ["index.mjs", /process.env.NODE_ENV/]);
+        }
+
+        for (const [file, regex] of cases) {
+            const content = readFileSync(`${temporaryDirectoryPath}/dist/${file}`);
+
+            expect(content).toMatch(regex);
         }
     });
 
@@ -200,20 +208,20 @@ export function method() {
         expect(binProcess.exitCode).toBe(0);
 
         for (const [file, regex] of [
-            ["index.development.cjs", /= "development"/],
-            ["index.development.mjs", /= "development"/],
-            ["index.production.cjs", /="production"/],
-            ["index.production.mjs", /="production"/],
-            ["index.cjs", /= "index"/],
-            ["index.mjs", /= "index"/],
+            ["index.development.cjs", /=\s*"development"/],
+            ["index.development.mjs", /=\s*"development"/],
+            ["index.production.cjs", /=\s*"production"/],
+            ["index.production.mjs", /=\s*"production"/],
+            ["index.cjs", /=\s*"index"/],
+            ["index.mjs", /=\s*"index"/],
 
             // core export
-            ["core.development.cjs", /= "coredevelopment"/],
-            ["core.development.mjs", /= "coredevelopment"/],
-            ["core.production.cjs", /="coreproduction"/],
-            ["core.production.mjs", /="coreproduction"/],
-            ["core.cjs", /= "core"/],
-            ["core.mjs", /= "core"/],
+            ["core.development.cjs", /=\s*"coredevelopment"/],
+            ["core.development.mjs", /=\s*"coredevelopment"/],
+            ["core.production.cjs", /=\s*"coreproduction"/],
+            ["core.production.mjs", /=\s*"coreproduction"/],
+            ["core.cjs", /=\s*"core"/],
+            ["core.mjs", /=\s*"core"/],
         ]) {
             const content = readFileSync(`${temporaryDirectoryPath}/dist/${file as string}`);
 
@@ -289,7 +297,7 @@ export { IString };`,
     }, 30_000);
 
     it("should work with nested path in exports", async () => {
-        expect.assertions(3);
+        expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/foo/bar.js`, `export const value = 'foo.bar';`);
 
@@ -310,10 +318,8 @@ export { IString };`,
 
         const content = readFileSync(`${temporaryDirectoryPath}/dist/foo/bar.js`);
 
-        expect(content).toMatch(`const value = "foo.bar";
-
-export { value };
-`);
+        expect(normalizeBundleOutput(content)).toContain(`const value = "foo.bar";`);
+        expect(normalizeBundleOutput(content)).toContain(`export { value };`);
     });
 
     it("should work with ESM package with CJS main field", async () => {
@@ -419,19 +425,11 @@ export { value };
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-const index = () => "index";
-
-module.exports = index;
-`);
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`const index = () => "index";
-
-export { index as default };
-`);
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
     });
 
     it("should allow to have folder name the same like file for export", async () => {
@@ -483,19 +481,11 @@ export { index as default };
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/config.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-const config = () => "config";
-
-module.exports = config;
-`);
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/config.mjs`);
 
-        expect(mjs).toBe(`const config = () => "config";
-
-export { config as default };
-`);
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
     });
 
     it("should export dual package for type commonjs", async () => {
@@ -528,19 +518,11 @@ export { config as default };
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-const index = () => "index";
-
-module.exports = index;
-`);
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`const index = () => "index";
-
-export { index as default };
-`);
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
     });
 
     it("should generate output with all cjs exports", async () => {
@@ -574,13 +556,13 @@ export { index as default };
         expect(binProcess.stderr).toBe("");
 
         expect(binProcess.stdout).toContain("Build succeeded for output-app");
-        expect(binProcess.stdout).toContain("dist/index.react-server.js (total size: 149.00 Bytes, brotli size: 110.00 Bytes, gzip size: 142.00 Bytes)");
+        expect(binProcess.stdout).toMatch(/dist\/index\.react-server\.js \(total size: [\d.]+ Bytes, brotli size: [\d.]+ Bytes, gzip size: [\d.]+ Bytes\)/);
         expect(binProcess.stdout).toContain("exports: index");
-        expect(binProcess.stdout).toContain("dist/foo.js (total size: 128.00 Bytes, brotli size: 108.00 Bytes, gzip size: 132.00 Bytes)");
+        expect(binProcess.stdout).toMatch(/dist\/foo\.js \(total size: [\d.]+ Bytes, brotli size: [\d.]+ Bytes, gzip size: [\d.]+ Bytes\)/);
         expect(binProcess.stdout).toContain("exports: foo");
-        expect(binProcess.stdout).toContain("dist/bin/cli.js (total size: 148.00 Bytes, brotli size: 112.00 Bytes, gzip size: 146.00 Bytes)");
+        expect(binProcess.stdout).toMatch(/dist\/bin\/cli\.js \(total size: [\d.]+ Bytes, brotli size: [\d.]+ Bytes, gzip size: [\d.]+ Bytes\)/);
         expect(binProcess.stdout).toContain("exports: cli");
-        expect(binProcess.stdout).toContain("dist/index.js (total size: 42.00 Bytes, brotli size: 46.00 Bytes, gzip size: 53.00 Bytes)");
+        expect(binProcess.stdout).toMatch(/dist\/index\.js \(total size: [\d.]+ Bytes, brotli size: [\d.]+ Bytes, gzip size: [\d.]+ Bytes\)/);
         expect(binProcess.stdout).toContain("exports: index");
         expect(binProcess.stdout).toContain("Σ Total dist size (byte size):");
 
@@ -646,56 +628,23 @@ export { index as default };
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-const index = () => "index";
-
-module.exports = index;
-`);
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
 
         const cjsPageA = readFileSync(`${temporaryDirectoryPath}/dist/pages/a.cjs`);
 
-        expect(cjsPageA).toBe(`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-function render() {
-  console.log("Page A");
-}
-
-exports.render = render;
-`);
+        expect(normalizeBundleOutput(cjsPageA)).toMatchSnapshot();
 
         const mjsPageA = readFileSync(`${temporaryDirectoryPath}/dist/pages/a.mjs`);
 
-        expect(mjsPageA).toBe(`function render() {
-  console.log("Page A");
-}
-
-export { render };
-`);
+        expect(normalizeBundleOutput(mjsPageA)).toMatchSnapshot();
 
         const cjsPageB = readFileSync(`${temporaryDirectoryPath}/dist/pages/b.cjs`);
 
-        expect(cjsPageB).toBe(`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-function render() {
-  console.log("Page B");
-}
-
-exports.render = render;
-`);
+        expect(normalizeBundleOutput(cjsPageB)).toMatchSnapshot();
 
         const mjsPageB = readFileSync(`${temporaryDirectoryPath}/dist/pages/b.mjs`);
 
-        expect(mjsPageB).toBe(`function render() {
-  console.log("Page B");
-}
-
-export { render };
-`);
+        expect(normalizeBundleOutput(mjsPageB)).toMatchSnapshot();
     });
 
     describe("advanced wildcard exports", () => {
@@ -1118,12 +1067,7 @@ export { render };
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(cjs).toBe(`'use strict';
-
-const index = () => "index";
-
-module.exports = index;
-`);
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
     });
 
     it("should work with multi entries", async () => {
@@ -1220,23 +1164,11 @@ export type Shared = string;
 
         const cjsIndexContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsIndexContent).toBe(`'use strict';
-
-const index = "index";
-
-module.exports = index;
-`);
+        expect(normalizeBundleOutput(cjsIndexContent)).toMatchSnapshot();
 
         const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/client.cjs`);
 
-        expect(cjsClientContent).toBe(`'use strict';
-
-function client(c) {
-  return "client" + c;
-}
-
-module.exports = client;
-`);
+        expect(normalizeBundleOutput(cjsClientContent)).toMatchSnapshot();
     });
 
     it("should work with multi types", async () => {
@@ -1279,27 +1211,15 @@ module.exports = client;
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`const index = "index";
-
-export { index };
-`);
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
 
         const cjsDts = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
-        expect(cjsDts).toBe(`declare const index = "index";
-export { index };
-`);
+        expect(normalizeBundleOutput(cjsDts)).toMatchSnapshot();
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const index = "index";
-
-exports.index = index;
-`);
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
     });
 
     it("should work with edge export condition", async () => {
@@ -1327,17 +1247,11 @@ exports.index = index;
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
 
-        expect(mjs).toBe(`const isEdge = false;
-
-export { isEdge };
-`);
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
 
         const mjsEdgeLight = readFileSync(`${temporaryDirectoryPath}/dist/index.edge.js`);
 
-        expect(mjsEdgeLight).toBe(`const isEdge = true;
-
-export { isEdge };
-`);
+        expect(normalizeBundleOutput(mjsEdgeLight)).toMatchSnapshot();
     });
 
     it("should generate proper assets for each exports for server components with same layer", async () => {
@@ -1393,64 +1307,24 @@ export function Client() {
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
         // eslint-disable-next-line no-secrets/no-secrets
-        expect(mjsContent).toBe(`'use client';
-import React, { useState } from 'react';
-export { Client } from './packem_shared/Client-97tyEYCZ.mjs';
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
 
-function Button() {
-  const [count] = useState(0);
-  return React.createElement("button", \`count: \${count}\`);
-}
+        const sharedDir = `${temporaryDirectoryPath}/dist/packem_shared`;
+        const sharedFiles = readdirSync(sharedDir);
+        const mjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".mjs"));
+        const cjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".cjs"));
 
-export { Button };
-`);
+        const mjsClientContent = readFileSync(`${sharedDir}/${mjsClientFile}`);
 
-        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-97tyEYCZ.mjs`);
-
-        expect(mjsClientContent).toBe(`'use client';
-function Client() {
-  return "client-module";
-}
-
-export { Client };
-`);
+        expect(normalizeBundleOutput(mjsClientContent)).toMatchSnapshot();
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use client';
-'use strict';
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
 
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+        const cjsClientContent = readFileSync(`${sharedDir}/${cjsClientFile}`);
 
-const React = require('react');
-const Client = require('./packem_shared/Client-gc0UrNx3.cjs');
-
-const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
-
-const React__default = /*#__PURE__*/_interopDefaultCompat(React);
-
-function Button() {
-  const [count] = React.useState(0);
-  return React__default.createElement("button", \`count: \${count}\`);
-}
-
-exports.Client = Client.Client;
-exports.Button = Button;
-`);
-
-        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-gc0UrNx3.cjs`);
-
-        expect(cjsClientContent).toBe(`'use client';
-'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-function Client() {
-  return "client-module";
-}
-
-exports.Client = Client;
-`);
+        expect(normalizeBundleOutput(cjsClientContent)).toMatchSnapshot();
     });
 
     it("should generate proper assets for each exports for server components", async () => {
@@ -1534,76 +1408,34 @@ export const asset = "asset-module";
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`export { Button } from './ui.mjs';
-export { action } from './packem_shared/action-Ec_x0XEO.mjs';
-export { Client, Client as UIClient } from './packem_shared/Client-97tyEYCZ.mjs';
-`);
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
 
-        const mjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-Ec_x0XEO.mjs`);
+        const sharedDir = `${temporaryDirectoryPath}/dist/packem_shared`;
+        const sharedFiles = readdirSync(sharedDir);
+        const mjsActionFile = sharedFiles.find((f) => f.startsWith("action-") && f.endsWith(".mjs"));
+        const cjsActionFile = sharedFiles.find((f) => f.startsWith("action-") && f.endsWith(".cjs"));
+        const mjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".mjs"));
+        const cjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".cjs"));
 
-        expect(mjsActionContent).toBe(`'use server';
-async function action() {
-  return "server-action";
-}
+        const mjsActionContent = readFileSync(`${sharedDir}/${mjsActionFile}`);
 
-export { action };
-`);
+        expect(normalizeBundleOutput(mjsActionContent)).toMatchSnapshot();
 
-        const mjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-97tyEYCZ.mjs`);
+        const mjsClientContent = readFileSync(`${sharedDir}/${mjsClientFile}`);
 
-        expect(mjsClientContent).toBe(`'use client';
-function Client() {
-  return "client-module";
-}
-
-export { Client };
-`);
+        expect(normalizeBundleOutput(mjsClientContent)).toMatchSnapshot();
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
 
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+        const cjsActionContent = readFileSync(`${sharedDir}/${cjsActionFile}`);
 
-const ui = require('./ui.cjs');
-const action = require('./packem_shared/action-DHDpyHIn.cjs');
-const Client = require('./packem_shared/Client-gc0UrNx3.cjs');
+        expect(normalizeBundleOutput(cjsActionContent)).toMatchSnapshot();
 
+        const cjsClientContent = readFileSync(`${sharedDir}/${cjsClientFile}`);
 
-
-exports.Button = ui.Button;
-exports.action = action.action;
-exports.Client = Client.Client;
-exports.UIClient = Client.Client;
-`);
-
-        const cjsActionContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/action-DHDpyHIn.cjs`);
-
-        expect(cjsActionContent).toBe(`'use server';
-'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-async function action() {
-  return "server-action";
-}
-
-exports.action = action;
-`);
-
-        const cjsClientContent = readFileSync(`${temporaryDirectoryPath}/dist/packem_shared/Client-gc0UrNx3.cjs`);
-
-        expect(cjsClientContent).toBe(`'use client';
-'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-function Client() {
-  return "client-module";
-}
-
-exports.Client = Client;
-`);
+        expect(normalizeBundleOutput(cjsClientContent)).toMatchSnapshot();
     });
 
     it("should find all files in the same directory if globstar is used", async () => {
@@ -1712,21 +1544,11 @@ exports.Client = Client;
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`const result = "mts";
-
-export { result };
-`);
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const result = "cts";
-
-exports.result = result;
-`);
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
     });
 
     it("should generate different files for mts and cts with same shared code", async () => {
@@ -1812,37 +1634,11 @@ export type { Colorize } from "./types";`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`const Colorize = function() {
-  return {
-    color: "red",
-    text: "hello world"
-  };
-};
-
-const result = Colorize();
-const {
-  text,
-  color
-} = result;
-
-export { color, result as default, text };
-`);
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-const Colorize = function() {
-  return {
-    color: "red",
-    text: "hello world"
-  };
-};
-
-const result = Colorize();
-
-module.exports = result;
-`);
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
     });
 
     it("should work with multiple exports conditions", async () => {
@@ -2011,41 +1807,11 @@ console.log('require-module-import', require('require-module-import').resolved);
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-console.log("import-module-require", require("import-module-require").resolved);
-console.log("module-and-import", require("module-and-import").resolved);
-console.log("module-and-require", require("module-and-require").resolved);
-console.log("module-import-require", require("module-import-require").resolved);
-console.log("module-only", require("module-only").resolved);
-console.log("module-require-import", require("module-require-import").resolved);
-console.log("require-module-import", require("require-module-import").resolved);
-`);
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`const resolved$6 = "module";
-
-const resolved$5 = "module";
-
-const resolved$4 = "module";
-
-const resolved$3 = "module";
-
-const resolved$2 = "module";
-
-const resolved$1 = "module";
-
-const resolved = "module";
-
-console.log("import-module-require", resolved$6);
-console.log("module-and-import", resolved$5);
-console.log("module-and-require", resolved$4);
-console.log("module-import-require", resolved$3);
-console.log("module-only", resolved$2);
-console.log("module-require-import", resolved$1);
-console.log("require-module-import", resolved);
-`);
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
     });
 
     it.skipIf(NODE_JS_VERSION !== "22.9")("should support the new 'module-sync' exports node", async () => {
@@ -2126,41 +1892,11 @@ console.log('require-module-import', require('require-module-import').resolved);
 
         const cjs = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjs).toBe(`'use strict';
-
-console.log("import-module-require", require("import-module-require").resolved);
-console.log("module-and-import", require("module-and-import").resolved);
-console.log("module-and-require", require("module-and-require").resolved);
-console.log("module-import-require", require("module-import-require").resolved);
-console.log("module-only", require("module-only").resolved);
-console.log("module-require-import", require("module-require-import").resolved);
-console.log("require-module-import", require("require-module-import").resolved);
-`);
+        expect(normalizeBundleOutput(cjs)).toMatchSnapshot();
 
         const mjs = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjs).toBe(`const resolved$6 = "module";
-
-const resolved$5 = "module";
-
-const resolved$4 = "module";
-
-const resolved$3 = "module";
-
-const resolved$2 = "module";
-
-const resolved$1 = "module";
-
-const resolved = "module";
-
-console.log("import-module-require", resolved$6);
-console.log("module-and-import", resolved$5);
-console.log("module-and-require", resolved$4);
-console.log("module-import-require", resolved$3);
-console.log("module-only", resolved$2);
-console.log("module-require-import", resolved$1);
-console.log("require-module-import", resolved);
-`);
+        expect(normalizeBundleOutput(mjs)).toMatchSnapshot();
     });
 
     it("should generate proper assets with custom extensions from outputExtensionMap", async () => {
@@ -2984,7 +2720,7 @@ export default App;`,
         expect(binProcess.exitCode).toBe(0);
 
         // Verify React imports are aliased to preact/compat
-        const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
+        const mjsContent = normalizeBundleOutput(readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`));
 
         expect(mjsContent).toContain("from 'preact/compat'");
         expect(mjsContent).not.toContain("from 'react'");

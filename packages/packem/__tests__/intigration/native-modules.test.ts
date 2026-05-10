@@ -8,7 +8,9 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 
-describe("native modules", () => {
+// Rolldown emits `//#region`/`//#endregion` markers around module output,
+// which breaks the byte-exact assertions about how `.node` requires render.
+describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("native modules", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {

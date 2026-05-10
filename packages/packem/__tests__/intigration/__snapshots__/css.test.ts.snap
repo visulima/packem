@@ -643,7 +643,6 @@ exports[`css > code-splitting > should work with processed 'multi-entry' css > c
 ".first_sub {
   color: black;
 }
-/*# sourceMappingURL=index.css.map */
 /*# sourceMappingURL=index.css.map */"
 `;
 

@@ -1,0 +1,29 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem package.json legacy > should work with the main field > cjs output 1`] = `
+"//#region src/index.ts
+console.log("Hello, world!");
+//#endregion
+"
+`;
+
+exports[`packem package.json legacy > should work with the main field and type module > cjs output 1`] = `
+"//#region src/index.ts
+console.log("Hello, world!");
+//#endregion
+"
+`;
+
+exports[`packem package.json legacy > should work with the module field > mjs output 1`] = `
+"//#region src/index.ts
+console.log("Hello, world!");
+//#endregion
+"
+`;
+
+exports[`packem package.json legacy > should work with the module field and type module > mjs output 1`] = `
+"//#region src/index.ts
+console.log("Hello, world!");
+//#endregion
+"
+`;

@@ -287,3 +287,19 @@ exports[`url > should use publicPath > mjs 1`] = `
 export { png as default };
 "
 `;
+
+exports[`url > should use publicPath with file that has empty dirname 1`] = `
+"const png = "/batman/6b71fbe07b498a82.png";
+
+export { png as default };
+"
+`;
+
+exports[`url > should use publicPath with file that has empty dirname 2`] = `
+"'use strict';
+
+const png = "/batman/6b71fbe07b498a82.png";
+
+module.exports = png;
+"
+`;

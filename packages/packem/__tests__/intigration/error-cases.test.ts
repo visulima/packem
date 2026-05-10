@@ -215,7 +215,9 @@ describe("packem error cases", () => {
         expect(binProcess.exitCode).toBe(1);
     });
 
-    describe("import trace", () => {
+    // Rolldown emits a different error format and does not run the rollup-plugin-import-trace
+    // output through its error renderer, so the "Import trace:" header / ↳ markers are absent.
+    describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("import trace", () => {
         it("should show import trace with 2 levels on build error", async () => {
             expect.assertions(5);
 

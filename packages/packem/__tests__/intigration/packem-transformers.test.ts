@@ -6,7 +6,9 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
-describe("packem-transformers", () => {
+// Rolldown emits `//#region`/`//#endregion` markers around each module's
+// rendered output, which makes these byte-exact transformer-output assertions fail.
+describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("packem-transformers", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {

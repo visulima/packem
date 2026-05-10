@@ -1,0 +1,591 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem typescript > node10 compatibility > should generate a node10 typesVersions field in package.json when node10Compatibility.writeToPackageJson is true > typesVersions 1`] = `
+{
+  "*": {
+    ".": [
+      "./dist/index.d.ts",
+    ],
+    "deep": [
+      "./dist/deep/index.d.ts",
+    ],
+  },
+}
+`;
+
+exports[`packem typescript > resolve-typescript-tsconfig-paths plugin > should resolve tsconfig paths > cjs code output 1`] = `
+"//#region src/components/Test.ts
+console.log(1);
+//#endregion
+//#region src/index.ts
+console.log("test");
+//#endregion
+"
+`;
+
+exports[`packem typescript > resolve-typescript-tsconfig-paths plugin > should resolve tsconfig paths > mjs code output 1`] = `
+"//#region src/components/Test.ts
+console.log(1);
+//#endregion
+//#region src/index.ts
+console.log("test");
+//#endregion
+"
+`;
+
+exports[`packem typescript > should allow support for "allowJs" and generate proper assets > cjs code output 1`] = `
+"//#region src/index.js
+var src_default = () => "index";
+//#endregion
+module.exports = src_default;
+"
+`;
+
+exports[`packem typescript > should allow support for "allowJs" and generate proper assets > ts type code output 1`] = `
+"declare function _default(): string;
+export = _default;
+"
+`;
+
+exports[`packem typescript > should bundle deeks package > cjs content 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region \\0rolldown/runtime.js
+var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
+//#endregion
+//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.0/node_modules/deeks/lib/utils.js
+var require_utils = /* @__PURE__ */ __commonJSMin(((exports) => {
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.isDocumentToRecurOn = exports.flatten = exports.unique = void 0;
+	function unique(array) {
+		return [...new Set(array)];
+	}
+	exports.unique = unique;
+	function flatten(array) {
+		return [].concat(...array);
+	}
+	exports.flatten = flatten;
+	function isDocumentToRecurOn(val) {
+		return typeof val === "object" && val !== null && !Array.isArray(val) && Object.keys(val).length;
+	}
+	exports.isDocumentToRecurOn = isDocumentToRecurOn;
+}));
+//#endregion
+//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.0/node_modules/deeks/lib/types.js
+var require_types = /* @__PURE__ */ __commonJSMin(((exports) => {
+	Object.defineProperty(exports, "__esModule", { value: true });
+}));
+//#endregion
+//#region src/index.ts
+var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
+	var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
+		if (k2 === void 0) k2 = k;
+		var desc = Object.getOwnPropertyDescriptor(m, k);
+		if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) desc = {
+			enumerable: true,
+			get: function() {
+				return m[k];
+			}
+		};
+		Object.defineProperty(o, k2, desc);
+	}) : (function(o, m, k, k2) {
+		if (k2 === void 0) k2 = k;
+		o[k2] = m[k];
+	}));
+	var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+		Object.defineProperty(o, "default", {
+			enumerable: true,
+			value: v
+		});
+	}) : function(o, v) {
+		o["default"] = v;
+	});
+	var __importStar = exports && exports.__importStar || function(mod) {
+		if (mod && mod.__esModule) return mod;
+		var result = {};
+		if (mod != null) {
+			for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+		}
+		__setModuleDefault(result, mod);
+		return result;
+	};
+	var __exportStar = exports && exports.__exportStar || function(m, exports2) {
+		for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p)) __createBinding(exports2, m, p);
+	};
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.deepKeysFromList = exports.deepKeys = void 0;
+	const utils = __importStar(require_utils());
+	__exportStar(require_types(), exports);
+	function deepKeys(object, options) {
+		const parsedOptions = mergeOptions(options);
+		const visited = /* @__PURE__ */ new WeakSet();
+		if (typeof object === "object" && object !== null) return generateDeepKeysList("", object, parsedOptions, visited);
+		return [];
+	}
+	exports.deepKeys = deepKeys;
+	function deepKeysFromList(list, options, visited) {
+		const parsedOptions = mergeOptions(options);
+		const localVisited = visited ?? /* @__PURE__ */ new WeakSet();
+		return list.map((document) => {
+			if (typeof document === "object" && document !== null) {
+				if (localVisited.has(document)) return [];
+				return generateDeepKeysList("", document, parsedOptions, localVisited);
+			}
+			return [];
+		});
+	}
+	exports.deepKeysFromList = deepKeysFromList;
+	function generateDeepKeysList(heading, data, options, visited) {
+		const result = [];
+		const rootKeys = Object.keys(data);
+		visited.add(data);
+		const stack = [{
+			obj: data,
+			keys: rootKeys,
+			i: 0,
+			basePath: heading
+		}];
+		while (stack.length) {
+			const frame = stack[stack.length - 1];
+			if (frame.i >= frame.keys.length) {
+				stack.pop();
+				continue;
+			}
+			const currentKey = frame.keys[frame.i++];
+			const value = frame.obj[currentKey];
+			const keyName = buildKeyName(frame.basePath, escapeNestedDotsIfSpecified(currentKey, options));
+			if (options.expandNestedObjects && utils.isDocumentToRecurOn(value) || options.arrayIndexesAsKeys && Array.isArray(value) && value.length) {
+				if (options.arrayIndexesAsKeys && Array.isArray(value)) {
+					const arr = value;
+					for (let idx = arr.length - 1; idx >= 0; idx--) {
+						const elem = arr[idx];
+						const elemPath = buildKeyName(keyName, String(idx));
+						if (typeof elem === "object" && elem !== null && !Array.isArray(elem)) {
+							if (!visited.has(elem)) {
+								visited.add(elem);
+								stack.push({
+									obj: elem,
+									keys: Object.keys(elem),
+									i: 0,
+									basePath: elemPath
+								});
+							}
+						} else result.push(elemPath);
+					}
+				} else if (!visited.has(value)) {
+					visited.add(value);
+					stack.push({
+						obj: value,
+						keys: Object.keys(value),
+						i: 0,
+						basePath: keyName
+					});
+				}
+			} else if (options.expandArrayObjects && Array.isArray(value)) {
+				const subKeys = processArrayKeys(value, keyName, options, visited);
+				for (const k of subKeys) result.push(k);
+			} else if (options.ignoreEmptyArrays && Array.isArray(value) && !value.length) continue;
+			else result.push(keyName);
+		}
+		return utils.unique(result);
+	}
+	function processArrayKeys(subArray, currentKeyPath, options, visited) {
+		let subArrayKeys = deepKeysFromList(subArray, options, visited);
+		if (!subArray.length) return options.ignoreEmptyArraysWhenExpanding ? [] : [currentKeyPath];
+		else if (subArray.length && utils.flatten(subArrayKeys).length === 0) return [currentKeyPath];
+		else {
+			subArrayKeys = subArrayKeys.map((schemaKeys) => {
+				if (Array.isArray(schemaKeys) && schemaKeys.length === 0) return [currentKeyPath];
+				return schemaKeys.map((subKey) => buildKeyName(currentKeyPath, escapeNestedDotsIfSpecified(subKey, options)));
+			});
+			return utils.unique(utils.flatten(subArrayKeys));
+		}
+	}
+	function escapeNestedDotsIfSpecified(key, options) {
+		if (options.escapeNestedDots) return key.replace(/\\./g, "\\\\.");
+		return key;
+	}
+	function buildKeyName(upperKeyName, currentKeyName) {
+		if (upperKeyName) return upperKeyName + "." + currentKeyName;
+		return currentKeyName;
+	}
+	function mergeOptions(options) {
+		return {
+			arrayIndexesAsKeys: false,
+			expandNestedObjects: true,
+			expandArrayObjects: false,
+			ignoreEmptyArraysWhenExpanding: false,
+			escapeNestedDots: false,
+			ignoreEmptyArrays: false,
+			...options ?? {}
+		};
+	}
+})))();
+//#endregion
+Object.defineProperty(exports, "deepKeys", {
+	enumerable: true,
+	get: function() {
+		return import_deeks.deepKeys;
+	}
+});
+Object.defineProperty(exports, "deepKeysFromList", {
+	enumerable: true,
+	get: function() {
+		return import_deeks.deepKeysFromList;
+	}
+});
+"
+`;
+
+exports[`packem typescript > should bundle deeks package > mjs content 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region \\0rolldown/runtime.js
+var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
+//#endregion
+//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.0/node_modules/deeks/lib/utils.js
+var require_utils = /* @__PURE__ */ __commonJSMin(((exports) => {
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.isDocumentToRecurOn = exports.flatten = exports.unique = void 0;
+	function unique(array) {
+		return [...new Set(array)];
+	}
+	exports.unique = unique;
+	function flatten(array) {
+		return [].concat(...array);
+	}
+	exports.flatten = flatten;
+	function isDocumentToRecurOn(val) {
+		return typeof val === "object" && val !== null && !Array.isArray(val) && Object.keys(val).length;
+	}
+	exports.isDocumentToRecurOn = isDocumentToRecurOn;
+}));
+//#endregion
+//#region ../../home/prisis/WebstormProjects/visulima/packem/node_modules/.pnpm/deeks@3.2.0/node_modules/deeks/lib/types.js
+var require_types = /* @__PURE__ */ __commonJSMin(((exports) => {
+	Object.defineProperty(exports, "__esModule", { value: true });
+}));
+//#endregion
+//#region src/index.ts
+var import_deeks = (/* @__PURE__ */ __commonJSMin(((exports) => {
+	var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
+		if (k2 === void 0) k2 = k;
+		var desc = Object.getOwnPropertyDescriptor(m, k);
+		if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) desc = {
+			enumerable: true,
+			get: function() {
+				return m[k];
+			}
+		};
+		Object.defineProperty(o, k2, desc);
+	}) : (function(o, m, k, k2) {
+		if (k2 === void 0) k2 = k;
+		o[k2] = m[k];
+	}));
+	var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+		Object.defineProperty(o, "default", {
+			enumerable: true,
+			value: v
+		});
+	}) : function(o, v) {
+		o["default"] = v;
+	});
+	var __importStar = exports && exports.__importStar || function(mod) {
+		if (mod && mod.__esModule) return mod;
+		var result = {};
+		if (mod != null) {
+			for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+		}
+		__setModuleDefault(result, mod);
+		return result;
+	};
+	var __exportStar = exports && exports.__exportStar || function(m, exports2) {
+		for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p)) __createBinding(exports2, m, p);
+	};
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.deepKeysFromList = exports.deepKeys = void 0;
+	const utils = __importStar(require_utils());
+	__exportStar(require_types(), exports);
+	function deepKeys(object, options) {
+		const parsedOptions = mergeOptions(options);
+		const visited = /* @__PURE__ */ new WeakSet();
+		if (typeof object === "object" && object !== null) return generateDeepKeysList("", object, parsedOptions, visited);
+		return [];
+	}
+	exports.deepKeys = deepKeys;
+	function deepKeysFromList(list, options, visited) {
+		const parsedOptions = mergeOptions(options);
+		const localVisited = visited ?? /* @__PURE__ */ new WeakSet();
+		return list.map((document) => {
+			if (typeof document === "object" && document !== null) {
+				if (localVisited.has(document)) return [];
+				return generateDeepKeysList("", document, parsedOptions, localVisited);
+			}
+			return [];
+		});
+	}
+	exports.deepKeysFromList = deepKeysFromList;
+	function generateDeepKeysList(heading, data, options, visited) {
+		const result = [];
+		const rootKeys = Object.keys(data);
+		visited.add(data);
+		const stack = [{
+			obj: data,
+			keys: rootKeys,
+			i: 0,
+			basePath: heading
+		}];
+		while (stack.length) {
+			const frame = stack[stack.length - 1];
+			if (frame.i >= frame.keys.length) {
+				stack.pop();
+				continue;
+			}
+			const currentKey = frame.keys[frame.i++];
+			const value = frame.obj[currentKey];
+			const keyName = buildKeyName(frame.basePath, escapeNestedDotsIfSpecified(currentKey, options));
+			if (options.expandNestedObjects && utils.isDocumentToRecurOn(value) || options.arrayIndexesAsKeys && Array.isArray(value) && value.length) {
+				if (options.arrayIndexesAsKeys && Array.isArray(value)) {
+					const arr = value;
+					for (let idx = arr.length - 1; idx >= 0; idx--) {
+						const elem = arr[idx];
+						const elemPath = buildKeyName(keyName, String(idx));
+						if (typeof elem === "object" && elem !== null && !Array.isArray(elem)) {
+							if (!visited.has(elem)) {
+								visited.add(elem);
+								stack.push({
+									obj: elem,
+									keys: Object.keys(elem),
+									i: 0,
+									basePath: elemPath
+								});
+							}
+						} else result.push(elemPath);
+					}
+				} else if (!visited.has(value)) {
+					visited.add(value);
+					stack.push({
+						obj: value,
+						keys: Object.keys(value),
+						i: 0,
+						basePath: keyName
+					});
+				}
+			} else if (options.expandArrayObjects && Array.isArray(value)) {
+				const subKeys = processArrayKeys(value, keyName, options, visited);
+				for (const k of subKeys) result.push(k);
+			} else if (options.ignoreEmptyArrays && Array.isArray(value) && !value.length) continue;
+			else result.push(keyName);
+		}
+		return utils.unique(result);
+	}
+	function processArrayKeys(subArray, currentKeyPath, options, visited) {
+		let subArrayKeys = deepKeysFromList(subArray, options, visited);
+		if (!subArray.length) return options.ignoreEmptyArraysWhenExpanding ? [] : [currentKeyPath];
+		else if (subArray.length && utils.flatten(subArrayKeys).length === 0) return [currentKeyPath];
+		else {
+			subArrayKeys = subArrayKeys.map((schemaKeys) => {
+				if (Array.isArray(schemaKeys) && schemaKeys.length === 0) return [currentKeyPath];
+				return schemaKeys.map((subKey) => buildKeyName(currentKeyPath, escapeNestedDotsIfSpecified(subKey, options)));
+			});
+			return utils.unique(utils.flatten(subArrayKeys));
+		}
+	}
+	function escapeNestedDotsIfSpecified(key, options) {
+		if (options.escapeNestedDots) return key.replace(/\\./g, "\\\\.");
+		return key;
+	}
+	function buildKeyName(upperKeyName, currentKeyName) {
+		if (upperKeyName) return upperKeyName + "." + currentKeyName;
+		return currentKeyName;
+	}
+	function mergeOptions(options) {
+		return {
+			arrayIndexesAsKeys: false,
+			expandNestedObjects: true,
+			expandArrayObjects: false,
+			ignoreEmptyArraysWhenExpanding: false,
+			escapeNestedDots: false,
+			ignoreEmptyArrays: false,
+			...options ?? {}
+		};
+	}
+})))();
+//#endregion
+Object.defineProperty(exports, "deepKeys", {
+	enumerable: true,
+	get: function() {
+		return import_deeks.deepKeys;
+	}
+});
+Object.defineProperty(exports, "deepKeysFromList", {
+	enumerable: true,
+	get: function() {
+		return import_deeks.deepKeysFromList;
+	}
+});
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts > .d.cts type code output 1`] = `
+"declare global {
+  interface String {}
+}
+type NativeStringTypes = string;
+export { NativeStringTypes };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts > .d.mts type code output 1`] = `
+"declare global {
+  interface String {}
+}
+type NativeStringTypes = string;
+export { NativeStringTypes };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts > .d.ts type code output 1`] = `
+"declare global {
+  interface String {}
+}
+type NativeStringTypes = string;
+export { NativeStringTypes };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > .d.cts type code output 1`] = `
+"declare global {
+  interface String {}
+}
+type NativeStringTypes = string;
+export { NativeStringTypes };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > .d.mts type code output 1`] = `
+"declare global {
+  interface String {}
+}
+type NativeStringTypes = string;
+export { NativeStringTypes };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > .d.ts type code output 1`] = `
+"declare global {
+  interface String {}
+}
+type NativeStringTypes = string;
+export { NativeStringTypes };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > cjs content 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/index.ts
+const isUpperCode = new Uint8Array(128);
+const isLowerCode = new Uint8Array(128);
+const isDigitCode = new Uint8Array(128);
+for (let index = 0; index < 128; index++) {
+	isUpperCode[index] = index >= 65 && index <= 90 ? 1 : 0;
+	isLowerCode[index] = index >= 97 && index <= 122 ? 1 : 0;
+	isDigitCode[index] = index >= 48 && index <= 57 ? 1 : 0;
+}
+//#endregion
+exports.isDigitCode = isDigitCode;
+exports.isLowerCode = isLowerCode;
+exports.isUpperCode = isUpperCode;
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > d.cts content 1`] = `
+"declare const isUpperCode: Uint8Array<ArrayBuffer>;
+declare const isLowerCode: Uint8Array<ArrayBuffer>;
+declare const isDigitCode: Uint8Array<ArrayBuffer>;
+export { isDigitCode, isLowerCode, isUpperCode };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > d.mts content 1`] = `
+"declare const isUpperCode: Uint8Array<ArrayBuffer>;
+declare const isLowerCode: Uint8Array<ArrayBuffer>;
+declare const isDigitCode: Uint8Array<ArrayBuffer>;
+export { isDigitCode, isLowerCode, isUpperCode };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > d.ts content 1`] = `
+"declare const isUpperCode: Uint8Array<ArrayBuffer>;
+declare const isLowerCode: Uint8Array<ArrayBuffer>;
+declare const isDigitCode: Uint8Array<ArrayBuffer>;
+export { isDigitCode, isLowerCode, isUpperCode };
+"
+`;
+
+exports[`packem typescript > should compile a .d.ts file into .d.cts and .d.mts, with other exports > mjs content 1`] = `
+"//#region src/index.ts
+const isUpperCode = new Uint8Array(128);
+const isLowerCode = new Uint8Array(128);
+const isDigitCode = new Uint8Array(128);
+for (let index = 0; index < 128; index++) {
+	isUpperCode[index] = index >= 65 && index <= 90 ? 1 : 0;
+	isLowerCode[index] = index >= 97 && index <= 122 ? 1 : 0;
+	isDigitCode[index] = index >= 48 && index <= 57 ? 1 : 0;
+}
+//#endregion
+export { isDigitCode, isLowerCode, isUpperCode };
+"
+`;
+
+exports[`packem typescript > should compile only a type file > .d.ts type code output 1`] = `
+"declare global {
+  interface String {}
+}
+"
+`;
+
+exports[`packem typescript > should support typescript decorator > cjs code output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/index.ts
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __decorateClass = (decorators, target, key, kind) => {
+	var result = kind > 1 ? void 0 : kind ? __getOwnPropDesc(target, key) : target;
+	for (var i = decorators.length - 1, decorator; i >= 0; i--) if (decorator = decorators[i]) result = (kind ? decorator(target, key, result) : decorator(result)) || result;
+	if (kind && result) __defProp(target, key, result);
+	return result;
+};
+function first() {
+	console.log("first(): factory evaluated");
+	return function(target, propertyKey, descriptor) {
+		console.log("first(): called");
+	};
+}
+var ExampleClass = class {};
+__decorateClass([first()], ExampleClass.prototype, "value", 2);
+//#endregion
+exports.ExampleClass = ExampleClass;
+"
+`;
+
+exports[`packem typescript > should support typescript decorator > mjs code output 1`] = `
+"//#region src/index.ts
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __decorateClass = (decorators, target, key, kind) => {
+	var result = kind > 1 ? void 0 : kind ? __getOwnPropDesc(target, key) : target;
+	for (var i = decorators.length - 1, decorator; i >= 0; i--) if (decorator = decorators[i]) result = (kind ? decorator(target, key, result) : decorator(result)) || result;
+	if (kind && result) __defProp(target, key, result);
+	return result;
+};
+function first() {
+	console.log("first(): factory evaluated");
+	return function(target, propertyKey, descriptor) {
+		console.log("first(): called");
+	};
+}
+var ExampleClass = class {};
+__decorateClass([first()], ExampleClass.prototype, "value", 2);
+//#endregion
+export { ExampleClass };
+"
+`;

@@ -107,3 +107,36 @@ export const getFileContents = async (directory: string): Promise<Record<string,
 
     return contents;
 };
+
+/**
+ * Normalize a JS bundle output string so byte-exact assertions pass under both
+ * rollup and rolldown. Rolldown wraps every module's emitted code in
+ * `//#region <id>` / `//#endregion` comment markers and emits double-quoted
+ * strings; rollup does neither. Stripping these makes structurally-equal
+ * outputs compare equal between the two bundlers.
+ *
+ * Note: this does NOT rewrite rolldown's `var X_default = ...` synthetic
+ * default-export rename — those tests must use per-test skipIf instead.
+ */
+export const normalizeBundleOutput = (content: string): string => {
+    // Strip the region opener entirely (no replacement). Strip the closer but
+    // leave a newline behind so adjacent code blocks remain separated by a
+    // blank line — matching rollup's spacing between modules.
+    let normalized = content
+        .replaceAll(/^\/\/#region(?:\s.*)?\n/gm, "")
+        .replaceAll(/^\/\/#endregion\n/gm, "\n");
+
+    // Normalize import/export string literals from double to single quotes.
+    // We only touch quoted strings on `from` / `import(...)` / `require(...)`
+    // statements to avoid disturbing arbitrary string content in user code.
+    normalized = normalized
+        .replaceAll(/(\bfrom\s+)"([^"\n]*)"/g, "$1'$2'")
+        .replaceAll(/(\bimport\()"([^"\n]*)"(\))/g, "$1'$2'$3")
+        .replaceAll(/(\brequire\()"([^"\n]*)"(\))/g, "$1'$2'$3")
+        .replaceAll(/(\bimport\s+)"([^"\n]*)"/g, "$1'$2'");
+
+    // Collapse runs of 3+ blank lines (created by stripped markers) into 2.
+    normalized = normalized.replaceAll(/\n{3,}/g, "\n\n");
+
+    return normalized;
+};

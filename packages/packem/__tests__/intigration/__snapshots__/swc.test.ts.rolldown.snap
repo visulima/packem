@@ -1,0 +1,151 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`packem swc > should generate shared common chunks with SWC transformer > entry1.cjs output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const require_foo = require("./chunks/foo-DTqsO28k.js");
+let _swc_helpers____ts_add_disposable_resource = require("@swc/helpers/_/_ts_add_disposable_resource");
+let _swc_helpers____ts_dispose_resources = require("@swc/helpers/_/_ts_dispose_resources");
+//#region src/bar.ts
+var Bar = class {
+	method() {
+		let s = {
+			stack: [],
+			error: void 0,
+			hasError: !1
+		};
+		try {
+			let o = (0, _swc_helpers____ts_add_disposable_resource._)(s, { [Symbol.dispose]: () => {
+				console.log("Hooray!");
+			} }, !1);
+			console.log("using resource", o);
+		} catch (r) {
+			s.error = r, s.hasError = !0;
+		} finally {
+			(0, _swc_helpers____ts_dispose_resources._)(s);
+		}
+	}
+};
+//#endregion
+//#region src/entry1.ts
+const entry1 = () => {
+	let t = new Bar(), e = new require_foo.Foo();
+	return t.method(), e.foo();
+};
+//#endregion
+exports.entry1 = entry1;
+"
+`;
+
+exports[`packem swc > should generate shared common chunks with SWC transformer > entry1.mjs output 1`] = `
+"import { t as Foo } from "./chunks/foo-D82BIBPp.js";
+import { _ } from "@swc/helpers/_/_ts_add_disposable_resource";
+import { _ as _$1 } from "@swc/helpers/_/_ts_dispose_resources";
+//#region src/bar.ts
+var Bar = class {
+	method() {
+		let s = {
+			stack: [],
+			error: void 0,
+			hasError: !1
+		};
+		try {
+			let o = _(s, { [Symbol.dispose]: () => {
+				console.log("Hooray!");
+			} }, !1);
+			console.log("using resource", o);
+		} catch (r) {
+			s.error = r, s.hasError = !0;
+		} finally {
+			_$1(s);
+		}
+	}
+};
+//#endregion
+//#region src/entry1.ts
+const entry1 = () => {
+	let t = new Bar(), e = new Foo();
+	return t.method(), e.foo();
+};
+//#endregion
+export { entry1 };
+"
+`;
+
+exports[`packem swc > should generate shared common chunks with SWC transformer > entry2.cjs output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const require_foo = require("./chunks/foo-DTqsO28k.js");
+//#region src/index.ts
+var Index = class {
+	async method() {
+		let e = { a: 1 }, s = { b: 2 };
+		console.log({
+			...e,
+			...s
+		}, Object.assign({}, e, s));
+	}
+};
+//#endregion
+//#region src/entry2.ts
+const entry2 = () => {
+	let r = new Index(), t = new require_foo.Foo();
+	return r.method(), t.foo();
+};
+//#endregion
+exports.entry2 = entry2;
+"
+`;
+
+exports[`packem swc > should generate shared common chunks with SWC transformer > entry2.mjs output 1`] = `
+"import { t as Foo } from "./chunks/foo-D82BIBPp.js";
+//#region src/index.ts
+var Index = class {
+	async method() {
+		let e = { a: 1 }, s = { b: 2 };
+		console.log({
+			...e,
+			...s
+		}, Object.assign({}, e, s));
+	}
+};
+//#endregion
+//#region src/entry2.ts
+const entry2 = () => {
+	let r = new Index(), t = new Foo();
+	return r.method(), t.foo();
+};
+//#endregion
+export { entry2 };
+"
+`;
+
+exports[`packem swc > should handle modern TypeScript syntax with SWC transformer > modern features index.cjs output 1`] = `
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const require_ModernFeatures = require("./packem_shared/ModernFeatures-CX9G-0Mp.cjs");
+exports.ModernFeatures = require_ModernFeatures.ModernFeatures;
+"
+`;
+
+exports[`packem swc > should handle modern TypeScript syntax with SWC transformer > modern features index.d.ts output 1`] = `
+"declare class ModernFeatures {
+  useResource(): {
+    [Symbol.dispose]: () => void;
+  };
+  processData(): Promise<{
+    name: string;
+    id: number;
+  }>;
+  safeAccess(obj?: {
+    nested?: {
+      value?: string;
+    };
+  }): string;
+}
+export { ModernFeatures };
+"
+`;
+
+exports[`packem swc > should handle modern TypeScript syntax with SWC transformer > modern features index.mjs output 1`] = `
+"import { ModernFeatures } from "./packem_shared/ModernFeatures-do-qwZu5.mjs";
+export { ModernFeatures };
+"
+`;

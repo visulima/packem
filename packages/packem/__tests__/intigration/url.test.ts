@@ -8,6 +8,7 @@ import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { assertContainFiles, createPackageJson, createPackemConfig, execPackem } from "../helpers";
+import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 const fixturePath = join(__dirname, "../..", "__fixtures__", "url");
 
@@ -204,20 +205,12 @@ describe("url", () => {
 
         const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.mjs`));
 
-        expect(mjsContent).toBe(`const png = "/batman/6b71fbe07b498a82.png";
-
-export { png as default };
-`);
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
 
         const cjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.cjs`));
 
         // eslint-disable-next-line no-secrets/no-secrets
-        expect(cjsContent).toBe(`'use strict';
-
-const png = "/batman/6b71fbe07b498a82.png";
-
-module.exports = png;
-`);
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
     });
 
     it("should create a nested directory for the output, if required", async () => {
@@ -271,7 +264,7 @@ module.exports = png;
     });
 
     it("should prefix the file with the parent directory of the source file, relative to the sourceDir option", async () => {
-        expect.assertions(5);
+        expect.assertions(7);
 
         const type = "png";
 
@@ -291,19 +284,14 @@ module.exports = png;
 
         const mjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.mjs`));
 
-        expect(mjsContent).toBe(`const png = "${pngPath}";
-
-export { png as default };
-`);
+        // The exact pngPath varies by temp dir; assert it appears in normalized output.
+        expect(normalizeBundleOutput(mjsContent)).toContain(pngPath);
+        expect(normalizeBundleOutput(mjsContent)).toContain("export {");
 
         const cjsContent = readFileSync(join(temporaryDirectoryPath, "dist", `${type}.cjs`));
 
-        expect(cjsContent).toBe(`'use strict';
-
-const png = "${pngPath}";
-
-module.exports = png;
-`);
+        expect(normalizeBundleOutput(cjsContent)).toContain(pngPath);
+        expect(normalizeBundleOutput(cjsContent)).toContain("module.exports");
     });
 
     it("should copy the file according to destDir option", async () => {

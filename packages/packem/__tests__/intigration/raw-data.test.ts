@@ -5,6 +5,7 @@ import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 describe("packem raw data", () => {
     let temporaryDirectoryPath: string;
@@ -50,25 +51,11 @@ export const data = content;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`const data$1 = "thisismydata";
-
-const data = data$1;
-
-export { data };
-`);
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const data$1 = "thisismydata";
-
-const data = data$1;
-
-exports.data = data;
-`);
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
     });
 
     it("should generate js files with included raw content when the '?raw' query param is used", async () => {
@@ -102,25 +89,11 @@ export const data = content;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`const data$1 = "thisismydata";
-
-const data = data$1;
-
-export { data };
-`);
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const data$1 = "thisismydata";
-
-const data = data$1;
-
-exports.data = data;
-`);
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
     });
 
     it("should generate js files with included raw content when importing .js?raw", async () => {
@@ -162,25 +135,11 @@ export const data = jsContent;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(String.raw`const data$1 = "const message = \"Hello from JS file\";\nconsole.log(message);\nexport default message;";
-
-const data = data$1;
-
-export { data };
-`);
+        expect(normalizeBundleOutput(mjsContent)).toMatchSnapshot();
 
         const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(String.raw`'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const data$1 = "const message = \"Hello from JS file\";\nconsole.log(message);\nexport default message;";
-
-const data = data$1;
-
-exports.data = data;
-`);
+        expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
     });
 
     it("should generate js files with included raw HTML content", async () => {

@@ -1,79 +1,68 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`packem package.json exports > should allow to have folder name the same like file for export 1`] = `
-"'use strict';
+"var config_default = () => "config";
 
-const config = () => "config";
-
-module.exports = config;
+module.exports = config_default;
 "
 `;
 
 exports[`packem package.json exports > should allow to have folder name the same like file for export 2`] = `
-"const config = () => "config";
+"var config_default = () => "config";
 
-export { config as default };
+export { config_default as default };
 "
 `;
 
 exports[`packem package.json exports > should export dual package for type commonjs 1`] = `
-"'use strict';
+"var src_default = () => "index";
 
-const index = () => "index";
-
-module.exports = index;
+module.exports = src_default;
 "
 `;
 
 exports[`packem package.json exports > should export dual package for type commonjs 2`] = `
-"const index = () => "index";
+"var src_default = () => "index";
 
-export { index as default };
+export { src_default as default };
 "
 `;
 
 exports[`packem package.json exports > should export dual package for type module 1`] = `
-"'use strict';
+"var src_default = () => "index";
 
-const index = () => "index";
-
-module.exports = index;
+module.exports = src_default;
 "
 `;
 
 exports[`packem package.json exports > should export dual package for type module 2`] = `
-"const index = () => "index";
+"var src_default = () => "index";
 
-export { index as default };
+export { src_default as default };
 "
 `;
 
 exports[`packem package.json exports > should generate different files for mts and cts with same shared code 1`] = `
 "const Colorize = function() {
-  return {
-    color: "red",
-    text: "hello world"
-  };
+	return {
+		color: "red",
+		text: "hello world"
+	};
 };
 
 const result = Colorize();
-const {
-  text,
-  color
-} = result;
+const { text, color } = result;
 
 export { color, result as default, text };
 "
 `;
 
 exports[`packem package.json exports > should generate different files for mts and cts with same shared code 2`] = `
-"'use strict';
-
-const Colorize = function() {
-  return {
-    color: "red",
-    text: "hello world"
-  };
+"const Colorize = function() {
+	return {
+		color: "red",
+		text: "hello world"
+	};
 };
 
 const result = Colorize();
@@ -90,10 +79,7 @@ export { result };
 `;
 
 exports[`packem package.json exports > should generate different files, if file with same name, but with cts and mts ending was found 2`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const result = "cts";
 
 exports.result = result;
@@ -101,57 +87,53 @@ exports.result = result;
 `;
 
 exports[`packem package.json exports > should generate output with all cjs exports > cjs output 1`] = `
-"const index = "index";
-
+"//#region src/index.js
+const index = "index";
+//#endregion
 export { index };
 "
 `;
 
 exports[`packem package.json exports > should generate output with all cjs exports > cjs output 2`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/index.react-server.js
 const index = "index.react-server";
-
+//#endregion
 exports.index = index;
 "
 `;
 
 exports[`packem package.json exports > should generate output with all cjs exports > cjs output 3`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/foo.js
 const foo = "foo";
-
+//#endregion
 exports.foo = foo;
 "
 `;
 
 exports[`packem package.json exports > should generate output with all cjs exports > cjs output 4`] = `
 "#!/usr/bin/env node
-'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
+Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/bin/cli.js
 const cli = "cli";
-
+//#endregion
 exports.cli = cli;
 "
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components 1`] = `
-"export { Button } from './ui.mjs';
-export { action } from './packem_shared/action-Ec_x0XEO.mjs';
-export { Client, Client as UIClient } from './packem_shared/Client-97tyEYCZ.mjs';
+"import { Client } from './packem_shared/Client-DCW9Tgls.mjs';
+import { Button } from './ui.mjs';
+import { action } from './packem_shared/action-BPf35DVp.mjs';
+export { Button, Client, Client as UIClient, action };
 "
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components 2`] = `
-"'use server';
+""use server";
 async function action() {
-  return "server-action";
+	return "server-action";
 }
 
 export { action };
@@ -159,9 +141,9 @@ export { action };
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components 3`] = `
-"'use client';
+""use client";
 function Client() {
-  return "client-module";
+	return "client-module";
 }
 
 export { Client };
@@ -169,29 +151,21 @@ export { Client };
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components 4`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const ui = require('./ui.cjs');
-const action = require('./packem_shared/action-DHDpyHIn.cjs');
-const Client = require('./packem_shared/Client-gc0UrNx3.cjs');
-
-exports.Button = ui.Button;
-exports.action = action.action;
-exports.Client = Client.Client;
-exports.UIClient = Client.Client;
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const require_ui = require('./packem_shared/ui-DDaaQRb5.cjs');
+const require_Client = require('./packem_shared/Client-CLFYieZU.cjs');
+const require_action = require('./packem_shared/action-B80tVyuP.cjs');
+exports.Button = require_ui.Button;
+exports.Client = require_Client.Client;
+exports.UIClient = require_Client.Client;
+exports.action = require_action.action;
 "
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components 5`] = `
-"'use server';
-'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
+""use server";
 async function action() {
-  return "server-action";
+	return "server-action";
 }
 
 exports.action = action;
@@ -199,13 +173,9 @@ exports.action = action;
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components 6`] = `
-"'use client';
-'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
+""use client";
 function Client() {
-  return "client-module";
+	return "client-module";
 }
 
 exports.Client = Client;
@@ -213,23 +183,22 @@ exports.Client = Client;
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components with same layer 1`] = `
-"'use client';
+""use client";
+import { Client } from './packem_shared/Client-DCW9Tgls.mjs';
 import React, { useState } from 'react';
-export { Client } from './packem_shared/Client-97tyEYCZ.mjs';
-
 function Button() {
-  const [count] = useState(0);
-  return React.createElement("button", \`count: \${count}\`);
+	const [count] = useState(0);
+	return React.createElement("button", \`count: \${count}\`);
 }
 
-export { Button };
+export { Button, Client };
 "
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components with same layer 2`] = `
-"'use client';
+""use client";
 function Client() {
-  return "client-module";
+	return "client-module";
 }
 
 export { Client };
@@ -237,36 +206,46 @@ export { Client };
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components with same layer 3`] = `
-"'use client';
-'use strict';
+""use client";
+Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+		key = keys[i];
+		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+			get: ((k) => from[k]).bind(null, key),
+			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+		});
+	}
+	return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+	value: mod,
+	enumerable: true
+}) : target, mod));
 
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
-const React = require('react');
-const Client = require('./packem_shared/Client-gc0UrNx3.cjs');
-
-const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
-
-const React__default = /*#__PURE__*/_interopDefaultCompat(React);
-
+const require_Client = require('./packem_shared/Client-CVSzmS1W.cjs');
+let react = require('react');
+react = __toESM(react);
 function Button() {
-  const [count] = React.useState(0);
-  return React__default.createElement("button", \`count: \${count}\`);
+	const [count] = (0, react.useState)(0);
+	return react.default.createElement("button", \`count: \${count}\`);
 }
 
-exports.Client = Client.Client;
 exports.Button = Button;
+exports.Client = require_Client.Client;
 "
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components with same layer 4`] = `
-"'use client';
-'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
+""use client";
 function Client() {
-  return "client-module";
+	return "client-module";
 }
 
 exports.Client = Client;
@@ -274,12 +253,10 @@ exports.Client = Client;
 `;
 
 exports[`packem package.json exports > should generate proper assets with custom extensions from outputExtensionMap > cjs output 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/index.ts
 const value = "index";
-
+//#endregion
 exports.value = value;
 "
 `;
@@ -291,61 +268,76 @@ export { value };
 `;
 
 exports[`packem package.json exports > should generate proper assets with custom extensions from outputExtensionMap > mjs output 1`] = `
-"const value = "index";
-
+"//#region src/index.ts
+const value = "index";
+//#endregion
 export { value };
 "
 `;
 
 exports[`packem package.json exports > should generate proper assets with js based on the package.json exports default > cjs output 1`] = `
-"'use strict';
-
-Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
-
-const myMod = require('my-mod');
-
-const _interopDefaultCompat = e => e && typeof e === 'object' && 'default' in e ? e.default : e;
-
-const myMod__default = /*#__PURE__*/_interopDefaultCompat(myMod);
-
-const index = "exports-sugar-default";
+"Object.defineProperties(exports, {
+	__esModule: { value: true },
+	[Symbol.toStringTag]: { value: "Module" }
+});
+//#region \\0rolldown/runtime.js
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+		key = keys[i];
+		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+			get: ((k) => from[k]).bind(null, key),
+			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+		});
+	}
+	return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+	value: mod,
+	enumerable: true
+}) : target, mod));
+//#endregion
+let my_mod = require("my-mod");
+my_mod = __toESM(my_mod);
+//#region src/index.js
+var src_default = "exports-sugar-default";
 function method() {
-  return myMod__default.test();
+	return my_mod.default.test();
 }
-
-exports.default = index;
+//#endregion
+exports.default = src_default;
 exports.method = method;
 "
 `;
 
 exports[`packem package.json exports > should generate proper assets with js based on the package.json exports default > mjs output 1`] = `
-"import myMod from 'my-mod';
-
-const index = "exports-sugar-default";
+"import myMod from "my-mod";
+//#region src/index.js
+var src_default = "exports-sugar-default";
 function method() {
-  return myMod.test();
+	return myMod.test();
 }
-
-export { index as default, method };
+//#endregion
+export { src_default as default, method };
 "
 `;
 
 exports[`packem package.json exports > should support wildcard subpath exports 1`] = `
-"'use strict';
+"var src_default = () => "index";
 
-const index = () => "index";
-
-module.exports = index;
+module.exports = src_default;
 "
 `;
 
 exports[`packem package.json exports > should support wildcard subpath exports 2`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 function render() {
-  console.log("Page A");
+	console.log("Page A");
 }
 
 exports.render = render;
@@ -354,7 +346,7 @@ exports.render = render;
 
 exports[`packem package.json exports > should support wildcard subpath exports 3`] = `
 "function render() {
-  console.log("Page A");
+	console.log("Page A");
 }
 
 export { render };
@@ -362,12 +354,9 @@ export { render };
 `;
 
 exports[`packem package.json exports > should support wildcard subpath exports 4`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 function render() {
-  console.log("Page B");
+	console.log("Page B");
 }
 
 exports.render = render;
@@ -376,7 +365,7 @@ exports.render = render;
 
 exports[`packem package.json exports > should support wildcard subpath exports 5`] = `
 "function render() {
-  console.log("Page B");
+	console.log("Page B");
 }
 
 export { render };
@@ -384,19 +373,18 @@ export { render };
 `;
 
 exports[`packem package.json exports > should work with ESM package with CJS main field > cjs output 1`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+//#region src/index.js
 const value = "cjs";
-
+//#endregion
 exports.value = value;
 "
 `;
 
 exports[`packem package.json exports > should work with ESM package with CJS main field > mjs output 1`] = `
-"const value = "cjs";
-
+"//#region src/index.js
+const value = "cjs";
+//#endregion
 export { value };
 "
 `;
@@ -416,19 +404,15 @@ export { isEdge };
 `;
 
 exports[`packem package.json exports > should work with multi entries 1`] = `
-"'use strict';
+"var src_default = "index";
 
-const index = "index";
-
-module.exports = index;
+module.exports = src_default;
 "
 `;
 
 exports[`packem package.json exports > should work with multi entries 2`] = `
-"'use strict';
-
-function client(c) {
-  return "client" + c;
+"function client(c) {
+	return "client" + c;
 }
 
 module.exports = client;
@@ -449,10 +433,7 @@ export { index };
 `;
 
 exports[`packem package.json exports > should work with multi types 3`] = `
-"'use strict';
-
-Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-
+"Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const index = "index";
 
 exports.index = index;
@@ -460,10 +441,8 @@ exports.index = index;
 `;
 
 exports[`packem package.json exports > should work with single entry 1`] = `
-"'use strict';
+"var src_default = () => "index";
 
-const index = () => "index";
-
-module.exports = index;
+module.exports = src_default;
 "
 `;

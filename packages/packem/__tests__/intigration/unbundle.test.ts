@@ -6,6 +6,7 @@ import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 describe("packem unbundle", () => {
     let temporaryDirectoryPath: string;
@@ -218,18 +219,18 @@ export { b } from './b/indexB';
         expect(binProcess.exitCode).toBe(0);
 
         // Verify the main index file exports from the correct paths
-        const indexJs = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
+        const indexJs = normalizeBundleOutput(readFileSync(`${temporaryDirectoryPath}/dist/index.js`));
 
         expect(indexJs).toContain("from './a/indexA.js'");
         expect(indexJs).toContain("from './b/indexB.js'");
 
         // Verify the individual module files exist and have correct content
-        const indexAjs = readFileSync(`${temporaryDirectoryPath}/dist/a/indexA.js`);
+        const indexAjs = normalizeBundleOutput(readFileSync(`${temporaryDirectoryPath}/dist/a/indexA.js`));
 
         expect(indexAjs).toContain("const a");
         expect(indexAjs).toContain("export { a }");
 
-        const indexBjs = readFileSync(`${temporaryDirectoryPath}/dist/b/indexB.js`);
+        const indexBjs = normalizeBundleOutput(readFileSync(`${temporaryDirectoryPath}/dist/b/indexB.js`));
 
         expect(indexBjs).toContain("const b");
         expect(indexBjs).toContain("export { b }");

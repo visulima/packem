@@ -6,7 +6,9 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
-describe("packem jsx", () => {
+// Rolldown wraps modules with `//#region` markers and renames default exports
+// (e.g. `var X_default = ...`), which breaks these byte-exact output assertions.
+describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("packem jsx", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {

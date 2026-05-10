@@ -4,7 +4,7 @@ import type { RollupLogger } from "@visulima/packem-share/utils";
 import { createRollupLogger } from "@visulima/packem-share/utils";
 import { basename, dirname, isAbsolute, join, normalize, parse, relative, resolve } from "@visulima/path";
 import { isRelative } from "@visulima/path/utils";
-import type { GetModuleInfo, OutputAsset, OutputChunk, Plugin } from "rollup";
+import type { GetModuleInfo, OutputChunk, Plugin } from "rollup";
 
 import LoaderManager from "./loaders/loader-manager";
 import type { Extracted, Loader, LoaderContext } from "./loaders/types";
@@ -414,18 +414,11 @@ const cssPlugin = async (
                     type: "asset" as const,
                 };
 
-                const cssFileId = this.emitFile(cssFile);
-
-                logger.info({
-                    chunkIds: ids.length,
-                    hasSourceMap: Boolean(extractedData.map && sourceMap),
-                    message: `Emitted CSS file: ${extractedData.name}`,
-                    plugin: "css",
-                    size: extractedData.css.length,
-                });
-
+                // Pre-compute the sourcemap comment and append it to cssFile.source BEFORE emitFile.
+                // Rollup's bundle param is mutated by emitFile in-place, but rolldown does not — so we
+                // build the final source up front instead of mutating bundle[fileName] afterwards.
                 if (extractedData.map && sourceMap) {
-                    const fileName = this.getFileName(cssFileId);
+                    const fileName = extractedData.name;
 
                     let assetDirectory = "assert";
 
@@ -468,8 +461,7 @@ const cssPlugin = async (
                     if (sourceMap.inline) {
                         map.modify((m) => sourceMap.transform?.(m, normalize(join(directory, fileName))));
 
-                        // eslint-disable-next-line no-param-reassign
-                        (bundle[fileName] as OutputAsset).source += map.toCommentData();
+                        cssFile.source += map.toCommentData();
 
                         logger.debug({
                             message: `Generated inline source map for ${fileName}`,
@@ -484,8 +476,7 @@ const cssPlugin = async (
 
                         const { base } = parse(mapFileName);
 
-                        // eslint-disable-next-line no-param-reassign
-                        (bundle[fileName] as OutputAsset).source += map.toCommentFile(base);
+                        cssFile.source += map.toCommentFile(base);
 
                         logger.debug({
                             message: `Generated external source map: ${mapFileName}`,
@@ -493,6 +484,16 @@ const cssPlugin = async (
                         });
                     }
                 }
+
+                this.emitFile(cssFile);
+
+                logger.info({
+                    chunkIds: ids.length,
+                    hasSourceMap: Boolean(extractedData.map && sourceMap),
+                    message: `Emitted CSS file: ${extractedData.name}`,
+                    plugin: "css",
+                    size: cssFile.source.length,
+                });
             }
 
             // Log summary

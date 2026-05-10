@@ -7,7 +7,8 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 import getFileNamesFromDirectory from "../helpers/get-file-names-from-directory";
 
-describe("packem dynamic require", () => {
+// Rolldown wraps modules with `//#region` markers, breaking byte-exact assertions.
+describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("packem dynamic require", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {

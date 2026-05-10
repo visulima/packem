@@ -8,6 +8,7 @@ import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 describe("packem externals", () => {
     let temporaryDirectoryPath: string;
@@ -365,7 +366,7 @@ console.log(foo);
         const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
         // packem should rewrite import to have explicit .js extension
-        expect(content).toMatch("'external-pkg/file-without-ext.js'");
+        expect(normalizeBundleOutput(content)).toMatch("'external-pkg/file-without-ext.js'");
 
         // Verify it actually runs in Node.js
         const { exitCode } = await execaNode("dist/index.js", [], {
@@ -422,7 +423,7 @@ console.log(foo);
         const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
         // Should NOT add extension - package has exports (conditions object)
-        expect(content).toMatch("'pkg-with-exports/file'");
+        expect(normalizeBundleOutput(content)).toMatch("'pkg-with-exports/file'");
     });
 
     it("should keep original import for package with subpaths exports when subpath is defined", async () => {
@@ -471,7 +472,7 @@ console.log(foo);
         const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
         // Should NOT add extension - subpath is defined in exports
-        expect(content).toMatch("'pkg-with-subpaths/utils'");
+        expect(normalizeBundleOutput(content)).toMatch("'pkg-with-subpaths/utils'");
     });
 
     it("should keep original import for package with subpaths exports when subpath is undefined", async () => {
@@ -521,7 +522,7 @@ console.log(foo);
 
         // Should NOT add extension - package has exports field (even though subpath not defined)
         // Node.js will error at runtime if trying to access undefined subpath
-        expect(content).toMatch("'pkg-with-subpaths/other'");
+        expect(normalizeBundleOutput(content)).toMatch("'pkg-with-subpaths/other'");
     });
 
     it("should resolve import with double extension (.min.js) correctly", async () => {
@@ -566,7 +567,7 @@ console.log(lib);
         const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
         // Should add .js extension to lib.min
-        expect(content).toMatch("'external-pkg/lib.min.js'");
+        expect(normalizeBundleOutput(content)).toMatch("'external-pkg/lib.min.js'");
 
         // Verify it actually runs in Node.js
         const { exitCode } = await execaNode("dist/index.js", [], {
@@ -619,7 +620,7 @@ console.log(utils);
         const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
         // Should resolve directory to index.js
-        expect(content).toMatch("'external-pkg/utils/index.js'");
+        expect(normalizeBundleOutput(content)).toMatch("'external-pkg/utils/index.js'");
 
         // Verify it actually runs in Node.js
         const { exitCode } = await execaNode("dist/index.js", [], {

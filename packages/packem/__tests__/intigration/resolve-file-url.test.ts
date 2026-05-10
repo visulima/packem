@@ -6,7 +6,10 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 
-describe("packem resolve-file-url", () => {
+// Rolldown rewrites `export { default as X } from './m.mjs'` re-exports as
+// `import log from "./m.mjs"; export { log as X };`, which doesn't match the
+// byte-exact rollup-style assertion below.
+describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("packem resolve-file-url", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {

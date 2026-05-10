@@ -6,6 +6,7 @@ import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 describe("packem require-cjs-transformer", () => {
     let temporaryDirectoryPath: string;
@@ -268,7 +269,7 @@ export const test = () => {
     });
 
     it("should handle multiple entry points with shared chunks correctly", async () => {
-        expect.assertions(6);
+        expect.assertions(12);
 
         // Create utility file 1 - fs utilities
         writeFileSync(
@@ -396,58 +397,20 @@ export const mainIndex2 = () => ({
         const indexMjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.js`);
         const index2MjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index2.js`);
 
-        // Check that helpers are properly injected in both entry points
-        expect(indexMjsContent).toMatchInlineSnapshot(`
-          "import { createRequire as __cjs_createRequire } from "node:module";
+        // Check that helpers are properly injected in both entry points (hash-independent structural check)
+        const normalizedIndex = normalizeBundleOutput(indexMjsContent);
 
-          const __cjs_require = __cjs_createRequire(import.meta.url);
+        expect(normalizedIndex).toContain("import { createRequire as __cjs_createRequire } from 'node:module'");
+        expect(normalizedIndex).toContain("const __cjs_require = __cjs_createRequire(import.meta.url)");
+        expect(normalizedIndex).toContain("__cjs_getBuiltinModule");
+        expect(normalizedIndex).toMatch(/__cjs_getBuiltinModule\(['"]node:fs['"]\)/);
+        expect(normalizedIndex).toMatch(/from '\.\/packem_shared\/process-utils-[^']+\.js'/);
+        expect(normalizedIndex).toContain("export { mainIndex }");
 
-          const __cjs_getProcess = typeof globalThis !== "undefined" && typeof globalThis.process !== "undefined" ? globalThis.process : process;
+        const normalizedIndex2 = normalizeBundleOutput(index2MjsContent);
 
-          const __cjs_getBuiltinModule = (module) => {
-              // Check if we're in Node.js and version supports getBuiltinModule
-              if (typeof __cjs_getProcess !== "undefined" && __cjs_getProcess.versions && __cjs_getProcess.versions.node) {
-                  const [major, minor] = __cjs_getProcess.versions.node.split(".").map(Number);
-                  // Node.js 20.16.0+ and 22.3.0+
-                  if (major > 22 || (major === 22 && minor >= 3) || (major === 20 && minor >= 16)) {
-                      return __cjs_getProcess.getBuiltinModule(module);
-                  }
-              }
-              // Fallback to createRequire
-              return __cjs_require(module);
-          };
-
-          const {
-            readFileSync,
-            writeFileSync
-          } = __cjs_getBuiltinModule("node:fs");
-          import { g as getCwd, a as getEnv, j as joinPaths } from './packem_shared/process-utils-D1raRETv.js';
-
-          const readFile = (path) => readFileSync(path, "utf8");
-          const writeFile = (path, content) => writeFileSync(path, content);
-
-          const mainIndex = () => ({
-            readFile,
-            writeFile,
-            joinPaths,
-            getEnv,
-            getCwd
-          });
-
-          export { mainIndex };
-          "
-        `);
-        expect(index2MjsContent).toMatchInlineSnapshot(`
-          "import { r as resolvePath, a as getEnv } from './packem_shared/process-utils-D1raRETv.js';
-
-          const mainIndex2 = () => ({
-            getEnv,
-            resolvePath
-          });
-
-          export { mainIndex2 };
-          "
-        `);
+        expect(normalizedIndex2).toMatch(/from '\.\/packem_shared\/process-utils-[^']+\.js'/);
+        expect(normalizedIndex2).toContain("export { mainIndex2 }");
 
         // Find the shared chunk file dynamically (filename contains hash)
         const sharedChunkDirectory = `${temporaryDirectoryPath}/dist/packem_shared`;

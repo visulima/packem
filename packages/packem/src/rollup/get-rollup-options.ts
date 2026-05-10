@@ -785,7 +785,8 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 ...context.options.rollup.polyfillNode,
             }),
 
-            context.options.rollup.json
+            !isRolldown
+            && context.options.rollup.json
             && JsonPlugin({
                 ...context.options.rollup.json,
             }),
