@@ -17,9 +17,7 @@ describe("packem validation", () => {
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    // Rolldown's `//#region`/`//#endregion` markers add bytes to every chunk so
-    // the size-limit assertions (which expect rollup's tighter byte counts) all fail.
-    describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("bundle size", () => {
+    describe("bundle size", () => {
         it("should throw a error if the size of the file extends the file limit", async () => {
             expect.assertions(2);
 
@@ -52,7 +50,8 @@ describe("packem validation", () => {
             });
 
             expect(binProcess.exitCode).toBe(1);
-            expect(binProcess.stdout).toContain("File size exceeds the limit: dist/index.mjs (21 Bytes / 1.00 Bytes)");
+            // Rolldown's region markers + interop bump emit size from 21B (rollup) to 57B.
+            expect(binProcess.stdout).toMatch(/File size exceeds the limit: dist\/index\.mjs \(\d+ Bytes \/ 1\.00 Bytes\)/);
         });
 
         it("should throw a warning if the size of the file extends the file limit and allowFail is enabled", async () => {
@@ -98,7 +97,7 @@ describe("packem validation", () => {
 
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
-            expect(binProcess.stdout).toContain("File size exceeds the limit: dist/index.mjs (21 Bytes / 1.00 Bytes)");
+            expect(binProcess.stdout).toMatch(/File size exceeds the limit: dist\/index\.mjs \(\d+ Bytes \/ 1\.00 Bytes\)/);
         });
 
         it("should throw a error if the size of the bundle extends the limit", async () => {
@@ -131,7 +130,7 @@ describe("packem validation", () => {
             });
 
             expect(binProcess.exitCode).toBe(1);
-            expect(binProcess.stdout).toContain("Total file size exceeds the limit: 93 Bytes / 1.00 Bytes");
+            expect(binProcess.stdout).toMatch(/Total file size exceeds the limit: \d+ Bytes \/ 1\.00 Bytes/);
         });
 
         it("should throw a warning if the size of the bundle extends the bundle limit and allowFail is enabled", async () => {
@@ -175,7 +174,7 @@ describe("packem validation", () => {
 
             expect(binProcess.stderr).toBe("");
             expect(binProcess.exitCode).toBe(0);
-            expect(binProcess.stdout).toContain("Total file size exceeds the limit: 93 Bytes / 1.00 Bytes");
+            expect(binProcess.stdout).toMatch(/Total file size exceeds the limit: \d+ Bytes \/ 1\.00 Bytes/);
         });
     });
 
