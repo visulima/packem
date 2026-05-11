@@ -131,7 +131,7 @@ export { Button, Client, Client as UIClient, action };
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components 2`] = `
-""use server";
+"'use server';
 async function action() {
 	return "server-action";
 }
@@ -141,7 +141,7 @@ export { action };
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components 3`] = `
-""use client";
+"'use client';
 function Client() {
 	return "client-module";
 }
@@ -163,7 +163,7 @@ exports.action = require_action.action;
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components 5`] = `
-""use server";
+"'use server';
 async function action() {
 	return "server-action";
 }
@@ -173,7 +173,7 @@ exports.action = action;
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components 6`] = `
-""use client";
+"'use client';
 function Client() {
 	return "client-module";
 }
@@ -183,7 +183,7 @@ exports.Client = Client;
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components with same layer 1`] = `
-""use client";
+"'use client';
 import { Client } from './packem_shared/Client-DCW9Tgls.mjs';
 import React, { useState } from 'react';
 
@@ -197,7 +197,7 @@ export { Button, Client };
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components with same layer 2`] = `
-""use client";
+"'use client';
 function Client() {
 	return "client-module";
 }
@@ -207,7 +207,7 @@ export { Client };
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components with same layer 3`] = `
-""use client";
+"'use client';
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 var __create = Object.create;
 var __defProp = Object.defineProperty;
@@ -244,7 +244,7 @@ exports.Client = require_Client.Client;
 `;
 
 exports[`packem package.json exports > should generate proper assets for each exports for server components with same layer 4`] = `
-""use client";
+"'use client';
 function Client() {
 	return "client-module";
 }

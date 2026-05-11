@@ -5,11 +5,11 @@ import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { normalizeBundleOutput } from "../helpers/testing-utils";
 
-// Rolldown emits `"use client";` (double-quoted, semicolon) and wraps modules
-// with `//#region` markers, breaking these single-quoted, plain-output assertions.
-// Snapshot-style fixes don't apply (assertions are exact-match). See PACKEM_TEST_BUNDLER.
-describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("packem preserve-directives", () => {
+const isRolldown = process.env.PACKEM_TEST_BUNDLER === "rolldown";
+
+describe("packem preserve-directives", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
@@ -20,7 +20,11 @@ describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("packem preserve
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it("should preserve user added shebang", async () => {
+    // Rolldown auto-detects entry files with no imports/exports as CJS and wraps
+    // them in a `__commonJSMin(() => { ... })` IIFE — a substantive bundler
+    // behavior difference, not a normalize-able artifact. Shebang preservation
+    // still works under rolldown; the wrapping just changes the body shape.
+    it.skipIf(isRolldown)("should preserve user added shebang", async () => {
         expect.assertions(4);
 
         writeFileSync(
@@ -66,7 +70,9 @@ console.log("Hello, world!");
 `);
     });
 
-    it("should preserve package.json bin added shebang", async () => {
+    // Same root cause as the previous test: rolldown wraps standalone entries
+    // (no imports/exports) in __commonJSMin. Skip under rolldown.
+    it.skipIf(isRolldown)("should preserve package.json bin added shebang", async () => {
         expect.assertions(4);
 
         writeFileSync(`${temporaryDirectoryPath}/src/index.ts`, `console.log("Hello, world!");`);
@@ -109,7 +115,7 @@ console.log("Hello, world!");
     });
 
     it("should preserve directives like 'use client;'", async () => {
-        expect.assertions(7);
+        expect.assertions(isRolldown ? 6 : 7);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.tsx`,
@@ -157,7 +163,7 @@ export default Tr;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`'use client';
+        expect(normalizeBundleOutput(mjsContent)).toBe(`'use client';
 import { jsx } from 'react/jsx-runtime';
 
 const Tr = () => jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20" });
@@ -165,9 +171,12 @@ const Tr = () => jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:b
 export { Tr as default };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        if (!isRolldown) {
+            // Rolldown emits a different CJS interop shape (no `'use strict';`,
+            // `(0, X.jsx)(...)` indirect-call form). DTS + ESM still match.
+            const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use client';
+            expect(normalizeBundleOutput(cjsContent)).toBe(`'use client';
 'use strict';
 
 const jsxRuntime = require('react/jsx-runtime');
@@ -176,6 +185,7 @@ const Tr = () => jsxRuntime.jsx("tr", { className: "m-0 border-t border-gray-300
 
 module.exports = Tr;
 `);
+        }
 
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
@@ -197,7 +207,7 @@ export = Tr;
     });
 
     it("should merge duplicated directives", async () => {
-        expect.assertions(8);
+        expect.assertions(isRolldown ? 6 : 8);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/cli.ts`,
@@ -233,14 +243,17 @@ console.log("Hello, cli!");`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`const foo = "foo";
+        expect(normalizeBundleOutput(mjsContent)).toBe(`const foo = "foo";
 
 export { foo };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        if (!isRolldown) {
+            // Rolldown's CJS interop diverges (no `'use strict';`, different
+            // Symbol.toStringTag preamble). DTS + ESM still match.
+            const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
+            expect(normalizeBundleOutput(cjsContent)).toBe(`'use strict';
 
 Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
@@ -249,13 +262,14 @@ const foo = "foo";
 exports.foo = foo;
 `);
 
-        const cjsCliContent = readFileSync(`${temporaryDirectoryPath}/dist/cli.cjs`);
+            const cjsCliContent = readFileSync(`${temporaryDirectoryPath}/dist/cli.cjs`);
 
-        expect(cjsCliContent).toBe(`#!/usr/bin/env node
+            expect(cjsCliContent).toBe(`#!/usr/bin/env node
 'use strict';
 
 console.log("Hello, cli!");
 `);
+        }
 
         const dtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.ts`);
 
@@ -270,7 +284,11 @@ console.log("Hello, cli!");
         expect(dMtsContent).toMatchSnapshot("d.mts content");
     });
 
-    it("should chunk directives in separated files", async () => {
+    // Rolldown chunks differ from rollup: it emits `import { foo } from './X';`
+    // + a combined `export { bar, baz, foo };` instead of rollup's per-export
+    // re-export form (`export { foo } from './X';`). Chunk hashes also diverge.
+    // This is a real bundler behavior difference, not a normalize-able artifact.
+    it.skipIf(isRolldown)("should chunk directives in separated files", async () => {
         expect.assertions(8);
 
         writeFileSync(`${temporaryDirectoryPath}/src/bar.ts`, `'use client';export const bar = 'bar';`);

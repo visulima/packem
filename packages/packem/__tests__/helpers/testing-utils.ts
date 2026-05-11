@@ -139,6 +139,11 @@ export const normalizeBundleOutput = (content: string): string => {
         .replaceAll(/(\brequire\()"([^"\n]*)"(\))/g, "$1'$2'$3")
         .replaceAll(/(\bimport\s+)"([^"\n]*)"/g, "$1'$2'");
 
+    // Normalize top-of-line directive prologues (e.g. `"use client";`) from
+    // double to single quotes. Rolldown preserves the source's quote style;
+    // rollup rewrites them to single. The two are semantically identical.
+    normalized = normalized.replaceAll(/^"(use [^"\n]+)";/gm, "'$1';");
+
     // Collapse runs of 3+ blank lines (created by stripped markers) into 2.
     normalized = normalized.replaceAll(/\n{3,}/g, "\n\n");
 
