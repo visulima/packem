@@ -7,8 +7,9 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 import getFileNamesFromDirectory from "../helpers/get-file-names-from-directory";
 
-// Rolldown wraps modules with `//#region` markers, breaking byte-exact assertions.
-describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("packem dynamic require", () => {
+const isRolldown = process.env.PACKEM_TEST_BUNDLER === "rolldown";
+
+describe("packem dynamic require", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
@@ -19,7 +20,10 @@ describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("packem dynamic 
         await rm(temporaryDirectoryPath, { recursive: true });
     });
 
-    it("should handle dynamic require in esm", async () => {
+    // Rolldown extracts the dynamically-required module into a shared chunk
+    // (`packem_shared/chunk-*.cjs`) instead of inlining it, so the dist file
+    // list contains a fifth entry. Rollup emits exactly the four entry files.
+    it.skipIf(isRolldown)("should handle dynamic require in esm", async () => {
         expect.assertions(7);
 
         writeFileSync(
