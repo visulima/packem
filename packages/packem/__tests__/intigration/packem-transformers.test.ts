@@ -6,8 +6,21 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
-// Rolldown emits `//#region`/`//#endregion` markers around each module's
-// rendered output, which makes these byte-exact transformer-output assertions fail.
+// The byte-exact assertions below capture rollup-specific CJS emit:
+//   - `'use strict';` directive prologue
+//   - retained source binding name (`const index = ...`)
+//   - `module.exports = index;`
+// Rolldown emits a structurally different shape:
+//   - no `'use strict'`
+//   - synthetic default-export rename (`var src_default = ...`)
+//   - `module.exports = src_default;`
+// These are semantically identical but not byte-comparable, and the
+// `normalizeBundleOutput` helper intentionally does NOT rewrite the
+// `_default` rename. The transformer plugins themselves run fine under
+// rolldown — the assertions are coupled to rollup's CJS shape, not the
+// transformer behavior. Splitting per-bundler expected output would
+// triple the table size; cheaper to skip and rely on other transformer
+// coverage (typescript.test.ts cases) under rolldown.
 describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("packem-transformers", () => {
     let temporaryDirectoryPath: string;
 

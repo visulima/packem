@@ -8,8 +8,15 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 
-// Rolldown emits `//#region`/`//#endregion` markers around module output,
-// which breaks the byte-exact assertions about how `.node` requires render.
+// The native-modules plugin emits virtual module IDs prefixed with a NUL
+// byte (rollup's `\0virtual:...` convention). Rolldown 1.0 doesn't preserve
+// the NUL prefix — it treats the ID as a relative path and prepends the
+// cwd, producing requests like `/tmp/<job>/\0natives:/tmp/<job>/src/...`.
+// The plugin's resolveId hook then can't recognise its own virtual IDs and
+// the build fails with `[build:plugin:native-modules] Native module not
+// found`. This is a packem-rolldown plugin-compat gap, not a test issue —
+// follow-up work needs to migrate the plugin to a rolldown-friendly
+// virtual ID scheme (e.g. `virtual:packem-natives/...`).
 describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("native modules", () => {
     let temporaryDirectoryPath: string;
 
