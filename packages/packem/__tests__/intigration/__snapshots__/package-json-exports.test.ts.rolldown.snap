@@ -186,6 +186,7 @@ exports[`packem package.json exports > should generate proper assets for each ex
 ""use client";
 import { Client } from './packem_shared/Client-DCW9Tgls.mjs';
 import React, { useState } from 'react';
+
 function Button() {
 	const [count] = useState(0);
 	return React.createElement("button", \`count: \${count}\`);

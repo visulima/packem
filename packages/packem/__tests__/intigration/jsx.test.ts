@@ -5,10 +5,11 @@ import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { normalizeBundleOutput } from "../helpers/testing-utils";
 
-// Rolldown wraps modules with `//#region` markers and renames default exports
-// (e.g. `var X_default = ...`), which breaks these byte-exact output assertions.
-describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("packem jsx", () => {
+const isRolldown = process.env.PACKEM_TEST_BUNDLER === "rolldown";
+
+describe("packem jsx", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
@@ -20,7 +21,7 @@ describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("packem jsx", ()
     });
 
     it("should correctly export react tsx to js", async () => {
-        expect.assertions(7);
+        expect.assertions(isRolldown ? 6 : 7);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.tsx`,
@@ -66,16 +67,19 @@ export default Tr;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`import { jsx } from 'react/jsx-runtime';
+        expect(normalizeBundleOutput(mjsContent)).toBe(`import { jsx } from 'react/jsx-runtime';
 
 const Tr = () => jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20" });
 
 export { Tr as default };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        if (!isRolldown) {
+            // Rolldown emits a different CJS interop shape (`let X = require(...)`,
+            // `(0, X.jsx)(...)`, no `'use strict';`). DTS + ESM still match.
+            const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
+            expect(normalizeBundleOutput(cjsContent)).toBe(`'use strict';
 
 const jsxRuntime = require('react/jsx-runtime');
 
@@ -83,6 +87,7 @@ const Tr = () => jsxRuntime.jsx("tr", { className: "m-0 border-t border-gray-300
 
 module.exports = Tr;
 `);
+        }
 
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
@@ -103,8 +108,11 @@ export = Tr;
 `);
     });
 
-    it("should not delete a attribute if the jsxRemoveAttributes config is empty", async () => {
-        expect.assertions(7);
+    // Rolldown line-breaks long object literals (className + data-testid here),
+    // which rollup never does. Real bundler output difference, not a normalize-able
+    // artifact — skip this single case rather than warp the assertion.
+    it.skipIf(isRolldown)("should not delete a attribute if the jsxRemoveAttributes config is empty", async () => {
+        expect.assertions(isRolldown ? 6 : 7);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.tsx`,
@@ -188,7 +196,7 @@ export = Tr;
     });
 
     it("should delete a attribute if the jsxRemoveAttributes is configured", async () => {
-        expect.assertions(7);
+        expect.assertions(isRolldown ? 6 : 7);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.tsx`,
@@ -240,16 +248,19 @@ export default Tr;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`import { jsx } from 'react/jsx-runtime';
+        expect(normalizeBundleOutput(mjsContent)).toBe(`import { jsx } from 'react/jsx-runtime';
 
 const Tr = () => jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20" });
 
 export { Tr as default };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        if (!isRolldown) {
+            // Rolldown emits a different CJS interop shape (`let X = require(...)`,
+            // `(0, X.jsx)(...)`, no `'use strict';`). DTS + ESM still match.
+            const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
+            expect(normalizeBundleOutput(cjsContent)).toBe(`'use strict';
 
 const jsxRuntime = require('react/jsx-runtime');
 
@@ -257,6 +268,7 @@ const Tr = () => jsxRuntime.jsx("tr", { className: "m-0 border-t border-gray-300
 
 module.exports = Tr;
 `);
+        }
 
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 
@@ -278,7 +290,7 @@ export = Tr;
     });
 
     it("should delete a attributes if the jsxRemoveAttributes is configured", async () => {
-        expect.assertions(7);
+        expect.assertions(isRolldown ? 6 : 7);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.tsx`,
@@ -331,16 +343,19 @@ export default Tr;`,
 
         const mjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-        expect(mjsContent).toBe(`import { jsx } from 'react/jsx-runtime';
+        expect(normalizeBundleOutput(mjsContent)).toBe(`import { jsx } from 'react/jsx-runtime';
 
 const Tr = () => jsx("tr", { className: "m-0 border-t border-gray-300 p-0 dark:border-gray-600 even:bg-gray-100 even:dark:bg-gray-600/20" });
 
 export { Tr as default };
 `);
 
-        const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
+        if (!isRolldown) {
+            // Rolldown emits a different CJS interop shape (`let X = require(...)`,
+            // `(0, X.jsx)(...)`, no `'use strict';`). DTS + ESM still match.
+            const cjsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.cjs`);
 
-        expect(cjsContent).toBe(`'use strict';
+            expect(normalizeBundleOutput(cjsContent)).toBe(`'use strict';
 
 const jsxRuntime = require('react/jsx-runtime');
 
@@ -348,6 +363,7 @@ const Tr = () => jsxRuntime.jsx("tr", { className: "m-0 border-t border-gray-300
 
 module.exports = Tr;
 `);
+        }
 
         const dCtsContent = readFileSync(`${temporaryDirectoryPath}/dist/index.d.cts`);
 

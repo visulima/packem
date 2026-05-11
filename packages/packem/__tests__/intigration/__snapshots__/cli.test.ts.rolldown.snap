@@ -75,6 +75,7 @@ export { w as myFunction, T as myVariable };
 exports[`packem cli > should externalize dependencies provided by --external option > --external option output 1`] = `
 "import { __TEST_EXPECTED_STRING__ } from '@test/shouldbeexternal';
 import bar from 'bar-package';
+
 function baz() {
 	return __TEST_EXPECTED_STRING__;
 }

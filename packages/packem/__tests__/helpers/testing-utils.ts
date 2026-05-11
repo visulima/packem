@@ -119,10 +119,14 @@ export const getFileContents = async (directory: string): Promise<Record<string,
  * default-export rename — those tests must use per-test skipIf instead.
  */
 export const normalizeBundleOutput = (content: string): string => {
-    // Strip the region opener entirely (no replacement). Strip the closer but
-    // leave a newline behind so adjacent code blocks remain separated by a
-    // blank line — matching rollup's spacing between modules.
+    // Strip the region opener and closer markers rolldown emits around each
+    // module body. The closer leaves a blank line so adjacent modules stay
+    // separated — matching rollup's per-module spacing. When the opener is
+    // directly preceded by a hoisted `import` statement (no blank between
+    // them), insert a blank too: rolldown packs the import flush against the
+    // user-code region, but rollup naturally separates them.
     let normalized = content
+        .replaceAll(/^(import\s.*;\n)\/\/#region(?:\s.*)?\n/gm, "$1\n")
         .replaceAll(/^\/\/#region(?:\s.*)?\n/gm, "")
         .replaceAll(/^\/\/#endregion\n/gm, "\n");
 
