@@ -11,6 +11,7 @@ import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
+import { normalizeBundleOutput } from "../helpers/testing-utils";
 
 // Tests that compare bundled output byte-exactly fail under rolldown because
 // rolldown wraps each module with `//#region`/`//#endregion` markers and renames
@@ -115,9 +116,7 @@ describe("packem typescript", () => {
         expect(binProcess.stdout).toContain("Generation of declaration files are disabled.");
     });
 
-    // Rolldown wraps modules with `//#region`/`//#endregion` markers, so the
-    // byte-exact `console.log(1);\n` assertions in this block all fail.
-    describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("resolve-typescript-mjs-cjs plugin", () => {
+    describe("resolve-typescript-mjs-cjs plugin", () => {
         it("should resolve .jsx -> .tsx", async () => {
             expect.assertions(3);
 
@@ -144,7 +143,10 @@ describe("packem typescript", () => {
 
             const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
-            expect(content).toBe("console.log(1);\n");
+            // Substring not byte-exact: rolldown wraps standalone entry-only
+            // modules (no imports/exports) in `__commonJSMin(() => { ... })`
+            // since it can't prove the top level is side-effect-free.
+            expect(content).toContain("console.log(1);");
         });
 
         it("should resolve .jsx -> .ts when .tsx does not exist", async () => {
@@ -226,7 +228,10 @@ describe("packem typescript", () => {
 
             const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
-            expect(content).toBe("console.log(1);\n");
+            // Substring not byte-exact: rolldown wraps standalone entry-only
+            // modules (no imports/exports) in `__commonJSMin(() => { ... })`
+            // since it can't prove the top level is side-effect-free.
+            expect(content).toContain("console.log(1);");
         });
 
         it("should resolve .mjs -> .ts", async () => {
@@ -255,7 +260,10 @@ describe("packem typescript", () => {
 
             const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
-            expect(content).toBe("console.log(1);\n");
+            // Substring not byte-exact: rolldown wraps standalone entry-only
+            // modules (no imports/exports) in `__commonJSMin(() => { ... })`
+            // since it can't prove the top level is side-effect-free.
+            expect(content).toContain("console.log(1);");
         });
 
         it("should resolve .cjs -> .ts", async () => {
@@ -284,7 +292,10 @@ describe("packem typescript", () => {
 
             const content = await readFile(`${temporaryDirectoryPath}/dist/index.js`);
 
-            expect(content).toBe("console.log(1);\n");
+            // Substring not byte-exact: rolldown wraps standalone entry-only
+            // modules (no imports/exports) in `__commonJSMin(() => { ... })`
+            // since it can't prove the top level is side-effect-free.
+            expect(content).toContain("console.log(1);");
         });
 
         it("should prefer .ts over .js in source code", async () => {
@@ -605,9 +616,7 @@ console.log(value);
         });
     });
 
-    // Rolldown wraps modules with `//#region` markers, so the byte-exact
-    // path-resolution assertions in this block all fail.
-    describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("resolve-typescript-tsconfig-paths plugin", () => {
+    describe("resolve-typescript-tsconfig-paths plugin", () => {
         it("should resolve tsconfig paths", async () => {
             expect.assertions(5);
 
@@ -700,23 +709,16 @@ console.log(value);
             expect(binProcess.stdout).not.toContain("If this is incorrect, add it to the");
 
             const cjs = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
-
-            expect(cjs).toBe(`'use strict';
-
-console.log(1);
-`);
-
             const mjs = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-            expect(mjs).toBe(`console.log(1);
-`);
+            expect(normalizeBundleOutput(cjs)).toContain("console.log(1);");
+            expect(normalizeBundleOutput(mjs)).toContain("console.log(1);");
         });
     });
 
-    // Rolldown wraps modules with `//#region` markers, breaking byte-exact assertions.
-    describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("resolve-typescript-tsconfig-root-dirs plugin", () => {
+    describe("resolve-typescript-tsconfig-root-dirs plugin", () => {
         it("should resolve tsconfig rootDirs", async () => {
-            expect.assertions(4);
+            expect.assertions(6);
 
             await installPackage(temporaryDirectoryPath, "typescript");
 
@@ -747,26 +749,17 @@ console.log(1);
             expect(binProcess.exitCode).toBe(0);
 
             const cjs = await readFile(`${temporaryDirectoryPath}/dist/index.cjs`);
-
-            expect(cjs).toBe(`'use strict';
-
-const a = 1;
-
-nconsole.log(a);
-const b = 2;
-
-console.log(b);
-`);
-
             const mjs = await readFile(`${temporaryDirectoryPath}/dist/index.mjs`);
 
-            expect(mjs).toBe(`const a = 1;
-
-nconsole.log(a);
-const b = 2;
-
-console.log(b);
-`);
+            // The test verifies tsconfig `rootDirs` resolves cross-folder imports.
+            // Both bundlers correctly emit the two log calls; rollup keeps the
+            // `const a/b` bindings, while rolldown inlines them (`console.log(1)`
+            // / `console.log(2)`). Check that both source modules contributed
+            // their log call to the bundle — that's the feature under test.
+            for (const out of [cjs, mjs]) {
+                expect(out).toMatch(/nconsole\.log\((a|1)\)/);
+                expect(out).toMatch(/console\.log\((b|2)\)/);
+            }
         });
     });
 
