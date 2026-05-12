@@ -1,3 +1,15 @@
+## @visulima/packem-rollup [1.0.0-alpha.65](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.64...@visulima/packem-rollup@1.0.0-alpha.65) (2026-05-07)
+
+### Bug Fixes
+
+* **packem-rollup:** deduplicate renamed require helpers ([4eee70c](https://github.com/visulima/packem/commit/4eee70c52a5d4dc8505df3e91de26650fb1a1885))
+
+
+### Dependencies
+
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.46
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.26
+
 ## @visulima/packem-rollup [1.0.0-alpha.64](https://github.com/visulima/packem/compare/@visulima/packem-rollup@1.0.0-alpha.63...@visulima/packem-rollup@1.0.0-alpha.64) (2026-04-27)
 
 

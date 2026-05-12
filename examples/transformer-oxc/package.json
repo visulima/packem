@@ -33,14 +33,14 @@
         "clean": "rimraf node_modules dist"
     },
     "dependencies": {
-        "react": "^19.2.6",
-        "react-dom": "^19.2.6"
+        "react": "^19.2.4",
+        "react-dom": "^19.2.4"
     },
     "devDependencies": {
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
         "@visulima/packem": "workspace:*",
-        "typescript": "^6.0.3"
+        "typescript": "^5.9.3 || ^6.0.0"
     },
     "engines": {
         "node": ">=20"

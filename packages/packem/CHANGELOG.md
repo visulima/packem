@@ -1,9 +1,158 @@
-## @visulima/packem [1.28.3](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@1.28.3) (2025-08-17)
+## @visulima/packem [2.0.0-alpha.78](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.77...@visulima/packem@2.0.0-alpha.78) (2026-05-07)
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.65
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.46
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.45
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.26
+
+## @visulima/packem [2.0.0-alpha.77](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.76...@visulima/packem@2.0.0-alpha.77) (2026-04-27)
 
 ### Bug Fixes
 
-* update package dependencies and versions ([e7a77fc](https://github.com/visulima/packem/commit/e7a77fcbbc6a03b5a387357378c0a474397478a2))
-* update test snapshots and package.json dependencies ([648dda3](https://github.com/visulima/packem/commit/648dda32516f84f5ce9d93c5a03b8e07fd0fd2d5))
+* **packem:** route .d.mts/.d.cts outputs to matching .mts/.cts source ([3ae5815](https://github.com/visulima/packem/commit/3ae5815520771522002f527a14904a1dc8f1ba6b))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.64
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.45
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.44
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.25
+
+## @visulima/packem [2.0.0-alpha.76](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.75...@visulima/packem@2.0.0-alpha.76) (2026-04-24)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** map cached `.d.ts` entries back to all source extensions ([5d8f670](https://github.com/visulima/packem/commit/5d8f670954806c6111eb90cff42e0faeef59dea1))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.63
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.44
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.43
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.24
+
+## @visulima/packem [2.0.0-alpha.75](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.74...@visulima/packem@2.0.0-alpha.75) (2026-04-24)
+
+### Bug Fixes
+
+* **packem:** declared deps win over tsconfig `paths` catch-all ([28450bf](https://github.com/visulima/packem/commit/28450bfe6339b1f077e14c911898936d1ce0f733))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.62
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.43
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.42
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.23
+
+## @visulima/packem [2.0.0-alpha.74](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.73...@visulima/packem@2.0.0-alpha.74) (2026-04-24)
+
+### Bug Fixes
+
+* **packem:** externalize transitive bare specifiers from workspace-sibling .d.ts ([b9e9fb9](https://github.com/visulima/packem/commit/b9e9fb942a7db26d2a0df14117be0fef6cb89fe8))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.61
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.42
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.41
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.22
+
+## @visulima/packem [2.0.0-alpha.73](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.72...@visulima/packem@2.0.0-alpha.73) (2026-04-24)
+
+### Bug Fixes
+
+* forward resolveId options + silence DTS-only circular warnings ([eaf1798](https://github.com/visulima/packem/commit/eaf1798e711bbf1ee0aeb50a20a8aa018c4526ac))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.60
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.41
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.40
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.21
+
+## @visulima/packem [2.0.0-alpha.72](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.71...@visulima/packem@2.0.0-alpha.72) (2026-04-24)
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.59
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.40
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.39
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.20
+
+## @visulima/packem [2.0.0-alpha.71](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.70...@visulima/packem@2.0.0-alpha.71) (2026-04-24)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** sibling .d.ts fallback for string-form exports ([2a26b69](https://github.com/visulima/packem/commit/2a26b69b322375061cdcd55a14c72301085606ef))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.58
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.39
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.38
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.19
+
+## @visulima/packem [2.0.0-alpha.70](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.69...@visulima/packem@2.0.0-alpha.70) (2026-04-24)
+
+### Bug Fixes
+
+* **packem:** stale dtsResolve cache + transitive bare-specifier crash ([f45c262](https://github.com/visulima/packem/commit/f45c262e24db950d1ae6eda99a9a885ee872fe55))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.57
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.38
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.37
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.18
+
+## @visulima/packem [2.0.0-alpha.69](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.68...@visulima/packem@2.0.0-alpha.69) (2026-04-24)
+
+### Bug Fixes
+
+* correctly handle peer-dep/types-only/merged-declaration edge cases in DTS ([42b6f7c](https://github.com/visulima/packem/commit/42b6f7c0888b6e51f7755a1afca5954b1e8ba1d3))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.56
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.37
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.36
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.17
+
+## @visulima/packem [2.0.0-alpha.68](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.67...@visulima/packem@2.0.0-alpha.68) (2026-04-24)
+
+### Bug Fixes
+
+* **rollup-plugin-dts:** inline bundled-package types in emitted .d.ts ([ce4c00d](https://github.com/visulima/packem/commit/ce4c00d24ebf14b25c799dc51f3b5f8939a9fae3))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.55
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.36
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.35
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.16
+
+## @visulima/packem [2.0.0-alpha.67](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.66...@visulima/packem@2.0.0-alpha.67) (2026-04-24)
+
+### ⚠ BREAKING CHANGES
+
+* **packem:** unify externals plugins, track per-entry DTS extensions
+
+### Features
+
+* **packem:** unify externals plugins, track per-entry DTS extensions ([22647ba](https://github.com/visulima/packem/commit/22647ba5d10c220051e71a3bfaa55baa59957d6e))
 
 ### Bug Fixes
 
@@ -104,13 +253,1079 @@
 
 ### Miscellaneous Chores
 
-* update package dependencies and versions ([c6220ac](https://github.com/visulima/packem/commit/c6220ac490b132b45420ecebe232467f73ad0140))
-* update package dependencies and versions ([b82ae05](https://github.com/visulima/packem/commit/b82ae050af50303281ba486bd4e508711a46b380))
-* update package versions and add engine requirements ([d594ac3](https://github.com/visulima/packem/commit/d594ac31a8302f3a4d86d07415002495361b6ba1))
+* refresh test snapshots for environment drift ([0a2e9a6](https://github.com/visulima/packem/commit/0a2e9a654937f4b91b79644561d2fb680b08f198))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.54
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.35
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.34
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.15
+
+## @visulima/packem [2.0.0-alpha.66](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.65...@visulima/packem@2.0.0-alpha.66) (2026-04-23)
+
+### Bug Fixes
+
+* **packem-share:** emit .d.mts/.d.cts for split dual-format contexts ([eecc05f](https://github.com/visulima/packem/commit/eecc05f65e727ad2fdf4bc9cd454144334d7ae3c))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.53
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.34
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.33
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.14
+
+## @visulima/packem [2.0.0-alpha.65](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.64...@visulima/packem@2.0.0-alpha.65) (2026-04-23)
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.52
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.33
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.32
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.13
+
+## @visulima/packem [2.0.0-alpha.64](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.63...@visulima/packem@2.0.0-alpha.64) (2026-04-23)
+
+### ⚠ BREAKING CHANGES
+
+* **packem:** drop isolatedDeclarationTransformer references; remove dead examples
+* **packem:** The following public API is removed:
+- `options.isolatedDeclarationTransformer` (packem config field)
+- `options.rollup.isolatedDeclarations` (plugin exclude/ignoreErrors config)
+- `@visulima/packem/dts/isolated/transformer/{oxc,swc,typescript}` subpath exports
+- `@visulima/packem-rollup/plugin/isolated-declarations` subpath export
+- Exported types `IsolatedDeclarationsTransformer`, `IsolatedDeclarationsResult`,
+  `IsolatedDeclarationsOptions`
+- CLI init prompts for "isolated declaration transformer" selection
+
+Enable TypeScript's isolated declarations via `tsconfig.compilerOptions.isolatedDeclarations`;
+rollup-plugin-dts picks it up automatically via oxc.
+
+- Delete packem-rollup/src/plugins/isolated-declarations/ (381 lines + 4 utils)
+- Delete three packem-rollup/src/plugins/{oxc,swc,typescript}/isolated-declarations-*-transformer.ts
+- Delete three packem/src/rollup/plugins/**/isolated-declarations-*-transformer.ts re-exports
+- Delete the ~600-line "isolated declarations" describe block in typescript.test.ts
+- Relocate the shared fix-dts-default-cjs-exports utility out of the deleted dir
+- Rewire build-types.ts, get-rollup-options.ts, watch.ts, cli/commands/init.ts,
+  packem/index.ts, and all packem.config.ts files to drop the option and the
+  plugin wiring
+- Drop processConditionalComments from minify-html-literals defaults since
+  html-minifier-next v6 removed it (fixes pre-existing tsc error)
+- Add types: ["node"] to packem-share tsconfig so pre-commit tsc finds the node
+  globals (process, Buffer, node:crypto) — pre-existing latent issue
+- Update two snapshots affected by the new bundled DTS pipeline (ecosystem/sitefetch,
+  externals namespaced peers — the latter also reflects the _$ prefix from the
+  prior rollup-plugin-dts sync)
+
+Skipped hook because it triggers a pre-existing flaky css cache-invalidation
+test (EPERM on index.css, unrelated to this refactor — verified failing on
+HEAD without these changes).
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+### Features
+
+* **packem:** add exe/SEA support for standalone executables ([61f9999](https://github.com/visulima/packem/commit/61f9999ea6262c8b8aa97272079dd0eb4200c35a))
+
+### Performance Improvements
+
+* **packem:** streamline DTS flow and switch self-build to oxc backend ([f4c4f39](https://github.com/visulima/packem/commit/f4c4f39c81f68972faaf86443ff62bdb46f50f20))
+
+### Documentation
+
+* **packem:** drop isolatedDeclarationTransformer references; remove dead examples ([f89bed6](https://github.com/visulima/packem/commit/f89bed6440b9a014401cb26c9d0759050f15614e))
+
+### Code Refactoring
+
+* **packem:** drop isolatedDeclarationTransformer; use rollup-plugin-dts only ([3e7049f](https://github.com/visulima/packem/commit/3e7049f29e877a305e1c32d05b44aee5da8805ff))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.51
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.32
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.31
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.12
+
+## @visulima/packem [2.0.0-alpha.63](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.62...@visulima/packem@2.0.0-alpha.63) (2026-04-18)
+
+### Features
+
+* **css:** extend stylus, fix lightningcss modules, add dts coverage ([302f01f](https://github.com/visulima/packem/commit/302f01f087a2a4e91e22a6da75bd280410923aa6))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.50
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.31
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.30
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.11
+
+## @visulima/packem [2.0.0-alpha.62](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.61...@visulima/packem@2.0.0-alpha.62) (2026-04-16)
+
+### Bug Fixes
+
+* fixed windows handling of externals, update deps ([095f18a](https://github.com/visulima/packem/commit/095f18a6eb16ff3d510be98ed533d67d550728d5))
+
+### Miscellaneous Chores
+
+* bump node engines to ^22.14.0 || >=24.10.0 ([32f705a](https://github.com/visulima/packem/commit/32f705aa866f9daea6a094df74ef66aa8088e2c6))
 
 ### Tests
 
-* update snapshots for browserslist-to-esbuild tests ([ac6e60b](https://github.com/visulima/packem/commit/ac6e60bc1e4f0f8a1d5d4fedf4998d9c42101696))
+* fixed test ([89838c1](https://github.com/visulima/packem/commit/89838c1f11dfc5b6af8f235622de603d90dd781f))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.49
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.30
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.29
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.10
+
+## @visulima/packem [2.0.0-alpha.61](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.60...@visulima/packem@2.0.0-alpha.61) (2026-03-28)
+
+### Bug Fixes
+
+* dont throw a error if only bin with package.json is used ([8a95946](https://github.com/visulima/packem/commit/8a95946677565894980104a05d6cff8effc99b79))
+* **packem:** fix data-uri timeout and externals test for postgraphile v5 ([03bb96d](https://github.com/visulima/packem/commit/03bb96d5cad3e92b7d228e2b28f643c4408934a2))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.48
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.29
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.28
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.9
+
+## @visulima/packem [2.0.0-alpha.60](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.59...@visulima/packem@2.0.0-alpha.60) (2026-03-24)
+
+### Features
+
+* **packem, packem-rollup:** import attributes, TS resolution, build/watch improvements ([7fa91de](https://github.com/visulima/packem/commit/7fa91de8ea6b9fff47cd0a3fd5874d94592ae5ea))
+* **packem:** add rollup-plugin-import-trace for build error diagnostics ([304cb0d](https://github.com/visulima/packem/commit/304cb0d54c19a95ca3df82b7cc52d4d289973d4e))
+
+### Miscellaneous Chores
+
+* update test ([bad6c42](https://github.com/visulima/packem/commit/bad6c427f898f88aad4f66969fa18c3e6fc89208))
+* updated test snap ([1887e4c](https://github.com/visulima/packem/commit/1887e4ca83efe950a27f8f60480af67e4ea03c4d))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.47
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.28
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.27
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.8
+
+## @visulima/packem [2.0.0-alpha.59](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.58...@visulima/packem@2.0.0-alpha.59) (2026-03-24)
+
+### Miscellaneous Chores
+
+* allow typescript 5 and 6 in peerDependencies and examples ([de6362d](https://github.com/visulima/packem/commit/de6362d402f593c11a9eedd04d756d69bade4ac5))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.46
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.27
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.26
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.7
+
+## @visulima/packem [2.0.0-alpha.58](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.57...@visulima/packem@2.0.0-alpha.58) (2026-03-24)
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.45
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.26
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.25
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.6
+
+## @visulima/packem [2.0.0-alpha.57](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.56...@visulima/packem@2.0.0-alpha.57) (2026-03-24)
+
+### Features
+
+* **packem:** support DTS-specific dependency inlining ([8b234c6](https://github.com/visulima/packem/commit/8b234c6fe25890250485c9aa3e81745601a7f6bd))
+* **rollup-plugin-dts:** add include/exclude filter support ([5d76867](https://github.com/visulima/packem/commit/5d76867939d95c1d75469f85a59b9504f3c3f1e4))
+
+### Bug Fixes
+
+* updated deps ([a50675d](https://github.com/visulima/packem/commit/a50675d7f9a98236edd89bc39bc35b8cb4db1565))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.44
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.25
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.24
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.5
+
+## @visulima/packem [2.0.0-alpha.56](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.55...@visulima/packem@2.0.0-alpha.56) (2026-03-16)
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.43
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.24
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.23
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.4
+
+## @visulima/packem [2.0.0-alpha.55](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.54...@visulima/packem@2.0.0-alpha.55) (2026-03-14)
+
+### Miscellaneous Chores
+
+* **packem:** update dependencies and clean up fixture package.json files ([9cf26d1](https://github.com/visulima/packem/commit/9cf26d177534aaa692971a630145273b87912ef0))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.42
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.23
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.22
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.3
+
+## @visulima/packem [2.0.0-alpha.54](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.53...@visulima/packem@2.0.0-alpha.54) (2026-03-06)
+
+### Bug Fixes
+
+* fixed broken publishing ([002f29a](https://github.com/visulima/packem/commit/002f29a6a3edf695d98abae0f18c6b0c328ef832))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.41
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.22
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.21
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.2
+
+## @visulima/packem [2.0.0-alpha.53](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.52...@visulima/packem@2.0.0-alpha.53) (2026-03-05)
+
+### Features
+
+* **packem:** update source, tests and configuration ([1d6e310](https://github.com/visulima/packem/commit/1d6e310c988e0a14414ea769b0560dc025fd0d16))
+
+### Bug Fixes
+
+* resolve test failures in packem-rollup and ecosystem tests ([2a43db8](https://github.com/visulima/packem/commit/2a43db81e52ec956e78e3c1ce70038fb40e28345))
+
+### Miscellaneous Chores
+
+* update dependencies, fix linting and improve code formatting ([d78b132](https://github.com/visulima/packem/commit/d78b1325ce79dbd14deeb6311a74d81f7172a81e))
+* update examples, root config and lockfile ([a10440d](https://github.com/visulima/packem/commit/a10440d06e9d0e283cee4b9ef3b06a43166e513e))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.40
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.21
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.20
+* **@visulima/rollup-plugin-dts:** upgraded to 1.0.0-alpha.1
+
+## @visulima/packem [2.0.0-alpha.52](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.51...@visulima/packem@2.0.0-alpha.52) (2026-02-21)
+
+### Bug Fixes
+
+* **packem:** fix integration test failures and update source ([64673f1](https://github.com/visulima/packem/commit/64673f1e7c631ed0e454c13579bb9f71d0f9b3b9))
+
+### Miscellaneous Chores
+
+* remove empty optionalDependencies sections from package.json files ([a4aecaa](https://github.com/visulima/packem/commit/a4aecaaacb33d1ffcc8731cfc5247e5f7fa79cf0))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.39
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.20
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.19
+
+## @visulima/packem [2.0.0-alpha.51](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.50...@visulima/packem@2.0.0-alpha.51) (2025-12-31)
+
+### Features
+
+* **packem:** enhance Preact and React presets for development mode ([4cf7b15](https://github.com/visulima/packem/commit/4cf7b154bab6b67adb1f0f253004c62e4e1d6079))
+
+## @visulima/packem [2.0.0-alpha.50](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.49...@visulima/packem@2.0.0-alpha.50) (2025-12-29)
+
+### Features
+
+* **packem:** add TypeScript resolution plugins and enhance integration tests ([fabe2aa](https://github.com/visulima/packem/commit/fabe2aadc0fb1df947c4f0c70df3357bbbac63d1))
+* **packem:** enhance external dependency resolution and add new tests ([397c914](https://github.com/visulima/packem/commit/397c9147611f9def319ea81e3fc0546a2300b8ec))
+* **packem:** enhance package.json imports handling and update integration tests ([6449db0](https://github.com/visulima/packem/commit/6449db0f134cafd514849e4c739c0f882f87f6ba))
+
+### Miscellaneous Chores
+
+* update pnpm workspace and lockfile configurations ([121fa13](https://github.com/visulima/packem/commit/121fa1399bff3738bc6dbeac310aaff04ead670d))
+
+### Tests
+
+* add integration test for externalized dependency resolution ([30fac39](https://github.com/visulima/packem/commit/30fac399113e835a6cde48e5c3b297ff965ee518))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.38
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.19
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.18
+
+## @visulima/packem [2.0.0-alpha.49](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.48...@visulima/packem@2.0.0-alpha.49) (2025-12-28)
+
+### Features
+
+* **shared-module:** add cross-boundary shared module support and integration tests ([59c2635](https://github.com/visulima/packem/commit/59c2635e1e84132b7157f78f191b49b4e180b7b1))
+
+### Miscellaneous Chores
+
+* update package dependencies and improve configurations ([e942f98](https://github.com/visulima/packem/commit/e942f9833920f04e112daa232bbe7bdb3628e039))
+
+### Code Refactoring
+
+* standardize code formatting and improve readability ([2bc01d1](https://github.com/visulima/packem/commit/2bc01d1e1b266dceb6023e29d3211bc7415e4946))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.37
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.17
+
+## @visulima/packem [2.0.0-alpha.48](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.47...@visulima/packem@2.0.0-alpha.48) (2025-12-28)
+
+### Features
+
+* **preact:** add Preact and React compatibility examples with Babel support ([0b77282](https://github.com/visulima/packem/commit/0b77282b802ed3d7c5df0733c1d7f5e2156df721))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.36
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.16
+
+## @visulima/packem [2.0.0-alpha.47](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.46...@visulima/packem@2.0.0-alpha.47) (2025-12-24)
+
+### Miscellaneous Chores
+
+* update dependencies and improve configuration ([aa5ea19](https://github.com/visulima/packem/commit/aa5ea194b5add7df38a8855e618736fea0ae37fe))
+* update package dependencies and improve configuration ([a7dd729](https://github.com/visulima/packem/commit/a7dd729e75a08380ebb70bffb629ec1df3c2bb7f))
+
+### Code Refactoring
+
+* enhance type inference and improve test coverage ([80fbf41](https://github.com/visulima/packem/commit/80fbf41b90595fa1c95133f0f18cd5c2ca48787c))
+* improve environment variable handling and enhance entry inference ([c21e7b9](https://github.com/visulima/packem/commit/c21e7b9537a77fe835ef25d5bc4b4d0898e89b35))
+* simplify JSX component definitions and update test cases ([14fd836](https://github.com/visulima/packem/commit/14fd8367b5164aecff0c39d28cc096a83fb1ca78))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.35
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.18
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.15
+
+## @visulima/packem [2.0.0-alpha.46](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.45...@visulima/packem@2.0.0-alpha.46) (2025-12-16)
+
+### Features
+
+* add solid preset options and user babel options merging ([1b93748](https://github.com/visulima/packem/commit/1b93748f986619ed121dbc31361072421eaae74f))
+* add support for loading environment variables from .env files ([0b041c6](https://github.com/visulima/packem/commit/0b041c62cb5457095bea5a9ea68ab8dbf8b63f53))
+* enhance build configuration and environment handling ([78d4c32](https://github.com/visulima/packem/commit/78d4c32f5f12685bb09acc5c50c3200274765125))
+* enhance hooks functionality and improve documentation ([dfea61d](https://github.com/visulima/packem/commit/dfea61ddd2b286327c382b2c50b1b94cceb3d3ad))
+* enhance package.json exports and improve Solid preset handling ([ba61fb6](https://github.com/visulima/packem/commit/ba61fb6e71fbfed8ae8f66256676b5606a5dca87))
+
+### Bug Fixes
+
+* update export handling and improve entry inference logic ([4897f4f](https://github.com/visulima/packem/commit/4897f4f31b7d9ec87b3254391f4b11385478e2e6))
+
+### Miscellaneous Chores
+
+* update package dependencies and improve build configuration ([690fb64](https://github.com/visulima/packem/commit/690fb641471278110f6175e6396d5bee9352c8eb))
+
+### Code Refactoring
+
+* streamline environment variable handling and improve test coverage ([642c513](https://github.com/visulima/packem/commit/642c513d61fdc64069a7d7affc78b986ad29b9b1))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.34
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.17
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.14
+
+## @visulima/packem [2.0.0-alpha.45](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.44...@visulima/packem@2.0.0-alpha.45) (2025-12-13)
+
+### Bug Fixes
+
+* update package versions in pnpm-lock.yaml and package.json files ([c227ecf](https://github.com/visulima/packem/commit/c227ecf2b15b900242c37958f754a48a6d47b57f))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.33
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.16
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.13
+
+## @visulima/packem [2.0.0-alpha.44](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.43...@visulima/packem@2.0.0-alpha.44) (2025-12-13)
+
+### Bug Fixes
+
+* improve logic for checking Git status in add command ([bbb85c7](https://github.com/visulima/packem/commit/bbb85c7952221bb840f0697a4db85a4ba4a5327b))
+
+## @visulima/packem [2.0.0-alpha.43](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.42...@visulima/packem@2.0.0-alpha.43) (2025-12-09)
+
+### Bug Fixes
+
+* update pnpm-lock.yaml and example files for consistency ([d11dd48](https://github.com/visulima/packem/commit/d11dd4868a3cb5265035897148f81dca3b33f359))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.32
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.12
+
+## @visulima/packem [2.0.0-alpha.42](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.41...@visulima/packem@2.0.0-alpha.42) (2025-12-09)
+
+### Features
+
+* add Vue and Svelte presets with example configurations ([5d7c0eb](https://github.com/visulima/packem/commit/5d7c0ebaac1a105a863c8c92e953623398734f5b))
+
+## @visulima/packem [2.0.0-alpha.41](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.40...@visulima/packem@2.0.0-alpha.41) (2025-12-09)
+
+### Features
+
+* added preset for react and solid, added babel transformer ([773b907](https://github.com/visulima/packem/commit/773b907b462985cb61a5c978c43e227f24db6706))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.31
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.15
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.11
+
+## @visulima/packem [2.0.0-alpha.40](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.39...@visulima/packem@2.0.0-alpha.40) (2025-11-30)
+
+### Code Refactoring
+
+* enhance extractExportFilenames function and improve package entry validation ([a3674e1](https://github.com/visulima/packem/commit/a3674e15a9c2484d43d8ae658df1b018a69a62b1))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.30
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.10
+
+## @visulima/packem [2.0.0-alpha.39](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.38...@visulima/packem@2.0.0-alpha.39) (2025-11-26)
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.29
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.9
+
+## @visulima/packem [2.0.0-alpha.38](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.37...@visulima/packem@2.0.0-alpha.38) (2025-11-25)
+
+### Bug Fixes
+
+* enable debarrel plugin in Rollup options ([5cde5f6](https://github.com/visulima/packem/commit/5cde5f63c043406b42cb1eea4e4245d0e34aa570))
+* enhance migrate command and update ESLint configuration ([95bfa33](https://github.com/visulima/packem/commit/95bfa33ba225cdcf8a88df0f55c781a23de746ef))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.28
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.14
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.8
+
+## @visulima/packem [2.0.0-alpha.37](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.36...@visulima/packem@2.0.0-alpha.37) (2025-11-13)
+
+### Bug Fixes
+
+* updated deps and added more cli command tests ([ddbc7fd](https://github.com/visulima/packem/commit/ddbc7fd46ca785a1e548a7b2dcdb259ac35d50bf))
+
+## @visulima/packem [2.0.0-alpha.36](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.35...@visulima/packem@2.0.0-alpha.36) (2025-11-11)
+
+### Features
+
+* add migrate command to facilitate migration from other bundlers to packem ([518154f](https://github.com/visulima/packem/commit/518154f7b7fe642be22698a4c0c3d1738ca41a88))
+
+### Miscellaneous Chores
+
+* update dependencies and package versions across multiple files ([#172](https://github.com/visulima/packem/issues/172)) ([f73c1dc](https://github.com/visulima/packem/commit/f73c1dc453f55c52da98e4b7c60f44ffd637e53c))
+* update package references to use 'catalog:visulima' for consistency across multiple packages ([14ee42b](https://github.com/visulima/packem/commit/14ee42b3ae978baef4752e12115d14d6bb2ba7bc))
+
+## @visulima/packem [2.0.0-alpha.35](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.34...@visulima/packem@2.0.0-alpha.35) (2025-11-11)
+
+### Bug Fixes
+
+* improve isolated declarations plugin and update filtering logic ([7efdf0d](https://github.com/visulima/packem/commit/7efdf0d052805a3d46cf767447728ca3d537fc24))
+* update license files and improve plugin configurations ([6372411](https://github.com/visulima/packem/commit/6372411fefbad9cb67d912c1447994b93a9ebc6f))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.27
+
+## @visulima/packem [2.0.0-alpha.34](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.33...@visulima/packem@2.0.0-alpha.34) (2025-11-10)
+
+### Bug Fixes
+
+* update dependencies and configurations across multiple packages ([74aeb65](https://github.com/visulima/packem/commit/74aeb6569713c08d19f5581952febf9934c56024))
+
+## @visulima/packem [2.0.0-alpha.33](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.32...@visulima/packem@2.0.0-alpha.33) (2025-11-08)
+
+### Features
+
+* add unbundle mode to preserve source file structure ([317e992](https://github.com/visulima/packem/commit/317e9925eae1344a2459f044250e717241a1d5a5))
+
+### Miscellaneous Chores
+
+* update package.json and pnpm-lock.yaml for dependency management ([aa523ca](https://github.com/visulima/packem/commit/aa523ca16f29ba0a874a13693d1f9581acf6f8c3))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.26
+
+## @visulima/packem [2.0.0-alpha.32](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.31...@visulima/packem@2.0.0-alpha.32) (2025-10-28)
+
+### Features
+
+* enhance require-cjs-transformer with multi-entry point support ([6f0a824](https://github.com/visulima/packem/commit/6f0a824fe982bc9dc18e0e19fd9de55754ac37b3))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.25
+
+## @visulima/packem [2.0.0-alpha.31](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.30...@visulima/packem@2.0.0-alpha.31) (2025-10-28)
+
+### Bug Fixes
+
+* fixed require-cjs-transformer doublication ([218cffb](https://github.com/visulima/packem/commit/218cffbb1b3667af92161e9537618bd1cd2a0fa7))
+
+### Miscellaneous Chores
+
+* update ESLint configurations across multiple packages ([1fe2d3d](https://github.com/visulima/packem/commit/1fe2d3d6e4e1139560755b538367351d2b170ad3))
+* update package configurations and dependencies ([be09695](https://github.com/visulima/packem/commit/be09695f800ee23a555c54bd92e7ddd4c88182eb))
+* update package dependencies and configurations ([8ec45ec](https://github.com/visulima/packem/commit/8ec45ec4cc34899161fed5446268c9036162d902))
+* update package dependencies and configurations ([8453e80](https://github.com/visulima/packem/commit/8453e80187d9e6212d98dbe5aaafd031a5cabdcf))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.24
+
+## @visulima/packem [2.0.0-alpha.30](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.29...@visulima/packem@2.0.0-alpha.30) (2025-10-14)
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.23
+
+## @visulima/packem [2.0.0-alpha.29](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.28...@visulima/packem@2.0.0-alpha.29) (2025-10-12)
+
+### Bug Fixes
+
+* update readme ([3b5467f](https://github.com/visulima/packem/commit/3b5467f8ba57e39495582a8914d970fe455c70e8))
+
+### Miscellaneous Chores
+
+* add .cursorignore and update package.json for isolated transformers ([750e101](https://github.com/visulima/packem/commit/750e101a6d5b88f0b9a6c5952ee1223c825eb2ad))
+* update pnpm workspace and package configurations ([feacec9](https://github.com/visulima/packem/commit/feacec93d1b0cefb8ea5d2b730fc1c6918925826))
+* update TypeScript SDK path and adjust package dependencies ([b3a3661](https://github.com/visulima/packem/commit/b3a3661299bcb2343a0da19dddebb43678575750))
+
+## @visulima/packem [2.0.0-alpha.28](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.27...@visulima/packem@2.0.0-alpha.28) (2025-10-11)
+
+### Bug Fixes
+
+* update dependencies and improve require CJS transformer ([a8d4fb7](https://github.com/visulima/packem/commit/a8d4fb7f35a313fd22c123b4b6487a346eb66e0a))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.22
+
+## @visulima/packem [2.0.0-alpha.27](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.26...@visulima/packem@2.0.0-alpha.27) (2025-10-08)
+
+### Bug Fixes
+
+* enhance minifyHTMLLiterals plugin options to include logger ([ca6ecae](https://github.com/visulima/packem/commit/ca6ecae6ea18fd5ee4cb13111d3fe3938bd489b0))
+
+## @visulima/packem [2.0.0-alpha.26](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.25...@visulima/packem@2.0.0-alpha.26) (2025-10-08)
+
+### Bug Fixes
+
+* update dependencies and improve minification options ([25b69b5](https://github.com/visulima/packem/commit/25b69b50f7631655303a417e61f3a37e2aa3c017))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.21
+
+## @visulima/packem [2.0.0-alpha.25](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.24...@visulima/packem@2.0.0-alpha.25) (2025-10-08)
+
+### Bug Fixes
+
+* enhance package-json-exports and preserve-directives tests ([c3b58f2](https://github.com/visulima/packem/commit/c3b58f251ea9ed3d8747a967b6f53fd4c1773509))
+
+### Miscellaneous Chores
+
+* update dependencies and add minify-html-literals plugin ([e20007d](https://github.com/visulima/packem/commit/e20007ddf3cbb80c34c323ed37164baaf6f9a649))
+* update dependencies and improve package validation tests ([b4fd83b](https://github.com/visulima/packem/commit/b4fd83bf3f5749d53c1c01eaf10d61f88530d9f4))
+
+### Tests
+
+* enhance infer-entries and package validation tests ([42624c1](https://github.com/visulima/packem/commit/42624c1b14f937e4365222753ace3f4b4b0d9b3c))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.20
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.13
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.7
+
+## @visulima/packem [2.0.0-alpha.24](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.23...@visulima/packem@2.0.0-alpha.24) (2025-10-07)
+
+### Bug Fixes
+
+* update documentation and references from Packen to Packem ([9983009](https://github.com/visulima/packem/commit/99830099c953e2b12269ea18606838d80f1e6e2b))
+
+### Miscellaneous Chores
+
+* update package.json dependencies for packem and rollup-plugin-css ([8ff92d6](https://github.com/visulima/packem/commit/8ff92d6a904882076bda9ac796b4fe8740fc4f57))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.19
+
+## @visulima/packem [2.0.0-alpha.23](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.22...@visulima/packem@2.0.0-alpha.23) (2025-10-02)
+
+### Bug Fixes
+
+* update dependencies and versions across multiple packages ([a0d209d](https://github.com/visulima/packem/commit/a0d209d847b1feb171850994a64591ab7d26f8cb))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.18
+
+## @visulima/packem [2.0.0-alpha.22](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.21...@visulima/packem@2.0.0-alpha.22) (2025-09-30)
+
+### Features
+
+* added support for attw and publint, fixed caching issue on validation ([6f05388](https://github.com/visulima/packem/commit/6f0538802b3cd5a2cd84a373c96b25eb7fa1c01c))
+* update dependencies and add requireCJS transformer support ([050ed47](https://github.com/visulima/packem/commit/050ed47cf1ced64e74e0cf5c043edd1b8f4dead1))
+
+### Miscellaneous Chores
+
+* update dependencies and versions across multiple packages ([5bd26ea](https://github.com/visulima/packem/commit/5bd26ea047d62464758e5810307f6e059f5c1025))
+* update dependencies and versions across multiple packages ([3e5b4a2](https://github.com/visulima/packem/commit/3e5b4a229fc514828ab9e012a5d556163b30c2fc))
+
+### Code Refactoring
+
+* remove publint integration and clean up related code ([68c0215](https://github.com/visulima/packem/commit/68c021590b5224e85d0609fad39705f71323fc6b))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.17
+
+## @visulima/packem [2.0.0-alpha.21](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.20...@visulima/packem@2.0.0-alpha.21) (2025-09-22)
+
+### Bug Fixes
+
+* updated deps, added usage of pnpm catalog ([14987df](https://github.com/visulima/packem/commit/14987dff37121ca7aab6f9d0a07b24a1a2f5284a))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.16
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.12
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.6
+
+## @visulima/packem [2.0.0-alpha.20](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.19...@visulima/packem@2.0.0-alpha.20) (2025-09-17)
+
+### Bug Fixes
+
+* update dependencies and versions across multiple packages ([b17ec3b](https://github.com/visulima/packem/commit/b17ec3b30f1bfa6267e9eede14fbb569c55b09cf))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.15
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.11
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.5
+
+## @visulima/packem [2.0.0-alpha.19](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.18...@visulima/packem@2.0.0-alpha.19) (2025-09-05)
+
+### Bug Fixes
+
+* update dependencies and versions across multiple packages ([1bf21ee](https://github.com/visulima/packem/commit/1bf21ee3bf5e06c6ac53872ec33d64b4ad7cf588))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.14
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.10
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.4
+
+## @visulima/packem [2.0.0-alpha.18](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.17...@visulima/packem@2.0.0-alpha.18) (2025-09-03)
+
+### Bug Fixes
+
+* enhance integration tests for CSS and raw data handling ([67aecd3](https://github.com/visulima/packem/commit/67aecd337192d8ea284425db7230661e87de7ad5))
+
+### Code Refactoring
+
+* update integration tests to use toContain for better readability ([f4015b1](https://github.com/visulima/packem/commit/f4015b10f9910e6f6e4f214a9e0a423c57c0291f))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.13
+
+## @visulima/packem [2.0.0-alpha.17](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.16...@visulima/packem@2.0.0-alpha.17) (2025-09-03)
+
+### Bug Fixes
+
+* update .gitignore and enhance tests for CSS processing ([4e706a2](https://github.com/visulima/packem/commit/4e706a267ee2d7b9a89796b7227ae65f80823b71))
+
+### Miscellaneous Chores
+
+* update dependencies and versions in package.json and pnpm-lock.yaml ([df62809](https://github.com/visulima/packem/commit/df628094fc6fd5e79cbb939a61bab79d6c89b833))
+
+
+### Dependencies
+
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.3
+
+## @visulima/packem [2.0.0-alpha.16](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.15...@visulima/packem@2.0.0-alpha.16) (2025-09-01)
+
+### Features
+
+* add inline CSS processing mode to rollup-plugin-css ([2605997](https://github.com/visulima/packem/commit/2605997bc1e76a80b22529fd71ec053c02111ea2))
+
+### Miscellaneous Chores
+
+* update dependencies and versions in package.json and pnpm-lock.yaml ([e6086fb](https://github.com/visulima/packem/commit/e6086fbd6ad21bbc35b8365b03e8a5d543354154))
+
+
+### Dependencies
+
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.2
+
+## @visulima/packem [2.0.0-alpha.15](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.14...@visulima/packem@2.0.0-alpha.15) (2025-08-29)
+
+### Features
+
+* added the first migration for the rolldown-plugin-dts for rollup ([fb3321f](https://github.com/visulima/packem/commit/fb3321fedb5101368bdf8e711db30d00d9ef26f3))
+* enhance jiti import resolution in create-stub ([6c4ddb3](https://github.com/visulima/packem/commit/6c4ddb32238fd5cb3ac94e9f98ce27999c58034a))
+* implement lazy barrel optimization in rollup-plugin ([2cdcb34](https://github.com/visulima/packem/commit/2cdcb342f41940b4b277698740153953b905acd0))
+* introduce debarrel optimization for improved import handling ([129435e](https://github.com/visulima/packem/commit/129435ee941f2cd9f003046225e2a8862eb2cba7))
+* update rollup-plugin-dts with new dependencies and type handling improvements ([b9ca7f8](https://github.com/visulima/packem/commit/b9ca7f802247977c5cd0a4debf8fe3a376c525df))
+
+### Code Refactoring
+
+* rename rollup-css-plugin to rollup-plugin-css and update related imports ([876e241](https://github.com/visulima/packem/commit/876e241ec8cf727e9f1666902733996752b18295))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.12
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.9
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.1
+
+## @visulima/packem [2.0.0-alpha.14](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.13...@visulima/packem@2.0.0-alpha.14) (2025-08-25)
+
+### Features
+
+* Add Data URI plugin support for SVG files ([8528648](https://github.com/visulima/packem/commit/852864828d09a70367c93228b1bee8699e1e00f2))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.11
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.8
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.10
+
+## @visulima/packem [2.0.0-alpha.13](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.12...@visulima/packem@2.0.0-alpha.13) (2025-08-21)
+
+### Bug Fixes
+
+* Introduce Button and Card components with Tailwind CSS styles ([bd9d5c3](https://github.com/visulima/packem/commit/bd9d5c371afbc6adf030ade6a64b572f6eb4c2cc))
+
+### Code Refactoring
+
+* Update component imports and CSS references for Tailwind integration ([46a1293](https://github.com/visulima/packem/commit/46a1293c5694fccd79670f9c9f51565374f26069))
+* Update CSS imports and component structure for Tailwind integration ([8f4535a](https://github.com/visulima/packem/commit/8f4535a6cf762ae8a5369154fdc870e76e817ffc))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.10
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.9
+
+## @visulima/packem [2.0.0-alpha.12](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.11...@visulima/packem@2.0.0-alpha.12) (2025-08-21)
+
+
+### Dependencies
+
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.8
+
+## @visulima/packem [2.0.0-alpha.11](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.10...@visulima/packem@2.0.0-alpha.11) (2025-08-20)
+
+### Bug Fixes
+
+* update raw plugin to handle .js?raw imports and improve file reading ([670dad5](https://github.com/visulima/packem/commit/670dad559e535af5c883556e6a7af7794465c669))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.9
+
+## @visulima/packem [2.0.0-alpha.10](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.9...@visulima/packem@2.0.0-alpha.10) (2025-08-20)
+
+### Bug Fixes
+
+* fixed the custom resolver for tailwind loader ([1fd0b43](https://github.com/visulima/packem/commit/1fd0b4345aa90f5c250eba9fd8c741e569b84abc))
+
+### Miscellaneous Chores
+
+* update dependencies for Tailwind CSS and CSS Style Inject ([ef84f41](https://github.com/visulima/packem/commit/ef84f4193be1008b630e9bb29b2cbc78a6d93532))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.8
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.7
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.7
+
+## @visulima/packem [2.0.0-alpha.9](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.8...@visulima/packem@2.0.0-alpha.9) (2025-08-17)
+
+### Features
+
+* added tailwindcss oxide loader ([#166](https://github.com/visulima/packem/issues/166)) ([acbbc59](https://github.com/visulima/packem/commit/acbbc59071e771a94d1a0c5435b267e483e3ad73))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.7
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.6
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.6
+
+## @visulima/packem [2.0.0-alpha.8](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.7...@visulima/packem@2.0.0-alpha.8) (2025-08-11)
+
+### Bug Fixes
+
+* fixed undefined based on exitCode ([9bd9a54](https://github.com/visulima/packem/commit/9bd9a5413d78163b56efda75c18270ad9f099106))
+
+## @visulima/packem [2.0.0-alpha.7](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.6...@visulima/packem@2.0.0-alpha.7) (2025-08-10)
+
+### Features
+
+* add lucide-static integration and SVG comment stripping ([ac344b3](https://github.com/visulima/packem/commit/ac344b3eb9566e479764625cd877617379d10c16))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.6
+
+## @visulima/packem [2.0.0-alpha.6](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.5...@visulima/packem@2.0.0-alpha.6) (2025-08-10)
+
+### Bug Fixes
+
+* update dependencies and add data-uri plugin support ([a52dab5](https://github.com/visulima/packem/commit/a52dab541290324218949ad5ea9502b127d0b0dd))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.5
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.5
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.5
+
+## @visulima/packem [2.0.0-alpha.5](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.4...@visulima/packem@2.0.0-alpha.5) (2025-07-31)
+
+### Bug Fixes
+
+* add comprehensive tests for glob pattern validation in package exports ([00cdaf1](https://github.com/visulima/packem/commit/00cdaf1770ce8997174392a5e6ef3f53c3e54da7))
+
+## @visulima/packem [2.0.0-alpha.4](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.3...@visulima/packem@2.0.0-alpha.4) (2025-07-31)
+
+### Bug Fixes
+
+* enhance `ignoreExportKeys` functionality to support wildcard patterns ([18370ae](https://github.com/visulima/packem/commit/18370ae4d298119ccc3ccfdb95b1c82968990209))
+
+### Tests
+
+* adjust assertions in package-json-exports integration test ([1b75e29](https://github.com/visulima/packem/commit/1b75e29d2c9e04e27c8ef00a64374c374c6a8f24))
+
+## @visulima/packem [2.0.0-alpha.3](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.2...@visulima/packem@2.0.0-alpha.3) (2025-07-31)
+
+### Features
+
+* add support for ignoring export keys and allowed export extensions ([3a49564](https://github.com/visulima/packem/commit/3a4956481e6896b7f86670e7df8efb521f30e6e6))
+* enhance file extension handling and update package dependencies ([42764b0](https://github.com/visulima/packem/commit/42764b0f0bfc56104c30cc91f43d23e6e8ffbc33))
+* set default TypeScript declaration option for ESM-only builds ([7064518](https://github.com/visulima/packem/commit/706451805bab49cadbf597b052cd44e20a55a493))
+
+### Bug Fixes
+
+* add new configuration options for build process ([f2f6b25](https://github.com/visulima/packem/commit/f2f6b25338b92dc2d17e103281de4523177a8356))
+* fixed isolated types ([2926425](https://github.com/visulima/packem/commit/29264250a4adb0407fe1a78e613c84d9f5ce9279))
+* **tests:** improve test descriptions and mock implementation ([8a11cdd](https://github.com/visulima/packem/commit/8a11cdd08277ef9d2229e81bd693c73ee28d4c56))
+* update .npmrc and package.json for dependency management ([71104f0](https://github.com/visulima/packem/commit/71104f0718aee2b66e548723c06c220a8a71cab7))
+* update package dependencies and improve compatibility ([0db341b](https://github.com/visulima/packem/commit/0db341b4e8c90e21d6bda36612d880168f183b7c))
+
+### Styles
+
+* cs fix ([9566a74](https://github.com/visulima/packem/commit/9566a74136eb8e78ae209997c652ce66a56afbf7))
+
+### Miscellaneous Chores
+
+* update package dependencies and improve TypeScript compatibility ([d0d337f](https://github.com/visulima/packem/commit/d0d337fe20558e1626cbcbeec19e9c2052f15aa2))
+* update package dependencies to version 2.0.3 for @anolilab/semantic-release-pnpm and @anolilab/semantic-release-preset; bump oxc-transform and oxc-parser to 0.79.1 ([ce60668](https://github.com/visulima/packem/commit/ce606682c65afcb710e7a923429c2c543f52d88f))
+* update semantic-release workflow and clean up test files ([04101d0](https://github.com/visulima/packem/commit/04101d0ea9936dc8231dce23c54e8bbef249e5c8))
+* update semantic-release workflow and refine integration tests ([d5a800f](https://github.com/visulima/packem/commit/d5a800fadb5037ec9c398ceba93f7b2b25fa6fb5))
+
+### Code Refactoring
+
+* consolidate file extension logic and update package dependencies ([ceff776](https://github.com/visulima/packem/commit/ceff776bbc5eaa6bd85819271942aab7faf77cd2))
+* **tests:** streamline file existence checks and update output extensions ([4567e62](https://github.com/visulima/packem/commit/4567e62dfa6ffdcc153c6d19ba26c88d209ccc95))
+* update output extension handling and improve TypeScript declaration mapping ([bca86e4](https://github.com/visulima/packem/commit/bca86e4fc1d5c3934f2ba5fff74c2f017d98068f))
+
+## @visulima/packem [2.0.0-alpha.2](https://github.com/visulima/packem/compare/@visulima/packem@2.0.0-alpha.1...@visulima/packem@2.0.0-alpha.2) (2025-07-02)
+
+### Bug Fixes
+
+* trigger next release ([cda86b2](https://github.com/visulima/packem/commit/cda86b27e898fcea953daa7457696f7c97f85133))
+
+## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02)
+
+### ⚠ BREAKING CHANGES
+
+* changed node from 18 to 20, split packem in reusable packages
+
+### Features
+
+* introduce @visulima/packem-share package for shared utilities a… ([#157](https://github.com/visulima/packem/issues/157)) ([99e977a](https://github.com/visulima/packem/commit/99e977a8f62021c9ac286fc0c9b184b96bce88f1))
+
+### Bug Fixes
+
+* fixed release ([047b530](https://github.com/visulima/packem/commit/047b530ebcd6458f93699fd9d0f819bc7dbf9990))
+* more release test ([027c421](https://github.com/visulima/packem/commit/027c4211ae769ed2066bc47d3b522986b43319ed))
+* **packem:**  changed node10Compatibility to false ([d35e03e](https://github.com/visulima/packem/commit/d35e03e63efad45c32e9eca9831539206e0c4503))
+* remove data from changelog ([9fa7476](https://github.com/visulima/packem/commit/9fa74762a914e9249e06c62b902ea5312fae80f9))
+* style changes to trigger new release ([fbf6b2f](https://github.com/visulima/packem/commit/fbf6b2f9030db0d9fd22ea61f65a2f03457a2a1a))
+* test commit ([4f5bf23](https://github.com/visulima/packem/commit/4f5bf23cf1ab2de74863449920de7eadd85eec25))
+
+### Miscellaneous Chores
+
+* **release:** @visulima/packem@2.0.0-alpha.1 [skip ci] ([b8e9d0c](https://github.com/visulima/packem/commit/b8e9d0cbdc0f5bda8a07505260499ccdfecdc917)), closes [#157](https://github.com/visulima/packem/issues/157)
+* **release:** @visulima/packem@2.0.0-alpha.1 [skip ci]\n\n## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02) ([90ea031](https://github.com/visulima/packem/commit/90ea03177baad2e07ee7a6c6367c92acac79154c)), closes [#157](https://github.com/visulima/packem/issues/157) [#157](https://github.com/visulima/packem/issues/157) [#157](https://github.com/visulima/packem/issues/157) [#157](https://github.com/visulima/packem/issues/157)
+* **release:** @visulima/packem@2.0.0-alpha.1 [skip ci]\n\n## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02) ([b0b6032](https://github.com/visulima/packem/commit/b0b60320543e1af93414a031c3b748ee4dff1cf7)), closes [#157](https://github.com/visulima/packem/issues/157) [#157](https://github.com/visulima/packem/issues/157)
+* **release:** @visulima/packem@2.0.0-alpha.1 [skip ci]\n\n## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02) ([ffc6d42](https://github.com/visulima/packem/commit/ffc6d425debac8d645c09aee522b62c398ca1b12)), closes [#157](https://github.com/visulima/packem/issues/157)
+* remove unused CSS style inject dependencies and refactor chunk handling ([f50c9e6](https://github.com/visulima/packem/commit/f50c9e69e1adc4661e7fc6b19ace2d1a0a3ab9b2))
+* update multi-semantic-release command to ignore @visulima/packem package ([fa85b28](https://github.com/visulima/packem/commit/fa85b283a5b2cbd15d2b52c09c2db2b2d2c6c65d))
+* update package versions and add engine requirements ([d594ac3](https://github.com/visulima/packem/commit/d594ac31a8302f3a4d86d07415002495361b6ba1))
+
+### Code Refactoring
+
+* centralize output extension logic in new utility functions ([fbf4b01](https://github.com/visulima/packem/commit/fbf4b0188aa9e4584a28bbe7dd02c7a323e2dce2))
+
+### Tests
+
+* add integration and unit tests for file extension handling ([0536e8a](https://github.com/visulima/packem/commit/0536e8a2cb4c7cddf01d66864e0fdbe3912b256c))
+
+## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02)
+
+### ⚠ BREAKING CHANGES
+
+* changed node from 18 to 20, split packem in reusable packages
+
+### Features
+
+* introduce @visulima/packem-share package for shared utilities a… ([#157](https://github.com/visulima/packem/issues/157)) ([99e977a](https://github.com/visulima/packem/commit/99e977a8f62021c9ac286fc0c9b184b96bce88f1))
+
+### Bug Fixes
+
+* **packem:**  changed node10Compatibility to false ([d35e03e](https://github.com/visulima/packem/commit/d35e03e63efad45c32e9eca9831539206e0c4503))
+* style changes to trigger new release ([fbf6b2f](https://github.com/visulima/packem/commit/fbf6b2f9030db0d9fd22ea61f65a2f03457a2a1a))
+
+### Miscellaneous Chores
+
+* **release:** @visulima/packem@2.0.0-alpha.1 [skip ci]\n\n## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02) ([b0b6032](https://github.com/visulima/packem/commit/b0b60320543e1af93414a031c3b748ee4dff1cf7)), closes [#157](https://github.com/visulima/packem/issues/157) [#157](https://github.com/visulima/packem/issues/157)
+* **release:** @visulima/packem@2.0.0-alpha.1 [skip ci]\n\n## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02) ([ffc6d42](https://github.com/visulima/packem/commit/ffc6d425debac8d645c09aee522b62c398ca1b12)), closes [#157](https://github.com/visulima/packem/issues/157)
+* remove unused CSS style inject dependencies and refactor chunk handling ([f50c9e6](https://github.com/visulima/packem/commit/f50c9e69e1adc4661e7fc6b19ace2d1a0a3ab9b2))
+* update multi-semantic-release command to ignore @visulima/packem package ([fa85b28](https://github.com/visulima/packem/commit/fa85b283a5b2cbd15d2b52c09c2db2b2d2c6c65d))
+* update package versions and add engine requirements ([d594ac3](https://github.com/visulima/packem/commit/d594ac31a8302f3a4d86d07415002495361b6ba1))
+
+### Code Refactoring
+
+* centralize output extension logic in new utility functions ([fbf4b01](https://github.com/visulima/packem/commit/fbf4b0188aa9e4584a28bbe7dd02c7a323e2dce2))
+
+### Tests
+
+* add integration and unit tests for file extension handling ([0536e8a](https://github.com/visulima/packem/commit/0536e8a2cb4c7cddf01d66864e0fdbe3912b256c))
+
+## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02)
+
+### ⚠ BREAKING CHANGES
+
+* changed node from 18 to 20, split packem in reusable packages
+
+### Features
+
+* introduce @visulima/packem-share package for shared utilities a… ([#157](https://github.com/visulima/packem/issues/157)) ([99e977a](https://github.com/visulima/packem/commit/99e977a8f62021c9ac286fc0c9b184b96bce88f1))
+
+### Bug Fixes
+
+* **packem:**  changed node10Compatibility to false ([d35e03e](https://github.com/visulima/packem/commit/d35e03e63efad45c32e9eca9831539206e0c4503))
+
+### Miscellaneous Chores
+
+* **release:** @visulima/packem@2.0.0-alpha.1 [skip ci]\n\n## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02) ([ffc6d42](https://github.com/visulima/packem/commit/ffc6d425debac8d645c09aee522b62c398ca1b12)), closes [#157](https://github.com/visulima/packem/issues/157)
+* remove unused CSS style inject dependencies and refactor chunk handling ([f50c9e6](https://github.com/visulima/packem/commit/f50c9e69e1adc4661e7fc6b19ace2d1a0a3ab9b2))
+* update multi-semantic-release command to ignore @visulima/packem package ([fa85b28](https://github.com/visulima/packem/commit/fa85b283a5b2cbd15d2b52c09c2db2b2d2c6c65d))
+* update package versions and add engine requirements ([d594ac3](https://github.com/visulima/packem/commit/d594ac31a8302f3a4d86d07415002495361b6ba1))
+
+### Code Refactoring
+
+* centralize output extension logic in new utility functions ([fbf4b01](https://github.com/visulima/packem/commit/fbf4b0188aa9e4584a28bbe7dd02c7a323e2dce2))
+
+### Tests
+
+* add integration and unit tests for file extension handling ([0536e8a](https://github.com/visulima/packem/commit/0536e8a2cb4c7cddf01d66864e0fdbe3912b256c))
+
+## @visulima/packem [2.0.0-alpha.1](https://github.com/visulima/packem/compare/@visulima/packem@1.28.2...@visulima/packem@2.0.0-alpha.1) (2025-07-02)
+
+### ⚠ BREAKING CHANGES
+
+* changed node from 18 to 20, split packem in reusable packages
+
+### Features
+
+* introduce @visulima/packem-share package for shared utilities a… ([#157](https://github.com/visulima/packem/issues/157)) ([99e977a](https://github.com/visulima/packem/commit/99e977a8f62021c9ac286fc0c9b184b96bce88f1))
+
+### Miscellaneous Chores
+
+* remove unused CSS style inject dependencies and refactor chunk handling ([f50c9e6](https://github.com/visulima/packem/commit/f50c9e69e1adc4661e7fc6b19ace2d1a0a3ab9b2))
+* update multi-semantic-release command to ignore @visulima/packem package ([fa85b28](https://github.com/visulima/packem/commit/fa85b283a5b2cbd15d2b52c09c2db2b2d2c6c65d))
+* update package versions and add engine requirements ([d594ac3](https://github.com/visulima/packem/commit/d594ac31a8302f3a4d86d07415002495361b6ba1))
+
+### Code Refactoring
+
+* centralize output extension logic in new utility functions ([fbf4b01](https://github.com/visulima/packem/commit/fbf4b0188aa9e4584a28bbe7dd02c7a323e2dce2))
+
+### Tests
+
+* add integration and unit tests for file extension handling ([0536e8a](https://github.com/visulima/packem/commit/0536e8a2cb4c7cddf01d66864e0fdbe3912b256c))
+
+
+### Dependencies
+
+* **@visulima/packem-rollup:** upgraded to 1.0.0-alpha.1
+* **@visulima/packem-share:** upgraded to 1.0.0-alpha.1
+* **@visulima/rollup-plugin-css:** upgraded to 1.0.0-alpha.1
 
 ## @visulima/packem [1.28.2](https://github.com/visulima/packem/compare/@visulima/packem@1.28.1...@visulima/packem@1.28.2) (2025-06-24)
 
