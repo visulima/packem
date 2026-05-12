@@ -72,5 +72,8 @@ dist
 packages/packem/__fixtures__/ecosystem/**/packem.config.ts
 packages/rollup-plugin-dts/tests/**/temp/**
 
-.cursor/rules/nx-rules.mdc
+.cursor/
+.cursorignore
+.vscode/
+.codiumai.toml
 .github/instructions/nx.instructions.md
