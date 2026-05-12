@@ -33,7 +33,7 @@ catalogs:
         "@visulima/packem-rollup": 1.0.0-alpha.37
         "@visulima/rollup-plugin-css": 1.0.0-alpha.17
         esbuild: 0.28.0
-        rolldown: 1.0.0-rc.5
+        rolldown: 1.0.0
         rollup: 4.60.1
         rollup-plugin-dts: 6.4.1
         rollup-plugin-import-trace: 1.0.1
