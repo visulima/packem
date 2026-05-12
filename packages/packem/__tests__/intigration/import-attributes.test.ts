@@ -6,19 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, createTsConfig, execPackem, installPackage } from "../helpers";
 
-// Two distinct rolldown gaps mostly disable this suite:
-//   1. `type: "bytes"` (TC39 proposal-import-bytes) is not implemented by
-//      rolldown — it errors with [UNLOADABLE_DEPENDENCY] when the file isn't
-//      valid UTF-8 because rolldown still routes the load through its text
-//      loader. This affects every bytes-import test (~14 cases).
-//   2. `type: "text"` works for `.html` content but not for code extensions
-//      (.js/.ts/.tsx/etc.) or `.txt`/`.bin` — packem-rolldown's raw-data
-//      plugin runs before the import-attributes handler and rewrites the
-//      file body to `const data = "..."; export default data;`, so the
-//      `.toContain("file content")` / `.toContain('""')` assertions fail.
-//      Fix is plugin-order work in packem-rolldown, not test-side. Tracked
-//      as a follow-up; until then the suite stays skipped under rolldown.
-describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("packem import-attributes", () => {
+describe("packem import-attributes", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
