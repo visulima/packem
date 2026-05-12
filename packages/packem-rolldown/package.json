@@ -49,6 +49,13 @@
     "module": "dist/index.mjs",
     "browser": "./dist/index.mjs",
     "types": "dist/index.d.ts",
+    "typesVersions": {
+        "*": {
+            ".": [
+                "./dist/index.d.ts"
+            ]
+        }
+    },
     "files": [
         "dist",
         "README.md",
