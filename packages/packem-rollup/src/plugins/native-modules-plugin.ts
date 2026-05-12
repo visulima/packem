@@ -4,7 +4,11 @@ import { ensureDir, isAccessible } from "@visulima/fs";
 import { basename, dirname, extname, join, resolve } from "@visulima/path";
 import type { NormalizedOutputOptions, Plugin } from "rollup";
 
-const PREFIX = "\0natives:";
+// Counter-based virtual ID prefix — rolldown 1.0 treats `\0name:path`-style IDs
+// as relative paths and prepends cwd, breaking the round-trip. A counter avoids
+// embedding any path segments inside the virtual ID, so the bundler keeps the
+// ID opaque under both rollup and rolldown.
+const PREFIX = "\0packem-natives/";
 
 export interface NativeModulesOptions {
     /**
@@ -21,17 +25,19 @@ export interface NativeModulesOptions {
  */
 export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin => {
     const { nativesDirectory = "natives" } = config;
-    // Map<original_path, final_destination_path>
-    const modulesToCopy = new Map<string, string>();
+    // Map<virtual_id, { source_path, output_name }>
+    const virtualEntries = new Map<string, { outputName: string; sourcePath: string }>();
+    let counter = 0;
     let distributionDirectory: string | undefined;
 
     return {
         buildStart() {
-            modulesToCopy.clear();
+            virtualEntries.clear();
+            counter = 0;
         },
 
         generateBundle: async (options: NormalizedOutputOptions) => {
-            if (modulesToCopy.size === 0) {
+            if (virtualEntries.size === 0) {
                 return;
             }
 
@@ -52,28 +58,31 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
 
             await ensureDir(nativeLibsDirectory);
 
-            // Copy all staged files in parallel.
-            await Promise.all(
-                Array.from(modulesToCopy.entries(), ([source, outputName]) => {
-                    const destination = join(nativeLibsDirectory, outputName);
+            // Deduplicate by source path — multiple imports of the same file share an outputName.
+            const seenSources = new Set<string>();
+            const copies: Array<Promise<void>> = [];
 
-                    return copyFile(source, destination);
-                }),
-            );
+            for (const { outputName, sourcePath } of virtualEntries.values()) {
+                if (seenSources.has(sourcePath)) {
+                    continue;
+                }
+
+                seenSources.add(sourcePath);
+
+                copies.push(copyFile(sourcePath, join(nativeLibsDirectory, outputName)));
+            }
+
+            await Promise.all(copies);
         },
 
         load(id) {
-            if (!id.startsWith(PREFIX)) {
+            const entry = virtualEntries.get(id);
+
+            if (!entry) {
                 return undefined;
             }
 
-            const originalPath = id.slice(PREFIX.length);
-            const outputName = modulesToCopy.get(originalPath);
-
-            if (!outputName) {
-                // Should not happen if resolveId ran correctly
-                this.error(`Could not find staged native module for: ${originalPath}`);
-            }
+            const { outputName } = entry;
 
             // If distributionDirectory is not set yet, try to get it from this context
             if (!distributionDirectory) {
@@ -124,6 +133,15 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
                     return undefined;
                 }
 
+                // Rolldown re-runs resolveId for the `./natives/<file>.node` reference
+                // emitted by our load hook. The importer is our virtual ID, so relative
+                // resolution produces a nonsense path. Mark it external so the
+                // require() / createRequire() call passes through to runtime.
+                if (importer?.startsWith(PREFIX)) {
+                    // eslint-disable-next-line unicorn/no-null
+                    return { external: true, id: source };
+                }
+
                 const resolvedPath = importer ? resolve(dirname(importer), source) : resolve(source);
 
                 if (!await isAccessible(resolvedPath)) {
@@ -132,26 +150,34 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
                     return undefined;
                 }
 
+                // Reuse a virtual ID if we've already staged this exact source path.
+                for (const [existingId, entry] of virtualEntries) {
+                    if (entry.sourcePath === resolvedPath) {
+                        return existingId;
+                    }
+                }
+
                 const resolvedPathBasename = basename(resolvedPath);
                 let outputName = resolvedPathBasename;
-                let counter = 1;
+                let suffix = 1;
 
-                // Handle name collisions by checking already staged values
-                const stagedBasenames = new Set(Array.from(modulesToCopy.values(), (p) => basename(p)));
+                // Handle name collisions by checking already staged output names.
+                const stagedOutputNames = new Set(Array.from(virtualEntries.values(), (e) => e.outputName));
 
-                while (stagedBasenames.has(outputName)) {
+                while (stagedOutputNames.has(outputName)) {
                     const extension = extname(resolvedPathBasename);
                     const name = basename(resolvedPathBasename, extension);
 
-                    outputName = `${name}_${counter}${extension}`;
-                    counter += 1;
+                    outputName = `${name}_${suffix}${extension}`;
+                    suffix += 1;
                 }
 
-                // We'll set the destination path in generateBundle when we have the distDirectory
-                modulesToCopy.set(resolvedPath, outputName);
+                const virtualId = `${PREFIX}${counter}`;
 
-                // Return a virtual module ID containing the original path
-                return PREFIX + resolvedPath;
+                counter += 1;
+                virtualEntries.set(virtualId, { outputName, sourcePath: resolvedPath });
+
+                return virtualId;
             },
         },
     };

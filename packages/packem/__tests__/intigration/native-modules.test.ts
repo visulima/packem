@@ -8,16 +8,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createPackageJson, createPackemConfig, execPackem } from "../helpers";
 
-// The native-modules plugin emits virtual module IDs prefixed with a NUL
-// byte (rollup's `\0virtual:...` convention). Rolldown 1.0 doesn't preserve
-// the NUL prefix — it treats the ID as a relative path and prepends the
-// cwd, producing requests like `/tmp/<job>/\0natives:/tmp/<job>/src/...`.
-// The plugin's resolveId hook then can't recognise its own virtual IDs and
-// the build fails with `[build:plugin:native-modules] Native module not
-// found`. This is a packem-rolldown plugin-compat gap, not a test issue —
-// follow-up work needs to migrate the plugin to a rolldown-friendly
-// virtual ID scheme (e.g. `virtual:packem-natives/...`).
-describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("native modules", () => {
+describe("native modules", () => {
     let temporaryDirectoryPath: string;
 
     beforeEach(async () => {
@@ -74,10 +65,16 @@ describe.skipIf(process.env.PACKEM_TEST_BUNDLER === "rolldown")("native modules"
         // Check that import was rewritten and uses createRequire for ESM
         const content = readFileSync(join(temporaryDirectoryPath, "dist", "index.js"), "utf8");
 
-        console.log(content);
-
         expect(content).toMatch("./natives");
-        expect(content).toMatch("createRequire");
+        // Rollup uses `createRequire`; rolldown emits its own require shim
+        // (`typeof require !== "undefined" ? require : Proxy ...`). Both
+        // give us a callable `require` in ESM; the assertion only checks
+        // that a require-style call is present.
+        if (process.env.PACKEM_TEST_BUNDLER === "rolldown") {
+            expect(content).toMatch(/require\s*(?:!==|\()/);
+        } else {
+            expect(content).toMatch("createRequire");
+        }
     });
 
     it("cJS: copies .node files to natives directory", async () => {
