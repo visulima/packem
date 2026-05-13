@@ -1,6 +1,6 @@
 import { createRequire } from "node:module";
 
-import { detectPackageManager, installPackage } from "@antfu/install-pkg";
+import { installPackage } from "@antfu/install-pkg";
 import { confirm, isCancel, spinner } from "@clack/prompts";
 import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
@@ -8,15 +8,7 @@ import { join } from "@visulima/path";
 import { getRolldownBuild } from "../rolldown/get-rolldown";
 import type { BundlerName } from "./build";
 import { getRollupBuild } from "./get-rollup";
-
-type TransformerName = "esbuild" | "oxc" | "sucrase" | "swc";
-
-const TRANSFORMER_PACKAGE: Record<TransformerName, string> = {
-    esbuild: "esbuild",
-    oxc: "oxc-transform",
-    sucrase: "sucrase",
-    swc: "@swc/core",
-};
+import { buildInstallHint, TRANSFORMER_PACKAGE, type TransformerName } from "./installer";
 
 const isBundlerAvailable = async (bundler: BundlerName): Promise<boolean> => {
     try {
@@ -46,13 +38,6 @@ const isModuleAvailable = (packageName: string, rootDirectory: string): boolean 
     } catch {
         return false;
     }
-};
-
-const buildInstallHint = async (packageName: string, rootDirectory: string): Promise<string> => {
-    const agent = await detectPackageManager(rootDirectory).catch(() => undefined);
-    const cmd = agent === "yarn" || agent === "bun" ? `${agent} add -D` : agent === "pnpm" ? "pnpm add -D" : "npm install -D";
-
-    return `${cmd} ${packageName}`;
 };
 
 const promptAndInstall = async (

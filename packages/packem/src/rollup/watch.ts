@@ -1,4 +1,3 @@
-import type { FSWatcher } from "node:fs";
 import { watch as fsWatch } from "node:fs";
 
 import { cyan, gray } from "@visulima/colorize";
@@ -10,6 +9,7 @@ import { join, relative } from "@visulima/path";
 import type { RollupCache, RollupWatcher, RollupWatcherEvent } from "rollup";
 
 import { getRollupWatch } from "../bundler/get-rollup";
+import { PACKEM_CONFIG_FILES } from "../config/utils/find-packem-file";
 import loadPackageJson from "../config/utils/load-package-json";
 import prepareEntries from "../config/utils/prepare-entries";
 import type { InternalBuildOptions } from "../types";
@@ -258,14 +258,7 @@ const watch = async (
     // or option changes. We close and restart the watchers when either file
     // changes, re-inferring entries from the updated package.json.
     const packageJsonPath = join(context.options.rootDir, "package.json");
-    const configCandidates = [
-        "packem.config.ts",
-        "packem.config.mts",
-        "packem.config.cts",
-        "packem.config.js",
-        "packem.config.mjs",
-        "packem.config.cjs",
-    ].map((file) => join(context.options.rootDir, file));
+    const configCandidates = PACKEM_CONFIG_FILES.map((file) => join(context.options.rootDir, file));
 
     let debounceTimer: ReturnType<typeof setTimeout>;
 
@@ -296,28 +289,18 @@ const watch = async (
         }, 100);
     };
 
-    // Track fs.watch handles so signal-triggered teardown can close them
-    // alongside the rollup watchers. Otherwise they'd dangle until process
-    // exit and prevent a clean programmatic shutdown.
-    const fsWatchers: FSWatcher[] = [fsWatch(packageJsonPath, () => restart(packageJsonPath))];
+    // Don't add a SIGINT listener here — Node's default SIGINT behavior is
+    // to terminate the process, and the OS reclaims these fs.watch handles
+    // automatically. Adding a listener would override the default and leave
+    // the rollup watcher + child onSuccess processes holding the event loop.
+    fsWatch(packageJsonPath, () => restart(packageJsonPath));
 
     for (const configPath of configCandidates) {
         if (isAccessibleSync(configPath)) {
-            fsWatchers.push(fsWatch(configPath, () => restart(configPath)));
+            fsWatch(configPath, () => restart(configPath));
             break;
         }
     }
-
-    const closeAll = (): void => {
-        for (const w of fsWatchers) {
-            w.close();
-        }
-
-        fsWatchers.length = 0;
-    };
-
-    process.once("SIGINT", closeAll);
-    process.once("SIGTERM", closeAll);
 };
 
 export default watch;
