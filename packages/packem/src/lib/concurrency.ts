@@ -23,8 +23,10 @@ const runWithConcurrency = async <T>(tasks: (() => Promise<T>)[], limit: number)
             }
         }
     };
-    // Start up to `limit` workers
-    const workers = Array.from({ length: Math.min(concurrencyLimit, tasks.length) }).fill(runNext());
+    // Start up to `limit` workers. `Array.from(_, mapFn)` invokes runNext()
+    // once per slot — `Array.from({length}).fill(runNext())` would fill the
+    // array with the same single promise and silently serialize all work.
+    const workers = Array.from({ length: Math.min(concurrencyLimit, tasks.length) }, () => runNext());
 
     await Promise.all(workers);
 

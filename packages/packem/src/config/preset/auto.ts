@@ -85,35 +85,15 @@ const autoPreset: BuildConfig = {
                 packageJson = overwriteWithPublishConfig(packageJson, context.options.declaration);
             }
 
-            // For unbundle mode, create entries for all source files
-            if (context.options.unbundle) {
-                context.logger.info("Unbundle mode detected, creating entries for all source files");
+            // Unbundle mode is handled by the early branch above (which
+            // returns), so by here we always run inferEntries.
+            const result = await inferEntries(packageJson, sourceFiles, context);
 
-                // Filter for TypeScript/JavaScript files
-                const codeFiles = sourceFiles.filter((file) => ALLOWED_TRANSFORM_EXTENSIONS_REGEX.test(file) && !file.endsWith(".d.ts"));
-
-                context.logger.info(`Found ${codeFiles.length} code files for unbundle mode`);
-
-                for (const file of codeFiles) {
-                    const relativePath = file.replace(`${sourceDirectory}/`, "");
-                    const name = relativePath.replace(ALLOWED_TRANSFORM_EXTENSIONS_REGEX, "").replaceAll("/", "/");
-
-                    context.logger.info(`Adding entry: ${name} -> ${file}`);
-
-                    context.options.entries.push({
-                        input: file,
-                        name,
-                    });
-                }
-            } else {
-                const result = await inferEntries(packageJson, sourceFiles, context);
-
-                for (const message of result.warnings) {
-                    context.logger.warn(message);
-                }
-
-                context.options.entries.push(...result.entries);
+            for (const message of result.warnings) {
+                context.logger.warn(message);
             }
+
+            context.options.entries.push(...result.entries);
 
             if (context.options.entries.length === 0) {
                 throw new Error("No entries detected. Please provide entries manually.");

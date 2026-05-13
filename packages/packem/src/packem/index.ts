@@ -663,43 +663,7 @@ const createContext = async (
     };
 
     if (mergedHooks) {
-        // #region agent log
-        const hooksBefore = (context.hooks as any)._hooks?.get?.("rollup:options");
-        const hooksCountBefore = hooksBefore ? hooksBefore.size : 0;
-
-        fetch("http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e", {
-            body: JSON.stringify({
-                data: { hasRollupOptionsHook: !!mergedHooks?.["rollup:options"], hooksCountBefore, hooksKeys: Object.keys(mergedHooks || {}) },
-                hypothesisId: "B",
-                location: "index.ts:677",
-                message: "Before addHooks",
-                runId: "run1",
-                sessionId: "debug-session",
-                timestamp: Date.now(),
-            }),
-            headers: { "Content-Type": "application/json" },
-            method: "POST",
-        }).catch(() => {});
-        // #endregion
         context.hooks.addHooks(mergedHooks);
-        // #region agent log
-        const hooksAfter = (context.hooks as any)._hooks?.get?.("rollup:options");
-        const hooksCountAfter = hooksAfter ? hooksAfter.size : 0;
-
-        fetch("http://127.0.0.1:7242/ingest/e5ffe05e-4121-4b48-a3e5-edf81dc8035e", {
-            body: JSON.stringify({
-                data: { hooksAdded: hooksCountAfter - hooksCountBefore, hooksCountAfter, hooksCountBefore },
-                hypothesisId: "B",
-                location: "index.ts:683",
-                message: "After addHooks",
-                runId: "run1",
-                sessionId: "debug-session",
-                timestamp: Date.now(),
-            }),
-            headers: { "Content-Type": "application/json" },
-            method: "POST",
-        }).catch(() => {});
-        // #endregion
     }
 
     // Allow to prepare and extending context

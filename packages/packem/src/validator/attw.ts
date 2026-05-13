@@ -154,7 +154,6 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
 
     const { packageJson } = loadPackageJson(context.options.rootDir);
 
-    context.logger.log(packageJson);
     context.pkg = packageJson;
 
     if (logged) {
