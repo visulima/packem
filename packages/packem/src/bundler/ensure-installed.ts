@@ -6,15 +6,10 @@ import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
 
 import { getRolldownBuild } from "../rolldown/get-rolldown";
+import type { BundlerName } from "./build";
 import { getRollupBuild } from "./get-rollup";
 
-type BundlerType = "rolldown" | "rollup";
 type TransformerName = "esbuild" | "oxc" | "sucrase" | "swc";
-
-const BUNDLER_PACKAGE: Record<BundlerType, string> = {
-    rolldown: "rolldown",
-    rollup: "rollup",
-};
 
 const TRANSFORMER_PACKAGE: Record<TransformerName, string> = {
     esbuild: "esbuild",
@@ -23,7 +18,7 @@ const TRANSFORMER_PACKAGE: Record<TransformerName, string> = {
     swc: "@swc/core",
 };
 
-const isBundlerAvailable = async (bundler: BundlerType): Promise<boolean> => {
+const isBundlerAvailable = async (bundler: BundlerName): Promise<boolean> => {
     try {
         if (bundler === "rolldown") {
             await getRolldownBuild();
@@ -109,16 +104,14 @@ const promptAndInstall = async (
  * the user to install it via the local package manager. In CI / non-TTY, throw
  * with an actionable error so the failure mode is loud, not silent.
  */
-export const ensureBundlerInstalled = async (bundler: BundlerType, rootDirectory: string, logger: Pail): Promise<void> => {
+export const ensureBundlerInstalled = async (bundler: BundlerName, rootDirectory: string, logger: Pail): Promise<void> => {
     if (await isBundlerAvailable(bundler)) {
         return;
     }
 
-    const packageName = BUNDLER_PACKAGE[bundler];
-
     await promptAndInstall(
-        packageName,
-        `${packageName} is required for bundler: "${bundler}" but is not installed. Install it now?`,
+        bundler,
+        `${bundler} is required as the bundler but is not installed. Install it now?`,
         rootDirectory,
         logger,
         () => isBundlerAvailable(bundler),

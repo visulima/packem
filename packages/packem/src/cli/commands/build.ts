@@ -86,7 +86,7 @@ const createBuildCommand = (cli: Cli<Console>): void => {
             // the steady-state build path is unchanged. Bundler/transformer
             // dependency checks for an *existing* config happen later, in
             // packem core's ensure-installed pass.
-            await runFirstRunWizard(rootPath, logger);
+            await runFirstRunWizard(rootPath);
 
             const jiti = createJiti(rootPath, { debug: options.debug });
             const { config: buildConfig, path: buildConfigPath } = await loadPackemConfig(

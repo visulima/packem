@@ -4,16 +4,11 @@ import { detectPackageManager, installPackage } from "@antfu/install-pkg";
 import { cancel, intro, isCancel, log, outro, select, spinner } from "@clack/prompts";
 import { cyan } from "@visulima/colorize";
 import { isAccessible } from "@visulima/fs";
-import type { Pail } from "@visulima/pail";
 import { join } from "@visulima/path";
 
-type BundlerName = "rolldown" | "rollup";
-type TransformerName = "esbuild" | "oxc" | "sucrase" | "swc";
+import type { BundlerName } from "./build";
 
-const BUNDLER_PACKAGES: Record<BundlerName, string> = {
-    rolldown: "rolldown",
-    rollup: "rollup",
-};
+type TransformerName = "esbuild" | "oxc" | "sucrase" | "swc";
 
 const TRANSFORMER_PACKAGES: Record<TransformerName, string> = {
     esbuild: "esbuild",
@@ -119,11 +114,6 @@ const buildInstallHint = async (packages: string[], rootDirectory: string): Prom
     return `${cmd} ${packages.join(" ")}`;
 };
 
-interface WizardResult {
-    configPath: string;
-    installed: string[];
-}
-
 /**
  * Runs only when packem.config is absent. Prompts for a bundler + transformer,
  * installs the chosen packages, and writes a minimal packem.config.ts. In CI
@@ -133,16 +123,15 @@ interface WizardResult {
  * Dependency checks for the bundler/transformer named in an *existing* config
  * live in ensure-installed.ts so this function only handles the cold-start case.
  */
-export const runFirstRunWizard = async (rootDirectory: string, logger: Pail): Promise<WizardResult | undefined> => {
+export const runFirstRunWizard = async (rootDirectory: string): Promise<void> => {
     if (await hasPackemConfig(rootDirectory)) {
-        return undefined;
+        return;
     }
 
     const isInteractive = Boolean(process.stdout.isTTY) && !process.env.CI;
 
     if (!isInteractive) {
-        const defaultPackages = ["rollup", "esbuild"];
-        const hint = await buildInstallHint(defaultPackages, rootDirectory);
+        const hint = await buildInstallHint(["rollup", "esbuild"], rootDirectory);
 
         throw new Error(
             `No packem.config found. Run packem in an interactive terminal to generate one, or install the defaults manually:\n  ${hint}\nand create a packem.config.ts.`,
@@ -157,10 +146,10 @@ export const runFirstRunWizard = async (rootDirectory: string, logger: Pail): Pr
 
     // Rollup is required for DTS regardless of bundler choice, since
     // @visulima/rollup-plugin-dts isn't rolldown-compatible yet.
-    const toInstall: string[] = [BUNDLER_PACKAGES[bundler]];
+    const toInstall: string[] = [bundler];
 
     if (bundler === "rolldown") {
-        toInstall.push(BUNDLER_PACKAGES.rollup);
+        toInstall.push("rollup");
     }
 
     toInstall.push(TRANSFORMER_PACKAGES[transformer]);
@@ -173,8 +162,4 @@ export const runFirstRunWizard = async (rootDirectory: string, logger: Pail): Pr
 
     log.success(`Created ${configPath}`);
     outro("Setup complete — continuing with build.");
-
-    logger.debug("Packem first-run setup finished.");
-
-    return { configPath, installed: toInstall };
 };
