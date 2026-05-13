@@ -1,3 +1,4 @@
+import type { FSWatcher } from "node:fs";
 import { watch as fsWatch } from "node:fs";
 
 import { cyan, gray } from "@visulima/colorize";
@@ -295,14 +296,28 @@ const watch = async (
         }, 100);
     };
 
-    fsWatch(packageJsonPath, () => restart(packageJsonPath));
+    // Track fs.watch handles so signal-triggered teardown can close them
+    // alongside the rollup watchers. Otherwise they'd dangle until process
+    // exit and prevent a clean programmatic shutdown.
+    const fsWatchers: FSWatcher[] = [fsWatch(packageJsonPath, () => restart(packageJsonPath))];
 
     for (const configPath of configCandidates) {
         if (isAccessibleSync(configPath)) {
-            fsWatch(configPath, () => restart(configPath));
+            fsWatchers.push(fsWatch(configPath, () => restart(configPath)));
             break;
         }
     }
+
+    const closeAll = (): void => {
+        for (const w of fsWatchers) {
+            w.close();
+        }
+
+        fsWatchers.length = 0;
+    };
+
+    process.once("SIGINT", closeAll);
+    process.once("SIGTERM", closeAll);
 };
 
 export default watch;

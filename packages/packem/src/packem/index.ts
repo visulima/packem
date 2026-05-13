@@ -809,6 +809,7 @@ const packem = async (
     let onSuccessProcess: ExecChild | undefined;
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type,@typescript-eslint/no-explicit-any
     let onSuccessCleanup: (() => any) | undefined | void;
+    let signalHandler: (() => Promise<void>) | undefined;
 
     const cacheKey
         = getHash(
@@ -1023,17 +1024,19 @@ const packem = async (
 
         context.logger.raw(`\n⚡️ Build run in ${getDuration()}\n`);
 
+        // Register signal handlers as named refs so we can deregister in
+        // finally. Without this, programmatic callers that invoke packem()
+        // multiple times leak listeners and trip Node's MaxListenersExceeded.
+        signalHandler = async () => {
+            await doOnSuccessCleanup();
+        };
+
+        process.once("SIGINT", signalHandler);
+        process.once("SIGTERM", signalHandler);
+
         await runBuilder();
 
         await runOnsuccess();
-
-        process.on("SIGINT", async () => {
-            await doOnSuccessCleanup();
-        });
-
-        process.on("SIGTERM", async () => {
-            await doOnSuccessCleanup();
-        });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         logger.raw("\n");
@@ -1043,6 +1046,11 @@ const packem = async (
 
         throw error;
     } finally {
+        if (signalHandler) {
+            process.off("SIGINT", signalHandler);
+            process.off("SIGTERM", signalHandler);
+        }
+
         // Restore all wrapped console methods
         logger.restoreAll();
 
