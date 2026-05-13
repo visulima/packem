@@ -77,3 +77,4 @@ packages/rollup-plugin-dts/tests/**/temp/**
 .vscode/
 .codiumai.toml
 .github/instructions/nx.instructions.md
+.claude/scheduled_tasks.lock
