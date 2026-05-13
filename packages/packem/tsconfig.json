@@ -18,6 +18,13 @@
         "noUnusedLocals": false,
         "noUnusedParameters": false,
         "useUnknownInCatchVariables": false,
+        // packem source is pure TypeScript, so checkJs from the base config
+        // adds no safety here. It was triggering false positives by following
+        // type-graph references from @visulima/rollup-plugin-dts back into
+        // bundled .js files in its dist (resolveOptions-DCaGXImI.js et al.),
+        // which lint-staged then reported as errors. A proper upstream fix
+        // would emit standalone .d.ts in rollup-plugin-dts; until then, this
+        // is the minimal change that stops tsc from leaking into bundled JS.
         "checkJs": false
     },
     "include": ["src/**/*", "*.d.ts", "./packem.config.ts"]

@@ -11,7 +11,6 @@ import { join, relative, resolve } from "@visulima/path";
 
 import bundlerBuild from "../bundler/build";
 import bundlerBuildTypes from "../bundler/build-types";
-import { ensureBundlerInstalled } from "../bundler/ensure-installed";
 import { buildExe } from "../exe";
 import runWithConcurrency from "../lib/concurrency";
 import type { BuildEntry, InternalBuildOptions } from "../types";
@@ -20,8 +19,9 @@ import groupByKeys from "./utils/group-by-keys";
 import gzipSize from "./utils/gzip-size";
 
 // Default concurrency limit for DTS generation to prevent memory overflow.
-// Each @visulima/rollup-plugin-dts instance holds TypeScript program state in memory.
-// Limiting concurrency allows V8 to GC between builds.
+// Each @visulima/rollup-plugin-dts instance holds TypeScript program state in
+// memory. Limiting concurrency allows V8 to GC between builds. Can be raised
+// via the `dtsConcurrency` option for hosts with more headroom.
 const DEFAULT_DTS_CONCURRENCY = 2;
 
 /**
@@ -707,20 +707,9 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
 
     const { builders, typeBuilders } = await prepareRollupConfig(context, fileCache);
 
-    // Pre-flight: rollup is required for DTS; rolldown is only required when
-    // the user opted into bundler: "rolldown". Prompt-install the missing one
-    // in interactive terminals; fail loudly in CI.
-    const needsRolldown = Array.from(builders).some(({ context: c }) => c.options.bundler === "rolldown");
-    const needsRollup = typeBuilders.size > 0
-        || Array.from(builders).some(({ context: c }) => c.options.bundler !== "rolldown");
-
-    if (needsRollup) {
-        await ensureBundlerInstalled("rollup", context.options.rootDir, context.logger);
-    }
-
-    if (needsRolldown) {
-        await ensureBundlerInstalled("rolldown", context.options.rootDir, context.logger);
-    }
+    // Bundler/transformer install checks happen upstream in packem/index.ts
+    // right after the context is created, so by the time we reach here we can
+    // assume both runtimes are loadable.
 
     // Run JS bundling in parallel (fast and memory-efficient)
     if (builders.size > 0) {
@@ -734,6 +723,8 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
     // Each @visulima/rollup-plugin-dts instance holds TypeScript program state in memory.
     // Limiting concurrency allows V8 to garbage collect between builds.
     if (typeBuilders.size > 0) {
+        const dtsConcurrency = context.options.dtsConcurrency ?? DEFAULT_DTS_CONCURRENCY;
+
         await runWithConcurrency(
             Array.from(
                 typeBuilders,
@@ -741,7 +732,7 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
                     () =>
                         bundlerBuildTypes(rollupContext, cache, subDirectory),
             ),
-            DEFAULT_DTS_CONCURRENCY,
+            dtsConcurrency,
         );
     }
 

@@ -1,6 +1,7 @@
 import { watch as fsWatch } from "node:fs";
 
 import { cyan, gray } from "@visulima/colorize";
+import { isAccessibleSync } from "@visulima/fs";
 import type { FileCache } from "@visulima/packem-share";
 import { enhanceRollupError } from "@visulima/packem-share";
 import type { BuildContext } from "@visulima/packem-share/types";
@@ -251,23 +252,31 @@ const watch = async (
 
     await startWatchers();
 
-    // Watch package.json for entry point changes.
-    // Rollup's watcher only rebuilds with the same config — it can't pick up
-    // new entry points. We use fs.watch to close and restart watchers when
-    // package.json changes, re-inferring entries from the updated exports.
+    // Watch package.json and packem.config.* for changes. Rollup's watcher
+    // only rebuilds with the same config — it can't pick up new entry points
+    // or option changes. We close and restart the watchers when either file
+    // changes, re-inferring entries from the updated package.json.
     const packageJsonPath = join(context.options.rootDir, "package.json");
+    const configCandidates = [
+        "packem.config.ts",
+        "packem.config.mts",
+        "packem.config.cts",
+        "packem.config.js",
+        "packem.config.mjs",
+        "packem.config.cjs",
+    ].map((file) => join(context.options.rootDir, file));
+
     let debounceTimer: ReturnType<typeof setTimeout>;
 
-    fsWatch(packageJsonPath, () => {
+    const restart = (changedFile: string) => {
         clearTimeout(debounceTimer);
 
         debounceTimer = setTimeout(async () => {
-            context.logger.info("package.json changed, restarting watchers...");
+            context.logger.info(`${relative(".", changedFile)} changed, restarting watchers...`);
 
             try {
                 await closeWatchers();
 
-                // Re-read package.json and re-infer entries
                 const { packageJson } = loadPackageJson(context.options.rootDir);
 
                 context.pkg = packageJson;
@@ -284,7 +293,16 @@ const watch = async (
                 });
             }
         }, 100);
-    });
+    };
+
+    fsWatch(packageJsonPath, () => restart(packageJsonPath));
+
+    for (const configPath of configCandidates) {
+        if (isAccessibleSync(configPath)) {
+            fsWatch(configPath, () => restart(configPath));
+            break;
+        }
+    }
 };
 
 export default watch;

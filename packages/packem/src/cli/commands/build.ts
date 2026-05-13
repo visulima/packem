@@ -8,7 +8,6 @@ import { createJiti } from "jiti";
 import { runFirstRunWizard } from "../../bundler/first-run-wizard";
 import autoPreset from "../../config/preset/auto";
 import loadEnvFile from "../../config/utils/load-env-file";
-import loadPackageJson from "../../config/utils/load-package-json";
 import loadPackemConfig from "../../config/utils/load-packem-config";
 import loadPreset from "../../config/utils/load-preset";
 import packem from "../../packem";
@@ -82,13 +81,12 @@ const createBuildCommand = (cli: Cli<Console>): void => {
 
             const rootPath = resolve(cwd(), options.dir ?? ".");
 
-            // Run the first-run wizard before loading the packem config so a
-            // missing config or missing deps can be fixed up interactively. The
-            // wizard returns undefined when nothing is missing, so the build
-            // path stays unchanged in the steady state.
-            const { packageJson } = loadPackageJson(rootPath);
-
-            await runFirstRunWizard(rootPath, packageJson, logger);
+            // Run the first-run wizard before loading the packem config. The
+            // wizard returns undefined when a packem.config already exists, so
+            // the steady-state build path is unchanged. Bundler/transformer
+            // dependency checks for an *existing* config happen later, in
+            // packem core's ensure-installed pass.
+            await runFirstRunWizard(rootPath, logger);
 
             const jiti = createJiti(rootPath, { debug: options.debug });
             const { config: buildConfig, path: buildConfigPath } = await loadPackemConfig(

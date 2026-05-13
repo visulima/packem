@@ -150,6 +150,14 @@ export interface BuildOptions {
     declaration?: boolean | "compatible" | "node16" | undefined;
 
     /**
+     * Maximum number of DTS bundles to build in parallel. Each
+     * @visulima/rollup-plugin-dts instance keeps a TypeScript program in
+     * memory, so this is capped low by default to avoid OOM on large monorepos.
+     * @default 2
+     */
+    dtsConcurrency?: number;
+
+    /**
      * If `true`, only generate declaration files.
      * If `false` or `undefined`, generate both declaration and source files.
      */

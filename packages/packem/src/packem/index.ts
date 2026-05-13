@@ -21,6 +21,7 @@ import { patchErrorWithTrace } from "rollup-plugin-import-trace";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
 
+import { ensureBundlerInstalled, ensureTransformerInstalled } from "../bundler/ensure-installed";
 import autoPreset from "../config/preset/auto";
 import loadPackageJson from "../config/utils/load-package-json";
 import loadTsconfig from "../config/utils/load-tsconfig";
@@ -875,6 +876,23 @@ const packem = async (
 
         fileCache.isEnabled = context.options.fileCache as boolean;
 
+        // Ensure the bundler runtime and transformer engine are installed before
+        // any build/watch work runs. These prompt-install in interactive
+        // terminals and fail loudly in CI with a package-manager-aware hint.
+        const requestedBundler = context.options.bundler === "rolldown" ? "rolldown" : "rollup";
+
+        await ensureBundlerInstalled(requestedBundler, rootDirectory, context.logger);
+
+        // Rolldown still depends on rollup for DTS until the dts plugin is
+        // rolldown-compatible. Pull rollup in so the DTS path doesn't crash.
+        if (requestedBundler === "rolldown" && context.options.declaration) {
+            await ensureBundlerInstalled("rollup", rootDirectory, context.logger);
+        }
+
+        if (context.options.transformerName) {
+            await ensureTransformerInstalled(context.options.transformerName, rootDirectory, context.logger);
+        }
+
         context.logger.info(cyan(`${getMode(mode)} ${context.options.name}`));
 
         context.logger.debug({
@@ -963,6 +981,16 @@ const packem = async (
         if (mode === "watch") {
             if (context.options.rollup.watch === false) {
                 throw new Error("Rollup watch is disabled. You should check your packem config.");
+            }
+
+            // Watch is rollup-only today. Surface the fallback so users on
+            // `bundler: "rolldown"` know what's actually running until a
+            // rolldown watch path lands.
+            if (context.options.bundler === "rolldown") {
+                context.logger.warn({
+                    message: "Watch mode falls back to rollup; rolldown watch isn't supported yet.",
+                    prefix: "bundler",
+                });
             }
 
             await rollupWatch(context, fileCache, runBuilder, runOnsuccess, doOnSuccessCleanup);
