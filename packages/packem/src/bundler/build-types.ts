@@ -4,9 +4,9 @@ import { getChunkFilename, getDtsExtension } from "@visulima/packem-share/utils"
 import { resolve } from "@visulima/path";
 import type { Plugin, RollupCache } from "rollup";
 
-import { getRollupBuild } from "../bundler/get-rollup";
+import { getRollupDtsOptions } from "../rollup/get-rollup-options";
 import type { BuildEntry, InternalBuildOptions } from "../types";
-import { getRollupDtsOptions } from "./get-rollup-options";
+import { getRollupBuild } from "./get-rollup";
 
 const DTS_CACHE_KEY = "rollup-dts.json";
 const SKIP_CHUNK_PREFIX = "__packem_skip__/";
@@ -57,6 +57,10 @@ const resolveEntryExtensions = (entry: BuildEntry, context: BuildContext<Interna
     return result;
 };
 
+// DTS is rollup-only because @visulima/rollup-plugin-dts depends on rollup
+// option shapes (treeshake.preset, generatedCode.arrowFunctions, compact…)
+// that rolldown rejects. The factory parameter keeps the seam visible so the
+// caller can swap it once a rolldown-compatible DTS plugin lands.
 const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache, subDirectory: string): Promise<void> => {
     const rollupTypeOptions = await getRollupDtsOptions(context, fileCache);
 
@@ -82,8 +86,6 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
             prefix: "dts",
         });
 
-        // Build a lookup from rollup entry name to BuildEntry so the per-write
-        // entryFileNames function can decide, per chunk, whether to emit the file.
         const entriesByName = new Map<string, BuildEntry>();
 
         for (const entry of context.options.entries) {
@@ -92,8 +94,6 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
             }
         }
 
-        // Union of extensions any entry wants. Each element becomes one `write()` pass.
-        // Without per-entry data this collapses to the previous behavior (CJS → ESM → compat).
         const allExtensions = new Set<DtsExtension>();
 
         for (const entry of context.options.entries) {
@@ -104,10 +104,6 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
 
         const outDir = resolve(context.options.rootDir, context.options.outDir);
 
-        // Plugin that strips chunks routed to SKIP_CHUNK_PREFIX by entryFileNames.
-        // Rollup's `entryFileNames` must return a string; we use a sentinel path to mark
-        // entries that shouldn't be emitted for the current extension, then drop them
-        // in generateBundle so nothing lands in the output dir.
         const filterSkipChunksPlugin: Plugin = {
             generateBundle(_options, bundle) {
                 for (const fileName of Object.keys(bundle)) {
@@ -126,9 +122,6 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
                 chunkFileNames: (chunk) => getChunkFilename(chunk, extension),
                 dir: outDir,
                 entryFileNames: (chunk) => {
-                    // The DTS plugin emits two chunks per entry: the real entry
-                    // (chunk.name === entry.name) and a `.d`-suffixed helper
-                    // (chunk.name === entry.name + ".d"). Both need filtering.
                     const entryName = chunk.name?.endsWith(".d") ? chunk.name.slice(0, -2) : chunk.name;
                     const entry = entryName ? entriesByName.get(entryName) : undefined;
 

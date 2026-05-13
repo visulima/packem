@@ -9,12 +9,11 @@ import { getDtsExtension, getOutputExtension } from "@visulima/packem-share/util
 import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
 
+import bundlerBuild from "../bundler/build";
+import bundlerBuildTypes from "../bundler/build-types";
 import { ensureBundlerInstalled } from "../bundler/ensure-installed";
 import { buildExe } from "../exe";
 import runWithConcurrency from "../lib/concurrency";
-import rolldownBuild from "../rolldown/build";
-import rollupBuild from "../rollup/build";
-import rollupBuildTypes from "../rollup/build-types";
 import type { BuildEntry, InternalBuildOptions } from "../types";
 import brotliSize from "./utils/brotli-size";
 import groupByKeys from "./utils/group-by-keys";
@@ -727,9 +726,7 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
     if (builders.size > 0) {
         await Promise.all(
             Array.from(builders, async ({ context: bContext, fileCache: cache, subDirectory }) =>
-                (bContext.options.bundler === "rolldown"
-                    ? await rolldownBuild(bContext, cache, subDirectory)
-                    : await rollupBuild(bContext, cache, subDirectory))),
+                bundlerBuild(bContext, cache, subDirectory, bContext.options.bundler === "rolldown" ? "rolldown" : "rollup")),
         );
     }
 
@@ -742,7 +739,7 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
                 typeBuilders,
                 ({ context: rollupContext, fileCache: cache, subDirectory }) =>
                     () =>
-                        rollupBuildTypes(rollupContext, cache, subDirectory),
+                        bundlerBuildTypes(rollupContext, cache, subDirectory),
             ),
             DEFAULT_DTS_CONCURRENCY,
         );
