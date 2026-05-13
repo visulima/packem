@@ -215,7 +215,6 @@
         "magic-string": "0.30.21",
         "mlly": "1.8.2",
         "picomatch": "4.0.4",
-        "rollup": "4.60.3",
         "rollup-plugin-import-trace": "catalog:build",
         "semver": "7.8.0",
         "tinyexec": "1.1.2",
@@ -328,6 +327,8 @@
         "postcss-modules-scope": ">=3.2.0",
         "postcss-modules-values": ">=4.0.0",
         "postcss-value-parser": ">=4.2.0",
+        "rolldown": ">=1.0.0",
+        "rollup": ">=4.0.0",
         "rollup-plugin-svelte": ">=7",
         "sass": ">=1.43.4",
         "sass-embedded": ">=1.79.4",
@@ -392,6 +393,9 @@
             "optional": true
         },
         "postcss-value-parser": {
+            "optional": true
+        },
+        "rolldown": {
             "optional": true
         },
         "rollup-plugin-svelte": {

@@ -11,7 +11,7 @@ import type { TypeDocOptions as BaseTypeDocumentOptions } from "typedoc";
 
 import type { ExeOptions } from "./exe";
 import type { Node10CompatibilityOptions } from "./packem/node10-compatibility";
-import type { ResolveExternalsPluginOptions } from "./rollup/plugins/externals-plugin";
+import type { ResolveExternalsPluginOptions } from "@visulima/packem-rollup/plugin/externals";
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
 

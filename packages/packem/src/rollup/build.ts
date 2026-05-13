@@ -1,8 +1,8 @@
 import type { FileCache } from "@visulima/packem-share";
 import type { BuildContext, BuildContextBuildAssetAndChunk, BuildContextBuildEntry } from "@visulima/packem-share/types";
 import type { OutputOptions, RollupCache } from "rollup";
-import { rollup } from "rollup";
 
+import { getRollupBuild } from "../bundler/get-rollup";
 import type { InternalBuildOptions } from "../types";
 import { collectBuildEntries } from "../utils/collect-build-entries";
 import { getRollupOptions } from "./get-rollup-options";
@@ -43,6 +43,7 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
         }
     }
 
+    const rollup = await getRollupBuild();
     const buildResult = await rollup(rollupOptions);
 
     try {

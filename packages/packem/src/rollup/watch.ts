@@ -6,8 +6,8 @@ import { enhanceRollupError } from "@visulima/packem-share";
 import type { BuildContext } from "@visulima/packem-share/types";
 import { join, relative } from "@visulima/path";
 import type { RollupCache, RollupWatcher, RollupWatcherEvent } from "rollup";
-import { watch as rollupWatch } from "rollup";
 
+import { getRollupWatch } from "../bundler/get-rollup";
 import loadPackageJson from "../config/utils/load-package-json";
 import prepareEntries from "../config/utils/prepare-entries";
 import type { InternalBuildOptions } from "../types";
@@ -189,6 +189,7 @@ const watch = async (
     };
 
     const startWatchers = async (): Promise<void> => {
+        const rollupWatch = await getRollupWatch();
         const rollupOptions = await getRollupOptions(context, fileCache);
 
         await context.hooks.callHook("rollup:options", context, rollupOptions);

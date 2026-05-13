@@ -17,7 +17,6 @@ import type { TsConfigJson, TsConfigResult } from "@visulima/tsconfig";
 import browserslist from "browserslist";
 import { createHooks } from "hookable";
 import { createJiti } from "jiti";
-import { VERSION } from "rollup";
 import { patchErrorWithTrace } from "rollup-plugin-import-trace";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
@@ -538,7 +537,7 @@ const generateOptions = (
     logger.info({
         message: options.bundler === "rolldown"
             ? `Using ${cyan("rolldown")} with ${cyan(options.runtime as string)} build runtime`
-            : `Using ${cyan("rollup ")}${VERSION} with ${cyan(options.runtime as string)} build runtime`,
+            : `Using ${cyan("rollup")} with ${cyan(options.runtime as string)} build runtime`,
         prefix: "bundler",
     });
     logger.info({

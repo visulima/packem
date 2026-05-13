@@ -3,8 +3,8 @@ import type { BuildContext } from "@visulima/packem-share/types";
 import { getChunkFilename, getDtsExtension } from "@visulima/packem-share/utils";
 import { resolve } from "@visulima/path";
 import type { Plugin, RollupCache } from "rollup";
-import { rollup } from "rollup";
 
+import { getRollupBuild } from "../bundler/get-rollup";
 import type { BuildEntry, InternalBuildOptions } from "../types";
 import { getRollupDtsOptions } from "./get-rollup-options";
 
@@ -69,6 +69,7 @@ const buildTypes = async (context: BuildContext<InternalBuildOptions>, fileCache
 
     rollupTypeOptions.cache = fileCache.get<RollupCache>(DTS_CACHE_KEY, subDirectory);
 
+    const rollup = await getRollupBuild();
     const typesBuild = await rollup(rollupTypeOptions);
 
     try {

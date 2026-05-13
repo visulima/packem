@@ -17,7 +17,8 @@
         "noUncheckedIndexedAccess": false,
         "noUnusedLocals": false,
         "noUnusedParameters": false,
-        "useUnknownInCatchVariables": false
+        "useUnknownInCatchVariables": false,
+        "checkJs": false
     },
     "include": ["src/**/*", "*.d.ts", "./packem.config.ts"]
 }

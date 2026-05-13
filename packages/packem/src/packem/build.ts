@@ -9,6 +9,7 @@ import { getDtsExtension, getOutputExtension } from "@visulima/packem-share/util
 import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
 
+import { ensureBundlerInstalled } from "../bundler/ensure-installed";
 import { buildExe } from "../exe";
 import runWithConcurrency from "../lib/concurrency";
 import rolldownBuild from "../rolldown/build";
@@ -706,6 +707,21 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
     await context.hooks.callHook("build:before", context);
 
     const { builders, typeBuilders } = await prepareRollupConfig(context, fileCache);
+
+    // Pre-flight: rollup is required for DTS; rolldown is only required when
+    // the user opted into bundler: "rolldown". Prompt-install the missing one
+    // in interactive terminals; fail loudly in CI.
+    const needsRolldown = Array.from(builders).some(({ context: c }) => c.options.bundler === "rolldown");
+    const needsRollup = typeBuilders.size > 0
+        || Array.from(builders).some(({ context: c }) => c.options.bundler !== "rolldown");
+
+    if (needsRollup) {
+        await ensureBundlerInstalled("rollup", context.options.rootDir, context.logger);
+    }
+
+    if (needsRolldown) {
+        await ensureBundlerInstalled("rolldown", context.options.rootDir, context.logger);
+    }
 
     // Run JS bundling in parallel (fast and memory-efficient)
     if (builders.size > 0) {
