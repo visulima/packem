@@ -37,11 +37,11 @@
     "type": "module",
     "exports": {
         ".": {
-            "types": "./dist/index.ts",
+            "types": "./dist/index.d.ts",
             "default": "./dist/index.js"
         },
         "./filename": {
-            "types": "./dist/filename.js",
+            "types": "./dist/filename.d.ts",
             "default": "./dist/filename.js"
         },
         "./package.json": "./package.json"
