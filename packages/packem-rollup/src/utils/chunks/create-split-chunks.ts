@@ -188,7 +188,7 @@ const createSplitChunks = (
                     continue;
                 }
 
-                const subModuleLayer = getModuleLayer(moduleMeta);
+                const subModuleLayer = getModuleLayer(subModuleInfo.meta);
 
                 if (subModuleLayer === moduleLayer) {
                     if (!dependencyGraphMap.has(subId)) {

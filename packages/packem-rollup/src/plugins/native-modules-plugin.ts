@@ -41,20 +41,22 @@ export const nativeModulesPlugin = (config: NativeModulesOptions = {}): Plugin =
                 return;
             }
 
-            // Try to get output directory from generateBundle options if not set yet
-            if (!distributionDirectory) {
-                if (options.dir) {
-                    distributionDirectory = options.dir;
-                } else if (options.file) {
-                    distributionDirectory = dirname(options.file);
-                }
+            // generateBundle runs once per output. Compute the dir from THIS
+            // output's options so multi-output configs (CJS + ESM) each get
+            // their `.node` files copied next to their own bundle.
+            let outputDirectory: string | undefined;
+
+            if (options.dir) {
+                outputDirectory = options.dir;
+            } else if (options.file) {
+                outputDirectory = dirname(options.file);
             }
 
-            if (!distributionDirectory) {
+            if (!outputDirectory) {
                 throw new Error("Output directory not detected. Please ensure Rollup output options are configured.");
             }
 
-            const nativeLibsDirectory = join(distributionDirectory, nativesDirectory);
+            const nativeLibsDirectory = join(outputDirectory, nativesDirectory);
 
             await ensureDir(nativeLibsDirectory);
 
