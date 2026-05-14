@@ -278,6 +278,7 @@
             "optional": true
         }
     },
+    "optionalDependencies": {},
     "engines": {
         "node": "^22.14.0 || >= 24.10.0"
     },

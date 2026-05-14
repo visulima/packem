@@ -246,7 +246,7 @@
         "@tailwindcss/node": "^4.3.0",
         "@tailwindcss/oxide": "^4.3.0",
         "@total-typescript/ts-reset": "^0.6.1",
-        "@types/node": "25.6.2",
+        "@types/node": "catalog:types",
         "@types/picomatch": "^4.0.3",
         "@types/react-dom": "^19.2.3",
         "@types/semver": "^7.7.1",
