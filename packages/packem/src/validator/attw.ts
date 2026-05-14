@@ -18,6 +18,10 @@ import type { AttwOptions, InternalBuildOptions, ValidationOptions } from "../ty
 
 const exec = promisify(child_process.exec);
 
+// Sentinel thrown after we've already logged the formatted problem table;
+// the outer catch skips its generic "ATTW check failed" line for this kind.
+class AttwReportedError extends Error {}
+
 // eslint-disable-next-line func-style
 function memo<Arguments extends (string | number)[], Result>(function_: (...arguments_: Arguments) => Result): (...arguments_: Arguments) => Result {
     const cache = new Map();
@@ -365,9 +369,12 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
                     prefix: "attw",
                 });
 
-                process.exitCode = 1;
-
-                return;
+                // Throwing lets the CLI wrapper translate to a non-zero exit
+                // code. Mutating process.exitCode here poisons embedded/test
+                // callers that share the parent process. The error already
+                // surfaced via logger.error above, so we throw a sentinel
+                // the outer catch skips to avoid double-logging.
+                throw new AttwReportedError("attw reported types problems; see the log above.");
             }
 
             context.logger.warn({
@@ -382,16 +389,14 @@ const attw = async (context: BuildContext<InternalBuildOptions>, logged: boolean
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-        context.logger.error({
-            message: `ATTW check failed: ${error.toString()}`,
-            prefix: "attw",
-        });
-        context.logger.debug({
-            message: "Found errors, setting exit code to 1",
-            prefix: "attw",
-        });
+        if (!(error instanceof AttwReportedError)) {
+            context.logger.error({
+                message: `ATTW check failed: ${error.toString()}`,
+                prefix: "attw",
+            });
+        }
 
-        process.exitCode = 1;
+        throw error;
     } finally {
         await rm(temporaryDirectory, { force: true, recursive: true }).catch(() => {});
     }

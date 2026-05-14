@@ -1255,7 +1255,7 @@ export type Shared = string;
     });
 
     it("should generate proper assets for each exports for server components with same layer", async () => {
-        expect.assertions(6);
+        expect.assertions(8);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.js`,
@@ -1314,7 +1314,10 @@ export function Client() {
         const mjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".mjs"));
         const cjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".cjs"));
 
-        const mjsClientContent = readFileSync(`${sharedDir}/${mjsClientFile}`);
+        expect(mjsClientFile, `expected a Client-*.mjs file in ${sharedDir}, found: ${sharedFiles.join(", ")}`).toBeDefined();
+        expect(cjsClientFile, `expected a Client-*.cjs file in ${sharedDir}, found: ${sharedFiles.join(", ")}`).toBeDefined();
+
+        const mjsClientContent = readFileSync(`${sharedDir}/${mjsClientFile as string}`);
 
         expect(normalizeBundleOutput(mjsClientContent)).toMatchSnapshot();
 
@@ -1322,13 +1325,13 @@ export function Client() {
 
         expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
 
-        const cjsClientContent = readFileSync(`${sharedDir}/${cjsClientFile}`);
+        const cjsClientContent = readFileSync(`${sharedDir}/${cjsClientFile as string}`);
 
         expect(normalizeBundleOutput(cjsClientContent)).toMatchSnapshot();
     });
 
     it("should generate proper assets for each exports for server components", async () => {
-        expect.assertions(8);
+        expect.assertions(12);
 
         writeFileSync(
             `${temporaryDirectoryPath}/src/index.js`,
@@ -1417,11 +1420,18 @@ export const asset = "asset-module";
         const mjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".mjs"));
         const cjsClientFile = sharedFiles.find((f) => f.startsWith("Client-") && f.endsWith(".cjs"));
 
-        const mjsActionContent = readFileSync(`${sharedDir}/${mjsActionFile}`);
+        const filesInDirectory = `expected matching shared file in ${sharedDir}, found: ${sharedFiles.join(", ")}`;
+
+        expect(mjsActionFile, filesInDirectory).toBeDefined();
+        expect(cjsActionFile, filesInDirectory).toBeDefined();
+        expect(mjsClientFile, filesInDirectory).toBeDefined();
+        expect(cjsClientFile, filesInDirectory).toBeDefined();
+
+        const mjsActionContent = readFileSync(`${sharedDir}/${mjsActionFile as string}`);
 
         expect(normalizeBundleOutput(mjsActionContent)).toMatchSnapshot();
 
-        const mjsClientContent = readFileSync(`${sharedDir}/${mjsClientFile}`);
+        const mjsClientContent = readFileSync(`${sharedDir}/${mjsClientFile as string}`);
 
         expect(normalizeBundleOutput(mjsClientContent)).toMatchSnapshot();
 
@@ -1429,11 +1439,11 @@ export const asset = "asset-module";
 
         expect(normalizeBundleOutput(cjsContent)).toMatchSnapshot();
 
-        const cjsActionContent = readFileSync(`${sharedDir}/${cjsActionFile}`);
+        const cjsActionContent = readFileSync(`${sharedDir}/${cjsActionFile as string}`);
 
         expect(normalizeBundleOutput(cjsActionContent)).toMatchSnapshot();
 
-        const cjsClientContent = readFileSync(`${sharedDir}/${cjsClientFile}`);
+        const cjsClientContent = readFileSync(`${sharedDir}/${cjsClientFile as string}`);
 
         expect(normalizeBundleOutput(cjsClientContent)).toMatchSnapshot();
     });

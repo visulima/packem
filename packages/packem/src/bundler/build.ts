@@ -13,6 +13,8 @@ const DEPENDENCIES_CACHE_KEY = "dependencies-cache.json";
 
 export type BundlerName = "rolldown" | "rollup";
 
+export const resolveBundlerName = (bundler: BundlerName | undefined): BundlerName => bundler ?? "rollup";
+
 const ROLLDOWN_CSS_MODULE_TYPES = {
     ".css": "js",
     ".less": "js",
@@ -87,9 +89,29 @@ const buildWithRollup = async (
 
 const buildWithRolldown = async (
     context: BuildContext<InternalBuildOptions>,
+    fileCache: FileCache,
+    subDirectory: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rollupOptions: any,
 ): Promise<void> => {
+    // Rolldown owns its own incremental cache, so we don't shadow it with
+    // BUNDLE_CACHE_KEY the way the rollup path does. The dependencies cache,
+    // however, is populated by our own plugins and feeds dependency
+    // validation — so it must stay in sync regardless of bundler.
+    const hasCachedDependencies
+        = context.options.validation
+            && context.options.validation.dependencies !== false
+            && !!fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
+
+    if (hasCachedDependencies) {
+        const cachedDeps = fileCache.get<{ hoisted: string[]; used: string[] }>(DEPENDENCIES_CACHE_KEY, subDirectory);
+
+        if (cachedDeps) {
+            cachedDeps.used?.forEach((dep) => context.usedDependencies.add(dep));
+            cachedDeps.hoisted?.forEach((dep) => context.hoistedDependencies.add(dep));
+        }
+    }
+
     const rolldown = await getRolldownBuild();
 
     // Rolldown 1.0 removed native CSS bundling (rolldown#4271) and rejects any
@@ -107,21 +129,32 @@ const buildWithRolldown = async (
 
     const bundle = await rolldown(rolldownOptions);
 
-    await context.hooks.callHook("rollup:build", context, bundle as unknown as RollupBuild);
-
-    const assets = new Map<string, BuildContextBuildAssetAndChunk | BuildContextBuildEntry>();
-
     try {
+        if (context.options.validation && context.options.validation.dependencies !== false) {
+            fileCache.set(
+                DEPENDENCIES_CACHE_KEY,
+                {
+                    hoisted: [...context.hoistedDependencies],
+                    used: [...context.usedDependencies],
+                },
+                subDirectory,
+            );
+        }
+
+        await context.hooks.callHook("rollup:build", context, bundle as unknown as RollupBuild);
+
+        const assets = new Map<string, BuildContextBuildAssetAndChunk | BuildContextBuildEntry>();
+
         for (const outputOptions of rollupOptions.output as unknown as Record<string, unknown>[]) {
             // eslint-disable-next-line no-await-in-loop
             const { output } = await bundle.write(outputOptions);
             collectBuildEntries(output, context, assets);
         }
+
+        context.buildEntries.push(...assets.values());
     } finally {
         await bundle.close?.();
     }
-
-    context.buildEntries.push(...assets.values());
 };
 
 const build = async (
@@ -140,7 +173,7 @@ const build = async (
     }
 
     if (bundler === "rolldown") {
-        await buildWithRolldown(context, rollupOptions);
+        await buildWithRolldown(context, fileCache, subDirectory, rollupOptions);
 
         return;
     }

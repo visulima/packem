@@ -67,13 +67,9 @@ import { importTrace } from "rollup-plugin-import-trace";
 import { minVersion } from "semver";
 
 import type { InternalBuildOptions } from "../types";
+import cloneReplaceOptions from "../utils/clone-replace-options";
+import isDeclarationOnlyName from "../utils/is-declaration-only";
 
-/**
- * Checks if a chunk/entry name indicates a declaration-only file that should not generate JavaScript.
- * @param name Chunk or entry name to check
- * @returns True if the name ends with .d (indicating declaration-only)
- */
-const isDeclarationOnlyName = (name: string | undefined): boolean => Boolean(name?.endsWith(".d"));
 
 /**
  * Creates a chunkFileNames function that skips declaration-only entries.
@@ -342,9 +338,27 @@ const sharedOnWarn = (warning: RollupLog, context: BuildContext<InternalBuildOpt
     return warning.code === "MIXED_EXPORTS" && context.options.cjsInterop === true;
 };
 
+const buildInputMap = (context: BuildContext<InternalBuildOptions>): Record<string, string> => {
+    const input: Record<string, string> = {};
+
+    for (const entry of context.options.entries) {
+        const resolved = resolve(context.options.rootDir, entry.input);
+
+        if (input[entry.name] !== undefined && input[entry.name] !== resolved) {
+            throw new Error(
+                `Duplicate rollup input name "${entry.name}" — one maps to "${input[entry.name]}", another to "${resolved}". Each entry must have a unique name.`,
+            );
+        }
+
+        input[entry.name] = resolved;
+    }
+
+    return input;
+};
+
 const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "build" | "dts"): RollupOptions =>
     <RollupOptions>{
-        input: Object.fromEntries(context.options.entries.map((entry) => [entry.name, resolve(context.options.rootDir, entry.input)])),
+        input: buildInputMap(context),
 
         logLevel: context.options.debug ? "debug" : "info",
 
@@ -434,11 +448,23 @@ const baseRollupOptions = (context: BuildContext<InternalBuildOptions>, type: "b
 // eslint-disable-next-line import/exports-last
 export const getRollupOptions = async (context: BuildContext<InternalBuildOptions>, fileCache: FileCache): Promise<RollupOptions> => {
     const resolvedAliases = resolveAliases(context.pkg, context.options);
+    // When the bundler is rolldown, several rollup plugins are skipped because
+    // rolldown handles those concerns natively (or is incompatible):
+    //   - JsonPlugin           (rolldown parses JSON internally)
+    //   - cjsInteropPlugin     (rolldown emits CJS-interop helpers itself)
+    //   - commonjsPlugin       (rolldown reads CommonJS without a transform)
+    //   - createNodeResolver   (rolldown uses its own resolver pipeline)
+    // Each call site short-circuits on `!isRolldown` rather than encoding this
+    // policy in one place — the plugins have different option shapes and the
+    // surrounding `&&` chain expects a falsy value to drop the entry, so a
+    // central gate would still need per-plugin glue.
     const isRolldown = context.options.bundler === "rolldown";
     const nodeResolver = isRolldown ? undefined : createNodeResolver(context);
 
+    const usePreserveModules = Boolean(context.options.unbundle || context.options.rollup.output?.preserveModules);
+
     const chunking
-        = context.options.unbundle || context.options.rollup.output?.preserveModules
+        = usePreserveModules
             ? {
                 preserveModules: true,
                 preserveModulesRoot: context.options.rollup.output?.preserveModulesRoot ?? context.options.sourceDir,
@@ -615,13 +641,13 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 assetFileNames: "[name]-[hash][extname]",
                 chunkFileNames: createChunkFileNames(
                     () => getOutputExtension(context, "cjs"),
-                    context.options.unbundle || context.options.rollup.output?.preserveModules === true,
+                    usePreserveModules,
                 ),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
                 entryFileNames: createEntryFileNames(
                     (_chunk) => getOutputExtension(context, "cjs"),
-                    context.options.unbundle || context.options.rollup.output?.preserveModules === true,
+                    usePreserveModules,
                 ),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
@@ -656,7 +682,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                 assetFileNames: "[name]-[hash][extname]",
                 chunkFileNames: createChunkFileNames(
                     () => getOutputExtension(context, "esm"),
-                    context.options.unbundle || context.options.rollup.output?.preserveModules === true,
+                    usePreserveModules,
                 ),
                 compact: context.options.minify,
                 dir: resolve(context.options.rootDir, context.options.outDir),
@@ -668,7 +694,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
                         // NOTE: In unbundle mode, inferEntries is skipped so emitCJS may be
                         // undefined even when the package declares a .cjs main field; the
                         // unbundle check must come first to prevent misdetection as ESM-only.
-                        if (context.options.unbundle || context.options.rollup.output?.preserveModules === true) {
+                        if (usePreserveModules) {
                             return "js";
                         }
 
@@ -694,7 +720,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
 
                         return getOutputExtension(context, "esm");
                     },
-                    context.options.unbundle || context.options.rollup.output?.preserveModules === true,
+                    usePreserveModules,
                 ),
                 esModule: useEsModuleMark ?? "if-default-prop",
                 exports: "auto",
@@ -742,17 +768,7 @@ export const getRollupOptions = async (context: BuildContext<InternalBuildOption
             resolveImplicitExternalsPlugin(context),
 
             context.options.rollup.replace
-            && (() => {
-                const replaceConfig = {
-                    sourcemap: context.options.sourcemap,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    ...(context.options.rollup.replace as any),
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    values: (context.options.rollup.replace as any).values ? { ...(context.options.rollup.replace as any).values } : {},
-                };
-
-                return replacePlugin(replaceConfig);
-            })(),
+            && replacePlugin(cloneReplaceOptions(context.options.rollup.replace, { sourcemap: context.options.sourcemap })),
 
             context.options.rollup.alias
             && (() => {
@@ -1204,17 +1220,7 @@ export const getRollupDtsOptions = async (context: BuildContext<InternalBuildOpt
             resolveImplicitExternalsPlugin(context),
 
             context.options.rollup.replace
-            && (() => {
-                const replaceConfig = {
-                    sourcemap: context.options.sourcemap,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    ...(context.options.rollup.replace as any),
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    values: (context.options.rollup.replace as any).values ? { ...(context.options.rollup.replace as any).values } : {},
-                };
-
-                return replacePlugin(replaceConfig);
-            })(),
+            && replacePlugin(cloneReplaceOptions(context.options.rollup.replace, { sourcemap: context.options.sourcemap })),
 
             context.options.rollup.alias
             && aliasPlugin({

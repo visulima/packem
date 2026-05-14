@@ -376,7 +376,7 @@ module.exports = defineConfig({
                 type: Boolean,
             },
             {
-                Description: "Use TypeScript",
+                description: "Use TypeScript",
                 name: "typescript",
                 type: Boolean,
             },

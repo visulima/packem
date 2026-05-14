@@ -9,6 +9,12 @@ import type { BuildEntry, InternalBuildOptions } from "../types";
 import { getRollupBuild } from "./get-rollup";
 
 const DTS_CACHE_KEY = "rollup-dts.json";
+
+// Each DTS pass emits *all* chunks for *one* extension, but only some entries
+// actually want that extension. We can't tell rollup "skip this entry" from
+// inside entryFileNames — so we redirect unwanted entries to a synthetic path
+// under this prefix, then `filterSkipChunksPlugin` deletes those bundle keys
+// in generateBundle before write.
 const SKIP_CHUNK_PREFIX = "__packem_skip__/";
 
 type DtsExtension = "d.cts" | "d.mts" | "d.ts";

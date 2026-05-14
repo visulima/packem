@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Patch tsc-emitted ESM dist/ files to add explicit `.js` / `/index.js` extensions
 // to relative imports so node ESM can resolve them.
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import process from "node:process";
 
@@ -59,6 +59,11 @@ const patchFile = (file) => {
 const root = process.argv[2];
 if (!root) {
     console.error("usage: fix-tsc-esm.js <dist-dir>");
+    process.exit(1);
+}
+
+if (!existsSync(root) || !statSync(root).isDirectory()) {
+    console.error(`fix-tsc-esm.js: not a directory: ${root}`);
     process.exit(1);
 }
 

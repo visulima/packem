@@ -21,6 +21,7 @@ import { patchErrorWithTrace } from "rollup-plugin-import-trace";
 import type { Result as ExecChild } from "tinyexec";
 import { exec } from "tinyexec";
 
+import { resolveBundlerName } from "../bundler/build";
 import { ensureBundlerInstalled, ensureTransformerInstalled } from "../bundler/ensure-installed";
 import autoPreset from "../config/preset/auto";
 import loadPackageJson from "../config/utils/load-package-json";
@@ -681,16 +682,6 @@ const createContext = async (
         context.logger.info("Minification is enabled, the output will be minified");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((context.options as any).json && context.options.minify && (context.options as any).json.preferConst === undefined) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (context.options as any).json = {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...(context.options as any).json,
-            preferConst: false,
-        };
-    }
-
     warnLegacyCJS(context);
 
     const hasTypescript = hasPackageJsonAnyDependency(packageJson as NormalizedPackageJson, ["typescript"]);
@@ -844,7 +835,7 @@ const packem = async (
         // Ensure the bundler runtime and transformer engine are installed before
         // any build/watch work runs. These prompt-install in interactive
         // terminals and fail loudly in CI with a package-manager-aware hint.
-        const requestedBundler = context.options.bundler === "rolldown" ? "rolldown" : "rollup";
+        const requestedBundler = resolveBundlerName(context.options.bundler);
 
         await ensureBundlerInstalled(requestedBundler, rootDirectory, context.logger);
 

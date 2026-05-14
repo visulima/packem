@@ -224,7 +224,7 @@ export interface BuildOptions {
     /** Root directory of the project */
     rootDir: string;
     /** Target runtime environment */
-    runtime?: "browser" | "node";
+    runtime?: Runtime;
     /** Source directory containing the source files */
     sourceDir: string;
     /** Whether to generate source maps */

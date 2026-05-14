@@ -757,7 +757,7 @@ console.log(value);
             // / `console.log(2)`). Check that both source modules contributed
             // their log call to the bundle — that's the feature under test.
             for (const out of [cjs, mjs]) {
-                expect(out).toMatch(/nconsole\.log\((a|1)\)/);
+                expect(out).toMatch(/console\.log\((a|1)\)/);
                 expect(out).toMatch(/console\.log\((b|2)\)/);
             }
         });

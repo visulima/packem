@@ -9,11 +9,13 @@ import { getDtsExtension, getOutputExtension } from "@visulima/packem-share/util
 import type { Pail } from "@visulima/pail";
 import { join, relative, resolve } from "@visulima/path";
 
-import bundlerBuild from "../bundler/build";
+import bundlerBuild, { resolveBundlerName } from "../bundler/build";
 import bundlerBuildTypes from "../bundler/build-types";
 import { buildExe } from "../exe";
 import runWithConcurrency from "../lib/concurrency";
 import type { BuildEntry, InternalBuildOptions } from "../types";
+import cloneReplaceOptions from "../utils/clone-replace-options";
+import isDeclarationOnlyName from "../utils/is-declaration-only";
 import brotliSize from "./utils/brotli-size";
 import groupByKeys from "./utils/group-by-keys";
 import gzipSize from "./utils/gzip-size";
@@ -242,13 +244,6 @@ interface BuilderProperties {
 const DTS_REGEX = /\.d\.[mc]?ts$/;
 
 /**
- * Checks if an entry name indicates a declaration-only file that should not generate JavaScript.
- * @param name Entry name to check
- * @returns True if the name ends with .d (indicating declaration-only)
- */
-const isDeclarationOnlyEntry = (name: string | undefined): boolean => Boolean(name?.endsWith(".d"));
-
-/**
  * Filters out declaration file entries from the entries array.
  * @param entries Array of build entries to filter
  * @returns Filtered entries excluding .d.ts files
@@ -343,13 +338,7 @@ const createAdjustedContext = (
             rollup: {
                 ...baseContext.options.rollup,
                 replace: baseContext.options.rollup.replace
-                    ? {
-                        ...baseContext.options.rollup.replace,
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        values: (baseContext.options.rollup.replace as any).values
-                            ? { ...(baseContext.options.rollup.replace as any).values }
-                            : { ...replaceValues },
-                    }
+                    ? cloneReplaceOptions(baseContext.options.rollup.replace, {}, replaceValues)
                     : false,
             },
         },
@@ -458,7 +447,7 @@ const prepareRollupConfig = async (
                 }
 
                 // Set runtime on context options so hooks can access it
-                const resolvedRuntime = runtime === "undefined" ? undefined : (runtime as "browser" | "node");
+                const resolvedRuntime = runtime === "undefined" ? undefined : (runtime as Runtime);
 
                 environmentRuntimeContext.options.runtime = resolvedRuntime;
 
@@ -521,9 +510,7 @@ const prepareRollupConfig = async (
                 const dtsEntries: BuildEntry[] = [];
 
                 for (const entry of buildEntries) {
-                    const isDeclarationOnlyName = isDeclarationOnlyEntry(entry.name);
-
-                    if (isDeclarationOnlyName) {
+                    if (isDeclarationOnlyName(entry.name)) {
                         if (entry.declaration) {
                             dtsEntries.push(entry);
                         }
@@ -715,7 +702,7 @@ const build = async (context: BuildContext<InternalBuildOptions>, fileCache: Fil
     if (builders.size > 0) {
         await Promise.all(
             Array.from(builders, async ({ context: bContext, fileCache: cache, subDirectory }) =>
-                bundlerBuild(bContext, cache, subDirectory, bContext.options.bundler === "rolldown" ? "rolldown" : "rollup")),
+                bundlerBuild(bContext, cache, subDirectory, resolveBundlerName(bContext.options.bundler))),
         );
     }
 
