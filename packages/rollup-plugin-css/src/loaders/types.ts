@@ -85,8 +85,7 @@ export interface LoaderContext<T = Record<string, unknown>> {
     readonly namedExports: InternalStyleOptions["namedExports"];
 
     /**
-     * Type-safe configuration options passed to the loader instance
-     * @default {}
+     * Type-safe configuration options passed to the loader instance.
      */
     readonly options: T;
 

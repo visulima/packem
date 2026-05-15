@@ -14,6 +14,15 @@ import type { Loader, LoaderContext } from "./types";
 // Type alias for resolver functions
 type ResolverFunction = (id: string, base: string) => Promise<string | false | undefined>;
 
+const QUERY_SUFFIX_REGEXP = /\?[^?]*$/u;
+const SVG_WITH_HASH_OR_QUERY_REGEXP = /[#?][^#?]*\.svg$/u;
+
+// eslint-disable-next-line no-bitwise
+const REQUIRED_FEATURES_MASK = Features.AtApply | Features.JsPluginCompat | Features.ThemeFunction | Features.Utilities;
+
+// eslint-disable-next-line no-bitwise
+const hasFeature = (features: number, mask: number): boolean => (features & mask) !== 0;
+
 /**
  * Tailwind Oxide Root class for managing compilation and scanning
  */
@@ -38,8 +47,9 @@ class TailwindRoot {
     /**
      * Generate CSS for the root file
      */
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     public async generate(content: string, addWatchFile: (file: string) => void): Promise<{ code: string; map: string | undefined } | false> {
-        const inputPath = pathResolve(this.id.replace(/\?.*$/u, ""));
+        const inputPath = pathResolve(this.id.replace(QUERY_SUFFIX_REGEXP, ""));
 
         const addWatchFileWrapper = (file: string) => {
             // Don't watch the input file since it's already a dependency
@@ -48,7 +58,7 @@ class TailwindRoot {
             }
 
             // Scanning `.svg` file containing a `#` or `?` in the path will crash
-            if (/[#?].*\.svg$/u.test(file)) {
+            if (SVG_WITH_HASH_OR_QUERY_REGEXP.test(file)) {
                 return;
             }
 
@@ -63,7 +73,7 @@ class TailwindRoot {
 
             this.buildDependencies.clear();
 
-            this.addBuildDependency(inputPath);
+            await this.addBuildDependency(inputPath);
 
             this.logger.debug({ message: "Setup compiler" });
 
@@ -74,7 +84,7 @@ class TailwindRoot {
                 customCssResolver: this.customCssResolver,
                 customJsResolver: this.customJsResolver,
                 from: this.enableSourceMaps ? this.id : undefined,
-                onDependency: (path) => {
+                onDependency: (path: string) => {
                     addWatchFileWrapper(path);
                     addBuildDependenciesPromises.push(this.addBuildDependency(path));
                 },
@@ -113,20 +123,17 @@ class TailwindRoot {
 
         // Check if compiler has required features using bitwise operations
 
-        const hasRequiredFeatures
-            = this.compiler.features
-            // eslint-disable-next-line no-bitwise
-                & (Features.AtApply | Features.JsPluginCompat | Features.ThemeFunction | Features.Utilities);
+        const hasRequiredFeatures = hasFeature(this.compiler.features, REQUIRED_FEATURES_MASK);
 
         this.logger.debug({
             data: {
                 availableFeatures: this.compiler.features,
-                hasAtApply: Boolean(this.compiler.features & Features.AtApply),
-                hasJsPluginCompat: Boolean(this.compiler.features & Features.JsPluginCompat),
-                hasRequiredFeatures: Boolean(hasRequiredFeatures),
-                hasThemeFunction: Boolean(this.compiler.features & Features.ThemeFunction),
-                hasUtilities: Boolean(this.compiler.features & Features.Utilities),
-                requiredFeatures: Features.AtApply | Features.JsPluginCompat | Features.ThemeFunction | Features.Utilities,
+                hasAtApply: hasFeature(this.compiler.features, Features.AtApply),
+                hasJsPluginCompat: hasFeature(this.compiler.features, Features.JsPluginCompat),
+                hasRequiredFeatures,
+                hasThemeFunction: hasFeature(this.compiler.features, Features.ThemeFunction),
+                hasUtilities: hasFeature(this.compiler.features, Features.Utilities),
+                requiredFeatures: REQUIRED_FEATURES_MASK,
             },
             message: "Feature analysis",
         });
@@ -135,10 +142,10 @@ class TailwindRoot {
             this.logger.debug({
                 data: {
                     missingFeatures: {
-                        AtApply: !(this.compiler.features & Features.AtApply),
-                        JsPluginCompat: !(this.compiler.features & Features.JsPluginCompat),
-                        ThemeFunction: !(this.compiler.features & Features.ThemeFunction),
-                        Utilities: !(this.compiler.features & Features.Utilities),
+                        AtApply: !hasFeature(this.compiler.features, Features.AtApply),
+                        JsPluginCompat: !hasFeature(this.compiler.features, Features.JsPluginCompat),
+                        ThemeFunction: !hasFeature(this.compiler.features, Features.ThemeFunction),
+                        Utilities: !hasFeature(this.compiler.features, Features.Utilities),
                     },
                 },
                 message: "Missing required features, returning false",
@@ -147,139 +154,123 @@ class TailwindRoot {
             return false;
         }
 
-        // eslint-disable-next-line no-bitwise
-        if (this.compiler.features & Features.Utilities) {
+        if (hasFeature(this.compiler.features, Features.Utilities)) {
+            const { scanner } = this;
+
             this.logger.debug({
                 data: {
                     candidatesCountBefore: this.candidates.size,
-                    scannerExists: Boolean(this.scanner),
-                    scannerHasScan: Boolean(this.scanner && typeof this.scanner.scan === "function"),
+                    scannerHasScan: typeof scanner.scan === "function",
                 },
                 message: "Scan for candidates - Utilities feature enabled",
             });
 
             // Use the real scanner to scan for candidates
-            if (this.scanner) {
-                const scannedCandidates = this.scanner.scan();
+            const scannedCandidates = scanner.scan();
 
-                this.logger.debug({
-                    data: {
-                        scannedCandidates: scannedCandidates.slice(0, 10), // Limit to first 10 for readability
-                        scannedCandidatesCount: scannedCandidates.length,
-                    },
-                    message: "Scanner results",
-                });
+            this.logger.debug({
+                data: {
+                    scannedCandidates: scannedCandidates.slice(0, 10), // Limit to first 10 for readability
+                    scannedCandidatesCount: scannedCandidates.length,
+                },
+                message: "Scanner results",
+            });
 
-                for (const candidate of scannedCandidates) {
-                    this.candidates.add(candidate);
-                }
-
-                this.logger.debug({
-                    data: {
-                        candidatesCountAfter: this.candidates.size,
-                        newCandidatesAdded: scannedCandidates.length,
-                    },
-                    message: "Candidates updated",
-                });
-            } else {
-                this.logger.debug({
-                    data: {
-                        hasScanMethod: Boolean(this.scanner && typeof (this.scanner as any).scan === "function"),
-                        scannerType: typeof this.scanner,
-                    },
-                    message: "Scanner not available or missing scan method",
-                });
+            for (const candidate of scannedCandidates) {
+                this.candidates.add(candidate);
             }
+
+            this.logger.debug({
+                data: {
+                    candidatesCountAfter: this.candidates.size,
+                    newCandidatesAdded: scannedCandidates.length,
+                },
+                message: "Candidates updated",
+            });
         } else {
             this.logger.debug({ message: "Utilities feature not enabled, skipping candidate scanning" });
         }
 
-        // eslint-disable-next-line no-bitwise
-        if (this.compiler.features & Features.Utilities) {
-            // Watch individual files found via custom `@source` paths
-            if (this.scanner && this.scanner.files) {
-                this.logger.debug({
-                    data: {
-                        files: this.scanner.files.slice(0, 5), // Limit to first 5 for readability
-                        filesCount: this.scanner.files.length,
-                    },
-                    message: "Watching individual files from scanner",
-                });
+        if (hasFeature(this.compiler.features, Features.Utilities)) {
+            const { scanner } = this;
 
-                for (const file of this.scanner.files) {
-                    addWatchFileWrapper(file);
-                }
-            } else {
-                this.logger.debug({ message: "No individual files to watch from scanner" });
+            // Watch individual files found via custom `@source` paths
+            this.logger.debug({
+                data: {
+                    files: scanner.files.slice(0, 5), // Limit to first 5 for readability
+                    filesCount: scanner.files.length,
+                },
+                message: "Watching individual files from scanner",
+            });
+
+            for (const file of scanner.files) {
+                addWatchFileWrapper(file);
             }
 
             // Watch globs found via custom `@source` paths
-            if (this.scanner && this.scanner.globs) {
+            this.logger.debug({
+                data: {
+                    globs: scanner.globs.slice(0, 3), // Limit to first 3 for readability
+                    globsCount: scanner.globs.length,
+                },
+                message: "Processing globs from scanner",
+            });
+
+            for (const glob of scanner.globs) {
+                if (glob.pattern[0] === "!") {
+                    this.logger.debug({
+                        data: { pattern: glob.pattern },
+                        message: "Skipping negated glob pattern",
+                    });
+                    continue;
+                }
+
+                let relativePath = relative(this.base, glob.base);
+
+                if (relativePath[0] !== ".") {
+                    relativePath = `./${relativePath}`;
+                }
+
+                const watchPath = join(relativePath, glob.pattern);
+
                 this.logger.debug({
-                    data: {
-                        globs: this.scanner.globs.slice(0, 3), // Limit to first 3 for readability
-                        globsCount: this.scanner.globs.length,
-                    },
-                    message: "Processing globs from scanner",
+                    data: { base: glob.base, glob: glob.pattern, watchPath },
+                    message: "Adding glob to watch list",
                 });
 
-                for await (const glob of this.scanner.globs) {
-                    if (glob.pattern[0] === "!") {
-                        this.logger.debug({
-                            data: { pattern: glob.pattern },
-                            message: "Skipping negated glob pattern",
-                        });
-                        continue;
-                    }
+                addWatchFileWrapper(watchPath);
 
-                    let relativePath = relative(this.base, glob.base);
+                const { root } = this.compiler;
 
-                    if (relativePath[0] !== ".") {
-                        relativePath = `./${relativePath}`;
-                    }
+                if (root !== "none" && root !== null) {
+                    const basePath = pathResolve(root.base, root.pattern);
 
-                    const watchPath = join(relativePath, glob.pattern);
+                    try {
+                        // eslint-disable-next-line no-await-in-loop
+                        const stats = await stat(basePath);
 
-                    this.logger.debug({
-                        data: { base: glob.base, glob: glob.pattern, watchPath },
-                        message: "Adding glob to watch list",
-                    });
-
-                    addWatchFileWrapper(watchPath);
-
-                    const { root } = this.compiler;
-
-                    if (root !== "none" && root !== null) {
-                        const basePath = pathResolve(root.base, root.pattern);
-
-                        try {
-                            const stats = await stat(basePath);
-
-                            if (stats.isDirectory()) {
-                                this.logger.debug({
-                                    data: { basePath, isDirectory: stats.isDirectory() },
-                                    message: "Valid source directory confirmed",
-                                });
-                            } else {
-                                const errorMessage = `The path given to \`source(…)\` must be a directory but got \`source(${basePath})\` instead.`;
-
-                                this.logger.debug({
-                                    data: { basePath, error: errorMessage, isDirectory: stats.isDirectory() },
-                                    message: "Invalid source path detected",
-                                });
-                                throw new Error(errorMessage);
-                            }
-                        } catch (error) {
+                        if (stats.isDirectory()) {
                             this.logger.debug({
-                                data: { basePath, error: error instanceof Error ? error.message : String(error) },
-                                message: "Error checking source directory",
+                                data: { basePath, isDirectory: stats.isDirectory() },
+                                message: "Valid source directory confirmed",
                             });
-                            // File doesn't exist or can't be accessed
+                        } else {
+                            const errorMessage = `The path given to \`source(…)\` must be a directory but got \`source(${basePath})\` instead.`;
+
+                            this.logger.debug({
+                                data: { basePath, error: errorMessage, isDirectory: stats.isDirectory() },
+                                message: "Invalid source path detected",
+                            });
+                            throw new Error(errorMessage);
                         }
+                    } catch (error) {
+                        this.logger.debug({
+                            data: { basePath, error: error instanceof Error ? error.message : String(error) },
+                            message: "Error checking source directory",
+                        });
+                        // File doesn't exist or can't be accessed
                     }
                 }
-            } else {
-                this.logger.debug({ message: "No globs to process from scanner" });
             }
         } else {
             this.logger.debug({ message: "Utilities feature not enabled, skipping file watching" });
@@ -310,14 +301,13 @@ class TailwindRoot {
         const map = sourceMap?.raw;
 
         if (map) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const mapObject = map as any;
+            const mapObject = map as { mappings?: string; sources?: string[] };
 
             this.logger.debug({
                 data: {
                     hasMappings: Boolean(mapObject.mappings),
                     mapSize: JSON.stringify(map).length,
-                    sourcesCount: mapObject.sources?.length || 0,
+                    sourcesCount: mapObject.sources?.length ?? 0,
                 },
                 message: "Source map generated",
             });
@@ -346,12 +336,13 @@ class TailwindRoot {
     }
 
     private async requiresBuild(): Promise<boolean> {
-        for await (const [path, mtime] of this.buildDependencies) {
+        for (const [path, mtime] of this.buildDependencies) {
             if (mtime === undefined) {
                 return true;
             }
 
             try {
+                // eslint-disable-next-line no-await-in-loop
                 const stats = await stat(path);
 
                 if (stats.mtimeMs > mtime) {
@@ -433,7 +424,13 @@ const tailwindcssLoader: Loader = {
         // Create or get the Tailwind root for this file
         // Resolve an absolute scanner base: prefer joining the absolute cwd with sourceDir,
         // fall back to sourceDir alone (may be relative) or process.cwd() as last resort.
-        const scannerBase = this.cwd ? this.sourceDir ? join(this.cwd, this.sourceDir) : this.cwd : this.sourceDir || process.cwd();
+        let scannerBase: string;
+
+        if (this.cwd) {
+            scannerBase = this.sourceDir ? join(this.cwd, this.sourceDir) : this.cwd;
+        } else {
+            scannerBase = this.sourceDir ?? process.cwd();
+        }
 
         const root = new TailwindRoot(this.id, scannerBase, this.useSourcemap, customCssResolver, customJsResolver, this.logger);
 
@@ -499,7 +496,7 @@ const tailwindcssLoader: Loader = {
 
         const jsExportResult = generateJsExports({
             css: result.code,
-            cwd: this.cwd as string,
+            cwd: this.cwd,
             dts: this.dts,
             emit: this.emit,
             extract: this.extract,

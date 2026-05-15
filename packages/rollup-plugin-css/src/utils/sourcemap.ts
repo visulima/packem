@@ -39,9 +39,7 @@ class MapModifier {
             return this;
         }
 
-        if (this.map.sources) {
-            this.map.sources = this.map.sources.map((s) => op(s));
-        }
+        this.map.sources = this.map.sources.map((s) => op(s));
 
         return this;
     }
@@ -111,7 +109,7 @@ class MapModifier {
     }
 }
 
-export const getMap = async (code: string, id?: string): Promise<string | undefined> => {
+export const getMap = (code: string, id?: string): string | undefined => {
     const [, data] = mapBlockRe.exec(code) ?? mapLineRe.exec(code) ?? [];
 
     if (!data) {

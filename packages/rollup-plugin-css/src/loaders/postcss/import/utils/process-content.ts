@@ -9,13 +9,8 @@ const runPostcss = async (
     filename: string,
     plugins: AcceptedPlugin[],
     parsers: ProcessOptions["parser"][],
-    index?: number,
+    index: number = 0,
 ): Promise<LazyResult> => {
-    if (index === undefined) {
-        // eslint-disable-next-line no-param-reassign
-        index = 0;
-    }
-
     if (plugins.length === 0) {
         plugins.push(postcssNoop());
     }
@@ -27,16 +22,13 @@ const runPostcss = async (
             parser: parsers[index],
         })
         .catch(async (error: unknown) => {
-            // If there's an error, try the next parser
-            // eslint-disable-next-line no-param-reassign,no-plusplus
-            (index as number)++;
+            const nextIndex = index + 1;
 
-            // If there are no parsers left, throw it
-            if (index === parsers.length) {
+            if (nextIndex === parsers.length) {
                 throw error;
             }
 
-            return await runPostcss(postcss, content, filename, plugins, parsers, index);
+            return await runPostcss(postcss, content, filename, plugins, parsers, nextIndex);
         });
 };
 

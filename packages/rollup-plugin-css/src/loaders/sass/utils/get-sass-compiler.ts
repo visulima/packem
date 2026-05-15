@@ -34,8 +34,8 @@ const getSassCompiler = async (
     return (sassOptions: (sass.StringOptions<"sync"> | sassEmbedded.StringOptions<"sync">) & { data: string }) => {
         const { data, ...rest } = sassOptions;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return resolvedCompiler(data as string, rest as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+        return resolvedCompiler(data, rest as any);
     };
 };
 

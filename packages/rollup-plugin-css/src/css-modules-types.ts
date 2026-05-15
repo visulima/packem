@@ -97,7 +97,8 @@ const cssModulesTypesPlugin = (options: StyleOptions, rootDirectory: string): Pl
             }
 
             // Extract type information from module metadata
-            const { types } = this.getModuleInfo(id)?.meta.styles ?? {};
+            const styles = this.getModuleInfo(id)?.meta.styles as { types?: string } | undefined;
+            const types = styles?.types;
 
             if (types === undefined) {
                 return undefined;
@@ -105,7 +106,7 @@ const cssModulesTypesPlugin = (options: StyleOptions, rootDirectory: string): Pl
 
             // Generate and write TypeScript declaration file
             if (await isAccessible(id)) {
-                await writeFile(`${id}.d.ts`, `${dtsComment}\n${types as string}`);
+                await writeFile(`${id}.d.ts`, `${dtsComment}\n${types}`);
 
                 this.info({
                     message: `Generated types for ${normalize(id).replace(`${rootDirectory}/`, "")}`,

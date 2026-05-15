@@ -44,7 +44,6 @@ const loadImportContent = async (
     options: ImportOptions & { root: string },
     state: State,
     postcss: Postcss,
-    // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Promise<Stylesheet> => {
     const { conditions, from, node } = stmt;
 
@@ -61,10 +60,8 @@ const loadImportContent = async (
 
         // save imported files to skip them next time
 
-        if (!state.importedFiles[filename]) {
-            // eslint-disable-next-line no-param-reassign
-            state.importedFiles[filename] = {};
-        }
+        // eslint-disable-next-line no-param-reassign
+        state.importedFiles[filename] ??= {};
 
         // eslint-disable-next-line no-param-reassign
         state.importedFiles[filename][stmtDuplicateCheckKey] = true;
@@ -104,10 +101,8 @@ const loadImportContent = async (
         if (!hasImport) {
             // save hash files to skip them next time
 
-            if (!state.hashFiles[content]) {
-                // eslint-disable-next-line no-param-reassign
-                state.hashFiles[content] = {};
-            }
+            // eslint-disable-next-line no-param-reassign
+            state.hashFiles[content] ??= {};
 
             // eslint-disable-next-line no-param-reassign
             state.hashFiles[content][stmtDuplicateCheckKey] = true;
@@ -200,19 +195,19 @@ const parseStyles = async (
         // Lazy because the current stylesheet might not contain any further @import statements
         const jobs: Promise<void>[] = [];
 
-        for await (const stmt of statements) {
+        for (const stmt of statements) {
             if (!isImportStatement(stmt) || !isProcessableURL(stmt.uri)) {
                 continue;
             }
 
             // eslint-disable-next-line unicorn/no-array-callback-reference
-            if (options.filter && !options.filter((stmt as ImportStatement).uri)) {
+            if (options.filter && !options.filter(stmt.uri)) {
                 // rejected by filter
 
                 continue;
             }
 
-            jobs.push(resolveImportId(options, result, stmt as ImportStatement, state, postcss));
+            jobs.push(resolveImportId(options, result, stmt, state, postcss));
         }
 
         if (jobs.length > 0) {
@@ -228,8 +223,8 @@ const parseStyles = async (
             if (charset && stmt.stylesheet.charset && charset.params.toLowerCase() !== stmt.stylesheet.charset.params.toLowerCase()) {
                 throw stmt.stylesheet.charset.error(
                     "Incompatible @charset statements:\n"
-                    + `  ${stmt.stylesheet.charset.params} specified in ${stmt.stylesheet.charset.source?.input.file}\n`
-                    + `  ${charset.params} specified in ${charset.source?.input.file}`,
+                    + `  ${stmt.stylesheet.charset.params} specified in ${stmt.stylesheet.charset.source?.input.file ?? "<unknown>"}\n`
+                    + `  ${charset.params} specified in ${charset.source?.input.file ?? "<unknown>"}`,
                 );
             } else if (!charset && stmt.stylesheet.charset) {
                 charset = stmt.stylesheet.charset;

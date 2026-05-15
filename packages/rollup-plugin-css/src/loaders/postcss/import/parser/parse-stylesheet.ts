@@ -129,7 +129,7 @@ const consumeLayers = (nodes: ChildNode[], conditions: Condition[], cursor: numb
 
         const next = nodes[index + 1];
 
-        if (next && next.type === "atrule" && IS_LAYER_REGEX.test(next.name) && !next.nodes) {
+        if (next?.type === "atrule" && IS_LAYER_REGEX.test(next.name) && !next.nodes) {
             continue;
         }
 
@@ -217,8 +217,8 @@ const parseStylesheet = (result: Result, styles: Document | Root, importingNode:
             if (stylesheet.charset && subStylesheet.charset && stylesheet.charset.params.toLowerCase() !== subStylesheet.charset.params.toLowerCase()) {
                 throw subStylesheet.charset.error(
                     "Incompatible @charset statements:\n"
-                    + `  ${subStylesheet.charset.params} specified in ${subStylesheet.charset.source?.input.file}\n`
-                    + `  ${stylesheet.charset.params} specified in ${stylesheet.charset.source?.input.file}`,
+                    + `  ${subStylesheet.charset.params} specified in ${subStylesheet.charset.source?.input.file ?? "<unknown>"}\n`
+                    + `  ${stylesheet.charset.params} specified in ${stylesheet.charset.source?.input.file ?? "<unknown>"}`,
                 );
             } else if (!stylesheet.charset && subStylesheet.charset) {
                 stylesheet.charset = subStylesheet.charset;

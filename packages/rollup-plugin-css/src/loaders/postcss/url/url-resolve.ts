@@ -17,7 +17,7 @@ export interface UrlFile {
 /** URL resolver */
 export type UrlResolve = (inputUrl: string, baseDirectories: string[]) => Promise<UrlFile>;
 
-export const urlResolve: UrlResolve = async (inputUrl: string, baseDirectories: string[]): Promise<UrlFile> => {
+export const urlResolve: UrlResolve = (inputUrl: string, baseDirectories: string[]): Promise<UrlFile> => {
     const urlObject = new URL(inputUrl, "file://");
     const fragmentIdentifier = urlObject.hash ? urlObject.hash.slice(1) : "";
     const url = inputUrl.split("?")[0] ?? "";
@@ -35,9 +35,9 @@ export const urlResolve: UrlResolve = async (inputUrl: string, baseDirectories: 
     const from = resolve(paths, { baseDirs: baseDirectories, caller: "URL resolver" });
     const urlQuery = new URLSearchParams(urlObject.search).toString();
 
-    return {
+    return Promise.resolve({
         from,
         source: readFileSync(from, { buffer: true }),
         urlQuery: (urlQuery ? `?${urlQuery}` : "") + (fragmentIdentifier ? `#${fragmentIdentifier}` : ""),
-    };
+    });
 };

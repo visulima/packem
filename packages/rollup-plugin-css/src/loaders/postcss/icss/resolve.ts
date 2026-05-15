@@ -13,7 +13,8 @@ const resolve = async (
 ): Promise<Record<string, string>> => {
     const imports: Record<string, string> = {};
 
-    for await (const [url, values] of Object.entries(icssImports)) {
+    for (const [url, values] of Object.entries(icssImports)) {
+        // eslint-disable-next-line no-await-in-loop
         const exports = await load(url, file, extensions, processor, options);
 
         for (const [k, v] of Object.entries(values)) {

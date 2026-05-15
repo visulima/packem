@@ -1,14 +1,14 @@
-/* eslint-disable vitest/require-mock-type-parameters */
 import { describe, expect, it, vi } from "vitest";
 
 import LoaderManager from "../../../../src/loaders/loader-manager";
+import type { LoaderContext } from "../../../../src/loaders/types";
 
 // Mock rollup logger that matches the RollupLogger interface
 const mockRollupLogger = {
-    debug: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
+    debug: vi.fn<(...args: unknown[]) => void>(),
+    error: vi.fn<(...args: unknown[]) => void>(),
+    info: vi.fn<(...args: unknown[]) => void>(),
+    warn: vi.fn<(...args: unknown[]) => void>(),
 };
 
 describe("loader", () => {
@@ -24,12 +24,12 @@ describe("loader", () => {
                 extensions: [],
                 extract: "",
                 inject: false,
+                inline: false,
             },
         });
 
         await expect(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            loaders.process({ code: "" }, { id: "file.less" } as any),
+            loaders.process({ code: "" }, { id: "file.less" } as unknown as LoaderContext),
         ).resolves.toStrictEqual({ code: "" });
     });
 });

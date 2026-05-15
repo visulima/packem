@@ -6,5 +6,5 @@
         "isolatedModules": false,
         "verbatimModuleSyntax": false
     },
-    "include": ["src/**/*", "*.d.ts"]
+    "include": ["src/**/*", "*.d.ts", "__tests__/**/*"]
 }

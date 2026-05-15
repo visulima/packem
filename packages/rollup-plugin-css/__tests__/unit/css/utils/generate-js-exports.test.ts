@@ -165,7 +165,7 @@ describe(generateJsExports, () => {
 
             const result = generateJsExports({
                 ...baseOptions,
-                inject: { insertAt: "top" },
+                inject: { insertAt: "top" } as unknown as { container?: string },
             });
 
             expect(result.code).toContain("import { cssStyleInject as");
@@ -189,7 +189,7 @@ describe(generateJsExports, () => {
         it("should handle custom injection function", () => {
             expect.assertions(1);
 
-            const customInject = (varname: string, id: string, output: string[]) => `console.log("Injecting ${varname} from ${id}");`;
+            const customInject = (varname: string, id: string, _output: string[]) => `console.log("Injecting ${varname} from ${id}");`;
 
             const result = generateJsExports({
                 ...baseOptions,
@@ -261,7 +261,7 @@ describe(generateJsExports, () => {
                     modulesExports,
                     supportModules: true,
                 });
-            }).toThrowError("`inject` keyword is reserved when using `inject.treeshakeable` option");
+            }).toThrow("`inject` keyword is reserved when using `inject.treeshakeable` option");
         });
     });
 });

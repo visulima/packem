@@ -4,10 +4,10 @@ import { ensurePCSSOption } from "../../../../src/utils/options";
 
 // Mock RollupLogger
 const mockLogger = {
-    debug: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
+    debug: vi.fn<(...args: unknown[]) => void>(),
+    error: vi.fn<(...args: unknown[]) => void>(),
+    info: vi.fn<(...args: unknown[]) => void>(),
+    warn: vi.fn<(...args: unknown[]) => void>(),
 };
 
 describe("option", () => {
@@ -22,10 +22,9 @@ describe("option", () => {
 
         try {
             await ensurePCSSOption("pumpinizer", "plugin", __dirname, mockLogger);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
+        } catch (error: unknown) {
             // eslint-disable-next-line vitest/no-conditional-expect
-            expect(error.message).toBe("Unable to load PostCSS plugin `pumpinizer`");
+            expect((error as Error).message).toBe("Unable to load PostCSS plugin `pumpinizer`");
         }
 
         expect(consoleDebugMock).toHaveBeenCalledWith("Cannot find module 'pumpinizer'", {

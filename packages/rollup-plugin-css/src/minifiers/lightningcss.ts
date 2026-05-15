@@ -35,16 +35,16 @@ const lightningcssMinifier: Minifier<NonNullable<InternalStyleOptions["lightning
      * Processes CSS content using LightningCSS for optimization.
      *
      * This handler:
-     * 1. Configures LightningCSS with browser targets and options
-     * 2. Transforms CSS with minification enabled
-     * 3. Reports any transformation warnings
-     * 4. Returns optimized CSS with source maps
-     * @param data Extracted CSS data containing content and metadata
-     * @param sourceMap Source map configuration from loader context
-     * @param options LightningCSS-specific transformation options
-     * @returns Promise resolving to optimized CSS data
+     * 1. Configures LightningCSS with browser targets and options.
+     * 2. Transforms CSS with minification enabled.
+     * 3. Reports any transformation warnings.
+     * 4. Returns optimized CSS with source maps.
+     * @param data Extracted CSS data containing content and metadata.
+     * @param sourceMap Source map configuration from loader context.
+     * @param options LightningCSS-specific transformation options.
+     * @returns Promise resolving to optimized CSS data.
      */
-    async handler(
+    handler(
         data: ExtractedData,
         sourceMap: LoaderContext["sourceMap"],
         options: NonNullable<InternalStyleOptions["lightningcss"]>,
@@ -66,11 +66,11 @@ const lightningcssMinifier: Minifier<NonNullable<InternalStyleOptions["lightning
             this.logger.warn({ message: `warnings when minifying css:\n${result.warnings.map((w) => w.message).join("\n")}` });
         }
 
-        return {
+        return Promise.resolve({
             ...data,
             css: result.code.toString(),
             map: "map" in result ? result.map?.toString() : undefined,
-        };
+        });
     },
     name: "lightningcss",
 };

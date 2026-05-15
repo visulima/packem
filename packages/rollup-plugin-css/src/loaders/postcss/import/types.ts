@@ -59,7 +59,7 @@ export interface ImportOptions {
      * want, just set this option to false to disable it.
      * @default true
      */
-    skipDuplicates?: boolean | undefined;
+    skipDuplicates?: boolean;
 
     /**
      * By default, css-import warns when an empty file is imported.

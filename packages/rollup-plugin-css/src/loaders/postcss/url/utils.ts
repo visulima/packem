@@ -4,8 +4,9 @@ import valueParser from "postcss-value-parser";
 
 const urlFunctionRe = /^url$/i;
 const imageSetFunctionRe = /^(?:-webkit-)?image-set$/i;
+const declUrlRe = /(?:url|(?:-webkit-)?image-set)\(/i;
 
-export const isDeclWithUrl = (decl: Declaration): boolean => /(?:url|(?:-webkit-)?image-set)\(/i.test(decl.value);
+export const isDeclWithUrl = (decl: Declaration): boolean => declUrlRe.test(decl.value);
 
 export const walkUrls = (parsed: ParsedValue, callback: (url: string, node?: Node) => void): void => {
     // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -19,7 +20,7 @@ export const walkUrls = (parsed: ParsedValue, callback: (url: string, node?: Nod
             const [urlNode] = nodes;
             const url = urlNode?.type === "string" ? urlNode.value : valueParser.stringify(nodes);
 
-            callback(url.replaceAll(/^\s+|\s+$/g, ""), urlNode);
+            callback(url.trim(), urlNode);
 
             return;
         }
@@ -27,7 +28,7 @@ export const walkUrls = (parsed: ParsedValue, callback: (url: string, node?: Nod
         if (imageSetFunctionRe.test(node.value)) {
             for (const nNode of node.nodes) {
                 if (nNode.type === "string") {
-                    callback(nNode.value.replaceAll(/^\s+|\s+$/g, ""), nNode);
+                    callback(nNode.value.trim(), nNode);
 
                     continue;
                 }
@@ -37,7 +38,7 @@ export const walkUrls = (parsed: ParsedValue, callback: (url: string, node?: Nod
                     const [urlNode] = nodes;
                     const url = urlNode?.type === "string" ? urlNode.value : valueParser.stringify(nodes);
 
-                    callback(url.replaceAll(/^\s+|\s+$/g, ""), urlNode);
+                    callback(url.trim(), urlNode);
                 }
             }
         }

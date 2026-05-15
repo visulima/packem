@@ -195,7 +195,7 @@ export interface StyleOptions {
     dts?: boolean;
 
     /** Files to exclude from processing */
-    exclude?: ReadonlyArray<RegExp | string> | RegExp | string | undefined;
+    exclude?: ReadonlyArray<RegExp | string> | RegExp | string;
 
     /**
      * Plugin will process files ending with these extensions
@@ -204,7 +204,7 @@ export interface StyleOptions {
     extensions?: string[];
 
     /** Files to include for processing */
-    include?: ReadonlyArray<RegExp | string> | RegExp | string | undefined;
+    include?: ReadonlyArray<RegExp | string> | RegExp | string;
 
     /** Options for Less loader */
     less?: LESSLoaderOptions;

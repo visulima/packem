@@ -35,8 +35,8 @@ const loader: Loader = {
      * @param payload.map Existing source map (if any)
      * @returns Processed payload with source map stripped from code and extracted as separate map
      */
-    async process({ code, map }) {
-        return { code: stripMap(code), map: await getMap(code, this.id) ?? map };
+    process({ code, map }) {
+        return { code: stripMap(code), map: getMap(code, this.id) ?? map };
     },
 };
 
