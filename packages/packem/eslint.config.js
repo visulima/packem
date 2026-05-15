@@ -44,4 +44,16 @@ export default createConfig(
             "jsonc/no-comments": "off",
         },
     },
+    {
+        // Integration tests construct package.json fixtures as inline object
+        // literals. Conditional `exports` resolution is order-sensitive: Node/TS
+        // pick the first matching condition by key order, so `types` must precede
+        // `default`. perfectionist/sort-objects would alphabetize these and
+        // silently break type resolution (default < types) — same rationale the
+        // base preset uses to disable jsonc/sort-keys for real package.json files.
+        files: ["**/__tests__/**"],
+        rules: {
+            "perfectionist/sort-objects": "off",
+        },
+    },
 );

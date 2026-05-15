@@ -2358,7 +2358,6 @@ export const test = "this should be in final bundle, test2 string";`,
             await writeFile(`${temporaryDirectoryPath}/src/is-color-supported.server.ts`, `export const server = "server";`);
 
             await createTsConfig(temporaryDirectoryPath);
-            /* eslint-disable perfectionist/sort-objects */
             await createPackageJson(temporaryDirectoryPath, {
                 devDependencies: {
                     typescript: "*",
@@ -2419,7 +2418,6 @@ export const test = "this should be in final bundle, test2 string";`,
                 browser: "./dist/is-color-supported.browser.mjs",
                 types: "dist/is-color-supported.server.d.ts",
             });
-            /* eslint-enable perfectionist/sort-objects */
             await createPackemConfig(temporaryDirectoryPath, {
                 config: {
                     cjsInterop: true,
@@ -2845,7 +2843,7 @@ throw new Error('line 9');
             // first matching condition in object order, so if default comes first we'd get
             // `./index.js` back even when asking for the types condition.
             JSON.stringify({
-                exports: { ".": { default: "./index.js", types: "./index.d.ts" } },
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
                 name: "fake-bundled-devdep",
                 types: "./index.d.ts",
@@ -2869,8 +2867,8 @@ throw new Error('line 9');
             },
             exports: {
                 ".": {
-                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
-                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                    require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
                 },
             },
             main: "./dist/index.cjs",
@@ -2907,7 +2905,7 @@ throw new Error('line 9');
         await writeFile(
             `${usedDepRoot}/package.json`,
             JSON.stringify({
-                exports: { ".": { default: "./index.js", types: "./index.d.ts" } },
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
                 name: "fake-used-devdep",
                 types: "./index.d.ts",
@@ -2927,7 +2925,7 @@ throw new Error('line 9');
         await writeFile(
             `${unusedDepRoot}/package.json`,
             JSON.stringify({
-                exports: { ".": { default: "./index.js", types: "./index.d.ts" } },
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
                 name: "fake-unused-devdep",
                 types: "./index.d.ts",
@@ -2953,8 +2951,8 @@ throw new Error('line 9');
             },
             exports: {
                 ".": {
-                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
-                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                    require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
                 },
             },
             main: "./dist/index.cjs",
@@ -2991,7 +2989,7 @@ throw new Error('line 9');
         await writeFile(
             `${peerDepRoot}/package.json`,
             JSON.stringify({
-                exports: { ".": { default: "./index.js", types: "./index.d.ts" } },
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
                 name: "fake-peer-devdep",
                 types: "./index.d.ts",
@@ -3015,8 +3013,8 @@ throw new Error('line 9');
             },
             exports: {
                 ".": {
-                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
-                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                    require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
                 },
             },
             main: "./dist/index.cjs",
@@ -3094,8 +3092,8 @@ throw new Error('line 9');
             },
             exports: {
                 ".": {
-                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
-                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                    require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
                 },
             },
             main: "./dist/index.cjs",
@@ -3138,7 +3136,7 @@ throw new Error('line 9');
         await writeFile(
             `${devDepRoot}/package.json`,
             JSON.stringify({
-                exports: { ".": { default: "./index.js", types: "./index.d.ts" } },
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
                 name: "fake-dual-dep",
                 types: "./index.d.ts",
@@ -3162,8 +3160,8 @@ throw new Error('line 9');
             },
             exports: {
                 ".": {
-                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
-                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                    require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
                 },
             },
             main: "./dist/index.cjs",
@@ -3230,8 +3228,8 @@ throw new Error('line 9');
             },
             exports: {
                 ".": {
-                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
-                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                    require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
                 },
             },
             main: "./dist/index.cjs",
@@ -3268,7 +3266,7 @@ throw new Error('line 9');
         await writeFile(
             `${bundledRoot}/package.json`,
             JSON.stringify({
-                exports: { ".": { default: "./index.js", types: "./index.d.ts" } },
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
                 name: "fake-bundled-with-transitive",
                 types: "./index.d.ts",
@@ -3302,8 +3300,8 @@ throw new Error('line 9');
             },
             exports: {
                 ".": {
-                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
-                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                    require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
                 },
             },
             main: "./dist/index.cjs",
@@ -3354,7 +3352,7 @@ throw new Error('line 9');
         await writeFile(
             `${sharedPackageDirectory}/../package.json`,
             JSON.stringify({
-                exports: { ".": { default: "./dist/index.js", types: "./dist/index.d.ts" } },
+                exports: { ".": { types: "./dist/index.d.ts", default: "./dist/index.js" } },
                 main: "./dist/index.js",
                 name: "fake-workspace-dep",
                 types: "./dist/index.d.ts",
@@ -3379,8 +3377,8 @@ throw new Error('line 9');
             },
             exports: {
                 ".": {
-                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
-                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                    require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
                 },
             },
             main: "./dist/index.cjs",
@@ -3422,7 +3420,7 @@ throw new Error('line 9');
             devDependencies: { typescript: "*" },
             exports: {
                 ".": {
-                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
                 },
             },
             main: "./dist/index.mjs",
@@ -3468,7 +3466,7 @@ throw new Error('line 9');
         await writeFile(
             `${mergedDepRoot}/package.json`,
             JSON.stringify({
-                exports: { ".": { default: "./index.js", types: "./index.d.ts" } },
+                exports: { ".": { types: "./index.d.ts", default: "./index.js" } },
                 main: "./index.js",
                 name: "fake-merged-devdep",
                 types: "./index.d.ts",
@@ -3505,8 +3503,8 @@ throw new Error('line 9');
             },
             exports: {
                 ".": {
-                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
-                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                    require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
                 },
             },
             main: "./dist/index.cjs",
@@ -3565,8 +3563,8 @@ throw new Error('line 9');
             devDependencies: { typescript: "*" },
             exports: {
                 ".": {
-                    import: { default: "./dist/index.mjs", types: "./dist/index.d.mts" },
-                    require: { default: "./dist/index.cjs", types: "./dist/index.d.cts" },
+                    import: { types: "./dist/index.d.mts", default: "./dist/index.mjs" },
+                    require: { types: "./dist/index.d.cts", default: "./dist/index.cjs" },
                 },
             },
             main: "./dist/index.cjs",
