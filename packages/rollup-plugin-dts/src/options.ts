@@ -531,7 +531,13 @@ export const resolveOptions = ({
     const tsgo = normalizeTsgo(tsgoOption);
     const oxcResolved = normalizeOxc(oxcOption, compilerOptions, vue, tsgo, tsMacro);
 
-    const emitJs = emitJsOption ?? (compilerOptions.checkJs ?? compilerOptions.allowJs ?? false);
+    // `checkJs` and `allowJs` independently justify emitting declarations for
+    // `.js` sources, so this is an OR — not a `??` precedence chain. An explicit
+    // `checkJs: false` (e.g. a consumer disabling JS type-checking to "avoid
+    // extra work") must not veto `allowJs: true`, which still requires `.js`
+    // declarations to be emitted.
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- `||` is intentional: this is boolean OR semantics (either flag enables JS emit), not a null/undefined fallback; `??` would let an explicit `checkJs: false` veto `allowJs: true`.
+    const emitJs = emitJsOption ?? Boolean(compilerOptions.checkJs || compilerOptions.allowJs);
 
     validateTsgoCompatibility(tsgo, vue, tsMacro, oxcResolved);
     validateOxcCompatibility(oxcResolved, vue, tsMacro);
