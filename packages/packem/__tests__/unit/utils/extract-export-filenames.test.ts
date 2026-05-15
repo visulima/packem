@@ -181,12 +181,10 @@ describe(extractExportFilenames, () => {
                 ".": {
                     default: {
                         types: "./dist/create-bundler.d.ts",
-                        // eslint-disable-next-line perfectionist/sort-objects
                         default: "./dist/create-bundler.js",
                     },
                     import: {
                         types: "./dist/create-bundler.d.mts",
-                        // eslint-disable-next-line perfectionist/sort-objects
                         default: "./dist/create-bundler.mjs",
                     },
                     node: {
@@ -195,7 +193,6 @@ describe(extractExportFilenames, () => {
                     },
                     require: {
                         types: "./dist/create-bundler.d.cts",
-                        // eslint-disable-next-line perfectionist/sort-objects
                         default: "./dist/create-bundler.cjs",
                     },
                 },
